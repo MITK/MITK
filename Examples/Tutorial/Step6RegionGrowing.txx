@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,23 +35,23 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   mitk::Geometry3D* geometry = step6->m_FirstImage->GetGeometry();
 
   // create itk::CurvatureFlowImageFilter for smoothing and set itkImage as input
-  typedef itk::CurvatureFlowImageFilter< ImageType, InternalImageType > 
+  typedef itk::CurvatureFlowImageFilter< ImageType, InternalImageType >
     CurvatureFlowFilter;
   typename CurvatureFlowFilter::Pointer smoothingFilter = CurvatureFlowFilter::New();
-  
+
   smoothingFilter->SetInput( itkImage );
   smoothingFilter->SetNumberOfIterations( 4 );
   smoothingFilter->SetTimeStep( 0.0625 );
- 
+
   // create itk::ConnectedThresholdImageFilter and set filtered image as input
   typedef itk::ConnectedThresholdImageFilter< InternalImageType, ImageType > RegionGrowingFilterType;
   typedef typename RegionGrowingFilterType::IndexType IndexType;
   typename RegionGrowingFilterType::Pointer regGrowFilter = RegionGrowingFilterType::New();
-  
+
   regGrowFilter->SetInput( smoothingFilter->GetOutput() );
   regGrowFilter->SetLower( step6->GetThresholdMin() );
   regGrowFilter->SetUpper( step6->GetThresholdMax() );
-  
+
   // convert the points in the PointSet m_Seeds (in world-coordinates) to
   // "index" values, i.e. points in pixel coordinates, and add these as seeds
   // to the RegionGrower
@@ -62,7 +62,7 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
     geometry->WorldToIndex(pit.Value(), seedIndex);
     regGrowFilter->AddSeed( seedIndex );
   }
-  
+
   regGrowFilter->GetOutput()->Update();
   mitk::Image::Pointer mitkImage = mitk::Image::New();
   mitk::CastToMitkImage(regGrowFilter->GetOutput(), mitkImage);
@@ -84,7 +84,7 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   levelwindow.SetAuto( mitkImage );
   levWinProp->SetLevelWindow( levelwindow );
   step6->m_ResultNode->SetProperty( "levelwindow", levWinProp );
-  
+
   step6->m_ResultImage = static_cast<mitk::Image*>(step6->m_ResultNode->GetData());
 }
 

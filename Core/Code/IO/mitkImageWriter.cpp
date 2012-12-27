@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -176,7 +176,7 @@ void mitk::ImageWriter::GenerateData()
   fclose(tempFile);
   remove(m_FileName.c_str());
 
-  // Creating clone of input image, since i might change the geometry 
+  // Creating clone of input image, since i might change the geometry
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput())->Clone();
 
   // Check if geometry information will be lost
@@ -185,13 +185,13 @@ void mitk::ImageWriter::GenerateData()
      if (!input->GetGeometry()->Is2DConvertable())
      {
         MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might consider using Convert2Dto3DImageFilter before saving.";
-        
+
         // set matrix to identity
         mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
         affTrans->SetIdentity();
         mitk::Vector3D spacing = input->GetGeometry()->GetSpacing();
         mitk::Point3D origin = input->GetGeometry()->GetOrigin();
-        input->GetGeometry()->SetIndexToWorldTransform(affTrans); 
+        input->GetGeometry()->SetIndexToWorldTransform(affTrans);
         input->GetGeometry()->SetSpacing(spacing);
         input->GetGeometry()->SetOrigin(origin);
      }

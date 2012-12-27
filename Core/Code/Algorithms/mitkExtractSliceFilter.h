@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,9 @@ namespace mitk
     mitkNewMacro1Param(Self, vtkImageReslice*);
 
     /** \brief Set the axis where to reslice at.*/
-    void SetWorldGeometry(const Geometry2D* geometry ){ this->m_WorldGeometry = geometry; }
+    void SetWorldGeometry(const Geometry2D* geometry ){
+       this->m_WorldGeometry = geometry;
+       this->Modified(); }
 
     /** \brief Set the time step in the 4D volume */
     void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
@@ -96,8 +98,8 @@ namespace mitk
     void SetOutputExtentZDirection(int zMin, int zMax) { this->m_ZMin = zMin; this->m_ZMax = zMax; }
 
     /** \brief Get the bounding box of the slice [xMin, xMax, yMin, yMax, zMin, zMax]
-    * The method uses the input of the filter to calculate the bounds. 
-    * It is recommended to use 
+    * The method uses the input of the filter to calculate the bounds.
+    * It is recommended to use
     * GetClippedPlaneBounds(const Geometry3D*, const PlaneGeometry*, vtkFloatingPointType*)
     * if you are not sure about the input.
     */

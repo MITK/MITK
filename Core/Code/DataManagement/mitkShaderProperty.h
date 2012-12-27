@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,16 +38,16 @@ public:
     public:
     std::string name;
   };
-  
+
   mitkClassMacro( ShaderProperty, EnumerationProperty );
-  
+
   itkNewMacro(ShaderProperty);
 
-  
+
   mitkNewMacro1Param(ShaderProperty, const IdType&);
-  
+
   mitkNewMacro1Param(ShaderProperty, const std::string&);
-  
+
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.
@@ -60,28 +60,28 @@ public:
   using BaseProperty::operator=;
 
 protected:
-  
+
   std::list<Element> shaderList;
 
   /**
    * Constructor. Sets the representation to a default value of surface(2)
    */
   ShaderProperty( );
-  
+
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the scalar mode is set to default (0).
    * @param value the integer representation of the scalar mode
    */
   ShaderProperty( const IdType& value );
-  
+
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the representation is set to default (0).
    * @param value the string representation of the scalar mode
    */
   ShaderProperty( const std::string& value );
-  
+
    /**
    * this function is overridden as protected, so that the user may not add
    * additional invalid scalar mode types.
@@ -101,7 +101,7 @@ private:
   ShaderProperty& operator=(const ShaderProperty&);
 
   virtual bool Assign(const BaseProperty &property);
-  
+
 };
 
 #ifdef _MSC_VER

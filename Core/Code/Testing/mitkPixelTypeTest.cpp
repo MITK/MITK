@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   {
 
     {
-      mitk::PixelType ptype2( ptype); 
+      mitk::PixelType ptype2( ptype);
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetTypeId() == typeid(int), "ptype2( ptype)- GetTypeId()");
       MITK_TEST_CONDITION( ptype2.GetPixelTypeId() == ptype.GetPixelTypeId(), "ptype2( ptype)-GetPixelTypeId(");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBpe() == 8*sizeof(int)*5, "ptype2( ptype)-GetBpe()");
@@ -72,7 +72,7 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
     }
 
     {
-      mitk::PixelType ptype2 = ptype; 
+      mitk::PixelType ptype2 = ptype;
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetTypeId() == typeid(int), "ptype2 = ptype- GetTypeId()");
       MITK_TEST_CONDITION( ptype2.GetPixelTypeId() == ptype.GetPixelTypeId(), "ptype2 = ptype- GetPixelTypeId(");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBpe() == 8*sizeof(int)*5, "ptype2 = ptype- GetBpe()");
@@ -82,13 +82,13 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
     }
 
     {
-      mitk::PixelType ptype2 = ptype; 
+      mitk::PixelType ptype2 = ptype;
       MITK_TEST_CONDITION_REQUIRED( ptype == ptype2, "operator ==");
       //MITK_TEST_CONDITION_REQUIRED( ptype == typeid(int), "operator ==");
       //mitk::PixelType ptype3 = mitk::MakePixelType<char, char ,5>;
       //MITK_TEST_CONDITION_REQUIRED( ptype != ptype3, "operator !=");
-      //MITK_TEST_CONDITION_REQUIRED( *ptype3 != typeid(int), "operator !="); 
-    }  
+      //MITK_TEST_CONDITION_REQUIRED( *ptype3 != typeid(int), "operator !=");
+    }
   }
 
   // test instantiation

@@ -1,5 +1,5 @@
 # - Find Eclipse
-# The following variables are set if Eclipse is found. 
+# The following variables are set if Eclipse is found.
 #
 #  Eclipse_DIR      - the path to the Eclipse base directory.
 

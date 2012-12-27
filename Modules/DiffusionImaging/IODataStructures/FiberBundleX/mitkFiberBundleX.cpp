@@ -51,6 +51,7 @@ using namespace std;
 mitk::FiberBundleX::FiberBundleX( vtkPolyData* fiberPolyData )
     : m_CurrentColorCoding(NULL)
     , m_NumFibers(0)
+    , m_FiberSampling(0)
 {
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     if (fiberPolyData != NULL)
@@ -75,14 +76,6 @@ mitk::FiberBundleX::~FiberBundleX()
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::GetDeepCopy()
 {
     mitk::FiberBundleX::Pointer newFib = mitk::FiberBundleX::New(m_FiberPolyData);
-
-    if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_ORIENTATION_BASED))
-        MITK_DEBUG << "ok";
-
-    vtkUnsignedCharArray* tmpColors = (vtkUnsignedCharArray*) m_FiberPolyData->GetPointData()->GetArray(COLORCODING_ORIENTATION_BASED);
-    int tmpColorss = tmpColors->GetNumberOfTuples();
-    int tmpColorc = tmpColors->GetNumberOfComponents();
-
     newFib->SetColorCoding(m_CurrentColorCoding);
     return newFib;
 }
@@ -1077,6 +1070,109 @@ void mitk::FiberBundleX::SetColorCoding(const char* requestedColorCoding)
     }
 }
 
+void mitk::FiberBundleX::RotateAroundAxis(double x, double y, double z)
+{
+    MITK_INFO << "Rotating fibers";
+    x = x*M_PI/180;
+    y = y*M_PI/180;
+    z = z*M_PI/180;
+
+    vnl_matrix_fixed< double, 3, 3 > rotX; rotX.set_identity();
+    rotX[1][1] = cos(x);
+    rotX[2][2] = rotX[1][1];
+    rotX[1][2] = -sin(x);
+    rotX[2][1] = -rotX[1][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotY; rotY.set_identity();
+    rotY[0][0] = cos(y);
+    rotY[2][2] = rotY[0][0];
+    rotY[0][2] = sin(y);
+    rotY[2][0] = -rotY[0][2];
+
+    vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
+    rotZ[0][0] = cos(z);
+    rotZ[1][1] = rotZ[0][0];
+    rotZ[0][1] = -sin(z);
+    rotZ[1][0] = -rotZ[0][1];
+
+    mitk::Geometry3D::Pointer geom = this->GetGeometry();
+    mitk::Point3D center = geom->GetCenter();
+
+    boost::progress_display disp(m_NumFibers);
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
+    vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
+    vLines->InitTraversal();
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        ++disp ;
+        vtkIdType   numPoints(0);
+        vtkIdType*  pointIds(NULL);
+        vLines->GetNextCell ( numPoints, pointIds );
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p = m_FiberPolyData->GetPoint(pointIds[j]);
+            vnl_vector_fixed< double, 3 > dir;
+            dir[0] = p[0]-center[0];
+            dir[1] = p[1]-center[1];
+            dir[2] = p[2]-center[2];
+            dir = rotZ*rotY*rotX*dir;
+            dir[0] += center[0];
+            dir[1] += center[1];
+            dir[2] += center[2];
+            vtkIdType id = vtkNewPoints->InsertNextPoint(dir.data_block());
+            container->GetPointIds()->InsertNextId(id);
+        }
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+}
+
+void mitk::FiberBundleX::TranslateFibers(double x, double y, double z)
+{
+    MITK_INFO << "Translating fibers";
+    boost::progress_display disp(m_NumFibers);
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkCellArray::New();
+
+    vtkSmartPointer<vtkCellArray> vLines = m_FiberPolyData->GetLines();
+    vLines->InitTraversal();
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        ++disp ;
+        vtkIdType   numPoints(0);
+        vtkIdType*  pointIds(NULL);
+        vLines->GetNextCell ( numPoints, pointIds );
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for (int j=0; j<numPoints; j++)
+        {
+            double* p = m_FiberPolyData->GetPoint(pointIds[j]);
+            p[0] += x;
+            p[1] += y;
+            p[2] += z;
+            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+            container->GetPointIds()->InsertNextId(id);
+        }
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
+    m_FiberPolyData->SetPoints(vtkNewPoints);
+    m_FiberPolyData->SetLines(vtkNewCells);
+    UpdateColorCoding();
+    UpdateFiberGeometry();
+}
+
 void mitk::FiberBundleX::MirrorFibers(unsigned int axis)
 {
     if (axis>2)
@@ -1298,7 +1394,7 @@ bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
     return true;
 }
 
-void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
+void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, double continuity, double bias )
 {
     vtkSmartPointer<vtkPoints> vtkSmoothPoints = vtkPoints::New(); //in smoothpoints the interpolated points representing a fiber are stored.
 
@@ -1328,6 +1424,9 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
         vtkSmartPointer<vtkKochanekSpline> xSpline = vtkKochanekSpline::New();
         vtkSmartPointer<vtkKochanekSpline> ySpline = vtkKochanekSpline::New();
         vtkSmartPointer<vtkKochanekSpline> zSpline = vtkKochanekSpline::New();
+        xSpline->SetDefaultBias(bias); xSpline->SetDefaultTension(tension); xSpline->SetDefaultContinuity(continuity);
+        ySpline->SetDefaultBias(bias); ySpline->SetDefaultTension(tension); ySpline->SetDefaultContinuity(continuity);
+        zSpline->SetDefaultBias(bias); zSpline->SetDefaultTension(tension); zSpline->SetDefaultContinuity(continuity);
 
         vtkSmartPointer<vtkParametricSpline> spline = vtkParametricSpline::New();
         spline->SetXSpline(xSpline);
@@ -1362,11 +1461,20 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
     m_FiberPolyData->SetLines(vtkSmoothCells);
     UpdateColorCoding();
     UpdateFiberGeometry();
+    m_FiberSampling = pointsPerCm;
+}
+
+void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
+{
+    DoFiberSmoothing(pointsPerCm, 0, 0, 0 );
 }
 
 // Resample fiber to get equidistant points
 void mitk::FiberBundleX::ResampleFibers(float pointDistance)
 {
+    if (pointDistance<=0.00001)
+        return;
+
     vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
@@ -1446,6 +1554,7 @@ void mitk::FiberBundleX::ResampleFibers(float pointDistance)
     m_FiberPolyData = newPoly;
     UpdateFiberGeometry();
     UpdateColorCoding();
+    m_FiberSampling = 10/pointDistance;
 }
 
 // reapply selected colorcoding in case polydata structure has changed

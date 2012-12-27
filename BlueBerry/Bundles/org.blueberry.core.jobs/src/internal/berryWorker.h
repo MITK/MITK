@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,11 +59,11 @@ private:
     JobRunnable(Worker* currentWorker);
 
     void run();
-    
-    // code that would be executed in java within a finally statement 
-    void RunMethodFinallyExecution(IStatus::Pointer sptr_result); 
 
-    IStatus::Pointer HandleException(InternalJob::Pointer sptr_pointer, const std::exception& exception); 
+    // code that would be executed in java within a finally statement
+    void RunMethodFinallyExecution(IStatus::Pointer sptr_result);
+
+    IStatus::Pointer HandleException(InternalJob::Pointer sptr_pointer, const std::exception& exception);
 
   private:
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ bool LevelWindowPreset::LoadPreset()
 {
   m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml", "Config");
 
-  if (!m_XmlFileName.empty()) 
+  if (!m_XmlFileName.empty())
     return LoadPreset(m_XmlFileName);
   else
     return false;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarSubdivisionPolygon.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkPlanarEllipse.h"
 
 #include "mitkBasePropertySerializer.h"
 
@@ -147,6 +148,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarCircle")
     {
       planarFigure = mitk::PlanarCircle::New();
+    }
+    else if (type == "PlanarEllipse")
+    {
+      planarFigure = mitk::PlanarEllipse::New();
     }
     else if (type == "PlanarCross")
     {

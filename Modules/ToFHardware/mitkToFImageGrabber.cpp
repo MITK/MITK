@@ -2,19 +2,19 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFImageGrabber.h"
-#include "mitkToFCameraPMDCamCubeDevice.h"
+//#include "mitkToFCameraPMDCamCubeDevice.h"
 
 #include "itkCommand.h"
 
@@ -27,10 +27,10 @@ namespace mitk
   {
     // Create the output. We use static_cast<> here because we know the default
     // output must be of type TOutputImage
-    OutputImageType::Pointer output0 = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer()); 
-    OutputImageType::Pointer output1 = static_cast<OutputImageType*>(this->MakeOutput(1).GetPointer()); 
-    OutputImageType::Pointer output2 = static_cast<OutputImageType*>(this->MakeOutput(2).GetPointer()); 
-    OutputImageType::Pointer output3 = static_cast<OutputImageType*>(this->MakeOutput(3).GetPointer()); 
+    OutputImageType::Pointer output0 = static_cast<OutputImageType*>(this->MakeOutput(0).GetPointer());
+    OutputImageType::Pointer output1 = static_cast<OutputImageType*>(this->MakeOutput(1).GetPointer());
+    OutputImageType::Pointer output2 = static_cast<OutputImageType*>(this->MakeOutput(2).GetPointer());
+    OutputImageType::Pointer output3 = static_cast<OutputImageType*>(this->MakeOutput(3).GetPointer());
     mitk::ImageSource::SetNumberOfRequiredOutputs(3);
     mitk::ImageSource::SetNthOutput(0, output0.GetPointer());
     mitk::ImageSource::SetNthOutput(1, output1.GetPointer());
@@ -66,7 +66,7 @@ namespace mitk
     dimensions[2] = 1;
     mitk::PixelType FloatType = MakeScalarPixelType<float>();
     // acquire new image data
-    this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray, 
+    this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
       requiredImageSequence, this->m_ImageSequence, this->m_RgbDataArray );
 
     mitk::Image::Pointer distanceImage = this->GetOutput(0);
@@ -157,6 +157,10 @@ namespace mitk
   bool ToFImageGrabber::IsCameraActive()
   {
     return m_ToFCameraDevice->IsCameraActive();
+  }
+  bool ToFImageGrabber::IsCameraConnected()
+  {
+    return m_ToFCameraDevice->IsCameraConnected();
   }
 
   void ToFImageGrabber::SetCameraDevice(ToFCameraDevice* aToFCameraDevice)
@@ -260,6 +264,7 @@ namespace mitk
   bool ToFImageGrabber::GetBoolProperty( const char* propertyKey)
   {
     mitk::BoolProperty::Pointer boolProp = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey));
+    if(!boolProp) return false;
     return boolProp->GetValue();
   }
 

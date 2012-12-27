@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,14 +44,14 @@ mitk::MaskImageFilter::~MaskImageFilter()
 
 }
 
-void mitk::MaskImageFilter::SetMask( const mitk::Image* mask ) 
+void mitk::MaskImageFilter::SetMask( const mitk::Image* mask )
 {
   // Process object is not const-correct so the const_cast is required here
   m_Mask = const_cast< mitk::Image * >( mask );
   this->ProcessObject::SetNthInput(1, m_Mask );
 }
 
-const mitk::Image* mitk::MaskImageFilter::GetMask() const 
+const mitk::Image* mitk::MaskImageFilter::GetMask() const
 {
   return m_Mask;
 }
@@ -85,7 +85,7 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
 
   output->Initialize(input->GetPixelType(), *input->GetTimeSlicedGeometry());
 
-  output->SetPropertyList(input->GetPropertyList()->Clone());    
+  output->SetPropertyList(input->GetPropertyList()->Clone());
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -96,7 +96,7 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
   typedef itk::Image<unsigned char, VImageDimension> ItkMaskImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
-  
+
   typedef itk::ImageRegionConstIterator< ItkInputImageType > ItkInputImageIteratorType;
   typedef itk::ImageRegionConstIterator< ItkMaskImageType > ItkMaskImageIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,26 +33,26 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     mitkClassMacro(FileWriter,itk::ProcessObject);
     //##Documentation
     //## @brief Get the specified the file to write
-    //## 
+    //##
     //## Either the FileName or FilePrefix plus FilePattern are used to write.
     virtual const char* GetFileName() const = 0;
 
     //##Documentation
     //## @brief Specify the file to write.
-    //## 
+    //##
     //## Either the FileName or FilePrefix plus FilePattern are used to write.
     virtual void SetFileName(const char* aFileName) = 0;
 
     //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to write. 
-    //## 
+    //## @brief Get the specified file prefix for the file(s) to write.
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual const char* GetFilePrefix() const = 0;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to write.
-    //## 
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual void SetFilePrefix(const char* aFilePrefix) = 0;
@@ -60,7 +60,7 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to write. The
     //## sprintf format used to build filename from FilePrefix and number.
-    //## 
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual const char* GetFilePattern() const = 0;
@@ -68,7 +68,7 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //##Documentation
     //## @brief Specified file pattern for the file(s) to write. The sprintf
     //## format used to build filename from FilePrefix and number.
-    //## 
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual void SetFilePattern(const char* aFilePattern) = 0;
@@ -90,7 +90,7 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
      virtual std::string GetPossibleFileExtensionsAsString();
 
     //##Documentation
-    //## @brief Check if the Writer can write this type of data of the 
+    //## @brief Check if the Writer can write this type of data of the
     //## DataTreenode.
     virtual bool CanWriteDataType( DataNode* );
 
@@ -106,10 +106,10 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     virtual void Write() = 0;
 
     /**
-    @brief Specifies, whether the file writer also can 
+    @brief Specifies, whether the file writer also can
     write a file to a memory buffer */
     virtual bool CanWriteToMemory(  );
-     
+
     /**
     @brief Set/Get functions to advise the file writer to
     use tis internal memory array as file writing destination*/
@@ -117,17 +117,17 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     virtual bool GetWriteToMemory(  );
 
     /**
-    @brief To be used along with a call of SetWriteToMemory(true). This returns 
+    @brief To be used along with a call of SetWriteToMemory(true). This returns
     the memory buffer where the file was written.*/
     virtual const char*  GetMemoryPointer();
-    
+
     /**
-    @brief To be used along with a call of SetWriteToMemory(true). This returns 
+    @brief To be used along with a call of SetWriteToMemory(true). This returns
     the size of the  memory buffer where the file was written.*/
-    virtual unsigned int GetMemorySize(); 
-    
+    virtual unsigned int GetMemorySize();
+
     /**
-    @brief CAUTION: It's up to the user to call this function to release the 
+    @brief CAUTION: It's up to the user to call this function to release the
     memory buffer after use in case the file writer has written to its memory array.*/
     virtual void         ReleaseMemory();
 
@@ -159,7 +159,7 @@ virtual void Write()                                                          \
 virtual void Update()                                                         \
 {                                                                             \
   Write();                                                                    \
-}                                                                                                                                                    
+}
 
 } // namespace mitk
 #endif /* FILEWRITER_H_HEADER_INCLUDED */

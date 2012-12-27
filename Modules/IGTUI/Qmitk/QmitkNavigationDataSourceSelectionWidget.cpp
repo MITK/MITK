@@ -76,15 +76,15 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
     m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(s);
     std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
     mitk::ModuleContext* context = mitk::GetModuleContext();
-    
+
     //Fill tool list
     for(int i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
-    
-        
+
+
     // Create Filter for ToolStorage
     std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationToolStorage::US_INTERFACE_NAME + ")("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + "))";
-        
-    // Get Storage 
+
+    // Get Storage
     std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationToolStorage::US_INTERFACE_NAME, filter);
     if (refs.size() == 0) return; //no storage was found
     m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
@@ -97,7 +97,7 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
       {
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;
-      }    
+      }
   }
 
 mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()

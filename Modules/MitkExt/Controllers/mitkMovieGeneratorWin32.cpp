@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,10 +34,10 @@ void mitk::MovieGeneratorWin32::InitBitmapHeader()
 {
   m_width  = m_renderer->GetRenderWindow()->GetSize()[0];  // changed from glGetIntegerv( GL_VIEWPORT, viewport );
   m_height = m_renderer->GetRenderWindow()->GetSize()[1]; // due to sometimes strange dimensions
-  
-  m_width  -= 10;  //remove colored boarders around renderwindows 
+
+  m_width  -= 10;  //remove colored boarders around renderwindows
   m_height -= 10;
-   
+
   m_width  -= m_width % 4; // some video codecs have prerequisites to the image dimensions
   m_height -= m_height % 4;
 
@@ -65,7 +65,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 {
   InitBitmapHeader();
 
-  AVISTREAMINFO strHdr; // information for a single stream 
+  AVISTREAMINFO strHdr; // information for a single stream
   AVICOMPRESSOPTIONS opts;
   AVICOMPRESSOPTIONS FAR * aopts[1] = {&opts};
 
@@ -74,10 +74,10 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 
   m_sError=_T("Ok");
 
-  // Step 0 : Let's make sure we are running on 1.1 
+  // Step 0 : Let's make sure we are running on 1.1
   DWORD wVer = HIWORD(VideoForWindowsVersion());
   if (wVer < 0x010a) {
-    // oops, we are too old, blow out of here 
+    // oops, we are too old, blow out of here
     m_sError=_T("Version of Video for Windows too old. Come on, join the 21th century!");
     return false;
   }
@@ -88,7 +88,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   // Step 2 : Open the movie file for writing....
   hr = AVIFileOpen(&m_pAVIFile,      // Address to contain the new file interface pointer
     (LPCTSTR)m_sFile,        // Null-terminated string containing the name of the file to open
-    OF_WRITE | OF_CREATE,      // Access mode to use when opening the file. 
+    OF_WRITE | OF_CREATE,      // Access mode to use when opening the file.
     NULL);            // use handler determined from file extension.
   // Name your file .avi -> very important
 
@@ -97,19 +97,19 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
     m_sError=szBuffer;
     // Check it succeded.
     switch(hr) {
-    case AVIERR_BADFORMAT: 
+    case AVIERR_BADFORMAT:
       m_sError+=_T("The file couldn't be read, indicating a corrupt file or an unrecognized format.");
       break;
-    case AVIERR_MEMORY:    
-      m_sError+=_T("The file could not be opened because of insufficient memory."); 
+    case AVIERR_MEMORY:
+      m_sError+=_T("The file could not be opened because of insufficient memory.");
       break;
     case AVIERR_FILEREAD:
-      m_sError+=_T("A disk error occurred while reading the file."); 
+      m_sError+=_T("A disk error occurred while reading the file.");
       break;
-    case AVIERR_FILEOPEN:    
+    case AVIERR_FILEOPEN:
       m_sError+=_T("A disk error occurred while opening the file.");
       break;
-    case REGDB_E_CLASSNOTREG:    
+    case REGDB_E_CLASSNOTREG:
       m_sError+=_T("According to the registry, the type of file specified in AVIFileOpen does not have a handler to process it");
       break;
     }
@@ -144,15 +144,15 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 
   // Step 4: Get codec and infos about codec
   memset(&opts, 0, sizeof(opts));
-  
+
   // predefine MS-CRAM as standard codec
   opts.fccType = streamtypeVIDEO;
   //creates a video with minor quality! Use different codec (must be installed on local machine) to generate movies with higher quality
-  opts.fccHandler = mmioFOURCC('M','S','V','C'); 
+  opts.fccHandler = mmioFOURCC('M','S','V','C');
   opts.dwQuality = 90000; // means 90% quality; dwQuality goes from [0...10000]
-  
-  
-  
+
+
+
   // Poping codec dialog
   // GUI Codec selection does not work in a vs 2005 compiled mitk, since we do not pass a hwnd as first parameter
   // of AVISaveOptions
@@ -166,9 +166,9 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   #endif
 
   // Step 5:  Create a compressed stream using codec options.
-  hr = AVIMakeCompressedStream(&m_pStreamCompressed, 
-    m_pStream, 
-    &opts, 
+  hr = AVIMakeCompressedStream(&m_pStreamCompressed,
+    m_pStream,
+    &opts,
     NULL);
 
   if (hr != AVIERR_OK)
@@ -182,7 +182,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
       break;
     case AVIERR_MEMORY:
       m_sError+=_T(" There is not enough memory to complete the operation.");
-      break; 
+      break;
     case AVIERR_UNSUPPORTED:
       m_sError+=_T("Compression is not supported for this type of data. This error might be returned if you try to compress data that is not audio or video.");
       break;
@@ -199,7 +199,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   }
 
   // Step 6 : sets the format of a stream at the specified position
-  hr = AVIStreamSetFormat(m_pStreamCompressed, 
+  hr = AVIStreamSetFormat(m_pStreamCompressed,
     0,      // position
     &m_bih,      // stream format
     m_bih.biSize +   // format size

@@ -1,0 +1,40 @@
+/**
+
+\page BlueBerrySelectionServiceIntro Selection Service
+
+-# \subpage IntroductionSelectionService "Introduction"
+-# \subpage BlueBerryExampleSelectionServiceQt
+-# \subpage BlueBerryExampleSelectionServiceMitk
+
+\page IntroductionSelectionService Introduction: Selection Service Concept
+
+The selection service provided by the BlueBerry workbench allows efficient linking of different parts within the workbench window: View parts that provide additional information for particular objects and update their content automatically whenever such objects are selected somewhere in the workbench window. For example the "Properties" view in MITK applications behaves in this way: Wherever an element is selected in the workbench this view lists the properties of that element.
+
+\image html MitkSelectionService.png "DataNode properties"
+
+Other aspects of the workbench like the enablement of global actions may also depend on the current selection.
+
+Each workbench window has its own selection service instance. The service keeps track of the selection in the currently active part and propagates selection changes to all registered listeners. Such selection events occur when the selection in the current part is changed or when a different part is activated. Both can be triggered by user interaction or programmatically.
+
+\image html SelectionServiceDiagram.png "Selection Service Diagram"
+
+\section WhatCanBeSelected What can be selected?
+
+From the users point of view a selection is a set of highlighted entries in a viewer like a table or tree widget. A selection can also be a piece of text in an editor.
+
+Internally a selection is a data structure holding the model objects which corresponds to the graphical elements selected in the workbench. As pointed out before there are two fundamental different kinds of selections:
+
+\li A list of objects
+\li A piece of text
+
+\section Examples
+The following two examples describe different ways of implementing and using the provided selection services. One example is based on the Qt selection model, the other one is based on the MITK Data node selection.
+
+\li \ref org_mitk_example_gui_selectionservicemitk
+\li \ref org_mitk_example_gui_selectionserviceqt
+
+Knowing and using the existing selection mechanisms gives your plug-ins a clean design, smoothly integrates them into the workbench and opens them for future extensions.
+
+[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceQt] [\ref BlueBerryExamples]
+
+*/

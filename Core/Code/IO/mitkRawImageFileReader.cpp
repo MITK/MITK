@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,22 +32,22 @@ mitk::RawImageFileReader::~RawImageFileReader()
 }
 
 void mitk::RawImageFileReader::SetDimensions(unsigned int i, unsigned int dim)
-{ 
+{
   if ( i > 2 ) return;
 
   this->Modified();               // TODO: this order (first modified, then set the variable) is intended??
   m_Dimensions[i] = dim;
 }
- 
-  
+
+
 unsigned int mitk::RawImageFileReader::GetDimensions(unsigned int i) const
 {
   if ( i > 2 ) return 0;
 
   return m_Dimensions[i];
 }
- 
-bool mitk::RawImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+
+bool mitk::RawImageFileReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
 {
   // First check the extension
   if(  filename == "" )
@@ -63,7 +63,7 @@ bool mitk::RawImageFileReader::CanReadFile(const std::string filename, const std
 void mitk::RawImageFileReader::GenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
-  
+
   if (this->GetOutput()==NULL)
   {
     MITK_INFO << "Error" << std::endl;
@@ -108,14 +108,14 @@ void mitk::RawImageFileReader::GenerateData()
       MITK_INFO << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;
       return;
     }
-  }  
+  }
   else
   {
     MITK_INFO << "Error while reading raw file: Dimensionality not supported" << std::endl;
     return;
-      
-  }   
-      
+
+  }
+
   MITK_INFO << "...reading raw finished!" << std::endl;
 }
 
@@ -123,12 +123,12 @@ template < typename TPixel, unsigned int VImageDimensions >
 void mitk::RawImageFileReader::TypedGenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
-  
+
   if (this->GetOutput()==NULL)
   {
     MITK_INFO << "Error" << std::endl;
   }
-  
+
   MITK_INFO << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
 
   // Check to see if we can read the file given the name or prefix
@@ -141,14 +141,14 @@ void mitk::RawImageFileReader::TypedGenerateData()
   typedef itk::Image< TPixel, VImageDimensions > ImageType;
   typedef itk::ImageFileReader< ImageType > ReaderType;
   typedef itk::RawImageIO< TPixel, VImageDimensions >  IOType;
-  
+
   typename ReaderType::Pointer reader = ReaderType::New();
   typename IOType::Pointer io = IOType::New();
 
   io->SetFileDimensionality(VImageDimensions);
-  
+
   for (unsigned short int dim = 0; dim < VImageDimensions; ++dim)
-  { 
+  {
     io->SetDimensions(dim, m_Dimensions[dim] );
   }
 
@@ -182,5 +182,5 @@ void mitk::RawImageFileReader::TypedGenerateData()
   mitk::CastToMitkImage(reader->GetOutput(), image);
   output->Initialize( image );
   output->SetVolume(  reader->GetOutput()->GetBufferPointer());
-} 
+}
 

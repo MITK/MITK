@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,20 +38,20 @@ class MyNavigationDataSourceTest : public mitk::NavigationDataSource
 /** Class that holds static test methods to structure the test. */
 class mitkNavigationDataSourceTestClass
   {
-  public: 
+  public:
 
   static void TestInstantiation()
     {
-    // let's create an object of our class  
+    // let's create an object of our class
     MyNavigationDataSourceTest::Pointer myFilter = MyNavigationDataSourceTest::New();
-    
+
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
     // it makes no sense to continue without an object.
     MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(), "Testing instantiation");
 
     // testing create outputs
-    MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 0, "testing initial number of inputs"); 
+    MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 0, "testing initial number of inputs");
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 0, "testing initial number of outputs");
     myFilter->CreateOutput();
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
@@ -73,7 +73,7 @@ class mitkNavigationDataSourceTestClass
     nd1->SetOrientation(initialOri);
     nd1->SetPositionAccuracy(initialError);
     nd1->SetDataValid(initialValid);
-    
+
     //test method graft
     MITK_TEST_OUTPUT(<< "testing Graftoutput()");
     myFilter->GraftOutput(nd1);
@@ -113,7 +113,7 @@ class mitkNavigationDataSourceTestClass
       exceptionThrown=true;
       }
     MITK_TEST_CONDITION(exceptionThrown,"Testing method GetOutputIndex with invalid navigation data name");
-  
+
     //test method GraftNthOutput with invalid index
     exceptionThrown=false;
     try
@@ -127,7 +127,7 @@ class mitkNavigationDataSourceTestClass
       }
     MITK_TEST_CONDITION(exceptionThrown,"Testing method GraftNthOutput with invalid index");
     }
-  
+
   static void TestMicroserviceRegister()
     {
     MyNavigationDataSourceTest::Pointer myFilter = MyNavigationDataSourceTest::New();
@@ -152,7 +152,7 @@ class mitkNavigationDataSourceTestClass
     //TODO: remove Microservice
 
     //TODO: test if Microservice is not available any more
-    
+
     }
   };
 
@@ -168,7 +168,7 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   mitkNavigationDataSourceTestClass::TestMethodsInvalidCases();
   mitkNavigationDataSourceTestClass::TestMicroserviceRegister();
   mitkNavigationDataSourceTestClass::TestMicroserviceAvailabilityAndUnregister();
-  
+
   // always end with this!
   MITK_TEST_END();
 }

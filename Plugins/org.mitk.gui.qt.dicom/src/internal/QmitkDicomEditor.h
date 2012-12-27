@@ -73,7 +73,7 @@ public:
     void DoSaveAs() {}
     bool IsDirty() const { return false; }
     bool IsSaveAsAllowed() const { return false; }
-    
+
 signals:
 
     void SignalStartDicomImport(const QString&);
@@ -118,7 +118,7 @@ protected:
 
     void SetDatabaseDirectory(const QString& databaseDirectory);
 
-    void QmitkDicomEditor::CreateTemporaryDirectory();
+    void CreateTemporaryDirectory();
 
     void StartDicomDirectoryListener();
 

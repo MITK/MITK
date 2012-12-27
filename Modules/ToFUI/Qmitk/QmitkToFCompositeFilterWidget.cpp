@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -243,7 +243,7 @@ void QmitkToFCompositeFilterWidget::SetBilateralFilterParameter()
   this->m_ToFCompositeFilter->SetBilateralFilterParameter(domainSigma, rangeSigma, kernelRadius);
 }
 
-void QmitkToFCompositeFilterWidget::OnSpanChanged(int lower, int upper) 
+void QmitkToFCompositeFilterWidget::OnSpanChanged(int lower, int upper)
 {
   int lowerVal =  m_Controls->m_ThresholdFilterRangeSlider->lowerValue();
   int upperVal =  m_Controls->m_ThresholdFilterRangeSlider->upperValue();
@@ -252,7 +252,7 @@ void QmitkToFCompositeFilterWidget::OnSpanChanged(int lower, int upper)
   m_Controls->m_ThresholdFilterMaxValueSpinBox->setValue(upperVal);
 }
 
-void QmitkToFCompositeFilterWidget::OnResetThresholdFilterRangeSlider() 
+void QmitkToFCompositeFilterWidget::OnResetThresholdFilterRangeSlider()
 {
   int lower =  1;
   int upper =  7000;

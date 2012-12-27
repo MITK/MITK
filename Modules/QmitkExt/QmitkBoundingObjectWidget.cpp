@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -75,8 +75,8 @@ m_BoundingObjectCounter(1)
   m_TreeWidget = new QTreeWidget(this);
   m_TreeWidget->setColumnCount(3);
   QStringList sList;
-  sList << tr("name") << tr("inverted") << tr("visible"); 
-  m_TreeWidget->setHeaderLabels(sList); 
+  sList << tr("name") << tr("inverted") << tr("visible");
+  m_TreeWidget->setHeaderLabels(sList);
   m_TreeWidget->setColumnWidth(0, 250);
   m_TreeWidget->setColumnWidth(1, 50);
   m_TreeWidget->setColumnWidth(2, 50);
@@ -210,7 +210,7 @@ void QmitkBoundingObjectWidget::AddItem(mitk::DataNode* node)
 
 
   }
-  else 
+  else
     MITK_ERROR << name << " is not a bounding object or does not exist in data storage" << endl;
 }
 
@@ -399,7 +399,7 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     m_addComboBox->setCurrentIndex(0);
 
     // set initial size
-    mitk::Vector3D size; 
+    mitk::Vector3D size;
     size.Fill(10);
     boundingObject->GetGeometry()->SetSpacing( size );
 

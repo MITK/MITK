@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,9 +62,9 @@ namespace mitk {
     itkNewMacro(Self);
     InternalTrackingTool();
     virtual ~InternalTrackingTool();
-    
+
     Point3D m_Position;      ///< holds the position of the tool
-    Quaternion m_Orientation;   ///< holds the orientation of the tool 
+    Quaternion m_Orientation;   ///< holds the orientation of the tool
     float m_TrackingError;    ///< holds the tracking error of the tool
     bool m_Enabled;           ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;         ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data

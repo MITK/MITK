@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -127,20 +127,20 @@ const int QmitkDiffusionTensorEstimation::odfsize = 252;
 const int QmitkDiffusionTensorEstimation::nrconvkernels = 252;
 
 // Compile-time Square Root Computation: ceil(sqrt(N))
-template <int Size, int Low = 1, int High = Size> 
+template <int Size, int Low = 1, int High = Size>
 struct Root;
-template <int Size, int Mid>                     
-struct Root<Size,Mid,Mid> { 
-  static const int root = Mid; 
+template <int Size, int Mid>
+struct Root<Size,Mid,Mid> {
+  static const int root = Mid;
 };
-template <int Size, int Low, int High>          
+template <int Size, int Low, int High>
 struct Root {
   static const int mean = (Low + High)/2;
   static const bool down = (mean * mean >= Size);
-  static const int root = Root<Size, 
-    (down ? Low : mean+1), 
-    (down ? mean : High) >::root;     
-};  
+  static const int root = Root<Size,
+    (down ? Low : mean+1),
+    (down ? mean : High) >::root;
+};
 
 QmitkDiffusionTensorEstimation::QmitkDiffusionTensorEstimation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -201,7 +201,7 @@ QWidget * QmitkDiffusionTensorEstimation::CreateControlWidget(QWidget *parent)
 
   m_Controls->m_QBallStandardAlgorithmsGFAParam1->setText("2");
   m_Controls->m_QBallStandardAlgorithmsGFAParam2->setText("1");
-  
+
   return m_Controls;
 }
 
@@ -334,7 +334,7 @@ void QmitkDiffusionTensorEstimation::Activated()
   m_DiffusionVolumesDataTreeFilter = mitk::DataTreeFilter::New( GetDataTreeIterator()->GetTree() );
   m_DiffusionVolumesDataTreeFilter->SetSelectionMode(mitk::DataTreeFilter::MULTI_SELECT);
   m_DiffusionVolumesDataTreeFilter->SetHierarchyHandling(mitk::DataTreeFilter::FLATTEN_HIERARCHY);
-  m_DiffusionVolumesDataTreeFilter->SetFilter( mitk::IsBaseDataType<mitk::DiffusionVolumes<short> >() ); // show diffusion volumes 
+  m_DiffusionVolumesDataTreeFilter->SetFilter( mitk::IsBaseDataType<mitk::DiffusionVolumes<short> >() ); // show diffusion volumes
 
   mitk::DataTreeFilter::PropertyList visible_props;
   visible_props.push_back("name");
@@ -353,7 +353,7 @@ void QmitkDiffusionTensorEstimation::Activated()
   m_TensorVolumesDataTreeFilter = mitk::DataTreeFilter::New( GetDataTreeIterator()->GetTree() );
   m_TensorVolumesDataTreeFilter->SetSelectionMode(mitk::DataTreeFilter::SINGLE_SELECT);
   m_TensorVolumesDataTreeFilter->SetHierarchyHandling(mitk::DataTreeFilter::FLATTEN_HIERARCHY);
-  m_TensorVolumesDataTreeFilter->SetFilter( mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsTensorVolume") ); // show tensor volumes 
+  m_TensorVolumesDataTreeFilter->SetFilter( mitk::IsBaseDataTypeWithBoolProperty<mitk::Image>("IsTensorVolume") ); // show tensor volumes
 
   m_TensorVolumesDataTreeFilter->SetVisibleProperties(visible_props);
 
@@ -407,16 +407,16 @@ void QmitkDiffusionTensorEstimation::Activated()
 }
 
 
-void QmitkDiffusionTensorEstimation::TensorVolumesSaveButton() 
+void QmitkDiffusionTensorEstimation::TensorVolumesSaveButton()
 {
   // GET SELECTED ITEM
   const mitk::DataTreeFilter::Item* selectedItem
     = m_TensorVolumesDataTreeFilter->GetSelectedItem();
   if( !selectedItem )
     return;
-  mitk::Image::Pointer tensorVol = 
+  mitk::Image::Pointer tensorVol =
     static_cast<mitk::Image*>(selectedItem->GetNode()->GetData());
-  TensorImageType::Pointer itkTensorVol = 
+  TensorImageType::Pointer itkTensorVol =
     TensorImageType::New();
   mitk::CastToItkImage<TensorImageType>(tensorVol, itkTensorVol);
 
@@ -442,7 +442,7 @@ void QmitkDiffusionTensorEstimation::TensorVolumesSaveButton()
   tensorWriter->Update();
 }
 
-void QmitkDiffusionTensorEstimation::TensorVolumesLoadButton() 
+void QmitkDiffusionTensorEstimation::TensorVolumesLoadButton()
 {
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this->m_Controls, "Select DWI data file", TRUE );
@@ -486,19 +486,19 @@ void QmitkDiffusionTensorEstimation::TensorVolumesLoadButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::TensorVolumesRemoveButton() 
+void QmitkDiffusionTensorEstimation::TensorVolumesRemoveButton()
 {
   m_TensorVolumesDataTreeFilter->DeleteSelectedItems();
 }
 
-void QmitkDiffusionTensorEstimation::QBallVolumesSaveButton() 
+void QmitkDiffusionTensorEstimation::QBallVolumesSaveButton()
 {
   // GET SELECTED ITEM
   const mitk::DataTreeFilter::Item* selectedItem
     = m_QballVolumesDataTreeFilter->GetSelectedItem();
   if( !selectedItem ) return;
 
-  mitk::Image::Pointer qBallVol = 
+  mitk::Image::Pointer qBallVol =
     static_cast<mitk::Image*>(selectedItem->GetNode()->GetData());
   if( !qBallVol)return;
 
@@ -551,7 +551,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesSaveButton()
   qballWriter->Update();
 }
 
-void QmitkDiffusionTensorEstimation::QBallVolumesLoadButton() 
+void QmitkDiffusionTensorEstimation::QBallVolumesLoadButton()
 {
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this->m_Controls, "Select DWI data file", TRUE );
@@ -601,12 +601,12 @@ void QmitkDiffusionTensorEstimation::QBallVolumesLoadButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::QBallVolumesRemoveButton() 
+void QmitkDiffusionTensorEstimation::QBallVolumesRemoveButton()
 {
   m_QballVolumesDataTreeFilter->DeleteSelectedItems();
 }
 
-void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton() 
+void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
 {
   itk::TimeProbe clock;
   QString status;
@@ -616,7 +616,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
 
   typedef itk::Vector<TTensorPixelType,odfsize> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
   mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -742,7 +742,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
   node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
   node->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
   node->SetProperty( "global_scaling", mitk::FloatProperty::New( 1.0 ) );
-  mitk::OdfVtkMapper2D<TTensorPixelType,odfsize>::Pointer odfMapper = 
+  mitk::OdfVtkMapper2D<TTensorPixelType,odfsize>::Pointer odfMapper =
     mitk::OdfVtkMapper2D<TTensorPixelType,odfsize>::New();
   node->SetMapper(1,odfMapper);
 
@@ -755,14 +755,14 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
 
 }
 
-void QmitkDiffusionTensorEstimation::DirectionVolumesSaveButton() 
+void QmitkDiffusionTensorEstimation::DirectionVolumesSaveButton()
 {
   // GET SELECTED ITEM
   const mitk::DataTreeFilter::Item* selectedItem
     = m_DirectionVolumesDataTreeFilter->GetSelectedItem();
   if( !selectedItem ) return;
 
-  mitk::Image::Pointer vol = 
+  mitk::Image::Pointer vol =
     static_cast<mitk::Image*>(selectedItem->GetNode()->GetData());
   if( !vol)return;
 
@@ -814,7 +814,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesSaveButton()
   writer->Update();
 }
 
-void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton() 
+void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
 {
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this->m_Controls, "Select DWI data file", TRUE );
@@ -855,7 +855,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
     SetDefaultNodeProperties(node, itksys::SystemTools::GetFilenameName(filename));
     node->SetProperty( "IsDirectionVolume", mitk::BoolProperty::New( true ) );
 
-    mitk::VectorImageMapper2D::Pointer mapper = 
+    mitk::VectorImageMapper2D::Pointer mapper =
       mitk::VectorImageMapper2D::New();
     node->SetMapper(1,mapper);
 
@@ -863,12 +863,12 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::DirectionVolumesRemoveButton() 
+void QmitkDiffusionTensorEstimation::DirectionVolumesRemoveButton()
 {
   m_DirectionVolumesDataTreeFilter->DeleteSelectedItems();
 }
 
-void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton() 
+void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
 {
   try
   {
@@ -884,14 +884,14 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() ); 
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() );
 
     std::vector<mitk::DataNode::Pointer> nodes;
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionVolumes<DiffusionPixelType>* vols = 
+      mitk::DiffusionVolumes<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionVolumes<DiffusionPixelType>*>(
         (*itemiter)->GetNode()->GetData());
 
@@ -903,9 +903,9 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
       MBI_INFO << "Teem Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Teem Tensor reconstruction for %s", nodename.c_str()));
-      typedef mitk::TeemDiffusionTensor3DReconstructionImageFilter< 
+      typedef mitk::TeemDiffusionTensor3DReconstructionImageFilter<
         DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
-      TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = 
+      TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
         TensorReconstructionImageFilterType::New();
       tensorReconstructionFilter->SetInput( vols );
       tensorReconstructionFilter->SetEstimateErrorImage( m_Controls->m_TensorEstimationTeemErrorImage->isChecked() );
@@ -972,7 +972,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::TensorEstimationButton() 
+void QmitkDiffusionTensorEstimation::TensorEstimationButton()
 {
   try
   {
@@ -987,14 +987,14 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() ); 
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() );
 
     std::vector<mitk::DataNode::Pointer> nodes;
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionVolumes<DiffusionPixelType>* vols = 
+      mitk::DiffusionVolumes<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionVolumes<DiffusionPixelType>*>(
         (*itemiter)->GetNode()->GetData());
 
@@ -1006,13 +1006,13 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
       MBI_INFO << "Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Tensor reconstruction for %s", nodename.c_str()));
-      typedef itk::DiffusionTensor3DReconstructionImageFilter< 
+      typedef itk::DiffusionTensor3DReconstructionImageFilter<
         DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
-      TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter = 
+      TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
         TensorReconstructionImageFilterType::New();
       tensorReconstructionFilter->SetGradientImage( vols->GetDirections(), vols->GetImage() );
       tensorReconstructionFilter->SetNumberOfThreads( m_Controls->m_TensorEstimationNumberThreadsSpinbox->value() );
-      tensorReconstructionFilter->SetBValue(vols->GetB_Value());  
+      tensorReconstructionFilter->SetBValue(vols->GetB_Value());
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorEstimationThreasholdEdit->text().toFloat() );
       tensorReconstructionFilter->Update();
       clock.Stop();
@@ -1050,7 +1050,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::QBallReconstructionButton() 
+void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
 {
   try
   {
@@ -1065,14 +1065,14 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() ); 
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() );
 
     std::vector<mitk::DataNode::Pointer> nodes;
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionVolumes<DiffusionPixelType>* vols = 
+      mitk::DiffusionVolumes<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionVolumes<DiffusionPixelType>*>(
         (*itemiter)->GetNode()->GetData());
 
@@ -1085,15 +1085,15 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "QBall reconstruction for %s", nodename.c_str()));
 
-      typedef itk::DiffusionQballReconstructionImageFilter< 
+      typedef itk::DiffusionQballReconstructionImageFilter<
         DiffusionPixelType, DiffusionPixelType, TTensorPixelType, odfsize>
         //int NOdfDirections = 162,
         QballReconstructionImageFilterType;
-      QballReconstructionImageFilterType::Pointer filter = 
+      QballReconstructionImageFilterType::Pointer filter =
         QballReconstructionImageFilterType::New();
       filter->SetGradientImage( vols->GetDirections(), vols->GetImage() );
       filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsSpinbox->value() );
-      filter->SetBValue(vols->GetB_Value());  
+      filter->SetBValue(vols->GetB_Value());
       filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->text().toFloat() );
 
       int normalization = m_Controls->m_QBallReconstructionPostprocessingMethod->currentItem();
@@ -1177,14 +1177,14 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
 template<int L>
 void QmitkDiffusionTensorEstimation::ReconstructAnalytically(
   mitk::DiffusionVolumes<DiffusionPixelType>* vols, float lambda,
-  std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes) 
+  std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes)
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter
     <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,odfsize> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetGradientImage( vols->GetDirections(), vols->GetImage() );
   filter->SetNumberOfThreads( m_Controls->m_QBallReconstructionNumberThreadsAnalyticalSpinbox->value() );
-  filter->SetBValue(vols->GetB_Value());  
+  filter->SetBValue(vols->GetB_Value());
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdAnalyticalEdit->text().toFloat() );
   filter->SetLambda(lambda);
   filter->SetAdcProfileOnly(m_Controls->m_QBallReconstructionAdcOnlyCheckbox->isChecked());
@@ -1200,7 +1200,7 @@ void QmitkDiffusionTensorEstimation::ReconstructAnalytically(
     {
       filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO_B_VALUE);
       break;
-    }            
+    }
   case 2:
     {
       filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO);
@@ -1243,7 +1243,7 @@ void QmitkDiffusionTensorEstimation::ReconstructAnalytically(
 
 }
 
-void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton() 
+void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
 {
   try
   {
@@ -1276,15 +1276,15 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles*nLambdas);
 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() ); 
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() );
 
     std::vector<mitk::DataNode::Pointer>* nodes
       = new std::vector<mitk::DataNode::Pointer>();
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionVolumes<DiffusionPixelType>* vols = 
+      mitk::DiffusionVolumes<DiffusionPixelType>* vols =
         static_cast<mitk::DiffusionVolumes<DiffusionPixelType>*>(
         (*itemiter)->GetNode()->GetData());
 
@@ -1352,7 +1352,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton() 
+void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
 {
   itk::TimeProbe clock;
   QString status;
@@ -1360,7 +1360,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
     = m_TensorVolumesDataTreeFilter->GetSelectedItem();
   if(!item)return;
 
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   itk::Image<TensorPixelType, 3>::Pointer itkvol = itk::Image<TensorPixelType, 3>::New();
   mitk::CastToItkImage<TensorImageType>(vol, itkvol);
@@ -1373,12 +1373,12 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
     "Computing FA for %s", nodename.c_str()));
   typedef TensorPixelType::RealValueType                 RealValueType;
   typedef itk::Image< RealValueType, 3 >                 FAImageType;
-  typedef itk::TensorFractionalAnisotropyImageFilter< 
+  typedef itk::TensorFractionalAnisotropyImageFilter<
     TensorImageType, FAImageType >                       FAFilterType;
   FAFilterType::Pointer fractionalAnisotropyFilter = FAFilterType::New();
   fractionalAnisotropyFilter->SetInput( itkvol );
 
-  typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType> 
+  typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType>
     ShiftScaleFilterType;
   ShiftScaleFilterType::Pointer multi =
     ShiftScaleFilterType::New();
@@ -1407,7 +1407,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
   m_Controls->update();
 }
 
-void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton() 
+void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
 {
   itk::TimeProbe clock;
   QString status;
@@ -1415,7 +1415,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
     = m_TensorVolumesDataTreeFilter->GetSelectedItem();
   if(!item)return;
 
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   itk::Image<TensorPixelType, 3>::Pointer itkvol = itk::Image<TensorPixelType, 3>::New();
   mitk::CastToItkImage<TensorImageType>(vol, itkvol);
@@ -1428,7 +1428,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
     "Computing RA for %s", nodename.c_str()));
   typedef TensorPixelType::RealValueType                 RealValueType;
   typedef itk::Image< RealValueType, 3 >                 RAImageType;
-  typedef itk::TensorRelativeAnisotropyImageFilter< 
+  typedef itk::TensorRelativeAnisotropyImageFilter<
     TensorImageType, RAImageType >                       RAFilterType;
   RAFilterType::Pointer relativeAnisotropyFilter = RAFilterType::New();
   relativeAnisotropyFilter->SetInput( itkvol );
@@ -1455,7 +1455,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
 
 }
 
-void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton() 
+void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
 {
 
     itk::TimeProbe clock;
@@ -1466,7 +1466,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
 
   typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
   typedef itk::Image<TensorType,3> TensorImgType;
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   TensorImgType::Pointer itkvol = TensorImgType::New();
   mitk::CastToItkImage<TensorImgType>(vol, itkvol);
@@ -1484,8 +1484,8 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
   filter->SetInput(itkvol);
   filter->SetNumberOfThreads(4);
   filter->Update();
-  itk::ImageRegionIterator<FilterType::OutputImageType> 
-    it (filter->GetOutput(), 
+  itk::ImageRegionIterator<FilterType::OutputImageType>
+    it (filter->GetOutput(),
     filter->GetOutput()->GetLargestPossibleRegion() );
   it = it.Begin();
 
@@ -1529,7 +1529,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
   node5->SetProperty( "Scale", mitk::FloatProperty::New( 1.0 ) );
   node5->SetProperty( "LineWidth", mitk::FloatProperty::New( 1 ) );
 
-  mitk::VectorImageMapper2D::Pointer vecMapper5 = 
+  mitk::VectorImageMapper2D::Pointer vecMapper5 =
     mitk::VectorImageMapper2D::New();
   node5->SetMapper(1,vecMapper5);
 
@@ -1540,7 +1540,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
 
 }
 
-void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton() 
+void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
 {
   itk::TimeProbe clock;
   QString status;
@@ -1551,8 +1551,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
   int nrFiles = selectedItems->size();
   if (!nrFiles) return;
 
-  mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
-  mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() ); 
+  mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
+  mitk::DataTreeFilter::ItemSet::const_iterator itemiterend( selectedItems->end() );
 
   std::vector<mitk::DataNode::Pointer> nodes;
   while ( itemiter != itemiterend ) // for all items
@@ -1560,7 +1560,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
 
     typedef itk::Vector<TTensorPixelType,odfsize> OdfVectorType;
     typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-    mitk::Image* vol = 
+    mitk::Image* vol =
       static_cast<mitk::Image*>((*itemiter)->GetNode()->GetData());
     OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
     mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -1631,7 +1631,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
         newname.append("05");
         scale = 200.0;
         break;
-      }    
+      }
     case 6:
       {
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_NORMALIZED_ENTROPY);
@@ -1713,7 +1713,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
     img->Allocate();
     itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
     ot = ot.Begin();
-    itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it 
+    itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
       (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
     it = it.Begin();
 
@@ -1750,7 +1750,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
 
 }
 
-void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton() 
+void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
 {
 
   itk::TimeProbe clock;
@@ -1761,7 +1761,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
 
   typedef itk::Vector<TTensorPixelType,odfsize> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
   mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -1778,8 +1778,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   gfaFilter->SetInput(itkvol);
   gfaFilter->SetNumberOfThreads(4);
   gfaFilter->Update();
-  itk::ImageRegionIterator<GfaFilterType::OutputImageType> 
-    itGfa (gfaFilter->GetOutput(), 
+  itk::ImageRegionIterator<GfaFilterType::OutputImageType>
+    itGfa (gfaFilter->GetOutput(),
     gfaFilter->GetOutput()->GetLargestPossibleRegion() );
   itGfa = itGfa.Begin();
 
@@ -1796,8 +1796,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   principleDirectionsFilter->SetMultiplyGfa(false);
   principleDirectionsFilter->Update();
 
-  itk::ImageRegionIterator<PrincipleDirectionsFilterType::OutputImageType> 
-    it (principleDirectionsFilter->GetOutput(), 
+  itk::ImageRegionIterator<PrincipleDirectionsFilterType::OutputImageType>
+    it (principleDirectionsFilter->GetOutput(),
     principleDirectionsFilter->GetOutput()->GetLargestPossibleRegion() );
 
   if(numdir == 0)
@@ -1930,7 +1930,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   node5->SetProperty( "Scale", mitk::FloatProperty::New( 0.8 ) );
   node5->SetProperty( "LineWidth", mitk::FloatProperty::New( 3 ) );
 
-  mitk::VectorImageMapper2D::Pointer vecMapper5 = 
+  mitk::VectorImageMapper2D::Pointer vecMapper5 =
     mitk::VectorImageMapper2D::New();
   node5->SetMapper(1,vecMapper5);
 
@@ -1941,7 +1941,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
 
 }
 
-void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton() 
+void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton()
 {
 
   itk::TimeProbe clock;
@@ -1952,7 +1952,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
 
   typedef itk::Vector<TTensorPixelType,odfsize> OdfVectorType;
   typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-  mitk::Image* vol = 
+  mitk::Image* vol =
     static_cast<mitk::Image*>(item->GetNode()->GetData());
   OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
   mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -1969,8 +1969,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
   gfaFilter->SetInput(itkvol);
   gfaFilter->SetNumberOfThreads(4);
   gfaFilter->Update();
-  itk::ImageRegionIterator<GfaFilterType::OutputImageType> 
-    itGfa (gfaFilter->GetOutput(), 
+  itk::ImageRegionIterator<GfaFilterType::OutputImageType>
+    itGfa (gfaFilter->GetOutput(),
     gfaFilter->GetOutput()->GetLargestPossibleRegion() );
   itGfa = itGfa.Begin();
 
@@ -2014,8 +2014,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
 
   for(int i=0; i<numdirs; i++)
   {
-    itk::ImageRegionIterator<DeconvolutionFilterType::OutputImageType> 
-      it (devonvolutionFilter->GetOutput(i), 
+    itk::ImageRegionIterator<DeconvolutionFilterType::OutputImageType>
+      it (devonvolutionFilter->GetOutput(i),
       devonvolutionFilter->GetOutput()->GetLargestPossibleRegion() );
     it = it.Begin();
 
@@ -2159,7 +2159,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
     node5->SetProperty( "Scale", mitk::FloatProperty::New( 0.8 ) );
     node5->SetProperty( "LineWidth", mitk::FloatProperty::New( 3 ) );
 
-    mitk::VectorImageMapper2D::Pointer vecMapper5 = 
+    mitk::VectorImageMapper2D::Pointer vecMapper5 =
       mitk::VectorImageMapper2D::New();
     node5->SetMapper(1,vecMapper5);
   }
@@ -2179,7 +2179,7 @@ void QmitkDiffusionTensorEstimation::SetDefaultNodeProperties(mitk::DataNode::Po
   node->SetProperty( "layer", mitk::IntProperty::New(0));
   node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->SetOpacity(1.0f);
-  node->SetColor(1.0,1.0,1.0);  
+  node->SetColor(1.0,1.0,1.0);
   node->SetVisibility(true);
 
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
@@ -2222,16 +2222,16 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
     int nrFiles = selectedItems->size();
     if (nrFiles != 2) return;
 
-    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() ); 
+    mitk::DataTreeFilter::ItemSet::const_iterator itemiter( selectedItems->begin() );
 
-    mitk::Image::Pointer vol1 = 
+    mitk::Image::Pointer vol1 =
       static_cast<mitk::Image*>((*itemiter)->GetNode()->GetData());
     if( !vol1)return;
     std::string nodename1 = (*itemiter)->GetProperty("name");
 
     itemiter++;
 
-    mitk::Image::Pointer vol2 = 
+    mitk::Image::Pointer vol2 =
       static_cast<mitk::Image*>((*itemiter)->GetNode()->GetData());
     if( !vol2)return;
     std::string nodename2 = (*itemiter)->GetProperty("name");
@@ -2286,7 +2286,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
 //
 //  typedef itk::Vector<TTensorPixelType,odfsize> OdfVectorType;
 //  typedef itk::Image<OdfVectorType,3> OdfVectorImgType;
-//  mitk::Image* vol = 
+//  mitk::Image* vol =
 //    static_cast<mitk::Image*>(item->GetNode()->GetData());
 //  OdfVectorImgType::Pointer itkvol = OdfVectorImgType::New();
 //  mitk::CastToItkImage<OdfVectorImgType>(vol, itkvol);
@@ -2350,7 +2350,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
 //  img->Allocate();
 //  itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
 //  ot = ot.Begin();
-//  itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it 
+//  itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
 //    (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
 //  it = it.Begin();
 //
@@ -2381,14 +2381,14 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
 //
 //}
 
-void QmitkDiffusionTensorEstimation::DiffusionVolumeSaveButton() 
+void QmitkDiffusionTensorEstimation::DiffusionVolumeSaveButton()
 {
   // GET SELECTED ITEM
   const mitk::DataTreeFilter::Item* selectedItem
     = m_DiffusionVolumesDataTreeFilter->GetSelectedItem();
   if( !selectedItem )
     return;
-  mitk::DiffusionVolumes<DiffusionPixelType>::Pointer diffVolumes = 
+  mitk::DiffusionVolumes<DiffusionPixelType>::Pointer diffVolumes =
     static_cast<mitk::DiffusionVolumes<DiffusionPixelType>*>(selectedItem->GetNode()->GetData());
 
   std::string sName = selectedItem->GetNode()->GetName();
@@ -2432,7 +2432,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumeSaveButton()
   }
 }
 
-void QmitkDiffusionTensorEstimation::DiffusionVolumesLoadButton() 
+void QmitkDiffusionTensorEstimation::DiffusionVolumesLoadButton()
 {
   // SELECT FOLDER DIALOG
   QFileDialog* w = new QFileDialog( this->m_Controls, "Select DWI data file", TRUE );
@@ -2487,13 +2487,13 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumesSelectAll()
 {
   const mitk::DataTreeFilter::ItemList* items = m_DiffusionVolumesDataTreeFilter->GetItems();
 
-  mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() ); 
-  mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() ); 
+  mitk::DataTreeFilter::ConstItemIterator itemiter( items->Begin() );
+  mitk::DataTreeFilter::ConstItemIterator itemiterend( items->End() );
 
   while ( itemiter != itemiterend )
   {
     m_DiffusionVolumesDataTreeFilter->SelectItem(*itemiter);
-    ++itemiter; 
+    ++itemiter;
   }
 
 }

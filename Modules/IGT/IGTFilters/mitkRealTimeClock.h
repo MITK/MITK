@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk {
   * \brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
   *
   * When mitk::RealTimeClock::New() is called, a new instance of a RealTimeClock will be
-  * instantiated. WindowsRealTimeClock on a Windows-system and a LinuxRealTimeClock on a 
+  * instantiated. WindowsRealTimeClock on a Windows-system and a LinuxRealTimeClock on a
   * Linux-system
   *
   * \ingroup IGT

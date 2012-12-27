@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProgressBar.h"
 
-mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
+mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
 {
   m_MedianFilter3D = false;
   m_MedianKernelSizeX = 3;
@@ -37,7 +37,7 @@ mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
 
 mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 
-void mitk::ManualSegmentationToSurfaceFilter::GenerateData() 
+void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image    =  (mitk::Image*)GetInput();
@@ -58,7 +58,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
-    // Median -->smooth 3D 
+    // Median -->smooth 3D
     MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
     if(m_MedianFilter3D)
     {
@@ -73,14 +73,14 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
     ProgressBar::GetInstance()->Progress();
 
-    //Interpolate image spacing 
+    //Interpolate image spacing
     MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);
 
-      //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)      
+      //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)
       imageresample->SetAxisOutputSpacing(0, m_InterpolationX);
       imageresample->SetAxisOutputSpacing(1, m_InterpolationY);
       imageresample->SetAxisOutputSpacing(2, m_InterpolationZ);
@@ -151,5 +151,5 @@ void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(vtkDouble x, vtkD
   m_InterpolationX = x;
   m_InterpolationY = y;
   m_InterpolationZ = z;
-} 
+}
 

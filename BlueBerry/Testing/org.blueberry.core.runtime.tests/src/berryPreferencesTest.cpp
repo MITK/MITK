@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,17 +55,17 @@ namespace berry
   public:
     TestPreferencesChangedListener(IBerryPreferences* _berryPrefNode) : numCalled(0), berryPrefNode(_berryPrefNode)
     {
-      berryPrefNode->OnChanged.AddListener( 
-        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> ( 
-        this, &TestPreferencesChangedListener::PreferencesChanged ) 
+      berryPrefNode->OnChanged.AddListener(
+        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> (
+        this, &TestPreferencesChangedListener::PreferencesChanged )
         );
     };
 
     ~TestPreferencesChangedListener()
     {
-      berryPrefNode->OnChanged.RemoveListener( 
-        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> ( 
-        this, &TestPreferencesChangedListener::PreferencesChanged ) 
+      berryPrefNode->OnChanged.RemoveListener(
+        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> (
+        this, &TestPreferencesChangedListener::PreferencesChanged )
         );
     };
 
@@ -87,7 +87,7 @@ namespace berry
     assert(root.IsNotNull());
 
     {
-      BERRY_INFO << "testing Preferences::Node(), Preferences::NodeExists(), Preferences::Parent(), " 
+      BERRY_INFO << "testing Preferences::Node(), Preferences::NodeExists(), Preferences::Parent(), "
         "Preferences::ChildrenNames(), Preferences::RemoveNode()";
 
       berry::IPreferences::Pointer editorsNode(0);
@@ -99,7 +99,7 @@ namespace berry
       assert(editorsNode->Parent() == root);
 
       berry::IPreferences::Pointer editorsGeneralNode = root->Node("/editors/general");
-      assert(editorsNode->NodeExists("/editors/general")); 
+      assert(editorsNode->NodeExists("/editors/general"));
 
       berry::IPreferences::Pointer editorsSyntaxNode = root->Node("/editors/syntax");
       assert(editorsGeneralNode->NodeExists("/editors/syntax"));
@@ -107,9 +107,9 @@ namespace berry
       berry::IPreferences::Pointer editorsFontNode = root->Node("/editors/font");
       assert(editorsSyntaxNode->NodeExists("/editors/font"));
 
-      vector<string> childrenNames; 
-      childrenNames.push_back("general"); 
-      childrenNames.push_back("syntax"); 
+      vector<string> childrenNames;
+      childrenNames.push_back("general");
+      childrenNames.push_back("syntax");
       childrenNames.push_back("font");
       assert(editorsNode->ChildrenNames() == childrenNames);
 
@@ -125,7 +125,7 @@ namespace berry
     }
 
     // testing methods
-    // Preferences::put*() 
+    // Preferences::put*()
     // Preferences::get*()
     {
       BERRY_INFO << "testing Preferences::put*(), Preferences::get*(), OnChanged";

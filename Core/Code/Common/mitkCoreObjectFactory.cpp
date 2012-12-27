@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -87,7 +87,7 @@ void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *fact
 
 mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
-  if (instance.IsNull()) 
+  if (instance.IsNull())
   {
      instance = mitk::CoreObjectFactory::New();
   }
@@ -166,7 +166,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       newMapper = tmpMapper;
   }
 
-  if (newMapper.IsNull()) 
+  if (newMapper.IsNull())
   {
 
     mitk::BaseData *data = node->GetData();
@@ -256,7 +256,7 @@ const char* mitk::CoreObjectFactory::GetFileExtensions()
   this->CreateFileExtensions(m_FileExtensionsMap, m_FileExtensions);
   return m_FileExtensions.c_str();
 }
-  
+
 /**
  * @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
  * @param fileExtensionsMap the existing map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
@@ -268,7 +268,7 @@ const char* mitk::CoreObjectFactory::GetFileExtensions()
 void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap)
 {
   bool duplicateFound = false;
-  std::pair<MultimapType::iterator, MultimapType::iterator> pairOfIter; 
+  std::pair<MultimapType::iterator, MultimapType::iterator> pairOfIter;
   for (MultimapType::iterator it = inputMap.begin(); it != inputMap.end(); ++it)
   {
     duplicateFound = false;

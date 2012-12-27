@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,11 +29,11 @@ class NavigationController;
 /** \brief Describes the geometry of a data object consisting of slices.
  *
  * A Geometry2D can be requested for each slice. In the case of
- * \em evenly-spaced, \em plane geometries (m_EvenlySpaced==true), 
- * only the 2D-geometry of the first slice has to be set (to an instance of 
- * PlaneGeometry). The 2D geometries of the other slices are calculated 
- * by shifting the first slice in the direction m_DirectionVector by 
- * m_Spacing.z * sliceNumber. The m_Spacing member (which is only 
+ * \em evenly-spaced, \em plane geometries (m_EvenlySpaced==true),
+ * only the 2D-geometry of the first slice has to be set (to an instance of
+ * PlaneGeometry). The 2D geometries of the other slices are calculated
+ * by shifting the first slice in the direction m_DirectionVector by
+ * m_Spacing.z * sliceNumber. The m_Spacing member (which is only
  * relevant in the case m_EvenlySpaced==true) descibes the size of a voxel
  * (in mm), i.e., m_Spacing.x is the voxel width in the x-direction of the
  * plane. It is derived from the reference geometry of this SlicedGeometry3D,
@@ -45,7 +45,7 @@ class NavigationController;
  * slices in any possible direction. In case of an inclined plane, the spacing
  * is derived as a product of the (regular) geometry spacing and the direction
  * vector of the plane.
- * 
+ *
  * SlicedGeometry3D and the associated Geometry2Ds have to be initialized in
  * the method GenerateOutputInformation() of BaseProcess (or CopyInformation /
  * UpdateOutputInformation of BaseData, if possible, e.g., by analyzing pic
@@ -54,12 +54,12 @@ class NavigationController;
  * \sa itk::ProcessObject::GenerateOutputInformation(),
  * \sa itk::DataObject::CopyInformation() and
  * \a itk::DataObject::UpdateOutputInformation().
- * 
- * Rule: everything is in mm (or ms for temporal information) if not 
+ *
+ * Rule: everything is in mm (or ms for temporal information) if not
  * stated otherwise.
- * 
+ *
  * \warning The hull (i.e., transform, bounding-box and
- * time-bounds) is only guaranteed to be up-to-date after calling 
+ * time-bounds) is only guaranteed to be up-to-date after calling
  * UpdateInformation().
  *
  * \ingroup Geometry
@@ -71,18 +71,18 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-  
+
   /**
    * \brief Returns the Geometry2D of the slice (\a s).
    *
    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
-   * for the requested slice, and (c) the first slice (s=0) 
+   * for the requested slice, and (c) the first slice (s=0)
    * is a PlaneGeometry instance, then we calculate the geometry of the
    * requested as the plane of the first slice shifted by m_Spacing[3]*s
    * in the direction of m_DirectionVector.
    *
    * \warning The Geometry2Ds are not necessarily up-to-date and not even
-   * initialized. 
+   * initialized.
    *
    * The Geometry2Ds have to be initialized in the method
    * GenerateOutputInformation() of BaseProcess (or CopyInformation /
@@ -144,7 +144,7 @@ public:
   /**
    * \brief Set/Get whether the SlicedGeometry3D is evenly-spaced
    * (m_EvenlySpaced)
-   * 
+   *
    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored for
    * the requested slice, and (c) the first slice (s=0) is a PlaneGeometry
    * instance, then we calculate the geometry of the requested as the plane
@@ -160,7 +160,7 @@ public:
   /**
    * \brief Set/Get the vector between slices for the evenly-spaced case
    * (m_EvenlySpaced==true).
-   * 
+   *
    * If the direction-vector is (0,0,0) (the default) and the first
    * 2D geometry is a PlaneGeometry, then the direction-vector will be
    * calculated from the plane normal.
@@ -210,7 +210,7 @@ public:
     mitk::ScalarType zSpacing, unsigned int slices, bool flipped=false );
 
   /**
-   * \brief Completely initialize this instance as evenly-spaced plane slices 
+   * \brief Completely initialize this instance as evenly-spaced plane slices
    * parallel to a side of the provided Geometry3D and using its spacing
    * information.
    *
@@ -219,7 +219,7 @@ public:
    * Geometry3D::GetExtent(2).
    *
    * \param planeorientation side parallel to which the slices will be oriented
-   * \param top if \a true, create plane at top, otherwise at bottom 
+   * \param top if \a true, create plane at top, otherwise at bottom
    * (for PlaneOrientation Axial, for other plane locations respectively)
    * \param frontside defines the side of the plane (the definition of
    * front/back is somewhat arbitrary)
@@ -234,7 +234,7 @@ public:
 
   virtual void SetImageGeometry(const bool isAnImageGeometry);
 
-  virtual void ExecuteOperation(Operation* operation); 
+  virtual void ExecuteOperation(Operation* operation);
 
   static double CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d );
 
@@ -245,12 +245,12 @@ protected:
 
   virtual ~SlicedGeometry3D();
 
-  
+
   /**
    * Reinitialize plane stack after rotation. More precisely, the first plane
    * of the stack needs to spatially aligned, in two respects:
    *
-   * 1. Re-alignment with respect to the dataset center; this is necessary 
+   * 1. Re-alignment with respect to the dataset center; this is necessary
    *    since the distance from the first plane to the center could otherwise
    *    continuously decrease or increase.
    * 2. Re-alignment with respect to a given reference point; the reference
@@ -259,7 +259,7 @@ protected:
    *    ensure this touching. Usually, the reference point would be the
    *    point around which the geometry is rotated.
    */
-  virtual void ReinitializePlanes( const Point3D &center, 
+  virtual void ReinitializePlanes( const Point3D &center,
     const Point3D &referencePoint );
 
 
@@ -272,7 +272,7 @@ protected:
    * ellipsoid equation.
    */
   double CalculateSpacing( const mitk::Vector3D &direction ) const;
-  
+
 
 
   /** The extent of the slice stack, i.e. the number of slices, depends on the
@@ -290,7 +290,7 @@ protected:
 
   /**
    * If (a) m_EvenlySpaced==true, (b) we don't have a Geometry2D stored
-   * for the requested slice, and (c) the first slice (s=0) 
+   * for the requested slice, and (c) the first slice (s=0)
    * is a PlaneGeometry instance, then we calculate the geometry of the
    * requested as the plane of the first slice shifted by m_Spacing.z*s
    * in the direction of m_DirectionVector.
@@ -301,7 +301,7 @@ protected:
 
   /**
    * Vector between slices for the evenly-spaced case (m_EvenlySpaced==true).
-   * If the direction-vector is (0,0,0) (the default) and the first 
+   * If the direction-vector is (0,0,0) (the default) and the first
    * 2D geometry is a PlaneGeometry, then the direction-vector will be
    * calculated from the plane normal.
    */

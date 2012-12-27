@@ -40,6 +40,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
+/**
+* \brief Merges diffusion weighted images, e.g. to generate one multishell volume from several single shell volumes.   */
+
 template <class TScalarType>
 class MergeDiffusionImagesFilter
         : public ImageSource<itk::VectorImage<TScalarType,3> >
@@ -54,10 +57,10 @@ public:
     typedef SmartPointer<const Self> ConstPointer;
 
     /** Method for creation through the object factory. */
-   itkNewMacro(Self);
+   itkNewMacro(Self)
 
    /** Runtime information support. */
-   itkTypeMacro(MergeDiffusionImagesFilter, ImageSource);
+   itkTypeMacro(MergeDiffusionImagesFilter, ImageSource)
 
     typedef itk::VectorImage<TScalarType,3>                  DwiImageType;
     typedef typename DwiImageType::PixelType                DwiPixelType;
@@ -68,12 +71,14 @@ public:
     typedef itk::VectorContainer< unsigned int, GradientType >  GradientListType;
     typedef typename std::vector< GradientListType::Pointer >   GradientListContainerType;
 
-    void SetImageVolumes(DwiImageContainerType cont);
-    void SetGradientLists(GradientListContainerType cont);
-    void SetBValues(std::vector< double > bvals);
+   // input
+    void SetImageVolumes(DwiImageContainerType cont);       ///< input DWI image volume container
+    void SetGradientLists(GradientListContainerType cont);  ///< gradients of all input images
+    void SetBValues(std::vector< double > bvals);           ///< b-values of all input images
 
-    GradientListType::Pointer GetOutputGradients();
-    double GetB_Value();
+    // output
+    GradientListType::Pointer GetOutputGradients();         ///< gradient list of the merged output image
+    double GetB_Value();                                    ///< main b-value of the merged output image
 
 protected:
 
@@ -82,12 +87,12 @@ protected:
 
     void GenerateData();
 
-    DwiImageContainerType       m_ImageVolumes;
-    GradientListContainerType   m_GradientLists;
-    std::vector< double >       m_BValues;
-    int                         m_NumGradients;
-    GradientListType::Pointer   m_OutputGradients;
-    double                      m_BValue;
+    DwiImageContainerType       m_ImageVolumes;     ///< contains input images
+    GradientListContainerType   m_GradientLists;    ///< contains gradients of all input images
+    std::vector< double >       m_BValues;          ///< contains b-values of all input images
+    int                         m_NumGradients;     ///< number of gradients in the output image
+    GradientListType::Pointer   m_OutputGradients;  ///< container for output gradients
+    double                      m_BValue;           ///< main output b-value
 };
 
 

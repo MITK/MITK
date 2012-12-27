@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 
 /*!
-\brief QmitkDicomExternalDataWidget 
+\brief QmitkDicomExternalDataWidget
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -50,12 +50,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 \ingroup Functionalities
 */
 class MITK_DICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
-{  
+{
    // this is needed for all Qt objects that should have a Qt meta-object
    // (everything that derives from QObject and wants to have signal/slots)
    Q_OBJECT
 
-public:  
+public:
 
    static const std::string Widget_ID;
 
@@ -64,7 +64,7 @@ public:
 
    virtual void CreateQtPartControl(QWidget *parent);
 
-   /* @brief   Initializes the widget. This method has to be called before widget can start. 
+   /* @brief   Initializes the widget. This method has to be called before widget can start.
    * @param dataStorage The data storage the widget should work with.
    * @param multiWidget The corresponding multiwidget were the ct Image is displayed and the user should define his path.
    * @param imageNode  The image node which will be the base of mitral processing

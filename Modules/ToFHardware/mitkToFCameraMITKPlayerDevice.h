@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDevice : public ToFCameraDevice
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFCameraMITKPlayerDevice , ToFCameraDevice );
 
@@ -45,13 +45,13 @@ namespace mitk
     /*!
     \brief opens a connection to the ToF camera
     */
-    virtual bool ConnectCamera();
+    virtual bool OnConnectCamera();
     /*!
     \brief closes the connection to the camera
     */
     virtual bool DisconnectCamera();
     /*!
-    \brief starts the continuous updating of the camera. 
+    \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
     virtual void StartCamera();
@@ -92,7 +92,7 @@ namespace mitk
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
 //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /*!
+//    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
 //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
 //    \param bufferSize buffer size the buffer should be reset to
 //    */

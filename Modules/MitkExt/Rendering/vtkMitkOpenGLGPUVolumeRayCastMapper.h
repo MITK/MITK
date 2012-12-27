@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -141,7 +141,7 @@ protected:
   void CreateGLSLObjects();
 
   // Description:
-  // Allows late binding textures to framebuffers, because ATI openGL requires 
+  // Allows late binding textures to framebuffers, because ATI openGL requires
   // the texture to initialized before
   void BindFramebuffer();
 
@@ -507,7 +507,7 @@ protected:
   double LastProgressEventTime; // initial value is 0.0. Expressed in seconds.
 
   bool PreserveOrientation;
-  
+
 private:
   vtkMitkOpenGLGPUVolumeRayCastMapper(const vtkMitkOpenGLGPUVolumeRayCastMapper&);  // Not implemented.
   void operator=(const vtkMitkOpenGLGPUVolumeRayCastMapper&);  // Not implemented.

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer() 
+mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
   : mitk::NavigationDataPlayerBase()
   , m_Doc(new TiXmlDocument)
   , m_DataElem(0)
@@ -50,7 +50,7 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   if(!m_DataElem)
   {
     MITK_WARN << "Data element not found";
-    mitkThrowException(mitk::IGTException) << "Data element not found"; 
+    mitkThrowException(mitk::IGTException) << "Data element not found";
   }
   else
   {
@@ -132,7 +132,7 @@ void mitk::NavigationDataSequentialPlayer::
     SetFileName(const std::string& _FileName)
 {
   m_FileName = _FileName;
-  
+
   if(!m_Doc->LoadFile(m_FileName))
   {
     this->SetNumberOfOutputs(0);
@@ -155,14 +155,14 @@ void mitk::NavigationDataSequentialPlayer::
   if((m_Doc->Parse( m_XMLString.c_str()))== NULL)
   {
     this->ReinitXML();
-  } 
-  else 
+  }
+  else
   {
     //if the string is not an XML string
     std::ostringstream s;
     s << "String" << _XMLString << " is not an XML string";
     mitkThrowException(mitk::IGTIOException)<<s.str();
-  } 
+  }
   this->Modified();
 }
 
@@ -171,7 +171,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   assert(m_DataElem);
   // very important: go through the tools (there could be more than one)
   mitk::NavigationData::Pointer tmp;
-  
+
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
     // go to the first element
@@ -199,7 +199,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
       {
       output->SetDataValid(false);
       m_StreamValid = false;
-      
+
       m_ErrorMessage = "Error: Cannot parse input file.";
       mitkThrowException(mitk::IGTException)<<m_ErrorMessage;
       }

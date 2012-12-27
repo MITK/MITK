@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,10 +46,10 @@ QmitkFunctionality::QmitkFunctionality()
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
 {
-  m_PreferencesService = 
+  m_PreferencesService =
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
-  
+
 void QmitkFunctionality::SetHandleMultipleDataStorages(bool multiple)
 {
   m_HandlesMultipleDataStorages = multiple;
@@ -59,13 +59,13 @@ bool QmitkFunctionality::HandlesMultipleDataStorages() const
 {
   return m_HandlesMultipleDataStorages;
 }
-  
-mitk::DataStorage::Pointer 
+
+mitk::DataStorage::Pointer
 QmitkFunctionality::GetDataStorage() const
 {
-  mitk::IDataStorageService::Pointer service = 
+  mitk::IDataStorageService::Pointer service =
     berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-  
+
   if (service.IsNotNull())
   {
     if (m_HandlesMultipleDataStorages)
@@ -73,13 +73,13 @@ QmitkFunctionality::GetDataStorage() const
     else
       return service->GetDefaultDataStorage()->GetDataStorage();
   }
-  
+
   return 0;
 }
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
-  mitk::IDataStorageService::Pointer service = 
+  mitk::IDataStorageService::Pointer service =
     berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   return service->GetDefaultDataStorage()->GetDataStorage();
@@ -89,7 +89,7 @@ void QmitkFunctionality::CreatePartControl(void* parent)
 {
 
   // scrollArea
-  QScrollArea* scrollArea = new QScrollArea;  
+  QScrollArea* scrollArea = new QScrollArea;
   //QVBoxLayout* scrollAreaLayout = new QVBoxLayout(scrollArea);
   scrollArea->setFrameShadow(QFrame::Plain);
   scrollArea->setFrameShape(QFrame::NoFrame);
@@ -147,7 +147,7 @@ void QmitkFunctionality::AfterCreateQtPartControl()
     = QmitkFunctionalitySelectionProvider::New(this);
   m_SelectionProvider = _SelectionProvider.GetPointer();
   this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(m_SelectionProvider));
-  
+
   // EMULATE INITIAL SELECTION EVENTS
 
   // by default a a multi widget is always available
@@ -212,7 +212,7 @@ void QmitkFunctionality::BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointe
   if(sourcepart.IsNull() || sourcepart->GetSite()->GetId() != "org.mitk.views.datamanager")
     return;
 
-  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection
     = selection.Cast<const mitk::DataNodeSelection>();
   this->OnSelectionChanged(this->DataNodeSelectionToVector(_DataNodeSelection));
 }
@@ -291,7 +291,7 @@ void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bo
 
 void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
 {
-  
+
 }
 
 void QmitkFunctionality::WaitCursorOn()

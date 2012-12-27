@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <highgui.h>
 
 //Other
-#include <stdio.h>  
+#include <stdio.h>
 
 
 mitk::USImageVideoSource::USImageVideoSource()
@@ -47,7 +47,7 @@ void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
   m_VideoCapture->open(path.c_str());
   if(!m_VideoCapture->isOpened())  // check if we succeeded
     m_IsVideoReady = false;
-  else     
+  else
     m_IsVideoReady = true;
 
   // If Override is enabled, use it
@@ -57,13 +57,13 @@ void mitk::USImageVideoSource::SetVideoFileInput(std::string path)
   }
 }
 
-    
+
 void mitk::USImageVideoSource::SetCameraInput(int deviceID)
 {
   m_VideoCapture->open(deviceID);
   if(!m_VideoCapture->isOpened())  // check if we succeeded
     m_IsVideoReady = false;
-  else     
+  else
     m_IsVideoReady = true;
 
   // If Override is enabled, use it
@@ -111,16 +111,18 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // Retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
- 
+
   // if Region of interest is set, crop image
   if (m_CropRegion.width > 0){
     buffer = image(m_CropRegion);
+    image.release();
     image = buffer;
   }
   // If this source is set to deliver greyscale images, convert it
   if (m_IsGreyscale)
   {
     cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
+    image.release();
     image = buffer;
   }
 
@@ -132,6 +134,11 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
+
+  // Clean up
+  buffer.release();
+  image.release();
+
   return result;
 }
 

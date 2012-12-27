@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotWidget.h"
 
-QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f): QWidget(parent, f) 
+QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f): QWidget(parent, f)
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
   m_Plot->setCanvasBackground(Qt::white);
-  boxLayout->addWidget( m_Plot );  
-} 
+  boxLayout->addWidget( m_Plot );
+}
 
 QmitkPlotWidget::~QmitkPlotWidget()
 {
@@ -144,9 +144,9 @@ double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::XYDataVector&
   double* raw = new double[ values.size() ];
   for( unsigned int i = 0; i < values.size(); ++i )
   {
-    switch (component) 
+    switch (component)
     {
-    case (0): 
+    case (0):
       raw[i] = values[i].first;
       break;
     case (1):

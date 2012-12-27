@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,7 +56,7 @@ void QmitkToFTutorialView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkToFTutorialViewControls;
     m_Controls->setupUi( parent );
- 
+
     connect( m_Controls->step1Button, SIGNAL(clicked()), this, SLOT(OnStep1()) );
     connect( m_Controls->step2Button, SIGNAL(clicked()), this, SLOT(OnStep2()) );
   }
@@ -82,11 +82,11 @@ void QmitkToFTutorialView::OnStep1()
   tofImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
   // set paths to test data
   std::string distanceFileName = MITK_TOF_DATA_DIR;
-  distanceFileName.append("/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic"); 
+  distanceFileName.append("/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic");
   std::string amplitudeFileName = MITK_TOF_DATA_DIR;
-  amplitudeFileName.append("/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.pic"); 
+  amplitudeFileName.append("/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.pic");
   std::string intensityFileName = MITK_TOF_DATA_DIR;
-  intensityFileName.append("/PMDCamCube2_MF0_IT0_20Images_IntensityImage.pic"); 
+  intensityFileName.append("/PMDCamCube2_MF0_IT0_20Images_IntensityImage.pic");
   // set file name property in image grabber. This will be propagated to the corresponding device and controller class
   tofImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
   tofImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,26 +34,26 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
   const int numBins = 20;
 
   vtkUnstructuredGrid* vtkUGrid = ugrid->GetVtkUnstructuredGrid();
-  
+
   double* range = vtkUGrid->GetScalarRange();
-   
+
   SizeType size;
   MeasurementVectorType lowerBound;
   MeasurementVectorType upperBound;
-  
+
   size.Fill(numBins);
   lowerBound[0] = range[0];
   upperBound[0] = range[1];
   double length = upperBound[0] - lowerBound[0];
-  
+
   this->Superclass::Initialize(size, lowerBound, upperBound);
-  
+
   vtkDataArray* data;
   if (m_UsePointData) data = vtkUGrid->GetPointData()->GetScalars();
   else data = vtkUGrid->GetCellData()->GetScalars();
-  
+
   if (data == 0) return;
-  
+
   if (m_UsePointData)
   {
     vtkIdList* cellIds = vtkIdList::New();

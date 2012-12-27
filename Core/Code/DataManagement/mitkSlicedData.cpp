@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -52,8 +52,8 @@ void mitk::SlicedData::UpdateOutputInformation()
     m_UseLargestPossibleRegion = true;
   }
 
-  // Now we should know what our largest possible region is. If our 
-  // requested region was not set yet, (or has been set to something 
+  // Now we should know what our largest possible region is. If our
+  // requested region was not set yet, (or has been set to something
   // invalid - with no data in it ) then set it to the largest possible
   // region.
   if ( ! m_RequestedRegionInitialized)
@@ -76,7 +76,7 @@ void mitk::SlicedData::PrepareForNewData()
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  if(GetGeometry()==NULL) 
+  if(GetGeometry()==NULL)
     return;
   unsigned int i;
   const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
@@ -92,7 +92,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   // Is the requested region within the currently buffered data?
   // SlicedData and subclasses store entire volumes or slices. The
-  // methods IsVolumeSet() and IsSliceSet are provided to check, 
+  // methods IsVolumeSet() and IsSliceSet are provided to check,
   // a volume or slice, respectively, is available. Thus, these
   // methods used here.
   const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
@@ -296,7 +296,7 @@ void mitk::SlicedData::SetSpacing(const float aSpacing[3])
 void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 {
   mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
-  
+
   assert(timeSlicedGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;
@@ -327,7 +327,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 {
   mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
-  
+
   assert(timeSlicedGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;

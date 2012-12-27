@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,18 +29,18 @@ namespace berry
  * A lock is used to control access to an exclusive resource.
  * <p>
  * Locks are reentrant.  That is, they can be acquired multiple times by the same thread
- * without releasing.  Locks are only released when the number of successful acquires 
+ * without releasing.  Locks are only released when the number of successful acquires
  * equals the number of successful releases.
  * </p><p>
  * Locks are capable of detecting and recovering from programming errors that cause
- * circular waiting deadlocks. When a deadlock between two or more <tt>ILock</tt> 
- * instances is detected, detailed debugging information is printed to the log file.  The 
- * locks will then automatically recover from the deadlock by employing a release 
- * and wait strategy. One thread will lose control of the locks it owns, thus breaking 
- * the deadlock and  allowing other threads to proceed.  Once that thread's locks are 
- * all available, it will be given exclusive access to all its locks and allowed to proceed.  
- * A thread can only lose locks while it is waiting on an <tt>acquire()</tt> call. 
- * 
+ * circular waiting deadlocks. When a deadlock between two or more <tt>ILock</tt>
+ * instances is detected, detailed debugging information is printed to the log file.  The
+ * locks will then automatically recover from the deadlock by employing a release
+ * and wait strategy. One thread will lose control of the locks it owns, thus breaking
+ * the deadlock and  allowing other threads to proceed.  Once that thread's locks are
+ * all available, it will be given exclusive access to all its locks and allowed to proceed.
+ * A thread can only lose locks while it is waiting on an <tt>acquire()</tt> call.
+ *
  * </p><p>
  * Successive acquire attempts by different threads are queued and serviced on
  * a first come, first served basis.
@@ -55,11 +55,11 @@ namespace berry
  *   lock.release();
  * }
  * </pre>
- * Note: although <tt>lock.acquire</tt> should never fail, it is good practice to place 
- * it inside the try block anyway.  Releasing without acquiring is far less catastrophic 
+ * Note: although <tt>lock.acquire</tt> should never fail, it is good practice to place
+ * it inside the try block anyway.  Releasing without acquiring is far less catastrophic
  * than acquiring without releasing.
  * </p>
- * 
+ *
  * @see IJobManager#NewLock()
  * @noimplement This interface is not intended to be implemented by clients.
  */

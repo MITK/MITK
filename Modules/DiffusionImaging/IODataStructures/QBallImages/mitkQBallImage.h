@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // 10 - 1002
 #define QBALL_ODFSIZE 252
 
-namespace mitk 
+namespace mitk
 {
 
   /**
@@ -50,7 +50,7 @@ namespace mitk
 
     mitkClassMacro( QBallImage, Image );
     itkNewMacro(Self);
-    
+
     virtual ImageVtkAccessor* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
     virtual ImageVtkAccessor* GetVtkImageData(int t = 0, int n = 0);
@@ -60,7 +60,7 @@ namespace mitk
   protected:
     QBallImage();
     virtual ~QBallImage();
-    
+
     mitk::Image::Pointer m_RgbImage;
 
   };

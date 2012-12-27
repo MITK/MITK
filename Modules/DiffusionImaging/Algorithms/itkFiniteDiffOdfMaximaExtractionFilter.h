@@ -27,8 +27,11 @@
 #include <itkOrientationDistributionFunction.h>
 
 namespace itk{
-/** \class FiniteDiffOdfMaximaExtractionFilter
- */
+
+/**
+* \brief Extract ODF peaks by searching all local maxima on a densely sampled ODF und clustering these maxima to get the underlying fiber direction.
+* NrOdfDirections: number of sampling points on the ODF surface (about 20000 is a good value)
+*/
 
 template< class PixelType, int ShOrder, int NrOdfDirections >
 class FiniteDiffOdfMaximaExtractionFilter :
@@ -39,9 +42,9 @@ Image< Vector< PixelType, 3 >, 3 > >
     public:
 
     enum NormalizationMethods {
-        NO_NORM,
-        SINGLE_VEC_NORM,
-        MAX_VEC_NORM
+        NO_NORM,            ///< no length normalization of the output peaks
+        SINGLE_VEC_NORM,    ///< normalize the single peaks to length 1
+        MAX_VEC_NORM        ///< normalize all peaks according to their length in comparison to the largest peak (0-1)
     };
 
     typedef FiniteDiffOdfMaximaExtractionFilter Self;
@@ -71,51 +74,54 @@ Image< Vector< PixelType, 3 >, 3 > >
     typedef VectorContainer< unsigned int, ItkDirectionImage::Pointer >   ItkDirectionImageContainer;
 
     // input
-    itkSetMacro( MaxNumPeaks, unsigned int)
-    itkSetMacro( PeakThreshold, double)
-    itkSetMacro( AbsolutePeakThreshold, double)
-    itkSetMacro( ClusteringThreshold, double)
-    itkSetMacro( AngularThreshold, double)
-    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)
-    itkSetMacro( NormalizationMethod, NormalizationMethods)
+    itkSetMacro( MaxNumPeaks, unsigned int)                 ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
+    itkSetMacro( PeakThreshold, double)                     ///< threshold on the peak length relative to the largest peak inside the current voxel
+    itkSetMacro( AbsolutePeakThreshold, double)             ///< hard threshold on the peak length of all local maxima
+    itkSetMacro( ClusteringThreshold, double)               ///< directions closer together than the specified angular threshold will be clustered (in rad)
+    itkSetMacro( AngularThreshold, double)                  ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
+    itkSetMacro( MaskImage, ItkUcharImgType::Pointer)       ///< only voxels inside the binary mask are processed
+    itkSetMacro( NormalizationMethod, NormalizationMethods) ///< normalization method of ODF peaks
 
     // output
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
-    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
+    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< container for output peaks
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< number of peaks per voxel
 
     protected:
     FiniteDiffOdfMaximaExtractionFilter();
     ~FiniteDiffOdfMaximaExtractionFilter(){}
 
-//    void GenerateData();
-
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadID );
     void AfterThreadedGenerateData();
 
+    /** Extract all local maxima from the densely sampled ODF surface. Thresholding possible. **/
     void FindCandidatePeaks(OdfType& odf, double odfMax, std::vector< DirectionType >& inDirs);
+
+    /** Cluster input directions within a certain angular threshold **/
     std::vector< DirectionType > MeanShiftClustering(std::vector< DirectionType >& inDirs);
 
+    /** Convert cartesian to spherical coordinates **/
     void Cart2Sph(const std::vector< DirectionType >& dir, vnl_matrix<double>& sphCoords);
+
+    /** Calculate spherical harmonic basis of the defined order **/
     vnl_matrix<double> CalcShBasis(vnl_matrix<double>& sphCoords);
 
     private:
 
-    NormalizationMethods                        m_NormalizationMethod;
-    unsigned int                                m_NumOdfDirections;
-    unsigned int                                m_MaxNumPeaks;
-    double                                      m_PeakThreshold;
-    double                                      m_AbsolutePeakThreshold;
-    vnl_matrix< double >                        m_ShBasis;
-    double                                      m_ClusteringThreshold;
-    double                                      m_AngularThreshold;
-    const int                                   m_NumCoeffs;
+    NormalizationMethods                        m_NormalizationMethod;  ///< normalization method of ODF peaks
+    unsigned int                                m_MaxNumPeaks;          ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
+    double                                      m_PeakThreshold;        ///< threshold on the peak length relative to the largest peak inside the current voxel
+    double                                      m_AbsolutePeakThreshold;///< hard threshold on the peak length of all local maxima
+    vnl_matrix< double >                        m_ShBasis;              ///< container for evaluated SH base functions
+    double                                      m_ClusteringThreshold;  ///< directions closer together than the specified angular threshold will be clustered (in rad)
+    double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
+    const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundleX::Pointer               m_OutputFiberBundle;
-    ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;
-    ItkUcharImgType::Pointer                  m_NumDirectionsImage;
-    ItkUcharImgType::Pointer                  m_MaskImage;
+    mitk::FiberBundleX::Pointer               m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
+    ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
+    ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
+    ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed
 };
 
 }

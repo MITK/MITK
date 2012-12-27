@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ class QmitkExt_EXPORT QClickableLabel2 : public QLabel
     :QLabel(parent, f)
     {
     }
-  
+
     virtual void mouseReleaseEvent( QMouseEvent* )
     {
       emit clicked();
@@ -49,17 +49,17 @@ class QmitkExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mi
   Q_OBJECT
 
   public:
-    
+
     QmitkStringPropertyOnDemandEdit( mitk::StringProperty*, QWidget* parent );
     virtual ~QmitkStringPropertyOnDemandEdit();
-      
+
     //virtual void setPalette ( const QPalette & );
     //virtual void setBackgroundMode ( BackgroundMode );
   protected:
 
     virtual void PropertyChanged();
     virtual void PropertyRemoved();
-    
+
     mitk::StringProperty* m_StringProperty;
 
     QHBoxLayout* m_layout;
@@ -67,7 +67,7 @@ class QmitkExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mi
     QClickableLabel2* m_toolbutton;
 
   protected slots:
-    
+
     void onToolButtonClicked();
 
   private:

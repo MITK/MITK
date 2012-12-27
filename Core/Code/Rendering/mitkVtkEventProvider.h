@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk
 
 
 /**
-* \brief Integrates into the VTK event mechanism to generate MITK specific events. 
+* \brief Integrates into the VTK event mechanism to generate MITK specific events.
 * This class is NON-QT dependent pandon to the current MITK event handling code in QmitkRenderWindow.
 * \ingroup Renderer
 */
@@ -41,7 +41,7 @@ class MITK_CORE_EXPORT vtkEventProvider : public vtkInteractorObserver
     // Satisfy the superclass API. Enable/disable listening for events.
     virtual void SetEnabled(int);
     virtual void SetInteractor(vtkRenderWindowInteractor* iren);
-    
+
     // Interface to MITK
     virtual void SetMitkRenderWindow(mitk::RenderWindow* renWin);
     mitk::RenderWindow* GetRenderWindow();
@@ -67,8 +67,8 @@ class MITK_CORE_EXPORT vtkEventProvider : public vtkInteractorObserver
   private:
     vtkEventProvider(const vtkEventProvider&);  // Not implemented.
     void operator=(const vtkEventProvider&);        // Not implemented.
-   
-   
+
+
 };
 
 }

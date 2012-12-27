@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,7 +54,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Constructor: ";
-  mitk::HistogramMatching::Pointer histogramMatching = mitk::HistogramMatching::New(); 
+  mitk::HistogramMatching::Pointer histogramMatching = mitk::HistogramMatching::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Set Reference Image: ";

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,7 +26,7 @@ namespace mitk
 {
 
    /** \brief Image Filter to convert 2D MITK images to 3D MITK images.
-   * 
+   *
    * A new 3D MITK image is created and all pixel and geometry information from
    * the given 2D input image is copied. The resulting image 3D image has just one slice.
    *
@@ -38,7 +38,7 @@ namespace mitk
    */
   class MITK_CORE_EXPORT Convert2Dto3DImageFilter : public ImageToImageFilter
   {
-  public: 
+  public:
 
     mitkClassMacro( Convert2Dto3DImageFilter , ImageToImageFilter );
     itkNewMacro( Self );

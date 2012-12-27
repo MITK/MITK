@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -99,18 +99,18 @@ QColor QmitkHistogram::color() const
 QwtDoubleRect QmitkHistogram::boundingRect() const
 {
   QwtDoubleRect rect = m_Data->data.boundingRect();
-  if ( !rect.isValid() ) 
+  if ( !rect.isValid() )
     return rect;
 
-  if ( rect.bottom() < m_Data->reference ) 
+  if ( rect.bottom() < m_Data->reference )
     rect.setBottom( m_Data->reference );
-  else if ( rect.top() > m_Data->reference ) 
+  else if ( rect.top() > m_Data->reference )
     rect.setTop( m_Data->reference );
 
   return rect;
 }
 
-void QmitkHistogram::draw(QPainter *painter, const QwtScaleMap &xMap, 
+void QmitkHistogram::draw(QPainter *painter, const QwtScaleMap &xMap,
                           const QwtScaleMap &yMap, const QRect &) const
 {
   const QwtIntervalData &iData = m_Data->data;
@@ -185,22 +185,22 @@ void QmitkHistogram::drawBar(QPainter *painter,
 
   painter->setPen(QPen(dark, 2));
 #if QT_VERSION >= 0x040000
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.left() + 1, r.bottom(), r.right() + 1, r.bottom());
 #else
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.left(), r.bottom(), r.right() + 1, r.bottom());
 #endif
 
   painter->setPen(QPen(light, 1));
 
 #if QT_VERSION >= 0x040000
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.left(), r.top() + 1, r.left(), r.bottom());
   QwtPainter::drawLine(painter,
     r.left() + 1, r.top() + 2, r.left() + 1, r.bottom() - 1);
 #else
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.left(), r.top() + 1, r.left(), r.bottom() + 1);
   QwtPainter::drawLine(painter,
     r.left() + 1, r.top() + 2, r.left() + 1, r.bottom());
@@ -209,14 +209,14 @@ void QmitkHistogram::drawBar(QPainter *painter,
   painter->setPen(QPen(dark, 1));
 
 #if QT_VERSION >= 0x040000
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.right() + 1, r.top() + 1, r.right() + 1, r.bottom());
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.right(), r.top() + 2, r.right(), r.bottom() - 1);
 #else
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.right() + 1, r.top() + 1, r.right() + 1, r.bottom() + 1);
-  QwtPainter::drawLine(painter, 
+  QwtPainter::drawLine(painter,
     r.right(), r.top() + 2, r.right(), r.bottom());
 #endif
 

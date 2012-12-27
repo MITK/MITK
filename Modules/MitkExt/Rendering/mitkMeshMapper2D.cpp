@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -61,9 +61,9 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
   //  @FIXME: Logik fuer update
   bool updateNeccesary = true;
 
-  if (updateNeccesary) 
+  if (updateNeccesary)
   {
-  //aus GenerateData    
+  //aus GenerateData
     mitk::Mesh::Pointer input = const_cast<mitk::Mesh*>(this->GetInput());
 
     // Get the TimeSlicedGeometry of the input object
@@ -94,7 +94,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh( timeStep );
 
-    if ( itkMesh.GetPointer() == NULL) 
+    if ( itkMesh.GetPointer() == NULL)
     {
       return;
     }
@@ -118,7 +118,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     //iterator on the additional data of each point
     Mesh::PointDataIterator dataIt;//, dataEnd;
     dataIt=itkMesh->GetPointData()->Begin();
-      
+
     //for switching back to old color after using selected color
     float unselectedColor[4];
     glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
@@ -143,8 +143,8 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         Vector2D horz,vert;
         horz[0]=5; horz[1]=0;
         vert[0]=0; vert[1]=5;
-                        
-        //check if the point is to be marked as selected 
+
+        //check if the point is to be marked as selected
         if (dataIt->Value().selected)
         {
           horz[0]=8;
@@ -268,7 +268,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           //search in data (vector<> selectedLines) if the index of the point is set. if so, then the line is selected.
           lineSelected = false;
           Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
-          
+
           //a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
           //since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
           Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
@@ -359,7 +359,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
                 glVertex2fv(&(*firstOfCell)[0]);
               glEnd ();
             }
-            else 
+            else
             {
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
               glBegin (GL_LINES);
@@ -377,7 +377,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         else
           showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox"))->GetValue();
 
-        if(showBoundingBox) 
+        if(showBoundingBox)
         {
           if (cellDataIt->Value().selected)
           {
@@ -439,7 +439,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           end=intersectionPoints.end();
           if((intersectionPoints.size()%2)!=0)
           {
-            --end; //ensure even number of intersection-points 
+            --end; //ensure even number of intersection-points
           }
           float p[2];
           Point3D pt3d;
@@ -447,19 +447,19 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           for ( it = intersectionPoints.begin( ); it != end; ++it )
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d); 
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
+              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
               ++it;
               displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
             glEnd ();
           }
           if(it!=intersectionPoints.end())
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d); 
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p); 
+              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
             glEnd ();
           }
         }//fill off-plane polygon part 2

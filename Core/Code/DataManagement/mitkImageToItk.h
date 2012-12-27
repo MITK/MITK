@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -43,7 +43,7 @@ class ImageToItk : public itk::ImageSource< TOutputImage >
 protected:
   mitk::Image::Pointer m_MitkImage;
   mitk::ImageDataItem::Pointer m_ImageDataItem;
-  
+
 public:
   typedef ImageToItk  Self;
   typedef itk::ImageSource<TOutputImage>  Superclass;
@@ -51,8 +51,8 @@ public:
   typedef itk::SmartPointer<const Self>  ConstPointer;
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);  
-  
+  itkNewMacro(Self);
+
   /** Superclass typedefs. */
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
@@ -65,7 +65,7 @@ public:
   typedef typename TOutputImage::IndexType        IndexType;
   typedef typename TOutputImage::RegionType       RegionType;
   typedef typename TOutputImage::PixelType        PixelType;
-  
+
   virtual void SetInput(mitk::Image *input);
   virtual void SetInput(unsigned int index, mitk::Image * image);
 
@@ -85,22 +85,22 @@ protected:
   ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
   {
   }
-  
+
   virtual ~ImageToItk()
   {
   }
 
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
-  
+
 
   virtual void GenerateData();
 
   virtual void GenerateOutputInformation();
-  
+
 private:
   bool m_CopyMemFlag;
   int m_Channel;
-  
+
   //ImageToItk(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 

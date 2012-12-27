@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,39 +22,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <mitkFileReader.h>
 #include <vector>
-#include <string> 
+#include <string>
 
 namespace mitk
 {
 
 /**
- * Provides a function which generates a list of files from 
+ * Provides a function which generates a list of files from
  * a given prefix and pattern.
  * Subclasses may use this function to load a series of files.
  */
-class MITK_CORE_EXPORT FileSeriesReader : public FileReader 
+class MITK_CORE_EXPORT FileSeriesReader : public FileReader
 {
 public:
     mitkClassMacro( FileSeriesReader, FileReader );
 
     typedef std::vector< std::string > MatchedFileNames;
-    
+
     virtual MatchedFileNames GetMatchedFileNames( );
-    
+
 protected:
-    
+
     FileSeriesReader();
-    
+
     virtual ~FileSeriesReader();
-    
+
     virtual bool GenerateFileList();
-    
+
     std::string m_FileName;
 
     std::string m_FilePrefix;
 
     std::string m_FilePattern;
-    
+
     MatchedFileNames m_MatchedFileNames;
 };
 

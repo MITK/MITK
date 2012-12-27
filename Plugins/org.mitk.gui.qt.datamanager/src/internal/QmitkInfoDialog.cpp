@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
   this->setLayout(parentLayout);
   this->setSizeGripEnabled(true);
   this->setModal(true);
-  
+
   parentLayout->addWidget(_QmitkDataStorageComboBox, 0, 0, 1, 2);
   parentLayout->addWidget(m_KeyWord, 1, 0);
   parentLayout->addWidget(m_SearchButton, 1, 1);
@@ -70,7 +70,7 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
     , this, SLOT( OnCancelButtonClicked( bool ) ) );
 
   _CancelButton->setDefault(true);
-  
+
 }
 
 void QmitkInfoDialog::OnSelectionChanged( const mitk::DataNode* node )
@@ -87,7 +87,7 @@ void QmitkInfoDialog::OnSearchButtonClicked( bool  /*checked*/ /*= false */ )
 {
   QString keyWord = m_KeyWord->text();
   QString text = m_TextBrowser->toPlainText();
-  
+
   if(keyWord.isEmpty() || text.isEmpty())
     return;
 
@@ -102,7 +102,7 @@ void QmitkInfoDialog::OnCancelButtonClicked( bool  /*checked*/ /*= false */ )
 
 bool QmitkInfoDialog::eventFilter( QObject *obj, QEvent *event )
 {
-  if (event->type() == QEvent::KeyPress) 
+  if (event->type() == QEvent::KeyPress)
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if(keyEvent->key() == Qt::Key_F3  || keyEvent->key() == Qt::Key_Return)

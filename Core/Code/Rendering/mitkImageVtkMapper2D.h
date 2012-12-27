@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ class vtkMitkApplyLevelWindowToRGBFilter;
 namespace mitk {
 
   /** \brief Mapper to resample and display 2D slices of a 3D image.
- * 
+ *
  * The following image gives a brief overview of the mapping and the involved parts.
  *
  * \image html imageVtkMapper2Darchitecture.png
@@ -82,7 +82,7 @@ namespace mitk {
  *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
  *   - \b "layer": (IntProperty) Layer of the image
  *   - \b "volume annotation color": (ColorProperty) color of the volume annotation, TODO has to be reimplemented
- *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!) 
+ *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!)
           unit is ml or cm3, TODO has to be reimplemented
 
  * The default properties are:
@@ -143,14 +143,18 @@ namespace mitk {
     public:
       /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
-      
+
       vtkSmartPointer<vtkPropAssembly> m_Actors;
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-      /** \brief Current slice of a 2D render window. */
+      /** \brief Current slice of a 2D render window.*/
       vtkSmartPointer<vtkImageData> m_ReslicedImage;
       /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
+      *   \warning This member variable is set to NULL,
+      *   if no image geometry is inside the plane geometry
+      *   of the respective render window. Any user of this
+      *   slice has to check whether it is set to NULL!
       */
       vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
       /** \brief Plane on which the slice is rendered as texture. */
@@ -160,14 +164,14 @@ namespace mitk {
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief The actual reslicer (one per renderer) */
-    mitk::ExtractSliceFilter::Pointer m_Reslicer;  
+    mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
     vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief PolyData object containg all lines/points needed for outlining the contour.
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
-    
+
 
       /** \brief Timestamp of last update of stored data. */
       itk::TimeStamp m_LastUpdateTime;
@@ -219,9 +223,8 @@ namespace mitk {
     void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
     /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
-      \param binarySlice - The binary image slice. (Volumes are not supported.)
-      \param mmPerPixel - Spacing of the binary image slice. Hence it's 2D, only in x/y-direction.
-      \note This code has been taken from the deprecated library iil.
+      \param renderer: Pointer to the renderer containing the needed information
+      \note This code is based on code from the iil library.
       */
     vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 
@@ -267,12 +270,12 @@ namespace mitk {
 
     /** \brief Set the opacity of the actor. */
     void ApplyOpacity( mitk::BaseRenderer* renderer );
-    
+
     /**
-    * \brief Calculates whether the given rendering geometry intersects the 
+    * \brief Calculates whether the given rendering geometry intersects the
     * given SlicedGeometry3D.
-    * 
-    * This method checks if the given Geometry2D intersects the given 
+    *
+    * This method checks if the given Geometry2D intersects the given
     * SlicedGeometry3D. It calculates the distance of the Geometry2D to all
     * 8 cornerpoints of the SlicedGeometry3D. If all distances have the same
     * sign (all positive or all negative) there is no intersection.

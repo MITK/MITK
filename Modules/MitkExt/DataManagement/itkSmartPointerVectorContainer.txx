@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -241,7 +241,7 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
 template <typename TElementIdentifier, typename TElement>
 typename SmartPointerVectorContainer< TElementIdentifier , TElement >::Iterator
 SmartPointerVectorContainer< TElementIdentifier , TElement >
-::Begin(void) 
+::Begin(void)
 {
   return Iterator(0, this, this->VectorType::begin());
 }
@@ -253,7 +253,7 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
 template <typename TElementIdentifier, typename TElement>
 typename SmartPointerVectorContainer< TElementIdentifier , TElement >::Iterator
 SmartPointerVectorContainer< TElementIdentifier , TElement >
-::End(void) 
+::End(void)
 {
   return Iterator(this->VectorType::size()-1, this, this->VectorType::end());
 }
@@ -275,9 +275,9 @@ SmartPointerVectorContainer< TElementIdentifier , TElement >
  * Clear the elements. The final size will be zero.
  */
 template <typename TElementIdentifier, typename TElement>
-void 
+void
 SmartPointerVectorContainer< TElementIdentifier , TElement >
-::Initialize(void) 
+::Initialize(void)
 {
   this->VectorType::clear();
 }

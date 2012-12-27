@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,10 +29,10 @@ namespace berry
  * running jobs.  There can only be one progress provider at any given time.
  * <p>
  * This class is intended for use by the currently executing Eclipse application.
- * Plug-ins outside the currently running application should not reference or 
+ * Plug-ins outside the currently running application should not reference or
  * subclass this class.
  * </p>
- * 
+ *
  * @see IJobManager#SetProgressProvider(ProgressProvider::Pointer)
  */
 struct ProgressProvider: public Object
@@ -110,4 +110,4 @@ public:
 };
 
 }
-#endif /* BERRY_PROGRESSPROVIDER_H */ 
+#endif /* BERRY_PROGRESSPROVIDER_H */

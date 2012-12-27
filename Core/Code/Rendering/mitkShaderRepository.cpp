@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -111,8 +111,8 @@ void mitk::ShaderRepository::LoadShader(std::string filename)
     shaders.push_back(element);
     SR_INFO << "found shader '" << element->name << "'";
   }
- 
-  else  
+
+  else
   {
     SR_INFO << "Error: no xml shader file!";
   }

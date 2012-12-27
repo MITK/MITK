@@ -12,7 +12,7 @@ if(NOT CPACK_GENERATOR)
       set(CPACK_GENERATOR ZIP)
     else()
       set(CPACK_GENERATOR "NSIS;ZIP")
-      
+
     endif(NOT NSIS_MAKENSIS)
   else()
     if(APPLE)
@@ -23,13 +23,13 @@ if(NOT CPACK_GENERATOR)
   endif()
 endif(NOT CPACK_GENERATOR)
 
-# On windows set default install directory appropriately for 32 and 64 bit 
+# On windows set default install directory appropriately for 32 and 64 bit
 # installers if not already set
 if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)
-  if(CMAKE_CL_64) 
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64") 
+  if(CMAKE_CL_64)
+    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
   else()
-    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES") 
+    set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
   endif()
 endif()
 

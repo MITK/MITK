@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,43 +27,43 @@ namespace mitk {
   class NonBlockingAlgorithm;
 
   class MitkExt_EXPORT NonBlockingAlgorithmEvent : public itk::AnyEvent
-  { 
-  public: 
-    typedef NonBlockingAlgorithmEvent Self; 
-    typedef itk::AnyEvent Superclass; 
+  {
+  public:
+    typedef NonBlockingAlgorithmEvent Self;
+    typedef itk::AnyEvent Superclass;
 
     NonBlockingAlgorithmEvent( const NonBlockingAlgorithm* algorithm = NULL )
-      : m_Algorithm(algorithm) {} 
+      : m_Algorithm(algorithm) {}
 
-    virtual ~NonBlockingAlgorithmEvent() {} 
+    virtual ~NonBlockingAlgorithmEvent() {}
 
-    virtual const char * GetEventName() const 
-    { 
-      return "NonBlockingAlgorithmEvent"; 
-    } 
-
-    virtual bool CheckEvent(const ::itk::EventObject* e) const 
-    { 
-      return dynamic_cast<const Self*>(e); 
-    } 
-
-    virtual ::itk::EventObject* MakeObject() const 
-    { 
-      return new Self( m_Algorithm ); 
-    } 
-
-    const mitk::NonBlockingAlgorithm* GetAlgorithm() const 
-    { 
-      return m_Algorithm.GetPointer(); 
+    virtual const char * GetEventName() const
+    {
+      return "NonBlockingAlgorithmEvent";
     }
-    
-    NonBlockingAlgorithmEvent(const Self& s) : itk::AnyEvent(s), m_Algorithm(s.m_Algorithm) {}; 
+
+    virtual bool CheckEvent(const ::itk::EventObject* e) const
+    {
+      return dynamic_cast<const Self*>(e);
+    }
+
+    virtual ::itk::EventObject* MakeObject() const
+    {
+      return new Self( m_Algorithm );
+    }
+
+    const mitk::NonBlockingAlgorithm* GetAlgorithm() const
+    {
+      return m_Algorithm.GetPointer();
+    }
+
+    NonBlockingAlgorithmEvent(const Self& s) : itk::AnyEvent(s), m_Algorithm(s.m_Algorithm) {};
 
   protected:
     mitk::NonBlockingAlgorithm::ConstPointer m_Algorithm;
-  
-  private: 
-    void operator=(const Self&); 
+
+  private:
+    void operator=(const Self&);
 
   };
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIcon>
 #include <mitkNodePredicateBase.h>
 
-/// 
+///
 /// \class QmitkNodeQmitkNodeDescriptor
 /// \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for the mitk::DataNode
 /// which enhances certain mitk::DataNode by additional infos needed by the GUI (Icon, ...)
@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// \sa QmitkDataNodeQmitkNodeDescriptorManager
 ///
 class QMITK_EXPORT QmitkNodeDescriptor : public QObject
-{  
+{
   Q_OBJECT
 public:
   ///
@@ -58,7 +58,7 @@ public:
   virtual QString GetClassName() const;
   ///
   /// Returns an Icon for this class of DataNodes
-  /// 
+  ///
   virtual QIcon GetIcon() const;
   ///
   /// Returns an Icon for this class of DataNodes

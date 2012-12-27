@@ -50,9 +50,12 @@ public:
   /** Runtime information support. */
   itkTypeMacro(FslShCoefficientImageConverter, ProcessObject)
 
-  itkSetMacro( InputImage, InputImageType::Pointer)
-  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)
-  itkGetMacro( QballImage, typename QballImageType::Pointer)
+  // input
+  itkSetMacro( InputImage, InputImageType::Pointer) ///< sh coefficient image in FSL file format
+
+  // output
+  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
+  itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
 
   void GenerateData();
 
@@ -63,10 +66,10 @@ protected:
   void CalcShBasis();
   vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> GetSphericalOdfDirections();
 
-  InputImageType::Pointer       m_InputImage;
-  typename CoefficientImageType::Pointer m_CoefficientImage;
-  typename QballImageType::Pointer       m_QballImage;
-  vnl_matrix<double> m_ShBasis;
+  InputImageType::Pointer                   m_InputImage;
+  typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
+  typename QballImageType::Pointer          m_QballImage;       ///< mitk Q-Ball image generated from the coefficients
+  vnl_matrix<double>                        m_ShBasis;
 
 private:
 

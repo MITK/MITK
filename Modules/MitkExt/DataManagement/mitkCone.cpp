@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ mitk::Cone::Cone()
   cone->CappingOn();
   cone->Update();
   SetVtkPolyData(cone->GetOutput());
-  cone->Delete(); 
+  cone->Delete();
 }
 
 mitk::Cone::~Cone()
@@ -51,7 +51,7 @@ bool mitk::Cone::IsInside(const Point3D& worldPoint) const
 
   GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
-  p[1] += 1;  // translate point, so that it fits to the formula below, which describes a cone that has its cone vertex at the origin                                            
+  p[1] += 1;  // translate point, so that it fits to the formula below, which describes a cone that has its cone vertex at the origin
   return (sqrt(p[0] * p[0] + p[2] * p[2]) <= p[1] * 0.5) && (p[1] <= 2);  // formula to calculate if a given point is inside a cone that has its cone vertex at the origin, is aligned on the second axis, has a radius of one an a height of two
 }
 

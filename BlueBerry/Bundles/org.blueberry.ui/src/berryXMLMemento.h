@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -104,7 +104,7 @@ class BERRY_UI XMLMemento : public IMemento {
     */
     static XMLMemento::Pointer CreateWriteRoot(const std::string& type);
 
-    /** 
+    /**
      * Copies another Memento into this memento
      *
      * @param child the new child memento
@@ -151,7 +151,7 @@ class BERRY_UI XMLMemento : public IMemento {
      * @return an array of children with the given type
      */
     virtual std::vector< IMemento::Pointer > GetChildren(const std::string& type) const;
-    
+
     /**
      * Returns the Type of this memento
     */
@@ -185,16 +185,16 @@ class BERRY_UI XMLMemento : public IMemento {
     /**
      * Returns the data of the Text node of the memento. Each memento is allowed
      * only one Text node.
-     * 
+     *
      * @return the data of the Text node of the memento, or <code>null</code>
      * if the memento has no Text node.
      */
     virtual const std::string& GetTextData() const;
-  
+
     /**
      * Returns an array of all the attribute keys of the memento. This will not
      * be <code>null</code>. If there are no keys, an array of length zero will
-     * be returned. 
+     * be returned.
      * @return an vector with all the attribute keys of the memento
      */
     virtual std::vector< std::string > GetAttributeKeys() const;
@@ -207,7 +207,7 @@ class BERRY_UI XMLMemento : public IMemento {
      */
     virtual void PutFloat(const std::string& key, double value);
 
-    /** 
+    /**
      * Puts a integer in this memento
      *
      * @param key the key
@@ -215,7 +215,7 @@ class BERRY_UI XMLMemento : public IMemento {
      */
     virtual void PutInteger(const std::string& key, int value);
 
-    /** 
+    /**
      * Puts another memento in this memento as a child
      *
      * @param key the key
@@ -223,7 +223,7 @@ class BERRY_UI XMLMemento : public IMemento {
      */
     virtual void PutMemento(IMemento::Pointer memento);
 
-    /** 
+    /**
      * Puts a string in this memento
      *
      * @param key the key
@@ -231,7 +231,7 @@ class BERRY_UI XMLMemento : public IMemento {
      */
     virtual void PutString(const std::string& key, const std::string& value);
 
-    /** 
+    /**
      * Puts a boolean in this memento
      *
      * @param key the key
@@ -239,7 +239,7 @@ class BERRY_UI XMLMemento : public IMemento {
      */
     virtual void PutBoolean(const std::string& key, bool value);
 
-    /** 
+    /**
      * Puts a text in this memento
      *
      * @param data the text
@@ -257,12 +257,12 @@ class BERRY_UI XMLMemento : public IMemento {
 
     /**
      * Returns the element of the memento
-     * 
+     *
      * @return the xml element
      */
     virtual Poco::XML::Element* GetElement() const;
 
-private:   
+private:
 
     /**
      * Returns the Text node of the memento. Each memento is allowed only
@@ -271,7 +271,7 @@ private:
      * @return the Text node of the memento, or <code>null</code> if
      * the memento has no Text node.
      */
-    Poco::XML::Text* GetTextNode() const; 
+    Poco::XML::Text* GetTextNode() const;
 
     /**
      * Places the element's attributes into the document.

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,15 +31,15 @@ namespace mitk
 {
   /** \brief An Operation for applying an edited slice to the volume.
     \sa DiffSliceOperationApplier
-    
+
     The information for the operation is specified by properties:
 
      imageVolume            the volume where the slice was extracted from.
      slice                  the slice to be applied.
      timestep               the timestep in an 4D image.
      currentWorldGeometry   specifies the axis where the slice has to be applied in the volume.
-    
-    This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.  
+
+    This Operation can be used to realize undo-redo functionality for e.g. segmentation purposes.
   */
   class Segmentation_EXPORT DiffSliceOperation : public Operation
   {
@@ -47,11 +47,11 @@ namespace mitk
   public:
 
     mitkClassMacro(DiffSliceOperation, OperationActor);
-    
+
     //itkNewMacro(DiffSliceOperation);
 
     //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::Geometry2D);
-    
+
     /** \brief Creates an empty instance.
       Note that it is not valid yet. The properties of the object have to be set.
     */

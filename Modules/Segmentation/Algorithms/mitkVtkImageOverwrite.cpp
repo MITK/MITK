@@ -107,7 +107,7 @@ mitkVtkImageOverwrite::~mitkVtkImageOverwrite()
 
 #define VTK_RESLICE_BACKGROUND 0   // use background if out-of-bounds
 #define VTK_RESLICE_WRAP       1   // wrap to opposite side of image
-#define VTK_RESLICE_MIRROR     2   // mirror off of the boundary 
+#define VTK_RESLICE_MIRROR     2   // mirror off of the boundary
 #define VTK_RESLICE_BORDER     3   // use a half-voxel border
 #define VTK_RESLICE_NULL       4   // do nothing to *outPtr if out-of-bounds
 
@@ -186,11 +186,11 @@ template <class F>
 inline void vtkResliceClamp(F val, vtkTypeInt8& clamp)
 {
   if (val < -128.0)
-    { 
+    {
     val = -128.0;
     }
   if (val > 127.0)
-    { 
+    {
     val = 127.0;
     }
   vtkResliceRound(val,clamp);
@@ -202,11 +202,11 @@ template <class F>
 inline void vtkResliceClamp(F val, vtkTypeUInt8& clamp)
 {
   if (val < 0)
-    { 
+    {
     val = 0;
     }
   if (val > 255.0)
-    { 
+    {
     val = 255.0;
     }
   vtkResliceRound(val,clamp);
@@ -218,11 +218,11 @@ template <class F>
 inline void vtkResliceClamp(F val, vtkTypeInt16& clamp)
 {
   if (val < -32768.0)
-    { 
+    {
     val = -32768.0;
     }
   if (val > 32767.0)
-    { 
+    {
     val = 32767.0;
     }
   vtkResliceRound(val,clamp);
@@ -234,11 +234,11 @@ template <class F>
 inline void vtkResliceClamp(F val, vtkTypeUInt16& clamp)
 {
   if (val < 0)
-    { 
+    {
     val = 0;
     }
   if (val > 65535.0)
-    { 
+    {
     val = 65535.0;
     }
   vtkResliceRound(val,clamp);
@@ -249,11 +249,11 @@ inline void vtkResliceClamp(F val, vtkTypeUInt16& clamp)
 template <class F>
 inline void vtkResliceClamp(F val, vtkTypeInt32& clamp)
 {
-  if (val < -2147483648.0) 
+  if (val < -2147483648.0)
     {
     val = -2147483648.0;
     }
-  if (val > 2147483647.0) 
+  if (val > 2147483647.0)
     {
     val = 2147483647.0;
     }
@@ -266,11 +266,11 @@ template <class F>
 inline void vtkResliceClamp(F val, vtkTypeUInt32& clamp)
 {
   if (val < 0)
-    { 
+    {
     val = 0;
     }
   if (val > 4294967295.0)
-    { 
+    {
     val = 4294967295.0;
     }
   vtkResliceRound(val,clamp);
@@ -296,19 +296,19 @@ inline void vtkResliceClamp(F val, vtkTypeFloat64& clamp)
 //----------------------------------------------------------------------------
 // Perform a wrap to limit an index to [0,range).
 // Ensures correct behaviour when the index is negative.
- 
+
 inline int vtkInterpolateWrap(int num, int range)
 {
   if ((num %= range) < 0)
     {
     num += range; // required for some % implementations
-    } 
+    }
   return num;
 }
 
 //----------------------------------------------------------------------------
 // Perform a mirror to limit an index to [0,range).
- 
+
 inline int vtkInterpolateMirror(int num, int range)
 {
   if (num < 0)
@@ -363,10 +363,10 @@ inline  int vtkInterpolateBorderCheck(int inIdX0, int inIdX1, int inExtX,
 }
 
 //----------------------------------------------------------------------------
-// Do nearest-neighbor interpolation of the input data 'inPtr' of extent 
-// 'inExt' at the 'point'.  The result is placed at 'outPtr'.  
+// Do nearest-neighbor interpolation of the input data 'inPtr' of extent
+// 'inExt' at the 'point'.  The result is placed at 'outPtr'.
 // If the lookup data is beyond the extent 'inExt', set 'outPtr' to
-// the background color 'background'.  
+// the background color 'background'.
 // The number of scalar components in the data is 'numscalars'
 template <class F, class T>
 static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
@@ -420,11 +420,11 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
 
   do
     {
-      
+
       if(!self->IsOverwriteMode())
       {
         //just copy from input to output
-        *outPtr++ = *inPtr++;        
+        *outPtr++ = *inPtr++;
       }
       else
       {
@@ -436,7 +436,7 @@ static int vtkNearestNeighborInterpolation(T *&outPtr, const T *inPtr,
   while (--numscalars);
 
   return 1;
-} 
+}
 
 
 //--------------------------------------------------------------------------
@@ -565,7 +565,7 @@ static void vtkAllocBackgroundPixelT(mitkVtkImageOverwrite *self,
     }
 }
 
-static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval, 
+static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
                              int numComponents)
 {
   switch (self->GetOutput()->GetScalarType())
@@ -573,7 +573,7 @@ static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
     vtkTemplateAliasMacro(vtkAllocBackgroundPixelT(self, (VTK_TT **)rval,
                                               numComponents));
     }
-}      
+}
 
 static void vtkFreeBackgroundPixel(mitkVtkImageOverwrite *self, void **rval)
 {
@@ -583,14 +583,14 @@ static void vtkFreeBackgroundPixel(mitkVtkImageOverwrite *self, void **rval)
     }
 
   *rval = 0;
-}      
+}
 
 //----------------------------------------------------------------------------
 // helper function for clipping of the output with a stencil
 static int vtkResliceGetNextExtent(vtkImageStencilData *stencil,
                             int &r1, int &r2, int rmin, int rmax,
-                            int yIdx, int zIdx, 
-                            void *&outPtr, void *background, 
+                            int yIdx, int zIdx,
+                            void *&outPtr, void *background,
                             int numscalars,
                             void (*setpixels)(void *&out,
                                               const void *in,
@@ -651,8 +651,8 @@ static void vtkImageResliceClearExecute(mitkVtkImageOverwrite *self,
   target = static_cast<unsigned long>
     ((outExt[5]-outExt[4]+1)*(outExt[3]-outExt[2]+1)/50.0);
   target++;
-  
-  // Get Increments to march through data 
+
+  // Get Increments to march through data
   outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
   scalarSize = outData->GetScalarSize();
   numscalars = outData->GetNumberOfScalarComponents();
@@ -667,9 +667,9 @@ static void vtkImageResliceClearExecute(mitkVtkImageOverwrite *self,
     {
     for (idY = outExt[2]; idY <= outExt[3]; idY++)
       {
-      if (id == 0) 
+      if (id == 0)
         { // update the progress if this is the main thread
-        if (!(count%target)) 
+        if (!(count%target))
           {
           self->UpdateProgress(count/(50.0*target));
           }
@@ -746,13 +746,13 @@ static void vtkImageResliceExecute(mitkVtkImageOverwrite *self,
 
   // find maximum input range
   inData->GetExtent(inExt);
-  
+
   // for the progress meter
   target = static_cast<unsigned long>
     ((outExt[5]-outExt[4]+1)*(outExt[3]-outExt[2]+1)/50.0);
   target++;
-  
-  // Get Increments to march through data 
+
+  // Get Increments to march through data
   inData->GetIncrements(inInc);
   outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
   scalarSize = outData->GetScalarSize();
@@ -773,24 +773,24 @@ static void vtkImageResliceExecute(mitkVtkImageOverwrite *self,
     {
     for (idY = outExt[2]; idY <= outExt[3]; idY++)
       {
-      if (id == 0) 
+      if (id == 0)
         { // update the progress if this is the main thread
-        if (!(count%target)) 
+        if (!(count%target))
           {
           self->UpdateProgress(count/(50.0*target));
           }
         count++;
         }
-      
+
       iter = 0; // if there is a stencil, it is applied here
       while (vtkResliceGetNextExtent(stencil, idXmin, idXmax,
                                      outExt[0], outExt[1], idY, idZ,
-                                     outPtr, background, numscalars, 
+                                     outPtr, background, numscalars,
                                      setpixels, iter))
         {
         for (idX = idXmin; idX <= idXmax; idX++)
           {
-          // convert to data coordinates 
+          // convert to data coordinates
           point[0] = idX*outSpacing[0] + outOrigin[0];
           point[1] = idY*outSpacing[1] + outOrigin[1];
           point[2] = idZ*outSpacing[2] + outOrigin[2];
@@ -811,7 +811,7 @@ static void vtkImageResliceExecute(mitkVtkImageOverwrite *self,
             {
             transform->InternalTransformPoint(point, point);
             }
-          
+
           // convert back to voxel indices
           point[0] = (point[0] - inOrigin[0])*inInvSpacing[0];
           point[1] = (point[1] - inOrigin[1])*inInvSpacing[1];
@@ -820,7 +820,7 @@ static void vtkImageResliceExecute(mitkVtkImageOverwrite *self,
           // interpolate output voxel from input data set
           interpolate(outPtr, inPtr, inExt, inInc, numscalars,
                       point, mode, background, self);
-          } 
+          }
         }
       outPtr = static_cast<void *>(
         static_cast<char *>(outPtr) + outIncY*scalarSize);
@@ -879,7 +879,7 @@ void mitkVtkImageOverwrite::ThreadedRequestData(
     {
     return;
     }
-  
+
   // Get the output pointer
   void *outPtr = outData[0]->GetScalarPointerForExtent(outExt);
 
@@ -889,11 +889,11 @@ void mitkVtkImageOverwrite::ThreadedRequestData(
                                 outExt, id);
     return;
     }
-  
+
   // Now that we know that we need the input, get the input pointer
   void *inPtr = inData[0][0]->GetScalarPointerForExtent(inExt);
 
-  
+
   vtkImageResliceExecute(this, inData[0][0], inPtr, outData[0], outPtr,
                            outExt, id);
 }

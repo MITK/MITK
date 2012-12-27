@@ -1,6 +1,7 @@
 set(CPP_FILES
 
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
+ QmitkApplicationBase/QmitkIOUtil.cpp
 
  #QmitkModels/QmitkDataStorageListModel.cpp
  #QmitkModels/QmitkPropertiesTableModel.cpp
@@ -112,7 +113,7 @@ set(CPP_FILES
  QmitkRegionGrow3DToolGUI.cpp
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
- 
+
  QmitkAdaptiveRegionGrowingWidget.cpp
 
  QmitkModuleTableModel.cpp

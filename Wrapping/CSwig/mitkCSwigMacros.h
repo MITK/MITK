@@ -23,4 +23,4 @@ typedef itk::name::Pointer::SmartPointer name##_Pointer;
 
 #define ITK_WRAP_OBJECT1(name, arg1, wrapname) \
 typedef itk::name<arg1 >::name wrapname; \
-typedef itk::name<arg1 >::Pointer::SmartPointer wrapname##_Pointer 
+typedef itk::name<arg1 >::Pointer::SmartPointer wrapname##_Pointer

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ namespace berry {
  * <p>
  * Example of creating and running a workbench (in an
  * <code>berry#IApplication</code>):
- * 
+ *
  * <pre>
  * <code>
  *           class MyApplication : public %berry::IApplication {
@@ -59,7 +59,7 @@ namespace berry {
  *           };
  * </code>
  * </pre>
- * 
+ *
  * </p>
  * <p>
  * An application should declare a subclass of <code>berry::WorkbenchAdvisor</code>
@@ -91,7 +91,7 @@ namespace berry {
  * registered during initialize</li>
  * </ul>
  * </p>
- * 
+ *
  */
 class BERRY_UI WorkbenchAdvisor {
 
@@ -118,7 +118,7 @@ class BERRY_UI WorkbenchAdvisor {
    * <p>
    * For internal use by the workbench only.
    * </p>
-   * 
+   *
    * @param configurer
    *            an object for configuring the workbench
    */
@@ -134,7 +134,7 @@ class BERRY_UI WorkbenchAdvisor {
    * in to tweak the workbench. If further tweaking is required in the future,
    * the configurer may be obtained using <code>GetWorkbenchConfigurer()</code>.
    * </p>
-   * 
+   *
    * @param configurer
    *            an object for configuring the workbench
    */
@@ -143,7 +143,7 @@ class BERRY_UI WorkbenchAdvisor {
   /**
    * Returns the workbench configurer for the advisor. Can be
    * <code>null</code> if the advisor is not initialized yet.
-   * 
+   *
    * @return the workbench configurer, or <code>null</code> if the advisor
    *         is not initialized yet
    */
@@ -200,7 +200,7 @@ class BERRY_UI WorkbenchAdvisor {
    * although this will be ignored if the workbench is being forced to shut
    * down.
    * </p>
-   * 
+   *
    * @return <code>true</code> to allow the workbench to proceed with
    *         shutdown, <code>false</code> to veto a non-forced shutdown
    */
@@ -292,7 +292,7 @@ class BERRY_UI WorkbenchAdvisor {
    * Creates a new workbench window advisor for configuring a new workbench
    * window via the given workbench window configurer. Clients should override
    * to provide their own window configurer.
-   * 
+   *
    * @param configurer
    *            the workbench window configurer
    * @return a new workbench window advisor
@@ -308,10 +308,10 @@ class BERRY_UI WorkbenchAdvisor {
    * The default implementation returns <code>null</code>. Subclasses may
    * override.
    * </p>
-   * 
+   *
    * @return the default input for a new workbench window page, or
    *         <code>null</code> if none
-   * 
+   *
    * @see #CreateWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer::Pointer)
    */
   public: virtual IAdaptable* GetDefaultPageInput();
@@ -328,7 +328,7 @@ class BERRY_UI WorkbenchAdvisor {
    * If the <code>WorkbenchPreferenceConstants#DEFAULT_PERSPECTIVE_ID</code>
    * preference is specified, it supercedes the perspective specified here.
    * </p>
-   * 
+   *
    * @return the id of the perspective for the initial window, or
    *         <code>null</code> if no initial perspective should be shown
    */
@@ -341,11 +341,11 @@ class BERRY_UI WorkbenchAdvisor {
    * The default implementation returns <code>null</code>. Subclasses may
    * override.
    * </p>
-   * 
+   *
    * @return the id of the preference page, or <code>null</code> if none
    */
   public: virtual std::string GetMainPreferencePageId();
-  
+
 
   /**
    * Opens the workbench windows on startup. The default implementation tries
@@ -354,7 +354,7 @@ class BERRY_UI WorkbenchAdvisor {
    * was no previously saved state, or if the restore failed, then a
    * first-time window is opened using
    * IWorkbenchConfigurer#OpenFirstTimeWindow().
-   * 
+   *
    * @return <code>true</code> to proceed with workbench startup, or
    *         <code>false</code> to exit
    */
@@ -367,7 +367,7 @@ class BERRY_UI WorkbenchAdvisor {
    * The default implementation simply returns an OK status. Subclasses may
    * extend or override.
    * </p>
-   * 
+   *
    * @param memento
    *            the memento in which to save the advisor's state
    * @return a status object indicating whether the save was successful
@@ -381,7 +381,7 @@ class BERRY_UI WorkbenchAdvisor {
    * The default implementation simply returns an OK status. Subclasses may
    * extend or override.
    * </p>
-   * 
+   *
    * @param memento
    *            the memento from which to restore the advisor's state
    * @return a status object indicating whether the restore was successful

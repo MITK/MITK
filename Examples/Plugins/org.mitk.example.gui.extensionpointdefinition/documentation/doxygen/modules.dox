@@ -1,0 +1,15 @@
+/**
+  \defgroup org_mitk_example_gui_extensionpointdefinition org.mitk.example.gui.extensionpointdefinition
+  \ingroup MITKExamplePlugins
+
+  \brief A minimal applictaion that definines an extension point and collects extensions.
+*/
+
+/**
+  \defgroup org_mitk_example_gui_extensionpointdefinition_internal Internal
+  \ingroup org_mitk_example_gui_extensionpointdefinition
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.extensionpointdefinition plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

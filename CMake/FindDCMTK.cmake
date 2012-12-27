@@ -90,17 +90,17 @@ foreach(lib
     ${DCMTK_DIR}/dcmjpeg/lib${lib}/Debug
     NO_DEFAULT_PATH
     )
-    
+
   mark_as_advanced(DCMTK_${lib}_LIBRARY_RELEASE)
   mark_as_advanced(DCMTK_${lib}_LIBRARY_DEBUG)
-  
+
   # Add libraries to variable according to build type
   set(DCMTK_${lib}_LIBRARY)
   if(DCMTK_${lib}_LIBRARY_RELEASE)
     list(APPEND DCMTK_LIBRARIES optimized ${DCMTK_${lib}_LIBRARY_RELEASE})
     list(APPEND DCMTK_${lib}_LIBRARY optimized ${DCMTK_${lib}_LIBRARY_RELEASE})
   endif()
-  
+
   if(DCMTK_${lib}_LIBRARY_DEBUG)
     list(APPEND DCMTK_LIBRARIES debug ${DCMTK_${lib}_LIBRARY_DEBUG})
     list(APPEND DCMTK_${lib}_LIBRARY debug ${DCMTK_${lib}_LIBRARY_DEBUG})

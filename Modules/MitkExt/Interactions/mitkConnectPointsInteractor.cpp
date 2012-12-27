@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -52,7 +52,7 @@ void mitk::ConnectPointsInteractor::SetPrecision(unsigned int precision)
 float mitk::ConnectPointsInteractor::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0;
-  
+
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
   //checking if a keyevent can be handled:
   if (posEvent == NULL)
@@ -97,7 +97,7 @@ float mitk::ConnectPointsInteractor::CanHandleEvent(StateEvent const* stateEvent
   {
     //get the point and calculate the jurisdiction out of it.
     mitk::PointSet::PointType point;
-    pointSet->GetPointSet()->GetPoint(index, &point); 
+    pointSet->GetPointSet()->GetPoint(index, &point);
     returnValue = point.EuclideanDistanceTo(worldPoint);
 
     //between 1 and 0.     1 if directly hit
@@ -107,7 +107,7 @@ float mitk::ConnectPointsInteractor::CanHandleEvent(StateEvent const* stateEvent
       itkWarningMacro("Difficulties in calculating Jurisdiction. Check PointInteractor");
       return 0;
     }
-    
+
     //and now between 0,5 and 1
     returnValue = 0.5 + (returnValue / 2);
 
@@ -141,7 +141,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
   case AcADDPOINT:
     {
       mitk::DisplayPositionEvent const  *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL) 
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D worldPoint;
@@ -152,7 +152,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
       {
         // if the point is the last in current cell, remove it (this has to be moved in a separate action)
         bool deleteLine=false;
-        if(mesh->GetMesh()->GetCells()->Size() > 0) 
+        if(mesh->GetMesh()->GetCells()->Size() > 0)
         {
           Mesh::CellAutoPointer cellAutoPointer;
           ok = mesh->GetMesh()->GetCell(m_CurrentCellId, cellAutoPointer);
@@ -160,7 +160,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
           {
             Mesh::PointIdIterator last = cellAutoPointer->PointIdsEnd();
             --last;
-            int foundCell = mesh->SearchFirstCell( (unsigned long) position ); 
+            int foundCell = mesh->SearchFirstCell( (unsigned long) position );
             if (foundCell != -1)//not found
               deleteLine = ((unsigned int)foundCell == m_CurrentCellId) && (*last == (unsigned int)position);
           }
@@ -178,7 +178,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
           mesh->ExecuteOperation(doOp );
         }
         else
-        {          
+        {
           // add new cell if necessary
           if(mesh->GetNewCellId() == 0) //allow single line only
             //allow multiple lines:          if((mesh->SearchFirstCell(position) >= 0) || ((m_CurrentCellId == 0) && (mesh->GetNewCellId() == 0)))
@@ -217,7 +217,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
   case AcREMOVEPOINT:
     {
       //mitk::DisplayPositionEvent const  *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      //if (posEvent == NULL) 
+      //if (posEvent == NULL)
       //  return false;
 
       //mitk::Point3D worldPoint;
@@ -292,7 +292,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
         this->HandleEvent( newStateEvent );
         ok = true;
       }
-      else 
+      else
       {
         if (mesh->GetSize()<(m_N-1))
           //pointset after addition won't be full

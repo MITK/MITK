@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,10 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
- 
+
 /**
  * This class encapsulates an algorithm, which takes a 2D binary image and a contour.
- * The algorithm tests if the line begins and ends inside or outside a segmentation 
+ * The algorithm tests if the line begins and ends inside or outside a segmentation
  * and whether areas should be added to or subtracted from the segmentation shape.
  *
  * This class has two outputs:
@@ -43,7 +43,7 @@ namespace mitk
  *   \li <b>+1</b> this pixel was background in the input image and should be added to the segmentation
  *
  * The output image is a combination of the original input with the generated difference image.
- * 
+ *
  * \sa CorrectorTool2D
  */
 class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
@@ -57,7 +57,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
      * \brief User drawn contour
      */
     itkSetMacro(Contour, Contour*);
-    
+
     /**
      * \brief Calculated difference image.
      */
@@ -66,17 +66,17 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
   protected:
 
     // used by TobiasHeimannCorrectionAlgorithm
-    typedef struct 
+    typedef struct
     {
       int  lineStart;
       int lineEnd;
       bool modified;
-    } 
+    }
     TSegData;
 
     CorrectorAlgorithm();
     virtual ~CorrectorAlgorithm();
-    
+
     // does the actual processing
     virtual void GenerateData();
 

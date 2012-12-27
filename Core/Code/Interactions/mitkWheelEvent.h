@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace mitk {
 
   //##Documentation
   //## @brief Event that stores coordinates and rotation on mouse wheel events
-  //## 
+  //##
   //## Stores display position of the mouse and 3D world position in mm.
   //## @ingroup Interaction
   class MITK_CORE_EXPORT WheelEvent : public DisplayPositionEvent
@@ -39,8 +39,8 @@ namespace mitk {
     //## @param sender: the widget, that caused that event, so that it can be asked for worldCoordinates. changed later to a focus
     //## @param type, button, buttonState, key: information from the Event
     //## @param displPosition: the 2D Position e.g. from the mouse
-    //## @param worldPosition: the 3D position e.g. from a picking 
-    //## @param delta: the movement of the mousewheel 
+    //## @param worldPosition: the 3D position e.g. from a picking
+    //## @param delta: the movement of the mousewheel
     WheelEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition, int delta);
 
     int GetDelta() const;

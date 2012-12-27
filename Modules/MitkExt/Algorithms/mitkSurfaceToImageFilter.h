@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,14 +32,14 @@ namespace mitk {
 
 /**
  *
- * @brief Converts surface data to pixel data. Requires a surface and an 
+ * @brief Converts surface data to pixel data. Requires a surface and an
  * image, which header information defines the output image.
  *
- * The resulting image has the same dimension, size, and Geometry3D 
+ * The resulting image has the same dimension, size, and Geometry3D
  * as the input image. The image is cut using a vtkStencil.
- * The user can decide if he wants to keep the original values or create a 
- * binary image by setting MakeBinaryOutputOn (default is \a false). If 
- * set to \a true all voxels inside the surface are set to one and all 
+ * The user can decide if he wants to keep the original values or create a
+ * binary image by setting MakeBinaryOutputOn (default is \a false). If
+ * set to \a true all voxels inside the surface are set to one and all
  * outside voxel are set to zero.
  *
  * NOTE: Since the reference input image is passed to the vtkStencil in
@@ -47,7 +47,7 @@ namespace mitk {
  * the numerical minimum of the used pixel type (e.g. at least -127 for
  * unsigned char images, etc.) to produce a correct binary image
  * representation of the surface in MakeOutputBinary mode.
- * 
+ *
  * @ingroup SurfaceFilters
  * @ingroup Process
  */

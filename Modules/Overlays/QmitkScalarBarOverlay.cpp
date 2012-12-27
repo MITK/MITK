@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayout>
 
 
-QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id ) 
+QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id )
 :QmitkOverlay(id)
 , m_ScalarBar( NULL )
 , m_ObserverTag(0)
@@ -88,7 +88,7 @@ void QmitkScalarBarOverlay::GetProperties( mitk::PropertyList::Pointer pl )
   QPalette palette = QPalette();
 
   // get the desired color of the textOverlays
-  mitk::ColorProperty::Pointer colorProp = 
+  mitk::ColorProperty::Pointer colorProp =
     dynamic_cast<mitk::ColorProperty*>( propertyList->GetProperty( "overlay.color" ) );
 
   if ( colorProp.IsNull() )

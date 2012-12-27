@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -78,12 +78,12 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
 
   if(!node)
     return data;
-   
+
   if(index.column() == 0 && role == Qt::DecorationRole)
   {
     if(node)
     {
-      QmitkNodeDescriptor* nodeDescriptor 
+      QmitkNodeDescriptor* nodeDescriptor
         = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
       data = nodeDescriptor->GetIcon();
     }
@@ -96,7 +96,7 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
       mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
       if(!planarFigure)
         return data;
-      
+
       mitk::PlanarAngle* planarAngle = dynamic_cast<mitk::PlanarAngle*>(planarFigure);
       double featureQuantity;
       for(unsigned int i=0; i<planarFigure->GetNumberOfFeatures(); ++i)

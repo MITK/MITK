@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ namespace mitk {
       mitkClassMacro(USImageMetadata, itk::Object);
       itkNewMacro(Self);
 
-    
+
       //## getter and setter ##
       itkGetMacro(DeviceManufacturer, std::string);
       itkSetMacro(DeviceManufacturer, std::string);
@@ -58,7 +58,7 @@ namespace mitk {
 
 
       // The following constants define how metadata is written to and read from an mitk image
-      // when defining new properties, add them here, define them in the cpp, and add them to 
+      // when defining new properties, add them here, define them in the cpp, and add them to
       // USImage's getMetadata and setMetadata methods as well
       static const char* PROP_DEV_MANUFACTURER;
       static const char* PROP_DEV_MODEL;
@@ -87,9 +87,9 @@ namespace mitk {
       bool m_DeviceIsVideoOnly;
       bool m_DeviceIsCalibrated;
 
-      
 
-    
+
+
 
     };
 } // namespace mitk

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,7 +36,7 @@ class BaseRenderer;
 /**
  * @brief OpenGL-based mapper to display a 2d cut through a poly data
  * OpenGL-based mapper to display a 2D cut through a poly data. The result is
- * normally a line. This class can be added to any data object, which is 
+ * normally a line. This class can be added to any data object, which is
  * rendered in 3D via a vtkPolyData.
  */
 class MITK_CORE_EXPORT PolyDataGLMapper2D : public GLMapper2D
@@ -89,7 +89,7 @@ protected:
     virtual vtkScalarsToColors* GetVtkLUT( );
 
     /**
-     * Checks if this mapper can be used to generate cuts through the associated 
+     * Checks if this mapper can be used to generate cuts through the associated
      * base data.
      * @return true if yes or false if not.
      */

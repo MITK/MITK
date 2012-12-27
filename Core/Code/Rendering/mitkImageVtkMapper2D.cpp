@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -107,7 +107,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
-{  
+{
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actors;
 }
@@ -177,6 +177,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // and the geometry of the image that is to be rendered.
   if ( !RenderingGeometryIntersectsImage( worldGeometry, input->GetSlicedGeometry() ) )
   {
+    // set image to NULL, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = NULL;
     localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
     return;
   }
@@ -265,7 +269,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
 
   if(thickSlicesMode > 0)
-  {  
+  {
     double dataZSpacing = 1.0;
 
     Vector3D normInIndex, normal;
@@ -318,7 +322,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   }
 
 
-  // Bounds information for reslicing (only reuqired if reference geometry 
+  // Bounds information for reslicing (only reuqired if reference geometry
   // is present)
   //this used for generating a vtkPLaneSource with the right size
   vtkFloatingPointType sliceBounds[6];
@@ -415,7 +419,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     bool binaryOutlineShadow( false );
     datanode->GetBoolProperty( "outline binary shadow", binaryOutlineShadow, renderer );
-    
+
     if ( binaryOutlineShadow )
       contourShadowActor->SetVisibility( true );
     else
@@ -429,7 +433,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     //set the plane as input for the mapper
     localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
     //set the texture for the actor
-    
+
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
     contourShadowActor->SetVisibility( false );
   }
@@ -703,15 +707,36 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
 
-  std::string modality;
-  if ( node->GetStringProperty( "dicom.series.Modality", modality ) )
+  std::string photometricInterpretation; // DICOM tag telling us how pixel values should be displayed
+  if ( node->GetStringProperty( "dicom.pixel.PhotometricInterpretation", photometricInterpretation ) )
   {
     // modality provided by DICOM or other reader
-    if ( modality == "PT") // NOT a typo, PT is the abbreviation for PET used in DICOM
+    if ( photometricInterpretation.find("MONOCHROME1") != std::string::npos ) // meaning: display MINIMUM pixels as WHITE
     {
+      // generate LUT (white to black)
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* bwLut = mitkLut->GetVtkLookupTable();
+      bwLut->SetTableRange (0, 1);
+      bwLut->SetSaturationRange (0, 0);
+      bwLut->SetHueRange (0, 0);
+      bwLut->SetValueRange (1, 0);
+      bwLut->SetAlphaRange (1, 1);
+      bwLut->SetRampToLinear();
+      bwLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+
       node->SetProperty( "use color", mitk::BoolProperty::New( false ), renderer );
-      node->SetProperty( "opacity", mitk::FloatProperty::New( 0.5 ), renderer );
     }
+    else
+    if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
+    {
+      // apply default LUT (black to white)
+      node->SetProperty( "use color", mitk::BoolProperty::New( true ), renderer );
+      node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
+    }
+    // PALETTE interpretation should be handled ok by RGB loading
   }
 
   bool isBinaryImage(false);
@@ -794,7 +819,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         {
           float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
           float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );
-          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer? 
+          contrast.SetRangeMinMax( smallestPixelValueInSeries-1, largestPixelValueInSeries+1 ); // why not a little buffer?
           // might remedy some l/w widget challenges
         }
         else
@@ -860,19 +885,20 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 
-  while (y <= yMax) 
-  { 
-    currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x, y, 0));
+  // We take the pointer to the first pixel of the image
+  currentPixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer() );
 
+  while (y <= yMax)
+  {
     //if the current pixel value is set to something
-    if ((currentPixel) && (*currentPixel != 0)) 
+    if ((currentPixel) && (*currentPixel != 0))
     {
       //check in which direction a line is necessary
       //a line is added if the neighbor of the current pixel has the value 0
       //and if the pixel is located at the edge of the image
 
       //if   vvvvv  not the first line vvvvv
-      if (y > yMin && *(currentPixel-line) == 0) 
+      if (y > yMin && *(currentPixel-line) == 0)
       { //x direction - bottom edge of the pixel
         //add the 2 points
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -884,7 +910,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last line vvvvv
-      if (y < yMax && *(currentPixel+line) == 0) 
+      if (y < yMax && *(currentPixel+line) == 0)
       { //x direction - top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -894,7 +920,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the first pixel vvvvv
-      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0) 
+      if ( (x > xMin || y > yMin) && *(currentPixel-1) == 0)
       { //y direction - left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -904,7 +930,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  not the last pixel vvvvv
-      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0) 
+      if ( (y < yMax || (x < xMax) ) && *(currentPixel+1) == 0)
       { //y direction - right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -916,7 +942,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       /*  now consider pixels at the edge of the image  */
 
       //if   vvvvv  left edge of image vvvvv
-      if (x == xMin) 
+      if (x == xMin)
       { //draw left edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -926,7 +952,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  right edge of image vvvvv
-      if (x == xMax) 
+      if (x == xMax)
       { //draw right edge of the pixel
         vtkIdType p1 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -936,7 +962,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  bottom edge of image vvvvv
-      if (y == yMin) 
+      if (y == yMin)
       { //draw bottom edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], y*localStorage->m_mmPerPixel[1], depth);
@@ -946,7 +972,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
       }
 
       //if   vvvvv  top edge of image vvvvv
-      if (y == yMax) 
+      if (y == yMax)
       { //draw top edge of the pixel
         vtkIdType p1 = points->InsertNextPoint(x*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
         vtkIdType p2 = points->InsertNextPoint((x+1)*localStorage->m_mmPerPixel[0], (y+1)*localStorage->m_mmPerPixel[1], depth);
@@ -958,12 +984,19 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
 
     x++;
 
-    if (x > xMax) 
+    if (x > xMax)
     { //reached end of line
       x = xMin;
       y++;
     }
-  }//end of while
+
+    // Increase the pointer-position to the next pixel.
+    // This is safe, as the while-loop and the x-reset logic above makes
+    // sure we do not exceed the bounds of the image
+    currentPixel++;
+
+
+}//end of while
 
 
   // Create a polydata to store everything in
@@ -997,7 +1030,7 @@ void mitk::ImageVtkMapper2D::TransformActor(mitk::BaseRenderer* renderer)
 
 bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
-  // if either one of the two geometries is NULL we return true 
+  // if either one of the two geometries is NULL we return true
   // for safety reasons
   if ( renderingGeometry == NULL || imageGeometry == NULL )
     return true;

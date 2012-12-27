@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,7 +54,7 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);
-  return retval; 
+  return retval;
 }
 
 

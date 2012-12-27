@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,5 +48,6 @@ MITK_REGISTER_PF_SUB_SERIALIZER(PlanarFourPointAngle);
 MITK_REGISTER_PF_SUB_SERIALIZER(PlanarLine);
 MITK_REGISTER_PF_SUB_SERIALIZER(PlanarPolygon);
 MITK_REGISTER_PF_SUB_SERIALIZER(PlanarRectangle);
+MITK_REGISTER_PF_SUB_SERIALIZER(PlanarEllipse);
 
 #endif

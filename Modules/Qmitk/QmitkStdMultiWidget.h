@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -143,7 +143,7 @@ public:
   void ActivateMenuWidget( bool state );
 
   bool IsMenuWidgetEnabled() const;
-  
+
 protected:
 
   void UpdateAllWidgets();
@@ -219,7 +219,7 @@ public slots:
   void EnableDepartmentLogo();
 
   void DisableDepartmentLogo();
-  
+
   void EnableColoredRectangles();
 
   void DisableColoredRectangles();
@@ -269,7 +269,7 @@ signals:
 
 public:
 
-  /** Define RenderWindow (public)*/ 
+  /** Define RenderWindow (public)*/
   QmitkRenderWindow* mitkWidget1;
   QmitkRenderWindow* mitkWidget2;
   QmitkRenderWindow* mitkWidget3;
@@ -318,7 +318,7 @@ protected:
   mitk::GradientBackground::Pointer m_GradientBackground4;
   mitk::GradientBackground::Pointer m_GradientBackground3;
   bool m_GradientBackgroundFlag;
-  
+
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
@@ -339,13 +339,13 @@ protected:
   QSplitter *m_LayoutSplit;
   QSplitter *m_SubSplit1;
   QSplitter *m_SubSplit2;
-  
+
   QWidget *mitkWidget1Container;
   QWidget *mitkWidget2Container;
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
-  struct  
+  struct
   {
     vtkCornerAnnotation *cornerText;
     vtkTextProperty *textProp;
@@ -354,6 +354,6 @@ protected:
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
-    
+
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

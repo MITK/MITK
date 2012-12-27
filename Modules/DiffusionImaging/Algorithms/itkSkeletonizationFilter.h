@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,19 +27,19 @@ namespace itk
 template < class TInputImage, class TOutputImage >
 class SkeletonizationFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-	/*!
-	\brief itkSkeletonizationFilter
-	
-	\brief Skeletonization algorithm from TBSS (Smith et al. 2006)
-	
-	\sa itkImageToImageFilter
-	
-	
-	*/
+  /*!
+  \brief itkSkeletonizationFilter
+
+  \brief Skeletonization algorithm from TBSS (Smith et al. 2006)
+
+  \sa itkImageToImageFilter
+
+
+  */
 
 public:
 
-	/** Typedef for input ImageType. */
+  /** Typedef for input ImageType. */
   typedef TInputImage  InputImageType;
 
   typedef itk::CovariantVector<int,3> VectorType;
@@ -48,31 +48,31 @@ public:
 
 
   /** Typedef for output ImageType. */
-  typedef TOutputImage OutputImageType;  
+  typedef TOutputImage OutputImageType;
 
   typedef itk::VectorImage<int, 3> GradientImageType;
 
 
-	/** */
+  /** */
   typedef SkeletonizationFilter Self;
-  
+
   /** Superclass */
   typedef ImageToImageFilter<InputImageType, OutputImageType> Superclass;
-  
+
   /** Smart Pointer */
   typedef SmartPointer<Self> Pointer;
-  
+
   /** Smart Pointer */
   typedef SmartPointer<const Self> ConstPointer;
 
-	/** */
+  /** */
   itkNewMacro( Self);
 
-	/** Generate Data. The image will be divided into a number of pieces, a number of threads 
+  /** Generate Data. The image will be divided into a number of pieces, a number of threads
   will be spawned and Threaded GenerateData() will be called in each thread. */
   virtual void GenerateData();
 
-  
+
   GradientImageType::Pointer GetGradientImage();
 
   VectorImageType::Pointer GetVectorImage()
@@ -81,13 +81,13 @@ public:
   }
 
 
-  
+
 
 protected:
 
-	/** Constructor */
+  /** Constructor */
   SkeletonizationFilter();
-  
+
   /** Destructor */
   virtual ~SkeletonizationFilter();
 
@@ -97,17 +97,17 @@ protected:
 
   //FloatVectorImageType::Pointer m_FixedDirImage;
 
-  int round(float x) 
-  { 
+  int round(float x)
+  {
     if (x>0.0) return ((int) (x+0.5));
     else       return ((int) (x-0.5));
   }
-  
-  
+
+
 protected:
- 	
-  	
-  
+
+
+
 };
 
 }

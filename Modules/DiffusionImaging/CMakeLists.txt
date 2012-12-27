@@ -9,7 +9,7 @@ endif(ITK_GDCM_DIR)
 
 MITK_CREATE_MODULE( MitkDiffusionImaging
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS IODataStructures Reconstruction Tractography Tractography/GibbsTracking Rendering Algorithms DicomImport Interactions IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures/FiberBundle IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite IODataStructures/TbssImages Algorithms/Connectomics IODataStructures/ConnectomicsNetwork  ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS SignalModels IODataStructures Reconstruction Tractography Tractography/GibbsTracking Rendering Algorithms DicomImport Interactions IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures/FiberBundle IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite IODataStructures/TbssImages Algorithms/Connectomics IODataStructures/ConnectomicsNetwork  ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS MitkExt SceneSerializationBase QmitkExt MitkGraphAlgorithms
   PACKAGE_DEPENDS Boost
 )

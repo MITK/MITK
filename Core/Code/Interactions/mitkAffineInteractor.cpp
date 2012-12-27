@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -115,7 +115,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         */
       }
 
-      /* write new state (selected/not selected) to the property */      
+      /* write new state (selected/not selected) to the property */
       this->HandleEvent( newStateEvent.get() );
       ok = true;
       break;
@@ -191,7 +191,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::Vector3D startPosition = m_LastMousePosition.GetVectorFromOrigin() - dataPosition.GetVectorFromOrigin();  // calculate vector from center of the data object to the last mouse position
 
       /* calculate rotation axis (by calculating the cross produkt of the vectors) */
-      mitk::Vector3D rotationaxis;   
+      mitk::Vector3D rotationaxis;
       rotationaxis[0] =  startPosition[1] * newPosition[2] - startPosition[2] * newPosition[1];
       rotationaxis[1] =  startPosition[2] * newPosition[0] - startPosition[0] * newPosition[2];
       rotationaxis[2] =  startPosition[0] * newPosition[1] - startPosition[1] * newPosition[0];
@@ -225,10 +225,10 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       break;
     }
   case AcSCALE:
-    {    
+    {
       mitk::Point3D p = event->GetWorldPosition();
 
-      mitk::Vector3D v = p - m_LastMousePosition;    
+      mitk::Vector3D v = p - m_LastMousePosition;
       /* calculate scale changes */
       mitk::Point3D newScale;
       newScale[0] = (geometry->GetAxisVector(0) * v) / geometry->GetExtentInMM(0);  // Scalarprodukt of normalized Axis

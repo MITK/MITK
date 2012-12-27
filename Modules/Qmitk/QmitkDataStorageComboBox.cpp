@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -130,18 +130,18 @@ void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage* _DataStorage)
     this->Reset();
   }
 }
-   
+
 void QmitkDataStorageComboBox::SetPredicate(const mitk::NodePredicateBase* _Predicate)
 {
   if(m_Predicate != _Predicate)
   {
     m_Predicate = _Predicate;
     this->Reset();
-  }  
+  }
 }
 
 void QmitkDataStorageComboBox::AddNode( const mitk::DataNode* _DataNode )
-{  
+{
   // this is an event function, make sure that we didnt call ourself
   if(!m_BlockEvents)
   {
@@ -175,7 +175,7 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
     // remove node name from combobox
     this->removeItem(index);
     // remove node from node vector
-    m_Nodes.erase(m_Nodes.begin()+index);  
+    m_Nodes.erase(m_Nodes.begin()+index);
   }
 }
 
@@ -197,7 +197,7 @@ void QmitkDataStorageComboBox::SetNode(int index, const mitk::DataNode* _DataNod
     this->InsertNode(index, _DataNode);
   }
 }
-    
+
 void QmitkDataStorageComboBox::SetNode( const mitk::DataNode* _DataNode, const mitk::DataNode* _OtherDataNode)
 {
   this->SetNode( this->Find(_DataNode), _OtherDataNode);
@@ -209,7 +209,7 @@ void QmitkDataStorageComboBox::SetAutoSelectNewItems( bool _AutoSelectNewItems )
 }
 
 void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
-{  
+{
   if(!m_BlockEvents)
   {
     m_BlockEvents = true;
@@ -235,7 +235,7 @@ void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *cal
           this->SetNode(it->first, it->first);
           break;
         }
-      }              
+      }
     }
     else
     {
@@ -260,7 +260,7 @@ void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataNode::Pointer item)
   {
     this->setCurrentIndex(index);
   }
-  
+
 }
 
 //#PROTECTED GETTER
@@ -273,7 +273,7 @@ int QmitkDataStorageComboBox::Find( const mitk::DataNode* _DataNode ) const
 {
   int index = -1;
 
-  std::vector<mitk::DataNode*>::const_iterator nodeIt = 
+  std::vector<mitk::DataNode*>::const_iterator nodeIt =
     std::find(m_Nodes.begin(), m_Nodes.end(), _DataNode);
 
   if(nodeIt != m_Nodes.end())
@@ -313,7 +313,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
     }
     else
       changedNode = true;
-  }  
+  }
   // otherwise a new node shall be added, let index point to the element after the last element
   else
   {
@@ -334,7 +334,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
     // add modified observer
     itk::MemberCommand<QmitkDataStorageComboBox>::Pointer modifiedCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
     modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
-    // !!!! add modified observer for the name 
+    // !!!! add modified observer for the name
     /// property of the node because this is the only thing we are interested in !!!!!
     if(nameProperty)
     {
@@ -344,7 +344,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
     // if there is no name node save an invalid value for the observer tag (-1)
     else
       m_NodesModifiedObserverTags.push_back( -1 );
-    
+
     // add delete observer
     itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
     deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
@@ -374,7 +374,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _Data
   {
     // update text in combobox
     this->setItemText( index, QString::fromStdString(_NonConstDataNodeName));
-  }  
+  }
 }
 
 void QmitkDataStorageComboBox::Init()

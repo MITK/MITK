@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ namespace mitk
   protected:
 
     // observerclass to react on changes on pointsetnodes
-    class Observer : public itk::Command 
+    class Observer : public itk::Command
     {
     public:
       typedef  Observer                 Self;
@@ -78,7 +78,7 @@ namespace mitk
       itkNewMacro( Self );
 
     protected:
-      Observer() 
+      Observer()
       {
         m_Counter = 0;
       };
@@ -94,7 +94,7 @@ namespace mitk
       void Execute(const itk::Object * object, const itk::EventObject & /*event*/)
       {
         const itk::ProcessObject * internalFilter = dynamic_cast<const itk::ProcessObject *>( object );
-        if (!(internalFilter->GetProgress() == 0 || internalFilter->GetProgress() == 1)) 
+        if (!(internalFilter->GetProgress() == 0 || internalFilter->GetProgress() == 1))
         {
           ++m_Counter;
           mitk::ProgressBar::GetInstance()->Progress();

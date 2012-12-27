@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -48,7 +48,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
       MITK_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format." << std::endl;
     }
   }
-  
+
   std::stringstream propertyListDeserializerClassName;
   propertyListDeserializerClassName << "PropertyListDeserializerV" << fileVersion;
 
@@ -72,7 +72,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
       bool success = reader->Deserialize();
       error |= !success;
       m_PropertyList = reader->GetOutput();
-      
+
       if ( error )
       {
         MITK_ERROR << "There were errors while loding property list file " << m_Filename << ". Your data may be corrupted";
@@ -80,7 +80,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
       break;
     }
   }
-   
+
   return !error;
 }
 
@@ -90,4 +90,4 @@ mitk::PropertyList::Pointer mitk::PropertyListDeserializer::GetOutput()
   return m_PropertyList;
 }
 
- 
+

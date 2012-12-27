@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -125,7 +125,7 @@ void mitk::PointSetWriter::GenerateData()
       out.close();
       throw std::ios_base::failure("Some error during point set writing.");
     }
- 
+
     out.close();
     m_Success = true;
     m_MimeType = "application/MITK.PointSet";
@@ -142,7 +142,7 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
     for(unsigned int i=0; i< timecount; i++)
     {
       WriteStartElement( XML_TIME_SERIES, out );
-      
+
       WriteStartElement( XML_TIME_SERIES_ID, out );
       WriteCharacterData( ConvertToString( i ).c_str() , out );
       WriteEndElement( XML_TIME_SERIES_ID, out, false );
@@ -334,7 +334,7 @@ void mitk::PointSetWriter::WriteIndent( std::ofstream& file )
 
 bool mitk::PointSetWriter::GetSuccess() const
 {
-    return m_Success;  
+    return m_Success;
 }
 
 
@@ -349,7 +349,7 @@ bool mitk::PointSetWriter::CanWriteDataType( DataNode* input )
        mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>( data );
        if( pointSet.IsNotNull() )
        {
-         //this writer has no "SetDefaultExtension()" - function 
+         //this writer has no "SetDefaultExtension()" - function
          m_Extension = ".mps";
          return true;
        }

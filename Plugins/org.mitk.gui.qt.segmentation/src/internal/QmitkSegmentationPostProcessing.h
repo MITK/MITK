@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -36,9 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkSegmentationPostProcessing : public QObject
 {
   Q_OBJECT
-  
+
   public:
-    
+
     // construction/destruction
     QmitkSegmentationPostProcessing(mitk::DataStorage* storage, QmitkFunctionality* functionality, QObject* parent = 0);
     virtual ~QmitkSegmentationPostProcessing();
@@ -55,7 +55,7 @@ class QmitkSegmentationPostProcessing : public QObject
     void CreateSurface(bool);
     void CreateSmoothedSurface(bool);
     void ImageStatistics(bool);
-    void AutocropSelected(bool);    
+    void AutocropSelected(bool);
 
     // class internal slots
     void ThresholdingDone(int);
@@ -80,7 +80,7 @@ class QmitkSegmentationPostProcessing : public QObject
 
     QDialog* m_ThresholdingDialog;
     mitk::ToolManager::Pointer m_ThresholdingToolManager;
-    
+
     berry::ISelectionListener::Pointer m_SelectionListener;
     mitk::DataNodeSelection::ConstPointer m_CurrentSelection;
     friend struct berry::SelectionChangedAdapter<QmitkSegmentationPostProcessing>;

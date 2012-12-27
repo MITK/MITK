@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -58,18 +58,18 @@ public:
     secondNode->SetName("Tool2");
     secondTool->SetDataNode(secondNode);
     claronStorage->AddTool(secondTool);
-    
+
     mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
 
     mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
-    
+
     MITK_TEST_CONDITION_REQUIRED(testSource.IsNull(),"..testing return value");
     MITK_TEST_CONDITION_REQUIRED(testInstance->GetErrorMessage().size()>1,"..testing if there is an error message");
 
     MITK_TEST_OUTPUT(<<"Testing simple claron tracking device with another 2 invalid tools");
-    
+
     secondTool->SetTrackingDeviceType(mitk::NDIAurora);
     claronStorage = mitk::NavigationToolStorage::New();
     claronStorage->AddTool(secondTool);
@@ -91,8 +91,8 @@ public:
     MITK_TEST_CONDITION_REQUIRED(!testInstance->IsCreateTrackingDeviceSourcePossible(),"..(2) testing if factory class detects the invalid data");
 
 
-   
-  
+
+
   }
   static void TestValidClaronTrackingDevice()
   {
@@ -124,20 +124,20 @@ public:
     secondTool->SetCalibrationFile(toolFileName);
     secondTool->SetIdentifier("Tool#2");
     claronStorage->AddTool(secondTool);
-    
+
     mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
-    
+
     mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
-    
+
     MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==2,"testing number of outputs");
     MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==2,"testing tracking device");
   }
 
   static void TestNDIAuroraTrackingDevice()
   {
-  
+
   }
 
   static void TestNDIPolarisTrackingDevice()
@@ -168,7 +168,7 @@ public:
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(polarisStorage,testDevice);
 
     mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
-    
+
     MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==1,"..testing number of outputs");
     MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==1,"..testing tracking device");
   }
@@ -203,11 +203,11 @@ public:
     secondTool->SetCalibrationFile(toolFileName);
     secondTool->SetIdentifier("Tool#2");
     claronStorage->AddTool(secondTool);
-    
+
     mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
-    
+
     mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
 
     //numbers must be the same in case of MicronTracker
@@ -215,8 +215,8 @@ public:
     MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolIdentifierInToolStorage(0)=="Tool#1","..testing method GetToolIdentifierInToolStorage()");
     MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolNumbersInToolStorage().at(0)==0,"..testing method GetToolNumbersInToolStorage()");
     MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolIdentifiersInToolStorage().at(0)=="Tool#1","..testing method GetToolIdentifiersInToolStorage()");
-    
-  
+
+
   }
 };
 
@@ -228,6 +228,6 @@ int mitkTrackingDeviceSourceConfiguratorTest(int /* argc */, char* /*argv*/[])
   mitkTrackingDeviceSourceConfiguratorTestClass::TestInvalidClaronTrackingDevice();
   mitkTrackingDeviceSourceConfiguratorTestClass::TestValidClaronTrackingDevice();
   mitkTrackingDeviceSourceConfiguratorTestClass::TestAdditionalMethods();
-  
+
   MITK_TEST_END();
 }

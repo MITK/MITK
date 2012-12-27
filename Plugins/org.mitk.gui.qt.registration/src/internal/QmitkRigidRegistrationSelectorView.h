@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,8 +45,8 @@ public:
     void TransformChanged();
     void OptimizerChanged(double value);
     void AddNewTransformationToUndoList();
-  
-  public slots:    
+
+  public slots:
     void SetFixedNode( mitk::DataNode * fixedNode );
     void SetFixedMaskNode(mitk::DataNode * fixedMaskNode );
     void SetFixedDimension( int dimension );

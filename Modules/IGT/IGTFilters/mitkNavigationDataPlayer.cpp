@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTException.h"
 #include "mitkIGTIOException.h"
 
-mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerBase() 
+mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerBase()
 {
   m_NumberOfOutputs = 0;
   m_Pause = false;
@@ -58,9 +58,9 @@ mitk::NavigationDataPlayer::~NavigationDataPlayer()
 void mitk::NavigationDataPlayer::GenerateData()
 {
   //Only produce new output if the player is started
-  if (!m_Playing) //m_Playing==true means player has started 
+  if (!m_Playing) //m_Playing==true means player has started
   {
-    //The output is not valid anymore 
+    //The output is not valid anymore
     for (unsigned int index = 0; index < m_NumberOfOutputs; index++)
     {
       mitk::NavigationData* output = this->GetOutput(index);
@@ -83,18 +83,18 @@ void mitk::NavigationDataPlayer::GenerateData()
   //first of all get current time
   TimeStampType now = mitk::TimeStamp::GetInstance()->GetElapsed();
 
-  //now we make a little time arithmetic 
+  //now we make a little time arithmetic
   //to get the elapsed time since the start of the player
   TimeStampType timeSinceStart = now - m_StartPlayingTimeStamp;
   //init the vectors
-  std::vector< NavigationData::Pointer > nextCandidates; 
-  std::vector< NavigationData::Pointer > lastCandidates; 
+  std::vector< NavigationData::Pointer > nextCandidates;
+  std::vector< NavigationData::Pointer > lastCandidates;
   std::vector< NavigationData::TimeStampType > currentTimeOfData;
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
   {
     nextCandidates.push_back(m_NextToPlayNavigationData.at(index));
     lastCandidates.push_back(m_NextToPlayNavigationData.at(index));
-    
+
     currentTimeOfData.push_back(timeSinceStart + m_StartTimeOfData.at(index));
   }
 
@@ -105,17 +105,17 @@ void mitk::NavigationDataPlayer::GenerateData()
   }
 
   // Now we try to find next NavigationData in the stream:
-  // This means we step through the stream of NavigationDatas until we find 
-  // a NavigationData which has a current timestamp (currentTimeOfData) greater 
-  // than the current playing time. Then we store the data in 
-  // m_NextToPlayNavigationData and take the last data (lastCandidates) for the 
+  // This means we step through the stream of NavigationDatas until we find
+  // a NavigationData which has a current timestamp (currentTimeOfData) greater
+  // than the current playing time. Then we store the data in
+  // m_NextToPlayNavigationData and take the last data (lastCandidates) for the
   // output of this filter.
   //
   // The loop will stop when a suitable NavigationData is found or we reach EOF.
-  // The timestamps of each recorded NavigationData should be equal 
+  // The timestamps of each recorded NavigationData should be equal
   // therefore we take always the time from the first.
 
-  
+
   while( nextCandidates[0]->GetTimeStamp() < currentTimeOfData[0])
   {
     for (unsigned int index=0; index < m_NumberOfOutputs; index++)
@@ -123,7 +123,7 @@ void mitk::NavigationDataPlayer::GenerateData()
       lastCandidates[index] = nextCandidates.at(index);
       switch(m_FileVersion) // m_FileVersion indicates which XML encoding is used
       {
-      case 1:  
+      case 1:
         nextCandidates[index] = ReadVersion1();
         break;
       default: //this case should not happen! therefore return at this point
@@ -168,7 +168,7 @@ void mitk::NavigationDataPlayer::UpdateOutputInformation()
 void mitk::NavigationDataPlayer::InitPlayer()
 {
   if (m_Stream == NULL)
-  {  
+  {
     StreamInvalid("Playing not possible. Wrong file name or path?");
     return;
   }
@@ -184,7 +184,7 @@ void mitk::NavigationDataPlayer::InitPlayer()
 
   //check if we have a valid version: m_FileVersion has to be always bigger than 1 for playing
   if (m_FileVersion < 1)
-  {  
+  {
     StreamInvalid("Playing not possible. Invalid file version!");
     return;
   }
@@ -198,7 +198,7 @@ void mitk::NavigationDataPlayer::InitPlayer()
     //This happens when the player is stopped and start again with different file
     if (this->GetNumberOfOutputs() != m_NumberOfOutputs) {SetNumberOfOutputs(m_NumberOfOutputs);}
     //initialize the player with first data
-    GetFirstData(); 
+    GetFirstData();
     //set stream valid
     m_ErrorMessage = "";
     m_StreamValid = true;
@@ -224,7 +224,7 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
     mitkThrowException(mitk::IGTException)<<"Stream is not good!";
   }
   int version = 1;
-  
+
   TiXmlDeclaration* dec = new TiXmlDeclaration();
   *stream >> *dec;
   if(strcmp(dec->Version(),"") == 0)
@@ -232,7 +232,7 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
     MITK_ERROR << "The input stream seems to have XML incompatible format";
     mitkThrowException(mitk::IGTIOException) << "The input stream seems to have XML incompatible format";
   }
-  
+
   m_parentElement = new TiXmlElement("");
   *stream >> *m_parentElement; //2nd line this is the file version
 
@@ -247,7 +247,7 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
   {
     m_parentElement->QueryIntAttribute("Ver",&version);
   }
-  
+
   if (version > 0)
     return version;
   else
@@ -259,21 +259,21 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
 unsigned int mitk::NavigationDataPlayer::GetNumberOfNavigationDatas(std::istream* stream)
 {
   if (stream == NULL)
-  { 
+  {
     MITK_ERROR << "No input stream set!";
     mitkThrowException(mitk::IGTException)<<"No input stream set!";
   }
   if (!stream->good())
-  { 
+  {
     MITK_ERROR << "Stream not good!";
     mitkThrowException(mitk::IGTException)<<"Stream not good!";
   }
 
-  //If something has changed in a future version of the XML definition e.g. navigationcount or addional parameters 
+  //If something has changed in a future version of the XML definition e.g. navigationcount or addional parameters
   //catch this here with a select case block (see GenerateData() method)
 
   int numberOfTools = 0;
-  
+
   std::string tempValue = m_parentElement->Value();
   if(tempValue == "Version"){
     *stream >> *m_parentElement;
@@ -282,7 +282,7 @@ unsigned int mitk::NavigationDataPlayer::GetNumberOfNavigationDatas(std::istream
 
   if (numberOfTools > 0)
     return numberOfTools;
-  
+
   return 0;
 
 }
@@ -305,7 +305,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
 
   /*TiXmlElement* elem = new TiXmlElement("");
   m_currentNode = m_parentElement->IterateChildren(m_currentNode);
-  
+
   if(m_currentNode)
   {
       elem = m_currentNode->ToElement();
@@ -325,13 +325,13 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
       }
     delElem = false;
   }
-  
+
   else
   {
     elem = new TiXmlElement("");
     delElem = true;
   }
-    
+
 
   mitk::NavigationData::Pointer nd = this->ReadNavigationData(elem);
 
@@ -344,13 +344,13 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
 void mitk::NavigationDataPlayer::StartPlaying()
 {
   if (m_Stream == NULL)
-  {   
+  {
     m_Playing = false;
-    
+
     //Perhaps the SetStream method was not called so we do this when a FileName is set with SetStream(PlayerMode)
     if (m_FileName != "")
     {
-    //The PlayerMode is initialized with LastSetStream 
+    //The PlayerMode is initialized with LastSetStream
     //CreateStreamFromFilename also calls InitPlayer()
     try
       {
@@ -370,7 +370,7 @@ void mitk::NavigationDataPlayer::StartPlaying()
 
     //now check again
     if (m_Stream == NULL)
-    {       
+    {
       StopPlaying();
       MITK_ERROR << "Playing not possible. Wrong file name or path?";
       mitkThrowException(mitk::IGTException) << "Playing not possible. Wrong file name or path?";
@@ -379,7 +379,7 @@ void mitk::NavigationDataPlayer::StartPlaying()
 
   if (!m_Playing && m_Stream->good())
   {
-    m_Playing = true; 
+    m_Playing = true;
     m_StartPlayingTimeStamp = mitk::TimeStamp::GetInstance()->GetElapsed();
   }
   else
@@ -413,7 +413,7 @@ void mitk::NavigationDataPlayer::StopPlaying()
 
 
 void mitk::NavigationDataPlayer::GetFirstData()
-{ 
+{
 
   //Here we read the first lines of input (dependend on the number of inputs)
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
@@ -425,7 +425,7 @@ void mitk::NavigationDataPlayer::GetFirstData()
 
     switch(m_FileVersion)
     {
-      case 1: 
+      case 1:
         m_NextToPlayNavigationData[index] = ReadVersion1();
         //check if there is valid data in it
 
@@ -441,7 +441,7 @@ void mitk::NavigationDataPlayer::GetFirstData()
 
         m_StartTimeOfData[index] = m_NextToPlayNavigationData[index]->GetTimeStamp();
         break;
-      
+
       default: //this case should not happen! therefore the return at this point
         return;
         break;
@@ -471,13 +471,13 @@ void mitk::NavigationDataPlayer::Resume()
 {
   //player is in pause mode -> play at the last position
   if(!m_Playing && m_Pause)
-  { 
+  {
     m_Playing = true;
     m_Pause = false;
     mitk::NavigationData::TimeStampType now = mitk::TimeStamp::GetInstance()->GetElapsed();
-    
+
     // in this case m_StartPlayingTimeStamp is set to the total elapsed time with NO playback
-    m_StartPlayingTimeStamp = now - (m_PauseTimeStamp - m_StartPlayingTimeStamp);    
+    m_StartPlayingTimeStamp = now - (m_PauseTimeStamp - m_StartPlayingTimeStamp);
   }
   else
   {
@@ -499,7 +499,7 @@ void mitk::NavigationDataPlayer::CreateStreamFromFilename()
   {
   case NormalFile:
     m_Stream = new std::ifstream(m_FileName.c_str());
-    m_StreamSetOutsideFromClass = false; 
+    m_StreamSetOutsideFromClass = false;
     break;
 
   case ZipFile:

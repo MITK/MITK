@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -59,20 +59,20 @@ void mitk::PadImageFilter::GenerateData()
   double outputOrigin[3];
   unsigned long padLowerBound[3];
   unsigned long padUpperBound[3];
-  
+
   int i;
   for ( i = 0; i < 3; ++i )
   {
     outputOrigin[i] = referenceOrigin[i];
-   
+
     padLowerBound[i] = static_cast< unsigned long >
       ((origin[i] - referenceOrigin[i]) / spacing[i] + 0.5);
 
-    padUpperBound[i] = referenceImage->GetDimension( i ) 
+    padUpperBound[i] = referenceImage->GetDimension( i )
       - image->GetDimension( i ) - padLowerBound[i];
   }
 
-  // The origin of the input image is passed through the filter and used as 
+  // The origin of the input image is passed through the filter and used as
   // output origin as well. Hence, it needs to be overwritten accordingly.
   itkImage->SetOrigin( outputOrigin );
 

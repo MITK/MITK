@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,14 +46,14 @@ namespace berry {
  * <code>getInterfaces</code> (in the example, A and its superinterfaces then B and its
  * superinterfaces) </il>
  * </ul>
- * 
+ *
  * @see IAdapterFactory
  * @see IAdapterManager
  */
 class AdapterService : public Service, public IAdapterManager {
-  
-  
-  /** 
+
+
+  /**
    * Cache of adapters for a given adaptable class. Maps String  -> Map
    * (adaptable class name -> (adapter class name -> factory instance))
    * Thread safety note: The outer map is synchronized using a synchronized
@@ -97,7 +97,7 @@ private:
 
 public: bool IsA(const std::type_info& type) const;
 public: const std::type_info& GetType() const;
-  
+
 public: static AdapterManager GetDefault();
 
   /**
@@ -130,7 +130,7 @@ public: void ComputeAdapterTypes(std::vector<std::string>& types, const std::typ
 
   /**
    * Computes the adapters that the provided class can adapt to, along
-   * with the factory object that can perform that transformation. Returns 
+   * with the factory object that can perform that transformation. Returns
    * a table of adapter class name to factory object.
    * @param adaptable
    */
@@ -144,7 +144,7 @@ private: void GetFactories(std::map<std::string, IAdapterFactory*> table, const 
    * value is the <b>sole<b> factory that defines that adapter. Note that
    * if multiple adapters technically define the same property, only the
    * first found in the search order is considered.
-   * 
+   *
    * Note that it is important to maintain a consistent class and interface
    * lookup order. See the class comment for more details.
    */

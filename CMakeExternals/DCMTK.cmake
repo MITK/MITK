@@ -8,7 +8,7 @@ if(MITK_USE_DCMTK)
   if(DEFINED DCMTK_DIR AND NOT EXISTS ${DCMTK_DIR})
     message(FATAL_ERROR "DCMTK_DIR variable is defined but corresponds to non-existing directory")
   endif()
-  
+
   set(proj DCMTK)
   set(proj_DEPENDENCIES )
   set(DCMTK_DEPENDS ${proj})
@@ -22,7 +22,7 @@ if(MITK_USE_DCMTK)
       set(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
       set(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
     endif()
-         
+
 
     set (dcmtk_shared_flags "-DBUILD_SHARED_LIBS:BOOL=${MITK_DCMTK_BUILD_SHARED_LIBS}")
     if (NOT MITK_DCMTK_BUILD_SHARED_LIBS)
@@ -56,10 +56,10 @@ if(MITK_USE_DCMTK)
       DEPENDS ${proj_DEPENDENCIES}
       )
     set(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
-    
+
   else()
-  
+
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
-  
+
   endif()
-endif()     
+endif()

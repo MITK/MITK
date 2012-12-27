@@ -21,8 +21,8 @@ std::string stripExtension(const std::string& fileName){
     if (fileName[i]=='.'){
       return fileName.substr(0,i);
     }
-  } 
-  return fileName; 
+  }
+  return fileName;
 }
 
 
@@ -55,7 +55,7 @@ bool SamplingDirections(const char* fn, typename TTOContainerType::Pointer direc
         directions->InsertElement(directioncount++,direction);
     }
   }
-  
+
   //close file
   m_file.close();
   return true;
@@ -69,10 +69,10 @@ bool WriteTractContainerToFile( const char* fn, TractContainerType* tractcontain
     for(int i=0; i<tractcontainer->Size(); i++ ){
       typename TractContainerType::Element tract =
         tractcontainer->GetElement(i);
-      
-      typename TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist = 
+
+      typename TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist =
         tract->GetVertexList();
-      
+
       for(int j=0; j<vertexlist->Size(); j++){
         typename TractContainerType::Element::ObjectType::VertexListType::Element vertex =
           vertexlist->GetElement(j);
@@ -85,7 +85,7 @@ bool WriteTractContainerToFile( const char* fn, TractContainerType* tractcontain
       tractfile.write((char*)&endoftractsymbol, sizeof(endoftractsymbol));
       tractfile.write((char*)&endoftractsymbol, sizeof(endoftractsymbol));
     }
-    
+
     tractfile.close();
     return true;
   }
@@ -113,8 +113,8 @@ bool WriteScalarContainerToFile( const char* fn, FAContainerType* facontainer ){
   }
 }
 
-namespace Functor {  
-   
+namespace Functor {
+
 template< class TInput, class TOutput>
 class ZeroDWITest
 {
@@ -140,7 +140,7 @@ public:
     */
     return 10;
   }
-}; 
+};
 
 template< class TInput, class TOutput>
 class ScalarMultiply
@@ -167,7 +167,7 @@ public:
     */
     return A*1000;
   }
-}; 
+};
 
 }
 
@@ -181,48 +181,48 @@ int main(int argc, char* argv[]){
 
   //define an iterator for the ROI image
   typedef itk::ImageRegionConstIterator< ROIImageType > ROIImageIteratorType;
-  
+
   //define reader and writer
   typedef itk::ImageFileReader< DWIVectorImageType > DWIVectorImageReaderType;
   typedef itk::ImageFileReader< WMPImageType > WMPImageReaderType;
   typedef itk::ImageFileReader< ROIImageType > ROIImageReaderType;
   typedef itk::ImageFileWriter< CImageType > CImageWriterType;
   typedef itk::ImageFileWriter< WMPImageType > WMPImageWriterType;
-  
+
   //define metadata dictionary types
   typedef itk::MetaDataDictionary DictionaryType;
   typedef DictionaryType::ConstIterator DictionaryIteratorType;
-    
+
   //define a probabilistic tractography filter type and associated bValue,
   //gradient direction, and measurement frame types
   typedef itk::StochasticTractographyFilter< DWIVectorImageType, WMPImageType,
-    CImageType > 
+    CImageType >
     PTFilterType;
   typedef PTFilterType::bValueContainerType bValueContainerType;
   typedef PTFilterType::GradientDirectionContainerType GDContainerType;
   typedef PTFilterType::MeasurementFrameType MeasurementFrameType;
-  
+
   //define a filter to generate a mask image that excludes zero dwi values
   typedef Functor::ZeroDWITest< DWIVectorImageType::PixelType, WMPImageType::PixelType >
     ZeroDWITestType;
-  typedef itk::UnaryFunctorImageFilter< DWIVectorImageType, WMPImageType, 
+  typedef itk::UnaryFunctorImageFilter< DWIVectorImageType, WMPImageType,
     ZeroDWITestType > ExcludeZeroDWIFilterType;
-  
+
   //FA stuff
   typedef itk::Image< double, 3 > FAImageType;
   typedef itk::TensorFractionalAnisotropyImageFilter< PTFilterType::OutputTensorImageType,
     FAImageType > FAFilterType;
   typedef itk::ImageFileWriter< FAImageType > FAImageWriterType;
-    
+
   //define a filter to multiply a FA image by 1000
   typedef Functor::ScalarMultiply< FAImageType::PixelType, FAImageType::PixelType >
     ScalarMultiplyType;
   typedef itk::UnaryFunctorImageFilter< FAImageType, FAImageType,
     ScalarMultiplyType > MultiplyFAFilterType;
-    
+
   //define AddImageFilterType to accumulate the connectivity maps of the pixels in the ROI
   typedef itk::AddImageFilter< CImageType, CImageType, CImageType> AddImageFilterType;
-  
+
   //parse command line arguments
   //if(argc < 3){
   //  std::cerr << "Usage: " << argv[0];
@@ -244,7 +244,7 @@ int main(int argc, char* argv[]){
   //sprintf( fafilename, "%s_CONDFAValues.txt", outputprefix.c_str() );
   std::string lengthfilename = outputprefix + "_CONDLENGTHValues.txt";
   //sprintf( lengthfilename, "%s_CONDLENGTHValues.txt", outputprefix.c_str() );
-  
+
   //open these files
   std::ofstream fafile( fafilename.c_str() );
   std::locale C("C");  // define standard locale
@@ -254,19 +254,19 @@ int main(int argc, char* argv[]){
     std::cerr<<"Could not open FA file!\n";
     return EXIT_FAILURE;
   }
-  
+
   std::ofstream lengthfile( lengthfilename.c_str() );
   lengthfile.imbue(C); // switch the stream to standard locale
   //if(!lengthfile.is_open()){
   //  std::cerr<<"Could not open Length file!\n";
   //  return EXIT_FAILURE;
  // }
-  
+
   //read in the DWI image
   DWIVectorImageReaderType::Pointer dwireaderPtr = DWIVectorImageReaderType::New();
   dwireaderPtr->SetFileName(dwifilename);
   dwireaderPtr->Update();
-  
+
   //Obtain bValue, gradient directions and measurement frame from metadata dictionary
   DictionaryType& dictionary = dwireaderPtr->GetMetaDataDictionary();
   bValueContainerType::Pointer bValuesPtr = bValueContainerType::New();
@@ -305,7 +305,7 @@ int main(int argc, char* argv[]){
       std::cout << dictit->first << std::endl;
     }
   }
-  
+
   //check to see if bValue, gradients, or measurement frame is missing
   if(scaling_bValue == 0){
     std::cerr << "scaling_bValue should never be 0, possibly not found in Nrrd header\n";
@@ -320,23 +320,23 @@ int main(int argc, char* argv[]){
     return EXIT_FAILURE;
   }
   //correct the measurement frame
-  
+
   std::cout << scaling_bValue << std::endl;
   for(unsigned int i=0; i<gradientsPtr->Size(); i++)
     std::cout << gradientsPtr->GetElement(i) << std::endl;
-  
+
   //std::cout << measurement_frame <<std::endl;
-  
+
   for(unsigned int i=0; i<measurement_frame.rows(); i++){
     for(unsigned int j=0; j<measurement_frame.columns(); j++){
       std::cout<<measurement_frame(i,j) << " ";
     }
     std::cout << std::endl;
   }
- 
+
   //correct the measurement frame since the image is now in LPS from RAS frame
   //NRRDIO should do this, but we do it here as a work around
-  
+
   //fill up bValue container with the scaling_bValue;
   for(unsigned int i=0; i<gradientsPtr->Size() ;i++){
     if(gradientsPtr->GetElement(i).squared_magnitude() == 0){
@@ -348,17 +348,17 @@ int main(int argc, char* argv[]){
       bValuesPtr->InsertElement(i, scaling_bValue);
     }
   }
-  
+
   //setup the ROI image reader
   ROIImageReaderType::Pointer roireaderPtr = ROIImageReaderType::New();
   roireaderPtr->SetFileName(roifilename);
   roireaderPtr->Update();
-  
+
   //setup the white matter probability image reader
   WMPImageReaderType::Pointer wmpreader = WMPImageReaderType::New();
   wmpreader->SetFileName(wmpfilename);
   wmpreader->Update();
-  
+
   //optionally set the origins of these images to be the same as the DWI
   if(recenteroriginswitch==true){
     roireaderPtr->GetOutput()->SetOrigin( dwireaderPtr->GetOutput()->GetOrigin() );
@@ -368,34 +368,34 @@ int main(int argc, char* argv[]){
   //set list of directions
   typedef PTFilterType::TractOrientationContainerType TOCType;
   TOCType::Pointer directionsPtr = TOCType::New();
-  
+
   if(SamplingDirections<TOCType>("SD.txt", directionsPtr));
   else return EXIT_FAILURE;
   */
   /*
   //write out the directions
   std::ofstream outfile("crapola.txt");
-  
- 
+
+
   for(int i=0; i<directionsPtr->Size(); i++){
     TOCType::Element dir = directionsPtr->GetElement(i);
     outfile<<"{"<<dir[0]<<", "<<dir[1]<<", "<<dir[2]<<"},"<<std::endl;
   }
   outfile.close();
   */
-  
-  //Create a default Mask Image which 
+
+  //Create a default Mask Image which
   //excludes DWI pixels which contain values that are zero
   //ExcludeZeroDWIFilterType::Pointer ezdwifilter = ExcludeZeroDWIFilterType::New();
   //ezdwifilter->SetInput( dwireaderPtr->GetOutput() );
-  //std::cout<<"Start mask image\n";  
+  //std::cout<<"Start mask image\n";
   //write out the mask image
   //MaskImageWriterType::Pointer maskwriterPtr = MaskImageWriterType::New();
   //maskwriterPtr->SetInput( ezdwifilter->GetOutput() );
   //maskwriterPtr->SetFileName( "maskimage.nhdr" );
   //maskwriterPtr->Update();
   //std::cout<<"Finish the mask image\n";
-  
+
   std::cout<<"Create PTFilter\n";
   //Setup the PTFilter
   PTFilterType::Pointer ptfilterPtr = PTFilterType::New();
@@ -410,27 +410,27 @@ int main(int argc, char* argv[]){
   ptfilterPtr->SetTotalTracts( totaltracts );
   ptfilterPtr->SetMaxLikelihoodCacheSize( maxlikelihoodcachesize );
   if(totalthreads!=0) ptfilterPtr->SetNumberOfThreads( totalthreads );
-  
+
   //calculate the tensor image
   ptfilterPtr->GenerateTensorImageOutput();
-  
+
   //Setup the FAImageFilter
   FAFilterType::Pointer fafilter =  FAFilterType::New();
-  
+
   fafilter->SetInput( ptfilterPtr->GetOutputTensorImage() );
   fafilter->Update();
-  
+
   //Setup the FA container to hold FA values for tracts of interest
   typedef itk::VectorContainer< unsigned int, double > FAContainerType;
   //FAContainerType::Pointer facontainer = FAContainerType::New();
-  
+
   //Setup the length container to hold lengths for tracts of interest
   typedef itk::VectorContainer< unsigned int, unsigned int > LengthContainerType;
   //LengthContainerType::Pointer lengthcontainer = LengthContainerType::New();
-  
+
   //Setup the AddImageFilter
   AddImageFilterType::Pointer addimagefilterPtr = AddImageFilterType::New();
-  
+
   //Create a zeroed Connectivity Image
   CImageType::Pointer accumulatedcimagePtr = CImageType::New();
   accumulatedcimagePtr->CopyInformation( dwireaderPtr->GetOutput() );
@@ -438,7 +438,7 @@ int main(int argc, char* argv[]){
   accumulatedcimagePtr->SetRequestedRegion( dwireaderPtr->GetOutput()->GetRequestedRegion() );
   accumulatedcimagePtr->Allocate();
   accumulatedcimagePtr->FillBuffer(0);
-  
+
   //Create another Connectivity Map for just the tracts
   //which make it to the second ROI
   CImageType::Pointer conditionedcimagePtr = CImageType::New();
@@ -447,12 +447,12 @@ int main(int argc, char* argv[]){
   conditionedcimagePtr->SetRequestedRegion( dwireaderPtr->GetOutput()->GetRequestedRegion() );
   conditionedcimagePtr->Allocate();
   conditionedcimagePtr->FillBuffer(0);
-    
+
   //graft this onto the output of the addimagefilter
   addimagefilterPtr->GraftOutput(accumulatedcimagePtr);
   addimagefilterPtr->SetInput1(ptfilterPtr->GetOutput());
   addimagefilterPtr->SetInput2(addimagefilterPtr->GetOutput());
-  
+
   ROIImageIteratorType ROIImageIt( roireaderPtr->GetOutput(),
     roireaderPtr->GetOutput()->GetRequestedRegion() );
   for(ROIImageIt.GoToBegin(); !ROIImageIt.IsAtEnd(); ++ROIImageIt){
@@ -464,20 +464,20 @@ int main(int argc, char* argv[]){
 
       //WriteTractContainerToFile( filename, ptfilterPtr->GetOutputTractContainer() );
       addimagefilterPtr->Update();
-      
+
       std::cout<<"Calculate Statistics\n";
       //calculate the FA stats for tracts which pass through a second ROI
-      PTFilterType::TractContainerType::Pointer tractcontainer = 
+      PTFilterType::TractContainerType::Pointer tractcontainer =
         ptfilterPtr->GetOutputTractContainer();
 
-      typedef itk::PathIterator< ROIImageType, PTFilterType::TractType > 
+      typedef itk::PathIterator< ROIImageType, PTFilterType::TractType >
         ROITractIteratorType;
-  
+
       for(int i=0; i<tractcontainer->Size(); i++ ){
         PTFilterType::TractType::Pointer currtract = tractcontainer->GetElement(i);
         ROITractIteratorType roitractIt( roireaderPtr->GetOutput(),
           currtract );
-        
+
         for(roitractIt.GoToBegin(); !roitractIt.IsAtEnd(); ++roitractIt){
           if(roitractIt.Get() == endlabelnumber){
             double accumFA=0;
@@ -497,7 +497,7 @@ int main(int argc, char* argv[]){
             //lengthcontainer->InsertElement( lengthcontainer->Size(),
               //(unsigned int) tractcontainer->GetElement(i)->EndOfInput() );
             //facontainer->InsertElement( facontainer->Size(), accumFA/((double)stepcount) );
- 
+
             //color in the tracts
             for(roitractIt.GoToBegin(); !roitractIt.IsAtEnd(); ++roitractIt){
               conditionedcimagePtr->GetPixel(roitractIt.GetIndex())++;
@@ -507,8 +507,8 @@ int main(int argc, char* argv[]){
         }
       }
     }
-  }        
-  
+  }
+
   std::cout<<"DWI image origin:"<< dwireaderPtr->GetOutput()->GetOrigin() <<std::endl;
   std::cout<<"ROI image origin:"<< roireaderPtr->GetOutput()->GetOrigin() <<std::endl;
   std::cout<<"wmp image origin:"<< wmpreader->GetOutput()->GetOrigin() <<std::endl;
@@ -520,7 +520,7 @@ int main(int argc, char* argv[]){
     writerPtr->SetInput( accumulatedcimagePtr );
     writerPtr->SetFileName( cfilename.c_str() );
     writerPtr->Update();
-    
+
     //Write out TensorImage
     std::string tensorimagefilename = outputprefix + "_TENSOR.nhdr";
     //sprintf(tensorimagefilename, "%s_TENSOR.nhdr", outputprefix.c_str() );
@@ -529,11 +529,11 @@ int main(int argc, char* argv[]){
     tensorwriter->SetInput( ptfilterPtr->GetOutputTensorImage() );
     tensorwriter->SetFileName( tensorimagefilename.c_str() );
     tensorwriter->Update();
-    
-    //Create a default Mask Image which 
+
+    //Create a default Mask Image which
     //excludes DWI pixels which contain values that are zero
     MultiplyFAFilterType::Pointer multFAfilter = MultiplyFAFilterType::New();
-    multFAfilter->SetInput( fafilter->GetOutput() );  
+    multFAfilter->SetInput( fafilter->GetOutput() );
     //write out the FA image
     std::string faimagefilename = outputprefix + "_FA.nhdr";
     //sprintf(faimagefilename, "%s_FA.nhdr", outputprefix.c_str() );
@@ -541,7 +541,7 @@ int main(int argc, char* argv[]){
     fawriter->SetInput( multFAfilter->GetOutput() );
     fawriter->SetFileName( faimagefilename.c_str() );
     fawriter->Update();
-    
+
     //Write out the conditioned connectivity map
     CImageWriterType::Pointer condcmapwriterPtr = CImageWriterType::New();
     condcmapwriterPtr->SetInput( conditionedcimagePtr );
@@ -561,7 +561,7 @@ int main(int argc, char* argv[]){
   //char fafilename[100];
   //sprintf( fafilename, "%s_CONDFAValues.txt", outputprefix.c_str() );
   //WriteScalarContainerToFile< FAContainerType >( fafilename, facontainer );
-  
+
   //Write out tract length container
   //char lengthfilename[100];
   //sprintf( lengthfilename, "%s_CONDLENGTHValues.txt", outputprefix.c_str() );

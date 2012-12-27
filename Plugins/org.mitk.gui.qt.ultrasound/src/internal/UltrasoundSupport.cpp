@@ -55,8 +55,9 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
-  std::string filter = "(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true)";
-  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
+  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
+
 
   m_Node = mitk::DataNode::New();
   m_Node->SetName("US Image Stream");
@@ -75,11 +76,11 @@ void UltrasoundSupport::DisplayImage()
 {
  // m_Device->UpdateOutputData(0);
  // mitk::USImage::Pointer image = m_Device->GetOutput();
-  
+
   m_Device->UpdateOutputData(0);
   m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
-  
+
   m_FrameCounter ++;
   if (m_FrameCounter == 10)
   {

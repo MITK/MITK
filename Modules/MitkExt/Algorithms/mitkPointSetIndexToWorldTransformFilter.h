@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,9 +26,9 @@ namespace mitk
 {
   //##Documentation
   //## @brief Transforms a point set object from index to world coordinates.
-  //## Transposes the points coordinates with the object's mitk::Geometry3D to display 
+  //## Transposes the points coordinates with the object's mitk::Geometry3D to display
   //## correct scene coordinates.
-  //## 
+  //##
   //## @ingroup Algorithms
 class MitkExt_EXPORT PointSetIndexToWorldTransformFilter : public PointSetToPointSetFilter
 {
@@ -55,7 +55,7 @@ protected:
    * method executed when calling Update();
    */
   virtual void GenerateData();
-  
+
 };
 
 }

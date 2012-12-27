@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*
 
    Defines a vector container just like from itkSmartPointerVectorContainer.h.
-   The important difference ist, that this vector holds SmartPointers 
+   The important difference ist, that this vector holds SmartPointers
    to object instead of objects themselves.
 
    Major difference to SmartPointerVectorContainer<SmartPointer<Object>>:
 
    When you ask for a ConstIterator you won't get const SmartPointers,
-   but a list of const Object*. 
+   but a list of const Object*.
 */
 
 #include "itkObject.h"
@@ -56,7 +56,7 @@ template <
   typename TElementIdentifier,
   typename TElement
   >
-class SmartPointerVectorContainer: 
+class SmartPointerVectorContainer:
   public Object,
   public std::vector<itk::SmartPointer<TElement> >  /** difference: we handle smart pointers */
 {
@@ -66,21 +66,21 @@ public:
   typedef Object                      Superclass;
   typedef SmartPointer<Self>          Pointer;
   typedef SmartPointer<const Self>    ConstPointer;
-  
+
   /** Save the template parameters. */
   typedef TElementIdentifier                     ElementIdentifier;
   typedef TElement                               Element;
   typedef const TElement                         ConstElement;
   typedef itk::SmartPointer<Element>             ElementPointer;
   typedef const itk::SmartPointer<const Element> ConstElementPointer;
-  
+
 private:
   /** Quick access to the STL vector type that was inherited. */
   typedef std::vector<ElementPointer>             VectorType;
-  typedef typename VectorType::size_type          size_type;  
+  typedef typename VectorType::size_type          size_type;
   typedef typename VectorType::iterator           VectorIterator;
   typedef typename VectorType::const_iterator     VectorConstIterator;
-    
+
 protected:
   /** Provide pass-through constructors corresponding to all the STL
    * vector constructors.  These are for internal use only since this is also
@@ -96,7 +96,7 @@ protected:
   template <typename InputIterator>
   SmartPointerVectorContainer(InputIterator first, InputIterator last):
     Object(), VectorType(first, last) {}
-  
+
 public:
 
   /** This type is provided to Adapt this container as an STL container */
@@ -104,14 +104,14 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-  
+
   /** Standard part of every itk Object. */
   itkTypeMacro(SmartPointerVectorContainer, Object);
 
   /** Convenient typedefs for the iterator and const iterator. */
   class Iterator;
   class ConstIterator;
-    
+
   /** Cast the container to a STL container type */
   STLContainerType & CastToSTLContainer() {
      return dynamic_cast<STLContainerType &>(*this); }
@@ -123,13 +123,13 @@ public:
   /** Friends to this class. */
   friend class Iterator;
   friend class ConstIterator;
-  
+
   class Iterator
   {
   public:
     Iterator() {}
     Iterator(size_type d, const VectorType* vec, const VectorIterator& i): m_Pos(d), m_Vector(vec), m_Iter(i) {}
-    
+
     ElementPointer& operator* ()    { return *m_Iter; }
     Element*        operator-> ()   { return m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer(); }
     ElementPointer& operator++ ()   { ++m_Pos; ++m_Iter; return *m_Iter; }
@@ -141,28 +141,28 @@ public:
     bool operator != (const Iterator& r) const { return m_Iter != r.m_Iter; }
     bool operator == (const ConstIterator& r) const { return m_Iter == r.m_Iter; }
     bool operator != (const ConstIterator& r) const { return m_Iter != r.m_Iter; }
-    
+
     /** Get the index into the SmartPointerVectorContainer associated with this iterator.   */
     ElementIdentifier Index(void) const { return static_cast<ElementIdentifier>( m_Pos ); }
-    
+
     /** Get the value at this iterator's location in the SmartPointerVectorContainer.   */
     Element* Value(void) const { return m_Iter->GetPointer(); }
-    
+
   private:
     size_type m_Pos;
     const VectorType* m_Vector;
     VectorIterator m_Iter;
     friend class ConstIterator;
   };
-  
+
   class ConstIterator
   {
   public:
     ConstIterator() {}
     ConstIterator(size_type d, const VectorType* vec, const VectorConstIterator& i): m_Pos(d), m_Vector(vec), m_Iter(i) {}
     ConstIterator(const Iterator& r): m_Pos(r.m_Pos), m_Vector(r.m_Vector), m_Iter(r.m_Iter) {}
-    
-    ConstElementPointer operator* ()    { return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); } 
+
+    ConstElementPointer operator* ()    { return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); }
     ConstElement*       operator-> ()   { return m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer(); }
     ConstElementPointer operator++ ()   { ++m_Pos; ++m_Iter; return ConstElementPointer(m_Iter == m_Vector->end() ? NULL : m_Iter->GetPointer()); }
     ConstElementPointer operator++ (int) { ConstIterator temp(*this); ++m_Pos; ++m_Iter; return *temp; }
@@ -170,25 +170,25 @@ public:
     ConstElementPointer operator-- (int) { ConstIterator temp(*this); --m_Pos; --m_Iter; return *temp; }
 
     ConstIterator& operator = (const Iterator& r) { m_Pos = r.m_Pos; m_Iter = r.m_Iter; return *this; }
-    
+
     bool operator == (const Iterator& r) const { return m_Iter == r.m_Iter; }
     bool operator != (const Iterator& r) const { return m_Iter != r.m_Iter; }
     bool operator == (const ConstIterator& r) const { return m_Iter == r.m_Iter; }
     bool operator != (const ConstIterator& r) const { return m_Iter != r.m_Iter; }
-    
+
     /** Get the index into the SmartPointerVectorContainer associated with this iterator.   */
     ElementIdentifier Index(void) const { return static_cast<ElementIdentifier>( m_Pos ); }
-    
+
     /** Get the value at this iterator's location in the SmartPointerVectorContainer.   */
     const Element* Value(void) const { return m_Iter->GetPointer(); }
-    
+
   private:
     size_type m_Pos;
     const VectorType* m_Vector;
     VectorConstIterator m_Iter;
     friend class Iterator;
-  };  
-  
+  };
+
   /** Declare the public interface routines. */
   ElementPointer& ElementAt(ElementIdentifier);
   ConstElementPointer ElementAt(ElementIdentifier) const; // no need to return reference, because assignment not allowed!
@@ -201,18 +201,18 @@ public:
   void CreateIndex(ElementIdentifier);
   void DeleteIndex(ElementIdentifier);
   ConstIterator Begin(void) const;
-  ConstIterator End(void) const;  
+  ConstIterator End(void) const;
   Iterator Begin(void);
-  Iterator End(void);  
+  Iterator End(void);
   unsigned long Size(void) const;
   void Reserve(ElementIdentifier);
   void Squeeze(void);
   void Initialize(void);
-    
+
 };
 
 } // end namespace itk
-  
+
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "itkSmartPointerVectorContainer.txx"
 #endif

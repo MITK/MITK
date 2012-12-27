@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInternalTrackingTool.h>
 #include "mitkTrackingTypes.h"
 
-namespace mitk 
+namespace mitk
 {
   class NDITrackingDevice;
   /**Documentation
@@ -29,7 +29,7 @@ namespace mitk
   *
   * implements the TrackingTool interface and has the ability to
   * load an srom file that contains the marker configuration for that tool
-  * 
+  *
   * \ingroup IGT
   */
   class MitkIGT_EXPORT NDIPassiveTool : public InternalTrackingTool
@@ -38,7 +38,7 @@ namespace mitk
     friend class NDITrackingDevice;
     /**
     * \brief tracking priority for NDI tracking devices
-    */    
+    */
     enum TrackingPriority
     {
       Static    = 'S',
@@ -59,7 +59,7 @@ namespace mitk
     itkGetConstMacro(TrackingPriority, TrackingPriority); ///< get tracking priority that the ndi tracking device should use
     itkSetStringMacro(SerialNumber);  ///< set serial number of the tool
     itkGetStringMacro(SerialNumber);  ///< get serial number of the tool
-    itkGetStringMacro(File);          ///< get file from which this tool was loaded 
+    itkGetStringMacro(File);          ///< get file from which this tool was loaded
 
   protected:
     itkNewMacro(Self);  // only the friend class NDITrackingDevice is allowed to instantiate NDIPassiveTools

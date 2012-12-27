@@ -35,9 +35,8 @@ class FslPeakImageConverter : public ProcessObject
 public:
 
   enum NormalizationMethods {
-    NO_NORM,
-    SINGLE_VEC_NORM,
-    SPACING_COMPENSATION
+    NO_NORM,            ///< don't normalize peaks
+    SINGLE_VEC_NORM     ///< normalize peaks to length 1
   };
 
   typedef FslPeakImageConverter Self;
@@ -59,10 +58,10 @@ public:
   typedef Image< Vector< float, 3 >, 3>                                 ItkDirectionImageType;
   typedef VectorContainer< int, ItkDirectionImageType::Pointer >        DirectionImageContainerType;
 
-  itkSetMacro( NormalizationMethod, NormalizationMethods)
-  itkSetMacro( InputImages, InputType::Pointer)
-  itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
-  itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)
+  itkSetMacro( NormalizationMethod, NormalizationMethods)                       ///< normalization method of ODF peaks
+  itkSetMacro( InputImages, InputType::Pointer)                                 ///< MRtrix peak image of type itk::Image< float, 4 >
+  itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
+  itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
 
   void GenerateData();
 
@@ -70,10 +69,10 @@ protected:
   FslPeakImageConverter();
   ~FslPeakImageConverter(){}
 
-  NormalizationMethods                  m_NormalizationMethod;
-  mitk::FiberBundleX::Pointer           m_OutputFiberBundle;
-  InputType::Pointer                    m_InputImages;
-  DirectionImageContainerType::Pointer  m_DirectionImageContainer;
+  NormalizationMethods                  m_NormalizationMethod;      ///< normalization method of ODF peaks
+  mitk::FiberBundleX::Pointer           m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
+  InputType::Pointer                    m_InputImages;              ///< MRtrix peak image of type itk::Image< float, 4 >
+  DirectionImageContainerType::Pointer  m_DirectionImageContainer;  ///< container for output peaks
 
 private:
 

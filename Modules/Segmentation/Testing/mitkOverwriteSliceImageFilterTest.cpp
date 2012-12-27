@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
   assert(image);
 
   filter->SetInput( image );
-  
+
   unsigned int initialNumberFailed = numberFailed;
   bool exception = false;
   // first extract slices and rewrite them
@@ -49,7 +49,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
     extractor->SetSliceDimension( sliceDimension );
     extractor->SetSliceIndex( 2 ); // third slice in that direction
 
-    try 
+    try
     {
       extractor->Update();
     }
@@ -82,10 +82,10 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       if ( sliceDimension < 3 )
       {
         ++numberFailed;
-        std::cerr << "  (EE) Couln't overwrite a slice with data from a neigbor in a " 
-                  << image->GetDimension() 
-                  << "-dimensional image, sliceDimension " 
-                  << sliceDimension 
+        std::cerr << "  (EE) Couln't overwrite a slice with data from a neigbor in a "
+                  << image->GetDimension()
+                  << "-dimensional image, sliceDimension "
+                  << sliceDimension
                   << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
       }
       else
@@ -101,9 +101,9 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
     {
       ++numberFailed;
       std::cerr << "  (EE) Overwrite filter has output NULL and gave no exception for an "
-                << image->GetDimension() 
-                << "-dimensional image, sliceDimension " 
-                << sliceDimension 
+                << image->GetDimension()
+                << "-dimensional image, sliceDimension "
+                << sliceDimension
                 << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
        continue;
     }
@@ -112,9 +112,9 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
     {
       ++numberFailed;
       std::cerr << "  (EE) Overwriting a slice seemed to work, but the pixels are not correct for an "
-                << image->GetDimension() 
-                << "-dimensional image, sliceDimension " 
-                << sliceDimension 
+                << image->GetDimension()
+                << "-dimensional image, sliceDimension "
+                << sliceDimension
                 << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
     }
 
@@ -133,18 +133,18 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
     {
       exception = true;
     }
-    
+
     if (!exception)
     {
       ++numberFailed;
-      std::cerr << "  (EE) Inserting a slice outside the 3D volume did NOT throw an exception for an " 
-                << image->GetDimension() 
-                << "-dimensional image, sliceDimension " 
-                << sliceDimension 
+      std::cerr << "  (EE) Inserting a slice outside the 3D volume did NOT throw an exception for an "
+                << image->GetDimension()
+                << "-dimensional image, sliceDimension "
+                << sliceDimension
                 << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
     }
 
- 
+
     mitk::Image::Pointer originalSlice = slice;
 
     // now test slices that just don't fit (slice too big)
@@ -158,7 +158,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       for(i=0; i<size; ++i, ++p)
         *p= (signed int)i;
 
-      // try to insert this bad slice 
+      // try to insert this bad slice
       filter->SetSliceImage( slice );
       exception = false;
       try
@@ -174,9 +174,9 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       {
         ++numberFailed;
         std::cerr << "  (EE) Trying to insert a slice of bad dimensions (larger) did NOT throw an exception in an "
-                  << image->GetDimension() 
-                  << "-dimensional image, sliceDimension " 
-                  << sliceDimension 
+                  << image->GetDimension()
+                  << "-dimensional image, sliceDimension "
+                  << sliceDimension
                   << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
       }
     }
@@ -194,7 +194,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       for(i=0; i<size; ++i, ++p)
         *p= (signed int)i;
 
-      // try to insert this bad slice 
+      // try to insert this bad slice
       filter->SetSliceImage( slice );
       exception = false;
       try
@@ -210,15 +210,15 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       {
         ++numberFailed;
         std::cerr << "  (EE) Trying to insert a slice of bad dimensions (smaller) did NOT throw an exception in an "
-                  << image->GetDimension() 
-                  << "-dimensional image, sliceDimension " 
-                  << sliceDimension 
+                  << image->GetDimension()
+                  << "-dimensional image, sliceDimension "
+                  << sliceDimension
                   << " sliceIndex 1-2." << "(l. " << __LINE__ << ")" << std::endl;
       }
     }
-   
+
   }
-  
+
 
 
   if ( numberFailed == initialNumberFailed )
@@ -257,7 +257,7 @@ static void Test2D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
   if ( numberFailed == initialNumberFailed )
   {
     std::cout << "  (II) Overwriting works nicely (gives result, pixels are good) "
-              << image->GetDimension() 
+              << image->GetDimension()
               << "-dimensional image." << "(l. " << __LINE__ << ")" << std::endl;
   }
 }
@@ -289,7 +289,7 @@ static void TestOtherD( mitk::OverwriteSliceImageFilter* filter, mitk::Image* im
   if ( numberFailed == initialNumberFailed )
   {
     std::cout << "  (II) Overwriting works nicely (gives result, pixels are good) "
-              << image->GetDimension() 
+              << image->GetDimension()
               << "-dimensional image." << "(l. " << __LINE__ << ")" << std::endl;
   }
 }
@@ -302,14 +302,14 @@ int mitkOverwriteSliceImageFilterTest(int argc, char* argv[])
 {
   // one big variable to tell if anything went wrong
     unsigned int numberFailed(0);
- 
+
   // need one parameter (image filename)
     if(argc==0)
     {
       std::cerr<<"No file specified [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
- 
+
   // load the image
 
     mitk::Image::Pointer image = NULL;
@@ -370,12 +370,12 @@ int mitkOverwriteSliceImageFilterTest(int argc, char* argv[])
     {
       mitkOverwriteSliceImageFilterTestClass::TestOtherD( filter, image, numberFailed );
     }
-  
+
     std::cout << "Testing filter destruction" << std::endl;
 
   // freeing
     filter = NULL;
-      
+
     std::cout << "  (II) Freeing works." << std::endl;
 
     if (numberFailed > 0)

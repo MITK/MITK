@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #ifndef _BERRY_WORKERPOOL_H
-#define _BERRY_WORKERPOOL_H 
+#define _BERRY_WORKERPOOL_H
 
 #include <berryObject.h>
 
@@ -55,7 +55,7 @@ public:
   /**
    * Signals the end of a job.  Note that this method can be called under
    * OutOfMemoryError conditions and thus must be paranoid about allocating objects.
-  */ 
+  */
   void EndJob(InternalJob::Pointer job, IStatus::Pointer result) ;
 
   /**
@@ -64,7 +64,7 @@ public:
   InternalJob::Pointer StartJob(Worker* worker);
 
 protected:
-  
+
 
   /**
    * Notification that a job has been added to the queue. Wake a worker,

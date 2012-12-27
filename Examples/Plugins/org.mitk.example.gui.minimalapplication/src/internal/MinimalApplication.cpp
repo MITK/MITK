@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MinimalApplication.h"
 
+// Berry
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
-class MinimalWorkbenchAdvisor : public berry::WorkbenchAdvisor
+class MinimalWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
@@ -29,6 +30,13 @@ public:
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
       berry::IWorkbenchWindowConfigurer::Pointer configurer)
   {
+    // Set an individual initial size
+    configurer->SetInitialSize(berry::Point(600,400));
+    // Set an individual title
+    configurer->SetTitle("Minimal Application");
+    // Enable or disable the perspective bar
+    configurer->SetShowPerspectiveBar(false);
+
     wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
     return wwAdvisor.data();
   }
@@ -53,14 +61,14 @@ MinimalApplication::MinimalApplication()
 MinimalApplication::~MinimalApplication()
 {
 }
- 
+
 int MinimalApplication::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 
   wbAdvisor.reset(new MinimalWorkbenchAdvisor);
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
-  
+
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART
               ? EXIT_RESTART : EXIT_OK;
@@ -68,5 +76,5 @@ int MinimalApplication::Start()
 
 void MinimalApplication::Stop()
 {
-  
+
 }

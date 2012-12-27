@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,20 +24,20 @@ namespace berry {
 /**
  * A variable resolver can be used to add additional variable resolving
  * strategies to an {@link EvaluationContext}.
- * 
+ *
  * @see org.blueberry.core.expressions.EvaluationContext#resolveVariable(String, Object[])
- * 
+ *
  * @since 3.0
  */
 struct BERRY_EXPRESSIONS IVariableResolver {
 
   virtual ~IVariableResolver() {};
-  
+
   /**
    * Resolves a variable for the given name and arguments. The
    * handler is allowed to return <code>null</code> to indicate
    * that it is not able to resolve the requested variable.
-   * 
+   *
    * @param name the variable to resolve
    * @param args an object array of arguments used to resolve the
    *  variable

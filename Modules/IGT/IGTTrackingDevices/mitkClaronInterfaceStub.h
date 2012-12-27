@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ typedef int mtHandle;
 namespace mitk
 {
   typedef int claronToolHandle;
-  
+
   /** Documentation:
   *   \brief An object of this class represents the interface to the MicronTracker. Normally the methods of this class
   *          are calling the c-functions which are provided by the MTC-library. But in this case the MicronTracker is
@@ -51,7 +51,7 @@ namespace mitk
     * \param toolFilesDir     The directory for the tool files.
     */
     void Initialize(std::string calibrationDir, std::string toolFilesDir);
-    
+
     /**
     * \brief This is only a stub, please switch the cmake variable USE_MICRON_TRACKER to on if you want to use the Microntracker.
     */

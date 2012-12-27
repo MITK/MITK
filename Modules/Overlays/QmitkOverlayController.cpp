@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -67,8 +67,8 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
 {
   // create a new QWidget as Tool & FramelessWindowHint
   m_PositionedOverlays[ pos ] = new QWidget( m_RenderWindow, Qt::Tool | Qt::FramelessWindowHint );
-  
-  // autoFillBackGround(false) and WA_TranslucentBackground = true are needed to have a translucent background 
+
+  // autoFillBackGround(false) and WA_TranslucentBackground = true are needed to have a translucent background
   // transparency does NOT work under Win-XP 32-Bit --> paint black background
 
 #if !defined(_WIN32) || defined(_WIN64)
@@ -98,7 +98,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
   // setting position-specific properties
   switch ( pos )
   {
-  case QmitkOverlay::top_Left : 
+  case QmitkOverlay::top_Left :
     {
       // adding left-aligned top-to-bottom layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
@@ -107,7 +107,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
-  case QmitkOverlay::top_Center : 
+  case QmitkOverlay::top_Center :
     {
       // adding center-aligned top-to-bottom layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
@@ -126,7 +126,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
-  case QmitkOverlay::middle_Left : 
+  case QmitkOverlay::middle_Left :
     {
       // adding left-aligned left-to-right layout
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
@@ -136,7 +136,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       break;
 
     }
-  case QmitkOverlay::middle_Right : 
+  case QmitkOverlay::middle_Right :
     {
       // adding right-aligned right-to-left layout
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
@@ -145,7 +145,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       layout->setSpacing( 3 );
       break;
     }
-  case QmitkOverlay::bottom_Left : 
+  case QmitkOverlay::bottom_Left :
     {
       // adding left-aligned bottom-to-top layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
@@ -154,7 +154,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
-  case QmitkOverlay::bottom_Center : 
+  case QmitkOverlay::bottom_Center :
     {
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::BottomToTop );
@@ -223,7 +223,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
   widget = m_PositionedOverlays[ QmitkOverlay::bottom_Right ];
   pos = m_RenderWindow->mapToGlobal( QPoint(  m_RenderWindow->size().width(), m_RenderWindow->size().height() ) ) ;
   widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height() );
-} 
+}
 
 
 void QmitkOverlayController::SetOverlayVisibility( bool visible )
@@ -272,7 +272,7 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
 
     // concatenate local propertyList and propertyList of the RenderingManager
-    // local properties have priority as they are not overwritten if preset in both 
+    // local properties have priority as they are not overwritten if preset in both
     m_PropertyList->ConcatenatePropertyList( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(), false );
 
     // add the overlay to the OverlayContainer in the RenderWindow ...
@@ -280,7 +280,7 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
 
     // ... and set it up with the correct properties
     this->UpdateOverlayData( overlay );
-    
+
     // add overlay to list of all overlays and correctly put it into the layering
     m_AllOverlays.push_back( overlay );
     this->RestackOverlays( pos );
@@ -306,7 +306,7 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
 
     OverlayVector::iterator iter = std::find( m_AllOverlays.begin(), m_AllOverlays.end(), overlay );
-    
+
     if ( iter != m_AllOverlays.end() )
     {
       m_AllOverlays.erase( iter );
@@ -366,15 +366,15 @@ void QmitkOverlayController::RestackOverlays( QmitkOverlay::DisplayPosition pos 
     {
       stackLayer = layer;
     }
-    
+
     switch ( pos )
     {
       // same alignment for all lefts, ...
     case QmitkOverlay::top_Left : {}
     case QmitkOverlay::middle_Left : {}
-    case QmitkOverlay::bottom_Left : 
+    case QmitkOverlay::bottom_Left :
       {
-        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignLeft );    
+        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignLeft );
         break;
       }
       // ... for all centers, ...
@@ -387,9 +387,9 @@ void QmitkOverlayController::RestackOverlays( QmitkOverlay::DisplayPosition pos 
       // ... and for all rights
     case QmitkOverlay::top_Right : {}
     case QmitkOverlay::middle_Right : {}
-    case QmitkOverlay::bottom_Right : 
+    case QmitkOverlay::bottom_Right :
       {
-        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignRight );    
+        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignRight );
         break;
       }
     }

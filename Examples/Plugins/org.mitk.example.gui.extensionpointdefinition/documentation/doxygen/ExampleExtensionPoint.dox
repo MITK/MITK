@@ -1,0 +1,55 @@
+/**
+
+\page ExtensionPointDefinition Extension Point Definition
+
+  This example plugin defines an extension point and collects extensions.
+  \image html ExtensionPointWithoutExtension.png
+
+  In this example the extension point concept is used to define an extension point and extend the plugin functionality with it. The GUI consists of a view with two group boxes. In the right box the user can insert text in an input text field. The left box is the area where extensions for this plugin are displayed.
+
+  In the plugin.xml file of this application the extension point is defined as follows:
+  \image html DefinitionXML.png
+
+  The according schema (\github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/schema/changetext.exsd,changetext.exsd}) defines attributes for extensions of this extension point like a description.
+
+  In the view of this plugin the registry is used to find all available extensions. For each found descriptor a push button is created that holds the functionality extension.
+  \snippet MinimalView.cpp Collect extensions through registry
+
+  These created push buttons are connected to the ChangeText method that alters the input text (in the way the extension defines) and outputs the changed text in another text field.
+  \snippet MinimalView.cpp Use extended functionality to alter input text
+
+  The plugin can now be extened by extensions provided by other plugins.
+
+  View complete source files:
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ChangeTextDescriptor.cpp,ChangeTextDescriptor.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ChangeTextDescriptor.h,ChangeTextDescriptor.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ChangeTextRegistry.cpp,ChangeTextRegistry.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ChangeTextRegistry.h,ChangeTextRegistry.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ExtensionPointDefinition.cpp,ExtensionPointDefinition.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ExtensionPointDefinition.h,ExtensionPointDefinition.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ExtensionPointDefinitionConstants.cpp,ExtensionPointDefinitionConstants.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointdefinition/src/internal/ExtensionPointDefinitionConstants.h,ExtensionPointDefinitionConstants.h}
+
+[\ref BlueBerryExampleExtensionPoint] [Next: \ref ExtensionContribution] [\ref BlueBerryExamples]
+
+\page ExtensionContribution Extension Contribution
+
+  This example plugin holds no GUI. It just extends the Extension Point Definition plugin.
+  \image html ExtensionPointWithExtension.png
+
+  Through the extension of the Extension Point Definition plugin two functionalities are added by implementing the minimal IChangeText interface of the plugin.
+
+  In the plugin.xml file of the plugin the extensions are defined as follows:
+  \image html ContributionXML.png
+  The extension point ID in the plugin.xml matches the ID of the extension point and is therefore found by the registry as a valid extension. A description is given for each extension although the schema for the extension point allows an extension without a description (<element ref="description" minOccurs="0" maxOccurs="1"/>).
+
+  The GUI now holds two buttons that change the input text of the user to upper or lower case. This is done by two simple methods.
+
+  View complete source files:
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointcontribution/src/internal/ChangeTextToLowerCase.cpp,ChangeTextToLowerCase.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointcontribution/src/internal/ChangeTextToLowerCase.h,ChangeTextToLowerCase.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointcontribution/src/internal/ChangeTextToUpperCase.cpp,ChangeTextToUpperCase.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.extensionpointcontribution/src/internal/ChangeTextToUpperCase.h,ChangeTextToUpperCase.h}
+
+[\ref BlueBerryExampleExtensionPoint] [Previous: \ref ExtensionPointDefinition] [\ref BlueBerryExamples]
+*/

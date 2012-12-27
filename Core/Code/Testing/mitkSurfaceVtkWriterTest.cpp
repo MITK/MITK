@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Simple example for a test for the (non-existent) class "ClassName".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -36,13 +36,13 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("SurfaceVtkWriter")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer mySurfaceVtkWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(mySurfaceVtkWriter.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(mySurfaceVtkWriter.IsNotNull(),"Testing instantiation")
 
   // create contour
   vtkPolyDataReader* reader = vtkPolyDataReader::New();
@@ -56,16 +56,16 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
 
     MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Surface creation")
 
-      try{  
+      try{
         // test for exception handling
         MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
         mySurfaceVtkWriter->SetInput(surface);
         mySurfaceVtkWriter->SetFileName("/usr/bin");
-        mySurfaceVtkWriter->Update(); 
+        mySurfaceVtkWriter->Update();
         MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
     }
     catch(...) {
-      //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
+      //this means that a wrong exception (i.e. no itk:Exception) has been thrown
       std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
       return EXIT_FAILURE;
     }

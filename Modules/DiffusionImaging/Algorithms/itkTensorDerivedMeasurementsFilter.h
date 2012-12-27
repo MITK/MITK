@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ namespace itk{
 
 template <class TPixel>
 class TensorDerivedMeasurementsFilter :
-  public ImageToImageFilter<  itk::Image< itk::DiffusionTensor3D<TPixel>, 3 >, 
+  public ImageToImageFilter<  itk::Image< itk::DiffusionTensor3D<TPixel>, 3 >,
                               itk::Image< TPixel, 3 > >
 {
 
@@ -58,16 +58,16 @@ public:
   typedef TensorDerivedMeasurementsFilter         Self;
   typedef SmartPointer<Self>                      Pointer;
   typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter< TensorType, 
+  typedef ImageToImageFilter< TensorType,
                               OutputImageType >
                                                   SuperClass;
-   
+
    /** Method for creation through the object factory. */
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   /** Runtime information support. */
   itkTypeMacro(TensorDerivedMeasurementsFilter, ImageToImageFilter);
- 
+
   itkSetMacro(Measure, Measure);
 
 
@@ -75,8 +75,8 @@ protected:
   TensorDerivedMeasurementsFilter();
   ~TensorDerivedMeasurementsFilter() {};
   //void PrintSelf(std::ostream& os, Indent indent) const;
-  
-  Measure m_Measure; 
+
+  Measure m_Measure;
 
   void GenerateData();
 

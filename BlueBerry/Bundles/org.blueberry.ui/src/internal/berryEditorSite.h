@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace berry {
 
 /**
  * \ingroup org_blueberry_ui_internal
- * 
+ *
  * An editor container manages the services for an editor.
  */
 class EditorSite : public PartSite, public IEditorSite {
@@ -40,41 +40,41 @@ private:
     //ListenerList propChangeListeners = new ListenerList(1);
 
     // SubActionBars ab = null;
-    
+
   /**
      * Initialize the local services.
      */
 //    void InitializeDefaultServices() {
-//      // Register an implementation of the service appropriate for the 
+//      // Register an implementation of the service appropriate for the
 //      // EditorSite.
 //      final IDragAndDropService editorDTService = new EditorSiteDragAndDropServiceImpl();
 //      serviceLocator.registerService(IDragAndDropService.class, editorDTService);
 //    }
-  
+
 protected:
-  
+
  std::string GetInitialScopeId();
 
 public:
-  
+
   berryObjectMacro(EditorSite)
-  
+
     /**
      * Constructs an EditorSite for an editor.
      */
     EditorSite(IEditorReference::Pointer ref, IEditorPart::Pointer editor,
             WorkbenchPage* page, EditorDescriptor::Pointer desc);
-  
+
 //    void SetActionBars(SubActionBars bars) {
 //        super.setActionBars(bars);
-//        
+//
 //        if (bars instanceof IActionBars2) {
 //            ab = new SubActionBars2((IActionBars2)bars, this);
 //        } else {
 //            ab = new SubActionBars(bars, this);
 //        }
 //    }
-    
+
 //    void ActivateActionBars(bool forceVisibility) {
 //        if (ab != null) {
 //            ab.activate(forceVisibility);
@@ -88,7 +88,7 @@ public:
 //        }
 //        super.deactivateActionBars(forceHide);
 //    }
-    
+
     /**
      * Returns the editor action bar contributor for this editor.
      * <p>
@@ -105,7 +105,7 @@ public:
 //        if (bars != null) {
 //      return bars.getEditorContributor();
 //    }
-//        
+//
 //        return null;
 //    }
 
@@ -117,7 +117,7 @@ public:
 //        if (bars != null) {
 //      return bars.getExtensionContributor();
 //    }
-//        
+//
 //        return null;
 //    }
 
@@ -127,15 +127,15 @@ public:
     IEditorPart::Pointer GetEditorPart();
 
     EditorDescriptor::Pointer GetEditorDescriptor();
-    
-    
+
+
 //    void registerContextMenu(final MenuManager menuManager,
 //            final ISelectionProvider selectionProvider,
 //            final boolean includeEditorInput) {
 //        registerContextMenu(getId(), menuManager, selectionProvider,
 //                includeEditorInput);
 //    }
-//    
+//
 //    void registerContextMenu(final String menuId,
 //            final MenuManager menuManager,
 //            final ISelectionProvider selectionProvider,
@@ -143,7 +143,7 @@ public:
 //        if (menuExtenders == null) {
 //            menuExtenders = new ArrayList(1);
 //        }
-//        
+//
 //        PartSite.registerContextMenu(menuId, menuManager, selectionProvider,
 //                includeEditorInput, getPart(), menuExtenders);
 //    }

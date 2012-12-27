@@ -1595,11 +1595,9 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       // make node visible
       if (selectedRenderWindow)
       {
-        mitk::Point3D centerP = _PlaneGeometry->GetOrigin();
+        const mitk::Point3D& centerP = _PlaneGeometry->GetOrigin();
         selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
             centerP, _PlaneGeometry->GetNormal());
-        selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-            centerP);
       }
     }
 

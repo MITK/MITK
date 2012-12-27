@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,28 +26,28 @@ namespace mitk
 {
   /**
   * This event type is used for button events triggered by the <br>
-  * the Wiimote driver. 
+  * the Wiimote driver.
   */
   class mitkWiiMote_EXPORT WiiMoteButtonEvent : public Event, itk::EventObject
   {
 
   public:
 
-    typedef WiiMoteButtonEvent Self; 
-    typedef itk::EventObject Superclass; 
+    typedef WiiMoteButtonEvent Self;
+    typedef itk::EventObject Superclass;
 
     /**
     * Initializes a Wiimote Event, that stores additional information. <br>
-    * 
-    * @see mitk::Event::Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);         
+    *
+    * @see mitk::Event::Event(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key);
     */
     WiiMoteButtonEvent(int type, int button, int buttonState, int key);
     ~WiiMoteButtonEvent();
 
     //itk::EventObject implementation
-    const char * GetEventName() const; 
-    bool CheckEvent(const ::itk::EventObject* e) const; 
-    ::itk::EventObject* MakeObject() const; 
+    const char * GetEventName() const;
+    bool CheckEvent(const ::itk::EventObject* e) const;
+    ::itk::EventObject* MakeObject() const;
 
   protected:
 

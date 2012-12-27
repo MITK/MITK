@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ public:
 
 static void TestSimpleCase()
     {
-    
+
     MITK_TEST_OUTPUT(<< "Starting simple test case...");
 
     mitk::Point3D test;
@@ -53,7 +53,7 @@ static void TestSimpleCase()
     testPointSet->InsertPoint(1,test);
 
     mitk::PointSetStatisticsCalculator::Pointer myPointSetStatisticsCalculator = mitk::PointSetStatisticsCalculator::New(testPointSet);
-  
+
     MITK_TEST_CONDITION_REQUIRED((myPointSetStatisticsCalculator->GetPositionMean()[0]==0.5),".. Testing GetPositionMean");
     MITK_TEST_CONDITION_REQUIRED((myPointSetStatisticsCalculator->GetPositionStandardDeviation()[0]==0.5),".. Testing GetPositionStandardDeviation");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[0],0.70710672),".. Testing GetPositionSampleStandardDeviation");
@@ -68,11 +68,11 @@ static void TestSimpleCase()
 
 static void TestComplexCase()
     {
-    
+
     MITK_TEST_OUTPUT(<< "Starting complex test case...");
     mitk::Point3D testPoint;
     mitk::PointSet::Pointer testPointSet = mitk::PointSet::New();
-   
+
     //1st point
     mitk::FillVector3D(testPoint,0,1,0);
     testPointSet->InsertPoint(0,testPoint);
@@ -111,7 +111,7 @@ static void TestComplexCase()
 
     mitk::PointSetStatisticsCalculator::Pointer myPointSetStatisticsCalculator = mitk::PointSetStatisticsCalculator::New();
     myPointSetStatisticsCalculator->SetPointSet(testPointSet);
-    
+
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionMean()[2],1.2895),".. Testing GetPositionMean");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionStandardDeviation()[2],0.86614074),".. Testing GetPositionStandardDeviation");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionSampleStandardDeviation()[2],0.91868098),".. Testing GetPositionStandardDeviation");
@@ -122,7 +122,7 @@ static void TestComplexCase()
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorMin(),0.90082741),".. Testing GetPositionErrorMin");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorSampleStandardDeviation(),5.65960626),".. Testing GetPositionErrorSampleStandardDeviation");
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(myPointSetStatisticsCalculator->GetPositionErrorStandardDeviation(),5.33592795),".. Testing GetPositionErrorStandardDeviation");
- 
+
     }
 
 

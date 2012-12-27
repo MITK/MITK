@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdio.h>
 
 
-mitk::NDIProtocol::NDIProtocol() 
+mitk::NDIProtocol::NDIProtocol()
 : itk::Object(), m_TrackingDevice(NULL), m_UseCRC(true)
 {
 }
@@ -38,7 +38,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::COMM(mitk::SerialCommunication::BaudRate b
 {
   /* Build parameter string */
   std::string param;
-  switch (baudRate) 
+  switch (baudRate)
   {
   case mitk::SerialCommunication::BaudRate14400:
     param += "1";
@@ -57,7 +57,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::COMM(mitk::SerialCommunication::BaudRate b
     break;
   case mitk::SerialCommunication::BaudRate9600:
   default:            // assume 9600 Baud as default
-    param += "0"; 
+    param += "0";
     break;
   }
   switch (dataBits)
@@ -155,7 +155,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
   /* wait for the trackingsystem to process the command */
   itksys::SystemTools::Delay(100);
   /* read and parse the reply from tracking device */
-  // the reply for IRCHK can be either Infrared Source Information or ERROR##    
+  // the reply for IRCHK can be either Infrared Source Information or ERROR##
   // because we use the simple reply format, the answer will be only one char:
   // "0" - no IR detected
   // "1" - IR detected
@@ -169,26 +169,26 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
     {
       if ( b == '0')
         *IRdetected = false;
       else
         *IRdetected = true;
       returnValue = NDIOKAY;
-    } 
-    else                            // return error in CRC 
+    }
+    else                            // return error in CRC
     {
       returnValue = NDICRCERROR;
       *IRdetected = false;          // IRdetected is only valid if return code of this function is NDIOKAY
     }
-  } 
+  }
   else if (b =='E')                 // expect ERROR##
   {
     std::string errorstring;
     m_TrackingDevice->Receive(&errorstring, 4);   // read the remaining 4 characters of ERROR
     reply += errorstring;
-    static const std::string error("ERROR"); 
+    static const std::string error("ERROR");
     if (error.compare(0, 5, reply) == 0)          // check for "ERROR"
     {
       std::string errorcode;
@@ -198,10 +198,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
       std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
       std::string readCRC;                        // read attached crc value
       m_TrackingDevice->Receive(&readCRC, 4);     // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-      if (expectedCRC == readCRC)                 // if the read CRC is correct, return normal error code 
+      if (expectedCRC == readCRC)                 // if the read CRC is correct, return normal error code
         returnValue = this->GetErrorCode(&errorcode);
       else
-        returnValue = NDICRCERROR;                // return error in CRC 
+        returnValue = NDICRCERROR;                // return error in CRC
     }
   } else  // something else, that we do not expect
     returnValue = NDIUNEXPECTEDREPLY;
@@ -214,7 +214,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
 
 mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string* portHandles)
 {
-  NDIErrorCode returnValue = NDIUNKNOWNERROR; 
+  NDIErrorCode returnValue = NDIUNKNOWNERROR;
 
   if (m_TrackingDevice == NULL)
     return TRACKINGDEVICENOTSET;
@@ -225,7 +225,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
   sprintf(stringQueryType, "%02X", queryType);// convert numerical queryType to string in hexadecimal format
 
   if (m_UseCRC == true)
-    command = std::string("PHSR:")  + std::string(stringQueryType); 
+    command = std::string("PHSR:")  + std::string(stringQueryType);
   else //if (m_UseCRC != true)
     command = std::string("PHSR ")  + std::string(stringQueryType); // command string format 2: without crc
 
@@ -241,7 +241,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
 
   std::string reply;
   m_TrackingDevice->Receive(&reply, 2);       // read first 2 characters of reply ("Number of Handles" as a 2 digit hexadecimal number)
-  static const std::string error("ERROR"); 
+  static const std::string error("ERROR");
   if (error.compare(0, 2, reply) == 0)        // check for "ERROR" (compare for "ER" because we can not be sure that the reply is more than 2 characters (in case of 0 port handles returned)
   {
     std::string ror;
@@ -254,9 +254,9 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
   else  // No error, expect number of handles as a 2 character hexadecimal value
@@ -274,7 +274,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
     {
       std::string handleInformation;
       portHandles->clear();
-      for (unsigned int i = 0; i < numberOfHandles; i++)  // read 5 characters for each handle and extract port handle 
+      for (unsigned int i = 0; i < numberOfHandles; i++)  // read 5 characters for each handle and extract port handle
       {
         m_TrackingDevice->Receive(&handleInformation, 5);
         *portHandles += handleInformation.substr(0, 2);   // Append the port handle to the portHandles string
@@ -322,7 +322,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
 
   std::string reply;
   m_TrackingDevice->Receive(&reply, 2);       // read first 2 characters of reply ("Number of Handles" as a 2 digit hexadecimal number)
-  static const std::string error("ERROR"); 
+  static const std::string error("ERROR");
   if (error.compare(0, 2, reply) == 0)        // check for "ERROR" (compare for "ER" because we can not be sure that the reply is more than 2 characters (in case of 0 port handles returned)
   {
     std::string ror;
@@ -335,9 +335,9 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
   else  // No error, expect port handle as a 2 character hexadecimal value
@@ -385,7 +385,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PVWR(std::string* portHandle, const unsign
   {
     sprintf(hexcharacter, "%02X", sromData[i]);   // convert srom byte to string in hexadecimal format
     //hexSROMData += "12";
-    hexSROMData += hexcharacter;                  // append hex string to srom data in hex format 
+    hexSROMData += hexcharacter;                  // append hex string to srom data in hex format
   }
   /* data must be written in chunks of 64 byte (128 hex characters). To ensure 64 byte chunks the last chunk must be padded with 00 */
   unsigned int zerosToPad = 128 - (hexSROMData.size() % 128);  // hexSROMData must be a multiple of 128
@@ -440,7 +440,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
 
   /* Parse reply from tracking device */
   static const std::string okay("OKAYA896");            // OKAY is static, so we can perform a static crc check
-  static const std::string error("ERROR"); 
+  static const std::string error("ERROR");
   static const std::string warning("WARNING7423");      // WARNING has a static crc too
 
   if (okay.compare(0, 4, reply) == 0)                   // check for "OKAY": compare first 4 characters from okay with reply
@@ -451,7 +451,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
       returnValue = NDIOKAY;
     else
       returnValue = NDICRCERROR;
-  } 
+  }
   else if (warning.compare(0, 4, reply) == 0)           // check for "WARNING"
   {
     // WARN was found, now check remaining characters and CRC16
@@ -460,7 +460,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
       returnValue = NDIWARNING;
     else
       returnValue = NDICRCERROR;
-  } 
+  }
   else if (error.compare(0, 4, reply) == 0)             // check for "ERRO"
   {
     char b;                                             // The ERROR reply is not static, so we can not use a static crc check.
@@ -473,9 +473,9 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                                // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);             // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)                         // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)                         // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                                // return error in CRC 
+    else                                                // return error in CRC
       returnValue = NDICRCERROR;
   } else                                                // else it is something else, that we do not expect
     returnValue = NDIUNEXPECTEDREPLY;
@@ -496,7 +496,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PENA(std::string* portHandle, TrackingPrio
   std::string param;
   if (portHandle != NULL)
     param = *portHandle + (char) prio;
-  else 
+  else
     param = "";
   return this->GenericCommand("PENA", &param);
 }
@@ -507,7 +507,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHINF(std::string portHandle, std::string*
   std::string command;
   if (m_UseCRC) command = "PHINF:" + portHandle;
   else command = "PHINF " + portHandle;
-  mitk::NDIErrorCode returnValue = m_TrackingDevice->Send(&command, m_UseCRC); 
+  mitk::NDIErrorCode returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
   if (returnValue==NDIOKAY)
     {
     m_TrackingDevice->ClearReceiveBuffer();
@@ -592,17 +592,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
       returnValue = NDIOKAY;
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
-  } 
+  }
   else if (b =='E')                           // expect ERROR##
   {
     std::string errorstring;
     m_TrackingDevice->Receive(&errorstring, 4);   // read the remaining 4 characters of ERROR
     reply += errorstring;
-    static const std::string error("ERROR"); 
+    static const std::string error("ERROR");
     if (error.compare(0, 5, reply) == 0)          // check for "ERROR"
     {
       std::string errorcode;
@@ -612,10 +612,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
       std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
       std::string readCRC;                        // read attached crc value
       m_TrackingDevice->Receive(&readCRC, 4);     // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-      if (expectedCRC == readCRC)                 // if the read CRC is correct, return normal error code 
+      if (expectedCRC == readCRC)                 // if the read CRC is correct, return normal error code
         returnValue = this->GetErrorCode(&errorcode);
       else
-        returnValue = NDICRCERROR;                // return error in CRC 
+        returnValue = NDICRCERROR;                // return error in CRC
     }
   } else  // something else, that we do not expect
     returnValue = NDIUNEXPECTEDREPLY;
@@ -668,7 +668,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       fullcommand = "TX:1001";          // command string format 1: with crc
     else
       fullcommand = "TX 1001";          // command string format 2: without crc
-  } else 
+  } else
   {
     if (m_UseCRC == true)
       fullcommand = "TX:";          // command string format 1: with crc
@@ -679,7 +679,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
   returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);
   if (returnValue != NDIOKAY)
   {
-    /* cleanup and return */   
+    /* cleanup and return */
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
     return returnValue;
   }
@@ -700,11 +700,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
     {
       returnValue = this->GetErrorCode(&errorcode);
     }
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
     {
       returnValue = NDICRCERROR;
     }
@@ -730,11 +730,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       {
         returnValue = UNKNOWNHANDLERETURNED;
         break;  // if we do not know the handle, we can not assume anything about the remaining data, so we better abort (we could read up to the next LF)
-      }    
+      }
       /* Parse reply from tracking device */
-      static const std::string missing("MISSING"); 
-      static const std::string disabled("DISABLED"); 
-      static const std::string unoccupied("UNOCCUPIED");       
+      static const std::string missing("MISSING");
+      static const std::string disabled("DISABLED");
+      static const std::string unoccupied("UNOCCUPIED");
 
       m_TrackingDevice->Receive(&s, 6);        // read next 6 characters: either an error message or part of the transformation data
       reply += s;                              // build complete command string
@@ -848,7 +848,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       converter << std::hex << s;           // insert reply into stringstream
       converter >> numberOfMarkers;             // extract number of markers as unsigned byte
       converter.clear();                        // converter must be cleared to be reused
-      converter.str(""); 
+      converter.str("");
 
       unsigned int oovReplySize = (unsigned int)ceil((double)numberOfMarkers/4.0);
       unsigned int nbMarkersInVolume = 0;
@@ -856,17 +856,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       // parse oov data to find out how many marker positions were recorded
       for (unsigned int i = 0; i < oovReplySize; i++)
       {
-        m_TrackingDevice->ReceiveByte(&c); 
+        m_TrackingDevice->ReceiveByte(&c);
         reply += c;
         nbMarkersInVolume += ByteToNbBitsOn(c);
-      }   
+      }
 
       nbMarkersInVolume = numberOfMarkers-nbMarkersInVolume;
 
       /* read and parse position data for each marker */
       for (unsigned int i = 0; i < nbMarkersInVolume; i++)
-      {    
-        /* define local copies */   
+      {
+        /* define local copies */
         signed int number = 0;
         MarkerPointType markerPosition;
         /* read and parse the three 7 character translation values */
@@ -883,7 +883,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
         markerPositions->push_back(markerPosition);
 
       } // end for all markers
-    } 
+    }
     //END read Reply Option 1000 data
 
 
@@ -898,7 +898,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
     {
       returnValue = NDIOKAY;
     }
-    else                                    // return error in CRC 
+    else                                    // return error in CRC
     {
       returnValue = NDICRCERROR;
       /* Invalidate all tools because the received data contained an error */
@@ -951,11 +951,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
     {
       returnValue = this->GetErrorCode(&errorcode);
     }
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
     {
       returnValue = NDICRCERROR;
     }
@@ -981,11 +981,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
       {
         returnValue = UNKNOWNHANDLERETURNED;
         break;  // if we do not know the handle, we can not assume anything about the remaining data, so we better abort (we could read up to the next LF)
-      }    
+      }
       /* Parse reply from tracking device */
-      static const std::string missing("MISSING"); 
-      static const std::string disabled("DISABLED"); 
-      static const std::string unoccupied("UNOCCUPIED");       
+      static const std::string missing("MISSING");
+      static const std::string disabled("DISABLED");
+      static const std::string unoccupied("UNOCCUPIED");
 
       m_TrackingDevice->Receive(&s, 6);        // read next 6 characters: either an error message or part of the transformation data
       reply += s;                              // build complete command string
@@ -1095,7 +1095,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     converter << std::hex << s;           // insert reply into stringstream
     converter >> numberOfMarkers;             // extract number of markers as unsigned byte
     converter.clear();                        // converter must be cleared to be reused
-    converter.str(""); 
+    converter.str("");
 
     unsigned int oovReplySize = (unsigned int)ceil((double)numberOfMarkers/4.0);
     unsigned int nbMarkersInVolume = 0;
@@ -1103,17 +1103,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     // parse oov data to find out how many marker positions were recorded
     for (unsigned int i = 0; i < oovReplySize; i++)
     {
-      m_TrackingDevice->ReceiveByte(&c); 
+      m_TrackingDevice->ReceiveByte(&c);
       reply += c;
       nbMarkersInVolume += ByteToNbBitsOn(c);
-    }   
+    }
 
     nbMarkersInVolume = numberOfMarkers-nbMarkersInVolume;
 
     /* read and parse position data for each marker */
     for (unsigned int i = 0; i < nbMarkersInVolume; i++)
-    {    
-      /* define local copies */   
+    {
+      /* define local copies */
       signed int number = 0;
       MarkerPointType markerPosition;
       /* read and parse the three 7 character translation values */
@@ -1132,7 +1132,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     } // end for all markers
     //m_TrackingDevice->Receive(&s, 1);   // read the line feed character, that terminates each handle data
     //reply += s;                         // build complete command string
-    //  
+    //
 
     //END read Reply Option 1000 data
 
@@ -1147,7 +1147,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     {
       returnValue = NDIOKAY;
     }
-    else                                    // return error in CRC 
+    else                                    // return error in CRC
     {
       returnValue = NDICRCERROR;
       /* Invalidate all tools because the received data contained an error */
@@ -1186,16 +1186,16 @@ mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
   returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);
   if (returnValue != NDIOKAY)
   {
-    /* cleanup and return */   
+    /* cleanup and return */
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
     return returnValue;
   }
   /* read number of handles returned */
   std::string reply;
-  m_TrackingDevice->Receive(&reply, 5);       // read first 5 characters of reply (error beginning of version information)  
+  m_TrackingDevice->Receive(&reply, 5);       // read first 5 characters of reply (error beginning of version information)
   static const std::string error("ERROR");
   if (error.compare(0, 6, reply) == 0) // ERROR case
-  { 
+  {
     std::string errorcode;
     m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
     reply += errorcode;                       // build complete reply string
@@ -1203,9 +1203,9 @@ mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
   else // no error, valid reply
@@ -1215,7 +1215,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
     reply += s;
     std::string upperCaseReply;
     upperCaseReply.resize(reply.size());
-    std::transform (reply.begin(), reply.end(), upperCaseReply.begin(), toupper);  // convert reply to uppercase to ease finding 
+    std::transform (reply.begin(), reply.end(), upperCaseReply.begin(), toupper);  // convert reply to uppercase to ease finding
     if (upperCaseReply.find("POLARIS") != std::string::npos)
       t = mitk::NDIPolaris;
     else if (upperCaseReply.find("AURORA") != std::string::npos)
@@ -1300,11 +1300,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
     {
       returnValue = this->GetErrorCode(&errorcode);
     }
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
     {
       returnValue = NDICRCERROR;
     }
@@ -1322,7 +1322,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
     converter << std::dec << reply;           // insert reply into stringstream
     converter >> numberOfMarkers;             // extract number of handles as unsigned byte
     converter.clear();                        // converter must be cleared to be reused
-    converter.str("");   
+    converter.str("");
     /* read and parse 3D data for each marker */
     for (unsigned int markerID = 0; markerID < numberOfMarkers; markerID++)    // for each marker
     {
@@ -1332,7 +1332,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
       for (unsigned int i = 0; i < 3; i++)
       {
         receivevalue = m_TrackingDevice->Receive(&s, 9); // read the next position vector number
-        if(receivevalue != NDIOKAY) 
+        if(receivevalue != NDIOKAY)
         {
           markerPositions->clear();
           std::cout << "ERROR: receive_value != NDIOKAY" << std::endl;
@@ -1347,7 +1347,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
       }
       /* read and parse 4 character line separation value */
       receivevalue = m_TrackingDevice->Receive(&s, 4);   // read the line separation value
-      if(receivevalue != NDIOKAY) 
+      if(receivevalue != NDIOKAY)
       {
         markerPositions->clear();
         std::cout << "ERROR: receive_value != NDIOKAY" << std::endl;
@@ -1361,7 +1361,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
       lineSeparation = number / 100.0;    // the line separation value is send with an implied decimal point with 2 digits to the right
       /* read and parse 1 character out of volume value */
       receivevalue = m_TrackingDevice->Receive(&s, 1);   // read the port status value
-      if(receivevalue != NDIOKAY) 
+      if(receivevalue != NDIOKAY)
       {
         markerPositions->clear();
         std::cout << std::endl << std::endl << std::endl << "ERROR: POS3D != NDIOKAY" << std::endl;
@@ -1370,7 +1370,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
       reply += s;                         // build complete command string
       /* store the marker positions in the point container */
       markerPositions->push_back(p);
-    }    
+    }
     //std::cout << "INFO: Found " << markerPositions->size() << " markers." << std::endl;
 
     /* now the reply string is complete, perform crc checking */
@@ -1381,7 +1381,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
     {
       returnValue = NDIOKAY;
     }
-    else                                    // return error in CRC 
+    else                                    // return error in CRC
     {
       returnValue = NDICRCERROR;
       std::cout << "ERROR: receive_value != NDIOKAY" << std::endl;
@@ -1418,7 +1418,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
   else
     fullcommand = command + " " + p;          // command string format 2: without crc
 
-  
+
   m_TrackingDevice->ClearReceiveBuffer(); // This is a workaround for a linux specific issue:
   // after sending the TSTART command and expecting an "okay" there are some unexpected bytes left in the buffer.
   // this issue is explained in bug 11825
@@ -1434,7 +1434,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
   itksys::SystemTools::Delay(100);
 
   /* read and parse the reply from tracking device */
-  // the reply for a generic command can be OKAY or ERROR##    
+  // the reply for a generic command can be OKAY or ERROR##
   // so we can use the generic parse method for these replies
   this->ParseOkayError();
   return returnValue;
@@ -1462,14 +1462,14 @@ mitk::NDIErrorCode mitk::NDIProtocol::ParseOkayError()
 {
   NDIErrorCode returnValue  = NDIUNKNOWNERROR;
   /* read reply from tracking device */
-  // the reply is expected to be OKAY or ERROR##    
+  // the reply is expected to be OKAY or ERROR##
   // define reply strings
   std::string reply;
   m_TrackingDevice->Receive(&reply, 4);       // read first 4 characters of reply
 
   /* Parse reply from tracking device */
   static const std::string okay("OKAYA896");  // OKAY is static, so we can perform a static crc check
-  static const std::string error("ERROR"); 
+  static const std::string error("ERROR");
 
   if (okay.compare(0, 4, reply) == 0)         // check for "OKAY": compare first 4 characters from okay with reply
   {
@@ -1479,7 +1479,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::ParseOkayError()
       returnValue = NDIOKAY;
     else
       returnValue = NDICRCERROR;
-  } 
+  }
   else if (error.compare(0, 4, reply) == 0)   // check for "ERRO"
   {
     char b;                                   // The ERROR reply is not static, so we can not use a static crc check.
@@ -1492,16 +1492,16 @@ mitk::NDIErrorCode mitk::NDIProtocol::ParseOkayError()
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
-  } 
+  }
   else                                      // something else, that we do not expect
     returnValue = NDIUNEXPECTEDREPLY;
 
   /* cleanup and return */
-  char b; 
+  char b;
   m_TrackingDevice->ReceiveByte(&b);          // read CR character
   m_TrackingDevice->ClearReceiveBuffer();     // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
   return returnValue;
@@ -1575,7 +1575,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GetErrorCode(const std::string* input)
   else if (input->compare("32") == 0)
     return NDIINVALIDOPERATIONFORDEVICE;
   // ...
-  else 
+  else
     return NDIUNKNOWNERROR;
 }
 
@@ -1585,7 +1585,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
-  
+
   /* send command */
   std::string command;
   if (m_UseCRC)
@@ -1596,7 +1596,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
   returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
   if (returnValue != NDIOKAY)
   {
-    /* cleanup and return */   
+    /* cleanup and return */
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
     return returnValue;
   }
@@ -1607,29 +1607,29 @@ mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
   /* read number of handles returned */
   std::string reply;
   m_TrackingDevice->Receive(&reply, 5); //look for ERROR
-  
-  // read first 5 characters of reply (error beginning of version information)  
+
+  // read first 5 characters of reply (error beginning of version information)
   static const std::string error("ERROR");
   if (error.compare(0, 6, reply) == 0) // ERROR case
-  { 
+  {
     std::string errorcode;
     m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
     reply += errorcode;                       // build complete reply string
-    
+
     /* perform CRC checking */
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
 
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
   else // no error, valid reply: expect something like: D.001.00450D4 (<Family>.<Major revision number>.<Minor revision number><CRC16><CR>
   {
     std::string s;
-    
+
     m_TrackingDevice->Receive(&s, 4);       // read further
     reply += s;
 
@@ -1637,10 +1637,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    
-    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
       returnValue = NDIOKAY;
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
 
@@ -1656,7 +1656,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
-  
+
   /* send command */
   std::string command;
   if (m_UseCRC)
@@ -1667,7 +1667,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
   returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
   if (returnValue != NDIOKAY)
   {
-    /* cleanup and return */   
+    /* cleanup and return */
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
     return returnValue;
   }
@@ -1675,25 +1675,25 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
   /* read number of handles returned */
   std::string reply;
   m_TrackingDevice->Receive(&reply, 5); //look for "ERROR"
-  
+
   static const std::string error("ERROR");
   if (error.compare(0,6,reply) == 0) // ERROR case
-  { 
+  {
     std::string errorcode;
     m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
     reply += errorcode;                       // build complete reply string
-    
+
     /* perform CRC checking */
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
 
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
-  
+
   else // no error, valid reply: expect numbers of devices in hex, and then info of each featured tracking volume <CRC16><CR>
   {
     /* parse number of volumes from first character in hex */
@@ -1722,8 +1722,8 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
         }
         else
         {
-          //read to the end of the line from the last volume 
-          //(needed here, because if only one volume is supported, 
+          //read to the end of the line from the last volume
+          //(needed here, because if only one volume is supported,
           //then there is no lineending <LF> before CRC checksum
           std::string l;
           m_TrackingDevice->ReceiveLine(&l);
@@ -1763,10 +1763,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    
-    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
       returnValue = NDIOKAY;
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
 
@@ -1781,7 +1781,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
-  
+
 
   //get information about the order of volumes from tracking device. Then choose the number needed for VSEL by the output and parameter "device"
   unsigned int numberOfVolumes;
@@ -1789,26 +1789,26 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
   mitk::NDITrackingDevice::TrackingVolumeDimensionType volumesDimensions;
   if (!m_TrackingDevice->GetSupportedVolumes(&numberOfVolumes, &volumes, &volumesDimensions))
     return returnValue;
-  
+
   //interested in volumes(!)
   if (volumes.empty())
     return returnValue;
   //with the order within volumes we can define our needed parameter for VSEL
   //find the index where volumes[n] == device
-  
+
   unsigned int index = 1; //the index for VSEL starts at 1
   mitk::NDITrackingDevice::NDITrackingVolumeContainerType::iterator it = volumes.begin();
   while (it != volumes.end())
   {
     if ((*it) == volume)
-      break;  
+      break;
     it++, index++;
   }
   if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported
     return NDIINVALIDOPERATIONFORDEVICE;
 
   //index now contains the information on which position the desired volume is situated
-  
+
   /* send command */
   std::string command;
   if (m_UseCRC)
@@ -1819,12 +1819,12 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
   //add index to command
   std::stringstream s;
     s << index;
-  command += s.str();  
-  
+  command += s.str();
+
   returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
   if (returnValue != NDIOKAY)
   {
-    /* cleanup and return */   
+    /* cleanup and return */
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
     return returnValue;
   }
@@ -1832,10 +1832,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
   /* read number of handles returned */
   std::string reply;
   m_TrackingDevice->Receive(&reply, 4); //look for "ERROR" or "OKAY"
-  
+
   static const std::string error("ERRO");
   if (error.compare(reply) == 0) // ERROR case
-  { 
+  {
     std::string s;
     m_TrackingDevice->Receive(&s, 1); //get the last "R" in "ERROR"
     reply += s;
@@ -1843,15 +1843,15 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
     std::string errorcode;
     m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
     reply += errorcode;                       // build complete reply string
-    
+
     /* perform CRC checking */
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
     std::string readCRC;                      // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
 
-    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code
       returnValue = this->GetErrorCode(&errorcode);
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
   else
@@ -1860,10 +1860,10 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
     std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
     std::string readCRC;                                          // read attached crc value
     m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
-    
-    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code
       returnValue = NDIOKAY;
-    else                                      // return error in CRC 
+    else                                      // return error in CRC
       returnValue = NDICRCERROR;
   }
 

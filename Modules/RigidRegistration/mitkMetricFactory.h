@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,16 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /*!
-  \brief This class creates a metric for a rigid registration process.  
+  \brief This class creates a metric for a rigid registration process.
 
-  This class will e.g. be instantiated by mitkImageRegistrationMethod and a 
-  metric corresponding to the integer value stored in mitkMetricParameters 
+  This class will e.g. be instantiated by mitkImageRegistrationMethod and a
+  metric corresponding to the integer value stored in mitkMetricParameters
   will be created. Therefore SetMetricParameters() has to be called with an instance
   of mitkMetricParameters, which holds all parameter informations for the new
   metric.
 
   GetMetric() returns the metric which then can be used in combination with a
-  transform, an optimizer and an interpolator within a registration pipeline. 
+  transform, an optimizer and an interpolator within a registration pipeline.
 
 
   \ingroup RigidRegistration
@@ -62,11 +62,11 @@ namespace mitk {
     typedef typename MetricType::Pointer                MetricPointer;
 
     /**
-    \brief Returns the metric which then can be used in combination with a transform, an optimizer 
+    \brief Returns the metric which then can be used in combination with a transform, an optimizer
     and an interpolator within a registration pipeline.
     */
     MetricPointer GetMetric( );
-    
+
     /**
     \brief Sets the instance to the metric parameters class which holds all parameters for the new metric.
     */

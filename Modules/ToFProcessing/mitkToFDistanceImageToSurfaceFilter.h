@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,7 +34,7 @@ namespace mitk
   * measured distance for each pixel corresponds to the distance between the object point and the corresponding image point on the
   * image plane.
   *
-  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera 
+  * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera
   * coordinate system (world coordinates) is at the pinhole
   * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
   * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image

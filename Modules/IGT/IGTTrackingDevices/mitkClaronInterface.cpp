@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -74,7 +74,7 @@ bool mitk::ClaronInterface::StartTracking()
     //Step 4: Initialize IdentifiedMarkers and PoseXf
     IdentifiedMarkers = Collection_New();
     PoseXf = Xform3D_New();
-    
+
     //now we are tracking...
 
     /* MTHome is not in use. The following code has to be activated if you want to use MTHome!
@@ -106,7 +106,7 @@ bool mitk::ClaronInterface::StopTracking()
 
     //stop the camera
     Cameras_Detach();
-    
+
     //now tracking is stopped
     isTracking = false;
     return true;
@@ -127,7 +127,7 @@ std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
   //are updated to reflect the next frame's content.
   //First, we will obtain the collection of the markers that were identified.
   MTC( Markers_IdentifiedMarkersGet(NULL, IdentifiedMarkers) );
-  
+
   //Now we iterate on the identified markers and add them to the returnvalue
   for (int j=1; j<=Collection_Count(IdentifiedMarkers); j++)
   {

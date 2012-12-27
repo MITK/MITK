@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,7 +66,7 @@ inline HRESULT SpaceNavigatorDriver::HookEvent1(CComPtr<ISimpleDevice> device)
 
 inline HRESULT SpaceNavigatorDriver::HookEvent2()
 {
-  return __hook(&_ISensorEvents::SensorInput, m_pISensor, 
+  return __hook(&_ISensorEvents::SensorInput, m_pISensor,
     &SpaceNavigatorDriver::OnSensorInput);
 }
 
@@ -77,13 +77,13 @@ inline HRESULT SpaceNavigatorDriver::HookEvent3(CComPtr<ISimpleDevice> device)
 
 inline HRESULT SpaceNavigatorDriver::HookEvent4()
 {
-  return __hook(&_IKeyboardEvents::KeyDown, m_pIKeyboard, 
+  return __hook(&_IKeyboardEvents::KeyDown, m_pIKeyboard,
     &SpaceNavigatorDriver::OnKeyDown);
 }
 
 inline HRESULT SpaceNavigatorDriver::HookEvent5()
 {
-  return __hook(&_IKeyboardEvents::KeyUp, m_pIKeyboard, 
+  return __hook(&_IKeyboardEvents::KeyUp, m_pIKeyboard,
     &SpaceNavigatorDriver::OnKeyUp);
 }
 
@@ -104,7 +104,7 @@ HRESULT SpaceNavigatorDriver::InitializeCOM()
     hr = _3DxDevice.QueryInterface(&_3DxSimpleDevice);
     if (SUCCEEDED(hr))
     {
-      hr = __hook(&_ISimpleDeviceEvents::DeviceChange, _3DxSimpleDevice, 
+      hr = __hook(&_ISimpleDeviceEvents::DeviceChange, _3DxSimpleDevice,
         &SpaceNavigatorDriver::OnDeviceChange);
 
       //workaround for .net 2003 Bug Nr. 829749
@@ -155,7 +155,7 @@ HRESULT SpaceNavigatorDriver::OnDeviceChange(long reserved )
       CString strLabel(bstrLabel);
       CString strName(bstrName);
 
-      //cout << "Key Label=%s\tKey Name=%s\n" << 
+      //cout << "Key Label=%s\tKey Name=%s\n" <<
       //(const TCHAR *)strLabel << " / " <<  (const TCHAR *)strName;
 
     }
@@ -275,7 +275,7 @@ HRESULT SpaceNavigatorDriver::UninitializeCOM()
   if (m_pISensor)
   {
     // unhook (unadvise) the sensor event sink
-    __unhook(&_ISensorEvents::SensorInput, m_pISensor, 
+    __unhook(&_ISensorEvents::SensorInput, m_pISensor,
       &SpaceNavigatorDriver::OnSensorInput);
 
     m_pISensor.Release();
@@ -283,7 +283,7 @@ HRESULT SpaceNavigatorDriver::UninitializeCOM()
 
   if (m_pIKeyboard)
   {
-    __unhook(&_IKeyboardEvents::KeyDown, m_pIKeyboard, 
+    __unhook(&_IKeyboardEvents::KeyDown, m_pIKeyboard,
       &SpaceNavigatorDriver::OnKeyDown);
 
     m_pIKeyboard.Release();

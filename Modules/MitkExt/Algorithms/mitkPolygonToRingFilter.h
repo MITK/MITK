@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,13 +57,13 @@ public:
 
   /** \brief Get ring resolution of created Surface */
   itkGetMacro(RingResolution, unsigned int);
-   
+
   /** \brief Set ring resolution of created Surface */
   itkSetMacro(RingResolution, unsigned int);
 
   /** \brief Get spline resolution */
   itkGetMacro(SplineResolution, unsigned int);
-   
+
   /** \brief Set spline resolution */
   itkSetMacro(SplineResolution, unsigned int);
 
@@ -75,12 +75,12 @@ protected:
 
   virtual ~PolygonToRingFilter();
 
-  void BuildVtkTube( vtkPoints *vPoints, vtkCellArray *polys, 
+  void BuildVtkTube( vtkPoints *vPoints, vtkCellArray *polys,
     PointListType& ptList, VectorListType& vecList );
-  void BuildPointAndVectorList( mitk::Mesh::CellType& cell, 
+  void BuildPointAndVectorList( mitk::Mesh::CellType& cell,
     PointListType& ptList, VectorListType& vecList, int timeStep = 0 );
-  void DrawCyl(vtkPoints *vPoints, vtkCellArray *polys, 
-    VectorListType &sl, VectorListType &sc, int idmax, 
+  void DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
+    VectorListType &sl, VectorListType &sc, int idmax,
     Point3D & last_p, Point3D & cur_p);
 
   /** \brief Ring radius */

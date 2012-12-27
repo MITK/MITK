@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -60,29 +60,29 @@ public:
   typedef PolyLineParametricPath<VDimension>  Superclass;
   typedef SmartPointer<Self>          Pointer;
   typedef SmartPointer<const Self>    ConstPointer;
-  
+
   /** Run-time type information (and related methods). */
   itkTypeMacro(SlowPolyLineParametricPath, PolyLineParametricPath);
-  
+
   /** Input type */
   typedef typename Superclass::InputType  InputType;
-  
+
   /** Output type */
   typedef typename Superclass::OutputType OutputType;
-  
-  
+
+
   /** Basic data-structure types used */
-  typedef typename Superclass::ContinuousIndexType    ContinuousIndexType;           
-  typedef typename Superclass::IndexType                  IndexType;                     
-  typedef typename Superclass::OffsetType                  OffsetType;                    
-  typedef typename Superclass::PointType              PointType;                    
-  typedef typename Superclass::VectorType             VectorType;                    
-  typedef typename Superclass::VertexType                   VertexType;                    
+  typedef typename Superclass::ContinuousIndexType    ContinuousIndexType;
+  typedef typename Superclass::IndexType                  IndexType;
+  typedef typename Superclass::OffsetType                  OffsetType;
+  typedef typename Superclass::PointType              PointType;
+  typedef typename Superclass::VectorType             VectorType;
+  typedef typename Superclass::VertexType                   VertexType;
   typedef typename Superclass::VertexListType VertexListType;
   typedef typename Superclass::VertexListPointer      VertexListPointer;
 
   /** Increment the input variable passed by reference such that the ND index of
-   * the path  moves to its next vertex-connected (8-connected in 2D) neighbor. 
+   * the path  moves to its next vertex-connected (8-connected in 2D) neighbor.
    * Return the Index-space offset of the path from its prior input to its new
    * input.  If the path is unable to increment, input is not changed and an
    * offset of Zero is returned. Children are not required to implement bounds
@@ -98,21 +98,21 @@ public:
    * uses the endpoint as a stopping condition. */
   virtual OffsetType IncrementInput(InputType & input) const;
 
-  
+
   ///** Evaluate the first derivative of the ND output with respect to the 1D
   //  * input.  This is an exact, algebraic function. */
   //virtual VectorType EvaluateDerivative(const InputType & input) const;
-  
-  
+
+
   /** New() method for dynamic construction */
   itkNewMacro( Self );
 
-  
+
 protected:
   SlowPolyLineParametricPath();
   ~SlowPolyLineParametricPath(){}
   void PrintSelf(std::ostream& os, Indent indent) const;
-  
+
 private:
   SlowPolyLineParametricPath(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented

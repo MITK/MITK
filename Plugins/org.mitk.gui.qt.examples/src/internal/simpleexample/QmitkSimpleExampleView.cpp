@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -240,7 +240,7 @@ void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 void QmitkSimpleExampleView::OnTakeScreenshot()
 {
   QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
-  
+
   QmitkRenderWindow* renWin = this->GetMovieRenderWindow();
   if (renWin == NULL)
     return;
@@ -282,7 +282,7 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   fileWriter->SetInput(magnifier->GetOutput());
   fileWriter->SetFileName(fileName.toLatin1());
 
-  // vtkRenderLargeImage has problems with different layers, therefore we have to 
+  // vtkRenderLargeImage has problems with different layers, therefore we have to
   // temporarily deactivate all other layers.
   // we set the background to white, because it is nicer than black...
   double oldBackground[3];
@@ -293,13 +293,13 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   m_MultiWidget->DisableDepartmentLogo();
   m_MultiWidget->DisableGradientBackground();
 
-  fileWriter->Write();  
-  fileWriter->Delete();  
+  fileWriter->Write();
+  fileWriter->Delete();
 
   m_MultiWidget->EnableColoredRectangles();
   m_MultiWidget->EnableDepartmentLogo();
   m_MultiWidget->EnableGradientBackground();
   renderer->SetBackground(oldBackground);
-  
+
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }

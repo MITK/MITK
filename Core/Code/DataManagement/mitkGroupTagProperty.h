@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,11 +27,11 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-/*! @brief Property class that has no value. 
-    
+/*! @brief Property class that has no value.
+
   @ingroup DataManagement
 
-    The GroupTag property is used to tag a datatree node to show, that it is member of a 
+    The GroupTag property is used to tag a datatree node to show, that it is member of a
     group of datatree nodes. This can be used to build groups of datatreenodes without the
     need to contain them in a specific hiearchic order in the datatree
 */

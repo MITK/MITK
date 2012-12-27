@@ -113,22 +113,20 @@ void FslPeakImageConverter< PixelType >
                     case SINGLE_VEC_NORM:
                         dirVec.normalize();
                         break;
-                    case SPACING_COMPENSATION:
-                        dirVec *= minSpacing/2;
-                        break;
                     }
+                    dirVec.normalize();
                     dirVec = img->GetDirection()*dirVec;
 
                     itk::Point<double> worldStart;
-                    worldStart[0] = worldCenter[0]-dirVec[0];
-                    worldStart[1] = worldCenter[1]-dirVec[1];
-                    worldStart[2] = worldCenter[2]-dirVec[2];
+                    worldStart[0] = worldCenter[0]-dirVec[0]/2 * minSpacing;
+                    worldStart[1] = worldCenter[1]-dirVec[1]/2 * minSpacing;
+                    worldStart[2] = worldCenter[2]-dirVec[2]/2 * minSpacing;
                     vtkIdType id = m_VtkPoints->InsertNextPoint(worldStart.GetDataPointer());
                     container->GetPointIds()->InsertNextId(id);
                     itk::Point<double> worldEnd;
-                    worldEnd[0] = worldCenter[0]+dirVec[0];
-                    worldEnd[1] = worldCenter[1]+dirVec[1];
-                    worldEnd[2] = worldCenter[2]+dirVec[2];
+                    worldEnd[0] = worldCenter[0]+dirVec[0]/2 * minSpacing;
+                    worldEnd[1] = worldCenter[1]+dirVec[1]/2 * minSpacing;
+                    worldEnd[2] = worldCenter[2]+dirVec[2]/2 * minSpacing;
                     id = m_VtkPoints->InsertNextPoint(worldEnd.GetDataPointer());
                     container->GetPointIds()->InsertNextId(id);
                     m_VtkCellArray->InsertNextCell(container);
@@ -136,6 +134,8 @@ void FslPeakImageConverter< PixelType >
                     // generate direction image
                     typename ItkDirectionImageType::IndexType index2;
                     index2[0] = index[0]; index2[1] = index[1]; index2[2] = index[2];
+
+
                     Vector< PixelType, 3 > pixel;
                     pixel.SetElement(0, dirVec[0]);
                     pixel.SetElement(1, dirVec[1]);

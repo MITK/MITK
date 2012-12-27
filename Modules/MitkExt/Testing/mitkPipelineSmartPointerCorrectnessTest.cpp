@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ protected:
   TwoOutputsFilter()
   {
     mitk::Image::Pointer output
-      = static_cast<mitk::Image*>(this->MakeOutput(0).GetPointer()); 
+      = static_cast<mitk::Image*>(this->MakeOutput(0).GetPointer());
     Superclass::SetNumberOfRequiredOutputs(2);
     Superclass::SetNthOutput(1, output.GetPointer());
   }
@@ -48,15 +48,15 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   typename FilterType::Pointer filter;
   std::cout << "Testing " << typeid(FilterType).name() << "::New(): ";
   filter = FilterType::New();
-  if (filter.IsNull()) 
+  if (filter.IsNull())
   {
     std::cout<<"[FAILED]"<<std::endl;
      return EXIT_FAILURE;
   }
-  else 
+  else
   {
     std::cout<<"[PASSED]"<<std::endl;
-  } 
+  }
 
   std::cout << "Testing SetInput(" << typeid(FilterType).name() << "): ";
   filter->SetInput(input);
@@ -69,7 +69,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   //}
   //else {
   //std::cout<<"[PASSED]"<<std::endl;
-  //} 
+  //}
 
 //#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
   //MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED test
@@ -80,7 +80,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part1: "<<std::endl;
-  try 
+  try
   {
     mitk::Image::Pointer output = filter->GetOutput();
     std::cout << "Testing to set filter to NULL, keeping reference to output:";
@@ -137,7 +137,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   filter = FilterType::New();
   filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter2");
   filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(), "filter2Output");
-  try 
+  try
   {
     std::cout << "Testing to set filter to NULL, keeping NO reference to output:";
     filter = NULL;
@@ -168,7 +168,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part3: "<<std::endl;
-  try 
+  try
   {
     mitk::Image::Pointer output;
     {
@@ -225,7 +225,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part4: "<<std::endl;
-  try 
+  try
   {
     mitk::Image::Pointer output;
     {
@@ -287,7 +287,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   }
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part5: "<<std::endl;
-  try 
+  try
   {
     {
       typename FilterType::Pointer localFilter = FilterType::New();
@@ -344,7 +344,7 @@ int mitkPipelineSmartPointerCorrectnessTest(int /*argc*/, char* /*argv*/[])
   result = runPipelineSmartPointerCorrectnessTestForFilterType<mitk::ImageSliceSelector, mitk::Image>(mitk::Image::New());
   if( result != EXIT_SUCCESS )
     return result;
-  
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

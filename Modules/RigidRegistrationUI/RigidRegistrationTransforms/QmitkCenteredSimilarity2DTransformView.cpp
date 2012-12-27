@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>
 
-QmitkCenteredSimilarity2DTransformView::QmitkCenteredSimilarity2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f), 
+QmitkCenteredSimilarity2DTransformView::QmitkCenteredSimilarity2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
 m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
@@ -75,7 +75,7 @@ itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(itk::
       {
         transformInitializer->GeometryOn();
       }
-      transformInitializer->InitializeTransform();        
+      transformInitializer->InitializeTransform();
     }
     transformPointer->SetScale( m_Controls.m_InitialScaleCenteredSimilarity2D->text().toFloat() );
     transformPointer->SetAngle( m_Controls.m_AngleCenteredSimilarity2D->text().toFloat() );

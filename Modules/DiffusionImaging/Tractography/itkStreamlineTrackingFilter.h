@@ -34,8 +34,9 @@ This file is based heavily on a corresponding ITK filter.
 #include <vtkPolyLine.h>
 
 namespace itk{
-  /** \class StreamlineTrackingFilter
- */
+
+/**
+* \brief Performes deterministic streamline tracking on the input tensor image.   */
 
   template< class TTensorPixelType, class TPDPixelType=double>
   class StreamlineTrackingFilter :
@@ -64,8 +65,7 @@ namespace itk{
     typedef itk::Image<unsigned char, 3>                ItkUcharImgType;
     typedef itk::Image<float, 3>                        ItkFloatImgType;
     typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
-
-    typedef vtkSmartPointer< vtkPolyData >     FiberPolyDataType;
+    typedef vtkSmartPointer< vtkPolyData >              FiberPolyDataType;
 
     itkGetMacro( FiberPolyData, FiberPolyDataType )
     itkSetMacro( SeedImage, ItkUcharImgType::Pointer)

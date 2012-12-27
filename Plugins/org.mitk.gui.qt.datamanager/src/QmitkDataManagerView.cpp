@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkCommonFunctionality.h>
+#include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
@@ -623,7 +624,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
         QString error;
         try
         {
-          CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+           mitk::QmitkIOUtil::SaveBaseDataWithDialog( data.GetPointer(), node->GetName().c_str(), m_Parent );
         }
         catch(std::exception& e)
         {
@@ -642,7 +643,10 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->OpenRenderWindowPart(false);
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
+  if (renderWindow == NULL)
+    renderWindow = this->OpenRenderWindowPart(false);
 
   QList<mitk::DataNode::Pointer> selectedNodes = this->GetCurrentSelection();
 
@@ -798,9 +802,14 @@ QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const
 
 void QmitkDataManagerView::GlobalReinit( bool )
 {
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();//->OpenRenderWindowPart();
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+
   if (renderWindow == NULL)
-    return;
+    renderWindow = this->OpenRenderWindowPart(false);
+
+  // no render window available
+  if (renderWindow == NULL) return;
+
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred
     = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"

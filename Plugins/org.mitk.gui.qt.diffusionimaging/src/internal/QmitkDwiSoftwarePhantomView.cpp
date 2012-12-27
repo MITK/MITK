@@ -1,38 +1,27 @@
-/*=========================================================================
+/*===================================================================
 
- Program:   Medical Imaging & Interaction Toolkit
- Language:  C++
- Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
- Version:   $Revision: 21975 $
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
- =========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
 
-//misc
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
+===================================================================*/
 
 // Qmitk
 #include "QmitkDwiSoftwarePhantomView.h"
 
 // MITK
-#include <mitkImage.h>
 #include <mitkDiffusionImage.h>
 #include <mitkImageToItk.h>
-#include <itkDwiPhantomGenerationFilter.h>
 #include <mitkImageCast.h>
-#include <mitkProperties.h>
+#include <itkDwiPhantomGenerationFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -269,6 +258,14 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     node->SetData( image );
     node->SetName(m_Controls->m_ImageName->text().toStdString());
     GetDataStorage()->Add(node);
+
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull())
+    {
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+                    basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
 
     if (m_Controls->m_OutputNumDirectionsBox->isChecked())
     {

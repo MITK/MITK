@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "toolFilesByNavigationToolReader" + Poco::Path::separator() + GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
-  
+
   //use SceneSerialization to load the DataStorage
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mitk::DataStorage::Pointer loadedStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage");
@@ -59,11 +59,11 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     m_ErrorMessage = "Invalid file: cannot parse tool data.";
     return NULL;
     }
-  
+
   //convert the DataStorage back to a NavigationTool-Object
   mitk::DataNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
   mitk::NavigationTool::Pointer returnValue = ConvertDataNodeToNavigationTool(myNode, tempDirectory);
-  
+
   //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
   std::remove((std::string(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage")).c_str());
 
@@ -73,7 +73,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
 mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavigationTool(mitk::DataNode::Pointer node, std::string toolPath)
   {
   mitk::NavigationTool::Pointer returnValue = mitk::NavigationTool::New();
-  
+
   //DateTreeNode with Name and Surface
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
@@ -84,7 +84,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   std::string identifier;
   node->GetStringProperty("identifier",identifier);
   returnValue->SetIdentifier(identifier);
-  
+
   //Serial Number
   std::string serial;
   node->GetStringProperty("serial number",serial);

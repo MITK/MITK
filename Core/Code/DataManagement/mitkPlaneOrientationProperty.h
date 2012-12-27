@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,11 +30,11 @@ namespace mitk
 /**
  * Property which controls whether 2D line representation of a PlaneGeometry
  * should have small arrows at both ends to indicate the orientation of
- * the plane, and whether the arrows should be oriented in the direction of 
+ * the plane, and whether the arrows should be oriented in the direction of
  * the plane's normal or against it.
- * 
+ *
  * Valid values of the enumeration property are
- * - PLANE_DECORATION_NONE (no arrows) 
+ * - PLANE_DECORATION_NONE (no arrows)
  * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing upwards)
  * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing downwards)
  *
@@ -45,11 +45,11 @@ class MITK_CORE_EXPORT PlaneOrientationProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( PlaneOrientationProperty, EnumerationProperty );
-  
+
   itkNewMacro(PlaneOrientationProperty);
-  
+
   mitkNewMacro1Param(PlaneOrientationProperty, const IdType&);
- 
+
   mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
   enum
@@ -58,7 +58,7 @@ public:
     PLANE_DECORATION_POSITIVE_ORIENTATION,
     PLANE_DECORATION_NEGATIVE_ORIENTATION
   };
-  
+
   /**
    * Returns the state of plane decoration.
    */
@@ -68,32 +68,32 @@ public:
    * Sets the decoration type to no decoration.
    */
   virtual void SetPlaneDecorationToNone();
-  
+
   /**
    * Sets the decoration type to arrows in positive plane direction.
    */
   virtual void SetPlaneDecorationToPositiveOrientation();
-  
+
   /**
    * Sets the decoration type to arrows in negative plane direction.
    */
   virtual void SetPlaneDecorationToNegativeOrientation();
 
   using BaseProperty::operator=;
-  
+
 protected:
-  
+
   /**
    * Constructor. Sets the decoration type to none.
    */
   PlaneOrientationProperty( );
-  
+
   /**
    * Constructor. Sets the decoration type to the given value. If it is not
    * valid, the interpolation is set to none
    */
   PlaneOrientationProperty( const IdType &value );
-  
+
   /**
    * Constructor. Sets the decoration type to the given value. If it is not
    * valid, the representation is set to none

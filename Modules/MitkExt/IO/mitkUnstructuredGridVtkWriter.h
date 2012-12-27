@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,8 +37,8 @@ namespace mitk
  * The mitk::UnstructuredGrid is written using the VTK-writer-type provided as the
  * template argument. If the mitk::UnstructuredGrid contains multiple points of
  * time, multiple files are written. The life-span (time-bounds) of each
- * each point of time is included in the filename according to the 
- * following scheme: 
+ * each point of time is included in the filename according to the
+ * following scheme:
  * &lt;filename&gt;_S&lt;timebounds[0]&gt;E&lt;timebounds[1]&gt;_T&lt;framenumber&gt;
  * (S=start, E=end, T=time).
  * Writing of multiple files according to a given filename pattern is not

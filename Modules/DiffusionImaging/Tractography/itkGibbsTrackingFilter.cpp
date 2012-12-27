@@ -324,6 +324,12 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         if (m_AbortTracking)
             break;
     }
+    if (m_AbortTracking)
+    {
+        FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
+        m_FiberPolyData = fiberBuilder.iterate(m_MinFiberLength);
+        m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
+    }
     clock.Stop();
 
     delete sampler;

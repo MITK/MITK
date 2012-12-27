@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+* \brief Contains and manages particles.   */
+
 class MitkDiffusionImaging_EXPORT ParticleGrid
 {
 

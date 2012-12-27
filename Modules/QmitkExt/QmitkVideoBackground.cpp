@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -128,7 +128,7 @@ void QmitkVideoBackground::RemoveRenderWindow( vtkRenderWindow* renderWindow, bo
   {
     if((*it).renWin == renderWindow)
     {
-      mitk::VtkLayerController* layerController = 
+      mitk::VtkLayerController* layerController =
         mitk::VtkLayerController::GetInstance((*it).renWin);
       // unregister video backround renderer from renderwindow
       if( layerController )
@@ -228,7 +228,7 @@ void QmitkVideoBackground::UpdateVideo()
 }
 
 void QmitkVideoBackground::Modified()
-{ 
+{
   // ensures registration of video backrounds in each renderwindow
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
@@ -240,7 +240,7 @@ void QmitkVideoBackground::Modified()
     (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();
     (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_VideoSource->GetImageHeight()/2);
 
-    mitk::VtkLayerController* layerController = 
+    mitk::VtkLayerController* layerController =
       mitk::VtkLayerController::GetInstance((*it).renWin);
 
     if( layerController && !layerController->IsRendererInserted((*it).videoRenderer) )
@@ -263,7 +263,7 @@ void QmitkVideoBackground::SetVideoSource( mitk::VideoSource* videoSource )
     itk::MemberCommand<QmitkVideoBackground>::Pointer _ModifiedCommand =
       itk::MemberCommand<QmitkVideoBackground>::New();
     _ModifiedCommand->SetCallbackFunction(this, &QmitkVideoBackground::OnVideoSourceDelete);
-    m_VideoSourceObserverTag 
+    m_VideoSourceObserverTag
       = m_VideoSource->AddObserver(itk::DeleteEvent(), _ModifiedCommand);
   }
 
@@ -285,9 +285,9 @@ int QmitkVideoBackground::GetTimerDelay()
   return m_QTimer->interval();
 }
 
-void QmitkVideoBackground::OnVideoSourceDelete( const itk::Object* caller, 
+void QmitkVideoBackground::OnVideoSourceDelete( const itk::Object* caller,
                                                const itk::EventObject &event )
-{  
+{
   this->Disable(); // will only disable if enabled
   m_VideoSource = 0;
 }

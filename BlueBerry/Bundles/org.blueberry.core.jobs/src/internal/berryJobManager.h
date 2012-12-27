@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,12 +46,12 @@ namespace berry
 
 /**
  * Implementation of API type IJobManager
- * 
+ *
  * Implementation note: all the data structures of this class are protected
  * by a single lock object held as a private field in this class.  The JobManager
  * instance itself is not used because this class is publicly reachable, and third
  * party clients may try to synchronize on it.
- * 
+ *
  * The WorkerPool class uses its own monitor for synchronizing its data
  * structures. To avoid deadlock between the two classes, the JobManager
  * must NEVER call the worker pool while its own monitor is held.
@@ -151,7 +151,7 @@ public:
    * @param monitor The monitor to report unblocking to.
    * @see #ReportBlocked
    */
-  void ReportUnblocked(IProgressMonitor::Pointer monitor) const ; 
+  void ReportUnblocked(IProgressMonitor::Pointer monitor) const ;
   /**
    *  @have a look at IJobManager Resume
    */
@@ -178,7 +178,7 @@ public:
 
   void Suspend();
 
-  /* 
+  /*
    * @see schedule(long)
    */
   void Schedule(InternalJob::Pointer job, Poco::Timestamp::TimeDiff delay, bool reschedule);
@@ -277,7 +277,7 @@ protected:
    */
   Job::Pointer StartJob();
 
-  /* 
+  /*
    * @see Job#WakeUp(long)
    */
   void WakeUp(InternalJob::Pointer job, Poco::Timestamp::TimeDiff delay);
@@ -421,7 +421,7 @@ private:
   //   * family and are in one of the provided states.
   //   */
   //   List Select(Object family, int stateMask) ;
-  
+
    /**
     * Validates that the given scheduling rule obeys the constraints of
     * scheduling rules as described in the <code>ISchedulingRule</code>

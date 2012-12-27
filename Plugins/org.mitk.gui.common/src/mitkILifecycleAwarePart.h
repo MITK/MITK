@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,13 +44,13 @@ struct MITK_GUI_COMMON_PLUGIN ILifecycleAwarePart
 
   /** \see berry::IPartListener::PartActivated */
   virtual void Activated() = 0;
-  
+
   /** \see berry::IPartListener::PartDeactivated */
   virtual void Deactivated() = 0;
-  
+
   /** \see berry::IPartListener::PartVisible */
   virtual void Visible() = 0;
-  
+
   /** \see berry::IPartListener::PartHidden */
   virtual void Hidden() = 0;
 };

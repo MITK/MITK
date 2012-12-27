@@ -35,6 +35,7 @@ set(INTERNAL_CPP_FILES
   Connectomics/QmitkNetworkHistogramCanvas.cpp
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
+  QmitkFiberfoxView.cpp
 )
 
 set(UI_FILES
@@ -59,6 +60,7 @@ set(UI_FILES
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
+  src/internal/QmitkFiberfoxViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -92,6 +94,7 @@ set(MOC_H_FILES
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
+  src/internal/QmitkFiberfoxView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -124,6 +127,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/StreamlineTracking.png
   resources/dwi2.png
+  resources/refresh.xpm
 )
 
 set(QRC_FILES

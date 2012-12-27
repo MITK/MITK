@@ -141,7 +141,7 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
 }
 
 void QmitkDicomLocalStorageWidget::OnSearchParameterChanged()
-{ 
+{
     m_LocalModel->setDatabase(m_LocalDatabase->database(),m_Controls->SearchOption->parameters());
 }
 

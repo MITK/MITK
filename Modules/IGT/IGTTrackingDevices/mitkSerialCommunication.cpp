@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -270,7 +270,7 @@ int mitk::SerialCommunication::ApplyConfiguration()
   }
 
   std::ostringstream o;
-  o << "baud=" << m_BaudRate << " parity=" << static_cast<char>(m_Parity) << " data=" << m_DataBits << " stop=" << m_StopBits;  
+  o << "baud=" << m_BaudRate << " parity=" << static_cast<char>(m_Parity) << " data=" << m_DataBits << " stop=" << m_StopBits;
   if (BuildCommDCBA(o.str().c_str(), &controlSettings)  == 0) // Build device-control block
     return ERROR_VALUE;
 

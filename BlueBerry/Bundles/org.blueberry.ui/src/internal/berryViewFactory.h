@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,15 +34,15 @@ struct IViewRegistry;
 
 /**
  * \ingroup org_blueberry_ui_internal
- * 
- * The ViewFactory is used to control the creation and disposal of views.  
+ *
+ * The ViewFactory is used to control the creation and disposal of views.
  * It implements a reference counting strategy so that one view can be shared
  * by more than one client.
  */
 class ViewFactory { // implements IExtensionChangeHandler {
 
-private: 
-  
+private:
+
    std::map<std::string, IMemento::Pointer> mementoTable;
    ReferenceCounter<std::string, IViewReference::Pointer> counter;
 
@@ -51,7 +51,7 @@ private:
     IViewRegistry* viewReg;
 
 public:
-  
+
     /**
      * Separates a view's primary id from its secondary id in view key strings.
      */
@@ -59,8 +59,8 @@ public:
 
     /**
      * Returns a string representing a view with the given id and (optional) secondary id,
-     * suitable for use as a key in a map.  
-     * 
+     * suitable for use as a key in a map.
+     *
      * @param id primary id of the view
      * @param secondaryId secondary id of the view or <code>null</code>
      * @return the key
@@ -68,8 +68,8 @@ public:
     static std::string GetKey(const std::string& id, const std::string& secondaryId);
 
     /**
-     * Returns a string representing the given view reference, suitable for use as a key in a map.  
-     * 
+     * Returns a string representing the given view reference, suitable for use as a key in a map.
+     *
      * @param viewRef the view reference
      * @return the key
      */
@@ -92,25 +92,25 @@ public:
     /**
      * Returns whether the given view id contains a wildcard. Wildcards cannot
      * be used in regular view ids, only placeholders.
-     * 
+     *
      * @param viewId the view id
      * @return <code>true</code> if the given view id contains a wildcard,
      *         <code>false</code> otherwise
-     * 
+     *
      * @since 3.1
      */
     static bool HasWildcard(const std::string& viewId);
-    
-    
+
+
     /**
      * Constructs a new view factory.
      */
     ViewFactory(WorkbenchPage* page, IViewRegistry* reg);
-    
-    
+
+
     /**
      * Creates an instance of a view defined by id and secondary id.
-     * 
+     *
      * This factory implements reference counting.  The first call to this
      * method will return a new view.  Subsequent calls will return the
      * first view with an additional reference count.  The view is
@@ -118,7 +118,7 @@ public:
      * to createView.
      */
     IViewReference::Pointer CreateView(const std::string& id, const std::string& secondaryId = "");
-    
+
     /**
      * Returns the set of views being managed by this factory
      *
@@ -152,9 +152,9 @@ public:
      * @since 3.0
      */
     WorkbenchPage* GetWorkbenchPage() const;
-    
+
     int GetReferenceCount(IViewReference::Pointer viewRef);
-    
+
     /**
      * Releases an instance of a view.
      *
@@ -165,7 +165,7 @@ public:
 
     /**
      * Restore view states.
-     *  
+     *
      * @param memento the <code>IMemento</code> to restore from.
      * @return <code>IStatus</code>
      */
@@ -173,7 +173,7 @@ public:
 
     /**
      * Save view states.
-     * 
+     *
      * @param memento the <code>IMemento</code> to save to.
      * @return <code>IStatus</code>
      */
@@ -184,7 +184,7 @@ public:
 
     // for dynamic UI
     void RestoreViewState(IMemento::Pointer memento);
-    
+
     IMemento::Pointer GetViewState(const std::string& key);
 
 };

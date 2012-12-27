@@ -435,7 +435,7 @@ void QmitkIVIMView::FittIVIMStart()
     }
 
     mitk::DiffusionImage<short>* img =
-            dynamic_cast<mitk::DiffusionImage<short>*>(
+ dynamic_cast<mitk::DiffusionImage<short>*>(
                 nodes.front()->GetData());
 
     if (!img)
@@ -449,6 +449,7 @@ void QmitkIVIMView::FittIVIMStart()
     VecImgType::Pointer vecimg = img->GetVectorImage();
 
     OutImgType::IndexType dummy;
+
     FittIVIM(vecimg, img->GetDirections(), img->GetB_Value(), true, dummy);
     OutputToDatastorage(nodes);
 }
@@ -466,33 +467,14 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
     if (m_MaskImageNode.IsNotNull())
         maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
 
-    IVIMFilterType::GradientDirectionContainerType::ConstIterator gdcit =
-            diffusionImg->GetDirections()->Begin();
-    bool foundB0 = false;
-    while( gdcit != diffusionImg->GetDirections()->End() )
-    {
-        if(gdcit.Value().one_norm() <= 0.0)
-            foundB0 = true;
-        ++gdcit;
-    }
-    if(!foundB0)
-    {
-        m_Controls->m_Warning->setText(QString("No baseline (non diffusion-weighted) image found.. aborting:("));
-        m_Controls->m_Warning->setVisible(true);
-    }
-    else
-    {
-        m_Controls->m_Warning->setVisible(false);
-    }
-
     if (!m_MultiWidget) return;
-
-    m_Controls->m_VisualizeResultsWidget->setVisible(true);
 
     typedef itk::VectorImage<short,3> VecImgType;
     VecImgType::Pointer vecimg = (VecImgType*)diffusionImg->GetVectorImage().GetPointer();
 
     VecImgType::Pointer roiImage = VecImgType::New();
+
+    bool success = false;
     if(maskImg.IsNull())
     {
         int roisize = 0;
@@ -500,8 +482,17 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
             roisize = 5;
 
         mitk::Point3D pos = m_MultiWidget->GetCrossPosition();
+
         VecImgType::IndexType crosspos;
         diffusionImg->GetTimeSlicedGeometry()->WorldToIndex(pos, crosspos);
+        if (!vecimg->GetLargestPossibleRegion().IsInside(crosspos))
+        {
+            m_Controls->m_Warning->setText(QString("Crosshair position not inside of selected diffusion weighted image. Reinit needed!"));
+            m_Controls->m_Warning->setVisible(true);
+            return;
+        }
+        else
+            m_Controls->m_Warning->setVisible(false);
 
         VecImgType::IndexType index;
         index[0] = crosspos[0] - roisize; index[0] = index[0] < 0 ? 0 : index[0];
@@ -536,7 +527,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(newstart, vecimg->GetPixel(index));
 
-        FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, crosspos);
+        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, crosspos);
     }
     else
     {
@@ -603,22 +594,25 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(index, avg);
 
-        FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, index);
+        success = FittIVIM(roiImage, diffusionImg->GetDirections(), diffusionImg->GetB_Value(), false, index);
     }
 
     vecimg->SetRegions( vecimg->GetLargestPossibleRegion() );
 
-    m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
-
+    if (success)
+    {
+        m_Controls->m_VisualizeResultsWidget->setVisible(true);
+        m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
+    }
 }
 
-void QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos)
+bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos)
 {
-
     IVIMFilterType::Pointer filter = IVIMFilterType::New();
     filter->SetInput(vecimg);
     filter->SetGradientDirections(dirs);
     filter->SetBValue(bval);
+    m_Controls->m_Warning->setVisible(false);
 
     switch(m_Controls->m_MethodCombo->currentIndex())
     {
@@ -666,13 +660,22 @@ void QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType
     filter->SetNumberOfThreads(1);
     filter->SetVerbose(false);
     filter->SetCrossPosition(crosspos);
-    filter->Update();
 
-    m_Snap = filter->GetSnapshot();
-    m_DStarMap = filter->GetOutput(2);
-    m_DMap = filter->GetOutput(1);
-    m_fMap = filter->GetOutput(0);
-
+    try{
+        filter->Update();
+        m_Snap = filter->GetSnapshot();
+        m_DStarMap = filter->GetOutput(2);
+        m_DMap = filter->GetOutput(1);
+        m_fMap = filter->GetOutput(0);
+    }
+    catch (itk::ExceptionObject &ex)
+    {
+        MITK_INFO << ex ;
+        m_Controls->m_Warning->setText(QString("IVIM fit not possible: ")+ex.GetDescription());
+        m_Controls->m_Warning->setVisible(true);
+        return false;
+    }
+    return true;
 }
 
 void QmitkIVIMView::OutputToDatastorage(std::vector<mitk::DataNode*> nodes)

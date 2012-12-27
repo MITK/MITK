@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ namespace berry {
 
 /**
  * \ingroup org_blueberry_ui
- * 
+ *
  * Registry of editors known to the workbench.
  * <p>
  * An editor can be created in one of two ways:
@@ -40,44 +40,44 @@ namespace berry {
  * </p>
  * <p>
  * The registry does not keep track of editors that are "implicitly" determined.
- * For example a bitmap (<code>.bmp</code>) file will typically not have a 
- * registered editor. Instead, when no registered editor is found, the 
+ * For example a bitmap (<code>.bmp</code>) file will typically not have a
+ * registered editor. Instead, when no registered editor is found, the
  * underlying OS is consulted.
  * </p>
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * 
+ *
  * @see org.blueberry.ui.IWorkbench#getEditorRegistry()
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI IEditorRegistry {
-  
+
     /**
      * The property identifier for the contents of this registry.
      */
     static const int PROP_CONTENTS; // = 0x01;
 
     /**
-     * The identifier for the system external editor descriptor. This descriptor 
+     * The identifier for the system external editor descriptor. This descriptor
      * is always present in the registry on all platforms.
      * This editor requires an input which implements
      * {@link org.blueberry.ui.IPathEditorInput IPathEditorInput}.
      * Use {@link #findEditor findEditor} to access the editor descriptor for
      * this identifier.
-     * 
+     *
      * @since 3.0
      */
     static const std::string SYSTEM_EXTERNAL_EDITOR_ID; // = "org.blueberry.ui.systemExternalEditor"; //$NON-NLS-1$
 
     /**
-     * The identifier for the system in-place editor descriptor. This descriptor 
+     * The identifier for the system in-place editor descriptor. This descriptor
      * is only present in the registry on platforms that support in-place editing
      * (for example Win32). This editor requires an input which implements
-     * {@link org.blueberry.ui.IInPlaceEditorInput IInPlaceEditorInput}. Use 
+     * {@link org.blueberry.ui.IInPlaceEditorInput IInPlaceEditorInput}. Use
      * {@link #findEditor findEditor} to access the editor descriptor for this
      * identifier.
-     * 
+     *
      * @since 3.0
      */
     static const std::string SYSTEM_INPLACE_EDITOR_ID; // = "org.blueberry.ui.systemInPlaceEditor"; //$NON-NLS-1$
@@ -125,16 +125,16 @@ struct BERRY_UI IEditorRegistry {
    * The default editor is determined by taking the file extension for the
    * file and obtaining the default editor for that extension.
    * </p>
-   * 
+   *
    * @param fileName
    *            the file name in the system
    * @return the descriptor of the default editor, or <code>null</code> if
    *         not found
    */
     virtual IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName) = 0;
-    
+
     /*
-     * Returns the default editor for a given file name and with the given content type.  
+     * Returns the default editor for a given file name and with the given content type.
      * <p>
      * The default editor is determined by taking the file extension for the
      * file and obtaining the default editor for that extension.
@@ -156,13 +156,13 @@ struct BERRY_UI IEditorRegistry {
    * Note: Use <code>getDefaultEditor(String)</code> if you only the need
    * the default editor rather than all candidate editors.
    * </p>
-   * 
+   *
    * @param fileName
    *            the file name in the system
    * @return a list of editor descriptors
    */
   virtual std::list<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName) = 0;
- 
+
   /*
    * Returns the list of file editors registered to work against the file with
    * the given file name and with the given content type.
@@ -170,7 +170,7 @@ struct BERRY_UI IEditorRegistry {
    * Note: Use <code>getDefaultEditor(String)</code> if you only the need
    * the default editor rather than all candidate editors.
    * </p>
-   * 
+   *
    * @param fileName
    *            the file name in the system
    * @param contentType
@@ -185,9 +185,9 @@ struct BERRY_UI IEditorRegistry {
      * Returns a list of mappings from file type to editor.  The resulting list
      * is sorted in ascending order by file extension.
      * <p>
-     * Each mapping defines an extension and the set of editors that are 
-     * available for that type. The set of editors includes those registered 
-     * via plug-ins and those explicitly associated with a type by the user 
+     * Each mapping defines an extension and the set of editors that are
+     * available for that type. The set of editors includes those registered
+     * via plug-ins and those explicitly associated with a type by the user
      * in the workbench preference pages.
      * </p>
      *
@@ -204,13 +204,13 @@ struct BERRY_UI IEditorRegistry {
    * obtaining the image for the default editor associated with that
    * extension. A default image is returned if no default editor is available.
    * </p>
-   * 
+   *
    * @param filename
    *            the file name in the system
    * @return the descriptor of the image to display next to the file
    */
    // virtual ImageDescriptor* GetImageDescriptor(const std::string& filename) = 0;
-  
+
   /*
    * Returns the image descriptor associated with a given file. This image is
    * usually displayed next to the given file.
@@ -219,7 +219,7 @@ struct BERRY_UI IEditorRegistry {
    * obtaining the image for the default editor associated with that
    * extension. A default image is returned if no default editor is available.
    * </p>
-   * 
+   *
    * @param filename
    *            the file name in the system
    * @param contentType
@@ -251,7 +251,7 @@ struct BERRY_UI IEditorRegistry {
     /**
      * Returns whether there is an in-place editor that could handle a file
      * with the given name.
-     * 
+     *
      * @param filename the file name
      * @return <code>true</code> if an in-place editor is available, and
      * <code>false</code> otherwise
@@ -262,7 +262,7 @@ struct BERRY_UI IEditorRegistry {
     /**
      * Returns whether the system has an editor that could handle a file
      * with the given name.
-     * 
+     *
      * @param filename the file name
      * @return <code>true</code> if an external editor available, and
      * <code>false</code> otherwise

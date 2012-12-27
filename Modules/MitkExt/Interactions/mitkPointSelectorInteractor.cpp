@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -147,7 +147,7 @@ float mitk::PointSelectorInteractor::CanHandleEvent(StateEvent const* stateEvent
   {
     //get the point and calculate the jurisdiction out of it.
     mitk::PointSet::PointType point;
-    pointSet->GetPointSet()->GetPoint(index, &point); 
+    pointSet->GetPointSet()->GetPoint(index, &point);
     returnValue = point.EuclideanDistanceTo(worldPoint);
 
     //between 1 and 0.     1 if directly hit
@@ -218,8 +218,8 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
           displPoint[1] = worldPoint[1];
 
           //new Event with information YES and with the correct point
-          mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(), 
-            posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(), 
+          mitk::PositionEvent const* newPosEvent = new mitk::PositionEvent(posEvent->GetSender(), posEvent->GetType(),
+            posEvent->GetButton(), posEvent->GetButtonState(), posEvent->GetKey(),
             displPoint, worldPoint);
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDYES, newPosEvent);
           //call HandleEvent to leave the guard-state
@@ -297,7 +297,7 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
           this->HandleEvent( newStateEvent );
           ok = true;
         }
-      }    
+      }
     }
     break;
   case AcINITMOVEMENT:
@@ -311,8 +311,8 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
   case AcSELECTANOTHEROBJECT:
     //selects an other Point after one point has been removed
     {
-      /*select the point "position-1", 
-      and if it is the first in list, 
+      /*select the point "position-1",
+      and if it is the first in list,
       then contine at the last in list*/
       if (pointSet->GetSize()>0)//only then a select of a point is possible!
       {
@@ -335,7 +335,7 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
     //select the point found at the given mouseposition
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL) 
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();
@@ -366,7 +366,7 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
   case AcDESELECT:
     {
       mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL) 
+      if (posEvent == NULL)
         return false;
 
       mitk::Point3D worldPoint = posEvent->GetWorldPosition();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,15 +57,15 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
   }
 
   //Use CylindricToCartesianFilter
-	mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
+  mitk::CylindricToCartesianFilter::Pointer cyl2cart = mitk::CylindricToCartesianFilter::New();
     cyl2cart->SetInput(image);
     cyl2cart->SetTargetXSize( 64 );
 
   //Take a slice
-	mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
-	  slice->SetInput(cyl2cart->GetOutput());
-	  slice->SetSliceNr(1);
-	  slice->Update();
+  mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
+    slice->SetInput(cyl2cart->GetOutput());
+    slice->SetSliceNr(1);
+    slice->Update();
 
   std::cout << "Testing IsInitialized(): ";
   if(slice->GetOutput()->IsInitialized()==false)
@@ -88,7 +88,7 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
     int time=image->GetDimension(3)-1;
 
     std::cout << "Testing 3D+t: Setting time to " << time << ": ";
-	  slice->SetTimeNr(time);
+    slice->SetTimeNr(time);
     if(slice->GetTimeNr()!=time)
     {
       std::cout<<"[FAILED]"<<std::endl;

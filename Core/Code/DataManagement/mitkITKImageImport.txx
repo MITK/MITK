@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -79,7 +79,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateData()
   InputImageConstPointer input  = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory); 
+  output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory);
 }
 
 template <class TInputImage>
@@ -120,7 +120,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
   Superclass::SetNthOutput(idx, output);
 }
 
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry, bool update)
 {
   typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
@@ -131,7 +131,7 @@ mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImage
   return importer->GetOutput();
 }
 
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry, bool update)
 {
   typename mitk::ITKImageImport<ItkOutputImageType>::Pointer importer = mitk::ITKImageImport<ItkOutputImageType>::New();
@@ -142,13 +142,13 @@ mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, co
   return importer->GetOutput();
 }
 
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 mitk::Image::Pointer mitk::GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
 {
   return GrabItkImageMemory( itkimage.GetPointer(), mitkImage, geometry, update );
 }
 
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage, const Geometry3D* geometry, bool update)
 {
   if(update)

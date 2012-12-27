@@ -3,12 +3,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  * \brief Base Class for Connectomics Networks   */
+  * \brief Connectomics Network Class
+  *
+  * This class is designed to represent a connectomics network (brain network). It encapsulates a
+  * boost adjacency list and provides additional capabilities. The information contained in the nodes and edges is:
+  *
+  * Network Node:
+  * <ul>
+  *  <li> int ID - The id of the node
+  *  <li> string label - The label of the node, this can be any string, such as an anatomical label
+  *  <li> vector<float> coordinates - The coordinates the node should be displayed at
+  * </ul>
+  *
+  * Network Edge:
+  * <ul>
+  *  <li> int sourceId - The Id of the source node
+  *  <li> int targetId - The Id of the target node
+  *  <li> int weight - Weight of the edge as int (used for counting fibers)
+  *  <li> double edge_weight - Used for boost and algorithms, should be between 0 and 1
+  * </ul>
+  */
   class MitkDiffusionImaging_EXPORT ConnectomicsNetwork : public BaseData
   {
   public:
@@ -71,7 +90,7 @@ namespace mitk {
 
     ////////////////// Interface ///////////////////
     /** return whether an edge exists between the two given vertices */
-    bool EdgeExists( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const; 
+    bool EdgeExists( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const;
 
     /** increase the weight of an edge between the two given vertices */
     void IncreaseEdgeWeight( VertexDescriptorType vertexA, VertexDescriptorType vertexB );
@@ -161,7 +180,7 @@ namespace mitk {
     void PruneUnconnectedSingleNodes();
 
     /** Remove edges below the specified weight
-      * 
+      *
       * targetWeight is the number of connecting fibers
       *
       * This will remove unconnected nodes after removal
@@ -172,7 +191,7 @@ namespace mitk {
     ConnectomicsNetwork();
     virtual ~ConnectomicsNetwork();
 
-    /** This function will relabel all vertices and edges in a continuous manner 
+    /** This function will relabel all vertices and edges in a continuous manner
       *
       * Mainly important after removing vertices, to make sure that the ids run continuously from
       * 0 to number of vertices - 1 and edge target and source ids match the corresponding node.

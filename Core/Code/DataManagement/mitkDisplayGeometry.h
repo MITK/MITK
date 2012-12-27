@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGeometry2D.h"
 
-namespace mitk 
+namespace mitk
 {
 
 /**
@@ -67,12 +67,12 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 {
 
   public:
-    
+
     mitkClassMacro(DisplayGeometry,Geometry2D);
 
     /// Method for creation through the object factory.
     itkNewMacro(Self);
-    
+
     /// \brief duplicates the geometry, NOT useful for this sub-class
     virtual AffineGeometryFrame3D::Pointer Clone() const;
 
@@ -98,11 +98,11 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 
     /**
      \brief Set the size of the display in display units.
-     
-     This method must be called every time the display is resized (normally, the GUI-toolkit 
+
+     This method must be called every time the display is resized (normally, the GUI-toolkit
      informs about resizing).
      \param keepDisplayedRegion: if \a true (the default), the displayed contents is zoomed/shrinked
-     so that the displayed region is (approximately) the same as before: The point at the center will 
+     so that the displayed region is (approximately) the same as before: The point at the center will
      be kept at the center and the length of the diagonal of the displayed region \em in \em units
      will also be kept.
      When the aspect ration changes, the displayed region includes the old displayed region, but
@@ -121,7 +121,7 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 
     virtual void SetConstrainZoomingAndPanning(bool constrain);
     virtual bool GetConstrainZommingAndPanning() const;
-   
+
     /// what percentage of the world should be visible at maximum zoom out (default 1.0, i.e. 100% of width or height)
     itkGetMacro(MaxWorldViewPercentage, float);
     itkSetMacro(MaxWorldViewPercentage, float);
@@ -129,7 +129,7 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     /// what percentage of the world should be visible at maximum zoom in (default 0.1, i.e. 10% of width or height)
     itkGetMacro(MinWorldViewPercentage, float);
     itkSetMacro(MinWorldViewPercentage, float);
-    
+
     virtual bool SetScaleFactor(ScalarType mmPerDisplayUnit);
     ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
@@ -142,7 +142,7 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     /**
     * \brief Zooms with a factor (1.0=identity) to/from the specified center, trying to preserve the center of zoom in world coordiantes
     *
-    * Same zoom as mentioned above but tries (if it's within view contraints) to match the center in display units with the center in world coordinates. 
+    * Same zoom as mentioned above but tries (if it's within view contraints) to match the center in display units with the center in world coordinates.
     *
     * \return true if zoom request was within accepted limits
     */
@@ -150,13 +150,13 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 
     // \return true if move request was within accepted limits
     virtual bool MoveBy(const Vector2D& shiftInDisplayUnits);
-    
+
     // \brief align display with world, make world completely visible
     virtual void Fit();
 
-    
-    
-    
+
+
+
     // conversion methods
 
     virtual void DisplayToWorld(const Point2D &pt_display, Point2D &pt_mm) const;
@@ -176,9 +176,22 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 
     virtual void ULDisplayToDisplay(const Vector2D &vec_ULdisplay, Vector2D &vec_display) const;
     virtual void DisplayToULDisplay(const Vector2D &vec_display, Vector2D &vec_ULdisplay) const;
-    
+
+    /**
+    * \brief projects the given point onto current 2D world geometry plane
+    */
     virtual bool Project(const Point3D &pt3d_mm, Point3D &projectedPt3d_mm) const;
+
+    /**
+    * \brief projects the given vector onto current 2D world geometry plane.
+    * \warning DEPRECATED, please use Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) instead
+    */
     virtual bool Project(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
+
+    /**
+    * \brief projects the given vector onto current 2D world geometry plane
+    */
+    virtual bool Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
 
     virtual bool Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const;
     virtual void Map(const Point2D &pt2d_mm, Point3D &pt3d_mm) const;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,13 +32,13 @@ namespace mitk
   class BaseProperty;
 };
 
-/// 
+///
 /// \class QmitkNDIToolDelegate
 /// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
 ///
 /// \see QmitkPropertiesTableModel
 class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
-{  
+{
   Q_OBJECT
 
   public:
@@ -109,7 +109,7 @@ class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
     void ComboBoxCurrentIndexChanged ( int index ) ;
 
 
-private: 
+private:
     QStringList m_Types;
     mitk::DataStorage* m_DataStorage;
     mitk::NodePredicateBase::Pointer m_Predicate;

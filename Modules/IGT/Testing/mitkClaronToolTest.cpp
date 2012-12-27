@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 * ClaronTool has a protected constructor and a protected itkNewMacro
 * so that only it's friend class ClaronTrackingDevice is able to instantiate
-* tool objects. Therefore, we derive from ClaronTool and add a 
+* tool objects. Therefore, we derive from ClaronTool and add a
 * public itkNewMacro, so that we can instantiate and test the class
 */
 class ClaronToolTestClass : public mitk::ClaronTool
@@ -32,7 +32,7 @@ public:
   */
   itkNewMacro(Self);
 protected:
-  ClaronToolTestClass() : mitk::ClaronTool()  
+  ClaronToolTestClass() : mitk::ClaronTool()
   {
   }
 };
@@ -45,14 +45,14 @@ int mitkClaronToolTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("ClaronTool")
   {
-    // let's create an object of our class  
+    // let's create an object of our class
     mitk::ClaronTool::Pointer myClaronTool = ClaronToolTestClass::New().GetPointer();
 
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
     // it makes no sense to continue without an object.
-    MITK_TEST_CONDITION_REQUIRED(myClaronTool.IsNotNull(),"Testing instantiation:") 
-  
+    MITK_TEST_CONDITION_REQUIRED(myClaronTool.IsNotNull(),"Testing instantiation:")
+
       mitk::Point3D pos;
     pos[0] = 10;
     pos[1] = 20;

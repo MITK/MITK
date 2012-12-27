@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   bool amplitudeImageSelected = false;
   bool intensityImageSelected = false;
   bool rgbImageSelected = false;
-  
+
   tofWriter->SetToFCaptureWidth(dimX);
   tofWriter->SetToFCaptureHeight(dimY);
   tofWriter->SetDistanceImageFileName(distanceImageFileName);
@@ -78,5 +78,5 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(fileExtension==tofWriter->GetExtension(), "Testing set/get file extension");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFImageWriter::ToFImageType2DPlusT==tofWriter->GetToFImageType(), "Testing set/get ToFImageType");
 
-  MITK_TEST_END();  
+  MITK_TEST_END();
 }

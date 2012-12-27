@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -23,20 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkExternalToolsTest(int argc, char* argv[])
 {
-  return EXIT_SUCCESS; // we'll go back to a CMake solution... 
+  return EXIT_SUCCESS; // we'll go back to a CMake solution...
 
 
   std::cout << "Got " << argc << " parameters" << std::endl;
   if ( argc == 5 )
   {
-    // "parse" commandline 
+    // "parse" commandline
     // quote spaces in commandline parameters (all paths/files)
     //std::string cmakeBinary         = itksys::SystemTools::EscapeChars( argv[1], " " );
     std::string cmakeBinary         = argv[1];
     std::string cmakeGenerator      = argv[2];
     std::string mitkBinaryDirectory = argv[3];
     std::string sourceDirectory     = argv[4];
-    
+
     // try to configure MITK external project
     std::cout << "Calling CMake as '" << cmakeBinary << "'" << std::endl;
     std::cout << "Calling CMake for generator '" << cmakeGenerator << "'" << std::endl;
@@ -54,7 +54,7 @@ int mitkExternalToolsTest(int argc, char* argv[])
     std::string commandline( oneCommandlineQuote );
     commandline += cmakeBinary;
     commandline += oneCommandlineQuote;
-    
+
     commandline += " -G ";
     commandline += oneCommandlineQuote;
     commandline += cmakeGenerator;
@@ -70,9 +70,9 @@ int mitkExternalToolsTest(int argc, char* argv[])
     commandline += sourceDirectory;
     commandline += oneCommandlineQuote;
 
-    std::cout << "Calling system() with '" 
+    std::cout << "Calling system() with '"
               << commandline
-              << "'" 
+              << "'"
               << std::endl;
 
     int returnCode = system(commandline.c_str());
@@ -93,7 +93,7 @@ int mitkExternalToolsTest(int argc, char* argv[])
     // commented out because mbits configures with Qt4. Have to check this monday.
     //returnCode = system(commandline.c_str());
 
-    if (returnCode != 0) // make should return 0 
+    if (returnCode != 0) // make should return 0
     {
       std::cout << "make returned " << returnCode << std::endl;
       std::cerr << "Building the project FAILED. See output above." << std::endl;
@@ -101,7 +101,7 @@ int mitkExternalToolsTest(int argc, char* argv[])
     }
 
 #endif
-    // 
+    //
     // TODO extend test here to support windows...
     //
     return returnCode;

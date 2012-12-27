@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ QmitkColourImageProcessingView::QmitkColourImageProcessingView()
   m_MultiWidget(NULL)
 {
   m_Controls=NULL;
-  
+
   m_Color[0]= 255;
   m_Color[1]= 0;
   m_Color[2]= 0;
@@ -63,20 +63,20 @@ void QmitkColourImageProcessingView::CreateQtPartControl(QWidget *parent)
   {
     m_Controls = new Ui::QmitkColourImageProcessingViewControls;
     m_Controls->setupUi(parent);
-    
+
     connect( m_Controls->m_ConvertImageToRGBA, SIGNAL( clicked(bool) ),this, SLOT( OnConvertToRGBAImage() ));
     connect( m_Controls->m_ConvertImageMaskToRGBA, SIGNAL( clicked(bool) ),this, SLOT( OnConvertToRGBAImage() ));
     connect( m_Controls->m_ConvertImageMaskColorToRGBA, SIGNAL( clicked(bool) ),this, SLOT( OnConvertImageMaskColorToRGBAImage() ));
     connect( m_Controls->m_ColorButton, SIGNAL( clicked(bool) ),this, SLOT( OnChangeColor() ));
     connect( m_Controls->m_CombineRGBAButton, SIGNAL( clicked(bool) ),this, SLOT( OnCombineRGBA() ));
-    
+
     m_Controls->m_ImageSelectedLabel->hide();
     m_Controls->m_NoImageSelectedLabel->show();
-    
-    
-    
+
+
+
   }
-  
+
    m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkColourImageProcessingView>
     (this, &QmitkColourImageProcessingView::SelectionChanged));
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
@@ -87,9 +87,9 @@ void QmitkColourImageProcessingView::CreateQtPartControl(QWidget *parent)
 
 
 void QmitkColourImageProcessingView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
-{ 
+{
 
-  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection
     = selection.Cast<const mitk::DataNodeSelection>();
 
   if(_DataNodeSelection.IsNotNull())
@@ -103,21 +103,21 @@ void QmitkColourImageProcessingView::SelectionChanged( berry::IWorkbenchPart::Po
       if(_DataNodeObject)
       {
         mitk::DataNode::Pointer node = _DataNodeObject->GetDataNode();
-      
+
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3   )
           selectedNodes.push_back( node );
       }
     }
-  
+
     mitk::DataNode::Pointer node;
-    
+
     if(selectedNodes.size() > 0)
       node=selectedNodes[0];
-    
+
     if( node.IsNotNull() )
     {
       m_SelectedNode = node;
-      
+
       m_Controls->m_NoImageSelectedLabel->hide();
       m_Controls->m_ImageSelectedLabel->show();
 
@@ -134,19 +134,19 @@ void QmitkColourImageProcessingView::SelectionChanged( berry::IWorkbenchPart::Po
       {
         m_SelectedNode2= 0;
       }
-      
+
       m_Controls->m_ImageSelectedLabel->setText( QString( infoText.c_str() ) );
-      
+
     }
     else
     {
       m_Controls->m_ImageSelectedLabel->hide();
       m_Controls->m_NoImageSelectedLabel->show();
-      
+
       m_SelectedNode = 0;
       m_SelectedNode2= 0;
     }
-  
+
   }
 }
 
@@ -155,22 +155,22 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
 {
   if(m_SelectedNode.IsNull())
     return;
-    
-    
+
+
   mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(m_SelectedNode->GetProperty("TransferFunction"));
 
   if(transferFunctionProp.IsNull())
     return;
-    
+
   mitk::TransferFunction::Pointer tf = transferFunctionProp->GetValue();
-  
+
   if(tf.IsNull())
     return;
-    
+
   mitk::mitkColourImageProcessor CImageProcessor;
-  
+
   mitk::Image::Pointer RGBAImageResult;
-  
+
   if(m_SelectedNode2.IsNotNull())
   {
     RGBAImageResult = CImageProcessor.convertWithBinaryToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),dynamic_cast<mitk::Image*>(m_SelectedNode2->GetData()),tf);
@@ -179,7 +179,7 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
   {
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
-  
+
   if (!RGBAImageResult)
   {
     QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
@@ -187,7 +187,7 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
   }
 
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
-  
+
   dtn->SetData( RGBAImageResult );
   dtn->SetName(m_SelectedNode->GetName() + "_RGBA");
   this->GetDefaultDataStorage()->Add( dtn ); // add as a child, because the segmentation "derives" from the original
@@ -200,22 +200,22 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
 {
    if(m_SelectedNode.IsNull())
     return;
-    
-    
+
+
   mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(m_SelectedNode->GetProperty("TransferFunction"));
 
   if(transferFunctionProp.IsNull())
     return;
-    
+
   mitk::TransferFunction::Pointer tf = transferFunctionProp->GetValue();
-  
+
   if(tf.IsNull())
     return;
-    
+
   mitk::mitkColourImageProcessor CImageProcessor;
-  
+
   mitk::Image::Pointer RGBAImageResult;
-  
+
   if(m_SelectedNode2.IsNotNull())
   {
     RGBAImageResult = CImageProcessor.convertWithBinaryAndColorToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),dynamic_cast<mitk::Image*>(m_SelectedNode2->GetData()),tf, m_Color);
@@ -224,7 +224,7 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
   {
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
-  
+
   if (!RGBAImageResult)
   {
     QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
@@ -232,10 +232,10 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
   }
 
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
-  
+
   dtn->SetData( RGBAImageResult );
   dtn->SetName(m_SelectedNode->GetName() + "_RGBA");
-  
+
   this->GetDefaultDataStorage()->Add( dtn ); // add as a child, because the segmentation "derives" from the original
 
 }
@@ -263,21 +263,21 @@ void QmitkColourImageProcessingView::OnCombineRGBA( )
 {
  if(m_SelectedNode.IsNull())
     return;
-    
+
   if(m_SelectedNode2.IsNull())
     return;
-   
-    
+
+
   mitk::mitkColourImageProcessor CImageProcessor;
-  
+
   mitk::Image::Pointer RGBAImageResult;
-  
+
    RGBAImageResult = CImageProcessor.combineRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),dynamic_cast<mitk::Image*>(m_SelectedNode2->GetData()));
   MITK_INFO <<"RGBAImage Result";
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
-  
+
   dtn->SetData( RGBAImageResult );
-  
+
   this->GetDefaultDataStorage()->Add( dtn ); // add as a child, because the segmentation "derives" from the original
 
 }

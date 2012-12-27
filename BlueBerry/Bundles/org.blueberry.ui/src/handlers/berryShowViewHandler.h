@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,10 +28,10 @@ namespace berry
 
 /**
  * \ingroup org_blueberry_ui
- * 
+ *
  * Shows the given view. If no view is specified in the parameters, then this
  * opens the view selection dialog.
- * 
+ *
  * @since 3.1
  */
 class BERRY_UI ShowViewHandler : public AbstractHandler
@@ -66,7 +66,7 @@ private:
 
   /**
    * Opens the view with the given identifier.
-   * 
+   *
    * @param viewId
    *            The view to open; must not be <code>null</code>
    * @throws PartInitException

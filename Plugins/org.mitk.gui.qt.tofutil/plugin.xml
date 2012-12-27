@@ -6,7 +6,11 @@
     <view id="org.mitk.views.tofutil"
           name="ToFUtil"
           class="QmitkToFUtilView" 
-          icon="resources/icon.xpm" />
+          icon="resources/iconToFUtilView.xpm" />
+    <view id="org.mitk.views.tofgeneration"
+          name="ToFDeviceGeneration"
+          class="QmitkToFDeviceGeneration"
+          icon="resources/iconGenerationView.xpm" />
   </extension>
 
 </plugin>

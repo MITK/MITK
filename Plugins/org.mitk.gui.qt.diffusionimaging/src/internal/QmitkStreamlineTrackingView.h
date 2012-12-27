@@ -29,10 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /*!
-\brief QmitkStreamlineTrackingView
-
-\warning  Implements standard streamline tracking as proposed by Mori et al. 1999 "Three-Dimensional Tracking of Axonal Projections in the Brain by Magnetic Resonance Imaging"
-
+\brief View for deterministic streamline fiber tracking.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
@@ -58,7 +55,7 @@ public:
 
   protected slots:
 
-  void DoFiberTracking();
+  void DoFiberTracking();   ///< start fiber tracking
 
 protected:
 
@@ -69,6 +66,7 @@ protected:
 
 protected slots:
 
+  /** update labels if parameters have changed */
   void OnSeedsPerVoxelChanged(int value);
   void OnMinTractLengthChanged(int value);
   void OnFaThresholdChanged(int value);
@@ -79,10 +77,10 @@ protected slots:
 
 private:
 
-  mitk::Image::Pointer          m_MaskImage;
-  mitk::Image::Pointer          m_SeedRoi;
-  mitk::TensorImage::Pointer    m_TensorImage;
-  mitk::DataNode::Pointer       m_TensorImageNode;
+  mitk::Image::Pointer          m_MaskImage;        ///< abort tracking if leaving mask
+  mitk::Image::Pointer          m_SeedRoi;          ///< binary image defining seed voxels for tracking process
+  mitk::TensorImage::Pointer    m_TensorImage;      ///< input image
+  mitk::DataNode::Pointer       m_TensorImageNode;  ///< input image datanode
 
 };
 

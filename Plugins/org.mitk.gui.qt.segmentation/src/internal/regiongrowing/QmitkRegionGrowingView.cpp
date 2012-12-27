@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -72,21 +72,23 @@ void QmitkRegionGrowingView::StdMultiWidgetNotAvailable()
 
 
 void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{ 
+{
   // iterate all selected objects, adjust warning visibility
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
        ++it )
   {
     mitk::DataNode::Pointer node = *it;
-  
+
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_Controls->lblWarning->setVisible( false );
+      m_Controls->m_AdaptiveRGWidget->EnableControls(true);
       m_Controls->m_AdaptiveRGWidget->SetInputImageNode(node);
       return;
     }
   }
 
   m_Controls->lblWarning->setVisible( true );
+  m_Controls->m_AdaptiveRGWidget->EnableControls(false);
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>
 
-QmitkAffineTransformView::QmitkAffineTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f), 
+QmitkAffineTransformView::QmitkAffineTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
 m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
@@ -54,7 +54,7 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelTy
   mitk::CastToItkImage(m_FixedImage, fixedImage);
   typename MovingImageType::Pointer movingImage;
   mitk::CastToItkImage(m_MovingImage, movingImage);
-  typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();    
+  typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();
   transformPointer->SetIdentity();
   if (m_Controls.m_CenterForInitializerAffine->isChecked())
   {
@@ -72,7 +72,7 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelTy
     {
       transformInitializer->GeometryOn();
     }
-    transformInitializer->InitializeTransform();        
+    transformInitializer->InitializeTransform();
   }
   m_CenterX = transformPointer->GetCenter()[0];
   m_CenterY = transformPointer->GetCenter()[1];
@@ -253,6 +253,6 @@ int QmitkAffineTransformView::GetNumberOfTransformParameters()
       return 12;
     }
   }
-  else 
+  else
     return 0;
 }

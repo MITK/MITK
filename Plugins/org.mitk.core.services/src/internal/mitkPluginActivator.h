@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,11 +34,11 @@ class org_mitk_core_services_Activator : public QObject, public ctkPluginActivat
   Q_INTERFACES(ctkPluginActivator)
 
 public:
-  
+
   static const std::string PLUGIN_ID;
 
   org_mitk_core_services_Activator();
-  
+
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
@@ -52,7 +52,7 @@ private:
 
   mitk::ModuleContext* mitkContext;
   ctkPluginContext* pluginContext;
-  
+
   void AddMitkService(const mitk::ServiceReference &ref);
 
   ctkDictionary CreateServiceProperties(const mitk::ServiceReference& ref);

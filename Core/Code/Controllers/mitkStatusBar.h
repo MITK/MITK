@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,8 +27,8 @@ namespace mitk {
 //## @brief Sending a message to the applications StatusBar
 //##
 //## Holds a GUI dependent StatusBarImplementation and sends the text further.
-//## nearly equal to itk::OutputWindow, 
-//## no Window, but one line of text and a delay for clear. 
+//## nearly equal to itk::OutputWindow,
+//## no Window, but one line of text and a delay for clear.
 //## all mitk-classes use this class to display text on GUI-StatusBar.
 //## The mainapplication has to set the internal held StatusBarImplementation with SetInstance(..).
 //## @ingroup Interaction
@@ -36,9 +36,9 @@ class MITK_CORE_EXPORT StatusBar : public itk::Object
 {
 public:
   itkTypeMacro(StatusBar, itk::Object);
-  
+
   //##Documentation
-  //## @brief static method to get the GUI dependent StatusBar-instance 
+  //## @brief static method to get the GUI dependent StatusBar-instance
   //## so the methods DisplayText, etc. can be called
   //## No reference counting, cause of decentral static use!
   static StatusBar* GetInstance();
@@ -68,9 +68,9 @@ public:
   void Clear();
 
   //##Documentation
-  //## @brief Set the SizeGrip of the window 
-  //## (the triangle in the lower right Windowcorner for changing the size) 
-  //## to enabled or disabled 
+  //## @brief Set the SizeGrip of the window
+  //## (the triangle in the lower right Windowcorner for changing the size)
+  //## to enabled or disabled
   void SetSizeGripEnabled(bool enable);
 
 protected:

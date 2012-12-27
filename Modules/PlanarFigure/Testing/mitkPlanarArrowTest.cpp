@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
   const mitk::PlanarFigure::PolyLineType polyLine0 = PlanarArrow->GetPolyLine( 0 );
   mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( PlanarArrow->GetPolyLinesSize() == 1, "Number of polylines after placement" );
-  
+
 
   // Get polylines and check if the generated coordinates are OK
   const mitk::Point2D& pp0 = iter->Point;
@@ -58,9 +58,9 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
   const mitk::Point2D& pp1 = iter->Point;
   MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1), "Correct polyline 1" );
 
-    
+
   // Test for number of measurement features
-  // none yet 
+  // none yet
 
 }
 };
@@ -68,7 +68,7 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
  * mitkPlanarArrowTest tests the methods and behavior of mitk::PlanarArrow with sub-tests:
  *
  * 1. Instantiation and basic tests
- * 
+ *
  */
 int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
 {
@@ -92,4 +92,4 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
 
   // always end with this!
   MITK_TEST_END();
-} 
+}

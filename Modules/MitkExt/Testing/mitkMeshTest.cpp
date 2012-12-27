@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
   mitk::Point3D point;
   point.Fill(1);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
-	mesh->ExecuteOperation(doOp);
+  mesh->ExecuteOperation(doOp);
 
   //now check new condition!
   if ( (mesh->GetSize()!=1) ||
@@ -60,7 +60,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   delete doOp;
-  
+
   //get the point and check if it is still the same
   std::cout << "Create an operation and add a point. Then try to get that point.";
   mitk::Point3D tempPoint;

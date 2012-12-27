@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,26 +44,26 @@ class MITK_CORE_EXPORT ColorProperty : public BaseProperty
 {
 protected:
   mitk::Color m_Color;
-  
+
   ColorProperty();
-  
+
   ColorProperty(const float red, const float green, const float blue);
-    
+
   ColorProperty(const float color[3]);
-  
+
   ColorProperty(const mitk::Color & color);
-    
+
 public:
-  
+
   mitkClassMacro(ColorProperty, BaseProperty);
-  
+
   itkNewMacro(ColorProperty);
   mitkNewMacro1Param(ColorProperty, const float*);
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);
 
   typedef mitk::Color ValueType;
-  
+
   const mitk::Color & GetColor() const;
   const mitk::Color & GetValue() const;
   std::string GetValueAsString() const;

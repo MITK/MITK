@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ class mitkSegmentationInterpolationTestClass
     }
 
   protected:
-    
+
     bool CreateNewInterpolator();
     bool CreateSegmentation();
     bool ClearSegmentation();
@@ -61,14 +61,14 @@ class mitkSegmentationInterpolationTestClass
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::Image::Pointer m_Image;
-    
+
     mitk::Image::Pointer m_ManualSlices;
     mitk::Image::Pointer m_InterpolatedSlices;
 
     unsigned int dim[3];
     int pad[3];
 };
-    
+
 bool mitkSegmentationInterpolationTestClass::CreateNewInterpolator()
 {
   std::cout << "Instantiation" << std::endl;
@@ -108,7 +108,7 @@ bool mitkSegmentationInterpolationTestClass::ClearSegmentation()
   int* p = (int*)m_Image->GetData(); // pointer to pixel data
   int size = dim[0]*dim[1]*dim[2];
   for(int i=0; i<size; ++i, ++p) *p=0; // fill image with zeros
-  
+
   return true;
 }
 
@@ -150,7 +150,7 @@ bool mitkSegmentationInterpolationTestClass::CreateTwoSlices(int slicedim)
         ydim = 1;
         break;
     }
-      
+
     if ( ((z == 0) || (z == 2)) && (x >= pad[xdim]) && (x < ( (signed) dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < ( (signed) dim[ydim]-pad[ydim])) )
     {
       *p = 1;
@@ -197,7 +197,7 @@ bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
       ydim = 1;
       break;
   }
- 
+
   ipMITKSegmentationTYPE* p = (ipMITKSegmentationTYPE*)interpolated->GetData(); // pointer to pixel data
 
   int size = dim[xdim]*dim[ydim];
@@ -214,9 +214,9 @@ bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
     y = i / dim[xdim];
 
     //if (x == 0) std::cout << std::endl;
-      
+
     ipMITKSegmentationTYPE value = *p;
-   
+
     //if (value == 1) std::cout << "O"; else std::cout << ".";
 
     if ( (x >= pad[xdim]) && (x < ((signed) dim[xdim]-pad[xdim])) && (y >= pad[ydim]) && (y < ((signed) dim[ydim]-pad[ydim])) && (value != 1) )
@@ -226,7 +226,7 @@ bool mitkSegmentationInterpolationTestClass::TestInterpolation(int slicedim)
       return false;
     }
   }
- 
+
   std::cout << "  (II) Interpolation of a square figure works like expected (slicedim " << slicedim << ")" << std::endl;
   return true;
 }
@@ -237,7 +237,7 @@ bool mitkSegmentationInterpolationTestClass::DeleteInterpolator()
 
 // freeing
   m_Interpolator = NULL;
-    
+
   std::cout << "  (II) Freeing works." << std::endl;
   return true;
 }
@@ -249,7 +249,7 @@ bool mitkSegmentationInterpolationTestClass::LoadTestImages(std::string filename
 
   return ( m_ManualSlices.IsNotNull() && m_InterpolatedSlices.IsNotNull() );
 }
-    
+
 mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std::string& filename)
 {
   mitk::Image::Pointer image = NULL;
@@ -280,7 +280,7 @@ mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std
 
   return image;
 }
-          
+
 bool mitkSegmentationInterpolationTestClass::CompareInterpolationsToDefinedReference()
 {
   std::cout << "  (II) Setting segmentation volume... " << std::flush;
@@ -288,7 +288,7 @@ bool mitkSegmentationInterpolationTestClass::CompareInterpolationsToDefinedRefer
   m_Interpolator->SetSegmentationVolume( m_ManualSlices );
 
   std::cout << "OK" << std::endl;
-    
+
   std::cout << "  (II) Testing interpolation result for slice " << std::flush;
 
   for (unsigned int slice = 1; slice < 98; ++slice)

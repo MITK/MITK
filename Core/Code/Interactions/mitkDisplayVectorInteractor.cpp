@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( oper
 {
   /*DisplayCoordinateOperation* dcOperation = static_cast<DisplayCoordinateOperation*>(operation);
   if(dcOperation==NULL) return;
-  
+
   switch(operation->GetOperationType())
   {
   case OpSELECTPOINT:
@@ -37,16 +37,16 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( oper
     m_LastDisplayCoordinate=dcOperation->GetLastDisplayCoordinate();
     m_CurrentDisplayCoordinate=dcOperation->GetCurrentDisplayCoordinate();
 //    MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
-    
+
     MITK_INFO<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
-      << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate 
-      << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate 
-      << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate 
+      << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate
+      << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate
+      << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate
       << std::endl;
-    
+
     break;
   }*/
-  
+
 }
 
 float mitk::DisplayVectorInteractor::CanHandleEvent(const StateEvent *stateEvent) const
@@ -70,7 +70,7 @@ float mitk::DisplayVectorInteractor::CanHandleEvent(const StateEvent *stateEvent
 bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok=false;
-  
+
   const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
   if(posEvent==NULL) return false;
 
@@ -116,26 +116,26 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
       //make Operation
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-      
+
       //execute the Operation
       m_Destination->ExecuteOperation(&doOp);
       ok = true;
       break;
     }
   case AcFINISHMOVE:
-    {     
+    {
       ok = true;
       break;
     }
   case AcZOOM:
     {
       DisplayCoordinateOperation doOp(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition(),m_StartCoordinateInMM);
-            
+
       //make Operation
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
       //MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
-      
+
       //execute the Operation
       m_Destination->ExecuteOperation(&doOp);
       ok = true;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ namespace mitk
   */
   class MITK_TOFHARDWARE_EXPORT ToFImageGrabber : public mitk::ImageSource
   {
-  public: 
+  public:
 
     mitkClassMacro( ToFImageGrabber , ImageSource );
 
@@ -45,7 +45,6 @@ namespace mitk
 
     /*!
     \brief Establish a connection to the ToF camera
-    \param device specifies the actually used ToF Camera. 0: PMD O3D, 1: PMD CamCube 2.0
     */
     virtual bool ConnectCamera();
     /*!
@@ -53,7 +52,7 @@ namespace mitk
     */
     virtual bool DisconnectCamera();
     /*!
-    \brief Starts the continuous updating of the camera. 
+    \brief Starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
     virtual void StartCamera();
@@ -65,6 +64,10 @@ namespace mitk
     \brief Returns true if the camera is connected and started
     */
     virtual bool IsCameraActive();
+    /*!
+    \brief Returns true if the camera is connected
+    */
+    virtual bool IsCameraConnected();
     /*!
     \brief Sets the ToF device, the image grabber is grabbing the images from
     \param aToFCameraDevice device internally used for grabbing the images from the camera

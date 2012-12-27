@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -116,7 +116,7 @@ struct wiimote_state
       //    complex scenarios *
       float   Pitch;  // in degrees (-180 - +180)
       float   Roll;  // "
-      // float Yaw;  
+      // float Yaw;
       } Orientation;
     } Acceleration;
 
@@ -140,9 +140,9 @@ struct wiimote_state
       EXTENDED  = 0x03,  // 12 bytes
       FULL    = 0x05,  // 16 bytes * 2 (format unknown)
       };
-    
+
     mode  Mode;    // read-only (depends on ReportType set)
-    
+
     struct dot
       {
       bool     bVisible;  // other values are not valid if == false
@@ -198,7 +198,7 @@ struct wiimote_state
   struct joystick
     {
     friend class wiimote;
-    
+
     // raw unprocessed coordinates:
     float RawX, RawY;
 
@@ -267,7 +267,7 @@ struct wiimote_state
       inline  bool ZR      () const { return (Bits & _ZR)    != 0; }
       inline  bool TriggerL  () const { return (Bits & TRIG_L) != 0; }
       inline  bool TriggerR  () const { return (Bits & TRIG_R) != 0; }
-      
+
       // all 15 buttons stored as bits (set = pressed)
        WORD Bits;
 
@@ -321,7 +321,7 @@ struct wiimote_state
       float   TopR;
       float BottomL;
       float BottomR;
-      
+
       float Total; // sum of the 4 corner weights
       };
 
@@ -363,7 +363,7 @@ struct wiimote_state
     } MotionPlus;
 
   // ---- internal use only ----
-  protected: 
+  protected:
      unsigned WiimoteNearGUpdates;
      unsigned NunchukNearGUpdates;
 
@@ -372,7 +372,7 @@ struct wiimote_state
       joystick::deadzone nunchuk_deadzone,
                  classic_joyl_deadzone,
                  classic_joyr_deadzone;
-    
+
       // preserve the deadzone settings?
       if(!including_deadzones) {
         nunchuk_deadzone    = Nunchuk.Joystick.DeadZone;

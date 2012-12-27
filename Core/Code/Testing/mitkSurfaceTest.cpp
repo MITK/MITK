@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -54,7 +54,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   cloneSurface = surface->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData of cloned surface!");
   cloneSurface = NULL;
-  
+
     vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     polys->ComputeBounds();
     polys->GetBounds( bounds );
@@ -65,9 +65,9 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     mitk::BoundingBox::BoundsArrayType surfBounds = bb->GetBounds();
 
     bool passed = false;
-    if ( bounds[0] == surfBounds[0] && bounds[1] == surfBounds[1] 
-      && bounds[2] == surfBounds[2] && bounds[3] == surfBounds[3] 
-      && bounds[4] == surfBounds[4] && bounds[5] == surfBounds[5] ) 
+    if ( bounds[0] == surfBounds[0] && bounds[1] == surfBounds[1]
+      && bounds[2] == surfBounds[2] && bounds[3] == surfBounds[3]
+      && bounds[4] == surfBounds[4] && bounds[5] == surfBounds[5] )
     {
       passed = true;
     }
@@ -98,15 +98,15 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   surface->SetRequestedRegionToLargestPossibleRegion();
 
   passed = true;
-  for (int i=0;i<5;i++) 
+  for (int i=0;i<5;i++)
   {
     mitk::BoundingBox::BoundsArrayType surfBounds = (const_cast<mitk::BoundingBox*>(surface->GetTimeSlicedGeometry()->GetGeometry3D(i)->GetBoundingBox()))->GetBounds();
 
-    if ( boundsMat[i][0] != surfBounds[0] 
-    || boundsMat[i][1] != surfBounds[1] 
-    || boundsMat[i][2] != surfBounds[2] 
-    || boundsMat[i][3] != surfBounds[3] 
-    || boundsMat[i][4] != surfBounds[4] 
+    if ( boundsMat[i][0] != surfBounds[0]
+    || boundsMat[i][1] != surfBounds[1]
+    || boundsMat[i][2] != surfBounds[2]
+    || boundsMat[i][3] != surfBounds[3]
+    || boundsMat[i][4] != surfBounds[4]
     || boundsMat[i][5] != surfBounds[5] )
     {
       passed = false;
@@ -130,7 +130,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Update();
   surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
   sphereSource->Delete();
-  
+
   inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
   time = 3;
   timestep=0;
@@ -143,7 +143,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   dummy->Graft(surface);
   MITK_TEST_CONDITION_REQUIRED( dummy->GetVtkPolyData() != NULL, "Testing copying a Surface with Graft()!");
   MITK_TEST_CONDITION_REQUIRED( dummy->GetTimeSteps() == numberoftimesteps, "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps());
-  
+
   surface = NULL;
   MITK_TEST_CONDITION_REQUIRED( surface.IsNull(), "Testing destruction of surface!");
 

@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -53,7 +53,7 @@ void QtPlatformLogModel::slotFlushLogEntries()
   m_Mutex.unlock();
 
   int num = static_cast<int>(m_Pending->size());
-  
+
   if (num > 0)
   {
     int row = static_cast<int>(m_Entries.size());
@@ -61,7 +61,7 @@ void QtPlatformLogModel::slotFlushLogEntries()
     do {
       m_Entries.push_back(m_Pending->front());
       m_Pending->pop_front();
-      
+
 
 
     } while(--num);
@@ -77,7 +77,7 @@ void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
   m_Mutex.unlock();
 
   emit signalFlushLogEntries();
-  
+
 }
 
 void
@@ -87,7 +87,7 @@ QtPlatformLogModel::SetShowAdvancedFiels( bool showAdvancedFiels )
   {
     m_ShowAdvancedFiels = showAdvancedFiels;
     this->reset();
- 
+
   }
 }
 
@@ -111,13 +111,13 @@ QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
   addLogEntry(msg);
 }
 
-QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(parent), 
+QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(parent),
 m_ShowAdvancedFiels(false),
 m_ShowCategory(true)
 {
   m_Active=new std::list<ExtendedLogMessage>;
   m_Pending=new std::list<ExtendedLogMessage>;
-  connect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ), Qt::QueuedConnection );  
+  connect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ), Qt::QueuedConnection );
   Platform::GetEvents().logged += PlatformEventDelegate(this, &QtPlatformLogModel::addLogEntry);
   myBackend = new QtLogBackend(this);
 }
@@ -125,8 +125,8 @@ m_ShowCategory(true)
 QtPlatformLogModel::~QtPlatformLogModel()
 {
   disconnect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ));
-  
-  // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mbilog::UnregisterBackend is not threadsafe 
+
+  // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mbilog::UnregisterBackend is not threadsafe
   // will be fixed.
   //  delete myBackend;
   //  delete m_Active;
@@ -156,7 +156,7 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
   struct LogEntry {
     LogEntry(const std::string& msg, const std::string& src, std::time_t t)
     : message(msg.c_str()), moduleName(src.c_str()),time(std::clock())
-    { 
+    {
     }
 
     QString message;
@@ -168,23 +168,23 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
     QString moduleName;
     QString category;
     QString function;
-    
+
     LogEntry(const mbilog::LogMessage &msg)
     {
       message = msg.message.c_str();
-      
-                                                           
+
+
       filePath = msg.filePath;
-            
+
       std::stringstream out;
       out << msg.lineNumber;
       lineNumber = out.str().c_str();
-      
+
       moduleName = msg.moduleName;
       category = msg.category.c_str();
       function = msg.functionName;
-      
-      time=std::clock(); 
+
+      time=std::clock();
     }
   };        */
 
@@ -192,21 +192,21 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
 QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
 {
   const ExtendedLogMessage *msg = &m_Entries[index.row()];
-  
+
   if (role == Qt::DisplayRole)
     {
-    switch (index.column()) 
+    switch (index.column())
       {
       case 0:
         if (m_ShowAdvancedFiels) return msg->getTime();
         else return msg->getLevel();
-      case 1: 
+      case 1:
         if (m_ShowAdvancedFiels) return msg->getLevel();
         else return msg->getMessage();
-      case 2: 
+      case 2:
         if (m_ShowAdvancedFiels) return msg->getMessage();
-        else return msg->getCategory();    
-      case 3: 
+        else return msg->getCategory();
+      case 3:
         if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getCategory();
         else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getModuleName();
         else break;
@@ -214,20 +214,20 @@ QVariant QtPlatformLogModel::data(const QModelIndex& index, int role) const
         if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getModuleName();
         else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getFunctionName();
         else break;
-      case 5: 
+      case 5:
         if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getFunctionName();
         else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getPath();
         else break;
-      case 6: 
+      case 6:
         if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getPath();
         else if (m_ShowAdvancedFiels && !m_ShowCategory) return msg->getLine();
         else break;
-      case 7: 
+      case 7:
         if (m_ShowAdvancedFiels && m_ShowCategory) return msg->getLine();
         else break;
       }
     }
-   
+
   else if(  role == Qt::DecorationRole )
   {
     if ( (m_ShowAdvancedFiels && index.column()==1)
@@ -261,7 +261,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
   {
     if( m_ShowAdvancedFiels && m_ShowCategory )
     {
-      switch (section) 
+      switch (section)
       {
         case 0: return QVariant("Time");
         case 1: return QVariant("Level");
@@ -275,7 +275,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
     }
     else if (m_ShowAdvancedFiels && !m_ShowCategory)
     {
-      switch (section) 
+      switch (section)
       {
         case 0: return QVariant("Time");
         case 1: return QVariant("Level");
@@ -288,7 +288,7 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
     }
     else //!m_ShowAdvancedFiels, m_ShowCategory is not handled seperately because it only activates case 2
     {
-      switch (section) 
+      switch (section)
       {
         case 0: return QVariant("Level");
         case 1: return QVariant("Message");
@@ -321,7 +321,7 @@ QString QtPlatformLogModel::GetDataAsString()
         }
       returnValue += "\n";
       }
-    
+
     return returnValue;
     }
 

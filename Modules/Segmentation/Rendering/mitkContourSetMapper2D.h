@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,16 +28,16 @@ class BaseRenderer;
 class ContourSet;
 class BaseRenderer;
 
-/** 
- * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window 
- * 
- * 
+/**
+ * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
+ *
+ *
  * @ingroup Mapper
  */
 class Segmentation_EXPORT ContourSetMapper2D : public GLMapper2D
 {
 public:
-    
+
     mitkClassMacro(ContourSetMapper2D, Mapper2D);
 
     itkNewMacro(Self);
@@ -48,7 +48,7 @@ public:
     virtual void Paint(mitk::BaseRenderer * renderer);
 
     /**
-     * return a refernce of the rendered data object 
+     * return a refernce of the rendered data object
      */
     const mitk::ContourSet * GetInput(void);
 

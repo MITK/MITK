@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
 
   // one big variable to tell if anything went wrong
     unsigned int numberFailed(0);
- 
+
     std::cout << "Instantiation" << std::endl;
 
   // instantiation
@@ -51,7 +51,7 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
       std::cout << numberFailed << " test failed, and it's the ugliest one!" << std::endl;
       return EXIT_FAILURE;
     }
-   
+
   // add an allowed value to prop1, test if it is now valid for prop2, too
     prop1->AddEnum( NEW_ORGAN, prop1->Size() );
 
@@ -77,7 +77,7 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
     prop1 = NULL;
     std::cout << "  (II) Freeing works for first property." << std::endl;
     prop2 = NULL;
-      
+
     std::cout << "  (II) Freeing works for both properties." << std::endl;
 
     if (numberFailed > 0)

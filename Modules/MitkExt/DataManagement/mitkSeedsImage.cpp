@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ mitk::SeedsImage::~SeedsImage()
 {
 }
 
-void mitk::SeedsImage::Initialize() 
+void mitk::SeedsImage::Initialize()
 {
   Superclass::Initialize();
   m_Radius = 1;
@@ -51,13 +51,13 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
   for(unsigned int i=0; i<this->GetDimension(); i++)
     orig_size[i] = this->GetDimension(i);
 
-  mitk::DrawOperation * seedsOp = 
+  mitk::DrawOperation * seedsOp =
     dynamic_cast< mitk::DrawOperation * >( operation );
 
   if ( seedsOp != NULL )
   {
     m_DrawState = seedsOp->GetDrawState();
-  
+
     if (m_Radius != seedsOp->GetRadius())
     {
       m_Radius = seedsOp->GetRadius();
@@ -66,7 +66,7 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
     switch (operation->GetOperationType())
     {
     case mitk::OpADD:
-      { 
+      {
         m_Point = seedsOp->GetPoint();
         m_LastPoint = m_Point;
         AccessByItk(this, AddSeedPoint);
@@ -85,8 +85,8 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
         m_Point = seedsOp->GetPoint();
         m_LastPoint = m_Point;
         m_DrawState = 0;
-        
-        // todo - operation is not equal with its inverse operation - possible 
+
+        // todo - operation is not equal with its inverse operation - possible
         // approximation problems in the function PointInterpolation()
         m_Radius = m_Radius+4;
         AccessByItk(this, AddSeedPoint);
@@ -96,8 +96,8 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
       {
         m_Point = seedsOp->GetPoint();
         m_DrawState = 0;
-        
-        // todo - operation is not equal with its inverse operation - possible 
+
+        // todo - operation is not equal with its inverse operation - possible
         // approximation problems in the function PointInterpolation()
         m_Radius = m_Radius+4;
         AccessByItk(this, AddSeedPoint);
@@ -106,7 +106,7 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
         break;
       }
     }
-    
+
     //*todo has to be done here, cause of update-pipeline not working yet
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     //mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
@@ -118,7 +118,7 @@ void mitk::SeedsImage::ExecuteOperation(mitk::Operation* operation)
 
 template < typename SeedsImageType >
 void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
-{ 
+{
   typedef itk::NeighborhoodIterator< SeedsImageType >
     NeighborhoodIteratorType;
   typedef typename NeighborhoodIteratorType::IndexType IndexType;
@@ -139,7 +139,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   }
   nit.SetLocation( itkIndex );
 
-  
+
   unsigned int i;
   for ( i = 0; i < nit.Size(); ++i )
   {
@@ -167,7 +167,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
 
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
-  const unsigned int dimension = 
+  const unsigned int dimension =
     ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
 
   mitk::Point3D indexBegin, indexEnd;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
 
 bool mitk::PlanarCross::GetSingleLineMode() const
 {
-  mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >( 
+  mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
     this->GetProperty( "SingleLineMode" ).GetPointer() );
 
   if ( singleLineMode != NULL )
@@ -86,7 +86,7 @@ bool mitk::PlanarCross::ResetOnPointSelect()
 
   case 1:
     {
-      // Control point 0 or 1 selected: reset number of control points to two 
+      // Control point 0 or 1 selected: reset number of control points to two
       this->ResetNumberOfControlPoints( 2 );
       this->SelectControlPoint( 1 );
       return true;
@@ -140,18 +140,18 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
   // helps to respect both constraints from the superclass and from this class. Without this,
   // situations may occur where control points are constrained by the superclass, but again
   // moved out of the superclass bounds by the subclass, or vice versa.
-  
+
   unsigned int count = 0; // ensures stop of approach if point does not converge in reasonable time
   Point2D confinedPoint = point;
   Point2D superclassConfinedPoint;
-  do 
+  do
   {
     superclassConfinedPoint = Superclass::ApplyControlPointConstraints( index, confinedPoint );
     confinedPoint = this->InternalApplyControlPointConstraints( index, superclassConfinedPoint );
     ++count;
   } while ( (confinedPoint.EuclideanDistanceTo( superclassConfinedPoint ) > mitk::eps)
          && (count < 32) );
-  
+
   return confinedPoint;
 }
 
@@ -202,7 +202,7 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       const Point2D p1 = this->GetControlPoint( 0 );
       const Point2D p2 = this->GetControlPoint( 1 );
       const Point2D p3 = this->GetControlPoint( 2 );
-     
+
       // Calculate distance of original point from orthogonal line the corrected
       // point should lie on to project the point onto this line
       Vector2D n1 = p2 - p1;
@@ -308,7 +308,7 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   }
 }
 
-  
+
 void mitk::PlanarCross::EvaluateFeaturesInternal()
 {
   // Calculate length of first line

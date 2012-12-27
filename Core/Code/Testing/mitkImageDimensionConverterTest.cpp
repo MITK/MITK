@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,7 +56,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
   ///////////////////////////////////////
   // Create 2D Image with a 3D rotation from scratch.
-  typedef itk::Image<double,2> ImageType; 
+  typedef itk::Image<double,2> ImageType;
   ImageType::Pointer itkImage = ImageType::New();
   ImageType::RegionType myRegion;
   ImageType::SizeType mySize;
@@ -65,7 +65,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   mySpacing[0] = 1;
   mySpacing[1] = 1;
   myIndex[0] = 0;
-  myIndex[1] = 0; 
+  myIndex[1] = 0;
   mySize[0] = 50;
   mySize[1] = 50;
   myRegion.SetSize( mySize);
@@ -77,7 +77,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
   mitk::Image::Pointer mitkImage2D;
   mitk::CastToMitkImage(itkImage,mitkImage2D);
-  
+
   // rotate
   mitk::Point3D p;
   p[0] = 1;
@@ -128,7 +128,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // check if spacing is ok
   mitk::Vector3D Loaded2D_Spacing = imageLoaded2D->GetGeometry()->GetSpacing();
 
-  error = abs(Loaded2D_Spacing[0] - Original_Spacing[0]) + 
+  error = abs(Loaded2D_Spacing[0] - Original_Spacing[0]) +
      abs(Loaded2D_Spacing[1] - Original_Spacing[1]) +
      abs(Loaded2D_Spacing[2] - 1) ;
 
@@ -137,7 +137,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // Check origin
   mitk::Point3D Loaded2D_Origin = imageLoaded2D->GetGeometry()->GetOrigin();
 
-  error = abs(Loaded2D_Origin[0] - Original_Origin[0]) + 
+  error = abs(Loaded2D_Origin[0] - Original_Origin[0]) +
      abs(Loaded2D_Origin[1] - Original_Origin[1]) +
      abs(Loaded2D_Origin[2] - 0) ;
 
@@ -176,11 +176,11 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   mitk::Image::Pointer mitkImage3D = convertFilter->GetOutput();
 
   MITK_TEST_CONDITION_REQUIRED( mitkImage3D->GetDimension() == 3   , "Converted Image is Dimension 3");
-  
-  // check if geometry is still same  
+
+  // check if geometry is still same
   mitk::Vector3D Converted_Spacing = mitkImage3D->GetGeometry()->GetSpacing();
-  
-  error = abs(Converted_Spacing[0] - Original_Spacing[0]) + 
+
+  error = abs(Converted_Spacing[0] - Original_Spacing[0]) +
      abs(Converted_Spacing[1] - Original_Spacing[1]) +
      abs(Converted_Spacing[2] - Original_Spacing[2]) ;
 
@@ -189,7 +189,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
   mitk::Point3D Converted_Origin = mitkImage3D->GetGeometry()->GetOrigin();
 
-  error = abs(Converted_Origin[0] - Original_Origin[0]) + 
+  error = abs(Converted_Origin[0] - Original_Origin[0]) +
      abs(Converted_Origin[1] - Original_Origin[1]) +
      abs(Converted_Origin[2] - Original_Origin[2]) ;
 
@@ -222,7 +222,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
 
      MITK_TEST_CONDITION_REQUIRED( matrixIsEqual , "Compare Geometry: Matrix");
-    
+
 
      ///////////////////////////////////////
      // So far it seems good! now try to save and load the file
@@ -237,23 +237,23 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      imageReader->SetFileName(sstream2.str().c_str());
      imageReader->Update();
      mitk::Image::Pointer imageLoaded = imageReader->GetOutput();
-     
+
      // check if image can be loaded
      MITK_TEST_CONDITION_REQUIRED( imageLoaded.IsNotNull() , "Loading saved Image");
 
      // check if loaded image is still what it should be:
      MITK_TEST_CONDITION_REQUIRED( imageLoaded->GetDimension() == 3   , "Loaded Image is Dimension 3");
 
-     // check if geometry is still same  
+     // check if geometry is still same
      mitk::Vector3D Loaded_Spacing = imageLoaded->GetGeometry()->GetSpacing();
-     error = abs(Loaded_Spacing[0] - Original_Spacing[0]) + 
+     error = abs(Loaded_Spacing[0] - Original_Spacing[0]) +
         abs(Loaded_Spacing[1] - Original_Spacing[1]) +
         abs(Loaded_Spacing[2] - Original_Spacing[2]) ;
 
      MITK_TEST_CONDITION_REQUIRED( error < eps    , "Compare Geometry: Spacing");
 
      mitk::Point3D Loaded_Origin = imageLoaded->GetGeometry()->GetOrigin();
-     error = abs(Loaded_Origin[0] - Original_Origin[0]) + 
+     error = abs(Loaded_Origin[0] - Original_Origin[0]) +
         abs(Loaded_Origin[1] - Original_Origin[1]) +
         abs(Loaded_Origin[2] - Original_Origin[2]) ;
      MITK_TEST_CONDITION_REQUIRED( error < eps     , "Compare Geometry: Origin");

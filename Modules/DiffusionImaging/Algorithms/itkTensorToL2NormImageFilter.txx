@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,21 +51,21 @@ namespace itk
     unsigned long numPixels = outputRegionForThread.GetNumberOfPixels();
     unsigned long step = numPixels/100;
     unsigned long progress = 0;
-  
+
     IteratorOutputType itOut(this->GetOutput(), outputRegionForThread);
     IteratorInputType  itIn(this->GetInput(), outputRegionForThread);
 
     if( threadId==0 )
       this->UpdateProgress (0.0);
-    
+
     while(!itOut.IsAtEnd())
     {
       if( this->GetAbortGenerateData() )
         throw itk::ProcessAborted(__FILE__,__LINE__);
-      
-      
+
+
       OutputPixelType out = static_cast<OutputPixelType>( 0.0 ); // be careful, overload in MedINRIA
-      
+
       InputPixelType T = itIn.Get();
 
       if ( !(T[0]==0 && T[1]==0 && T[2]==0 && T[3]==0 && T[4]==0 && T[5]==0) )
@@ -74,26 +74,26 @@ namespace itk
           + T[1]*T[2]*2.0 + T[2]*T[4]*2.0 + T[1]*T[4]*2.0;
         out = static_cast<OutputPixelType>( vcl_sqrt( sum ));
       }
-              
+
       if( threadId==0 && step>0)
-      {        
+      {
         if( (progress%step)==0 )
           this->UpdateProgress ( double(progress)/double(numPixels) );
       }
 
-      
+
       itOut.Set (out);
       ++progress;
       ++itOut;
       ++itIn;
-      
+
     }
 
     if( threadId==0 )
       this->UpdateProgress (1.0);
-    
+
   }
-  
-  
+
+
 
 } // end of namespace

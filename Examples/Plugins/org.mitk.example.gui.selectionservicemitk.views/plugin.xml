@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.listenerviewmitk"
+      name="Selection Listener"
+      icon="resources/selectionListenerIcon.png"
+      class="ListenerViewMitk">
+    </view>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.selectionviewmitk"
+      name="Selection Provider"
+      icon="resources/selectionProviderIcon.png"
+      class="SelectionViewMitk">
+    </view>
+  </extension>
+
+</plugin>

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,16 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /*!
-  \brief This class creates a transform for a rigid registration process.  
+  \brief This class creates a transform for a rigid registration process.
 
-  This class will e.g. be instantiated by mitkImageRegistrationMethod and a 
-  transform corresponding to the integer value stored in mitkTransformParameters 
+  This class will e.g. be instantiated by mitkImageRegistrationMethod and a
+  transform corresponding to the integer value stored in mitkTransformParameters
   will be created. Therefore SetTransformParameters() has to be called with an instance
   of mitkTransformParameters, which holds all parameter informations for the new
   transformation.
 
   GetTransform() returns the transform which then can be used in combination with a
-  metric, an optimizer and an interpolator within a registration pipeline. 
+  metric, an optimizer and an interpolator within a registration pipeline.
 
 
   \ingroup RigidRegistration
@@ -47,7 +47,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(TransformFactory, itk::Object);
-  
+
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
 
@@ -63,7 +63,7 @@ namespace mitk {
     typedef typename TransformType::Pointer TransformPointer;
 
     /**
-    \brief Returns the transform which then can be used in combination with a metric, an optimizer 
+    \brief Returns the transform which then can be used in combination with a metric, an optimizer
     and an interpolator within a registration pipeline.
     */
     TransformPointer GetTransform( );

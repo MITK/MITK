@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,14 +34,14 @@ class QmitkExt_EXPORT QmitkToolGUIArea : public QWidget
   Q_OBJECT
 
   public:
-    
-	QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
+
+  QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
   virtual ~QmitkToolGUIArea();
 
   signals:
 
   public slots:
-  
+
   protected slots:
 
   protected:

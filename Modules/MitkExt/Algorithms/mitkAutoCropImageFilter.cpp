@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -58,7 +58,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   typedef typename InternalImageType::Pointer   InternalImagePointer;
 
   typedef itk::RegionOfInterestImageFilter < InternalImageType, InternalImageType > ROIFilterType;
-  typedef typename itk::RegionOfInterestImageFilter < InternalImageType, InternalImageType >::Pointer ROIFilterPointer; 
+  typedef typename itk::RegionOfInterestImageFilter < InternalImageType, InternalImageType >::Pointer ROIFilterPointer;
 
   InternalImagePointer outputItk = InternalImageType::New();
 
@@ -146,7 +146,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
     memcpy(dimensions+3, input->GetDimensions()+3, (dimension-3)*sizeof(unsigned int));
-  
+
   // create basic slicedGeometry that will be initialized below
   output->Initialize(mitk::PixelType( GetOutputPixelType() ), dimension, dimensions);
   delete [] dimensions;
@@ -167,7 +167,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // get the PlaneGeometry for the first slice of the original image
   mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>( inputGeometry->GetGeometry2D( 0 )->Clone().GetPointer() );
   assert( plane );
-  
+
   // re-initialize the plane according to the new requirements:
   // dimensions of the cropped image
   // right- and down-vector as well as spacing do not change, so use the ones from
@@ -271,7 +271,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
   {
     // Check if a 3D or 4D image is present
     unsigned int timeSteps = 1;
-    if (inputMitk->GetDimension() == 4 ) 
+    if (inputMitk->GetDimension() == 4 )
       timeSteps = inputMitk->GetDimension(3);
 
     ImageType::IndexType minima,maxima;

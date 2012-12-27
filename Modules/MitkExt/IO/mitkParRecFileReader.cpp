@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,25 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 
 #ifdef __GNUC__
-#define stricmp strcasecmp 
+#define stricmp strcasecmp
 #endif
 
 void mitk::ParRecFileReader::GenerateOutputInformation()
 {
   mitk::Image::Pointer output = this->GetOutput();
-  
+
   if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
     return;
-  
+
   itkDebugMacro(<<"Reading PAR file for GenerateOutputInformation()" << m_FileName);
-  
+
   // Check to see if we can read the file given the name or prefix
   //
   if ( m_FileName == "" && m_FilePrefix == "" )
   {
     throw itk::ImageFileReaderException(__FILE__, __LINE__, "One of FileName or FilePrefix must be non-empty");
   }
-  
+
   m_RecFileName = "";
   if( m_FileName != "")
   {
@@ -66,7 +66,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     mitk::Vector3D thickness; thickness.Fill(1.0);
     mitk::Vector3D gap; gap.Fill(0.0);
     mitk::Vector3D spacing;
-    
+
     FILE *f;
     f=fopen(m_FileName.c_str(), "r");
     if(f!=NULL)
@@ -154,7 +154,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         spacing=thickness+gap;
       }
     }
-    
+
     if( headerRead == false)
     {
       itk::ImageFileReaderException e(__FILE__, __LINE__);
@@ -165,7 +165,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
       throw e;
       return;
     }
-    
+
     // define types
     mitk::PixelType SCType = mitk::MakeScalarPixelType<signed char>();
     mitk::PixelType SSType = mitk::MakeScalarPixelType<signed short>();
@@ -180,21 +180,21 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     //output->GetSlicedGeometry()->SetGeometry2D(mitk::Image::BuildStandardPlaneGeometry2D(output->GetSlicedGeometry(), dimensions).GetPointer(), 0);
     output->GetSlicedGeometry()->SetEvenlySpaced();
   }
-  
+
   m_ReadHeaderTime.Modified();
 }
 
 void mitk::ParRecFileReader::GenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
-  
+
   // Check to see if we can read the file given the name or prefix
   //
   if ( m_RecFileName == "" )
   {
     throw itk::ImageFileReaderException(__FILE__, __LINE__, "FileName for rec-file empty");
   }
-  
+
   if( m_RecFileName != "")
   {
     FILE *f = fopen(m_RecFileName.c_str(), "r");
@@ -212,7 +212,7 @@ void mitk::ParRecFileReader::GenerateData()
     zmax=zstart+output->GetRequestedRegion().GetSize(2);
     tmax=tstart+output->GetRequestedRegion().GetSize(3);
 
-    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8;    
+    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8;
     void *data = malloc(sliceSize);
 
     bool ignore4Dtopogram=false;
@@ -238,7 +238,7 @@ void mitk::ParRecFileReader::GenerateData()
     //{
     //  for(;z<zmax;++z)
     //  {
-    //    fseek(f,sliceSize*z,SEEK_SET);          
+    //    fseek(f,sliceSize*z,SEEK_SET);
     //    fread(data, sliceSize, 1, f);
     //    output->SetSlice(data,z,0,0);
     //  }
@@ -249,7 +249,7 @@ void mitk::ParRecFileReader::GenerateData()
   }
 }
 
-bool mitk::ParRecFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+bool mitk::ParRecFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
 {
   // First check the extension
   if(  filename == "" )

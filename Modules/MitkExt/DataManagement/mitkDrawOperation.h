@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ class MitkExt_EXPORT DrawOperation : public Operation
   //## @param point is the information of the seedpoint to add to the seedsimage
   //## @param last_point is the information of the point added before
   //## @param draw_state represents the seeds type e.g foreground or background seeds
-  //## @param radius is the radius of seeds 
+  //## @param radius is the radius of seeds
   DrawOperation(OperationType operationType,  Point3D point, Point3D last_point, int draw_state, int radius);
 
   virtual ~DrawOperation();

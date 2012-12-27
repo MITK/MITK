@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ namespace mitk {
   \sa ExtractImageFilter
   \sa OverwriteSliceImageFilter
   \sa OverwriteDirectedPlaneImageFilter
-  
+
   \ingroup Process
   \ingroup Reliver
 
@@ -60,19 +60,19 @@ public:
     itkNewMacro(Self);
 
     /**
-      \brief Set macro for the current worldgeometry 
-      
-      \a Parameter The current wordgeometry that describes the position (rotation, translation) 
-         of the plane (and therefore the slice to be extracted) in our 3D(+t) image 
+      \brief Set macro for the current worldgeometry
+
+      \a Parameter The current wordgeometry that describes the position (rotation, translation)
+         of the plane (and therefore the slice to be extracted) in our 3D(+t) image
     */
     itkSetMacro(CurrentWorldGeometry2D, Geometry3D* );
 
     itkSetMacro(ImageGeometry, Geometry3D* );
 
     /**
-      \brief Set macro for the current timestep 
-      
-      \a Parameter The timestep of the image from which the slice shall be extracted 
+      \brief Set macro for the current timestep
+
+      \a Parameter The timestep of the image from which the slice shall be extracted
     */
     itkSetMacro(ActualInputTimestep, int);
 

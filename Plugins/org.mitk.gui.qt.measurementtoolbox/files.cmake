@@ -1,5 +1,5 @@
 set(SRC_CPP_FILES
-  
+
 )
 
 set(INTERNAL_CPP_FILES
@@ -20,7 +20,7 @@ set(MOC_H_FILES
   src/internal/QmitkImageStatisticsView.h
   src/internal/QmitkImageStatisticsCalculationThread.h
   src/internal/mitkPluginActivator.h
-  
+
 )
 
 set(CACHED_RESOURCE_FILES

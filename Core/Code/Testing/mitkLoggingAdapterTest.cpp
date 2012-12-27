@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ItkLoggingTestClass : public itk::Object
   {
-  public: 
+  public:
 
     mitkClassMacro( ItkLoggingTestClass , itk::Object );
     itkNewMacro( ItkLoggingTestClass );
@@ -31,14 +31,14 @@ class ItkLoggingTestClass : public itk::Object
       {
       itkWarningMacro("Test ITK Warning message");
       }
-   
+
   };
 
 /** @brief This test tests all logging adapters of MITK. */
 class LoggingAdapterTestClass
 {
-public: 
-  
+public:
+
   static void TestVtkLoggingWithoutAdapter()
     {
     MITK_TEST_OUTPUT(<<"Testing vtk logging without adapter class: a separate window should open and display the logging messages.")

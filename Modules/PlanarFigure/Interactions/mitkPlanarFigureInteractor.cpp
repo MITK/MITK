@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -136,7 +136,7 @@ bool mitk::PlanarFigureInteractor
   bool ok = false;
 
   // Check corresponding data; has to be sub-class of mitk::PlanarFigure
-  mitk::PlanarFigure *planarFigure = 
+  mitk::PlanarFigure *planarFigure =
     dynamic_cast< mitk::PlanarFigure * >( m_DataNode->GetData() );
 
   if ( planarFigure == NULL )
@@ -162,7 +162,7 @@ bool mitk::PlanarFigureInteractor
   mitk::Geometry2D *planarFigureGeometry =
     dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
 
-  // Get the Geometry2D of the window the user interacts with (for 2D point 
+  // Get the Geometry2D of the window the user interacts with (for 2D point
   // projection)
   mitk::BaseRenderer *renderer = NULL;
   const Geometry2D *projectionPlane = NULL;
@@ -377,7 +377,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint( positionEvent, planarFigure );
+      m_LastPointWasValid = IsMousePositionAcceptableAsNewControlPoint( stateEvent, planarFigure );
       if (m_LastPointWasValid)
       {
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
@@ -418,8 +418,8 @@ bool mitk::PlanarFigureInteractor
 
       // TODO: check segement of polyline we clicked in
       int nextIndex = -1;
-      
-      // We only need to check which position to insert the control point 
+
+      // We only need to check which position to insert the control point
       // when interacting with a PlanarPolygon. For all other types
       // new control points will always be appended
 
@@ -691,7 +691,7 @@ bool mitk::PlanarFigureInteractor
       {
         planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
       }
-  
+
       planarFigure->InvokeEvent( ContextMenuPlanarFigureEvent() );
       ok = true;
 
@@ -780,7 +780,7 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(
 {
   // Extract world position, and from this position on geometry, if
   // available
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -828,7 +828,7 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
 
 bool mitk::PlanarFigureInteractor::IsPointNearLine(
   const mitk::Point2D& point,
-  const mitk::Point2D& startPoint, 
+  const mitk::Point2D& startPoint,
   const mitk::Point2D& endPoint,
   mitk::Point2D& projectedPoint
   ) const
@@ -848,7 +848,7 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
   if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
-      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0 
+      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0
       || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
   {
     return true;
@@ -866,7 +866,7 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   Point2D& pointProjectedOntoLine ) const
 {
   // Extract display position
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -933,7 +933,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   const DisplayGeometry *displayGeometry ) const
 {
   // Extract display position
-  const mitk::PositionEvent *positionEvent = 
+  const mitk::PositionEvent *positionEvent =
     dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
   if ( positionEvent == NULL )
   {
@@ -983,7 +983,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
 }
 
 
-void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities( 
+void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
   const PlanarFigure *planarFigure )
 {
   MITK_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();
@@ -996,12 +996,12 @@ void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
 
 bool
 mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
-    const PositionEvent* positionEvent,
+    mitk::StateEvent const * stateEvent,
     const PlanarFigure* planarFigure )
 {
-  assert(positionEvent && planarFigure);
+  assert(stateEvent && planarFigure);
 
-  BaseRenderer* renderer = positionEvent->GetSender();
+  BaseRenderer* renderer = stateEvent->GetEvent()->GetSender();
 
   assert(renderer);
 
@@ -1009,31 +1009,57 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
   int timeStep( renderer->GetTimeStep( planarFigure ) );
 
   // Get current display position of the mouse
-  Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
+  //Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
 
   // Check if a previous point has been set
   bool tooClose = false;
+
+  const Geometry2D *renderingPlane = renderer->GetCurrentWorldGeometry2D();
+
+  mitk::Geometry2D *planarFigureGeometry =
+    dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
+
+  Point2D point2D, correctedPoint;
+  // Get the point2D from the positionEvent
+  if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
+    planarFigureGeometry ) )
+  {
+    return false;
+  }
+
+  // apply the controlPoint constraints of the planarFigure to get the
+  // coordinates that would actually be used.
+  correctedPoint = const_cast<PlanarFigure*>( planarFigure )->ApplyControlPointConstraints( 0, point2D );
+
+  // map the 2D coordinates of the new point to world-coordinates
+  // and transform those to display-coordinates
+  mitk::Point3D newPoint3D;
+  planarFigureGeometry->Map( correctedPoint, newPoint3D );
+  mitk::Point2D newDisplayPosition;
+  renderingPlane->Map( newPoint3D, newDisplayPosition );
+  renderer->GetDisplayGeometry()->WorldToDisplay( newDisplayPosition, newDisplayPosition );
+
 
   for( int i=0; i < (int)planarFigure->GetNumberOfControlPoints(); i++ )
   {
     if ( i != planarFigure->GetSelectedControlPoint() )
     {
       // Try to convert previous point to current display coordinates
-      mitk::Geometry2D *planarFigureGeometry =
-        dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
-
-      const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
-
       mitk::Point3D previousPoint3D;
+      // map the 2D coordinates of the control-point to world-coordinates
       planarFigureGeometry->Map( planarFigure->GetControlPoint( i ), previousPoint3D );
+
       if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
       {
         mitk::Point2D previousDisplayPosition;
-        projectionPlane->Map( previousPoint3D, previousDisplayPosition );
+        // transform the world-coordinates into display-coordinates
+        renderingPlane->Map( previousPoint3D, previousDisplayPosition );
         renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
 
-        double a = currentDisplayPosition[0] - previousDisplayPosition[0];
-        double b = currentDisplayPosition[1] - previousDisplayPosition[1];
+        //Calculate the distance. We use display-coordinates here to make
+        // the check independent of the zoom-level of the rendering scene.
+        double a = newDisplayPosition[0] - previousDisplayPosition[0];
+        double b = newDisplayPosition[1] - previousDisplayPosition[1];
 
         // If point is to close, do not set a new point
         tooClose = (a * a + b * b < m_MinimumPointDistance );

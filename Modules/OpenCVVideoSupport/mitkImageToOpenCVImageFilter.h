@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ namespace mitk
     typedef itk::RGBPixel< float > FloatRGBPixelType;
     typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
-    template <typename TPixel, unsigned int VImageDimension> 
+    template <typename TPixel, unsigned int VImageDimension>
     static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer = true );
 
     mitkClassMacro(ImageToOpenCVImageFilter, itk::Object);
@@ -135,12 +135,12 @@ namespace mitk
 
     unsigned int x = 0,y = 0;
     CvScalar s;
-    for ( it.GoToBegin(); !it.IsAtEnd(); ++it ) 
+    for ( it.GoToBegin(); !it.IsAtEnd(); ++it )
     {
       s.val[0] = it.Value().GetBlue();
       s.val[1] = it.Value().GetGreen();
       s.val[2] = it.Value().GetRed();
-      
+
       //MITK_DEBUG << "[" << x << "," << y << "] " << s.val[0] << "(B)," << s.val[1] << "(G)," << s.val[2] << "(R)";
 
       cvSet2D(m_OpenCVImage,y,x,s);

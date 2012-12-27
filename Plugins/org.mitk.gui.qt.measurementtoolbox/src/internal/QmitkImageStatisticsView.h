@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,15 +24,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStepperAdapter.h"
 #include "QmitkImageStatisticsCalculationThread.h"
 
-// mitk includes 
+// mitk includes
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkILifecycleAwarePart.h"
 #include "mitkPlanarLine.h"
 
 /*!
-\brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes 
+\brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
        are supported: 1. Statistics of one image, 2. Statistics of an image and a segmentation, 3. Statistics
-       of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the 
+       of an image and a Planar Figure. The statistics calculation is realized in a seperate thread to keep the
        gui accessable during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
@@ -66,16 +66,16 @@ public:
   /*!
   \brief method for creating the connections of main and control widget */
   virtual void CreateConnections();
-  /*! 
+  /*!
   \brief  not implemented*/
   //bool IsExclusiveFunctionality() const;
-  /*! 
+  /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
 
   static const std::string VIEW_ID;
 
-public slots: 
+public slots:
     /** \brief  Called when the statistics update is finished, sets the results to GUI.*/
     void OnThreadedStatisticsCalculationEnds();
 
@@ -133,7 +133,7 @@ protected:
 
   void NodeRemoved(const mitk::DataNode *node);
 
-  // member variables 
+  // member variables
   Ui::QmitkImageStatisticsViewControls *m_Controls;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
 
@@ -152,7 +152,7 @@ protected:
   long m_PlanarFigureObserverTag;
 
   SelectedDataNodeVectorType m_SelectedDataNodes;
-  
+
   bool m_CurrentStatisticsValid;
   bool m_StatisticsUpdatePending;
   bool m_StatisticsIntegrationPending;

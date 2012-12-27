@@ -38,7 +38,7 @@ class ActivatorSL3 :
 public:
 
   ActivatorSL3() : tracker(0), context(0) {}
-  
+
   ~ActivatorSL3()
   { delete tracker; }
 
@@ -51,18 +51,10 @@ public:
     tracker = new FooTracker(context, this);
     tracker->Open();
   }
-  
+
   void Unload(ModuleContext* /*context*/)
   {
     tracker->Close();
-
-#ifndef US_BUILD_SHARED_LIBS
-    if (sr)
-    {
-      sr.Unregister();
-      sr = 0;
-    }
-#endif
   }
 
   const ModulePropsInterface::Properties& GetProperties() const
@@ -79,12 +71,12 @@ public:
     fooService->foo();
     return fooService;
   }
-  
+
   void ModifiedService(const ServiceReference& /*reference*/, FooService* /*service*/)
   {
-  
+
   }
-  
+
   void RemovedService(const ServiceReference& reference, FooService* /*service*/)
   {
     props["serviceRemoved"] = true;
@@ -101,7 +93,7 @@ private:
 
   ModulePropsInterface::Properties props;
 
-}; 
+};
 
 US_END_NAMESPACE
 

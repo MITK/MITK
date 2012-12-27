@@ -2,7 +2,7 @@ if(BUILD_TESTING)
 
 #package testing
   if(NOT MITK_FAST_TESTING)
-    
+
     # package testing in windows only for release
     if(WIN32)
       add_test(NAME mitkPackageTest CONFIGURATIONS Release

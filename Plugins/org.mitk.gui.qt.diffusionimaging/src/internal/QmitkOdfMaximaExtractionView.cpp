@@ -1,23 +1,23 @@
-/*=========================================================================
+/*===================================================================
 
- Program:   Medical Imaging & Interaction Toolkit
- Language:  C++
- Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
- Version:   $Revision: 21975 $
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
- =========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 //misc
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <QFileDialog>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -38,6 +38,7 @@
 #include <itkVectorImage.h>
 #include <itkOdfMaximaExtractionFilter.h>
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
+#include <itkMrtrixPeakImageConverter.h>
 #include <itkFslPeakImageConverter.h>
 #include <itkFslShCoefficientImageConverter.h>
 #include <itkDiffusionTensorPrincipalDirectionImageFilter.h>
@@ -74,6 +75,7 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_ConvertFromFsl, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaksFromFsl()));
         connect((QObject*) m_Controls->m_ConvertShFromFsl, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertShCoeffsFromFsl()));
+        connect((QObject*) m_Controls->m_MrtrixPeaks, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaksFromMrtrix()));
     }
 }
 
@@ -270,6 +272,65 @@ void QmitkOdfMaximaExtractionView::ConvertPeaksFromFsl()
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
         QString name(m_ImageNodes.at(i)->GetName().c_str());
+        name += "_Direction";
+        name += QString::number(i+1);
+        node->SetName(name.toStdString().c_str());
+        GetDataStorage()->Add(node);
+    }
+}
+
+void QmitkOdfMaximaExtractionView::ConvertPeaksFromMrtrix()
+{
+    if (m_ImageNodes.empty())
+        return;
+
+    typedef itk::Image< float, 4 > ItkImageType;
+    typedef itk::MrtrixPeakImageConverter< float > FilterType;
+    FilterType::Pointer filter = FilterType::New();
+
+    // cast to itk
+    mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(0)->GetData());
+    mitk::Geometry3D::Pointer geom = mitkImg->GetGeometry();
+    typedef mitk::ImageToItk< FilterType::InputImageType > CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput(mitkImg);
+    caster->Update();
+    FilterType::InputImageType::Pointer itkImg = caster->GetOutput();
+
+    filter->SetInputImage(itkImg);
+    filter->GenerateData();
+
+    mitk::Vector3D outImageSpacing = geom->GetSpacing();
+    float maxSpacing = 1;
+    if(outImageSpacing[0]>outImageSpacing[1] && outImageSpacing[0]>outImageSpacing[2])
+        maxSpacing = outImageSpacing[0];
+    else if (outImageSpacing[1] > outImageSpacing[2])
+        maxSpacing = outImageSpacing[1];
+    else
+        maxSpacing = outImageSpacing[2];
+
+    mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+    directions->SetGeometry(geom);
+    DataNode::Pointer node = DataNode::New();
+    node->SetData(directions);
+    QString name(m_ImageNodes.at(0)->GetName().c_str());
+    name += "_VectorField";
+    node->SetName(name.toStdString().c_str());
+    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
+    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
+    GetDataStorage()->Add(node);
+
+    typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
+    DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
+    for (int i=0; i<container->Size(); i++)
+    {
+        ItkDirectionImage3DType::Pointer itkImg = container->GetElement(i);
+        mitk::Image::Pointer img = mitk::Image::New();
+        img->InitializeByItk( itkImg.GetPointer() );
+        img->SetVolume( itkImg->GetBufferPointer() );
+        DataNode::Pointer node = DataNode::New();
+        node->SetData(img);
+        QString name(m_ImageNodes.at(0)->GetName().c_str());
         name += "_Direction";
         name += QString::number(i+1);
         node->SetName(name.toStdString().c_str());
@@ -557,7 +618,6 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
         break;
     }
 
-    filter->SetUseAdaptiveStepWidth(true);
     filter->GenerateData();
 
     ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();

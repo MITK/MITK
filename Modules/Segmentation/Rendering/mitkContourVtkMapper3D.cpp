@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,7 +62,7 @@ mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
 
   if(m_Contour)
     m_Contour->Delete();
-  
+
   if(m_Actor)
     m_Actor->Delete();
 }
@@ -170,7 +170,7 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
-  
+
   SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 

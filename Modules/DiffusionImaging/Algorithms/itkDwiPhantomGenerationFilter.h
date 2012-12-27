@@ -24,8 +24,9 @@
 #include <mitkFiberBundleX.h>
 
 namespace itk{
-/** \class DwiPhantomGenerationFilter
- */
+
+/**
+* \brief Generation of synthetic diffusion weighted images using a second rank tensor model.   */
 
 template< class TOutputScalarType >
 class DwiPhantomGenerationFilter : public ImageSource< itk::VectorImage<TOutputScalarType,3> >
@@ -64,21 +65,21 @@ public:
     void SetTensorDirection(std::vector< vnl_vector_fixed<double, 3> > directionList){m_TensorDirection = directionList;}
 
     // input parameters
-    itkSetMacro( BValue, float )
-    itkSetMacro( SignalScale, float )
-    itkSetMacro( NoiseVariance, double )
-    itkSetMacro( GreyMatterAdc, float )
-    itkSetMacro( Spacing, mitk::Vector3D )
-    itkSetMacro( Origin, mitk::Point3D )
-    itkSetMacro( DirectionMatrix, MatrixType )
-    itkSetMacro( ImageRegion, ImageRegion<3> )
-    itkSetMacro( SimulateBaseline, bool )
+    itkSetMacro( BValue, float )                ///< signal parameter
+    itkSetMacro( SignalScale, float )           ///< scaling factor for signal
+    itkSetMacro( NoiseVariance, double )        ///< variance of rician noise
+    itkSetMacro( GreyMatterAdc, float )         ///< ADC of isotropic diffusion tensor
+    itkSetMacro( Spacing, mitk::Vector3D )      ///< parameter of output image
+    itkSetMacro( Origin, mitk::Point3D )        ///< parameter of output image
+    itkSetMacro( DirectionMatrix, MatrixType )  ///< parameter of output image
+    itkSetMacro( ImageRegion, ImageRegion<3> )  ///< parameter of output image
+    itkSetMacro( SimulateBaseline, bool )       ///< generate baseline image values as the l2 norm of the corresponding tensor used for the diffusion signal generation
 
     // output
-    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
-    itkGetMacro( SNRImage, ItkFloatImgType::Pointer)
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
+    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< contains one vectorimage for each input ROI
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< contains number of directions per voxel
+    itkGetMacro( SNRImage, ItkFloatImgType::Pointer)                            ///< contains local SNR values
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< output vector field
 
     protected:
     DwiPhantomGenerationFilter();
@@ -93,36 +94,36 @@ private:
     mitk::Point3D                                   m_Origin;
     itk::Matrix<double, 3, 3>                       m_DirectionMatrix;
     ImageRegion<3>                                  m_ImageRegion;
-    ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;
-    ItkUcharImgType::Pointer                        m_NumDirectionsImage;
-    ItkFloatImgType::Pointer                        m_SNRImage;
-    mitk::FiberBundleX::Pointer                     m_OutputFiberBundle;
+    ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;  ///< contains one vectorimage for each input ROI
+    ItkUcharImgType::Pointer                        m_NumDirectionsImage;       ///< contains number of directions per voxel
+    ItkFloatImgType::Pointer                        m_SNRImage;                 ///< contains local SNR values
+    mitk::FiberBundleX::Pointer                     m_OutputFiberBundle;        ///< output vector field
 
     // signal regions
-    std::vector< ItkUcharImgType::Pointer >         m_SignalRegions;
-    std::vector< float >                            m_TensorFA;
-    std::vector< float >                            m_TensorADC;
-    std::vector< float >                            m_TensorWeight;
-    std::vector< vnl_vector_fixed<double, 3> >      m_TensorDirection;
+    std::vector< ItkUcharImgType::Pointer >         m_SignalRegions;    ///< binary images defining the regions for the signal generation
+    std::vector< float >                            m_TensorFA;         ///< kernel tensor parameter
+    std::vector< float >                            m_TensorADC;        ///< kernel tensor parameter
+    std::vector< float >                            m_TensorWeight;     ///< weight factor of the signal
+    std::vector< vnl_vector_fixed<double, 3> >      m_TensorDirection;  ///< principal direction of the kernel tensor in the different ROIs
 
     // signal related variable
-    GradientListType                                m_GradientList;
-    std::vector< itk::DiffusionTensor3D<float> >    m_TensorList;
-    float                                           m_BValue;
-    float                                           m_SignalScale;
+    GradientListType                                m_GradientList;     ///< list of used diffusion gradient directions
+    std::vector< itk::DiffusionTensor3D<float> >    m_TensorList;       ///< kernel tensor rotated in the different directions
+    float                                           m_BValue;           ///< signal parameter
+    float                                           m_SignalScale;      ///< scaling factor for signal
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
-    int                                             m_BaselineImages;
-    double                                          m_MaxBaseline;
-    double                                          m_MeanBaseline;
-    double                                          m_NoiseVariance;
-    float                                           m_GreyMatterAdc;
-    bool                                            m_SimulateBaseline;
-    TOutputScalarType                               m_DefaultBaseline;
+    int                                             m_BaselineImages;   ///< number of simulated baseline images
+    double                                          m_MaxBaseline;      ///< maximum value of the baseline image
+    double                                          m_MeanBaseline;     ///< mean value of the baseline image
+    double                                          m_NoiseVariance;    ///< variance of rician noise
+    float                                           m_GreyMatterAdc;    ///< ADC of isotropic diffusion tensor
+    bool                                            m_SimulateBaseline; ///< generate baseline image values as the l2 norm of the corresponding tensor used for the diffusion signal generation
+    TOutputScalarType                               m_DefaultBaseline;  ///< default value for baseline image
 
     double GetTensorL2Norm(itk::DiffusionTensor3D<float>& T);
-    void GenerateTensors();
+    void GenerateTensors();     ///< rotates kernel tensor in the direction of the input direction vectors
     typename OutputImageType::PixelType SimulateMeasurement(itk::DiffusionTensor3D<float>& tensor, float weight);
-    void AddNoise(typename OutputImageType::PixelType& pix);
+    void AddNoise(typename OutputImageType::PixelType& pix);    ///< Adds rician noise to the input pixel
 };
 
 }

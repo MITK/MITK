@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 
 /*!
-\brief QmitkConnectomicsDataView 
+\brief QmitkConnectomicsDataView
 
 This view provides functionality for the generation of networks. Either from parcellation and fiber bundle or synthetically.
 
@@ -38,12 +38,12 @@ This view provides functionality for the generation of networks. Either from par
 \ingroup Functionalities
 */
 class QmitkConnectomicsDataView : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-public:  
+public:
 
   static const std::string VIEW_ID;
 
@@ -60,7 +60,7 @@ public:
     /// \brief Align two images by copying the geometry
     void OnNetworkifyPushButtonClicked();
 
-    /// \brief Create synthetic networks 
+    /// \brief Create synthetic networks
     void OnSyntheticNetworkCreationPushButtonClicked();
 
     /// \brief Adjust parameters depending on synthetic network type

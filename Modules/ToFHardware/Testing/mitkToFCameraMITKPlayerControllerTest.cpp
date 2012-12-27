@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -64,7 +64,7 @@ void ReadFileFormatTestCase(std::string extension, mitk::ToFImageGrabber::Pointe
   testImage->Initialize( FloatType, 3, dim);
   testImage->SetVolume(data);
 
-  // save image as dist, ampl and inten image to file. 
+  // save image as dist, ampl and inten image to file.
   std::string distanceImageFileName("distTestImage");
   std::string amplitudeImageFileName("amplTestImage");
   std::string intensityImageFileName("intenTestImage");
@@ -81,7 +81,7 @@ void ReadFileFormatTestCase(std::string extension, mitk::ToFImageGrabber::Pointe
   writer->SetFileName(intensityImageFileName);
   writer->Update();
 
-  // load the files from directory 
+  // load the files from directory
 
   grabber->SetStringProperty("DistanceImageFileName", (distanceImageFileName.append(extension)).c_str());
   grabber->SetStringProperty("AmplitudeImageFileName", (amplitudeImageFileName.append(extension)).c_str());

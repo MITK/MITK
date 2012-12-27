@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
   Q_OBJECT
 
   //#CTORS/DTOR
-  public:    
+  public:
     ///
     /// \brief Ctor for an empty combobox. Use setDataStorage and setPredicate afterwards.
     ///
@@ -68,16 +68,16 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual int Find( const mitk::DataNode* _DataNode ) const;
 
-  //#PUBLIC GETTER  
+  //#PUBLIC GETTER
   public:
     ///
     /// \brief Get the DataStorage this ComboBox listens to.
     ///
-    mitk::DataStorage::Pointer GetDataStorage() const;    
+    mitk::DataStorage::Pointer GetDataStorage() const;
     ///
     /// \brief Return the predicate (may be NULL) that is responsible for the _DataNode selection of this ComboBox.
     ///
-    const mitk::NodePredicateBase::ConstPointer GetPredicate() const;     
+    const mitk::NodePredicateBase::ConstPointer GetPredicate() const;
     ///
     /// \brief Returns the _DataNode at Index index or 0 if the index is out of bounds.
     ///
@@ -89,7 +89,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Returns all nodes that are stored in this combobox.
     ///
-    mitk::DataStorage::SetOfObjects::ConstPointer GetNodes() const;   
+    mitk::DataStorage::SetOfObjects::ConstPointer GetNodes() const;
     ///
     /// Returns the AutoSelectNewItems.
     /// \see SetAutoSelectNewItems
@@ -107,7 +107,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Set the predicate for this ComboBox. (QmitkDataStorageComboBox is now owner of the predicate)
     ///
     /// If predicate is NULL all nodes will be selected. If predicate changes the whole combobox will be resetted.
-    void SetPredicate(const mitk::NodePredicateBase* _Predicate); 
+    void SetPredicate(const mitk::NodePredicateBase* _Predicate);
     ///
     /// Adds a node to the ComboBox. Gets called everytime a DataStorage Add Event was thrown.
     ///
@@ -121,7 +121,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual void RemoveNode(const mitk::DataNode* _DataNode);
     ///
-    /// Set a _DataNode in the ComboBox at the specified index (if the index exists).    
+    /// Set a _DataNode in the ComboBox at the specified index (if the index exists).
     /// Internally the method just calls RemoveNode(unsigned int)
     ///
     virtual void SetNode(int index, const mitk::DataNode* _DataNode);
@@ -139,7 +139,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual void OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
 
-   
+
 
   signals:
     ///
@@ -147,7 +147,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     void OnSelectionChanged(const mitk::DataNode*);
 
-    
+
   //#PROTECTED GETTER
   protected:
     ///

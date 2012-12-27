@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,7 +66,7 @@ namespace mitk
 class QmitkMeasurementView : public QmitkAbstractView
 {
   Q_OBJECT
-  
+
   public:
 
     static const std::string VIEW_ID;
@@ -76,7 +76,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void CreateQtPartControl(QWidget* parent);
     void SetFocus();
 
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, 
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
       const QList<mitk::DataNode::Pointer> &nodes);
 
     void NodeAdded(const mitk::DataNode* node);

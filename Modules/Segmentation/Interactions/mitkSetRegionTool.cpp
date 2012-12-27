@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
   if ( workingSlice.IsNull() ) return false; // can't do anything without the segmentation
- 
+
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
   itk::Index<2> projectedPointIn2D;
@@ -78,7 +78,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
     return false; // can't use that as a seed point
   }
-  
+
     // Convert to ipMITKSegmentationTYPE (because ipMITKSegmentationGetContour8N relys on that data type)
     itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
     CastToItkImage( workingSlice, correctPixelTypeImage );
@@ -110,17 +110,17 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     MITK_ERROR << "Memory offset calculation if mitk::SetRegionTool has some serious flaw! Aborting.." << std::endl;
     return false;
   }
-  
+
   // 2. Determine the contour that surronds the selected "piece of the image"
-  
+
   // find a contour seed point
   unsigned int oneContourOffset = static_cast<unsigned int>( m_SeedPointMemoryOffset ); // safe because of earlier check if m_SeedPointMemoryOffset < 0
 
-  /** 
+  /**
     * The logic of finding a starting point for the contour is the following:
-    * 
+    *
     *  - If the initial seed point is 0, we are either inside a hole or outside of every segmentation.
-    *    We move to the right until we hit a 1, which must be part of a contour. 
+    *    We move to the right until we hit a 1, which must be part of a contour.
     *
     *  - If the initial seed point is 1, then ...
     *    we now do the same (running to the right) until we hit a 1
@@ -159,7 +159,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       {
         inSeg = true; // first iteration lands here
       }
-      
+
     }
     oneContourOffset = lastValidPixel;
   }
@@ -175,15 +175,15 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     m_FillContour = false;
     return false;
   }
-  
+
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
   //MITK_INFO << "getting contour from offset " << oneContourOffset << " ("<<oneContourOffset%originalPicSlice->n[0]<<","<<oneContourOffset/originalPicSlice->n[0]<<")"<<std::endl;
   float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-  
+
   //MITK_INFO << "contourPoints " << contourPoints << " (N="<<numberOfContourPoints<<")"<<std::endl;
   assert(contourPoints == NULL || numberOfContourPoints > 0);
-    
+
   bool cursorInsideContour = ipMITKSegmentationIsInsideContour( contourPoints, numberOfContourPoints, projectedPointIn2D[0], projectedPointIn2D[1]);
 
   // decide if contour should be filled or not
@@ -191,7 +191,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
   if (m_FillContour)
   {
-    // copy point from float* to mitk::Contour 
+    // copy point from float* to mitk::Contour
     Contour::Pointer contourInImageIndexCoordinates = Contour::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
@@ -208,14 +208,14 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
-    
+
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
 
   // always generate a second contour, containing the whole image (used when CTRL is pressed)
   {
-    // copy point from float* to mitk::Contour 
+    // copy point from float* to mitk::Contour
     Contour::Pointer contourInImageIndexCoordinates = Contour::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
@@ -232,7 +232,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
-    
+
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
@@ -247,15 +247,15 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
-  
+
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-  
+
   if (!m_FillContour && !m_StatusFillWholeSlice) return true;
-  
+
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -289,12 +289,12 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 }
 
 /**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0. 
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
 */
 bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
 {
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
-  
+
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
@@ -304,7 +304,7 @@ bool mitk::SetRegionTool::OnInvertLogic(Action* action, const StateEvent* stateE
     if (m_SegmentationContourInWorldCoordinates.IsNotNull())
       FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-  } 
+  }
   else
   {
     // use some artificial contour

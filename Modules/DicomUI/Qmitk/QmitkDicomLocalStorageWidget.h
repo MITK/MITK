@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 
 /*!
-\brief QmitkDicomLocalStorageWidget 
+\brief QmitkDicomLocalStorageWidget
 
 \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -42,12 +42,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 \ingroup Functionalities
 */
 class MITK_DICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
-{  
+{
     // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
-public:  
+public:
 
     static const std::string Widget_ID;
 

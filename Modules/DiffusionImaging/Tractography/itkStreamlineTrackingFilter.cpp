@@ -197,6 +197,8 @@ template< class TTensorPixelType, class TPDPixelType>
 void StreamlineTrackingFilter< TTensorPixelType, TPDPixelType>
 ::CalculateNewPosition(itk::ContinuousIndex<double, 3>& pos, vnl_vector_fixed<double,3>& dir, typename InputImageType::IndexType& index)
 {
+    vnl_matrix_fixed< double, 3, 3 > rot = m_InputImage->GetDirection().GetTranspose();
+    dir = rot*dir;
     if (true)
     {
         dir *= m_StepSize;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ namespace mitk {
     * @brief static New method to use SmartPointer
     **/
     mitkNewMacro1Param(Self, int);
-    
+
     /**
     * @brief Adds a property to the list of properties.
     **/
@@ -54,7 +54,7 @@ namespace mitk {
     **/
     mitk::BaseProperty* GetProperty( const char *propertyKey ) const;
 
-  protected: 
+  protected:
     /**
     * @brief Default Constructor.
     * Set the actionId.

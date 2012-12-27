@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ void QmitkNumberPropertyView::initialize()
   //setDecimalPlaces(-1); // unlimited
   setDecimalPlaces(2);
 }
-    
+
 short QmitkNumberPropertyView::decimalPlaces() const
 {
   return m_DecimalPlaces;
@@ -77,17 +77,17 @@ short QmitkNumberPropertyView::decimalPlaces() const
 void QmitkNumberPropertyView::setDecimalPlaces(short places)
 {
   m_DecimalPlaces = places;
-  
+
 //  if (m_DecimalPlaces >= 0)
 //  {
-//    m_FormatString = "%%.%if";  
+//    m_FormatString = "%%.%if";
 //    m_FormatString.sprintf(QString(m_FormatString), m_DecimalPlaces); // do copy before sprintf
 //  }
 //  else
 //  {
-//    m_FormatString = "%g";  
+//    m_FormatString = "%g";
 //  }
-  
+
   DisplayNumber();
 }
 
@@ -123,7 +123,7 @@ void QmitkNumberPropertyView::setShowPercent(bool show)
     m_DisplayFactor = 1.0;
     setSuffix("");
   }
-  
+
   //DisplayNumber(); // gets called in setSuffix
 }
 
@@ -145,10 +145,10 @@ void QmitkNumberPropertyView::DisplayNumber()
   QTextStream stream(&displayedText);
 
   stream.setRealNumberPrecision(m_DecimalPlaces);
-  
+
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();
@@ -177,7 +177,7 @@ void QmitkNumberPropertyView::DisplayNumber()
     default:
       break;
   }
-    
+
   setText( displayedText );
 }
 

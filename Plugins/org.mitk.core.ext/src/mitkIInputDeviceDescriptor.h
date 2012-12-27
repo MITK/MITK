@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -70,7 +70,7 @@ namespace mitk
     /**
     * Returns the name of this input device.
     *
-    * @return the name 
+    * @return the name
     */
     virtual std::string GetName() const = 0;
 
@@ -82,8 +82,8 @@ namespace mitk
     /**
     * Equals this class with the given parameter.
     *
-    * @param object 
-    *			the object for the equation
+    * @param object
+    *      the object for the equation
     * @return true, if the objects are equal :: false, if they differ in any way
     */
     virtual bool operator==(const Object* object) const = 0;

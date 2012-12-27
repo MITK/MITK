@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,28 +47,28 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   this->m_SeedIndex[2]=0;
   this->m_MeasurementFrame.set_identity();
   this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image and a Mask Image
-  
-  
+
+
   m_ClockPtr = RealTimeClock::New();
   this->m_RandomGenerator.reseed( ((unsigned long) this->m_ClockPtr->GetTimeStamp()) );
   //load in default sample directions
   this->LoadDefaultSampleDirections();
-} 
+}
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
 ::~StochasticTractographyFilter(){
   delete this->m_A;
   delete this->m_Aqr;
-} 
+}
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
-::ProbabilisticallyInterpolate( vnl_random& randomgenerator, 
+::ProbabilisticallyInterpolate( vnl_random& randomgenerator,
   const TractType::ContinuousIndexType& cindex,
   typename InputDWIImageType::IndexType& index){
-                      
+
   for(int i=0; i<3; i++){
     if ((vcl_ceil(cindex[i]+vnl_math::eps)-cindex[i]) < randomgenerator.drand64())
        index[i]=(int)vcl_ceil(cindex[i]);
@@ -82,18 +82,18 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::UpdateGradientDirections(void){
   //the gradient direction is transformed into IJK space
   //by moving into the image space and then to IJK space
-  
+
   this->m_TransformedGradients = GradientDirectionContainerType::New();
   unsigned int N = this->m_Gradients->Size();
   for(unsigned int i=0; i<N; i++){
-    GradientDirectionContainerType::Element g_i = 
+    GradientDirectionContainerType::Element g_i =
       this->m_MeasurementFrame *
       this->m_Gradients->GetElement(i);
-    
+
     /** The correction to LPS space is not neccessary as of itk 3.2 **/
     //g_i[0] = -g_i[0];
     //g_i[1] = -g_i[1];
-    g_i = this->GetInput()->GetDirection().GetInverse() * g_i;  
+    g_i = this->GetInput()->GetDirection().GetInverse() * g_i;
     this->m_TransformedGradients->InsertElement(i, g_i);
   }
 }
@@ -109,16 +109,16 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   //number of rows of the matrix depends on the number of inputs,
   //i.e. the number of measurements of the voxel (n)
   unsigned int N = this->m_TransformedGradients->Size();
-  
+
   if(this->m_A!=NULL)
     delete this->m_A;
   this->m_A = new vnl_matrix< double >(N, 7); //potential memory leak here
   vnl_matrix< double >& A = *(this->m_A);
-  
+
   for(unsigned int j=0; j< N ; j++){
     GradientDirectionContainerType::Element g = m_TransformedGradients->GetElement(j);
     const bValueType&  b_i = m_bValues->GetElement(j);
-    
+
     A(j,0)=1.0;
     A(j,1)=-1*b_i*(g[0]*g[0]);
     A(j,2)=-1*b_i*(g[1]*g[1]);
@@ -127,7 +127,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
     A(j,5)=-1*b_i*(2*g[0]*g[2]);
     A(j,6)=-1*b_i*(2*g[1]*g[2]);
   }
-  
+
   //Store a QR decomposition to quickly estimate
   //the weighing matrix for each voxel
   if(this->m_Aqr!=NULL)
@@ -141,36 +141,36 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::CalculateTensorModelParameters( const DWIVectorImageType::PixelType& dwivalues,
   vnl_diag_matrix<double>& W,
   TensorModelParamType& tensormodelparams){
-  
+
   unsigned  int N = this->m_TransformedGradients->Size();
-  
+
   //setup const references for code clarity
   const vnl_matrix< double >& A = *(this->m_A);
   const vnl_qr< double >& Aqr = *(this->m_Aqr);
-  
+
   //vnl_vector is used because the itk vector is limited in its methods and does not
   //contain an internal vnl class like VariableSizematrix
   //also itk_matrix has methods which are compatible with vnl_vectors
   vnl_vector< double > logPhi( N );
-  
+
   for(unsigned int j=0; j< N ; j++){
     //fill up the logPhi vector using log(dwi) values
     logPhi.put(j, vcl_log(static_cast<double>(dwivalues[j]) + vnl_math::eps));
   }
-  
+
   /** Find WLS estimate of the parameters of the Tensor model **/
-  
+
   // First estimate W by LS estimation of the intensities
   //vnl_matrix< double > Q = Aqr.Q();
   //vnl_vector< double > QtB = Aqr.Q().transpose()*logPhi;
   //vnl_vector< double > QTB = Aqr.QtB(logPhi);
-  //vnl_matrix< double > R = Aqr.R(); 
+  //vnl_matrix< double > R = Aqr.R();
   W = A* vnl_qr< double >(Aqr.R()).solve(Aqr.QtB(logPhi));
-  //W = A * Aqr.solve(logPhi);  
+  //W = A * Aqr.solve(logPhi);
   for(vnl_diag_matrix< double >::iterator i = W.begin();i!=W.end(); i++){
     *i = vcl_exp( *i );
   }
-  
+
   // Now solve for parameters using the estimated weighing matrix
   tensormodelparams = vnl_qr< double >((W*A).transpose()*W*A).solve(
     (W*A).transpose()*W*logPhi);
@@ -182,8 +182,8 @@ template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class T
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
 ::CalculateConstrainedModelParameters( const TensorModelParamType& tensormodelparams,
-    ConstrainedModelParamType& constrainedmodelparams){          
-              
+    ConstrainedModelParamType& constrainedmodelparams){
+
   vnl_sym_matrix< double > D( 3, 0 );
   double alpha =0;
   double beta=0;
@@ -197,9 +197,9 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   D(2,0) = tensormodelparams[5];
   D(2,1) = tensormodelparams[6];
   D(2,2) = tensormodelparams[3];
-  
+
   //pass through the no gradient intensity Z_0 and
-  //calculate alpha, beta and v hat (the eigenvector 
+  //calculate alpha, beta and v hat (the eigenvector
   //associated with the largest eigenvalue)
   vnl_matrix_fixed< double, 3, 3 > S(0.0);
   vnl_vector_fixed< double, 3 > Lambda(0.0);
@@ -207,25 +207,25 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
     vnl_vector_fixed< double, 3 >, vnl_matrix_fixed< double, 3, 3 > >
     eigensystem( 3 );
   eigensystem.ComputeEigenValuesAndVectors( D, Lambda, S );
-  
+
   //need to take abs to get rid of negative eigenvalues
   alpha = (vcl_abs(Lambda[0]) + vcl_abs(Lambda[1])) / 2;
   beta = vcl_abs(Lambda[2]) - alpha;
-  
+
   constrainedmodelparams[0] = tensormodelparams[0];
   constrainedmodelparams[1] = alpha;
   constrainedmodelparams[2] = beta;
   constrainedmodelparams[3] = S[2][0];
   constrainedmodelparams[4] = S[2][1];
-  constrainedmodelparams[5] = S[2][2];                  
+  constrainedmodelparams[5] = S[2][2];
 }
-              
+
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
 ::CalculateNoiseFreeDWIFromConstrainedModel( const ConstrainedModelParamType& constrainedmodelparams,
     DWIVectorImageType::PixelType& noisefreedwi){
-    
+
   unsigned int N = this->m_TransformedGradients->Size();
   const double& z_0 = constrainedmodelparams[0];
   const double& alpha = constrainedmodelparams[1];
@@ -233,15 +233,15 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   TractOrientationContainerType::Element v_hat( constrainedmodelparams[3],
     constrainedmodelparams[4],
     constrainedmodelparams[5]);
-  
+
   for(unsigned int i=0; i < N ; i++ ){
     const double& b_i = this->m_bValues->GetElement(i);
-    const GradientDirectionContainerType::Element& g_i = 
+    const GradientDirectionContainerType::Element& g_i =
       this->m_TransformedGradients->GetElement(i);
-    
+
     noisefreedwi.SetElement(i,
       vcl_exp(z_0-(alpha*b_i+beta*b_i*vnl_math_sqr(dot_product(g_i, v_hat)))));
-  }     
+  }
 }
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
@@ -252,11 +252,11 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
     const vnl_diag_matrix< double >& W,
     const unsigned int numberofparameters,
     double& residualvariance){
-    
+
   unsigned int N = this->m_TransformedGradients->Size();
-  
+
   residualvariance=0;
-  
+
   /** Not sure if we should be taking difference of log or nonlog intensities **/
   /** residual variance is too low if we take the difference of log intensities **/
   /** perhaps using WLS will correct this problem **/
@@ -264,14 +264,14 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
     residualvariance+=vnl_math_sqr(W(i,i) * (vcl_log(noisydwi[i]/noisefreedwi[i])));
   residualvariance/=(N-numberofparameters);
 }
-                                 
+
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
-::CalculateLikelihood( const DWIVectorImageType::PixelType &dwipixel, 
+::CalculateLikelihood( const DWIVectorImageType::PixelType &dwipixel,
     TractOrientationContainerType::ConstPointer orientations,
     ProbabilityDistributionImageType::PixelType& likelihood){
-    
+
   unsigned int N = this->m_TransformedGradients->Size();
   TensorModelParamType tensorparams( 0.0 );
   vnl_diag_matrix< double > W(N,0);
@@ -279,49 +279,49 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   DWIVectorImageType::PixelType noisefreedwi(N);
   double residualvariance=0;
   double jointlikelihood=1;
-  
+
   CalculateTensorModelParameters( dwipixel, W, tensorparams );
   CalculateConstrainedModelParameters( tensorparams, constrainedparams );
   CalculateNoiseFreeDWIFromConstrainedModel( constrainedparams, noisefreedwi );
   CalculateResidualVariance( dwipixel, noisefreedwi, W, 6, residualvariance );
-  
+
   for(unsigned int i=0; i < orientations->Size(); i++){
     /** Vary the entry corresponding to the estimated
       Tract orientation over the selected sample directions,
       while preserving the best estimate for the other parameters **/
     TractOrientationContainerType::Element currentdir = orientations->GetElement(i);
-    
+
     /** Incorporate the current sample direction into the secondary parameters **/
     constrainedparams[3]=currentdir[0];
     constrainedparams[4]=currentdir[1];
     constrainedparams[5]=currentdir[2];
-    
+
     /** Obtain the estimated
       intensity for this choice of Tract direction **/
     CalculateNoiseFreeDWIFromConstrainedModel(constrainedparams, noisefreedwi);
-    
+
     jointlikelihood = 1.0;
     for(unsigned int j=0; j<N; j++){
       /** Calculate the likelihood given the residualvariance,
         estimated intensity and the actual intensity (refer to Friman) **/
-      jointlikelihood *= 
+      jointlikelihood *=
         (noisefreedwi[j]/vcl_sqrt(2*vnl_math::pi*residualvariance))*
           vcl_exp(-vnl_math_sqr(noisefreedwi[j]*vcl_log(dwipixel[j]/noisefreedwi[j]))/
                 (2*residualvariance));
     }
-    likelihood[i]=jointlikelihood;  
+    likelihood[i]=jointlikelihood;
   }
 }
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
-::CalculatePrior( TractOrientationContainerType::Element v_prev, 
+::CalculatePrior( TractOrientationContainerType::Element v_prev,
     TractOrientationContainerType::ConstPointer orientations,
     ProbabilityDistributionImageType::PixelType& prior ){
-    
+
   const double gamma = 1;
-          
+
   for(unsigned int i=0; i < orientations->Size(); i++){
     if(v_prev.squared_magnitude()==0){
       prior[i]=1.0;
@@ -344,7 +344,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::CalculatePosterior( const ProbabilityDistributionImageType::PixelType& likelihood,
     const ProbabilityDistributionImageType::PixelType& prior,
     ProbabilityDistributionImageType::PixelType& posterior){
-    
+
     double sum=0;
     for(unsigned int i=0; i<likelihood.Size(); i++){
       sum+=likelihood[i]*prior[i];
@@ -357,24 +357,24 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
 void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
-::SampleTractOrientation( vnl_random& randomgenerator, 
+::SampleTractOrientation( vnl_random& randomgenerator,
     const ProbabilityDistributionImageType::PixelType& posterior,
     TractOrientationContainerType::ConstPointer orientations,
     TractOrientationContainerType::Element& choosendirection ){
-    
+
       double randomnum = randomgenerator.drand64();
       int i=0;
       double cumsum=0;
-      
+
       //will crash in the unlikely case that 0 was choosen as the randomnum
       while(cumsum < randomnum){
         cumsum+=posterior[i];
         i++;
       }
       choosendirection = orientations->GetElement(i-1);
-      
+
       //std::cout<< "cumsum: " << cumsum<<std::endl;
-      //std::cout<<"selected orientation:( " << (i-1) 
+      //std::cout<<"selected orientation:( " << (i-1)
       //  <<") "<<choosendirection<< std::endl;
 }
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
@@ -398,35 +398,35 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   typename InputDWIImageType::IndexType seedindex,
   unsigned long randomseed,
   TractType::Pointer tract){
-  
+
   TractType::ContinuousIndexType cindex_curr = seedindex;
   typename InputDWIImageType::IndexType index_curr = {{0,0,0}};
-  ProbabilityDistributionImageType::PixelType 
-      prior_curr(this->m_SampleDirections->Size()); 
-  ProbabilityDistributionImageType::PixelType 
+  ProbabilityDistributionImageType::PixelType
+      prior_curr(this->m_SampleDirections->Size());
+  ProbabilityDistributionImageType::PixelType
       posterior_curr(this->m_SampleDirections->Size());
   TractOrientationContainerType::Element v_curr(0,0,0);
   TractOrientationContainerType::Element v_prev(0,0,0);
-  
+
   tract->Initialize();
   vnl_random randomgenerator(randomseed);
   //std::cout<<randomseed<<std::endl;
-  
+
   for(unsigned int j=0; j<this->m_MaxTractLength; j++){
     this->ProbabilisticallyInterpolate( randomgenerator, cindex_curr, index_curr );
-    
+
     if(!dwiimagePtr->GetLargestPossibleRegion().IsInside(index_curr)){
       break;
     }
-    
+
     if( FiberExistenceTest( randomgenerator, wmpimagePtr, index_curr ) ){
       tract->AddVertex(cindex_curr);
-      
+
       this->CalculatePrior( v_prev, this->m_SampleDirections, prior_curr);
-      
+
       const ProbabilityDistributionImageType::PixelType&
         cachelikelihood_curr = this->AccessLikelihoodCache(index_curr);
-                              
+
       if( cachelikelihood_curr.GetSize() != 0){
         //use the cached direction
         this->CalculatePosterior( cachelikelihood_curr, prior_curr, posterior_curr);
@@ -434,7 +434,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
       else{
         //do the likelihood calculation and discard
         //std::cout<<"Cache Miss!\n";
-        ProbabilityDistributionImageType::PixelType 
+        ProbabilityDistributionImageType::PixelType
           likelihood_curr_temp(this->m_SampleDirections->Size());
 
         this->CalculateLikelihood(static_cast< DWIVectorImageType::PixelType >(
@@ -445,7 +445,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
       }
       this->SampleTractOrientation(randomgenerator, posterior_curr,
         this->m_SampleDirections, v_curr);
-      
+
       //takes into account voxels of different sizes
       //converts from a step length of 1 mm to the corresponding length in IJK space
       const typename InputDWIImageType::SpacingType& spacing = dwiimagePtr->GetSpacing();
@@ -468,17 +468,17 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::GenerateTractContainerOutput(){
   //allocate tractcontainer
   this->m_OutputTractContainer = TractContainerType::New();
-  
+
   this->UpdateGradientDirections();
   this->UpdateTensorModelFittingMatrices();
   this->m_TotalDelegatedTracts = 0;
-  
+
   //calculate the number of voxels to cache from Megabyte memory size limit
-  ProbabilityDistributionImageType::PixelType 
+  ProbabilityDistributionImageType::PixelType
     element(this->GetSampleDirections()->Size());
-  unsigned long elementsize = sizeof(ProbabilityDistributionImageType::PixelType) + 
+  unsigned long elementsize = sizeof(ProbabilityDistributionImageType::PixelType) +
     sizeof(double)*element.Size();
-  this->m_MaxLikelihoodCacheElements = 
+  this->m_MaxLikelihoodCacheElements =
     (this->m_MaxLikelihoodCacheSize*1048576)/elementsize;
   std::cout << "MaxLikelhoodCacheElements: "
     << this->m_MaxLikelihoodCacheElements
@@ -490,11 +490,11 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   this->GetMultiThreader()->SetSingleMethod( StochasticTractGenerationCallback,
     &data );
   this->GetMultiThreader()->SetNumberOfThreads(this->GetNumberOfThreads());
-  std::cout<<"Number of Threads: " << this->GetMultiThreader()->GetNumberOfThreads() << std::endl; 
+  std::cout<<"Number of Threads: " << this->GetMultiThreader()->GetNumberOfThreads() << std::endl;
   //start the multithreaded execution
   this->GetMultiThreader()->SingleMethodExecute();
-  std::cout<< "CurrentLikelihoodCacheElements: " << 
-    this->m_CurrentLikelihoodCacheElements << std::endl; 
+  std::cout<< "CurrentLikelihoodCacheElements: " <<
+    this->m_CurrentLikelihoodCacheElements << std::endl;
 }
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
@@ -503,17 +503,17 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::GenerateData(){
   //Generate the tracts
   this->GenerateTractContainerOutput();
-  
+
   //allocate outputs
   this->AllocateOutputs();
-  
+
   //write tracts to output image
   this->TractContainerToConnectivityMap(this->m_OutputTractContainer);
 
 }
 
 template< class TInputDWIImage, class TInputWhiteMatterProbabilityImage, class TOutputConnectivityImage >
-ITK_THREAD_RETURN_TYPE 
+ITK_THREAD_RETURN_TYPE
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
 ::StochasticTractGenerationCallback( void *arg )
 {
@@ -522,22 +522,22 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
       (((MultiThreader::ThreadInfoStruct *)(arg))->UserData);
 
   typename InputDWIImageType::ConstPointer inputDWIImagePtr = str->Filter->GetInput();
-  typename InputWhiteMatterProbabilityImageType::ConstPointer inputWMPImage = 
+  typename InputWhiteMatterProbabilityImageType::ConstPointer inputWMPImage =
     str->Filter->GetWhiteMatterProbabilityImageInput();
 
   unsigned long randomseed=0;
-  
+
   while(str->Filter->DelegateTract(randomseed)){
     //std::cout<<randomseed<<std::endl;
     //generate the tract
     TractType::Pointer tract = TractType::New();
-    
+
     str->Filter->StochasticTractGeneration( inputDWIImagePtr,
       inputWMPImage,
       str->Filter->GetSeedIndex(),
       randomseed,
       tract);
-    
+
     //only store tract if it is of nonzero length
     if( tract->GetVertexList()->Size() > 4 ){
       //std::cout<<"Storing tract\n";
@@ -556,11 +556,11 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::AccessLikelihoodCache( typename InputDWIImageType::IndexType index )
 {
   this->m_LikelihoodCacheMutexImagePtr->GetPixel(index).Lock();
-  
-  ProbabilityDistributionImageType::PixelType& likelihood = 
+
+  ProbabilityDistributionImageType::PixelType& likelihood =
     m_LikelihoodCachePtr->GetPixel( index );
   typename InputDWIImageType::ConstPointer inputDWIImagePtr = this->GetInput();
-  
+
   if( likelihood.GetSize() !=0){
     //entry found in cache
     this->m_LikelihoodCacheMutexImagePtr->GetPixel(index).Unlock();
@@ -576,7 +576,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
       this->m_SampleDirections,
       likelihood);
     this->m_CurrentLikelihoodCacheElements++;
-    
+
     this->m_LikelihoodCacheMutexImagePtr->GetPixel(index).Unlock();
     return likelihood;
   }
@@ -608,7 +608,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   }
   else success = false; //all tracts have been delegated
   this->m_TotalDelegatedTractsMutex.Unlock();
-  
+
   return success;
 }
 
@@ -621,18 +621,18 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   outputPtr->FillBuffer(0);
 
   typedef PathIterator< OutputConnectivityImageType, TractType > OutputTractIteratorType;
-  
+
   for(unsigned int i=0; i<tractcontainer->Size(); i++ ){
     TractType::Pointer tract = tractcontainer->GetElement(i);
     //std::cout<< tract->EndOfInput() <<std::endl;
     OutputTractIteratorType outputtractIt( outputPtr,
       tract );
-      
+
     for(outputtractIt.GoToBegin(); !outputtractIt.IsAtEnd(); ++outputtractIt){
     /* there is an issue using outputtractIt.Value() */
 //      outputtractIt.Set(outputtractIt.Get()+1);
- 
-      
+
+
     }
   }
 }
@@ -642,7 +642,7 @@ void
 StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage, TOutputConnectivityImage >
 ::StoreTract(TractType::Pointer tract){
     this->m_OutputTractContainerMutex.Lock();
-    this->m_OutputTractContainer->InsertElement( 
+    this->m_OutputTractContainer->InsertElement(
       this->m_OutputTractContainer->Size(),
       tract);
     this->m_OutputTractContainerMutex.Unlock();
@@ -654,33 +654,33 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 ::GenerateTensorImageOutput(void){
   this->UpdateGradientDirections();
   this->UpdateTensorModelFittingMatrices();
-  
+
   //allocate the tensor image
   this->m_OutputTensorImage = OutputTensorImageType::New();
   m_OutputTensorImage->CopyInformation( this->GetInput() );
   m_OutputTensorImage->SetBufferedRegion( this->GetInput()->GetBufferedRegion() );
   m_OutputTensorImage->SetRequestedRegion( this->GetInput()->GetRequestedRegion() );
   m_OutputTensorImage->Allocate();
-  
+
   //define an iterator for the input and output images
   typedef itk::ImageRegionConstIterator< InputDWIImageType > DWIImageIteratorType;
   typedef itk::ImageRegionIterator< OutputTensorImageType > TensorImageIteratorType;
-  
-  DWIImageIteratorType 
+
+  DWIImageIteratorType
   inputDWIit( this->GetInput(), m_OutputTensorImage->GetRequestedRegion() );
-  
+
   TensorImageIteratorType outputtensorit
     ( m_OutputTensorImage, m_OutputTensorImage->GetRequestedRegion() );
-  
+
   unsigned int N = this->m_TransformedGradients->Size();
   TensorModelParamType tensormodelparams( 0.0 );
   vnl_diag_matrix< double > W(N,0);
-  
+
   for(inputDWIit.GoToBegin(), outputtensorit.GoToBegin();
     !outputtensorit.IsAtEnd(); ++inputDWIit, ++outputtensorit){
     CalculateTensorModelParameters( inputDWIit.Get(),
       W, tensormodelparams);
-      
+
     OutputTensorImageType::PixelType& D = outputtensorit.Value();
     //set the tensor model parameters into a Diffusion tensor
     D(0,0) = tensormodelparams[1];
@@ -692,7 +692,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
     D(2,0) = tensormodelparams[5];
     D(2,1) = tensormodelparams[6];
     D(2,2) = tensormodelparams[3];
-    
+
     //std::cout<<D;
   }
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,41 +35,41 @@ Widget for setting up and controlling an update timer in an IGT-Pipeline.
 
 */
 class MitkIGTUI_EXPORT QmitkToolDistanceWidget : public QWidget
-{  
+{
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
-public: 
+public:
 
   typedef QVector<QVector<QLabel*> > DistanceLabelType;
 
-  /*!  
-  \brief default constructor  
-  */ 
+  /*!
+  \brief default constructor
+  */
   QmitkToolDistanceWidget( QWidget* parent );
 
-  /*!  
-  \brief default destructor  
-  */ 
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkToolDistanceWidget();
 
-  /*!  
+  /*!
   \brief This method displays the matrix with the distances between the tracking source's outputs in a QGridLayout.
-  */ 
+  */
   void ShowDistanceValues(itk::ProcessObject::DataObjectPointerArray & outputs);
-  
-  /*!  
+
+  /*!
   \brief This method creates the initial distances matrix and labels it with the connected tool names.
-  */ 
+  */
   void CreateToolDistanceMatrix(itk::ProcessObject::DataObjectPointerArray & outputs);
 
-  /*!  
+  /*!
   \brief This method clears the whole tool distances matrix
-  */ 
+  */
   void ClearDistanceMatrix();
 
 public slots:
-  /*!  
+  /*!
   \brief This method set's all distance entries in the matrix to "---". Can be used e.g. if tracking is stopped.
-  */ 
+  */
   void SetDistanceLabelValuesInvalid();
 
 protected:
@@ -79,7 +79,7 @@ protected:
 
 
 private:
-  /*!  
+  /*!
   \brief Double vector for all between tool distances labels.
   */
   DistanceLabelType* m_DistanceLabels;

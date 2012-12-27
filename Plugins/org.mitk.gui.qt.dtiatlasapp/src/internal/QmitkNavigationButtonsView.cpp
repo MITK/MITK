@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -146,7 +146,7 @@ mitk::DataStorage::SetOfObjects::Pointer
         mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
     i != m_CurrentSelection->End();
     ++i)
     {
@@ -283,7 +283,7 @@ void QmitkNavigationButtonsView::Reinit()
 {
   if (m_CurrentSelection)
   {
-    mitk::DataNodeObject::Pointer nodeObj = 
+    mitk::DataNodeObject::Pointer nodeObj =
         m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
     mitk::DataNode::Pointer node = nodeObj->GetDataNode();
     mitk::BaseData::Pointer basedata = node->GetData();

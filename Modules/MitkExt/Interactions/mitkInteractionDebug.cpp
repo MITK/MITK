@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -55,7 +55,7 @@ namespace mitk {
     char* wb = m_Buffer;
     *((unsigned long*) wb) = (unsigned long) GetHashValue();
     wb += sizeof(long);
-    
+
     size_t size = strlen( m_FileName );
 
     *((unsigned long*) wb) = (unsigned long) size;
@@ -75,7 +75,7 @@ namespace mitk {
   bool InteractionDebug::NewStateMachine( const char* name, const StateMachine* stateMachine )
   {
     if ( name == NULL )
-      return false;  
+      return false;
 
     // Instance Address
     char* wb = m_Buffer;
@@ -115,7 +115,7 @@ namespace mitk {
 
       // eventID
       *((unsigned long*) wb) = EventId;
-      
+
       sendCounter();
       // MITK_INFO << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
       return SocketClient::GetInstance()->send( EVENT, 2*sizeof(long), m_Buffer );
@@ -146,9 +146,9 @@ namespace mitk {
       *wb = transitionName[i];
 
     size += 2*sizeof(long);
-    
+
     //sendCounter();
-    //MITK_INFO << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
+    //MITK_INFO << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;
     return SocketClient::GetInstance()->send( TRANSITION, size, m_Buffer );
   }
 

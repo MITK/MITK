@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ const mitk::Surface *mitk::ProbeFilter::GetInput(void)
 
 const mitk::Image *mitk::ProbeFilter::GetSource(void)
 {
-  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));    
+  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));
 }
 
 void mitk::ProbeFilter::SetInput(const mitk::Surface *input)
@@ -60,20 +60,20 @@ void mitk::ProbeFilter::SetInput(const mitk::Surface *input)
 
 void mitk::ProbeFilter::SetSource(const mitk::Image *source)
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );  
+  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );
 }
 
 void mitk::ProbeFilter::GenerateOutputInformation()
 {
-  mitk::Surface::ConstPointer input  = this->GetInput();  
-  mitk::Image::ConstPointer source = this->GetSource();  
+  mitk::Surface::ConstPointer input  = this->GetInput();
+  mitk::Image::ConstPointer source = this->GetSource();
   mitk::Surface::Pointer output = this->GetOutput();
 
   if(input.IsNull()) return;
   if(source.IsNull()) return;
 
-  if(input->GetGeometry()==NULL) return;  
-  if(source->GetGeometry()==NULL) return; 
+  if(input->GetGeometry()==NULL) return;
+  if(source->GetGeometry()==NULL) return;
 
   if( (input->GetTimeSlicedGeometry()->GetTimeSteps()==1) && (source->GetTimeSlicedGeometry()->GetTimeSteps()>1) )
   {
@@ -96,7 +96,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
 
 void mitk::ProbeFilter::GenerateData()
 {
-  mitk::Surface *input  = const_cast< mitk::Surface * >(this->GetInput());  
+  mitk::Surface *input  = const_cast< mitk::Surface * >(this->GetInput());
   mitk::Image *source = const_cast< mitk::Image * >(this->GetSource());
   mitk::Surface::Pointer output = this->GetOutput();
 
@@ -133,7 +133,7 @@ void mitk::ProbeFilter::GenerateData()
     timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
     probe->SetSource( source->GetVtkImageData(timestep) );
 
-    output->SetVtkPolyData( probe->GetPolyDataOutput(), t );  
+    output->SetVtkPolyData( probe->GetPolyDataOutput(), t );
 
     probe->Update();
     probe->Delete();
@@ -144,7 +144,7 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Surface *input  = const_cast< mitk::Surface * >( this->GetInput() );  
+  mitk::Surface *input  = const_cast< mitk::Surface * >( this->GetInput() );
   mitk::Image *source = const_cast< mitk::Image * >( this->GetSource() );
 
   if(input==NULL) return;

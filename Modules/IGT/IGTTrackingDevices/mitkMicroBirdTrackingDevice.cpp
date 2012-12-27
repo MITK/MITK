@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -103,7 +103,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   }
 
   /* use metric measurements in mm */
-  errorCode = SetSystemParameter(METRIC, &m_metric, sizeof(m_metric)); 
+  errorCode = SetSystemParameter(METRIC, &m_metric, sizeof(m_metric));
   if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
   {
     HandleError(errorCode);
@@ -113,7 +113,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   /* Set the measurement rate to m_measurementRate */
   if ((m_measurementRate > 30) && (m_measurementRate < 80))
   {
-    errorCode = SetSystemParameter(MEASUREMENT_RATE, &m_measurementRate, sizeof(m_measurementRate)); 
+    errorCode = SetSystemParameter(MEASUREMENT_RATE, &m_measurementRate, sizeof(m_measurementRate));
     if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
     {
       HandleError(errorCode);
@@ -170,7 +170,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
 
     /* Set data format for sensor */
     DATA_FORMAT_TYPE *pTempBuffer = &tempBuffer;
-    errorCode = SetSensorParameter(i, DATA_FORMAT, pTempBuffer, sizeof(tempBuffer));  
+    errorCode = SetSensorParameter(i, DATA_FORMAT, pTempBuffer, sizeof(tempBuffer));
     if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
     {
       HandleError(errorCode);
@@ -213,7 +213,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
 
 
 bool mitk::MicroBirdTrackingDevice::SwitchTransmitter(bool switchOn)
-{ 
+{
   if (switchOn)
   {
     /* Search for the first attached transmitter and turn it on */
@@ -230,7 +230,7 @@ bool mitk::MicroBirdTrackingDevice::SwitchTransmitter(bool switchOn)
           HandleError(errorCode);
           return false;
         }
-        else 
+        else
           return true; //break; // \TODO: Stop after the first attached transmitter was turned off?
       }
     }
@@ -280,7 +280,7 @@ bool mitk::MicroBirdTrackingDevice::CloseConnection()
   // Clear error message
   this->SetErrorMessage("");
 
-  return true; 
+  return true;
 }
 
 
@@ -324,7 +324,7 @@ bool mitk::MicroBirdTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread 
+  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this); // start a new thread that executes the TrackTools() method
   mitk::TimeStamp::GetInstance()->Start(this);
   return true;
@@ -346,7 +346,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
   MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   // Because m_StopTracking is used by two threads, access has to be guarded
-  //   by a mutex. To minimize thread locking, a local copy is used here 
+  //   by a mutex. To minimize thread locking, a local copy is used here
   bool localStopTracking;
 
   /* update the local copy of m_StopTracking */
@@ -359,7 +359,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
   {
     int errorCode;
     unsigned int nOfAttachedSensors = 0;
-    double timeStamp = 0.0;   
+    double timeStamp = 0.0;
     int toolNumber = 0; // Numbers for attached sensors only
 
     for (int sensorID = 0; sensorID < m_SystemConfig.numberSensors; sensorID++) // for each sensor grep data
@@ -369,9 +369,9 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
 
       // sensor attached so get record
       errorCode = GetAsynchronousRecord(sensorID, pRecord, sizeof(record));
-      if (CompareError(errorCode, BIRD_ERROR_SUCCESS))      
+      if (CompareError(errorCode, BIRD_ERROR_SUCCESS))
       { // On SUCCESS, parse sensor information
-        nOfAttachedSensors++;       
+        nOfAttachedSensors++;
         timeStamp += record.time; // Get timestamp from record
         ToolType* tool = GetMicroBirdTool(toolNumber); /// Get tool (current sensor)
         if (tool != NULL)
@@ -385,13 +385,13 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
           mitk::Quaternion orientation(record.q[1], record.q[2], record.q[3],record.q[0]);
           tool->SetOrientation(orientation); // Set orientation as quaternion \todo : verify quaternion order q(r,x,y,z)
           tool->SetDataValid(true); // Set data state to valid
-        }        
+        }
         toolNumber++; // Increment tool number
-      }  
+      }
       else
       { // ERROR while reading sensor information
         HandleError(errorCode);
-      }      
+      }
     }
 
     /// @todo : is there any synchronisation?
@@ -409,7 +409,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
     }
 
     // Update the local copy of m_StopTracking
-    this->m_StopTrackingMutex->Lock();  
+    this->m_StopTrackingMutex->Lock();
     localStopTracking = m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
   }
@@ -436,7 +436,7 @@ mitk::MicroBirdTrackingDevice::ToolType* mitk::MicroBirdTrackingDevice::GetMicro
   if (toolNumber < m_Tools.size())
   {
     t = m_Tools.at(toolNumber);
-  }  
+  }
   return t;
 }
 

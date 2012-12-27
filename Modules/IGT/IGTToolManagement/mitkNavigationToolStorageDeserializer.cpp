@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk:
   m_DataStorage = dataStorage;
   //create temp directory for this reader
   m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolDeserializer";
-  Poco::File myFile(m_tempDirectory);  
+  Poco::File myFile(m_tempDirectory);
   myFile.createDirectory();
   }
 
@@ -58,10 +58,10 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
   bool success = false;
-  
+
   //decomress zip file into temporary directory
   decomressFiles(filename,m_tempDirectory);
-  
+
   //now read all files and convert them to navigation tools
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New(m_DataStorage);
   bool cont = true;
@@ -111,7 +111,7 @@ void mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filenam
     }
 
   catch(Poco::IllegalStateException e) //temporary solution: replace this by defined exception handling later!
-    {  
+    {
     m_ErrorMessage = "Error: wrong file format! \n (please only load tool storage files)";
     MITK_ERROR << m_ErrorMessage;
     mitkThrowException(mitk::IGTException) << m_ErrorMessage;

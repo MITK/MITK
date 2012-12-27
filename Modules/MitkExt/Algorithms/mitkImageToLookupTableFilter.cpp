@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ImageToLookupTableFilter::ImageToLookupTableFilter()
 {
-    this->SetNumberOfRequiredInputs(1);    
+    this->SetNumberOfRequiredInputs(1);
 }
 
 
@@ -32,7 +32,7 @@ mitk::ImageToLookupTableFilter::ImageToLookupTableFilter()
 
 mitk::ImageToLookupTableFilter::~ImageToLookupTableFilter()
 {
-    
+
 }
 
 
@@ -42,7 +42,7 @@ void mitk::ImageToLookupTableFilter::SetInput( const mitk::ImageToLookupTableFil
 {
     // Process object is not const-correct so the const_cast is required here
     this->itk::ProcessObject::SetNthInput( 0, const_cast< InputImageType * >( input ) );
-    
+
 }
 
 
@@ -77,7 +77,7 @@ const mitk::ImageToLookupTableFilter::InputImageType * mitk::ImageToLookupTableF
 {
     return static_cast< const InputImageType * >( this->ProcessObject::GetInput( idx ) );
 }
-            
+
 
 
 
@@ -88,22 +88,22 @@ void mitk::ImageToLookupTableFilter::GenerateData()
     {
         InputImagePointer image = const_cast<mitk::Image*>(this->GetInput( inputIdx ));
         OutputTypePointer output = dynamic_cast<OutputType*>(this->MakeOutput( inputIdx ).GetPointer());
-        
+
         this->ProcessObject::SetNthOutput( inputIdx, output.GetPointer() );
         if (image.IsNull())
         {
-            itkWarningMacro(<< inputIdx<<"'th input image is null!");    
+            itkWarningMacro(<< inputIdx<<"'th input image is null!");
             return;
         }
-        
-        // the default vtkLookupTable has range=[0,1]; and hsv ranges set 
+
+        // the default vtkLookupTable has range=[0,1]; and hsv ranges set
         // up for rainbow color table (from red to blue).
-        
+
         vtkLookupTable* vtkLut = vtkLookupTable::New();
         /*
         if ( ( image->GetPixelType().GetNumberOfComponents() == 3 ) && ( image->GetDimension() == 3 ) )
         {
-            
+
             // some typedefs for conversion to an iterable itk image
             const unsigned int VectorDimension = 3;
             typedef float VectorComponentType;
@@ -111,12 +111,12 @@ void mitk::ImageToLookupTableFilter::GenerateData()
             typedef itk::Image< VectorType, VectorDimension > VectorFieldType;
             typedef itk::ImageRegionIterator< VectorFieldType > VectorFieldIteratorType;
             typedef mitk::ImageToItk<VectorFieldType> ImageConverterType;
-            
+
             // some local variables
             float minValue = itk::NumericTraits<float>::max();
             float maxValue = itk::NumericTraits<float>::NonpositiveMin();
             float norm = 0.0f;
-            
+
             //determine the range of the vector magnitudes in the image
             ImageConverterType::Pointer imageConverter = ImageConverterType::New();
             imageConverter->SetInput(image);
@@ -130,11 +130,11 @@ void mitk::ImageToLookupTableFilter::GenerateData()
                 maxValue = std::max(norm, maxValue);
             }
             MITK_INFO << "Range of vector magnitudes: [" << minValue << ", "<< maxValue << "]." << std::endl;
-            vtkLut->SetRange(minValue, maxValue);      
+            vtkLut->SetRange(minValue, maxValue);
         }
-        else 
+        else
         {
-            itkWarningMacro(<< "Sorry, only 3d vector images are currently supported!");    
+            itkWarningMacro(<< "Sorry, only 3d vector images are currently supported!");
         }*/
         vtkLut->SetRange(0, 10);
         output->SetVtkLookupTable( vtkLut );

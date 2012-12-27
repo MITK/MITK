@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -60,14 +60,14 @@ namespace mitk
     itkNewMacro( Self );
 
     typedef mitk::ConnectomicsNetwork InputType;
-    typedef std::vector< std::pair< std::pair< 
-      mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode > 
+    typedef std::vector< std::pair< std::pair<
+      mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
       , mitk::ConnectomicsNetwork::NetworkEdge > > EdgeVectorType;
     typedef std::vector< mitk::ConnectomicsNetwork::NetworkNode >  VertexVectorType;
 
     /**
     * Sets the filename of the file to write.
-    * @param FileName the name of the file to write.
+    * @param _arg the name of the file to write.
     */
     itkSetStringMacro( FileName );
 
@@ -121,7 +121,7 @@ namespace mitk
     virtual const char * GetDefaultFilename() { return "ConnectomicsNetwork.cnf"; }
     virtual const char * GetFileDialogPattern() { return "ConnectomicsNetwork (*.cnf)"; }
     virtual const char * GetDefaultExtension() { return ".cnf"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data) { 
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) {
       return (dynamic_cast<mitk::ConnectomicsNetwork*>(data.GetPointer()) != NULL); }
 
     virtual void DoWrite(BaseData::Pointer data) {

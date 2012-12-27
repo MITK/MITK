@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,26 +30,26 @@ class MITK_CORE_EXPORT FileReader
   public:
     //##Documentation
     //## @brief Get the specified the file to load.
-    //## 
+    //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
     virtual const char* GetFileName() const = 0;
 
     //##Documentation
     //## @brief Specify the file to load.
-    //## 
+    //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
     virtual void SetFileName(const char* aFileName) = 0;
 
     //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to load. 
-    //## 
+    //## @brief Get the specified file prefix for the file(s) to load.
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual const char* GetFilePrefix() const = 0;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
-    //## 
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual void SetFilePrefix(const char* aFilePrefix) = 0;
@@ -57,7 +57,7 @@ class MITK_CORE_EXPORT FileReader
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
     //## sprintf format used to build filename from FilePrefix and number.
-    //## 
+    //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
     virtual const char* GetFilePattern() const = 0;
@@ -65,16 +65,16 @@ class MITK_CORE_EXPORT FileReader
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
     format used to build filename from FilePrefix and number.
-    
+
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
     virtual void SetFilePattern(const char* aFilePattern) = 0;
 
     /**
-    @brief Specifies, whether the file reader also can 
+    @brief Specifies, whether the file reader also can
     read a file from a memory buffer */
     virtual bool CanReadFromMemory(  );
-    
+
     /**
     @brief Set/Get functions to advise the file reader to
     use a memory array for reading a file*/
@@ -82,7 +82,7 @@ class MITK_CORE_EXPORT FileReader
     virtual bool GetReadFromMemory(  );
 
     /**
-    @brief To be used along with a call of SetReadFromMemory(true). This sets 
+    @brief To be used along with a call of SetReadFromMemory(true). This sets
     the memory buffer and the size from which the reader will read.*/
     virtual void SetMemoryBuffer(const char* dataArray, unsigned int size);
 

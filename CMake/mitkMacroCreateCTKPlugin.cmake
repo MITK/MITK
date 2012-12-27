@@ -5,7 +5,7 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
   MITK_CHECK_MODULE(_MODULE_CHECK_RESULT Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
   if(NOT _MODULE_CHECK_RESULT)
     MITK_USE_MODULE(Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
-   
+
     link_directories(${ALL_LIBRARY_DIRS})
     include_directories(${ALL_INCLUDE_DIRECTORIES})
 
@@ -22,6 +22,10 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
     target_link_libraries(${PLUGIN_TARGET} ${ALL_LIBRARIES})
 
+    if(ALL_META_DEPENDENCIES)
+      add_dependencies(${PLUGIN_TARGET} ${ALL_META_DEPENDENCIES})
+    endif()
+
     if(MITK_DEFAULT_SUBPROJECTS AND NOT MY_SUBPROJECTS)
       set(MY_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
     endif()
@@ -32,6 +36,28 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
         add_dependencies(${subproject} ${PLUGIN_TARGET})
       endforeach()
     endif()
+
+    #------------------------------------------------------------#
+    #------------------ Installer support -----------------------#
+    if(NOT _PLUGIN_TEST_PLUGIN)
+
+      set(_autoload_targets )
+      foreach(_dependency ${ALL_DEPENDENCIES})
+        get_target_property(_dep_autoloads ${_dependency} MITK_AUTOLOAD_TARGETS)
+        if (_dep_autoloads)
+          list(APPEND _autoload_targets ${_dep_autoloads})
+        endif()
+      endforeach()
+
+      # The MITK_AUTOLOAD_TARGETS property is used in the mitkFunctionInstallAutoLoadModules
+      # macro which expects a list of plug-in targets.
+      if (_autoload_targets)
+        list(REMOVE_DUPLICATES _autoload_targets)
+        set_target_properties(${PLUGIN_TARGET} PROPERTIES MITK_AUTOLOAD_TARGETS "${_autoload_targets}")
+      endif()
+
+    endif()
+
   else(NOT _MODULE_CHECK_RESULT)
     if(NOT MITK_BUILD_ALL_PLUGINS)
       message(SEND_ERROR "${PROJECT_NAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")

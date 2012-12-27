@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -290,12 +290,12 @@ protected:
    * extend beyond the edge of the monitor. This is used for computing the
    * initial window position, and subclasses can use this as a utility method
    * if they want to limit the region in which the window may be moved.
-   * 
+   *
    * @param preferredSize
    *            the preferred position of the window
    * @return a rectangle as close as possible to preferredSize that does not
    *         extend outside the monitor
-   * 
+   *
    */
   Rectangle GetConstrainedShellBounds(const Rectangle& preferredSize);
 

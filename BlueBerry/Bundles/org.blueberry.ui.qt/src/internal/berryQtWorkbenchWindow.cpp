@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,10 @@ void* QtWorkbenchWindow::CreatePageComposite(void* p)
 {
   QWidget* parent = static_cast<QWidget*> (p);
   QtControlWidget* pageArea = new QtControlWidget(parent, 0);
-  pageArea->setObjectName("Page Composite");
+  pageArea->setObjectName("PageCompositeControlWidget");
   new QHBoxLayout(pageArea);
+  pageArea->layout()->setContentsMargins(0,0,0,0);
+  pageArea->layout()->setSpacing(0);
   if (qobject_cast<QMainWindow*> (parent) != 0)
     qobject_cast<QMainWindow*> (parent)->setCentralWidget(pageArea);
   else

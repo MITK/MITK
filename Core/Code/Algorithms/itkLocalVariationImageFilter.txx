@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ namespace itk
   {}
 
   template <class TInputImage, class TOutputImage>
-  void 
+  void
     LocalVariationImageFilter<TInputImage, TOutputImage>
     ::GenerateInputRequestedRegion() throw (InvalidRequestedRegionError)
   {
@@ -52,7 +52,7 @@ namespace itk
     Superclass::GenerateInputRequestedRegion();
 
     // get pointers to the input and output
-    typename Superclass::InputImagePointer inputPtr = 
+    typename Superclass::InputImagePointer inputPtr =
       const_cast< TInputImage * >( this->GetInput() );
     typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
@@ -104,7 +104,7 @@ namespace itk
     return p.GetSquaredNorm();
   }
 
-  template<class TPixelType> double 
+  template<class TPixelType> double
     SquaredEuclideanMetric<TPixelType>::Calc(TPixelType p)
   {
     return p*p;
@@ -146,13 +146,13 @@ namespace itk
     {
 
       // iterators over output and input
-      ImageRegionIterator<OutputImageType> 
+      ImageRegionIterator<OutputImageType>
         output_image_it(output, *fit);
-      ImageRegionConstIterator<InputImageType> 
+      ImageRegionConstIterator<InputImageType>
         input_image_it(input.GetPointer(), *fit);
 
       // neighborhood iterator for input image
-      ConstShapedNeighborhoodIterator<InputImageType> 
+      ConstShapedNeighborhoodIterator<InputImageType>
         input_image_neighbors_it(size, input, *fit);
       typename ConstShapedNeighborhoodIterator<InputImageType>::
         OffsetType offset;
@@ -176,11 +176,11 @@ namespace itk
         typename OutputImageType::PixelType locVariation = 0;
         typename ConstShapedNeighborhoodIterator<InputImageType>::
           ConstIterator input_neighbors_it;
-        for (input_neighbors_it = input_image_neighbors_it.Begin(); 
-          ! input_neighbors_it.IsAtEnd(); 
+        for (input_neighbors_it = input_image_neighbors_it.Begin();
+          ! input_neighbors_it.IsAtEnd();
           input_neighbors_it++)
-        { 
-            typename TInputImage::PixelType diffVec = 
+        {
+            typename TInputImage::PixelType diffVec =
               input_neighbors_it.Get()-input_image_it.Get();
             locVariation += SquaredEuclideanMetric
               <typename TInputImage::PixelType>::Calc(diffVec);
@@ -206,7 +206,7 @@ namespace itk
   void
     LocalVariationImageFilter<TInputImage, TOutput>
     ::PrintSelf(
-    std::ostream& os, 
+    std::ostream& os,
     Indent indent) const
   {
     Superclass::PrintSelf( os, indent );

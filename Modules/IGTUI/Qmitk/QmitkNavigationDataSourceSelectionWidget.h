@@ -47,7 +47,7 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
     mitk::NavigationDataSource::Pointer GetSelectedNavigationDataSource();
 
     /** @return Returns the ID of the currently selected tool. You can get the corresponding NavigationData when calling GetOutput(id)
-      *         on the source object. Returns -1 if there is no tool selected. 
+      *         on the source object. Returns -1 if there is no tool selected.
       */
     int GetSelectedToolID();
 
@@ -56,14 +56,14 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
       */
     mitk::NavigationTool::Pointer GetSelectedNavigationTool();
 
-    /** @return Returns the NavigationToolStorage of the currently selected NavigationDataSource. Returns NULL if there is no 
+    /** @return Returns the NavigationToolStorage of the currently selected NavigationDataSource. Returns NULL if there is no
       *         source selected or if the source has no NavigationToolStorage assigned.
       */
     mitk::NavigationToolStorage::Pointer GetNavigationToolStorageOfSource();
 
-  signals:  
-    
-    
+  signals:
+
+
 
   protected slots:
 
@@ -79,7 +79,7 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
 
     Ui::QmitkNavigationDataSourceSelectionWidgetControls* m_Controls;
 
-    
+
 
     mitk::NavigationToolStorage::Pointer m_CurrentStorage;
     mitk::NavigationDataSource::Pointer m_CurrentSource;

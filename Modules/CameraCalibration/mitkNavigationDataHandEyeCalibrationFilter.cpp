@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NavigationDataHandEyeCalibrationFilter::NavigationDataHandEyeCalibrationFilter()
-: NavigationDataToNavigationDataFilter(), 
+: NavigationDataToNavigationDataFilter(),
 m_ObjectsToTransform(),m_HandEyeTransformations()
 {
 }
@@ -91,6 +91,6 @@ void mitk::NavigationDataHandEyeCalibrationFilter::GenerateData()
     objectToTransform->GetGeometry()->SetIndexToWorldTransform(transform);
     objectToTransform->Modified();
     // operation was successful, therefore data of output is valid.
-    output->SetDataValid(true); 
+    output->SetDataValid(true);
   }
 }

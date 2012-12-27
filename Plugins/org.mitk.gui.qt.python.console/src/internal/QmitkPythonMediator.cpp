@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,7 +66,7 @@ void QmitkPythonMediator::runSimpleString(const char* str)
 std::vector<QStringList> QmitkPythonMediator::getAttributeList()
 {
   PyObject* dict = PyImport_GetModuleDict();
-  PyObject* object = PyDict_GetItemString(dict, "__main__");    
+  PyObject* object = PyDict_GetItemString(dict, "__main__");
   PyObject* dirMain = PyObject_Dir(object);
   PyObject* tempObject;
   std::vector<QStringList> variableStack;
@@ -93,7 +93,7 @@ std::vector<QStringList> QmitkPythonMediator::getAttributeList()
 PyObject * QmitkPythonMediator::getPyObject(PyObject * object)
 {
   PyObject* dict = PyImport_GetModuleDict();
-  PyObject* main = PyDict_GetItemString(dict, "__main__");    
+  PyObject* main = PyDict_GetItemString(dict, "__main__");
   return PyObject_GetAttr(main, object);
 }
 
@@ -127,7 +127,7 @@ void QmitkPythonMediator::unregisterClient(QmitkPythonClient * client)
 void QmitkPythonMediator::update()
 {
   if(Py_IsInitialized)
-  {    
+  {
     std::set<QmitkPythonClient *>::iterator it
         = m_clients.begin();
 

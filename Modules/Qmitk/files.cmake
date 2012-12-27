@@ -62,5 +62,5 @@ QmitkServiceListWidgetControls.ui
 )
 
 set(QRC_FILES
-  Qmitk.qrc  
+  Qmitk.qrc
 )

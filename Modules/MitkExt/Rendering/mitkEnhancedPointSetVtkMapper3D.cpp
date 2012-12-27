@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
   m_Contour->Delete();
   m_ContourSource->Delete();
   m_PropAssembly->Delete();
-  
+
   // TODO: do cleanup correctly
 
   // Clean up all remaining actors and poly-data sources
@@ -93,16 +93,16 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
   const mitk::PointSet* pointset = this->GetInput();
   //pointset->Update();
   int timestep = this->GetTimestep();
- 
+
   mitk::PointSet::DataType* itkPointSet = pointset->GetPointSet( timestep );
   mitk::PointSet::PointsContainer* points = itkPointSet->GetPoints();
   mitk::PointSet::PointDataContainer* pointData = itkPointSet->GetPointData();
-  
+
   assert(points->Size() == pointData->Size());
 
   mitk::PointSet::PointsIterator pIt;
   mitk::PointSet::PointDataIterator pdIt;
-  
+
   /* search removed points and delete the corresponding source/actor/mapper objects */
   for (ActorMap::iterator it = m_PointActors.begin(); it != m_PointActors.end(); )
   {
@@ -120,7 +120,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
     else
       ++it;
   }
-  
+
   /* iterate over each point in the pointset and create corresponding vtk objects */
   for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)
   {
@@ -129,7 +129,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
     mitk::PointSet::PointType point = pIt->Value();
     mitk::PointSet::PointDataType data = pdIt->Value();
-    
+
     ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
 
     /* Create/Update sources for the point */
@@ -150,7 +150,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
     {
       a = aIt->second.first;
       if (specChanged)  // point exists, but point spec has changed
-      {     
+      {
         this->RemoveEntryFromSourceMaps( pointID );
       }
     }
@@ -183,7 +183,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       m->SetInput(source->GetOutput());
       aIt->second.second = data.pointSpec; // update point spec in actormap
     }
-  } // for each point  
+  } // for each point
 }
 
 
@@ -219,7 +219,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
 
     ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
     assert(aIt != m_PointActors.end()); // UpdateVtkObjects() must ensure that actor exists
-    
+
     vtkActor* a = aIt->second.first;
     assert(a != NULL);
 
@@ -293,7 +293,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
     case PTCORNER:          //cone
       m_ConeSources[pointID]->SetRadius(pointSize/2);
       m_ConeSources[pointID]->SetHeight(pointSize);
-      m_ConeSources[pointID]->SetResolution(2); // two crossed triangles. Maybe introduce an extra property for 
+      m_ConeSources[pointID]->SetResolution(2); // two crossed triangles. Maybe introduce an extra property for
       //m_ConeSources[pointID]->SetCenter(pos[0], pos[1], pos[2]);
       break;
     case PTEDGE:          // cylinder
@@ -330,12 +330,12 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
       mitk::LookupTableProperty* b = dynamic_cast<mitk::LookupTableProperty*>(a);
       if (b != NULL)
       {
-         mitk::LookupTable::Pointer c = b->GetLookupTable();    
+         mitk::LookupTable::Pointer c = b->GetLookupTable();
          vtkLookupTable *d = c->GetVtkLookupTable();
          double *e=d->GetTableValue(pointID);
-         color[0]=e[0];         
-         color[1]=e[1];         
-         color[2]=e[2];         
+         color[0]=e[0];
+         color[1]=e[1];
+         color[2]=e[2];
       }
       else
       {
@@ -343,8 +343,8 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
           n->GetColor(color, renderer);
       }
     }
-      
-     
+
+
         // TODO: What about "color" property? 2D Mapper only uses unselected and selected color properties
     a->GetProperty()->SetColor(color[0], color[1], color[2]);
 
@@ -352,7 +352,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
   }
   //TODO test different pointSpec
   // TODO "line width" "show contour" "contourcolor" "contoursize" "close contour" "show label", "label"
-  // TODO "show points" vs "visibility"  - is visibility evaluated at all? in a superclass maybe? 
+  // TODO "show points" vs "visibility"  - is visibility evaluated at all? in a superclass maybe?
   // TODO create lookup tables for all properties that should be evaluated per point. also create editor widgets for these lookup tables!
   // TODO check if property changes and pointset changes are reflected in the render window immediately.
   // TODO check behavior with large PointSets
@@ -370,7 +370,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * 
 {
   // TODO: apply new transform if time step changed
 
-  //vtkLinearTransform * vtktransform = 
+  //vtkLinearTransform * vtktransform =
   //  this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   //m_SelectedActor->SetUserTransform(vtktransform);
@@ -431,7 +431,7 @@ void mitk::EnhancedPointSetVtkMapper3D::RemoveEntryFromSourceMaps( mitk::PointSe
   case PTEND:
   default:
     m_SphereSources[pointID]->Delete();
-    m_SphereSources.erase(pointID);          
+    m_SphereSources.erase(pointID);
     break;
-  }        
+  }
 }

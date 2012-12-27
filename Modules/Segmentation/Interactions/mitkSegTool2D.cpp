@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -237,14 +237,15 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
 
   //the image was modified within the pipeline, but not marked so
   image->Modified();
+  image->GetVtkImageData()->Modified();
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the edited slice
   m_doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),slice->GetGeometry(), timeStep, const_cast<mitk::PlaneGeometry*>(planeGeometry));
-  
+
   //create an operation event for the undo stack
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), m_doOperation, m_undoOperation, "Segmentation" );
-  
+
   //add it to the undo controller
   UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
@@ -252,7 +253,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   m_undoOperation = NULL;
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
-  
+
   slice->DisconnectPipeline();
   ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
   contourExtractor->SetInput(slice);

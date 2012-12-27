@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -66,8 +66,8 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
     if (filename == "") return;
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
     if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
-    else 
-      { 
+    else
+      {
       if (!m_NavigationToolStorage->AddTool(readTool))
         {
         MessageBox("Error: Can't add tool!");
@@ -85,7 +85,7 @@ void QmitkNavigationToolManagementWidget::OnSaveTool()
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toAscii().data();
     if (filename == "") return;
-    if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row()))) 
+    if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())))
       MessageBox("Error: "+ myWriter->GetErrorMessage());
 
 }
@@ -102,7 +102,7 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
       connect( (QObject*)(m_Controls->m_LoadTool), SIGNAL(clicked()), this, SLOT(OnLoadTool()) );
       connect( (QObject*)(m_Controls->m_SaveTool), SIGNAL(clicked()), this, SLOT(OnSaveTool()) );
-          
+
       //widget page "add tool":
       connect( (QObject*)(m_Controls->m_AddToolCancel), SIGNAL(clicked()), this, SLOT(OnAddToolCancel()) );
       connect( (QObject*)(m_Controls->m_AddToolSave), SIGNAL(clicked()), this, SLOT(OnAddToolSave()) );
@@ -132,7 +132,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
     m_Controls->m_ToolNameEdit->setText("");
     m_Controls->m_IdentifierEdit->setText("NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount()));
     m_Controls->m_SerialNumberEdit->setText("");
-    m_Controls->m_CalibrationFileName->setText("");   
+    m_Controls->m_CalibrationFileName->setText("");
 
     m_edit = false;
   }
@@ -198,7 +198,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     if (filename == "") return;
     mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
-    else 
+    else
       {
       m_NavigationToolStorage = tempStorage;
       Poco::Path myPath = Poco::Path(filename.c_str());
@@ -212,17 +212,17 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     //read in filename
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool Storage"), "/", "*.IGTToolStorage").toAscii().data();
     if (filename == "") return; //canceled by the user
-   
+
     //serialize tool storage
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-    if (!mySerializer->Serialize(filename,m_NavigationToolStorage)) 
+    if (!mySerializer->Serialize(filename,m_NavigationToolStorage))
       {
       MessageBox("Error: " + mySerializer->GetErrorMessage());
       return;
       }
     Poco::Path myPath = Poco::Path(filename.c_str());
     m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
-    
+
   }
 
 
@@ -233,11 +233,11 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
 void QmitkNavigationToolManagementWidget::OnAddToolSave()
   {
     mitk::NavigationTool::Pointer workTool;
-   
+
     if (m_edit) //here we edit a existing tool
       {
       workTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
-      
+
       //edit existing DataNode...
       workTool->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
       workTool->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
@@ -245,7 +245,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
     else //here we create a new tool
       {
       workTool = mitk::NavigationTool::New();
-    
+
       //create DataNode...
       mitk::DataNode::Pointer newNode = mitk::DataNode::New();
       newNode->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());

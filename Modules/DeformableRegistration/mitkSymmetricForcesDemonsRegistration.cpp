@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ namespace mitk {
     m_SaveResult(true),
     m_DeformationField(NULL)
   {
-    
+
   }
 
   SymmetricForcesDemonsRegistration::~SymmetricForcesDemonsRegistration()
@@ -83,9 +83,9 @@ namespace mitk {
 
     typedef float InternalPixelType;
     typedef typename itk::Image< InternalPixelType, VImageDimension > InternalImageType;
-    typedef typename itk::CastImageFilter< FixedImageType, 
+    typedef typename itk::CastImageFilter< FixedImageType,
                                   InternalImageType > FixedImageCasterType;
-    typedef typename itk::CastImageFilter< MovingImageType, 
+    typedef typename itk::CastImageFilter< MovingImageType,
                                   InternalImageType > MovingImageCasterType;
     typedef typename itk::Vector< float, VImageDimension >    VectorPixelType;
     typedef typename itk::Image<  VectorPixelType, VImageDimension > DeformationFieldType;
@@ -94,7 +94,7 @@ namespace mitk {
                                   InternalImageType,
                                   DeformationFieldType>   RegistrationFilterType;
     typedef typename itk::WarpImageFilter<
-                            MovingImageType, 
+                            MovingImageType,
                             MovingImageType,
                             DeformationFieldType  >     WarperType;
     typedef typename itk::LinearInterpolateImageFunction<
@@ -103,13 +103,13 @@ namespace mitk {
 
     typedef  TPixel  OutputPixelType;
     typedef typename itk::Image< OutputPixelType, VImageDimension > OutputImageType;
-    typedef typename itk::CastImageFilter< 
+    typedef typename itk::CastImageFilter<
                           MovingImageType,
                           OutputImageType > CastFilterType;
     typedef typename itk::ImageFileWriter< OutputImageType >  WriterType;
     typedef typename itk::ImageFileWriter< DeformationFieldType >  FieldWriterType;
     typedef  typename itk::InverseDeformationFieldImageFilter<DeformationFieldType, DeformationFieldType>  InverseFilterType;
-    
+
 
     typename FixedImageType::Pointer fixedImage = FixedImageType::New();
     mitk::CastToItkImage(m_ReferenceImage, fixedImage);
@@ -144,10 +144,10 @@ namespace mitk {
       warper->SetDeformationField( filter->GetOutput() );
       warper->Update();
       typename WriterType::Pointer      writer =  WriterType::New();
-      typename CastFilterType::Pointer  caster =  CastFilterType::New(); 
+      typename CastFilterType::Pointer  caster =  CastFilterType::New();
 
       writer->SetFileName( m_ResultName );
-  
+
       caster->SetInput( warper->GetOutput() );
       writer->SetInput( caster->GetOutput()   );
       if(m_SaveResult)
@@ -166,7 +166,7 @@ namespace mitk {
 
         typename VectorImage2DType::RegionType  region2D = vectorImage2D->GetBufferedRegion();
         typename VectorImage2DType::IndexType   index2D  = region2D.GetIndex();
-        typename VectorImage2DType::SizeType    size2D   = region2D.GetSize(); 
+        typename VectorImage2DType::SizeType    size2D   = region2D.GetSize();
 
 
         typedef typename itk::Vector< float,       3 >  Vector3DType;
@@ -177,7 +177,7 @@ namespace mitk {
         WriterType::Pointer writer3D = WriterType::New();
 
         VectorImage3DType::Pointer vectorImage3D = VectorImage3DType::New();
-        
+
         VectorImage3DType::RegionType  region3D;
         VectorImage3DType::IndexType   index3D;
         VectorImage3DType::SizeType    size3D;
@@ -185,7 +185,7 @@ namespace mitk {
         index3D[0] = index2D[0];
         index3D[1] = index2D[1];
         index3D[2] = 0;
-        
+
         size3D[0]  = size2D[0];
         size3D[1]  = size2D[1];
         size3D[2]  = 1;
@@ -204,7 +204,7 @@ namespace mitk {
 
         vectorImage3D->SetRegions( region3D );
         vectorImage3D->Allocate();
-        
+
         typedef typename itk::ImageRegionConstIterator< VectorImage2DType > Iterator2DType;
 
         typedef typename itk::ImageRegionIterator< VectorImage3DType > Iterator3DType;
@@ -223,8 +223,8 @@ namespace mitk {
         while( !it2.IsAtEnd() )
         {
           vector2D = it2.Get();
-          vector3D[0] = vector2D[0];  
-          vector3D[1] = vector2D[1];  
+          vector3D[0] = vector2D[0];
+          vector3D[1] = vector2D[1];
           it3.Set( vector3D );
           ++it2;
           ++it3;
@@ -258,7 +258,7 @@ namespace mitk {
         {
           fieldwriter->Update();
         }
-        
+
       }
       this->SetRemainingProgress(4);
     }

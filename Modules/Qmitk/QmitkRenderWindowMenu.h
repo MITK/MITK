@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,20 +35,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkStdMultiWidget;
 
 /**
-* \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow. 
-* The Menu Widget is located in the right top corner of each RenderWindow. It includes different settings. For example 
+* \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow.
+* The Menu Widget is located in the right top corner of each RenderWindow. It includes different settings. For example
 * the layout design can be changed with the setting button. Switching between full-screen mode and layout design can be done
-* with the full-screen button. Splitting the Widget horizontal or vertical as well closing the Widget is not implemented yet. 
+* with the full-screen button. Splitting the Widget horizontal or vertical as well closing the Widget is not implemented yet.
 * The popup Widget can be deactivated with ActivateMenuWidget(false) in QmitkRenderWindow.
 *
 * \ingroup Renderer
-* 
+*
 * \sa QmitkRenderWindow
 * \sa QmitkStdMultiWidget
-* 
+*
 */
 
-class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget  
+class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
 {
   Q_OBJECT
 
@@ -57,25 +57,25 @@ public:
   QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0, mitk::BaseRenderer * b = 0, QmitkStdMultiWidget* mw = 0 );
   virtual ~QmitkRenderWindowMenu();
 
-  /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes 
+  /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
   layout direction (axial, coronal .. ) and layout design (standard layout, 2D images top,
   3D bottom ... ). */
   bool GetSettingsMenuVisibilty()
-  { 
+  {
     if( m_Settings == NULL)
       return false;
     else
-      return m_Settings->isVisible();  
+      return m_Settings->isVisible();
   }
 
   /*! Set layout index. Defines layout direction (axial, coronal, sagital or threeD) of the parent. */
   void SetLayoutIndex( unsigned int layoutIndex );
-  
+
   /*! Return layout direction of parent (axial, coronal, sagital or threeD) */
   unsigned int GetLayoutIndex()
   {  return m_Layout;  }
 
-  /*! Update list of layout design (standard layout, 2D images top, 3D bottom ..). Set action of current layout design 
+  /*! Update list of layout design (standard layout, 2D images top, 3D bottom ..). Set action of current layout design
   to disable and all other to enable. */
   void UpdateLayoutDesignList( int layoutDesignIndex );
 
@@ -98,7 +98,7 @@ protected:
   and their signal/slot connection for handling.  */
   void CreateMenuWidget();
 
-   
+
   /*! Create settings menu which contains layout direction and the different layout designs. */
   void CreateSettingsWidget();
 
@@ -106,7 +106,7 @@ protected:
   void paintEvent(QPaintEvent *event);
 
   /*! Update list of layout direction (axial, coronal, sagital or threeD). Set action of currect layout direction
-  to disable and all other to enable. Normaly the user can switch here between the different layout direction, but 
+  to disable and all other to enable. Normaly the user can switch here between the different layout direction, but
   this is not supported yet. */
   void UpdateLayoutList();
 
@@ -117,16 +117,16 @@ protected:
   int currentCrosshairRotationMode;
 
   public slots:
-  
+
   void SetCrossHairVisibility( bool state ) ;
 
 
 signals:
-  
+
   void ResetView(); // == "global reinit"
-  
+
   // \brief int parameters are enum from QmitkStdMultiWidget
-  void ChangeCrosshairRotationMode(int); 
+  void ChangeCrosshairRotationMode(int);
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void SignalChangeLayoutDesign( int layoutDesign );
@@ -137,7 +137,7 @@ public slots:
   void DeferredShowMenu( );
   void smoothHide( );
 
-protected slots:  
+protected slots:
 
   ///
   /// this function is continously called by a timer
@@ -148,20 +148,20 @@ protected slots:
   /// this function is invoked when the auto-rotate action
   /// is clicked
   ///
-  void OnAutoRotationActionTriggered(); 
+  void OnAutoRotationActionTriggered();
 
   void enterEvent( QEvent* /*e*/ );
   void leaveEvent( QEvent* /*e*/ );
   void OnTSNumChanged(int);
 
-  void OnCrosshairRotationModeSelected(QAction*); 
+  void OnCrosshairRotationModeSelected(QAction*);
 
-  /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of m_FullScreenButton. 
-  Activating the full-screen maximize the current widget, deactivating restore If layout design changed by the settings menu, 
+  /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of m_FullScreenButton.
+  Activating the full-screen maximize the current widget, deactivating restore If layout design changed by the settings menu,
   the full-Screen mode is automatically switch to false. */
   void OnFullScreenButton( bool checked );
- 
-  /*! Slot for opening setting menu. The slot is connected to the clicked() event of m_SettingsButton. 
+
+  /*! Slot for opening setting menu. The slot is connected to the clicked() event of m_SettingsButton.
   The settings menu includes differen layout directions (axial, coronal, saggital and 3D) as well all layout design
   (standard layout, 2D images top, 3D bottom ..)*/
   void OnSettingsButton( bool checked );
@@ -201,11 +201,11 @@ protected slots:
 
   /*! Slot for changing layout design to Axial n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
-  
+
   void OnCrossHairMenuAboutToShow();
 
 public:
-  
+
   /*! enum for layout direction*/
   enum
   {
@@ -264,7 +264,7 @@ protected:
 
   /*! QAction for Default layout design */
   QAction*            m_DefaultLayoutAction;
-  
+
   /*! QAction for 2D images up layout design */
   QAction*            m_2DImagesUpLayoutAction;
 
@@ -303,7 +303,7 @@ protected:
 
   /*! QMenu containg all layout direction and layout design settings.*/
   QMenu*              m_Settings;
-  
+
   QMenu*              m_CrosshairMenu;
 
   /*! Index of layout direction. 0: axial; 1: saggital; 2: coronal; 3: threeD */
@@ -319,13 +319,13 @@ protected:
 
   /*! Flag if full-screen mode is activated or deactivated. */
   bool                m_FullScreenMode;
-  
+
   bool                m_Entered;
 
   bool                m_Hidden;
 
   private:
-  
+
   mitk::BaseRenderer::Pointer m_Renderer;
 
   QmitkStdMultiWidget* m_MultiWidget;

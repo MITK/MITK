@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,7 +39,7 @@ namespace mitk
 class Segmentation_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
-    
+
     mitkClassMacro(DiffImageApplier, Object);
     itkNewMacro(DiffImageApplier);
 
@@ -54,13 +54,13 @@ class Segmentation_EXPORT DiffImageApplier : public itk::Object, public Operatio
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch2DDiff( itk::Image<TPixel,VImageDimension>* image );
-    
+
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch3DDiff( itk::Image<TPixel,VImageDimension>* image );
 
     template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
     void ItkImageProcessing2DDiff( itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
-    
+
     template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
     void ItkImageProcessing3DDiff( itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
 
@@ -69,7 +69,7 @@ class Segmentation_EXPORT DiffImageApplier : public itk::Object, public Operatio
 
     Image::Pointer m_Image;
     Image::Pointer m_SliceDifferenceImage;
-    
+
     unsigned int m_SliceIndex;
     unsigned int m_SliceDimension;
     unsigned int m_TimeStep;

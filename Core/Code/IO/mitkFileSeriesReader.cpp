@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,14 +27,14 @@ bool mitk::FileSeriesReader::GenerateFileList()
 {
     typedef std::vector<std::string> StringContainer;
     typedef std::map<unsigned int, std::string> SortedStringContainer;
-    
+
     if ( m_FileName == "" )
     {
       throw itk::ImageFileReaderException( __FILE__, __LINE__, "FileName must be non-empty" );
     }
     //MITK_INFO << "FileName: "<< m_FileName <<", FilePrefix: "<< m_FilePrefix << ", FilePattern: "<< m_FilePattern << std::endl;
-    
-    // determine begin and end idexes of the last digit sequence in the 
+
+    // determine begin and end idexes of the last digit sequence in the
     // filename from the sample file name
     // Therefore, walk backwards from the end of the filename until
     // a number is found. The string in front of the number is the prefix,
@@ -42,7 +42,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     std::string basename, path;
     path = itksys::SystemTools::GetFilenamePath( m_FileName );
     basename = itksys::SystemTools::GetFilenameName( m_FileName );
-    
+
     unsigned int digitBegin = 0;
     unsigned int digitEnd = 0;
     bool digitFound = false;
@@ -54,9 +54,9 @@ bool mitk::FileSeriesReader::GenerateFileList()
         if (!digitFound)
         {
           digitEnd = i;
-          digitBegin = i;  
+          digitBegin = i;
           digitFound = true;
-        } 
+        }
         else
           digitBegin = i;
       }
@@ -69,26 +69,26 @@ bool mitk::FileSeriesReader::GenerateFileList()
       if ( i == 0 )
         break;
     }
-    
+
     //
     // if there is no digit in the filename, then we have a problem
     // no matching filenames can be identified!
-    // 
+    //
     if ( !digitFound )
     {
       itkWarningMacro("Filename contains no digit!");
       return false;
     }
-    
+
     //
     // determine prefix and extension start and length
     //
     unsigned int prefixBegin = 0;
     unsigned int prefixLength = digitBegin;
     unsigned int extensionBegin = digitEnd + 1;
-    unsigned int extensionLength = (digitEnd == basename.length() -1 ? 0 : basename.length() - 1 - digitEnd);    
+    unsigned int extensionLength = (digitEnd == basename.length() -1 ? 0 : basename.length() - 1 - digitEnd);
     unsigned int numberLength = digitEnd - digitBegin + 1;
-    
+
     //
     // extract prefix and extension
     //
@@ -98,7 +98,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     std::string extension = "";
     if (extensionLength != 0)
       extension = basename.substr( extensionBegin, extensionLength );
-    
+
     //
     // print debug information
     //
@@ -117,8 +117,8 @@ bool mitk::FileSeriesReader::GenerateFileList()
     {
       throw itk::ImageFileReaderException( __FILE__, __LINE__, "prefixLength + extensionLength + numberLength != basenameLength" );
     }
-    
-    
+
+
     //
     // Load Directory
     //
@@ -155,19 +155,19 @@ bool mitk::FileSeriesReader::GenerateFileList()
     {
         bool prefixMatch = false;
         bool extensionMatch = false;
-        
+
         // check if the file prefix matches the current file
         if ( prefixLength != 0 )
           prefixMatch = ( it->find(prefix) == prefixBegin ); // check if prefix is found
         else
           prefixMatch = ( ( (*it)[0] >='0' ) && ( (*it)[0] <='9' ) ); //check if filename begins with digit
-        
+
         // check if the file extension matches the current file
         if ( extensionLength != 0 )
           extensionMatch = ( it->find(extension) == it->length() - extensionLength ); // check if prefix is found
         else
           extensionMatch = ( ( (*it)[it->length()-1] >='0' ) && ( (*it)[it->length()-1] <='9' ) ); //check if filename ends with digit
-        
+
         if ( prefixMatch && extensionMatch )
         {
             matchedFiles.push_back( *it );

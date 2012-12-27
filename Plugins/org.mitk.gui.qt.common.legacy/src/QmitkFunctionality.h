@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,7 +68,7 @@ class QmitkFunctionalitySelectionProvider;
 ///   <li> Some minor important convenience methods (like changing the mouse cursor/exception handling)
 /// </ol>
 ///
-/// Please use the Activated/Deactivated method to add/remove interactors, disabling multiwidget crosshair or anything which may 
+/// Please use the Activated/Deactivated method to add/remove interactors, disabling multiwidget crosshair or anything which may
 /// "affect" other functionalities. For further reading please have a look at QmitkFunctionality::IsExclusiveFunctionality().
 ///
 class MITK_QT_COMMON_LEGACY QmitkFunctionality : public berry::QtViewPart
@@ -90,7 +90,7 @@ public:
   ///
   virtual ~QmitkFunctionality();
   ///
-  /// Called, when the WorkbenchPart gets closed 
+  /// Called, when the WorkbenchPart gets closed
   /// by the user directly or by closing the whole
   /// app (e.g. for removing event listeners)
   ///
@@ -145,20 +145,20 @@ public:
   virtual void Deactivated();
   ///
   /// Some functionalities need to add special interactors, removes the crosshair from the stdmultiwidget, etc.
-  /// In this case the functionality has to tidy up when changing to another functionality 
+  /// In this case the functionality has to tidy up when changing to another functionality
   /// which also wants to change the "default configuration". In the old Qt3-based
-  /// version of MITK, two functionalities could never be opened at the same time so that the 
-  /// methods Activated() and Deactivated() were the right place for the functionalitites to 
+  /// version of MITK, two functionalities could never be opened at the same time so that the
+  /// methods Activated() and Deactivated() were the right place for the functionalitites to
   /// add/remove their interactors, etc. This is still true for the new MITK Workbench,
-  /// but as there can be several functionalities visible at the same time, the behaviour concerning 
+  /// but as there can be several functionalities visible at the same time, the behaviour concerning
   /// when Activated() and Deactivated() are called has changed:
   ///
-  /// 1. Activated() and Deactivated() are only called if IsExclusiveFunctionality() returns true 
+  /// 1. Activated() and Deactivated() are only called if IsExclusiveFunctionality() returns true
   ///
   /// 2. If only one standalone functionality is or becomes visible, Activated() will be called on that functionality
   ///
   /// 3. If two or more standalone functionalities are visible,
-  ///    Activated() will be called on the functionality that receives focus, Deactivated() will be called 
+  ///    Activated() will be called on the functionality that receives focus, Deactivated() will be called
   ///    on the one that looses focus, gets hidden or closed
   ///
   ///
@@ -216,7 +216,7 @@ protected:
   ///
   /// \return the selection of the currently active part of the workbench or an empty vector
   ///         if nothing is selected
-  ///    
+  ///
   std::vector<mitk::DataNode*> GetCurrentSelection() const;
   ///
   /// Returns the current selection made in the datamanager bundle or an empty vector
@@ -227,7 +227,7 @@ protected:
   /// Returns the Preferences object for this Functionality.
   /// <b>Important</b>: When refering to this preferences, e.g. in a PreferencePage: The ID
   /// for this preferences object is "/<VIEW-ID>", e.g. "/org.mitk.views.datamanager"
-  /// 
+  ///
   berry::IPreferences::Pointer GetPreferences() const;
   ///
   /// Returns the default <b>or</b> the currently active DataStorage if m_HandlesMultipleDataStorages
@@ -253,16 +253,16 @@ protected:
   /// \param e the exception which should be handled
   /// \param showDialog controls, whether additionally a message box should be
   ///        displayed to inform the user that something went wrong
-  /// 
+  ///
   void HandleException( std::exception& e, QWidget* parent = NULL, bool showDialog = true ) const;
   ///
   /// Calls HandleException ( std::exception&, QWidget*, bool ) internally
   /// \see HandleException ( std::exception&, QWidget*, bool )
   ///
-  void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;  
+  void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
   ///
   /// Convenient method to set and reset a wait cursor ("hourglass")
-  /// 
+  ///
   void WaitCursorOn();
   ///
   /// Convenient method to restore the standard cursor
@@ -270,7 +270,7 @@ protected:
   void WaitCursorOff();
   ///
   /// Convenient method to set and reset a busy cursor
-  /// 
+  ///
   void BusyCursorOn();
   ///
   /// Convenient method to restore the standard cursor
@@ -295,19 +295,19 @@ public:
   ///
   /// Called when a DataStorage Add Event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.
-  /// \see m_InDataStorageChanged  
+  /// \see m_InDataStorageChanged
   ///
   void NodeAddedProxy(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage remove event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeRemoved afterwards.
-  /// \see m_InDataStorageChanged  
+  /// \see m_InDataStorageChanged
   ///
   void NodeRemovedProxy(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage changed event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeChanged afterwards.
-  /// \see m_InDataStorageChanged  
+  /// \see m_InDataStorageChanged
   ///
   void NodeChangedProxy(const mitk::DataNode* node);
   ///
@@ -337,7 +337,7 @@ protected:
   /// code to activate the last visible functionality
   ///
   void ActivateLastVisibleFunctionality();
-  /// 
+  ///
   /// reactions to selection events from data manager (and potential other senders)
   ///
   void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
@@ -347,7 +347,7 @@ protected:
   std::vector<mitk::DataNode*> DataNodeSelectionToVector(mitk::DataNodeSelection::ConstPointer currentSelection) const;
   //# protected fields
 protected:
-  /// 
+  ///
   /// helper stuff to observe BlueBerry selections
   ///
   friend struct berry::SelectionChangedAdapter<QmitkFunctionality>;
@@ -372,7 +372,7 @@ private:
   ///
   QmitkFunctionalitySelectionProvider* m_SelectionProvider;
   ///
-  /// object to observe BlueBerry selections 
+  /// object to observe BlueBerry selections
   ///
   berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
   ///

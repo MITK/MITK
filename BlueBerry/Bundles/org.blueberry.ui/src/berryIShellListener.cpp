@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,15 +45,15 @@ IShellListener::Events
   shellIconified -= Delegate(listener.GetPointer(), &IShellListener::ShellIconified);
 }
 
-void IShellListener::ShellActivated(ShellEvent::Pointer  /*e*/) 
+void IShellListener::ShellActivated(ShellEvent::Pointer  /*e*/)
 {}
-void IShellListener::ShellClosed(ShellEvent::Pointer  /*e*/) 
+void IShellListener::ShellClosed(ShellEvent::Pointer  /*e*/)
 {}
-void IShellListener::ShellDeactivated(ShellEvent::Pointer  /*e*/) 
+void IShellListener::ShellDeactivated(ShellEvent::Pointer  /*e*/)
 {}
-void IShellListener::ShellDeiconified(ShellEvent::Pointer  /*e*/) 
+void IShellListener::ShellDeiconified(ShellEvent::Pointer  /*e*/)
 {}
-void IShellListener::ShellIconified(ShellEvent::Pointer  /*e*/) 
+void IShellListener::ShellIconified(ShellEvent::Pointer  /*e*/)
 {}
 
 }

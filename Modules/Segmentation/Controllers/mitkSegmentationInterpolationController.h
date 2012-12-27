@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -137,6 +137,11 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     void OnImageModified(const itk::EventObject&);
 
+    /**
+     * Activate/Deactivate the 2D interpolation.
+    */
+    void Activate2DInterpolation(bool);
+
   protected:
 
     /**
@@ -193,6 +198,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     Image::ConstPointer m_Segmentation;
     Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
+    bool m_2DInterpolationActivated;
 };
 
 } // namespace

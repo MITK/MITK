@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 //##Documentation
-//## @brief 
+//## @brief
 //## @ingroup Process
 
 class MitkExt_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
@@ -48,11 +48,11 @@ public:
 
 protected:
 
-  //##Description 
+  //##Description
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
- 
- 
+
+
 protected:
   virtual void GenerateData();
 
@@ -60,7 +60,7 @@ protected:
 
   virtual void GenerateInputRequestedRegion();
 
-  
+
   DopplerToStrainRateFilter();
 
     ~DopplerToStrainRateFilter();
@@ -70,8 +70,8 @@ private:
 
   float m_Distance;
   int m_NoStrainInterval;
-  itk::Point<int, 3> m_Origin;  
-    
+  itk::Point<int, 3> m_Origin;
+
 };
 
 } // namespace mitk

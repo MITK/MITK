@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
   QCoreApplication app(argc, argv);
   app.setApplicationName(appName);
   app.setOrganizationName("DKFZ");
-  
+
   ctkCommandLineParser parser;
   // Use Unix-style argument names
   parser.setArgumentPrefix("--", "-");
@@ -274,7 +274,7 @@ int main(int argc, char** argv)
   }
 
   QTextStream out(stdout, QIODevice::WriteOnly);
- 
+
   // Show a help message
   if (parsedArgs.contains("help"))
   {
@@ -306,7 +306,7 @@ int main(int argc, char** argv)
       checkUpdates(out);
     }
   }
- 
+
   // Check arguments
 
   // Project options
@@ -336,7 +336,7 @@ int main(int argc, char** argv)
   QString outDir = QDir::fromNativeSeparators(parsedArgs["out-dir"].toString());
   QString licensePath = QDir::fromNativeSeparators(parsedArgs["license"].toString());
   QString pluginExportDirective = pluginSymbolicName.split('.').last().toUpper() + "_EXPORT";
- 
+
   QString pluginName = parsedArgs["plugin-name"].toString();
   if (pluginName.isEmpty())
   {

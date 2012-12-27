@@ -4,8 +4,8 @@
 # GPU: NA
 #
 
-# Note: The specific version and processor type of this machine should be reported in the 
-# header above. Indeed, this file will be send to the dashboard as a NOTE file. 
+# Note: The specific version and processor type of this machine should be reported in the
+# header above. Indeed, this file will be send to the dashboard as a NOTE file.
 
 cmake_minimum_required(VERSION 2.8.4)
 
@@ -46,14 +46,14 @@ else()
   set(CTEST_BUILD_FLAGS "")
 endif()
 
-# experimental: 
+# experimental:
 #     - run_ctest() macro will be called *ONE* time
 #     - binary directory will *NOT* be cleaned
-# continuous: 
-#     - run_ctest() macro will be called EVERY 5 minutes ... 
+# continuous:
+#     - run_ctest() macro will be called EVERY 5 minutes ...
 #     - binary directory will *NOT* be cleaned
 #     - configure/build will be executed *ONLY* if the repository has been updated
-# nightly: 
+# nightly:
 #     - run_ctest() macro will be called *ONE* time
 #     - binary directory *WILL BE* cleaned
 set(SCRIPT_MODE "experimental") # "experimental", "continuous", "nightly"

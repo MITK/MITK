@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,13 +26,13 @@ namespace mitk {
 
 
   /*!
-  \brief This class is used to hold all transform parameters needed for a rigid registration process.  
+  \brief This class is used to hold all transform parameters needed for a rigid registration process.
 
   To use the rigid registration framework you have to create an instance of this class and fill it with the parameters
-  belonging to the selected transformation. To let the rigid registration work properly, this instance has to be given 
+  belonging to the selected transformation. To let the rigid registration work properly, this instance has to be given
   to mitkImageRegistrationMethod before calling the update() method in mitkImageRegistrationMethod.
 
-  Also instances of the classes mitkMetricParameters and mitkOptimizerParameters have to be set in mitkImageRegistrationMethod 
+  Also instances of the classes mitkMetricParameters and mitkOptimizerParameters have to be set in mitkImageRegistrationMethod
   before calling the update() method.
 
 
@@ -82,23 +82,23 @@ namespace mitk {
 
     /**
       \brief Sets an array that holds the magnitudes of changes for the transforms degrees of freedom.
-      
-      The optimizer changes the transforms values corresponding to this array values.  
+
+      The optimizer changes the transforms values corresponding to this array values.
     */
     void SetScales(itk::Array<double> scales);
     /**
       \brief Returns an array that holds the magnitudes of changes for the transforms degrees of freedom.
 
-      The optimizer changes the transforms values corresponding to this array values.  
+      The optimizer changes the transforms values corresponding to this array values.
     */
     itk::Array<double> GetScales();
 
     /**
-      \brief Sets an array that holds the initial transform parameters. 
+      \brief Sets an array that holds the initial transform parameters.
     */
     void SetInitialParameters(itk::Array<double> initialParameters);
     /**
-      \brief Returns an array that holds the initial transform parameters. 
+      \brief Returns an array that holds the initial transform parameters.
     */
     itk::Array<double> GetInitialParameters();
 

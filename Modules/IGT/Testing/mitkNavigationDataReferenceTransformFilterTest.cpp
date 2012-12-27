@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,9 +32,9 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
 
   MITK_TEST_BEGIN("NavigationDataReferenceTransformFilter")
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NavigationDataReferenceTransformFilter::Pointer myFilter = mitk::NavigationDataReferenceTransformFilter::New();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -57,7 +57,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   mitk::NavigationData::OrientationType targetOri1(0.4, 0.4, 0.4, 0.4);
   mitk::NavigationData::OrientationType targetOri2(0.5, 0.5, 0.5, 0.5);
   mitk::NavigationData::OrientationType targetOri3(0.6, 0.6, 0.6, 0.6);
-  
+
   /*create helper objects: ND position accurancy and validity bool*/
   mitk::ScalarType initialError(0.0);
   bool initialValid(true);
@@ -174,13 +174,13 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   MITK_TEST_CONDITION_REQUIRED(sourcePointsCleared && targetPointsCleared, "Testing if reinit of filter was successful");
 
   // ------------------ testing the point generation ------------------
-  
+
   myFilter->SetSourceNavigationDatas(oneSourceNDs); // set the ND with sourcePos1 and sourceOri1 for that the points will be generated
 
   itk::QuaternionRigidTransform<double>::Pointer quaternionTransform = itk::QuaternionRigidTransform<double>::New();
   vnl_quaternion<double> const vnlQuatIn(sourceOri1.x(), sourceOri1.y(), sourceOri1.z(), sourceOri1.r());
   quaternionTransform->SetRotation(vnlQuatIn);
-  
+
   mitk::Point3D pointA;
   mitk::Point3D pointB;
   mitk::Point3D pointC;

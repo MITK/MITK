@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ QmitkIGTConnectionWidget::~QmitkIGTConnectionWidget()
 }
 
 void QmitkIGTConnectionWidget::CreateQtPartControl(QWidget *parent)
-{ 
+{
   if (!m_Controls)
   {
   // create GUI widgets
@@ -78,8 +78,8 @@ void QmitkIGTConnectionWidget::OnConnect()
       QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open Navigation tool storage"), "/", tr("Toolfile (*.tfl)"));
       if (LoadToolfile(fileName))
       {
-        // Create TrackingDeviceSource and add tools 
-        mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = 
+        // Create TrackingDeviceSource and add tools
+        mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory =
           mitk::TrackingDeviceSourceConfigurator::New(this->m_NavigationToolStorage,m_TrackingDevice);
         m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource();
         m_TrackingDeviceSource->Connect();
@@ -163,7 +163,7 @@ bool QmitkIGTConnectionWidget::LoadToolfile(QString qFilename)
     //check if all tools are from the same device
     for (int i=1; i<tempStorage->GetToolCount(); i++)
     {
-      if (lastDevice!=tempStorage->GetTool(i)->GetTrackingDeviceType()) 
+      if (lastDevice!=tempStorage->GetTool(i)->GetTrackingDeviceType())
       {
         m_ErrorMessage = "Error: Toolfile contains tools of different tracking devices which is not acceptable for this application.";
         return false;

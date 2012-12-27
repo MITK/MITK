@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,12 +56,12 @@ class QmitkToolTrackingStatusWidget;
   \ingroup ${plugin_target}_internal
 */
 class QmitkIGTTrackingLabView : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
@@ -69,7 +69,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief default constructor
     */
     QmitkIGTTrackingLabView();
-    
+
     /**
     \brief default destructor
     */
@@ -142,7 +142,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method activates the permanent registration based on one tool's position.
     */
     void OnPermanentRegistration(int toolID, bool on);
-    
+
 
   protected:
 
@@ -223,7 +223,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
 
     mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
-    
+
 
 private:
 
@@ -241,7 +241,7 @@ private:
 
   std::string m_RegistrationTrackingFiducialsName;
   std::string m_RegistrationImageFiducialsName;
-  
+
   std::string m_PointSetRecordingDataNodeName;
   bool m_PointSetRecording;
 

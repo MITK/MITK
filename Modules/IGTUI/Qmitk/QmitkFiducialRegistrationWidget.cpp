@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FRW_DEBUG MITK_DEBUG("Fiducial Registration Widget")
 
 /* VIEW MANAGEMENT */
-QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)  
+QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL),m_MultiWidget(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL)
 {
   CreateQtPartControl(this);
@@ -55,7 +55,7 @@ void QmitkFiducialRegistrationWidget::CreateQtPartControl(QWidget *parent)
 
 
 void QmitkFiducialRegistrationWidget::CreateConnections()
-{     
+{
   connect( (QObject*)(m_Controls->m_AddTrackingFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedTrackingFiducial()) );
   connect( (QObject*)(m_Controls->m_AddImageFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedImageFiducial()) );
   connect( (QObject*)(m_Controls->m_RegisterFiducialsBtn), SIGNAL(clicked()), this, SIGNAL(PerformFiducialRegistration()) );

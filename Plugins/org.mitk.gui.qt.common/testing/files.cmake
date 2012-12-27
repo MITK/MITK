@@ -1,7 +1,7 @@
 set(MOC_H_FILES
   src/QmitkQtCommonTestSuite.h
   src/api/QmitkMockFunctionality.h
-  
+
   src/internal/mitkPluginActivator.h
 )
 
@@ -13,7 +13,7 @@ set(SRC_CPP_FILES
   api/QmitkFunctionalityTest.cpp
   api/QmitkMockFunctionality.cpp
   api/QmitkUiApiTestSuite.cpp
-  
+
 )
 
 set(INTERNAL_CPP_FILES

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,17 +39,17 @@ namespace mitk {
     * \brief sets the direction of projection of the camera of the renderer in tool coordinates
     */
     itkSetMacro(DirectionOfProjectionInToolCoordinates, mitk::Vector3D);
-    
+
     /**
     * \brief sets the view up vector of the camera of the renderer in tool coordinates
     */
     itkSetMacro(ViewUpInToolCoordinates, mitk::Vector3D);
-    
+
     /**
     * \brief sets the focal length of the camera
     */
     itkSetMacro(FocalLength, float);
-    
+
     /**
     * \brief returns the direction of projection of the camera of the renderer in tool coordinates
     */
@@ -59,23 +59,23 @@ namespace mitk {
     * \brief returns the view up vector of the camera of the renderer in tool coordinates
     */
     itkGetConstMacro(ViewUpInToolCoordinates, mitk::Vector3D);
-    
+
     /**
     * \brief returns the focal length of the camera
     */
     itkGetConstMacro(FocalLength, float);
-    
+
     /**
     * \brief sets renderer that visualizes the navigation data
     */
     virtual void SetRenderer( mitk::BaseRenderer* renderer );
-    
+
     /**
     * \brief returns the renderer that visualizes the navigation data
     */
     virtual const mitk::BaseRenderer* GetRenderer();
 
-    /**Documentation 
+    /**Documentation
     *\brief Set all filter parameters as the PropertyList p
     *
     * This method reads the following properties from the PropertyList (name : data type):
@@ -86,7 +86,7 @@ namespace mitk {
     */
     virtual void SetParameters(const mitk::PropertyList* p);
 
-    /**Documentation 
+    /**Documentation
     *\brief Get all filter parameters as a PropertyList
     *
     * This method returns a PropertyList containing the following
@@ -95,7 +95,7 @@ namespace mitk {
     *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
     *  - "CameraVisualization_ViewAngle" : mitk::FloatProperty
-    * The returned PropertyList must be assigned to a 
+    * The returned PropertyList must be assigned to a
     * SmartPointer immediately, or else it will get destroyed.
     */
     mitk::PropertyList::ConstPointer GetParameters() const;

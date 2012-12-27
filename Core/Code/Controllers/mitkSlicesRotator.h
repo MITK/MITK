@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,38 +29,38 @@ namespace mitk {
 /**
   \brief Coordinates rotation of multiple visible rendering planes (represented as lines in other render windows).
   \ingroup NavigationControl
- 
+
   This class takes care of several SliceNavigationControllers and handles slice selection
   / slice rotation. It is added as listener to GlobalInteraction by QmitkStdMultiWidget.
- 
+
   The SlicesRotator class adds the possibility of slice rotation to the "normal" behaviour
   of SliceNavigationControllers (which is picking one plane from a stack of planes).
-  
+
   This additional class SlicesRotator is needed, because one has to be aware of multiple
   "visible slices" (selected Geometry2Ds of some SliceNavigationControllers) in order to
   choose between rotation and slice selection. Such functionality could not be implemented
   by a single SliceNavigationController.
- 
+
   Rotation is achieved by modifying (rotating) the generated TimeSlicedGeometry of the
   corresponding SliceNavigationControllers.
 
   \section mitkSlicesRotator_StandardCase The standard case: three orthogonal views (MPR)
- 
+
   With SlicesRotator, the rule to choose between slice rotation and selection is simple:
   For a mouse down event, count the number of visible planes, which are "near" the cursor.
   If this number is 2 (one for the window, which currently holds the cursor, one for the
   intersection line of another visible slice), then initiate rotation, else select slices
   near the cursor. If the "LinkPlanes" flag is set, the rotation is applied to the planes
   of all registered SNCs, not only of the one associated with the directly selected plane.
-   
+
   In contrast to the situation without the SlicesRotator, the SliceNavigationControllers
   are now NOT directly registered as listeners to GlobalInteraction. SlicesRotator is
   registered as a listener and decides whether something should be rotated or whether
   another slice should be selected. In the latter case, a PositionEvent is just forwarded
   to the SliceNavigationController.
-  
+
   \section mitkSlicesRotator_GeneralizedCase The generalized case: any number of views
-  
+
   Above section as well as the original implementation of this class assumes that we have
   exactly three 2D vies in our scene. This used to be the standard setup of the MITK
   associated application for a long time.  With custom applications based on MITK it is
@@ -86,7 +86,7 @@ namespace mitk {
    when it is identical to another line. I.e. we just count how many visible lines on the
    screen are very close to the cursor. When this number is 1, we rotate, otherwise we let
    the SliceNavigationControllers do their slice selection job.
- 
+
   \sa SlicesSwiveller
  */
 class MITK_CORE_EXPORT SlicesRotator : public SlicesCoordinator
@@ -114,13 +114,13 @@ class MITK_CORE_EXPORT SlicesRotator : public SlicesCoordinator
     virtual void SetGeometry(const itk::EventObject& EventObject);
 
     /**
-      \brief NOT USED by anything open-source.
+      \brief NOT USED by anything open-source. Deprecated. Highly obfuscated code. Use SliceNavigationController::ReorientSlices() instead!
+      #Deprecated
 
-      \TODO check if this is actually still needed, with SliceNavigationController::ReorientSlices() now being implemented this could be obsolete!?
      */
-    virtual void RotateToPoint( SliceNavigationController *rotationPlaneSNC, 
-                                SliceNavigationController *rotatedPlaneSNC, 
-                                const Point3D &point, 
+    virtual void RotateToPoint( SliceNavigationController *rotationPlaneSNC,
+                                SliceNavigationController *rotatedPlaneSNC,
+                                const Point3D &point,
                                 bool linked = false );
 
   protected:
@@ -158,8 +158,8 @@ class MITK_CORE_EXPORT SlicesRotator : public SlicesCoordinator
 
 };
 
-} // namespace 
+} // namespace
 
-#endif 
+#endif
 
 

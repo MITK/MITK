@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -51,7 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkProperty.h"
 
 //##Documentation
-//## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION. 
+//## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION.
 
 
 mitk::RenderWindow::Pointer mitkWidget1;
@@ -78,7 +78,7 @@ mitk::DataNode::Pointer m_Node;
 
 void InitializeWindows()
 {
-  
+
   // Set default view directions for SNCs
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Axial );
@@ -116,13 +116,13 @@ void InitializeWindows()
   // Let NavigationControllers listen to GlobalInteraction
   mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
   gi->AddListener( m_TimeNavigationController );
-    
+
   m_LastLeftClickPositionSupplier =
     mitk::CoordinateSupplier::New("navigation", NULL);
   mitk::GlobalInteraction::GetInstance()->AddListener(
     m_LastLeftClickPositionSupplier
     );
- 
+
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
     mitkWidget4->GetVtkRenderWindow() );
@@ -154,7 +154,7 @@ void InitializeWindows()
 
 void AddDisplayPlaneSubTree()
 {
-  // add the displayed planes of the multiwidget to a node to which the subtree 
+  // add the displayed planes of the multiwidget to a node to which the subtree
   // @a planesSubTree points ...
 
   float white[3] = {1.0f,1.0f,1.0f};
@@ -230,19 +230,19 @@ void Fit()
   vtkObject::GlobalWarningDisplayOff();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow())->GetVtkRenderer();
-  if ( vtkrenderer!= NULL ) 
+  if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow())->GetVtkRenderer();
-  if ( vtkrenderer!= NULL ) 
+  if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow())->GetVtkRenderer();
-  if ( vtkrenderer!= NULL ) 
+  if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
 
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow())->GetVtkRenderer();
-  if ( vtkrenderer!= NULL ) 
+  if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
 
   vtkObject::SetGlobalWarningDisplay(w);
@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // Create a DataStorage  
+  // Create a DataStorage
   m_DataStorage = mitk::StandaloneDataStorage::New();
 
   //*************************************************************************
@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
       mitk::DataNode::Pointer node = nodeReader->GetOutput();
       m_DataStorage->Add(node);
 
-      
+
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
       if(image.IsNotNull())
       {
@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
   // Part V: Create window and pass the tree to it
   //*************************************************************************
 
-  // Global Interaction initialize 
+  // Global Interaction initialize
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // instantiate display interactor
@@ -312,56 +312,56 @@ int main(int argc, char* argv[])
 
   mitk::GlobalInteraction::GetInstance()->AddListener(m_MoveAndZoomInteractor);
 
-  
+
   // Create renderwindows
   mitkWidget1 = mitk::RenderWindow::New();
   mitkWidget2 = mitk::RenderWindow::New();
   mitkWidget3 = mitk::RenderWindow::New();
   mitkWidget4 = mitk::RenderWindow::New();
- 
+
   // Tell the renderwindow which (part of) the datastorage to render
   mitkWidget1->GetRenderer()->SetDataStorage(m_DataStorage);
   mitkWidget2->GetRenderer()->SetDataStorage(m_DataStorage);
   mitkWidget3->GetRenderer()->SetDataStorage(m_DataStorage);
   mitkWidget4->GetRenderer()->SetDataStorage(m_DataStorage);
 
- 
+
   // Let NavigationControllers listen to GlobalInteraction
   mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
   gi->AddListener( mitkWidget1->GetSliceNavigationController() );
   gi->AddListener( mitkWidget2->GetSliceNavigationController() );
   gi->AddListener( mitkWidget3->GetSliceNavigationController() );
   gi->AddListener( mitkWidget4->GetSliceNavigationController() );
-  
+
   // Use it as a 2D View
   mitkWidget1->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget2->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget3->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
   mitkWidget4->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
- 
+
 
   mitkWidget1->SetSize(400, 400);
-  
-  
+
+
   mitkWidget2->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0]+420,
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]);
   mitkWidget2->SetSize(400, 400);
-  
-  
+
+
   mitkWidget3->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0],
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]+450);
   mitkWidget3->SetSize(400, 400);
-  
-  
+
+
   mitkWidget4->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0]+420,
                                                  mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]+450);
   mitkWidget4->SetSize(400, 400);
 
 
   InitializeWindows();
-  
+
   AddDisplayPlaneSubTree();
- 
+
   Fit();
 
   // Initialize the RenderWindows
@@ -373,7 +373,7 @@ int main(int argc, char* argv[])
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   // reinit the mitkVTKEventProvider;
-  // this is only necessary once after calling 
+  // this is only necessary once after calling
   // ForceImmediateUpdateAll() for the first time
   mitkWidget1->ReinitEventProvider();
   mitkWidget2->ReinitEventProvider();
@@ -386,7 +386,7 @@ int main(int argc, char* argv[])
   mitkWidget4->GetVtkRenderWindow()->Render();
   mitkWidget4->GetVtkRenderWindowInteractor()->Start();
 
- 
+
   return 0;
 }
 

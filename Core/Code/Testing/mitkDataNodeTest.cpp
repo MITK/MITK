@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,8 +57,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /**
  *  Simple example for a test for the (non-existent) class "DataNode".
- *  
- *  argc and argv are the command line parameters which were passed to 
+ *
+ *  argc and argv are the command line parameters which were passed to
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
@@ -68,7 +68,7 @@ class mitkDataNodeTestClass { public:
 static void TestDataSetting(mitk::DataNode::Pointer dataNode)
 {
 
-  mitk::BaseData::Pointer baseData; 
+  mitk::BaseData::Pointer baseData;
 
   //NULL pointer Test
   dataNode->SetData(baseData);
@@ -77,8 +77,8 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   baseData = mitk::RenderWindowFrame::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a RenderWindowFrame object was set correctly" )
-//  MITK_TEST_CONDITION( baseData->GetGeometry(0)->GetVtkTransform() == dataNode->GetVtkTransform(0), "Testing if a NULL pointer was set correctly" )    
-  
+//  MITK_TEST_CONDITION( baseData->GetGeometry(0)->GetVtkTransform() == dataNode->GetVtkTransform(0), "Testing if a NULL pointer was set correctly" )
+
   baseData = mitk::GeometryData::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a GeometryData object was set correctly" )
@@ -190,7 +190,7 @@ static void TestPropertyList(mitk::DataNode::Pointer dataNode)
 {
 
   mitk::PropertyList::Pointer propertyList =  dataNode->GetPropertyList();
-   
+
 
   MITK_TEST_CONDITION(dataNode->GetPropertyList() != NULL, "Testing if the constructor set the propertylist" )
 
@@ -225,7 +225,7 @@ static void TestPropertyList(mitk::DataNode::Pointer dataNode)
 static void TestSelected(mitk::DataNode::Pointer dataNode)
 {
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
- 
+
   mitk::VtkPropRenderer::Pointer base = mitk::VtkPropRenderer::New( "the first renderer", renderWindow, mitk::RenderingManager::GetInstance() );
 
   //with BaseRenderer==Null
@@ -248,10 +248,10 @@ static void TestGetMTime(mitk::DataNode::Pointer dataNode)
   unsigned long time;
   time = dataNode->GetMTime();
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-  
+
   dataNode->SetData(pointSet);
   MITK_TEST_CONDITION( time != dataNode->GetMTime(), "Testing if the node timestamp is updated after adding data to the node" )
-  
+
   mitk::Point3D point;
   point.Fill(3.0);
   pointSet->SetPoint(0,point);
@@ -274,13 +274,13 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation")
 
   //test setData() Method
   mitkDataNodeTestClass::TestDataSetting(myDataNode);
@@ -294,7 +294,7 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
-  
+
   // always end with this!
   MITK_TEST_END()
 }

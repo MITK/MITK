@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,13 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
       { \
       this->m_##name = _arg; \
       } \
-  } 
+  }
 
 #define getMacro(name,type) \
   virtual type Get##name () \
   { \
   return m_##name; \
-  } 
+  }
 
 class vtkPoints;
 
@@ -54,10 +54,10 @@ namespace mitk
   \ingroup ImageToImageFilter
 
   This class takes a 3D or 4D mitk::Image as input and tries to extract one slice from it.
-  This slice can be arbitrary oriented in space. The 2D slice is resliced by a 
+  This slice can be arbitrary oriented in space. The 2D slice is resliced by a
   vtk::ResliceImage filter if not perpendicular to the input image.
 
-  The world geometry of the plane to be extracted image must be given as an input 
+  The world geometry of the plane to be extracted image must be given as an input
   to the filter in order to correctly calculate world coordinates of the extracted slice.
   Setting a timestep from which the plane should be extracted is optional.
 
@@ -102,7 +102,7 @@ namespace mitk
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
 
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
+    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
       vtkFloatingPointType *bounds );

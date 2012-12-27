@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #ifndef _BERRYJOBSTATUS_H
-#define _BERRYJOBSTATUS_H  
+#define _BERRYJOBSTATUS_H
 
 #include "berryIJobStatus.h"
 #include "berryStatus.h"
@@ -26,7 +26,7 @@ namespace berry {
 
   class BERRY_JOBS JobStatus : public IJobStatus {
 
-     
+
   public:
 
   berryObjectMacro(JobStatus)
@@ -36,16 +36,16 @@ namespace berry {
    * @param severity
    * @param job
    * @param message
-   */ 
-   JobStatus( const Status::Severity& severity, Job::Pointer sptr_job, const std::string& message) ;  
-  
-  /** 
+   */
+   JobStatus( const Status::Severity& severity, Job::Pointer sptr_job, const std::string& message) ;
+
+  /**
    * @see IJobStatus#GetJob()
    */
    Job::Pointer GetJob() ;
 
   /**
-   *  @see org.blueberry.solstice.common IStatus GetChildren() 
+   *  @see org.blueberry.solstice.common IStatus GetChildren()
    */
    std::vector<IStatus::Pointer> GetChildren() const ;
 
@@ -70,7 +70,7 @@ namespace berry {
    std::string GetPlugin() const ;
 
   /**
-   * @see org.blueberry.solstice.common IStatus GetSeverity () 
+   * @see org.blueberry.solstice.common IStatus GetSeverity ()
    */
    Severity GetSeverity() const ;
 
@@ -90,9 +90,9 @@ namespace berry {
    bool Matches(const Severities& severityMask) const ;
 
 
-  private: 
+  private:
 
-    Job::Pointer m_myJob ; 
+    Job::Pointer m_myJob ;
 
     Status::Pointer m_internalStatus ;
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkIGTExports.h>
 
 
-namespace mitk 
+namespace mitk
 {
   /**Documentation
   * \brief This class offers methods to write objects of the class navigation tool permanently
@@ -35,7 +35,7 @@ namespace mitk
   *        by the class NavigationToolReader to restore the object.
   *
   * \ingroup IGT
-  */  
+  */
   class MitkIGT_EXPORT NavigationToolWriter : public itk::Object
   {
   friend class mitk::NavigationToolStorageSerializer;
@@ -43,7 +43,7 @@ namespace mitk
   public:
     mitkClassMacro(NavigationToolWriter,itk::Object);
     itkNewMacro(Self);
-    
+
     /**
      * @brief           Writes a navigation tool to a file.
      * @param  FileName The filename (complete, with path, C:\temp\myTool.igtTool for example)

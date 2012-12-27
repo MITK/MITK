@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.osgi.applications">
+    <application id="org.mitk.example.multipleperspectives">
+      <run class="MultiplePerspectives"/>
+    </application>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.minimalperspective"
+      name="Minimal Perspective 1"
+      icon="resources/perspectiveIcon1.png"
+      class="MinimalPerspective">
+    </perspective>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.extendedperspective"
+      name="Minimal Perspective 2"
+      icon="resources/perspectiveIcon2.png"
+      class="ExtendedPerspective">
+    </perspective>
+  </extension>
+
+<extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.emptyview1"
+      name="Empty View 1"
+      icon="resources/viewIcon1.png"
+      class="EmptyView1">
+    </view>
+  </extension>
+
+<extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.emptyview2"
+      name="Empty View 2"
+      icon="resources/viewIcon2.png"
+      class="EmptyView2">
+    </view>
+  </extension>
+
+</plugin>

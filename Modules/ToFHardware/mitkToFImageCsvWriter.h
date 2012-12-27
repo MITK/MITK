@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,13 +26,13 @@ namespace mitk
   *
   * This writer class allows streaming of ToF data into a CSV file.
   * Writer can simultaneously save "distance", "intensity" and "amplitude" image data.
-  * Output files are written as 1D CSV data stream. 
+  * Output files are written as 1D CSV data stream.
   *
   * @ingroup ToFHardware
   */
   class MITK_TOFHARDWARE_EXPORT ToFImageCsvWriter : public ToFImageWriter
   {
-  public: 
+  public:
     /*!
     \brief standard ctor
     */
@@ -55,7 +55,9 @@ namespace mitk
     void Close();
     /*!
     \brief Pushes the image data to the output files
-    \param data from distance, amplitude and intensity images as float values
+    \param distanceFloatData from distance image as float value
+    \param amplitudeFloatData from amplitude image as float value
+    \param intensityFloatData from intensity image as float value
     */
     void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
 

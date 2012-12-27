@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,15 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
       itkNewMacro(Self);
 
     virtual void GenerateOutputInformation()
-      {     
+      {
       mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput(0);
-      mitk::Image::Pointer output      = (mitk::Image*) this->GetOutput(0);    
+      mitk::Image::Pointer output      = (mitk::Image*) this->GetOutput(0);
      if(inputImage.IsNull()) return;
      };
-    
+
 
     void GenerateData()
-      {       
+      {
       mitk::USImage::Pointer ni = this->GetInput(0);
       mitk::USImage::Pointer result = mitk::USImage::New();
 
@@ -55,16 +55,16 @@ See LICENSE.txt or http://www.mitk.org for details.
       };
     };
 
- 
+
 // END TESTFILTER
 
 class mitkUSPipelineTestClass
 {
- 
+
 public:
 
   static void TestPipelineUS(std::string videoFilePath)
-  {   
+  {
    // Set up a pipeline
     mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
     TestUSFilter::Pointer filter = TestUSFilter::New();
@@ -92,7 +92,7 @@ int mitkUSPipelineTest(int  argc , char* argv[])
   #ifdef WIN32 // Video file compression is currently only supported under windows.
    // US Pipelines need to be reworked :(
    // mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
-  #endif    
+  #endif
 
   MITK_TEST_END();
 }

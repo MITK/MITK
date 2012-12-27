@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,17 +31,17 @@ class QmitkExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::
   Q_PROPERTY( int maxValue READ maxValue WRITE setMaxValue )
 
   public:
-    
+
     //QmitkNumberPropertyEditor( mitk::GenericProperty<short>*, QWidget* parent, const char* name = 0 );
     QmitkNumberPropertyEditor( mitk::IntProperty*, QWidget* parent );
     QmitkNumberPropertyEditor( mitk::FloatProperty*, QWidget* parent );
     QmitkNumberPropertyEditor( mitk::DoubleProperty*, QWidget* parent );
-    
+
     virtual ~QmitkNumberPropertyEditor();
 
     short getDecimalPlaces() const;
     void setDecimalPlaces(short);
-    
+
     bool getShowPercent() const;
     void setShowPercent(bool);
 
@@ -72,12 +72,12 @@ class QmitkExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::
     };
 
     const int m_DataType;
-    
+
     short m_DecimalPlaces;            // how many decimal places are shown
     double m_FactorPropertyToSpinbox; // internal conversion factor. neccessary because spinbox ranges work only with ints
     double m_FactorSpinboxToDisplay;  // internal conversion factor. neccessary because spinbox ranges work only with ints
     bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
-  
+
   protected slots:
 
     void onValueChanged(int);

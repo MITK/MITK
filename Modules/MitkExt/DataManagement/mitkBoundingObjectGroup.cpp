@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,10 +33,10 @@ m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
 
 mitk::BoundingObjectGroup::~BoundingObjectGroup()
 {
-} 
+}
 
 void mitk::BoundingObjectGroup::UpdateOutputInformation()
-{  
+{
   if ( this->GetSource() )
   {
     this->GetSource()->UpdateOutputInformation();
@@ -50,7 +50,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
     GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
     GetGeometry()->SetBounds(boundsArray);
     GetTimeSlicedGeometry()->UpdateInformation();
-    return; 
+    return;
   }
 
   // initialize container
@@ -130,7 +130,7 @@ void mitk::BoundingObjectGroup::RemoveBoundingObject(mitk::BoundingObject::Point
 }
 
 bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
-{  
+{
   bool inside = false; // initialize with true for intersection, with false for union
   bool posInside = false;
   bool negInside = false;
@@ -151,7 +151,7 @@ bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
     case Difference:
       posInside = false;
       negInside = false;
-      // calculate union: each point, that is inside least one BoundingObject is considered inside the group        
+      // calculate union: each point, that is inside least one BoundingObject is considered inside the group
       if (m_BoundingObjects.at(i)->GetPositive())
         posInside = m_BoundingObjects.at(i)->IsInside(p) || posInside;
       else
@@ -166,7 +166,7 @@ bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
     default:
       inside = false;
       // calculate union: each point, that is inside least one BoundingObject is considered inside the group
-      inside = m_BoundingObjects.at(i)->IsInside(p) || inside;  
+      inside = m_BoundingObjects.at(i)->IsInside(p) || inside;
       if (inside) // shortcut, it is enough to find one object that contains the point
         i=m_BoundingObjects.size();
       break;

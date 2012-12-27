@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,15 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-namespace itk 
+namespace itk
 {
   // Constructor  (initialize standard values)
   template <class TInputImageType, class TOutputImageType>
   ShortestPathImageFilter<TInputImageType, TOutputImageType>
     ::ShortestPathImageFilter() :
-    m_FullNeighborsMode(false),   
+    m_FullNeighborsMode(false),
     m_MakeOutputImage(true),
-    m_StoreVectorOrder(false),    
+    m_StoreVectorOrder(false),
     m_CalcAllDistances(false),
     m_ActivateTimeOut(false),
       multipleEndPoints(false),
@@ -46,9 +46,9 @@ namespace itk
       if (m_MakeOutputImage)
       {
          this->SetNumberOfRequiredOutputs(1);
-       this->SetNthOutput( 0, OutputImageType::New() ); 
+       this->SetNthOutput( 0, OutputImageType::New() );
       }
-  } 
+  }
 
   template <class TInputImageType, class TOutputImageType>
   inline typename ShortestPathImageFilter<TInputImageType, TOutputImageType>::IndexType
@@ -59,7 +59,7 @@ namespace itk
     int dim = InputImageType::ImageDimension;
     IndexType coord;
     if (dim == 2)
-    {      
+    {
       coord[1] = node / size[0];
       coord[0] = node % size[0];
       if ((coord[0] >= size[0]) || (coord[1] >= size[1]))
@@ -69,7 +69,7 @@ namespace itk
       }
     }
     if (dim == 3)
-    {      
+    {
       coord[2] = node / (size[0]*size[1]);
       coord[1] = (node % (size[0]*size[1])) / size[0];
       coord[0] = (node % (size[0]*size[1])) % size[0];
@@ -81,19 +81,19 @@ namespace itk
       }
     }
 
-    return coord;    
+    return coord;
   }
 
   template <class TInputImageType, class TOutputImageType>
   inline typename itk::NodeNumType
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     CoordToNode (IndexType coord)
-  {    
+  {
     const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
     int dim = InputImageType::ImageDimension;
     NodeNumType node = 0;
     if (dim == 2)
-    {      
+    {
       node = (coord[1]*size[0]) + coord[0];
     }
     if (dim == 3)
@@ -122,7 +122,7 @@ namespace itk
 
     if (dim == 2)
     {
-      if ((coord[0] >= 0) 
+      if ((coord[0] >= 0)
         && (coord[0] < size[0])
         && (coord[1] >= 0 )
         && (coord[1] < size[1] ))
@@ -132,7 +132,7 @@ namespace itk
     }
     if (dim == 3)
     {
-      if ((coord[0] >= 0) 
+      if ((coord[0] >= 0)
         && (coord[0] < size[0])
         && (coord[1] >= 0 )
         && (coord[1] < size[1] )
@@ -257,19 +257,19 @@ namespace itk
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]-neighborDistance;
         NeighborCoord[2] = Coord[2];
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]-neighborDistance; 
+        NeighborCoord[0] = Coord[0]-neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2];
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2];
         if (CoordIsInBounds(NeighborCoord))
@@ -282,19 +282,19 @@ namespace itk
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]-neighborDistance;
         NeighborCoord[2] = Coord[2]-neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]-neighborDistance; 
+        NeighborCoord[0] = Coord[0]-neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2]-neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2]-neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
@@ -332,19 +332,19 @@ namespace itk
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]-neighborDistance;
         NeighborCoord[2] = Coord[2]+neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]-neighborDistance; 
+        NeighborCoord[0] = Coord[0]-neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2]+neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
           nodeList.push_back(&m_Nodes[CoordToNode(NeighborCoord)]);
 
-        NeighborCoord[0] = Coord[0]+neighborDistance; 
+        NeighborCoord[0] = Coord[0]+neighborDistance;
         NeighborCoord[1] = Coord[1]+neighborDistance;
         NeighborCoord[2] = Coord[2]+neighborDistance;
         if (CoordIsInBounds(NeighborCoord))
@@ -388,8 +388,8 @@ namespace itk
     for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
     {
       m_StartIndex[i] = StartIndex[i];
-    }    
-      m_Graph_StartNode = CoordToNode(m_StartIndex); 
+    }
+      m_Graph_StartNode = CoordToNode(m_StartIndex);
       //MITK_INFO << "StartIndex = " << StartIndex;
       //MITK_INFO << "StartNode = " << m_Graph_StartNode;
   }
@@ -403,7 +403,7 @@ namespace itk
     {
       m_EndIndex[i] = EndIndex[i];
     }
-      m_Graph_EndNode = CoordToNode(m_EndIndex); 
+      m_Graph_EndNode = CoordToNode(m_EndIndex);
       //MITK_INFO << "EndNode = " << m_Graph_EndNode;
   }
 
@@ -417,8 +417,8 @@ namespace itk
     {
       newEndIndex[i] = index[i];
     }
-      m_endPoints.push_back(newEndIndex);            
-      SetEndIndex( m_endPoints[0] );      
+      m_endPoints.push_back(newEndIndex);
+      SetEndIndex( m_endPoints[0] );
       multipleEndPoints = true;
   }
 
@@ -457,11 +457,11 @@ namespace itk
     // Initialize mainNodeList with that number
     m_Nodes = new ShortestPathNode[m_Graph_NumberOfNodes];
 
-    // Initialize each node in nodelist    
+    // Initialize each node in nodelist
     for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
-    {  
-      m_Nodes[i].distAndEst = -1; 
-      m_Nodes[i].distance = -1; 
+    {
+      m_Nodes[i].distAndEst = -1;
+      m_Nodes[i].distance = -1;
       m_Nodes[i].prevNode = -1;
       m_Nodes[i].mainListIndex=i;
          m_Nodes[i].closed=false;
@@ -483,7 +483,7 @@ namespace itk
 
       // init variables
     double durationAll = 0;
-    bool timeout = false; 
+    bool timeout = false;
     bool makeNewHeapNecessary = false;
       NodeNumType mainNodeListIndex = 0;
     DistanceType curNodeDistance = 0;
@@ -501,28 +501,28 @@ namespace itk
     // While there are discovered Nodes, pick the one with lowest distance,
       // update its neighbors and eventually delete it from the discovered Nodes list.
     while(!myMap.empty())
-    {     
+    {
          numberOfNodesChecked++;
          if ( (numberOfNodesChecked % (m_Graph_NumberOfNodes/100)) == 0)
          {
-            MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size() << "\n";            
+            MITK_INFO << "Checked " << ( numberOfNodesChecked / (m_Graph_NumberOfNodes/100) ) << "% List: " << myMap.size() << "\n";
          }
-         
+
          // Get element with lowest score
-         mainNodeListIndex = myMap.begin()->second->mainListIndex; 
-      curNodeDistAndEst = myMap.begin()->second->distAndEst; 
-      curNodeDistance = myMap.begin()->second->distance; 
+         mainNodeListIndex = myMap.begin()->second->mainListIndex;
+      curNodeDistAndEst = myMap.begin()->second->distAndEst;
+      curNodeDistance = myMap.begin()->second->distance;
          myMap.begin()->second->closed = true; // close it
 
-         // Debug:         
+         // Debug:
          //MITK_INFO << "INFO: size " << myMap.size();
          /*
          for (it = myMap.begin(); it != myMap.end(); ++it)
          {
-            MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+            MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;
          }
          */
-         
+
       // Kicks out element with lowest score
          myMap.erase( myMap.begin() );
 
@@ -535,7 +535,7 @@ namespace itk
       // Check neighbors
       std::vector<ShortestPathNode*> neighborNodes = GetNeighbors(mainNodeListIndex, m_Graph_fullNeighbors);
       for (NodeNumType i=0; i<neighborNodes.size(); i++)
-      {         
+      {
             if (neighborNodes[i]->closed)
                continue; // this nodes is already closed, go to next neighbor
 
@@ -552,17 +552,17 @@ namespace itk
           // if that neighbornode is not in discoverednodeList yet, Push it there and update
           if (neighborNodes[i]->distance == -1)
           {
-                  
+
             neighborNodes[i]->distance = newDistance;
             neighborNodes[i]->distAndEst = newDistance + getEstimatedCostsToTarget(coordNeighborNode);
-            neighborNodes[i]->prevNode = mainNodeListIndex;                                    
+            neighborNodes[i]->prevNode = mainNodeListIndex;
                   myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
                   /*
                   MITK_INFO << "Inserted: " << m_Nodes[neighborNodes[i]->mainListIndex].distAndEst << "|" << m_Nodes[neighborNodes[i]->mainListIndex].mainListIndex;
                   MITK_INFO << "INFO: size " << myMap.size();
                   for (it = myMap.begin(); it != myMap.end(); ++it)
                   {
-                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;
                   }
                   */
           }
@@ -585,7 +585,7 @@ namespace itk
                         }
 
                      }
-                  }   
+                  }
                   */
 
                   // 1st : find and delete old element
@@ -593,7 +593,7 @@ namespace itk
                   double lookFor = neighborNodes[i]->distAndEst;
                   unsigned int lookForId = neighborNodes[i]->mainListIndex;
                   ret = myMap.equal_range(neighborNodes[i]->distAndEst);
-                  
+
                   if ((ret.first == ret.second))
                   {
                      MITK_INFO << "No exact match!"; // if this happens, you are screwed
@@ -605,11 +605,11 @@ namespace itk
                         MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
                         ++it;
                         MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
-                        --it; 
+                        --it;
                         --it;
                         MITK_INFO << "Found: " << it->first << "  ID: " << it->second->mainListIndex;
                      }
-                     
+
                      // look if that ID is found in the map
                      for (it = myMap.begin(); it != myMap.end(); ++it)
                      {
@@ -622,22 +622,22 @@ namespace itk
                      }
                      */
                   }
-                  else 
+                  else
                   {
                      for (it=ret.first; it!=ret.second; ++it)
                      {
                         if (it->second->mainListIndex == neighborNodes[i]->mainListIndex)
                         {
-                           found = true;                           
+                           found = true;
                            myMap.erase(it);
                            /*
                            MITK_INFO << "INFO: size " << myMap.size();
                            MITK_INFO << "Erase: " << it->first << "|" << it->second->mainListIndex;
-                           
+
                            MITK_INFO << "INFO: size " << myMap.size();
                            for (it = myMap.begin(); it != myMap.end(); ++it)
                            {
-                              MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+                              MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;
                            }
                            */
                            break;
@@ -645,7 +645,7 @@ namespace itk
                      }
                   }
 
-                  
+
                   if (!found)
                   {
                      MITK_INFO << "Could not find it! :(";
@@ -655,7 +655,7 @@ namespace itk
                   // 2nd: update and insert new element
                   neighborNodes[i]->distance = newDistance;
             neighborNodes[i]->distAndEst = newDistance + getEstimatedCostsToTarget(coordNeighborNode);
-            neighborNodes[i]->prevNode = mainNodeListIndex;                          
+            neighborNodes[i]->prevNode = mainNodeListIndex;
                   //myMap.insert( std::pair<double,ShortestPathNode*> (neighborNodes[i]->distAndEst, neighborNodes[i]));
                   myMap.insert( std::pair<double,ShortestPathNode*> (m_Nodes[neighborNodes[i]->mainListIndex].distAndEst, &m_Nodes[neighborNodes[i]->mainListIndex]) );
 
@@ -663,33 +663,33 @@ namespace itk
                   //MITK_INFO << "INFO: size " << myMap.size();
                   /*for (it = myMap.begin(); it != myMap.end(); ++it)
                   {
-                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;         
+                     MITK_INFO << "(1) " << it->first << "|" << it->second->distAndEst << "|"<<it->second->mainListIndex;
                   }*/
-                  
+
           }
         }
-      }   
-      // finished with checking all neighbors. 
+      }
+      // finished with checking all neighbors.
 
       // Check Timeout, if activated
       if (m_ActivateTimeOut)
       {
         stopAll = clock();
-        durationAll =  (double)(stopAll - startAll) / CLOCKS_PER_SEC;   
+        durationAll =  (double)(stopAll - startAll) / CLOCKS_PER_SEC;
         if (durationAll >= 30)
         {
-          MITK_INFO << "TIMEOUT!! Search took over 30 seconds"; 
+          MITK_INFO << "TIMEOUT!! Search took over 30 seconds";
           timeout = true ;
         }
       }
 
          // Check end criteria:
          // For multiple points
-         if ( multipleEndPoints )         
+         if ( multipleEndPoints )
          {
             // super slow, make it faster
             for (int i=0 ;i<m_endPoints.size(); i++)
-            { 
+            {
                if (CoordToNode(m_endPoints[i]) == mainNodeListIndex)
                {
                   m_endPointsClosed.push_back(NodeToCoord(mainNodeListIndex));
@@ -701,12 +701,12 @@ namespace itk
                   }
                   if (m_Graph_EndNode == mainNodeListIndex)
                   {
-                     // set new end 
-                     SetEndIndex( m_endPoints[0] );                    
+                     // set new end
+                     SetEndIndex( m_endPoints[0] );
                   }
                }
-            }            
-         }      
+            }
+         }
          // if single end point, then end, if this one is reached or timeout happened.
       else if ( ( mainNodeListIndex == m_Graph_EndNode || timeout) && !m_CalcAllDistances)
       {
@@ -727,14 +727,14 @@ namespace itk
       if (m_MakeOutputImage)
       {
        OutputImagePointer output0 = this->GetOutput(0);
-       output0->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );      
+       output0->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
          output0->Allocate();
-         OutputImageIteratorType shortestPathImageIt (output0, output0->GetRequestedRegion());        
-         // Create ShortestPathImage (Output 0)    
+         OutputImageIteratorType shortestPathImageIt (output0, output0->GetRequestedRegion());
+         // Create ShortestPathImage (Output 0)
        for (shortestPathImageIt.GoToBegin(); !shortestPathImageIt.IsAtEnd(); ++shortestPathImageIt)
        {
          // First intialize with background color
-         shortestPathImageIt.Set( BACKGROUND ) ;           
+         shortestPathImageIt.Set( BACKGROUND ) ;
        }
 
          if (!multipleEndPoints) // Only one path was calculated
@@ -767,11 +767,11 @@ namespace itk
   {
       // Create Vector Order Image
       // Return it
-    
-      OutputImagePointer image = OutputImageType::New();    
+
+      OutputImagePointer image = OutputImageType::New();
       image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
       image->Allocate();
-      OutputImageIteratorType vectorOrderImageIt  (image, image->GetRequestedRegion());     
+      OutputImageIteratorType vectorOrderImageIt  (image, image->GetRequestedRegion());
 
 
       MITK_INFO << "GetVectorOrderImage";
@@ -797,23 +797,23 @@ namespace itk
       // Create Distance Image
       // Return it
 
-      OutputImagePointer image = OutputImageType::New();    
+      OutputImagePointer image = OutputImageType::New();
       image->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
       image->Allocate();;
       OutputImageIteratorType distanceImageIt     (image, image->GetRequestedRegion());
-      // Create Distance Image (Output 1)          
-      NodeNumType myNodeNum;    
+      // Create Distance Image (Output 1)
+      NodeNumType myNodeNum;
       for (distanceImageIt.GoToBegin(); !distanceImageIt.IsAtEnd(); ++distanceImageIt)
       {
          IndexType index = distanceImageIt.GetIndex();
-         myNodeNum = CoordToNode(index); 
+         myNodeNum = CoordToNode(index);
          double newVal = m_Nodes[myNodeNum].distance;
-         distanceImageIt.Set(newVal);     
+         distanceImageIt.Set(newVal);
       }
    }
 
 
- 
+
   template <class TInputImageType, class TOutputImageType>
   std::vector< itk::Index<3> >
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
@@ -836,27 +836,27 @@ namespace itk
     MakeShortestPathVector()
   {
       MITK_INFO << "Make ShortestPath Vec";
-      
+
       // single end point
       if ( !multipleEndPoints )
       {
          // fill m_VectorPath with the Shortest Path
          m_VectorPath.clear();
 
-         // Go backwards from endnote to startnode    
-         NodeNumType prevNode = m_Graph_EndNode;       
-         while (prevNode != -1) 
-         { 
-            m_VectorPath.push_back( NodeToCoord(prevNode) );           
+         // Go backwards from endnote to startnode
+         NodeNumType prevNode = m_Graph_EndNode;
+         while (prevNode != -1)
+         {
+            m_VectorPath.push_back( NodeToCoord(prevNode) );
 
             if (prevNode == m_Graph_StartNode)
                break;
 
-            prevNode = m_Nodes[prevNode].prevNode;     
+            prevNode = m_Nodes[prevNode].prevNode;
          }
 
-         // reverse it 
-         std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
+         // reverse it
+         std::reverse(m_VectorPath.begin(), m_VectorPath.end() );
       }
       // Multiple end end points and pathes
       else
@@ -864,23 +864,23 @@ namespace itk
          for (int i=0; i<m_endPointsClosed.size(); i++)
          {
             m_VectorPath.clear();
-            // Go backwards from endnote to startnode    
-            NodeNumType prevNode = CoordToNode(m_endPointsClosed[i]);       
-            while (prevNode != -1) 
-            { 
-               m_VectorPath.push_back( NodeToCoord(prevNode) );           
+            // Go backwards from endnote to startnode
+            NodeNumType prevNode = CoordToNode(m_endPointsClosed[i]);
+            while (prevNode != -1)
+            {
+               m_VectorPath.push_back( NodeToCoord(prevNode) );
 
                if (prevNode == m_Graph_StartNode)
                   break;
 
-               prevNode = m_Nodes[prevNode].prevNode;     
+               prevNode = m_Nodes[prevNode].prevNode;
             }
 
-            // reverse it 
-            std::reverse(m_VectorPath.begin(), m_VectorPath.end() ); 
+            // reverse it
+            std::reverse(m_VectorPath.begin(), m_VectorPath.end() );
             // push_back
             m_MultipleVectorPaths.push_back( m_VectorPath );
-         }         
+         }
       }
   }
 
@@ -889,14 +889,14 @@ namespace itk
   void
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     CleanUp()
-  {      
-      
+  {
+
 
       m_VectorPath.clear();
       //TODO: if multiple Path, clear all multiple Paths
     /*
     for (NodeNumType i=0; i<m_Graph_NumberOfNodes; i++)
-    {      
+    {
     delete m_Nodes[i];
     }*/
 
@@ -911,7 +911,7 @@ namespace itk
   void
     ShortestPathImageFilter<TInputImageType, TOutputImageType>::
     GenerateData()
-  {     
+  {
     // Build Graph
     InitGraph();
 
@@ -923,7 +923,7 @@ namespace itk
 
     // Make Outputs
     MakeOutputs();
-  } 
+  }
 
   template <class TInputImageType, class TOutputImageType>
   void

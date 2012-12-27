@@ -1,0 +1,46 @@
+/**
+\page DeploymentPage Deployment
+
+\section DeploymentPageIntroduction Introduction
+
+<ul>
+  <li> easily create portable or installable versions of your MITK-based applications.
+  <li> created packages include all MITK and 3rd party libraries necessary for running the application on other systems
+  <li> distribute your binary application to other people without giving them your source code or putting them in the need for setting up a development environment themselves, eg for evaluation of your tool.
+</ul>
+
+\note This does not install the MITK headers (like an SDK). If you want to develop applications based on MITK you still have to compile MITK yourself.
+
+\section DeploymentPagePlatform Platform specific notes
+
+\subsection DeploymentPagePlatformLinux Linux
+
+You can create a tarball (.tar.gz) of your MITK application which includes all necessary non-system libraries by following these steps:
+
+<ul>
+  <li> Set the %CMake Variable CMAKE_BUILD_TYPE to either "Debug" or "Release". Any other type (or leaving the variable empty) will not work.
+  <li> If you are using third-pary libraries not shipped with MITK, you might need to add the paths to the third-party libs to your LD_LIBRARY_PATH environment variable (not necessary if you use RPATH in your shared libraries).
+  <li> Type "make package" in your build-tree. This will create a tarball in your build-tree directory.
+</ul>
+
+\note Libraries in system locations (/lib/, /lib32/, /lib64/, /usr/lib/, /usr/lib32/,/usr/lib64/, and /usr/X11R6/) will not be included in the tarball. If you want to distribute Qt (for example), you have to do a custom Qt installation outside of these directories.
+
+\subsection DeploymentPagePlatformWindows Windows
+
+You can create a Zip file (.zip) or an NSIS installer (needs an installation of <a href="http://nsis.sourceforge.net/Main_Page">NSIS</a>) for Windows platforms. Only "Release" builds are supported during packaging, the results of trying to package "Debug" builds are undefined.
+
+\note Building installers based on MinGW is not supported.
+
+<ul>
+  <li> In Visual Studio, build the "PACKAGE" project, this will create a .zip file and a .exe NSIS installer (if NSIS is installed).
+</ul>
+
+On some systems, it might still be necessary to install the Microsoft Visual C++ Redistributable Package to start the installed application successfully.
+
+\subsection DeploymentPagePlatformMacOS MacOS
+
+You can create a drag'n drop disk image (.dmg) file for MacOS. The procedure is pretty much the same as for Linux.
+
+\note On MacOS, libraries in system locations as pointed out in the Linux section \b and libraries located in /System/Library will not be copied. If you want to distribute any libraries from these locations, you have to install them somewhere else prior to configuring your MITK build.
+
+*/

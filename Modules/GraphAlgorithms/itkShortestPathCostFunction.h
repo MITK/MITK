@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 #include "itkShapedNeighborhoodIterator.h"
 #include <itkImageRegionConstIterator.h>
- 
+
 
 namespace itk
 {
 
   // \brief this is a pure virtual superclass for all cost function for the itkShortestPathImageFilter
-  template <class TInputImageType>            
+  template <class TInputImageType>
   class ShortestPathCostFunction : public Object
   {
   public:
@@ -38,7 +38,7 @@ namespace itk
     typedef SmartPointer<const Self>  ConstPointer;
     typedef ShapedNeighborhoodIterator< TInputImageType > itkShapedNeighborhoodIteratorType;
 
-  
+
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunction, Object);
 
@@ -50,7 +50,7 @@ namespace itk
     typedef typename TInputImageType::ConstPointer          ImageConstPointer;
 
 
-    typedef typename TInputImageType::PixelType             PixelType;    
+    typedef typename TInputImageType::PixelType             PixelType;
 
     typedef typename TInputImageType::IndexType             IndexType;
 
@@ -80,7 +80,7 @@ namespace itk
     virtual ~ShortestPathCostFunction() {};
     void PrintSelf(std::ostream& os, Indent indent) const;
     ImageConstPointer    m_Image;
-    IndexType m_StartIndex, m_EndIndex; 
+    IndexType m_StartIndex, m_EndIndex;
 
   private:
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -75,7 +75,7 @@ class mitkDataNodeExtTestClass { public:
 static void TestDataSetting(mitk::DataNode::Pointer dataNode)
 {
 
-  mitk::BaseData::Pointer baseData; 
+  mitk::BaseData::Pointer baseData;
 
   //NULL pointer Test
   dataNode->SetData(baseData);
@@ -190,24 +190,24 @@ int mitkDataNodeExtTest(int /* argc */, char* /*argv*/[])
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation")
 
   //test setData() Method
   mitkDataNodeExtTestClass::TestDataSetting(myDataNode);
   mitkDataNodeExtTestClass::TestMapperSetting(myDataNode);
-  
+
   //note, that no data is set to the dataNode
   mitkDataNodeExtTestClass::TestInteractorSetting(myDataNode);
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
-  
+
   // always end with this!
   MITK_TEST_END()
 }

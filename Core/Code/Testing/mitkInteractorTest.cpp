@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,18 +38,18 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   //load interactor
   std::cout << "Testing to initialize the interactor";
   MITK_TEST_CONDITION_REQUIRED(interactor.IsNotNull(),"Testing to initialize the interactor")
-  
+
   std::cout<<"The pattern of the interactor is called: "<<interactor->GetType()<<std::endl;
-  
+
   //creating an event to go from state 0 to state 1:
   //<!-- middle MouseButton -->
   //<event NAME="middle MouseBN" ID="4" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0000" KEY="Key_none" />
   mitk::Event *event = new mitk::Event(NULL, mitk::Type_MouseButtonPress, mitk::BS_MidButton, mitk::BS_NoButton, mitk::Key_none);
   mitk::StateEvent *stateEvent = new mitk::StateEvent(4, event);
   MITK_TEST_CONDITION_REQUIRED(interactor->HandleEvent(stateEvent),"Testing to send an event to go from State 0 to State 1")
-  
+
   MITK_TEST_CONDITION_REQUIRED(interactor->GetMode() == mitk::Interactor::SMSELECTED,"Testing right Mode and thus right action behavior")
-  
+
   //statemachine should have called transition "initmove", executed action with he id 9 and currentState should be 1 = "move"
   delete event;
 
@@ -73,7 +73,7 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(returnvalue == 0.5,"Testing to call CanHandleEvent with next event")
   std::cout<<"CanHandleEvent returned: "<<returnvalue<<std::endl;
 
-  //The transition "finish" should call no action an lead into state 0 = startState 
+  //The transition "finish" should call no action an lead into state 0 = startState
   MITK_TEST_CONDITION_REQUIRED(interactor->HandleEvent(stateEvent),"Testing to send next event leading back to startState0")
 
   MITK_TEST_CONDITION_REQUIRED(interactor->GetMode() == mitk::Interactor::SMDESELECTED,"Testing right Mode and thus right action behavior")
@@ -86,6 +86,6 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   delete stateEvent;
   stateEvent = NULL;
   MITK_TEST_CONDITION_REQUIRED( ! interactor->HandleEvent(stateEvent),"Testing to send stateEvent == NULL to interactor")
-  
+
   MITK_TEST_END()
 }

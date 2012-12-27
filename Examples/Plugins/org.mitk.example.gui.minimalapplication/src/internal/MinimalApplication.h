@@ -17,8 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MINIMALAPPLICATION_H_
 #define MINIMALAPPLICATION_H_
 
+// Berry
 #include <berryIApplication.h>
 
+// Qt
 #include <QObject>
 #include <QScopedPointer>
 
@@ -28,12 +30,12 @@ class MinimalApplication : public QObject, public berry::IApplication
 {
   Q_OBJECT
   Q_INTERFACES(berry::IApplication)
-  
+
 public:
-  
+
   MinimalApplication();
   ~MinimalApplication();
-  
+
   int Start();
   void Stop();
 

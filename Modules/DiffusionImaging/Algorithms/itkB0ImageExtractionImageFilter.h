@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,10 +25,10 @@ namespace itk{
   *
   */
 
-  template< class TInputImagePixelType, 
+  template< class TInputImagePixelType,
   class TOutputImagePixelType >
   class B0ImageExtractionImageFilter :
-    public ImageToImageFilter< VectorImage<TInputImagePixelType, 3>, 
+    public ImageToImageFilter< VectorImage<TInputImagePixelType, 3>,
     Image< TOutputImagePixelType, 3 > >
   {
 
@@ -37,15 +37,15 @@ namespace itk{
     typedef B0ImageExtractionImageFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< VectorImage< TInputImagePixelType, 3 >, 
+    typedef ImageToImageFilter< VectorImage< TInputImagePixelType, 3 >,
       Image< TOutputImagePixelType, 3 >  >
       Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);  
+    itkNewMacro(Self);
 
     /** Runtime information support. */
-    itkTypeMacro(B0ImageExtractionImageFilter, 
+    itkTypeMacro(B0ImageExtractionImageFilter,
       ImageToImageFilter);
 
     typedef TInputImagePixelType                     InputPixelType;
@@ -69,10 +69,10 @@ namespace itk{
     { this->m_Directions = directions; }
 
   protected:
-    
+
     B0ImageExtractionImageFilter();
     virtual ~B0ImageExtractionImageFilter() {};
-    
+
     void GenerateData();
 
     GradientDirectionContainerType::Pointer   m_Directions;

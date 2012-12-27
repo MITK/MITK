@@ -12,7 +12,7 @@
 @BEGIN_NAMESPACE@
 
 /*!
-  \brief @VIEW_CLASS@ 
+  \brief @VIEW_CLASS@
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -20,12 +20,12 @@
   \ingroup Functionalities
 */
 class @VIEW_CLASS@ : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
@@ -38,7 +38,7 @@ class @VIEW_CLASS@ : public QmitkFunctionality
     virtual void StdMultiWidgetNotAvailable();
 
   protected slots:
-  
+
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
 

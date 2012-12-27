@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkIGTTutorialView::VIEW_ID = "org.mitk.views.igttutorial";
 
 QmitkIGTTutorialView::QmitkIGTTutorialView()
-: QmitkFunctionality(), 
+: QmitkFunctionality(),
   m_Controls(NULL),  m_MultiWidget(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
 {
 }
@@ -92,9 +92,9 @@ void QmitkIGTTutorialView::Deactivated()
 
 void QmitkIGTTutorialView::OnStartIGT()
 {
-  //This method is called when the Do IGT button is pressed. Any kind of navigation application will 
-  //start with the connection to a tracking system and as we do image guided procedures we want to show 
-  //something on the screen. In this tutorial we connect to the NDI Polaris tracking system and we will 
+  //This method is called when the Do IGT button is pressed. Any kind of navigation application will
+  //start with the connection to a tracking system and as we do image guided procedures we want to show
+  //something on the screen. In this tutorial we connect to the NDI Polaris tracking system and we will
   //show the movement of a tool as cone in MITK.
 
   //Check if we have a widget for visualization. Makes no sense to start otherwise.
@@ -113,7 +113,7 @@ void QmitkIGTTutorialView::OnStartIGT()
   {
 /**************** Variant 1: Use a NDI Polaris Tracking Device ****************/
     ////Here we want to use the NDI Polaris tracking device. Therefore we instantiate a object of the class
-    ////NDITrackingDevice and make some settings which are necessary for a proper connection to the device. 
+    ////NDITrackingDevice and make some settings which are necessary for a proper connection to the device.
     //mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();  //instantiate
     //tracker->SetPortNumber(mitk::SerialCommunication::COM4); //set the comport
     //tracker->SetBaudRate(mitk::SerialCommunication::BaudRate115200); //set the baud rate
@@ -122,11 +122,11 @@ void QmitkIGTTutorialView::OnStartIGT()
     ////The tools represent the sensors of the tracking device. In this case we have one pointer tool.
     ////The TrackingDevice object it self fills the tool with data. So we have to add the tool to the
     ////TrackingDevice object.
-    //mitk::NDIPassiveTool::Pointer tool = mitk::NDIPassiveTool::New(); 
+    //mitk::NDIPassiveTool::Pointer tool = mitk::NDIPassiveTool::New();
     //tool->SetToolName("MyInstrument"); //Every tool should have a name.
     //tool->LoadSROMFile("c:\\myinstrument.rom"); //The Polaris system needs a ".rom" file which describes
     ////the geometry of the markers related to the tool tip.
-    ////NDI provides an own software (NDI architect) to 
+    ////NDI provides an own software (NDI architect) to
     ////generate those files.
 
     ////tool->LoadSROMFile(mitk::StandardFileLocations::GetInstance()->FindFile("myToolDefinitionFile.srom").c_str());
@@ -144,13 +144,13 @@ void QmitkIGTTutorialView::OnStartIGT()
 
     //The tracking device object is used for the physical connection to the device. To use the
     //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
-    //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores 
-    //position, orientation, if the data is valid or not and special error informations in a covariance 
+    //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
+    //position, orientation, if the data is valid or not and special error informations in a covariance
     //matrix.
     //
-    //Typically the start of a pipeline is a TrackingDeviceSource. To work correct we have to set a 
+    //Typically the start of a pipeline is a TrackingDeviceSource. To work correct we have to set a
     //TrackingDevice object. Attention you have to set the tools before you set the whole TrackingDevice
-    //object to the TrackingDeviceSource because the source need to know how many outputs should be 
+    //object to the TrackingDeviceSource because the source need to know how many outputs should be
     //generated.
     m_Source = mitk::TrackingDeviceSource::New();   //We need the filter objects to stay alive,
                                                     //therefore they must be members.
@@ -164,9 +164,9 @@ void QmitkIGTTutorialView::OnStartIGT()
     //to show it inside of the rendering windows. After that you can change the properties of the cone
     //to manipulate rendering, e.g. the position and orientation as in our case.
     mitk::Cone::Pointer cone = mitk::Cone::New();                 //instantiate a new cone
-    float scale[] = {10.0, 10.0, 10.0}; 
+    float scale[] = {10.0, 10.0, 10.0};
     cone->GetGeometry()->SetSpacing(scale);                       //scale it a little that so we can see something
-    mitk::DataNode::Pointer node = mitk::DataNode::New(); //generate a new node to store the cone into 
+    mitk::DataNode::Pointer node = mitk::DataNode::New(); //generate a new node to store the cone into
                                                                   //the DataStorage.
     node->SetData(cone);                          //The data of that node is our cone.
     node->SetName("My tracked object");           //The node has additional properties like a name
@@ -175,7 +175,7 @@ void QmitkIGTTutorialView::OnStartIGT()
                                                   //DataStorage, MITK will show the cone in the
                                                   //render windows.
 
-    //For updating the render windows we use another filter of the MITK-IGT pipeline concept. The 
+    //For updating the render windows we use another filter of the MITK-IGT pipeline concept. The
     //NavigationDataObjectVisualizationFilter needs as input a NavigationData and a
     //PolyData. In our case the input is the source and the PolyData our cone.
 
@@ -184,9 +184,9 @@ void QmitkIGTTutorialView::OnStartIGT()
     m_Visualizer->SetInput(0, m_Source->GetOutput(0));        //Then we connect to the pipeline.
     m_Visualizer->SetRepresentationObject(0, cone);  //After that we have to assign the cone to the input
 
-    //Now this simple pipeline is ready, so we can start the tracking. Here again: We do not call the 
+    //Now this simple pipeline is ready, so we can start the tracking. Here again: We do not call the
     //StartTracking method from the tracker object itself. Instead we call this method from our source.
-    m_Source->StartTracking(); 
+    m_Source->StartTracking();
 
     //Now every call of m_Visualizer->Update() will show us the cone at the position and orientation
     //given from the tracking device.
@@ -194,7 +194,7 @@ void QmitkIGTTutorialView::OnStartIGT()
     if (m_Timer == NULL)
     {
       m_Timer = new QTimer(this);  //create a new timer
-    }    
+    }
     connect(m_Timer, SIGNAL(timeout()), this, SLOT(OnTimer())); //connect the timer to the method OnTimer()
 
     m_Timer->start(100);  //Every 100ms the method OnTimer() is called. -> 10fps

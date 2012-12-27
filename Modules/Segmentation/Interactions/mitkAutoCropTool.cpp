@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,14 +46,14 @@ std::string mitk::AutoCropTool::GetErrorMessage()
 {
   return "Cropping of these nodes failed:";
 }
-    
+
 bool mitk::AutoCropTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {
     Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNull()) return false;
-      
+
 //     if (image->GetDimension() == 4)
 //     {
 //       Tool::ErrorMessage.Send("Cropping 3D+t segmentations is not implemented. Sorry. Bug #1281");

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -62,8 +62,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
-  : BaseRenderer(name,renWin, rm), 
-  m_VtkMapperPresent(false), 
+  : BaseRenderer(name,renWin, rm),
+  m_VtkMapperPresent(false),
   m_NewRenderer(true),
   m_CameraInitializedForMapperID(0)
 {
@@ -162,7 +162,7 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
 
 
 /*!
-\brief 
+\brief
 
 Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
@@ -170,7 +170,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
 
   // Do we have objects to render?
-  if ( this->GetEmptyWorldGeometry()) 
+  if ( this->GetEmptyWorldGeometry())
     return 0;
 
   if ( m_DataStorage.IsNull())
@@ -179,11 +179,11 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   // Update mappers and prepare mapper queue
   if (type == VtkPropRenderer::Opaque)
     this->PrepareMapperQueue();
-  
+
   //go through the generated list and let the sorted mappers paint
   bool lastVtkBased = true;
   //bool sthVtkBased = false;
-  
+
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
@@ -232,7 +232,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     //end Workarround for bug GL_TEXTURE_2D (bug #8188)
 
   }
-  
+
   if (lastVtkBased == false)
     Disable2DOpenGL();
 
@@ -307,41 +307,41 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int nr = (layer<<16) + mapperNo;
     m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
-  }  
+  }
 }
 
 /*!
-\brief 
+\brief
 
 Enable2DOpenGL() and Disable2DOpenGL() are used to switch between 2D rendering (orthographic projection) and 3D rendering (perspective projection)
 */
 void mitk::VtkPropRenderer::Enable2DOpenGL()
 {
-  GLint iViewport[4];  
+  GLint iViewport[4];
 
-  // Get a copy of the viewport  
-  glGetIntegerv( GL_VIEWPORT, iViewport );  
+  // Get a copy of the viewport
+  glGetIntegerv( GL_VIEWPORT, iViewport );
 
-  // Save a copy of the projection matrix so that we can restore it  
-  // when it's time to do 3D rendering again.  
-  glMatrixMode( GL_PROJECTION );  
+  // Save a copy of the projection matrix so that we can restore it
+  // when it's time to do 3D rendering again.
+  glMatrixMode( GL_PROJECTION );
   glPushMatrix();
-  glLoadIdentity();  
+  glLoadIdentity();
 
-  // Set up the orthographic projection  
-  glOrtho( 
+  // Set up the orthographic projection
+  glOrtho(
       iViewport[0], iViewport[0]+iViewport[2],
       iViewport[1], iViewport[1]+iViewport[3],
       -1.0, 1.0
       );
-  glMatrixMode( GL_MODELVIEW );  
-  glPushMatrix();  
+  glMatrixMode( GL_MODELVIEW );
+  glPushMatrix();
   glLoadIdentity();
 
-  // Make sure depth testing and lighting are disabled for 2D rendering until  
-  // we are finished rendering in 2D  
+  // Make sure depth testing and lighting are disabled for 2D rendering until
+  // we are finished rendering in 2D
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );
-  glDisable( GL_DEPTH_TEST );  
+  glDisable( GL_DEPTH_TEST );
   glDisable( GL_LIGHTING );
 }
 
@@ -353,10 +353,10 @@ Enable2DOpenGL() and Disable2DOpenGL() are used to switch between 2D rendering (
 void mitk::VtkPropRenderer::Disable2DOpenGL()
 {
   glPopAttrib();
-  glMatrixMode( GL_PROJECTION );  
-  glPopMatrix();  
-  glMatrixMode( GL_MODELVIEW );  
-  glPopMatrix(); 
+  glMatrixMode( GL_PROJECTION );
+  glPopMatrix();
+  glMatrixMode( GL_MODELVIEW );
+  glPopMatrix();
 }
 
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
@@ -575,7 +575,7 @@ mitk::DataNode *
         continue;
 
       m_CellPicker->AddPickList( prop );
-    }  
+    }
 
 
     // Do the picking and retrieve the picked vtkProp (if any)
@@ -609,13 +609,13 @@ mitk::DataNode *
       {
         return node;
       }
-    }  
+    }
 
     return NULL;
   }
   else
   {
-    return Superclass::PickObject( displayPosition, worldPosition ); 
+    return Superclass::PickObject( displayPosition, worldPosition );
   }
 };
 
@@ -733,7 +733,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
     Mapper::Pointer mapper = node->GetMapper(m_MapperID);
     if(mapper.IsNotNull())
       mapper->ReleaseGraphicsResources(renWin);
-  } 
+  }
 }
 
 
@@ -778,14 +778,14 @@ void mitk::VtkPropRenderer::checkState()
     {
       didCount = true;
       glWorkAroundGlobalCount++;
-      
+
       if (glWorkAroundGlobalCount == 2)
       {
         MITK_INFO << "Multiple 3D Renderwindows active...: turning Immediate Rendering ON for legacy mappers";
         //          vtkMapper::GlobalImmediateModeRenderingOn();
       }
       //MITK_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
-      
+
     }
   }
   else

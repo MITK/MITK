@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,7 +47,7 @@ vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 
 void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
-  vtkLinearTransform * vtktransform = 
+  vtkLinearTransform * vtktransform =
     this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   m_SpheresActor->SetUserTransform(vtktransform);
@@ -103,13 +103,13 @@ void mitk::MeshVtkMapper3D::GenerateData()
 
   mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( this->GetTimestep() );
 
-  if ( itkMesh.GetPointer() == NULL) 
+  if ( itkMesh.GetPointer() == NULL)
   {
     m_PropAssembly->VisibilityOff();
     return;
   }
 
-  
+
   mitk::Mesh::PointsContainer::Iterator i;
 
   int j;
@@ -119,8 +119,8 @@ void mitk::MeshVtkMapper3D::GenerateData()
   mitk::Color tmpColor;
 
   // check for color prop and use it for rendering if it exists
-  m_DataNode->GetColor(floatRgba, NULL); 
- 
+  m_DataNode->GetColor(floatRgba, NULL);
+
   if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetProperty("unselectedcolor")) != NULL)
   {
     tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor"))->GetValue();

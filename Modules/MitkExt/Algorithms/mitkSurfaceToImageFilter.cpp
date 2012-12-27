@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,19 +56,19 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 {
   mitk::Image *inputImage = (mitk::Image*)this->GetImage();
   mitk::Image::Pointer output = this->GetOutput();
- 
+
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if((inputImage == NULL) || 
-     (inputImage->IsInitialized() == false) || 
+  if((inputImage == NULL) ||
+     (inputImage->IsInitialized() == false) ||
      (inputImage->GetTimeSlicedGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
     output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeSlicedGeometry());
   else
-    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());  
+    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
 
-  output->SetPropertyList(inputImage->GetPropertyList()->Clone());    
+  output->SetPropertyList(inputImage->GetPropertyList()->Clone());
 }
 
 void mitk::SurfaceToImageFilter::GenerateData()
@@ -77,7 +77,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
   mitk::Image::Pointer output = this->GetOutput();
 
   if(inputImage.IsNull())
-    return;  
+    return;
 
   if(output->IsInitialized()==false )
     return;
@@ -95,7 +95,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
       Stencil3DImage( t );
     }
   }
-  else 
+  else
   {
     Stencil3DImage( 0 );
   }
@@ -108,7 +108,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   // Convert time step from image time-frame to surface time-frame
   int surfaceTimeStep = surfaceTimeGeometry->TimeStepToTimeStep( imageTimeGeometry, time );
-  
+
   vtkPolyData * polydata = ( (mitk::Surface*)GetInput() )->GetVtkPolyData( surfaceTimeStep );
 
   vtkTransformPolyDataFilter * move=vtkTransformPolyDataFilter::New();
@@ -145,13 +145,13 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   normalsFilter->Delete();
 
   mitk::Image::Pointer binaryImage = mitk::Image::New();
-  
+
   if (m_MakeOutputBinary)
   {
     binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeSlicedGeometry());
-  
+
     unsigned int size = sizeof(unsigned char);
-    for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i) 
+    for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i)
       size *= binaryImage->GetDimension(i);
 
     memset(binaryImage->GetData(), 1, size);
@@ -160,7 +160,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   vtkImageData *image = m_MakeOutputBinary
     ? binaryImage->GetVtkImageData(time)
     : const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
-  
+
   // Create stencil and use numerical minimum of pixel type as background value
   vtkImageStencil *stencil = vtkImageStencil::New();
   stencil->SetInput(image);
@@ -194,16 +194,16 @@ const mitk::Surface *mitk::SurfaceToImageFilter::GetInput(void)
 void mitk::SurfaceToImageFilter::SetInput(const mitk::Surface *input)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, 
+  this->ProcessObject::SetNthInput(0,
     const_cast< mitk::Surface * >( input ) );
 }
 
 void mitk::SurfaceToImageFilter::SetImage(const mitk::Image *source)
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );  
+  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );
 }
 
 const mitk::Image *mitk::SurfaceToImageFilter::GetImage(void)
 {
-  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));    
+  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));
 }

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ void
 mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
 {
   QmitkNodeDescriptorManager* descriptorManager = QmitkNodeDescriptorManager::GetInstance();
-  
+
   // Adding "PlanarLine"
   mitk::NodePredicateDataType::Pointer isPlanarLine = mitk::NodePredicateDataType::New("PlanarLine");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarLine"), QString(":/QmitkExt/PlanarLine_48.png"), isPlanarLine, descriptorManager));
@@ -36,23 +36,23 @@ mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
   // Adding "PlanarCircle"
   mitk::NodePredicateDataType::Pointer isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarCircle"), QString(":/QmitkExt/PlanarCircle_48.png"), isPlanarCircle, descriptorManager));
-  
+
   // Adding "PlanarAngle"
   mitk::NodePredicateDataType::Pointer isPlanarAngle = mitk::NodePredicateDataType::New("PlanarAngle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarAngle"), QString(":/QmitkExt/PlanarAngle_48.png"), isPlanarAngle, descriptorManager));
-  
+
   // Adding "PlanarFourPointAngle"
   mitk::NodePredicateDataType::Pointer isPlanarFourPointAngle = mitk::NodePredicateDataType::New("PlanarFourPointAngle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarFourPointAngle"), QString(":/QmitkExt/PlanarFourPointAngle_48.png"), isPlanarFourPointAngle, descriptorManager));
-  
+
   // Adding "PlanarRectangle"
   mitk::NodePredicateDataType::Pointer isPlanarRectangle = mitk::NodePredicateDataType::New("PlanarRectangle");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarRectangle"), QString(":/QmitkExt/PlanarRectangle_48.png"), isPlanarRectangle, descriptorManager));
-  
+
   // Adding "PlanarPolygon"
   mitk::NodePredicateDataType::Pointer isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarPolygon"), QString(":/QmitkExt/PlanarPolygon_48.png"), isPlanarPolygon, descriptorManager));
-  
+
   // Adding "PlanarPath"
   mitk::NodePredicateProperty::Pointer isNotClosedPolygon = mitk::NodePredicateProperty::New("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
   mitk::NodePredicateAnd::Pointer isPlanarPath = mitk::NodePredicateAnd::New(isNotClosedPolygon, isPlanarPolygon);

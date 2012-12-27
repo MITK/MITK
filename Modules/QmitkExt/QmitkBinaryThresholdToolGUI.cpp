@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -118,14 +118,14 @@ void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
 void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
 {
   if (m_BinaryThresholdTool.IsNotNull())
-  {    
+  {
      m_ChangingSlider = true;
     double doubleVal = SliderIntToDouble(value);
     if (m_ChangingSpinner == false)
       m_Spinner->setValue(doubleVal);
     m_ChangingSlider = false;
   }
-  
+
 }
 
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
@@ -165,13 +165,13 @@ void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lo
   {
      m_Slider->setRange(int(lower), int(upper));
      m_Spinner->setDecimals(0);
-     m_Spinner->setSingleStep(1);     
+     m_Spinner->setSingleStep(1);
   }
   else
   {
      m_Slider->setRange(0, 99);
      m_Spinner->setDecimals(2);
-     m_Range = upper-lower; 
+     m_Range = upper-lower;
      m_Spinner->setSingleStep(m_Range/100);
   }
 

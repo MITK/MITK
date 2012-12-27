@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,6 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+  /**
+    * \brief Creates connectomics networks from fibers and parcellation
+    *
+    * This class needs a parcellation image and a fiber image to be set. Then you can create
+    * a connectomics network from the two, using different strategies.
+    */
+
   class MitkDiffusionImaging_EXPORT ConnectomicsNetworkCreator : public itk::Object
   {
   public:
@@ -53,10 +60,10 @@ namespace mitk
     itkNewMacro(Self);
 
     /** Types for the standardized Tract **/
-    typedef itk::Point<float,3>                                          PointType; 
+    typedef itk::Point<float,3>                                          PointType;
     typedef itk::VectorContainer<unsigned int, PointType>                TractType;
     typedef itk::VectorContainer< unsigned int, TractType::Pointer >     TractContainerType; //init via smartpointer
-    
+
 
     /** Types for Network **/
     typedef mitk::ConnectomicsNetwork::VertexDescriptorType VertexType;
@@ -106,17 +113,17 @@ namespace mitk
     /** Check whether the label in question belongs to background according to the freesurfer table */
     bool IsBackgroundLabel( int labelInQuestion );
 
-    /** Extend a straight line through the given points and look for the first non white matter label  
+    /** Extend a straight line through the given points and look for the first non white matter label
 
     It will try extend in the direction of the points in the vector so a vector {B,C} will result in
     extending from C in the direction C-B */
-    void LinearExtensionUntilGreyMatter( std::vector<int> & indexVectorOfPointsToUse, TractType::Pointer singleTract, 
+    void LinearExtensionUntilGreyMatter( std::vector<int> & indexVectorOfPointsToUse, TractType::Pointer singleTract,
       int & label, mitk::Index3D & mitkIndex );
 
-    /** Retract fiber until the first brain matter label is hit  
+    /** Retract fiber until the first brain matter label is hit
 
     The bool parameter controls whether the front or the end is retracted */
-    void RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract, 
+    void RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
       int & label, mitk::Index3D & mitkIndex );
 
     /** Convert point to itk point */
@@ -124,7 +131,7 @@ namespace mitk
 
     ///////// Mapping strategies //////////
 
-    /** Use the position of the end and starting element only to map to labels 
+    /** Use the position of the end and starting element only to map to labels
 
     Map a fiber to a vertex by taking the value of the parcellation image at the same world coordinates as the last
     and first element of the tract.*/
@@ -132,19 +139,19 @@ namespace mitk
 
     /** Map by distance between elements and vertices depending on their volume
 
-    First go through the parcellation and compute the coordinates of the future vertices. Assign a radius according on their volume.    
+    First go through the parcellation and compute the coordinates of the future vertices. Assign a radius according on their volume.
     Then map an edge to a label by considering the nearest vertices and comparing the distance to them to their radii. */
     ImageLabelPairType PrecomputeVertexLocationsBySegmentation( TractType::Pointer singleTract );
 
-        /** Use the position of the end and starting element only to map to labels 
-    
+        /** Use the position of the end and starting element only to map to labels
+
     Just take first and last position, no labelling, nothing */
     ImageLabelPairType JustEndPointVerticesNoLabelTest( TractType::Pointer singleTract );
 
-    /** Use the position of the end and starting element unless it is in white matter, then search for nearby parcellation to map to labels 
+    /** Use the position of the end and starting element unless it is in white matter, then search for nearby parcellation to map to labels
 
     Map a fiber to a vertex by taking the value of the parcellation image at the same world coordinates as the last
-    and first element of the tract. If this happens to be white matter, then try to extend the fiber in a line and 
+    and first element of the tract. If this happens to be white matter, then try to extend the fiber in a line and
     take the first non-white matter parcel, that is intersected. */
     ImageLabelPairType EndElementPositionLabelAvoidingWhiteMatter( TractType::Pointer singleTract );
 

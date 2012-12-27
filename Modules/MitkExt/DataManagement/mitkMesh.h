@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,12 +42,12 @@ namespace mitk {
  * to be created, then declare several cells, each containing one line.
  *
  * The operations take care of the coherence. If a line is added to an
- * existing LineCell, then a TriangleCell is built with the old and the new 
+ * existing LineCell, then a TriangleCell is built with the old and the new
  * parameter (and so on). Deletion is done the opposite way.
  *
  * Example for inserting a line into a TriangleCell:
- * existing PIds ind the cell: 1, 2, 4; 
- * inserting (2, 3) so that new PIds in Cell: 1, 2, 3, 4 
+ * existing PIds ind the cell: 1, 2, 4;
+ * inserting (2, 3) so that new PIds in Cell: 1, 2, 3, 4
  *
  * The cell is now of type QuadrilateralCell
  *
@@ -70,7 +70,7 @@ public:
   typedef Superclass::DataType::CellsContainer::Iterator CellIterator;
   typedef Superclass::DataType::CellsContainer::ConstIterator ConstCellIterator;
   typedef itk::PolygonCell< CellType > PolygonType;
-  typedef MeshType::CellType::MultiVisitor MeshMultiVisitor;    
+  typedef MeshType::CellType::MultiVisitor MeshMultiVisitor;
 
   /** \brief returns the current number of cells in the mesh */
   virtual unsigned long GetNumberOfCells( int t = 0 );
@@ -86,7 +86,7 @@ public:
   /** \brief checks if the given point is in a cell and returns that cellId.
    * Basicaly it searches lines and points that are hit.
    */
-  virtual bool EvaluatePosition( Point3D point, unsigned long &cellId, 
+  virtual bool EvaluatePosition( Point3D point, unsigned long &cellId,
     float precision, int t = 0 );
 
   /** \brief searches for the next new cellId and returns that id */
@@ -105,7 +105,7 @@ public:
    * the PointIds, that assign the line; if successful, then return
    * param = true;
    */
-  virtual bool GetPointIds( unsigned long cellId, unsigned long lineId, 
+  virtual bool GetPointIds( unsigned long cellId, unsigned long lineId,
     int &idA, int &idB, int t = 0 );
 
   /** \brief searches a selected cell and returns the id of that cell. If no
@@ -118,7 +118,7 @@ public:
    *
    * Returns the BoundingBox != IsNull() if successful.
    */
-  virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell( 
+  virtual DataType::BoundingBoxPointer GetBoundingBoxFromCell(
     unsigned long cellId, int t = 0 );
 
   /** \brief executes the given Operation */

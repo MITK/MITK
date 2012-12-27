@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -126,7 +126,7 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
       }
     }
 
-	//# no errors -> save all values and flush to file
+  //# no errors -> save all values and flush to file
     for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
       _DataManagerHotkeysPreferencesNode->Put(it->first.toStdString()

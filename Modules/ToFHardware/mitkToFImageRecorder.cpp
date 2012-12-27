@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,7 +46,7 @@ namespace mitk
     this->m_SourceDataSize = 0;
     this->m_ToFImageType = ToFImageWriter::ToFImageType3D;
     this->m_RecordMode = ToFImageRecorder::PerFrames;
-    this->m_DistanceImageFileName = ""; 
+    this->m_DistanceImageFileName = "";
     this->m_AmplitudeImageFileName = "";
     this->m_IntensityImageFileName = "";
     this->m_RGBImageFileName = "";
@@ -175,7 +175,7 @@ namespace mitk
 
       mitk::RealTimeClock::Pointer realTimeClock;
       realTimeClock = mitk::RealTimeClock::New();
-      int n = 100; 
+      int n = 100;
       double t1 = 0;
       double t2 = 0;
       t1 = realTimeClock->GetCurrentStamp();
@@ -193,8 +193,8 @@ namespace mitk
         if ( ((toFImageRecorder->m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < toFImageRecorder->m_NumOfFrames)) ||
               (toFImageRecorder->m_RecordMode == ToFImageRecorder::Infinite) )
         {
-        
-          toFCameraDevice->GetAllImages(toFImageRecorder->m_DistanceArray, toFImageRecorder->m_AmplitudeArray, 
+
+          toFCameraDevice->GetAllImages(toFImageRecorder->m_DistanceArray, toFImageRecorder->m_AmplitudeArray,
             toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence, toFImageRecorder->m_RGBArray );
 
           if (toFImageRecorder->m_ImageSequence >= requiredImageSequence)
@@ -204,7 +204,7 @@ namespace mitk
               MITK_INFO << "Problem! required: " << requiredImageSequence << " captured: " << toFImageRecorder->m_ImageSequence;
             }
             requiredImageSequence = toFImageRecorder->m_ImageSequence + 1;
-            toFImageRecorder->m_ToFImageWriter->Add( toFImageRecorder->m_DistanceArray, 
+            toFImageRecorder->m_ToFImageWriter->Add( toFImageRecorder->m_DistanceArray,
               toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray, toFImageRecorder->m_RGBArray );
             numOfFramesRecorded++;
             if (numOfFramesRecorded % n == 0)

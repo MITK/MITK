@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ vtkPointSetSlicer::vtkPointSetSlicer(vtkPlane *cf)
 
   this->Cutter = vtkCutter::New();
   this->Cutter->GenerateValues( 1, 0, 1 );
-  
+
 }
 
 vtkPointSetSlicer::~vtkPointSetSlicer()
@@ -66,7 +66,7 @@ vtkPointSetSlicer::~vtkPointSetSlicer()
 
 void vtkPointSetSlicer::SetSlicePlane(vtkPlane* plane)
 {
-  if ( this->SlicePlane == plane ) 
+  if ( this->SlicePlane == plane )
   {
     return;
   }
@@ -136,7 +136,7 @@ int vtkPointSetSlicer::RequestData(
 
   if (input->GetDataObjectType() == VTK_STRUCTURED_POINTS ||
       input->GetDataObjectType() == VTK_IMAGE_DATA)
-    {    
+    {
     if ( input->GetCell(0) && input->GetCell(0)->GetCellDimension() >= 3 )
       {
       //this->StructuredPointsCutter(input, output, request, inputVector, outputVector);
@@ -158,15 +158,15 @@ int vtkPointSetSlicer::RequestData(
     }
   if (input->GetDataObjectType() == VTK_RECTILINEAR_GRID)
     {
-    
+
       //this->RectilinearGridCutter(input, output);
       return 1;
-      
+
     }
 
   if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
-    { 
-    vtkDebugMacro(<< "Executing Unstructured Grid Cutter");   
+    {
+    vtkDebugMacro(<< "Executing Unstructured Grid Cutter");
     this->UnstructuredGridCutter(input, output);
     }
   else
@@ -238,7 +238,7 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
     inPD->ShallowCopy(input->GetPointData());//copies original attributes
     inPD->SetScalars(cutScalars);
   }
-  else 
+  else
   {
     inPD = input->GetPointData();
   }
@@ -363,7 +363,7 @@ void vtkPointSetSlicer::UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *o
   } // for all dimensions (1,2,3).
 
   // Update ourselves.  Because we don't know upfront how many verts, lines,
-  // polys we've created, take care to reclaim memory. 
+  // polys we've created, take care to reclaim memory.
   //
   cellScalars->Delete();
   cutScalars->Delete();
@@ -440,7 +440,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
       vert = edges[edge[i]];
 
       // calculate a preferred interpolation direction
-      deltaScalar = (cellScalars->GetComponent(vert[1],0) 
+      deltaScalar = (cellScalars->GetComponent(vert[1],0)
           - cellScalars->GetComponent(vert[0],0));
       if (deltaScalar > 0)
       {
@@ -464,7 +464,7 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
       }
       if ( locator->InsertUniquePoint(x, pts[i]) )
       {
-        if ( outPd ) 
+        if ( outPd )
         {
           vtkIdType p1 = cell->GetPointIds()->GetId(v1);
           vtkIdType p2 = cell->GetPointIds()->GetId(v2);
@@ -502,11 +502,11 @@ void vtkPointSetSlicer::ContourUnstructuredGridCell(vtkCell* cell,
   }
 }
 
-// Specify a spatial locator for merging points. By default, 
+// Specify a spatial locator for merging points. By default,
 // an instance of vtkMergePoints is used.
 void vtkPointSetSlicer::SetLocator(vtkPointLocator *locator)
 {
-  if ( this->Locator == locator ) 
+  if ( this->Locator == locator )
     {
     return;
     }
@@ -549,7 +549,7 @@ void vtkPointSetSlicer::PrintSelf(std::ostream& os, vtkIndent indent)
     os << indent << "Locator: (none)\n";
     }
 
-  os << indent << "Generate Cut Scalars: " 
+  os << indent << "Generate Cut Scalars: "
      << (this->GenerateCutScalars ? "On\n" : "Off\n");
 }
 

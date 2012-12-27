@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,7 +34,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   CreateQtPartControl(this);
   CreateConnections();
   m_MTCalibrationFile = "";
-  
+
   //reset a few things
   ResetOutput();
   AddOutput("<br>NDI Polaris selected");
@@ -69,7 +69,7 @@ switch(style)
     m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalLayout_4);
     m_Controls->mainLayout->removeItem(m_Controls->horizontalLayout_4);
-    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);  
+    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
     m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_2);
     m_Controls->verticalLayout_3->removeItem(m_Controls->verticalSpacer_2);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_9);
@@ -95,7 +95,7 @@ switch(style)
     m_Controls->m_resetButton->setMinimumHeight(0);
     m_Controls->m_resetButton->setMaximumHeight(0);
 
- 
+
     //set the height of the tracking device combo box
     m_Controls->m_trackingDeviceChooser->setMinimumHeight(50);
 
@@ -108,7 +108,7 @@ switch(style)
     this->setMaximumHeight(150);
 
     this->EnableAdvancedUserControl(false);
-    
+
 
     break;
 
@@ -127,7 +127,7 @@ QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget(
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
-{ 
+{
   if (!m_Controls)
   {
   // create GUI widgets
@@ -172,10 +172,10 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 {
   //show the correspondig widget
   m_Controls->m_TrackingSystemWidget->setCurrentIndex(m_Controls->m_trackingDeviceChooser->currentIndex());
-  
+
   //the new trackingdevice is not configurated yet
   m_TrackingDeviceConfigurated = false;
-  
+
   //reset output
   ResetOutput();
 
@@ -186,7 +186,7 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
     }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)  //NDI Aurora
     {
-    AddOutput("<br>NDI Aurora selected");   
+    AddOutput("<br>NDI Aurora selected");
     }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) //ClaronTechnology MicronTracker 2
     {
@@ -195,7 +195,7 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
       {
       AddOutput("<br>ERROR: not installed!");
       }
-    else if (this->m_MTCalibrationFile == "") //if configuration file for MicronTracker is empty: load default 
+    else if (this->m_MTCalibrationFile == "") //if configuration file for MicronTracker is empty: load default
       {
       mitk::ClaronTrackingDevice::Pointer tempDevice = mitk::ClaronTrackingDevice::New();
       m_MTCalibrationFile = tempDevice->GetCalibrationDir();
@@ -226,7 +226,7 @@ if (testTrackingDevice->OpenConnection())
   {
   AddOutput(" OK");
   AddOutput("<br>testing tracking <br>  ...");
-  if (testTrackingDevice->StartTracking()) 
+  if (testTrackingDevice->StartTracking())
     {
     AddOutput(" OK");
     if (!testTrackingDevice->StopTracking())AddOutput("<br>ERROR while stop tracking<br>");
@@ -311,7 +311,7 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
         m_Controls->portTypeAurora->setCurrentIndex(1);
         break;
       }
-      
+
     }
     for(unsigned int i = 0; i <7; ++i)
     {
@@ -330,10 +330,10 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPorts()
         m_Controls->portTypeAurora->setCurrentIndex(0);
         break;
       }
-      
+
     }
   #endif
-      
+
   if ( result.size() == resultSize) result += "<br>none";
 
   AddOutput(result.toStdString());
@@ -398,10 +398,10 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
         }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
         {
-        
+
         mitk::ClaronTrackingDevice::Pointer newDevice = mitk::ClaronTrackingDevice::New();
         if(this->m_MTCalibrationFile=="") AddOutput("<br>Warning: Calibration file is not set!");
-        else 
+        else
           {
           //extract path from calibration file and set the calibration dir of the device
           std::string path =  itksys::SystemTools::GetFilenamePath(m_MTCalibrationFile);
@@ -420,7 +420,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-  
+
   //get port
   int port = 0;
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) port = m_Controls->m_portSpinBoxAurora->value();
@@ -437,7 +437,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
   else //Polaris
     prefix = m_Controls->portTypePolaris->currentText();
   #endif
-  
+
   //build port name string
   QString portName = prefix + QString::number(port);
 

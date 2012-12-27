@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 //##Documentation
-//## @brief IOAdapterBase class is an abstract adapter class for IO process objects. 
+//## @brief IOAdapterBase class is an abstract adapter class for IO process objects.
 //##
 //## @ingroup IO
 class MITK_CORE_EXPORT IOAdapterBase: public itk::Object
@@ -35,7 +35,7 @@ public:
   typedef itk::Object Superclass;
   typedef itk::SmartPointer<Self>Pointer;
   typedef itk::SmartPointer<const Self>ConstPointer;
-  
+
   /// Create an object and return a pointer to it as a mitk::BaseProcess.
   virtual itk::SmartPointer<BaseProcess> CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
   virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
@@ -43,15 +43,15 @@ public:
 protected:
   IOAdapterBase() {}
   ~IOAdapterBase() {}
-  
+
 private:
   IOAdapterBase(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented  
+  void operator=(const Self&); //purposely not implemented
 };
 
 //##Documentation
 //## @brief IOAdapter class is an adapter class for instantiation of IO process objects.
-//## Additional this interface defines the function CanReadFile(). 
+//## Additional this interface defines the function CanReadFile().
 //## This interface allows the target (object) the access to the adaptee (IO process object).
 //## @ingroup IO
 template <class T>
@@ -61,18 +61,18 @@ public:
   /** Standard class typedefs. */
   typedef IOAdapter Self;
   typedef itk::SmartPointer<Self> Pointer;
-    
+
   /** Methods from mitk::BaseProcess. */
   itkFactorylessNewMacro(Self);
   mitk::BaseProcess::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
-  { 
+  {
     typename T::Pointer ioProcessObject = T::New();
     ioProcessObject->SetFileName(filename.c_str());
     ioProcessObject->SetFilePrefix(filePrefix.c_str());
     ioProcessObject->SetFilePattern(filePattern.c_str());
-    return ioProcessObject.GetPointer(); 
+    return ioProcessObject.GetPointer();
   }
-  
+
   virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
   {
     return T::CanReadFile(filename, filePrefix, filePattern);
@@ -81,10 +81,10 @@ public:
 protected:
   IOAdapter() {}
   ~IOAdapter() {}
-  
+
 private:
   IOAdapter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented  
+  void operator=(const Self&); //purposely not implemented
 };
 
 

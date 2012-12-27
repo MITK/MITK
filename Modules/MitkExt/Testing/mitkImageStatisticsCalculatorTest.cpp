@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * - instantiation of an ImageStatisticsCalculator class
  * - correctness of statistics when using PlanarFigures for masking
  */
-class mitkImageStatisticsCalculatorTestClass 
-{ 
+class mitkImageStatisticsCalculatorTestClass
+{
 
 public:
 
@@ -70,7 +70,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * one whole white pixel  
+    * one whole white pixel
     * -> mean of 255 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -97,7 +97,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * half pixel in x-direction (white) 
+    * half pixel in x-direction (white)
     * -> mean of 255 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -124,7 +124,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * half pixel in diagonal-direction (white) 
+    * half pixel in diagonal-direction (white)
     * -> mean of 255 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -178,7 +178,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * whole pixel (white) + half pixel (gray) in x-direction 
+    * whole pixel (white) + half pixel (gray) in x-direction
     * -> mean of 191.5 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -205,7 +205,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * quarter pixel (black) + whole pixel (white) + half pixel (gray) in x-direction 
+    * quarter pixel (black) + whole pixel (white) + half pixel (gray) in x-direction
     * -> mean of 191.5 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -232,7 +232,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * half pixel (black) + whole pixel (white) + half pixel (gray) in x-direction 
+    * half pixel (black) + whole pixel (white) + half pixel (gray) in x-direction
     * -> mean of 127.66 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
@@ -260,7 +260,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * whole pixel (gray) 
+    * whole pixel (gray)
     * -> mean of 128 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
@@ -342,7 +342,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
 
   {
     /*****************************
-    * 9 whole pixels (white) + 3 half pixels (white) 
+    * 9 whole pixels (white) + 3 half pixels (white)
     * + 3 whole pixel (black) [ + 3 slightly less than half pixels (black)]
     * -> mean of 204.0 expected
     ******************************/
@@ -394,7 +394,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
   }
 
 
-  
+
   return testCases;
 }
 
@@ -419,7 +419,7 @@ static mitk::Image::Pointer GetTestImage()
   file.push_back( filename );
 
   mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
-     
+
   mitk::DataNode::Pointer node = reader->LoadDicomSeries( file, false, false );
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
 
@@ -432,7 +432,7 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkImageStatisticsCalculatorTest")
-  
+
   //QCoreApplication app(argc, argv);
 
   mitk::Image::Pointer image = mitkImageStatisticsCalculatorTestClass::GetTestImage();
@@ -440,7 +440,7 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);
 
-  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases = 
+  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases =
     mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom );
 
 
@@ -448,7 +448,7 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
   {
     mitkImageStatisticsCalculatorTestClass::testCase test = allTestCases[i];
 
-    const mitk::ImageStatisticsCalculator::Statistics stats = 
+    const mitk::ImageStatisticsCalculator::Statistics stats =
       mitkImageStatisticsCalculatorTestClass::TestStatistics( image, test.figure );
 
     int tmpMean = stats.Mean * 100;
@@ -463,7 +463,7 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
       "Calculated grayvalue sd '"<< calculatedSD <<"'  is equal to the desired value '"
       << test.sd <<"' for testcase #" << test.id );
   }
- 
+
 
   MITK_TEST_END()
 }

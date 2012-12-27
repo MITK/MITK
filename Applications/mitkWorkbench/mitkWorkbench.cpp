@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,8 +50,8 @@ public:
     }
     catch (mitk::Exception& e)
     {
-      msg = QString("MITK Exception:\n\n") 
-            + QString("Desciption: ") 
+      msg = QString("MITK Exception:\n\n")
+            + QString("Desciption: ")
             + QString(e.GetDescription()) + QString("\n\n")
             + QString("Filename: ") + QString(e.GetFile()) + QString("\n\n")
             + QString("Line: ") + QString::number(e.GetLine());
@@ -78,7 +78,7 @@ public:
     msgBox.addButton(trUtf8("Ignore"), QMessageBox::NoRole);
 
     int ret = msgBox.exec();
-    
+
     switch(ret)
       {
       case 0:
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
   // overwrite the settings in MapConfiguration
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
-  
+
   Poco::Path provFile(basePath);
   provFile.setFileName("mitkWorkbench.provisioning");
 

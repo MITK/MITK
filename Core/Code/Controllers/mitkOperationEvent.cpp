@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,7 +45,7 @@ void mitk::UndoStackItem::ExecuteIncrement()
     ++m_CurrObjectEventId;
     m_IncrObjectEventId = false;
   }
-  
+
   if (m_IncrGroupEventId)
   {
     ++m_CurrGroupEventId;
@@ -105,12 +105,12 @@ mitk::Operation* mitk::OperationEvent::GetOperation()
   return m_Operation;
 }
 
-mitk::OperationEvent::OperationEvent(OperationActor* destination, 
+mitk::OperationEvent::OperationEvent(OperationActor* destination,
                                      Operation* operation, Operation* undoOperation,
                                      std::string description)
-: UndoStackItem(description), 
+: UndoStackItem(description),
   m_Destination(destination),
-  m_Operation(operation), 
+  m_Operation(operation),
   m_UndoOperation(undoOperation),
   m_Invalid(false)
 {
@@ -142,7 +142,7 @@ mitk::OperationEvent::~OperationEvent()
 //##  swaps the Undo and Redo- operation and changes m_Reversed
 void mitk::OperationEvent::ReverseOperations()
 {
-  if (m_Operation == NULL) 
+  if (m_Operation == NULL)
     return;
 
   Operation *tempOperation = m_Operation;
@@ -159,7 +159,7 @@ void mitk::OperationEvent::ReverseAndExecute()
     m_Destination->ExecuteOperation( m_Operation );
 }
 
-mitk::OperationActor* mitk::OperationEvent::GetDestination() 
+mitk::OperationActor* mitk::OperationEvent::GetDestination()
 {
   return m_Destination;
 }

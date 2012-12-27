@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -70,7 +70,7 @@ bool mitk::ClaronTool::LoadFile(std::string filename)
     while( (start!=0) && (filename[start-1]!='\\') ) start--;
 
     //if not (start==0) perhaps it is given in Linux format
-    if (start==0) 
+    if (start==0)
     {
       start = end;
       while( (start!=0) && (filename[start-1]!='/') )

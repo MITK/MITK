@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,8 +31,8 @@ namespace berry
  * receive duplicate notifications).
  * </p><p>
  * Clients should not rely on the result of the <code>Job#GetState()</code>
- * method on jobs for which notification is occurring. Listeners are notified of 
- * all job state changes, but whether the state change occurs before, during, or 
+ * method on jobs for which notification is occurring. Listeners are notified of
+ * all job state changes, but whether the state change occurs before, during, or
  * after listeners are notified is unspecified.
  * </p><p>
  * Clients may implement this interface.

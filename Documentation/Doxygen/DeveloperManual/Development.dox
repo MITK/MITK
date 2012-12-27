@@ -10,6 +10,7 @@ Some abstract concepts of MITK are described in \ref Concepts
 \li \subpage SupportedPlatformsPage
 \li \subpage BuildInstructionsPage
 \li \subpage thirdpartylibs
+\li \ref HowToNewProject
 
 \section DevelopmentGettingToKnow Getting To Know MITK
 
@@ -22,12 +23,17 @@ Some abstract concepts of MITK are described in \ref Concepts
 \li \subpage NewPluginPage
 \li \subpage StatemachineEditor
 \li \subpage mitkExtPointsIndex
+\li \subpage DeploymentPage
 \li \subpage KnownProblemsPage
 
 \section DevelopmentContributing Contributing To MITK
 
 \li \subpage DocumentationGuide
 \li \subpage StyleGuideAndNotesPage
+
+\section DevelopmentGettingToKnowBlueberry Getting To Know BlueBerry
+
+\li \subpage BlueBerryExamples
 
 \section DevelopmentFurtherInfo Further Information
 

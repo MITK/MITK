@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ipSegmentation.h"
 
-mitk::Image::Pointer 
+mitk::Image::Pointer
 mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
@@ -50,7 +50,7 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   CastToMitkImage( correctPixelTypeLowerITKSlice, correctPixelTypeLowerMITKSlice );
   mitkIpPicDescriptor* lowerPICSlice = mitkIpPicNew();
   CastToIpPicDescriptor( correctPixelTypeLowerMITKSlice, lowerPICSlice);
-  
+
   Image::Pointer correctPixelTypeUpperMITKSlice = Image::New();
   CastToMitkImage( correctPixelTypeUpperITKSlice, correctPixelTypeUpperMITKSlice );
   mitkIpPicDescriptor* upperPICSlice = mitkIpPicNew();

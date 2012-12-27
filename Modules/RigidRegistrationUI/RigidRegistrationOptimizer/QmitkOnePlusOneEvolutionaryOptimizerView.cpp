@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -40,7 +40,7 @@ itk::Object::Pointer QmitkOnePlusOneEvolutionaryOptimizerView::GetOptimizer()
   //OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
   itk::Statistics::NormalVariateGenerator::Pointer generator = itk::Statistics::NormalVariateGenerator::New();
   generator->Initialize(12345);
-  OptimizerPointer->SetNormalVariateGenerator(generator); 
+  OptimizerPointer->SetNormalVariateGenerator(generator);
   OptimizerPointer->SetShrinkFactor(m_Controls.m_ShrinkFactorOnePlusOneEvolutionary->text().toFloat());
   OptimizerPointer->SetGrowthFactor(m_Controls.m_GrowthFactorOnePlusOneEvolutionary->text().toFloat());
   OptimizerPointer->SetEpsilon(m_Controls.m_EpsilonOnePlusOneEvolutionary->text().toFloat());

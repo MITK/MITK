@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -318,7 +318,7 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
-  QString nodeName;  
+  QString nodeName;
   if(DicomPropertiesExists(*dataNode))
   {
     mitk::BaseProperty* seriesDescription = (dataNode->GetProperty("dicom.series.SeriesDescription"));
@@ -443,7 +443,7 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
 
       mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetSubset(m_Predicate);
 
-      // finally add all nodes to the model 
+      // finally add all nodes to the model
       this->Update();
     }
   }

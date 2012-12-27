@@ -15,7 +15,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY 
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
@@ -44,10 +44,10 @@ if(WIN32)
     set(_src_dir_length_max 43) # _src_dir_length_max - strlen(ITK-src)
     set(_bin_dir_length_max 40) # _bin_dir_length_max - strlen(MITK-build)
   endif()
-  
+
   string(LENGTH "${MITK_SOURCE_DIR}" _src_n)
   string(LENGTH "${MITK_BINARY_DIR}" _bin_n)
-  
+
   # The warnings should be converted to errors
   if(_src_n GREATER _src_dir_length_max)
     message(WARNING "MITK source code directory path length is too long (${_src_n} > ${_src_dir_length_max})."
@@ -150,6 +150,7 @@ option(MITK_USE_QT "Use Nokia's Qt library" ${MITK_USE_CTK})
 option(MITK_USE_DCMTK "EXPERIMENTAL, superbuild only: Use DCMTK in MITK" ${MITK_USE_CTK})
 option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK as shared libs" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 
@@ -167,13 +168,13 @@ endif()
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   mark_as_advanced(MITK_BUILD_ALL_PLUGINS)
-  
+
   if(NOT MITK_USE_CTK)
     message("Forcing MITK_USE_CTK to ON because of MITK_USE_BLUEBERRY")
     set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
   endif()
 endif()
-  
+
 if(MITK_USE_CTK)
   if(NOT MITK_USE_QT)
     message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
@@ -276,7 +277,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
 # Configure CTestConfigSubProject.cmake that could be used by CTest scripts
 configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in
                ${MITK_BINARY_DIR}/CTestConfigSubProject.cmake)
-               
+
 if(CTEST_PROJECT_ADDITIONAL_TARGETS)
   # those targets will be executed at the end of the ctest driver script
   # and they also get their own subproject label
@@ -315,6 +316,7 @@ include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallAutoLoadModules)
 include(mitkFunctionCompileSnippets)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
@@ -353,7 +355,7 @@ option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
 mark_as_advanced(USE_ITKZLIB)
 
 if(NOT MITK_FAST_TESTING)
-  if(DEFINED MITK_CTEST_SCRIPT_MODE 
+  if(DEFINED MITK_CTEST_SCRIPT_MODE
       AND (MITK_CTEST_SCRIPT_MODE STREQUAL "continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "experimental") )
     set(MITK_FAST_TESTING 1)
   endif()
@@ -655,7 +657,7 @@ if(MITK_USE_BLUEBERRY)
     foreach(mitk_plugin ${MITK_PRIVATE_PLUGINS})
       list(APPEND mitk_plugins_fullpath ${MITK_PRIVATE_MODULES}/${mitk_plugin})
     endforeach()
-  endif() 
+  endif()
 
   # Specify which plug-ins belong to this project
   macro(GetMyTargetLibraries all_target_libraries varname)
@@ -691,7 +693,7 @@ endif()
 
 # Construct a list of paths containing runtime directories
 # for MITK applications on Windows
-set(MITK_RUNTIME_PATH 
+set(MITK_RUNTIME_PATH
     "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
     )
 
@@ -765,7 +767,7 @@ if(MITK_APPS)
   list(LENGTH MITK_APPS app_count)
 
   # Check how many apps have been enabled
-  # If more than one app has been activated, the we use the 
+  # If more than one app has been activated, the we use the
   # default CPack configuration. Otherwise that apps configuration
   # will be used, if present.
   foreach(mitk_app ${MITK_APPS})
@@ -836,20 +838,42 @@ include(mitkInstallRules)
 # Last configuration steps
 #-----------------------------------------------------------------------------
 
+# This is for installation support of external projects depending on
+# MITK plugins and modules. The export file should not be used for linking to MITK
+# libraries without using LINK_DIRECTORIES, since the exports are incomplete
+# yet (depending libraries are not exported).
+
 set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
 file(REMOVE ${MITK_EXPORTS_FILE})
 
+set(targets_to_export)
+get_property(module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+if(module_targets)
+  list(APPEND targets_to_export ${module_targets})
+endif()
+
 if(MITK_USE_BLUEBERRY)
-  # This is for installation support of external projects depending on
-  # MITK plugins. The export file should not be used for linking to MITK
-  # libraries without using LINK_DIRECTORIES, since the exports are incomplete
-  # yet(depending libraries are not exported).
   if(MITK_PLUGIN_LIBRARIES)
-    export(TARGETS ${MITK_PLUGIN_LIBRARIES}
-           APPEND
-           FILE ${MITK_EXPORTS_FILE})
+    list(APPEND targets_to_export ${MITK_PLUGIN_LIBRARIES})
   endif()
 endif()
+
+export(TARGETS ${targets_to_export} APPEND
+       FILE ${MITK_EXPORTS_FILE})
+
+set(MITK_EXPORTED_TARGET_PROPERTIES )
+foreach(target_to_export ${targets_to_export})
+  get_target_property(autoload_targets ${target_to_export} MITK_AUTOLOAD_TARGETS)
+  if(autoload_targets)
+    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
+set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${autoload_targets}\")")
+  endif()
+  get_target_property(autoload_dir ${target_to_export} MITK_AUTOLOAD_DIRECTORY)
+  if(autoload_dir)
+    set(MITK_EXPORTED_TARGET_PROPERTIES "${MITK_EXPORTED_TARGET_PROPERTIES}
+set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
+  endif()
+endforeach()
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
@@ -879,7 +903,7 @@ set(MITK_MODULE_NAMES)
 foreach(_module ${_MODULES_CONF_FILES})
   string(REPLACE Config.cmake "" _module_name ${_module})
   list(APPEND MITK_MODULE_NAMES ${_module_name})
-endforeach() 
+endforeach()
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
@@ -888,7 +912,7 @@ configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
 # set up the environment for the application and for Visual Studio
 if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
-  
+
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"

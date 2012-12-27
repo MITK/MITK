@@ -12,6 +12,9 @@
 
 using namespace mitk;
 
+/**
+* \brief ODF lookuptable based energy computer.   */
+
 class MitkDiffusionImaging_EXPORT GibbsEnergyComputer : public EnergyComputer
 {
   public:
@@ -33,7 +36,7 @@ class MitkDiffusionImaging_EXPORT GibbsEnergyComputer : public EnergyComputer
 
     float EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir);
   protected:
-  
+
     ItkQBallImgType*                m_Image;
 
 };

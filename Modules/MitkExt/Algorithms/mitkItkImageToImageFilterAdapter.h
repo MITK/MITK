@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,12 +29,12 @@ namespace mitk {
 //##Documentation
 //## @brief adapter class, that encapsulates any itk::ImageToImageFilter
 //##
-//## This filter converts a mitk::Image to an itk::Image, executes the 
+//## This filter converts a mitk::Image to an itk::Image, executes the
 //## itkFilter and converts the itk::Image back to a mitk::Image as output.
-//## Either call SetSingleFilter() to encapsulate one itk::ImageToImageFilter, 
+//## Either call SetSingleFilter() to encapsulate one itk::ImageToImageFilter,
 //## or SetFirstFilter() and SetLastFilter() to encapsulate a whole itk pipeline.
 //## @ingroup Process
-template <typename TPixel> 
+template <typename TPixel>
 class ItkImageToImageFilterAdapter : public ImageToImageFilter
 {
 public:
@@ -58,7 +58,7 @@ public:
 protected:
   ItkImageToImageFilterAdapter();
   virtual ~ItkImageToImageFilterAdapter();
- 
+
   typename ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
   typename ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline
 };

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -33,7 +33,7 @@ mitk::DiffImageApplier::DiffImageApplier()
 mitk::DiffImageApplier::~DiffImageApplier()
 {
 }
-    
+
 void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
 {
   ApplyDiffImageOperation* imageOperation = dynamic_cast<ApplyDiffImageOperation*>( operation );
@@ -106,7 +106,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
           interpolator->BlockModified(true);
           interpolator->SetChangedSlice( m_SliceDifferenceImage, m_SliceDimension, m_SliceIndex, m_TimeStep );
         }
-        
+
         m_Image->Modified();
 
         if (interpolator)
@@ -127,7 +127,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
     else if ( m_SliceDifferenceImage->GetDimension() == 3 )
-    { 
+    {
       // ...
       if (  m_SliceDifferenceImage->GetDimension(0) != m_Image->GetDimension(0) ||
             m_SliceDifferenceImage->GetDimension(1) != m_Image->GetDimension(1) ||
@@ -183,7 +183,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
       {
         m_Image->Modified(); // check if interpolation is called. prefer to send diff directly
       }
-      
+
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
     else
@@ -217,7 +217,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
     itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
-}                                                              
+}
 
 
 #define myMITKDiffImageApplierFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \
@@ -263,7 +263,7 @@ void mitk::DiffImageApplier::ItkImageProcessing2DDiff( itk::Image<TPixel1,VImage
   sliceInVolumeRegion = outputImage->GetLargestPossibleRegion();
   sliceInVolumeRegion.SetSize( m_SliceDimension, 1 );             // just one slice
   sliceInVolumeRegion.SetIndex( m_SliceDimension, m_SliceIndex ); // exactly this slice, please
-  
+
   OutputSliceIteratorType outputIterator( outputImage, sliceInVolumeRegion );
   outputIterator.SetFirstDirection(m_Dimension0);
   outputIterator.SetSecondDirection(m_Dimension1);
@@ -281,8 +281,8 @@ void mitk::DiffImageApplier::ItkImageProcessing2DDiff( itk::Image<TPixel1,VImage
       {
         TPixel2 newValue = outputIterator.Get() + (TPixel2) ((double)diffIterator.Get() * m_Factor);
         outputIterator.Set( newValue );
-        ++outputIterator; 
-        ++diffIterator; 
+        ++outputIterator;
+        ++diffIterator;
       }
       outputIterator.NextLine();
     }
@@ -310,8 +310,8 @@ void mitk::DiffImageApplier::ItkImageProcessing3DDiff( itk::Image<TPixel1,VImage
   {
     TPixel2 newValue = outputIterator.Get() + (TPixel2) ((double)diffIterator.Get() * m_Factor);
     outputIterator.Set( newValue );
-    ++outputIterator; 
-    ++diffIterator; 
+    ++outputIterator;
+    ++diffIterator;
   }
 }
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -45,14 +45,14 @@ public:
   mitkClassMacro(ClippingProperty, BaseProperty);
 
   typedef std::string ValueType;
-  
+
   itkNewMacro( ClippingProperty );
-  mitkNewMacro2Param( ClippingProperty, 
+  mitkNewMacro2Param( ClippingProperty,
     const Point3D &, const Vector3D & );
-  
+
   bool GetClippingEnabled() const;
   void SetClippingEnabled( bool enabled );
-  
+
   const Point3D &GetOrigin() const;
   void SetOrigin( const Point3D &origin );
 
@@ -66,10 +66,10 @@ public:
 protected:
 
   bool m_ClippingEnabled;
-  
+
   Point3D m_Origin;
   Vector3D m_Normal;
-  
+
   ClippingProperty();
   ClippingProperty( const Point3D &origin, const Vector3D &normal );
 

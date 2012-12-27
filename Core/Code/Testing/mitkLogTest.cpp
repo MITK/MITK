@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   * @brief Objects of this class can start an internal thread by calling the Start() method.
   *        The thread is then logging messages until the method Stop() is called. The class
-  *        can be used to test if logging is thread-save by using multiple objects and let 
+  *        can be used to test if logging is thread-save by using multiple objects and let
   *        them log simuntanously.
   */
 class mitkTestLoggingThread : public itk::Object
@@ -35,13 +35,13 @@ class mitkTestLoggingThread : public itk::Object
 public:
 
 mitkClassMacro(mitkTestLoggingThread,itk::Object);
-mitkNewMacro2Param(mitkTestLoggingThread,int,itk::MultiThreader::Pointer);
+mitkNewMacro1Param(mitkTestLoggingThread,itk::MultiThreader::Pointer);
 
 protected:
 
-mitkTestLoggingThread(int number, itk::MultiThreader::Pointer MultiThreader)
+mitkTestLoggingThread(itk::MultiThreader::Pointer MultiThreader)
   {
-  ThreadID = number;
+  ThreadID = -1;
   m_MultiThreader = MultiThreader;
   }
 
@@ -53,7 +53,7 @@ itk::MultiThreader::Pointer m_MultiThreader;
 
 void LogMessages()
   {
-  
+
   while(LoggingRunning)
     {
     MITK_INFO << "Test info stream in thread " << ThreadID;
@@ -88,11 +88,11 @@ static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* pInfoStruct)
 
 public:
 
-void Start()
+int Start()
   {
   LoggingRunning = true;
-  m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);
-
+  this->ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);
+  return ThreadID;
   }
 
 void Stop()
@@ -104,10 +104,10 @@ void Stop()
 
 /** Documentation
  *
- *  @brief This class holds static test methods to sturcture the test of the mitk logging mechanism.   
+ *  @brief This class holds static test methods to sturcture the test of the mitk logging mechanism.
  */
 class mitkLogTestClass
-{ 
+{
 
 public:
 
@@ -126,7 +126,7 @@ static void TestSimpleLog()
     catch(mitk::Exception e)
       {
       testSucceded = false;
-      }  
+      }
     MITK_TEST_CONDITION_REQUIRED(testSucceded,"Test logging streams.");
     }
 
@@ -143,18 +143,18 @@ static void TestObjectInfoLogging()
       testStringStream << "test" << "String" << "Stream";
       mitk::Point3D testMitkPoint;
       testMitkPoint.Fill(2);
-      
+
       MITK_INFO << i;
       MITK_INFO << f;
       MITK_INFO << d;
       MITK_INFO << testString;
       MITK_INFO << testStringStream;
-      MITK_INFO << testMitkPoint;      
+      MITK_INFO << testMitkPoint;
       }
     catch(mitk::Exception e)
       {
       testSucceded = false;
-      }  
+      }
     MITK_TEST_CONDITION_REQUIRED(testSucceded,"Test logging of object information.");
     }
 
@@ -164,17 +164,19 @@ static void TestObjectInfoLogging()
 static void TestThreadSaveLog()
     {
     bool testSucceded = true;
-    
+
+
     try
       {
+      int threadID1 = -1, threadID2 = -1;
       //initialize two threads...
       itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
-      mitkTestLoggingThread::Pointer myThreadClass1 = mitkTestLoggingThread::New(1,multiThreader);
-      mitkTestLoggingThread::Pointer myThreadClass2 = mitkTestLoggingThread::New(2,multiThreader);
-      
+      mitkTestLoggingThread::Pointer myThreadClass1 = mitkTestLoggingThread::New(multiThreader);
+      mitkTestLoggingThread::Pointer myThreadClass2 = mitkTestLoggingThread::New(multiThreader);
+
       //start them
-      myThreadClass1->Start();
-      myThreadClass2->Start();
+      threadID1 = myThreadClass1->Start();
+      threadID2 = myThreadClass2->Start();
 
       //wait for 500 ms
       itksys::SystemTools::Delay(500);
@@ -184,12 +186,20 @@ static void TestThreadSaveLog()
       myThreadClass2->Stop();
 
       //Wait for all threads to end
-      multiThreader->TerminateThread(1);
-      multiThreader->TerminateThread(2);
+      if(threadID1 >= 0)
+        multiThreader->TerminateThread(threadID1);
+      if(threadID2 >= 0)
+          multiThreader->TerminateThread(threadID2);
+      }
+    catch(std::exception e)
+      {
+        MITK_ERROR << "exception during 'TestThreadSaveLog': "<<e.what();
+        testSucceded = false;
       }
     catch(...)
       {
-      testSucceded = false;
+        MITK_ERROR << "unknown exception during 'TestThreadSaveLog'";
+        testSucceded = false;
       }
 
     //if no error occured until now, everything is ok
@@ -230,13 +240,14 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("Log")
 
   MITK_TEST_OUTPUT(<<"TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURED!")
-  
+
   mitkLogTestClass::TestSimpleLog();
   mitkLogTestClass::TestObjectInfoLogging();
-  mitkLogTestClass::TestThreadSaveLog();
+
   mitkLogTestClass::TestLoggingToFile();
   mitkLogTestClass::TestAddAndRemoveBackends();
-  
+    mitkLogTestClass::TestThreadSaveLog();
+
   // always end with this!
   MITK_TEST_END()
 }

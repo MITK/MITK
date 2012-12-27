@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -74,7 +74,7 @@ QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget * parent )
   xAxis->getOptions()->setGridVisible(false);
   xAxis->getOptions()->setPrecision( 0 );
   xAxis->getOptions()->setNotation( vtkQtChartAxisOptions::Standard );
-  
+
   vtkQtChartAxis *yAxis = axisLayer->getAxis(vtkQtChartAxis::Left);
   yAxis->getOptions()->setPrecision( 0 );
   yAxis->getOptions()->setNotation( vtkQtChartAxisOptions::Standard );
@@ -182,7 +182,7 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
   {
     const double &frequency = it.GetFrequency();
     const double &measurement = it.GetMeasurementVector()[0];
-    
+
     m_ItemModel->setVerticalHeaderItem( i, new QStandardItem() );
     m_ItemModel->verticalHeaderItem( i )->setData(
       QVariant( measurement ), Qt::DisplayRole );

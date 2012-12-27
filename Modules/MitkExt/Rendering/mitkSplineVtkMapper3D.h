@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -34,9 +34,9 @@ namespace mitk
   //## @ingroup Mapper
 
   /************************************************************************/
-  /* 
+  /*
   *   - \b "line width": (FloatProperty) line width of the spline
-  
+
   */
   /************************************************************************/
 class MitkExt_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
@@ -51,19 +51,19 @@ public:
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
     bool SplinesAreAvailable();
-    
+
     vtkPolyData* GetSplinesPolyData();
-    
+
     vtkActor* GetSplinesActor();
-    
+
     unsigned long GetLastUpdateTime() const;
-    
+
     virtual void UpdateSpline();
-    
+
     itkSetMacro( SplineResolution, unsigned int );
-    
+
     itkGetMacro( SplineResolution, unsigned int );
-    
+
 protected:
 
     SplineVtkMapper3D();
@@ -75,17 +75,17 @@ protected:
     virtual void GenerateDataForRenderer(mitk::BaseRenderer * renderer);
 
     virtual void ApplyProperties(vtkActor *actor, BaseRenderer *renderer);
-    
+
     vtkActor* m_SplinesActor;
-    
+
     vtkPropAssembly* m_SplineAssembly;
-    
+
     bool m_SplinesAvailable;
-    
+
     bool m_SplinesAddedToAssembly;
-    
+
     unsigned int m_SplineResolution;
-    
+
     itk::TimeStamp m_SplineUpdateTime;
 };
 

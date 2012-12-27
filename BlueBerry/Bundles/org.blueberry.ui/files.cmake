@@ -97,7 +97,7 @@ set(SRC_CPP_FILES
   berryWorkbenchPart.cpp
   berryWorkbenchPreferenceConstants.cpp
   berryXMLMemento.cpp
-  
+
   #application
   application/berryActionBarAdvisor.cpp
   application/berryIActionBarConfigurer.cpp
@@ -105,7 +105,7 @@ set(SRC_CPP_FILES
   application/berryIWorkbenchWindowConfigurer.cpp
   application/berryWorkbenchAdvisor.cpp
   application/berryWorkbenchWindowAdvisor.cpp
-  
+
   #commands
   #commands/berryAbstractContributionFactory.cpp
   #commands/berryCommandContributionItem.cpp
@@ -123,12 +123,12 @@ set(SRC_CPP_FILES
   #commands/berryMenuManager.cpp
   #commands/berrySubContributionItem.cpp
   #commands/berryUIElement.cpp
-  
+
   #dialogs
   dialogs/berryIDialog.cpp
   dialogs/berryIShowViewDialog.cpp
   dialogs/berryMessageDialog.cpp
-  
+
   #guitk
   guitk/berryGuiTkControlEvent.cpp
   guitk/berryGuiTkEvent.cpp
@@ -136,13 +136,13 @@ set(SRC_CPP_FILES
   guitk/berryGuiTkIMenuListener.cpp
   guitk/berryGuiTkISelectionListener.cpp
   guitk/berryGuiTkSelectionEvent.cpp
-  
+
   #handlers
   handlers/berryHandlerUtil.cpp
   handlers/berryIHandlerActivation.cpp
   handlers/berryIHandlerService.cpp
   handlers/berryShowViewHandler.cpp
-  
+
   #src
   intro/berryIIntroManager.cpp
   intro/berryIntroPart.cpp
@@ -155,7 +155,7 @@ set(SRC_CPP_FILES
   services/berryIServiceFactory.cpp
   services/berryIServiceLocator.cpp
   services/berryIServiceWithSources.cpp
-  
+
   #tweaklets
   tweaklets/berryDnDTweaklet.cpp
   tweaklets/berryGuiWidgetsTweaklet.cpp
@@ -164,7 +164,7 @@ set(SRC_CPP_FILES
   tweaklets/berryITracker.cpp
   tweaklets/berryWorkbenchPageTweaklet.cpp
   tweaklets/berryWorkbenchTweaklet.cpp
-  
+
   #presentations
   presentations/berryIPresentablePart.cpp
   presentations/berryIPresentationFactory.cpp
@@ -172,14 +172,14 @@ set(SRC_CPP_FILES
   presentations/berryIStackPresentationSite.cpp
   presentations/berryStackDropResult.cpp
   presentations/berryStackPresentation.cpp
-  
+
   #testing
   testing/berryTestableObject.cpp
-  
+
   #util
   util/berryISafeRunnableRunner.cpp
   util/berrySafeRunnable.cpp
-  
+
 )
 
 
@@ -195,7 +195,7 @@ set(INTERNAL_CPP_FILES
   intro/berryIntroRegistry.cpp
   intro/berryViewIntroAdapterPart.cpp
   intro/berryWorkbenchIntroManager.cpp
-  
+
   berryAbstractPartSelectionTracker.cpp
   berryAbstractSelectionService.cpp
   berryBundleUtility.cpp

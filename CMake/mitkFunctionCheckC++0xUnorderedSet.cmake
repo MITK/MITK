@@ -8,6 +8,6 @@ function(mitkFunctionCheckCxx0xUnorderedSet var_has_feature)
     "
     ${var_has_feature}
   )
-  
+
   set(${var_has_feature} "${${var_has_feature}}" PARENT_SCOPE)
 endfunction()

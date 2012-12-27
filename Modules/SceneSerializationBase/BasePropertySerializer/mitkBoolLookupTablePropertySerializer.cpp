@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ namespace mitk
 class SceneSerializationBase_EXPORT BoolLookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
-    
+
     mitkClassMacro( BoolLookupTablePropertySerializer, BasePropertySerializer );
     itkNewMacro(Self);
 
@@ -39,7 +39,7 @@ class SceneSerializationBase_EXPORT BoolLookupTablePropertySerializer : public B
       if (prop == NULL)
         return NULL;
       BoolLookupTable lut = prop->GetValue();
-      //if (lut.IsNull()) 
+      //if (lut.IsNull())
       //  return NULL; // really?
       const BoolLookupTable::LookupTableType& map = lut.GetLookupTable();
 
@@ -59,7 +59,7 @@ class SceneSerializationBase_EXPORT BoolLookupTablePropertySerializer : public B
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {
-      if (!element) 
+      if (!element)
         return NULL;
 
       BoolLookupTable lut;

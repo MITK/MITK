@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -114,11 +114,11 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   MITK_INFO << "  Smoothing  = " << smoothing;
   MITK_INFO << "  Decimation = " << decimation;
   MITK_INFO << "  Closing    = " << closing;
- 
+
   Geometry3D::Pointer geometry = dynamic_cast<Geometry3D *>(image->GetGeometry()->Clone().GetPointer());
-  
+
   // Make ITK image out of MITK image
-  
+
   typedef itk::Image<unsigned char, 3> CharImageType;
   typedef itk::Image<unsigned short, 3> ShortImageType;
   typedef itk::Image<float, 3> FloatImageType;
@@ -133,7 +133,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   }
 
   ImageToItk<CharImageType>::Pointer imageToItkFilter = ImageToItk<CharImageType>::New();
-  
+
   try
   {
     imageToItkFilter->SetInput(image);
@@ -160,7 +160,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   CharImageType::IndexType minIndex;
   minIndex.Fill(numeric_limits<CharImageType::IndexValueType>::max());
 
-  CharImageType::IndexType maxIndex;  
+  CharImageType::IndexType maxIndex;
   maxIndex.Fill(numeric_limits<CharImageType::IndexValueType>::min());
 
   itk::ImageRegionIteratorWithIndex<CharImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
@@ -230,7 +230,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   padFilter->Update();
 
   CharImageType::Pointer roiImage = padFilter->GetOutput();
-  
+
   roiImage->DisconnectPipeline();
   roiFilter = 0;
   padFilter = 0;
@@ -285,7 +285,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   closingFilter->ReleaseDataBeforeUpdateFlagOn();
   closingFilter->SetSurfaceRatio(surfaceRatio);
   closingFilter->Update();
-  
+
   ShortImageType::Pointer closedImage = closingFilter->GetOutput();
 
   closedImage->DisconnectPipeline();
@@ -336,7 +336,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   binThresFromFloatFilter->Update();
 
   CharImageType::Pointer blurredImage = binThresFromFloatFilter->GetOutput();
-  
+
   blurredImage->DisconnectPipeline();
   closedImage = 0;
   binThresToFloatFilter = 0;

@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   // overwrite the settings in MapConfiguration
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
-  
+
   Poco::Path provFile(basePath);
   provFile.setFileName("$(project-app-name).provisioning");
 

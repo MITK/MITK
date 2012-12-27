@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ unsigned long mitk::DisplayGeometry::GetMTime() const
 
 const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
 {
-  if(m_WorldGeometry.IsNull()) 
+  if(m_WorldGeometry.IsNull())
   {
     return m_TimeBounds;
   }
@@ -50,7 +50,7 @@ const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
 
 
 
-    
+
 // size definition methods
 
 void mitk::DisplayGeometry::SetWorldGeometry(const Geometry2D* aWorldGeometry)
@@ -133,17 +133,17 @@ mitk::Vector2D mitk::DisplayGeometry::GetSizeInMM() const
 
 unsigned int mitk::DisplayGeometry::GetDisplayWidth() const
 {
-  assert(m_SizeInDisplayUnits[0] >= 0);  
+  assert(m_SizeInDisplayUnits[0] >= 0);
   return (unsigned int)m_SizeInDisplayUnits[0];
 }
 
 unsigned int mitk::DisplayGeometry::GetDisplayHeight() const
 {
-  assert(m_SizeInDisplayUnits[1] >= 0);  
+  assert(m_SizeInDisplayUnits[1] >= 0);
   return (unsigned int)m_SizeInDisplayUnits[1];
 }
 
-    
+
 
 
 
@@ -165,7 +165,7 @@ bool mitk::DisplayGeometry::GetConstrainZommingAndPanning() const
 
 bool mitk::DisplayGeometry::SetScaleFactor(ScalarType mmPerDisplayUnit)
 {
-  if(mmPerDisplayUnit<0.0001) 
+  if(mmPerDisplayUnit<0.0001)
   {
     mmPerDisplayUnit=0.0001;
   }
@@ -199,7 +199,7 @@ bool mitk::DisplayGeometry::Zoom(ScalarType factor, const Point2D& centerInDispl
 }
 
 
-// Zooms with a factor (1.0=identity) around the specified center, but tries (if its within view contraints) to match the center in display units with the center in world coordinates. 
+// Zooms with a factor (1.0=identity) around the specified center, but tries (if its within view contraints) to match the center in display units with the center in world coordinates.
 bool mitk::DisplayGeometry::ZoomWithFixedWorldCoordinates(ScalarType factor, const Point2D& focusDisplayUnits, const Point2D& focusUnitsInMM )
 {
   assert(factor > 0);
@@ -261,9 +261,9 @@ void mitk::DisplayGeometry::Fit()
   Modified();
 }
 
-    
-    
-    
+
+
+
 
 // conversion methods
 
@@ -359,9 +359,21 @@ bool mitk::DisplayGeometry::Project(const Point3D & atPt3d_mm, const Vector3D &v
   }
 }
 
+bool mitk::DisplayGeometry::Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const
+{
+   if(m_WorldGeometry.IsNotNull())
+   {
+      return m_WorldGeometry->Project(vec3d_mm, projectedVec3d_mm);
+   }
+   else
+   {
+      return false;
+   }
+}
+
 bool mitk::DisplayGeometry::Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const
 {
-  if(m_WorldGeometry.IsNotNull()) 
+  if(m_WorldGeometry.IsNotNull())
   {
     return m_WorldGeometry->Map(pt3d_mm, pt2d_mm);
   }
@@ -374,7 +386,7 @@ bool mitk::DisplayGeometry::Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const
 void mitk::DisplayGeometry::Map(const Point2D &pt2d_mm, Point3D &pt3d_mm) const
 {
   if(m_WorldGeometry.IsNull()) return;
-  m_WorldGeometry->Map(pt2d_mm, pt3d_mm);    
+  m_WorldGeometry->Map(pt2d_mm, pt3d_mm);
 }
 
 bool mitk::DisplayGeometry::Map(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector2D &vec2d_mm) const
@@ -393,7 +405,7 @@ void mitk::DisplayGeometry::Map(const Point2D & atPt2d_mm, const Vector2D &vec2d
 {
   if(m_WorldGeometry.IsNull()) return;
 
-  m_WorldGeometry->Map(atPt2d_mm, vec2d_mm, vec3d_mm);    
+  m_WorldGeometry->Map(atPt2d_mm, vec2d_mm, vec3d_mm);
 }
 
 

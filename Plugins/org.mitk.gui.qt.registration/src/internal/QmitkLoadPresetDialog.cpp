@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ QmitkLoadPresetDialog::QmitkLoadPresetDialog(QWidget* parent, Qt::WindowFlags f,
   verticalLayout->addWidget( lstPresets );
 
   std::list<std::string>::iterator iter;
-  for( iter = presets.begin(); iter != presets.end(); iter++ ) 
+  for( iter = presets.begin(); iter != presets.end(); iter++ )
   {
     std::string preset = *iter;
     new QListWidgetItem(preset.c_str(), lstPresets);

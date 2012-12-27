@@ -42,6 +42,15 @@ class Image;
   {
     friend class Image;
 
+  public:
+    typedef itk::Index<VDimension> IndexType;
+    typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
+    /** Get Dimensions from ImageDataItem */
+    int GetDimension (int i) const {
+      return m_ImageDataItem->GetDimension(i);
+    }
+
   protected:
      /**  \param ImageDataItem* specifies the allocated image part */
     ImagePixelAccessor(mitk::Image::Pointer iP, mitk::ImageDataItem* iDI) :
@@ -78,6 +87,26 @@ class Image;
       * The different flags in mitk::ImageAccessorBase::Options can be unified by bitwise operations.
       */
     int m_Options;
+
+    /** Get memory offset for a given image index */
+    unsigned int GetOffset(const IndexType & idx) const {
+
+      const unsigned int * imageDims = m_ImageDataItem->m_Dimensions;
+
+      unsigned int offset = 0;
+      switch(VDimension)
+      {
+        case 4:
+          offset += idx[3]*imageDims[0]*imageDims[1]*imageDims[2];
+        case 3:
+          offset += idx[2]*imageDims[0]*imageDims[1];
+        case 2:
+          offset += idx[0] + idx[1]*imageDims[0];
+          break;
+      }
+      return offset;
+    }
+
 
   private:
 

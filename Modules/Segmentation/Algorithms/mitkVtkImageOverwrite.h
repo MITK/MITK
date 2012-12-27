@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     neighbor and uses the non optimized execute function of vtkImageReslice. Note that any interpolation doesn't make sense
   for round trip use extract->edit->overwrite, because it is nearly impossible to invert the interolation.
     There are two use cases for the Filter which are specified by the overwritemode property:
-    
+
     1)Extract slices from a 3D volume.
       Overwritemode = false
 
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
     2)Overwrite a 3D volume at a given slice.
       Overwritemode = true
-      
+
       The handling in this mode is quite similar to the description above with the addition that the
       InputSlice needs to be specified via SetInputSlice(vtkImageData*).
       - Set the properties mentioned above (Note that SetInput specifies the volume to write to)
@@ -69,7 +69,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
   protected:
-    
+
     mitkVtkImageOverwrite();
     virtual ~mitkVtkImageOverwrite();
 

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -139,13 +139,13 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
       std::cout << "Warning: Cannot find complete information on NumberOfImagesInMosaic in 0029|1010\n";
       std::cout << "         Resulting image may contain empty slices.\n";
     }
-    else 
+    else
     {
       this->m_Output->nSliceInVolume = static_cast<int>(valueArray[0]);
       mMosaic = static_cast<int> (ceil(sqrt(valueArray[0])));
       nMosaic = mMosaic;
     }
-    std::cout << "Mosaic in " << mMosaic << " X " << nMosaic << " blocks (total number of blocks = " << valueArray[0] << ").\n"; 
+    std::cout << "Mosaic in " << mMosaic << " X " << nMosaic << " blocks (total number of blocks = " << valueArray[0] << ").\n";
 
 
     ReadPublicTags2();

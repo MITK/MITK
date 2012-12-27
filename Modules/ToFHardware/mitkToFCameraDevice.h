@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,28 +27,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMultiThreader.h"
 #include "itkFastMutexLock.h"
 
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+
 namespace mitk
 {
   /**
-  * @brief Virtual interface and base class for all Time-of-Flight devices. 
+  * @brief Virtual interface and base class for all Time-of-Flight devices.
   *
   * @ingroup ToFHardware
   */
   class MITK_TOFHARDWARE_EXPORT ToFCameraDevice : public itk::Object
   {
-  public: 
+  public:
 
     mitkClassMacro(ToFCameraDevice, itk::Object);
     /*!
     \brief opens a connection to the ToF camera
     */
-    virtual bool ConnectCamera() = 0;
+    virtual bool OnConnectCamera() = 0;
+
+    virtual bool ConnectCamera();
     /*!
     \brief closes the connection to the camera
     */
     virtual bool DisconnectCamera() = 0;
     /*!
-    \brief starts the continuous updating of the camera. 
+    \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
     virtual void StartCamera() = 0;
@@ -60,6 +66,10 @@ namespace mitk
     \brief returns true if the camera is connected and started
     */
     virtual bool IsCameraActive();
+    /*!
+    \brief returns true if the camera is connected
+    */
+    virtual bool IsCameraConnected();
     /*!
     \brief updates the camera for image acquisition
     */
@@ -95,7 +105,7 @@ namespace mitk
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL) = 0;
 //    TODO: Buffer size currently set to 1. Once Buffer handling is working correctly, method may be reactivated
-//    /*!
+//    /* // * TODO: Reenable doxygen comment when uncommenting, disabled to fix doxygen warning see bug 12882
 //    \brief pure virtual method resetting the buffer using the specified bufferSize. Has to be implemented by sub-classes
 //    \param bufferSize buffer size the buffer should be reset to
 //    */
@@ -217,6 +227,10 @@ namespace mitk
 
   private:
 
+    mitk::ServiceRegistration m_ServiceRegistration;
+
   };
 } //END mitk namespace
+// This is the microservice declaration. Do not meddle!
+US_DECLARE_SERVICE_INTERFACE(mitk::ToFCameraDevice, "org.mitk.services.ToFCameraDevice")
 #endif

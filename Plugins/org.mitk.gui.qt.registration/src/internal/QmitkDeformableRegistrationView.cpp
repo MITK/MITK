@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -93,7 +93,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
         bool foundFixedImage = false;
         mitk::DataNode::Pointer fixedNode;
         // iterate selection
-        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
@@ -165,7 +165,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
 };
 
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false), 
+: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
   m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false)
 {
   this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkDeformableRegistrationView,
@@ -187,7 +187,7 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
   m_Parent->setEnabled(false);
-  this->CreateConnections(); 
+  this->CreateConnections();
   m_Controls.TextLabelFixed->hide();
   m_Controls.m_SwitchImages->hide();
   m_Controls.m_FixedLabel->hide();
@@ -215,7 +215,7 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
 void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
 {
   if(node == m_FixedNode || node == m_MovingNode)
-  {  
+  {
     m_Controls.m_StatusLabel->show();
     m_Controls.TextLabelFixed->hide();
     m_Controls.m_SwitchImages->hide();
@@ -229,24 +229,24 @@ void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNod
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
     m_Controls.m_DeformableTransform->hide();
     m_Controls.m_CalculateTransformation->setEnabled(false);
-  }    
+  }
 
 }
 
 
 void QmitkDeformableRegistrationView::ApplyDeformationField()
 {
-  
+
   ImageReaderType::Pointer reader  = ImageReaderType::New();
   reader->SetFileName( m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_DeformationField->text().toStdString() );
   reader->Update();
-      
+
   DeformationFieldType::Pointer deformationField = reader->GetOutput();
 
   mitk::Image * mimage = dynamic_cast<mitk::Image*> (m_MovingNode->GetData());
   mitk::Image * fimage = dynamic_cast<mitk::Image*> (m_FixedNode->GetData());
-  
-  typedef itk::Image<float, 3> FloatImageType;  
+
+  typedef itk::Image<float, 3> FloatImageType;
 
   FloatImageType::Pointer itkMovingImage = FloatImageType::New();
   FloatImageType::Pointer itkFixedImage = FloatImageType::New();
@@ -254,7 +254,7 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   mitk::CastToItkImage(fimage, itkFixedImage);
 
   typedef itk::WarpImageFilter<
-                            FloatImageType, 
+                            FloatImageType,
                             FloatImageType,
                             DeformationFieldType  >     WarperType;
 
@@ -280,17 +280,17 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
 
   // Create new DataNode
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  newNode->SetData( result );   
+  newNode->SetData( result );
   newNode->SetProperty( "name", mitk::StringProperty::New("warped image") );
 
   // add the new datatree node to the datatree
-  this->GetDefaultDataStorage()->Add(newNode); 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
+  this->GetDefaultDataStorage()->Add(newNode);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   //Image::Pointer outputImage = this->GetOutput();
   //mitk::CastToMitkImage( warper->GetOutput(), outputImage );
 
-  
+
 }
 
 void QmitkDeformableRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -315,7 +315,7 @@ void QmitkDeformableRegistrationView::CreateConnections()
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
   connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
-    SIGNAL(clicked()), 
+    SIGNAL(clicked()),
     (QObject*) this,
     SLOT(ApplyDeformationField()) );
 }
@@ -553,7 +553,7 @@ void QmitkDeformableRegistrationView::Calculate()
       return;
     }
     mitk::Image::Pointer resultImage = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultImage();
-    mitk::Image::Pointer resultDeformationField = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultDeformationfield();   
+    mitk::Image::Pointer resultDeformationField = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultDeformationfield();
     if (resultImage.IsNotNull())
     {
       mitk::DataNode::Pointer resultImageNode = mitk::DataNode::New();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,18 +31,18 @@ namespace mitk {
   /**
   * @brief Connection of two states
   *
-  * A transition connects two states. 
+  * A transition connects two states.
   * Several actions are stored, that have to be executed after the statechange.
   * @ingroup Interaction
   **/
-  class MITK_CORE_EXPORT Transition 
+  class MITK_CORE_EXPORT Transition
   {
   public:
 
     typedef std::vector< mitk::Action::Pointer > ActionVectorType;
     typedef ActionVectorType::iterator ActionVectorIterator;
     typedef const ActionVectorIterator ActionVectorConstIterator;
-    
+
     /**
     * @brief Add the action to this object.
     **/
@@ -64,7 +64,7 @@ namespace mitk {
     int GetNextStateId() const;
 
     /**
-    * @brief Get the eventId of this object. 
+    * @brief Get the eventId of this object.
     **/
     int GetEventId() const;
 
@@ -94,20 +94,20 @@ namespace mitk {
     void SetNextState(State* state);
 
     /**
-    * @brief Default Constructor 
-    * Sets the necessary informations name (to enhance readability during debug), 
+    * @brief Default Constructor
+    * Sets the necessary informations name (to enhance readability during debug),
     * nextStateId (the Id of the next state) and eventId (the Id of the event that causes the statechange).
     **/
     Transition(std::string name, int nextStateId, int eventId);
-    
+
     /**
-    * @brief Default Denstructor 
+    * @brief Default Denstructor
     **/
     ~Transition();
 
   private:
     /**
-    * @brief For better debugging and reading it stores the name of this. 
+    * @brief For better debugging and reading it stores the name of this.
     **/
     std::string m_Name;
 

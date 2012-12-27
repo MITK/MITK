@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,19 +30,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
 {
-  
+
   if(argc==0)
   {
     std::cout<<"no file specified [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  
+
   std::string path = argv[1];
   itksys::SystemTools::ConvertToUnixSlashes(path);
   std::string fileIn = path;
   std::string fileOut = "BallBinary30x30x30.stl";
 
-  
+
   std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
   std::cout<<"Ausgabe Datei: "<<fileOut<<std::endl;
   mitk::Image::Pointer image = NULL;
@@ -95,13 +95,13 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
     std::cout<<"Instantiat SurfaceVtkWirter: [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  else {  
+  else {
     writer->GlobalWarningDisplayOn();
     writer->SetFileName(fileOut.c_str());
-    writer->GetVtkWriter()->SetFileTypeToBinary();  
-   
+    writer->GetVtkWriter()->SetFileTypeToBinary();
+
   }
-  
+
   std::cout << "Create surface with default settings: ";
   if (image->GetDimension()==3)
   {
@@ -131,18 +131,18 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
     filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
     filter->SetTargetReduction(0.05f);
     filter->SmoothOn();
-    
-    try 
+
+    try
     {
       filter->Update();
     }
-    catch( itk::ExceptionObject & err ) 
-    { 
+    catch( itk::ExceptionObject & err )
+    {
       MITK_INFO << " ERROR!" << std::endl;
-      MITK_ERROR << "ExceptionObject caught!" << std::endl; 
-      MITK_ERROR << err << std::endl; 
+      MITK_ERROR << "ExceptionObject caught!" << std::endl;
+      MITK_ERROR << err << std::endl;
       return EXIT_FAILURE;
-    } 
+    }
 
     writer->SetInput( filter->GetOutput() );
     if( writer->GetNumberOfInputs() < 1 )

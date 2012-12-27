@@ -6,8 +6,8 @@ set(LIBPOSTFIX "")
 
 # MITK_VERSION
 set(MITK_VERSION_MAJOR "2012")
-set(MITK_VERSION_MINOR "09")
-set(MITK_VERSION_PATCH "99")
+set(MITK_VERSION_MINOR "12")
+set(MITK_VERSION_PATCH "00")
 set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
 if(MITK_VERSION_PATCH STREQUAL "99")
   set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
@@ -34,11 +34,11 @@ set(CORE_DIRECTORIES Common DataManagement Algorithms IO Rendering Interactions 
 foreach(d ${CORE_DIRECTORIES})
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/Code/${d})
 endforeach()
-#list(APPEND MITK_INCLUDE_DIRS  
+#list(APPEND MITK_INCLUDE_DIRS
      #${ITK_INCLUDE_DIRS}
      #${VTK_INCLUDE_DIRS}
 #    )
-     
+
 foreach(d Utilities Utilities/ipPic Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
   list(APPEND MITK_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${d})
 endforeach()
@@ -58,7 +58,6 @@ set(VTK_FOR_MITK_LIBRARIES
     vtkGraphics
     vtkCommon
     vtkFiltering
-    vtkftgl
     vtkGraphics
     vtkHybrid
     vtkImaging
@@ -85,15 +84,15 @@ set(MITK_LIBRARIES
     ${LIBRARIES_FOR_MITK_CORE}
     pic2vtk
     ipSegmentation
-    ann 
+    ann
    )
-   
+
 # variables used in CMake macros which are called from external projects
 set(MITK_VTK_LIBRARY_DIRS ${VTK_LIBRARY_DIRS})
 set(MITK_ITK_LIBRARY_DIRS ${ITK_LIBRARY_DIRS})
 
 # variables containing link directories
-set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})                                                                                                              
+set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 set(MITK_LINK_DIRECTORIES
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
     ${ITK_LIBRARY_DIRS}
@@ -104,12 +103,12 @@ set(MITK_LINK_DIRECTORIES
 if(MITK_USE_QT)
   find_package(Qt4 REQUIRED)
 
-  set(QMITK_INCLUDE_DIRS 
+  set(QMITK_INCLUDE_DIRS
       ${MITK_INCLUDE_DIRS}
       ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Qmitk
       ${PROJECT_BINARY_DIR}/Modules/Qmitk
      )
-  
+
   set(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES})
   set(QMITK_LINK_DIRECTORIES ${MITK_LINK_DIRECTORIES})
 endif()

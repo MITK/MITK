@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -100,7 +100,7 @@ public:
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
 
-  
+
   mitkClassMacro( ImageStatisticsCalculator, itk::Object );
   itkNewMacro( ImageStatisticsCalculator );
 
@@ -149,7 +149,7 @@ public:
   virtual bool ComputeStatistics( unsigned int timeStep = 0 );
 
 
-  /** \brief Retrieve the histogram depending on the current masking mode. 
+  /** \brief Retrieve the histogram depending on the current masking mode.
    *
    * \param label The label for which to retrieve the histogram in multi-label situations (ascending order).
    */
@@ -168,7 +168,7 @@ public:
   const StatisticsContainer &GetStatisticsVector( unsigned int timeStep = 0 ) const;
 
 
-  
+
 protected:
   typedef std::vector< HistogramContainer > HistogramVector;
   typedef std::vector< StatisticsContainer > StatisticsVector;
@@ -182,7 +182,7 @@ protected:
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
 
   ImageStatisticsCalculator();
-  
+
   virtual ~ImageStatisticsCalculator();
 
   /** \brief Depending on the masking mode, the image and mask from which to

@@ -152,7 +152,6 @@ void QmitkODFDetailsView::UpdateOdf()
 
     try
     {
-        m_Values.clear();
         m_Controls->m_OverviewBox->setVisible(true);
         if (m_ImageNode.IsNull() || !m_MultiWidget)
         {

@@ -149,11 +149,19 @@ void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::Dat
 
 void QmitkStochasticFiberTrackingView::DoFiberTracking()
 {
+    typedef itk::VectorImage< short int, 3 >    DWIVectorImageType;
+    typedef itk::Image< float, 3 >              FloatImageType;
+    typedef itk::Image< unsigned int, 3 >       CImageType;
+    typedef itk::StochasticTractographyFilter< DWIVectorImageType, FloatImageType, CImageType > TrackingFilterType;
+    typedef itk::DTITubeSpatialObject<3>        DTITubeType;
+    typedef itk::DTITubeSpatialObjectPoint<3>   DTITubePointType;
+    typedef itk::SceneSpatialObject<3>          SceneSpatialObjectType;
+
     /* get Gradients/Direction of dwi */
     itk::VectorContainer< unsigned int, vnl_vector_fixed<double,3> >::Pointer Pdir = m_DiffusionImage->GetDirections();
 
     /* bValueContainer, Container includes b-values according to corresponding gradient-direction*/
-    PTFilterType::bValueContainerType::Pointer vecCont = PTFilterType::bValueContainerType::New();
+    TrackingFilterType::bValueContainerType::Pointer vecCont = TrackingFilterType::bValueContainerType::New();
 
     /* for each gradient set b-Value; for 0-gradient set b-value eq. 0 */
     for ( int i=0; i<(int)Pdir->size(); ++i)
@@ -168,7 +176,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     }
 
     /* define measurement frame (identity-matrix 3x3) */
-    PTFilterType::MeasurementFrameType measurement_frame = m_DiffusionImage->GetMeasurementFrame();
+    TrackingFilterType::MeasurementFrameType measurement_frame = m_DiffusionImage->GetMeasurementFrame();
 
     /* generate white matterImage (dummy?)*/
     FloatImageType::Pointer wmImage = FloatImageType::New();
@@ -188,7 +196,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     }
 
     /* init TractographyFilter */
-    PTFilterType::Pointer trackingFilter = PTFilterType::New();
+    TrackingFilterType::Pointer trackingFilter = TrackingFilterType::New();
     trackingFilter->SetInput(m_DiffusionImage->GetVectorImage().GetPointer());
     trackingFilter->SetbValues(vecCont);
     trackingFilter->SetGradients(Pdir);
@@ -197,9 +205,6 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     trackingFilter->SetTotalTracts(m_Controls->m_SeedsPerVoxelSlider->value());
     trackingFilter->SetMaxLikelihoodCacheSize(m_Controls->m_MaxCacheSizeSlider->value()*1000);
     trackingFilter->SetMaxTractLength(m_Controls->m_MaxTractLengthSlider->value());
-
-
-    m_tractcontainer = PTFilterType::TractContainerType::New();
 
     //itk::Image< char, 3 >
     mitk::ImageToItk< itk::Image< unsigned char, 3 > >::Pointer binaryImageToItk1 = mitk::ImageToItk< itk::Image< unsigned char, 3 > >::New();
@@ -225,19 +230,19 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
 
             /* get results from Filter */
             /* write each single tract into member container */
-            PTFilterType::TractContainerType::Pointer container_tmp = trackingFilter->GetOutputTractContainer();
-            PTFilterType::TractContainerType::Iterator elIt = container_tmp->Begin();
-            PTFilterType::TractContainerType::Iterator end = container_tmp->End();
+            TrackingFilterType::TractContainerType::Pointer container_tmp = trackingFilter->GetOutputTractContainer();
+            TrackingFilterType::TractContainerType::Iterator elIt = container_tmp->Begin();
+            TrackingFilterType::TractContainerType::Iterator end = container_tmp->End();
             bool addTract = true;
 
             while( elIt != end ){
-                PTFilterType::TractContainerType::Element tract = elIt.Value();
-                PTFilterType::TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist = tract->GetVertexList();
+                TrackingFilterType::TractContainerType::Element tract = elIt.Value();
+                TrackingFilterType::TractContainerType::Element::ObjectType::VertexListType::ConstPointer vertexlist = tract->GetVertexList();
 
                 vtkSmartPointer<vtkPolyLine> vPolyLine = vtkSmartPointer<vtkPolyLine>::New();
                 for( int j=0; j<(int)vertexlist->Size(); j++)
                 {
-                    PTFilterType::TractContainerType::Element::ObjectType::VertexListType::Element vertex = vertexlist->GetElement(j);
+                    TrackingFilterType::TractContainerType::Element::ObjectType::VertexListType::Element vertex = vertexlist->GetElement(j);
                     mitk::Point3D index;
                     index[0] = (float)vertex[0];
                     index[1] = (float)vertex[1];

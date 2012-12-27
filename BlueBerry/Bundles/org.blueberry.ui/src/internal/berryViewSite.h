@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -30,19 +30,19 @@ struct IViewDescriptor;
 
 /**
  * \ingroup org_blueberry_ui_internal
- * 
+ *
  * A view container manages the services for a view.
  */
 class ViewSite : public PartSite, public IViewSite {
-    
+
 public:
-  
+
   berryObjectMacro(ViewSite)
-  
-  ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view, 
+
+  ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view,
            WorkbenchPage* page,
             const std::string& id, const std::string& pluginId, const std::string& registeredName);
-    
+
     /**
      * Creates a new ViewSite.
      */

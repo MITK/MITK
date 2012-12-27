@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -469,6 +469,9 @@ namespace mitk
 
           if ( planeRenderer.IsNotNull() )
           {
+            // perform update of imagemapper if needed (maybe the respective 2D renderwindow is not rendered/update before)
+            imageMapper->Update(planeRenderer);
+
             // If it has not been initialized already in a previous pass,
             // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.
@@ -513,6 +516,11 @@ namespace mitk
               dataSetMapper->SetInput( surface->GetVtkPolyData() );
             }
 
+            //Check if the m_ReslicedImage is NULL.
+            //This is the case when no image geometry is met by
+            //the reslicer. In that case, the texture has to be
+            //empty (black) and we don't have to do anything.
+            //See fixed bug #13275
             if(localStorage->m_ReslicedImage != NULL)
             {
               bool binaryOutline = node->IsOn( "outline binary", renderer );

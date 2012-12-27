@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -117,12 +117,12 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::st
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetToolName())==name) return GetTool(i);
   return NULL;
   }
-    
+
 int mitk::NavigationToolStorage::GetToolCount()
   {
   return m_ToolCollection.size();
   }
-    
+
 bool mitk::NavigationToolStorage::isEmpty()
   {
   return m_ToolCollection.empty();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -38,7 +38,7 @@ ItkImageToImageFilterAdapter< TPixel>::~ItkImageToImageFilterAdapter()
 
 /**
  * \todo check if this is no conflict to the ITK filter writing rules -> ITK SoftwareGuide p.512
- */  
+ */
 template <typename TPixel>
 void ItkImageToImageFilterAdapter< TPixel>::GenerateOutputInformation()
 {
@@ -64,7 +64,7 @@ void ItkImageToImageFilterAdapter< TPixel>::GenerateData()
   /* convert input mitk image to itk image */
   mitk::Image::Pointer inputImageMitk = const_cast<mitk::Image*>(inputImage.GetPointer());  // const away cast, because FixedInput...Multiplexer Macro needs non const Pointer
   typename ItkImageType::Pointer itkImage = ItkImageType::New();
-  //FixedInputDimensionMitkToItkFunctionMultiplexer(itkImage, ItkImageType , inputImageMitk, 3, MakeCastImageFilter);    
+  //FixedInputDimensionMitkToItkFunctionMultiplexer(itkImage, ItkImageType , inputImageMitk, 3, MakeCastImageFilter);
   CastToItkImage(inputImageMitk, itkImage);
   /* check if image conversion failed */
   if (itkImage.IsNull())

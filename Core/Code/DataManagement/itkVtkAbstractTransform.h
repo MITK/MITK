@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -46,14 +46,14 @@ public:
 
 
   itkNewMacro(Self);
-  
+
   //##Documentation
   //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
   //##Documentation
   //## @brief Get the inverse vtkAbstractTransform (stored in m_InverseVtkAbstractTransform)
   virtual vtkAbstractTransform* GetInverseVtkAbstractTransform() const;
-  
+
   //##Documentation
   //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
@@ -73,15 +73,15 @@ public:
 protected:
   VtkAbstractTransform();
   virtual ~VtkAbstractTransform();
-  
+
   //##Documentation
   //## @brief Instance of the vtkAbstractTransform
   vtkAbstractTransform* m_VtkAbstractTransform;
-  
+
   //##Documentation
   //## @brief Instance of the vtkAbstractTransform
   vtkAbstractTransform* m_InverseVtkAbstractTransform;
-  
+
   mutable unsigned long m_LastVtkAbstractTransformTimeStamp;
 };
 

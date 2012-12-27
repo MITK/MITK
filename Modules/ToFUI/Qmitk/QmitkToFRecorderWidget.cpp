@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -71,7 +71,7 @@ void QmitkToFRecorderWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_PlayButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnPlay()) );
     connect( (QObject*)(m_Controls->m_StopButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStop()) );
     connect( (QObject*)(m_Controls->m_StartRecordingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartRecorder()) );
-    connect( (QObject*)(m_Controls->m_RecordModeComboBox), SIGNAL(currentIndexChanged(int)),(QObject*) this, SLOT(OnChangeRecordModeComboBox(int)) );    
+    connect( (QObject*)(m_Controls->m_RecordModeComboBox), SIGNAL(currentIndexChanged(int)),(QObject*) this, SLOT(OnChangeRecordModeComboBox(int)) );
 
     connect(this, SIGNAL(RecordingStopped()), this, SLOT(OnRecordingStopped()), Qt::BlockingQueuedConnection);
   }
@@ -107,7 +107,7 @@ void QmitkToFRecorderWidget::ResetGUIToInitial()
 }
 
 void QmitkToFRecorderWidget::OnRecordingStopped()
-{  
+{
   m_Controls->m_StartRecordingButton->setChecked(false);
   m_Controls->m_RecorderGroupBox->setEnabled(true);
 }
@@ -177,7 +177,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     QString selectedFilter("");
     QString imageFileName("");
     mitk::ToFImageWriter::ToFImageType tofImageType;
-    tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType, 
+    tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType,
       distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rgbImageSelected, rawDataSelected,
       NULL, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
 
@@ -209,11 +209,11 @@ void QmitkToFRecorderWidget::OnStartRecorder()
         numOfFramesStr.setNum(numOfFrames);
       }
 
-      std::string distImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(), 
+      std::string distImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(),
         integrationTimeStr.toStdString(), numOfFramesStr.toStdString(), extension, "_DistanceImage");
       MITK_INFO << "Save distance data to: " << distImageFileName;
 
-      std::string amplImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(), 
+      std::string amplImageFileName = prepareFilename(dir, baseFilename, modulationFreqStr.toStdString(),
         integrationTimeStr.toStdString(), numOfFramesStr.toStdString(), extension, "_AmplitudeImage");
       MITK_INFO << "Save amplitude data to: " << amplImageFileName;
 
@@ -233,8 +233,8 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       {
         //default
         this->m_ToFImageRecorder->SetFileFormat(".pic");
-        
-        QMessageBox::warning(NULL, "Deprecated File Format!", 
+
+        QMessageBox::warning(NULL, "Deprecated File Format!",
           "Please note that *.pic file format is deprecated and not longer supported! The suggested file format for images is *.nrrd!");
       }
       else if (selectedFilter.compare("NRRD Images (*.nrrd)") == 0)
@@ -324,7 +324,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   QLayout* layout = fileDialog->layout();
   QGridLayout* gridbox = qobject_cast<QGridLayout*>(layout);
 
-  if (gridbox) 
+  if (gridbox)
   {
     gridbox->addWidget(new QLabel("ToF-Image type:"));
     gridbox->addWidget(combo);
@@ -340,7 +340,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
     fileDialog->selectNameFilter(*selectedFilter);
   }
 
-  if (fileDialog->exec() == QDialog::Accepted) 
+  if (fileDialog->exec() == QDialog::Accepted)
   {
     if (selectedFilter)
     {
@@ -370,12 +370,12 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   return selectedFileName;
 }
 
-std::string QmitkToFRecorderWidget::prepareFilename(std::string dir, 
-                                                    std::string baseFilename, 
-                                                    std::string modulationFreq, 
-                                                    std::string integrationTime, 
-                                                    std::string numOfFrames, 
-                                                    std::string extension, 
+std::string QmitkToFRecorderWidget::prepareFilename(std::string dir,
+                                                    std::string baseFilename,
+                                                    std::string modulationFreq,
+                                                    std::string integrationTime,
+                                                    std::string numOfFrames,
+                                                    std::string extension,
                                                     std::string imageType)
 {
   std::string filenName("");

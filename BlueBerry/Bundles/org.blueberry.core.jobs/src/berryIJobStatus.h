@@ -2,18 +2,18 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _BERRYIJOBSTATUS_H  
+#ifndef _BERRYIJOBSTATUS_H
 #define _BERRYIJOBSTATUS_H
 
 #include "berryIStatus.h"
@@ -30,8 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   */
 
    struct IJobStatus : public IStatus {
-  
-   berryObjectMacro(IJobStatus) 
+
+   berryObjectMacro(IJobStatus)
 
   /**
    * Returns the job associated with this status.
@@ -42,4 +42,4 @@ See LICENSE.txt or http://www.mitk.org for details.
 }
 
 
-#endif /*_BERRYIJOBSTATUS_H */ 
+#endif /*_BERRYIJOBSTATUS_H */

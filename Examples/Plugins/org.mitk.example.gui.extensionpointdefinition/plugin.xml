@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension point="org.blueberry.osgi.applications">
+    <application id="org.mitk.example.extensionpointdefinition">
+      <run class="ExtensionPointDefinition"/>
+    </application>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.example.minimalperspective"
+      name="Minimal Example Perspective"
+      class="MinimalPerspective">
+    </perspective>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view
+      id="org.mitk.views.minimalview"
+      name="Text Changers"
+      class="MinimalView">
+    </view>
+  </extension>
+
+  <extension-point id="org.mitk.example.extensionpointdefinition.changetext" name="Change Text of Label" schema="schema/changetext.exsd"/>
+
+</plugin>

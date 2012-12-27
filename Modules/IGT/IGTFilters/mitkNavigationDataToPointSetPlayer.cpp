@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -78,19 +78,19 @@ void mitk::NavigationDataToPointSetPlayer::ReinitXML()
 
     m_NumberOfSnapshots = 0;
     TiXmlElement* nextND = m_DataElem->FirstChildElement("NavigationData");
-    
+
     while(nextND)
     {
       ++m_NumberOfSnapshots;
       nextND = nextND->NextSiblingElement("NavigationData");
-    }   
+    }
 
     // e.g. 12 nd found and 2 tools used => number of snapshots is 12:2=6
     m_NumberOfSnapshots = m_NumberOfSnapshots/toolcount;
 
     /*NavigationData::TimeStampType recordedTime = (lastTimestamp-firstTimestamp) / 1000;
     int frameRate = static_cast<int>(floor(1000 / (float) (m_NumberOfSnapshots/recordedTime) + 0.5));*/
-    
+
   }
 }
 

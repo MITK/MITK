@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -72,7 +72,7 @@ void mitk::KalmanFilter::SetProcessNoise( float processNoise )
 {
   ///// SYSTEM NOISE ////
   // Q - process noise covariance matrix Q
-  float q  = processNoise; 
+  float q  = processNoise;
   float Q[] = { (float)q, (float)0 };
   cvInitMatHeader( m_cvKalman->process_noise_cov, 2, 1, CV_32FC1, Q );
 }
@@ -83,7 +83,7 @@ void mitk::KalmanFilter::ResetFilter()
 
   // A - (or F) relates the state at previous time step k-1 to the state at current time step k
   // B - control matrix, it is not used if there is no control
-  // H - measurement matrix, 
+  // H - measurement matrix,
   // Q - process noise covariance matrix, constant or variable,
   // R - measurement noise covariance matrix, constant or variable
 

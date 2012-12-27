@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-QmitkToolDistanceWidget::QmitkToolDistanceWidget(QWidget* parent)  
+QmitkToolDistanceWidget::QmitkToolDistanceWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_DistanceLabels(NULL)
 {
   this->CreateQtPartControl( this );
@@ -63,7 +63,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
   {
     this->show();
 
-    mitk::NavigationData* navData; 
+    mitk::NavigationData* navData;
 
 
     if(m_DistanceLabels == NULL)
@@ -71,7 +71,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
       m_DistanceLabels = new DistanceLabelType;
     }
 
-    if(m_DistanceLabels->isEmpty()) 
+    if(m_DistanceLabels->isEmpty())
     {
       this->m_Controls->m_StatusLabel->setText("");
 
@@ -80,7 +80,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
 
       // labeling of matrix
       for (unsigned int i = 0; i < outputs.size()-1; i++)
-      { 
+      {
         navData = dynamic_cast<mitk::NavigationData*>(outputs.at(i).GetPointer());
         label = new QLabel(navData->GetName(),this);
         label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -97,7 +97,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
       {
         QVector<QLabel*>* rowDistances = new QVector<QLabel*>();
 
-        for(unsigned int j = i+1; j < outputs.size(); j++) 
+        for(unsigned int j = i+1; j < outputs.size(); j++)
         {
           // distance labels initializing
           label = new QLabel(QString("---"), this);
@@ -124,7 +124,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
   void QmitkToolDistanceWidget::ShowDistanceValues(itk::ProcessObject::DataObjectPointerArray & outputs)
   {
 
-    mitk::NavigationData* navData; 
+    mitk::NavigationData* navData;
     mitk::NavigationData* nextNavData;
 
     for(int i=0; i < m_DistanceLabels->size(); i++)
@@ -142,7 +142,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
         mitk::NavigationData::PositionType::RealType distance =  navData->GetPosition().EuclideanDistanceTo(nextNavData->GetPosition());
         distance = floor(distance * 10.) / 10.;
         QString distanceStr;
-        if(!navData->IsDataValid() || !nextNavData->IsDataValid()) 
+        if(!navData->IsDataValid() || !nextNavData->IsDataValid())
         {
           distanceStr = "---";
         }
@@ -156,7 +156,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
     }
   }
 
-  void QmitkToolDistanceWidget::ClearDistanceMatrix() 
+  void QmitkToolDistanceWidget::ClearDistanceMatrix()
   {
 
     while(m_Controls->m_GridLayout->count() > 0)
@@ -169,7 +169,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
    this->m_DistanceLabels = NULL;
 
    this->m_Controls->m_StatusLabel->setText(QString("For distance information please set up the connection again."));
- 
+
   }
 
   void QmitkToolDistanceWidget::SetDistanceLabelValuesInvalid()

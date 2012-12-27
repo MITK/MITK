@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ const std::string mitk::NavigationDataSource::US_PROPKEY_DEVICENAME = US_INTERFA
 const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
-mitk::NavigationDataSource::NavigationDataSource() 
+mitk::NavigationDataSource::NavigationDataSource()
 : itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)")
 {
 
@@ -107,9 +107,9 @@ void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObjec
 {
   if ( idx >= this->GetNumberOfOutputs() )
   {
-    itkExceptionMacro(<<"Requested to graft output " << idx << 
+    itkExceptionMacro(<<"Requested to graft output " << idx <<
       " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }  
+  }
 
   if ( !graft )
   {

@@ -92,6 +92,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         itk::DiffusionTensor3D<float> tensor;
         vnl_vector_fixed<double, 3> dir = m_TensorDirection.at(i);
         MITK_INFO << "Tensor direction: " << dir;
+
         dir.normalize();
 
         vnl_vector_fixed<double, 3> axis = vnl_cross_3d(kernelDir, dir); axis.normalize();
@@ -118,7 +119,7 @@ void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputIm
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
         float signal = pix[i];
-        float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  m_SignalScale*pow(m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
+        float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  pow(m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
         pix[i] += val;
     }
 }
@@ -192,9 +193,9 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     m_RandGen->SetSeed();
 
     typename OutputImageType::Pointer outImage = OutputImageType::New();
-    outImage->SetSpacing( m_Spacing );   // Set the image spacing
-    outImage->SetOrigin( m_Origin );     // Set the image origin
-    outImage->SetDirection( m_DirectionMatrix );  // Set the image direction
+    outImage->SetSpacing( m_Spacing );
+    outImage->SetOrigin( m_Origin );
+    outImage->SetDirection( m_DirectionMatrix );
     outImage->SetLargestPossibleRegion( m_ImageRegion );
     outImage->SetBufferedRegion( m_ImageRegion );
     outImage->SetRequestedRegion( m_ImageRegion );
@@ -324,10 +325,10 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         }
         else if (numDirs==0)
         {
-            pix = SimulateMeasurement(isoTensor, 1.0);
-            if (!m_SimulateBaseline)
-                for( unsigned int i=0; i<m_BaselineImages; i++)
-                    pix[i] = 0;
+            if (m_SimulateBaseline)
+                pix = SimulateMeasurement(isoTensor, 1.0);
+            else
+                pix.Fill(0.0);
         }
 
         m_MeanBaseline += pix[0];

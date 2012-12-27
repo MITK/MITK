@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -164,12 +164,12 @@ class mitkTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
     \param imageType type of image (DistanceImage, IntensityImage, AmplitudeImage)
     \return dir+"/"+baseFilename+"_MF"+modulationFreq+"_IT"+integrationTime+"_"+numOfFrames+"Images"+imageType+extension
     */
-    std::string prepareFilename(std::string dir, 
-                                std::string baseFilename, 
-                                std::string modulationFreq, 
-                                std::string integrationTime, 
-                                std::string numOfFrames, 
-                                std::string extension, 
+    std::string prepareFilename(std::string dir,
+                                std::string baseFilename,
+                                std::string modulationFreq,
+                                std::string integrationTime,
+                                std::string numOfFrames,
+                                std::string extension,
                                 std::string imageType);
 
     Ui::QmitkToFRecorderWidgetControls* m_Controls; ///< member holding the UI elements of this widget
@@ -178,7 +178,7 @@ class mitkTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
     mitk::ToFImageRecorder::Pointer m_ToFImageRecorder; ///< member holding the recorder for ToF images
 
     mitk::ToFImageRecorder::RecordMode m_RecordMode; ///< member holding the RecordMode of the recorder (PerFrame / Infinite)
-    
+
     typedef itk::SimpleMemberCommand<QmitkToFRecorderWidget> CommandType;
     CommandType::Pointer m_StopRecordingCommand; ///< itkCommand for abort of recording
 

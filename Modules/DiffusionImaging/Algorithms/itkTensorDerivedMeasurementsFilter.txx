@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,8 +35,8 @@ namespace itk {
     typedef ImageRegionConstIterator< TensorImageType > TensorImageIteratorType;
     typedef ImageRegionIterator< OutputImageType > OutputImageIteratorType;
 
-    
-    typename OutputImageType::Pointer outputImage = 
+
+    typename OutputImageType::Pointer outputImage =
         static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     typename TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
@@ -88,7 +88,7 @@ namespace itk {
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
           outputIt.Set((evs[0]+evs[1])/2.0);
-          
+
           break;
         }
       case CA:
@@ -136,10 +136,10 @@ namespace itk {
       ++outputIt;
     }
 
-    
+
   }
 
 
-}  
+}
 
 #endif // __itkTensorDerivedMeasurements_txx

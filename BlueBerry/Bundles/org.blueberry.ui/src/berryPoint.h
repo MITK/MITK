@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ namespace berry
  * The hashCode() method in this class uses the values of the public
  * fields to compute the hash value. When storing instances of the
  * class in hashed collections, do not modify these fields after the
- * object has been inserted.  
+ * object has been inserted.
  * </p>
  * <p>
  * Application code does <em>not</em> need to explicitly release the
@@ -84,8 +84,8 @@ public:
   bool operator==(const Point& p) const;
 
   /**
-   * Returns an integer hash code for the receiver. Any two 
-   * objects that return <code>true</code> when passed to 
+   * Returns an integer hash code for the receiver. Any two
+   * objects that return <code>true</code> when passed to
    * <code>equals</code> must return the same value for this
    * method.
    *

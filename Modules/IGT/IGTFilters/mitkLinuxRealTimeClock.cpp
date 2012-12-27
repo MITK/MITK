@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -35,7 +35,7 @@ mitk::LinuxRealTimeClock::~LinuxRealTimeClock()
 
 /**
 * \brief returns the current time in milliseconds
-* 
+*
 * Gets the current time since the Epoch (01.01.1970). gettimeofday returns the elapsed time in
 * microseconds.This value is calculated to milliseconds and returned as a double.
 *

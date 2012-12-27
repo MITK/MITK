@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -22,14 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "PlanarFigureExports.h"
 
 
-namespace mitk 
+namespace mitk
 {
 
 class Geometry2D;
 
 /**
  * \brief Implementation of PlanarFigure representing a four point
- * angle, which is defined by two non-intersecting lines in 2D. Each of those lines 
+ * angle, which is defined by two non-intersecting lines in 2D. Each of those lines
  * is defined by two control points.
  */
 class PlanarFigure_EXPORT PlanarFourPointAngle : public PlanarFigure
@@ -49,7 +49,7 @@ public:
    */
   //virtual void Initialize();
 
-  
+
   /** \brief Four point angle has 4 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {

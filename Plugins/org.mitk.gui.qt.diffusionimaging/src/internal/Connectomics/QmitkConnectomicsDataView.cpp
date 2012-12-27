@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -47,8 +47,8 @@ const std::string QmitkConnectomicsDataView::VIEW_ID = "org.mitk.views.connectom
 QmitkConnectomicsDataView::QmitkConnectomicsDataView()
 : QmitkFunctionality()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )  
-, m_ConnectomicsNetworkCreator( mitk::ConnectomicsNetworkCreator::New() ) 
+, m_MultiWidget( NULL )
+, m_ConnectomicsNetworkCreator( mitk::ConnectomicsNetworkCreator::New() )
 , m_demomode( false )
 , m_currentIndex( 0 )
 {
@@ -148,7 +148,7 @@ void QmitkConnectomicsDataView::OnSelectionChanged( std::vector<mitk::DataNode*>
   {
     mitk::DataNode::Pointer node = *it;
     currentFormatUnknown = true;
-  
+
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       currentFormatUnknown = false;
@@ -263,8 +263,8 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
   int numberOfNodes( 0 );
   switch (m_currentIndex) {
   case 0:
-    numberOfNodes = this->m_Controls->parameterOneSpinBox->value() 
-      * this->m_Controls->parameterOneSpinBox->value() 
+    numberOfNodes = this->m_Controls->parameterOneSpinBox->value()
+      * this->m_Controls->parameterOneSpinBox->value()
       * this->m_Controls->parameterOneSpinBox->value();
     break;
   case 1:
@@ -327,7 +327,7 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
     MITK_WARN << "Problem occured during synthetic network generation.";
   }
 
-  return;  
+  return;
 }
 
 void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
@@ -374,7 +374,7 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
 
     if (image && fiberBundle)
     {
-      m_ConnectomicsNetworkCreator->SetSegmentation( image ); 
+      m_ConnectomicsNetworkCreator->SetSegmentation( image );
       m_ConnectomicsNetworkCreator->SetFiberBundle( fiberBundle );
       m_ConnectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
       mitk::DataNode::Pointer networkNode = mitk::DataNode::New();

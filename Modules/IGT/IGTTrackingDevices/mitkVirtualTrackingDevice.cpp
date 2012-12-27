@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -26,9 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(), 
+mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
   m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20)
-{ 
+{
   m_Data = mitk::DeviceDataVirtualTracker;
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
   m_Bounds[1] = m_Bounds[3] = m_Bounds[5] =  400.0;
@@ -51,7 +51,7 @@ mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
   {
     m_MultiThreader->TerminateThread(m_ThreadID);
     m_MultiThreader = NULL;
-  }  
+  }
   m_AllTools.clear();
 }
 
@@ -77,14 +77,14 @@ bool mitk::VirtualTrackingDevice::StartTracking()
   if (this->GetState() != Ready)
     return false;
   this->SetState(Tracking);            // go to mode Tracking
-  this->m_StopTrackingMutex->Lock();  
+  this->m_StopTrackingMutex->Lock();
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
   mitk::TimeStamp::GetInstance()->Start(this);
-  
+
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
     m_MultiThreader->TerminateThread(m_ThreadID);
   if (m_MultiThreader.IsNull())
@@ -122,7 +122,7 @@ unsigned int mitk::VirtualTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
-  if ( toolNumber < m_AllTools.size()) 
+  if ( toolNumber < m_AllTools.size())
     return this->m_AllTools.at(toolNumber);
   return NULL;
 }
@@ -179,7 +179,7 @@ void mitk::VirtualTrackingDevice::InitializeSpline( mitk::VirtualTrackingTool* t
 
 bool mitk::VirtualTrackingDevice::CloseConnection()
 {
-  bool returnValue = true; 
+  bool returnValue = true;
   if(this->GetState() == Setup)
     return true;
 
@@ -199,7 +199,7 @@ mitk::ScalarType mitk::VirtualTrackingDevice::GetSplineChordLength(unsigned int 
 
 
 void mitk::VirtualTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond)
-{ 
+{
   if (roundsPerSecond < 0.0001)
     throw std::invalid_argument("Minimum tool speed is 0.0001 rounds per second");
 
@@ -225,7 +225,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
 {
   try
   {
-    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
 
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
@@ -300,7 +300,7 @@ ITK_THREAD_RETURN_TYPE mitk::VirtualTrackingDevice::ThreadStartTracking(void* pI
   }
   VirtualTrackingDevice *trackingDevice = static_cast<VirtualTrackingDevice*>(pInfo->UserData);
 
-  if (trackingDevice != NULL) 
+  if (trackingDevice != NULL)
     trackingDevice->TrackTools();
 
   trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here

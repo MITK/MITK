@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -71,7 +71,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   pluginContext = context;
 
   //initialize logging
-  mitk::LoggingBackend::Register(); 
+  mitk::LoggingBackend::Register();
   QString filename = "mitk.log";
   QFileInfo path = context->getDataFile(filename);
   mitk::LoggingBackend::SetLogFile(path.absoluteFilePath().toStdString().c_str());
@@ -112,7 +112,7 @@ void org_mitk_core_services_Activator::stop(ctkPluginContext* /*context*/)
 
   //clean up logging
   mitk::LoggingBackend::Unregister();
-  
+
   dataStorageService = 0;
   mitkContext = 0;
   pluginContext = 0;

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -68,13 +68,13 @@ namespace mitk
 
     /*!
     \brief sets the input of this filter
-    \param distanceImage input is the distance image of e.g. a ToF camera
+    \param input is the distance image of e.g. a ToF camera
     */
     virtual void SetInput( Image* input);
     /*!
     \brief sets the input of this filter at idx
     \param idx number of the current input
-    \param distanceImage input is the distance image of e.g. a ToF camera
+    \param input is the distance image of e.g. a ToF camera
     */
     virtual void SetInput(unsigned int idx,  Image* input);
     /*!

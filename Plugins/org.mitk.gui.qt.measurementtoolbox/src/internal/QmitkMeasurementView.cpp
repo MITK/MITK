@@ -325,15 +325,12 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it =
       d->m_DataNodeToPlanarFigureData.find(nonConstNode);
 
+  bool isFigureFinished = false;
+  bool isPlaced = false;
+
   if( it != d->m_DataNodeToPlanarFigureData.end() )
   {
     QmitkPlanarFigureData& data = it->second;
-
-    MEASUREMENT_DEBUG << "removing figure interactor to globalinteraction";
-    mitk::Interactor::Pointer oldInteractor = node->GetInteractor();
-//    if(oldInteractor.IsNotNull())
-//      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
-
     // remove observers
     data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
     data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
@@ -342,8 +339,41 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
 
     MEASUREMENT_DEBUG << "removing from the list of tracked planar figures";
     d->m_DataNodeToPlanarFigureData.erase( it );
+
+    isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
+    if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+      PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
+    }
   }
 
+  mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes =
+   GetDataStorage()->GetDerivations(node,isPlanarFigure);
+
+  for (unsigned int x = 0; x < nodes->size(); x++)
+  {
+    mitk::PlanarFigure* planarFigure  = dynamic_cast<mitk::PlanarFigure*>  (nodes->at(x)->GetData());
+    if (planarFigure != NULL) {
+
+      isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
+      if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+        GetDataStorage()->Remove(nodes->at(x));
+        if( !d->m_DataNodeToPlanarFigureData.empty() )
+        {
+          std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it2 =
+            d->m_DataNodeToPlanarFigureData.find(nodes->at(x));
+          //check if returned it2 valid
+          if( it2 != d->m_DataNodeToPlanarFigureData.end() )
+          {
+            d->m_DataNodeToPlanarFigureData.erase( it2 );// removing planar figure from tracked figure list
+            PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
+            EnableCrosshairNavigation();
+          }
+        }
+      }
+    }
+  }
   this->CheckForTopMostVisibleImage(nonConstNode);
 }
 
@@ -397,7 +427,7 @@ void QmitkMeasurementView::SetFocus()
   d->m_SelectedImageLabel->setFocus();
 }
 
-void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
                                               const QList<mitk::DataNode::Pointer> &nodes)
 {
   MEASUREMENT_DEBUG << "Determine the top most visible image";
@@ -407,14 +437,13 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer par
 
   MEASUREMENT_DEBUG << "refreshing selection and detailed text";
   d->m_CurrentSelection = nodes;
-  this->UpdateMeasurementText();   
+  this->UpdateMeasurementText();
 
   for( int i=d->m_CurrentSelection.size()-1; i>= 0; --i)
   {
     mitk::DataNode* node = d->m_CurrentSelection.at(i);
 
-    mitk::PlanarFigure* _PlanarFigure =
-        _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
+    mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (node->GetData());
 
     // the last selected planar figure
     if( _PlanarFigure )
@@ -543,7 +572,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
   this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
 
   // set all others in selection as deselected
-  for( size_t i=0; i<d->m_CurrentSelection.size(); ++i)
+  for( int i=0; i<d->m_CurrentSelection.size(); ++i)
     d->m_CurrentSelection.at(i)->SetSelected(false);
   d->m_CurrentSelection.clear();
   d->m_CurrentSelection.push_back( newNode );
@@ -560,13 +589,13 @@ void QmitkMeasurementView::UpdateMeasurementText()
 
   QString infoText;
   QString plainInfoText;
-  unsigned int j = 1;
+  int j = 1;
   mitk::PlanarFigure* _PlanarFigure = 0;
   mitk::PlanarAngle* planarAngle = 0;
   mitk::PlanarFourPointAngle* planarFourPointAngle = 0;
   mitk::DataNode::Pointer node = 0;
 
-  for (unsigned int i=0; i<d->m_CurrentSelection.size(); ++i, ++j)
+  for (int i=0; i<d->m_CurrentSelection.size(); ++i, ++j)
   {
     plainInfoText.clear();
     node = d->m_CurrentSelection.at(i);
@@ -614,7 +643,7 @@ void QmitkMeasurementView::UpdateMeasurementText()
     }
 
     if (j != d->m_CurrentSelection.size())
-      infoText.append("<br />");    
+      infoText.append("<br />");
   }
 
   d->m_SelectedPlanarFiguresText->setHtml(infoText);
@@ -702,7 +731,7 @@ void QmitkMeasurementView::EnableCrosshairNavigation()
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
   {
     MEASUREMENT_DEBUG << "enabling linked navigation";
-    //linkedRenderWindow->EnableLinkedNavigation(true);
+    linkedRenderWindow->EnableLinkedNavigation(true);
     linkedRenderWindow->EnableSlicingPlanes(true);
   }
 }
@@ -716,7 +745,7 @@ void QmitkMeasurementView::DisableCrosshairNavigation()
       dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
   {
     MEASUREMENT_DEBUG << "disabling linked navigation";
-    //linkedRenderWindow->EnableLinkedNavigation(false);
+    linkedRenderWindow->EnableLinkedNavigation(false);
     linkedRenderWindow->EnableSlicingPlanes(false);
   }
 }

@@ -14,6 +14,7 @@
 #! \param EXCLUDE_PLUGINS (optional) A list of plug-ins which should not be used. Mainly
 #!        useful if PLUGINS was not used.
 #! \param LINK_LIBRARIES A list of libraries to be linked with the executable.
+#! \param LIBRARY_DIRS A list of directories to pass through to MITK_INSTALL_TARGETS
 #! \param SHOW_CONSOLE (option) Show the console output window (on Windows).
 #! \param NO_PROVISIONING (option) Do not create provisioning files.
 #! \param NO_INSTALL (option) Do not install this executable
@@ -30,7 +31,7 @@
 #!
 function(FunctionCreateBlueBerryApplication)
 
-macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES" "SHOW_CONSOLE;NO_PROVISIONING;NO_INSTALL" ${ARGN})
+macro_parse_arguments(_APP "NAME;DESCRIPTION;SOURCES;PLUGINS;EXCLUDE_PLUGINS;LINK_LIBRARIES;LIBRARY_DIRS" "SHOW_CONSOLE;NO_PROVISIONING;NO_INSTALL" ${ARGN})
 
 if(NOT _APP_NAME)
   message(FATAL_ERROR "NAME argument cannot be empty.")
@@ -49,7 +50,7 @@ else()
     string(REPLACE "." "_" _plugin_target ${_plugin})
     list(APPEND _APP_PLUGINS ${_plugin_target})
   endforeach()
-  
+
   # get all plug-in dependencies
   ctkFunctionGetPluginDependencies(_plugin_deps PLUGINS ${_APP_PLUGINS} ALL)
   # add the dependencies to the list of application plug-ins
@@ -172,8 +173,16 @@ if(NOT _APP_NO_INSTALL)
   # This installs all third-party CTK plug-ins
   FunctionInstallThirdPartyCTKPlugins(${_APP_PLUGINS} EXCLUDE ${_APP_EXCLUDE_PLUGINS})
 
+  if(COMMAND BlueBerryApplicationInstallHook)
+    set(_real_app_plugins ${_APP_PLUGINS})
+    if(_APP_EXCLUDE_PLUGINS)
+      list(REMOVE_ITEM _real_app_plugins ${_APP_EXCLUDE_PLUGINS})
+    endif()
+    BlueBerryApplicationInstallHook(APP_NAME ${_APP_NAME} PLUGINS ${_real_app_plugins})
+  endif()
+
   # Install the executable
-  MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} GLOB_PLUGINS )
+  MITK_INSTALL_TARGETS(EXECUTABLES ${_APP_NAME} LIBRARY_DIRS ${_APP_LIBRARY_DIRS} GLOB_PLUGINS )
 
   if(NOT _APP_NO_PROVISIONING)
     # Install the provisioning file

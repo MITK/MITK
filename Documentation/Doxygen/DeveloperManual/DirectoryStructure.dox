@@ -1,21 +1,88 @@
 /**
 \page DirectoryStructurePage Directory Structure
 
-There are eight directories on the top level, each containing several sub-directories that contain the implementation. Thus, as far as code is concerned, the depth of the directory structure is limited to two. Classes in a sub-directory may reference classes in other sub-directories on the same level and in sub-directories that have already been mentioned, which are listed from top to bottom:
-\li \a DataStructures: contains sub-directories with data classes. Besides the actual data storage classes, the same sub-directory may contain functions inherently associated to the data storage class in the sense of object-oriented programming. For example a container class may include methods like \a add, \a remove, \a addSorted (add and keep the container sorted), and comparison operators. Classes in a directory may reference classes in other data-directories, but \em not in any of the other seven directories at the top level.
-\li \a Algorithms: contains sub-directories with algorithms, which may reference other algorithms and data-structures. 
-\li \a Controllers: contains sub-directories with controllers. Controllers are invisible data management classes.  An (non-exclusive!) example are controllers in the sense of the model-view-controller design-pattern. Controllers may reference other controllers, algorithms and data-structures.
-\li \a Rendering: contains sub-directories with rendering classes, e.g. mitk-mappers. Rendering classes may be graphics library dependent (e.g. OpenGL or vtk), but are GUI-toolkit independent (independent from Qt, FLTK, etc.). They produce output within a widget provided to them. Other classes within sub-directories of \a Rendering and all above mentioned directories may be referenced.
-\li \a Interactions: contains sub-directories with interaction classes, which may reference other interactions and all above mentioned directories.
-\li \a AppModule: contains sub-directories with classes creating a (part of a) GUI, which can be used within applications. This includes widgets and combinations of widgets and other AppModules. Classes in all directories except the \a Functionalities and \a Application directory may be referenced.
-\li \a Functionalities: contains sub-directories with functionalities. A functionality combines a main-widget area with a control widget area and an icon/menu-entry/description. Functionalities may include other functionalities. Classes in all directories except the \a Application directory may be referenced.
-\li \a Applications: Each directory includes the files required for at least one application. Classes in all directories may be referenced. In future, this directory may be moved to a seperate cvs-repository.
+To avoid clutter and ease the administration of the source code the MITK source code is structured into several subdirectories according to their function. This document aims at helping you finding what you want within this structure.
 
-\section Directory Naming Conventions
-If the classes within a sub-directory are implemented according to the mechanisms or on basis of a toolkit, the name of the sub-directory should start with the acronym of the toolkit. For example, if a registration algorithm uses itk, a reasonable directory name is \a itkRegistration. The classes within the directory need not be in the namespace of the toolkit (as in the case of itk-using classes), but they may, as in the case of directories containing mitk-core-classes. Typical acronyms are \a mitk, \a itk, \a vtk, \a ip and \a Qmitk (following the <a href="http://www.trolltech.com/documentation/naming.html">Qt-Naming Guidelines</a>).
-If a file contains a class that is within a namespace, the file name \em must begin with the namespace name, e.g.  mitkImage.h and mitkImage.cpp contain the class mitk::Image. Namespace names are normally identical to toolkit acronyms. Consequently, name of the directory will begin with the acronym according to the previous section.
+\section DirectoryStructurePageOverview Overview
 
-\section Compilation Conventions
-Files created during compilation should be stored in a separate directory tree parallel to the source tree (e.g. \a mitkBinary). For mitk, cmake should be used.
+The top level directories are the following:
+
+\li \ref DirectoryStructurePageApplications
+\li \ref DirectoryStructurePageBlueBerry
+\li \ref DirectoryStructurePageBuild
+\li \ref DirectoryStructurePageCMake
+\li \ref DirectoryStructurePageCMakeExternals
+\li \ref DirectoryStructurePageConfig
+\li \ref DirectoryStructurePageCore
+\li \ref DirectoryStructurePageDocumentation
+\li \ref DirectoryStructurePageExamples
+\li \ref DirectoryStructurePageModules
+\li \ref DirectoryStructurePagePlugins
+\li \ref DirectoryStructurePageUtilities
+\li \ref DirectoryStructurePageWrapping
+
+see the corresponding section for more information.
+
+\section DirectoryStructurePageTopLevelDirs The Top Level Directories
+
+\subsection DirectoryStructurePageApplications Applications
+
+This directory contains the different applications. Each application has its own subfolder, including the necessary code, icons and other resources. For more information on applications see \ref ModularizationPageApplications or \ref ApplicationsPageApplications .
+
+\subsection DirectoryStructurePageBlueBerry BlueBerry
+
+The BlueBerry directory contains all code related to the BlueBerry framework. This code can be used independently of MITK.
+
+\subsection DirectoryStructurePageBuild Build
+
+The Build directory contains tools for the generation of MITK Plugins, editing of StateMachines and similar tasks. They are usually their own executables which are not integrated within any applications from the Applications directory.
+
+\subsection DirectoryStructurePageCMake CMake
+
+The %CMake directory contains %CMake files, macros and templates for the configuration of MITK as a project.
+
+\subsection DirectoryStructurePageCMakeExternals CMakeExternals
+
+This directory contains %CMake files for the configuration of other projects used by MITK.
+
+\subsection DirectoryStructurePageConfig Config
+
+The Config directory contains configuration files. These provide presets and default values.
+
+\subsection DirectoryStructurePageCore Core
+
+The Core directory contains the basic MITK classes, which are used by most of the Plugins or Modules. They provide the basic MITK functionality and are subject to stricter quality controls than the rest of the code.
+
+\subsubsection DirectoryStructurePageCoreCode Code
+
+This subdirectory contains the actual core code of MITK. It provides datastructures, rendering classes, interactors and many more.
+
+\subsubsection DirectoryStructurePageCoreDocumentation Documentation
+
+This subdirectory contains the documentation on the concepts MITK was designed upon.
+
+\subsection DirectoryStructurePageDocumentation Documenation
+
+The Documentation directory contains doxygen and other documentation as well as tutorials and examples. It includes basic end user manuals for the framework as well as developer documentation which does not depend on any additional Modules.
+
+\subsection DirectoryStructurePageExamples Examples
+
+This directory contains example code used by the documentation in the Documentation directory.
+
+\subsection DirectoryStructurePageModules Modules
+
+This directory contains modules which extend the capabilities of MITK. For the concept behind modules see \ref ModularizationPageModules .
+
+\subsection DirectoryStructurePagePlugins Plugins
+
+This directory contains plugins, which provide specific solutions. For further information see \ref ModularizationPagePlugInBundles .
+
+\subsection DirectoryStructurePageUtilities Utilities
+
+The Utilities directory contains self contained libraries, which are used by MITK, but not necessarily developed or maintained by the MITK team.
+
+\subsection DirectoryStructurePageWrapping Wrapping
+
+The Wrapping directory contains code necessary for the Python wrapping capabilities of MITK.
 
 */

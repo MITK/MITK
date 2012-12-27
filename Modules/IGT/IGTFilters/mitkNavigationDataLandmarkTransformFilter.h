@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,11 +28,11 @@ namespace mitk {
 
   /**Documentation
   * \brief NavigationDataLandmarkTransformFilter applies a itk-landmark-transformation
-  * defined by source and target pointsets. 
-  * 
-  * Before executing the filter SetSourceLandmarks and SetTargetLandmarks must be called. Before both source 
+  * defined by source and target pointsets.
+  *
+  * Before executing the filter SetSourceLandmarks and SetTargetLandmarks must be called. Before both source
   * and target landmarks are set, the filter performs an identity transform.
-  * If source or target points are changed after calling SetXXXPoints, the corresponding SetXXXPoints 
+  * If source or target points are changed after calling SetXXXPoints, the corresponding SetXXXPoints
   * method has to be called again to apply the changes.
   * If UseICPInitialization is false (standard value, or set with SetUseICPInitialization(false) or UseICPInitializationOff())
   * then source landmarks and target landmarks with the same ID must correspondent to each other.
@@ -52,13 +52,13 @@ namespace mitk {
     typedef std::vector<mitk::ScalarType> ErrorVector;
     typedef itk::VersorRigid3DTransform< double > LandmarkTransformType;
 
-    /** 
+    /**
     *\brief Set points used as source points for landmark transform.
     *
     */
     virtual void SetSourceLandmarks(mitk::PointSet::Pointer sourcePointSet);
 
-    /** 
+    /**
     *\brief Set points used as target points for landmark transform
     *
     */
@@ -66,47 +66,47 @@ namespace mitk {
 
     virtual bool IsInitialized() const;
 
-    /** 
+    /**
     *\brief Returns the Fiducial Registration Error
     *
     */
     mitk::ScalarType GetFRE() const;
 
-    /** 
+    /**
     *\brief Returns the standard deviation of the Fiducial Registration Error
     *
     */
     mitk::ScalarType GetFREStdDev() const;
-    
-    /** 
+
+    /**
     *\brief Returns the Root Mean Square of the registration error
     *
-    */    
+    */
     mitk::ScalarType GetRMSError() const;
-    
-    /** 
+
+    /**
     *\brief Returns the minimum registration error / best fitting landmark distance
     *
-    */    
+    */
     mitk::ScalarType GetMinError() const;
-    
-    /** 
+
+    /**
     *\brief Returns the maximum registration error / worst fitting landmark distance
     *
-    */   
+    */
     mitk::ScalarType GetMaxError() const;
-    
-    /** 
+
+    /**
     *\brief Returns the absolute maximum registration error
     *
     */
     mitk::ScalarType GetAbsMaxError() const;
 
-    /** 
+    /**
     *\brief Returns a vector with the euclidean distance of each transformed source point to its respective target point
     *
     */
-    const ErrorVector& GetErrorVector() const; 
+    const ErrorVector& GetErrorVector() const;
 
     itkSetMacro(UseICPInitialization, bool); ///< If set to true, source and target point correspondences are established with iterative closest point optimization
     itkGetMacro(UseICPInitialization, bool); ///< If set to true, source and target point correspondences are established with iterative closest point optimization
@@ -116,20 +116,20 @@ namespace mitk {
 
   protected:
     typedef itk::Image< signed short, 3>  ImageType;       // only because itk::LandmarkBasedTransformInitializer must be templated over two imagetypes
-    
+
     typedef itk::LandmarkBasedTransformInitializer< LandmarkTransformType, ImageType, ImageType > TransformInitializerType;
-    typedef TransformInitializerType::LandmarkPointContainer LandmarkPointContainer; 
+    typedef TransformInitializerType::LandmarkPointContainer LandmarkPointContainer;
     typedef itk::QuaternionRigidTransform<double> QuaternionTransformType;
 
     /**
-    * \brief Constructor 
+    * \brief Constructor
     **/
     NavigationDataLandmarkTransformFilter();
     virtual ~NavigationDataLandmarkTransformFilter();
 
     /**
-    * \brief transforms input NDs according to the calculated LandmarkTransform 
-    * 
+    * \brief transforms input NDs according to the calculated LandmarkTransform
+    *
     */
     virtual void GenerateData();
 
@@ -138,25 +138,25 @@ namespace mitk {
     *
     * Perform ICP optimization to match source landmarks to target landmarks. Landmark containers must contain
     * at least 6 landmarks for the optimization.
-    * after ICP, landmark correspondences are established and the source landmarks are sorted, so that 
+    * after ICP, landmark correspondences are established and the source landmarks are sorted, so that
     * corresponding landmarks have the same indices.
-    * 
+    *
     * \param[in] sources Source landmarks that will be mapped to the target landmarks
     * \param[in] targets Target landmarks onto which the source landmarks will be mapped
-    * \param[out] sources The sources container will be sorted, 
+    * \param[out] sources The sources container will be sorted,
                   so that landmarks have the same index as their corresponding target landmarks
     * \return true if ICP was successful and sources are sorted , false otherwise
     */
-    bool FindCorrespondentLandmarks(LandmarkPointContainer& sources, const LandmarkPointContainer& targets) const; 
+    bool FindCorrespondentLandmarks(LandmarkPointContainer& sources, const LandmarkPointContainer& targets) const;
 
     /**
     * \brief initializes the transform using source and target PointSets
     *
-    * if UseICPInitialization is true, FindCorrespondentLandmarks() will be used to sort the source landmarks in order to 
+    * if UseICPInitialization is true, FindCorrespondentLandmarks() will be used to sort the source landmarks in order to
     * establish corresponding landmark pairs before the landmark transform is build
     */
     void InitializeLandmarkTransform(LandmarkPointContainer& sources, const LandmarkPointContainer& targets);
-    
+
     /**
     * \brief calculates the transform using source and target PointSets
     */
@@ -174,7 +174,7 @@ namespace mitk {
 
     LandmarkPointContainer m_SourcePoints;      ///<  positions of the source points
     LandmarkPointContainer m_TargetPoints;      ///<  positions of the target points
-    TransformInitializerType::Pointer m_LandmarkTransformInitializer;     ///<  landmark based transform initializer 
+    TransformInitializerType::Pointer m_LandmarkTransformInitializer;     ///<  landmark based transform initializer
     LandmarkTransformType::Pointer m_LandmarkTransform;               ///<  transform calculated from source and target points
 
     QuaternionTransformType::Pointer m_QuatLandmarkTransform; ///< transform needed to rotate orientation

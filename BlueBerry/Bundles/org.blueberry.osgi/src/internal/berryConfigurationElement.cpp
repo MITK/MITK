@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -77,6 +77,7 @@ ConfigurationElement
     Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
     for (unsigned long i = 0; i < ch->length(); ++i)
     {
+      if (ch->item(i)->nodeType() != Poco::XML::Node::ELEMENT_NODE) continue;
       IConfigurationElement::Pointer xelem(new ConfigurationElement(IConfigurationElement::m_ClassLoader, ch->item(i), m_Contributor, m_Extension, this));
       children.push_back(xelem);
     }
@@ -112,7 +113,21 @@ ConfigurationElement
 std::string
 ConfigurationElement::GetValue() const
 {
-  return m_ConfigurationNode->nodeValue();
+  std::string value;
+  if (m_ConfigurationNode->hasChildNodes())
+  {
+    Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
+    for (unsigned long i = 0; i < ch->length(); ++i)
+    {
+      if (ch->item(i)->nodeType() == Poco::XML::Node::TEXT_NODE)
+      {
+        value = ch->item(i)->nodeValue();
+        break;
+      }
+    }
+    ch->release();
+  }
+  return value;
 }
 
 std::string

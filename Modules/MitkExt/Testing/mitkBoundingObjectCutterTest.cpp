@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -57,7 +57,7 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char* /*argv*/[])
   //mitk::Cuboid::Pointer cuboid = mitk::Cuboid::New();
   //cuboid->FitGeometry(image->GetGeometry());
   //std::cout<<"[PASSED]"<<std::endl;
- 
+
   // MITK_TEST_OUTPUT(<< "Testing whether corners of the cuboid are identical to corners of the image: ");
   // int c;
   // for(c=0; c<6; ++c)

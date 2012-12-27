@@ -486,7 +486,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged(/*const itk::Object* 
   temp->InsertElement(0,workingData);
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(temp);
 
-  
+
   // Reinit current node
   ForceDisplayPreferencesUponAllImages();
 
@@ -1145,7 +1145,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->lblSegmentation->hide();
 
   m_Controls->refImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->refImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+
+  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+  mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
+  isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+
+  mitk::NodePredicateOr::Pointer isImage = mitk::NodePredicateOr::New(isDiffusionImage, isMitkImage);
+
+  m_Controls->refImageSelector->SetPredicate(isImage);
 
   if( m_Controls->refImageSelector->GetSelectedNode().IsNotNull() )
     m_Controls->lblReferenceImageSelectionWarning->hide();

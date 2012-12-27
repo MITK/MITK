@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -42,7 +42,7 @@ void mitk::QBallImage::ConstructRgbImage()
   typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
   typedef itk::QBallToRgbImageFilter<ImageType> FilterType;
   FilterType::Pointer filter = FilterType::New();
-  
+
   ImageType::Pointer itkvol = ImageType::New();
   mitk::CastToItkImage<ImageType>(this, itkvol);
   filter->SetInput(itkvol);

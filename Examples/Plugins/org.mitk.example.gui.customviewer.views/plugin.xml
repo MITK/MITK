@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.customviewer.views.dicomview"
+          name="Dicom View"
+          class="DicomView"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.customviewer.views.simplerenderwindowview"
+      name="Simple Render Window View"
+      class="SimpleRenderWindowView" />
+  </extension>
+
+</plugin>

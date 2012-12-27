@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ namespace berry {
 
 /**
  * An evaluation result represents the result of an expression
- * evaluation. There are exact three instances of evaluation 
+ * evaluation. There are exact three instances of evaluation
  * result. They are: <code>FALSE_EVAL</code>, <code>TRUE_EVAL</code> and
  * <code>NOT_LOADED</code>. <code>NOT_LOADED</code> represents
  * the fact that an expression couldn't be evaluated since a
@@ -134,23 +134,23 @@ namespace berry {
  *     </tr>
  *   </tbody>
  * </table>
- * 
+ *
  * <p>
  * The class is not intended to be subclassed by clients.
  * </p>
  * @since 3.0
  */
 class BERRY_EXPRESSIONS EvaluationResult {
-  
+
 private:
   int fValue;
-  
+
   static const int FALSE_VALUE;
   static const int TRUE_VALUE;
   static const int NOT_LOADED_VALUE;
-  
+
 public:
-  
+
   /** The evaluation result representing the value FALSE */
   static const EvaluationResult FALSE_EVAL;
   /** The evaluation result representing the value TRUE */
@@ -159,7 +159,7 @@ public:
   static const EvaluationResult NOT_LOADED;
 
 private:
-  
+
   static const EvaluationResult AND[3][3];
   static const EvaluationResult OR[3][3];
   static const EvaluationResult NOT[3];
@@ -168,55 +168,55 @@ private:
    * No instances outside of <code>EvaluationResult</code>
    */
   EvaluationResult(int value);
-  
+
 public:
-  
+
   bool operator==(const EvaluationResult&);
-  
+
   bool operator!=(const EvaluationResult&);
-  
+
   /**
    * Returns an <code>EvaluationResult</code> whose value is <code>this &amp;&amp; other)</code>.
-   * 
+   *
    * @param other the right hand side of the and operation.
-   * 
+   *
    * @return <code>this &amp;&amp; other</code> as defined by the evaluation result
    */
   EvaluationResult And(EvaluationResult other);
-  
+
   /**
    * Returns an <code>EvaluationResult</code> whose value is <code>this || other)</code>.
-   * 
+   *
    * @param other the right hand side of the or operation.
-   * 
+   *
    * @return <code>this || other</code> as defined by the evaluation result
    */
   EvaluationResult Or(EvaluationResult other);
-  
+
   /**
    * Returns the inverted value of this evaluation result
-   * 
+   *
    * @return the inverted value of this evaluation result
    */
   EvaluationResult Not();
-  
+
   /**
    * Returns an evaluation result instance representing the
    * given boolean value. If the given boolean value is
    * <code>TRUE_EVAL</code> then <code>ExpressionResult.TRUE_EVAL</code>
    * is returned. If the value is <code>FALSE_EVAL</code> then <code>
    * ExpressionResult.FALSE_EVAL</code> is returned.
-   * 
+   *
    * @param b a boolean value
-   * 
+   *
    * @return the expression result representing the boolean
    *  value
    */
   static EvaluationResult ValueOf(bool b);
-  
+
   /**
    * For debugging purpose only
-   * 
+   *
    * @return a string representing this object. The result is not
    *  human readable
    */

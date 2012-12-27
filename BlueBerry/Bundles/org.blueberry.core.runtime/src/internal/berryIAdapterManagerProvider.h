@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -24,7 +24,7 @@ class AdapterManager;
 /**
  * The callback interface for the elements desiring to lazily supply
  * information to the adapter manager.
- * 
+ *
  * @since org.blueberry.core.runtime 3.2
  */
 struct IAdapterManagerProvider {
@@ -32,9 +32,9 @@ struct IAdapterManagerProvider {
   /**
    * Add factories. The method called before the AdapterManager starts
    * using factories.
-   *  
+   *
    * @param adapterManager the adapter manager that is about to be used
-   * @return <code>true</code> if factories were added; <code>false</code> 
+   * @return <code>true</code> if factories were added; <code>false</code>
    * if no factories were added in this method call.
    */
   bool AddFactories(AdapterManager* adapterManager);

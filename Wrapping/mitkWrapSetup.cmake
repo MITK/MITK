@@ -25,10 +25,10 @@ if(MITK_NEED_CableSwig)
     set(CableSwig_DIR ${MITK_BINARY_DIR}/Utilities/CableSwig CACHE PATH "CableSwig_DIR: The directory containing CableSwigConfig.cmake.")
     set(CableSwig_FOUND 1)
     set(CableSwig_INSTALL_ROOT ${MITK_INSTALL_LIB_DIR}/CSwig)
-    include(${CableSwig_DIR}/CableSwigConfig.cmake OPTIONAL) 
+    include(${CableSwig_DIR}/CableSwigConfig.cmake OPTIONAL)
     subdirs(Utilities/CableSwig)
   else(EXISTS ${MITK_SOURCE_DIR}/Utilities/CableSwig)
-    # If CableSwig is not in the source tree, 
+    # If CableSwig is not in the source tree,
     # then try to find a binary build of CableSwig
     find_package(CableSwig)
     set(CMAKE_MODULE_PATH ${CableSwig_DIR}/SWIG/CMake)

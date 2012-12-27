@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -75,105 +75,200 @@ void mitk::PaintbrushTool::SetSize(int value)
   m_Size = value;
 }
 
+mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
+{
+   p[0] -= 0.5;
+   p[1] += 0.5;
+   return p;
+}
+
+
 void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 {
-    //MITK_INFO<<"Update...";
+  //MITK_INFO<<"Update...";
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
-  
-  // create a copy of this slice (at least match the pixel sizes/spacings),
-  // then draw the desired mask on it and create a contour from it
 
-  // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
-  itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-  CastToItkImage(m_WorkingSlice/*dynamic_cast<mitk::Image*>(m_WorkingNode->GetData())*/, correctPixelTypeImage );
-  assert (correctPixelTypeImage.IsNotNull() );
+  // Get Spacing of current Slice
+  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing();
 
-  itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-  imageDirection.SetIdentity();
-  correctPixelTypeImage->SetDirection(imageDirection);
+  //
+  // Draw a contour in Square according to selected brush size
+  //
+  int radius = (m_Size)/2;
+  float fradius = static_cast<float>(m_Size) / 2.0f;
 
-  Image::Pointer temporarySlice = Image::New();
-  CastToMitkImage( correctPixelTypeImage, temporarySlice );
-
-  //mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
-  mitkIpPicDescriptor* stupidClone = mitkIpPicNew();
-  CastToIpPicDescriptor( temporarySlice->GetSliceData(), stupidClone );
-  unsigned int pixelWidth  = m_Size + 1;
-  unsigned int pixelHeight = m_Size + 1;
-
-  if ( stupidClone->n[0] <= pixelWidth || stupidClone->n[1] <= pixelHeight )
-  {
-    MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
-                "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
-    mitkIpPicFree( stupidClone );
-    return;
-  }
-  
-  unsigned int lineLength( stupidClone->n[0] );
-  unsigned int oneContourOffset(0);
-  float circleCenterX = (float)m_Size / 2.0;
-  float circleCenterY = (float)m_Size / 2.0;
-  for (unsigned int x = 0; x <= pixelWidth; ++x)
-  {
-    for (unsigned int y = 0; y <= pixelHeight; ++y)
-    {
-      unsigned int offset = lineLength * y + x;
-      ipMITKSegmentationTYPE* current = (ipMITKSegmentationTYPE*)stupidClone->data + offset;
-
-      float pixelCenterX = x + 0.5;
-      float pixelCenterY = y + 0.5;
-
-      float xoff = pixelCenterX - circleCenterX;
-      float yoff = pixelCenterY - circleCenterY;
-
-      bool inside = xoff * xoff + yoff * yoff < (m_Size * m_Size) / 4.0; // no idea, if this would work for ellipses
-      if (inside)
-      {
-        *current = 1;
-        oneContourOffset = offset;
-      }
-      else
-      {
-        *current = 0;
-      }
-    }
-  }
-      
-  int numberOfContourPoints( 0 );
-  int newBufferSize( 0 );
-  float* contourPoints = ipMITKSegmentationGetContour8N( stupidClone, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
-  if (!contourPoints) 
-  {
-    mitkIpPicFree( stupidClone );
-    return;
-  }
-
-  // copy point from float* to mitk::Contour 
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
-  Point3D newPoint;
-  //ipMITKSegmentationGetContour8N returns all points, which causes vtk warnings, since the first and the last points are coincident.
-  //leaving the last point out, the contour is still drawn correctly
-  for (int index = 0; index < numberOfContourPoints-1; ++index)
-  {
-    newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
-    newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
-    newPoint[2] = 0.0;
-    MITK_DEBUG << "Point [" << index << "] (" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+  // estimate center point of the brush ( relative to the pixel the mouse points on )
+  // -- left upper corner for even sizes,
+  // -- midpoint for uneven sizes
+  mitk::Point2D centerCorrection;
+  centerCorrection.Fill(0);
+
+  // even --> correction of [+0.5, +0.5]
+  bool evenSize = ((m_Size % 2) == 0);
+  if( evenSize )
+  {
+    centerCorrection[0] += 0.5;
+    centerCorrection[1] += 0.5;
   }
 
-  free(contourPoints);
+  // we will compute the control points for the upper left quarter part of a circle contour
+  std::vector< mitk::Point2D > quarterCycleUpperRight;
+  std::vector< mitk::Point2D > quarterCycleLowerRight;
+  std::vector< mitk::Point2D > quarterCycleLowerLeft;
+  std::vector< mitk::Point2D > quarterCycleUpperLeft;
+
+
+  mitk::Point2D curPoint;
+  bool curPointIsInside = true;
+  curPoint[0] = 0;
+  curPoint[1] = radius;
+  quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+
+  // to estimate if a pixel is inside the circle, we need to compare against the 'outer radius'
+  // i.e. the distance from the midpoint [0,0] to the border of the pixel [0,radius]
+  //const float outer_radius = static_cast<float>(radius) + 0.5;
+
+  while (curPoint[1] > 0)
+  {
+     // Move right until pixel is outside circle
+     float curPointX_squared = 0.0f;
+     float curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
+     while( curPointIsInside )
+     {
+        // increment posX and chec
+        curPoint[0]++;
+        curPointX_squared = (curPoint[0] - centerCorrection[0] ) * (curPoint[0] - centerCorrection[0] );
+        const float len = sqrt( curPointX_squared + curPointY_squared);
+        if ( len > fradius )
+        {
+           // found first Pixel in this horizontal line, that is outside the circle
+           curPointIsInside = false;
+        }
+     }
+     quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+
+     // Move down until pixel is inside circle
+     while( !curPointIsInside )
+     {
+        // increment posX and chec
+        curPoint[1]--;
+        curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
+        const float len = sqrt( curPointX_squared + curPointY_squared);
+        if ( len <= fradius )
+        {
+           // found first Pixel in this horizontal line, that is outside the circle
+           curPointIsInside = true;
+           quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+        }
+
+        // Quarter cycle is full, when curPoint y position is 0
+        if (curPoint[1] <= 0)
+           break;
+     }
+
+   }
+
+  // QuarterCycle is full! Now copy quarter cycle to other quarters.
+
+  if( !evenSize )
+  {
+    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
+    while( it != quarterCycleUpperRight.end() )
+    {
+      mitk::Point2D p;
+      p = *it;
+
+      // the contour points in the lower right corner have same position but with negative y values
+      p[1] *= -1;
+      quarterCycleLowerRight.push_back(p);
+
+      // the contour points in the lower left corner have same position
+      // but with both x,y negative
+      p[0] *= -1;
+      quarterCycleLowerLeft.push_back(p);
+
+      // the contour points in the upper left corner have same position
+      // but with x negative
+      p[1] *= -1;
+      quarterCycleUpperLeft.push_back(p);
+
+      it++;
+    }
+  }
+  else
+  {
+    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
+    while( it != quarterCycleUpperRight.end() )
+    {
+      mitk::Point2D p,q;
+      p = *it;
+
+      q = p;
+      // the contour points in the lower right corner have same position but with negative y values
+      q[1] *= -1;
+      // correct for moved offset if size even = the midpoint is not the midpoint of the current pixel
+      // but its upper rigt corner
+      q[1] += 1;
+      quarterCycleLowerRight.push_back(q);
+
+      q = p;
+      // the contour points in the lower left corner have same position
+      // but with both x,y negative
+      q[1] = -1.0f * q[1] + 1;
+      q[0] = -1.0f * q[0] + 1;
+      quarterCycleLowerLeft.push_back(q);
+
+      // the contour points in the upper left corner have same position
+      // but with x negative
+      q = p;
+      q[0] *= -1;
+      q[0] +=  1;
+      quarterCycleUpperLeft.push_back(q);
+
+      it++;
+    }
+  }
+
+  // fill contour with poins in right ordering, starting with the upperRight block
+  mitk::Point3D tempPoint;
+  for (unsigned int i=0; i<quarterCycleUpperRight.size(); i++)
+  {
+     tempPoint[0] = quarterCycleUpperRight[i][0];
+     tempPoint[1] = quarterCycleUpperRight[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint  );
+  }
+  // the lower right has to be parsed in reverse order
+  for (int i=quarterCycleLowerRight.size()-1; i>=0; i--)
+  {
+     tempPoint[0] = quarterCycleLowerRight[i][0];
+     tempPoint[1] = quarterCycleLowerRight[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint);
+  }
+  for (unsigned int i=0; i<quarterCycleLowerLeft.size(); i++)
+  {
+     tempPoint[0] = quarterCycleLowerLeft[i][0];
+     tempPoint[1] = quarterCycleLowerLeft[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
+  }
+  // the upper left also has to be parsed in reverse order
+  for (int i=quarterCycleUpperLeft.size()-1; i>=0; i--)
+  {
+     tempPoint[0] = quarterCycleUpperLeft[i][0];
+     tempPoint[1] = quarterCycleUpperLeft[i][1];
+     tempPoint[2] = 0;
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
+  }
 
   m_MasterContour = contourInImageIndexCoordinates;
 
-  // The PicDescriptor is only REFERENCING(!) the data, the temporarySlice takes care of deleting the data also the descriptor is pointing on
-  // because they got allocated by the ImageDataItem, not the descriptor.
-  stupidClone->data = NULL;
-  mitkIpPicFree( stupidClone );
 }
 
 
@@ -225,8 +320,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   // round to nearest voxel center (abort if this hasn't changed)
   if ( m_Size % 2 == 0 ) // even
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0] /*+ 0.5*/) + 0.5;
-    indexCoordinates[1] = ROUND( indexCoordinates[1] /*+ 0.5*/ ) + 0.5;
+    indexCoordinates[0] = ROUND( indexCoordinates[0]);// /*+ 0.5*/) + 0.5;
+    indexCoordinates[1] = ROUND( indexCoordinates[1]);// /*+ 0.5*/ ) + 0.5;
   }
   else // odd
   {
@@ -248,7 +343,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     MITK_DEBUG << "." << std::flush;
     return false;
   }
-    
+
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
   Contour::Pointer contour = Contour::New();
@@ -262,7 +357,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
     contour->AddVertex( point );
   }
-  
+
 
   if (leftMouseButtonPressed)
   {
@@ -308,9 +403,9 @@ bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent*
 }
 
 /**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0. 
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnInvertLogic(Action* itkNotUsed(action), const StateEvent* /*stateEvent*/)
 {
     // Inversion only for 0 and 1 as painting values
     if (m_PaintingPixelValue == 1)

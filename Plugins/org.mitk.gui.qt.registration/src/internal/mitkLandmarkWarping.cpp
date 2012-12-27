@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -87,7 +87,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
 
   m_Warper = FilterType::New();
 
-  typedef itk::LinearInterpolateImageFunction< 
+  typedef itk::LinearInterpolateImageFunction<
                        MovingImageType, double >  InterpolatorType;
 
   InterpolatorType::Pointer interpolator = InterpolatorType::New();
@@ -104,7 +104,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
 
   unsigned long obs3 = m_Warper->AddObserver(itk::ProgressEvent(), m_Observer);
   m_Warper->UpdateLargestPossibleRegion();
-  m_Warper->RemoveObserver(obs3);  
+  m_Warper->RemoveObserver(obs3);
 
   return m_Warper->GetOutput();
 }

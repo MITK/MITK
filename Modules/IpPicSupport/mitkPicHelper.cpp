@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -108,8 +108,8 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
     if( dicomFindElement( (unsigned char *) tsv->value, 0x0028, 0x0030, &data, &len )
       && len>0 && ((char *)data)[0] )
     {
-      sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value 
-//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");        
+      sscanf( (char *) data, "%lf\\%lf", &fy, &fx );    // row / column value
+//        itkGenericOutputMacro( "fx, fy: " << fx << "/" << fy  << " mm");
     }
     else
       ok=false;
@@ -151,13 +151,13 @@ bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor* aPic, SlicedGeometry
 
   mitkIpPicTSV_t *tsv;
   if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
-  {    
+  {
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
     mitk::Vector3D pixelSize;
     spacing.Fill(0);
 
-    for ( int s=0; s < count; s++ ) 
+    for ( int s=0; s < count; s++ )
     {
       pixelSize[0] = (ScalarType) *value++;
       pixelSize[1] = (ScalarType) *value++;
@@ -187,7 +187,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, uns
 
   mitkIpPicTSV_t *geometryTag;
   if ( (geometryTag = mitkIpPicQueryTag( const_cast<mitkIpPicDescriptor*>(pic), "ISG" )) != NULL)
-  {    
+  {
     mitk::Point3D  origin;
     mitk::Vector3D rightVector;
     mitk::Vector3D downVector;
@@ -201,7 +201,7 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, uns
     mitk::PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
     planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightVector, downVector, &spacing);
     planegeometry->SetOrigin(origin);
-    slicedgeometry->InitializeEvenlySpaced(planegeometry, slices);    
+    slicedgeometry->InitializeEvenlySpaced(planegeometry, slices);
   }
   else
   {
@@ -233,7 +233,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
     mitk::Vector3D rightDV, bottomDV;
     mitkIpPicTSV_t *tsv;
     if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
-    {    
+    {
       unsigned int count = (unsigned int) tsv->n[1];
       float* value = (float*) tsv->value;
       mitk::Vector3D pixelSize;
@@ -253,7 +253,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
       }
 
       unsigned int slice;
-      for (slice=0; slice < count; ++slice ) 
+      for (slice=0; slice < count; ++slice )
       {
         pixelSize[0] = (ScalarType) *value++;
         pixelSize[1] = (ScalarType) *value++;
@@ -276,7 +276,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
         }
 
         zPosition += pixelSize[2] / 2.0f;  // second half slice thickness
-      } 
+      }
 
     }
     else

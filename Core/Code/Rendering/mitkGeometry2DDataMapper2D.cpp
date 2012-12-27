@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -56,7 +56,7 @@ void mitk::Geometry2DDataMapper2D::GenerateData()
   m_OtherGeometry2Ds.clear();
   if (m_DataStorage.IsNull())
     return;
-  
+
   mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("Geometry2DData");
   mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode, p, false);
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
@@ -85,36 +85,36 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
   {
     return;
   }
-  
+
   Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 
   // intersecting with ourself?
-  if ( input.IsNull() || (this->GetInput()->GetGeometry2D() == 
+  if ( input.IsNull() || (this->GetInput()->GetGeometry2D() ==
        renderer->GetCurrentWorldGeometry2D()) )
   {
     return; // do nothing!
   }
-  
-  const PlaneGeometry *inputPlaneGeometry = 
+
+  const PlaneGeometry *inputPlaneGeometry =
     dynamic_cast< const PlaneGeometry * >( input->GetGeometry2D() );
 
   const PlaneGeometry *worldPlaneGeometry =
-    dynamic_cast< const PlaneGeometry* >( 
+    dynamic_cast< const PlaneGeometry* >(
     renderer->GetCurrentWorldGeometry2D() );
 
-  if ( worldPlaneGeometry && inputPlaneGeometry 
+  if ( worldPlaneGeometry && inputPlaneGeometry
     && inputPlaneGeometry->GetReferenceGeometry() )
   {
     DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
     assert( displayGeometry );
 
-    const Geometry3D *referenceGeometry = 
+    const Geometry3D *referenceGeometry =
       inputPlaneGeometry->GetReferenceGeometry();
 
-    // calculate intersection of the plane data with the border of the 
+    // calculate intersection of the plane data with the border of the
     // world geometry rectangle
     Point2D lineFrom, lineTo;
-    
+
     typedef Geometry3D::TransformType TransformType;
     const TransformType *transform = dynamic_cast< const TransformType * >(
       referenceGeometry->GetIndexToWorldTransform() );
@@ -125,7 +125,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     Line3D crossLine, otherCrossLine;
 
     // Calculate the intersection line of the input plane with the world plane
-    if ( worldPlaneGeometry->IntersectionLine( 
+    if ( worldPlaneGeometry->IntersectionLine(
           inputPlaneGeometry, crossLine ) )
     {
       BoundingBox::PointType boundingBoxMin, boundingBoxMax;
@@ -143,7 +143,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       crossLine.Transform( *inverseTransform );
       Point3D point1, point2;
 
-      // Then, clip this line with the (transformed) bounding box of the 
+      // Then, clip this line with the (transformed) bounding box of the
       // reference geometry.
       if ( crossLine.BoxLineIntersection(
         boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2],
@@ -153,9 +153,9 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       {
         // Transform the resulting line start and end points into display
         // coordinates.
-        worldPlaneGeometry->Map( 
+        worldPlaneGeometry->Map(
           transform->TransformPoint( point1 ), lineFrom );
-        worldPlaneGeometry->Map( 
+        worldPlaneGeometry->Map(
           transform->TransformPoint( point2 ), lineTo );
 
         Line< ScalarType, 2 > mainLine, otherLine;
@@ -169,7 +169,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
         ScalarType lengthInDisplayUnits = (lineTo - lineFrom).GetNorm();
 
-        Vector2D mainLineDirectionOrthogonal; 
+        Vector2D mainLineDirectionOrthogonal;
         mainLineDirectionOrthogonal[0] = -mainLine.GetDirection()[1];
         mainLineDirectionOrthogonal[1] = mainLine.GetDirection()[0];
 
@@ -192,7 +192,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
         secondaryHelperLineParams.push_back( 0.0 );
         secondaryHelperLineParams.push_back( 1.0 );
 
-        
+
         // Now iterate through all other lines displayed in this window and
         // calculate the positions of intersection with the line to be
         // rendered; these positions will be stored in lineParams to form a
@@ -215,7 +215,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
           // if we have found the correct node
           if ( (otherPlane == inputPlaneGeometry)
-            && worldPlaneGeometry->IntersectionLine( 
+            && worldPlaneGeometry->IntersectionLine(
             otherPlane, otherCrossLine ) )
           {
             dataNodeOfInputPlaneGeometry = (*otherPlanesIt);
@@ -285,7 +285,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           // Just as with the original line, calculate the intersection with
           // the world geometry...
           if ( (otherPlane != inputPlaneGeometry)
-            && worldPlaneGeometry->IntersectionLine( 
+            && worldPlaneGeometry->IntersectionLine(
                  otherPlane, otherCrossLine ) )
           {
             //otherLineThickSlicesMode = this->DetermineThickSliceMode((*otherPlanesIt), otherLineThickSlicesNum);
@@ -296,7 +296,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
             Point2D otherLineFrom, otherLineTo;
 
-            // ... and clip the resulting line segment with the reference 
+            // ... and clip the resulting line segment with the reference
             // geometry bounding box.
             otherCrossLine.Transform( *inverseTransform );
             if ( otherCrossLine.BoxLineIntersection(
@@ -305,9 +305,9 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
               otherCrossLine.GetPoint(), otherCrossLine.GetDirection(),
               point1, point2 ) == 2 )
             {
-              worldPlaneGeometry->Map( 
+              worldPlaneGeometry->Map(
                 transform->TransformPoint( point1 ), otherLineFrom );
-              worldPlaneGeometry->Map( 
+              worldPlaneGeometry->Map(
                 transform->TransformPoint( point2 ), otherLineTo );
 
               otherLine.SetPoints( otherLineFrom, otherLineTo );
@@ -317,7 +317,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
               this->DetermineParametricCrossPositions( mainLine, otherLine, mainLineParams );
 
 
-              // if the other line is also in thick slice mode, we have to determine the 
+              // if the other line is also in thick slice mode, we have to determine the
               // gapsize considering the width of that other line and the spacing in its direction
               if ( showAreaOfThickSlicing )
               {
@@ -350,7 +350,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
           );
 
 
-        // If drawn, the helperlines are drawn as a solid line. The gapsize depends on the 
+        // If drawn, the helperlines are drawn as a solid line. The gapsize depends on the
         // width of the crossed line.
         if ( showAreaOfThickSlicing )
         {
@@ -383,7 +383,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       GetDataNode()->GetProperty(
         "surfacegeometry", renderer));
 
-    if( (surfacecreatorprop.IsNull()) || 
+    if( (surfacecreatorprop.IsNull()) ||
         (surfacecreatorprop->GetSmartPointer().IsNull()) ||
         ((surfaceCreator = dynamic_cast< Geometry2DDataToSurfaceFilter * >(
           surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
@@ -394,7 +394,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       surfaceCreator->PlaceByGeometryOn();
       GetDataNode()->SetProperty( "surfacegeometry", surfacecreatorprop );
     }
-    
+
     surfaceCreator->SetInput( input );
 
     // Clip the Geometry2D with the reference geometry bounds (if available)
@@ -410,30 +410,30 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     if ( GetDataNode()->GetIntProperty("xresolution", res, renderer))
     {
       surfaceCreator->SetXResolution(res);
-      usegeometryparametricbounds=false;        
+      usegeometryparametricbounds=false;
     }
     if (GetDataNode()->GetIntProperty("yresolution", res, renderer))
     {
       surfaceCreator->SetYResolution(res);
-      usegeometryparametricbounds=false;        
+      usegeometryparametricbounds=false;
     }
     surfaceCreator->SetUseGeometryParametricBounds(usegeometryparametricbounds);
 
     // Calculate the surface of the Geometry2D
     surfaceCreator->Update();
-    
+
     if (m_SurfaceMapper.IsNull())
     {
       m_SurfaceMapper=SurfaceGLMapper2D::New();
     }
     m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
     m_SurfaceMapper->SetDataNode(GetDataNode());
-    
+
     m_SurfaceMapper->Paint(renderer);
   }
 }
 
-void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint, 
+void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint,
   const mitk::PlaneGeometry *planeGeometry,
   const mitk::PlaneGeometry *rendererPlaneGeometry,
   const mitk::DisplayGeometry *displayGeometry,
@@ -460,8 +460,8 @@ void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoi
   // Initialize remaining triangle coordinates accordingly
   // (above/below state is XOR'ed with orientation flag)
   Point2D p1 = outerPoint + v1 * 2.0;
-  Point2D p2 = outerPoint + v1 
-    + ((positiveOrientation ^ planeGeometry->IsAbove( worldPoint )) 
+  Point2D p2 = outerPoint + v1
+    + ((positiveOrientation ^ planeGeometry->IsAbove( worldPoint ))
     ? v2 : -v2);
 
   // Draw the arrow (triangle)
@@ -481,13 +481,13 @@ void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
   if ( decorationProperty != NULL )
   {
-    if ( decorationProperty->GetPlaneDecoration() == 
+    if ( decorationProperty->GetPlaneDecoration() ==
       PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
       m_ArrowOrientationPositive = true;
     }
-    else if ( decorationProperty->GetPlaneDecoration() == 
+    else if ( decorationProperty->GetPlaneDecoration() ==
       PlaneOrientationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
@@ -513,12 +513,12 @@ void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::Data
   }
 }
 
-void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer, 
-                                            ScalarType lengthInDisplayUnits, 
-                                            Line<ScalarType,2> &line, 
-                                            std::vector<ScalarType> &gapPositions, 
-                                            const PlaneGeometry* inputPlaneGeometry, 
-                                            bool drawDashed, 
+void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
+                                            ScalarType lengthInDisplayUnits,
+                                            Line<ScalarType,2> &line,
+                                            std::vector<ScalarType> &gapPositions,
+                                            const PlaneGeometry* inputPlaneGeometry,
+                                            bool drawDashed,
                                             ScalarType gapSizeInPixel
                                             )
 {
@@ -529,13 +529,13 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
   // Apply color and opacity read from the PropertyList.
   this->ApplyProperties( renderer );
 
-  ScalarType gapSizeInParamUnits = 
+  ScalarType gapSizeInParamUnits =
     1.0 / lengthInDisplayUnits * gapSizeInPixel;
 
   std::sort( gapPositions.begin(), gapPositions.end() );
 
   Point2D p1, p2;
-  ScalarType p1Param, p2Param; 
+  ScalarType p1Param, p2Param;
 
   p1Param = gapPositions[0];
   p1 = line.GetPoint( p1Param );
@@ -549,7 +549,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
   if ( drawDashed )
   {
     glEnable(GL_LINE_STIPPLE);
-    glLineStipple(1, 0xF0F0); 
+    glLineStipple(1, 0xF0F0);
   }
   glEnable(GL_DEPTH_TEST);
 
@@ -563,7 +563,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
 
     if ( p2Param > p1Param )
     {
-      // Convert intersection points (until now mm) to display 
+      // Convert intersection points (until now mm) to display
       // coordinates (units).
       displayGeometry->WorldToDisplay( p2, p2 );
 
@@ -576,7 +576,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
       if ( (i == 1) && (m_RenderOrientationArrows) )
       {
         // Draw orientation arrow for first line segment
-        this->DrawOrientationArrow( p1, p2, 
+        this->DrawOrientationArrow( p1, p2,
           inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
           m_ArrowOrientationPositive );
       }
@@ -604,13 +604,13 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
   // Draw orientation arrows
   if ( m_RenderOrientationArrows )
   {
-    this->DrawOrientationArrow( p2, p1, 
+    this->DrawOrientationArrow( p2, p1,
       inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
       m_ArrowOrientationPositive );
     if ( preLastLineParam < 2 )
     {
       // If we only have one line segment, draw other arrow, too
-      this->DrawOrientationArrow( p1, p2, 
+      this->DrawOrientationArrow( p1, p2,
         inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
         m_ArrowOrientationPositive );
     }
@@ -640,7 +640,7 @@ int mitk::Geometry2DDataMapper2D::DetermineThickSliceMode( DataNode * dn, int &t
   return thickSlicesMode;
 }
 
-void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine, 
+void mitk::Geometry2DDataMapper2D::DetermineParametricCrossPositions( Line< mitk::ScalarType, 2 > &mainLine,
                                                                      Line< mitk::ScalarType, 2 > &otherLine,
                                                                      std::vector< mitk::ScalarType > &crossPositions )
 {

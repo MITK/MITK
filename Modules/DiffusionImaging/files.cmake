@@ -88,8 +88,7 @@ set(CPP_FILES
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   Rendering/mitkTbssImageMapper.cpp
-  Rendering/mitkPlanarCircleMapper3D.cpp
-  Rendering/mitkPlanarPolygonMapper3D.cpp
+  Rendering/mitkPlanarFigureMapper3D.cpp
   Rendering/mitkConnectomicsNetworkMapper3D.cpp
 
 # Interactions
@@ -124,7 +123,6 @@ set(CPP_FILES
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
-
 )
 
 set(H_FILES
@@ -138,9 +136,8 @@ set(H_FILES
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
-  Rendering/mitkPlanarCircleMapper3D.h
-  Rendering/mitkPlanarPolygonMapper3D.h
   Rendering/mitkConnectomicsNetworkMapper3D.h
+  Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
@@ -218,9 +215,14 @@ set(H_FILES
   Algorithms/itkMergeDiffusionImagesFilter.h
   Algorithms/itkDwiPhantomGenerationFilter.h
   Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
+  Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
   Algorithms/itkFslShCoefficientImageConverter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
+  Algorithms/itkFibersFromPlanarFiguresFilter.h
+  Algorithms/itkTractsToDWIImageFilter.h
+  Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkResampleDwiImageFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
@@ -237,7 +239,15 @@ set(H_FILES
   Algorithms/Connectomics/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h
   Algorithms/Connectomics/itkConnectomicsNetworkToConnectivityMatrixImageFilter.h
 
-
+  SignalModels/mitkDiffusionSignalModel.h
+  SignalModels/mitkTensorModel.h
+  SignalModels/mitkBallModel.h
+  SignalModels/mitkStickModel.h
+  SignalModels/mitkDiffusionNoiseModel.h
+  SignalModels/mitkRicianNoiseModel.h
+  SignalModels/mitkKspaceArtifact.h
+  SignalModels/mitkGibbsRingingArtifact.h
+  SignalModels/mitkT2SmearingArtifact.h
 )
 
 set( TOOL_FILES

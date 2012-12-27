@@ -19,7 +19,7 @@ if(MITK_USE_CTK)
     else()
       list(APPEND _qtplugin_install_destinations bin/plugins/designer)
     endif()
-    
+
     if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
       set(_matching_pattern_release FILES_MATCHING PATTERN "*Release*")
       set(_matching_pattern_debug FILES_MATCHING PATTERN "*Debug*")
@@ -27,7 +27,7 @@ if(MITK_USE_CTK)
       set(_matching_pattern_release )
       set(_matching_pattern_debug )
     endif()
-    
+
     foreach(_qtplugin_install_dir ${_qtplugin_install_destinations})
       install(DIRECTORY ${CTK_QTDESIGNERPLUGINS_DIR}/designer/
               DESTINATION ${_qtplugin_install_dir}
@@ -52,12 +52,12 @@ if(WIN32)
         ${DCMTK_dcmnet_LIBRARY}
         ${DCMTK_ofstd_LIBRARY}
        )
-       
+
     foreach(_dcmtk_lib ${_dcmtk_libs})
       MITK_INSTALL(FILES ${_dcmtk_lib} )
     endforeach()
   endif()
-  
+
   #BlueBerry
   # Since this file is also included from external projects, you
   # can only use variables which are made available through MITKConfig.cmake
@@ -71,7 +71,7 @@ if(WIN32)
       endif(NOT APPLE)
     endif()
   endif()
-  
+
   #MinGW dll
   if(MINGW)
     find_library(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
@@ -80,7 +80,7 @@ if(WIN32)
     else()
       message(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
     endif()
-  
+
     find_library(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
     if(MINGW_GCC_RUNTIME_DLL)
       MITK_INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} )
@@ -103,7 +103,7 @@ else()
       #MITK_INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
     endforeach()
   endif()
- 
+
 endif()
- 
+
 

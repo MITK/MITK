@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -28,7 +28,7 @@ namespace mitk
 #endif
 
 /**
- * Encapsulates the enumeration vtkInterpolation. Valid values are 
+ * Encapsulates the enumeration vtkInterpolation. Valid values are
  * (VTK constant/Id/string representation):
  * VTK_FLAT/0/Flat, VTK_GOURAUD/1/Gouraud, VTK_PHONG/2/Phong
  * Default is the Gouraud interpolation
@@ -38,11 +38,11 @@ class MITK_CORE_EXPORT VtkInterpolationProperty : public EnumerationProperty
 public:
 
   mitkClassMacro( VtkInterpolationProperty, EnumerationProperty );
-  
+
   itkNewMacro(VtkInterpolationProperty);
-  
+
   mitkNewMacro1Param(VtkInterpolationProperty, const IdType&);
- 
+
   mitkNewMacro1Param(VtkInterpolationProperty, const std::string&);
 
   /**
@@ -55,33 +55,33 @@ public:
    * Sets the interpolation type to VTK_FLAT.
    */
   virtual void SetInterpolationToFlat();
-  
+
   /**
    * Sets the interpolation type to VTK_WIREFRAME.
    */
   virtual void SetInterpolationToGouraud();
-  
+
   /**
    * Sets the interpolation type to VTK_SURFACE.
    */
   virtual void SetInterpolationToPhong();
 
   using BaseProperty::operator=;
-  
+
 protected:
-  
+
   /**
    * Constructor. Sets the representation to a default value of surface(2)
    */
   VtkInterpolationProperty( );
-  
+
   /**
    * Constructor. Sets the interpolation to the given value. If it is not
    * valid, the interpolation is set to gouraud(1)
    * @param value the integer representation of the interpolation
    */
   VtkInterpolationProperty( const IdType& value );
-  
+
   /**
    * Constructor. Sets the interpolation to the given value. If it is not
    * valid, the representation is set to gouraud(1)
@@ -96,7 +96,7 @@ protected:
   virtual bool AddEnum( const std::string& name, const IdType& id );
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
+   * Adds the enumeration types as defined by vtk to the list of known
    * enumeration values.
    */
   virtual void AddInterpolationTypes();

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 //##Documentation
-//## @brief Pipelined import of itk::Image 
+//## @brief Pipelined import of itk::Image
 //##
 //## The image data contained in the itk::Image is referenced,
 //## not copied.
@@ -49,8 +49,8 @@ public:
   typedef TInputImage InputImageType;
   typedef typename InputImageType::Pointer        InputImagePointer;
   typedef typename InputImageType::ConstPointer   InputImageConstPointer;
-  typedef typename InputImageType::RegionType     InputImageRegionType; 
-  typedef typename InputImageType::PixelType      InputImagePixelType; 
+  typedef typename InputImageType::RegionType     InputImageRegionType;
+  typedef typename InputImageType::PixelType      InputImagePixelType;
 
   /** ImageDimension constants */
   itkStaticConstMacro(InputImageDimension, unsigned int,
@@ -113,7 +113,7 @@ protected:
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
 //## \sa itk::Image::CastToMitkImage
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const Geometry3D* geometry = NULL, bool update = true);
 
 //##Documentation
@@ -131,16 +131,16 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 //## and call Update of a downstream filter at some time.
 //## \sa itk::Image::CastToMitkImage
 //## \sa GrabItkImageMemory
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry3D* geometry = NULL, bool update = true);
 
 //##Documentation
-//## @brief Grabs the memory of an itk::Image (with a specific type) 
+//## @brief Grabs the memory of an itk::Image (with a specific type)
 //## and puts it into an mitk::Image.
 //## @ingroup Adaptor
 //##
 //## The memory is managed by the mitk::Image after calling this
-//## function. The itk::Image remains valid until the mitk::Image  
+//## function. The itk::Image remains valid until the mitk::Image
 //## decides to free the memory.
 //## \param update: if \a true, fill mitk::Image, which will execute the
 //## up-stream pipeline connected to the input itk::Image. Otherwise you
@@ -148,16 +148,16 @@ Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const Geometry
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
 //## \sa ImportItkImage
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
 
 //##Documentation
-//## @brief Grabs the memory of an itk::Image (with a specific type) 
+//## @brief Grabs the memory of an itk::Image (with a specific type)
 //## and puts it into an mitk::Image.
 //## @ingroup Adaptor
 //##
 //## The memory is managed by the mitk::Image after calling this
-//## function. The itk::Image remains valid until the mitk::Image  
+//## function. The itk::Image remains valid until the mitk::Image
 //## decides to free the memory.
 //## \param update: if \a true, fill mitk::Image, which will execute the
 //## up-stream pipeline connected to the input itk::Image. Otherwise you
@@ -165,7 +165,7 @@ Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimag
 //## its data is being used, e.g., by connecting it to an mitk-pipeline
 //## and call Update of a downstream filter at some time.
 //## \sa ImportItkImage
-template <typename ItkOutputImageType> 
+template <typename ItkOutputImageType>
 Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = NULL, const Geometry3D* geometry = NULL, bool update = true);
 
 } // namespace mitk

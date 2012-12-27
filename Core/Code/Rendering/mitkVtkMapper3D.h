@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -50,7 +50,7 @@ public:
   virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
   virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
   virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
-  
+
 
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
@@ -66,21 +66,21 @@ public:
   //## @brief Apply color and opacity read from the PropertyList
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
-  /** 
+  /**
   * \brief Release vtk-based graphics resources. Must be overwritten in
   * subclasses if vtkProps additional to m_Prop3D are used.
   */
   virtual void ReleaseGraphicsResources(vtkWindow *renWin);
 
-  
+
   /** \brief Returns true if this mapper owns the specified vtkProp for
    * the given BaseRenderer.
    *
    * Note: returns false by default; should be implemented for VTK-based
    * Mapper subclasses. */
   virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
-  
-  /** 
+
+  /**
    * \brief Returns whether this is an vtk-based mapper
    */
   virtual bool IsVtkBased() const { return true; }

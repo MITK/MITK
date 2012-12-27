@@ -46,6 +46,10 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.fiberfoxview");
+  lo = layout->GetViewLayout("org.mitk.views.fiberfoxview");
+  lo->SetCloseable(false);
+
   left->AddView("org.mitk.views.segmentation");
   lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);

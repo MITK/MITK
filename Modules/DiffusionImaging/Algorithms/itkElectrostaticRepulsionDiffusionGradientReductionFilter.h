@@ -39,6 +39,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
+/**
+* \brief Select subset of the input vectors equally distributed over the sphere using an iterative electrostatic repulsion strategy.   */
+
   template <class TInputScalarType, class TOutputScalarType>
   class ElectrostaticRepulsionDiffusionGradientReductionFilter
     : public ImageToImageFilter<itk::VectorImage<TInputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >
@@ -70,11 +73,11 @@ namespace itk
     typedef BaselineScalarType                        BaselinePixelType;
     typedef typename itk::Image<BaselinePixelType,3>  BaselineImageType;
 
-    typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
+    typedef vnl_vector_fixed< double, 3 >                               GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
-    typedef std::vector<unsigned int> IndicesVector;
-    typedef std::map<double, IndicesVector> BValueMap;
+    typedef std::vector<unsigned int>           IndicesVector;
+    typedef std::map<double, IndicesVector>     BValueMap;
 
     itkGetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
@@ -92,10 +95,10 @@ namespace itk
     ~ElectrostaticRepulsionDiffusionGradientReductionFilter() {}
 
     void GenerateData();
-    double Costs();
+    double Costs(); ///< calculates electrostatic energy of current direction set
 
-    GradientDirectionContainerType::Pointer m_GradientDirections;
-    GradientDirectionContainerType::Pointer m_OriginalGradientDirections;
+    GradientDirectionContainerType::Pointer m_GradientDirections;   ///< container for the subsampled output gradient directions
+    GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions
 
     IndicesVector m_UsedGradientIndices;
     IndicesVector m_UnusedGradientIndices;

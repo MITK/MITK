@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkToFConnectionWidgetControls</class>
- <widget class="QWidget" name="QmitkToFConnectionWidgetControls">
+ <class>QmitkToFConnectionWidgetControls2</class>
+ <widget class="QWidget" name="QmitkToFConnectionWidgetControls2">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
+    <width>579</width>
     <height>307</height>
    </rect>
   </property>
@@ -20,6 +20,82 @@
    <string>QmitkToFConnection</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
+    <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QmitkServiceListWidget" name="m_DeviceList" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_ConnectCameraButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Connect to camera</string>
+       </property>
+       <property name="text">
+        <string>Connect</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/QmitkToFUtilWidget.qrc">
+         <normaloff>:/images/powerRed.png</normaloff>
+         <normalon>:/images/powerGreen.png</normalon>:/images/powerRed.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -32,84 +108,10 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QComboBox" name="m_SelectCameraCombobox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="currentIndex">
-      <number>-1</number>
-     </property>
-     <property name="maxVisibleItems">
-      <number>7</number>
-     </property>
-     <property name="insertPolicy">
-      <enum>QComboBox::InsertAtBottom</enum>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QComboBox::AdjustToContents</enum>
-     </property>
-     <property name="frame">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="m_ConnectCameraButton">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Connect to camera</string>
-     </property>
-     <property name="text">
-      <string>Connect</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/QmitkToFUtilWidget.qrc">
-       <normaloff>:/images/powerRed.png</normaloff>
-       <normalon>:/images/powerGreen.png</normalon>:/images/powerRed.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QmitkToFPMDParameterWidget" name="m_PMDParameterWidget" native="true"/>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QmitkToFMESAParameterWidget" name="m_MESAParameterWidget" native="true"/>
-   </item>
-   <item row="4" column="0" colspan="2">
+   <item row="4" column="0">
     <widget class="QmitkKinectParameterWidget" name="m_KinectParameterWidget" native="true"/>
    </item>
   </layout>
@@ -132,6 +134,12 @@
    <class>QmitkKinectParameterWidget</class>
    <extends>QWidget</extends>
    <header>QmitkKinectParameterWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkServiceListWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkServiceListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

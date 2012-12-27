@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -37,7 +37,7 @@ class mitkNavigationToolTestClass
     static void TestGetterAndSetter()
     {
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
-    
+
     //initialize a few things
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("TestNodeName");
@@ -52,7 +52,7 @@ class mitkNavigationToolTestClass
     myNavigationTool->SetCalibrationFile("Test.srom");
     myNavigationTool->SetSerialNumber("0815");
     myNavigationTool->SetTrackingDeviceType(mitk::NDIAurora);
-    
+
     mitk::PointSet::Pointer CalLandmarks = mitk::PointSet::New();
     mitk::Point3D testPt1;
     mitk::FillVector3D(testPt1,1,2,3);
@@ -87,7 +87,7 @@ int mitkNavigationToolTest(int /* argc */, char* /*argv*/[])
 
   mitkNavigationToolTestClass::TestInstantiation();
   mitkNavigationToolTestClass::TestGetterAndSetter();
-  
+
   MITK_TEST_END()
 }
 

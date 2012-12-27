@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -44,7 +44,7 @@ const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 /***************       CONSTRUCTOR      ***************/
 QmitkFunctionalityComponentContainer::QmitkFunctionalityComponentContainer(QObject *parent, const char *parentName, bool updateSelector, bool showSelector)
 : QmitkBaseFunctionalityComponent(parent, parentName),
-m_UpdateSelector(updateSelector), 
+m_UpdateSelector(updateSelector),
 m_ShowSelector(showSelector),
 m_GUI(NULL),
 //m_ParentMitkImage(NULL),
@@ -52,8 +52,8 @@ m_GUI(NULL),
 m_Active(false),
 m_SelectedItem(NULL),
 m_FunctionalityComponentContainerGUI(NULL),
-m_Parent(parent), 
-//m_ParentName(parentName), 
+m_Parent(parent),
+//m_ParentName(parentName),
 m_ComponentName("ComponentContainer"),
 //m_MultiWidget(mitkStdMultiWidget),
 m_Spacer(NULL),
@@ -142,7 +142,7 @@ void QmitkFunctionalityComponentContainer::TreeChanged()
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->TreeChanged();
-  } 
+  }
 }
 
 /************ Update DATATREECOMBOBOX(ES) *************/
@@ -160,7 +160,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
   if ( m_FunctionalityComponentContainerGUI )
   {
     connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataNode *)));
-    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_ContainerBorder),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));    
+    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_ContainerBorder),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));
   }
 }
 
@@ -188,7 +188,7 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
       {
         functionalityComponent->DataStorageChanged(ds);
       }
-    }   
+    }
   }
 
   if(m_FunctionalityComponentContainerGUI)
@@ -214,7 +214,7 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
           functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData());
 
         }
-      }   
+      }
     }
   }
   //TreeChanged(;)
@@ -236,7 +236,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode* i
       if (functionalityComponent != NULL)
         //functionalityComponent->GetTreeNodeSelector()->SetSelectedNode(selectedItem);
         functionalityComponent->ImageSelected(item);
-    }   
+    }
   }
 
   if(m_FunctionalityComponentContainerGUI)
@@ -253,7 +253,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode* i
         {
           functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (item->GetData());
         }
-      }   
+      }
     }
   }
   TreeChanged();
@@ -273,9 +273,9 @@ void QmitkFunctionalityComponentContainer::CreateQtPartControl(QWidget * /*paren
 
     m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->SetDataStorage(dataStorage);
     m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-      
+
 m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(0);
-    
+
     //m_FunctionalityComponentContainerGUI->m_TreeNodeSelector()->SetDataTree(GetDataTreeIterator());
     //m_FunctionalityComponentContainerGUI->GetContainerBorder()->setTitle("<bold>Select Image<\bold>");
     //m_FunctionalityComponentContainerGUI->GetContainerBorder()->setLineWidth(0);
@@ -322,7 +322,7 @@ void QmitkFunctionalityComponentContainer::SetContentContainerVisibility(bool)
       m_AddedChildList[i]->GetMainCheckBoxContainer()->setChecked(GetMainCheckBoxContainer()->isChecked());
     }
     m_AddedChildList[i]->SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());
-  } 
+  }
 }
 
 /************** SET SELECTOR VISIBILITY ***************/
@@ -344,7 +344,7 @@ void QmitkFunctionalityComponentContainer::Activated()
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Activated();
-  } 
+  }
 }
 
 /***************      DEACTIVATED       ***************/
@@ -355,12 +355,12 @@ void QmitkFunctionalityComponentContainer::Deactivated()
   for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
   {
     m_AddedChildList[i]->Deactivated();
-  } 
+  }
 }
 
 /***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* component)
-{  
+{
   if(component!=NULL)
   {
     QWidget* componentWidget = component->CreateControlWidget(m_GUI);
@@ -373,7 +373,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     }
     QSpacerItem*  spacer = new QSpacerItem( 20, 20, QSizePolicy::Minimum, QSizePolicy::Expanding );
     m_Spacer = spacer;
-    m_GUI->layout()->addItem( m_Spacer ); 
+    m_GUI->layout()->addItem( m_Spacer );
     m_GUI->repaint();
   }
 }
@@ -392,7 +392,7 @@ QPushButton* QmitkFunctionalityComponentContainer::GetBackButton()
 
 /***************      ADD COMPONENT     ***************/
 void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityComponentContainer* component, QString label, int stackPage)
-{  
+{
   if(component!=NULL)
   {
     QWidget* visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
@@ -410,25 +410,25 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
       visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
       idVisibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->indexOf(visibleWidget);
       new QVBoxLayout(visibleWidget);
-	  // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+    // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
     }
 
     QLayout* layout;
     if(m_FunctionalityComponentContainerGUI->m_WidgetStack->layout() == 0)
     {
-		layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
+    layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
     }
-    else 
+    else
     {
       layout = m_FunctionalityComponentContainerGUI->m_WidgetStack->layout();
     }
 
-    component->CreateQtPartControl(m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget(), this->m_DataStorage); 
+    component->CreateQtPartControl(m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget(), this->m_DataStorage);
     QWidget* componentWidget = component->GetGUI();
       //CreateControlWidget(m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget());
     AddComponentListener(component);
-    //QTabWidget* myTabWidget = 
-    //m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(stackPage); 
+    //QTabWidget* myTabWidget =
+    //m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(stackPage);
     m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(stackPage);
     QWidget* theCurrentWidget=m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
     QLayout* theCurrentLayout = theCurrentWidget->layout();
@@ -484,8 +484,8 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
   m_GUI->layout()->activate();
   m_GUI->repaint();
 
-//  connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
-//  connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
+//  connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed()));
+//  connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed()));
 
   m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(1);
   SetWizardText("");

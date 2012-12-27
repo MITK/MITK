@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -31,7 +31,7 @@ bool mitk::VerboseLimitedLinearUndo::SetOperationEvent(UndoStackItem* undoStackI
   if (!undoStackItem) return false;
 
   // clear the redolist, if a new operation is saved
-  if (!m_RedoList.empty()) 
+  if (!m_RedoList.empty())
   {
     this->ClearList(&m_RedoList);
     InvokeEvent( RedoEmptyEvent() );
@@ -47,7 +47,7 @@ bool mitk::VerboseLimitedLinearUndo::SetOperationEvent(UndoStackItem* undoStackI
 mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
 {
   mitk::VerboseLimitedLinearUndo::StackDescription descriptions;
-  
+
   if(m_UndoList.empty()) return descriptions;
 
   int oeid = m_UndoList.back()->GetObjectEventId();  // ObjectEventID of current group
@@ -63,9 +63,9 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       // current description complete, append to list
       if ( currentDescription.empty() )
         currentDescription = "Some unnamed action";  // set a default description
-      
+
       descriptions.push_back( StackDescriptionItem(oeid,currentDescription) );
-      
+
       currentDescription = "";                 // prepare for next group
       currentDescriptionCount = 0;
       niceDescriptionFound = false;
@@ -113,7 +113,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
 mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetRedoDescriptions()
 {
   mitk::VerboseLimitedLinearUndo::StackDescription descriptions;
-  
+
   if(m_RedoList.empty()) return descriptions;
 
   int oeid = m_RedoList.back()->GetObjectEventId();  // ObjectEventID of current group
@@ -129,9 +129,9 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
       // current description complete, append to list
       if ( currentDescription.empty() )
         currentDescription = "Some unnamed action";  // set a default description
-      
+
       descriptions.push_back( StackDescriptionItem( oeid, currentDescription) );
-      
+
       currentDescription = "";                 // prepare for next group
       currentDescriptionCount = 0;
       niceDescriptionFound = false;
@@ -140,7 +140,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
 
     if ( !(*iter)->GetDescription().empty() )  // if there is a description
     {
-   
+
       if (!dynamic_cast<OperationEvent*>(*iter))
       {
         // anything but an OperationEvent overrides the collected descriptions

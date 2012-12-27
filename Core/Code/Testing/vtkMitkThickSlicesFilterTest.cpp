@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,41 +27,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 vtkImageData *GenerateTestImageForTSFilter()
 {
   // a 2x2x2 image
-  short myData[] = 
+  short myData[] =
   {
-   
+
     234,234,
     123,565,
-   
+
     -213,800,
     1000,-20
   };
-  
+
   vtkImageData *i = vtkImageData::New();
-  
+
   i->SetExtent(0,1,0,1,0,1);
-  
+
   i->SetScalarTypeToShort();
 
   i->AllocateScalars();
-  
+
   short *p = (short*)i->GetScalarPointer();
-  
+
   memcpy(p,myData,2*2*2*sizeof(short));
-  
+
   return i;
 }
 
 void CheckResultImageForTSFilter(vtkImageData *i)
 {
   int *e=i->GetExtent();
-  
+
   MITK_TEST_CONDITION_REQUIRED( e[0] == 0 && e[1] == 1 && e[2] == 0 && e[3] == 1 && e[4] == 0 && e[5] == 0 , "output image has correct extent" )
   MITK_TEST_CONDITION_REQUIRED( i->GetScalarType() == VTK_SHORT , "output image has correct scalar type" )
-  
-  short expectedResult[] = 
+
+  short expectedResult[] =
   {
-   
+
     234,800,
     1000,565
   };
@@ -80,7 +80,7 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("ThickSlicesFilter")
 
   vtkImageData *i,*o;
-  
+
   i = GenerateTestImageForTSFilter();
 
   vtkMitkThickSlicesFilter *f = vtkMitkThickSlicesFilter::New();
@@ -88,13 +88,13 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
   f->SetInput( i );
   f->Update();
   o = f->GetOutput();
-  
+
   CheckResultImageForTSFilter(o);
 
   //Delete vtk variable correctly
   i->Delete();
   f->Delete();
-  
+
   MITK_TEST_END()
 }
 

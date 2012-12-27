@@ -2,12 +2,12 @@
 
 BlueBerry Platform
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -108,9 +108,9 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     this->init(argc, argv);
   }
   catch (const Poco::Util::UnknownOptionException& e)
-  { 
+  {
     BERRY_WARN << e.displayText();
-  } 
+  }
   this->loadConfiguration();
   if (config)
   {
@@ -152,7 +152,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   BERRY_INFO(m_ConsoleLog) << "Framework storage dir: " << m_UserPath.toString();
 
   Poco::File userFile(m_UserPath);
-  
+
   try
   {
     userFile.createDirectories();
@@ -220,7 +220,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       }
       catch (const ctkPluginException& e)
       {
-        BERRY_ERROR << "Failed to install: " << pluginUrl.toString().toStdString() << ",\n" << e.what();
+        QString errorMsg;
+        QDebug dbg(&errorMsg);
+        dbg << e.printStackTrace();
+        BERRY_ERROR << qPrintable(errorMsg);
       }
     }
   }
@@ -291,7 +294,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
         BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
         continue;
       }
-    
+
       std::vector<std::string> pluginList;
       pluginDir.list(pluginList);
 

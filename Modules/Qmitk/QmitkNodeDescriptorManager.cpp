@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
 {
   static QmitkNodeDescriptorManager _Instance;
-  return &_Instance; 
+  return &_Instance;
 /*
   static std::auto_ptr<QmitkNodeDescriptorManager> instance;
   if(instance.get() == 0)
@@ -83,7 +83,7 @@ void QmitkNodeDescriptorManager::RemoveDescriptor( QmitkNodeDescriptor* _Descrip
     _Descriptor->setParent(0);
     delete _Descriptor;
   }
-  
+
 }
 
 QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const mitk::DataNode* _Node ) const

@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCommand.h"
 #include <MitkExports.h>
 
-namespace mitk 
+namespace mitk
 {
 
 //##Documentation
 //## @brief Keeps track of the reference count of an object even if
 //## it is destroyed.
-//## 
+//##
 //## Example usage:
 //## \code
 //##   SomeFilter* filter = GetSomeFilter();
@@ -54,7 +54,7 @@ protected:
   bool m_Deleted;
 
   //##Documentation
-  //## @brief itk::Command to get a notification when the object 
+  //## @brief itk::Command to get a notification when the object
   //## is deleted.
   CommandType::Pointer m_DeleteCommand;
 

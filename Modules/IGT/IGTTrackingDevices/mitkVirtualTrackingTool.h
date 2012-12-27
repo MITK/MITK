@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -49,7 +49,7 @@ namespace mitk {
     mitkClassMacro(VirtualTrackingTool, InternalTrackingTool);
     friend class VirtualTrackingDevice;
     typedef itk::NonUniformBSpline<3> SplineType; ///< spline type used for tool path interpolation
-    
+
     itkGetMacro(SplineLength, mitk::ScalarType);
     itkSetMacro(SplineLength, mitk::ScalarType);
 
@@ -63,7 +63,7 @@ namespace mitk {
     itkNewMacro(Self);
     VirtualTrackingTool();
     virtual ~VirtualTrackingTool();
-    
+
     SplineType::Pointer m_Spline;
     mitk::ScalarType m_SplineLength;
     mitk::ScalarType m_Velocity;

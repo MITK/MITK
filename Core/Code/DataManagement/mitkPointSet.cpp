@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,19 @@ mitk::PointSet::PointSet()
 
 mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
 {
+   // Copy overall geometry information
+   this->SetGeometry(other.GetGeometry());
+
+   // Copy geometry information of every single timestep
+   for (unsigned int t=0; t < other.GetTimeSteps(); t++)
+   {
+      this->SetClonedGeometry( other.GetGeometry(t) );
+   }
+
+   // Expand to desired amount of timesteps
    this->Expand(other.GetTimeSteps());
+
+   // Copy points
    for (unsigned int t=0; t < other.GetTimeSteps(); t++)
    {
       for (int i=0; i< other.GetSize(t); i++)
@@ -35,7 +47,6 @@ mitk::PointSet::PointSet(const PointSet &other): BaseData(other)
          this->InsertPoint(i, other.GetPoint(i,t), t);
       }
    }
-   this->SetGeometry(other.GetGeometry());   
 }
 
 mitk::PointSet::~PointSet()
@@ -135,7 +146,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
   {
     return -1;
   }
-  
+
   // Out is the point which is checked to be the searched point
   PointType out;
   out.Fill( 0 );
@@ -150,7 +161,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
   end = m_PointSetSeries[t]->GetPoints()->End();
   int bestIndex = -1;
   distance = distance * distance;
-  
+
   // To correct errors from converting index to world and world to index
   if (distance == 0.0)
   {
@@ -161,7 +172,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
   ScalarType dist, tmp;
 
   for ( it = m_PointSetSeries[t]->GetPoints()->Begin(), i = 0;
-        it != end; 
+        it != end;
         ++it, ++i )
   {
     bool ok = m_PointSetSeries[t]->GetPoints()
@@ -190,7 +201,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
   return bestIndex;
 }
 
-mitk::PointSet::PointType 
+mitk::PointSet::PointType
 mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
 {
   PointType out;
@@ -214,7 +225,7 @@ mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
 }
 
 
-bool 
+bool
 mitk::PointSet
 ::GetPointIfExists( PointIdentifier id, PointType* point, int t ) const
 {
@@ -382,7 +393,7 @@ bool mitk::PointSet::GetSelectInfo( int position, int t ) const
   }
 }
 
-  
+
 void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
 {
   if ( this->IndexExists( position, t ) )
@@ -402,7 +413,7 @@ void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
     {
       op.reset(new mitk::PointOperation(OpDESELECTPOINT, timeInMS, point, position ));
     }
-      
+
     this->ExecuteOperation( op.get() );
   }
 }
@@ -452,7 +463,7 @@ int mitk::PointSet::SearchSelectedPoint( int t ) const
   }
 
   PointDataIterator it;
-  for ( it = m_PointSetSeries[t]->GetPointData()->Begin(); 
+  for ( it = m_PointSetSeries[t]->GetPointData()->Begin();
         it != m_PointSetSeries[t]->GetPointData()->End();
         it++ )
   {
@@ -487,14 +498,14 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
   case OpNOTHING:
     break;
 
-  case OpINSERT://inserts the point at the given position and selects it. 
+  case OpINSERT://inserts the point at the given position and selects it.
     {
       int position = pointOp->GetIndex();
 
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
-      //transfer from world to index coordinates 
+      //transfer from world to index coordinates
       mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
       if (geometry == NULL)
       {
@@ -505,10 +516,10 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
       m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position, pt);
 
-      PointDataType pointData = 
+      PointDataType pointData =
       {
-        static_cast<unsigned int>(pointOp->GetIndex()), 
-        pointOp->GetSelected(), 
+        static_cast<unsigned int>(pointOp->GetIndex()),
+        pointOp->GetSelected(),
         pointOp->GetPointType()
       };
 
@@ -516,7 +527,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
         ->InsertElement(position, pointData);
 
       this->Modified();
-      
+
       //boundingbox has to be computed
       m_CalculateBoundingBox = true;
 
@@ -529,8 +540,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     {
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
-      
-      //transfer from world to index coordinates 
+
+      //transfer from world to index coordinates
       this->GetGeometry( timeStep )->WorldToIndex(pt, pt);
 
       // Copy new point into container
@@ -555,7 +566,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpREMOVE://removes the point at given by position 
+  case OpREMOVE://removes the point at given by position
     {
       m_PointSetSeries[timeStep]->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
       m_PointSetSeries[timeStep]->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
@@ -600,7 +611,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpMOVEPOINTUP: // swap content of point with ID pointOp->GetIndex() with the point preceding it in the container // move point position within the pointset 
+  case OpMOVEPOINTUP: // swap content of point with ID pointOp->GetIndex() with the point preceding it in the container // move point position within the pointset
     {
       PointIdentifier currentID = pointOp->GetIndex();
       /* search for point with this id and point that precedes this one in the data container */
@@ -612,13 +623,13 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
         break;
 
       /* get and cache current point & pointdata and previous point & pointdata */
-      --it; 
+      --it;
       PointIdentifier prevID = it->first;
       if (this->SwapPointContents(prevID, currentID, timeStep) == true)
         this->Modified();
     }
     break;
-  case OpMOVEPOINTDOWN: // move point position within the pointset 
+  case OpMOVEPOINTDOWN: // move point position within the pointset
     {
       PointIdentifier currentID = pointOp->GetIndex();
       /* search for point with this id and point that succeeds this one in the data container */
@@ -641,8 +652,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     itkWarningMacro("mitkPointSet could not understrand the operation. Please check!");
     break;
   }
-  
-  //to tell the mappers, that the data is modified and has to be updated 
+
+  //to tell the mappers, that the data is modified and has to be updated
   //only call modified if anything is done, so call in cases
   //this->Modified();
 
@@ -687,19 +698,19 @@ void mitk::PointSet::UpdateOutputInformation()
       const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
       BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
 
-      if ( m_PointSetSeries[i].IsNull() || (m_PointSetSeries[i]->GetNumberOfPoints() == 0) 
+      if ( m_PointSetSeries[i].IsNull() || (m_PointSetSeries[i]->GetNumberOfPoints() == 0)
         || (itkBounds == itkBoundsNull) )
       {
         itkBounds = itkBoundsNull;
         continue;
       }
-      
+
       // Ensure minimal bounds of 1.0 in each dimension
       for ( unsigned int j = 0; j < 3; ++j )
       {
         if ( itkBounds[j*2+1] - itkBounds[j*2] < 1.0 )
         {
-          BoundingBox::CoordRepType center = 
+          BoundingBox::CoordRepType center =
             (itkBounds[j*2] + itkBounds[j*2+1]) / 2.0;
           itkBounds[j*2] = center - 0.5;
           itkBounds[j*2+1] = center + 0.5;
@@ -747,7 +758,7 @@ void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
     MeshType::PointDataContainer* datas = ps->GetPointData();
     MeshType::PointDataContainer::Iterator dataIterator = datas->Begin();
     for (MeshType::PointsContainer::Iterator pointIterator = points->Begin();
-      pointIterator != points->End(); 
+      pointIterator != points->End();
       ++pointIterator, ++dataIterator)
     {
       os << nextIndent << "Point " << pointIterator->Index() << ": [";

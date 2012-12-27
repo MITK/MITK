@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -32,7 +32,7 @@ namespace mitk
   \brief Base class for objects that serialize BaseProperty types.
 
   The name of sub-classes must be deduced from the class name of the object that should be serialized.
-  The serialization assumes that 
+  The serialization assumes that
 
   \verbatim
   If the class derived from BaseProperty is called GreenProperty
@@ -42,7 +42,7 @@ namespace mitk
 class SceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
 {
   public:
-    
+
     mitkClassMacro( BasePropertySerializer, itk::Object );
 
     itkSetConstObjectMacro(Property, BaseProperty);
@@ -50,8 +50,8 @@ class SceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
     /**
       \brief Serializes given BaseProperty object.
       \return The filename of the newly created file.
-      
-      This should be overwritten by specific sub-classes. 
+
+      This should be overwritten by specific sub-classes.
     */
     virtual TiXmlElement* Serialize();
 
@@ -68,7 +68,7 @@ class SceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
 
     BasePropertySerializer();
     virtual ~BasePropertySerializer();
-    
+
     BaseProperty::ConstPointer m_Property;
 };
 

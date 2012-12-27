@@ -1,7 +1,7 @@
 ###################################################################
 #
-# MITK_CREATE_MODULE_CONF 
-# 
+# MITK_CREATE_MODULE_CONF
+#
 # This can be called in a similar way like MITK_CREATE_MODULE
 # but it just creates the module configuration files without
 # actually building it. It is used for integration of legacy libraries
@@ -29,7 +29,7 @@ macro(_MITK_CREATE_MODULE_CONF)
     endforeach(dir)
 
     set(MODULE_INCLUDE_DIRS ${MODULE_INCLUDE_DIRS_ABSOLUTE} ${CMAKE_CURRENT_SOURCE_DIR})
-    
+
     # Qt generates headers in the binary tree
     if(MODULE_QT_MODULE)
       set(MODULE_INCLUDE_DIRS ${MODULE_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})

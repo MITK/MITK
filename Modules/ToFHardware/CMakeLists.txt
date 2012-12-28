@@ -1,6 +1,3 @@
-OPTION(MITK_ENABLE_TOF_HARDWARE "Support for range cameras" OFF)
-
-IF(MITK_ENABLE_TOF_HARDWARE)
 #Define the platform string
 IF(WIN32)
   IF(CMAKE_CL_64)
@@ -16,10 +13,6 @@ ELSE(WIN32)
   ENDIF(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
 ENDIF(WIN32)
 
-#option MITK_USE_TOF_HARDWARE
-
-
-
 MITK_CREATE_MODULE(mitkToFHardware
   SUBPROJECTS MITK-ToF
   INCLUDE_DIRS ${MITK_BIN_DIR}
@@ -33,8 +26,6 @@ add_subdirectory(Testing)
 add_subdirectory(Kinect)
 add_subdirectory(PMD)
 add_subdirectory(MesaSR4000)
-
-ENDIF(MITK_ENABLE_TOF_HARDWARE)
 
 CONFIGURE_FILE(mitkToFConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFConfig.h @ONLY)
 

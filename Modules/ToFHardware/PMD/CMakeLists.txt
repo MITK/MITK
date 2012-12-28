@@ -1,6 +1,3 @@
-#option MITK_USE_TOF_HARDWARE
-IF(MITK_ENABLE_TOF_HARDWARE)
-
 #Begin PMD Module
 OPTION(MITK_USE_TOF_PMDCAMCUBE "Enable support for Cam Cube camera" OFF)
 
@@ -107,8 +104,5 @@ Message("PMDO3 is activated")
  ENDIF(MITK_USE_TOF_PMDO3)
  ENDIF(WIN32)
 
-
  #Generate the mitkToFPMDConfig.h file which is used internally
 CONFIGURE_FILE(mitkToFPMDConfig.h.in ${PROJECT_BINARY_DIR}/mitkToFPMDConfig.h @ONLY)
-
-ENDIF(MITK_ENABLE_TOF_HARDWARE)

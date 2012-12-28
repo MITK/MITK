@@ -40,6 +40,7 @@ namespace mitk
 
     /*!
     \brief opens a connection to the ToF camera. Has to be implemented by the sub class
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     //TODO return value
     virtual bool OpenCameraConnection() = 0;
@@ -94,6 +95,7 @@ namespace mitk
 
     /*!
     \brief calls update on the camera -> a new ToF-image is aquired
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual bool UpdateCamera();
     /*!

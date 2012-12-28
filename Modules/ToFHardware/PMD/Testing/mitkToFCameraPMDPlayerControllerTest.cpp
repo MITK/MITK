@@ -31,24 +31,21 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
 
   //initialize test
   mitk::ToFCameraPMDPlayerDevice::Pointer pmdPlayerDevice = mitk::ToFCameraPMDPlayerDevice::New();
-  mitk::ToFCameraPMDPlayerController::Pointer testObject = mitk::ToFCameraPMDPlayerController::New();
+  mitk::ToFCameraPMDPlayerController::Pointer pmdPlayerController = mitk::ToFCameraPMDPlayerController::New();
 
-  MITK_TEST_CONDITION_REQUIRED( !(testObject.GetPointer() == NULL),"Testing object initialization!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureHeight()== 200,"Testing member variable init 1!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureWidth() == 200 ,"Testing member variable init 2!");
+  MITK_TEST_CONDITION_REQUIRED( pmdPlayerController.IsNotNull(),"Testing object initialization!");
+  MITK_TEST_CONDITION_REQUIRED( pmdPlayerController->GetCaptureHeight()== 200,"Testing GetCaptureHeight()");
+  MITK_TEST_CONDITION_REQUIRED( pmdPlayerController->GetCaptureWidth() == 200 ,"Testing GetCaptureWidth()");
 
-  //testing the creation of a connection without valid data
-
-  MITK_TEST_CONDITION_REQUIRED( !testObject->OpenCameraConnection(),"Testing OpenConnection without valid data!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetIntegrationTime() == 0, "Testing passing of integration time from PMD data!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetModulationFrequency() == 0, "Testing passing of modulation frequency from PMD data!");
+  //nice one!
+  MITK_TEST_CONDITION_REQUIRED( !pmdPlayerController->OpenCameraConnection(),"Testing OpenConnection without valid data!");
 
   // set some valid data and test connecting again! TODO: Set the data to generic dir!!
   std::string filePath = MITK_TOF_DATA_DIR;
   std::string fileName = "/TestSequence.pmd";
   filePath.append(fileName);
   pmdPlayerDevice->SetStringProperty("PMDFileName", filePath.c_str());
-  testObject = dynamic_cast<mitk::ToFCameraPMDPlayerController*>(pmdPlayerDevice->GetController().GetPointer());
+  pmdPlayerController = dynamic_cast<mitk::ToFCameraPMDPlayerController*>(pmdPlayerDevice->GetController().GetPointer());
   // current implementation for mitkToFCameraPMDPlayerController only works for 32 bit machines, so we need to check
   // the platform we are working on!
   std::string  platformVar = MITK_TOF_PLATFORM;
@@ -57,12 +54,12 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
   {
     if(std::string(MITK_TOF_PMDFILE_SOURCE_PLUGIN) != "")
     {
-      MITK_TEST_CONDITION_REQUIRED( testObject->OpenCameraConnection(),"Testing OpenConnection with valid data!");
-      MITK_TEST_CONDITION_REQUIRED( !testObject->GetIntegrationTime() == 0, "Testing passing of integration time from PMD data!");
-      MITK_TEST_CONDITION_REQUIRED( !testObject->GetModulationFrequency() == 0, "Testing passing of modulation frequency from PMD data!")
+      MITK_TEST_CONDITION_REQUIRED( pmdPlayerController->OpenCameraConnection(),"Testing OpenConnection with valid data!");
+      MITK_TEST_CONDITION_REQUIRED( !pmdPlayerController->GetIntegrationTime() == 0, "Testing passing of integration time from PMD data!");
+      MITK_TEST_CONDITION_REQUIRED( !pmdPlayerController->GetModulationFrequency() == 0, "Testing passing of modulation frequency from PMD data!")
     }
     // testing disconnection
-    MITK_TEST_CONDITION_REQUIRED ( testObject->CloseCameraConnection(), "Testing CloseConnection with data!");
+    MITK_TEST_CONDITION_REQUIRED ( pmdPlayerController->CloseCameraConnection(), "Testing CloseConnection with data!");
   }
   else
   {

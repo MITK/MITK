@@ -50,7 +50,8 @@ namespace mitk
     if(error != PMD_OK)
     {
       pmdGetLastError (m_PMDHandle, m_PMDError, 128);
-      MITK_ERROR << "Camera Error " << m_PMDError;
+      MITK_ERROR << "PMD CamCube Error " << m_PMDError;
+      mitkThrow() << "PMD CamCube Error " << m_PMDError;
       return false;
     }
     else return true;

@@ -53,12 +53,12 @@
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QCheckBox" name="m_VideoTextureCheckBox">
+       <widget class="QCheckBox" name="m_KinectTextureCheckBox">
         <property name="enabled">
          <bool>true</bool>
         </property>
         <property name="text">
-         <string>RGB Texture</string>
+         <string>Kinect RGB Texture</string>
         </property>
        </widget>
       </item>

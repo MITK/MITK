@@ -209,13 +209,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       lastVtkBased = false;
     }
 
-    //Workarround for bug GL_TEXTURE_2D (bug #8188)
-    GLboolean mode;
-    GLenum bit = GL_TEXTURE_2D;
-    GLfloat lineWidth;
-    glGetFloatv(GL_LINE_WIDTH, &lineWidth);
-    glGetBooleanv(bit, &mode);
-
     switch(type)
     {
     case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
@@ -223,14 +216,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
     case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
     }
-    if(mode)
-      glEnable(bit);
-    else
-      glDisable(bit);
-
-    glLineWidth(lineWidth);
-    //end Workarround for bug GL_TEXTURE_2D (bug #8188)
-
   }
 
   if (lastVtkBased == false)
@@ -343,6 +328,11 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );
   glDisable( GL_DEPTH_TEST );
   glDisable( GL_LIGHTING );
+  // fix for previous workaround in renderfunction
+  // disable the texturing here so crosshair is painted in teh correct colors
+  // vtk will reenable texturing every time it is needed
+  glDisable( GL_TEXTURE_1D );
+  glDisable( GL_TEXTURE_2D );
 }
 
 /*!

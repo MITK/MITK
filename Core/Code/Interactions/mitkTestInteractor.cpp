@@ -18,6 +18,7 @@
 #include "mitkMouseMoveEvent.h"
 #include <mitkPointOperation.h>
 #include "mitkInteractionConst.h" // TODO: refactor file
+#include "mitkRenderingManager.h"
 void mitk::TestInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("addpoint", AddPoint);
@@ -28,16 +29,15 @@ void mitk::TestInteractor::ConnectActionsAndFunctions()
 
 bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-
     mitk::Point3D point = positionEvent->GetPositionInWorld();
     m_PointSet->InsertPoint(m_NumberOfPoints, point, 0);
     m_NumberOfPoints++;
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return true;
   }
   else
@@ -53,14 +53,12 @@ bool mitk::TestInteractor::SelectPoint(StateMachineAction*, InteractionEvent* in
   {
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
-
     if (GetPointIndexByPosition(point) != -1)
     {
       m_SelectedPointIndex = GetPointIndexByPosition(point);
       return true;
     }
     return false;
-
   }
   else
   {
@@ -70,7 +68,6 @@ bool mitk::TestInteractor::SelectPoint(StateMachineAction*, InteractionEvent* in
 
 bool mitk::TestInteractor::DeSelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
@@ -123,6 +120,7 @@ bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionE
     PointOperation* doOp = new PointOperation(mitk::OpREMOVE, point, m_SelectedPointIndex);
     GetDataNode()->GetData()->ExecuteOperation(doOp);
     m_SelectedPointIndex = -1;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return true;
   }
   else

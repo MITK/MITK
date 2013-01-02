@@ -16,12 +16,13 @@
 
 #include "mitkDataInteractor.h"
 #include "mitkInteractor.h"
-
+#include "mitkPointSet.h"
 #include "mitkDataNode.h"
 
 mitk::DataInteractor::DataInteractor()
 {
   m_DataNode = NULL;
+  m_SelectionAccuracy = 2.0;
 }
 
 mitk::DataNode::Pointer mitk::DataInteractor::GetDataNode()
@@ -67,7 +68,36 @@ mitk::DataInteractor::~DataInteractor()
   }
 }
 
+void mitk::DataInteractor::SetAccuracy(float accuracy)
+{
+  m_SelectionAccuracy = accuracy;
+}
+
 void mitk::DataInteractor::ConnectActionsAndFunctions()
 {
-  MITK_WARN << "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
+  MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
+}
+
+int mitk::DataInteractor::GetPointIndexByPosition(Point3D position)
+{
+
+  // iterate over point set and check if it contains a point close enough to the pointer to be selected
+  PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
+  int index = -1;
+  if (points == NULL)
+  {
+    return index;
+  }
+  PointSet::PointsContainer* pointsContainer = points->GetPointSet()->GetPoints();
+
+  float minDistance = m_SelectionAccuracy;
+  for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
+  {
+    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index())));  // TODO: support time!
+    if (distance < minDistance) // if several points fall within the margin, choose the one with minimal distance to position
+    { // TODO: does this make sense, which unit is it?
+      index = it->Index();
+    }
+  }
+  return index;
 }

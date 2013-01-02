@@ -77,6 +77,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
     {
       // perform state change
       m_CurrentState = transition->GetNextState();
+      //MITK_INFO << "StateChange: " << m_CurrentState->GetName();
     }
     return success;
   }

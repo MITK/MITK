@@ -16,7 +16,8 @@
 
 #include "mitkTestInteractor.h"
 #include "mitkMouseMoveEvent.h"
-
+#include <mitkPointOperation.h>
+#include "mitkInteractionConst.h" // TODO: refactor file
 void mitk::TestInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("addpoint", AddPoint);
@@ -28,45 +29,76 @@ void mitk::TestInteractor::ConnectActionsAndFunctions()
 bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
 
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*> (interactionEvent);
-  if (positionEvent != NULL) {
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
 
-
-  mitk::Point3D point = positionEvent->GetPositionInWorld();
-  point.Fill(3.0);
-  m_PointSet->SetPoint(m_NumberOfPoints,point,0);
-  m_NumberOfPoints++;
-  GetDataNode()->SetData(m_PointSet);
-  MITK_INFO<< "AddPoint";
-  return true;
-  } else
+    mitk::Point3D point = positionEvent->GetPositionInWorld();
+    m_PointSet->InsertPoint(m_NumberOfPoints, point, 0);
+    m_NumberOfPoints++;
+    GetDataNode()->SetData(m_PointSet);
+    GetDataNode()->Modified();
+    return true;
+  }
+  else
   {
     return false;
   }
 }
 
-bool mitk::TestInteractor::SelectPoint(StateMachineAction*, InteractionEvent*)
+bool mitk::TestInteractor::SelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  //MITK_INFO<< "SelectPoint";
-  return true;
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    Point3D point = positionEvent->GetPositionInWorld();
+    // iterate over point set and check if it contains a point close enough to the pointer to be selected
+
+    if (GetPointIndexByPosition(point) != -1)
+    {
+      m_SelectedPointIndex = GetPointIndexByPosition(point);
+      return true;
+    }
+    return false;
+
+  }
+  else
+  {
+    return false;
+  }
 }
 
-bool mitk::TestInteractor::DeSelectPoint(StateMachineAction*, InteractionEvent*)
+bool mitk::TestInteractor::DeSelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  //MITK_INFO<< "DeSelectPoint";
-  return true;
+
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    Point3D point = positionEvent->GetPositionInWorld();
+    // delections action is executed, if pointer points to nothing, OR
+    // is close to a different point. this is done to ensure there is a deselect transition between selecting a different point.
+    if (GetPointIndexByPosition(point) == -1 || GetPointIndexByPosition(point) != m_SelectedPointIndex)
+    {
+      m_SelectedPointIndex = -1;
+      return true;
+    }
+  }
+  return false;
 }
 
 mitk::TestInteractor::TestInteractor() :
-m_NumberOfPoints(0)
+    m_NumberOfPoints(0)
 {
   m_PointSet = PointSet::New();
+  m_NumberOfPoints = 0;
+  m_SelectedPointIndex = -1;
 }
 
 mitk::TestInteractor::~TestInteractor()
 {
 }
 
+// TODO: probably obsolete! also in superclass!!
 bool mitk::TestInteractor::IsPointerOverData(InteractionEvent* interactionEvent)
 {
   // here we only want to handle mouse move events, since for all other events it is irrelevant if
@@ -85,6 +117,17 @@ bool mitk::TestInteractor::IsPointerOverData(InteractionEvent* interactionEvent)
 
 bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionEvent*)
 {
-  //MITK_INFO<< "DeleteSelectedPoint";
-  return true;
+  if (m_SelectedPointIndex != -1)
+  {
+    Point3D point;
+    PointOperation* doOp = new PointOperation(mitk::OpREMOVE, point, m_SelectedPointIndex);
+    GetDataNode()->GetData()->ExecuteOperation(doOp);
+    m_SelectedPointIndex = -1;
+    return true;
+  }
+  else
+  {
+    MITK_WARN << "Impossible/unexpected State";
+    return false;
+  }
 }

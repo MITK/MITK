@@ -53,6 +53,7 @@ namespace mitk
 
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;
+    int m_SelectedPointIndex;
   };
 
 } /* namespace mitk */

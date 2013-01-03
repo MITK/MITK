@@ -87,6 +87,5 @@ namespace mitk
   const std::string KEY = "Key";
   const std::string WHEELDELTA = "WheelDelta";
 
-
 }     //namespace mitk
 #endif //ifndef MITKINTERACTEVENTCONST_H

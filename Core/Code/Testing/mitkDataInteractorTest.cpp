@@ -41,7 +41,8 @@ int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
    */
 
   // Global interaction must(!) be initialized if used, needed for RenderWindow
-  mitk  ::GlobalInteraction::GetInstance()->Initialize("global");
+
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // Here BindDispatcherInteractor and Dispatcher should be created automatically
   vtkRenderWindow* renWin = vtkRenderWindow::New();

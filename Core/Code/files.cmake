@@ -222,6 +222,7 @@ set(CPP_FILES
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
   Interactions/mitkInteractor.cpp
+  Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionKeyEvent.cpp

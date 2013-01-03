@@ -24,13 +24,11 @@
  * @brief This class builds up all the necessary structures for a statemachine.
  * and stores one start-state for all built statemachines.
  **/
-//mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
-//mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
-//std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
 //XML StateMachine Tags
 const std::string NAME = "name";
 const std::string CONFIG = "statemachine";
 const std::string STATE = "state";
+const std::string STATEMODE = "state_mode";
 const std::string TRANSITION = "transition";
 const std::string EVENTCLASS = "event_class";
 const std::string EVENTVARIANT = "event_variant";
@@ -85,12 +83,6 @@ void mitk::StateMachineContainer::ConnectStates()
 
 void mitk::StateMachineContainer::StartElement(const char* elementName, const char **atts)
 {
-
-  /*
-   * TODO: Check if necessary information has been collected i.o. to construct the states/actions/transition, if not, warn user.
-   * TODO: test if it works ..
-   */
-
   std::string name(elementName);
 
   if (name == CONFIG)
@@ -100,13 +92,22 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
   else if (name == STATE)
   {
     std::string stateName = ReadXMLStringAttribut(NAME, atts);
+    std::string stateMode = ReadXMLStringAttribut(STATEMODE, atts);
     bool isStartState = ReadXMLBooleanAttribut(STARTSTATE, atts);
 
     if (isStartState)
     {
       m_StartStateFound = true;
     }
-    m_CurrState = mitk::StateMachineState::New(stateName);
+
+    // sanitize state modes
+    if (stateMode == "" || stateMode == "REGULAR") {
+      stateMode = "REGULAR";
+    } else if (stateMode != "GRAB_INPUT" && stateMode != "PREFER_INPUT") {
+      MITK_WARN << "Invalid State Modus " << stateMode << ". Mode assumed to be REGULAR";
+      stateMode = "REGULAR";
+    }
+    m_CurrState = mitk::StateMachineState::New(stateName, stateMode);
 
     if (isStartState)
       m_StartState = m_CurrState;

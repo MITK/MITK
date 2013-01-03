@@ -19,6 +19,7 @@
 
 mitk::Dispatcher::Dispatcher()
 {
+  m_ProcessingMode = REGULAR;
 }
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
@@ -65,13 +66,55 @@ mitk::Dispatcher::~Dispatcher()
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
-//  MITK_INFO << "Event received " << event->GetEventClass();
   InteractionEvent::Pointer p = event;
+
+  switch (m_ProcessingMode)
+  {
+  case CONNECTEDMOUSEACTION:
+    // finished connected mouse action
+    if (p->GetEventClass() == "MouseReleaseEvent")
+    {
+      m_ProcessingMode = REGULAR;
+      return (m_SelectedInteractor->HandleEvent(event));
+    }
+    // give event to selected interactor
+    if (p->GetEventClass() == "MouseMoveEvent")
+    {
+      return (m_SelectedInteractor->HandleEvent(event));
+    }
+    break;
+
+  case GRABINPUT:
+  {
+    bool success = m_SelectedInteractor->HandleEvent(event);
+    SetEventProcessingMode(m_SelectedInteractor);
+    return success;
+    break;
+  }
+  case PREFERINPUT:
+    if (m_SelectedInteractor->HandleEvent(event) == true)
+    {
+      SetEventProcessingMode(m_SelectedInteractor);
+      return true;
+    }
+    break;
+
+  case REGULAR:
+    break;
+  }
+  // Standard behavior. Is executed for in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
   m_Interactors.sort(); // sorts interactors by layer (descending);
   for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
   {
     if ((*it)->HandleEvent(event))
-    {
+    { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
+
+      SetEventProcessingMode(*it);
+      if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)
+      {
+        m_SelectedInteractor = *it;
+        m_ProcessingMode = CONNECTEDMOUSEACTION;
+      }
       return true;
     }
   }
@@ -103,5 +146,25 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
         ++it;
       }
     }
+  }
+}
+
+void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataInteractor)
+{
+  if (dataInteractor->GetMode() == "REGULAR")
+  {
+    m_ProcessingMode = REGULAR;
+  }
+
+  // prefer/grab input overrule connected mouse action
+  if (dataInteractor->GetMode() == "PREFER_INPUT")
+  {
+    m_ProcessingMode = PREFERINPUT;
+    m_SelectedInteractor = dataInteractor;
+  }
+  if (dataInteractor->GetMode() == "GRAB_INPUT")
+  {
+    m_ProcessingMode = GRABINPUT;
+    m_SelectedInteractor = dataInteractor;
   }
 }

@@ -44,14 +44,13 @@ mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
   /*
    * Follow transitions and check if all actions have been loaded.
    */
-
   mitk::StateMachineTransition::Pointer s1 = smc->GetStartState()->GetTransition("StdMouseMove","no1"); // transition exists
   mitk::StateMachineTransition::Pointer s2 = smc->GetStartState()->GetTransition("StdMouseNotMove","no1");// transition does not exist
   mitk::StateMachineState::Pointer st2 = s1->GetNextState();
   mitk::StateMachineTransition::Pointer s3 = st2->GetTransition("StdMouseMove","no1");// transition from state2 to state3
-
   typedef std::vector<mitk::StateMachineAction::Pointer> ActionCollectionType;
   ActionCollectionType actions = s3->GetActions();
+
   ActionCollectionType::iterator it = actions.begin();
   std::string action1 = (*it)->GetActionName();
   it++;

@@ -115,6 +115,7 @@ namespace mitk
      */
     void AddActionFunction(std::string action, TActionFunctor* functor);
 
+    StateMachineState* GetCurrentState();
 
     /**
      * Is called after loading a statemachine.

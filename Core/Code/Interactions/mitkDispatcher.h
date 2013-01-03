@@ -19,7 +19,7 @@
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
-#include "mitkEvent.h"
+#include "mitkEvent.h" //
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkDataInteractor.h"
@@ -35,6 +35,8 @@
 
 namespace mitk
 {
+
+  enum ProcessEventMode { REGULAR, GRABINPUT, PREFERINPUT, CONNECTEDMOUSEACTION };
   class InteractionEvent;
   class MITK_CORE_EXPORT Dispatcher : public itk::Object {
 
@@ -73,6 +75,21 @@ namespace mitk
      * Removes ALL related Interactors, this is necessary especially when DataNode is assigned to new Interactor
      */
     void RemoveOrphanedInteractors();
+
+    /**
+     * A ConnectedMouseAction is described by the sequence of Mouse-Press, [Mouse-Move] , Mouse-Release Events.
+     * Within this sequence all events are sent to the same Interactor, namely the one which received the event from the Mouse-Press action.
+     * m_ConnectedMouseAction  - is set to true, when a Mouse-Down Event occurs and an interactor takes the events,
+     * m_SelectedInteractor contains said interactor.
+     * m_ConnectedMouseAction is reset to false, after the Mouse-Release Event occurs,
+     * while it is true, the m_SelectedInteractor is the only one that receives Mouse-Events.
+     */
+    ProcessEventMode m_ProcessingMode;
+    DataInteractor::Pointer m_SelectedInteractor;
+
+    void SetEventProcessingMode(DataInteractor::Pointer);
+
+
   };
 
 } /* namespace mitk */

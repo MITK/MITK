@@ -16,9 +16,14 @@
 
 #include "mitkStateMachineState.h"
 
-mitk::StateMachineState::StateMachineState(std::string stateName) :
-    m_Name(stateName)
+mitk::StateMachineState::StateMachineState(std::string stateName, std::string stateMode) :
+    m_Name(stateName),  m_StateMode(stateMode)
 {
+}
+
+std::string mitk::StateMachineState::GetMode()
+{
+  return m_StateMode;
 }
 
 mitk::StateMachineState::~StateMachineState()

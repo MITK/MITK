@@ -23,6 +23,7 @@
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include "mitkEventStateMachine.h"
+#include <string.h>
 
 namespace mitk
 {
@@ -52,6 +53,8 @@ namespace mitk
      * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
      */
     void SetAccuracy(float accuracy);
+
+    std::string GetMode();
 
     NodeType GetDataNode();
     int GetLayer();

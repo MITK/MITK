@@ -108,6 +108,11 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
   return retVal;
 }
 
+mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
+{
+  return m_CurrentState.GetPointer();
+}
+
 bool mitk::EventStateMachine::IsPointerOverData(InteractionEvent* interactionEvent)
 {
   interactionEvent->GetEventClass(); // dummy

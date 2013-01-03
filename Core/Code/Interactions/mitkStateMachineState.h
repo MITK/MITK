@@ -23,14 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkWeakPointer.h>
 #include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
+
 namespace mitk {
 
+  // Dispatcher and State Modes
 
   class MITK_CORE_EXPORT StateMachineState : public itk::Object
   {
   public:
     mitkClassMacro(StateMachineState, itk::Object);
-    mitkNewMacro1Param(Self, std::string);
+    mitkNewMacro2Param(Self, std::string, std::string);
+
+
 
     typedef std::vector<mitk::StateMachineState::Pointer> StateMap;
     typedef std::vector<StateMachineTransition::Pointer> TransitionVector;
@@ -47,6 +51,8 @@ namespace mitk {
     **/
     std::string GetName();
 
+    std::string GetMode();
+
     /**
     * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions.
     * Required for this is a List of all build States of that StateMachine (allStates). This way the StateMachine can be build up.
@@ -55,7 +61,7 @@ namespace mitk {
 
   protected:
 
-    StateMachineState(std::string name);
+    StateMachineState(std::string name, std::string stateMode);
     ~StateMachineState();
 
   private:
@@ -63,6 +69,13 @@ namespace mitk {
     * @brief Name of this State.
     **/
     std::string m_Name;
+    /**
+     * State Modus, which determines the behavior of the dispatcher. A State can be in three different modes:
+     * REGULAR - standard dispatcher behavior
+     * GRAB_INPUT - all events are given to the statemachine in this modus, if they are not processed by this statemachine the events are dropped.
+     * PREFER_INPUT - events are first given to this statemachine, and if not processed, offered to the other statemachines.
+     */
+    std::string m_StateMode;
 
     /**
     * @brief map of transitions that lead from this state to the next state

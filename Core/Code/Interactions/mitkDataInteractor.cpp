@@ -18,11 +18,12 @@
 #include "mitkInteractor.h"
 #include "mitkPointSet.h"
 #include "mitkDataNode.h"
+#include "mitkStateMachineState.h"
 
 mitk::DataInteractor::DataInteractor()
 {
   m_DataNode = NULL;
-  m_SelectionAccuracy = 2.0;
+  m_SelectionAccuracy = 3.5;
 }
 
 mitk::DataNode::Pointer mitk::DataInteractor::GetDataNode()
@@ -76,6 +77,11 @@ void mitk::DataInteractor::SetAccuracy(float accuracy)
 void mitk::DataInteractor::ConnectActionsAndFunctions()
 {
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
+}
+
+std::string mitk::DataInteractor::GetMode()
+{
+  return GetCurrentState()->GetMode();
 }
 
 int mitk::DataInteractor::GetPointIndexByPosition(Point3D position)

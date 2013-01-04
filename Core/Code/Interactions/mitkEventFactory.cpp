@@ -24,8 +24,7 @@
 #include <mitkMouseWheelEvent.h>
 #include <mitkInteractionKeyEvent.h>
 #include <mitkInteractionEventConst.h>
-
-
+#include <mitkInternalEvent.h>
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
@@ -63,6 +62,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   char key;
   std::string strWheelDelta;
   int wheelDelta;
+  std::string strSignalName = "";
 
   Point2D pos;
 
@@ -86,7 +86,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       }
       else
       {
-        MITK_WARN<< "mitkEventFactory: Invalid event modifier in config file:" << modifiers ;
+        MITK_WARN<< "mitkEventFactory: Invalid event modifier in config file:" << modifiers;
       }
     }
   }
@@ -108,7 +108,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
     else
     {
-      MITK_WARN<< "mitkEventFactory: Invalid event button in config file:" << eventButton ;
+      MITK_WARN<< "mitkEventFactory: Invalid event button in config file:" << eventButton;
     }
   }
 
@@ -132,11 +132,10 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       }
       else
       {
-        MITK_WARN<< "mitkEventFactory: Invalid event buttonstate in config file:" << eventButton ;
+        MITK_WARN<< "mitkEventFactory: Invalid event buttonstate in config file:" << eventButton;
       }
     }
   }
-
 
   // Key
   if (!list->GetStringProperty(KEY.c_str(), strKey))
@@ -156,6 +155,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     wheelDelta = atoi(strWheelDelta.c_str());
   }
+  // Internal Signals Name
+  list->GetStringProperty(SIGNALNAME.c_str(), strSignalName);
 
   /*
    * Here the objects are created
@@ -184,6 +185,10 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   else if (eventClass == "MouseWheelEvent")
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
+  }
+  else if (eventClass == "InternalEvent")
+  {
+    event = InternalEvent::New(NULL,strSignalName);
   }
   return event;
 }

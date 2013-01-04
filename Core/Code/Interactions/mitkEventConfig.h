@@ -35,7 +35,7 @@ namespace mitk
   /**
    *@brief Configuration Object for Statemachines.
    *
-   * Reads given config file, which translates specific user inputs (mitk::InteractionEvents) into EventVariants that can be processed
+   * Reads given config file, which translates specific user inputs (InteractionEvents) into EventVariants that can be processed
    * by the StateMachine.
    * @ingroup Interaction
    **/
@@ -58,6 +58,7 @@ namespace mitk
      **/
     bool LoadConfigString(std::string xmlString);
 
+    void ClearConfig();
     /**
      * Returns a PropertyList that contains the properties set in the configuration file.
      * All properties are stored as strings.

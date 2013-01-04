@@ -142,6 +142,11 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
   return "";
 }
 
+void mitk::EventConfig::ClearConfig()
+{
+  m_EventList.clear();
+}
+
 bool mitk::EventConfig::ReadXMLBooleanAttribut(std::string name, const char** atts)
 {
   std::string s = ReadXMLStringAttribut(name, atts);

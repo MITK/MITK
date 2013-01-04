@@ -41,13 +41,6 @@ namespace mitk
     mitkClassMacro(DataInteractor, EventStateMachine);
     itkNewMacro(Self);
 
-    /**
-     * Overload operator to compare Interactors. Criteria is the layer of the associated DataNode.
-     * Note: This is intentionally implemented using 'greater than' to achieve a list which is sorted in descending order
-     * (DataNodes on top are first in list)
-     */
-    bool operator<(const DataInteractor::Pointer dataInteractor);
-
     void SetDataNode(NodeType);
     /**
      * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.

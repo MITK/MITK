@@ -27,7 +27,7 @@ void mitk::InteractionEvent::SetSender(mitk::BaseRenderer* sender)
   m_Sender = sender;
 }
 
-const mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
+mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
 {
   return m_Sender;
 }

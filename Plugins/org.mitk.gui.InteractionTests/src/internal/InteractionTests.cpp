@@ -70,6 +70,7 @@ void InteractionTests::DoImageProcessing()
   m_CurrentInteractor = mitk::TestInteractor::New();
   m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
   m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+  m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
   m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
 
 }

@@ -39,6 +39,11 @@ namespace mitk
     itkNewMacro(Self);
     virtual bool LoadEventConfig();
     virtual bool LoadEventConfig(std::string filename);
+    /**
+     * Can be used to combine several config files.
+     * For example to load the standard configuration plus some additional definitions.
+     */
+    virtual bool AddEventConfig(std::string filename);
 
   protected:
     EventHandler();

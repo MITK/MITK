@@ -36,7 +36,7 @@ namespace mitk
     mitkClassMacro(InteractionEvent,itk::Object);
     mitkNewMacro2Param(Self,BaseRenderer*, std::string);
     void SetSender(BaseRenderer* sender);
-    const BaseRenderer* GetSender();
+    BaseRenderer* GetSender();
 
     /**
      * Implementation of equality for each event class

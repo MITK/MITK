@@ -19,12 +19,18 @@
 #include <mitkPointOperation.h>
 #include "mitkInteractionConst.h" // TODO: refactor file
 #include "mitkRenderingManager.h"
+#include "mitkInternalEvent.h"
+//
+#include "mitkDispatcher.h"
+#include "mitkBaseRenderer.h"
+
 void mitk::TestInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("addpoint", AddPoint);
   CONNECT_FUNCTION("selectpoint", SelectPoint);
   CONNECT_FUNCTION("unselect", DeSelectPoint);
   CONNECT_FUNCTION("deleteselection", DeleteSelectedPoint);
+  CONNECT_FUNCTION("colourme", ColorGreen);
 }
 
 bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -38,6 +44,11 @@ bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* inter
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    if (m_NumberOfPoints >= 3)
+    {
+      InternalEvent::Pointer event = InternalEvent::New(NULL, "has3points");
+      positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+    }
     return true;
   }
   else
@@ -56,6 +67,9 @@ bool mitk::TestInteractor::SelectPoint(StateMachineAction*, InteractionEvent* in
     if (GetPointIndexByPosition(point) != -1)
     {
       m_SelectedPointIndex = GetPointIndexByPosition(point);
+      GetDataNode()->SetBoolProperty("show contour", true);
+      GetDataNode()->SetProperty("contourcolor", ColorProperty::New(0.0, 0.0, 1.0));
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
     }
     return false;
@@ -72,11 +86,13 @@ bool mitk::TestInteractor::DeSelectPoint(StateMachineAction*, InteractionEvent* 
   if (positionEvent != NULL)
   {
     Point3D point = positionEvent->GetPositionInWorld();
-    // delections action is executed, if pointer points to nothing, OR
+    // deselect action is executed, if pointer points to nothing, OR
     // is close to a different point. this is done to ensure there is a deselect transition between selecting a different point.
     if (GetPointIndexByPosition(point) == -1 || GetPointIndexByPosition(point) != m_SelectedPointIndex)
     {
       m_SelectedPointIndex = -1;
+      GetDataNode()->SetProperty("contourcolor", ColorProperty::New(0.0, 1.0, 0.0));
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
     }
   }
@@ -112,6 +128,13 @@ bool mitk::TestInteractor::IsPointerOverData(InteractionEvent* interactionEvent)
 
 }
 
+bool mitk::TestInteractor::ColorGreen(StateMachineAction*, InteractionEvent*)
+{
+  GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 1.0, 0.0));
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  return true;
+}
+
 bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionEvent*)
 {
   if (m_SelectedPointIndex != -1)
@@ -121,11 +144,12 @@ bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionE
     GetDataNode()->GetData()->ExecuteOperation(doOp);
     m_SelectedPointIndex = -1;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_NumberOfPoints--;
     return true;
   }
   else
   {
-    MITK_WARN << "Impossible/unexpected State";
+    MITK_WARN<< "Impossible/unexpected State";
     return false;
   }
 }

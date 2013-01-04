@@ -67,7 +67,7 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
-
+  bool eventIsHandled = false;
   switch (m_ProcessingMode)
   {
   case CONNECTEDMOUSEACTION:
@@ -75,50 +75,62 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     if (p->GetEventClass() == "MouseReleaseEvent")
     {
       m_ProcessingMode = REGULAR;
-      return (m_SelectedInteractor->HandleEvent(event));
+      eventIsHandled = m_SelectedInteractor->HandleEvent(event);
     }
     // give event to selected interactor
-    if (p->GetEventClass() == "MouseMoveEvent")
+    if (eventIsHandled == false)
     {
-      return (m_SelectedInteractor->HandleEvent(event));
+      eventIsHandled = m_SelectedInteractor->HandleEvent(event);
     }
     break;
 
   case GRABINPUT:
-  {
-    bool success = m_SelectedInteractor->HandleEvent(event);
+    eventIsHandled = m_SelectedInteractor->HandleEvent(event);
     SetEventProcessingMode(m_SelectedInteractor);
-    return success;
     break;
-  }
+
   case PREFERINPUT:
     if (m_SelectedInteractor->HandleEvent(event) == true)
     {
       SetEventProcessingMode(m_SelectedInteractor);
-      return true;
+      eventIsHandled = true;
     }
     break;
 
   case REGULAR:
     break;
   }
-  // Standard behavior. Is executed for in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
-  m_Interactors.sort(); // sorts interactors by layer (descending);
-  for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
+  // Standard behavior. Is executed in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
+  if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
-    if ((*it)->HandleEvent(event))
-    { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
-
-      SetEventProcessingMode(*it);
-      if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)
-      {
-        m_SelectedInteractor = *it;
-        m_ProcessingMode = CONNECTEDMOUSEACTION;
+    // FixME sorting seems not to work
+    m_Interactors.sort(cmp());// sorts interactors by layer (descending);
+    for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end() && eventIsHandled == false;
+        ++it)
+    {
+      if ((*it)->HandleEvent(event))
+      { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
+        SetEventProcessingMode(*it);
+        if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)
+        {
+          m_SelectedInteractor = *it;
+          m_ProcessingMode = CONNECTEDMOUSEACTION;
+        }
+        eventIsHandled = true;
       }
-      return true;
     }
   }
-  return false;
+
+  // TODO: inform listeners
+
+  // Process event queue
+  if (!m_QueuedEvents.empty())
+  {
+    InteractionEvent::Pointer e = m_QueuedEvents.front();
+    m_QueuedEvents.pop_front();
+    ProcessEvent(e.GetPointer());
+  }
+  return eventIsHandled;
 }
 
 /*
@@ -147,6 +159,12 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
       }
     }
   }
+}
+
+void mitk::Dispatcher::QueueEvent(InteractionEvent* event)
+{
+  InteractionEvent::Pointer e = event;
+  m_QueuedEvents.push_back(e);
 }
 
 void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataInteractor)

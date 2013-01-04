@@ -55,11 +55,6 @@ int mitk::DataInteractor::GetLayer()
   return layer;
 }
 
-bool mitk::DataInteractor::operator <(const DataInteractor::Pointer dataInteractor)
-{
-  return (GetLayer() > dataInteractor->GetLayer()); // intentionally greater than !
-}
-
 mitk::DataInteractor::~DataInteractor()
 {
   if (m_DataNode.IsNotNull())

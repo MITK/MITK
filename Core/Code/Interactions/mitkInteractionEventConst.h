@@ -86,6 +86,7 @@ namespace mitk
   const std::string BUTTONSTATE = "ButtonState";
   const std::string KEY = "Key";
   const std::string WHEELDELTA = "WheelDelta";
+  const std::string SIGNALNAME = "SignalName";
 
 }     //namespace mitk
 #endif //ifndef MITKINTERACTEVENTCONST_H

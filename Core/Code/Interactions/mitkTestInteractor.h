@@ -47,6 +47,7 @@ namespace mitk
 
   private:
     bool AddPoint(StateMachineAction* , InteractionEvent*);
+    bool ColorGreen(StateMachineAction* , InteractionEvent*);
     bool SelectPoint(StateMachineAction* , InteractionEvent*);
     bool DeSelectPoint(StateMachineAction* , InteractionEvent*);
     bool DeleteSelectedPoint(StateMachineAction* , InteractionEvent*);

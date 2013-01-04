@@ -46,6 +46,11 @@ bool mitk::EventHandler::LoadEventConfig(std::string filename)
   return m_EventConfig->LoadConfig(filename);
 }
 
+bool mitk::EventHandler::AddEventConfig(std::string filename)
+{
+  return m_EventConfig->LoadConfig(filename);
+}
+
 std::string mitk::EventHandler::GetMappedEvent(InteractionEvent* interactionEvent)
 {
   if (m_EventConfig != NULL)

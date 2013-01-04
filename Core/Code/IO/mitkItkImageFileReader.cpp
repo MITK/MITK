@@ -48,7 +48,7 @@ void mitk::ItkImageFileReader::GenerateData()
     }
     catch(...)
     {
-      MITK_INFO << "Could not set locale " << locale;
+      MITK_WARN << "Could not set locale " << locale;
     }
   }
 
@@ -57,7 +57,7 @@ void mitk::ItkImageFileReader::GenerateData()
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
 
-  MITK_INFO << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
+  MITK_DEBUG << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
 
   // Check to see if we can read the file given the name or prefix
   if ( m_FileName == "" )
@@ -160,7 +160,7 @@ void mitk::ItkImageFileReader::GenerateData()
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
 
   buffer = NULL;
-  MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
+  MITK_DEBUG << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 //  mitk::DataNode::Pointer node = this->GetOutput();
 //  node->SetData( image );
 
@@ -169,7 +169,7 @@ void mitk::ItkImageFileReader::GenerateData()
   //{
   //  SetDefaultImageProperties( node );
   //}
-  MITK_INFO << "...finished!" << std::endl;
+  MITK_DEBUG << "...finished!" << std::endl;
 
   try
   {
@@ -177,7 +177,7 @@ void mitk::ItkImageFileReader::GenerateData()
   }
   catch(...)
   {
-    MITK_INFO << "Could not reset locale " << currLocale;
+    MITK_WARN << "Could not reset locale " << currLocale;
   }
 }
 

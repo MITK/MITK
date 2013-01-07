@@ -33,7 +33,7 @@ vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOqacity(0.0),m_MaxOpac
 {
   //  SetNumberOfThreads(1);
 
-  MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
+  MITK_DEBUG << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
 
 vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()

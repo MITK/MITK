@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk{
 /** \class DiffusionMultiShellQballReconstructionImageFilter
-    Aganj_2010
+    I. Aganj, C. Lenglet, G. Sapiro, E. Yacoub, K. Ugurbil, and N. Harel, “Reconstruction of the orientation distribution function in single and multiple shell q-ball imaging within constant solid angle,” Magnetic Resonance in Medicine, vol. 64, no. 2, pp. 554–566, 2010.
  */
 
 template< class TReferenceImagePixelType, class TGradientImagePixelType, class TOdfPixelType, int NOrderL, int NrOdfDirections>

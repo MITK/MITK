@@ -27,14 +27,6 @@ namespace itk {
 template< class T, class TG, class TO, int L, int NODF>
 DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::DiffusionMultiShellQballReconstructionImageFilter() :
-  m_GradientDirectionContainer(NULL),
-  m_NumberOfGradientDirections(0),
-  m_NumberOfBaselineImages(1),
-  m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
-  m_BValue(1.0),
-  m_Lambda(0.0),
-  m_IsHemisphericalArrangementOfGradientDirections(false),
-  m_IsArithmeticProgession(false),
   m_ReconstructionType(Mode_Standard1Shell),
   m_Interpolation_Flag(false),
   m_Interpolation_SHT1_inv(0),
@@ -42,7 +34,20 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_Interpolation_SHT3_inv(0),
   m_TARGET_SH_shell1(0),
   m_TARGET_SH_shell2(0),
-  m_TARGET_SH_shell3(0)
+  m_TARGET_SH_shell3(0),
+  m_MaxDirections(0),
+  m_CoeffReconstructionMatrix(0),
+  m_ODFSphericalHarmonicBasisMatrix(0),
+  m_GradientDirectionContainer(0),
+  m_NumberOfGradientDirections(0),
+  m_NumberOfBaselineImages(0),
+  m_Threshold(0),
+  m_BZeroImage(0),
+  m_CoefficientImage(0),
+  m_BValue(1.0),
+  m_Lambda(0.0),
+  m_IsHemisphericalArrangementOfGradientDirections(false),
+  m_IsArithmeticProgession(false)
 {
   // At least 1 inputs is necessary for a vector image.
   // For images added one at a time we need at least six
@@ -133,11 +138,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 ::Projection1(vnl_vector<double> & vec, double delta)
 {
   if (delta==0){   //Clip attenuation values. If att<0 => att=0, if att>1 => att=1
-    for (int i=0; i<vec.size(); i++)
+    for (unsigned int i=0; i<vec.size(); i++)
       vec[i]=(vec[i]>=0 && vec[i]<=1)*vec[i]+(vec[i]>1);
   }
   else{            //Use function from Aganj et al, MRM, 2010
-    for (int i=0; i< vec.size(); i++)
+    for (unsigned int i=0; i< vec.size(); i++)
       vec[i]=CalculateThreashold(vec[i], delta);
   }
 }
@@ -178,7 +183,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 
   // logarithmierung aller werte in E
-  for(int i = 0 ; i < m_MaxDirections; i++)
+  for(unsigned int i = 0 ; i < m_MaxDirections; i++)
   {
     T0(i,0) = -log(E1(i));
     T0(i,1) = -log(E2(i));
@@ -189,12 +194,12 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
 
 
   // Summeiere Zeilenweise über alle Shells sum = E1+E2+E3
-  for(int i = 0 ; i < m_MaxDirections; i++)
+  for(unsigned int i = 0 ; i < m_MaxDirections; i++)
   {
     s0[i] = T0(i,0) + T0(i,1) + T0(i,2);
   }
 
-  for(int i = 0; i < m_MaxDirections; i ++)
+  for(unsigned int i = 0; i < m_MaxDirections; i ++)
   {
     // Alle Signal-Werte auf der Ersten shell E(N,0) normiert auf s0
     a0[i] = T0(i,0) / s0[i];
@@ -207,7 +212,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
   e = tb - (ta * 2.0);
   m = (tb *  2.0 ) + ta;
 
-  for(int i = 0; i <m_MaxDirections; i++)
+  for(unsigned int i = 0; i <m_MaxDirections; i++)
   {
     C(i,0) = (tb[i] < 1+3*delta && 0.5+1.5*(sF+1)*delta < ta[i] && ta[i] < 1-3* (sF+2) *delta);
     C(i,1) = (e[i] <= -1+3*(2*sF+5)*delta) && (ta[i]>=1-3*(sF+2)*delta);
@@ -234,7 +239,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     B(i,6)=(bool)C(i,6) * b0(i);
   }
 
-  for(int i = 0 ; i < m_MaxDirections; i++)
+  for(unsigned int i = 0 ; i < m_MaxDirections; i++)
   {
     double sumA = 0;
     double sumB = 0;
@@ -247,7 +252,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     b[i] = sumB;
   }
 
-  for(int i = 0; i < m_MaxDirections; i++)
+  for(unsigned int i = 0; i < m_MaxDirections; i++)
   {
     E1(i) = exp(-(a[i]*s0[i]));
     E2(i) = exp(-(b[i]*s0[i]));
@@ -326,8 +331,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
   vnl_matrix<double> R2(a.size(), 15);
   std::vector<unsigned int> I(a.size());
 
-  for (int i=0; i<AM.rows(); i++){
-    for (int j=0; j<AM.cols(); j++){
+  for (unsigned int i=0; i<AM.rows(); i++){
+    for (unsigned int j=0; j<AM.cols(); j++){
       if (delta0 < AM(i,j) && 2*(AM(i,j)+delta0*s15)<aM(i,j)-bM(i,j) && bM(i,j)>delta0 && aM(i,j)<1-delta0)
         R2(i,j) = (AM(i,j)-A(i))*(AM(i,j)-A(i))+ (aM(i,j)-a(i))*(aM(i,j)-a(i))+(bM(i,j)-b(i))*(bM(i,j)-b(i));
       else
@@ -345,7 +350,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType,
     I[i] = index;
   }
 
-  for (int i=0; i < A.size(); i++){
+  for (unsigned int i=0; i < A.size(); i++){
     A(i) = AM(i,(int)I[i]);
     a(i) = aM(i,(int)I[i]);
     b(i) = bM(i,(int)I[i]);
@@ -357,7 +362,7 @@ template<class TReferenceImagePixelType, class TGradientImagePixelType, class TO
 void DiffusionMultiShellQballReconstructionImageFilter<TReferenceImagePixelType, TGradientImagePixelType, TOdfPixelType,NOrderL, NrOdfDirections>
 ::S_S0Normalization( vnl_vector<double> & vec, double S0 )
 {
-  for(int i = 0; i < vec.size(); i++)
+  for(unsigned int i = 0; i < vec.size(); i++)
   {
     if (S0==0)
       S0 = 0.01;
@@ -370,7 +375,7 @@ template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::DoubleLogarithm(vnl_vector<double> & vec)
 {
-  for(int i = 0; i < vec.size(); i++)
+  for(unsigned int i = 0; i < vec.size(); i++)
   {
     vec[i] = log(-log(vec[i]));
   }
@@ -422,19 +427,19 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        int interp_SHOrder_shell1 = 20;
+        int interp_SHOrder_shell1 = 12;
         while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
           interp_SHOrder_shell1 -= 2 ;
 
         const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
 
-        int interp_SHOrder_shell2 = 20;
+        int interp_SHOrder_shell2 = 12;
         while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
           interp_SHOrder_shell2 -= 2 ;
 
         const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
 
-        int interp_SHOrder_shell3 = 20;
+        int interp_SHOrder_shell3 = 12;
         while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
           interp_SHOrder_shell3 -= 2 ;
 
@@ -555,7 +560,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int NumberOfThreads)
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int /*NumberOfThreads*/)
 {
 
   itk::TimeProbe clock;
@@ -603,7 +608,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   IndiciesVector SignalIndicies = it->second;
   IndiciesVector BZeroIndicies = m_BValueMap[0];
 
-  int NumbersOfGradientIndicies = SignalIndicies.size();
+  unsigned int NumbersOfGradientIndicies = SignalIndicies.size();
 
   typedef typename GradientImagesType::PixelType         GradientVectorType;
 
@@ -615,8 +620,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     OdfPixelType odf(0.0);
 
     double b0average = 0;
-    const int b0size = BZeroIndicies.size();
-    for(unsigned int i = 0; i <b0size ; ++i)
+    const unsigned int b0size = BZeroIndicies.size();
+    for(unsigned int i = 0; i < b0size ; ++i)
     {
       b0average += b[BZeroIndicies[i]];
     }
@@ -768,7 +773,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
     double shell2b0Norm =0;
     double shell3b0Norm =0;
     double b0average = 0;
-    const int b0size = BZeroIndicies.size();
+    const unsigned int b0size = BZeroIndicies.size();
 
     if(b0size == 1)
     {
@@ -778,7 +783,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       b0average = b[BZeroIndicies[0]];
     }else if(b0size % 3 ==0)
     {
-      for(unsigned int i = 0; i <b0size ; ++i)
+      for(unsigned int i = 0; i < b0size ; ++i)
       {
         if(i < b0size / 3)                          shell1b0Norm += b[BZeroIndicies[i]];
         if(i >= b0size / 3 && i < (b0size / 3)*2)   shell2b0Norm += b[BZeroIndicies[i]];
@@ -822,11 +827,11 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       *///fsl fix -------------------------------------------ende--
 
       ///correct version
-      for(int i = 0 ; i < Shell1Indiecies.size(); i++)
+      for(unsigned int i = 0 ; i < Shell1Indiecies.size(); i++)
         DataShell1[i] = static_cast<double>(b[Shell1Indiecies[i]]);
-      for(int i = 0 ; i < Shell2Indiecies.size(); i++)
+      for(unsigned int i = 0 ; i < Shell2Indiecies.size(); i++)
         DataShell2[i] = static_cast<double>(b[Shell2Indiecies[i]]);
-      for(int i = 0 ; i < Shell3Indiecies.size(); i++)
+      for(unsigned int i = 0 ; i < Shell3Indiecies.size(); i++)
         DataShell3[i] = static_cast<double>(b[Shell3Indiecies[i]]);
 
       // Normalize the Signal: Si/S0
@@ -879,7 +884,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       Projection3(PValues, AlphaValues, BetaValues);
 
-      for(int i = 0 ; i < m_MaxDirections; i++)
+      for(unsigned int i = 0 ; i < m_MaxDirections; i++)
       {
         const double fac = (PValues[i] * 2 ) / (AlphaValues[i] - BetaValues[i]);
         lambda = 0.5 + 0.5 * std::sqrt(1 - fac * fac);;
@@ -1044,7 +1049,7 @@ template< class T, class TG, class TO, int L, int NOdfDirections>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 ::ComputeSphericalFromCartesian(vnl_matrix<double> * Q,  IndiciesVector const & refShell)
 {
-  for(int i = 0; i < refShell.size(); i++)
+  for(unsigned int i = 0; i < refShell.size(); i++)
   {
     double x = m_GradientDirectionContainer->ElementAt(refShell[i]).normalize().get(0);
     double y = m_GradientDirectionContainer->ElementAt(refShell[i]).normalize().get(1);
@@ -1185,11 +1190,11 @@ bool DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   mapIterator++;
   IndiciesVector shell3 = mapIterator->second;
 
-  for (int i=0; i< shell1.size(); i++)
+  for (unsigned int i=0; i< shell1.size(); i++)
     if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell1[i]), m_GradientDirectionContainer->ElementAt(shell2[i])))  <= 0.9998) {interp_flag=true; break;}
-  for (int i=0; i< shell1.size(); i++)
+  for (unsigned int i=0; i< shell1.size(); i++)
     if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell1[i]), m_GradientDirectionContainer->ElementAt(shell3[i])))  <= 0.9998) {interp_flag=true; break;}
-  for (int i=0; i< shell1.size(); i++)
+  for (unsigned int i=0; i< shell1.size(); i++)
     if (fabs(dot(m_GradientDirectionContainer->ElementAt(shell2[i]), m_GradientDirectionContainer->ElementAt(shell3[i])))  <= 0.9998) {interp_flag=true; break;}
   return interp_flag;
 }

@@ -123,6 +123,8 @@ private:
         Mode_Standard1Shell
     };
 
+    ReconstructionType m_ReconstructionType;
+
     // Interpolation
     bool m_Interpolation_Flag;
     vnl_matrix< double > * m_Interpolation_SHT1_inv;
@@ -131,7 +133,7 @@ private:
     vnl_matrix< double > * m_TARGET_SH_shell1;
     vnl_matrix< double > * m_TARGET_SH_shell2;
     vnl_matrix< double > * m_TARGET_SH_shell3;
-    int m_MaxDirections;
+    unsigned int m_MaxDirections;
 
     vnl_matrix< double > * m_CoeffReconstructionMatrix;
     vnl_matrix< double > * m_ODFSphericalHarmonicBasisMatrix;
@@ -164,7 +166,7 @@ private:
 
     //int m_NumberCoefficients;
 
-    ReconstructionType m_ReconstructionType;
+
 
     void ComputeReconstructionMatrix(IndiciesVector const & refVector);
     void ComputeODFSHBasis();
@@ -193,7 +195,7 @@ private:
     {
       vnl_vector<WntValue> result(v1.size());
 
-      for(int i = 0 ; i < v1.size(); i++)
+      for(unsigned int i = 0 ; i < v1.size(); i++)
            result[i] = static_cast< WntValue>(v1[i]);
 
       return result;

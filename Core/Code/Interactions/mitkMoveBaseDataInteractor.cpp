@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkMoveSurfaceInteractor.h"
+#include "mitkMoveBaseDataInteractor.h"
 #include "mitkSurface.h"
 #include "mitkInteractionConst.h"
 #include <mitkDataNode.h>
@@ -27,13 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 
 //## Default Constructor
-mitk::MoveSurfaceInteractor
-::MoveSurfaceInteractor(const char * type, DataNode* dataNode)
+mitk::MoveBaseDataInteractor
+::MoveBaseDataInteractor(const char * type, DataNode* dataNode)
 :Interactor(type, dataNode)
 {
 }
 
-mitk::MoveSurfaceInteractor::~MoveSurfaceInteractor()
+mitk::MoveBaseDataInteractor::~MoveBaseDataInteractor()
 {
     mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
     if ( color.IsNull() )
@@ -49,7 +49,7 @@ mitk::MoveSurfaceInteractor::~MoveSurfaceInteractor()
 }
 
 
-bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
+bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
   bool ok = false;
 
@@ -68,7 +68,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       mitk::DisplayPositionEvent const *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
       if (posEvent == NULL)
       {
-        MITK_WARN<<"Wrong usage of mitkMoveSurfaceInteractor! Aborting interaction!\n";
+        MITK_WARN<<"Wrong usage of mitkMoveBaseDataInteractor! Aborting interaction!\n";
         return false;
       }
 
@@ -160,7 +160,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       mitk::BaseData* surface = dynamic_cast<mitk::BaseData*>(m_DataNode->GetData());
       if ( surface == NULL )
       {
-        MITK_WARN<<"MoveSurfaceInteractor got wrong type of data! Aborting interaction!\n";
+        MITK_WARN<<"MoveBaseDataInteractor got wrong type of data! Aborting interaction!\n";
         return false;
       }
       Geometry3D* geometry = surface->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
@@ -184,8 +184,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
 }
 
 /**
-\example mitkMoveSurfaceInteractor.cpp
+\example mitkMoveBaseDataInteractor.cpp
  * This is an example of how to implement a new Interactor.
  * See more details about this example in tutorial Step10.
  */
-

@@ -25,12 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 //for the interaction
-#include <mitkMoveSurfaceInteractor.h>
+#include <mitkMoveBaseDataInteractor.h>
 #include "mitkGlobalInteraction.h"
 
 //##Documentation
 //## @brief Load two or more surfaces (stl format, see e.g. Core/Code/Testing/data directory for binary.stl) and display it in a 3D view.
-//## The MoveSurfaceInteractor explained in tutorial Step10.dox is used to move the surfaces in 3D by arrow keys in combination
+//## The MoveBaseDataInteractor explained in tutorial Step10.dox is used to move the surfaces in 3D by arrow keys in combination
 //## with and without Shift key. Use two surfaces to see that the objects and not the camera are moving.
 int main(int argc, char* argv[])
 {
@@ -95,8 +95,8 @@ int main(int argc, char* argv[])
     // create interactor
     // use it with up, down (->z direction), left and right (x-direction) arrow keys. Also hold Shift to translate in y direction.
     // see state machine pattern SelectAndMoveObjectWithArrowKeys in file StateMachine.xml for definition of interaction or use the StatemachineEditor.
-    mitk::MoveSurfaceInteractor::Pointer surfaceInteractor =
-      mitk::MoveSurfaceInteractor::New("SelectAndMoveObjectWithArrowKeys",node);
+    mitk::MoveBaseDataInteractor::Pointer surfaceInteractor =
+      mitk::MoveBaseDataInteractor::New("SelectAndMoveObjectWithArrowKeys",node);
 
     //activate interactor at interaction controller:
     mitk::GlobalInteraction::GetInstance()->AddInteractor(surfaceInteractor);

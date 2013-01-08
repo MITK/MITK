@@ -59,7 +59,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   std::string strButtonState;
   MouseButtons buttonState = NoButton;
   std::string strKey;
-  char key;
+  std::string key;
   std::string strWheelDelta;
   int wheelDelta;
   std::string strSignalName = "";
@@ -140,11 +140,11 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   // Key
   if (!list->GetStringProperty(KEY.c_str(), strKey))
   {
-    key = 0;
+    key = "";
   }
   else
   {
-    key = strKey.at(0);
+    key = strKey;
   }
   // WheelDelta
   if (!list->GetStringProperty(WHEELDELTA.c_str(), strWheelDelta))
@@ -188,7 +188,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "InternalEvent")
   {
-    event = InternalEvent::New(NULL,strSignalName);
+    event = InternalEvent::New(NULL,NULL,strSignalName);
   }
   return event;
 }

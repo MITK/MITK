@@ -16,6 +16,7 @@
 
 #include "mitkDispatcher.h"
 #include "mitkInteractionEvent.h"
+#include "mitkInternalEvent.h"
 
 mitk::Dispatcher::Dispatcher()
 {
@@ -67,7 +68,18 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
+  MITK_INFO << event->GetEventClass();
   bool eventIsHandled = false;
+
+  /* Filter out and handle Internal Events separately */
+  InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(event);
+  if (internalEvent != NULL) {
+    eventIsHandled = HandleInternalEvent(internalEvent);
+    // InternalEvents that are handled are not sent to the listeners
+    if (eventIsHandled) {
+      return true;
+    }
+  }
   switch (m_ProcessingMode)
   {
   case CONNECTEDMOUSEACTION:
@@ -103,7 +115,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   // Standard behavior. Is executed in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
-    // FixME sorting seems not to work
+
     m_Interactors.sort(cmp());// sorts interactors by layer (descending);
     for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end() && eventIsHandled == false;
         ++it)
@@ -121,7 +133,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     }
   }
 
-  // TODO: inform listeners
+  // TODO: inform listeners here
 
   // Process event queue
   if (!m_QueuedEvents.empty())
@@ -185,4 +197,16 @@ void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataIntera
     m_ProcessingMode = GRABINPUT;
     m_SelectedInteractor = dataInteractor;
   }
+}
+
+bool mitk::Dispatcher::HandleInternalEvent(InternalEvent* internalEvent)
+{
+  if (internalEvent->GetSignalName() == INTERNALDeleteMe && internalEvent->GetTargetInteractor() != NULL) {
+    internalEvent->GetTargetInteractor()->GetDataNode()->SetDataInteractor(NULL);
+    internalEvent->GetTargetInteractor()->SetDataNode(NULL);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return true;
+  }
+  return false;
 }

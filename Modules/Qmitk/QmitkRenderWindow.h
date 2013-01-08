@@ -24,6 +24,8 @@
 #include "QmitkRenderWindowMenu.h"
 
 #include "mitkInteractionEventConst.h"
+#include <string.h>
+
 
 class QmitkStdMultiWidget;
 class QDragEnterEvent;
@@ -163,7 +165,7 @@ private:
   mitk::MouseButtons GetButtonState(QWheelEvent* we);
   mitk::ModifierKeys GetModifiers(QWheelEvent* we);
   mitk::ModifierKeys GetModifiers(QKeyEvent* ke);
-  char GetKeyLetter(QKeyEvent* ke);
+  std::string GetKeyLetter(QKeyEvent* ke);
   int GetDelta(QWheelEvent* we);
 
   bool m_ResendQtEvents;

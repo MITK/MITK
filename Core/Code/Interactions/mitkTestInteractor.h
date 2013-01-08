@@ -51,6 +51,7 @@ namespace mitk
     bool SelectPoint(StateMachineAction* , InteractionEvent*);
     bool DeSelectPoint(StateMachineAction* , InteractionEvent*);
     bool DeleteSelectedPoint(StateMachineAction* , InteractionEvent*);
+    bool Abort(StateMachineAction* , InteractionEvent*);
 
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;

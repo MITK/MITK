@@ -39,6 +39,7 @@ namespace mitk
     REGULAR, GRABINPUT, PREFERINPUT, CONNECTEDMOUSEACTION
   };
 
+  class InternalEvent;
   class InteractionEvent;
   class MITK_CORE_EXPORT Dispatcher: public itk::Object
   {
@@ -87,7 +88,7 @@ namespace mitk
 
     struct cmp{
       bool operator()(DataInteractor::Pointer d1, DataInteractor::Pointer d2){
-        return (d1->GetLayer() < d2->GetLayer());
+        return (d1->GetLayer() > d2->GetLayer());
       }
     };
     std::list<DataInteractor::Pointer> m_Interactors;
@@ -128,6 +129,12 @@ namespace mitk
 
     void SetEventProcessingMode(DataInteractor::Pointer);
 
+    /*
+     * Function to handle special internal events,
+     * such as events that are directed at a specific DataInteractor,
+     * or the request to delete an Interactor and its DataNode.
+     */
+    bool HandleInternalEvent(InternalEvent* internalEvent);
 
   };
 

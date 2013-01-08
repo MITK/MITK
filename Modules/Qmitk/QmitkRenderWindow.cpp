@@ -150,7 +150,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 {
   mitk::ModifierKeys modifiers = GetModifiers(ke);
-  char key = GetKeyLetter(ke);
+  std::string key = GetKeyLetter(ke);
 
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
   if (!m_Renderer->GetDispatcher()->ProcessEvent(keyEvent.GetPointer()))
@@ -426,25 +426,56 @@ mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent* ke)
 {
   mitk::ModifierKeys modifiers = mitk::NoKey;
 
-  if (ke->modifiers() && Qt::ShiftModifier)
+  if (ke->modifiers() & Qt::ShiftModifier)
     modifiers = modifiers | mitk::ShiftKey;
-  if (ke->modifiers() && Qt::CTRL)
+  if (ke->modifiers() & Qt::CTRL)
     modifiers = modifiers | mitk::ControlKey;
-  if (ke->modifiers() && Qt::ALT)
+  if (ke->modifiers() & Qt::ALT)
     modifiers = modifiers | mitk::AltKey;
 
   return modifiers;
 }
 
-char QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
+std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
 {
-  // Converting Qt Key Event to ascii element.
-  // extract only standard letter keys, drop modifier keys
-  char ckey = 0;
+  // Converting Qt Key Event to string element.
+  std::string key = "";
   int tkey = ke->key();
-  if (tkey < 128)  // else only a modifier-key is pressed
-    ckey = tkey;
-  return ckey;
+  if (tkey < 128)
+  { //standard ascii letter
+    key = (char) tkey;
+  }
+  else
+  { // special keys
+    switch (tkey)
+    {
+    case Qt::Key_Return:
+      key = "Return";
+      break;
+    case Qt::Key_Enter:
+      key = "Enter";
+      break;
+    case Qt::Key_Escape:
+      key = "Escape";
+      break;
+    case Qt::Key_Delete:
+      key = "Delete";
+      break;
+    case Qt::Key_Up:
+      key = "ArrowUp";
+      break;
+    case Qt::Key_Down:
+      key = "ArrowDown";
+      break;
+    case Qt::Key_Left:
+      key = "ArrowLeft";
+      break;
+    case Qt::Key_Right:
+      key = "ArrowRight";
+      break;
+    }
+  }
+  return key;
 }
 
 int QmitkRenderWindow::GetDelta(QWheelEvent* we)

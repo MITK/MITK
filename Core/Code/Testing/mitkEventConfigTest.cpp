@@ -66,7 +66,7 @@ int mitkEventConfigTest(int /*argc*/, char* /*argv*/[])
   mitk::MouseMoveEvent::Pointer mme1 = mitk::MouseMoveEvent::New(NULL,pos,mitk::RightMouseButton | mitk::LeftMouseButton,mitk::ShiftKey );
   mitk::MouseMoveEvent::Pointer mme2 = mitk::MouseMoveEvent::New(NULL,pos,mitk::RightMouseButton,mitk::ShiftKey );
   mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(NULL,pos,mitk::RightMouseButton,mitk::ShiftKey,-2 );
-  mitk::InteractionKeyEvent::Pointer ke = mitk::InteractionKeyEvent::New(NULL,'l',mitk::NoKey );
+  mitk::InteractionKeyEvent::Pointer ke = mitk::InteractionKeyEvent::New(NULL,"l",mitk::NoKey );
 
 
   MITK_TEST_CONDITION_REQUIRED(

@@ -30,21 +30,29 @@
 
 namespace mitk
 {
+
+  // Constants for Internal commands that are understood by the Dispatcher
+  const std::string INTERNALDeleteMe = "DeleteMe";
+
+  class DataInteracor;
   class MITK_CORE_EXPORT InternalEvent : public InteractionEvent {
 
   public:
     mitkClassMacro(InternalEvent,InteractionEvent);
-    mitkNewMacro2Param(Self, BaseRenderer*, std::string);
+    mitkNewMacro3Param(Self, BaseRenderer*, DataInteractor*, std::string);
+
+    std::string GetSignalName();
+    DataInteractor* GetTargetInteractor();
 
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    InternalEvent(BaseRenderer*, std::string signalName);
+    InternalEvent(BaseRenderer*, DataInteractor* sourceInteractor, std::string signalName);
     virtual ~InternalEvent();
 
-    std::string GetSignalName();
 
   private:
+    DataInteractor* m_DataInteractor;
     std::string m_SignalName;
   };
 } /* namespace mitk */

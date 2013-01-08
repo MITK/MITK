@@ -39,9 +39,12 @@ void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer d
   }
 }
 
-
 mitk::BindDispatcherInteractor::~BindDispatcherInteractor()
 {
+  if (m_DataStorage.IsNotNull())
+  {
+    UnRegisterDataStorageEvents();
+  }
 }
 
 void mitk::BindDispatcherInteractor::RegisterInteractor(const mitk::DataNode* dataNode)
@@ -66,9 +69,9 @@ void mitk::BindDispatcherInteractor::RegisterDataStorageEvents()
 void mitk::BindDispatcherInteractor::UnRegisterInteractor(const DataNode* dataNode)
 {
   if (m_Dispatcher.IsNotNull())
-   {
-     m_Dispatcher->RemoveDataInteractor(dataNode);
-   }
+  {
+    m_Dispatcher->RemoveDataInteractor(dataNode);
+  }
 }
 
 mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher()
@@ -80,8 +83,6 @@ void mitk::BindDispatcherInteractor::SetDispatcher(Dispatcher::Pointer dispatche
 {
   m_Dispatcher = dispatcher;
 }
-
-
 
 void mitk::BindDispatcherInteractor::UnRegisterDataStorageEvents()
 {

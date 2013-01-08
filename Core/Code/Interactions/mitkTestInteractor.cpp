@@ -31,6 +31,7 @@ void mitk::TestInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("unselect", DeSelectPoint);
   CONNECT_FUNCTION("deleteselection", DeleteSelectedPoint);
   CONNECT_FUNCTION("colourme", ColorGreen);
+  CONNECT_FUNCTION("abort", Abort);
 }
 
 bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -46,7 +47,7 @@ bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* inter
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     if (m_NumberOfPoints >= 3)
     {
-      InternalEvent::Pointer event = InternalEvent::New(NULL, "has3points");
+      InternalEvent::Pointer event = InternalEvent::New(NULL,this, "has3points");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
     return true;
@@ -152,4 +153,12 @@ bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionE
     MITK_WARN<< "Impossible/unexpected State";
     return false;
   }
+}
+
+bool mitk::TestInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  MITK_INFO << "request abort";
+  InternalEvent::Pointer event = InternalEvent::New(NULL,this, INTERNALDeleteMe );
+  interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+  return true;
 }

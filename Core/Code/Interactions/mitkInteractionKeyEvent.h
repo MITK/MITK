@@ -24,6 +24,7 @@
 #include "mitkInteractionPositionEvent.h"
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEvent.h"
+#include <string.h>
 
 #include <MitkExports.h>
 
@@ -38,18 +39,18 @@ namespace mitk
 
   public:
     mitkClassMacro(InteractionKeyEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, char , ModifierKeys);
+    mitkNewMacro3Param(Self, BaseRenderer*, std::string , ModifierKeys);
 
     virtual bool isEqual(InteractionEvent::Pointer);
     ModifierKeys GetModifiers() const;
-    char GetKey() const;
+    std::string GetKey() const;
 
   protected:
-    InteractionKeyEvent(BaseRenderer*, char key, ModifierKeys modifiers);
+    InteractionKeyEvent(BaseRenderer*, std::string key, ModifierKeys modifiers);
     virtual ~InteractionKeyEvent();
 
   private:
-    char m_Key;
+    std::string m_Key;
     ModifierKeys m_Modifiers;
   };
 } /* namespace mitk */

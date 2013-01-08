@@ -32,7 +32,7 @@ namespace mitk
 {
 
   // Constants for Internal commands that are understood by the Dispatcher
-  const std::string INTERNALDeleteMe = "DeleteMe";
+  const std::string INTERNALDeactivateMe = "DeactivateMe";
 
   class DataInteracor;
   class MITK_CORE_EXPORT InternalEvent : public InteractionEvent {

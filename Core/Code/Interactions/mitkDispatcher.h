@@ -129,7 +129,7 @@ namespace mitk
 
     void SetEventProcessingMode(DataInteractor::Pointer);
 
-    /*
+    /**
      * Function to handle special internal events,
      * such as events that are directed at a specific DataInteractor,
      * or the request to delete an Interactor and its DataNode.

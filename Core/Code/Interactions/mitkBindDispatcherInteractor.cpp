@@ -16,6 +16,7 @@
 
 #include "mitkBindDispatcherInteractor.h"
 #include "mitkMessage.h"
+#include <string.h>
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor()
 {
@@ -59,7 +60,8 @@ void mitk::BindDispatcherInteractor::RegisterInteractor(const mitk::DataNode* da
 void mitk::BindDispatcherInteractor::RegisterDataStorageEvents()
 {
   m_DataStorage->AddNodeEvent.AddListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>( this, &BindDispatcherInteractor::RegisterInteractor));
+
   m_DataStorage->RemoveNodeEvent.AddListener(
       MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
   m_DataStorage->ChangedNodeEvent.AddListener(

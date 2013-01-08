@@ -158,7 +158,7 @@ bool mitk::TestInteractor::DeleteSelectedPoint(StateMachineAction*, InteractionE
 bool mitk::TestInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   MITK_INFO << "request abort";
-  InternalEvent::Pointer event = InternalEvent::New(NULL,this, INTERNALDeleteMe );
+  InternalEvent::Pointer event = InternalEvent::New(NULL,this, INTERNALDeactivateMe );
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
   return true;
 }

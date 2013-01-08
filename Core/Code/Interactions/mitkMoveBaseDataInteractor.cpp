@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkMoveBaseDataInteractor.h"
-#include "mitkSurface.h"
 #include "mitkInteractionConst.h"
 #include <mitkDataNode.h>
 #include "mitkDisplayPositionEvent.h"
@@ -156,14 +155,7 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
       movementVector.SetElement(1, (float) yP->GetValue());
       movementVector.SetElement(2, (float) zP->GetValue());
 
-      //checking corresponding Data; has to be a surface or a subclass
-      mitk::BaseData* surface = dynamic_cast<mitk::BaseData*>(m_DataNode->GetData());
-      if ( surface == NULL )
-      {
-        MITK_WARN<<"MoveBaseDataInteractor got wrong type of data! Aborting interaction!\n";
-        return false;
-      }
-      Geometry3D* geometry = surface->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
+      Geometry3D* geometry = m_DataNode->GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
       geometry->Translate(movementVector);
 
       // indicate modification of data tree node

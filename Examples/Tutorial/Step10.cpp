@@ -17,9 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkSTLFileReader.h>
-#include <mitkSurface.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -29,9 +28,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGlobalInteraction.h"
 
 //##Documentation
-//## @brief Load two or more surfaces (stl format, see e.g. Core/Code/Testing/data directory for binary.stl) and display it in a 3D view.
+//## @brief Load two or more surfaces (or objects) (e.g. ../mitk-superbuild-release/CMakeExternals/Source/MITK-Data/ball.stl) and display it in a 3D view.
 //## The MoveBaseDataInteractor explained in tutorial Step10.dox is used to move the surfaces in 3D by arrow keys in combination
 //## with and without Shift key. Use two surfaces to see that the objects and not the camera are moving.
+//## @Warning: In principle, the MoveBaseDataInteractor can move any object
+//## and IOUtil can be used to load any object, however, there are no helper
+//## planes in this example added to scene. Thus, no image is displayed in
+//## the 3D renderwindow (and nothing can be moved/visualized/picked). The
+//## data repository contains some pointsets with a single point. For unknown
+//## reasons, the picking does not work on pointsets with just one point.
+//## You have to use pointsets like:
+//## ../mitk-superbuild-release/CMakeExternals/Source/MITK-Data/RenderingTestData/openMeAlone.mps
+//## in order to perform the picking/moving.
 int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );
@@ -56,62 +64,46 @@ int main(int argc, char* argv[])
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-
   //*************************************************************************
-  // Part II: Create surface data by reading an stl file
+  // Part II: Create objects by reading files
   //*************************************************************************
 
   for(int i=1; i<argc; ++i)
   {
-    // For testing
+    //For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a STLFileReader to read a .stl-file
-    mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
-    const char * filename = argv[i];
+    //create a container node for the data
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    //try to read a file
+    std::string filename = argv[i];
     try
     {
-      reader->SetFileName(filename);
-      reader->Update();
+        //try to read the file with IOUtil which offers lots of I/O methods
+        node = mitk::IOUtil::LoadDataNode(filename);
+        // Add the node to the DataStorage
+        ds->Add(node);
     }
-    catch(...)
+    catch(mitk::Exception &e)
     {
-      fprintf( stderr, "Could not open file %s \n\n", filename );
-      exit(2);
+        MITK_ERROR << "An exception occured! Message: " << e.what();
+        exit(2);
     }
-
-    //*************************************************************************
-    // Part III: Put the data into the datastorage
-    //*************************************************************************
-
-    // Create a node and add the Image (which is read from the file) to it
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(reader->GetOutput());
-
-    // *******************************************************
-    // ****************** START OF NEW PART ******************
-    // *******************************************************
-
     // create interactor
     // use it with up, down (->z direction), left and right (x-direction) arrow keys. Also hold Shift to translate in y direction.
     // see state machine pattern SelectAndMoveObjectWithArrowKeys in file StateMachine.xml for definition of interaction or use the StatemachineEditor.
-    mitk::MoveBaseDataInteractor::Pointer surfaceInteractor =
+    mitk::MoveBaseDataInteractor::Pointer moveBaseDataInteractor =
       mitk::MoveBaseDataInteractor::New("SelectAndMoveObjectWithArrowKeys",node);
 
     //activate interactor at interaction controller:
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(surfaceInteractor);
-
-    // *******************************************************
-    // ******************* END OF NEW PART *******************
-    // *******************************************************
-
-    // Add the node to the DataStorage
-    ds->Add(node);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(moveBaseDataInteractor);
 
     //doesn't have to be done, but nicer! Is destroyed when leaving the sccope anyway
-    reader = NULL;
-    surfaceInteractor = NULL;
+    moveBaseDataInteractor = NULL;
   }
+  // *******************************************************
+  // ******************* END OF NEW PART *******************
+  // *******************************************************
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it
@@ -136,8 +128,8 @@ int main(int argc, char* argv[])
   renderWindow.show();
   renderWindow.resize( 256, 256 );
 
-  MITK_INFO<<"Select an object with a mouse click. Use arrow keys (also with shift-key) to move the surface.\n";
-  MITK_INFO<<"Deselecting and selecting an other surface by clicking onto it. Selected surfaces turn yellow, deselected blue.\n";
+  MITK_INFO<<"Select an object with a mouse click. Use arrow keys (also with shift-key) to move the object.\n";
+  MITK_INFO<<"Deselecting and selecting an other object by clicking onto it. Selected objects turn green, deselected blue.\n";
 
   // for testing
   #include "QtTesting.h"

@@ -11,6 +11,7 @@ If you are absolutely new to MITK you might want to read up on setting up MITK t
 <ul>
  <li> \subpage HowToNewProject "A comprehensive guide to setting up your own MITK project"
  <li> \ref BuildInstructionsPage "Building MITK"
+ <li> \ref CMAKE_FAQ
 </ul>
 
 \section TutorialSection Tutorial chapters

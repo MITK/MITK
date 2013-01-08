@@ -16,11 +16,11 @@ Here you have again two options.
 
 \subsection ShortIntroductionToMITKAsFrameworkExtendingWorkbench I want use the MITK Workbench and extend its capabilities
 
-You are using MITK as software framework and writing your own modules and plugins for MITK. You want to read the \ref BuildInstructionsPage and further on \ref Development.
+You are using MITK as software framework and writing your own modules and plugins for MITK. You want to read the \ref BuildInstructionsPage and further on \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
 
 \subsection ShortIntroductionToMITKAsFrameworkExternalProject I want to create my own application based on MITK but with major customizations and changes
 
-This is probably the most common way to use MITK. You are using MITK as software framework and building your own project and application using MITK. You want to read \ref HowToNewProject and the general information in \ref Development.
+This is probably the most common way to use MITK. You are using MITK as software framework and building your own project and application using MITK. You want to read \ref HowToNewProject and the general information in \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
 
 \section ShortIntroductionToMITKAsFrameworkEndUser I want to use the MITK Workbench to do image processing
 

@@ -15,10 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKMOVESURFACEINTERACTOR_H_HEADER_INCLUDED
-#define MITKMOVESURFACEINTERACTOR_H_HEADER_INCLUDED
+#ifndef MITKMoveBaseDataInteractor_H_HEADER_INCLUDED
+#define MITKMoveBaseDataInteractor_H_HEADER_INCLUDED
 
 #include <mitkInteractor.h>
+#include <mitkColorProperty.h>
 
 namespace mitk
 {
@@ -29,10 +30,10 @@ namespace mitk
    *
    * \ingroup Interaction
    */
-  class MITK_CORE_EXPORT MoveSurfaceInteractor : public Interactor
+  class MITK_CORE_EXPORT MoveBaseDataInteractor : public Interactor
   {
   public:
-    mitkClassMacro(MoveSurfaceInteractor, Interactor);
+    mitkClassMacro(MoveBaseDataInteractor, Interactor);
     mitkNewMacro2Param(Self, const char*, DataNode*);
 
     /**
@@ -53,24 +54,26 @@ namespace mitk
     /**
      * \brief Constructor
      */
-    MoveSurfaceInteractor(const char * type, DataNode* dataNode);
+    MoveBaseDataInteractor(const char * type, DataNode* dataNode);
 
     /**
      * \brief Default Destructor
      **/
-    virtual ~MoveSurfaceInteractor();
+    virtual ~MoveBaseDataInteractor();
 
     /**
     * @brief Convert the given Actions to Operations and send to data and UndoController
     **/
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+
+    mitk::ColorProperty::Pointer m_NodeColor;
   };
 }
 
 /**
-\example mitkMoveSurfaceInteractor.h
+\example mitkMoveBaseDataInteractor.h
  * This is an example of how to implement a new Interactor.
  * See more details about this example in tutorial Step10.
  */
 
-#endif /* MITKMOVESURFACEINTERACTOR_H_HEADER_INCLUDED */
+#endif /* MITKMoveBaseDataInteractor_H_HEADER_INCLUDED */

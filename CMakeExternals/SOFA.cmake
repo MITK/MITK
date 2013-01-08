@@ -114,27 +114,27 @@ message(STATUS \"extracting... done\")")
   set(download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-sofa.cmake)
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-sofa.cmake)
 
-  set(file "sofa-rev${rev}-patch.zip")
-  set(md5 "1584acde8a206d96b837c2b04855667e")
+  set(file "sofa-rev${rev}-gl.zip")
+  set(md5 "5e21312e2bff45cbff1979bfb6249a9f")
 
   write_downloadfile_script(
-    "${stamp_dir}/download-patch.cmake"
+    "${stamp_dir}/download-gl.cmake"
     "${url_base}${file}"
     "${download_dir}/${file}"
     "${md5}"
   )
 
   write_extractfile_script(
-    "${stamp_dir}/extract-patch.cmake"
+    "${stamp_dir}/extract-gl.cmake"
     "${download_dir}/${file}"
     "${source_dir}"
   )
 
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-patch.cmake)
-  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-patch.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-gl.cmake)
+  list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-gl.cmake)
 
   set(file "sofa-rev${rev}-cmake.zip")
-  set(md5 "8235d8790e084fe8209ef74bfb353dcd")
+  set(md5 "8381ec98ad47b48f34d19b836bc1063c")
 
   write_downloadfile_script(
     "${stamp_dir}/download-cmake.cmake"
@@ -152,12 +152,15 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/download-cmake.cmake)
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-cmake.cmake)
 
+  set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev8935.cmake)
+
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}
       SOURCE_DIR ${source_dir}
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       DOWNLOAD_COMMAND "${download_cmd}"
+      PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

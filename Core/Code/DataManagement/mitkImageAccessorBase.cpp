@@ -49,12 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
         if(m_Image->GetSource()->Updating()==false)
           m_Image->GetSource()->UpdateOutputInformation();
       }
-      m_Image->m_CompleteData=m_Image->GetChannelData();
 
-      // update channel's data
-      // if data was not available at creation point, the m_Data of channel descriptor is NULL
-      // if data present, it won't be overwritten
-      m_Image->m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_Image->m_CompleteData->m_Data);
 
       // Investigate 4 cases of possible image parts/regions
 

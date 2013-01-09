@@ -45,19 +45,13 @@ typedef itk::SmartPointer<mitk::Image> ImagePointer;
      *  \param Image::Pointer specifies the associated Image
      */
     ImageVtkAccessor(
-      ImagePointer iP
+      ImagePointer iP,
+      ImageDataItem* iDI
     );
 
   public:
 
-  static ImageVtkAccessor *New(ImagePointer); /* {
-    vtkObject* object = vtkObjectFactory::CreateInstance("ImageVtkAccessor");
-    if(object)
-    {
-      return static_cast<ImageVtkAccessor*>(object);
-    }
-    else return new ImageVtkAccessor;
-  }*/
+  static ImageVtkAccessor *New(ImagePointer, const ImageDataItem*);
 
   //vtkTypeMacro(ImageVtkAccessor,vtkDataSet)
 

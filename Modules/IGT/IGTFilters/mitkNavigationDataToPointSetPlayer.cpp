@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //for the pause
 #include <itksys/SystemTools.hxx>
-
-#include <mitkTimeStamp.h>
 #include <fstream>
 #include <sstream>
 

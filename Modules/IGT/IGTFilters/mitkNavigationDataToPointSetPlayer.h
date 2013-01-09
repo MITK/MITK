@@ -151,7 +151,7 @@ namespace mitk
     unsigned int m_NumberOfSnapshots;
     int m_LastGoTo;
 
-    std::vector<PointSet> m_NDPointSet;
+    std::vector<mitk::PointSet::Pointer> m_NDPointSet;
   };
 } // namespace mitk
 

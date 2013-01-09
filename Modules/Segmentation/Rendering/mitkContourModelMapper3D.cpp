@@ -199,9 +199,9 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromCo
       mitk::ContourModel::VertexType* currentControlPoint = *current;
       mitk::ContourModel::VertexType* nextControlPoint = *next;
 
-      if( currentControlPoint->Coordinates[0] != nextControlPoint->Coordinates[0] &&
-          currentControlPoint->Coordinates[1] != nextControlPoint->Coordinates[1] &&
-          currentControlPoint->Coordinates[2] != nextControlPoint->Coordinates[2])
+      if( !(currentControlPoint->Coordinates[0] == nextControlPoint->Coordinates[0] &&
+          currentControlPoint->Coordinates[1] == nextControlPoint->Coordinates[1] &&
+          currentControlPoint->Coordinates[2] == nextControlPoint->Coordinates[2]))
       {
         vtkIdType p1 = points->InsertNextPoint(currentControlPoint->Coordinates[0], currentControlPoint->Coordinates[1], currentControlPoint->Coordinates[2]);
         vtkIdType p2 = points->InsertNextPoint(nextControlPoint->Coordinates[0], nextControlPoint->Coordinates[1], nextControlPoint->Coordinates[2]);

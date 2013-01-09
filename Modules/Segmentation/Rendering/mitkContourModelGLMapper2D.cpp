@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkContourModel.h"
+#include "mitkContourModelSubDivisionFilter.h"
 #include <vtkLinearTransform.h>
 
 #include "mitkGL.h"
@@ -43,14 +44,37 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   int timestep = renderer->GetTimeStep();
 
   mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput());
+  mitk::ContourModel::Pointer renderingContour = input;
 
-  input->UpdateOutputInformation();
+  bool subdivision = false;
+  this->GetDataNode()->GetBoolProperty( "subdivision curve", subdivision, renderer );
+  if (subdivision)
+  {
+
+    mitk::ContourModel::Pointer subdivContour = mitk::ContourModel::New();
+
+    mitk::ContourModelSubDivisionFilter::Pointer subdivFilter = mitk::ContourModelSubDivisionFilter::New();
+
+    subdivFilter->SetInput(input);
+    subdivFilter->Update();
+
+    subdivContour = subdivFilter->GetOutput();
+
+    if(subdivContour->GetNumberOfVertices() == 0 )
+    {
+      subdivContour = input;
+    }
+
+    renderingContour = subdivContour;
+  }
+
+  renderingContour->UpdateOutputInformation();
 
 
-  if( input->GetMTime() < this->m_LastUpdateTime )
+  if( renderingContour->GetMTime() < this->m_LastUpdateTime )
     updateNeccesary = false;
 
-  if(input->GetNumberOfVertices(timestep) < 1)
+  if(renderingContour->GetNumberOfVertices(timestep) < 1)
     updateNeccesary = false;
 
   if (updateNeccesary)
@@ -62,7 +86,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("color", renderer));
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.color", renderer));
     if(colorprop)
     {
       //set the color of the contour
@@ -72,7 +96,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       glColor4f(red,green,blue,0.5);
     }
 
-    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("pointcolor", renderer));
+    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("points.color", renderer));
     if(!selectedcolor)
     {
       selectedcolor = mitk::ColorProperty::New(1.0,0.0,0.1);
@@ -88,19 +112,19 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("width")) != NULL)
-      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("width"))->GetValue();
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contour.width")) != NULL)
+      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("contour.width"))->GetValue();
     glLineWidth(lineWidth);
 
 
     bool drawit=false;
 
-    mitk::ContourModel::VertexIterator pointsIt = input->IteratorBegin(timestep);
+    mitk::ContourModel::VertexIterator pointsIt = renderingContour->IteratorBegin(timestep);
 
     Point2D pt2d;       // projected_p in display coordinates
     Point2D lastPt2d;
 
-    while ( pointsIt != input->IteratorEnd(timestep) )
+    while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
       lastPt2d = pt2d;
 
@@ -132,7 +156,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(drawit)
       {
         //lastPt2d is not valid in first step
-        if( !(pointsIt == input->IteratorBegin(timestep)) )
+        if( !(pointsIt == renderingContour->IteratorBegin(timestep)) )
         {
           glBegin (GL_LINES);
           glVertex2f(pt2d[0], pt2d[1]);
@@ -175,10 +199,10 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }//end while iterate over controlpoints
 
     //close contour if necessary
-    if(input->IsClosed(timestep) && drawit)
+    if(renderingContour->IsClosed(timestep) && drawit)
     {
       lastPt2d = pt2d;
-      point = input->GetVertexAt(0,timestep)->Coordinates;
+      point = renderingContour->GetVertexAt(0,timestep)->Coordinates;
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
@@ -193,10 +217,10 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     }
 
     //draw selected vertex if exists
-    if(input->GetSelectedVertex())
+    if(renderingContour->GetSelectedVertex())
     {
       //transform selected vertex
-      point = input->GetSelectedVertex()->Coordinates;
+      point = renderingContour->GetSelectedVertex()->Coordinates;
 
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
@@ -240,9 +264,9 @@ const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
-  node->AddProperty( "pointcolor", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
-  node->AddProperty( "width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
+  node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
+  node->AddProperty( "points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
+  node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
 

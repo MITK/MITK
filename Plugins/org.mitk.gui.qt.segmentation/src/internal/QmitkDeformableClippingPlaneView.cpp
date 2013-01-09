@@ -198,33 +198,45 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 {
   if (m_ToolManager->GetReferenceData(0)!= NULL)
   {
-    m_Controls.volumeGroupBox->setEnabled(m_ToolManager->GetWorkingData(0)!= NULL);
     m_Controls.noSelectedImageLabel->hide();
     m_Controls.selectedImageLabel->setText(QString::fromUtf8(m_ToolManager->GetReferenceData(0)->GetName().c_str()));
 
-    //clear list --> than search for all shown clipping plans (max 7 planes)
-    m_Controls.selectedVolumePlanesLabel->setText("");
-    m_Controls.planesWarningLabel->hide();
-    int volumePlanes=0;
-
-    mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
+    if (m_ToolManager->GetWorkingData(0)!= NULL)
     {
-      bool isVisible(false);
-      itPlanes.Value()->GetBoolProperty("visible",isVisible);
-      if (isVisible)
+      bool isSegmentation(false);
+      m_ToolManager->GetReferenceData(0)->GetBoolProperty("binary", isSegmentation);
+      m_Controls.volumeGroupBox->setEnabled(isSegmentation);
+
+      //clear list --> than search for all shown clipping plans (max 7 planes)
+      m_Controls.selectedVolumePlanesLabel->setText("");
+      m_Controls.planesWarningLabel->hide();
+      int volumePlanes=0;
+
+      mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
+      for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
       {
-        if (volumePlanes<7)
+        bool isVisible(false);
+        itPlanes.Value()->GetBoolProperty("visible",isVisible);
+        if (isVisible)
         {
-          volumePlanes ++;
-          m_Controls.selectedVolumePlanesLabel->setText(m_Controls.selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
-        }
-        else
-        {
-          m_Controls.planesWarningLabel->show();
-          return;
+          if (volumePlanes<7)
+          {
+            volumePlanes ++;
+            m_Controls.selectedVolumePlanesLabel->setText(m_Controls.selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
+          }
+          else
+          {
+            m_Controls.planesWarningLabel->show();
+            return;
+          }
         }
       }
+    }
+    else
+    {
+      m_Controls.volumeGroupBox->setEnabled(false);
+      m_Controls.selectedVolumePlanesLabel->setText("");
+      m_Controls.volumeList->clear();
     }
   }
 

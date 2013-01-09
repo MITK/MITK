@@ -328,8 +328,7 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );
   glDisable( GL_DEPTH_TEST );
   glDisable( GL_LIGHTING );
-  // fix for previous workaround in renderfunction
-  // disable the texturing here so crosshair is painted in teh correct colors
+  // disable the texturing here so crosshair is painted in the correct colors
   // vtk will reenable texturing every time it is needed
   glDisable( GL_TEXTURE_1D );
   glDisable( GL_TEXTURE_2D );

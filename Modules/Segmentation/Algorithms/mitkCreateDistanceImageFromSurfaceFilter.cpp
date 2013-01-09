@@ -211,10 +211,13 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   Vector3D extentMM;
   for (unsigned int dim = 0; dim < 3; ++dim)
   {
-    extentMM[dim] = std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
+    extentMM[dim] = (int)
+      (
+                    (std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
                               (DistanceImageType::IndexType::IndexValueType) 1
-                            )
-                    * m_ReferenceImage->GetSpacing()[dim];
+                            ) + 1.0) // (max-index - min-index)+1 because the pixels between index 3 and 5 cover 2+1=3 pixels (pixel 3,4, and 5)
+                    * m_ReferenceImage->GetSpacing()[dim]
+      ) + 1; // (int) ((...) + 1) -> we round up to the next BIGGER int value
   }
 
   /*
@@ -299,6 +302,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   // Transform the input point in world-coordinates to index-coordinates
   DistanceImageType::IndexType currentIndex;
   distanceImg->TransformPhysicalPointToIndex( currentPointAsPoint, currentIndex );
+
+  assert( lpRegion.IsInside(currentIndex) ); // we are quite certain this should hold
 
   narrowbandPoints.push(currentIndex);
   distanceImg->SetPixel(currentIndex, distance);

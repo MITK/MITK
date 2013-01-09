@@ -391,7 +391,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   if(imageNode.IsNull() || !isSegmentation)
   {
-    MITK_INFO << "No segmentation selected! Can't calculate volume";
+    MITK_ERROR << "No segmentation selected! Can't calculate volume";
     return;
   }
 
@@ -409,10 +409,9 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   if (clippingPlanes.empty())
   {
-    MITK_INFO << "No clipping plane selected! Can't calculate volume";
+    MITK_ERROR << "No clipping plane selected! Can't calculate volume";
     return;
   }
-
 
   //deactivate Tools
   m_ToolManager->ActivateTool(-1);
@@ -479,7 +478,6 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     }
   }
 
-
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by
@@ -528,7 +526,6 @@ mitk::Color QmitkDeformableClippingPlaneView::GetLabelColor(int label)
 
   if ( outerCycleNr == 0)
     factor = 255;
-
   else
     factor = ( 256 / ( 2 * cycleSize ) ) + ( insideCycleCounter * ( 256 / cycleSize ) );
 

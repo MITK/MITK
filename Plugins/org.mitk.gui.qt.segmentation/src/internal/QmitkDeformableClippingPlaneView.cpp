@@ -167,13 +167,18 @@ void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
 
   if (node->GetBoolProperty("clippingPlane", isClippingPlane))
   {
-    if(this->GetAllClippingPlanes()->empty())
+    if(this->GetAllClippingPlanes()->Size()<=1)
     {
       m_ToolManager->SetWorkingData(NULL);
       this->UpdateView();
     }
     else
-      this->OnSelectionChanged(GetAllClippingPlanes()->front());
+    {
+      if (GetAllClippingPlanes()->front()!= node)
+        this->OnSelectionChanged(GetAllClippingPlanes()->front());
+      else
+        this->OnSelectionChanged(GetAllClippingPlanes()->ElementAt(1));
+    }
   }
   else
   {
@@ -184,7 +189,7 @@ void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
         m_ToolManager->SetReferenceData(NULL);
         m_Controls.volumeList->clear();
       }
-      this->OnSelectionChanged(mitk::DataNode::New());
+      this->UpdateView();
     }
   }
 }

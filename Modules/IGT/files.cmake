@@ -18,7 +18,7 @@ set(CPP_FILES
 
   IGTFilters/mitkTrackingDeviceSource.cpp
   IGTFilters/mitkTrackingVolumeGenerator.cpp
-  IGTFilters/mitkTimeStamp.cpp
+  IGTFilters/mitkIGTTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
   IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
 

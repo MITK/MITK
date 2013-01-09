@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkImageData.h>
 
-#include <itkSmartPointerForwardReference.txx>
-
-
 mitk::ProbeFilter::ProbeFilter()
 {
 

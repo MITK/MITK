@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkUnstructuredGrid.h>
 
-#include <itkListSampleToHistogramFilter.h>
+#include <itkSampleToHistogramFilter.h>
 #include <vtkDataArray.h>
 #include <vtkPointData.h>
 #include <vtkUnstructuredGrid.h>
@@ -102,25 +102,33 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
     upperBound[0] = range[1];
   }
 
-  m_UGHistogram->Initialize(size, lowerBound, upperBound);
-
-  typedef itk::Statistics::ListSampleToHistogramFilter<ListSampleType, HistogramType> FilterType;
+  typedef itk::Statistics::SampleToHistogramFilter<ListSampleType, HistogramType> FilterType;
   FilterType::Pointer histoFilter = FilterType::New();
 
-  histoFilter->SetListSample(listSample);
-  histoFilter->SetHistogram(m_UGHistogram);
+  FilterType::HistogramMeasurementVectorType binMin;
+  FilterType::HistogramMeasurementVectorType binMax;
+
+  binMin[0] = lowerBound[0];
+  binMax[0] = upperBound[0];
+
+  histoFilter->SetInput(listSample);
+  histoFilter->SetHistogramSize(size);
+  histoFilter->SetHistogramBinMinimum(binMin);
+  histoFilter->SetHistogramBinMaximum(binMax);
   histoFilter->Update();
+
+  m_UGHistogram = histoFilter->GetOutput()->Clone();
 
   m_BinSize = (GetMax() - GetMin())/(double)numberOfBins;
 
   m_Mins = m_UGHistogram->GetMins();
   m_Maxs = m_UGHistogram->GetMaxs();
 
-  HistogramType::FrequencyType maxFrequency = 0;
+  HistogramType::AbsoluteFrequencyType maxFrequency = 0;
   HistogramType::SizeValueType histoSize = m_UGHistogram->GetSize(0);
   for (HistogramType::SizeValueType i = 0; i < histoSize; ++i)
   {
-    HistogramType::FrequencyType f = m_UGHistogram->GetFrequency(i);
+    HistogramType::AbsoluteFrequencyType f = m_UGHistogram->GetFrequency(i);
     if (f > maxFrequency)
     {
       maxFrequency = f;
@@ -142,16 +150,14 @@ float SimpleUnstructuredGridHistogram::GetRelativeBin( double start, double end 
 
 
   //MITK_INFO << "GetRelativeBin start: " << start << ", end: " << end;
-  HistogramType::FrequencyType maxf = 0;
-  MeasurementVectorType v;
+  HistogramType::AbsoluteFrequencyType maxf = 0;
   for(double pos = start; pos < end; pos += m_BinSize)
   {
-    v[0] = pos;
-    HistogramType::FrequencyType f = m_UGHistogram->GetFrequency(m_UGHistogram->GetIndex(v));
+    HistogramType::AbsoluteFrequencyType f = m_UGHistogram->GetFrequency(m_UGHistogram->GetIndex(pos));
     if (f > maxf) maxf = f;
   }
 
-  return log(maxf)*m_InvMaxFrequency;
+  return log(static_cast<double>(maxf))*m_InvMaxFrequency;
 }
 
 }

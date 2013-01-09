@@ -56,7 +56,7 @@ public:
 
   virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
 
 protected:
 

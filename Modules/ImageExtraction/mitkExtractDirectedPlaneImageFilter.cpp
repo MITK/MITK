@@ -308,13 +308,13 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   double cosines[9];
 
   // direction of the X-axis of the sampled result
-  vnl2vtk( right.Get_vnl_vector(), cosines );
+  vnl2vtk( right.GetVnlVector(), cosines );
 
   // direction of the Y-axis of the sampled result
-  vnl2vtk( bottom.Get_vnl_vector(), cosines + 3 );
+  vnl2vtk( bottom.GetVnlVector(), cosines + 3 );
 
   // normal of the plane
-  vnl2vtk( normal.Get_vnl_vector(), cosines + 6 );
+  vnl2vtk( normal.GetVnlVector(), cosines + 6 );
 
   m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 

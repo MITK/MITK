@@ -192,7 +192,7 @@ void mitk::DataNodeFactory::GenerateData()
 void mitk::DataNodeFactory::ResizeOutputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs( num );
+  this->SetNumberOfIndexedOutputs( num );
   for ( unsigned int i = prevNum; i < num; ++i )
   {
     this->SetNthOutput( i, this->MakeOutput( i ).GetPointer() );
@@ -253,7 +253,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     return;
 
   }
-      
+
   DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
   const unsigned int size = imageBlocks.size();
 
@@ -270,7 +270,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     DataNode::Pointer node = this->GetOutput(outputIndex);
 
     const DicomSeriesReader::ImageBlockDescriptor& imageBlockDescriptor( n_it->second );
-    
+
     MITK_INFO << "--------------------------------------------------------------------------------";
     MITK_INFO << "DataNodeFactory: Loading DICOM series " << outputIndex << ": Series UID " << imageBlockDescriptor.GetSeriesInstanceUID() << std::endl;
     MITK_INFO << "  " << imageBlockDescriptor.GetFilenames().size() << " '" << imageBlockDescriptor.GetModality() << "' files (" << imageBlockDescriptor.GetSOPClassUIDAsString() << ") loaded into 1 mitk::Image";
@@ -281,7 +281,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     MITK_INFO << "  3D+t: " << (imageBlockDescriptor.HasMultipleTimePoints()?"Yes":"No");
     MITK_INFO << "--------------------------------------------------------------------------------";
 
-    if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true)) 
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true))
     {
       std::string nodeName(uid);
       std::string studyDescription;

@@ -45,7 +45,7 @@ namespace mitk
     m_MaxHeight( 1024.0 ),
     m_MultiPlaneValue(2)
   {
-    this->SetNumberOfInputs(8);
+    this->SetNumberOfIndexedInputs(8);
     this->SetNumberOfRequiredInputs(2);
 
     m_InputTimeSelector = ImageTimeSelector::New();

@@ -148,9 +148,8 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
   unsigned int startIndex = 0, endIndex = 0, i = 0;
   HistogramConstIteratorType startIt = m_DerivedHistogram->End();
   HistogramConstIteratorType endIt = m_DerivedHistogram->End();
-  HistogramConstIteratorType it;
   bool firstNonEmptyBinFound = false;
-  for ( it = m_DerivedHistogram->Begin(); it != m_DerivedHistogram->End(); ++it, ++i )
+  for (HistogramConstIteratorType it = m_DerivedHistogram->Begin(); it != m_DerivedHistogram->End(); ++it, ++i )
   {
     if ( it.GetFrequency() > 0.0 )
     {
@@ -178,7 +177,8 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
   m_ItemModel->setColumnCount( 1 );
 
   // Fill item model with histogram data
-  for ( it = startIt, i = 0; it != endIt; ++it, ++i )
+  i = 0;
+  for (HistogramConstIteratorType it = startIt; it != endIt; ++it)
   {
     const double &frequency = it.GetFrequency();
     const double &measurement = it.GetMeasurementVector()[0];
@@ -189,6 +189,8 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
 
     m_ItemModel->setItem( i, 0, new QStandardItem() );
     m_ItemModel->item( i, 0 )->setData( QVariant( frequency ), Qt::DisplayRole );
+
+    ++i;
   }
 
   vtkQtChartTableSeriesModel *table =

@@ -123,9 +123,9 @@ void mitk::PolygonToRingFilter::DrawCyl(vtkPoints *vPoints, vtkCellArray *polys,
   for(i=0;i<m_RingResolution;++i)
   {
     VnlVector v0,v1,v2,v3,normal;
-    v0=a.Get_vnl_vector(); v1=b.Get_vnl_vector();
+    v0=a.GetVnlVector(); v1=b.GetVnlVector();
     a=last_p+*slit*m_RingRadius; b=cur_p+*scit*m_RingRadius;
-    v2=b.Get_vnl_vector(); v3=a.Get_vnl_vector();
+    v2=b.GetVnlVector(); v3=a.GetVnlVector();
     normal=vnl_cross_3d(v1-v0,v3-v0);
 
     if(i!=0)
@@ -172,11 +172,11 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   //  last_v=*(vl.getLast()); next_v=*vit.current(); s.cross(last_v,next_v); s.normalize();
   //  axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
   //alternative3:
-  last_v=vecList.back(); next_v=*vit; s.Set_vnl_vector( vnl_cross_3d(last_v.Get_vnl_vector(),next_v.Get_vnl_vector()) ); s.Normalize();
+  last_v=vecList.back(); next_v=*vit; s.SetVnlVector( vnl_cross_3d(last_v.GetVnlVector(),next_v.GetVnlVector()) ); s.Normalize();
   a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
   //Stern am ersten Punkt aufbauen
-  m = vnl_quaternion<mitk::ScalarType>(axis.Get_vnl_vector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
+  m = vnl_quaternion<mitk::ScalarType>(axis.GetVnlVector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
   unsigned int i;
   for(i=0;i<m_RingResolution;++i)
   {
@@ -191,13 +191,13 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   for ( ; pit != pend; ++pit, ++vit )
   {
     //    cur_p=*pit.current(); last_v=next_v; next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
-    cur_p=*pit; last_v=next_v; next_v=*vit; s.Set_vnl_vector( vnl_cross_3d(last_v.Get_vnl_vector(),next_v.Get_vnl_vector()) ); s.Normalize();
+    cur_p=*pit; last_v=next_v; next_v=*vit; s.SetVnlVector( vnl_cross_3d(last_v.GetVnlVector(),next_v.GetVnlVector()) ); s.Normalize();
     //    axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
     a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
     //neuen Stern sc (SternCurrent) bauen und dabei Start für neuen Stern suchen
     double max=0; int idmax=0; Vector3D sl0=*(sl->begin());
-    m = vnl_quaternion<mitk::ScalarType>(axis.Get_vnl_vector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
+    m = vnl_quaternion<mitk::ScalarType>(axis.GetVnlVector(),2*vnl_math::pi/(double)m_RingResolution).rotation_matrix_transpose();
     for(i=0;i<m_RingResolution;++i)
     {
       sc->push_back(s);

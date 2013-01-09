@@ -79,7 +79,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         if( header == NULL || header->bpe == 0)
         {
             itk::ImageFileReaderException e(__FILE__, __LINE__);
-            itk::OStringStream msg;
+            std::ostringstream msg;
             msg << " Could not read file "
                 << m_FileName.c_str();
             e.SetDescription(msg.str().c_str());
@@ -146,7 +146,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
         if(numberOfImages==0)
         {
             itk::ImageFileReaderException e(__FILE__, __LINE__);
-            itk::OStringStream msg;
+            std::ostringstream msg;
             msg << "no images found";
             e.SetDescription(msg.str().c_str());
             throw e;

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RGBToRGBACastImageFilter::RGBToRGBACastImageFilter()
 {
-  this->SetNumberOfInputs(1);
+  this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);
 
   m_InputTimeSelector  = mitk::ImageTimeSelector::New();

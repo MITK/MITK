@@ -40,6 +40,7 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 class vtkPolyData;
 class vtkMitkApplyLevelWindowToRGBFilter;
+class vtkMitkLevelWindowFilter;
 
 namespace mitk {
 
@@ -178,7 +179,7 @@ namespace mitk {
       mitk::ScalarType* m_mmPerPixel;
 
       /** \brief This filter is used to apply the level window to RBG(A) images. */
-      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */
       LocalStorage();
@@ -245,18 +246,23 @@ namespace mitk {
     */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
+    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
+    bool LineIntersectZero( vtkPoints *points, int p1, int p2,
+                            vtkFloatingPointType *bounds );
+
+    /** \brief Calculate the bounding box of the resliced image. This is necessary for
+        arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
+        will have a new bounding box, which needs to be calculated. */
+    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
-    /** \brief This method applies a level window on RBG(A) images.
-    * It should only be called for internally for RGB(A) images. */
-    void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
-
     /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+    void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );
 
     /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
     Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous

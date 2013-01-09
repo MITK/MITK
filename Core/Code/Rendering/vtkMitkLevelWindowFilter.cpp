@@ -144,9 +144,6 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
 
   double tableRange[2];
 
-  clippingBounds ++;
-
-
   lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
 
   lookupTable->GetTableRange(tableRange);

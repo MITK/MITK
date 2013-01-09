@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingTool.h"
 
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 
 
 mitk::TrackingDeviceSource::TrackingDeviceSource()
@@ -89,7 +89,7 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());
-    nd->SetTimeStamp( mitk::TimeStamp::GetInstance()->GetElapsed() );
+    nd->SetTimeStamp( mitk::IGTTimeStamp::GetInstance()->GetElapsed() );
   }
 }
 

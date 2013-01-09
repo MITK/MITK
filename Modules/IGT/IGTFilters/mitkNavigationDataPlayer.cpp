@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataPlayer.h"
 
 #include <itksys/SystemTools.hxx>
-#include <mitkTimeStamp.h>
+#include <mitkIGTTimeStamp.h>
 #include <fstream>
 
 //includes for exceptions
@@ -44,7 +44,7 @@ mitk::NavigationDataPlayer::NavigationDataPlayer() : mitk::NavigationDataPlayerB
   m_StreamSetOutsideFromClass = false;
 
   //To get a start time
-  mitk::TimeStamp::GetInstance()->Start(this);
+  mitk::IGTTimeStamp::GetInstance()->Start(this);
 }
 
 
@@ -81,7 +81,7 @@ void mitk::NavigationDataPlayer::GenerateData()
   }
 
   //first of all get current time
-  TimeStampType now = mitk::TimeStamp::GetInstance()->GetElapsed();
+  TimeStampType now = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
 
   //now we make a little time arithmetic
   //to get the elapsed time since the start of the player
@@ -380,7 +380,7 @@ void mitk::NavigationDataPlayer::StartPlaying()
   if (!m_Playing && m_Stream->good())
   {
     m_Playing = true;
-    m_StartPlayingTimeStamp = mitk::TimeStamp::GetInstance()->GetElapsed();
+    m_StartPlayingTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
   }
   else
   {
@@ -457,7 +457,7 @@ void mitk::NavigationDataPlayer::Pause()
   {
     m_Playing = false;
     m_Pause = true;
-    m_PauseTimeStamp = mitk::TimeStamp::GetInstance()->GetElapsed();
+    m_PauseTimeStamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
   }
   else
   {
@@ -474,7 +474,7 @@ void mitk::NavigationDataPlayer::Resume()
   {
     m_Playing = true;
     m_Pause = false;
-    mitk::NavigationData::TimeStampType now = mitk::TimeStamp::GetInstance()->GetElapsed();
+    mitk::NavigationData::TimeStampType now = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
 
     // in this case m_StartPlayingTimeStamp is set to the total elapsed time with NO playback
     m_StartPlayingTimeStamp = now - (m_PauseTimeStamp - m_StartPlayingTimeStamp);

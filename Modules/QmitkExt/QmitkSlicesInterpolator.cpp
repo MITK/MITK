@@ -1025,7 +1025,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-      if ((workingNode->IsSelected() &&
+      if ((m_MultiWidget != NULL && workingNode->IsSelected() &&
            workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
           !isInterpolationResult)
       {

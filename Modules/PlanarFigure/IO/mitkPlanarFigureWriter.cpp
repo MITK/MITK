@@ -25,7 +25,7 @@ mitk::PlanarFigureWriter::PlanarFigureWriter()
   m_MimeType("application/MITK.PlanarFigure"), m_Success(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
-  this->SetNumberOfOutputs( 0 );
+  this->SetNumberOfIndexedOutputs( 0 );
   //this->SetNthOutput( 0, mitk::PlanarFigure::New().GetPointer() );
 
   m_CanWriteToMemory = true;
@@ -222,7 +222,7 @@ TiXmlElement* mitk::PlanarFigureWriter::CreateXMLVectorElement(const char* name,
 void mitk::PlanarFigureWriter::ResizeInputs( const unsigned int& num )
 {
   //unsigned int prevNum = this->GetNumberOfInputs();
-  this->SetNumberOfInputs( num );
+  this->SetNumberOfIndexedInputs( num );
   //for ( unsigned int i = prevNum; i < num; ++i )
   //{
   //  this->SetNthInput( i, mitk::PlanarFigure::New().GetPointer() );

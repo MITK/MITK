@@ -192,7 +192,7 @@ void mitk::DataNodeFactory::GenerateData()
 void mitk::DataNodeFactory::ResizeOutputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs( num );
+  this->SetNumberOfIndexedOutputs( num );
   for ( unsigned int i = prevNum; i < num; ++i )
   {
     this->SetNthOutput( i, this->MakeOutput( i ).GetPointer() );

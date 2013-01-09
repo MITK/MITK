@@ -270,7 +270,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
           FillVector3D(bottomDV, 0,         pic->n[1], 0);
 
           mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-          planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &spacing);
+          planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &spacing);
           planegeometry->SetOrigin(origin);
           slicedgeometry->SetGeometry2D(planegeometry, s);
         }
@@ -286,7 +286,7 @@ bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, Slic
       FillVector3D(bottomDV,0,pic->n[1],0);
 
       mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
-      planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &slicedgeometry->GetSpacing());
+      planegeometry->InitializeStandardPlane(pic->n[0], pic->n[1], rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &slicedgeometry->GetSpacing());
       planegeometry->SetOrigin(origin);
       slicedgeometry->SetGeometry2D(planegeometry, s);
     }

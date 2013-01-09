@@ -62,7 +62,7 @@ const mitk::PlanarFigureToPlanarFigureFilter::InputType* mitk::PlanarFigureToPla
 
 void mitk::PlanarFigureToPlanarFigureFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
   {
     if (this->GetOutput(idx) == NULL)

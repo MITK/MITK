@@ -53,7 +53,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     if ( header == NULL )
     {
         itk::ImageFileReaderException e( __FILE__, __LINE__ );
-        itk::OStringStream msg;
+        std::ostringstream msg;
         msg << " Could not read file " << m_FileName.c_str();
         e.SetDescription( msg.str().c_str() );
         throw e;
@@ -110,7 +110,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
 
         if ( volume3d == NULL )
         {
-          ::itk::OStringStream message;
+          std::ostringstream message;
           message << "mitk::ERROR: " << this->GetNameOfClass() << "(" << this << "): "
                   << "File (" << filename << ") of time frame " << t << " could not be read!";
           throw itk::ImageFileReaderException( __FILE__, __LINE__, message.str().c_str() );
@@ -131,7 +131,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
         //result = output->SetPicVolume( volume3d, t );
         if(result==false)
         {
-          ::itk::OStringStream message;
+          std::ostringstream message;
           message << "mitk::ERROR: " << this->GetNameOfClass() << "(" << this << "): "
                   << "Volume of time frame " << t << " did not match size of other time frames.";
           throw itk::ImageFileReaderException( __FILE__, __LINE__, message.str().c_str() );

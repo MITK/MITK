@@ -22,7 +22,6 @@ namespace itk {
 
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
-  Superclass(3, 0),
   m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL),
   m_LastVtkAbstractTransformTimeStamp(0)
 {
@@ -222,6 +221,30 @@ itk::VtkAbstractTransform<TScalarType>::GetMTime() const
   }
 
   return Superclass::GetMTime();
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::SetParameters(const ParametersType&)
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::SetFixedParameters(const ParametersType&)
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::ComputeJacobianWithRespectToParameters(const InputPointType&, JacobianType&) const
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::ComputeJacobianWithRespectToPosition(const InputPointType&, JacobianType&) const
+{
+  // TODO
 }
 
 } // namespace itk

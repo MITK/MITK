@@ -158,7 +158,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
     if( headerRead == false)
     {
       itk::ImageFileReaderException e(__FILE__, __LINE__);
-      itk::OStringStream msg;
+      std::ostringstream msg;
       msg << " Could not read file "
         << m_FileName.c_str();
       e.SetDescription(msg.str().c_str());

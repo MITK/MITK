@@ -39,7 +39,7 @@ void mitk::InteractionDebugger::Set(const char* sender, const char* text)
 {
   if (m_Active)
   {
-    itk::OStringStream itkmsg;
+    std::ostringstream itkmsg;
     if (! itk::Object::GetGlobalWarningDisplay())
       return;
 

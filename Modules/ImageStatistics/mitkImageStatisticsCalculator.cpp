@@ -790,8 +790,8 @@ void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
   itk::ImageRegionConstIterator<ImageType>
       itimage(image, image->GetLargestPossibleRegion());
 
-  itmask = itmask.Begin();
-  itimage = itimage.Begin();
+  itmask.GoToBegin();
+  itimage.GoToBegin();
 
   while( !itmask.IsAtEnd() )
   {

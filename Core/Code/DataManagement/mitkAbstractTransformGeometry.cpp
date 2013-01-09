@@ -106,12 +106,25 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D & atPt3d_mm, c
   assert(m_BoundingBox.IsNotNull());
 
   Vector3D vec3d_units;
-  vec3d_units = GetIndexToWorldTransform()->BackTransform(vec3d_mm);
+  vec3d_units = GetIndexToWorldTransform()->GetInverseMatrix() * vec3d_mm;
   vec3d_units[2] = 0;
   projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
 
   Point3D pt3d_units;
-  pt3d_units = GetIndexToWorldTransform()->BackTransformPoint(atPt3d_mm);
+  mitk::ScalarType temp[3];
+  unsigned int i, j;
+
+  for (j = 0; j < 3; ++j)
+    temp[j] = atPt3d_mm[j] - GetIndexToWorldTransform()->GetOffset()[j];
+
+  for (i = 0; i < 3; ++i)
+  {
+    pt3d_units[i] = 0.0;
+
+    for (j = 0; j < 3; ++j)
+      pt3d_units[i] += GetIndexToWorldTransform()->GetInverseMatrix()[i][j] * temp[j];
+  }
+
   return const_cast<BoundingBox*>(m_BoundingBox.GetPointer())->IsInside(pt3d_units);
 }
 

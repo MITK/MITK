@@ -76,7 +76,7 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
     timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
     for(t = 0; t < timesteps; ++t)
     {
-      ::itk::OStringStream filename;
+      std::ostringstream filename;
       geometry = input->GetGeometry(t);
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {

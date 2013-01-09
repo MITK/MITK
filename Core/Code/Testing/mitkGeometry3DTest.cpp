@@ -327,6 +327,24 @@ int testGeometry3D(bool imageGeometry)
   MITK_TEST_OUTPUT( << "Testing that ImageGeometry is still " << imageGeometry);
   MITK_TEST_CONDITION_REQUIRED(geometry3d->GetImageGeometry() == imageGeometry, "");
 
+  //Test if the translate function moves the origin correctly.
+  mitk::Point3D oldOrigin = geometry3d->GetOrigin();
+
+  //use some random values for translation
+  mitk::Vector3D translationVector;
+  translationVector.SetElement(0, 17.5f);
+  translationVector.SetElement(1, -32.3f);
+  translationVector.SetElement(2, 4.0f);
+  //compute ground truth
+  mitk::Point3D tmpResult = geometry3d->GetOrigin() + translationVector;
+  geometry3d->Translate(translationVector);
+  MITK_TEST_CONDITION( mitk::Equal( geometry3d->GetOrigin(), tmpResult ), "Testing if origin was translated.");
+
+  translationVector*=-1; //vice versa
+  geometry3d->Translate(translationVector);
+
+  MITK_TEST_CONDITION( mitk::Equal( geometry3d->GetOrigin(), oldOrigin ), "Testing if the translation could be done vice versa." );
+
   return EXIT_SUCCESS;
 }
 

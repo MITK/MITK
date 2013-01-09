@@ -167,13 +167,18 @@ void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
 
   if (node->GetBoolProperty("clippingPlane", isClippingPlane))
   {
-    if(this->GetAllClippingPlanes()->empty())
+    if(this->GetAllClippingPlanes()->Size()<=1)
     {
       m_ToolManager->SetWorkingData(NULL);
       this->UpdateView();
     }
     else
-      this->OnSelectionChanged(GetAllClippingPlanes()->front());
+    {
+      if (GetAllClippingPlanes()->front()!= node)
+        this->OnSelectionChanged(GetAllClippingPlanes()->front());
+      else
+        this->OnSelectionChanged(GetAllClippingPlanes()->ElementAt(1));
+    }
   }
   else
   {
@@ -184,7 +189,7 @@ void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
         m_ToolManager->SetReferenceData(NULL);
         m_Controls.volumeList->clear();
       }
-      this->OnSelectionChanged(mitk::DataNode::New());
+      this->UpdateView();
     }
   }
 }
@@ -193,33 +198,45 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 {
   if (m_ToolManager->GetReferenceData(0)!= NULL)
   {
-    m_Controls.volumeGroupBox->setEnabled(m_ToolManager->GetWorkingData(0)!= NULL);
     m_Controls.noSelectedImageLabel->hide();
     m_Controls.selectedImageLabel->setText(QString::fromUtf8(m_ToolManager->GetReferenceData(0)->GetName().c_str()));
 
-    //clear list --> than search for all shown clipping plans (max 7 planes)
-    m_Controls.selectedVolumePlanesLabel->setText("");
-    m_Controls.planesWarningLabel->hide();
-    int volumePlanes=0;
-
-    mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
+    if (m_ToolManager->GetWorkingData(0)!= NULL)
     {
-      bool isVisible(false);
-      itPlanes.Value()->GetBoolProperty("visible",isVisible);
-      if (isVisible)
+      bool isSegmentation(false);
+      m_ToolManager->GetReferenceData(0)->GetBoolProperty("binary", isSegmentation);
+      m_Controls.volumeGroupBox->setEnabled(isSegmentation);
+
+      //clear list --> than search for all shown clipping plans (max 7 planes)
+      m_Controls.selectedVolumePlanesLabel->setText("");
+      m_Controls.planesWarningLabel->hide();
+      int volumePlanes=0;
+
+      mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
+      for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
       {
-        if (volumePlanes<7)
+        bool isVisible(false);
+        itPlanes.Value()->GetBoolProperty("visible",isVisible);
+        if (isVisible)
         {
-          volumePlanes ++;
-          m_Controls.selectedVolumePlanesLabel->setText(m_Controls.selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
-        }
-        else
-        {
-          m_Controls.planesWarningLabel->show();
-          return;
+          if (volumePlanes<7)
+          {
+            volumePlanes ++;
+            m_Controls.selectedVolumePlanesLabel->setText(m_Controls.selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
+          }
+          else
+          {
+            m_Controls.planesWarningLabel->show();
+            return;
+          }
         }
       }
+    }
+    else
+    {
+      m_Controls.volumeGroupBox->setEnabled(false);
+      m_Controls.selectedVolumePlanesLabel->setText("");
+      m_Controls.volumeList->clear();
     }
   }
 
@@ -386,7 +403,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   if(imageNode.IsNull() || !isSegmentation)
   {
-    MITK_INFO << "No segmentation selected! Can't calculate volume";
+    MITK_ERROR << "No segmentation selected! Can't calculate volume";
     return;
   }
 
@@ -404,10 +421,9 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   if (clippingPlanes.empty())
   {
-    MITK_INFO << "No clipping plane selected! Can't calculate volume";
+    MITK_ERROR << "No clipping plane selected! Can't calculate volume";
     return;
   }
-
 
   //deactivate Tools
   m_ToolManager->ActivateTool(-1);
@@ -474,7 +490,6 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     }
   }
 
-
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by
@@ -523,7 +538,6 @@ mitk::Color QmitkDeformableClippingPlaneView::GetLabelColor(int label)
 
   if ( outerCycleNr == 0)
     factor = 255;
-
   else
     factor = ( 256 / ( 2 * cycleSize ) ) + ( insideCycleCounter * ( 256 / cycleSize ) );
 

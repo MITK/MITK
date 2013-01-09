@@ -19,14 +19,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKMoveBaseDataInteractor_H_HEADER_INCLUDED
 
 #include <mitkInteractor.h>
-#include <mitkColorProperty.h>
 
 namespace mitk
 {
   class DataNode;
 
   /**
-   * \brief Interaction to move a surface by the arrow keys. See tutorial step 10 for explanation
+   * \brief Interaction to move an object by the arrow keys. See tutorial step 10 for explanation.
+   *
+   * Left- and right-arrows move the x-direction.
+   * Shift + up-and down-arrows move the y-direction.
+   * Up- and down-arrows move the z-direction.
+   * Every move is one unit in world coordinates (usually 1mm).
+   * This class offers three properties:
+   * - \b "MovingInteractor.SelectedColor": This color is used to mark that
+   *    the object is selected and the interactor can be used.
+   * - \b "MovingInteractor.DeselectedColor": Marks that the interactor is
+   *    is added to the data node, but the node is not selected.
+   * - \b "MovingInteractor.PriorColor":  Temporary property used to
+   *    save the old color of the data node in order to restore it
+   *    uppon removal of the interactor.
+   *
+   * All properties are deleted when the interactor is destroyed.
+   *
+   * \warning After moving an object, the user has to perform a reinit manually, in order to change the geoemtrie.
+   *
+   * \warning The picking seems not to work on a single point. If you want to move pointsets,
+   *    they should atleast have 2 or more points.
    *
    * \ingroup Interaction
    */
@@ -35,20 +54,6 @@ namespace mitk
   public:
     mitkClassMacro(MoveBaseDataInteractor, Interactor);
     mitkNewMacro2Param(Self, const char*, DataNode*);
-
-    /**
-     * \brief check how good an event can be handled
-     */
-    //virtual float CanHandleEvent(StateEvent const* stateEvent) const;
-    //used from mitkInteractor
-
-    /**
-    *@brief Gets called when mitk::DataNode::SetData() is called
-    *
-    * No need to use it here, because the pattern won't be complex
-    * and we can take care of unexpected data change
-    **/
-    //virtual void DataChanged(){};
 
   protected:
     /**
@@ -65,8 +70,6 @@ namespace mitk
     * @brief Convert the given Actions to Operations and send to data and UndoController
     **/
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
-
-    mitk::ColorProperty::Pointer m_NodeColor;
   };
 }
 

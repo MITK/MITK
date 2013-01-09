@@ -30,19 +30,30 @@ mitk::MoveBaseDataInteractor
 ::MoveBaseDataInteractor(const char * type, DataNode* dataNode)
 :Interactor(type, dataNode)
 {
+    //define the colors for selected/deselected state
+    m_DataNode->AddProperty( "MovingInteractor.SelectedColor", ColorProperty::New(0.0,1.0,0.0) );
+    m_DataNode->AddProperty( "MovingInteractor.DeselectedColor", ColorProperty::New(0.0,0.0,1.0) );
+    //save the previous color of the node, in order to restore it after the interactor is destroyed
+    mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
+    if ( priorColor.IsNotNull() )
+    {
+        mitk::ColorProperty::Pointer tmpCopyOfPriorColor = mitk::ColorProperty::New();
+        tmpCopyOfPriorColor->SetColor( priorColor->GetColor() );
+        m_DataNode->AddProperty( "MovingInteractor.PriorColor", tmpCopyOfPriorColor );
+    }
 }
 
 mitk::MoveBaseDataInteractor::~MoveBaseDataInteractor()
 {
-    mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-    if ( color.IsNull() )
+    mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.PriorColor"));
+    if ( color.IsNotNull() )
     {
-      color = mitk::ColorProperty::New();
-      m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", color);
     }
 
-    color->SetColor(1.0, 1.0, 1.0);
-
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.SelectedColor");
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.DeselectedColor");
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.PriorColor");
     //update rendering
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -97,15 +108,12 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() )
+      mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.SelectedColor"));
+      if ( selectedColor.IsNotNull() )
       {
-        color = mitk::ColorProperty::New();
-        m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", selectedColor);
       }
-
       selected->SetValue(true);
-      color->SetColor(0.0, 1.0, 0.0);
 
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -123,15 +131,14 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() )
+      mitk::ColorProperty::Pointer deselectedColor =
+              dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.DeselectedColor"));
+      if ( deselectedColor.IsNotNull() )
       {
-        color = mitk::ColorProperty::New();
-        m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", deselectedColor);
       }
 
       selected = mitk::BoolProperty::New(false);
-      color->SetColor(0.0, 0.0, 1.0);
 
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

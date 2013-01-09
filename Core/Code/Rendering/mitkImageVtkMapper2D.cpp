@@ -879,7 +879,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       node->SetProperty( "LookupTable", mitkLutProp );
 
       node->SetProperty( "use color", mitk::BoolProperty::New( false ), renderer );
-      node->SetProperty( "opacity", mitk::FloatProperty::New( 0.5 ), renderer );
     }
     else
     if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK

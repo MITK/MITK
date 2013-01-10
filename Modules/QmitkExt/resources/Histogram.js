@@ -25,7 +25,6 @@ var width = histogramData.width - margin.left - margin.right;
 var tension = 0.8;
 var connected = false;
 var dur = 1000;
-var useLinePlot = false;
 
 // connecting signal from qt side with JavaScript method
 if (!connected)
@@ -50,7 +49,7 @@ var yAxis = d3.svg.axis()
   .scale(yScale)
   .orient("left");
 
-var zoomer = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom)
+var zoombie = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom);
 
 var svg = d3.select("body")
   .append("svg")
@@ -59,7 +58,7 @@ var svg = d3.select("body")
   .attr("height", height + margin.top + margin.bottom)
  .append("g")
   .attr("transform", "translate (" + margin.left + "," + margin.top + ")")
-  .call(zoomer);
+  .call(zoombie);
 
 var vis = svg.append("svg")
   .attr("width", width)
@@ -106,7 +105,9 @@ function barChart()
     .scale(yScale)
     .orient("left");
 
-  svg.call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
+  zoombie = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom);
+
+  svg.call(zoombie);
 
   var linenull = d3.svg.line()
     .interpolate("linear")
@@ -199,7 +200,9 @@ function linePlot()
     .scale(yScale)
     .orient("left");
 
-  svg.call(d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom));
+  zoombie = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 10]).on("zoom", zoom);
+
+  svg.call(zoombie);
 
 // element to animate transition from barchart to linegraph
   vis.selectAll("rect.bar")
@@ -263,7 +266,6 @@ function linePlot()
     .transition().duration(dur)
     .attr("opacity", 100)
     .call(yAxis);
-
 }
 
 // method to ensure barwidth is not smaller than 1px
@@ -279,34 +281,13 @@ function barWidth()
 
 function zoom()
 {
- /* if (d3.event.scale != 1){
-    var t = d3.event.translate;
-    t[0] = Math.min(0, t[0]);
-    t[1] = Math.min(0, t[1]);
-    d3.event.translate = t;
-    svg.select(".x.axis").call(xAxis);
-    svg.select(".y.axis").call(yAxis);
-    vis.selectAll(".bar").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-    vis.selectAll("path.line").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  if (zoombie.scale() == 1) {
+    zoombie.translate([0,0]);
+    //xScale.domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)]);
+    //yScale.domain([0,d3.max(histogramData.frequency)]);
   }
-  else {
-    d3.event.translate = [0,0];
-
-    xScale.domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)]);
-    yScale.domain([0,d3.max(histogramData.frequency)]);*/
-  if (d3.event.scale == 1)
-  {
-    zoom.translate([0,0]);
-    //d3.event.translate = [0,0];
-  }
-    svg.select(".x.axis").call(xAxis);
-    svg.select(".y.axis").call(yAxis);
-    vis.selectAll(".bar").attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")");
-    vis.selectAll("path.line").attr("transform", "translate(" + zoom.translate() + ")scale(" + zoom.scale() + ")");
-
+  svg.select(".x.axis").call(xAxis);
+  svg.select(".y.axis").call(yAxis);
+  vis.selectAll(".bar").attr("transform", "translate(" + zoombie.translate() + ")scale(" + zoombie.scale() + ")");
+  vis.selectAll("path.line").attr("transform", "translate(" + zoombie.translate() + ")scale(" + zoombie.scale() + ")");
 }
-
-svg.append("rect")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .attr("opacity", 0);

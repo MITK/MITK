@@ -115,8 +115,9 @@ void QmitkSegmentationView::Activated()
     mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( isSegmentation );
 
     mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset( isImage );
-    OnSelectionChanged(*image->begin());
-
+    if (!image->empty()) {
+      OnSelectionChanged(*image->begin());
+    }
     for ( mitk::DataStorage::SetOfObjects::const_iterator iter = segmentations->begin();
       iter != segmentations->end();
       ++iter)

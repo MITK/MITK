@@ -29,6 +29,17 @@
 #include "mitkTestInteractor.h"
 #include "mitkDataNode.h"
 
+// us
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+#include "mitkInformer.h"
+
+#include "mitkEventObserver.h"
+
+
+//#include "mitkInformerActivator.h"
+
 const std::string InteractionTests::VIEW_ID = "org.mitk.views.interactiontests";
 
 void InteractionTests::SetFocus()
@@ -65,12 +76,28 @@ void InteractionTests::DoImageProcessing()
 
   m_CurrentDataNode = mitk::DataNode::New();
 
-  GetDataStorage()->Add(m_CurrentDataNode.GetPointer(),m_CurrentImage);
+  GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
 
   m_CurrentInteractor = mitk::TestInteractor::New();
   m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
   m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
   m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
   m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
+
+  mitk::EventObserver::Pointer eO = mitk::EventObserver::New();
+  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
+  mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
+  service->RegisterObserver(eO);
+
+  //mitk::ServiceReference informerService = mitk::GetModuleContext()->GetServiceReference<mitk::InformerService>();
+//  if (informerService)
+//  {
+//    mitk::EventObserverInformerService* dictionaryService = mitk::GetModuleContext()->GetService <mitk::EventObserverInformerService> (informerService);
+//    if (dictionaryService)
+//    {
+//     //MITK_INFO << "Dictionary contains 'Tutorial': " << dictionaryService->RegisterObserver(eO) ;
+//    }
+//  }
 
 }

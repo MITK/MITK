@@ -18,9 +18,26 @@
 #include "mitkMessage.h"
 #include <string.h>
 
+// us
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+#include "mitkInformer.h"
+
 mitk::BindDispatcherInteractor::BindDispatcherInteractor()
 {
-  m_Dispatcher = mitk::Dispatcher::New();
+  m_InformerService = NULL;
+  ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
+  ServiceReference serviceRef = context->GetServiceReference<InformerService>();
+
+  if (!serviceRef)
+  {
+    // TODO: service object is not destroyed anywhere,
+    // registration persists forever until a good place to destroy and unregister is found
+    m_InformerService = new InformerService();
+    context->RegisterService<InformerService>(m_InformerService);
+  }
+  m_Dispatcher = Dispatcher::New();
 }
 
 void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
@@ -60,12 +77,12 @@ void mitk::BindDispatcherInteractor::RegisterInteractor(const mitk::DataNode* da
 void mitk::BindDispatcherInteractor::RegisterDataStorageEvents()
 {
   m_DataStorage->AddNodeEvent.AddListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>( this, &BindDispatcherInteractor::RegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
 
   m_DataStorage->RemoveNodeEvent.AddListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
   m_DataStorage->ChangedNodeEvent.AddListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
 }
 
 void mitk::BindDispatcherInteractor::UnRegisterInteractor(const DataNode* dataNode)
@@ -89,9 +106,9 @@ void mitk::BindDispatcherInteractor::SetDispatcher(Dispatcher::Pointer dispatche
 void mitk::BindDispatcherInteractor::UnRegisterDataStorageEvents()
 {
   m_DataStorage->AddNodeEvent.RemoveListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
   m_DataStorage->RemoveNodeEvent.RemoveListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
   m_DataStorage->ChangedNodeEvent.RemoveListener(
-      MessageDelegate1<BindDispatcherInteractor, const mitk::DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+      MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
 }

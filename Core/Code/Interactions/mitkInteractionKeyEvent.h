@@ -28,7 +28,7 @@
 
 #include <MitkExports.h>
 
-/**
+/*
  * Note: A Click with the MiddleButton is to be handled with MousePressEvents
  */
 

@@ -97,7 +97,7 @@ void mitk::EventConfig::EndElement(const char* elementName)
     m_CurrEventMapping.interactionEvent = event;
     m_EventList.push_back(m_CurrEventMapping);
     } else {
-      MITK_WARN << "EventConfig: Unknown Event-Type in config. Entry skipped.";
+      MITK_WARN << "EventConfig: Unknown Event-Type in config. Entry skipped: " << name;
     }
   }
 

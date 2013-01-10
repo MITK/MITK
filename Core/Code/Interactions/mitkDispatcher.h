@@ -41,6 +41,7 @@ namespace mitk
 
   class InternalEvent;
   class InteractionEvent;
+  class InformerService;
   class MITK_CORE_EXPORT Dispatcher: public itk::Object
   {
 
@@ -135,6 +136,11 @@ namespace mitk
      * or the request to delete an Interactor and its DataNode.
      */
     bool HandleInternalEvent(InternalEvent* internalEvent);
+
+    /**
+     * Hold microservice reference to object that takes care of informing the EventObservers about InteractionEvents
+     */
+    InformerService* m_InformerService;
 
   };
 

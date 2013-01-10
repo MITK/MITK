@@ -20,22 +20,24 @@
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
+#include <MitkExports.h>
 
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
 #include "mitkDispatcher.h"
 
-#include <MitkExports.h>
+
 
 /**
  * This Class is used to connect a DataStorage with the Dispatcher.
  * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
- * When an Interactor is registered with a DataNode the Dispatcher will be notified.
+ * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
+ * Also this class registers the MicroService at which EventObservers can register to receive events.
  */
 
 namespace mitk
 {
-
+  class InformerService;
   class MITK_CORE_EXPORT BindDispatcherInteractor: public itk::Object
   {
 
@@ -49,12 +51,13 @@ namespace mitk
     void SetDataStorage(DataStorage::Pointer dataStorage);
 
     /**
-     * Sets Dispatcher which will be notified.
+     * Sets Dispatcher which will be notified. By default each RenderWindow gets its own Dispatcher,
+     * this function can be used to override this behavior.
      */
     void SetDispatcher(Dispatcher::Pointer dispatcher);
 
     /**
-     * Return current Dispatcher.
+     * Return currently active Dispatcher.
      */
     Dispatcher::Pointer GetDispatcher();
 
@@ -71,6 +74,8 @@ namespace mitk
 
     Dispatcher::Pointer m_Dispatcher;
     DataStorage::Pointer m_DataStorage;
+
+    InformerService* m_InformerService;
   };
 
 } /* namespace mitk */

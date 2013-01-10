@@ -18,9 +18,20 @@
 #include "mitkInteractionEvent.h"
 #include "mitkInternalEvent.h"
 
+// MicroServices
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+
+#include "mitkInformer.h"
+
 mitk::Dispatcher::Dispatcher()
 {
   m_ProcessingMode = REGULAR;
+  // get service to inform EventObserver
+  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
+  m_InformerService = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
 }
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
@@ -68,15 +79,17 @@ mitk::Dispatcher::~Dispatcher()
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
   InteractionEvent::Pointer p = event;
-  MITK_INFO << event->GetEventClass();
+  //MITK_INFO << event->GetEventClass();
   bool eventIsHandled = false;
 
   /* Filter out and handle Internal Events separately */
   InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(event);
-  if (internalEvent != NULL) {
+  if (internalEvent != NULL)
+  {
     eventIsHandled = HandleInternalEvent(internalEvent);
     // InternalEvents that are handled are not sent to the listeners
-    if (eventIsHandled) {
+    if (eventIsHandled)
+    {
       return true;
     }
   }
@@ -116,7 +129,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
 
-    m_Interactors.sort(cmp());// sorts interactors by layer (descending);
+    m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
     for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end() && eventIsHandled == false;
         ++it)
     {
@@ -133,7 +146,8 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     }
   }
 
-  // TODO: inform listeners here
+  /* Notify EventObserver  */
+  m_InformerService->NotifyObservers(event);
 
   // Process event queue
   if (!m_QueuedEvents.empty())
@@ -201,7 +215,8 @@ void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataIntera
 
 bool mitk::Dispatcher::HandleInternalEvent(InternalEvent* internalEvent)
 {
-  if (internalEvent->GetSignalName() == INTERNALDeactivateMe && internalEvent->GetTargetInteractor() != NULL) {
+  if (internalEvent->GetSignalName() == INTERNALDeactivateMe && internalEvent->GetTargetInteractor() != NULL)
+  {
     internalEvent->GetTargetInteractor()->GetDataNode()->SetDataInteractor(NULL);
     internalEvent->GetTargetInteractor()->SetDataNode(NULL);
 

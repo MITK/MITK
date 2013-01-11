@@ -106,6 +106,8 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkIOUtilTest.cpp
+    mitkSurfaceVtkMapper3DTest
+    mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
 )
 
 # Create an artificial module initializing class for

@@ -44,11 +44,13 @@ var yScale = d3.scale.linear()
 
 var xAxis = d3.svg.axis()
   .scale(xScale)
-  .orient("bottom");
+  .orient("bottom")
+  .tickFormat(d3.format("s"));
 
 var yAxis = d3.svg.axis()
   .scale(yScale)
-  .orient("left");
+  .orient("left")
+  .tickFormat(d3.format("s"));
 
 var zoombie = d3.behavior.zoom().x(xScale).scaleExtent([1, 50]).on("zoom", zoom);
 
@@ -77,7 +79,6 @@ updateHistogram();
 function updateHistogram()
 {
   calcBinSize();
-
   if (!histogramData.useLineGraph)
   {
     barChart();
@@ -92,7 +93,7 @@ function calcBinSize()
 {
   var min = d3.min(histogramData.measurement);
   var max = d3.max(histogramData.measurement);
-  binSize = (max - min) / (histogramData.measurement.length);
+  binSize = Math.round((max - min) / (histogramData.measurement.length));
 }
 
 // method to display histogram as barchart
@@ -121,30 +122,22 @@ function barChart()
     .on("mouseover", myMouseOver)
     .on("mouseout", myMouseOut)
     .attr("x", function(d,i) {
-      return xScale(histogramData.measurement[i]);
+      return xScale(histogramData.measurement[i]-binSize/2);
     })
     .attr("y", height)
     .attr("height", 0)
     .attr("width", barWidth)
     .transition().delay(dur).duration(dur*1.5)
-    .attr("height", function(d) {
-      return (height - yScale(d));
-    })
+    .attr("height", barHeight)
     .attr("width", barWidth)
-    .attr("y", function(d) {
-      return yScale(d);
-    });
+    .attr("y", myYPostion);
 
   bar.transition().delay(dur).duration(dur*1.5)
     .attr("x", function(d,i) {
-      return xScale(histogramData.measurement[i]);
+      return xScale(histogramData.measurement[i]-binSize/2);
     })
-    .attr("y", function(d) {
-      return yScale(d);
-    })
-    .attr("height", function(d) {
-      return (height - yScale(d));
-    })
+    .attr("y", myYPostion)
+    .attr("height", barHeight)
     .attr("width", barWidth);
 
   bar.exit().transition().delay(dur).duration(dur*1.5)
@@ -247,7 +240,7 @@ function definition()
 {
 // match scale to current data
   xScale = d3.scale.linear()
-    .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
+    .domain([d3.min(histogramData.measurement)-binSize/2,d3.max(histogramData.measurement)+binSize/2])
     .range([0,width]);
 
   yScale = d3.scale.linear()
@@ -256,11 +249,13 @@ function definition()
 
   xAxis = d3.svg.axis()
     .scale(xScale)
-    .orient("bottom");
+    .orient("bottom")
+    .tickFormat(d3.format("s"));
 
   yAxis = d3.svg.axis()
     .scale(yScale)
-    .orient("left");
+    .orient("left")
+    .tickFormat(d3.format("s"));
 }
 
 // method to ensure barwidth is not smaller than 1px
@@ -270,6 +265,25 @@ function barWidth(d, i)
   bw =(xScale(histogramData.measurement[i + 1]) - xScale(histogramData.measurement[i])) * (histogramData.frequency.length / (histogramData.frequency.length + 1)) - 1;
   bw = bw > 1 ? bw : 1;
   return bw;
+}
+
+function barHeight(d)
+{
+  var bh;
+  bh = height - yScale(d);
+  bh = bh >=2 ? bh : 2;
+  return bh;
+}
+
+function myYPostion(d)
+{
+  var myy = yScale(d);
+  myy = (height-myy) > 2 ? myy : (height-2);
+  if (d == 0)
+  {
+    return height;
+  }
+  return myy;
 }
 
 // zoom function, with plot focus by scale 1 and different zooming mode
@@ -286,7 +300,7 @@ function zoom()
     svg.select(".x.axis").call(xAxis);
     vis.selectAll(".bar")
       .attr("width", barWidth)
-      .attr("x", function(d, i) { return xScale(histogramData.measurement[i])});
+      .attr("x", function(d, i) { return xScale(histogramData.measurement[i]-binSize/2)});
   }
   else
   {
@@ -308,7 +322,8 @@ function myMouseOver()
 
   myBar.style("fill", "red");
   d3.select(".infobox").style("display", "block");
-  d3.select(".measurement").text("Greyvalue: " + (Math.round(x*100))/100 + " ... " + (Math.round((x+binSize)*100))/100);
+  d3.select(".measurement").text("Greyvalue: " + (Math.round(x)) + " ... " + (Math.round(x+binSize)));
+  //d3.select(".measurement").text("Greyvalue: " + (Math.round(x*100))/100 + " ... " + (Math.round((x+binSize)*100))/100);
   d3.select(".frequency").text("Frequency: " + y);
 }
 

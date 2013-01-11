@@ -61,10 +61,17 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   HistogramConstIteratorType it;
   clearData();
   unsigned int i = 0;
+  bool firstValue = false;
   for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it, ++i)
   {
+    if (i<1) MITK_INFO << "Measurement: " << it.GetMeasurementVector()[0] << " Frequency: " <<  it.GetFrequency();
     // filter frequencies of 0 to guarantee a better view while using a mask
-    if (it.GetFrequency() != 0)
+    if (it.GetFrequency() != 0 && !firstValue)
+    {
+      firstValue = true;
+      i=0;
+    }
+    if (firstValue)
     {
       QVariant frequency = it.GetFrequency();
       QVariant measurement = it.GetMeasurementVector()[0];

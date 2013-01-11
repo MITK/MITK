@@ -28,8 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkShaderProperty.h"
 #include "mitkShaderRepository.h"
+#include <mitkExtractSliceFilter.h>
+#include <mitkImageSliceSelector.h>
 
-
+//VTK
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
@@ -38,9 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkPlaneCollection.h>
 #include <vtkSmartPointer.h>
-#include <mitkExtractSliceFilter.h>
-#include <mitkImageSliceSelector.h>
-
 
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 {
@@ -309,23 +308,29 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     if(imagetextureProp.IsNotNull())
     {
         mitk::Image* miktTexture = dynamic_cast< mitk::Image* >( imagetextureProp->GetSmartPointer().GetPointer() );
-
-        if(miktTexture->GetDimension(2) > 2)
+        vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
+        //Either select the first slice of a volume
+        if(miktTexture->GetDimension(2) > 1)
         {
             MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
+            mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
+            sliceselector->SetSliceNr(0);
+            sliceselector->SetChannelNr(0);
+            sliceselector->SetTimeNr(0);
+            sliceselector->SetInput(miktTexture);
+            sliceselector->Update();
+            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
         }
-
-        mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
-        sliceselector->SetSliceNr(0);
-        sliceselector->SetChannelNr(0);
-        sliceselector->SetTimeNr(0);
-        sliceselector->SetInput(miktTexture);
-        sliceselector->Update();
-
-        vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
-        vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
-
+        else //or just use the 2D image
+        {
+            vtkTxture->SetInput(miktTexture->GetVtkImageData());
+        }
+        //pass the texture to the actor
         ls->m_Actor->SetTexture(vtkTxture);
+        if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
+        {
+            MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
+        }
     }
 
     // deprecated settings

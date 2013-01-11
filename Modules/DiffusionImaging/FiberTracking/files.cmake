@@ -51,6 +51,8 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
   IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
 
+  IODataStructures/mitkFiberTrackingObjectFactory.h
+
   # Algorithms
   Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h

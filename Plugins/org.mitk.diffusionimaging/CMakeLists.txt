@@ -3,5 +3,5 @@ project(org_mitk_diffusionimaging)
 MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE ORG_MITK_DIFFUSIONIMAGING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDENCIES DiffusionCore QmitkExt
+  MODULE_DEPENDENCIES DiffusionCore Quantification FiberTracking Connectomics QmitkExt
 )

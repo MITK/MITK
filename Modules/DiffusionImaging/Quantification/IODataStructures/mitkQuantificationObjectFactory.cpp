@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNrrdTbssRoiImageWriterFactory.h"
 #include "mitkNrrdTbssRoiImageWriter.h"
 
+#include "mitkVolumeDataVtkMapper3D.h"
+#include "mitkGPUVolumeMapper3D.h"
+
 typedef char TbssRoiPixelType;
 typedef float TbssPixelType;
 typedef int TbssGradientPixelType;
@@ -63,7 +66,7 @@ mitk::Mapper::Pointer mitk::QuantificationObjectFactory::CreateMapper(mitk::Data
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    classname = "TbssRoiImage";
+    std::string classname = "TbssRoiImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::ImageVtkMapper2D::New();
@@ -80,7 +83,7 @@ mitk::Mapper::Pointer mitk::QuantificationObjectFactory::CreateMapper(mitk::Data
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    classname = "TbssRoiImage";
+    std::string classname = "TbssRoiImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeDataVtkMapper3D::New();
@@ -101,7 +104,7 @@ mitk::Mapper::Pointer mitk::QuantificationObjectFactory::CreateMapper(mitk::Data
 
 void mitk::QuantificationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  classname = "TbssRoiImage";
+  std::string classname = "TbssRoiImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::ImageVtkMapper2D::SetDefaultProperties(node);

@@ -24,7 +24,11 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "FiberTrackingExports.h"
 #include <itkImage.h>
-#include <mitkTbssImage.h>
+#include <itkVectorImage.h>
+#include "mitkImage.h"
+#include "mitkImageCast.h"
+
+//#include <mitkTbssImage.h>
 
 
 namespace mitk{
@@ -60,10 +64,12 @@ public:
   }*/
 
 
+  /* Unused method - would introduce circular dependency to the new module structure
+   * of the diffusion imaging
   void SetTbssImage(mitk::TbssImage::Pointer tbssImg)
   {
     m_TbssImage = tbssImg;
-  }
+  }*/
 
   void SetProjections(ProjectionsImageType::Pointer projections)
   {
@@ -123,7 +129,7 @@ protected:
   CharImageType::Pointer m_RoiImg;
   ProjectionsImageType::Pointer m_Projections;
   //FloatImageType::Pointer m_MeanSkeleton;
-  mitk::TbssImage::Pointer m_TbssImage;
+  //mitk::TbssImage::Pointer m_TbssImage;
 
   mitk::Image::Pointer m_InputImage;
 

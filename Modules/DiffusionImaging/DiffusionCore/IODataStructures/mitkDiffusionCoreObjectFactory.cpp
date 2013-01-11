@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGPUVolumeMapper3D.h"
 #include "mitkVolumeDataVtkMapper3D.h"
 
+#include "mitkPlanarFigureMapper3D.h"
+
 
 typedef short DiffusionPixelType;
 

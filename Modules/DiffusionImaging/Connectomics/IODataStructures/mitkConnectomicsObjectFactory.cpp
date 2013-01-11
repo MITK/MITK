@@ -52,7 +52,7 @@ mitk::Mapper::Pointer mitk::ConnectomicsObjectFactory::CreateMapper(mitk::DataNo
 
   if ( id == mitk::BaseRenderer::Standard3D )
   {
-    classname = "ConnectomicsNetwork";
+    std::string classname("ConnectomicsNetwork");
     if (node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::ConnectomicsNetworkMapper3D::New();
@@ -66,7 +66,7 @@ mitk::Mapper::Pointer mitk::ConnectomicsObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::ConnectomicsObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  classname = "ConnectomicsNetwork";
+  std::string classname("ConnectomicsNetwork");
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(node);

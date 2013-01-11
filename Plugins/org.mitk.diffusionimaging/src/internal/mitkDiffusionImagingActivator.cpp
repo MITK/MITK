@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffusionImagingActivator.h"
-#include "mitkDiffusionImagingObjectFactory.h"
+#include "mitkDiffusionCoreObjectFactory.h"
 
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
@@ -27,7 +27,7 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  RegisterDiffusionImagingObjectFactory();
+  RegisterDiffusionCoreObjectFactory();
 
   QmitkNodeDescriptorManager* manager =
     QmitkNodeDescriptorManager::GetInstance();
@@ -41,7 +41,7 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 
   mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkDiffusionImaging/reconodf.png"), isQBallImage, manager));
-
+/*
   mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/FiberBundle.png"), isFiberBundle, manager));
 
@@ -50,7 +50,7 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 
   mitk::NodePredicateDataType::Pointer isConnectomicsNetwork = mitk::NodePredicateDataType::New("ConnectomicsNetwork");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("ConnectomicsNetwork"), QString(":/QmitkDiffusionImaging/ConnectomicsNetwork.png"), isConnectomicsNetwork, manager));
-
+*/
 }
 
 void

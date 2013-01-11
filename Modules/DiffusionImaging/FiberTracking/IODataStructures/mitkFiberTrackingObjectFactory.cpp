@@ -31,7 +31,7 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    classname = "FiberBundleX";
+    std::string classname("FiberBundleX");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::FiberBundleXMapper2D::New();
@@ -41,7 +41,7 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    classname = "FiberBundleX";
+    std::string classname("FiberBundleX");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::FiberBundleXMapper3D::New();
@@ -61,7 +61,7 @@ mitk::Mapper::Pointer mitk::FiberTrackingObjectFactory::CreateMapper(mitk::DataN
 
 void mitk::FiberTrackingObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  classname = "FiberBundleX";
+  std::string classname("FiberBundleX");
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::FiberBundleXMapper3D::SetDefaultProperties(node);

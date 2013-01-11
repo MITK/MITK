@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( FiberTracking
   INCLUDE_DIRS Algorithms Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS DiffusionCore
+  DEPENDS DiffusionCore MitkGraphAlgorithms
 )
 
 if(FiberTracking_IS_ENABLED)

@@ -47,6 +47,7 @@ set(CPP_FILES
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
+  Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
@@ -63,6 +64,7 @@ set(H_FILES
   # Rendering
   Rendering/mitkDiffusionImageMapper.h
   Rendering/mitkOdfVtkMapper2D.h
+  Rendering/mitkPlanarFigureMapper3D.h
 
   # Reconstruction
   Algorithms/Reconstruction/itkDiffusionQballReconstructionImageFilter.h

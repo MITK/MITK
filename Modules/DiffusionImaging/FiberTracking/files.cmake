@@ -19,7 +19,7 @@ set(CPP_FILES
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
-  Rendering/mitkPlanarFigureMapper3D.cpp
+  #Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
@@ -40,7 +40,7 @@ set(H_FILES
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
   Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
-  Rendering/mitkPlanarFigureMapper3D.h
+  #Rendering/mitkPlanarFigureMapper3D.h
 
   # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.h

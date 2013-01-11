@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-#include <mitkDiffusionImagingObjectFactory.h>
+#include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include <mitkFiberBundleXReader.h>
 #include <mitkBaseDataIOFactory.h>
@@ -43,7 +43,7 @@ int mitkFiberBundleXTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(reader.IsNotNull(),"reader instantiation")
 
   try{
-    RegisterDiffusionImagingObjectFactory();
+    RegisterFiberTrackingObjectFactory();
 
     // test if fib1 can be read
     const std::string s1="", s2="";

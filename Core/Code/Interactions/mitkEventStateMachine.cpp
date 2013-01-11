@@ -27,19 +27,28 @@ mitk::EventStateMachine::EventStateMachine()
   m_CurrentState = NULL;
 }
 
-void mitk::EventStateMachine::LoadStateMachine(std::string filename)
+bool mitk::EventStateMachine::LoadStateMachine(std::string filename)
 {
   if (m_StateMachineContainer != NULL)
   {
     m_StateMachineContainer->Delete();
   }
   m_StateMachineContainer = StateMachineContainer::New();
-  m_StateMachineContainer->LoadBehavior(filename);
-  m_CurrentState = m_StateMachineContainer->GetStartState();
 
-  // clear actions map ,and connect all actions as declared in sub-class
-  m_ActionFunctionsMap.clear();
-  ConnectActionsAndFunctions();
+  if (m_StateMachineContainer->LoadBehavior(filename))
+  {
+    m_CurrentState = m_StateMachineContainer->GetStartState();
+
+    // clear actions map ,and connect all actions as declared in sub-class
+    m_ActionFunctionsMap.clear();
+    ConnectActionsAndFunctions();
+    return true;
+  }
+  else
+  {
+    MITK_WARN << "Unable to load StateMachine from file: " << filename;
+    return false;
+  }
 }
 
 mitk::EventStateMachine::~EventStateMachine()
@@ -54,14 +63,14 @@ void mitk::EventStateMachine::AddActionFunction(std::string action, mitk::TActio
 {
   if (!functor)
     return;
-  // make sure double calls for same action won't cause memory leaks
+// make sure double calls for same action won't cause memory leaks
   delete m_ActionFunctionsMap[action];
   m_ActionFunctionsMap[action] = functor;
 }
 
 bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
 {
-  // check if the current state holds a transition that works with the given event.
+// check if the current state holds a transition that works with the given event.
   StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetEventClass(), GetMappedEvent(event));
 
   if (transition.IsNotNull())
@@ -78,7 +87,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
     {
       // perform state change
       m_CurrentState = transition->GetNextState();
-      //MITK_INFO << "StateChange: " << m_CurrentState->GetName();
+      MITK_INFO << "StateChange: " << m_CurrentState->GetName();
     }
     return success;
   }

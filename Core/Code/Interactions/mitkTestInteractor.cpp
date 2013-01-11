@@ -36,6 +36,8 @@ void mitk::TestInteractor::ConnectActionsAndFunctions()
 
 bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  GetDataNode()->SetBoolProperty("show contour", true);
+
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
@@ -44,12 +46,17 @@ bool mitk::TestInteractor::AddPoint(StateMachineAction*, InteractionEvent* inter
     m_NumberOfPoints++;
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     if (m_NumberOfPoints >= 3)
     {
       InternalEvent::Pointer event = InternalEvent::New(NULL,this, "has3points");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
+    if (m_NumberOfPoints == 2)
+      {
+        InternalEvent::Pointer event = InternalEvent::New(NULL,this, "has2points");
+        positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+      }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return true;
   }
   else
@@ -101,11 +108,9 @@ bool mitk::TestInteractor::DeSelectPoint(StateMachineAction*, InteractionEvent* 
 }
 
 mitk::TestInteractor::TestInteractor() :
-    m_NumberOfPoints(0)
+    m_NumberOfPoints(0), m_SelectedPointIndex(-1)
 {
   m_PointSet = PointSet::New();
-  m_NumberOfPoints = 0;
-  m_SelectedPointIndex = -1;
 }
 
 mitk::TestInteractor::~TestInteractor()

@@ -92,7 +92,7 @@ namespace mitk
     typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
-    void LoadStateMachine(std::string filename);
+    bool LoadStateMachine(std::string filename);
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for

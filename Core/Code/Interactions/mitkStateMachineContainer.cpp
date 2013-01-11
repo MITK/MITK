@@ -101,10 +101,13 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
     }
 
     // sanitize state modes
-    if (stateMode == "" || stateMode == "REGULAR") {
+    if (stateMode == "" || stateMode == "REGULAR")
+    {
       stateMode = "REGULAR";
-    } else if (stateMode != "GRAB_INPUT" && stateMode != "PREFER_INPUT") {
-      MITK_WARN << "Invalid State Modus " << stateMode << ". Mode assumed to be REGULAR";
+    }
+    else if (stateMode != "GRAB_INPUT" && stateMode != "PREFER_INPUT")
+    {
+      MITK_WARN<< "Invalid State Modus " << stateMode << ". Mode assumed to be REGULAR";
       stateMode = "REGULAR";
     }
     m_CurrState = mitk::StateMachineState::New(stateName, stateMode);
@@ -120,10 +123,14 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
 
     mitk::StateMachineTransition::Pointer transition = mitk::StateMachineTransition::New(target, eventClass, eventVariant);
     if (m_CurrState)
+    {
       m_CurrState->AddTransition(transition);
+    }
     else
+    {
       MITK_WARN<< "Malformed Statemachine Pattern. Transition has no origin. \n Will be ignored.";
-
+      MITK_WARN<< "Malformed Transition details: target="<< target << ", event class:" <<  eventClass << ", event variant:"<< eventVariant ;
+    }
     m_CurrTransition = transition;
   }
 

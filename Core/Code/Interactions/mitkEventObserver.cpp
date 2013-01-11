@@ -16,9 +16,8 @@
 
 #include "mitkEventObserver.h"
 
-void mitk::EventObserver::Notify(InteractionEvent::Pointer interactionEvent)
+void mitk::EventObserver::Notify(InteractionEvent::Pointer /*interactionEvent*/)
 {
-  MITK_INFO << "has been informed about " << interactionEvent->GetEventClass();
 }
 
 mitk::EventObserver::EventObserver()

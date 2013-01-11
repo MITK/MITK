@@ -267,7 +267,7 @@
       <item row="0" column="0">
        <widget class="QGroupBox" name="groupBox_2">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -284,14 +284,14 @@
         <widget class="QRadioButton" name="m_lineRadioButton">
          <property name="geometry">
           <rect>
-           <x>150</x>
+           <x>230</x>
            <y>10</y>
            <width>85</width>
            <height>17</height>
           </rect>
          </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -314,6 +314,12 @@
            <width>82</width>
            <height>17</height>
           </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="text">
           <string>Use barchart</string>

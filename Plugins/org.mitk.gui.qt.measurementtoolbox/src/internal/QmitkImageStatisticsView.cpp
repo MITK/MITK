@@ -388,6 +388,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_Controls->m_LineProfileWidget->ClearItemModel();
+      m_Controls->m_JSHistogram->clearHistogram();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
       return;
@@ -531,6 +532,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_HistogramWidget->ClearItemModel();
     m_Controls->m_LineProfileWidget->ClearItemModel();
+    m_Controls->m_JSHistogram->clearHistogram();
     m_CurrentStatisticsValid = false;
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
@@ -545,6 +547,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
         m_Controls->m_HistogramWidget->ClearItemModel();
         m_Controls->m_LineProfileWidget->ClearItemModel();
+        m_Controls->m_JSHistogram->clearHistogram();
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
         m_Controls->m_SelectedMaskLabel->setText( "None" );
@@ -556,6 +559,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_LineProfileWidget->SetImage( this->m_CalculationThread->GetStatisticsImage() );
       m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
       m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+      //m_Controls->m_JSHistogram
     }
   }
   this->m_StatisticsUpdatePending = false;

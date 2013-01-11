@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
-#include <mitkDiffusionImagingObjectFactory.h>
+#include <mitkConnectomicsObjectFactory.h>
 #include "mitkConnectomicsNetwork.h"
 #include "mitkConnectomicsSyntheticNetworkGenerator.h"
 #include "mitkConnectomicsSimulatedAnnealingManager.h"

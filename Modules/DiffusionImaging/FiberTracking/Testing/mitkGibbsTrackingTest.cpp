@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseDataIOFactory.h>
-#include <mitkDiffusionImagingObjectFactory.h>
+#include <mitkFiberTrackingObjectFactory.h>
+#include <mitkDiffusionCoreObjectFactory.h>
 #include <itkGibbsTrackingFilter.h>
 #include <mitkFiberBundleX.h>
 
@@ -45,8 +46,8 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Lut path: " << argv[4];
     MITK_INFO << "Reference bundle: " << argv[5];
 
-    RegisterDiffusionImagingObjectFactory();
-
+    RegisterDiffusionCoreObjectFactory();
+    RegisterFiberTrackingObjectFactory();
 
     // test if fib1 can be read
     const std::string s1="", s2="";

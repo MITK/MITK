@@ -204,6 +204,16 @@
               </property>
              </widget>
             </item>
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="m_UseWeights">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only for a dataset with 3 Shells and an arethmetic progression (e.g. b1=1000, b2=2000, b3=3000 ).&lt;/p&gt;&lt;p&gt;Weightings will be applied on the interpolated directions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Use Shell Weights</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>

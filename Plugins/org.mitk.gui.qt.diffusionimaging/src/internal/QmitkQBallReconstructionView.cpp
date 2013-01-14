@@ -408,6 +408,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 
   m_Controls->m_QBallSelectionBox->setHidden(true);
   m_Controls->m_OutputCoeffsImage->setHidden(true);
+  m_Controls->m_UseWeights->setHidden(true);
 
   if (method==0)
     m_Controls->m_ShFrame->setVisible(false);
@@ -440,6 +441,7 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     m_Controls->m_Description->setText("SH recon. of the multi shell diffusion signal (Aganj 2010)");
     m_Controls->m_QBallSelectionBox->setHidden(false);
     m_Controls->m_OutputCoeffsImage->setHidden(false);
+    m_Controls->m_UseWeights->setHidden(false);
     break;
   }
 }
@@ -937,6 +939,8 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
 
   //filter->SetBValue(vols->GetB_Value());
+  filter->SetUseWeights( m_Controls->m_UseWeights->isChecked());
+
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 

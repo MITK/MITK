@@ -257,9 +257,17 @@ mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(Point2D
 {
   Point2D p_mm;
   Point3D position;
-  GetDisplayGeometry()->ULDisplayToDisplay(mousePosition, mousePosition);
-  GetDisplayGeometry()->DisplayToWorld(mousePosition, p_mm);
-  GetDisplayGeometry()->Map(p_mm, position);
+  if (m_MapperID == 1)
+  {
+    GetDisplayGeometry()->ULDisplayToDisplay(mousePosition, mousePosition);
+    GetDisplayGeometry()->DisplayToWorld(mousePosition, p_mm);
+    GetDisplayGeometry()->Map(p_mm, position);
+  }
+  else if (m_MapperID == 2)
+  {
+    GetDisplayGeometry()->ULDisplayToDisplay(mousePosition, mousePosition);
+    PickWorldPoint(mousePosition, position);
+  }
   return position;
 }
 

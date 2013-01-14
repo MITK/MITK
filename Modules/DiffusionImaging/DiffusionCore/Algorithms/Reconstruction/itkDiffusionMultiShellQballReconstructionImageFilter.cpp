@@ -431,45 +431,40 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       if(m_Interpolation_Flag)
       {
-        int interp_SHOrder_shell1 = 12;
+        unsigned int interp_SHOrder_shell1 = 12;
         while( ((interp_SHOrder_shell1+1)*(interp_SHOrder_shell1+2)/2) > size_shell1 && interp_SHOrder_shell1 > L )
           interp_SHOrder_shell1 -= 2 ;
 
         const int number_coeffs_shell1 = (int)(interp_SHOrder_shell1*interp_SHOrder_shell1 + interp_SHOrder_shell1 + 2.0)/2.0 + interp_SHOrder_shell1;
 
-        int interp_SHOrder_shell2 = 12;
+        unsigned int interp_SHOrder_shell2 = 12;
         while( ((interp_SHOrder_shell2+1)*(interp_SHOrder_shell2+2)/2) > size_shell2 && interp_SHOrder_shell2 > L )
           interp_SHOrder_shell2 -= 2 ;
 
         const int number_coeffs_shell2 = (int)(interp_SHOrder_shell2*interp_SHOrder_shell2 + interp_SHOrder_shell2 + 2.0)/2.0 + interp_SHOrder_shell2;
 
-        int interp_SHOrder_shell3 = 12;
+        unsigned int interp_SHOrder_shell3 = 12;
         while( ((interp_SHOrder_shell3+1)*(interp_SHOrder_shell3+2)/2) > size_shell3 && interp_SHOrder_shell3 > L )
           interp_SHOrder_shell3 -= 2 ;
 
         const int number_coeffs_shell3 = (int)(interp_SHOrder_shell3*interp_SHOrder_shell3 + interp_SHOrder_shell3 + 2.0)/2.0 + interp_SHOrder_shell3;
 
 
-        MITK_INFO << "Debug Information: Multishell Reconstruction filter - Interpolation";
-        MITK_INFO << "Shell 1 - SHOrder: " << interp_SHOrder_shell1 << " Number of Coeffs: " << number_coeffs_shell1 << " Number of Gradientdirections: " << size_shell1;
-        MITK_INFO << "Shell 2 - SHOrder: " << interp_SHOrder_shell2 << " Number of Coeffs: " << number_coeffs_shell2 << " Number of Gradientdirections: " << size_shell2;
-        MITK_INFO << "Shell 3 - SHOrder: " << interp_SHOrder_shell3 << " Number of Coeffs: " << number_coeffs_shell3 << " Number of Gradientdirections: " << size_shell3;
-        MITK_INFO << "Overall - SHOrder: " << L                     << " Number of Coeffs: " << (L+1)*(L+2)*0.5      << " Number of Gradientdirections: " << size_shell1+size_shell2+size_shell3;
+        // find shell with max(dirs)
+        if(m_UseWeights){
+          double maxDirs = size_shell3;
+          if(size_shell2 > maxDirs) maxDirs = size_shell2;
+          if(size_shell1 > maxDirs) maxDirs = size_shell1;
+
+          // calculate weights
+          m_WeightShell1 = size_shell1 / maxDirs;
+          m_WeightShell2 = size_shell2 / maxDirs;
+          m_WeightShell3 = size_shell3 / maxDirs;
+        }
 
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();
-
         m_MaxDirections = all_directions_container.size();
-
-        // calculate weights
-        m_WeightShell1 = size_shell1 / (double)m_MaxDirections;
-        m_WeightShell2 = size_shell2 / (double)m_MaxDirections;
-        m_WeightShell3 = size_shell3 / (double)m_MaxDirections;
-
-        MITK_INFO << "Information content per shell";
-        MITK_INFO << "1. Shell: " << m_WeightShell1;
-        MITK_INFO << "2. Shell: " << m_WeightShell2;
-        MITK_INFO << "3. Shell: " << m_WeightShell3;
 
         // create target SH-Basis
         // initialize empty target matrix and set the wanted directions
@@ -492,8 +487,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ComputeSphericalHarmonicsBasis(Q, m_TARGET_SH_shell3, interp_SHOrder_shell3);
         delete Q;
         // end creat target SH-Basis
-
-
 
 
         // create measured-SHBasis
@@ -550,6 +543,31 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         delete tempSHBasis;
 
         ComputeReconstructionMatrix(all_directions_container);
+
+        MITK_INFO << "Reconstruction information: Multishell Reconstruction filter - Interpolation";
+        MITK_INFO << "Shell 1";
+        MITK_INFO << "  SHOrder: " << interp_SHOrder_shell1;
+        MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell1;
+        MITK_INFO << "  Number of Gradientdirections: " << size_shell1;
+        if(m_WeightShell1 != 0) MITK_INFO << "  Information content: " << m_WeightShell1;
+
+        MITK_INFO << "Shell 2";
+        MITK_INFO << "  SHOrder: " << interp_SHOrder_shell2;
+        MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell2;
+        MITK_INFO << "  Number of Gradientdirections: " << size_shell2;
+        if(m_WeightShell2 != 0) MITK_INFO << "  Information content: " << m_WeightShell2;
+
+        MITK_INFO << "Shell 3";
+        MITK_INFO << "  SHOrder: " << interp_SHOrder_shell3;
+        MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell3;
+        MITK_INFO << "  Number of Gradientdirections: " << size_shell3;
+        if(m_WeightShell3 != 0) MITK_INFO << "  Information content: " << m_WeightShell3;
+
+        MITK_INFO << "Overall";
+        MITK_INFO << "  SHOrder: " << L;
+        MITK_INFO << "  Number of Coeffs: " << (L+1)*(L+2)*0.5;
+        MITK_INFO << "  Number of Gradientdirections: " << m_MaxDirections;
+
         return;
       }else
       {
@@ -935,7 +953,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
       // the first coeff is a fix value
       coeffs[0] = 1.0/(2.0*sqrt(M_PI));
-
       coeffPixel = element_cast<double, TO>(coeffs).data_block();
 
       // Cast the Signal-Type from double to float for the ODF-Image
@@ -1014,7 +1031,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 
   const int LOrder = L;
   int NumberOfCoeffs = (int)(LOrder*LOrder + LOrder + 2.0)/2.0 + LOrder;
-  MITK_INFO << NumberOfCoeffs;
   MatrixDoublePtr SHBasisMatrix(new vnl_matrix<double>(numberOfGradientDirections,NumberOfCoeffs));
   SHBasisMatrix->fill(0.0);
   VectorIntPtr SHOrderAssociation(new vnl_vector<int>(NumberOfCoeffs));

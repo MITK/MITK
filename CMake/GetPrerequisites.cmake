@@ -353,7 +353,7 @@ function(gp_resolve_item context item exepath dirs resolved_item_var)
   # by whatever logic they choose:
   #
   if(COMMAND gp_resolve_item_override)
-    gp_resolve_item_override("${context}" "${item}" "${exepath}" "${dirs}" resolved_item resolved)
+    gp_resolve_item_override("${context}" "${resolved_item}" "${exepath}" "${dirs}" resolved_item resolved)
   endif(COMMAND gp_resolve_item_override)
 
   if(NOT resolved)

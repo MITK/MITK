@@ -90,7 +90,7 @@ macro(_fixup_target)
       endif()
     endmacro(gp_resolved_file_type_override)
 
-    macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
+    macro(gp_resolve_item_override context item exepath dirs resolved_item resolved)
     
       get_filename_component(_item_name \"\${item}\" NAME)
       get_filename_component(_item_path \"\${item}\" PATH)

@@ -516,7 +516,6 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
     {
         dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) )->GetProperty()->SetOpacity(opacity);
     }
-
 }
 
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
@@ -536,17 +535,15 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
-            (this->GetDataNode()->GetProperty("LookupTable"));
+            (this->GetDataNode()->GetProperty("UserDefinedLookupTable"));
 
     if(binary) // is it a binary image?
     {
         //default lookuptable for binary images
         localStorage->m_Texture->GetLookupTable()->SetRange(0.0, 1.0);
-        MITK_INFO << "Binary image lookuptabel is used.";
     }
     else if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
     {
-        MITK_INFO << "User lookuptabel is used.";
         //If a lookup table is supplied by the user:
         //only update the lut, when the properties have changed...
         if( lookupTableProp->GetLookupTable()->GetMTime()
@@ -562,12 +559,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
     }
     else if(transferFunctionProperty.IsNotNull()) // is a color transfer function set?
     {
-        MITK_INFO << "User transferfunction is used.";
         localStorage->m_Texture->SetLookupTable(transferFunctionProperty->GetValue()->GetColorTransferFunction());
     }
     else
     {
-        MITK_INFO << "Default lut is used.";
         //default lookuptable
         LevelWindow levelWindow;
         this->GetLevelWindow( levelWindow, renderer );
@@ -579,7 +574,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
     localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
     if((transferFunctionProperty.IsNotNull()) && (lookupTableProp.IsNotNull()))
     {
-        MITK_WARN << "A LookupTable and a transfer functionImage Rendering.Transfer Function property is set! Only the LookupTable will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
+        MITK_WARN << "A LookupTable and a transfer function Image Rendering.Transfer Function property is set! Only the LookupTable will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
     }
     // check for texture interpolation property
     bool textureInterpolation = false;
@@ -690,7 +685,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
             bwLut->Build();
             mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
             mitkLutProp->SetLookupTable(mitkLut);
-//            node->SetProperty( "LookupTable", mitkLutProp );
+            node->SetProperty( "UserDefinedLookupTable", mitkLutProp );
         }
         else
             if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK
@@ -801,18 +796,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
             opaclevwin.SetWindowBounds(0,255);
             mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(opaclevwin);
             node->SetProperty( "opaclevelwindow", prop, renderer );
-        }
-        if((overwrite) || (node->GetProperty("LookupTable", renderer)==NULL))
-        {
-            // add a default rainbow lookup table for color mapping
-            mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-            vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-            vtkLut->SetHueRange(0.6667, 0.0);
-            vtkLut->SetTableRange(0.0, 20.0);
-            vtkLut->Build();
-            mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-            mitkLutProp->SetLookupTable(mitkLut);
-//            node->SetProperty( "LookupTable", mitkLutProp );
         }
     }
     Superclass::SetDefaultProperties(node, renderer, overwrite);
@@ -955,10 +938,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
         // This is safe, as the while-loop and the x-reset logic above makes
         // sure we do not exceed the bounds of the image
         currentPixel++;
-
-
     }//end of while
-
 
     // Create a polydata to store everything in
     vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();

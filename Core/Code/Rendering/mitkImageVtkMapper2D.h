@@ -72,7 +72,13 @@ namespace mitk {
  *
  *   - \b "opacity": (FloatProperty) Opacity of the image
  *   - \b "color": (ColorProperty) Color of the image
- *   - \b "use color": (BoolProperty) Use the color of the image or not
+ *   - \b "UserDefinedLookupTable": (mitkLookupTableProperty) If this property is set,
+ *          the default lookuptable will be ignored and the "User Defined Lookup table"
+ *          will be used instead.
+ *   - \b "Image Rendering.Transfer Function": (mitkTransferFunctionProperty) If this
+ *          property is set, a color transferfunction will be used to color the image.
+ *     \warning This property will not have any effect if, the "UserDefinedLookupTable"
+ *                   is set.
  *   - \b "binary": (BoolProperty) is the image a binary image or not
  *   - \b "outline binary": (BoolProperty) show outline of the image or not
  *   - \b "texture interpolation": (BoolProperty) texture interpolation of the image
@@ -96,6 +102,8 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
+ *   - \b "Image Rendering.Transfer Function":  Undefined. Must be set by the user.
+ *   - \b "UserDefinedLookupTable":  Undefined. Must be set by the user.
 
  * If the modality-property is set for an image, the mapper uses modality-specific default properties,
  * e.g. color maps, if they are defined.

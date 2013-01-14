@@ -83,6 +83,10 @@ class mitkTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     \brief set the image holding the distance information used for measuring
     */
     void SetDistanceImage(mitk::Image::Pointer distanceImage);
+    /*!
+    \brief Set intrinsic parameters of the used device
+    */
+    void SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer cameraIntrinsics);
 
   signals:
 

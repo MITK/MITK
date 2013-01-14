@@ -35,6 +35,7 @@ class QTimer;
 #include <mitkToFSurfaceVtkMapper3D.h>
 #include <mitkToFImageRecorder.h>
 #include <mitkToFCompositeFilter.h>
+#include <mitkCameraIntrinsics.h>
 
 /*!
   \brief QmitkToFUtilView
@@ -65,6 +66,7 @@ public:
     QmitkToFUtilView();
     ~QmitkToFUtilView();
 
+
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated.
     virtual void Activated();
@@ -76,7 +78,6 @@ public:
     virtual void Hidden();
 
     void SetFocus();
-
 
 protected slots:
 
@@ -167,6 +168,7 @@ protected:
     double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
     double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
 
+    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< member holding the intrinsic parameters of the camera
 private:
 
     /*!

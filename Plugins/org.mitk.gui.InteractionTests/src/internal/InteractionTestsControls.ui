@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
+    <width>234</width>
     <height>161</height>
    </rect>
   </property>
@@ -33,10 +33,24 @@
    <item>
     <widget class="QPushButton" name="buttonPerformImageProcessing">
      <property name="toolTip">
-      <string>Do image processing</string>
+      <string/>
      </property>
      <property name="text">
-      <string>Do Something</string>
+      <string>Line Interactor</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="toggleConfig">
+     <property name="text">
+      <string>Toggle Config of Selected</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="grabInput">
+     <property name="text">
+      <string>Line Interactor (Grab Input)</string>
      </property>
     </widget>
    </item>

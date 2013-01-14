@@ -93,11 +93,14 @@ void mitk::EventConfig::EndElement(const char* elementName)
   if (name == INPUT)
   {
     InteractionEvent::Pointer event = EventFactory::CreateEvent(m_EventPropertyList);
-    if (event.IsNotNull()) {
-    m_CurrEventMapping.interactionEvent = event;
-    m_EventList.push_back(m_CurrEventMapping);
-    } else {
-      MITK_WARN << "EventConfig: Unknown Event-Type in config. Entry skipped: " << name;
+    if (event.IsNotNull())
+    {
+      m_CurrEventMapping.interactionEvent = event;
+      m_EventList.push_back(m_CurrEventMapping);
+    }
+    else
+    {
+      MITK_WARN<< "EventConfig: Unknown Event-Type in config. Entry skipped: " << name;
     }
   }
 
@@ -138,7 +141,7 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
       return (*it).variantName;
     }
   }
-  MITK_INFO << "no mapping found for" << interactionEvent->GetEventClass();
+  MITK_INFO<< "no mapping found for" << interactionEvent->GetEventClass();
   return "";
 }
 

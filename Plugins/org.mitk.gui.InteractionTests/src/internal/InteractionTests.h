@@ -47,7 +47,9 @@ public:
 protected slots:
 
   /// \brief Called when the user clicks the GUI button
-  void DoImageProcessing();
+  void DrawLines();
+  void ToggleConfig();
+  void GrabInput();
 
 protected:
 
@@ -61,6 +63,7 @@ private:
   mitk::DataNode::Pointer m_CurrentDataNode;
   mitk::TestInteractor::Pointer m_CurrentInteractor;
   mitk::DataNode::Pointer m_CurrentImage;
+  bool m_ConfigChoice;
 };
 
 #endif // InteractionTests_h

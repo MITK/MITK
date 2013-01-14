@@ -106,6 +106,9 @@ public:
     itkSetMacro( Lambda, double );
     itkGetMacro( Lambda, double );
 
+    itkSetMacro( UseWeights, bool);
+    itkGetMacro( UseWeights, bool);
+
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
     ~DiffusionMultiShellQballReconstructionImageFilter() { };
@@ -164,8 +167,11 @@ private:
 
     bool m_IsArithmeticProgession;
 
-    //int m_NumberCoefficients;
+    bool m_UseWeights;
 
+    double m_WeightShell1;
+    double m_WeightShell2;
+    double m_WeightShell3;
 
 
     void ComputeReconstructionMatrix(IndiciesVector const & refVector);

@@ -47,7 +47,11 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BValue(1.0),
   m_Lambda(0.0),
   m_IsHemisphericalArrangementOfGradientDirections(false),
-  m_IsArithmeticProgession(false)
+  m_IsArithmeticProgession(false),
+  m_UseWeights(false),
+  m_WeightShell1(0.0),
+  m_WeightShell2(0.0),
+  m_WeightShell3(0.0)
 {
   // At least 1 inputs is necessary for a vector image.
   // For images added one at a time we need at least six
@@ -393,16 +397,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     BValueMapIteraotr it = m_BValueMap.begin();
     it++; // skip b0 entry
-    const int bValue_shell1 = it->first;
-    const int size_shell1 = it->second.size();
+    const unsigned int bValue_shell1 = it->first;
+    const unsigned int size_shell1 = it->second.size();
     IndiciesVector shell1 = it->second;
     it++;
-    const int bValue_shell2 = it->first;
-    const int size_shell2 = it->second.size();
+    const unsigned int bValue_shell2 = it->first;
+    const unsigned int size_shell2 = it->second.size();
     IndiciesVector shell2 = it->second;
     it++;
-    const int bValue_shell3 = it->first;
-    const int size_shell3 = it->second.size();
+    const unsigned int bValue_shell3 = it->first;
+    const unsigned int size_shell3 = it->second.size();
     IndiciesVector shell3 = it->second;
 
     // arithmetic progrssion
@@ -456,6 +460,16 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         IndiciesVector  all_directions_container = GetAllDirections();
 
         m_MaxDirections = all_directions_container.size();
+
+        // calculate weights
+        m_WeightShell1 = size_shell1 / (double)m_MaxDirections;
+        m_WeightShell2 = size_shell2 / (double)m_MaxDirections;
+        m_WeightShell3 = size_shell3 / (double)m_MaxDirections;
+
+        MITK_INFO << "Information content per shell";
+        MITK_INFO << "1. Shell: " << m_WeightShell1;
+        MITK_INFO << "2. Shell: " << m_WeightShell2;
+        MITK_INFO << "3. Shell: " << m_WeightShell3;
 
         // create target SH-Basis
         // initialize empty target matrix and set the wanted directions
@@ -670,7 +684,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::NumericalNShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
 
- /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
+  /* itk::LevenbergMarquardtOptimizer::Pointer optimizer = itk::LevenbergMarquardtOptimizer::New();
   optimizer->SetUseCostFunctionGradient(false);
 
   // Scale the translation components of the Transform in the Optimizer
@@ -759,6 +773,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   double P2,A,B2,B,P,alpha,beta,lambda, ER1, ER2;
 
 
+
   // iterate overall voxels of the gradient image region
   while( ! gradientInputImageIterator.IsAtEnd() )
   {
@@ -834,6 +849,8 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
       for(unsigned int i = 0 ; i < Shell3Indiecies.size(); i++)
         DataShell3[i] = static_cast<double>(b[Shell3Indiecies[i]]);
 
+
+
       // Normalize the Signal: Si/S0
       S_S0Normalization(DataShell1, shell1b0Norm);
       S_S0Normalization(DataShell2, shell2b0Norm);
@@ -849,6 +866,14 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E1 = (DataShell1);
         E2 = (DataShell2);
         E3 = (DataShell3);
+      }
+
+      //signal weighting according to information content
+      if(m_UseWeights)
+      {
+        E1 *= m_WeightShell1;
+        E2 *= m_WeightShell2;
+        E3 *= m_WeightShell3;
       }
 
       //Implements Eq. [19] and Fig. 4.

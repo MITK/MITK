@@ -28,7 +28,7 @@ namespace mitk {
 # pragma warning(disable: 4522)
 #endif
 
-class MITK_CORE_EXPORT CameraIntrinsicsProperty : public BaseProperty
+class mitkCameraCalibration_EXPORT CameraIntrinsicsProperty : public BaseProperty
 {
 public:
 

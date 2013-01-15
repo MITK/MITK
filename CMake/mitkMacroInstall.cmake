@@ -90,8 +90,13 @@ macro(_fixup_target)
       endif()
     endmacro(gp_resolved_file_type_override)
 
+    if(NOT APPLE)
+      macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
+      endmacro()
+    endif()
+
     macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
-    
+
       if(NOT APPLE AND \${item} MATCHES \"blueberry_osgi\")
         get_filename_component(_item_name \${item} NAME)
         set(\${resolved_item_var} \"\${exepath}/plugins/\${_item_name}\")
@@ -107,33 +112,24 @@ macro(_fixup_target)
         else()
           set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
         endif()
-
-        if(_item_path STREQUAL _plugins_path
-           OR (_item_path MATCHES \"\${_plugins_path}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
-          )
-          # Only fix plugins
-          
-          set(full_path \"full_path-NOTFOUND\")
-          file(GLOB_RECURSE full_path \${_plugins_path}/\${_item_name} )
-          list(LENGTH full_path full_path_length)
-          if(full_path_length GREATER 1)
-            list(GET full_path 0 full_path)
+  
+        file(GLOB_RECURSE full_path \${_plugins_path}/\${_item_name} )
+        list(LENGTH full_path full_path_length)
+        if(full_path_length GREATER 1)
+          list(GET full_path 0 full_path)
+          get_filename_component(_item_name \"\${full_path}\" NAME)
+          get_filename_component(_item_path \"\${full_path}\" PATH)
+          if(_item_path STREQUAL _plugins_path
+             OR (_item_path MATCHES \"\${_plugins_path}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
+            )
+            # Only fix plugins
+            set(resolved_item_var \"\${full_path}\")
+            set(resolved_var 1)   
           endif()
-          get_filename_component(_item_path \"\${full_path}\" PATH)      
-
-          set(ri \"ri-NOTFOUND\")
-          find_file(ri \"\${item}\" \${_item_path})
-          if(ri)
-            set(resolved_var 1)
-            set(resolved_item_var \"\${ri}\")
-            set(ri \"ri-NOTFOUND\")
-          endif(ri)
-          
-        endif() # is a plugin.
-      endif() # blueberry plugin not on apple.
-         
+        endif()      
+      endif()
     endmacro()
-
+    
     if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\")
       # When installing multiple applications, this will find *all* already installed
       # and pulled in libraries (except on MacOS). We don't care...

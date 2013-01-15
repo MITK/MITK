@@ -92,34 +92,46 @@ macro(_fixup_target)
 
     macro(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
     
-      get_filename_component(_item_name \"\${item}\" NAME)
-      get_filename_component(_item_path \"\${item}\" PATH)
-    
-      set(_bundle_dest_dir \"${_bundle_dest_dir}\")
-      if(_bundle_dest_dir)
-        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/\${_bundle_dest_dir}/plugins\")
+      if(NOT APPLE AND \${item} MATCHES \"blueberry_osgi\")
+        get_filename_component(_item_name \${item} NAME)
+        set(\${resolved_item_var} \"\${exepath}/plugins/\${_item_name}\")
+        set(\${resolved_var} 1)
       else()
-        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
-      endif()
-          
-      if(NOT _item_path MATCHES \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}\")
-        set(full_path \"full_path-NOTFOUND\")
-        file(GLOB_RECURSE full_path \${_plugins_path}/\${_item_name} )
-        list(LENGTH full_path full_path_length)
-        if(full_path_length GREATER 1)
-          list(GET full_path 0 full_path)
+      
+        get_filename_component(_item_name \"\${item}\" NAME)
+        get_filename_component(_item_path \"\${item}\" PATH)
+      
+        set(_bundle_dest_dir \"${_bundle_dest_dir}\")
+        if(_bundle_dest_dir)
+          set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/\${_bundle_dest_dir}/plugins\")
+        else()
+          set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
         endif()
-        get_filename_component(_item_path \"\${full_path}\" PATH)      
-      endif()
 
-      set(ri \"ri-NOTFOUND\")
-      find_file(ri \"\${item}\" \${_item_path})
-      if(ri)
-        set(resolved_var 1)
-        set(resolved_item_var \"\${ri}\")
-        set(ri \"ri-NOTFOUND\")
-      endif(ri)
-            
+        if(_item_path STREQUAL _plugins_path
+           OR (_item_path MATCHES \"\${_plugins_path}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
+          )
+          # Only fix plugins
+          
+          set(full_path \"full_path-NOTFOUND\")
+          file(GLOB_RECURSE full_path \${_plugins_path}/\${_item_name} )
+          list(LENGTH full_path full_path_length)
+          if(full_path_length GREATER 1)
+            list(GET full_path 0 full_path)
+          endif()
+          get_filename_component(_item_path \"\${full_path}\" PATH)      
+
+          set(ri \"ri-NOTFOUND\")
+          find_file(ri \"\${item}\" \${_item_path})
+          if(ri)
+            set(resolved_var 1)
+            set(resolved_item_var \"\${ri}\")
+            set(ri \"ri-NOTFOUND\")
+          endif(ri)
+          
+        endif() # is a plugin.
+      endif() # blueberry plugin not on apple.
+         
     endmacro()
 
     if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\")

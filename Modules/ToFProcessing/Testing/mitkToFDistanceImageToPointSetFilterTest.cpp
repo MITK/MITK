@@ -267,8 +267,8 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   surfaceFilter->SetInput(image);
   surfaceFilter->SetInterPixelDistance(interPixelDistance);
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
-  surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
-  MITK_TEST_CONDITION_REQUIRED(surfaceFilter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
+  surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(surfaceFilter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
   surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface

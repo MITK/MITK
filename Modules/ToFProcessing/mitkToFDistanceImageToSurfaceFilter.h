@@ -59,7 +59,7 @@ namespace mitk
 
 
     /**
-     * @brief The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units (=true) or interpixeldistances and focal length in mm (=false)
+     * @brief The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
      */
     enum ReconstructionModeType{ WithOutInterPixelDistance = 1, WithInterPixelDistance = 2, Kinect = 3};
 
@@ -157,7 +157,7 @@ namespace mitk
 
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
 
-    ReconstructionModeType m_ReconstructionMode; ///< true = Reconstruction without interpixeldistance and with focal lengths in pixel units. false = Reconstruction with interpixeldistance and with focal length in mm.
+    ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
   };
 } //END mitk namespace
 #endif

@@ -130,13 +130,17 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     //calculate world coordinates
     mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
     mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
-    if (m_ReconstructionMode)
+    if((m_ReconstructionMode == WithOutInterPixelDistance) || (m_ReconstructionMode == Kinect))
     {
         focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
         focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
     }
-    else
+    else if( m_ReconstructionMode == WithInterPixelDistance)
+    {
+        //convert focallength from pixel to mm
         focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+    }
+
     mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
     principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
     principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();

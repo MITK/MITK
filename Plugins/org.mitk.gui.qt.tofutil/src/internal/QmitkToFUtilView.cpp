@@ -302,8 +302,9 @@ void QmitkToFUtilView::OnToFCameraStarted()
         m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
 
         if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
-
         {
+            //set the reconstruction mode for kinect
+            this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
             if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
             {
                 this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));

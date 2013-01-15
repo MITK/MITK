@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkToFDistanceImageToSurfaceFilter.h>
-//#include <mitkToFSurfaceGenerationFilter.h>
 
 #include <mitkImage.h>
 #include <mitkImageGenerator.h>
@@ -25,16 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 #include <mitkToFTestingCommon.h>
 
-//#include <itkImage.h>
-//#include <itkImageRegionIterator.h>
-//#include <itkMersenneTwisterRandomVariateGenerator.h>
-
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-/**Documentation
- *  test for the class "ToFDistanceImageToSurfaceFilter".
+/**
+ *  @brief Test for the class "ToFDistanceImageToSurfaceFilter".
  */
 
 typedef mitk::ToFProcessingCommon::ToFPoint2D ToFPoint2D;
@@ -79,8 +74,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
   // test SetReconstructionMode()
-  filter->SetReconstructionMode(false);
-  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == false,"Testing Set/GetReconstructionMode()");
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
 
   // test Set/GetInput()
   filter->SetInput(image);
@@ -88,7 +83,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   // test filter without subset (without interpixeldistance)
   MITK_INFO<<"Test filter with subset without interpixeldistance ";
-  filter->SetReconstructionMode(true);
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
+    MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
 
   vtkSmartPointer<vtkPoints> expectedResult = vtkSmartPointer<vtkPoints>::New();
   expectedResult->SetDataTypeToDouble();
@@ -160,7 +156,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   // test filter without subset (with interpixeldistance)
   MITK_INFO<<"Test filter with subset with interpixeldistance ";
-  filter->SetReconstructionMode(false);
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
   // calculate focal length considering inter pixel distance
   ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
   expectedResult = vtkSmartPointer<vtkPoints>::New();

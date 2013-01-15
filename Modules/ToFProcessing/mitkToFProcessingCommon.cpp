@@ -36,7 +36,19 @@ namespace mitk
 
     cartesianCoordinates[0] = distance * imageX / d_in_pX; //Strahlensatz: x / imageX = distance / d
     cartesianCoordinates[1] = distance * imageY_in_pX / d_in_pX; //Strahlensatz: y / imageY = distances / d
-    cartesianCoordinates[2] = distance * focalLengthX / d_in_pX; //Strahlensatz: z / f = distance / d.
+    cartesianCoordinates[2] = distance/* * focalLengthX / d_in_pX*/; //Strahlensatz: z / f = distance / d.
+
+    return cartesianCoordinates;
+  }
+
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY)
+  {
+    ToFPoint3D cartesianCoordinates;
+
+    cartesianCoordinates[0] = distance * (i - principalPointX) / focalLengthX;
+    cartesianCoordinates[1] = distance * (j - principalPointY) / focalLengthY;
+    cartesianCoordinates[2] = distance;
 
     return cartesianCoordinates;
   }

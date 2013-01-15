@@ -97,7 +97,7 @@ inline static mitk::Image::Pointer CreateTestImageWithPointSet(mitk::ScalarType 
   distances.push_back(2050);
   distances.push_back(300);
   // set the pixel values for the subset
-  for (unsigned int i=0; i<subSet->GetSize(); i++)
+  for(int i=0; i<subSet->GetSize(); i++)
   {
     mitk::Point3D point = subSet->GetPoint(i);
     ItkImageType2D::IndexType index;
@@ -116,7 +116,7 @@ bool PointSetsEqual(mitk::PointSet::Pointer pointSet1, mitk::PointSet::Pointer p
   bool pointSetsEqual = true;
   if (pointSet1->GetSize()==pointSet2->GetSize())
   {
-    for (unsigned int i=0; i<pointSet1->GetSize(); i++)
+    for (int i=0; i<pointSet1->GetSize(); i++)
     {
       mitk::Point3D expectedPoint = pointSet1->GetPoint(i);
       mitk::Point3D resultPoint = pointSet2->GetPoint(i);
@@ -215,7 +215,8 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   surfaceFilter->SetInput(image);
   surfaceFilter->SetInterPixelDistance(interPixelDistance);
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
-  surfaceFilter->SetReconstructionMode(true);
+  surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
   mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface
@@ -266,7 +267,8 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   surfaceFilter->SetInput(image);
   surfaceFilter->SetInterPixelDistance(interPixelDistance);
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
-  surfaceFilter->SetReconstructionMode(false);
+  surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(surfaceFilter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
   surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface
@@ -295,7 +297,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetReconstructionMode(true);
   expectedResult = mitk::PointSet::New();
   counter = 0;
-  for (unsigned int i=0; i<subSet->GetSize(); i++)
+  for(int i=0; i<subSet->GetSize(); i++)
   {
     mitk::Point3D point = subSet->GetPoint(i);
     mitk::Index3D index;
@@ -325,7 +327,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetReconstructionMode(false);
   expectedResult = mitk::PointSet::New();
   counter = 0;
-  for (unsigned int i=0; i<subSet->GetSize(); i++)
+  for(int i=0; i<subSet->GetSize(); i++)
   {
     mitk::Point3D point = subSet->GetPoint(i);
     mitk::Index3D index;

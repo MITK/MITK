@@ -39,7 +39,7 @@ var xScale = d3.scale.linear()
   .range([0,width]);
 
 var yScale = d3.scale.linear()
-  .domain([0,d3.max(histogramData.frequency)])
+  .domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)])
   .range([height,margin.top]);
 
 var xAxis = d3.svg.axis()
@@ -244,7 +244,7 @@ function definition()
     .range([0,width]);
 
   yScale = d3.scale.linear()
-    .domain([0,d3.max(histogramData.frequency)])
+    .domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)])
     .range([height,margin.top]);
 
   xAxis = d3.svg.axis()
@@ -293,7 +293,7 @@ function zoom()
   {
     zoombie.translate([0,0]);
     xScale.domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)]);
-    yScale.domain([0,d3.max(histogramData.frequency)]);
+    yScale.domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)]);
   }
   if (!histogramData.useLineGraph)
   {

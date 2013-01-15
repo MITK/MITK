@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkExtExports.h"
 #include <QVariant>
 #include "mitkImage.h"
+#include "mitkPlanarFigure.h"
+#include <itkPolyLineParametricPath.h>
 
 
 
@@ -42,6 +44,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
 public:
   typedef mitk::Image::HistogramType HistogramType;
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
+  typedef itk::PolyLineParametricPath< 3 > ParametricPathType;
+  typedef itk::ParametricPath< 3 >::Superclass PathType;
 
   explicit QmitkHistogramJSWidget(QWidget *parent = 0);
   ~QmitkHistogramJSWidget();
@@ -51,12 +55,19 @@ public:
   QList<QVariant> getMeasurement();
   QList<QVariant> getFrequency();
   bool getUseLineGraph();
+  void setImage(mitk::Image* image);
+  void setPlanarFigure(const mitk::PlanarFigure* planarFigure);
+  void ComputeHistogramOfPlanarFigure();
 
 private:
   QList<QVariant> m_Frequency;
   QList<QVariant> m_Measurement;
+  mitk::Image::Pointer m_Image;
+  mitk::PlanarFigure::ConstPointer m_PlanarFigure;
   bool m_UseLineGraph;
   HistogramType::ConstPointer m_Histogram;
+  PathType::ConstPointer m_DerivedPath;
+  ParametricPathType::Pointer m_ParametricPath;
 
   void clearData();
 

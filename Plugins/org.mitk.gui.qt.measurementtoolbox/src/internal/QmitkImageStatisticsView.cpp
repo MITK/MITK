@@ -256,8 +256,6 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_ErrorMessageLabel->hide();
   this->InvalidateStatisticsTableView();
   m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-  m_Controls->m_HistogramWidget->ClearItemModel();
-  m_Controls->m_LineProfileWidget->ClearItemModel();
   m_Controls->m_JSHistogram->clearHistogram();
 }
 
@@ -386,8 +384,6 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
       this->InvalidateStatisticsTableView();
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-      m_Controls->m_HistogramWidget->ClearItemModel();
-      m_Controls->m_LineProfileWidget->ClearItemModel();
       m_Controls->m_JSHistogram->clearHistogram();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
@@ -498,6 +494,12 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
+  m_Controls->m_lineRadioButton->setEnabled(true);
+  m_Controls->m_barRadioButton->setEnabled(true);
+  if (m_Controls->m_barRadioButton->isChecked())
+  {
+    m_Controls->m_JSHistogram->histogramToBarChart();
+  }
   if(m_DataNodeSelectionChanged)
   {
     this->m_StatisticsUpdatePending = false;
@@ -515,11 +517,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     }
 
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-    m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     m_Controls->m_JSHistogram->ComputeHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
-    m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-    //int timeStep = this->m_CalculationThread->GetTimeStep();
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
   else
@@ -530,8 +528,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramWidget->ClearItemModel();
-    m_Controls->m_LineProfileWidget->ClearItemModel();
     m_Controls->m_JSHistogram->clearHistogram();
     m_CurrentStatisticsValid = false;
 
@@ -545,8 +541,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-        m_Controls->m_HistogramWidget->ClearItemModel();
-        m_Controls->m_LineProfileWidget->ClearItemModel();
         m_Controls->m_JSHistogram->clearHistogram();
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
@@ -555,11 +549,11 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         return;
       }
       // TODO: enable line profile widget
-      m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
-      m_Controls->m_LineProfileWidget->SetImage( this->m_CalculationThread->GetStatisticsImage() );
-      m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
-      m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
-      //m_Controls->m_JSHistogram
+      m_Controls->m_JSHistogram->setImage(this->m_CalculationThread->GetStatisticsImage());
+      m_Controls->m_JSHistogram->setPlanarFigure(m_SelectedPlanarFigure);
+      m_Controls->m_JSHistogram->ComputeHistogramOfPlanarFigure();
+      m_Controls->m_lineRadioButton->setEnabled(false);
+      m_Controls->m_barRadioButton->setEnabled(false);
     }
   }
   this->m_StatisticsUpdatePending = false;
@@ -583,10 +577,7 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
     double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + double(i)/sampling * direction);
     histogram->SetFrequency(i,d);
   }
-  m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-  m_Controls->m_HistogramWidget->SetHistogram( histogram );
   m_Controls->m_JSHistogram->ComputeHistogram( histogram );
-  m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
 }
 
 void QmitkImageStatisticsView::FillStatisticsTableView(

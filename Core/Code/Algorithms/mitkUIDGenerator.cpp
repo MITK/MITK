@@ -95,8 +95,6 @@ std::string UIDGenerator::GetUID()
   return s.str();
 }
 
-}
-
 unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
 {
   unsigned int h1 = 0;
@@ -115,4 +113,8 @@ unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
   }
   return h1 ^ h2;
 }
+
+}
+
+
 

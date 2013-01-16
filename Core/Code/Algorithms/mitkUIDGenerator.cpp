@@ -32,12 +32,18 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 {
   if (lengthOfRandomPart < 5)
   {
-    MITK_ERROR << lengthOfRandomPart << " are not really unique, right?" << std::endl;
+    MITK_ERROR << "To few digits requested (" <<lengthOfRandomPart<< " digits)";
     throw std::invalid_argument("To few digits requested");
   }
 
   static int instanceID = 0;
-  unsigned int seed = ((time( (time_t *)0 )) + getpid()) * 10 + instanceID++;
+  int processID = 0;
+  #ifdef WIN32
+    processID = _getpid();
+  #else
+    processID = getpid();
+  #endif
+  unsigned int seed = ((time( (time_t *)0 )) + processID) * 10 + instanceID++;
   std::srand(seed);
 }
 

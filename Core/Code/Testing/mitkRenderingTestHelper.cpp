@@ -116,8 +116,6 @@ void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
             break;
         }
     }
-    //perform global reinit:
-    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 
 void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
@@ -126,7 +124,8 @@ void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 
-void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation) {
+void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation)
+{
    mitk::SliceNavigationController::Pointer sliceNavigationController =
    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
    sliceNavigationController->ReorientSlices(origin, rotation);
@@ -171,11 +170,17 @@ void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
     try
     {
         mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filename);
-        this->m_DataStorage->Add(node);
+        this->AddNodeToStorage(node);
     }
     catch ( itk::ExceptionObject & e )
     {
         MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
     }
+}
+
+void mitkRenderingTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
+{
+    this->m_DataStorage->Add(node);
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 

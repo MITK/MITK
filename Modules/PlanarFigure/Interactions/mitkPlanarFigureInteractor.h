@@ -73,10 +73,25 @@ public:
   void SetMinimumPointDistance( ScalarType minimumDistance );
 
   /**
-    * \brief calculates how good the data, this statemachine handles, is hit
+    * \brief Calculates how good the data, this statemachine handles, is hit
     * by the event.
     *
-    * overwritten, cause we don't look at the boundingbox, we look at each point
+    * This method returns 0.0 (and thus does NOT handle the given event at
+    * all) if:
+    *  - the incoming event is NOT a mitk::PositionEvent
+    *  - this statemachine has no transition for the incoming event in the current state
+    *  - the current position (in world coordinates) of the incoming event is further away
+    *    from the planarFigure geometry than the planeThickness
+    *
+    * If the planarFigure that is handled by this statemachine is NULL, 0.42 is returned.
+    * (rather unlikely that the event will be handled)
+    *
+    * If the planarFigure is
+    *  - selected but NOT placed (on click a new planarFigure will be created) -> 0.6 is returned
+    *  - placed but NOT selected (picking of existing planarFigures) -> 0.7 is returned
+    *  - placed AND selected (editing of selected planarFigure) -> 0.75 is returned
+    *
+    * Thus, the user rather edits an existing planarFigure than create a new one.
     */
   virtual float CanHandleEvent(StateEvent const *stateEvent) const;
 

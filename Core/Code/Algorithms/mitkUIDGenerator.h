@@ -47,6 +47,7 @@ class MITK_CORE_EXPORT UIDGenerator
   private:
     std::string m_Prefix;
     unsigned int m_LengthOfRandomPart;
+    unsigned int hash( time_t t, clock_t c );
 };
 
 }

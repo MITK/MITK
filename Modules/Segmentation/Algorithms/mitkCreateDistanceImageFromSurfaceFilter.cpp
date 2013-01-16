@@ -485,7 +485,16 @@ const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput( unsig
 
 void mitk::CreateDistanceImageFromSurfaceFilter::RemoveInputs(mitk::Surface* input)
 {
-    this->RemoveInput(input);
+  DataObjectPointerArraySizeType nb = this->GetNumberOfIndexedInputs();
+
+  for(DataObjectPointerArraySizeType i = 0; i < nb; i++)
+  {
+    if( this->GetInput(i) == input )
+    {
+      this->RemoveInput(i);
+      return;
+    }
+  }
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
@@ -494,8 +503,8 @@ void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
   {
     this->PopBackInput();
   }
-  this->SetNumberOfInputs(0);
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedInputs(0);
+  this->SetNumberOfIndexedOutputs(1);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::SetUseProgressBar(bool status)

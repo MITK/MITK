@@ -290,8 +290,8 @@ void mitk::ComputeContourSetNormalsFilter::Reset()
   {
     this->PopBackInput();
   }
-  this->SetNumberOfInputs(0);
-  this->SetNumberOfOutputs(0);
+  this->SetNumberOfIndexedInputs(0);
+  this->SetNumberOfIndexedOutputs(0);
 }
 
 void mitk::ComputeContourSetNormalsFilter::SetUseProgressBar(bool status)

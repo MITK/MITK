@@ -23,7 +23,7 @@ mitk::ContourSetToPointSetFilter::ContourSetToPointSetFilter()
 {
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
   this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfOutputs( 1 );
+  this->SetNumberOfIndexedOutputs( 1 );
   this->SetNthOutput(0, output.GetPointer());
   m_Frequency = 5;
 }

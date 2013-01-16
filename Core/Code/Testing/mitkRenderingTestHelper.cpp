@@ -14,18 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkRenderingTestHelper.h"
-#include <mitkStandaloneDataStorage.h>
-
+//VTK
 #include <vtkRenderWindow.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindowInteractor.h>
 
+//MITK
+#include <mitkRenderingTestHelper.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkRenderWindow.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkIOUtil.h>
 
 // include gl to read out properties
 #include <vtkOpenGL.h>
@@ -68,18 +70,24 @@ void mitkRenderingTestHelper::PrintGLInfo()
               << "- GL_EXTENSIONS: "<< glGetString(GL_EXTENSIONS);
 }
 
+void mitkRenderingTestHelper::SetMapperID( mitk::BaseRenderer::StandardMapperSlot id)
+{
+    m_RenderWindow->GetRenderer()->SetMapperID(id);
+}
+
 void mitkRenderingTestHelper::Render()
 {
     //if the datastorage is initialized and at least 1 image is loaded render it
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
-
+        //perform global reinit:
+      mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
       mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
+      m_RenderWindow->GetRenderer()->PrepareRender();
 
       //use this to actually show the iamge in a renderwindow
 //        this->GetVtkRenderWindow()->Render();
 //        this->GetVtkRenderWindow()->GetInteractor()->Start();
-
     }
     else
     {
@@ -128,7 +136,7 @@ vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()
     return m_RenderWindow->GetRenderer()->GetVtkRenderer();
 }
 
-void mitkRenderingTestHelper::SetProperty(const char *propertyKey, mitk::BaseProperty* property )
+void mitkRenderingTestHelper::SetImageProperty(const char *propertyKey, mitk::BaseProperty* property )
 {
     this->m_DataStorage->GetNode(mitk::NodePredicateDataType::New("Image"))->SetProperty(propertyKey, property);
 }
@@ -159,26 +167,14 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
 
 void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
 {
-    mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
     try
     {
-        reader->SetFileName( filename );
-        reader->Update();
-
-        if(reader->GetNumberOfOutputs()<1)
-        {
-            MITK_ERROR << "Could not find test data '" << filename << "'";
-        }
-
-        mitk::DataNode::Pointer node = reader->GetOutput( 0 );
+        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filename);
         this->m_DataStorage->Add(node);
     }
     catch ( itk::ExceptionObject & e )
     {
         MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
     }
-
-    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
-
 }
 

@@ -53,7 +53,7 @@ public:
     /** @brief This method set the property of the member datastorage
         @param property Set a property for each image in the datastorage m_DataStorage.
     **/
-    void SetProperty(const char *propertyKey, mitk::BaseProperty *property);
+    void SetImageProperty(const char *propertyKey, mitk::BaseProperty *property);
 
     /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
     **/
@@ -70,6 +70,12 @@ public:
     /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/
     mitk::DataStorage::Pointer GetDataStorage();
+
+    /**
+     * @brief SetMapperID Change between Standard2D and 3D mappers.
+     * @param id Enum mitk::BaseRenderer::StandardMapperSlot which defines the mapper.
+     */
+    void SetMapperID(mitk::BaseRenderer::StandardMapperSlot id);
 protected:
 
     /** @brief Prints the opengl information, e.g. version, vendor and extensions,

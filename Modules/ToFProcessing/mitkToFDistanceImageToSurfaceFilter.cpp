@@ -141,6 +141,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
+  mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+
   for (int j=0; j<yDimension; j++)
   {
     for (int i=0; i<xDimension; i++)
@@ -157,9 +159,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
       if (m_ReconstructionMode)
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthInPixelUnits,principalPoint);
+          cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
       else
-        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i+origin[0],j+origin[1],distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
 
       //TODO: why epsilon here and what value should it have?
 //      if (cartesianCoordinates[2] == 0)

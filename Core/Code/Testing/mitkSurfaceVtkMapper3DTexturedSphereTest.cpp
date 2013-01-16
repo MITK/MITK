@@ -52,6 +52,8 @@ int mitkSurfaceVtkMapper3DTexturedSphereTest(int argc, char* argv[])
     }
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    //This is a test for a 3D surface, thus we need to set the mapper ID to 3D
+    renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
 
     //######## Exmaple code begin ########
     //Generate a sphere in order to map texture on it
@@ -79,11 +81,9 @@ int mitkSurfaceVtkMapper3DTexturedSphereTest(int argc, char* argv[])
     mitk::SmartPointerProperty::Pointer textureProperty = mitk::SmartPointerProperty::New(textureImage);
     surfaceNode->SetProperty("Surface.Texture", textureProperty);
     //add to data storage
-    renderingHelper.GetDataStorage()->Add(surfaceNode);
+    renderingHelper.AddNodeToStorage(surfaceNode);
     //######## Exmaple code end ########
 
-    //set renderwindow to 3D
-    renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
     renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:

@@ -76,6 +76,12 @@ public:
      * @param id Enum mitk::BaseRenderer::StandardMapperSlot which defines the mapper.
      */
     void SetMapperID(mitk::BaseRenderer::StandardMapperSlot id);
+
+    /**
+     * @brief AddNodeToStorage Add a node to the datastorage and perform a reinit which is necessary for rendering.
+     * @param node The data you want to add.
+     */
+    void AddNodeToStorage(mitk::DataNode::Pointer node);
 protected:
 
     /** @brief Prints the opengl information, e.g. version, vendor and extensions,

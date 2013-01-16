@@ -50,6 +50,9 @@ int mitkSurfaceVtkMapper3DTest(int argc, char* argv[])
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
 
+    //3D rendering test, thus 3D mapper ID.
+    renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
+
     vtkSmartPointer<vtkFloatArray> textureCoordinates =
             vtkSmartPointer<vtkFloatArray>::New();
     textureCoordinates->SetNumberOfComponents(2);
@@ -79,8 +82,9 @@ int mitkSurfaceVtkMapper3DTest(int argc, char* argv[])
     //remove the image from the data storage in order to not disturb the world geometry
     //(only the surface geometry should be used for rendering)
     renderingHelper.GetDataStorage()->Remove( renderingHelper.GetDataStorage()->GetNode( mitk::NodePredicateDataType::New("Image")) );
+    //Perform reinit, because we removed data.
+    mitk::RenderingManager::GetInstance()->InitializeViews( renderingHelper.GetDataStorage()->ComputeBoundingGeometry3D(renderingHelper.GetDataStorage()->GetAll()) );
 
-    renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
     renderingHelper.Render();
 
     //Find a nice camera position to view the surface from the front.

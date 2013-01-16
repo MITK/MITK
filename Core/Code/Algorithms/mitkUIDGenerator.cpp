@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdexcept>
 #include <iostream>
 
+#ifdef WIN32
+#include "process.h"
+#endif
+
 namespace mitk {
 
 UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)

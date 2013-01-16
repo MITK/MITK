@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
-#include <mitkTimeStamp.h>
 #include <itksys/SystemTools.hxx>
 
 mitk::NavigationDataToPointSetFilter::NavigationDataToPointSetFilter()

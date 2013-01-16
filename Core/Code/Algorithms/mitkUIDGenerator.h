@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include<string>
+#include <ctime>
 #include <MitkExports.h>
 
 #ifdef _MSC_VER
@@ -47,7 +48,7 @@ class MITK_CORE_EXPORT UIDGenerator
   private:
     std::string m_Prefix;
     unsigned int m_LengthOfRandomPart;
-    unsigned int hash( time_t t, clock_t c );
+    unsigned int seedhash( time_t t, clock_t c );
 };
 
 }

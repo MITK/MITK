@@ -101,14 +101,14 @@ unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
   unsigned char *p = (unsigned char *) &t;
   for( size_t i = 0; i < sizeof(t); ++i )
   {
-    h1 *= UCHAR_MAX + 2U;
+    h1 *= 255 + 2U;
     h1 += p[i];
   }
   unsigned int h2 = 0;
   p = (unsigned char *) &c;
   for( size_t j = 0; j < sizeof(c); ++j )
   {
-    h2 *= UCHAR_MAX + 2U;
+    h2 *= 255 + 2U;
     h2 += p[j];
   }
   return h1 ^ h2;

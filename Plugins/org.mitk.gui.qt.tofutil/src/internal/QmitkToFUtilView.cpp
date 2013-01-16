@@ -293,10 +293,12 @@ void QmitkToFUtilView::OnToFCameraStarted()
     if (this->m_ToFImageGrabber->GetProperty("CameraIntrinsics"))
     {
       m_CameraIntrinsics = dynamic_cast<mitk::CameraIntrinsicsProperty*>(this->m_ToFImageGrabber->GetProperty("CameraIntrinsics"))->GetValue();
+      MITK_INFO << m_CameraIntrinsics->ToString();
     }
     else
     {
       m_CameraIntrinsics = NULL;
+      MITK_ERROR << "No camera intrinsics were found!";
     }
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();

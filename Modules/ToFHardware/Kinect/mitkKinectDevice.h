@@ -43,7 +43,6 @@ namespace mitk
   {
   public:
 
-
     mitkClassMacro( KinectDevice , ToFCameraDevice );
 
     itkNewMacro( Self );

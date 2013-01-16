@@ -81,9 +81,8 @@ void mitkRenderingTestHelper::Render()
     if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
     {
         //perform global reinit:
-      mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
-      mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
       m_RenderWindow->GetRenderer()->PrepareRender();
+      mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
       //use this to actually show the iamge in a renderwindow
 //        this->GetVtkRenderWindow()->Render();
@@ -117,6 +116,8 @@ void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
             break;
         }
     }
+    //perform global reinit:
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 
 void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
@@ -128,7 +129,7 @@ void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::
 void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation) {
    mitk::SliceNavigationController::Pointer sliceNavigationController =
    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
-     sliceNavigationController->ReorientSlices(origin, rotation);
+   sliceNavigationController->ReorientSlices(origin, rotation);
 }
 
 vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()

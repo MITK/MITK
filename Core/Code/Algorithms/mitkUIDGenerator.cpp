@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGenerator.h>
 #include <mitkLogMacros.h>
 
-#include <ctime>
 #include <cstdlib>
 #include <sstream>
 #include <math.h>
@@ -47,7 +46,7 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
   #else
     processID = getpid();
   #endif
-  unsigned int hash = hash( time(NULL), clock() );
+  unsigned int hash = seedhash( time(NULL), clock() );
   unsigned int seed = (hash + processID) * 10 + instanceID;
   instanceID++;
 
@@ -98,7 +97,7 @@ std::string UIDGenerator::GetUID()
 
 }
 
-unsigned int UIDGenerator::hash( time_t t, clock_t c )
+unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
 {
   unsigned int h1 = 0;
   unsigned char *p = (unsigned char *) &t;

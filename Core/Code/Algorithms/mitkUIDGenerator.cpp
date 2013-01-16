@@ -47,7 +47,10 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
   #else
     processID = getpid();
   #endif
-  unsigned int seed = ((time( (time_t *)0 )) + processID) * 10 + instanceID++;
+  unsigned int hash = hash( time(NULL), clock() );
+  unsigned int seed = (hash + processID) * 10 + instanceID;
+  instanceID++;
+
   std::srand(seed);
 }
 
@@ -93,5 +96,24 @@ std::string UIDGenerator::GetUID()
   return s.str();
 }
 
+}
+
+unsigned int UIDGenerator::hash( time_t t, clock_t c )
+{
+  unsigned int h1 = 0;
+  unsigned char *p = (unsigned char *) &t;
+  for( size_t i = 0; i < sizeof(t); ++i )
+  {
+    h1 *= UCHAR_MAX + 2U;
+    h1 += p[i];
+  }
+  unsigned int h2 = 0;
+  p = (unsigned char *) &c;
+  for( size_t j = 0; j < sizeof(c); ++j )
+  {
+    h2 *= UCHAR_MAX + 2U;
+    h2 += p[j];
+  }
+  return h1 ^ h2;
 }
 

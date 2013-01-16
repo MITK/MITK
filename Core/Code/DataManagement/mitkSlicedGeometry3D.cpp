@@ -829,7 +829,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       // Get Rotation axis und angle
       currentNormal.Normalize();
       newNormal.Normalize();
-      float rotationAngle = angle(currentNormal.Get_vnl_vector(),newNormal.Get_vnl_vector());
+      float rotationAngle = angle(currentNormal.GetVnlVector(),newNormal.GetVnlVector());
 
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
@@ -884,7 +884,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
          VecAxisCurr.Normalize();
 
-         float rotationAngle = angle(VecAxisCurr.Get_vnl_vector(),vecAxixNew.Get_vnl_vector());
+         float rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
          rotationAngle = rotationAngle * 180 / PI; // Rad to Deg
 
          // we rotate around the normal of the plane, but we do not know, if we need to rotate clockwise

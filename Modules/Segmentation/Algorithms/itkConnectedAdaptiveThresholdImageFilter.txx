@@ -72,7 +72,7 @@ void ConnectedAdaptiveThresholdImageFilter<TInputImage,TOutputImage>::GenerateDa
   function->SetInputImage ( inputImage );
 
   //pass parameters needed for region growing to iterator
-  IteratorType it ( outputImage, function, this->m_SeedList );
+  IteratorType it ( outputImage, function, this->m_Seeds );
   it.SetFineDetectionMode(m_FineDetectionMode);
   it.SetExpansionDirection(m_GrowingDirectionIsUpwards);
   it.SetMinTH((int) Superclass::m_Lower);

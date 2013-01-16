@@ -496,6 +496,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
   m_Controls->m_lineRadioButton->setEnabled(true);
   m_Controls->m_barRadioButton->setEnabled(true);
+  m_Controls->m_InfoLabel->setText(QString(""));
   if (m_Controls->m_barRadioButton->isChecked())
   {
     m_Controls->m_JSHistogram->histogramToBarChart();
@@ -554,6 +555,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_JSHistogram->ComputeHistogramOfPlanarFigure();
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
+      std::stringstream message;
+      message << "<font color='red'>Only linegraph available for an intesityprofile!</font>";
+      m_Controls->m_InfoLabel->setText(message.str().c_str());
     }
   }
   this->m_StatisticsUpdatePending = false;

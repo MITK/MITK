@@ -264,7 +264,7 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
         <property name="currentIndex">
          <number>0</number>
@@ -288,7 +288,7 @@
         <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">
@@ -425,6 +425,13 @@
           </item>
          </layout>
         </widget>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_InfoLabel">
+        <property name="text">
+         <string/>
+        </property>
        </widget>
       </item>
      </layout>

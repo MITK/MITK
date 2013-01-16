@@ -37,9 +37,12 @@ mitk::ImageVtkAccessor::ImageVtkAccessor(
       mitk::ImagePointer iP,
       mitk::ImageDataItem* iDI
       ) :
-    ImageAccessorBase(iP, iDI),
+    ImageAccessorBase(NULL, iDI),
     vtkImageData()
     {
+
+      m_Image = iP.GetPointer();
+
       m_Image->m_VtkReadersLock.Lock();
 
       m_Image->m_VtkReaders.push_back(this);

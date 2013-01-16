@@ -73,6 +73,8 @@ typedef itk::SmartPointer<mitk::Image> ImagePointer;
 
 
   private:
+    // due to smart pointer issues, the image is only kept as a weak pointer.
+    Image* m_Image;
 
   };
 

@@ -36,20 +36,24 @@ See LICENSE.txt or http://www.mitk.org for details.
       // Check validity of ImageAccessor
 
       // Is there an Image?
+      /*
       if(!m_Image)
       {
         mitkThrow() << "Invalid ImageAccessor: No Image was specified in constructor of ImageAccessor";
       }
+      */
 
-      // Make sure, that the Image is initialized properly
-      if(m_Image->m_Initialized==false)
+      if(m_Image)
       {
-        if(m_Image->GetSource().IsNull())
-          mitkThrow() << "ImageAccessor: No image source is defined";
-        if(m_Image->GetSource()->Updating()==false)
-          m_Image->GetSource()->UpdateOutputInformation();
+        // Make sure, that the Image is initialized properly
+        if(m_Image->m_Initialized==false)
+        {
+          if(m_Image->GetSource().IsNull())
+            mitkThrow() << "ImageAccessor: No image source is defined";
+          if(m_Image->GetSource()->Updating()==false)
+            m_Image->GetSource()->UpdateOutputInformation();
+        }
       }
-
 
       // Investigate 4 cases of possible image parts/regions
 

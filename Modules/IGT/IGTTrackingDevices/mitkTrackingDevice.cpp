@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingDevice.h"
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 #include "mitkTrackingTool.h"
 #include <itkMutexLockHolder.h>
 
@@ -88,7 +88,7 @@ bool mitk::TrackingDevice::StopTracking()
     m_StopTrackingMutex->Unlock();
     //we have to wait here that the other thread recognizes the STOP-command and executes it
     m_TrackingFinishedMutex->Lock();
-    mitk::TimeStamp::GetInstance()->Stop(this); // notify realtime clock
+    mitk::IGTTimeStamp::GetInstance()->Stop(this); // notify realtime clock
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
     this->SetState(Ready);

@@ -62,5 +62,8 @@ int mitkKinectReconstructionTest(int  argc , char* argv[])
     mitk::Surface::Pointer resultOfFilter = distToSurf->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(resultOfFilter.IsNotNull(), "Testing if any output was generated.");
 
+    MITK_TEST_CONDITION_REQUIRED( mitk::ToFTestingCommon::VtkPolyDatasEqual(resultOfFilter->GetVtkPolyData(),
+                                                                            groundTruth->GetVtkPolyData() ),
+                                  "Testing if point sets are equal (with a small epsilon).");
     MITK_TEST_END();
 }

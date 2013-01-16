@@ -101,9 +101,9 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   imageNormal1.Normalize();
   imageNormal2.Normalize();
 
-  imageNormal0.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal0.Get_vnl_vector()) );
-  imageNormal1.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal1.Get_vnl_vector()) );
-  imageNormal2.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal2.Get_vnl_vector()) );
+  imageNormal0.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal0.GetVnlVector()) );
+  imageNormal1.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal1.GetVnlVector()) );
+  imageNormal2.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal2.GetVnlVector()) );
 
   double eps( 0.00001 );
   // axial

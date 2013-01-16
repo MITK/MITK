@@ -261,7 +261,7 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
 
         currentMeasurementVector[0]
             = static_cast<HistogramType::MeasurementType> (referenceIterator.Get());
-        m_ITKHistogram->IncreaseFrequency(currentMeasurementVector, 1);
+        m_ITKHistogram->IncreaseFrequencyOfMeasurement(currentMeasurementVector, 1);
 
         mean = (mean * (static_cast<double> (voxelCount) / static_cast<double> (voxelCount + 1))) // 3 points:   old center * 2/3 + currentPoint * 1/3;
             + static_cast<double> (referenceIterator.Get()) / static_cast<double> (voxelCount + 1);

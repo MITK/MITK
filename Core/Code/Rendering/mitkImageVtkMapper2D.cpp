@@ -156,11 +156,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 {
     LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-
-
     mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
     mitk::DataNode* datanode = this->GetDataNode();
-//    datanode->GetPropertyList()->DeleteProperty("LookupTable");
 
     if ( input == NULL || input->IsInitialized() == false )
     {
@@ -535,7 +532,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
-            (this->GetDataNode()->GetProperty("UserDefinedLookupTable"));
+            (this->GetDataNode()->GetProperty("LookupTable"));
 
     if(binary) // is it a binary image?
     {
@@ -685,7 +682,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
             bwLut->Build();
             mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
             mitkLutProp->SetLookupTable(mitkLut);
-            node->SetProperty( "UserDefinedLookupTable", mitkLutProp );
+            node->SetProperty( "LookupTable", mitkLutProp );
         }
         else
             if ( photometricInterpretation.find("MONOCHROME2") != std::string::npos ) // meaning: display MINIMUM pixels as BLACK

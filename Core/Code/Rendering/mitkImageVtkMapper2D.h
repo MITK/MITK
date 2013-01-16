@@ -72,7 +72,13 @@ namespace mitk {
  *
  *   - \b "opacity": (FloatProperty) Opacity of the image
  *   - \b "color": (ColorProperty) Color of the image
- *   - \b "use color": (BoolProperty) Use the color of the image or not
+ *   - \b "LookupTable": (mitkLookupTableProperty) If this property is set,
+ *          the default lookuptable will be ignored and the "LookupTable" value
+ *          will be used instead.
+ *   - \b "Image Rendering.Transfer Function": (mitkTransferFunctionProperty) If this
+ *          property is set, a color transferfunction will be used to color the image.
+ *     \warning This property will not have any effect if, the "LookupTable" property
+ *                   is set.
  *   - \b "binary": (BoolProperty) is the image a binary image or not
  *   - \b "outline binary": (BoolProperty) show outline of the image or not
  *   - \b "texture interpolation": (BoolProperty) texture interpolation of the image
@@ -88,7 +94,6 @@ namespace mitk {
 
  *   - \b "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite )
  *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
- *   - \b "use color", mitk::BoolProperty::New( true ), renderer, overwrite )
  *   - \b "binary", mitk::BoolProperty::New( true ), renderer, overwrite )
  *   - \b "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite )
  *   - \b "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) )
@@ -96,6 +101,8 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
+ *   - \b "Image Rendering.Transfer Function":  Undefined. Must be set by the user.
+ *   - \b "LookupTable":  Undefined. Must be set by the user.
 
  * If the modality-property is set for an image, the mapper uses modality-specific default properties,
  * e.g. color maps, if they are defined.

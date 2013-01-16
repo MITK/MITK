@@ -69,13 +69,17 @@ void mitk::PlanarFigureInteractor::SetMinimumPointDistance( ScalarType minimumDi
 float mitk::PlanarFigureInteractor
 ::CanHandleEvent(StateEvent const* stateEvent) const
 {
-  float returnValue = 0.5;
-
-
   // If it is a key event that can be handled in the current state,
   // then return 0.5
   mitk::DisplayPositionEvent const *disPosEvent =
     dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
+
+  const mitk::PositionEvent *positionEvent = dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+  if ( positionEvent == NULL )
+  {
+    return 0.0;
+  }
+
 
   // Key event handling:
   if (disPosEvent == NULL)
@@ -96,37 +100,39 @@ float mitk::PlanarFigureInteractor
 
   if ( planarFigure != NULL )
   {
-    if ( planarFigure->IsPlaced() )
-    {
-      const mitk::PositionEvent *positionEvent = dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
-      if ( positionEvent == NULL )
-      {
-        return false;
-      }
-
-      double pixelValueAtCursorPosition = 0.0;
-      mitk::Point3D worldPoint3D = positionEvent->GetWorldPosition();
-
-      mitk::Geometry2D *planarFigureGeometry2D =
-        dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
-
-      double planeThickness = planarFigureGeometry2D->GetExtentInMM( 2 );
-      if ( planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
-      {
-        return 0.0;
-      }
-    }
-
-    // Give higher priority if this figure is currently selected
     bool selected = false;
     m_DataNode->GetBoolProperty("selected", selected);
-    if ( selected )
+
+    mitk::Point3D worldPoint3D = positionEvent->GetWorldPosition();
+
+    mitk::Geometry2D *planarFigureGeometry2D =
+      dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
+
+    double planeThickness = planarFigureGeometry2D->GetExtentInMM( 2 );
+    if ( planarFigure->IsPlaced()
+      && planarFigureGeometry2D->Distance( worldPoint3D ) > planeThickness )
     {
-      return 1.0;
+      // don't react, when interaction is too far away
+      return 0.0;
     }
 
+    if ( planarFigure->IsPlaced() && selected )
+    {
+      // if a figure is placed, it has to return a higher value than one
+      // that is not, even if the new one is already 'selected'
+      return 0.75;
+    }
+    else if ( planarFigure->IsPlaced() )
+    {
+      return 0.7;
+    }
+    else if ( selected )
+    {
+      return 0.6;
+    }
+    // else fall through
   }
-  return returnValue;
+  return 0.42;
 }
 
 

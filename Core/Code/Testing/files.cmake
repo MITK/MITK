@@ -62,6 +62,7 @@ set(MODULE_TESTS
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
+  mitkUIDGeneratorTest.cpp
 )
 
 # test with image filename as an extra command line parameter

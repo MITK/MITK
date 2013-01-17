@@ -17,9 +17,9 @@ The core of the interaction concept is based on entities called \b DataInteracto
 actions when such an event is triggered. In the following the different components of the interaction concept are explained, then in the
 end an high-level overview about how the different components interact is given.
 
-See the \ref DataInteractionTechnicalPage page for a more technical explanation.
-//TODO: See here for an example on how to use an existing DataInteractor
-TODO: See here for an example on how to implement a new DataInteractor
+See the \ref DataInteractionTechnicalPage page for a more technical explanation. \n
+//TODO: See here for an example on how to use an existing DataInteractor \n
+TODO: See here for an example on how to implement a new DataInteractor \n
 
 \section EventPage Events
 

@@ -6,24 +6,57 @@
 
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
-The interaction framework in MITK has been completely redesigned in order to facilitate the process of handling interaction and to provide
-easier means of configuration. For now these two frameworks co-exist, and this page describes the new framework. The documentation for the old
-and deprecated version can be found here \ref InteractionPage .
 
-Interaction is a very important task in medical image processing software. Therefore MITK provides a special interaction concept
-that provides the developer with an easy way to develop and maintain user interaction separately from the algorithms processing the input.
-This allows e.g. for common interaction schemes to be re-used in different contexts.
-
-The core of the interaction concept is based on entities called \b DataInteractors that listen for certain pre-defined events and execute
-actions when such an event is triggered. In the following the different components of the interaction concept are explained, then in the
-end an high-level overview about how the different components interact is given.
 
 //TODO: See here for a more technical explanation.
 //TODO: See here for an example on how to use an existing DataInteractor
 //TODO: See here for an example on how to implement a new DataInteractor
 
 
-\section EventsTechnical Events
+\section Dispatcher
+
+Each BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the DataStorage and the Dispatcher,
+and thereby allowing a DataInteractor to register with a Dispatcher when only knowing the DataNode.
+
+BindDispatcherInteractor creates a new Dispatcher object and registers for DataNode events at the DataStorage, as a callback function the
+Dispatchers AddDataInteractor() and RemoveDataInteractor() functions are set.
+
+\dot
+digraph {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  a [ label="{BaseRenderer|m_BindDispatcherInteractor}"];
+  b [ label="{BindDispatcherInteractor|m_Dispatcher\n m_DataStorage}" ];
+  c [ label="Dispatcher" ];
+  d [ label="DataStorage" ];
+  a -> b;
+  b -> c;
+  b -> d;
+}
+\enddot
+
+This way the Dispatcher is notified about all changes regarding
+DataNodes that are shown in the BaseRenderer. When a node is added, remove or modified the Dispatcher can check it a DataInterator is set,
+and accordingly add or remove this DataInteractor from its internal list.
+
+\dot
+digraph {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  d [ label="DataInteractor" ];
+  a [ label="DataNode" ];
+  b [ label="DataStorage" ];
+  c [ label="Dispatcher" ];
+  e [ label="BaseRenderer"]
+  edge [fontname=Helvetica, fontsize=10]
+  d -> a [label="SetDataInteractor(this)"];
+  a -> b [label="Modified()"];
+  b -> c [label="NodeModified(dataNode)"];
+  e -> c [label="HandleEvent(interactionEvent)"];
+ { rank=same; a b c }
+}
+\enddot
+
+Events that are generated within the scope of the BaseRenderer are sent to the associated Dispatcher to be handled.
+
 
 \section ConfigurationTechnical Configuration
 
@@ -31,7 +64,7 @@ end an high-level overview about how the different components interact is given.
 
 ADD diagram
 
-\subsection EventDescriptionSection How are Events described
+\subsection EventDescriptionSection HowTo Create a Config-File for Events
 
 Events are described by their parameters. Each event type has its own set of parameters that can be set in the configuration file.
 If a parameter is ommitted it is set to its default value. Following all possible parameters are listed and described, to which parameters
@@ -81,6 +114,7 @@ by the event is generated with the actual value, and this value can be retrieved
 
 Examples for key events:
 \code
+<config>
   <!-- Event of key 'a' pressed -->
   <input event_class="KeyEvent" event_variant="StdA">
     <attribute name="Key" value="A"/>
@@ -90,20 +124,23 @@ Examples for key events:
     <attribute name="Key" value="A"/>
     <attribute name="Modifiers" value="shift,ctrl"/>
   </input>
+</config>
 \endcode
 
 
 Examples for MousePress events:
 \code
  <!-- Standard left click -->
+<config>
   <input event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </input>
-   <!-- right click with control key pressed-->
+<!-- right click with control key pressed-->
   <input event_class="MousePressEvent" event_variant="RightWithCTRL">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
   </input>
+</config>
 \endcode
 
 There exists a standard configuration file for the most common events called GlobalConfig.xml that can be used to as a default and can be extended

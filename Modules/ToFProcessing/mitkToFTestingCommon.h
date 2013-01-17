@@ -49,6 +49,11 @@ public:
                 mitk::Point3D resultPoint = pointSet2->GetPoint(i);
                 if (!mitk::Equal(expectedPoint,resultPoint))
                 {
+                    std::cout << std::endl;
+                    std::cout << std::setprecision(12) << "expected: " << expectedPoint;
+                    std::cout << std::endl;
+                    std::cout << std::setprecision(12) << "resultPoint: " << resultPoint;
+                    std::cout << std::endl;
                     pointSetsEqual = false;
                 }
             }

@@ -70,33 +70,33 @@ QmitkToFUtilView::QmitkToFUtilView()
     , m_2DTimeAfter(0.0)
     , m_CameraIntrinsics(NULL)
 {
-  this->m_Frametimer = new QTimer(this);
+    this->m_Frametimer = new QTimer(this);
 
-  this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
-  this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
-  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
+    this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
+    this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
+    this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
+    this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 }
 
 //Destructor, specifically calling OnToFCameraStopped() and OnToFCammeraDiconnected()
 QmitkToFUtilView::~QmitkToFUtilView()
 {
-  OnToFCameraStopped();
-  OnToFCameraDisconnected();
+    OnToFCameraStopped();
+    OnToFCameraDisconnected();
 }
 
 //Createing the PartControl Signal-Slot principal
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
-  // build up qt view, unless already done
-  if ( !m_Controls )
-  {
-    // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkToFUtilViewControls;
-    m_Controls->setupUi( parent );
+    // build up qt view, unless already done
+    if ( !m_Controls )
+    {
+        // create GUI widgets from the Qt Designer's .ui file
+        m_Controls = new Ui::QmitkToFUtilViewControls;
+        m_Controls->setupUi( parent );
 
-    //Looking for Input and Defining reaction
-    connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
+        //Looking for Input and Defining reaction
+        connect(m_Frametimer, SIGNAL(timeout()), this, SLOT(OnUpdateCamera()));
 
         connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(KinectAcquisitionModeChanged()), this, SLOT(OnKinectAcquisitionModeChanged()) ); // Todo in Widget2
         connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
@@ -116,7 +116,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 //SetFocus-Method -> actually seting Focus to the Recorder
 void QmitkToFUtilView::SetFocus()
 {
-  m_Controls->m_ToFRecorderWidget->setFocus();
+    m_Controls->m_ToFRecorderWidget->setFocus();
 }
 
 //Activated-Method->Generating RenderWindow
@@ -141,34 +141,34 @@ void QmitkToFUtilView::Activated()
         GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
         GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
 
-    this->UseToFVisibilitySettings(true);
+        this->UseToFVisibilitySettings(true);
 
-    if (this->m_ToFCompositeFilter)
-    {
-      m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
-    }
-    if (this->GetDataStorage())
-    {
-      m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
-    }
+        if (this->m_ToFCompositeFilter)
+        {
+            m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+        }
+        if (this->GetDataStorage())
+        {
+            m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+        }
 
-    if (this->m_ToFImageGrabber.IsNull())
-    {
-      m_Controls->m_ToFRecorderWidget->setEnabled(false);
-      m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
-      m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
-      m_Controls->tofMeasurementWidget->setEnabled(false);
-      m_Controls->SurfacePropertiesBox->setEnabled(false);
+        if (this->m_ToFImageGrabber.IsNull())
+        {
+            m_Controls->m_ToFRecorderWidget->setEnabled(false);
+            m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+            m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
+            m_Controls->tofMeasurementWidget->setEnabled(false);
+            m_Controls->SurfacePropertiesBox->setEnabled(false);
+        }
     }
-  }
 }
 
 //ZomnnieView-Method -> Resetting GUI to default. Why not just QmitkToFUtilView()?!
 void QmitkToFUtilView::ActivatedZombieView(berry::IWorkbenchPartReference::Pointer /*zombieView*/)
 {
-  ResetGUIToDefault();
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::Deactivated()
@@ -182,7 +182,7 @@ void QmitkToFUtilView::Visible()
 //Reset of the ToFUtilView
 void QmitkToFUtilView::Hidden()
 {
-  ResetGUIToDefault();
+    ResetGUIToDefault();
 }
 
 void QmitkToFUtilView::OnToFCameraConnected()
@@ -190,33 +190,33 @@ void QmitkToFUtilView::OnToFCameraConnected()
     MITK_DEBUG <<"OnToFCameraConnected";
     this->m_2DDisplayCount = 0;
 
-  this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
+    this->m_ToFImageGrabber = m_Controls->m_ToFConnectionWidget->GetToFImageGrabber();
 
-  // initialize surface generation
-  this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
-  this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
+    // initialize surface generation
+    this->m_ToFDistanceImageToSurfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
+    this->m_ToFSurfaceVtkMapper3D = mitk::ToFSurfaceVtkMapper3D::New();
 
-  // initialize ToFImageRecorder and ToFRecorderWidget
-  this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
-  this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
-  m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
-  m_Controls->m_ToFRecorderWidget->setEnabled(true);
-  m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
-  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+    // initialize ToFImageRecorder and ToFRecorderWidget
+    this->m_ToFImageRecorder = mitk::ToFImageRecorder::New();
+    this->m_ToFImageRecorder->SetCameraDevice(this->m_ToFImageGrabber->GetCameraDevice());
+    m_Controls->m_ToFRecorderWidget->SetParameter(this->m_ToFImageGrabber, this->m_ToFImageRecorder);
+    m_Controls->m_ToFRecorderWidget->setEnabled(true);
+    m_Controls->m_ToFRecorderWidget->ResetGUIToInitial();
+    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
 
-  // initialize ToFCompositeFilterWidget
-  this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
-  if (this->m_ToFCompositeFilter)
-  {
-    m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
-  }
-  if (this->GetDataStorage())
-  {
-    m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
-  }
+    // initialize ToFCompositeFilterWidget
+    this->m_ToFCompositeFilter = mitk::ToFCompositeFilter::New();
+    if (this->m_ToFCompositeFilter)
+    {
+        m_Controls->m_ToFCompositeFilterWidget->SetToFCompositeFilter(this->m_ToFCompositeFilter);
+    }
+    if (this->GetDataStorage())
+    {
+        m_Controls->m_ToFCompositeFilterWidget->SetDataStorage(this->GetDataStorage());
+    }
 
-  // initialize measurement widget
-  m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage());
+    // initialize measurement widget
+    m_Controls->tofMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
 
     this->m_RealTimeClock = mitk::RealTimeClock::New();
     this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
@@ -244,24 +244,23 @@ void QmitkToFUtilView::ResetGUIToDefault()
         GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
         GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
 
-    this->UseToFVisibilitySettings(false);
+        this->UseToFVisibilitySettings(false);
 
-    //global reinit
-    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(/*this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll())*/);
-    this->RequestRenderWindowUpdate();
-  }
+        //global reinit
+        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews();
+        this->RequestRenderWindowUpdate();
+    }
 }
 
 void QmitkToFUtilView::OnToFCameraDisconnected()
 {
-  m_Controls->m_ToFRecorderWidget->OnStop();
-  m_Controls->m_ToFRecorderWidget->setEnabled(false);
-  m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
-  m_Controls->tofMeasurementWidget->setEnabled(false);
-  m_Controls->SurfacePropertiesBox->setEnabled(false);
-  //clean up measurement widget
-  m_Controls->tofMeasurementWidget->CleanUpWidget();
-
+    m_Controls->m_ToFRecorderWidget->OnStop();
+    m_Controls->m_ToFRecorderWidget->setEnabled(false);
+    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(false);
+    m_Controls->tofMeasurementWidget->setEnabled(false);
+    m_Controls->SurfacePropertiesBox->setEnabled(false);
+    //clean up measurement widget
+    m_Controls->tofMeasurementWidget->CleanUpWidget();
 }
 
 void QmitkToFUtilView::OnKinectAcquisitionModeChanged()
@@ -301,69 +300,62 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
-    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+        this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+        this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
 
-    // initial update of composite filter
-    this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+        // initial update of composite filter
+        this->m_ToFCompositeFilter->Update();
+        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+        this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
 
-    std::string rgbFileName;
-    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
+        std::string rgbFileName;
+        m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
 
-    if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
+        if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
+        {
+            //set the reconstruction mode for kinect
+            this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
+            if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
+            {
+                this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+            }
+            else if (m_ToFImageGrabber->GetBoolProperty("IR"))
+            {
+                this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+            }
+        }
+        else
+        {
+            this->m_RGBImageNode = NULL;
+            this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+            this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+            this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+            this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+        }
+        this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+        this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
 
-    {
-      if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
-      {
-        this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
-      }
-      else if (m_ToFImageGrabber->GetBoolProperty("IR"))
-      {
-        this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-      }
-    }
-    else
-    {
-      this->m_RGBImageNode = NULL;
-      this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-      this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-      this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-      this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-    }
-    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+        this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+        this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
 
-    if (m_CameraIntrinsics.IsNotNull())
-    {
-      this->m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
-    }
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+        this->UseToFVisibilitySettings(true);
 
-    this->UseToFVisibilitySettings(true);
+        m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+        // initialize visualization widget
+        m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+        // set distance image to measurement widget
+        m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
 
-    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-    // initialize visualization widget
-    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
-    // initialize measurement widget
-    if (m_CameraIntrinsics.IsNotNull())
-    {
-      m_Controls->tofMeasurementWidget->SetCameraIntrinsics(m_CameraIntrinsics);
-    }
-    m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
+        this->m_Frametimer->start(0);
 
-    this->m_Frametimer->start(0);
-
-    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
-    m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
-    m_Controls->tofMeasurementWidget->setEnabled(true);
-    m_Controls->SurfacePropertiesBox->setEnabled(true);
+        m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
+        m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
+        m_Controls->tofMeasurementWidget->setEnabled(true);
+        m_Controls->SurfacePropertiesBox->setEnabled(true);
 
         if (m_Controls->m_TextureCheckBox->isChecked())
         {
@@ -383,7 +375,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
     m_Controls->m_ToFCompositeFilterWidget->setEnabled(false);
     m_Controls->SurfacePropertiesBox->setEnabled(false);
 
-  this->m_Frametimer->stop();
+    this->m_Frametimer->stop();
 }
 
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
@@ -494,15 +486,15 @@ void QmitkToFUtilView::OnTextureCheckBoxChecked(bool checked)
 
 void QmitkToFUtilView::OnKinectRGBTextureCheckBoxChecked(bool checked)
 {
-  if((m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
-  {
-    if (checked)
+    if((m_SelectedCamera.contains("Kinect")) && (m_ToFImageGrabber->GetBoolProperty("RGB")))
     {
-      //define the dimensions of the texture
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
-      this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
+        if (checked)
+        {
+            //define the dimensions of the texture
+            this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageWidth(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(0));
+            this->m_ToFDistanceImageToSurfaceFilter->SetTextureImageHeight(this->m_ToFImageGrabber->GetOutput(3)->GetDimension(1));
+        }
     }
-  }
 }
 
 void QmitkToFUtilView::OnChangeCoronalWindowOutput(int index)

@@ -18,17 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToFProcessingExports.h"
 #include "mitkVector.h"
-#include <vnl/vnl_math.h>
-#include "mitkToFProcessingCommon.h"
-#include "mitkPicFileReader.h"
+#include <mitkToFProcessingCommon.h>
 #include <mitkSurface.h>
-#include <mitkSTLFileReader.h>
-#include <mitkImageWriter.h>
+#include <mitkPointSet.h>
 #include <itksys/SystemTools.hxx>
 
-#include <itkImage.h>
-#include <itkImageRegionIterator.h>
-#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
 
 namespace mitk
 {
@@ -36,60 +32,65 @@ class mitkToFProcessing_EXPORT ToFTestingCommon
 {
 public:
 
-//loads an image from file
-inline static mitk::Image::Pointer LoadImage( std::string filename )
-{
-  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
-  reader->SetFileName ( filename.c_str() );
-  reader->Update();
-  if ( reader->GetOutput() == NULL )
-    itkGenericExceptionMacro("File "<<filename <<" could not be read!");
-  mitk::Image::Pointer image = reader->GetOutput();
-  return image;
-}
+    /**
+     * @brief PointSetsEqual Method two test if two point sets contain the same points. mitk::Equal is used for comparison of the points.
+     * @param pointSet1
+     * @param pointSet2
+     * @return True if pointsets are equal.
+     */
+    static bool PointSetsEqual(mitk::PointSet::Pointer pointSet1, mitk::PointSet::Pointer pointSet2)
+    {
+        bool pointSetsEqual = true;
+        if (pointSet1->GetSize()==pointSet2->GetSize())
+        {
+            for (int i=0; i<pointSet1->GetSize(); i++)
+            {
+                mitk::Point3D expectedPoint = pointSet1->GetPoint(i);
+                mitk::Point3D resultPoint = pointSet2->GetPoint(i);
+                if (!mitk::Equal(expectedPoint,resultPoint))
+                {
+                    pointSetsEqual = false;
+                }
+            }
+        }
+        else
+        {
+            pointSetsEqual = false;
+        }
+        return pointSetsEqual;
+    }
 
-//loads a surface from file
-inline static mitk::Surface::Pointer LoadSurface( std::string filename )
-{
-  mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
-  reader->SetFileName( filename.c_str() );
-  reader->Update();
-  if ( reader->GetOutput() == NULL )
-    itkGenericExceptionMacro("File "<< filename <<" could not be read!");
-  mitk::Surface::Pointer surface = reader->GetOutput();
-  return surface;
-}
+    /**
+     * @brief VtkPolyDatasEqual Convenience method for comparing the points of two vtkPolyData (using PointSetsEqual).
+     * @param poly1
+     * @param poly2
+     * @return True if polydatas are equal.
+     */
+    static bool VtkPolyDatasEqual( vtkSmartPointer<vtkPolyData> poly1, vtkSmartPointer<vtkPolyData> poly2  )
+    {
+        return PointSetsEqual(VtkPolyDataToMitkPointSet(poly1), VtkPolyDataToMitkPointSet(poly2));
+    }
 
-inline static bool SaveImage( mitk::Image* data, std::string filename )
-{
-  std::string extension = itksys::SystemTools::GetFilenameLastExtension( filename );
-  if (extension == ".gz")
-  {
-    filename.assign( filename, 0, filename.length() - 7 ); // remove last 7 characters (.pic.gz)
-  }
-  else if (extension == ".pic")
-  {
-    filename.assign( filename, 0, filename.length() - 4 ); // remove last 4 characters
-  }
-
-  try
-  {
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-    imageWriter->SetInput(data);
-
-    imageWriter->SetFileName(filename.c_str());
-    imageWriter->SetExtension(".pic.gz");
-    imageWriter->Write();
-  }
-  catch ( std::exception& e )
-  {
-    std::cerr << "Error during attempt to write '" << filename << "'.pic Exception says:" << std::endl;
-    std::cerr << e.what() << std::endl;
-    return false;
-  }
-  return true;
-}
-
+    /**
+     * @brief VtkPolyDataToMitkPointSet Converts a vtkPolyData into an mitkPointSet
+     * @param poly Input polydata.
+     * @return mitk::PointSet::Pointer The resulting point set.
+     */
+    static mitk::PointSet::Pointer VtkPolyDataToMitkPointSet( vtkSmartPointer<vtkPolyData> poly )
+    {
+        mitk::PointSet::Pointer result = mitk::PointSet::New();
+        int numberOfPoints = poly->GetNumberOfPoints();
+        for (int i=0; i<numberOfPoints; i++)
+        {
+          double* currentPoint = poly->GetPoint(i);
+          mitk::Point3D point;
+          point[0] = currentPoint[0];
+          point[1] = currentPoint[1];
+          point[2] = currentPoint[2];
+          result->InsertPoint(i,point);
+        }
+        return result;
+    }
 };
 
 }

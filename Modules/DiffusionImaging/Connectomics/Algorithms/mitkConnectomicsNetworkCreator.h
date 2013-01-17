@@ -82,6 +82,14 @@ namespace mitk
 
     mitk::ConnectomicsNetwork::Pointer GetNetwork();
 
+    /** \brief Calculate the locations of vertices
+     *
+     * Calculate the center of mass for each label and store the information. This will need a set parcellation image.
+     * Unless this function is called the first location where a label is encountered will be used. After calling this function
+     * the center of mass will be used instead.
+     */
+    void CalculateCenterOfMass();
+
   protected:
 
     //////////////////// Functions ///////////////////////
@@ -125,6 +133,11 @@ namespace mitk
     The bool parameter controls whether the front or the end is retracted */
     void RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
       int & label, mitk::Index3D & mitkIndex );
+
+    /** \brief Get the location of the center of mass for a specific label
+     * This can throw an exception if the label is not found.
+     */
+    std::vector< double > GetCenterOfMass( int label );
 
     /** Convert point to itk point */
     itk::Point<float, 3> GetItkPoint(double point[3]);
@@ -179,6 +192,12 @@ namespace mitk
 
     // toggles whether edges between a node and itself can exist
     bool allowLoops;
+
+    // toggles whether to use the center of mass coordinates
+    bool m_UseCoMCoordinates;
+
+    // stores the coordinates of labels
+    std::map< int, std::vector< double> > m_LabelsToCoordinatesMap;
 
     //////////////////////// IDs ////////////////////////////
 

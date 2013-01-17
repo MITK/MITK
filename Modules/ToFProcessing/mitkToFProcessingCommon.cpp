@@ -36,11 +36,12 @@ namespace mitk
 
     cartesianCoordinates[0] = distance * imageX / d_in_pX; //Strahlensatz: x / imageX = distance / d
     cartesianCoordinates[1] = distance * imageY_in_pX / d_in_pX; //Strahlensatz: y / imageY = distances / d
-    cartesianCoordinates[2] = distance/* * focalLengthX / d_in_pX*/; //Strahlensatz: z / f = distance / d.
+    cartesianCoordinates[2] = distance * focalLengthX / d_in_pX; //Strahlensatz: z / f = distance / d.
 
     return cartesianCoordinates;
   }
 
+  //See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
     ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY)
   {
@@ -53,6 +54,22 @@ namespace mitk
     return cartesianCoordinates;
   }
 
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToKinectIndexCoordinates(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY, ToFScalarType cartesianPointZ, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX,                                                                                                     ToFScalarType principalPointY, bool calculateDistance)
+  {
+      ToFPoint3D indexCoordinatesAndDistanceValue;
+      indexCoordinatesAndDistanceValue[0] = ((cartesianPointX*focalLengthX)/cartesianPointZ) + principalPointX;
+      indexCoordinatesAndDistanceValue[1] = ((cartesianPointY*focalLengthY)/cartesianPointZ) + principalPointY;
+
+      if (calculateDistance)
+      { //There is no computation for kinect. See KinectIndexToCartesianCoordinates.
+        indexCoordinatesAndDistanceValue[2] = cartesianPointZ;
+      }
+      else
+      {
+        indexCoordinatesAndDistanceValue[2] = 0.0;
+      }
+      return indexCoordinatesAndDistanceValue;
+  }
 
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
     ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY,

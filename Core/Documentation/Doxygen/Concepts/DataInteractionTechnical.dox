@@ -1,0 +1,25 @@
+/**
+
+\page DataInteractionTechnicalPage Interaction Concept Implementation
+
+\section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
+
+The interaction framework in MITK has been completely redesigned in order to facilitate the process of handling interaction and to provide
+easier means of configuration. For now these two frameworks co-exist, and this page describes the new framework. The documentation for the old
+and deprecated version can be found here \ref InteractionPage .
+
+Interaction is a very important task in medical image processing software. Therefore MITK provides a special interaction concept
+that provides the developer with an easy way to develop and maintain user interaction separately from the algorithms processing the input.
+This allows e.g. for common interaction schemes to be re-used in different contexts.
+
+The core of the interaction concept is based on entities called \b DataInteractors that listen for certain pre-defined events and execute
+actions when such an event is triggered. In the following the different components of the interaction concept are explained, then in the
+end an high-level overview about how the different components interact is given.
+
+//TODO: See here for a more technical explanation.
+//TODO: See here for an example on how to use an existing DataInteractor
+//TODO: See here for an example on how to implement a new DataInteractor
+
+\section EventsTechnical Events
+
+ */

@@ -25,11 +25,6 @@
 #include <MitkExports.h>
 #include <list>
 
-/**
- * Receives Events (Mouse-,Key-, ... Events) and dispatches them to the registered DataInteractor Objects.
- * The order in which DataInteractors are offered to handle an event is determined by layer of their associated DataNode.
- * Higher layers are preferred.
- */
 
 namespace mitk
 {
@@ -42,6 +37,16 @@ namespace mitk
   class InternalEvent;
   class InteractionEvent;
   class InformerService;
+
+  /**
+  * \class Dispatcher
+  * \brief Manages event distribution
+  *
+  * Receives Events (Mouse-,Key-, ... Events) and dispatches them to the registered DataInteractor Objects.
+  * The order in which DataInteractors are offered to handle an event is determined by layer of their associated DataNode.
+  * Higher layers are preferred.
+  */
+
   class MITK_CORE_EXPORT Dispatcher: public itk::Object
   {
 

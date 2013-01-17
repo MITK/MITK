@@ -62,21 +62,25 @@ namespace mitk
     Dispatcher::Pointer GetDispatcher();
 
   protected:
+
     BindDispatcherInteractor();
     virtual ~BindDispatcherInteractor();
 
   private:
-
-    void RegisterInteractor(const DataNode*  dataNode);
-    void UnRegisterInteractor(const DataNode*  dataNode);
+    /** @brief Registers for events from DataStorage.
+     *
+     * This way whenever a DataNode is added the Dispatcher is notified about this change, and checks whether a DataInteractor
+     * is set for this DataNode
+     */
+    void RegisterInteractor(const DataNode* dataNode);
+    void UnRegisterInteractor(const DataNode* dataNode);
     void RegisterDataStorageEvents();
     void UnRegisterDataStorageEvents();
 
     Dispatcher::Pointer m_Dispatcher;
     DataStorage::Pointer m_DataStorage;
-
-    InformerService* m_InformerService;
+    InformerService* m_InformerService; // holds reference to MicroService that notifies listeners
   };
 
-} /* namespace mitk */
+}
 #endif /* mitkBindDispatcherInteractor_h */

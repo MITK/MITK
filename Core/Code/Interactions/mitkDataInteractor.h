@@ -27,7 +27,7 @@
 
 namespace mitk
 {
-  /** Base class from with data interactors are to be derived.
+  /** Base class from with interactors that handle DataNodes are to be derived.
    * Provides an interface that is relevant for the interactor to work together with the dispatcher.
    * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
    */
@@ -47,6 +47,9 @@ namespace mitk
      */
     void SetAccuracy(float accuracy);
 
+    /**
+     * @brief Returns the mode the DataInteractor currently is in. See in mitkDispatcher the description of m_ProcessingMode for further details.
+     */
     std::string GetMode();
 
     NodeType GetDataNode();
@@ -55,9 +58,25 @@ namespace mitk
   protected:
     DataInteractor();
     virtual ~DataInteractor();
+    /**
+     * @brief Overwrite this function to connect actions from StateMachine description with functions.
+     *
+     * Following example shows how to connect the 'addpoint' action from the StateMachine XML description using the CONNECT_FUNCTION macro
+     * with the AddPoint() function in the TestInteractor.
+     * @code
+     * void mitk::TestInteractor::ConnectActionsAndFunctions()
+      {
+        CONNECT_FUNCTION("addpoint", AddPoint);
+      }
+     * @endcode
+     */
     virtual void ConnectActionsAndFunctions();
 
-    /** Function that iterates over all points in datanode to check if it contains a point near the pointer position.
+    /**
+     * @ brief Return index in PointSet of the point that is within given accuracy to the provided position.
+     *
+     * Assumes that the DataNode contains a PointSet, if so it iterates over all points
+     * in the DataNode to check if it contains a point near the pointer position.
      * If a point is found its index-position is returned, else -1 is returned.
      */
     virtual int GetPointIndexByPosition(Point3D position);

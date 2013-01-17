@@ -115,6 +115,7 @@ function barChart()
 
 // element to animate transition from linegraph to barchart
   vis.selectAll("path.line").transition().duration(dur).attr("d", linenull(histogramData.frequency)).remove();
+  vis.selectAll("circle").remove();
 
   var bar = vis.selectAll("rect.bar").data(histogramData.frequency);
 
@@ -156,13 +157,13 @@ function barChart()
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .transition().duration(dur)
-    .attr("opacity", 100)
+    .attr("opacity", 1)
     .call(xAxis);
 
   svg.append("g")
     .attr("class", "y axis")
     .transition().duration(dur)
-    .attr("opacity", 100)
+    .attr("opacity", 1)
     .call(yAxis);
 }
 
@@ -182,9 +183,9 @@ function linePlot()
     .remove();
 
   var line = d3.svg.line()
-    .interpolate("cardinal")
+    .interpolate("linear")
     .x(function(d,i) {
-      return xScale(histogramData.measurement[i]);
+      return xScale(histogramData.measurement[i]-binSize/2);
     })
     .y(function(d) {
       return yScale(d);
@@ -192,9 +193,9 @@ function linePlot()
     .tension(0.8);
 
   var linenull = d3.svg.line()
-    .interpolate("cardinal")
+    .interpolate("linear")
     .x(function(d,i) {
-      return xScale(histogramData.measurement[i]);
+      return xScale(histogramData.measurement[i]-binSize/2);
     })
     .y(function(d) {
       return yScale(0);
@@ -207,7 +208,6 @@ function linePlot()
     .append("path")
     .attr("class", "line")
     .attr("d", linenull)
-    .style("stroke", getRandomColor)
     .transition()
     .duration(dur)
     .attr("d", line);
@@ -217,6 +217,30 @@ function linePlot()
     .attr("d", line);
 
   graph.exit().transition().duration(dur).attr("d", linenull);
+
+  vis.selectAll("circle").remove();
+  if(histogramData.intensityProfile)
+  {
+  var circles = vis.selectAll("circle").data(histogramData.frequency);
+
+  circles.enter()
+    .append("circle")
+    .on("mouseover", myMouseOverLine)
+    .on("mouseout", myMouseOutLine)
+    .attr("cx", function(d,i) {
+      return xScale(histogramData.measurement[i]-binSize/2);
+    })
+    .attr("cy", function (d) {
+      return yScale(d)
+    })
+    .attr("r", 5)
+    .attr("opacity", 0)
+    .style("stroke", "red")
+    .style("stroke-width", 1)
+    .style("fill-opacity", 0);
+
+  circles.exit().remove();
+  }
 
   svg.selectAll("g")
     .transition()
@@ -228,13 +252,13 @@ function linePlot()
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .transition().duration(dur)
-    .attr("opacity", 100)
+    .attr("opacity", 1)
     .call(xAxis);
 
   svg.append("g")
     .attr("class", "y axis")
     .transition().duration(dur)
-    .attr("opacity", 100)
+    .attr("opacity", 1)
     .call(yAxis);
 }
 
@@ -302,13 +326,24 @@ function zoom()
     svg.select(".x.axis").call(xAxis);
     vis.selectAll(".bar")
       .attr("width", barWidth)
-      .attr("x", function(d, i) { return xScale(histogramData.measurement[i]-binSize/2)});
+      .attr("x", function(d, i) {
+        return xScale(histogramData.measurement[i]-binSize/2);
+        });
   }
   else
   {
     svg.select(".x.axis").call(xAxis);
     svg.select(".y.axis").call(yAxis);
-    vis.selectAll("path.line").attr("transform", "translate(" + zoombie.translate() + ")scale(" + zoombie.scale() + ")").style("stroke-width", 1 / zoombie.scale());
+    vis.selectAll("path.line")
+      .attr("transform", "translate(" + zoombie.translate() + ")scale(" + zoombie.scale() + ")")
+      .style("stroke-width", 1 / zoombie.scale());
+    vis.selectAll("circle")
+      .attr("cx", function(d, i) {
+        return xScale(histogramData.measurement[i]-binSize/2);
+      })
+      .attr("cy", function(d) {
+        return yScale(d);
+      });
   }
 }
 
@@ -325,7 +360,6 @@ function myMouseOver()
   myBar.style("fill", "red");
   d3.select(".infobox").style("display", "block");
   d3.select(".measurement").text("Greyvalue: " + (Math.round(x)) + " ... " + (Math.round(x+binSize)));
-  //d3.select(".measurement").text("Greyvalue: " + (Math.round(x*100))/100 + " ... " + (Math.round((x+binSize)*100))/100);
   d3.select(".frequency").text("Frequency: " + y);
 }
 
@@ -333,7 +367,31 @@ function myMouseOver()
 function myMouseOut()
 {
   var myBar = d3.select(this);
-  myBar.style("fill", "steelblue");
+  myBar.style("fill", d3.rgb(0,71,185));
+  d3.select(".infobox").style("display", "none");
+}
+
+function myMouseOverLine()
+{
+  var myCircle = d3.select(this)
+  var reScale = d3.scale.linear()
+    .domain(xScale.range())
+    .range(xScale.domain());
+  var y = myCircle.data();
+  var x = reScale(myCircle.attr("cx"));
+
+  x = x >= 0 ? x : 0;
+
+  myCircle.attr("opacity", 1);
+  d3.select(".infobox").style("display", "block");
+  d3.select(".measurement").text("Distance: " + (Math.round(x*100)/100) + " mm");
+  d3.select(".frequency").text("Intesity: " + y);
+}
+
+function myMouseOutLine()
+{
+  var myCircle = d3.select(this);
+  myCircle.attr("opacity", 0);
   d3.select(".infobox").style("display", "none");
 }
 
@@ -344,13 +402,4 @@ function myMouseMove()
   var coords = d3.mouse(this);
   infobox.style("left", coords[0] + 75 + "px");
   infobox.style("top", coords[1] + "px");
-}
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.round(Math.random() * 15)];
-    }
-    return color;
 }

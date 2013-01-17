@@ -115,7 +115,7 @@ message(STATUS \"extracting... done\")")
   list(APPEND download_cmd ${CMAKE_COMMAND} -P ${stamp_dir}/extract-sofa.cmake)
 
   set(file "sofa-rev${rev}-gl.zip")
-  set(md5 "5e21312e2bff45cbff1979bfb6249a9f")
+  set(md5 "0eb29af3eb1de3779c9afa2ff825aed0")
 
   write_downloadfile_script(
     "${stamp_dir}/download-gl.cmake"

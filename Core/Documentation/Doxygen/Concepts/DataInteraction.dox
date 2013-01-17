@@ -1,8 +1,7 @@
 /**
+\page DataInteractionPage Interaction Concepts
 
 \tableofcontents
-
-\page DataInteractionPage Interaction Concepts
 
 \section InteractionPage_Introduction Introduction to Interaction in MITK
 
@@ -24,13 +23,12 @@ TODO: See here for an example on how to implement a new DataInteractor
 
 \section EventPage Events
 
-Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures. These events are mapped to an MITK internal representation
+Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures. These events are mapped from an UI framework like Qt to an MITK internal representation
 and send to the Dispatcher which in turn deals with further processing of the event.
-For an overview of already available Events see \ref EventsTechnical.
+For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \ref ConfigurationTechnical page.
 
-Example ?
 
-\section EventHandler
+\section EventHandlerSection EventHandler
 Is the term describing objects in general that can handle events. These objects can be devided into two groups, namely
 DataInteractors and EventObserver.
 
@@ -46,7 +44,7 @@ digraph linker_deps {
 \enddot
 
 
-\subsection Configuration
+\subsection ConfigurationSection Configuration
 EventHandler provide an interface to modify the user input that triggers an action by loading a different configuration, this allows to implement
 user-specific behavior of the software on an abstract level and to switch in on run-time.
 This is achieved through XML files describing a configuration. These files can be loaded by the EventHandler and will lead to an internal mapping
@@ -80,15 +78,16 @@ and
 
 If the EventHandler is loaded with the first configuration the event variant 'AddPoint' is triggered when the user performs a mouse click,
 while when the second configuration is loaded 'AddPoint' is triggered when the user performs a right click while pressing the shift button.
-In this way all objects derived by EventHandler can be configured.
-There exists a standard configuration file for the most common events in ADD LINK to GlobalConfig.xml that can be used to as a default and can be extended
-by a specific definition.
+In this way all objects derived by EventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
 
-\subsection DataInteractors
+
+
+
+\subsection DataInteractorsSection DataInteractors
 DataInteractors are specialized EventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
-\subsubsection StateMachines
+\subsubsection StateMachinesSection StateMachines
 The basic idea here is that each interaction can be described by states
 and transitions which in turn trigger actions. This principle is best described by an example.
 Imagine a DataInteractor with the functionality (1) to add Points at a given mouse position and connect them by a line and (2) check if two
@@ -157,19 +156,19 @@ An example of a state machine describing the interaction of example 2 looks like
 
 For a more detailed desciption of state machine patterns see here. TODO
 
-\subsection EventObserver
+\subsection EventObserverSection EventObserver
 
 EventObserver are objects which will receive all user input and are intented for observation only, they should never modify any DataNodes.
 
 
-\section Dispatcher
+\section DispatcherSection Dispatcher
 
 This unit receives all events and distributes them to the DataInteractors. This is done by ordering the DataInteractors according to the layer of their
 DataNode in descending order. Then the event is offered to the first DataInteractor, which in turn checks if it can handle the event. This is done
 for each DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all EventObservers are notified.
 The Dispatcher provides some special modi of event distribution, for more details see here TODO LINK.
 
-\section Sequence Diagram of Event Handling
+\section HandlingSection Sequence Diagram of Event Handling
 
 The following sequence diagram gives an examplary overview of the process from creating an event until executing an action in the DataInteractor.
 

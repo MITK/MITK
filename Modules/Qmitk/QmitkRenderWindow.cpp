@@ -450,28 +450,28 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
     switch (tkey)
     {
     case Qt::Key_Return:
-      key = "Return";
+      key = mitk::KEYRETURN;
       break;
     case Qt::Key_Enter:
-      key = "Enter";
+      key = mitk::KEYENTER;
       break;
     case Qt::Key_Escape:
-      key = "Escape";
+      key = mitk::KEYENTER;
       break;
     case Qt::Key_Delete:
-      key = "Delete";
+      key = mitk::KEYDELETE;
       break;
     case Qt::Key_Up:
-      key = "ArrowUp";
+      key = mitk::KEYARROWUP;
       break;
     case Qt::Key_Down:
-      key = "ArrowDown";
+      key = mitk::KEYARROWDOWN;
       break;
     case Qt::Key_Left:
-      key = "ArrowLeft";
+      key = mitk::KEYARROWLEFT;
       break;
     case Qt::Key_Right:
-      key = "ArrowRight";
+      key = mitk::KEYARROWRIGHT;
       break;
     }
   }

@@ -31,10 +31,14 @@
 /*
  * Note: A Click with the MiddleButton is to be handled with MousePressEvents
  */
-
-
 namespace mitk
 {
+  /**
+   * \class InteractionKeyEvent
+   * \brief Handles key events.
+   */
+
+
   class MITK_CORE_EXPORT InteractionKeyEvent : public InteractionEvent {
 
   public:

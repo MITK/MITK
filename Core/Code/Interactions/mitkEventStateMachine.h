@@ -33,7 +33,8 @@ namespace mitk
   class StateMachineState;
 
   /**
-   * Base class of ActionFunctors, to provide an easy to connect actions with functions.
+   * \class TActionFunctor
+   * \brief Base class of ActionFunctors, to provide an easy to connect actions with functions.
    */
 
   class MITK_CORE_EXPORT TActionFunctor
@@ -46,6 +47,7 @@ namespace mitk
   };
 
   /**
+   * \class TSpecificActionFunctor
    * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed. It takes two arguments:
    * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
    */
@@ -80,7 +82,9 @@ namespace mitk
     EventStateMachine::AddActionFunction(a, new TSpecificActionFunctor<Self>(this, &Self::f));
 
   /**
-   * Super-class that provides the functionality of a StateMachine for DataInteractors.
+   * \class EventStateMachine
+   *
+   * \brief Super-class that provides the functionality of a StateMachine for DataInteractors.
    */
 
   class MITK_CORE_EXPORT EventStateMachine: public EventHandler
@@ -100,10 +104,9 @@ namespace mitk
      * and true is returned to the caller.
      * If the StateMachine can't handle this event false is returned.
      * Attention:
-     * If a transition is associated with multiple actions - "false" is returned if ALL action return false,
+     * If a transition is associated with multiple actions - "true" is returned if one action returns true,
      * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all actions that occur within
      * one transitions have the same conditions.
-     * TODO: fixme description
      */
     bool HandleEvent(InteractionEvent* event);
 
@@ -132,9 +135,9 @@ namespace mitk
     virtual bool ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
 
     /**
-     * [Implementation Optional]
+     * Implementation is optional. \n
      * Overwrite this function to check if Pointer is over a data object with which interaction is possible.
-     * This helps structuring the code, but helps to keep the decision of executing a transition on statemachine level.
+     * This helps structuring the code, but helps to keep the decision of executing a transition on state machine level.
      * A possible implementation could be:
      */
     virtual bool IsPointerOverData(InteractionEvent* interactionEvent);

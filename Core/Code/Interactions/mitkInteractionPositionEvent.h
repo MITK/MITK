@@ -27,6 +27,15 @@
 
 namespace mitk
 {
+/**
+ * \class InteractionPositionEvent
+ *
+ * \brief Super class for all position events.
+ *
+ * This class is instantiated with a BaseRenderer and the 2D pointer position relative to the renderer,
+ * the object then queries the Renderer for 3D world coordinates and supplies them to deriving classes.
+ *
+ */
 
   class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
 

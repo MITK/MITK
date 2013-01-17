@@ -66,7 +66,17 @@ namespace mitk
     return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
   }
 
-  // XML
+  /**
+   * KeyConstants Constants for special keys
+   */
+  const std::string KEYESC = "Escape";
+  const std::string KEYENTER = "Enter";
+  const std::string KEYRETURN = "Return";
+  const std::string KEYDELETE = "Delete";
+  const std::string KEYARROWUP = "ArrowUp";
+  const std::string KEYARROWDOWN = "ArrowDown";
+  const std::string KEYARROWLEFT = "ArrowLeft";
+  const std::string KEYARROWRIGHT = "ArrowRight";
 
   // XML Tags
   const std::string CONFIG = "config";

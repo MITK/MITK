@@ -2,6 +2,8 @@
 
 \page DataInteractionTechnicalPage Interaction Concept Implementation
 
+\tableofcontents
+
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
 The interaction framework in MITK has been completely redesigned in order to facilitate the process of handling interaction and to provide
@@ -20,6 +22,91 @@ end an high-level overview about how the different components interact is given.
 //TODO: See here for an example on how to use an existing DataInteractor
 //TODO: See here for an example on how to implement a new DataInteractor
 
+
 \section EventsTechnical Events
+
+\section ConfigurationTechnical Configuration
+
+\subsection MappingSection How is mapping done
+
+ADD diagram
+
+\subsection EventDescriptionSection How are Events described
+
+Events are described by their parameters. Each event type has its own set of parameters that can be set in the configuration file.
+If a parameter is ommitted it is set to its default value. Following all possible parameters are listed and described, to which parameters
+events have is decribed in their respective documentation.
+
+Mandatory for each event description is the event class and the event variant. The parameters of an event are set by attribute tags.
+
+\b Modifier \b Keys \n
+
+mitk::ModifierKeys represent the combination of pressed modifier keys, several modifier keys pressed at the same time
+are denoted by listing them all separated by commas.
+
+\code
+<!-- shift and control key are pressed -->
+<attribute name="Modifiers" value="shift,ctrl"/>
+\endcode
+
+\b Mouse \b Buttons \n
+
+mitk::MouseButtons represent the buttons. They can be used for two attributes. First the EventButton which describes the button that triggered the event,
+this allways is a single button. Secondly the ButtonState attribute that describes which buttons were pressed at the moment the event has been generated.
+For example assume the right mouse button and the middle mouse button are already pressed, now also the left mouse button is pressed too and generates a second event,
+this would be described as follows:
+
+\code
+<attribute name="EventButton" value="LeftMouseButton"/>
+<attribute name="ButtonState" value="RightMouseButton,MiddleMouseButton"/>
+\endcode
+
+Note: Technically the LeftMouseButton is also pressed and should be listed in the ButtonState, but this is taken care of by the mitk:EventFactory .
+
+\b WheelDelta \n
+
+This attribute is unique to the mitk::MouseWheelEvent and describes the direction in which the mouse wheel is rotated. Up is represented by a positive number
+and down by a negative one. Be aware that therefore a wheel delta of 1 is equivaltent to one of 7. In the event description actual value is irrelevant
+by the event is generated with the actual value, and this value can be retrieved from the object.
+
+\code
+ <attribute name="WheelDelta" value="-1"/>
+ <!-- or -->
+ <attribute name="WheelDelta" value="1"/>
+\endcode
+
+
+\subsubsection ExamplesSection Examples
+
+
+Examples for key events:
+\code
+  <!-- Event of key 'a' pressed -->
+  <input event_class="KeyEvent" event_variant="StdA">
+    <attribute name="Key" value="A"/>
+  </input>
+  <!-- Event of key 'b' pressed  while modifiers ctrl and shift are pressed-->
+  <input event_class="KeyEvent" event_variant="StdA">
+    <attribute name="Key" value="A"/>
+    <attribute name="Modifiers" value="shift,ctrl"/>
+  </input>
+\endcode
+
+
+Examples for MousePress events:
+\code
+ <!-- Standard left click -->
+  <input event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+   <!-- right click with control key pressed-->
+  <input event_class="MousePressEvent" event_variant="RightWithCTRL">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+\endcode
+
+There exists a standard configuration file for the most common events called GlobalConfig.xml that can be used to as a default and can be extended
+by a specific definition.
 
  */

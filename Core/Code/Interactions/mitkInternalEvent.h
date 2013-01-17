@@ -31,6 +31,12 @@
 namespace mitk
 {
 
+  /**
+   *\brief Class to create events from within the application to signal about internal events.
+   *
+   * These events can target a specific DataInteractor, if this DataInteractor is specified in the constructor;
+   * else this parameter is set to NULL and the event is treated as a regular event.
+   */
   // Constants for Internal commands that are understood by the Dispatcher
   const std::string INTERNALDeactivateMe = "DeactivateMe";
 
@@ -47,7 +53,8 @@ namespace mitk
     virtual bool isEqual(InteractionEvent::Pointer);
 
   protected:
-    InternalEvent(BaseRenderer*, DataInteractor* sourceInteractor, std::string signalName);
+
+    InternalEvent(BaseRenderer*, DataInteractor* destInteractor, std::string signalName);
     virtual ~InternalEvent();
 
 

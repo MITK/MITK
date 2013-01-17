@@ -40,6 +40,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
              READ getFrequency)
   Q_PROPERTY(bool useLineGraph
              READ getUseLineGraph)
+  Q_PROPERTY(bool intensityProfile
+             READ getIntensityProfile)
 
 public:
   typedef mitk::Image::HistogramType HistogramType;
@@ -58,6 +60,7 @@ public:
   void setImage(mitk::Image* image);
   void setPlanarFigure(const mitk::PlanarFigure* planarFigure);
   void ComputeHistogramOfPlanarFigure();
+  bool getIntensityProfile();
 
 private:
   QList<QVariant> m_Frequency;
@@ -68,6 +71,7 @@ private:
   HistogramType::ConstPointer m_Histogram;
   PathType::ConstPointer m_DerivedPath;
   ParametricPathType::Pointer m_ParametricPath;
+  bool m_IntensityProfile;
 
   void clearData();
 
@@ -81,6 +85,7 @@ public slots:
 
 signals:
   void DataChanged();
+  void GraphChanged();
 };
 
 #endif // QMITKHISTOGRAMJSWIDGET_H

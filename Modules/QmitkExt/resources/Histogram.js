@@ -32,6 +32,7 @@ if (!connected)
 {
   connected = true;
   histogramData.DataChanged.connect(updateHistogram);
+  histogramData.GraphChanged.connect(updateHistogram);
 }
 
 var xScale = d3.scale.linear()
@@ -206,6 +207,7 @@ function linePlot()
     .append("path")
     .attr("class", "line")
     .attr("d", linenull)
+    .style("stroke", getRandomColor)
     .transition()
     .duration(dur)
     .attr("d", line);
@@ -342,4 +344,13 @@ function myMouseMove()
   var coords = d3.mouse(this);
   infobox.style("left", coords[0] + 75 + "px");
   infobox.style("top", coords[1] + "px");
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
 }

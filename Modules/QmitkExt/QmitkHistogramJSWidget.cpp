@@ -80,7 +80,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
       m_Measurement.insert(i, measurement);
     }
   }
-
+  m_IntensityProfile = false;
   this->DataChanged();
 }
 
@@ -111,17 +111,17 @@ bool QmitkHistogramJSWidget::getUseLineGraph()
   return m_UseLineGraph;
 }
 
-// slots for radio- and pushbuttons
+// slots for radiobuttons
 void QmitkHistogramJSWidget::histogramToBarChart()
 {
   m_UseLineGraph = false;
-  this->DataChanged();
+  this->GraphChanged();
 }
 
 void QmitkHistogramJSWidget::histogramToLineGraph()
 {
   m_UseLineGraph = true;
-  this->DataChanged();
+  this->GraphChanged();
 }
 
 void QmitkHistogramJSWidget::resetView()
@@ -228,6 +228,12 @@ void QmitkHistogramJSWidget::ComputeHistogramOfPlanarFigure()
     currentWorldPoint = worldPoint;
   }
 
+  m_IntensityProfile = true;
   m_UseLineGraph = true;
   this->DataChanged();
+}
+
+bool QmitkHistogramJSWidget::getIntensityProfile()
+{
+  return m_IntensityProfile;
 }

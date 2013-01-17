@@ -22,6 +22,7 @@ if (!connected)
 {
   connected = true;
   histogramData.DataChanged.connect(updateHistogram);
+  histogramData.GraphChanged.connect(toggleGraph);
 }
 
 $(function () {
@@ -41,7 +42,7 @@ $(function () {
       zoomType: 'x'
     },
     title: {
-      text: 'Histogram'
+      text: null
     },
     plotOptions: {
       column: {
@@ -50,25 +51,26 @@ $(function () {
         turboThreshold: 500.0,
         enableMouseTracking: false
       },
-      spline: {
+      line: {
         shadow: false,
         lineWidth: 1.0,
         marker: {
           enabled: false
         },
+        stickyTracking: false,
         visible: false
       }
     },
     xAxis: {
       title: {
-        text: 'Greyvalue'
+        text: null
       },
       allowDecimals: false,
       endOnTick: true
     },
     yAxis: {
       title: {
-        text: 'Frequency (px)'
+        text: null
       },
       allowDecimals: false,
       endOnTick: true
@@ -76,7 +78,14 @@ $(function () {
     tooltip: {
       shadow: false,
       formatter: function() {
-        return 'Greyvalue: '+this.x+'<br/>'+'Frequency: '+this.y;
+        if (!histogramData.intensityProfile)
+        {
+          return 'Greyvalue: '+this.x+'<br/>'+'Frequency: '+this.y;
+        }
+        else
+        {
+          return 'Distance: '+Math.round(this.x*100)/100+' mm<br/>'+'Intensity: '+this.y;
+        }
       }
     },
     series: [{
@@ -84,7 +93,7 @@ $(function () {
       data: histData,
       name: 'Barchart'
     }, {
-      type: 'spline',
+      type: 'line',
       data: histData,
       name: 'Lineplot'
     }],
@@ -97,7 +106,7 @@ $(function () {
       }
     },
     legend: {
-      enabled: true
+      enabled: false
     }
   });
 });
@@ -105,6 +114,16 @@ $(function () {
 updateHistogram();
 
 function updateHistogram() {
+  if (histogramData.useLineGraph)
+  {
+    chart.series[0].hide();
+    chart.series[1].show();
+  }
+  else
+  {
+    chart.series[0].show();
+    chart.series[1].hide();
+  }
   histData = [];
   for (var i = 0; i < histogramData.frequency.length; i++)
   {
@@ -114,4 +133,18 @@ function updateHistogram() {
   chart.series[0].setData(histData);
   chart.series[1].setData(histData);
   chart.redraw();
+}
+
+function toggleGraph()
+{
+  if (histogramData.useLineGraph)
+  {
+    chart.series[0].hide();
+    chart.series[1].show();
+  }
+  else
+  {
+    chart.series[0].show();
+    chart.series[1].hide();
+  }
 }

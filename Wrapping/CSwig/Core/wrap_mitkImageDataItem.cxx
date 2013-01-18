@@ -1,4 +1,5 @@
 #include "mitkImageDataItem.h"
+#include "mitkImage.h"
 #include "mitkCSwigMacros.h"
 
 #ifdef CABLE_CONFIGURATION

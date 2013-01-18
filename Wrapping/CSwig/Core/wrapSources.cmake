@@ -189,12 +189,12 @@ set(WRAP_SOURCES_TEST
   wrap_mitkLookupTableProperty
   wrap_mitkOperation
   wrap_mitkOperationActor
-  wrap_mitkPicFileIOFactory
-  wrap_mitkPicFileReader
-  wrap_mitkPicFileWriter
-  wrap_mitkPicHelper
-  wrap_mitkPicVolumeTimeSeriesIOFactory
-  wrap_mitkPicVolumeTimeSeriesReader
+  #wrap_mitkPicFileIOFactory
+  #wrap_mitkPicFileReader
+  #wrap_mitkPicFileWriter
+  #wrap_mitkPicHelper
+  #wrap_mitkPicVolumeTimeSeriesIOFactory
+  #wrap_mitkPicVolumeTimeSeriesReader
   wrap_mitkPixelType
   wrap_mitkPointSetIOFactory
   wrap_mitkPointSetReader
@@ -222,7 +222,7 @@ set(WRAP_SOURCES_TEST
   wrap_mitkGeometry2DDataVtkMapper3D
   wrap_mitkGLMapper2D
   wrap_mitkGradientBackground
-  wrap_mitkImageMapperGL2D
+  #wrap_mitkImageMapperGL2D
   wrap_mitkMapper
   wrap_mitkMapper2D
   wrap_mitkMapper3D

@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>
-#include <dPython.h>
+#include <Python.h>
 #include <QMetaType>
 
 #include "berryFileEditorInput.h"

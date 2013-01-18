@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QTextEdit>
 
-#include "mitkQtCommonDll.h"
-
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>

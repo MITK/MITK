@@ -40,3 +40,7 @@ void QmitkPythonPerspective::CreateInitialLayout(berry::IPageLayout::Pointer lay
   bottomFolder->AddView("org.mitk.views.propertylistview");
   bottomFolder->AddView("org.blueberry.views.logview");
 }
+
+QmitkPythonPerspective::QmitkPythonPerspective()
+{
+}

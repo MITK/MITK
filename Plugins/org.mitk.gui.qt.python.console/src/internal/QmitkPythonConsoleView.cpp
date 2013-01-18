@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <mitkRenderingManager.h>
 #include <mitkDataStorageEditorInput.h>
-#include <dPython.h>
+#include <Python.h>
 #include <QMetaType>
 //#include <wrap_mitkDataStoragePython.cxx>
 
@@ -58,6 +58,8 @@ QmitkPythonConsoleView::QmitkPythonConsoleView()
 
   QmitkPythonMediator::getInstance()->runSimpleString("import sys");
 
+
+  /*
   std::string cmd ( "sys.path.append('" MITK_PYTHONPATH_MITK_LIBRARY_DIRS "');" );
   QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
 
@@ -79,6 +81,7 @@ QmitkPythonConsoleView::QmitkPythonConsoleView()
     cmd = "sys.path.append('" MITK_PYTHONPATH_OPEN_CV_LIBRARY_DIRS "');";
     QmitkPythonMediator::getInstance()->runSimpleString(cmd.c_str());
   }
+  */
 }
 
 QmitkPythonConsoleView::~QmitkPythonConsoleView()

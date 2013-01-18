@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QList>
 #include <QUrl>
 
-#include <dPython.h>
+#include <Python.h>
 
 
 QmitkCTKPythonShell::QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent)

@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkPythonMediator.h"
-#include <dPython.h>
+#include <Python.h>
 
 QmitkPythonMediator::QmitkPythonMediator()
 {

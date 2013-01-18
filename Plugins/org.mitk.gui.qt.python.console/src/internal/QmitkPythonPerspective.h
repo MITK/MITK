@@ -27,7 +27,8 @@ struct QmitkPythonPerspective : public QObject, public berry::IPerspectiveFactor
   Q_OBJECT
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
-
+public:
+  QmitkPythonPerspective();
   QmitkPythonPerspective(const QmitkPythonPerspective& other)
   {
     Q_UNUSED(other)

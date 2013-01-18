@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <set>
 #include <QStringList>
-#include <dPython.h>
+//#include <dPython.h>
+#include <Python.h>
 #include "mitkCommon.h"
 
 class QmitkPythonClient

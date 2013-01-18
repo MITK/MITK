@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * \sa QmitkFunctionality
  */
-class QmitkPythonSnippets : public QObject, public berry::QtViewPart, public berry::ISizeProvider
+class QmitkPythonSnippets : public berry::QtViewPart, public berry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

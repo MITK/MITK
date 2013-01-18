@@ -27,7 +27,7 @@ namespace _cable_
          ITK_WRAP_OBJECT(LightObject)
          ITK_WRAP_OBJECT(ObjectFactoryBase)
          typedef itk::EndEvent::EndEvent EndEvent;
-         typedef mbilog::AbstractBackend::AbstractBackend AbstractBackend;
+         //typedef mbilog::AbstractBackend::AbstractBackend AbstractBackend;
          typedef itk::AffineTransform<float, 3 >::AffineTransform AffineTransform_F3U;
          typedef itk::AffineTransform<float, 3 >::Pointer::SmartPointer AffineTransform_F3U_Pointer;
          typedef itk::MatrixOffsetTransformBase<float, 3, 3 >::MatrixOffsetTransformBase MatrixOffsetTransformBase_F3U3U;

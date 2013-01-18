@@ -13,7 +13,7 @@
 //TODO: See here for an example on how to implement a new DataInteractor
 
 
-\section Dispatcher
+\section DispatcherSection Dispatcher
 
 Each BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the DataStorage and the Dispatcher,
 and thereby allowing a DataInteractor to register with a Dispatcher when only knowing the DataNode.
@@ -58,13 +58,68 @@ digraph {
 Events that are generated within the scope of the BaseRenderer are sent to the associated Dispatcher to be handled.
 
 
-\section ConfigurationTechnical Configuration
+\subsection DispatcherEventDistSection Event Distribution
 
-\subsection MappingSection How is mapping done
+ A Dispatcher can operate in different processing modes, which determine how the interactor that receives an event is chosen.
+ These modes are managed and set by the Dispatcher itself.
 
-ADD diagram
+<ul>
+ <li> \b Regular: \n
+    DataInteractors are sorted by their layer, and distribution is stared with the top-most.
 
-\subsection EventDescriptionSection HowTo Create a Config-File for Events
+ <li> \bConnected \b Mouse \b Action:
+
+      A connected mouse action is described by the sequence of Mouse-Press, (optionally) Mouse-Move , Mouse-Release Events.\n
+      Within this sequence all events are sent to the same DateInteractor, the one which received the event from the Mouse-Press action.\n
+      \b m_ConnectedMouseAction  - is set to true, when a Mouse-Down Event occurs and a DataInterator takes the event and
+      \b m_SelectedInteractor is then set to this DataInteractor.\n
+      \b m_ConnectedMouseAction is reset to false, after the Mouse-Release Event occurs,\n
+      while it is true, the m_SelectedInteractor is the only one that receives Mouse-Events.
+
+ <li> \b Grab \b Input:\n
+      Whenever a DataInteractor performs a state change into a state that is marked by the grab input-tag, the Dispatcher switches into this mode.
+      As long as it is in this mode ONLY the selected DataInteractor will receive the event. This mode is ended when the DataInteractor switches back to
+      a state without a tag/ or the REGULAR-tag.\n
+      \note In this mode EventObservers will NOT receive the events.
+
+   <li> \b Prefer \b Input: \n
+      Basically works as Grab Input, with the difference that if the Interactor in an prefer input state, cannot process the event offered,
+      it will be offered to the other interactors in the regular way.\n
+      In this mode EventObservers ARE informed.
+
+</ul>
+\section StateMachineSection State Machine & Configuration
+
+A  mitk::EventStateMachine points to a \b state, which in turn references  \b transitions
+(which describe a change from one state to another) and \b actions (indicating which functions are executed when a transition is taken).
+\dot
+digraph {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  a [ label="{StateMachine|m_CurrentState}" ];
+  b [ label="{StateMachineState|m_Transitions}" ];
+  c [ label="{StateMachineTransitions|m_Actions}"];
+  d [ label="{StateMachineAction}"];
+  edge [fontname=Helvetica, fontsize=10]
+  a -> b [label="asd"];
+  b -> c [label="ads"];
+  c -> d [label="asd"];
+  {rank=same; a b }
+
+}
+\enddot
+
+After an event is received by the Dispatcher it is given to a DataInteractor that has to decide if it can process this event.
+On a high level this is done by the mitk::EventStateMachine.
+First the state machine asks if the received event is known in the
+configuration. If it does the matching variant name is returned. Then the state machine checks if there exists a transition
+in its current state that is triggered by this event variant. If this is the case all actions that are associated with this transition
+are queried and executed. The actions themselves are implemented on DataInteractor level. The following diagram illustrates the process:
+
+\image html sm_and_config.png
+
+\section ConfigFileDescriptionSection HowTo Create a Config-File
+
+\subsection EventDescriptionSection Event Description
 
 Events are described by their parameters. Each event type has its own set of parameters that can be set in the configuration file.
 If a parameter is ommitted it is set to its default value. Following all possible parameters are listed and described, to which parameters
@@ -109,7 +164,7 @@ by the event is generated with the actual value, and this value can be retrieved
 \endcode
 
 
-\subsubsection ExamplesSection Examples
+\subsection ExamplesSection Examples
 
 
 Examples for key events:
@@ -145,5 +200,98 @@ Examples for MousePress events:
 
 There exists a standard configuration file for the most common events called GlobalConfig.xml that can be used to as a default and can be extended
 by a specific definition.
+
+\subsection ParameterDescriptionSection Parameter Description
+
+It is also possible to store parameters in the config file. Those are stored using the param-tag, like this:
+
+\code
+<config name="example2">
+ <param name="property1" value="yes"/>
+ <param name="scrollModus" value="leftright"/>
+</config>
+\endcode
+
+Within the application these properties can then be access via a mitk::PropertyList like this:
+
+\code
+  // sm - state machine loaded with config file example2
+
+  mitk::PropertyList::Pointer properties = sm->GetPropertyList();
+  std::string prop1;
+  properties->GetStringProperty("property1",prop1)
+\endcode
+
+
+\section HowToStateMachine HowTo Write a State Machine
+
+A state machine pattern is described in a XML file.
+
+\subsection StateSection States
+
+States are described using the state-tag. Each state has to have a name. Exactly one state has to be as start state in
+each state machine to indicate the state in which the state machine is set when it is constructed.
+So a valid, but rather useless state machine would like like this:
+
+\code
+<statemachine>
+ <state name="start" startstate="true"/>
+</statemachine>
+\endcode
+
+Optionally a state can be assigned a special mode that influences the event distribution.
+These modes are GRAB_INPUT , PREFER_INPUT and REGULAR (where REGULAR is default and does not need to be indicated).
+See \ref DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
+receive events.
+
+\code
+<!-- example -->
+<state name="someState" startstate="true" state_mode="GRAB_INPUT"/>
+\endcode
+
+\subsubsection TransitionSection Transitions
+Transitions are part of a state and describe all possible state switches, and are therefore important for modelling an interaction scheme.
+Transitions consist a part that describes the event which triggers the transition (event class and event variant) and a target which is state
+to which the state machine switches after executing a transition.
+An event class describes the event type (see mitk::InteractionEvent for the different classes) and the event variant is a specification thereof
+and the exact description is taken from  a config file. Together they determine which event can trigger this transition.
+For example this state machine will switch from state A to state B when the StdMousePressPrimaryButton event (left mouse button is pressed) occurs.
+
+\code
+<statemachine>
+ <state name="A" startstate="true">
+   <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="B"/>
+ <state/>
+ <state name="B" />
+</statemachine>
+\endcode
+
+subsection ActionSection Actions
+Actions can be added to transitions and represent functions in the DataInteractor that are executed on taking a transition.
+The following simple state machine will listen for left mouse clicks and execute two actions (and actually never stop).
+\code
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="start">
+            <action name="addPoint"/>
+            <action name="countClicks"/>
+        </transition>
+    </state>
+</statemachine>
+\endcode
+
+In order to tell the DataInteractor which function to execute these actions are made known to the DataInteractor using
+the CONNECT_FUNCTION macro.  This example assumes that there exists an ExampleInteractor which inherits from DataInteractor.
+This class implements the functions AddPoint and CountClicks. The actions are introduced by implementing the virtual method
+ConnectActionsAndFunctions():
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+  CONNECT_FUNCTION("addPoint", AddPoint);
+  CONNECT_FUNCTION("countClicks", CountClicks);
+}
+\endcode
+
 
  */

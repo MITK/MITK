@@ -70,7 +70,9 @@ namespace mitk
      * NOTES: 1) If an event is added from an other source than an Interactor / Listener its execution will be delayed until the next regular event
      * comes in.
      * 2) Make sure you're not causing infinite loops!
+     *
      */
+
     void QueueEvent(InteractionEvent* event);
 
     /**
@@ -101,34 +103,12 @@ namespace mitk
     ListEventsType m_QueuedEvents;
 
     /**
-     * Removes ALL Interactors without a DataNode pointing to them, this is necessary especially when a DataNode is assigned to a new Interactor
+     * Removes all Interactors without a DataNode pointing to them, this is necessary especially when a DataNode is assigned to a new Interactor
      */
     void RemoveOrphanedInteractors();
 
     /**
-     * The Dispatcher operates in different processing modes, which determine the way the interactor that receives an event is chosen.
-     * Those modes are:
-     *
-     * - Regular
-     *
-     * - Connected Mouse Action:
-     * A connected mouse action is described by the sequence of Mouse-Press, [Mouse-Move] , Mouse-Release Events.
-     * Within this sequence all events are sent to the same Interactor, namely the one which received the event from the Mouse-Press action.
-     * m_ConnectedMouseAction  - is set to true, when a Mouse-Down Event occurs and an interactor takes the events,
-     * m_SelectedInteractor contains said interactor.
-     * m_ConnectedMouseAction is reset to false, after the Mouse-Release Event occurs,
-     * while it is true, the m_SelectedInteractor is the only one that receives Mouse-Events.
-     *
-     * - Grab Input
-     * Whenever an interactor performs a state change into a state that is marked by the grab input-tag, the dispatcher switches into this mode.
-     * As long as it is in this mode ONLY the selected interactor will receive the event. This mode is ended when the interactor switches back to
-     * a state without a tag/ or the REGULAR-tag.
-     * NOTE: Does NOT inform Listeners.
-     *
-     * - Prefer Input
-     * Basically works as Grab Input, with the difference that if the Interactor in an prefer input state, cannot process the event offered,
-     * it will be offered to the other interactors in the regular way.
-     * Does inform Listeners.
+     * See \ref DispatcherEventDistSection for a description of ProcessEventModes
      */
     ProcessEventMode m_ProcessingMode;
     DataInteractor::Pointer m_SelectedInteractor;

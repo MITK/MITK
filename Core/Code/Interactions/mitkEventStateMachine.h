@@ -84,7 +84,12 @@ namespace mitk
   /**
    * \class EventStateMachine
    *
-   * \brief Super-class that provides the functionality of a StateMachine for DataInteractors.
+   * \brief Super-class that provides the functionality of a StateMachine to DataInteractors.
+   *
+   * A state machine is created by loading a state machine pattern. It consists of states, transitions and action.
+   * The state represent the current status of the interaction, transitions are means to switch between states. Each transition
+   * is triggered by an event and it is associated with actions that are to be executed when the state change is performed.
+   *
    */
 
   class MITK_CORE_EXPORT EventStateMachine: public EventHandler
@@ -137,8 +142,23 @@ namespace mitk
     /**
      * Implementation is optional. \n
      * Overwrite this function to check if Pointer is over a data object with which interaction is possible.
-     * This helps structuring the code, but helps to keep the decision of executing a transition on state machine level.
+     * This helps structuring the code and helps to keep the decision of executing a transition on state machine level.
      * A possible implementation could be:
+     \code
+     // here we only want to handle mouse move events, since for all other events it is irrelevant if
+     // we hover over an object
+     bool mitk::EventStateMachine::IsPointerOverData(InteractionEvent* interactionEvent)  {
+       MouseMoveEvent* mouseMoveEvent = dynamic_cast<MouseMoveEvent*>(interactionEvent);
+       if (mouseMoveEvent != NULL)
+       {
+         return true;
+       }
+       else
+       {
+         return true; // we do not handle other events
+       }
+     }
+     \endcode
      */
     virtual bool IsPointerOverData(InteractionEvent* interactionEvent);
 

@@ -28,8 +28,8 @@
 namespace mitk
 {
 /**
- * Factory Class:
- * Generates InteractionEvent-Objects which are described by a PropertyList.
+ * \class EventFactory
+ * \brief Generates InteractionEvent-Objects which are described by a PropertyList.
  */
   class MITK_CORE_EXPORT EventFactory: public itk::Object
   {

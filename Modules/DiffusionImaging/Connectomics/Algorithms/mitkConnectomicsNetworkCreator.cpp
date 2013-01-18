@@ -120,12 +120,10 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   }
 
   // Prune unconnected nodes
-  m_ConNetwork->PruneUnconnectedSingleNodes();
+  //m_ConNetwork->PruneUnconnectedSingleNodes();
+
   // provide network with geometry
-  {
-    mitk::Geometry3D::Pointer clonedGeometry = dynamic_cast<mitk::Geometry3D*>(m_Segmentation->GetGeometry()->Clone().GetPointer());
-    m_ConNetwork->SetGeometry( clonedGeometry );
-  }
+  m_ConNetwork->SetGeometry( dynamic_cast<mitk::Geometry3D*>(m_Segmentation->GetGeometry()->Clone().GetPointer()) );
   m_ConNetwork->UpdateBounds();
   m_ConNetwork->SetIsModified( true );
 
@@ -137,21 +135,17 @@ void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType new
   VertexType vertexA = newConnection.first;
   VertexType vertexB = newConnection.second;
 
-  // if vertices A and B exist
-  if( vertexA && vertexB)
+  // check for loops (if they are not allowed)
+  if( allowLoops || !( vertexA == vertexB ) )
   {
-    // check for loops (if they are not allowed
-    if( allowLoops || !( vertexA == vertexB ) )
+    // If the connection already exists, increment weight, else create connection
+    if ( m_ConNetwork->EdgeExists( vertexA, vertexB ) )
     {
-      // If the connection already exists, increment weight, else create connection
-      if ( m_ConNetwork->EdgeExists( vertexA, vertexB ) )
-      {
-        m_ConNetwork->IncreaseEdgeWeight( vertexA, vertexB );
-      }
-      else
-      {
-        m_ConNetwork->AddEdge( vertexA, vertexB );
-      }
+      m_ConNetwork->IncreaseEdgeWeight( vertexA, vertexB );
+    }
+    else
+    {
+      m_ConNetwork->AddEdge( vertexA, vertexB );
     }
   }
 }
@@ -792,7 +786,6 @@ void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, mitk::Index3D i
       std::vector<double> labelCoords = GetCenterOfMass( label );
       for( unsigned int loop = 0; loop < newNode.coordinates.size() ; loop++ )
       {
-        std::cout << "Using CoM\n";
         newNode.coordinates[ loop ] = labelCoords.at( loop ) ;
       }
     }

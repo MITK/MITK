@@ -32,15 +32,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
-    m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0)
+  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0)
 {
-    m_InterPixelDistance.Fill(0.045);
-    m_CameraIntrinsics = mitk::CameraIntrinsics::New();
-    m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
-    m_CameraIntrinsics->SetFocalLength(5.9421434211923247e+02,5.9104053696870778e+02);
-    m_CameraIntrinsics->SetPrincipalPoint(3.3930780975300314e+02,2.4273913761751615e+02);
-    m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
-    m_ReconstructionMode = WithInterPixelDistance;
+  m_InterPixelDistance.Fill(0.045);
+  m_CameraIntrinsics = mitk::CameraIntrinsics::New();
+  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
+  m_CameraIntrinsics->SetFocalLength(5.9421434211923247e+02,5.9104053696870778e+02);
+  m_CameraIntrinsics->SetPrincipalPoint(3.3930780975300314e+02,2.4273913761751615e+02);
+  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+  m_ReconstructionMode = WithInterPixelDistance;
 }
 
 mitk::ToFDistanceImageToSurfaceFilter::~ToFDistanceImageToSurfaceFilter()
@@ -107,13 +107,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
 
-//  float textureScaleCorrection1 = 0.0;
-//  float textureScaleCorrection2 = 0.0;
-//  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-//  {
-//    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
-//    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
-//  }
+  //  float textureScaleCorrection1 = 0.0;
+  //  float textureScaleCorrection2 = 0.0;
+  //  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+  //  {
+  //    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
+  //    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
+  //  }
 
   float* scalarFloatData = NULL;
 
@@ -126,74 +126,74 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     scalarFloatData = (float*)this->GetInput(m_TextureIndex)->GetData();
   }
 
-    float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
-    //calculate world coordinates
-    mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
-    mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
-    if((m_ReconstructionMode == WithOutInterPixelDistance) || (m_ReconstructionMode == Kinect))
-    {
-        focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
-        focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
-    }
-    else if( m_ReconstructionMode == WithInterPixelDistance)
-    {
-        //convert focallength from pixel to mm
-        focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
-    }
+  float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
+  //calculate world coordinates
+  mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
+  mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;
+  if((m_ReconstructionMode == WithOutInterPixelDistance) || (m_ReconstructionMode == Kinect))
+  {
+    focalLengthInPixelUnits[0] = m_CameraIntrinsics->GetFocalLengthX();
+    focalLengthInPixelUnits[1] = m_CameraIntrinsics->GetFocalLengthY();
+  }
+  else if( m_ReconstructionMode == WithInterPixelDistance)
+  {
+    //convert focallength from pixel to mm
+    focalLengthInMm = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  }
 
-    mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
-    principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
-    principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
+  mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+  principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
+  principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
-    mitk::Point3D origin = input->GetGeometry()->GetOrigin();
+  mitk::Point3D origin = input->GetGeometry()->GetOrigin();
 
-    for (int j=0; j<yDimension; j++)
+  for (int j=0; j<yDimension; j++)
+  {
+    for (int i=0; i<xDimension; i++)
     {
-        for (int i=0; i<xDimension; i++)
-        {
-            // distance value
-            mitk::Index3D pixel;
-            pixel[0] = i;
-            pixel[1] = j;
-            pixel[2] = 0;
+      // distance value
+      mitk::Index3D pixel;
+      pixel[0] = i;
+      pixel[1] = j;
+      pixel[2] = 0;
 
       unsigned int pixelID = pixel[0]+pixel[1]*xDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
-            mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
-            switch (m_ReconstructionMode)
-            {
-            case WithOutInterPixelDistance:
-            {
-                cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
-                break;
-            }
-            case WithInterPixelDistance:
-            {
-                cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i+origin[0],j+origin[1],distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
-                break;
-            }
-            case Kinect:
-            {
-                cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
-                break;
-            }
-            default:
-            {
-                MITK_ERROR << "Incorrect reconstruction mode!";
-            }
-            }
+      mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates;
+      switch (m_ReconstructionMode)
+      {
+      case WithOutInterPixelDistance:
+      {
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        break;
+      }
+      case WithInterPixelDistance:
+      {
+        cartesianCoordinates = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i+origin[0],j+origin[1],distance,focalLengthInMm,m_InterPixelDistance,principalPoint);
+        break;
+      }
+      case Kinect:
+      {
+        cartesianCoordinates = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(i+origin[0],j+origin[1],distance,focalLengthInPixelUnits,principalPoint);
+        break;
+      }
+      default:
+      {
+        MITK_ERROR << "Incorrect reconstruction mode!";
+      }
+      }
 
-                //Epsilon here, because we may have small float values like 0.00000001 which in fact represents 0.
-                if (distance<=mitk::eps)
-                {
-                    isPointValid[pointCount] = false;
-                }
-                else
-                {
-                    isPointValid[pointCount] = true;
-                    points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
+      //Epsilon here, because we may have small float values like 0.00000001 which in fact represents 0.
+      if (distance<=mitk::eps)
+      {
+        isPointValid[pointCount] = false;
+      }
+      else
+      {
+        isPointValid[pointCount] = true;
+        points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
 
         if((i >= 1) && (j >= 1))
         {
@@ -253,9 +253,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
-    DataObjectPointer newOutput = this->MakeOutput(idx);
-    this->SetNthOutput(idx, newOutput);
-  }
+      DataObjectPointer newOutput = this->MakeOutput(idx);
+      this->SetNthOutput(idx, newOutput);
+    }
   this->Modified();
 }
 

@@ -79,7 +79,7 @@ std::string mitk::DataInteractor::GetMode()
   return GetCurrentState()->GetMode();
 }
 
-int mitk::DataInteractor::GetPointIndexByPosition(Point3D position)
+int mitk::DataInteractor::GetPointIndexByPosition(Point3D position, int time)
 {
 
   // iterate over point set and check if it contains a point close enough to the pointer to be selected
@@ -89,7 +89,7 @@ int mitk::DataInteractor::GetPointIndexByPosition(Point3D position)
   {
     return index;
   }
-  PointSet::PointsContainer* pointsContainer = points->GetPointSet()->GetPoints();
+  PointSet::PointsContainer* pointsContainer = points->GetPointSet(time)->GetPoints();
 
   float minDistance = m_SelectionAccuracy;
   for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)

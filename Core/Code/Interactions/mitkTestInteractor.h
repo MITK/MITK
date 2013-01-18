@@ -27,11 +27,10 @@
 
 namespace mitk
 {
-  /** Temporal Dummy Interactor that only servers during developement
+  /** Temporal Dummy Interactor that only serves during developement
    * to ensure the Interaction Framework does what it needs to do.
    */
 
-  class DataNode;
   class MITK_CORE_EXPORT TestInteractor: public DataInteractor
   {
 

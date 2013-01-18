@@ -51,7 +51,8 @@ digraph {
   a -> b [label="Modified()"];
   b -> c [label="NodeModified(dataNode)"];
   e -> c [label="HandleEvent(interactionEvent)"];
- { rank=same; a b c }
+ { rank=same; b c a }
+ { rank=same; e }
 }
 \enddot
 
@@ -95,16 +96,14 @@ A  mitk::EventStateMachine points to a \b state, which in turn references  \b tr
 \dot
 digraph {
   node [shape=record, fontname=Helvetica, fontsize=10];
-  a [ label="{StateMachine|m_CurrentState}" ];
-  b [ label="{StateMachineState|m_Transitions}" ];
-  c [ label="{StateMachineTransitions|m_Actions}"];
-  d [ label="{StateMachineAction}"];
+  d [ label="{StateMachine|m_CurrentState}" ];
+  a [ label="{StateMachineState|m_Transitions}" ];
+  b [ label="{StateMachineTransitions|m_Actions}"];
+  c [ label="{StateMachineAction}"];
   edge [fontname=Helvetica, fontsize=10]
-  a -> b [label="asd"];
-  b -> c [label="ads"];
-  c -> d [label="asd"];
-  {rank=same; a b }
-
+  d -> a [label="1 : 1"];
+  a -> b [label="1 : n"];
+  b -> c [label="1 : n"];
 }
 \enddot
 
@@ -219,7 +218,7 @@ Within the application these properties can then be access via a mitk::PropertyL
 
   mitk::PropertyList::Pointer properties = sm->GetPropertyList();
   std::string prop1;
-  properties->GetStringProperty("property1",prop1)
+  properties->GetStringProperty("property1",prop1);
 \endcode
 
 
@@ -249,7 +248,7 @@ receive events.
 <state name="someState" startstate="true" state_mode="GRAB_INPUT"/>
 \endcode
 
-\subsubsection TransitionSection Transitions
+\subsection TransitionSection Transitions
 Transitions are part of a state and describe all possible state switches, and are therefore important for modelling an interaction scheme.
 Transitions consist a part that describes the event which triggers the transition (event class and event variant) and a target which is state
 to which the state machine switches after executing a transition.
@@ -266,7 +265,7 @@ For example this state machine will switch from state A to state B when the StdM
 </statemachine>
 \endcode
 
-subsection ActionSection Actions
+\subsection ActionSection Actions
 Actions can be added to transitions and represent functions in the DataInteractor that are executed on taking a transition.
 The following simple state machine will listen for left mouse clicks and execute two actions (and actually never stop).
 \code
@@ -293,5 +292,176 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
+
+\section HowToDataInteractor HowTo Implement a new DataInteractor
+
+This HowTo assumes knowlege of the Interaction concept described in \ref DataInteractionPage , State Machines and Configuration described in
+\ref StateMachineSection, \ref HOW TO Config, HOW TO StateMachine.
+
+DataInteractor are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
+\code
+bool SomeFunctionality(StateMachineAction* , InteractionEvent*);
+\endcode
+
+Your functions are connected with actions by implementing the function ConnectActionsAndFunctions(), e.g.
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+ CONNECT_FUNCTION("addPoint", AddPoint);
+ CONNECT_FUNCTION("enoughPoints", EnoughPoints);
+}
+\endcode
+
+Now all that is left it to write a state machine pattern and a config file as is described in the tutorials.
+
+\subsection ExampleInternalEvent Example Interactor using InternalEvent
+
+A useful tool in creating DataInteractors are mitk::InternalEvents which allow to the DataInteractor send signals on its own.
+The following will describe how to build a DataInteractor that allows to add points until a certain number of points is reached.
+The number of accepted points is provided in the config file as a parameter.
+So we start by writing a state machine pattern that add points until it receives an InternalEvent telling it, that enough points
+have been added.
+
+\code
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="MousePressEvent" event_variant="AddPointClick" target="start">
+            <action name="addPoint"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="SetIsFull" target="final">
+            <action name="enoughPoints"/>
+        </transition>
+    </state>
+    <state name="final">
+    <!-- dead state, nothing happens any more, once we reached this -->
+    </state>
+</statemachine>
+\endcode
+
+In our config file we set the number of maximal points to 10, and define AddPointClick as a right mouse click with the
+ctrl button pressed.
+\code
+<config>
+  <param name="NumberOfPoints" value="10">
+  <input event_class="InternalEvent" event_variant="SetIsFull">
+    <attribute name="SignalName" value="enoughPointsAdded"/>
+  </input>
+   <input event_class="MousePressEvent" event_variant="AddPointClick">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+</config>
+\endcode
+
+The header file of the DataInteractor looks like this:
+
+\code
+#include "itkObject.h"
+#include "itkSmartPointer.h"
+#include "itkObjectFactory.h"
+#include "mitkCommon.h"
+#include <MitkExports.h>
+#include "mitkDataInteractor.h"
+#include <mitkPointSet.h>
+
+
+namespace mitk
+{
+  class MITK_CORE_EXPORT ExampleInteractor: public DataInteractor
+  {
+  public:
+    mitkClassMacro(ExampleInteractor, DataInteractor);
+    itkNewMacro(Self);
+
+  protected:
+    ExampleInteractor();
+    virtual ~ExampleInteractor();
+    virtual void ConnectActionsAndFunctions();
+
+  private:
+    bool AddPoint(StateMachineAction* , InteractionEvent*); // function to add new points
+    bool EnoughPoints(StateMachineAction* , InteractionEvent*); // function changes color of pointset to indicate, it is full
+    PointSet::Pointer m_PointSet;
+    int m_NumberOfPoints;
+  };
+}
+\endcode
+
+The header file looks like this:
+
+\code
+#include "mitkTestInteractor.h"
+#include "mitkMouseMoveEvent.h"
+#include <mitkPointOperation.h>
+#include "mitkRenderingManager.h"
+#include "mitkInternalEvent.h"
+//
+#include "mitkDispatcher.h"
+#include "mitkBaseRenderer.h"
+#include <mitkPropertyList.h>
+
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+  // connect the action names of the state machine pattern with function within
+  // this DataInteractor
+  CONNECT_FUNCTION("addPoint", AddPoint);
+  CONNECT_FUNCTION("enoughPoints", SelectPoint);
+}
+
+bool mitk::ExampleInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  // cast InteractionEvent to a position event in order to read out the mouse position
+  // we stay here as general as possible so that a different state machine pattern
+  // can reuse this code with MouseRelease or MouseMoveEvents.
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    // query the position of the mouse in the world geometry
+    mitk::Point3D point = positionEvent->GetPositionInWorld();
+    m_PointSet->InsertPoint(m_NumberOfPoints, point, 0);
+    m_NumberOfPoints++;
+    GetDataNode()->SetData(m_PointSet);
+    GetDataNode()->Modified();
+
+    // read how many points we accept from the config properties
+    mitk::PropertyList::Pointer properties = sm->GetPropertyList();
+    std::string maxNumber;
+    properties->GetStringProperty("NumberOfPoints",maxNumber);
+    if (m_NumberOfPoints >=  atoi(maxNumber.c_str());)
+    {
+      // create internal event that signal that the maximal number of points is reached
+      InternalEvent::Pointer event = InternalEvent::New(NULL,this, "enoughPointsAdded");
+      // add the internal event to the event queue of the Dispatcher
+      positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+    }
+    // update the RenderWindow to show new points
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+mitk::ExampleInteractor::ExampleInteractor() :
+{
+  m_NumberOfPoints = 0;
+  m_PointSet = PointSet::New(); // create PointSet to store our point in
+}
+
+mitk::ExampleInteractor::~ExampleInteractor()
+{
+}
+
+bool mitk::ExampleInteractor::EnoughPoints(StateMachineAction*, InteractionEvent*)
+{
+  GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 1.0, 0.0));
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  return true;
+}
+
+\endcode
 
  */

@@ -79,7 +79,7 @@ namespace mitk
      * in the DataNode to check if it contains a point near the pointer position.
      * If a point is found its index-position is returned, else -1 is returned.
      */
-    virtual int GetPointIndexByPosition(Point3D position);
+    virtual int GetPointIndexByPosition(Point3D position, int time =0 );
 
   private:
     NodeType m_DataNode;

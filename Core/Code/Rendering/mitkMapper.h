@@ -49,100 +49,92 @@ namespace mitk {
   };
 
 
-  //##Documentation
-  //## @brief Base class of all mappers, 2D as well as 3D
-  //##
-  //## Base class of all Mappers, 2D as well as 3D.
-  //## Subclasses of mitk::Mapper control the creation of rendering primitives
-  //## that interface to the graphics library (e.g., OpenGL, vtk).
-  //## @todo Should Mapper be a subclass of ImageSource?
-  //## @ingroup Mapper
+  /** \brief Base class of all mappers, 2D as well as 3D
+  *
+  * Base class of all Mappers, 2D as well as 3D.
+  * Subclasses of mitk::Mapper control the creation of rendering primitives
+  * that interface to the graphics library (e.g., OpenGL, vtk).
+  * @todo Should Mapper be a subclass of ImageSource?
+  * @ingroup Mapper
+  */
   class MITK_CORE_EXPORT Mapper : public itk::Object
   {
   public:
 
     mitkClassMacro(Mapper, itk::Object);
 
-    //##Documentation
-    //## @brief Set the DataNode containing the data to map
+    /** \brief Set the DataNode containing the data to map */
     itkSetObjectMacro(DataNode, DataNode);
 
-    //##Documentation
-    //## @brief Get the data to map
-    //##
-    //## Returns the mitk::BaseData object associated with this mapper.
-    //## @returns the mitk::BaseData associated with this mapper.
+
+    /**\brief Get the data to map
+    *
+    * Returns the mitk::BaseData object associated with this mapper.
+    * \return the mitk::BaseData associated with this mapper.
+    */
     BaseData* GetData() const;
 
-    //##Documentation
-    //## @brief Get the DataNode containing the data to map
+    /** \brief Get the DataNode containing the data to map */
     virtual DataNode* GetDataNode() const;
 
-    //##Documentation
-    //## @brief Convenience access method for color properties (instances of
-    //## ColorProperty)
-    //## @return @a true property was found
+
+    /** \brief Convenience access method for color properties (instances of
+    * ColorProperty)
+    * \return \a true property was found
+    */
     virtual bool GetColor(float rgb[3], BaseRenderer* renderer, const char* name = "color") const;
 
-    //##Documentation
-    //## @brief Convenience access method for visibility properties (instances
-    //## of BoolProperty)
-    //## @return @a true property was found
-    //## @sa IsVisible
+
+    /** \brief Convenience access method for visibility properties (instances
+    * of BoolProperty)
+    * \return \a true property was found
+    * \sa IsVisible
+    */
     virtual bool GetVisibility(bool &visible, BaseRenderer* renderer, const char* name = "visible") const;
 
-    //##Documentation
-    //## @brief Convenience access method for opacity properties (instances of
-    //## FloatProperty)
-    //## @return @a true property was found
+
+    /** \brief Convenience access method for opacity properties (instances of
+    * FloatProperty)
+    * \return \a true property was found
+    */
     virtual bool GetOpacity(float &opacity, BaseRenderer* renderer, const char* name = "opacity") const;
 
-    //##Documentation
-    //## @brief Convenience access method for color properties (instances of
-    //## LevelWindoProperty)
-    //## @return @a true property was found
+    /** \brief Convenience access method for color properties (instances of
+    * LevelWindoProperty)
+    * \return \a true property was found
+    */
     virtual bool GetLevelWindow(LevelWindow &levelWindow, BaseRenderer* renderer, const char* name = "levelwindow") const;
 
-    //##Documentation
-    //## @brief Convenience access method for visibility properties (instances
-    //## of BoolProperty). Return value is the visibility. Default is
-    //## visible==true, i.e., true is returned even if the property (@a
-    //## propertyKey) is not found.
-    //##
-    //## Thus, the return value has a different meaning than in the
-    //## GetVisibility method!
-    //## @sa GetVisibility
+
+    /** \brief Convenience access method for visibility properties (instances
+    * of BoolProperty). Return value is the visibility. Default is
+    * visible==true, i.e., true is returned even if the property (\a
+    * propertyKey) is not found.
+    *
+    * Thus, the return value has a different meaning than in the
+    * GetVisibility method!
+    * \sa GetVisibility
+    */
     virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const;
 
     virtual void Update(BaseRenderer* renderer);
 
+    /** \brief Responsible for calling the appropriate render functions.
+    *   To be implemented in sub-classes.
+    */
     virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
-//    virtual void MitkRenderOverlay(BaseRenderer* renderer) = 0;
-//    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
- //   virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
-
- //   virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
-
-
-
-    /**
-    * \brief Returns whether this is an vtk-based mapper
-    */
+    /** \brief Returns whether this is an vtk-based mapper */
      virtual bool IsVtkBased() const = 0;
-
 
     /** \brief Returns true if this mapper owns the specified vtkProp for
      * the given BaseRenderer.
      *
      * Note: returns false by default; should be implemented for VTK-based
-     * Mapper subclasses. */
-    virtual bool HasVtkProp( const vtkProp* /*prop*/, BaseRenderer* /*renderer*/ )
-    {
-      return false;
-    }
+     * mapper subclasses. */
+    virtual bool HasVtkProp( const vtkProp* /*prop*/, BaseRenderer* /*renderer*/ ){ return false; };
 
-    virtual bool IsPickable() const = 0;
+  //  virtual bool IsPickable() const = 0;
 
     /**
     * \brief Release vtk-based graphics resources. Must be overwritten in
@@ -161,8 +153,7 @@ namespace mitk {
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
-    int GetTimestep() const {return m_TimeStep;};
-
+    int GetTimestep() const { return m_TimeStep; };
 
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
@@ -175,34 +166,32 @@ namespace mitk {
 
     virtual ~Mapper();
 
-    //##Documentation
-    //## @brief Generate the data needed for rendering (independent of a specific renderer)
+    /** \brief Generate the data needed for rendering (independent of a specific renderer) */
     virtual void GenerateData();
-    //##Documentation
-    //## @brief Generate the data needed for rendering into @a renderer
+
+    /** \brief Generate the data needed for rendering into \a renderer */
     virtual void GenerateDataForRenderer(BaseRenderer* renderer);
 
-    //## Updates the time step, which is sometimes needed in subclasses
+    /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep( BaseRenderer* renderer );
 
-    //## Reset the mapper (i.e., make sure that nothing is displayed) if no
-    //## valid data is present.
-    //##
-    //## To be implemented in sub-classes.
+    /** \brief Reset the mapper (i.e., make sure that nothing is displayed) if no
+    * valid data is present.
+    * To be implemented in sub-classes.
+    */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
-
 
     itk::WeakPointer<DataNode> m_DataNode;
 
-    //##Documentation
-    //## @brief timestamp of last update of stored data
+    /** \brief timestamp of last update of stored data */
     itk::TimeStamp m_LastUpdateTime;
 
   private:
 
-
-    //## The current time step of the dataset to be rendered, for use in subclasses
-    //## The momentary timestep can be accessed via the GetTimestep() method.
+    /** \brief The current time step of the dataset to be rendered,
+    * for use in subclasses.
+    * The current timestep can be accessed via the GetTimestep() method.
+    */
     int m_TimeStep;
 
 
@@ -276,9 +265,6 @@ namespace mitk {
         }
 
     };
-
-
-
 
   };
 

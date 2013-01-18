@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include "mitkBaseRenderer.h"
+#include "mitkVtkPropRenderer.h"
 #include "mitkLevelWindow.h"
 
 #include <itkObject.h>
@@ -115,11 +116,13 @@ namespace mitk {
 
     virtual void Update(BaseRenderer* renderer);
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer) = 0;
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
+    virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
+//    virtual void MitkRenderOverlay(BaseRenderer* renderer) = 0;
+//    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
+ //   virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
+
+ //   virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
 
 
 
@@ -138,6 +141,8 @@ namespace mitk {
     {
       return false;
     }
+
+    virtual bool IsPickable() const = 0;
 
     /**
     * \brief Release vtk-based graphics resources. Must be overwritten in

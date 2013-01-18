@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGL.h"
 #include "mitkGLMapper.h"
 
+
 mitk::GLMapper::GLMapper()
 {
 
@@ -27,13 +28,14 @@ mitk::GLMapper::~GLMapper()
 {
 }
 
-void mitk::GLMapper::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
-{
+void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
+
   if(IsVisible(renderer)==false)
     return;
 
   Paint(renderer);
 }
+
 
 void mitk::GLMapper::ApplyProperties(mitk::BaseRenderer* renderer)
 {

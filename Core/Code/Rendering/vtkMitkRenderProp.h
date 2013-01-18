@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 
-
-
 /*!
 \brief vtkMitkRenderProp
 
@@ -75,5 +73,3 @@ class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
 
 
 #endif /* VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723 */
-
-

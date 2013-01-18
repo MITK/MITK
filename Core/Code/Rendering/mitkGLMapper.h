@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
+#include "mitkVtkPropRenderer.h"
 
 namespace mitk {
 
@@ -40,15 +41,18 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
     //## @brief Apply color and opacity read from the PropertyList
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
-    void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
-   // void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
-   // void MitkRenderOverlay(mitk::BaseRenderer* renderer);
-    //void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+    // todo: virtual or not?
+    //##
+    //## @brief calls the paint method
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
-  /**
-   * \brief Returns whether this is an vtk-based mapper
-   */
+   //##
+   //## @brief Returns whether this is an vtk-based mapper
    virtual bool IsVtkBased() const { return false; }
+
+   //##
+   //## @brief Returns whether this mapper allows picking in the renderwindow
+   virtual bool IsPickable() const { return false; }
 
   protected:
 

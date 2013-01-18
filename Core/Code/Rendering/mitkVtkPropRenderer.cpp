@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MAPPERS
 #include "mitkMapper.h"
 #include "mitkImageVtkMapper2D.h"
-#include "mitkVtkMapper2D.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
+#include "mitkGLMapper.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "mitkPointSetGLMapper2D.h"
 
@@ -190,12 +190,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     if((mapper->IsVtkBased() == true) )
     {
       //sthVtkBased = true;
-      mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
-      if(vtkMapper)
-      {
-        vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
-        //vtkMapper->GetVtkProp(this)->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
-      }
       if(lastVtkBased == false)
       {
         Disable2DOpenGL();
@@ -216,13 +210,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     glGetFloatv(GL_LINE_WIDTH, &lineWidth);
     glGetBooleanv(bit, &mode);
 
-    switch(type)
-    {
-    case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
-    case mitk::VtkPropRenderer::Translucent: mapper->MitkRenderTranslucentGeometry(this); break;
-    case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
-    case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
-    }
+     mapper->MitkRender(this, type);
+
     if(mode)
       glEnable(bit);
     else
@@ -359,6 +348,7 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix();
 }
 
+/*
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
 {
   if(datatreenode!=NULL)
@@ -389,6 +379,38 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
           vtkmapper3d->Update(this);
           vtkmapper3d->UpdateVtkTransform(this);
           m_VtkMapperPresent=true;
+        }
+      }
+    }
+  }
+}*/
+
+
+void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
+{
+  if(datatreenode!=NULL)
+  {
+    mitk::Mapper::Pointer mapper = datatreenode->GetMapper(m_MapperID);
+    if(mapper.IsNotNull())
+    {
+      GLMapper* glmapper=dynamic_cast<GLMapper*>(mapper.GetPointer());
+
+      if(GetDisplayGeometry()->IsValid())
+      {
+        if(glmapper != NULL)
+        {
+          glmapper->Update(this);
+          m_VtkMapperPresent=false;
+        }
+        else
+        {
+          VtkMapper* vtkmapper=dynamic_cast<VtkMapper*>(mapper.GetPointer());
+          if(vtkmapper != NULL)
+          {
+            vtkmapper->Update(this);
+            vtkmapper->UpdateVtkTransform(this);
+            m_VtkMapperPresent=true;
+          }
         }
       }
     }
@@ -565,8 +587,9 @@ mitk::DataNode *
       if ( !pickable )
         continue;
 
-      VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
-                            ( node->GetMapper( m_MapperID ) );
+      //VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
+      //                    ( node->GetMapper( m_MapperID ) );
+      VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
 
@@ -688,7 +711,8 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
       Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
       if (mapper)
       {
-        VtkMapper3D* vtkmapper = dynamic_cast<VtkMapper3D*>( mapper );
+       // VtkMapper3D* vtkmapper = dynamic_cast<VtkMapper3D*>( mapper );
+        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
         if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);

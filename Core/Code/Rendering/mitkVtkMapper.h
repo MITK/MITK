@@ -63,6 +63,14 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
      */
     virtual bool IsVtkBased() const { return true; }
 
+     /**
+     * \brief Returns whether this mapper allows picking in the renderwindow
+     */
+    virtual bool IsPickable() const { return true; }
+
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
+
+      // virtual or not???
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);

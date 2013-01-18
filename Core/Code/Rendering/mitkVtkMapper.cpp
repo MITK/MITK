@@ -24,6 +24,19 @@ mitk::VtkMapper::~VtkMapper()
 {
 }
 
+void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
+
+ switch(type)
+    {
+    case mitk::VtkPropRenderer::Opaque: this->MitkRenderOpaqueGeometry(renderer); break;
+    case mitk::VtkPropRenderer::Translucent: this->MitkRenderTranslucentGeometry(renderer); break;
+    case mitk::VtkPropRenderer::Overlay:       this->MitkRenderOverlay(renderer); break;
+    case mitk::VtkPropRenderer::Volumetric:    this->MitkRenderVolumetricGeometry(renderer); break;
+    }
+
+}
+
+
 void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 {
   if ( this->IsVisible(renderer)==false )

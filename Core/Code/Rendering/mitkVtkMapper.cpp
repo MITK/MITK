@@ -33,7 +33,6 @@ void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRend
     case mitk::VtkPropRenderer::Overlay:       this->MitkRenderOverlay(renderer); break;
     case mitk::VtkPropRenderer::Volumetric:    this->MitkRenderVolumetricGeometry(renderer); break;
     }
-
 }
 
 

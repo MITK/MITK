@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Mapper::Mapper()
   :m_TimeStep( 0 )
 {
-
 }
 
 

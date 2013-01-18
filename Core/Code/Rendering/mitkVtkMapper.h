@@ -22,33 +22,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
-//#include "mitkProperties.h"
-//#include "mitkAnnotationProperty.h"
 #include "mitkVtkPropRenderer.h"
 
 #include <vtkProp3D.h>
-//#include <vtkLODProp3D.h>
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkLinearTransform.h>
 #include <vtkMapper.h>
 #include <vtkPropAssembly.h>
-//#include <vtkFollower.h>
-//#include <vtkVectorText.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 
 class vtkProp;
 class vtkProp3D;
 class vtkActor;
-class vtkProp3DCollection;
 
 namespace mitk {
 
-//##Documentation
-//## @brief Base class of all Mappers for 2D display
-//##
-//## @ingroup Mapper
+/** \brief Base class of all Vtk Mappers in order to display geometry
+*
+* \ingroup Mapper
+*/
 class MITK_CORE_EXPORT VtkMapper : public Mapper
 {
   public:
@@ -56,6 +50,10 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) = 0;
 
+    /** \brief Re-issues all drawing commands required to describe
+    * the entire scene each time a new frame is required,
+    * regardless of actual changes.
+    */
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
      /**
@@ -66,14 +64,27 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
      /**
      * \brief Returns whether this mapper allows picking in the renderwindow
      */
-    virtual bool IsPickable() const { return true; }
+    //virtual bool IsPickable() const { return true; }
 
+    /** \brief Determines which geometry should be rendered
+    * (opaque, translucent, volumetric, overlay)
+    * and calls the appropriate function.
+    *
+    * Called by mitk::VtkPropRenderer::Render
+    */
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
-      // virtual or not???
+    // virtual or not???
+    /** \brief Checks visibility and renders the overlay */
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
+
+    /** \brief Checks visibility and renders untransparent geometry */
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
+
+    /** \brief Checks visiblity and renders transparent geometry */
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
+
+    /** \brief Checks visibility and renders volumes */
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
 
     /** \brief Returns true if this mapper owns the specified vtkProp for
@@ -83,16 +94,17 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     * Mapper subclasses. */
     virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
 
-    //##Documentation
-    //## @brief Set the vtkTransform of the m_Prop3D for
-    //## the current time step of \a renderer
-    //##
-    //## Called by mitk::VtkPropRenderer::Update before rendering
-    //##
+
+    /** \brief Set the vtkTransform of the m_Prop3D for
+    * the current time step of \a renderer
+    *
+    * Called by mitk::VtkPropRenderer::Update before rendering
+    */
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
-    //##Documentation
-    //## @brief Apply color and opacity read from the PropertyList
+    /**
+    * \brief Apply color and opacity read from the PropertyList
+    */
     virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
     /**

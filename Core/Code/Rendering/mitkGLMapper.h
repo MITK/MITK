@@ -25,34 +25,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-//##Documentation
-//## @brief Base class of all OpenGL-based Mappers
-//##
-//## Those must implement the abstract method Paint(BaseRenderer).
-//## @ingroup Mapper
+
+/** \brief Base class of all OpenGL-based Mappers
+*
+* Those must implement the abstract method Paint(BaseRenderer).
+* \ingroup Mapper
+*/
 class MITK_CORE_EXPORT GLMapper : public Mapper
 {
   public:
-    //##Documentation
-    //## @brief Do the painting into the @a renderer
+    /** \brief Do the painting into the \a renderer */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
-    //##Documentation
-    //## @brief Apply color and opacity read from the PropertyList
+    /** \brief Apply color and opacity read from the PropertyList */
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
     // todo: virtual or not?
-    //##
-    //## @brief calls the paint method
+    /** \brief Checks visibility and calls the paint method */
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
-   //##
-   //## @brief Returns whether this is an vtk-based mapper
+   /** \brief Returns  whether this is a vtk-based mapper
+   *  \return false, since all mappers deriving from this class are OpenGL mappers
+   */
    virtual bool IsVtkBased() const { return false; }
 
-   //##
-   //## @brief Returns whether this mapper allows picking in the renderwindow
-   virtual bool IsPickable() const { return false; }
+   /** \brief Returns whether this mapper allows picking in the renderwindow
+   virtual bool IsPickable() const { return false; }*/
 
   protected:
 

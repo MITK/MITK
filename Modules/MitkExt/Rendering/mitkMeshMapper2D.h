@@ -36,7 +36,7 @@ class Mesh;
 class MitkExt_EXPORT MeshMapper2D : public GLMapper2D
 {
 public:
-  mitkClassMacro(MeshMapper2D, Mapper2D);
+  mitkClassMacro(MeshMapper2D, GLMapper2D);
 
   itkNewMacro(Self);
 

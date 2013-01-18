@@ -38,7 +38,7 @@ class Segmentation_EXPORT ContourMapper2D : public GLMapper2D
 {
 public:
 
-    mitkClassMacro(ContourMapper2D, Mapper2D);
+    mitkClassMacro(ContourMapper2D, GLMapper2D);
 
     itkNewMacro(Self);
 

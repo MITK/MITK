@@ -110,7 +110,7 @@ class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper2D
 {
 public:
 
-  mitkClassMacro(PlanarFigureMapper2D, Mapper2D);
+  mitkClassMacro(PlanarFigureMapper2D, GLMapper2D);
 
   itkNewMacro(Self);
 

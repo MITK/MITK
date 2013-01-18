@@ -209,6 +209,10 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   }
 
   this->ReinitData();
+  if (!selectedNodes.size())
+  {
+    m_Controls->m_JSHistogram->clearHistogram();
+  }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
     for (int i= 0; i< selectedNodes.size(); ++i)
@@ -256,7 +260,6 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_ErrorMessageLabel->hide();
   this->InvalidateStatisticsTableView();
   m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-  m_Controls->m_JSHistogram->clearHistogram();
 }
 
 void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()

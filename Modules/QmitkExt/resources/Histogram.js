@@ -74,6 +74,24 @@ var vis = svg.append("svg")
   .attr("width", width)
   .attr("height", height);
 
+var line = d3.svg.line()
+  .interpolate("linear")
+  .x(function(d,i) {
+    return xScale(histogramData.measurement[i]-binSize/2);
+  })
+  .y(function(d) {
+    return yScale(d);
+  });
+
+var linenull = d3.svg.line()
+  .interpolate("linear")
+  .x(function(d,i) {
+    return xScale(histogramData.measurement[i]-binSize/2);
+  })
+  .y(function(d) {
+    return yScale(0);
+  });
+
 updateHistogram();
 
 // method to update and choose histogram
@@ -114,7 +132,7 @@ function barChart()
     });
 
 // element to animate transition from linegraph to barchart
-  vis.selectAll("path.line").transition().duration(dur).attr("d", linenull(histogramData.frequency)).remove();
+  vis.selectAll("path.line").remove();
   vis.selectAll("circle").remove();
 
   var bar = vis.selectAll("rect.bar").data(histogramData.frequency);
@@ -129,12 +147,9 @@ function barChart()
     .attr("y", height)
     .attr("height", 0)
     .attr("width", barWidth)
-    .transition().delay(dur).duration(dur*1.5)
-    .attr("height", barHeight)
-    .attr("width", barWidth)
-    .attr("y", myYPostion);
 
-  bar.transition().delay(dur).duration(dur*1.5)
+  bar.transition()
+    .duration(dur)
     .attr("x", function(d,i) {
       return xScale(histogramData.measurement[i]-binSize/2);
     })
@@ -142,28 +157,23 @@ function barChart()
     .attr("height", barHeight)
     .attr("width", barWidth);
 
-  bar.exit().transition().delay(dur).duration(dur*1.5)
+  bar.exit()
+    .transition()
+    .duration(dur)
     .attr("y", height)
     .attr("height", 0)
     .remove();
 
   svg.selectAll("g")
-    .transition()
-    .duration(dur)
-    .attr("opacity", 0)
     .remove();
 
   svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .transition().duration(dur)
-    .attr("opacity", 1)
     .call(xAxis);
 
   svg.append("g")
     .attr("class", "y axis")
-    .transition().duration(dur)
-    .attr("opacity", 1)
     .call(yAxis);
 }
 
@@ -175,39 +185,32 @@ function linePlot()
 
   svg.call(zoombie);
 // element to animate transition from barchart to linegraph
-  vis.selectAll("rect.bar")
-    .transition()
-    .duration(dur)
-    .attr("height", 0)
-    .attr("fill", "black")
-    .remove();
+  if(!histogramData.intensityProfile)
+  {
+    vis.selectAll("rect.bar")
+      .transition()
+      .duration(dur)
+      .attr("height", 0)
+      .remove();
+  }
+  else
+  {
+    vis.selectAll("rect.bar")
+      .transition()
+      .duration(dur)
+      .attr("y", height)
+      .attr("height", 0)
+      .remove();
+  }
 
-  var line = d3.svg.line()
-    .interpolate("linear")
-    .x(function(d,i) {
-      return xScale(histogramData.measurement[i]-binSize/2);
-    })
-    .y(function(d) {
-      return yScale(d);
-    })
-    .tension(0.8);
+  vis.selectAll("circle").remove();
 
-  var linenull = d3.svg.line()
-    .interpolate("linear")
-    .x(function(d,i) {
-      return xScale(histogramData.measurement[i]-binSize/2);
-    })
-    .y(function(d) {
-      return yScale(0);
-    })
-    .tension(0.8);
-
-  var graph = vis.selectAll("path.line").data([histogramData.frequency]);
+  var graph = vis.selectAll("path.line")
+    .data([histogramData.frequency]);
 
   graph.enter()
     .append("path")
     .attr("class", "line")
-    .attr("d", linenull)
     .transition()
     .duration(dur)
     .attr("d", line);
@@ -216,9 +219,6 @@ function linePlot()
     .duration(dur)
     .attr("d", line);
 
-  graph.exit().transition().duration(dur).attr("d", linenull);
-
-  vis.selectAll("circle").remove();
   if(histogramData.intensityProfile)
   {
   var circles = vis.selectAll("circle").data(histogramData.frequency);
@@ -243,22 +243,15 @@ function linePlot()
   }
 
   svg.selectAll("g")
-    .transition()
-    .duration(dur)
-    .attr("opacity", 0)
     .remove();
 
   svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .transition().duration(dur)
-    .attr("opacity", 1)
     .call(xAxis);
 
   svg.append("g")
     .attr("class", "y axis")
-    .transition().duration(dur)
-    .attr("opacity", 1)
     .call(yAxis);
 }
 

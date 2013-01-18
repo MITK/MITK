@@ -25,9 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkFloatArray.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkCleanPolyData.h>
 #include <vtkSmartPointer.h>
+#include <vtkIdList.h>
 
 #include <math.h>
 
@@ -64,7 +63,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetInput(  mitk::Image* distanceImag
   this->SetInput(0,distanceImage);
 }
 
-//TODO: braucht man diese Methode?
 void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
   if ((distanceImage == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
@@ -83,7 +81,9 @@ mitk::Image* mitk::ToFDistanceImageToSurfaceFilter::GetInput()
 mitk::Image* mitk::ToFDistanceImageToSurfaceFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL; //TODO: geeignete exception werfen
+  {
+    mitkThrow() << "No input given for ToFDistanceImageToSurfaceFilter";
+  }
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -99,7 +99,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   unsigned int size = xDimension*yDimension; //size of the image-array
   std::vector<bool> isPointValid;
   isPointValid.resize(size);
-  int pointCount = 0;
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetDataTypeToDouble();
   vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
@@ -107,13 +106,12 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
 
-  //  float textureScaleCorrection1 = 0.0;
-  //  float textureScaleCorrection2 = 0.0;
-  //  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-  //  {
-  //    textureScaleCorrection1 = float(this->m_TextureImageHeight) / float(this->m_TextureImageWidth);
-  //    textureScaleCorrection2 = ((float(this->m_TextureImageWidth) - float(this->m_TextureImageHeight))/2) / float(this->m_TextureImageWidth);
-  //  }
+  //Make a vtkIdList to save the ID's of the polyData corresponding to the image
+  //pixel ID's. See below for more documentation.
+  vtkSmartPointer<vtkIdList> vertexIdList = vtkSmartPointer<vtkIdList>::New();
+  //Allocate the object once else it would automatically allocate new memory
+  //for every vertex and perform a copy which is expensive.
+  vertexIdList->Allocate(size);
 
   float* scalarFloatData = NULL;
 
@@ -151,13 +149,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     for (int i=0; i<xDimension; i++)
     {
-      // distance value
-      mitk::Index3D pixel;
-      pixel[0] = i;
-      pixel[1] = j;
-      pixel[2] = 0;
-
-      unsigned int pixelID = pixel[0]+pixel[1]*xDimension;
+      unsigned int pixelID = i+j*xDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
 
@@ -184,65 +176,88 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         MITK_ERROR << "Incorrect reconstruction mode!";
       }
       }
-
       //Epsilon here, because we may have small float values like 0.00000001 which in fact represents 0.
       if (distance<=mitk::eps)
       {
-        isPointValid[pointCount] = false;
+        isPointValid[pixelID] = false;
       }
       else
       {
-        isPointValid[pointCount] = true;
-        points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer());
+        isPointValid[pixelID] = true;
+        //VTK would insert empty points into the polydata if we use
+        //points->InsertPoint(pixelID, cartesianCoordinates.GetDataPointer()).
+        //If we use points->InsertNextPoint(...) instead, the ID's do not
+        //correspond to the image pixel ID's. Thus, we have to save them
+        //in the vertexIdList.
+        vertexIdList->InsertId(pixelID, points->InsertNextPoint(cartesianCoordinates.GetDataPointer()));
 
         if((i >= 1) && (j >= 1))
         {
-          vtkIdType xy = i+j*xDimension;
-          vtkIdType x_1y = i-1+j*xDimension;
-          vtkIdType xy_1 = i+(j-1)*xDimension;
-          vtkIdType x_1y_1 = (i-1)+(j-1)*xDimension;
+          //This little piece of art explains the ID's:
+          //
+          // P(x_1y_1)---P(xy_1)
+          // |           |
+          // |           |
+          // |           |
+          // P(x_1y)-----P(xy)
+          //
+          //We can only start triangulation if we are at vertex (1,1),
+          //because we need the other 3 vertices near this one.
+          //To go one pixel line back in the image array, we have to
+          //subtract 1x xDimension.
+          vtkIdType xy = pixelID;
+          vtkIdType x_1y = pixelID-1;
+          vtkIdType xy_1 = pixelID-xDimension;
+          vtkIdType x_1y_1 = xy_1-1;
+
+          //Find the corresponding vertex ID's in the saved vertexIdList:
+          vtkIdType xyV = vertexIdList->GetId(xy);
+          vtkIdType x_1yV = vertexIdList->GetId(x_1y);
+          vtkIdType xy_1V = vertexIdList->GetId(xy_1);
+          vtkIdType x_1y_1V = vertexIdList->GetId(x_1y_1);
 
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1y);
-            polys->InsertCellPoint(xy);
-            polys->InsertCellPoint(x_1y_1);
+              polys->InsertNextCell(3);
+              polys->InsertCellPoint(x_1yV);
+              polys->InsertCellPoint(xyV);
+              polys->InsertCellPoint(x_1y_1V);
 
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1y_1);
-            polys->InsertCellPoint(xy);
-            polys->InsertCellPoint(xy_1);
+              polys->InsertNextCell(3);
+              polys->InsertCellPoint(x_1y_1V);
+              polys->InsertCellPoint(xyV);
+              polys->InsertCellPoint(xy_1V);
           }
         }
-
+        //Scalar values are necessary for mapping colors/texture onto the surface
         if (scalarFloatData)
         {
-          scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
-          //scalarArray->InsertTuple1(pixelID, scalarFloatData[pixelID]);
+          scalarArray->InsertTuple1(vertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
         }
+        //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {
 
-          float xNorm = (((float)pixel[0])/xDimension)/**textureScaleCorrection1 + textureScaleCorrection2 */; // correct video texture scale 640 * 480!!
-          float yNorm = ((float)pixel[1])/yDimension; //don't flip. we don't need to flip.
-          textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
+          float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+          float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+          textureCoords->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
         }
       }
-      pointCount++;
     }
   }
 
   vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
   mesh->SetPoints(points);
   mesh->SetPolys(polys);
+  //Pass the scalars to the polydata (if they were set).
   if (scalarArray->GetNumberOfTuples()>0)
   {
     mesh->GetPointData()->SetScalars(scalarArray);
-    if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-    {
-      mesh->GetPointData()->SetTCoords(textureCoords);
-    }
+  }
+  //Pass the TextureCoords to the polydata (if they were set).
+  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+  {
+    mesh->GetPointData()->SetTCoords(textureCoords);
   }
   output->SetVtkPolyData(mesh);
 }

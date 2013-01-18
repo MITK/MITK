@@ -142,6 +142,13 @@ namespace mitk
     /** Convert point to itk point */
     itk::Point<float, 3> GetItkPoint(double point[3]);
 
+    /** \brief Creates a new node
+     *
+     * A new node will be created, using the label and either the supplied coordinates
+     * or the center of mass coordinates, depending on the supplied bool.
+     */
+    void CreateNewNode( int label, mitk::Index3D, bool useIndex );
+
     ///////// Mapping strategies //////////
 
     /** Use the position of the end and starting element only to map to labels

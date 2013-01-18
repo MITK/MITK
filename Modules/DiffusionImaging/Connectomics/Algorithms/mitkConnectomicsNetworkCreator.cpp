@@ -244,57 +244,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     labelpair.second = lastLabel;
 
     // Add property to property map
-    if( ! ( m_LabelToNodePropertyMap.count( firstLabel ) > 0 ) )
-    {
-      NetworkNode firstNode;
-
-      firstNode.coordinates.resize( 3 );
-      if( m_UseCoMCoordinates )
-      {
-        std::vector<double> labelCoords = GetCenterOfMass( firstLabel );
-        for( unsigned int index = 0; index < firstNode.coordinates.size() ; index++ )
-        {
-          firstNode.coordinates[ index ] = labelCoords.at( index ) ;
-        }
-      }
-      else
-      {
-        for( unsigned int index = 0; index < firstNode.coordinates.size() ; index++ )
-        {
-          firstNode.coordinates[ index ] = firstElementSegIndex[ index ] ;
-        }
-      }
-
-      firstNode.label = LabelToString( firstLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( firstLabel, firstNode ) );
-    }
-
-    if( ! ( m_LabelToNodePropertyMap.count( lastLabel ) > 0 ) )
-    {
-      NetworkNode lastNode;
-
-      lastNode.coordinates.resize( 3 );
-      if( m_UseCoMCoordinates )
-      {
-        std::vector<double> labelCoords = GetCenterOfMass( lastLabel );
-        for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
-        {
-          lastNode.coordinates[ index ] = labelCoords.at( index ) ;
-        }
-      }
-      else
-      {
-        for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
-        {
-          lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
-        }
-      }
-
-      lastNode.label = LabelToString( lastLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( lastLabel, lastNode ) );
-    }
+    CreateNewNode( firstLabel, firstElementSegIndex, m_UseCoMCoordinates );
+    CreateNewNode( lastLabel, lastElementSegIndex, m_UseCoMCoordinates );
   }
 
   return labelpair;
@@ -419,35 +370,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     labelpair.second = lastLabel;
 
     // Add property to property map
-    if( ! ( m_LabelToNodePropertyMap.count( firstLabel ) > 0 ) )
-    {
-      NetworkNode firstNode;
-
-      firstNode.coordinates.resize( 3 );
-      for( unsigned int index = 0; index < firstNode.coordinates.size() ; index++ )
-      {
-        firstNode.coordinates[ index ] = firstElementSegIndex[ index ] ;
-      }
-
-      firstNode.label = LabelToString( firstLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( firstLabel, firstNode ) );
-    }
-
-    if( ! ( m_LabelToNodePropertyMap.count( lastLabel ) > 0 ) )
-    {
-      NetworkNode lastNode;
-
-      lastNode.coordinates.resize( 3 );
-      for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
-      {
-        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
-      }
-
-      lastNode.label = LabelToString( lastLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( lastLabel, lastNode ) );
-    }
+    CreateNewNode( firstLabel, firstElementSegIndex, m_UseCoMCoordinates );
+    CreateNewNode( lastLabel, lastElementSegIndex, m_UseCoMCoordinates );
   }
 
   return labelpair;
@@ -489,35 +413,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     labelpair.second = lastLabel;
 
     // Add property to property map
-    if( ! ( m_LabelToNodePropertyMap.count( firstLabel ) > 0 ) )
-    {
-      NetworkNode firstNode;
-
-      firstNode.coordinates.resize( 3 );
-      for( unsigned int index = 0; index < firstNode.coordinates.size() ; index++ )
-      {
-        firstNode.coordinates[ index ] = firstElementSegIndex[ index ] ;
-      }
-
-      firstNode.label = LabelToString( firstLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( firstLabel, firstNode ) );
-    }
-
-    if( ! ( m_LabelToNodePropertyMap.count( lastLabel ) > 0 ) )
-    {
-      NetworkNode lastNode;
-
-      lastNode.coordinates.resize( 3 );
-      for( unsigned int index = 0; index < lastNode.coordinates.size() ; index++ )
-      {
-        lastNode.coordinates[ index ] = lastElementSegIndex[ index ] ;
-      }
-
-      lastNode.label = LabelToString( lastLabel );
-
-      m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( lastLabel, lastNode ) );
-    }
+    CreateNewNode( firstLabel, firstElementSegIndex, m_UseCoMCoordinates );
+    CreateNewNode( lastLabel, lastElementSegIndex, m_UseCoMCoordinates );
   }
 
   return labelpair;
@@ -872,4 +769,36 @@ std::vector< double >  mitk::ConnectomicsNetworkCreator::GetCenterOfMass( int la
 
   //return associated coordinates
   return m_LabelsToCoordinatesMap.find( label )->second;
+}
+
+void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, mitk::Index3D index, bool useCoM )
+{
+  // Only create node if it does not exist yet
+
+  if( ! ( m_LabelToNodePropertyMap.count( label ) > 0 ) )
+  {
+    NetworkNode newNode;
+
+    newNode.coordinates.resize( 3 );
+    if( !useCoM )
+    {
+      for( unsigned int loop = 0; loop < newNode.coordinates.size() ; loop++ )
+      {
+        newNode.coordinates[ loop ] = index[ loop ] ;
+      }
+    }
+    else
+    {
+      std::vector<double> labelCoords = GetCenterOfMass( label );
+      for( unsigned int loop = 0; loop < newNode.coordinates.size() ; loop++ )
+      {
+        std::cout << "Using CoM\n";
+        newNode.coordinates[ loop ] = labelCoords.at( loop ) ;
+      }
+    }
+
+    newNode.label = LabelToString( label );
+
+    m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( label, newNode ) );
+  }
 }

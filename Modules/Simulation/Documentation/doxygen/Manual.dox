@@ -5,7 +5,8 @@ The MITK Simulation Module provides medical simulation capabilities by integrati
 
 \section SimulationManualBuildInstructions Build Instructions
 
-Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA as well as the MITK Simulation Module during the superbuild process. Afterwards you can activate simulation-enabled plugins during the MITK build configuration, e.g. <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>.
+Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA as well as the MITK Simulation Module during the superbuild process.
+Afterwards you can activate simulation-enabled plugins during the MITK build configuration, e.g. <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>.
 
 \section SimulationManualIntroduction Introduction
 
@@ -23,6 +24,46 @@ While the former two parts make up the actual framework, the latter part is buil
 
 To be able to integrate SOFA into MITK, the MITK Simulation Module conceptionally replaces the application layer and solely uses the framework and module layer as a toolkit.
 
+\section SimulationManualHowToUpdate How to update SOFA
+
+SOFA is deployed to the MITK superbuild in three ZIP archives, namely
+
+<ul>
+  <li> sofa-rev[rev].zip
+  <li> sofa-rev[rev]-cmake.zip
+  <li> sofa-rev[rev]-gl.zip
+</ul>
+
+where [rev] is a substitute for the SVN revision of SOFA, e.g. 8935.
+The follwing process was proven suitable to create these ZIP archives out of a certain SOFA revision.
+Since it is a very time-consuming task you should only update SOFA if it is really necessary!
+
+<ol>
+  <li> Follow the instructions of the SOFA framework download website to check out a recent revsion of the trunk form their SVN server into a newly created directory named SOFA-svn (check the dashboard first to see if that revision is likely to compile properly on all supported platforms).
+  <li> To get rid of all SVN files in the source directory use SVN export to export the source code to a separate directory named SOFA-rev[rev].
+  <li> Delete all irrelevant directories and files in SOFA-rev[rev]. Relevant directories and files are:
+       <ul>
+         <li> extlibs/eigen-3.1.1, extlibs/miniBoost, extlibs/miniFlowVR, extlibs/newmat, extlibs/tinyxml
+         <li> framework
+         <li> modules/sofa/component, modules/sofa/simulation, modules/copyright.txt, modules/LGPL-license.txt
+         <li> Authors.txt, LICENCE.txt, readme.txt
+       </ul>
+  <li> Create sofa-rev[rev].zip out of the SOFA-rev[rev] directory.
+  <li> Download the old sofa-rev[old_rev].zip and extract it to SOFA-rev[old_rev].
+  <li> Download the old sofa-rev[old_rev]-cmake.zip and extract it to SOFA-CMake.
+  <li> Download the old sofa-rev[old_rev]-gl.zip and extract it to SOFA-GL.
+  <li> Download a directory diff tool like DirDiff for Windows and compare sofa-rev[old_rev] with sofa_rev[rev] to get an overview of what has changed. Note that you have to look at the .pro files to see which files were added or removed to the projects. Just looking at the files in a project directory is not sufficient!
+  <li> Adapt the CMake files in SOFA-CMake to the changes.
+  <li> Copy SOFA-rev[rev] to SOFA-rev[rev]-Test and also copy SOFA-CMake and SOFA-GL into that directory.
+  <li> Manually apply the patch for SOFA you find in the MITK source tree (MITK/CMakeExternals/PatchSOFA-rev[old_rev].cmake.
+  <li> Try to build SOFA-rev[rev]-Test. Make changes to SOFA-CMake and SOFA-GL files (don't forget to reapply the patch or even change the patch if necessary) until you can build everything successfully.
+  <li> Create sofa-rev[rev]-cmake.zip out of SOFA-CMake and sofa-rev[rev]-gl.zip out of SOFA-GL.
+  <li> Upload all three ZIP archives to a easily accessible location like your public DropBox folder.
+  <li> Update MITK/CMakeExternals/SOFA.cmake to point to the temporary locations and don't forget to update the MD5 hashes and to use an up-to-date patch file, i.e. PatchSOFA-rev[rev].cmake.
+  <li> Try to build MITK. Repeat any of the above steps until you are able to compile and use MITK with SOFA on every supprted plattform.
+  <li> Upload the new SOFA archives to mitk.org and adapt the URLs in MITK/CMakeExternals/SOFA.cmake.
+</ol>
+
 \section SimulationManualDrawing Drawing
 
 Drawing is done by SOFA at three different places:
@@ -37,17 +78,26 @@ These cases are handled by the MITK Simulation Module as follows.
 
 \subsection SimulationManualDrawingVisualModel sofa::component::visualmodel
 
-One of the most important drawing classes is <tt>OglModel</tt> since it makes up most of the visual part of a simulation scene. It inherits from <tt>VisualModel</tt> (which encapsulates all API-independent drawing code) and contains OpenGL-related code to draw the visual model.
+One of the most important drawing classes is <tt>OglModel</tt> since it makes up most of the visual part of a simulation scene.
+It inherits from <tt>VisualModel</tt> (which encapsulates all API-independent drawing code) and contains OpenGL-related code to draw the visual model.
 
-To hook into the drawing of visual models, the MITK Simulation Module creates an alias in the SOFA object system so that every <tt>OglModel</tt> and <tt>VisualModel</tt> node found in a scene file is used to instantiate a MITK <b>SimulationModel</b> class instead. This class creates VTK actors that contain the visual model rather than drawing it directly. The simulation mapper, which is responsible for drawing a simulation scene, utilizes the visitor mechanism of SOFA to collect all VTK actors of the scene tree and finally draws them.
+To hook into the drawing of visual models, the MITK Simulation Module creates an alias in the SOFA object system so that every <tt>OglModel</tt> and <tt>VisualModel</tt> node found in a scene file is used to instantiate a MITK <b>SimulationModel</b> class instead.
+This class creates VTK actors that contain the visual model rather than drawing it directly.
+The simulation mapper, which is responsible for drawing a simulation scene, utilizes the visitor mechanism of SOFA to collect all VTK actors of the scene tree and finally draws them.
 
 \subsection SimulationManualDrawingDrawToolGL sofa::core::visual::DrawTool
 
-The abstract class <tt>DrawTool</tt> and its default OpenGL implementation <tt>DrawToolGL</tt> provide the interface to draw basic primitives, e.g. points, lines, spheres, arrows, and so forth. It is usually set by a call to <tt> sofa::core::visual::VisualParams::defaultInstance()->drawTool()</tt> at application initialization.
+The abstract class <tt>DrawTool</tt> and its default OpenGL implementation <tt>DrawToolGL</tt> provide the interface to draw basic primitives, e.g. points, lines, spheres, arrows, and so forth.
+It is usually set by a call to <tt> sofa::core::visual::VisualParams::defaultInstance()->drawTool()</tt> at application initialization.
 
-The MITK Simulation Module provide its own VTK-based implementation of <tt>DrawTool</tt>, namely <b>SimulationDrawTool</b>. This class creates VTK actors instead of drawing anything directly. There is one <b>SimulationDrawTool</b> per simulation scene and the simulation mapper draws all current VTK actors according to which simulation scene is drawn.
+The MITK Simulation Module provide its own VTK-based implementation of <tt>DrawTool</tt>, namely <b>SimulationDrawTool</b>.
+This class creates VTK actors instead of drawing anything directly.
+There is one <b>SimulationDrawTool</b> per simulation scene and the simulation mapper draws all current VTK actors according to which simulation scene is drawn.
 
 \subsection SimulationManualDrawingGL sofa::helper::gl
 
-Classes and functions in this namespace are problematic since they don't support the SOFA object system and therefore cannot be easily replaced by own implementations. Currently they are not handled by MITK at all and an OpenGL stub is injected into SOFA so that all draw related methods and functions in this namespace do practically nothing. This stub is automatically downloaded during the MITK superbuild process (sofa-rev****-gl.zip). However, a patch is additionally applied by the superbuild script to SOFA which alters a few header files to include the stub header files instead of the original OpenGL/GLUT/GLEW ones.
+Classes and functions in this namespace are problematic since they don't support the SOFA object system and therefore cannot be easily replaced by own implementations.
+Currently they are not handled by MITK at all and an OpenGL stub is injected into SOFA so that all draw related methods and functions in this namespace do practically nothing.
+This stub is automatically downloaded during the MITK superbuild process (sofa-rev[rev]-gl.zip).
+However, a patch is additionally applied by the superbuild script to SOFA which alters a few header files to include the stub header files instead of the original OpenGL/GLUT/GLEW ones.
 */

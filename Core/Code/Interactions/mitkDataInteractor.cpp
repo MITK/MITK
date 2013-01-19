@@ -43,6 +43,8 @@ void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
   { // if DataInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
     tmpDN->SetDataInteractor(NULL);
   }
+  // notify implementations ...
+  DataNodeChanged();
 }
 
 int mitk::DataInteractor::GetLayer()
@@ -101,4 +103,8 @@ int mitk::DataInteractor::GetPointIndexByPosition(Point3D position, int time)
     }
   }
   return index;
+}
+
+void mitk::DataInteractor::DataNodeChanged()
+{
 }

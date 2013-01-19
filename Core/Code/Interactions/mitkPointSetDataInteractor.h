@@ -45,6 +45,7 @@ namespace mitk
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
     virtual void ConnectActionsAndFunctions();
+    void DataNodeChanged();
 
   private:
     bool AddPoint(StateMachineAction* , InteractionEvent*);
@@ -56,8 +57,11 @@ namespace mitk
     bool UnSelectPoint(StateMachineAction* , InteractionEvent*);
     bool Abort(StateMachineAction* , InteractionEvent*);
 
+    bool IsContourClosed();
+
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;
+    int m_MaxNumberOfPoints;
     int m_SelectedPointIndex;
   };
 

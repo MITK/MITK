@@ -25,7 +25,7 @@
 #include <QMessageBox>
 
 // rest
-#include "mitkTestInteractor.h"
+
 #include "mitkDataNode.h"
 #include <vector>
 
@@ -87,7 +87,7 @@ void InteractionTests::GrabInput()
   m_CurrentDataNode = mitk::DataNode::New();
   GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
 
-  m_CurrentInteractor = mitk::TestInteractor::New();
+  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
   if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSMGrab.xml"))
   {
     return;
@@ -115,14 +115,16 @@ m_Controls.buttonPerformImageProcessing->setEnabled( false );
 
 void InteractionTests::DrawLines()
 {
+  MITK_INFO << "Create new Interactor";
   m_CurrentDataNode = mitk::DataNode::New();
   GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
-  m_CurrentInteractor = mitk::TestInteractor::New();
-//  m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
-  if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSM.xml"))
+  //m_CurrentInteractor = mitk::TestInteractor::New();
+  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+  m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
+ /* if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSM.xml"))
   {
     return;
-  }
+  }*/
 
   if (m_ConfigChoice)
   {

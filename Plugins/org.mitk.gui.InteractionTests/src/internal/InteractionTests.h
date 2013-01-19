@@ -20,7 +20,9 @@
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+
 #include <mitkTestInteractor.h>
+#include "mitkPointSetDataInteractor.h"
 
 #include "ui_InteractionTestsControls.h"
 
@@ -61,7 +63,7 @@ protected:
   Ui::InteractionTestsControls m_Controls;
 private:
   mitk::DataNode::Pointer m_CurrentDataNode;
-  mitk::TestInteractor::Pointer m_CurrentInteractor;
+  mitk::PointSetDataInteractor::Pointer m_CurrentInteractor;
   mitk::DataNode::Pointer m_CurrentImage;
   bool m_ConfigChoice;
 };

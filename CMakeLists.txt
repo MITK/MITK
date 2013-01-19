@@ -724,7 +724,7 @@ if(OpenCV_DIR)
 endif()
 
 if(SOFA_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${SOFA_DIR}/bin/%VS_BUILD_TYPE%;${SOFA_DIR}/../SOFA-src/bin")
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${SOFA_DIR}/bin/%VS_BUILD_TYPE%")
 endif()
 
 # DCMTK is statically build

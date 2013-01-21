@@ -730,186 +730,159 @@ void QmitkSegmentationView::OnSurfaceSelectionChanged()
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  // if the selected node is a contourmarker
-  if ( !nodes.empty() )
+  if (nodes.size() == 0 && m_Controls->patImageSelector->GetSelectedNode().IsNull())
   {
+    SetToolManagerSelection(NULL,NULL);
+  }
+  else if (nodes.size() == 1)
+  {
+    mitk::DataNode::Pointer selectedNode = nodes.at(0);
+    if(selectedNode.IsNull())
+    {
+      return;
+    }
+
     std::string markerName = "Position";
     unsigned int numberOfNodes = nodes.size();
     std::string nodeName = nodes.at( 0 )->GetName();
     if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
     {
       this->OnContourMarkerSelected( nodes.at( 0 ) );
-    }
-  }
-
-  // if Image and Surface are selected, enable button
-  if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
-    (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
-    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
-  else
-    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
-
-  m_DataSelectionChanged = false;
-  if (!m_Parent || !m_Parent->isVisible())
-  {
-    m_DataSelectionChanged = true;
-    return;
-  }
-
-  // reaction to BlueBerry selection events
-  //   this method will try to figure out if a relevant segmentation and its corresponding original image were selected
-  //   a warning is issued if the selection is invalid
-  //   appropriate reactions are triggered otherwise
-
-  mitk::DataNode::Pointer referenceData = FindFirstRegularImage( nodes ); //m_Controls->refImageSelector->GetSelectedNode(); //FindFirstRegularImage( nodes );
-  mitk::DataNode::Pointer workingData =   FindFirstSegmentation( nodes );
-
-  if(referenceData.IsNull() && workingData.IsNull())
-    return;
-
-  bool invalidSelection( !nodes.empty() &&
-    (
-    nodes.size() > 2 ||    // maximum 2 selected nodes
-    (nodes.size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) || // with two nodes, one must be the original image, one the segmentation
-    ( workingData.GetPointer() == referenceData.GetPointer() ) //one node is selected as reference and working image
-    // one item is always ok (might be working or reference or nothing
-    )
-    );
-
-  if (invalidSelection)
-  {
-    // TODO visible warning when two images are selected
-    MITK_ERROR << "WARNING: No image, too many (>2) or two equal images were selected.";
-    workingData = NULL;
-
-    if( m_Controls->refImageSelector->GetSelectedNode().IsNull() )
-      referenceData = NULL;
-  }
-
-  if ( workingData.IsNotNull() && referenceData.IsNull() )
-  {
-    // find the DataStorage parent of workingData
-    // try to find a "normal image" parent, select this as reference image
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-    mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateNot::Pointer isNotBinary = mitk::NodePredicateNot::New( isBinary );
-    mitk::NodePredicateAnd::Pointer isNormalImage = mitk::NodePredicateAnd::New( isImage, isNotBinary );
-
-    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( workingData, isNormalImage );
-
-    if (possibleParents->size() > 0)
-    {
-      if (possibleParents->size() > 1)
-      {
-        // TODO visible warning for this rare case
-        MITK_ERROR << "Selected binary image has multiple parents. Using arbitrary first one for segmentation.";
-      }
-
-      referenceData = (*possibleParents)[0];
-    }
-
-    NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( workingData );
-    if ( searchIter == m_WorkingDataObserverTags.end() )
-    {
-      //MITK_INFO<<"Creating new observer";
-      itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-      m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( workingData, workingData->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-      workingData->GetProperty("visible")->Modified();
-
       return;
     }
 
-    if(workingData->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
+    MITK_INFO<<"NodeNAme: "<<nodeName;
+    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
+    if (selectedImage.IsNull())
     {
-        //set comboBox to reference image
-        disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-          this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+      SetToolManagerSelection(NULL,NULL);
+      return;
+    }
+    else
+    {
+      bool isASegmentation(false);
+      selectedNode->GetBoolProperty("binary", isASegmentation);
 
-        m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(workingData) );
+      if (isASegmentation)
+      {
 
-        connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-          this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+        //If a segmentation is selected find a possible reference image:
+        mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(selectedNode, m_IsNotABinaryImagePredicate);
+        mitk::DataNode::Pointer refNode;
+        if (sources->Size() != 0)
+        {
+          refNode = sources->ElementAt(0);
 
+          refNode->SetVisibility(m_AutoSelectionEnabled || refNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))));
+          selectedNode->SetVisibility(m_AutoSelectionEnabled || selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))));
+          SetToolManagerSelection(refNode,selectedNode);
 
-        // if Image and Surface are selected, enable button
-        if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
-          (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()) ||
-          (!referenceData))
-          m_Controls->CreateSegmentationFromSurface->setEnabled(false);
+          mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
+          for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
+          {
+            mitk::DataNode* node = *iter;
+            if (dynamic_cast<mitk::Image*>(node->GetData()) != selectedImage.GetPointer() && m_AutoSelectionEnabled)
+              node->SetVisibility(false);
+          }
+
+          mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
+          for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
+          {
+            mitk::DataNode* node = *iter;
+            if (dynamic_cast<mitk::Image*>(node->GetData()) != dynamic_cast<mitk::Image*>(refNode->GetData()) && m_AutoSelectionEnabled)
+              node->SetVisibility(false);
+          }
+        }
         else
-          m_Controls->CreateSegmentationFromSurface->setEnabled(true);
+        {
+          mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
 
-        SetToolManagerSelection(referenceData, workingData);
-        FireNodeSelected(workingData);
+          for (mitk::DataStorage::SetOfObjects::ConstIterator it = possiblePatientImages->Begin(); it != possiblePatientImages->End(); it++)
+          {
+            refNode = it->Value();
+
+            if (this->CheckForSameGeometry(selectedNode, it->Value()))
+            {
+              refNode->SetVisibility(m_AutoSelectionEnabled || refNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))));
+              selectedNode->SetVisibility(m_AutoSelectionEnabled || selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))));
+
+              mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
+              for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
+              {
+                mitk::DataNode* node = *iter;
+                if (dynamic_cast<mitk::Image*>(node->GetData()) != selectedImage.GetPointer() && m_AutoSelectionEnabled)
+                  node->SetVisibility(false);
+              }
+
+              mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
+              for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
+              {
+                mitk::DataNode* node = *iter;
+                if (dynamic_cast<mitk::Image*>(node->GetData()) != dynamic_cast<mitk::Image*>(refNode->GetData()) && m_AutoSelectionEnabled)
+                  node->SetVisibility(false);
+              }
+              this->SetToolManagerSelection(refNode, selectedNode);
+
+              //Doing this we can assure that the segmenation is always visible if the segmentation and the patient image are at the
+              //same level in the datamanager
+              int layer(10);
+              refNode->GetIntProperty("layer", layer);
+              layer++;
+              selectedNode->SetProperty("layer", mitk::IntProperty::New(layer));
+              return;
+            }
+          }
+          this->SetToolManagerSelection(NULL, selectedNode);
+
+        }
+      }
+      else
+      {
+        if (m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) != selectedNode)
+        {
+          SetToolManagerSelection(selectedNode, NULL);
+          this->UpdateWarningLabel("The selected patient image does not match with the selected segmentation!");
+        }
+      }
     }
-    else
-    {
-        SetToolManagerSelection(NULL, NULL);
-        FireNodeSelected(workingData);
-    }
-
   }
-  else
-  {
-    //set comboBox to reference image
-    disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-      this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
-
-    m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(referenceData) );
-
-    connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
-      this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
-
-    // if Image and Surface are selected, enable button
-    if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
-      (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()) ||
-      (!referenceData))
-      m_Controls->CreateSegmentationFromSurface->setEnabled(false);
-    else
-      m_Controls->CreateSegmentationFromSurface->setEnabled(true);
-
-    SetToolManagerSelection(referenceData, workingData);
-
-    FireNodeSelected(referenceData);
-  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
-  //TODO renderWindow anders bestimmen, siehe CheckAlignment
   QmitkRenderWindow* selectedRenderWindow = 0;
   QmitkRenderWindow* RenderWindow1 =
-    this->GetActiveStdMultiWidget()->GetRenderWindow1();
+      this->GetActiveStdMultiWidget()->GetRenderWindow1();
   QmitkRenderWindow* RenderWindow2 =
-    this->GetActiveStdMultiWidget()->GetRenderWindow2();
+      this->GetActiveStdMultiWidget()->GetRenderWindow2();
   QmitkRenderWindow* RenderWindow3 =
-    this->GetActiveStdMultiWidget()->GetRenderWindow3();
+      this->GetActiveStdMultiWidget()->GetRenderWindow3();
   QmitkRenderWindow* RenderWindow4 =
-    this->GetActiveStdMultiWidget()->GetRenderWindow4();
+      this->GetActiveStdMultiWidget()->GetRenderWindow4();
   bool PlanarFigureInitializedWindow = false;
 
   // find initialized renderwindow
   if (node->GetBoolProperty("PlanarFigureInitializedWindow",
-    PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+                PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
   {
     selectedRenderWindow = RenderWindow1;
   }
   if (!selectedRenderWindow && node->GetBoolProperty(
-    "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-    RenderWindow2->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow2->GetRenderer()))
   {
     selectedRenderWindow = RenderWindow2;
   }
   if (!selectedRenderWindow && node->GetBoolProperty(
-    "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-    RenderWindow3->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow3->GetRenderer()))
   {
     selectedRenderWindow = RenderWindow3;
   }
   if (!selectedRenderWindow && node->GetBoolProperty(
-    "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-    RenderWindow4->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow4->GetRenderer()))
   {
     selectedRenderWindow = RenderWindow4;
   }

@@ -14,10 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDataNodeObject.h"
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
-#include "mitkGlobalInteraction.h"
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
@@ -27,16 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 #include "QmitkSegmentationView.h"
-#include "QmitkSegmentationPostProcessing.h"
 #include "QmitkSegmentationOrganNamesHandling.cpp"
 
 #include <mitkSurfaceToImageFilter.h>
-#include <vtkPolyData.h>
 
-//For Segmentation in rotated slices
-//TODO clean up includes
 #include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkPlanarCircle.h"
 
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
@@ -45,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 
 const std::string QmitkSegmentationView::VIEW_ID =
-"org.mitk.views.segmentation";
+    "org.mitk.views.segmentation";
 
 // public methods
 

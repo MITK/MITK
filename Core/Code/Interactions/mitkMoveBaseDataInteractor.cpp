@@ -15,8 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkMoveSurfaceInteractor.h"
-#include "mitkSurface.h"
+#include "mitkMoveBaseDataInteractor.h"
 #include "mitkInteractionConst.h"
 #include <mitkDataNode.h>
 #include "mitkDisplayPositionEvent.h"
@@ -27,29 +26,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 
 //## Default Constructor
-mitk::MoveSurfaceInteractor
-::MoveSurfaceInteractor(const char * type, DataNode* dataNode)
+mitk::MoveBaseDataInteractor
+::MoveBaseDataInteractor(const char * type, DataNode* dataNode)
 :Interactor(type, dataNode)
 {
+    //define the colors for selected/deselected state
+    m_DataNode->AddProperty( "MovingInteractor.SelectedColor", ColorProperty::New(0.0,1.0,0.0) );
+    m_DataNode->AddProperty( "MovingInteractor.DeselectedColor", ColorProperty::New(0.0,0.0,1.0) );
+    //save the previous color of the node, in order to restore it after the interactor is destroyed
+    mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
+    if ( priorColor.IsNotNull() )
+    {
+        mitk::ColorProperty::Pointer tmpCopyOfPriorColor = mitk::ColorProperty::New();
+        tmpCopyOfPriorColor->SetColor( priorColor->GetColor() );
+        m_DataNode->AddProperty( "MovingInteractor.PriorColor", tmpCopyOfPriorColor );
+    }
 }
 
-mitk::MoveSurfaceInteractor::~MoveSurfaceInteractor()
+mitk::MoveBaseDataInteractor::~MoveBaseDataInteractor()
 {
-    mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-    if ( color.IsNull() )
+    mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.PriorColor"));
+    if ( color.IsNotNull() )
     {
-      color = mitk::ColorProperty::New();
-      m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", color);
     }
 
-    color->SetColor(1.0, 1.0, 1.0);
-
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.SelectedColor");
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.DeselectedColor");
+    m_DataNode->GetPropertyList()->DeleteProperty("MovingInteractor.PriorColor");
     //update rendering
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
-bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
+bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
   bool ok = false;
 
@@ -68,7 +78,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       mitk::DisplayPositionEvent const *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
       if (posEvent == NULL)
       {
-        MITK_WARN<<"Wrong usage of mitkMoveSurfaceInteractor! Aborting interaction!\n";
+        MITK_WARN<<"Wrong usage of mitkMoveBaseDataInteractor! Aborting interaction!\n";
         return false;
       }
 
@@ -98,15 +108,12 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() )
+      mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.SelectedColor"));
+      if ( selectedColor.IsNotNull() )
       {
-        color = mitk::ColorProperty::New();
-        m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", selectedColor);
       }
-
       selected->SetValue(true);
-      color->SetColor(0.0, 1.0, 0.0);
 
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -124,15 +131,14 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
         m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
-      if ( color.IsNull() )
+      mitk::ColorProperty::Pointer deselectedColor =
+              dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("MovingInteractor.DeselectedColor"));
+      if ( deselectedColor.IsNotNull() )
       {
-        color = mitk::ColorProperty::New();
-        m_DataNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", deselectedColor);
       }
 
       selected = mitk::BoolProperty::New(false);
-      color->SetColor(0.0, 0.0, 1.0);
 
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -156,14 +162,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       movementVector.SetElement(1, (float) yP->GetValue());
       movementVector.SetElement(2, (float) zP->GetValue());
 
-      //checking corresponding Data; has to be a surface or a subclass
-      mitk::BaseData* surface = dynamic_cast<mitk::BaseData*>(m_DataNode->GetData());
-      if ( surface == NULL )
-      {
-        MITK_WARN<<"MoveSurfaceInteractor got wrong type of data! Aborting interaction!\n";
-        return false;
-      }
-      Geometry3D* geometry = surface->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
+      Geometry3D* geometry = m_DataNode->GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
       geometry->Translate(movementVector);
 
       // indicate modification of data tree node
@@ -184,8 +183,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
 }
 
 /**
-\example mitkMoveSurfaceInteractor.cpp
+\example mitkMoveBaseDataInteractor.cpp
  * This is an example of how to implement a new Interactor.
  * See more details about this example in tutorial Step10.
  */
-

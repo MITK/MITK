@@ -95,6 +95,9 @@ protected slots:
 
   void OnWorkingNodeVisibilityChanged();
 
+  // called if a node's binary property has changed
+  void OnBinaryPropertyChanged();
+
   void OnShowMarkerNodes(bool);
 
 protected:
@@ -142,6 +145,8 @@ protected:
 
   void NodeRemoved(const mitk::DataNode* node);
 
+  void NodeAdded(const mitk::DataNode *node);
+  void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 
@@ -161,7 +166,11 @@ protected:
   bool m_DataSelectionChanged;
 
   NodeTagMapType  m_WorkingDataObserverTags;
+
+  NodeTagMapType  m_BinaryPropertyObserverTags;
+
   bool m_AutoSelectionEnabled;
+
   mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
   mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
   mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;

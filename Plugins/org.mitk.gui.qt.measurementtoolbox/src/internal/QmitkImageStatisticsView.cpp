@@ -500,10 +500,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   m_Controls->m_lineRadioButton->setEnabled(true);
   m_Controls->m_barRadioButton->setEnabled(true);
   m_Controls->m_InfoLabel->setText(QString(""));
-  if (m_Controls->m_barRadioButton->isChecked())
-  {
-    m_Controls->m_JSHistogram->histogramToBarChart();
-  }
+
   if(m_DataNodeSelectionChanged)
   {
     this->m_StatisticsUpdatePending = false;
@@ -520,6 +517,10 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_CurrentStatisticsValid = true;
     }
 
+    if (m_Controls->m_barRadioButton->isChecked())
+    {
+      m_Controls->m_JSHistogram->histogramToBarChart();
+    }
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_JSHistogram->ComputeHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
@@ -532,8 +533,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_JSHistogram->clearHistogram();
+    //m_Controls->m_JSHistogram->clearHistogram();
     m_CurrentStatisticsValid = false;
+
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
     if ( m_SelectedPlanarFigure != NULL )

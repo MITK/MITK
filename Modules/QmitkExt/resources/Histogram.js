@@ -122,14 +122,6 @@ function barChart()
   zoombie = d3.behavior.zoom().x(xScale).scaleExtent([1, 50]).on("zoom", zoom);
 
   svg.call(zoombie);
-  var linenull = d3.svg.line()
-    .interpolate("linear")
-    .x(function(d,i) {
-      return xScale(histogramData.measurement[i]);
-    })
-    .y(function(d) {
-      return yScale(0);
-    });
 
 // element to animate transition from linegraph to barchart
   vis.selectAll("path.line").remove();
@@ -203,22 +195,6 @@ function linePlot()
       .remove();
   }
 
-  vis.selectAll("circle").remove();
-
-  var graph = vis.selectAll("path.line")
-    .data([histogramData.frequency]);
-
-  graph.enter()
-    .append("path")
-    .attr("class", "line")
-    .transition()
-    .duration(dur)
-    .attr("d", line);
-
-  graph.transition()
-    .duration(dur)
-    .attr("d", line);
-
   if(histogramData.intensityProfile)
   {
   var circles = vis.selectAll("circle").data(histogramData.frequency);
@@ -241,6 +217,24 @@ function linePlot()
 
   circles.exit().remove();
   }
+  else
+  {
+    vis.selectAll("circle").remove();
+  }
+
+  var graph = vis.selectAll("path.line")
+    .data([histogramData.frequency]);
+
+  graph.enter()
+    .append("path")
+    .attr("class", "line")
+    .transition()
+    .duration(dur)
+    .attr("d", line);
+
+  graph.transition()
+    .duration(dur)
+    .attr("d", line);
 
   svg.selectAll("g")
     .remove();

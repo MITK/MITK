@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkPolyLineParametricPath.h>
 
 
-
 class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
 {
   Q_OBJECT

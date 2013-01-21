@@ -35,6 +35,17 @@ mitk::MoveSurfaceInteractor
 
 mitk::MoveSurfaceInteractor::~MoveSurfaceInteractor()
 {
+    mitk::ColorProperty::Pointer color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
+    if ( color.IsNull() )
+    {
+      color = mitk::ColorProperty::New();
+      m_DataNode->GetPropertyList()->SetProperty("color", color);
+    }
+
+    color->SetColor(1.0, 1.0, 1.0);
+
+    //update rendering
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -95,7 +106,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       }
 
       selected->SetValue(true);
-      color->SetColor(1.0, 1.0, 0.0);
+      color->SetColor(0.0, 1.0, 0.0);
 
       //update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -146,7 +157,7 @@ bool mitk::MoveSurfaceInteractor::ExecuteAction( Action* action, mitk::StateEven
       movementVector.SetElement(2, (float) zP->GetValue());
 
       //checking corresponding Data; has to be a surface or a subclass
-      mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_DataNode->GetData());
+      mitk::BaseData* surface = dynamic_cast<mitk::BaseData*>(m_DataNode->GetData());
       if ( surface == NULL )
       {
         MITK_WARN<<"MoveSurfaceInteractor got wrong type of data! Aborting interaction!\n";

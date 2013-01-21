@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 class QmitkRenderWindow;
-// class QmitkSegmentationPostProcessing;
 
 /**
  * \ingroup ToolManagerEtAl
@@ -91,8 +90,6 @@ protected slots:
 
   void OnSurfaceSelectionChanged();
 
-  //called when the checkbox Remember Contour Positions is selected/deselected
-
   void OnWorkingNodeVisibilityChanged();
 
   // called if a node's binary property has changed
@@ -118,9 +115,6 @@ protected:
 
   // propagate BlueBerry selection to ToolManager for manual segmentation
   void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
-
-  // checks if selected reference image is aligned with the slices stack orientation of the StdMultiWidget
-  void CheckImageAlignment();
 
   // checks if given render window aligns with the slices of given image
   bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
@@ -160,11 +154,6 @@ protected:
   // THE currently existing QmitkStdMultiWidget
   QmitkStdMultiWidget * m_MultiWidget;
 
-  // QmitkSegmentationPostProcessing* m_PostProcessing;
-
-  unsigned long m_RenderingManagerObserverTag;
-  unsigned long m_SlicesRotationObserverTag1;
-  unsigned long m_SlicesRotationObserverTag2;
   unsigned long m_VisibilityChangedObserverTag;
 
   bool m_DataSelectionChanged;

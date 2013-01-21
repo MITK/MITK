@@ -77,7 +77,8 @@ public:
 
 protected slots:
 
-  void OnComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
 
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();

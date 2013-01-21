@@ -212,6 +212,9 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   if (!selectedNodes.size())
   {
     m_Controls->m_JSHistogram->clearHistogram();
+    m_Controls->m_lineRadioButton->setEnabled(true);
+    m_Controls->m_barRadioButton->setEnabled(true);
+    m_Controls->m_InfoLabel->setText(QString(""));
   }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
@@ -390,6 +393,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_JSHistogram->clearHistogram();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
+      m_Controls->m_lineRadioButton->setEnabled(true);
+      m_Controls->m_barRadioButton->setEnabled(true);
+      m_Controls->m_InfoLabel->setText(QString(""));
       return;
     }
 
@@ -552,6 +558,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_ErrorMessageLabel->hide();
         m_Controls->m_SelectedMaskLabel->setText( "None" );
         this->m_StatisticsUpdatePending = false;
+        m_Controls->m_lineRadioButton->setEnabled(true);
+        m_Controls->m_barRadioButton->setEnabled(true);
+        m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
       // TODO: enable line profile widget

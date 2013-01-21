@@ -25,7 +25,7 @@ var width = histogramData.width - margin.left - margin.right;
 var tension = 0.8;
 var connected = false;
 var dur = 1000;
-var binSize = 0;
+var binSize = 10;
 
 // connecting signal from qt side with JavaScript method
 if (!connected)
@@ -36,7 +36,7 @@ if (!connected)
 }
 
 var xScale = d3.scale.linear()
-  .domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)])
+  .domain([d3.min(histogramData.measurement)-binSize/2,d3.max(histogramData.measurement)+binSize/2])
   .range([0,width]);
 
 var yScale = d3.scale.linear()
@@ -275,7 +275,14 @@ function definition()
 function barWidth(d, i)
 {
   var bw;
-  bw =(xScale(histogramData.measurement[i + 1]) - xScale(histogramData.measurement[i])) * (histogramData.frequency.length / (histogramData.frequency.length + 1)) - 1;
+  if (i != (histogramData.measurement.length-1))
+  {
+    bw =(xScale(histogramData.measurement[i + 1]) - xScale(histogramData.measurement[i])) * (histogramData.frequency.length / (histogramData.frequency.length + 1)) - 1;
+  }
+  else
+  {
+    bw =(xScale(histogramData.measurement[i]) - xScale(histogramData.measurement[i - 1])) * (histogramData.frequency.length / (histogramData.frequency.length + 1)) - 1;
+  }
   bw = bw > 1 ? bw : 1;
   return bw;
 }
@@ -305,7 +312,7 @@ function zoom()
   if (zoombie.scale() == 1)
   {
     zoombie.translate([0,0]);
-    xScale.domain([d3.min(histogramData.measurement),d3.max(histogramData.measurement)]);
+    xScale.domain([d3.min(histogramData.measurement)-binSize/2,d3.max(histogramData.measurement)+binSize/2]);
     yScale.domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)]);
   }
   if (!histogramData.useLineGraph)

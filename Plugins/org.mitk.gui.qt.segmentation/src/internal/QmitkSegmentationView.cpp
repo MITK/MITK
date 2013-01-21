@@ -70,7 +70,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
 
 void QmitkSegmentationView::NewNodesGenerated()
 {
-//  ForceDisplayPreferencesUponAllImages();
+  MITK_WARN<<"Use of deprecated function: NewNodesGenerated!! This function is empty and will be removed in the next time!";
 }
 
 void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)

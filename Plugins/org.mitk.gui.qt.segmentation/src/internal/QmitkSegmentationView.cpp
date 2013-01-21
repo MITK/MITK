@@ -57,6 +57,18 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_DataSelectionChanged(false)
 {
   RegisterSegmentationObjectFactory();
+  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+  mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+  mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
+  isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+  m_IsOfTypeImagePredicate = mitk::NodePredicateOr::New(isDiffusionImage, mitk::TNodePredicateDataType<mitk::Image>::New());
+
+  m_IsBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  m_IsNotBinaryPredicate = mitk::NodePredicateNot::New( m_IsBinaryPredicate );
+
+  m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsNotBinaryPredicate );
+  m_IsABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsBinaryPredicate);
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()

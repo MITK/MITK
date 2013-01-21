@@ -23,8 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdexcept>
 #include <iostream>
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #include "process.h"
+#else
+#include <unistd.h>
 #endif
 
 namespace mitk {

@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 #define MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872
 
-//#include "mitkMapper2D.h"
 #include "mitkGLMapper.h"
 
 namespace mitk {

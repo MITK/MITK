@@ -85,13 +85,6 @@ bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) con
     return visible;
 }
 
-void mitk::Mapper::GenerateData()
-{
-}
-
-void mitk::Mapper::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
-{
-}
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {

@@ -49,13 +49,16 @@ namespace mitk {
   };
 
 
-  /** \brief Base class of all mappers, 2D as well as 3D
+  /** \brief Base class of all mappers, Vtk as well as OpenGL mappers
   *
-  * Base class of all Mappers, 2D as well as 3D.
+  * By the help of mappers, the input data is transformed to tangible primitives,
+  * such as surfaces, points, lines, etc.
+  * This is the base class of all mappers, Vtk as well as OpenGL mappers.
   * Subclasses of mitk::Mapper control the creation of rendering primitives
   * that interface to the graphics library (e.g., OpenGL, vtk).
-  * @todo Should Mapper be a subclass of ImageSource?
-  * @ingroup Mapper
+  *
+  * \todo Should Mapper be a subclass of ImageSource?
+  * \ingroup Mapper
   */
   class MITK_CORE_EXPORT Mapper : public itk::Object
   {
@@ -65,7 +68,6 @@ namespace mitk {
 
     /** \brief Set the DataNode containing the data to map */
     itkSetObjectMacro(DataNode, DataNode);
-
 
     /**\brief Get the data to map
     *
@@ -117,6 +119,10 @@ namespace mitk {
     */
     virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const;
 
+
+    /** \brief Calls the time step of the input data for the specified renderer and checks
+    * whether the time step is valid and calls method GenerateDataForRenderer()
+    */
     virtual void Update(BaseRenderer* renderer);
 
     /** \brief Responsible for calling the appropriate render functions.
@@ -167,10 +173,10 @@ namespace mitk {
     virtual ~Mapper();
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer) */
-    virtual void GenerateData();
+    virtual void GenerateData() { };
 
     /** \brief Generate the data needed for rendering into \a renderer */
-    virtual void GenerateDataForRenderer(BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(BaseRenderer* renderer) { };
 
     /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep( BaseRenderer* renderer );

@@ -39,7 +39,11 @@ class vtkActor;
 
 namespace mitk {
 
-/** \brief Base class of all Vtk Mappers in order to display geometry
+/** \brief Base class of all Vtk Mappers in order to display primitives
+* by exploiting Vtk functionality.
+*
+* Rendering of opaque, translucent or volumetric geometry and overlays
+* is done in consecutive render passes.
 *
 * \ingroup Mapper
 */

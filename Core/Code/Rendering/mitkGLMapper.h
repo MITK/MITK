@@ -26,9 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-/** \brief Base class of all OpenGL-based Mappers
+/** \brief Base class of all OpenGL-based mappers.
 *
-* Those must implement the abstract method Paint(BaseRenderer).
+* Those must implement the abstract method Paint(BaseRenderer), which is called by
+* MitkRender(...).
 * \ingroup Mapper
 */
 class MITK_CORE_EXPORT GLMapper : public Mapper
@@ -41,7 +42,11 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
     // todo: virtual or not?
-    /** \brief Checks visibility and calls the paint method */
+    /** \brief Checks visibility and calls the paint method
+    *
+    * Note: The enumeration is disregarded, since OpenGL rendering only needs a
+    * single render pass.
+    */
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
    /** \brief Returns  whether this is a vtk-based mapper

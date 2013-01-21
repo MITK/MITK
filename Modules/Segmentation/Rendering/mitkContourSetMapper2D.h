@@ -20,13 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 
 namespace mitk {
 
 class BaseRenderer;
 class ContourSet;
-class BaseRenderer;
 
 /**
  * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
@@ -34,11 +33,11 @@ class BaseRenderer;
  *
  * @ingroup Mapper
  */
-class Segmentation_EXPORT ContourSetMapper2D : public GLMapper2D
+class Segmentation_EXPORT ContourSetMapper2D : public GLMapper
 {
 public:
 
-    mitkClassMacro(ContourSetMapper2D, GLMapper2D);
+    mitkClassMacro(ContourSetMapper2D, GLMapper);
 
     itkNewMacro(Self);
 

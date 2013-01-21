@@ -53,7 +53,7 @@ const mitk::PointSet *mitk::PointSetGLMapper2D::GetInput(void)
 
 void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-  GLMapper2D::ApplyProperties( renderer );
+  GLMapper::ApplyProperties( renderer );
 
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 #include "mitkTransferFunction.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
@@ -45,11 +45,11 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is
  * rendered in 3D via a vtkPolyData.
  */
-class MitkExt_EXPORT UnstructuredGridMapper2D : public GLMapper2D
+class MitkExt_EXPORT UnstructuredGridMapper2D : public GLMapper
 {
 public:
 
-    mitkClassMacro( UnstructuredGridMapper2D, GLMapper2D );
+    mitkClassMacro( UnstructuredGridMapper2D, GLMapper );
 
     itkNewMacro( Self );
 

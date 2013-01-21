@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPointSetMAPPER2D_H_HEADER_INCLUDED
 
 #include <MitkExports.h>
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 
 namespace mitk {
 
@@ -54,10 +54,10 @@ class PointSet;
  *
  * @ingroup Mapper
  */
-class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
 {
 public:
-  mitkClassMacro(PointSetGLMapper2D, GLMapper2D);
+  mitkClassMacro(PointSetGLMapper2D, GLMapper);
 
   itkNewMacro(Self);
 

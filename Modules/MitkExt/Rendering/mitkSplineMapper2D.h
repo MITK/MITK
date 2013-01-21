@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 #include "mitkPointSetGLMapper2D.h"
 #include <vtkSystemIncludes.h>
 

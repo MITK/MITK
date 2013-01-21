@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB
 
 #include <MitkExports.h>
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
@@ -45,11 +45,11 @@ class BaseRenderer;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper
 {
 
 public:
-  mitkClassMacro(Geometry2DDataMapper2D, GLMapper2D);
+  mitkClassMacro(Geometry2DDataMapper2D, GLMapper);
 
   itkNewMacro(Self);
 

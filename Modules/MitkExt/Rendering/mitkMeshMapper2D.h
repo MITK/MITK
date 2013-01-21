@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 
 namespace mitk {
 
@@ -33,10 +33,10 @@ class Mesh;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class MitkExt_EXPORT MeshMapper2D : public GLMapper2D
+class MitkExt_EXPORT MeshMapper2D : public GLMapper
 {
 public:
-  mitkClassMacro(MeshMapper2D, GLMapper2D);
+  mitkClassMacro(MeshMapper2D, GLMapper);
 
   itkNewMacro(Self);
 

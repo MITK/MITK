@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MitkPolyDataGLMapper2D_H
 
 #include <MitkExports.h>
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 
 class vtkCutter;
 class vtkPlane;
@@ -39,11 +39,11 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is
  * rendered in 3D via a vtkPolyData.
  */
-class MITK_CORE_EXPORT PolyDataGLMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT PolyDataGLMapper2D : public GLMapper
 {
 public:
 
-    mitkClassMacro( PolyDataGLMapper2D, GLMapper2D );
+    mitkClassMacro( PolyDataGLMapper2D, GLMapper );
 
     itkNewMacro( Self );
 

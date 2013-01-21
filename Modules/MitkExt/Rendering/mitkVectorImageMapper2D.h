@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkExtExports.h"
 
 #include "mitkCommon.h"
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 #include "mitkImage.h"
 
 class vtkLookupTable;
@@ -40,10 +40,10 @@ class BaseRenderer;
 class Geometry2D;
 class DisplayGeometry;
 
-class MitkExt_EXPORT VectorImageMapper2D : public GLMapper2D
+class MitkExt_EXPORT VectorImageMapper2D : public GLMapper
 {
 public:
-    mitkClassMacro( VectorImageMapper2D, GLMapper2D );
+    mitkClassMacro( VectorImageMapper2D, GLMapper );
 
     itkNewMacro( Self );
     typedef vtkFloatingPointType vtkScalarType;

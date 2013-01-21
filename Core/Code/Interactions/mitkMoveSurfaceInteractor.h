@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   // @deprecated Use MoveBaseDataInteractor instead.
-  typedef MoveSurfaceInteractor MoveBaseDataInteractor;
+  typedef MoveBaseDataInteractor MoveSurfaceInteractor;
 }
 
 #endif /* MITKMoveSurfaceInteractor_H_HEADER_INCLUDED */

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.simulation"
+          name="Simulation"
+          class="QmitkSimulationView"
+          icon="resources/icon.png" />
+  </extension>
+</plugin>

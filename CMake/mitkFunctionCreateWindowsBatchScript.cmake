@@ -11,6 +11,12 @@ function(mitkFunctionCreateWindowsBatchScript in out build_type)
     set(OpenCV_BIN_DIR)
   endif()
 
+  if(SOFA_DIR)
+    set(SOFA_BIN_DIR "${SOFA_DIR}/bin/${build_type}")
+  else()
+    set(SOFA_BIN_DIR)
+  endif()
+
   set(MITK_LIBRARY_DIRS_WITH_BUILD_TYPE)
   if(MITK_LIBRARY_DIRS)
     foreach(lib_dir ${MITK_LIBRARY_DIRS})

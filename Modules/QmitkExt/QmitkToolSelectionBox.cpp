@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolSelectionBox.h"
 #include "QmitkToolGUI.h"
+#include "mitkBaseRenderer.h"
 
 #include <qtoolbutton.h>
 #include <QList>
@@ -39,7 +40,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_LastToolGUI(NULL),
  m_ToolButtonGroup(NULL),
  m_ButtonLayout(NULL),
- m_EnabledMode(EnabledWithReferenceAndWorkingData)
+ m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
 {
   QFont currentFont = QWidget::font();
   currentFont.setBold(true);
@@ -300,8 +301,11 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   switch ( m_EnabledMode )
   {
     default:
-    case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && isVisible();
+    case EnabledWithReferenceAndWorkingDataVisible:
+      enabled = referenceNode && workingNode
+                  && referenceNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
+                  && workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
+                  && isVisible();
       break;
     case EnabledWithReferenceData:
       enabled = referenceNode && isVisible();

@@ -249,10 +249,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   }
 }
 
-void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*)
-{
-  ForceDisplayPreferencesUponAllImages();
-}
+void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 
 //TODO remove function
 void QmitkSegmentationView::RenderingManagerReinitialized(const itk::EventObject&)
@@ -263,7 +260,7 @@ void QmitkSegmentationView::RenderingManagerReinitialized(const itk::EventObject
 //TODO remove function
 void QmitkSegmentationView::SliceRotation(const itk::EventObject&)
 {
-  CheckImageAlignment();
+  m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
 }
 
 

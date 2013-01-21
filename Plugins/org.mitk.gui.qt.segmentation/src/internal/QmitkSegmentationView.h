@@ -65,7 +65,7 @@ public:
   virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 
   // BlueBerry's notification about preference changes (e.g. from a dialog)
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences*);
+  virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
   void RenderingManagerReinitialized(const itk::EventObject&);
@@ -160,6 +160,7 @@ protected:
   bool m_DataSelectionChanged;
 
   NodeTagMapType  m_WorkingDataObserverTags;
+  bool m_AutoSelectionEnabled;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

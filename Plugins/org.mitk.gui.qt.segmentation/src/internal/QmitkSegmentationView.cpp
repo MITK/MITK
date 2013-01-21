@@ -1105,6 +1105,32 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 }
 
+bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const
+{
+  bool isSameGeometry(true);
+
+  mitk::Image* image1 = dynamic_cast<mitk::Image*>(node1->GetData());
+  mitk::Image* image2 = dynamic_cast<mitk::Image*>(node2->GetData());
+  if (image1 && image2)
+  {
+    mitk::Geometry3D* geo1 = image1->GetGeometry();
+    mitk::Geometry3D* geo2 = image2->GetGeometry();
+
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetOrigin(), geo2->GetOrigin());
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(0), geo2->GetExtent(0));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(1), geo2->GetExtent(1));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetExtent(2), geo2->GetExtent(2));
+    isSameGeometry = isSameGeometry && mitk::Equal(geo1->GetSpacing(), geo2->GetSpacing());
+    isSameGeometry = isSameGeometry && mitk::MatrixEqualElementWise(geo1->GetIndexToWorldTransform()->GetMatrix(), geo2->GetIndexToWorldTransform()->GetMatrix());
+
+    return isSameGeometry;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 void QmitkSegmentationView::UpdateWarningLabel(QString text)
 {
   m_Controls->lblSegmentationWarnings->setText(text);

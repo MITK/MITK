@@ -146,7 +146,11 @@ protected:
   void NodeRemoved(const mitk::DataNode* node);
 
   void NodeAdded(const mitk::DataNode *node);
+
+  bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*) const;
+
   void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
+
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 

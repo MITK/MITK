@@ -38,27 +38,49 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(PointSetDataInteractor, DataInteractor);
-    itkNewMacro(Self);
+    mitkClassMacro(PointSetDataInteractor, DataInteractor)
+    ;itkNewMacro(Self)
+    ;
 
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
     virtual void ConnectActionsAndFunctions();
+    void DataNodeChanged();
+
+    /* PointSet Interactor functionality */
+    virtual bool AddPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*);
+    /**
+     * Checks if new point is close enough to an old one,
+     * if so, trigger the ClosedContour signal which can be caught by the state machine.
+     */
+    virtual bool IsClosedContour(StateMachineAction*, InteractionEvent*);
+
+    virtual bool MovePoint(StateMachineAction*, InteractionEvent*);
+    virtual bool InitMove(StateMachineAction*, InteractionEvent*);
+    virtual bool FinishMove(StateMachineAction*, InteractionEvent*);
+    /**
+     * Stores original position from which movement can be calculated
+     */
+    virtual bool InitMoveAll(StateMachineAction*, InteractionEvent*);
+    /**
+     * Moves all points of the PointSet by the same vector, which is the relative distance from the
+     * initialization point.
+     */
+    virtual bool MoveSet(StateMachineAction*, InteractionEvent*);
+
+    virtual bool SelectPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool UnSelectPoint(StateMachineAction*, InteractionEvent*);
+    virtual bool Abort(StateMachineAction*, InteractionEvent*);
 
   private:
-    bool AddPoint(StateMachineAction* , InteractionEvent*);
-    bool RemovePoint(StateMachineAction* , InteractionEvent*);
-    bool CloseContourPoint(StateMachineAction* , InteractionEvent*);
-    bool MovePoint(StateMachineAction* , InteractionEvent*);
-    bool MoveSet(StateMachineAction* , InteractionEvent*);
-    bool SelectPoint(StateMachineAction* , InteractionEvent*);
-    bool UnSelectPoint(StateMachineAction* , InteractionEvent*);
-    bool Abort(StateMachineAction* , InteractionEvent*);
-
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;
+    int m_MaxNumberOfPoints;
     int m_SelectedPointIndex;
+    /** member to keep track of PointSet movements */
+    Point3D m_LastMovePosition;
   };
 
 }

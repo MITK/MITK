@@ -23,6 +23,7 @@
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include "mitkEventConfig.h"
+#include "mitkPropertyList.h"
 #include <string>
 
 
@@ -44,6 +45,8 @@ namespace mitk
      * For example to load the standard configuration plus some additional definitions.
      */
     virtual bool AddEventConfig(std::string filename);
+
+    PropertyList::Pointer GetPropertyList();
 
   protected:
     EventHandler();

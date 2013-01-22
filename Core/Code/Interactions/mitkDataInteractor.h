@@ -37,9 +37,9 @@ namespace mitk
   {
 
   public:
-    typedef itk::SmartPointer<DataNode> NodeType;
-    mitkClassMacro(DataInteractor, EventStateMachine);
-    itkNewMacro(Self);
+    typedef itk::SmartPointer<DataNode> NodeType;mitkClassMacro(DataInteractor, EventStateMachine)
+    ;itkNewMacro(Self)
+    ;
 
     void SetDataNode(NodeType);
     /**
@@ -65,9 +65,9 @@ namespace mitk
      * with the AddPoint() function in the TestInteractor.
      * @code
      * void mitk::TestInteractor::ConnectActionsAndFunctions()
-      {
-        CONNECT_FUNCTION("addpoint", AddPoint);
-      }
+     {
+     CONNECT_FUNCTION("addpoint", AddPoint);
+     }
      * @endcode
      */
     virtual void ConnectActionsAndFunctions();
@@ -79,7 +79,16 @@ namespace mitk
      * in the DataNode to check if it contains a point near the pointer position.
      * If a point is found its index-position is returned, else -1 is returned.
      */
-    virtual int GetPointIndexByPosition(Point3D position, int time =0 );
+    virtual int GetPointIndexByPosition(Point3D position, int time = 0);
+
+    /** \brief Is called when a DataNode is initially set or changed
+     *  To be implemented by sub-classes for initialization code which require a DataNode.
+     *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest Layer,
+     *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
+     *  \note Is also called when the DataNode is set to NULL.
+     *
+     */
+    virtual void DataNodeChanged();
 
   private:
     NodeType m_DataNode;

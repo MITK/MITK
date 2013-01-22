@@ -26,31 +26,54 @@
 
 void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 {
-
+  CONNECT_FUNCTION("addpoint", AddPoint);
+  CONNECT_FUNCTION("selectpoint", SelectPoint);
+  CONNECT_FUNCTION("unselect", UnSelectPoint);
+  CONNECT_FUNCTION("initMove", InitMove);
+  CONNECT_FUNCTION("initMovePointSet", InitMoveAll);
+  CONNECT_FUNCTION("movePoint", MovePoint);
+  CONNECT_FUNCTION("movePointSet", MoveSet);
+  CONNECT_FUNCTION("finishMovement", FinishMove);
+  CONNECT_FUNCTION("removePoint", RemovePoint);
 }
 
-bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
-  GetDataNode()->SetBoolProperty("show contour", true);
+  // Find the position, the point is to be added to: first entry with
+  // empty index. If the Set is empty, then start with 0. if not empty,
+  // then take the first index which is not occupied
+  int lastPosition = 0;
+  PointSet::PointsContainer* pointsContainer = m_PointSet->GetPointSet(0)->GetPoints();
+
+  if (!pointsContainer->empty())
+  {
+    mitk::PointSet::PointsIterator it, end;
+    it = pointsContainer->Begin();
+    end = pointsContainer->End();
+    while (it != end)
+    {
+      if (!pointsContainer->IndexExists(lastPosition))
+        break;
+      ++it;
+      ++lastPosition;
+    }
+  }
 
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
+    IsClosedContour(stateMachineAction, interactionEvent);
+    // Get time step from BaseRenderer
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
     mitk::Point3D point = positionEvent->GetPositionInWorld();
-    m_PointSet->InsertPoint(m_NumberOfPoints, point, 0);
-    m_NumberOfPoints++;
+    m_PointSet->InsertPoint(lastPosition, point, timeStep);
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
-    if (m_NumberOfPoints >= 3)
+    if (m_NumberOfPoints >= m_MaxNumberOfPoints)
     {
-      InternalEvent::Pointer event = InternalEvent::New(NULL,this, "has3points");
+      InternalEvent::Pointer event = InternalEvent::New(NULL, this, "MaxNumberOfPoints");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
-    if (m_NumberOfPoints == 2)
-      {
-        InternalEvent::Pointer event = InternalEvent::New(NULL,this, "has2points");
-        positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
-      }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return true;
   }
@@ -65,12 +88,14 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
-    if (GetPointIndexByPosition(point) != -1)
+    if (GetPointIndexByPosition(point, timeStep) != -1)
     {
-      m_SelectedPointIndex = GetPointIndexByPosition(point);
-      GetDataNode()->SetBoolProperty("show contour", true);
+      //TODO FIXME is this safe ? can pointset and renderer have different sizes ?
+      m_SelectedPointIndex = GetPointIndexByPosition(point, timeStep);
+
       GetDataNode()->SetProperty("contourcolor", ColorProperty::New(0.0, 0.0, 1.0));
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
@@ -89,18 +114,6 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
 mitk::PointSetDataInteractor::PointSetDataInteractor() :
     m_NumberOfPoints(0), m_SelectedPointIndex(-1)
 {
-  PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
-  if (points == NULL)
-  {
-    m_PointSet = PointSet::New();
-
-  } else
-  {
-    m_PointSet = points;
-    GetDataNode()->SetData(m_PointSet);
-  }
-  //TODO initialization stuff
-  // Check if loaded set matches descriptions such as maximal point number
 }
 
 mitk::PointSetDataInteractor::~PointSetDataInteractor()
@@ -109,28 +122,182 @@ mitk::PointSetDataInteractor::~PointSetDataInteractor()
 
 bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent*)
 {
+  if (m_SelectedPointIndex != -1)
+  {
+    Point3D point;
+    PointOperation* doOp = new PointOperation(mitk::OpREMOVE, point, m_SelectedPointIndex);
+    GetDataNode()->GetData()->ExecuteOperation(doOp);
+    m_SelectedPointIndex = -1;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_NumberOfPoints--;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
-bool mitk::PointSetDataInteractor::CloseContourPoint(StateMachineAction*, InteractionEvent*)
+bool mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    Point3D point = positionEvent->GetPositionInWorld();
+    // iterate over point set and check if it contains a point close enough to the pointer to be selected
+    if (GetPointIndexByPosition(point, timeStep) != -1 && m_PointSet->GetSize(timeStep) >= 3)
+    {
+      InternalEvent::Pointer event = InternalEvent::New(NULL, this, "ClosedContour");
+      positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+      return true;
+    }
+
+  }
+  return false;
 }
 
-bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction*, InteractionEvent*)
+bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    IsClosedContour(stateMachineAction, interactionEvent);
+    // Get time step from BaseRenderer
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    mitk::Point3D point = positionEvent->GetPositionInWorld();
+    m_PointSet->SetPoint(m_SelectedPointIndex, point, timeStep);
+    GetDataNode()->SetData(m_PointSet);
+    GetDataNode()->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // TODO implement logic around this:
+    // notify if last added point closed the contour
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
-bool mitk::PointSetDataInteractor::MoveSet(StateMachineAction*, InteractionEvent*)
+bool mitk::PointSetDataInteractor::MoveSet(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    // Vector that represents movement relative to last position
+    Point3D movementVector;
+    movementVector[0] = positionEvent->GetPositionInWorld()[0] - m_PointSet->GetPoint(m_SelectedPointIndex, timeStep)[0];
+    movementVector[1] = positionEvent->GetPositionInWorld()[1] - m_PointSet->GetPoint(m_SelectedPointIndex, timeStep)[1];
+    movementVector[2] = positionEvent->GetPositionInWorld()[2] - m_PointSet->GetPoint(m_SelectedPointIndex, timeStep)[2];
+
+    PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
+    PointSet::PointsContainer* pointsContainer = points->GetPointSet(timeStep)->GetPoints();
+
+    // Iterate over point set and update each point
+    Point3D newPoint;
+    for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
+    {
+      newPoint[0] = m_PointSet->GetPoint(it->Index(), timeStep)[0] + movementVector[0];
+      newPoint[1] = m_PointSet->GetPoint(it->Index(), timeStep)[1] + movementVector[1];
+      newPoint[2] = m_PointSet->GetPoint(it->Index(), timeStep)[2] + movementVector[2];
+      m_PointSet->SetPoint(it->Index(), newPoint, timeStep);
+    }
+
+    GetDataNode()->SetData(m_PointSet);
+    GetDataNode()->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
-bool mitk::PointSetDataInteractor::UnSelectPoint(StateMachineAction*, InteractionEvent*)
+bool mitk::PointSetDataInteractor::UnSelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    Point3D point = positionEvent->GetPositionInWorld();
+    // iterate over point set and check if it contains a point close enough to the pointer to be selected
+    int index = GetPointIndexByPosition(point, timeStep);
+    // here it is ensured that we don't switch from one point being selected to another one being selected,
+    // without accepting the unselect of the current point
+    if (index == -1 || index != m_SelectedPointIndex)
+    {
+      m_SelectedPointIndex = -1;
+      GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 0.0, 1.0));
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      return true;
+    }
+    return false;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  MITK_INFO << "request abort";
-  InternalEvent::Pointer event = InternalEvent::New(NULL,this, INTERNALDeactivateMe );
+  InternalEvent::Pointer event = InternalEvent::New(NULL, this, INTERNALDeactivateMe);
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
   return true;
+}
+
+void mitk::PointSetDataInteractor::DataNodeChanged()
+{
+  if (GetDataNode().IsNotNull())
+  {
+    // find proper place for this command!
+    // maybe when DN is created ?
+    GetDataNode()->SetBoolProperty("show contour", true);
+    PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
+    if (points == NULL)
+    {
+      m_PointSet = PointSet::New();
+      GetDataNode()->SetData(m_PointSet);
+    }
+    else
+    {
+      m_PointSet = points;
+    }
+    // load config file parameter: maximal number of points
+    mitk::PropertyList::Pointer properties =  GetPropertyList();
+    std::string strNumber;
+    properties->GetStringProperty("MaxPoints",strNumber);
+    m_NumberOfPoints = strNumber.
+  }
+}
+
+bool mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEvent*)
+{
+  GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 1.0, 1.0));
+  return true;
+}
+
+bool mitk::PointSetDataInteractor::FinishMove(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+{
+  IsClosedContour(stateMachineAction, interactionEvent);
+  GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 0.0, 0.0));
+  return true;
+}
+
+bool mitk::PointSetDataInteractor::InitMoveAll(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent != NULL)
+  {
+    MITK_INFO<< "Set lastMovePosition";
+    m_LastMovePosition = positionEvent->GetPositionInWorld();
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }

@@ -216,7 +216,7 @@ Within the application these properties can then be access via a mitk::PropertyL
 \code
   // sm - state machine loaded with config file example2
 
-  mitk::PropertyList::Pointer properties = sm->GetPropertyList();
+  mitk::PropertyList::Pointer properties = GetPropertyList();
   std::string prop1;
   properties->GetStringProperty("property1",prop1);
 \endcode
@@ -391,7 +391,7 @@ namespace mitk
 The header file looks like this:
 
 \code
-#include "mitkTestInteractor.h"
+#include "mitkExampleInteractor.h"
 #include "mitkMouseMoveEvent.h"
 #include <mitkPointOperation.h>
 #include "mitkRenderingManager.h"
@@ -425,7 +425,7 @@ bool mitk::ExampleInteractor::AddPoint(StateMachineAction*, InteractionEvent* in
     GetDataNode()->Modified();
 
     // read how many points we accept from the config properties
-    mitk::PropertyList::Pointer properties = sm->GetPropertyList();
+    mitk::PropertyList::Pointer properties = GetPropertyList();
     std::string maxNumber;
     properties->GetStringProperty("NumberOfPoints",maxNumber);
     if (m_NumberOfPoints >=  atoi(maxNumber.c_str());)

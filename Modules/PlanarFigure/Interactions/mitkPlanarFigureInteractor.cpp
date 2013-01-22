@@ -412,6 +412,13 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
+      // If the planarFigure already has reached the maximum number
+      if ( planarFigure->GetNumberOfControlPoints() >= planarFigure->GetMaximumNumberOfControlPoints() )
+      {
+        ok = false;
+        break;
+      }
+
       // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
       Point2D point2D, projectedPoint;
@@ -422,7 +429,7 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      // TODO: check segement of polyline we clicked in
+      // TODO: check segment of polyline we clicked in
       int nextIndex = -1;
 
       // We only need to check which position to insert the control point
@@ -471,16 +478,19 @@ bool mitk::PlanarFigureInteractor
   case AcDESELECTPOINT:
     {
       PLANARFIGUREINTERACTOR_DBG << "AcDESELECTPOINT";
-      planarFigure->DeselectControlPoint();
+      bool wasSelected = planarFigure->DeselectControlPoint();
 
-      // Issue event so that listeners may update themselves
-      planarFigure->Modified();
-      planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+      if ( wasSelected )
+      {
+        // Issue event so that listeners may update themselves
+        planarFigure->Modified();
+        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
-      m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
-      m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
-      m_DataNode->Modified();
+        m_DataNode->SetBoolProperty( "planarfigure.drawcontrolpoints", true );
+        m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
+        m_DataNode->Modified();
 
+      }
       // falls through
       break;
     }

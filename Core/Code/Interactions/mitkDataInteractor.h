@@ -90,6 +90,15 @@ namespace mitk
      */
     virtual void DataNodeChanged();
 
+    /** \brief Is called when a DataNode is initially set or changed
+     *
+     *  To be implemented by sub-classes for initialization code which require a DataNode.
+     *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest Layer,
+     *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
+     *  \note Is also called when the DataNode is set to NULL.
+     *
+     */
+
   private:
     NodeType m_DataNode;
     float m_SelectionAccuracy;

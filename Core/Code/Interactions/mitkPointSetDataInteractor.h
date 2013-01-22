@@ -38,15 +38,14 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(PointSetDataInteractor, DataInteractor)
-    ;itkNewMacro(Self)
-    ;
+    mitkClassMacro(PointSetDataInteractor, DataInteractor);
+    itkNewMacro(Self);
 
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
     virtual void ConnectActionsAndFunctions();
-    void DataNodeChanged();
+    virtual void DataNodeChanged();
 
     /* PointSet Interactor functionality */
     virtual bool AddPoint(StateMachineAction*, InteractionEvent*);
@@ -69,12 +68,12 @@ namespace mitk
      * initialization point.
      */
     virtual bool MoveSet(StateMachineAction*, InteractionEvent*);
-
     virtual bool SelectPoint(StateMachineAction*, InteractionEvent*);
     virtual bool UnSelectPoint(StateMachineAction*, InteractionEvent*);
     virtual bool Abort(StateMachineAction*, InteractionEvent*);
 
   private:
+
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;
     int m_MaxNumberOfPoints;

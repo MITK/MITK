@@ -95,7 +95,6 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
     {
       //TODO FIXME is this safe ? can pointset and renderer have different sizes ?
       m_SelectedPointIndex = GetPointIndexByPosition(point, timeStep);
-
       GetDataNode()->SetProperty("contourcolor", ColorProperty::New(0.0, 0.0, 1.0));
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       return true;
@@ -122,6 +121,7 @@ mitk::PointSetDataInteractor::~PointSetDataInteractor()
 
 bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent*)
 {
+
   if (m_SelectedPointIndex != -1)
   {
     Point3D point;
@@ -267,10 +267,10 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
       m_PointSet = points;
     }
     // load config file parameter: maximal number of points
-    mitk::PropertyList::Pointer properties =  GetPropertyList();
+    mitk::PropertyList::Pointer properties = GetPropertyList();
     std::string strNumber;
-    properties->GetStringProperty("MaxPoints",strNumber);
-    m_NumberOfPoints = strNumber.
+    properties->GetStringProperty("MaxPoints", strNumber);
+    m_NumberOfPoints = atoi(strNumber.c_str());
   }
 }
 

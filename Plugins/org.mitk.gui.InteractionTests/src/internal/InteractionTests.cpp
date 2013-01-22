@@ -115,7 +115,6 @@ m_Controls.buttonPerformImageProcessing->setEnabled( false );
 
 void InteractionTests::DrawLines()
 {
-  MITK_INFO<< "Create new Interactor";
   m_CurrentDataNode = mitk::DataNode::New();
   GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
   //m_CurrentInteractor = mitk::TestInteractor::New();

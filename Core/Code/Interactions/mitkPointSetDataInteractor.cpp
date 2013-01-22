@@ -67,6 +67,7 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
     int timeStep = positionEvent->GetSender()->GetTimeStep();
     mitk::Point3D point = positionEvent->GetPositionInWorld();
     m_PointSet->InsertPoint(lastPosition, point, timeStep);
+    m_NumberOfPoints++;
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
     if (m_NumberOfPoints >= m_MaxNumberOfPoints)
@@ -270,7 +271,7 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
     mitk::PropertyList::Pointer properties = GetPropertyList();
     std::string strNumber;
     properties->GetStringProperty("MaxPoints", strNumber);
-    m_NumberOfPoints = atoi(strNumber.c_str());
+    m_MaxNumberOfPoints = atoi(strNumber.c_str());
   }
 }
 

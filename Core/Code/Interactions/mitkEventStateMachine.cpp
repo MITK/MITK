@@ -46,7 +46,7 @@ bool mitk::EventStateMachine::LoadStateMachine(std::string filename)
   }
   else
   {
-    MITK_WARN << "Unable to load StateMachine from file: " << filename;
+    MITK_WARN<< "Unable to load StateMachine from file: " << filename;
     return false;
   }
 }
@@ -68,9 +68,13 @@ void mitk::EventStateMachine::AddActionFunction(std::string action, mitk::TActio
   m_ActionFunctionsMap[action] = functor;
 }
 
-bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
+bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dataNode)
 {
-// check if the current state holds a transition that works with the given event.
+  if (!FilterEvents(event, dataNode))
+  {
+    return false;
+  }
+  // check if the current state holds a transition that works with the given event.
   StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetEventClass(), GetMappedEvent(event));
 
   if (transition.IsNotNull())
@@ -83,11 +87,11 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event)
 
       success |= ExecuteAction(*it, event); // treat an event as handled if at least one of the actions is executed successfully
     }
-    if (success)
+    if (success || actions.size() == 0)  // an empty action list is always successful
     {
       // perform state change
       m_CurrentState = transition->GetNextState();
-      MITK_INFO << "StateChange: " << m_CurrentState->GetName();
+      MITK_INFO<< "StateChange: " << m_CurrentState->GetName();
     }
     return success;
   }
@@ -104,6 +108,7 @@ void mitk::EventStateMachine::ConnectActionsAndFunctions()
 
 bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, InteractionEvent* event)
 {
+
   if (action == NULL)
   {
     return false;
@@ -123,8 +128,12 @@ mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
   return m_CurrentState.GetPointer();
 }
 
-bool mitk::EventStateMachine::IsPointerOverData(InteractionEvent* interactionEvent)
+bool mitk::EventStateMachine::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* dataNode)
 {
-  interactionEvent->GetEventClass(); // dummy
-  return true;
+  bool visible = false;
+  if (dataNode->GetPropertyList()->GetBoolProperty("visible", visible) == false)
+  { //property doesn't exist
+    return false;
+  }
+  return visible;
 }

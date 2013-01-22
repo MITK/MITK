@@ -100,22 +100,22 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     if (p->GetEventClass() == "MouseReleaseEvent")
     {
       m_ProcessingMode = REGULAR;
-      eventIsHandled = m_SelectedInteractor->HandleEvent(event);
+      eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
     }
     // give event to selected interactor
     if (eventIsHandled == false)
     {
-      eventIsHandled = m_SelectedInteractor->HandleEvent(event);
+      eventIsHandled = m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode());
     }
     break;
 
   case GRABINPUT:
-    eventIsHandled = m_SelectedInteractor->HandleEvent(event);
+    eventIsHandled = m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode());
     SetEventProcessingMode(m_SelectedInteractor);
     break;
 
   case PREFERINPUT:
-    if (m_SelectedInteractor->HandleEvent(event) == true)
+    if (m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode()) == true)
     {
       SetEventProcessingMode(m_SelectedInteractor);
       eventIsHandled = true;
@@ -133,7 +133,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end() && eventIsHandled == false;
         ++it)
     {
-      if ((*it)->HandleEvent(event))
+      if ((*it)->HandleEvent(event, (*it)->GetDataNode()))
       { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
         SetEventProcessingMode(*it);
         if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)

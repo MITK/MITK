@@ -85,13 +85,11 @@ namespace mitk
     static vtkRenderWindow* GetRenderWindowByName(const std::string& name);
 
 #pragma GCC visibility push(default)
-    itkEventMacro( RendererResetEvent, itk::AnyEvent )
-    ;
+    itkEventMacro( RendererResetEvent, itk::AnyEvent );
 #pragma GCC visibility pop
 
     /** Standard class typedefs. */
-    mitkClassMacro(BaseRenderer, itk::Object)
-    ;
+    mitkClassMacro(BaseRenderer, itk::Object);
 
     BaseRenderer(const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL);
 
@@ -111,8 +109,7 @@ namespace mitk
     virtual DataStorage::Pointer GetDataStorage() const
     {
       return m_DataStorage.GetPointer();
-    }
-    ;
+    };
 
     //##Documentation
     //## @brief Access the RenderWindow into which this renderer renders.

@@ -31,6 +31,7 @@ namespace mitk
   class StateMachineAction;
   class InteractionEvent;
   class StateMachineState;
+  class DataNode;
 
   /**
    * \class TActionFunctor
@@ -113,7 +114,7 @@ namespace mitk
      * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all actions that occur within
      * one transitions have the same conditions.
      */
-    bool HandleEvent(InteractionEvent* event);
+    bool HandleEvent(InteractionEvent* event, DataNode* dataNode);
 
   protected:
     EventStateMachine();
@@ -140,27 +141,26 @@ namespace mitk
     virtual bool ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
 
     /**
-     * Implementation is optional. \n
-     * Overwrite this function to check if Pointer is over a data object with which interaction is possible.
-     * This helps structuring the code and helps to keep the decision of executing a transition on state machine level.
-     * A possible implementation could be:
+     * Implements filter scheme for events.
+     * Standard implementation accepts events from 2d and 3d windows,
+     * and rejects events if DataNode is not visible.
+     * \return true if event is accepted, else false
+     *
+     * Overwrite this function to adapt for your own needs, for example to filter out events from
+     * 3d windows like this:
      \code
-     // here we only want to handle mouse move events, since for all other events it is irrelevant if
-     // we hover over an object
-     bool mitk::EventStateMachine::IsPointerOverData(InteractionEvent* interactionEvent)  {
-       MouseMoveEvent* mouseMoveEvent = dynamic_cast<MouseMoveEvent*>(interactionEvent);
-       if (mouseMoveEvent != NULL)
-       {
-         return true;
-       }
-       else
-       {
-         return true; // we do not handle other events
-       }
-     }
+      bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
+        if (interactionEvent->GetSender()->GetMapperID() != 1) // 1 - 2D window
+        {
+          return false;
+        } else {
+          return true;
+        }
+      }
      \endcode
+     * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager view..
      */
-    virtual bool IsPointerOverData(InteractionEvent* interactionEvent);
+    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
 
 
   private:

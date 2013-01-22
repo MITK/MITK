@@ -43,6 +43,8 @@ void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
   { // if DataInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
     tmpDN->SetDataInteractor(NULL);
   }
+  // notify implementations ...
+  DataNodeChanged();
 }
 
 int mitk::DataInteractor::GetLayer()
@@ -94,11 +96,15 @@ int mitk::DataInteractor::GetPointIndexByPosition(Point3D position, int time)
   float minDistance = m_SelectionAccuracy;
   for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
   {
-    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index())));  // TODO: support time!
+    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));  // TODO: support time!
     if (distance < minDistance) // if several points fall within the margin, choose the one with minimal distance to position
     { // TODO: does this make sense, which unit is it?
       index = it->Index();
     }
   }
   return index;
+}
+
+void mitk::DataInteractor::DataNodeChanged()
+{
 }

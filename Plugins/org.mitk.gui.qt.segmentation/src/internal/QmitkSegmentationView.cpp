@@ -394,15 +394,17 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
 {
   bool isBinary (false);
+  bool isHelperObject (false);
   if (m_AutoSelectionEnabled)
   {
     node->GetBoolProperty("binary", isBinary);
+    node->GetBoolProperty("helper object", isHelperObject);
     if (!isBinary && dynamic_cast<mitk::Image*>(node->GetData()))
     {
       FireNodeSelected(const_cast<mitk::DataNode*>(node));
     }
   }
-  if (isBinary)
+  if (isBinary && !isHelperObject)
   {
     itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
     command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);

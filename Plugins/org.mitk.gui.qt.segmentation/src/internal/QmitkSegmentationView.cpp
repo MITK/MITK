@@ -457,9 +457,10 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     node->GetProperty("binary")->RemoveObserver( m_BinaryPropertyObserverTags[tempNode] );
     m_BinaryPropertyObserverTags.erase(tempNode);
 
-    if ((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0) == node))
+    if ((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
     {
-      m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData(NULL);
+      this->SetToolManagerSelection(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0), NULL);
+      this->UpdateWarningLabel("Select or create a segmentation!");
     }
 
     mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);

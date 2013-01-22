@@ -41,6 +41,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , allowLoops( false )
 , m_UseCoMCoordinates( false )
 , m_LabelsToCoordinatesMap()
+, m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 {
 }
 
@@ -53,6 +54,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_LabelToNodePropertyMap()
 , allowLoops( false )
 , m_LabelsToCoordinatesMap()
+, m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 {
 }
 
@@ -106,14 +108,11 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
       singleTract->InsertElement( singleTract->Size(), point );
     }
 
-    //MappingStrategy strategy = EndElementPosition;
-    //MappingStrategy strategy = JustEndPointVerticesNoLabel;
-    MappingStrategy strategy = EndElementPositionAvoidingWhiteMatter;
     if ( singleTract && ( singleTract->Size() > 0 ) )
     {
       AddConnectionToNetwork(
         ReturnAssociatedVertexPairForLabelPair(
-        ReturnLabelForFiberTract( singleTract, strategy )
+        ReturnLabelForFiberTract( singleTract, m_MappingStrategy )
         )
         );
     }
@@ -794,4 +793,9 @@ void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, mitk::Index3D i
 
     m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( label, newNode ) );
   }
+}
+
+void mitk::ConnectomicsNetworkCreator::SetMappingStrategy( mitk::ConnectomicsNetworkCreator::MappingStrategy newStrategy)
+{
+  m_MappingStrategy = newStrategy;
 }

@@ -630,6 +630,11 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       }
 
     }
+    else if (refNode && this->CheckForSameGeometry(node, refNode))
+    {
+      this->UpdateWarningLabel("");
+      this->SetToolManagerSelection(refNode, node);
+    }
     else if (!refNode || !this->CheckForSameGeometry(node, refNode))
     {
       this->UpdateWarningLabel("Please select or load the according patient image!");

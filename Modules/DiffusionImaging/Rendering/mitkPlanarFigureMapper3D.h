@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define PlanarFigureMapper3D_H
 
 #include <mitkBaseData.h>
-#include <mitkVtkMapper3D.h>
+#include <mitkVtkMapper.h>
 #include <mitkPlanarFigure.h>
 
 #include <vtkPoints.h>
@@ -37,11 +37,11 @@ namespace mitk {
   //## @brief 3D mapper for planar figures
   //## @ingroup Mapper
   //  template<class TPixelType>
-  class PlanarFigureMapper3D : public VtkMapper3D
+  class PlanarFigureMapper3D : public VtkMapper
   {
   public:
 
-    mitkClassMacro(PlanarFigureMapper3D, VtkMapper3D)
+    mitkClassMacro(PlanarFigureMapper3D, VtkMapper)
     itkNewMacro(Self)
 
     const mitk::PlanarFigure* GetInput();

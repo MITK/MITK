@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkExtExports.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "vtkMitkVolumeTextureMapper3D.h"
 
 //VTK
@@ -55,10 +55,10 @@ namespace mitk {
 //## @brief Vtk-based mapper for VolumeData
 //##
 //## @ingroup Mapper
-class MitkExt_EXPORT GPUVolumeMapper3D : public VtkMapper3D
+class MitkExt_EXPORT GPUVolumeMapper3D : public VtkMapper
 {
 public:
-  mitkClassMacro(GPUVolumeMapper3D, VtkMapper3D);
+  mitkClassMacro(GPUVolumeMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 

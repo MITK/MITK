@@ -401,7 +401,7 @@ mitk::UnstructuredGridMapper2D
   if ( node.IsNull() )
     return 0;
 
-  mitk::VtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::VtkMapper3D* > ( node->GetMapper( 2 ) );
+  mitk::VtkMapper::Pointer mitkMapper = dynamic_cast< mitk::VtkMapper* > ( node->GetMapper( 2 ) );
   if ( mitkMapper.IsNull() )
   {
     return 0;
@@ -500,7 +500,7 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
     if ( node.IsNull() )
       return 0;
 
-    mitk::VtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::VtkMapper3D* > ( node->GetMapper( 2 ) );
+    mitk::VtkMapper::Pointer mitkMapper = dynamic_cast< mitk::VtkMapper* > ( node->GetMapper( 2 ) );
     if ( mitkMapper.IsNull() )
     {
       //MITK_INFO << "mitkMapper is null\n";

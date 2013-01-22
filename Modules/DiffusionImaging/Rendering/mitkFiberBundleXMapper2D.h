@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 //#include "MitkDiffusionImagingExports.h"
 
-#include <mitkVtkMapper2D.h>
+#include <mitkVtkMapper.h>
 #include <mitkFiberBundleX.h>
 #include <vtkSmartPointer.h>
 
@@ -40,11 +40,11 @@ class vtkPolyData;
 namespace mitk {
 
 
-  class FiberBundleXMapper2D : public VtkMapper2D
+  class FiberBundleXMapper2D : public VtkMapper
   {
 
   public:
-    mitkClassMacro(FiberBundleXMapper2D, VtkMapper2D);
+    mitkClassMacro(FiberBundleXMapper2D, VtkMapper);
     itkNewMacro(Self);
     mitk::FiberBundleX* GetInput();
 
@@ -59,10 +59,6 @@ namespace mitk {
 
     //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderOverlay(BaseRenderer* renderer);
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
     //### end of methods of MITK-VTK rendering pipeline
 
 

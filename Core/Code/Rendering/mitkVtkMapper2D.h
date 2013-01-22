@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
   // enables integration of mappers into the new mapper architecture
-  typedef VtkMapper VtkMapper2D;
+ typedef VtkMapper VtkMapper2D;
 
 } // namespace mitk
 

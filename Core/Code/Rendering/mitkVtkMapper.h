@@ -78,7 +78,6 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     */
     void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
 
-    // virtual or not???
     /** \brief Checks visibility and renders the overlay */
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
 

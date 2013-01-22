@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPointSet.h"
 #include "mitkVector.h"
@@ -66,10 +66,10 @@ namespace mitk {
   *
   * \sa PointSetVtkMapper3D
   */
-  class MitkExt_EXPORT EnhancedPointSetVtkMapper3D : public VtkMapper3D
+  class MitkExt_EXPORT EnhancedPointSetVtkMapper3D : public VtkMapper
   {
   public:
-    mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper3D);
+    mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper);
 
     itkNewMacro(Self);
 

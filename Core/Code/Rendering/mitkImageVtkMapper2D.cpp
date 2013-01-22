@@ -112,45 +112,6 @@ vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
   return m_LSH.GetLocalStorage(renderer)->m_Actors;
 }
 
-void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible( renderer )==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
-{
-  if(IsVisible(renderer)==false)
-    return;
-  if ( GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-  }
-}
 
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {

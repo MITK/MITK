@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ODFVTKMAPPER2D_H_HEADER_INCLUDED
 #define ODFVTKMAPPER2D_H_HEADER_INCLUDED
 
-#include "mitkVtkMapper2D.h"
+#include "mitkVtkMapper.h"
 #include "vtkPropAssembly.h"
 #include "vtkAppendPolyData.h"
 #include "vtkActor.h"
@@ -40,7 +40,7 @@ namespace mitk {
   //## @brief Mapper for spherical object densitiy function representations
   //##
   template<class TPixelType, int NrOdfDirections>
-  class OdfVtkMapper2D : public VtkMapper2D
+  class OdfVtkMapper2D : public VtkMapper
   {
     struct OdfDisplayGeometry {
       vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
@@ -68,18 +68,15 @@ namespace mitk {
 
   public:
 
-    mitkClassMacro(OdfVtkMapper2D,VtkMapper2D);
+    mitkClassMacro(OdfVtkMapper2D,VtkMapper);
     itkNewMacro(Self);
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);
 
-    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
+    //calls MeasureDisplayedGeometry( renderer);
     virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
-
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
 
     OdfDisplayGeometry MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
     double GetMinImageSpacing( int index );

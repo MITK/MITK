@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <mitkBaseData.h> //?? necessary
 #include <MitkDiffusionImagingExports.h>
-#include <mitkVtkMapper3D.h>
+#include <mitkVtkMapper.h>
 #include <mitkFiberBundleX.h>
 
 #include <vtkSmartPointer.h>
@@ -41,11 +41,11 @@ namespace mitk {
 //## @brief Mapper for FiberBundleX
 //## @ingroup Mapper
 
-class MitkDiffusionImaging_EXPORT FiberBundleXMapper3D : public VtkMapper3D
+class MitkDiffusionImaging_EXPORT FiberBundleXMapper3D : public VtkMapper
 {
 public:
 
-    mitkClassMacro(FiberBundleXMapper3D, VtkMapper3D);
+    mitkClassMacro(FiberBundleXMapper3D, VtkMapper);
     itkNewMacro(Self);
 
     //========== essential implementation for 3D mapper ========

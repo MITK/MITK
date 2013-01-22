@@ -686,18 +686,6 @@ bool mitk::OdfVtkMapper2D<T,N>
   return retval;
 }
 
-template<class T, int N>
-void  mitk::OdfVtkMapper2D<T,N>
-::MitkRenderOverlay(mitk::BaseRenderer* renderer)
-{
-  if ( this->IsVisibleOdfs(renderer)==false )
-    return;
-
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
-}
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
@@ -713,18 +701,6 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
-}
-
-template<class T, int N>
-void  mitk::OdfVtkMapper2D<T,N>
-::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
-{
-  if ( this->IsVisibleOdfs(renderer)==false )
-    return;
-
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-
 }
 
 template<class T, int N>

@@ -56,8 +56,13 @@ class Image;
     ImagePixelAccessor(mitk::Image::Pointer iP, mitk::ImageDataItem* iDI) :
       m_ImageDataItem(iDI)
     {
+
+      // let image organise its channel data
+      iP->GetData();
+
       if(iDI == NULL)
         m_ImageDataItem = iP->GetChannelData();
+
     }
 
 

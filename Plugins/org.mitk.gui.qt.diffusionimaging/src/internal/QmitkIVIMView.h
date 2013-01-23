@@ -52,8 +52,8 @@ public:
   virtual ~QmitkIVIMView();
 
   typedef mitk::DiffusionImage<short>::GradientDirectionContainerType DirContainerType;
-  typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, short> IVIMFilterType;
-  typedef itk::Image<short,3> OutImgType;
+  typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, float> IVIMFilterType;
+  typedef itk::Image<float,3> OutImgType;
 
   virtual void CreateQtPartControl(QWidget *parent);
 

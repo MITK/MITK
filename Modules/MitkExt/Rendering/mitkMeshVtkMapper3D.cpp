@@ -86,8 +86,10 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
   m_Contour->Delete();
 }
 
-void mitk::MeshVtkMapper3D::GenerateData()
+
+void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
+
   m_PropAssembly->VisibilityOn();
 
   if(m_PropAssembly->GetParts()->IsItemPresent(m_SpheresActor))
@@ -182,11 +184,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
       m_PropAssembly->AddPart(m_ContourActor);
     }
   }
-}
 
-
-void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
   SetVtkMapperImmediateModeRendering(m_ContourMapper);
   SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 

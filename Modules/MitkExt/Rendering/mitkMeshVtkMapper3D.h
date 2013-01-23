@@ -68,8 +68,6 @@ protected:
 
   virtual ~MeshVtkMapper3D();
 
-  virtual void GenerateData();
-
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
 
   virtual void ResetMapper( BaseRenderer* renderer );

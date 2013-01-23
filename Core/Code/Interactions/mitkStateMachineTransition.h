@@ -23,6 +23,7 @@
 #include <itkObjectFactory.h>
 #include <string>
 #include "mitkStateMachineAction.h"
+#include "mitkInteractionEvent.h"
 
 namespace mitk
 {
@@ -32,6 +33,7 @@ namespace mitk
     typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
     /**
+     * \class StateMachineTransition
    * @brief Connects two states, and holds references to actions that are executed on transition.
    *
    * @ingroup Interaction
@@ -47,6 +49,11 @@ namespace mitk
     void AddAction(StateMachineAction::Pointer action);
     SpStateMachineState GetNextState();
     std::string GetNextStateName() const;
+    /**
+     * Check for equality. Equality is given if event variant is the same and
+     * classes are the same or the first argument is a superclass of the second.
+     * \warn Here the order of arguments matters. !
+     */
     bool operator==(const StateMachineTransition& transition);
 
 
@@ -54,10 +61,6 @@ namespace mitk
      * @brief Get an iterator on the first action in list.
      **/
     ActionVectorType GetActions() const;
-    /*
-     * @brief Returns true if the transition is triggered by the given event.
-     **/
-    bool MatchesEvent(std::string eventClass, std::string eventVariant) const;
 
     /**
      * @brief Set the next state of this object.
@@ -77,6 +80,8 @@ namespace mitk
     SpStateMachineState m_NextState;
     std::string m_NextStateName;
 
+
+    InteractionEvent::Pointer m_TransitionEvent;
 
     /**
      * @brief The list of actions, that are executed if this transition is done.

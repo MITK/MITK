@@ -36,6 +36,16 @@ void mitk::MouseReleaseEvent::SetEventButton(MouseButtons buttons)
   m_EventButton = buttons;
 }
 
+bool mitk::MouseReleaseEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  MouseReleaseEvent* event = dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 }

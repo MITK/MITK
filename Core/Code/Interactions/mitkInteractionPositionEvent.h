@@ -40,17 +40,23 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionPositionEvent : public InteractionEvent {
 
   public:
+
+    mitkClassMacro(InteractionPositionEvent,InteractionEvent);
+    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, std::string);
+
     Point2D GetPointerPositionOnScreen();
     Point3D GetPositionInWorld();
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
-    InteractionPositionEvent(BaseRenderer*, Point2D, MouseButtons, ModifierKeys, std::string);
+    InteractionPositionEvent(BaseRenderer* baseRenderer, Point2D mousePosition, MouseButtons buttonStates, ModifierKeys modifiers, std::string eventClass);
     virtual bool isEqual(InteractionEvent::Pointer);
     virtual ~InteractionPositionEvent();
+
 
   private:
     Point2D m_PointerPosition;

@@ -33,6 +33,16 @@ void mitk::MousePressEvent::SetEventButton(MouseButtons buttons)
   m_EventButton = buttons;
 }
 
+bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  MousePressEvent* event = dynamic_cast<MousePressEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::MousePressEvent::~MousePressEvent()
 {
 }

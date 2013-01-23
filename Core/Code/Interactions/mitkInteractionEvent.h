@@ -43,6 +43,7 @@ namespace mitk
      */
     virtual bool isEqual(InteractionEvent::Pointer);
     std::string GetEventClass();
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     InteractionEvent(BaseRenderer*, std::string);

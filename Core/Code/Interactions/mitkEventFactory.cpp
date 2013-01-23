@@ -24,6 +24,7 @@
 #include <mitkMouseWheelEvent.h>
 #include <mitkInteractionKeyEvent.h>
 #include <mitkInteractionEventConst.h>
+#include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
 
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
@@ -186,9 +187,17 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
   }
+  else if (eventClass == "PositionEvent")
+  {
+    event = InteractionPositionEvent::New(NULL, pos, buttonState, modifiers, "PositionEvent");
+    MITK_INFO << event;
+  }
   else if (eventClass == "InternalEvent")
   {
-    event = InternalEvent::New(NULL,NULL,strSignalName);
+    event = InternalEvent::New(NULL, NULL, strSignalName);
+  }
+  if (event.IsNull()) {
+    MITK_WARN << "Event couldn't be constructed. Please check your StateMachine patterns and config files\n for the following event class, which is not valid: " << eventClass;
   }
   return event;
 }

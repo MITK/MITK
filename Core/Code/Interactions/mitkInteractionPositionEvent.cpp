@@ -73,6 +73,16 @@ void mitk::InteractionPositionEvent::SetButtonStates(MouseButtons buttons)
   m_ButtonStates = buttons;
 }
 
+bool mitk::InteractionPositionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  InteractionPositionEvent* event = dynamic_cast<InteractionPositionEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::InteractionPositionEvent::~InteractionPositionEvent()
 {
 }

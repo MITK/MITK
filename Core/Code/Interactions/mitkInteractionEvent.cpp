@@ -37,6 +37,16 @@ bool mitk::InteractionEvent::isEqual(InteractionEvent::Pointer)
   return false;
 }
 
+bool mitk::InteractionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  InteractionEvent* event = dynamic_cast<InteractionEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::InteractionEvent::~InteractionEvent()
 {
 }

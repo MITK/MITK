@@ -48,6 +48,7 @@ namespace mitk
     virtual bool isEqual(InteractionEvent::Pointer);
     ModifierKeys GetModifiers() const;
     std::string GetKey() const;
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     InteractionKeyEvent(BaseRenderer*, std::string key, ModifierKeys modifiers);

@@ -36,6 +36,7 @@ namespace mitk
     mitkNewMacro4Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys);
 
     virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     MouseMoveEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers);

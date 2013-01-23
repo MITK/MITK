@@ -32,6 +32,16 @@ bool mitk::InternalEvent::isEqual(mitk::InteractionEvent::Pointer interactionEve
   return (m_SignalName == internalEvent->GetSignalName());
 }
 
+bool mitk::InternalEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  InternalEvent* event = dynamic_cast<InternalEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::InternalEvent::~InternalEvent()
 {
 }

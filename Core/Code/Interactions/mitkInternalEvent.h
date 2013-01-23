@@ -51,6 +51,7 @@ namespace mitk
     DataInteractor* GetTargetInteractor();
 
     virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
 

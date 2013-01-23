@@ -23,6 +23,16 @@ mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Poi
 {
 }
 
+bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  MouseMoveEvent* event = dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+
 mitk::MouseMoveEvent::~MouseMoveEvent()
 {
 }

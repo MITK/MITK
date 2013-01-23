@@ -80,10 +80,10 @@ namespace mitk
     /// true if changes on slider or line-edits will affect always the topmost layer image
     bool isAutoTopMost();
 
-    /// Change notifications from DataStorage
-    void DataStorageChanged(const DataNode* n = NULL);
+    /** @brief This method is called when a node is added to the data storage. */
+    void DataStorageAddedNode(const DataNode* n = NULL);
 
-    /// Node removal notifications from DataStorage
+    /** @brief This method is called when a node is removed to the data storage. */
     void DataStorageRemovedNode(const DataNode* removedNode = NULL);
 
     /// change notifications from mitkLevelWindowProperty
@@ -115,8 +115,13 @@ namespace mitk
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
     typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
     typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
-    ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
+
+    ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
+    void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
+    void CreatePropObserverLists();                     ///< internal help method to create both lists/maps.
+    const mitk::DataNode*        m_NoteMarkedToDelete;  ///< this variable holds a data node which will be deleted from the datastorage immedeately (if there is one, NULL otherways)
+
     bool                         m_AutoTopMost;
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;

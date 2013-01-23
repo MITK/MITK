@@ -162,7 +162,8 @@ private:
     THRESHOLD,
     INVERSION,
     DOWNSAMPLING,
-    FLIPPING
+    FLIPPING,
+    RESAMPLING
   } m_SelectedAction;
 
   enum OperationType{

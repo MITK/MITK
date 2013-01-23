@@ -212,6 +212,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( FLIPPING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Flipping", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( RESAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Resample to", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -231,6 +232,14 @@ void QmitkBasicImageProcessing::Activated()
 //datamanager selection changed
 void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+  m_Controls->dsbParam1->hide();
+  m_Controls->dsbParam2->hide();
+  m_Controls->dsbParam3->hide();
+  m_Controls->tlParam3->hide();
+  m_Controls->tlParam4->hide();
+  m_Controls->sbParam1->show();
+  m_Controls->sbParam2->show();
+  m_Controls->cobParam4->hide();
   //any nodes there?
   if (!nodes.empty())
   {
@@ -314,11 +323,29 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
   m_Controls->tlParam->setEnabled(false);
   m_Controls->tlParam1->setEnabled(false);
   m_Controls->tlParam2->setEnabled(false);
+  m_Controls->tlParam3->setEnabled(false);
+  m_Controls->tlParam4->setEnabled(false);
 
   m_Controls->sbParam1->setEnabled(false);
   m_Controls->sbParam2->setEnabled(false);
+  m_Controls->dsbParam1->setEnabled(false);
+  m_Controls->dsbParam2->setEnabled(false);
+  m_Controls->dsbParam3->setEnabled(false);
+  m_Controls->cobParam4->setEnabled(false);
   m_Controls->sbParam1->setValue(0);
   m_Controls->sbParam2->setValue(0);
+  m_Controls->dsbParam1->setValue(0);
+  m_Controls->dsbParam2->setValue(0);
+  m_Controls->dsbParam3->setValue(0);
+
+  m_Controls->sbParam1->show();
+  m_Controls->sbParam2->show();
+  m_Controls->dsbParam1->hide();
+  m_Controls->dsbParam2->hide();
+  m_Controls->dsbParam3->hide();
+  m_Controls->cobParam4->hide();
+  m_Controls->tlParam3->hide();
+  m_Controls->tlParam4->hide();
 }
 
 void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
@@ -342,6 +369,8 @@ void QmitkBasicImageProcessing::SelectAction(int action)
 
   QString text1 = "No Parameters";
   QString text2 = "No Parameters";
+  QString text3 = "No Parameters";
+  QString text4 = "No Parameters";
 
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (action)
@@ -509,12 +538,43 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
+  case 19:
+    {
+      m_SelectedAction = RESAMPLING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(false);
+      m_Controls->sbParam1->hide();
+      m_Controls->dsbParam1->show();
+      m_Controls->dsbParam1->setEnabled(true);
+      m_Controls->tlParam2->setEnabled(true);
+      m_Controls->sbParam2->setEnabled(false);
+      m_Controls->sbParam2->hide();
+      m_Controls->dsbParam2->show();
+      m_Controls->dsbParam2->setEnabled(true);
+      m_Controls->tlParam3->show();
+      m_Controls->tlParam3->setEnabled(true);
+      m_Controls->dsbParam3->show();
+      m_Controls->dsbParam3->setEnabled(true);
+      m_Controls->tlParam4->show();
+      m_Controls->tlParam4->setEnabled(true);
+      m_Controls->cobParam4->show();
+      m_Controls->cobParam4->setEnabled(true);
+
+      text1 = "x-spacing:";
+      text2 = "y-spacing:";
+      text3 = "z-spacing:";
+      text4 = "Interplation:";
+      break;
+    }
+
   default: return;
   }
 
   m_Controls->tlParam->setEnabled(true);
   m_Controls->tlParam1->setText(text1);
   m_Controls->tlParam2->setText(text2);
+  m_Controls->tlParam3->setText(text3);
+  m_Controls->tlParam4->setText(text4);
 
   m_Controls->btnDoIt->setEnabled(true);
   m_Controls->cbHideOrig->setEnabled(true);
@@ -581,6 +641,9 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   int param1 = m_Controls->sbParam1->value();
   int param2 = m_Controls->sbParam2->value();
+  double dparam1 = m_Controls->dsbParam1->value();
+  double dparam2 = m_Controls->dsbParam2->value();
+  double dparam3 = m_Controls->dsbParam3->value();
 
   try{
 
@@ -840,6 +903,11 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       std::cout << "Image flipping successful." << std::endl;
       break;
     }
+
+  case RESAMPLING
+  {
+    break;
+  }
 
   default:
     this->BusyCursorOff();

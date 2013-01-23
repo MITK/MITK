@@ -131,6 +131,8 @@ int mitkLevelWindowManagerTest(int, char* [])
   mitkLevelWindowManagerTestClass::TestSetGetDataStorage();
   mitkLevelWindowManagerTestClass::TestMethodsWithInvalidParameters();
   mitkLevelWindowManagerTestClass::TestOtherMethods();
+
+  //This test fails because of bug 13499, activate it as soon as bug 13499 is fixed.
   //mitkLevelWindowManagerTestClass::TestRemoveObserver();
 
   MITK_TEST_END();

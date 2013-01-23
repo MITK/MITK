@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include<string>
 #include <ctime>
 #include <MitkExports.h>
+#include <itkMersenneTwisterRandomVariateGenerator.h>
 
 #ifdef _MSC_VER
 # pragma warning(push)
@@ -54,6 +55,7 @@ class MITK_CORE_EXPORT UIDGenerator
     std::string m_Prefix;
     unsigned int m_LengthOfRandomPart;
     unsigned int seedhash( time_t t, clock_t c );
+    itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandomGenerator;
 };
 
 }

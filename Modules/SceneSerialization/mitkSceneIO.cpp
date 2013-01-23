@@ -60,21 +60,9 @@ mitk::SceneIO::~SceneIO()
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
 
-#ifdef WIN32
-  SYSTEMTIME st;
+  mitk::UIDGenerator uidGen("UID_",6);
 
-  GetSystemTime(&st);
-  srand ( st.wMilliseconds );
-#else
-  timeval time_microsec;
-
-  gettimeofday(&time_microsec, 0);
-  srand ( time_microsec.tv_usec );
-#endif
-
-  mitk::UIDGenerator uidGen("UID_",16);
-
-  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
+  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
   std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
 
@@ -84,19 +72,6 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
     if (!existsNot)
       {
       MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
-
-#ifdef WIN32
-      SYSTEMTIME st;
-
-      GetSystemTime(&st);
-      srand ( st.wMilliseconds );
-#else
-      timeval time_microsec;
-
-      gettimeofday(&time_microsec, 0);
-      srand ( time_microsec.tv_usec );
-#endif
-
       returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
       uniquename = returnValue + Poco::Path::separator();
       Poco::File tempdir2( uniquename );

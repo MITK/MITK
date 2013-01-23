@@ -33,30 +33,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHash>
 #include <QVariant>
 
-/*!
-\brief QmitkDicomLocalStorageWidget 
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-\sa QmitkFunctionality
-\ingroup Functionalities
+/**
+* \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
+*
+* \sa QmitkFunctionality
+* \ingroup Functionalities
 */
 class MITK_DICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget
-{  
+{
     // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
     Q_OBJECT
 
-public:  
+public:
 
     static const std::string Widget_ID;
 
+   /**
+    * \brief QmitkDicomLocalStorageWidget(QWidget *parent) constructor.
+    *
+    * \param parent is a pointer to the parent widget
+    */
     QmitkDicomLocalStorageWidget(QWidget *parent);
 
+   /**
+    * \brief QmitkDicomExternalDataWidget destructor.
+    */
     virtual ~QmitkDicomLocalStorageWidget();
 
+   /**
+    * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
+    *
+    * \param parent is a pointer to the parent widget
+    */
     virtual void CreateQtPartControl(QWidget *parent);
 
+   /**
+    * \brief SetDatabaseDirectory sets database directory.
+    *
+    * \param newDatabaseDirectory contains path to new database directoy.
+    */
     void SetDatabaseDirectory(QString newDatabaseDirectory);
 
 signals:
@@ -64,10 +80,19 @@ signals:
     /// @brief emitted when import into database is finished.
     void SignalFinishedImport();
 
-    /// @brief emitted when view button is clicked.
+   /**
+    * @brief emitted when view button is clicked.
+    * @param QHash containing dicom UIDs properties.
+    */
     void SignalDicomToDataManager(QHash<QString,QVariant>);
+
+    /// \brief emitted when import progress changes.
     void SignalProgress(int);
+
+    /// \brief emitted when anoter file is processed.
     void SignalProcessingFile(QString);
+
+    /// \brief emitted if cancel button is pressed.
     void SignalCancelImport();
 
 public slots:

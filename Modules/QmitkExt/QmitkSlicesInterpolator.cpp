@@ -697,6 +697,12 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
     s2iFilter->MakeOutputBinaryOn();
     s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
+
+    // check if ToolManager holds valid ReferenceData
+    if (m_ToolManager->GetReferenceData(0)->GetData() == NULL)
+    {
+        return;
+    }
     s2iFilter->SetImage(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
     s2iFilter->Update();
 

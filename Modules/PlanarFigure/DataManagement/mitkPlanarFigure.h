@@ -154,7 +154,7 @@ public:
 
 
   /** \brief Deselect control point; no control point active. */
-  virtual void DeselectControlPoint();
+  virtual bool DeselectControlPoint();
 
 
   /** \brief Return currently selected control point. */

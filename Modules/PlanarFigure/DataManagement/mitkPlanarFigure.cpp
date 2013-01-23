@@ -205,9 +205,13 @@ bool mitk::PlanarFigure::SelectControlPoint( unsigned int index )
 }
 
 
-void mitk::PlanarFigure::DeselectControlPoint()
+bool mitk::PlanarFigure::DeselectControlPoint()
 {
+  bool wasSelected = ( m_SelectedControlPoint != -1);
+
   m_SelectedControlPoint = -1;
+
+  return wasSelected;
 }
 
 void mitk::PlanarFigure::SetPreviewControlPoint( const Point2D& point )

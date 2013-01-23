@@ -342,19 +342,13 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 }
 
 
-void mitk::PointSetVtkMapper3D::GenerateData()
+void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  //create new vtk render objects (e.g. sphere for a point)
+  // create new vtk render objects (e.g. sphere for a point)
   this->CreateVTKRenderObjects();
 
   //apply props
   this->ApplyProperties(m_ContourActor,NULL);
-
-}
-
-
-void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
-{
   SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
   SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
 

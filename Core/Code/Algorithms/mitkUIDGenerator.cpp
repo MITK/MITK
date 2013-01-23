@@ -17,12 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGenerator.h>
 #include <mitkLogMacros.h>
 
-#include <ctime>
 #include <cstdlib>
 #include <sstream>
 #include <math.h>
 #include <stdexcept>
 #include <iostream>
+
+#ifdef _MSC_VER
+#include "process.h"
+#else
+#include <unistd.h>
+#endif
 
 namespace mitk {
 
@@ -32,11 +37,22 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 {
   if (lengthOfRandomPart < 5)
   {
-    MITK_ERROR << lengthOfRandomPart << " are not really unique, right?" << std::endl;
+    MITK_ERROR << "To few digits requested (" <<lengthOfRandomPart<< " digits)";
     throw std::invalid_argument("To few digits requested");
   }
 
-  std::srand((unsigned int) time( (time_t *)0 ));
+  static int instanceID = 0;
+  int processID = 0;
+  #ifdef WIN32
+    processID = _getpid();
+  #else
+    processID = getpid();
+  #endif
+  unsigned int hash = seedhash( time(NULL), clock() );
+  unsigned int seed = (hash + processID) * 10 + instanceID;
+  instanceID++;
+
+  std::srand(seed);
 }
 
 std::string UIDGenerator::GetUID()
@@ -48,6 +64,8 @@ std::string UIDGenerator::GetUID()
 
   if (t)
   {
+
+
     s << t->tm_year + 1900;
 
     if (t->tm_mon < 9) s << "0"; // add a 0 for months 1 to 9
@@ -79,5 +97,26 @@ std::string UIDGenerator::GetUID()
   return s.str();
 }
 
+unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
+{
+  unsigned int h1 = 0;
+  unsigned char *p = (unsigned char *) &t;
+  for( size_t i = 0; i < sizeof(t); ++i )
+  {
+    h1 *= 255 + 2U;
+    h1 += p[i];
+  }
+  unsigned int h2 = 0;
+  p = (unsigned char *) &c;
+  for( size_t j = 0; j < sizeof(c); ++j )
+  {
+    h2 *= 255 + 2U;
+    h2 += p[j];
+  }
+  return h1 ^ h2;
 }
+
+}
+
+
 

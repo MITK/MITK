@@ -16,25 +16,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkToFDistanceImageToSurfaceFilter.h>
-//#include <mitkToFSurfaceGenerationFilter.h>
 
 #include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
 #include <mitkImageGenerator.h>
 #include <mitkSurface.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkVector.h>
 #include <mitkToFTestingCommon.h>
-
-//#include <itkImage.h>
-//#include <itkImageRegionIterator.h>
-//#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkIOUtil.h>
 
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 
-/**Documentation
- *  test for the class "ToFDistanceImageToSurfaceFilter".
+/**
+ *  @brief Test for the class "ToFDistanceImageToSurfaceFilter".
  */
 
 typedef mitk::ToFProcessingCommon::ToFPoint2D ToFPoint2D;
@@ -79,8 +76,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
   // test SetReconstructionMode()
-  filter->SetReconstructionMode(false);
-  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == false,"Testing Set/GetReconstructionMode()");
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
 
   // test Set/GetInput()
   filter->SetInput(image);
@@ -88,7 +85,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
   // test filter without subset (without interpixeldistance)
   MITK_INFO<<"Test filter with subset without interpixeldistance ";
-  filter->SetReconstructionMode(true);
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
+    MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
 
   vtkSmartPointer<vtkPoints> expectedResult = vtkSmartPointer<vtkPoints>::New();
   expectedResult->SetDataTypeToDouble();
@@ -102,11 +100,20 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-      mitk::Index3D index;
-      index[0] = i;
-      index[1] = j;
-      index[2] = 0;
-      ToFScalarType distance = image->GetPixelValueByIndex(index);
+      itk::Index<2> index = {{ i, j }};
+      float distance = 0.0;
+
+      try
+      {
+        mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
+        distance = readAccess.GetPixelByIndex(index);
+      }
+      catch(mitk::Exception& e)
+      {
+          MITK_ERROR << "Image read exception!" << e.what();
+      }
+
+
       ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLengthX,focalLengthY,principalPoint[0],principalPoint[1]);
 //      if ((i==0)&&(j==0))
 //      {
@@ -131,6 +138,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   vtkSmartPointer<vtkPoints> result = vtkSmartPointer<vtkPoints>::New();
   result->SetDataTypeToDouble();
   result = resultSurface->GetVtkPolyData()->GetPoints();
+
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetNumberOfPoints()==result->GetNumberOfPoints()),"Test if number of points in surface is equal");
   bool pointSetsEqual = true;
   for (unsigned int i=0; i<expectedResult->GetNumberOfPoints(); i++)
@@ -150,17 +158,15 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     if (!mitk::Equal(expectedPoint,resultPoint))
     {
 //      MITK_INFO << i;
-      MITK_INFO<<"expected: "<<expectedPoint;
-      MITK_INFO<<"result: "<<resultPoint;
       pointSetsEqual = false;
     }
   }
   MITK_TEST_CONDITION_REQUIRED(pointSetsEqual,"Testing filter without subset");
 
-
   // test filter without subset (with interpixeldistance)
   MITK_INFO<<"Test filter with subset with interpixeldistance ";
-  filter->SetReconstructionMode(false);
+  filter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
+  MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
   // calculate focal length considering inter pixel distance
   ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
   expectedResult = vtkSmartPointer<vtkPoints>::New();
@@ -175,11 +181,17 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   {
     for (unsigned int i=0; i<dimY; i++)
     {
-      mitk::Index3D index;
-      index[0] = i;
-      index[1] = j;
-      index[2] = 0;
-      ToFScalarType distance = image->GetPixelValueByIndex(index);
+        itk::Index<2> index = {{ i, j }};
+        float distance = 0.0;
+        try
+        {
+          mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
+          distance = readAccess.GetPixelByIndex(index);
+        }
+        catch(mitk::Exception& e)
+        {
+            MITK_ERROR << "Image read exception!" << e.what();
+        }
       ToFPoint3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(i,j,distance,focalLength,interPixelDistance,principalPoint);
 //      if ((i==0)&&(j==0))
 //      {
@@ -311,12 +323,20 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     ToFPoint3D resultPointBackward =
         mitk::ToFProcessingCommon::CartesianToIndexCoordinates(resultPoint,focalLengthXY,principalPoint);
 
-    mitk::Index3D pixelIndex;
-    pixelIndex[0] = (int) (resultPointBackward[0]+0.5);
-    pixelIndex[1] = (int) (resultPointBackward[1]+0.5);
-    pixelIndex[2] = 0;
+    itk::Index<2> index = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5) }};
+    float distanceBackward = 0.0;
 
-    if (!mitk::Equal(image->GetPixelValueByIndex(pixelIndex),resultPointBackward[2]))
+    try
+    {
+      mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
+      distanceBackward = readAccess.GetPixelByIndex(index);
+    }
+    catch(mitk::Exception& e)
+    {
+        MITK_ERROR << "Image read exception!" << e.what();
+    }
+
+    if (!mitk::Equal(distanceBackward,resultPointBackward[2]))
     {
 //      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
 //      MITK_INFO<<"result: "<< resultPoint;
@@ -340,12 +360,19 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     ToFPoint3D resultPointBackward =
         mitk::ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(resultPoint,focalLength,interPixelDistance,principalPoint);
 
-    mitk::Index3D pixelIndex;
-    pixelIndex[0] = (int) (resultPointBackward[0]+0.5);
-    pixelIndex[1] = (int) (resultPointBackward[1]+0.5);
-    pixelIndex[2] = 0;
+    itk::Index<2> pixelIndex = {{ (int) (resultPointBackward[0]+0.5), (int) (resultPointBackward[1]+0.5) }};
+    float distanceBackward = 0.0;
+    try
+    {
+      mitk::ImagePixelReadAccessor<float,2> readAccess(image, image->GetSliceData());
+      distanceBackward = readAccess.GetPixelByIndex(pixelIndex);
+    }
+    catch(mitk::Exception& e)
+    {
+        MITK_ERROR << "Image read exception!" << e.what();
+    }
 
-    if (!mitk::Equal(image->GetPixelValueByIndex(pixelIndex),resultPointBackward[2]))
+    if (!mitk::Equal(distanceBackward,resultPointBackward[2]))
     {
 //      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
 //      MITK_INFO<<"result: "<< resultPoint;

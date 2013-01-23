@@ -57,7 +57,20 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapp
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 )
 
-SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 #mitkImageVtkMapper2D_pic3dOpacity640x480
+mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVtkMapper3DTest
+                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom.vtp
+                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom_RGBImage.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedLiver640x480REF.png corresponding reference screenshot
+)
+
+#mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTexturedSphereTest_Football mitkSurfaceVtkMapper3DTexturedSphereTest
+#                        ${MITK_DATA_DIR}/RenderingTestData/texture.jpg #input texture
+#                        -V
+#                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedSphere640x480REF.png corresponding reference screenshot
+#)
+
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkSurfaceVtkMapper3DTest_TextureProperty #mitkSurfaceVtkMapper3DTexturedSphereTest_Football #mitkImageVtkMapper2D_pic3dOpacity640x480
 PROPERTY RUN_SERIAL TRUE)
 
 endif()

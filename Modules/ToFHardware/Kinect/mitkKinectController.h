@@ -47,6 +47,7 @@ namespace mitk
 
     /*!
     \brief opens a connection to the Kinect camera.
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual bool OpenCameraConnection();
     /*!
@@ -55,6 +56,7 @@ namespace mitk
     virtual bool CloseCameraConnection();
     /*!
     \brief updates the camera. The update function of the hardware interface is called only when new data is available
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual bool UpdateCamera();
     /*!

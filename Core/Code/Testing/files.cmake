@@ -62,6 +62,7 @@ set(MODULE_TESTS
   mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
+  mitkUIDGeneratorTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -106,6 +107,8 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkIOUtilTest.cpp
+    mitkSurfaceVtkMapper3DTest
+    mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
 )
 
 # Create an artificial module initializing class for

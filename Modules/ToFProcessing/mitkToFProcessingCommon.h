@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include <vnl/vnl_math.h>
 
-
-
 namespace mitk
 {
   /**
@@ -262,6 +260,62 @@ namespace mitk
       return CartesianToIndexCoordinatesWithInterpixdist(cartesianPoint[0],cartesianPoint[1],cartesianPoint[2],focalLength,
         interPixelDistance[0],interPixelDistance[1],principalPoint[0],principalPoint[1],calculateDistance);
     }
+
+    /** \addtogroup <KinectReconstruction>
+     * @{
+     *
+     * @brief KinectIndexToCartesianCoordinates Convert a pixel (i,j) with value d to a 3D world point. This conversion is meant for Kinect and slightly different then ToF reconstruction. See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
+     * @param i Pixel index i.
+     * @param j Pixel index j.
+     * @param distance Distance value d in mm as obtained from OpenNI.
+     * @param focalLengthX Focallength from calibration.
+     * @param focalLengthY Focallength from calibration.
+     * @param principalPointX Principal point from calibration.
+     * @param principalPointY Principal point from calibration.
+     * @return a ToFPoint3D. The point in world coordinates (mm).
+     */
+    static ToFProcessingCommon::ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY);
+
+    inline static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+      ToFScalarType focalLength[2], ToFScalarType principalPoint[2])
+    {
+      return KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
+    }
+
+    inline static ToFPoint3D KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+      ToFPoint2D focalLength, ToFPoint2D principalPoint)
+    {
+      return KinectIndexToCartesianCoordinates(i,j,distance,focalLength[0],focalLength[1],principalPoint[0],principalPoint[1]);
+    }
+
+    inline static ToFPoint3D KinectIndexToCartesianCoordinates(mitk::Index3D index, ToFScalarType distance, ToFPoint2D focalLength, ToFPoint2D principalPoint)
+    {
+        return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
+    }
+    /** @}*/
+    /** \addtogroup <KinectReconstructionInverse>
+     * @{
+     * @brief CartesianCoordinatesToKinectIndexCoordinates Transform a 3D world point back to distance image pixel coordinates.
+     * @param cartesianPointX x value of the cartesian point.
+     * @param cartesianPointY y value of the cartesian point.
+     * @param cartesianPointZ z value of the cartesian point.
+     * @param focalLengthX x value of the focal length (from calibration).
+     * @param focalLengthY y value of the focal length (from calibration).
+     * @param principalPointX x value of the principal point (from calibration).
+     * @param principalPointY y value of the principal point (from calibration).
+     * @param calculateDistance Do you want to compute also the distance of the distance image? For Kinect, this value is always the same in cartesian and index coordinates.
+     * @return A ToFPoint3D containing the pixel indices (i,j) in [0] and [1] and (optionally) the distance value in [2] (or just 0.0).
+     */
+    static ToFPoint3D CartesianToKinectIndexCoordinates(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,
+                                                                   ToFScalarType cartesianPointZ, ToFScalarType focalLengthX,
+                                                                   ToFScalarType focalLengthY, ToFScalarType principalPointX,
+                                                                   ToFScalarType principalPointY, bool calculateDistance=true);
+
+    inline static ToFProcessingCommon::ToFPoint3D CartesianToKinectIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength, ToFPoint2D  principalPoint, bool calculateDistance=true)
+    {
+        return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
+    }
+    /** @}*/
   };
 }
 #endif

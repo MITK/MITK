@@ -41,6 +41,35 @@ namespace mitk
     return cartesianCoordinates;
   }
 
+  //See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::KinectIndexToCartesianCoordinates(unsigned int i, unsigned int j, ToFScalarType distance,
+    ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY)
+  {
+    ToFPoint3D cartesianCoordinates;
+
+    cartesianCoordinates[0] = distance * (i - principalPointX) / focalLengthX;
+    cartesianCoordinates[1] = distance * (j - principalPointY) / focalLengthY;
+    cartesianCoordinates[2] = distance;
+
+    return cartesianCoordinates;
+  }
+
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToKinectIndexCoordinates(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY, ToFScalarType cartesianPointZ, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX,                                                                                                     ToFScalarType principalPointY, bool calculateDistance)
+  {
+      ToFPoint3D indexCoordinatesAndDistanceValue;
+      indexCoordinatesAndDistanceValue[0] = ((cartesianPointX*focalLengthX)/cartesianPointZ) + principalPointX;
+      indexCoordinatesAndDistanceValue[1] = ((cartesianPointY*focalLengthY)/cartesianPointZ) + principalPointY;
+
+      if (calculateDistance)
+      { //There is no computation for kinect. See KinectIndexToCartesianCoordinates.
+        indexCoordinatesAndDistanceValue[2] = cartesianPointZ;
+      }
+      else
+      {
+        indexCoordinatesAndDistanceValue[2] = 0.0;
+      }
+      return indexCoordinatesAndDistanceValue;
+  }
 
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::IndexToCartesianCoordinatesWithInterpixdist(unsigned int i, unsigned int j, ToFScalarType distance, ToFScalarType focalLength,
     ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY,

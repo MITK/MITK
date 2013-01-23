@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 #include "mitkStandardFileLocations.h"
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 
 #include <iostream>
 #include <sstream>
@@ -89,7 +89,7 @@ class mitkNavigationDataPlayerTestClass
     refPoints[3][0] = 4; refPoints[3][1] = 3; refPoints[3][2] = 6;
     refPoints[4][0] = 5; refPoints[4][1] = 4; refPoints[4][2] = 7;
 
-    mitk::TimeStamp::Pointer timer = mitk::TimeStamp::GetInstance();
+    mitk::IGTTimeStamp::Pointer timer = mitk::IGTTimeStamp::GetInstance();
     timer->Initialize();
 
     itk::Object::Pointer obj = itk::Object::New();
@@ -178,7 +178,7 @@ class mitkNavigationDataPlayerTestClass
     refPoints[3][0] = 4; refPoints[3][1] = 3; refPoints[3][2] = 6;
     refPoints[4][0] = 5; refPoints[4][1] = 4; refPoints[4][2] = 7;
 
-    mitk::TimeStamp::Pointer timer = mitk::TimeStamp::GetInstance();
+    mitk::IGTTimeStamp::Pointer timer = mitk::IGTTimeStamp::GetInstance();
     timer->Initialize();
 
     itk::Object::Pointer obj = itk::Object::New();

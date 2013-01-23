@@ -46,7 +46,7 @@ set(MITK_DOXYGEN_TAGFILE_NAME "@MITK_DOXYGEN_TAGFILE_NAME@")
 if(MODULES_CONF_DIRS)
   list(APPEND MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
   list(REMOVE_DUPLICATES MODULES_CONF_DIRS)
-else() 
+else()
   set(MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
 endif()
 
@@ -83,6 +83,7 @@ set(DCMTK_DIR "@DCMTK_DIR@")
 set(GDCM_DIR "@GDCM_DIR@")
 set(BOOST_ROOT "@BOOST_ROOT@")
 set(OpenCV_DIR "@OpenCV_DIR@")
+set(SOFA_DIR "@SOFA_DIR@")
 set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 set(MITK_RUNTIME_PATH "@MITK_RUNTIME_PATH@")
@@ -96,6 +97,7 @@ set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
 set(MITK_USE_CTK @MITK_USE_CTK@)
 set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
 set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
+set(MITK_USE_SOFA @MITK_USE_SOFA@)
 set(MITK_USE_Python @MITK_USE_Python@)
 
 # There is no PocoConfig.cmake, so we set Poco specific CMake variables
@@ -119,7 +121,7 @@ endif()
 if(MITK_USE_BLUEBERRY)
 
   set(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-  
+
   # Don't include the BlueBerry exports file, since the targets are
   # also exported in the MITK exports file
   set(BB_PLUGIN_EXPORTS_FILE_INCLUDED 1)

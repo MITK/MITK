@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCollection.h>
 #include <vtkScalarsToColors.h>
+#include <vtkSmartPointer.h>
 
 #include "mitkToFProcessingExports.h"
 
@@ -104,9 +105,9 @@ public:
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  void SetTexture(unsigned char*);
+  void SetTexture(vtkImageData *img);
 
-  unsigned char* GetTexture();
+  vtkSmartPointer<vtkTexture> GetTexture();
 
   itkSetMacro(TextureWidth, int);
 
@@ -134,7 +135,7 @@ protected:
   //enable ImmediateModeRendering for the vtkMapper
   int m_ImmediateModeRenderingOn;
 
-  unsigned char* m_Texture; // pointer to the texture/video image
+  vtkSmartPointer<vtkTexture> m_Texture; // pointer to the texture/video image
 
   int m_TextureWidth; // width of the texture/video image
 

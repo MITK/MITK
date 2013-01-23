@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSequentialPlayer.h"
 
 #include <itksys/SystemTools.hxx> //for the pause
-
-#include <mitkTimeStamp.h>
 #include <fstream>
 #include <sstream>
 

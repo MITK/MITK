@@ -35,6 +35,7 @@ class QTimer;
 #include <mitkToFSurfaceVtkMapper3D.h>
 #include <mitkToFImageRecorder.h>
 #include <mitkToFCompositeFilter.h>
+#include <mitkCameraIntrinsics.h>
 
 /*!
   \brief QmitkToFUtilView
@@ -65,8 +66,6 @@ public:
     QmitkToFUtilView();
     ~QmitkToFUtilView();
 
-    //TODO bitte loeschen, wenn besserer weg gefunden
-    void HackForPlayer();
 
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated.
@@ -109,11 +108,17 @@ protected slots:
     /*!
     \brief Slot invoked when the texture checkbox is checked. Enables the scalar visibility of the surface
     */
+    /**
+     * @brief OnSurfaceCheckboxChecked Slot beeing called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
+     * @param checked Is it checked or not?
+     */
+    void OnSurfaceCheckboxChecked(bool checked);
+
     void OnTextureCheckBoxChecked(bool checked);
     /*!
     \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
     */
-    void OnVideoTextureCheckBoxChecked(bool checked);
+    void OnKinectRGBTextureCheckBoxChecked(bool checked);
     /*!
     \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
     */
@@ -156,7 +161,6 @@ protected:
     mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
     mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
 
-    int m_SurfaceDisplayCount; ///< member used to determine whether surface is initialized or not
     int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
     // members for calculating the frame rate
     mitk::RealTimeClock::Pointer m_RealTimeClock; ///< real time clock used to calculate the display framerate
@@ -164,13 +168,7 @@ protected:
     double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
     double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
 
-    // members used for displaying an external video source
-    mitk::OpenCVVideoSource::Pointer m_VideoSource; ///< OpenCV video source to connect a video device
-    unsigned char* m_VideoTexture; ///< texture used to show video image
-    int m_VideoCaptureWidth; ///< width of the video image
-    int m_VideoCaptureHeight; ///< height of the video image
-    bool m_VideoEnabled; ///< flag indicating whether video grabbing is enabled. Set via the RGB texture checkbox
-
+    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< member holding the intrinsic parameters of the camera
 private:
 
     /*!

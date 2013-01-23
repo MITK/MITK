@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "mitkToFConfig.h"
+#include "mitkCameraIntrinsics.h"
+#include "mitkCameraIntrinsicsProperty.h"
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -302,6 +304,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     m_Controls->m_ConnectCameraButton->setText("Disconnect");  //Reset the ConnectCameraButton to disconnected
 
     //if a connection could be established
+    try
+    {
+
     if (this->m_ToFImageGrabber->ConnectCamera())
     {
       this->m_Controls->m_PMDParameterWidget->SetToFImageGrabber(this->m_ToFImageGrabber);
@@ -328,9 +333,11 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       // send connect signal to the caller functionality
       emit ToFCameraConnected();
     }
-    //Throw an error if the Connection failed and reset the Widgets
     else
+        //##### TODO: Remove this else part once all controllers are throwing exceptions
+        //if they cannot to any device!
     {
+        //Throw an error if the Connection failed and reset the Widgets <- better catch an exception!
       QMessageBox::critical( this, "Error", "Connection failed. Check if you have installed the latest driver for your system." );
       m_Controls->m_ConnectCameraButton->setChecked(false);
       m_Controls->m_ConnectCameraButton->setEnabled(true);
@@ -338,10 +345,33 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
       this->OnSelectCamera();
       return;
-
+    }
+    }catch(std::exception &e)
+    {
+        //catch exceptions of camera which cannot connect give a better reason
+        QMessageBox::critical( this, "Connection failed.", e.what() );
+        m_Controls->m_ConnectCameraButton->setChecked(false);
+        m_Controls->m_ConnectCameraButton->setEnabled(true);
+        m_Controls->m_ConnectCameraButton->setText("Connect");
+        m_Controls->m_DeviceList->setEnabled(true);           //Reactivating ServiceListWidget
+        this->OnSelectCamera();
+        return;
     }
     m_Controls->m_ConnectCameraButton->setEnabled(true);
 
+    // ask wether camera parameters (intrinsics, ...) should be loaded
+    if (QMessageBox::question(this,"Camera parameters","Do you want to specify your own camera intrinsics?",QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
+    {
+      MITK_INFO<<"Yes";
+      QString fileName = QFileDialog::getOpenFileName(this,"Open camera intrinsics","/","*.xml");
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+      cameraIntrinsics->FromXMLFile(fileName.toStdString());
+      this->m_ToFImageGrabber->SetProperty("CameraIntrinsics",mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+    }
+    else
+    {
+      MITK_INFO<<"No";
+    }
   }
   else if (m_Controls->m_ConnectCameraButton->text()=="Disconnect")
   {

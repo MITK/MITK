@@ -84,6 +84,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     */
     void GenerateData( mitk::PropertyList::Pointer );
 
+    QSize GetNeededSize();
+
+
   protected:
 
     /**
@@ -104,6 +107,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     QLabel* m_Label;
 
     mitk::PropertyList::Pointer m_PropertyList;
+
+    mitk::BaseProperty::Pointer m_ObservedProperty;
 
     unsigned long m_ObserverTag;
   };

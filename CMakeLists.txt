@@ -693,7 +693,7 @@ endif()
 # Construct a list of paths containing runtime directories
 # for MITK applications on Windows
 set(MITK_RUNTIME_PATH
-    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
+    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_DIR}/bin/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
     )
 
 if(QT4_FOUND)

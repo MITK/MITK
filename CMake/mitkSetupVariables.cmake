@@ -89,13 +89,13 @@ set(MITK_LIBRARIES
 
 # variables used in CMake macros which are called from external projects
 set(MITK_VTK_LIBRARY_DIRS ${VTK_LIBRARY_DIRS})
-set(MITK_ITK_LIBRARY_DIRS ${ITK_LIBRARY_DIRS})
+set(MITK_ITK_LIBRARY_DIRS ${ITK_DIR}/bin)
 
 # variables containing link directories
 set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 set(MITK_LINK_DIRECTORIES
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-    ${ITK_LIBRARY_DIRS}
+    ${ITK_DIR}/bin
     ${VTK_LIBRARY_DIRS}
     ${GDCM_LIBRARY_DIRS})
 

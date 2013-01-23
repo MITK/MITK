@@ -57,8 +57,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIOFactory.h>
 #include <itkImageIORegion.h>
 #include <itkImageSeriesReader.h>
-#include <itkDICOMImageIO2.h>
-#include <itkDICOMSeriesFileNames.h>
 #include <itkGDCMImageIO.h>
 
 #ifdef NOMINMAX

@@ -126,7 +126,7 @@ void mitk::SeedsImage::AddSeedPoint(SeedsImageType* itkImage)
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
   const unsigned int dimension =
-    ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+    SeedsImageType::ImageDimension;
 
   mitk::Point3D index;
   this->GetGeometry()->WorldToIndex( m_Point, index );
@@ -168,7 +168,7 @@ void mitk::SeedsImage::PointInterpolation(SeedsImageType* itkImage)
   NeighborhoodIteratorType& nit = this->GetNit< SeedsImageType >( itkImage );
 
   const unsigned int dimension =
-    ::itk::GetImageDimension<SeedsImageType>::ImageDimension;
+    SeedsImageType::ImageDimension;
 
   mitk::Point3D indexBegin, indexEnd;
   this->GetGeometry()->WorldToIndex( m_Point, indexBegin );

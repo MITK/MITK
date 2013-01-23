@@ -34,14 +34,14 @@ if(NOT DEFINED ITK_DIR)
         )
   endif()
 
-  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.2.1.cmake)
+  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.3.1.cmake)
 
   ExternalProject_Add(${proj}
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL http://dl.dropbox.com/u/5822501/InsightToolkit-4.2.1.tar.gz
-     URL_MD5 2faeae2d78cc1fc6782250ee126a67b1
+     URL http://dl.dropbox.com/u/5822501/InsightToolkit-4.3.1.tar.gz
+     URL_MD5 31869cdc83d05802e040e7f909001e1d
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}

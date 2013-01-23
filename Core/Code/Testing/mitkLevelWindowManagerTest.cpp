@@ -103,7 +103,7 @@ public:
   manager = mitk::LevelWindowManager::New();
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   manager->SetDataStorage(ds);
-  MITK_INFO << "Number of observers: " << manager->GetNumberOfObservers();
+
   //add multiple objects to the data storage => multiple observers should be created
   mitk::Image::Pointer image1 = mitk::IOUtil::LoadImageA("D:/prg/MITK-02-bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd");
   mitk::DataNode::Pointer node1 = mitk::DataNode::New();
@@ -113,13 +113,29 @@ public:
   node2->SetData(image2);
   ds->Add(node1);
   ds->Add(node2);
-  MITK_INFO << "Number of observers: " << manager->GetNumberOfObservers();
+
   MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Test if nodes have been added");
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
+
+  mitk::Image::Pointer image3 = mitk::IOUtil::LoadImageA("D:/prg/MITK-02-bin/CMakeExternals/Source/MITK-Data/Pic3D.nrrd");
+  mitk::DataNode::Pointer node3 = mitk::DataNode::New();
+  node3->SetData(image3);
+  ds->Add(node3);
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 3, "Test if another node have been added");
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
 
   ds->Remove(node1);
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Deleted node 1 (test GetRelevantNodes())");
+  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 2, "Deleted node 1 (test GetNumberOfObservers())");
+
   ds->Remove(node2);
-  //remove them
-  MITK_INFO << "Number of observers: " << manager->GetNumberOfObservers();
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 1, "Deleted node 2 (test GetRelevantNodes())");
+  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 1, "Deleted node 2 (test GetNumberOfObservers())");
+
+  ds->Remove(node3);
+  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 0, "Deleted node 3 (test GetRelevantNodes())");
+  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 0, "Deleted node 3 (test GetNumberOfObservers())");
+
   }
 
 };
@@ -133,7 +149,7 @@ int mitkLevelWindowManagerTest(int, char* [])
   mitkLevelWindowManagerTestClass::TestOtherMethods();
 
   //This test fails because of bug 13499, activate it as soon as bug 13499 is fixed.
-  //mitkLevelWindowManagerTestClass::TestRemoveObserver();
+  mitkLevelWindowManagerTestClass::TestRemoveObserver();
 
   MITK_TEST_END();
 }

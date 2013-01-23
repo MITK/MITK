@@ -19,10 +19,8 @@
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer,
     mitk::Point2D mousePosition,
-    mitk::MouseButtons buttonStates,
-    mitk::ModifierKeys modifiers,
     std::string eventClass) :
-    InteractionEvent(baseRenderer, eventClass), m_PointerPosition(mousePosition), m_ButtonStates(buttonStates), m_Modifiers(modifiers)
+    InteractionEvent(baseRenderer, eventClass), m_PointerPosition(mousePosition)
 {
   if (GetSender() != NULL)
   {
@@ -35,7 +33,6 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
     m_WorldPosition[2] = 0;
     //MITK_WARN<< "Renderer not initialized. WorldCoordinates bogus!";
   }
-
 }
 
 mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen()
@@ -48,29 +45,9 @@ mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld()
   return m_WorldPosition;
 }
 
-mitk::ModifierKeys mitk::InteractionPositionEvent::GetModifiers() const
-{
-  return m_Modifiers;
-}
-
-mitk::MouseButtons mitk::InteractionPositionEvent::GetButtonStates() const
-{
-  return m_ButtonStates;
-}
-
 bool mitk::InteractionPositionEvent::isEqual(InteractionEvent::Pointer)
 {
   return true;
-}
-
-void mitk::InteractionPositionEvent::SetModifiers(ModifierKeys modifiers)
-{
-  m_Modifiers = modifiers;
-}
-
-void mitk::InteractionPositionEvent::SetButtonStates(MouseButtons buttons)
-{
-  m_ButtonStates = buttons;
 }
 
 bool mitk::InteractionPositionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)

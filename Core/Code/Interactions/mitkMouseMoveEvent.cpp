@@ -19,7 +19,7 @@
 
 mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition = NULL, mitk::MouseButtons buttonStates =
     NoButton, mitk::ModifierKeys modifiers = NoKey) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseMoveEvent")
+    InteractionPositionEvent(baseRenderer, mousePosition,  "MouseMoveEvent"),m_ButtonStates(buttonStates),m_Modifiers(modifiers)
 {
 }
 
@@ -31,6 +31,26 @@ bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
     return true;
   }
   return false;
+}
+
+mitk::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const
+{
+  return m_Modifiers;
+}
+
+mitk::MouseButtons mitk::MouseMoveEvent::GetButtonStates() const
+{
+  return m_ButtonStates;
+}
+
+void mitk::MouseMoveEvent::SetModifiers(ModifierKeys modifiers)
+{
+  m_Modifiers = modifiers;
+}
+
+void mitk::MouseMoveEvent::SetButtonStates(MouseButtons buttons)
+{
+  m_ButtonStates = buttons;
 }
 
 mitk::MouseMoveEvent::~MouseMoveEvent()

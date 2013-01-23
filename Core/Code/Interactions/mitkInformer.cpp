@@ -23,7 +23,6 @@
 
 mitk::InformerService::InformerService()
 {
-  MITK_INFO << "informer service constructed";
 }
 
 void mitk::InformerService::RegisterObserver(EventObserver::Pointer eventObserver)

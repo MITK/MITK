@@ -141,7 +141,6 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
       return (*it).variantName;
     }
   }
-  MITK_INFO<< "no mapping found for" << interactionEvent->GetEventClass();
   return "";
 }
 

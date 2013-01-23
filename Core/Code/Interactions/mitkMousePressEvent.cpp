@@ -17,9 +17,13 @@
 #include "mitkException.h"
 #include "mitkMousePressEvent.h"
 
-mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer = NULL, mitk::Point2D mousePosition = NULL, mitk::MouseButtons buttonStates =
-    NoButton, mitk::ModifierKeys modifiers = NoKey, mitk::MouseButtons eventButton = NoButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MousePressEvent"), m_EventButton(eventButton)
+mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer = NULL,
+    mitk::Point2D mousePosition = NULL,
+    mitk::MouseButtons buttonStates = NoButton,
+    mitk::ModifierKeys modifiers = NoKey,
+    mitk::MouseButtons eventButton = NoButton) :
+    InteractionPositionEvent(baseRenderer, mousePosition, "MousePressEvent"), m_EventButton(eventButton), m_ButtonStates(buttonStates), m_Modifiers(
+        modifiers)
 {
 }
 
@@ -41,6 +45,26 @@ bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
     return true;
   }
   return false;
+}
+
+mitk::ModifierKeys mitk::MousePressEvent::GetModifiers() const
+{
+  return m_Modifiers;
+}
+
+mitk::MouseButtons mitk::MousePressEvent::GetButtonStates() const
+{
+  return m_ButtonStates;
+}
+
+void mitk::MousePressEvent::SetModifiers(ModifierKeys modifiers)
+{
+  m_Modifiers = modifiers;
+}
+
+void mitk::MousePressEvent::SetButtonStates(MouseButtons buttons)
+{
+  m_ButtonStates = buttons;
 }
 
 mitk::MousePressEvent::~MousePressEvent()

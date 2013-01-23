@@ -21,7 +21,7 @@ mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer = NULL,
     MouseButtons buttonStates = NoButton,
     ModifierKeys modifiers = NoKey,
     int wheelDelta = 0) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseWheelEvent"), m_WheelDelta(wheelDelta)
+    InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent"), m_WheelDelta(wheelDelta) , m_ButtonStates(buttonStates), m_Modifiers(modifiers)
 {
 }
 
@@ -43,6 +43,26 @@ bool mitk::MouseWheelEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
     return true;
   }
   return false;
+}
+
+mitk::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
+{
+  return m_Modifiers;
+}
+
+mitk::MouseButtons mitk::MouseWheelEvent::GetButtonStates() const
+{
+  return m_ButtonStates;
+}
+
+void mitk::MouseWheelEvent::SetModifiers(ModifierKeys modifiers)
+{
+  m_Modifiers = modifiers;
+}
+
+void mitk::MouseWheelEvent::SetButtonStates(MouseButtons buttons)
+{
+  m_ButtonStates = buttons;
 }
 
 mitk::MouseWheelEvent::~MouseWheelEvent()

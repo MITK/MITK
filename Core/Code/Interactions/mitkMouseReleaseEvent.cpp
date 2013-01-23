@@ -22,7 +22,7 @@ mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer = NU
     mitk::MouseButtons buttonStates = NoButton,
     mitk::ModifierKeys modifiers = NoKey,
     mitk::MouseButtons eventButton = NoButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, buttonStates, modifiers, "MouseReleaseEvent"), m_EventButton(eventButton)
+    InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent"), m_EventButton(eventButton),m_ButtonStates(buttonStates), m_Modifiers(modifiers)
 {
 }
 
@@ -46,6 +46,26 @@ bool mitk::MouseReleaseEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass
   return false;
 }
 
+mitk::ModifierKeys mitk::MouseReleaseEvent::GetModifiers() const
+{
+  return m_Modifiers;
+}
+
+mitk::MouseButtons mitk::MouseReleaseEvent::GetButtonStates() const
+{
+  return m_ButtonStates;
+}
+
+void mitk::MouseReleaseEvent::SetModifiers(ModifierKeys modifiers)
+{
+  m_Modifiers = modifiers;
+}
+
+void mitk::MouseReleaseEvent::SetButtonStates(MouseButtons buttons)
+{
+  m_ButtonStates = buttons;
+}
+
 mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 }
@@ -61,6 +81,5 @@ bool mitk::MouseReleaseEvent::isEqual(mitk::InteractionEvent::Pointer interactio
       && this->GetButtonStates() == mre->GetButtonStates()
 
   );
-
 }
 

@@ -189,7 +189,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "PositionEvent")
   {
-    event = InteractionPositionEvent::New(NULL, pos, buttonState, modifiers, "PositionEvent");
+    event = InteractionPositionEvent::New(NULL, pos, "PositionEvent");
     MITK_INFO << event;
   }
   else if (eventClass == "InternalEvent")

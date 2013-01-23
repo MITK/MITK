@@ -1625,6 +1625,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   // find image with largest layer, that is the image shown on top in the render window
   for (unsigned int x = 0; x < nodes->size(); x++)
   {
+    bool isBinaryImage = nodes->at(x)->GetProperty("binary");
+    if(!isBinaryImage){
     if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
          nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
     {
@@ -1638,6 +1640,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
           maxlayer = layer;
         }
       }
+    }
     }
   }
 

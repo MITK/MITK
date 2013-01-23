@@ -71,8 +71,7 @@ protected:
 
   virtual ~Geometry2DDataMapper2D();
 
-  virtual void GenerateData();
-
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
   /**
   * \brief Returns the thick slice mode for the given datanode.
   *

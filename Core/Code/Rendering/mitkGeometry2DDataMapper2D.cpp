@@ -49,8 +49,7 @@ const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
   return static_cast<const Geometry2DData * > ( GetData() );
 }
 
-
-void mitk::Geometry2DDataMapper2D::GenerateData()
+void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
   // collect all Geometry2DDatas accessible from the DataStorage
   m_OtherGeometry2Ds.clear();

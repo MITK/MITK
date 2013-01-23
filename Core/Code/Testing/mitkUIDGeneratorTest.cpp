@@ -30,14 +30,21 @@ void newGeneratorInstancesHeapTest()
 
     uid2_1 = uidGen1->GetUID();
 
-    MITK_INFO << uid1_1;
-    MITK_INFO << uid2_1;
-
     delete uidGen1;
     delete uidGen2;
 
     MITK_TEST_CONDITION(uid1_1 != uid2_1,"Different UIDs are not allowed to be equal");
 
+}
+
+void multipleUIDsFromSameGeneratorTest(int UIDlength)
+{
+    mitk::UIDGenerator* uidGen = new mitk::UIDGenerator("UID_",8);
+    std::string uid1, uid2;
+    uid1 = uidGen->GetUID();
+    uid2 = uidGen->GetUID();
+    delete uidGen;
+    MITK_TEST_CONDITION(uid1 != uid2,"Testing two UIDs from the same generator. Different UIDs are not allowed to be equal");
 }
 
 
@@ -52,9 +59,6 @@ void newGeneratorInstancesTest()
 
     uid2_1 = uidGen1.GetUID();
 
-    MITK_INFO << uid1_1;
-    MITK_INFO << uid2_1;
-
     MITK_TEST_CONDITION(uid1_1 != uid2_1,"Different UIDs are not allowed to be equal");
 
 }
@@ -68,11 +72,7 @@ void severalGeneratorInstancesTest()
     uid1_1 = uidGen1.GetUID();
     uid2_1 = uidGen2.GetUID();
 
-    MITK_INFO << uid1_1;
-    MITK_INFO << uid2_1;
-
     MITK_TEST_CONDITION(uid1_1 != uid2_1,"Different UIDs are not allowed to be equal");
-
 }
 
 int mitkUIDGeneratorTest(int /*argc*/, char* /*argv*/[])
@@ -81,6 +81,7 @@ int mitkUIDGeneratorTest(int /*argc*/, char* /*argv*/[])
     severalGeneratorInstancesTest();
     newGeneratorInstancesTest();
     newGeneratorInstancesHeapTest();
-
+    multipleUIDsFromSameGeneratorTest(8);
+    multipleUIDsFromSameGeneratorTest(16);
     MITK_TEST_END();
 }

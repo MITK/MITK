@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdexcept>
 #include <iostream>
 
+
 #ifdef _MSC_VER
 #include "process.h"
 #else
@@ -33,7 +34,8 @@ namespace mitk {
 
 UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 :m_Prefix(prefix),
- m_LengthOfRandomPart(lengthOfRandomPart)
+ m_LengthOfRandomPart(lengthOfRandomPart),
+ m_RandomGenerator(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
   if (lengthOfRandomPart < 5)
   {
@@ -41,6 +43,8 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
     throw std::invalid_argument("To few digits requested");
   }
 
+  m_RandomGenerator->Initialize();
+  /*
   static int instanceID = 0;
   int processID = 0;
   #ifdef WIN32
@@ -53,6 +57,7 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
   instanceID++;
 
   std::srand(seed);
+  */
 }
 
 std::string UIDGenerator::GetUID()
@@ -84,7 +89,7 @@ std::string UIDGenerator::GetUID()
     s << t->tm_sec;
 
     std::ostringstream rs;
-    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(rand()) );
+    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(m_RandomGenerator->GetUniformVariate(0, RAND_MAX)) );
 
     for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i)
     {

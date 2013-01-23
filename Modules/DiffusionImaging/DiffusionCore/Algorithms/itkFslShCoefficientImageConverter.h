@@ -30,46 +30,50 @@ class FslShCoefficientImageConverter : public ProcessObject
 
 public:
 
-  enum NormalizationMethods {
-    NO_NORM,
-    SINGLE_VEC_NORM,
-    SPACING_COMPENSATION
-  };
+    enum NormalizationMethods {
+        NO_NORM,
+        SINGLE_VEC_NORM,
+        SPACING_COMPENSATION
+    };
 
-  typedef FslShCoefficientImageConverter Self;
-  typedef SmartPointer<Self>                      Pointer;
-  typedef SmartPointer<const Self>                ConstPointer;
-  typedef ProcessObject                           Superclass;
-  typedef itk::Image< float, 4 >                  InputImageType;
-  typedef Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 > CoefficientImageType;
-  typedef Image< Vector< PixelType, QBALL_ODFSIZE >, 3 > QballImageType;
+    typedef FslShCoefficientImageConverter Self;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ProcessObject                           Superclass;
+    typedef itk::Image< float, 4 >                  InputImageType;
+    typedef Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 > CoefficientImageType;
+    typedef Image< Vector< PixelType, QBALL_ODFSIZE >, 3 > QballImageType;
 
-   /** Method for creation through the object factory. */
-  itkNewMacro(Self)
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self)
 
-  /** Runtime information support. */
-  itkTypeMacro(FslShCoefficientImageConverter, ProcessObject)
+    /** Runtime information support. */
+    itkTypeMacro(FslShCoefficientImageConverter, ProcessObject)
 
-  // input
-  itkSetMacro( InputImage, InputImageType::Pointer) ///< sh coefficient image in FSL file format
+    // input
+    itkSetMacro( InputImage, InputImageType::Pointer) ///< sh coefficient image in FSL file format
 
-  // output
-  itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
-  itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
+    // output
+    itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
+    itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
 
-  void GenerateData();
+    itkSetMacro( Toolkit, int)
+    itkGetMacro( Toolkit, int)
+
+    void GenerateData();
 
 protected:
-  FslShCoefficientImageConverter();
-  ~FslShCoefficientImageConverter(){}
+    FslShCoefficientImageConverter();
+    ~FslShCoefficientImageConverter(){}
 
-  void CalcShBasis();
-  vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> GetSphericalOdfDirections();
+    void CalcShBasis();
+    vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> GetSphericalOdfDirections();
 
-  InputImageType::Pointer                   m_InputImage;
-  typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
-  typename QballImageType::Pointer          m_QballImage;       ///< mitk Q-Ball image generated from the coefficients
-  vnl_matrix<double>                        m_ShBasis;
+    InputImageType::Pointer                   m_InputImage;
+    typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
+    typename QballImageType::Pointer          m_QballImage;       ///< mitk Q-Ball image generated from the coefficients
+    vnl_matrix<double>                        m_ShBasis;
+    int                                       m_Toolkit;
 
 private:
 

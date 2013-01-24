@@ -78,7 +78,6 @@ namespace mitk {
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void GenerateData();
 
     virtual const mitk::ConnectomicsNetwork* GetInput();
 

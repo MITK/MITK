@@ -609,7 +609,6 @@ bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType
     filter->SetInput(vecimg);
     filter->SetGradientDirections(dirs);
     filter->SetBValue(bval);
-    m_Controls->m_Warning->setVisible(false);
 
     switch(m_Controls->m_MethodCombo->currentIndex())
     {

@@ -16,7 +16,7 @@
 
 #include "mitkEventObserver.h"
 
-void mitk::EventObserver::Notify(InteractionEvent::Pointer /*interactionEvent*/)
+void mitk::EventObserver::Notify(InteractionEvent::Pointer /*interactionEvent*/, bool /*isHandled*/)
 {
 }
 

@@ -125,6 +125,7 @@ If a parameter is ommitted it is set to its default value. Following all possibl
 events have is decribed in their respective documentation.
 
 Mandatory for each event description is the event class and the event variant. The parameters of an event are set by attribute tags.
+\note Refer to \ref EventClassSection for the meaning of event class.
 
 \b Modifier \b Keys \n
 
@@ -256,6 +257,29 @@ An event class describes the event type (see mitk::InteractionEvent for the diff
 and the exact description is taken from  a config file. Together they determine which event can trigger this transition.
 For example this state machine will switch from state A to state B when the StdMousePressPrimaryButton event (left mouse button is pressed) occurs.
 
+\subsubsection EventClassSection Event Class
+The event class description supports the polymorphism of the event classes. Therefore state machine patters should be written in the most
+general ways possible.
+So for a given class hierarchy like this:
+\dot
+digraph {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  a [ label="{PositionEvent}"];
+  b [ label="{MousePressEvent}" ];
+  c [ label="MouseReleaseEvent" ];
+  d [ label="+TouchEvent" ];
+  a -> b;
+  a -> c;
+  a -> d;
+}
+\enddot
+
+in the state machine pattern the  PositionEvent can be declared as event class to restrict to the events which hold a position information.
+The actual implementation is then given in the configuration file. In this case it allows to define event of the classes PositionEvent itself, or
+MousePressEvent,MouseReleaseEvent,TouchEvent.
+This has the advantage that the patterns remain the same no matter what input devices are used, and the state machine patterns can be configured
+for newly added event classes as long as they match the class hierachy (this ensures they hold the neccessary properties).
+
 \code
 <statemachine>
  <state name="A" startstate="true">
@@ -291,7 +315,6 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("countClicks", CountClicks);
 }
 \endcode
-
 
 \section HowToDataInteractor HowTo Implement a new DataInteractor
 

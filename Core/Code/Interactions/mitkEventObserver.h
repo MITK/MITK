@@ -32,7 +32,14 @@ namespace mitk
   public:
     mitkClassMacro(EventObserver,EventHandler);
     itkNewMacro(Self);
-    virtual void Notify(InteractionEvent::Pointer interactionEvent);
+    /**
+     * By this method all registered EventObersers are notified about every InteractionEvent,
+     * the isHandled flag indicates if a DataInteractor has already handled that event.
+     * EventObserver that trigger an action when observing an event may consider
+     * this in order to not confuse the user by, triggering several independant action with one
+     * single user event (such as a mouse click)
+     */
+    virtual void Notify(InteractionEvent::Pointer interactionEvent,bool isHandled);
 
   protected:
     EventObserver();

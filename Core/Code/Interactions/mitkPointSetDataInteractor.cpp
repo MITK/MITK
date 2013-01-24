@@ -24,8 +24,6 @@
 #include "mitkDispatcher.h"
 #include "mitkBaseRenderer.h"
 
-
-
 void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("addpoint", AddPoint);
@@ -72,7 +70,7 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
     m_NumberOfPoints++;
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
-    if (m_NumberOfPoints >= m_MaxNumberOfPoints)
+    if (m_MaxNumberOfPoints != 0 && m_NumberOfPoints >= m_MaxNumberOfPoints)
     {
       InternalEvent::Pointer event = InternalEvent::New(NULL, this, "MaxNumberOfPoints");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
@@ -110,11 +108,8 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
   }
 }
 
-/*
- * Check whether the DataNode contains a pointset, if not create one and add it.
- */
 mitk::PointSetDataInteractor::PointSetDataInteractor() :
-    m_NumberOfPoints(0), m_SelectedPointIndex(-1)
+    m_NumberOfPoints(0), m_MaxNumberOfPoints(0),m_SelectedPointIndex(-1)
 {
 }
 
@@ -252,6 +247,9 @@ bool mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* 
   return true;
 }
 
+/*
+ * Check whether the DataNode contains a pointset, if not create one and add it.
+ */
 void mitk::PointSetDataInteractor::DataNodeChanged()
 {
   if (GetDataNode().IsNotNull())
@@ -272,8 +270,10 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
     // load config file parameter: maximal number of points
     mitk::PropertyList::Pointer properties = GetPropertyList();
     std::string strNumber;
-    properties->GetStringProperty("MaxPoints", strNumber);
-    m_MaxNumberOfPoints = atoi(strNumber.c_str());
+    if (properties->GetStringProperty("MaxPoints", strNumber))
+    {
+      m_MaxNumberOfPoints = atoi(strNumber.c_str());
+    }
   }
 }
 

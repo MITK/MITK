@@ -42,11 +42,11 @@ void mitk::InformerService::UnRegisterObserver(EventObserver::Pointer eventObser
   m_ListObserver.remove(eventObserver);
 }
 
-void mitk::InformerService::NotifyObservers(InteractionEvent::Pointer interactionEvent)
+void mitk::InformerService::NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled)
 {
   for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
   {
-    (*it)->Notify(interactionEvent);
+    (*it)->Notify(interactionEvent, isHandled);
   }
 }
 

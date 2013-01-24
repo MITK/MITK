@@ -34,7 +34,7 @@ namespace mitk
   public:
     void RegisterObserver(EventObserver::Pointer eventObserver);
     void UnRegisterObserver(EventObserver::Pointer eventObserver);
-    void NotifyObservers(InteractionEvent::Pointer interactionEvent);
+    void NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled);
 
     InformerService();
     ~InformerService();

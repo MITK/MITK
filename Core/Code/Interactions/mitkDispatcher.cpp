@@ -147,7 +147,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   }
 
   /* Notify EventObserver  */
-  m_InformerService->NotifyObservers(event);
+  m_InformerService->NotifyObservers(event, eventIsHandled);
 
   // Process event queue
   if (!m_QueuedEvents.empty())

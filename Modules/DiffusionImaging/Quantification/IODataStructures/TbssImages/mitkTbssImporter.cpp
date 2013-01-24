@@ -68,7 +68,7 @@ namespace mitk
     {
       for(int j=0; j<3; j++)
       {
-        dir[j][i] = p[t]; // row-major order (where the column index varies the fastest)
+        dir[i][j] = p[t]; // row-major order (where the column index varies the fastest)
         t++;
       }
     }

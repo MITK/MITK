@@ -64,21 +64,26 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   clearData();
   unsigned int i = 0;
   bool firstValue = false;
-  for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it, ++i)
+  // filter frequencies of 0 to guarantee a better view while using a mask
+  for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it)
   {
-    // filter frequencies of 0 to guarantee a better view while using a mask
-    if (it.GetFrequency() != 0 && !firstValue)
+    if (it.GetFrequency() > 0.0)
     {
-      firstValue = true;
-      i=0;
+      endIt = it;
+      if (!firstValue)
+      {
+        firstValue = true;
+        startIt = it;
+      }
     }
-    if (firstValue)
-    {
-      QVariant frequency = it.GetFrequency();
-      QVariant measurement = it.GetMeasurementVector()[0];
-      m_Frequency.insert(i, frequency);
-      m_Measurement.insert(i, measurement);
-    }
+  }
+  ++endIt;
+  for (it = startIt ; it != endIt; ++it, ++i)
+  {
+    QVariant frequency = it.GetFrequency();
+    QVariant measurement = it.GetMeasurementVector()[0];
+    m_Frequency.insert(i, frequency);
+    m_Measurement.insert(i, measurement);
   }
   m_IntensityProfile = false;
   this->DataChanged();

@@ -95,7 +95,6 @@ namespace mitk {
     // update all vtk sources, mappers, actors with current data and properties
     void UpdateVtkObjects();
 
-    virtual void GenerateData();
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 

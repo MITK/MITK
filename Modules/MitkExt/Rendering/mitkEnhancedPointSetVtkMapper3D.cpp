@@ -188,14 +188,11 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData()
-{
-  this->UpdateVtkObjects();
-}
-
-
 void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * renderer )
 {
+
+  this->UpdateVtkObjects();
+
   /* iterate over all points in pointset and apply properties to corresponding vtk objects */
   // get and update the PointSet
   const mitk::PointSet* pointset = this->GetInput();

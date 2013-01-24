@@ -42,6 +42,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , m_UseCoMCoordinates( false )
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
+, m_EndPointSearchRadius( 10.0 )
 {
 }
 
@@ -55,6 +56,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , allowLoops( false )
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
+, m_EndPointSearchRadius( 10.0 )
 {
 }
 
@@ -670,6 +672,50 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
 
       if( !IsBackgroundLabel( tempLabel ) )
       {
+        // check whether result is within the search space
+        {
+          mitk::Point3D endPoint, foundPointSegmentation, foundPointFiber;
+          for( int index = 0; index < singleTract->front().Size(); index++ )
+          {
+            // this is in fiber (world) coordinates
+            endPoint.SetElement( index, singleTract->GetElement( retractionStartIndex ).GetElement( index ) );
+          }
+
+          for( int index( 0 ); index < 3; index++ )
+          {
+            foundPointSegmentation.SetElement( index,
+              currentPoint.GetElement( index ) + ( 1.0 + parameter ) / ( 1.0 + length ) * differenceVector[ index ] );
+          }
+
+          SegmentationToFiberCoords( foundPointSegmentation, foundPointFiber );
+
+          std::vector< double > finalDistance;
+          finalDistance.resize( singleTract->front().Size() );
+          for( int index = 0; index < singleTract->front().Size(); index++ )
+          {
+            finalDistance[ index ] = foundPointSegmentation.GetElement( index ) - endPoint.GetElement( index );
+          }
+
+          // calculate length of direction vector
+
+          double finalLength( 0.0 );
+          double finalSum( 0.0 );
+
+          for( int index = 0; index < finalDistance.size() ; index++ )
+          {
+            finalSum = finalSum + finalDistance[ index ] * finalDistance[ index ];
+          }
+          finalLength = std::sqrt( finalSum );
+
+          std::cout << "Distance is " << finalLength << "\n";
+
+          if( finalLength > m_EndPointSearchRadius )
+          {
+            // the found point was not within the search space
+            return;
+          }
+        }
+
         label = tempLabel;
         mitkIndex = tempIndex;
         return;
@@ -793,9 +839,4 @@ void mitk::ConnectomicsNetworkCreator::CreateNewNode( int label, mitk::Index3D i
 
     m_LabelToNodePropertyMap.insert( std::pair< ImageLabelType, NetworkNode >( label, newNode ) );
   }
-}
-
-void mitk::ConnectomicsNetworkCreator::SetMappingStrategy( mitk::ConnectomicsNetworkCreator::MappingStrategy newStrategy)
-{
-  m_MappingStrategy = newStrategy;
 }

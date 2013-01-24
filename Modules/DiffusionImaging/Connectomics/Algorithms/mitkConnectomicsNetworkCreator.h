@@ -82,7 +82,8 @@ namespace mitk
 
     mitk::ConnectomicsNetwork::Pointer GetNetwork();
 
-    void SetMappingStrategy( MappingStrategy newStrategy);
+    itkSetMacro(MappingStrategy, MappingStrategy);
+    itkSetMacro(EndPointSearchRadius, double);
 
     /** \brief Calculate the locations of vertices
      *
@@ -210,6 +211,9 @@ namespace mitk
 
     // the straty to use for mapping
     MappingStrategy m_MappingStrategy;
+
+    // search radius for finding a non white matter/background area. Should be in mm
+    double m_EndPointSearchRadius;
 
     //////////////////////// IDs ////////////////////////////
 

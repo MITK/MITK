@@ -377,6 +377,7 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
       m_ConnectomicsNetworkCreator->SetSegmentation( image );
       m_ConnectomicsNetworkCreator->SetFiberBundle( fiberBundle );
       m_ConnectomicsNetworkCreator->CalculateCenterOfMass();
+      m_ConnectomicsNetworkCreator->SetEndPointSearchRadius( 50 );
       m_ConnectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
       mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
 

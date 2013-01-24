@@ -276,16 +276,13 @@ set(CPP_FILES
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
-  Rendering/mitkVtkMapper2D.cpp
-  Rendering/mitkVtkMapper3D.cpp
+  Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper2D.cpp
+  Rendering/mitkGLMapper.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
-  Rendering/mitkMapper2D.cpp
-  Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp

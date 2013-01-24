@@ -119,8 +119,10 @@ vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
   return m_Assembly;
 }
 
-void mitk::UnstructuredGridVtkMapper3D::GenerateData()
+
+void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
+
   m_Assembly->VisibilityOn();
 
   m_ActorWireframe->GetProperty()->SetAmbient(1.0);
@@ -148,10 +150,6 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData()
       colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
     }
   }
-}
-
-void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
-{
 
   if(!IsVisible(renderer))
   {
@@ -180,7 +178,6 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);
 
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
   mitk::DataNode::Pointer bbNode = renderer->GetDataStorage()->GetNamedDerivedNode("Clipping Bounding Object", node);

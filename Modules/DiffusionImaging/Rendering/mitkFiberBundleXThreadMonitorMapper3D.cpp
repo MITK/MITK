@@ -66,9 +66,10 @@ const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
+void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-//  MITK_INFO << m_LastUpdateTime;
+
+  //  MITK_INFO << m_LastUpdateTime;
   FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetData() );
 
 //  m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
@@ -90,7 +91,6 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   tpropOpen->SetColor(0.85,0.8,0.8);
   m_TextActorOpen->SetDisplayPosition( monitor->getBracketOpenPosition()[0], monitor->getBracketOpenPosition()[1] );
   //m_TextActorOpen->Modified();
-
 
 
   m_TextActorHeading->SetInput(  monitor->getHeading().toStdString().c_str() );
@@ -143,13 +143,6 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   m_TextActorTerminated->SetDisplayPosition( monitor->getTerminatedPosition()[0], monitor->getTerminatedPosition()[1] );
   //m_TextActorTerminated->Modified();
 
-
-}
-
-
-
-void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
-{
   if ( !this->IsVisible( renderer ) )
   {
     return;

@@ -54,7 +54,6 @@ namespace mitk {
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void GenerateData();
     //=========================================================
 
   protected:

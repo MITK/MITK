@@ -59,11 +59,11 @@ mitk::VectorImageVtkGlyphMapper3D::~VectorImageVtkGlyphMapper3D()
     m_Glyph3DGenerator->Delete();
 }
 
-
 /*
 * Generate a vtkPolyData by creating vectors as glyphs
+* This method is called, each time a specific renderer is updated.
 */
-void mitk::VectorImageVtkGlyphMapper3D::GenerateData()
+void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
   //
   // get the input image...
@@ -178,14 +178,8 @@ m_MaximumNumberOfPoints = 80*80*80;
     //writer->SetFileName( "out.vtk" );
     //writer->Update();
   }
-}
 
 
-/*
-* This method is called, each time a specific renderer is updated.
-*/
-void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
   if ( IsVisible( renderer ) == false )
   {
     if ( m_Glyph3DActor != NULL )

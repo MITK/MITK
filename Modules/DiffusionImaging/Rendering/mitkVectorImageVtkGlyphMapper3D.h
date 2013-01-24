@@ -66,10 +66,6 @@ protected:
 
     /**
      * Generate a vtkPolyData by creating vectors as glyphs
-     */
-    virtual void GenerateData();
-
-    /**
      * This method is called, each time a specific renderer is updated.
      */
     virtual void GenerateDataForRenderer( mitk::BaseRenderer* renderer );

@@ -40,13 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
-#ifdef WIN32
-  #include <windows.h>
-#else
-  #include <sys/time.h>
-#endif
-
-
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
  m_UnzipErrors(0)

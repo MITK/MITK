@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_UID_GENERATOR_INDCLUDED_FASAWE
 
 #include<string>
-#include <ctime>
 #include <MitkExports.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 
@@ -38,11 +37,9 @@ namespace mitk {
   The prefix is given to the constructor, together with the desired
   length of the random part (minimum 5 digits).
 
-  The current implementation uses the time in milliseconds in combination with an internal counter
-  and the process ID to initialze a std::rand random generator. This should at least assure a unique
-  ID one the same machine. However, this method is limited and you might get problems if generating
-  IDs on different machines. Still, there is also a very small chance to get identical random numbers.
-  A feature request for improved UID generation is handled in BUG 14333.
+  The current implementation uses the time in seconds in combination with an a random part. This
+  should assure a unique ID on a very high probability. Still, there is a very small chance to get
+  identical random numbers. A feature request for improved UID generation is handled in BUG 14333.
 */
 class MITK_CORE_EXPORT UIDGenerator
 {
@@ -54,7 +51,6 @@ class MITK_CORE_EXPORT UIDGenerator
   private:
     std::string m_Prefix;
     unsigned int m_LengthOfRandomPart;
-    unsigned int seedhash( time_t t, clock_t c );
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandomGenerator;
 };
 

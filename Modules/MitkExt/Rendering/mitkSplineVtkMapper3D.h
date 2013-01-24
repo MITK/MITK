@@ -70,8 +70,6 @@ protected:
 
     virtual ~SplineVtkMapper3D();
 
-    virtual void GenerateData();
-
     virtual void GenerateDataForRenderer(mitk::BaseRenderer * renderer);
 
     virtual void ApplyProperties(vtkActor *actor, BaseRenderer *renderer);

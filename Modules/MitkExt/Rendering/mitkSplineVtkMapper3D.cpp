@@ -60,10 +60,9 @@ void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer
   m_SplinesActor->SetUserTransform(vtktransform);
 }
 
-void
-mitk::SplineVtkMapper3D::GenerateData()
+
+void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
-  Superclass::GenerateData();
 
   // only update spline if UpdateSpline has not been called from
   // external, e.g. by the SplineMapper2D. But call it the first time when m_SplineUpdateTime = 0 and m_LastUpdateTime = 0.
@@ -89,11 +88,8 @@ mitk::SplineVtkMapper3D::GenerateData()
       m_SplinesAddedToAssembly = false;
     }
   }
-}
 
 
-void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
   if ( IsVisible( renderer ) == false )
   {
     m_SplinesActor->VisibilityOff();

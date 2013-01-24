@@ -28,7 +28,7 @@ mitk::GLMapper::~GLMapper()
 {
 }
 
-void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
+void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType /* type */){
 
   if(IsVisible(renderer)==false)
     return;

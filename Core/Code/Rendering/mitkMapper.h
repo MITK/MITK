@@ -176,7 +176,7 @@ namespace mitk {
     virtual void GenerateData() { };
 
     /** \brief Generate the data needed for rendering into \a renderer */
-    virtual void GenerateDataForRenderer(BaseRenderer* renderer) { };
+    virtual void GenerateDataForRenderer(BaseRenderer* /* renderer */) { };
 
     /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep( BaseRenderer* renderer );

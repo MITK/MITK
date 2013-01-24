@@ -127,13 +127,13 @@ void InteractionTests::DrawLines()
 
   if (m_ConfigChoice)
   {
-    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
-    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
   }
   else
   {
-    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfigRightClick.xml");
-    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfigRightClick.xml");
   }
   m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
 

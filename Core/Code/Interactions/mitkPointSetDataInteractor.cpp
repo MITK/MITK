@@ -24,6 +24,8 @@
 #include "mitkDispatcher.h"
 #include "mitkBaseRenderer.h"
 
+
+
 void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("addpoint", AddPoint);

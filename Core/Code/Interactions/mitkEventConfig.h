@@ -95,6 +95,7 @@ namespace mitk
      **/
     bool ReadXMLBooleanAttribut(std::string name, const char** atts);
 
+
     /**
      * @brief List of all global properties of the config object.
      */
@@ -111,6 +112,12 @@ namespace mitk
       std::string variantName;
       EventType interactionEvent;
     };
+    /**
+     * Checks if mapping with the same parameters already exists, if so, it is replaced,
+     * else the new mapping added
+     */
+    void InsertMapping(EventMapping mapping);
+
     typedef std::list<EventMapping> EventListType;
     EventMapping m_CurrEventMapping;
 

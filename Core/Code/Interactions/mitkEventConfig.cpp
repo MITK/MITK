@@ -39,16 +39,29 @@ mitk::EventConfig::~EventConfig()
 {
 }
 
+void mitk::EventConfig::InsertMapping(EventMapping mapping)
+{
+  for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
+  {
+    if ((*it).interactionEvent->isEqual(mapping.interactionEvent))
+    {
+      m_EventList.erase(it);
+      break;
+    }
+  }
+  m_EventList.push_back(mapping);
+}
+
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
 bool mitk::EventConfig::LoadConfig(std::string fileName)
 {
   if (fileName.empty())
+  {
     return false;
-
+  }
   this->SetFileName(fileName.c_str());
-
   return this->Parse() && !m_errors;
 }
 
@@ -83,7 +96,6 @@ void mitk::EventConfig::StartElement(const char* elementName, const char **atts)
     std::string value = ReadXMLStringAttribut(VALUE, atts);
     m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
-
 }
 
 void mitk::EventConfig::EndElement(const char* elementName)
@@ -96,14 +108,13 @@ void mitk::EventConfig::EndElement(const char* elementName)
     if (event.IsNotNull())
     {
       m_CurrEventMapping.interactionEvent = event;
-      m_EventList.push_back(m_CurrEventMapping);
+      InsertMapping(m_CurrEventMapping);
     }
     else
     {
       MITK_WARN<< "EventConfig: Unknown Event-Type in config. Entry skipped: " << name;
     }
   }
-
 }
 
 std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const char** atts)
@@ -123,7 +134,6 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
       attsIter++;
     }
   }
-
   return std::string();
 }
 

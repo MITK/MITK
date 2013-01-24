@@ -348,43 +348,6 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix();
 }
 
-/*
-void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
-{
-  if(datatreenode!=NULL)
-  {
-    mitk::Mapper::Pointer mapper = datatreenode->GetMapper(m_MapperID);
-    if(mapper.IsNotNull())
-    {
-      Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
-      if(mapper2d != NULL)
-      {
-        if(GetDisplayGeometry()->IsValid())
-        {
-          VtkMapper2D* vtkmapper2d=dynamic_cast<VtkMapper2D*>(mapper.GetPointer());
-          if(vtkmapper2d != NULL)
-          {
-            vtkmapper2d->Update(this);
-            m_VtkMapperPresent=true;
-          }
-          else
-            mapper2d->Update(this);
-        }
-      }
-      else
-      {
-        VtkMapper3D* vtkmapper3d=dynamic_cast<VtkMapper3D*>(mapper.GetPointer());
-        if(vtkmapper3d != NULL)
-        {
-          vtkmapper3d->Update(this);
-          vtkmapper3d->UpdateVtkTransform(this);
-          m_VtkMapperPresent=true;
-        }
-      }
-    }
-  }
-}*/
-
 
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
 {

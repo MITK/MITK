@@ -48,12 +48,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkProp3DCollection.h>
 
 
-void mitk::UnstructuredGridMapper2D::GenerateData()
+void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
+
+   mitk::DataNode::ConstPointer node = this->GetDataNode();
   if ( node.IsNull() )
     return;
-
 
   if (!node->GetProperty(m_ScalarMode, "scalar mode"))
   {
@@ -80,10 +80,6 @@ void mitk::UnstructuredGridMapper2D::GenerateData()
     m_LineWidth = mitk::IntProperty::New(1);
   }
 
-}
-
-void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
   mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetData() );
   assert( input );
 

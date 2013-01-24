@@ -66,7 +66,6 @@ protected:
 
     virtual ~UnstructuredGridMapper2D();
 
-    virtual void GenerateData();
     virtual void GenerateDataForRenderer(BaseRenderer*);
 
     /**

@@ -117,23 +117,6 @@ mitk::TestInteractor::~TestInteractor()
 {
 }
 
-// TODO: probably obsolete! also in superclass!!
-bool mitk::TestInteractor::IsPointerOverData(InteractionEvent* interactionEvent)
-{
-  // here we only want to handle mouse move events, since for all other events it is irrelevant if
-  // we hover over an object
-  MouseMoveEvent* mouseMoveEvent = dynamic_cast<MouseMoveEvent*>(interactionEvent);
-  if (mouseMoveEvent != NULL)
-  {
-    return true;
-  }
-  else
-  {
-    return true; // we do not handle other events
-  }
-
-}
-
 bool mitk::TestInteractor::ColorGreen(StateMachineAction*, InteractionEvent*)
 {
   GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 1.0, 0.0));

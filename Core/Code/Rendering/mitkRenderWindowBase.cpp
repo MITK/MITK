@@ -67,6 +67,11 @@ void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManage
   m_InResize = false;
 }
 
+bool mitk::RenderWindowBase::HandleEvent(InteractionEvent* interactionEvent)
+{
+  return m_Renderer->GetDispatcher()->ProcessEvent(interactionEvent);
+}
+
 void mitk::RenderWindowBase::Destroy()
 {
   m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetVtkRenderWindow());
@@ -79,6 +84,7 @@ mitk::RenderWindowBase::~RenderWindowBase()
 {
 
 }
+
 
 void mitk::RenderWindowBase::mousePressMitkEvent(mitk::MouseEvent *me)
 {

@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
 
+#include "mitkInteractionEvent.h"
+
 namespace mitk
 {
 
@@ -39,6 +41,7 @@ namespace mitk
  *
  * \ingroup Renderer
  */
+
 class MITK_CORE_EXPORT RenderWindowBase
 {
 
@@ -67,12 +70,20 @@ public:
 
   void SetInvertScrollingDirection( bool );
 
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void mousePressMitkEvent(mitk::MouseEvent *me);
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me);
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void mouseMoveMitkEvent(mitk::MouseEvent *me);
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void wheelMitkEvent(mitk::WheelEvent *we);
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void keyPressMitkEvent(mitk::KeyEvent* mke);
+  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
   virtual void resizeMitkEvent(int width, int height);
+
+  virtual bool HandleEvent(InteractionEvent* interactionEvent);
 
 protected:
   RenderWindowBase();

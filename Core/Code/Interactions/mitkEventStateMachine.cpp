@@ -87,7 +87,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
 
       success |= ExecuteAction(*it, event); // treat an event as handled if at least one of the actions is executed successfully
     }
-    if (success || actions.size() == 0)  // an empty action list is always successful
+    if (success || actions.empty())  // an empty action list is always successful
     {
       // perform state change
       m_CurrentState = transition->GetNextState();

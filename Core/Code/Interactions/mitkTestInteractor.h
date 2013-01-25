@@ -42,7 +42,6 @@ namespace mitk
     TestInteractor();
     virtual ~TestInteractor();
     virtual void ConnectActionsAndFunctions();
-    virtual bool IsPointerOverData(InteractionEvent*);
 
   private:
     bool AddPoint(StateMachineAction* , InteractionEvent*);

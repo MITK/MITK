@@ -84,7 +84,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
       GetModifiers(me), GetEventButton(me));
 
-  if (!m_Renderer->GetDispatcher()->ProcessEvent(mPressEvent.GetPointer()))
+  if (!this->HandleEvent(mPressEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mousePressMitkEvent(&myevent);
@@ -100,7 +100,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
       GetModifiers(me), GetEventButton(me));
 
-  if (!m_Renderer->GetDispatcher()->ProcessEvent(mReleaseEvent.GetPointer()))
+  if (!this->HandleEvent(mReleaseEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
@@ -118,7 +118,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
       GetModifiers(me));
 
-  if (!m_Renderer->GetDispatcher()->ProcessEvent(mMoveEvent.GetPointer()))
+  if (!this->HandleEvent(mMoveEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     this->mouseReleaseMitkEvent(&myevent);
@@ -136,7 +136,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, GetMousePosition(we), GetButtonState(we),
       GetModifiers(we), GetDelta(we));
 
-  if (!m_Renderer->GetDispatcher()->ProcessEvent(mWheelEvent.GetPointer()))
+  if (!this->HandleEvent(mWheelEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
     this->wheelMitkEvent(&myevent);
@@ -153,7 +153,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   std::string key = GetKeyLetter(ke);
 
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
-  if (!m_Renderer->GetDispatcher()->ProcessEvent(keyEvent.GetPointer()))
+  if (!this->HandleEvent(keyEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     QPoint cp = mapFromGlobal(QCursor::pos());
     mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
@@ -169,6 +169,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
+  // TODO implement new event
   QVTKWidget::enterEvent(e);
 }
 
@@ -182,6 +183,7 @@ void QmitkRenderWindow::DeferredHideMenu()
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
+  // TODO implement new event
   MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
 
   if (m_MenuWidget)

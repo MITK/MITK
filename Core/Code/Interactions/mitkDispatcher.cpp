@@ -78,6 +78,7 @@ mitk::Dispatcher::~Dispatcher()
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 {
+
   InteractionEvent::Pointer p = event;
   //MITK_INFO << event->GetEventClass();
   bool eventIsHandled = false;

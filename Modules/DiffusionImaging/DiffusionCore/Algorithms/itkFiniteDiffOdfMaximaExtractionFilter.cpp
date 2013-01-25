@@ -460,15 +460,25 @@ vnl_matrix<double> FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOd
         for (int l=0; l<=ShOrder; l=l+2)
             for (m=-l; m<=l; m++)
             {
-                plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
-                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+//                plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
+//                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
 
-                if (m<0)
-                    shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));
+//                if (m<0)
+//                    shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));
+//                else if (m==0)
+//                    shBasis(p,j) = mag;
+//                else
+//                    shBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(p,1));
+
+                plm = legendre_p<double>(l,abs(m),-cos(sphCoords(p,0)));
+                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                if (m>0)
+                    shBasis(p,j) = mag*cos(m*sphCoords(p,1));
                 else if (m==0)
                     shBasis(p,j) = mag;
                 else
-                    shBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(p,1));
+                    shBasis(p,j) = mag*sin(-m*sphCoords(p,1));
+
                 j++;
             }
     }

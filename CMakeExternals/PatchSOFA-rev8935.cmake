@@ -5,3 +5,9 @@ foreach(sourceFile "${baseDir}gl.h" "${baseDir}glu.h" "${baseDir}glut.h" "${base
   set(CONTENTS ${sourceCode})
   configure_file(${TEMPLATE_FILE} ${sourceFile} @ONLY)
 endforeach()
+
+set(sourceFile "modules/sofa/component/linearsolver/SSORPreconditioner.inl")
+file(STRINGS ${sourceFile} sourceCode NEWLINE_CONSUME)
+string(REGEX REPLACE "getM" "this->getM" sourceCode ${sourceCode})
+set(CONTENTS ${sourceCode})
+configure_file(${TEMPLATE_FILE} ${sourceFile} @ONLY)

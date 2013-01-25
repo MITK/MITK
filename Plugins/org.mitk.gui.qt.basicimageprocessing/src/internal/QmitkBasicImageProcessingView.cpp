@@ -77,6 +77,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkCastImageFilter.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 // Image Arithmetics
 #include <itkAddImageFilter.h>
@@ -131,6 +132,8 @@ typedef itk::AndImageFilter< ImageType, ImageType >                             
 typedef itk::XorImageFilter< ImageType, ImageType >                                     XorImageFilterType;
 
 typedef itk::FlipImageFilter< ImageType >                                               FlipImageFilterType;
+
+typedef itk::LinearInterpolateImageFunction< ImageType, double >                       LinearInterpolatorType;
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
@@ -227,6 +230,8 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat2->insertItem( OR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "OR", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( XOR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "XOR", 0, QApplication::UnicodeUTF8) ) );
 
+  this->m_Controls->cbParam4->clear();
+  this->m_Controls->cbParam4->insertItem( LINEAR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Linear", 0, QApplication::UnicodeUTF8) ) );
 }
 
 //datamanager selection changed
@@ -239,7 +244,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   m_Controls->tlParam4->hide();
   m_Controls->sbParam1->show();
   m_Controls->sbParam2->show();
-  m_Controls->cobParam4->hide();
+  m_Controls->cbParam4->hide();
   //any nodes there?
   if (!nodes.empty())
   {
@@ -331,7 +336,7 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
   m_Controls->dsbParam1->setEnabled(false);
   m_Controls->dsbParam2->setEnabled(false);
   m_Controls->dsbParam3->setEnabled(false);
-  m_Controls->cobParam4->setEnabled(false);
+  m_Controls->cbParam4->setEnabled(false);
   m_Controls->sbParam1->setValue(0);
   m_Controls->sbParam2->setValue(0);
   m_Controls->dsbParam1->setValue(0);
@@ -343,7 +348,7 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
   m_Controls->dsbParam1->hide();
   m_Controls->dsbParam2->hide();
   m_Controls->dsbParam3->hide();
-  m_Controls->cobParam4->hide();
+  m_Controls->cbParam4->hide();
   m_Controls->tlParam3->hide();
   m_Controls->tlParam4->hide();
 }
@@ -557,8 +562,12 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->dsbParam3->setEnabled(true);
       m_Controls->tlParam4->show();
       m_Controls->tlParam4->setEnabled(true);
-      m_Controls->cobParam4->show();
-      m_Controls->cobParam4->setEnabled(true);
+      m_Controls->cbParam4->show();
+      m_Controls->cbParam4->setEnabled(true);
+
+      m_Controls->dsbParam1->setValue(0.3);
+      m_Controls->dsbParam2->setValue(0.3);
+      m_Controls->dsbParam3->setValue(1.5);
 
       text1 = "x-spacing:";
       text2 = "y-spacing:";
@@ -904,10 +913,46 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       break;
     }
 
-  case RESAMPLING
-  {
-    break;
-  }
+  case RESAMPLING:
+    {
+      ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+      switch (m_SelectedInterpolation)
+      {
+      case LINEAR:
+        {
+          LinearInterpolatorType::Pointer interpolator = LinearInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          break;
+        }
+      }
+      resampler->SetInput( itkImage );
+      resampler->SetOutputOrigin( itkImage->GetOrigin() );
+
+      ImageType::SizeType input_size = itkImage->GetLargestPossibleRegion().GetSize();
+      ImageType::SpacingType input_spacing = itkImage->GetSpacing();
+
+      ImageType::SizeType output_size;
+      ImageType::SpacingType output_spacing;
+
+      output_size[0] = input_size[0] * (input_spacing[0] / dparam1);
+      output_size[1] = input_size[1] * (input_spacing[1] / dparam2);
+      output_size[2] = input_size[2] * (input_spacing[2] / dparam3);
+      output_spacing [0] = dparam1;
+      output_spacing [1] = dparam2;
+      output_spacing [2] = dparam3;
+
+      resampler->SetSize( output_size );
+      resampler->SetOutputSpacing( output_spacing );
+      resampler->SetOutputDirection( itkImage->GetDirection() );
+
+      resampler->UpdateLargestPossibleRegion();
+
+      ImageType::Pointer resampledImage = resampler->GetOutput();
+
+      newImage = mitk::ImportItkImage( resampledImage );
+      nameAddition << "_Resampled";
+      break;
+    }
 
   default:
     this->BusyCursorOff();

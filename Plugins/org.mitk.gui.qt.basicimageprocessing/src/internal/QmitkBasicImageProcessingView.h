@@ -180,6 +180,9 @@ private:
     XOR
   } m_SelectedOperation;
 
+  enum InterpolationType{
+    LINEAR
+  } m_SelectedInterpolation;
 };
 
 #endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)

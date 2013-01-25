@@ -82,6 +82,9 @@ namespace mitk
 
     mitk::ConnectomicsNetwork::Pointer GetNetwork();
 
+    itkSetMacro(MappingStrategy, MappingStrategy);
+    itkSetMacro(EndPointSearchRadius, double);
+
     /** \brief Calculate the locations of vertices
      *
      * Calculate the center of mass for each label and store the information. This will need a set parcellation image.
@@ -205,6 +208,12 @@ namespace mitk
 
     // stores the coordinates of labels
     std::map< int, std::vector< double> > m_LabelsToCoordinatesMap;
+
+    // the straty to use for mapping
+    MappingStrategy m_MappingStrategy;
+
+    // search radius for finding a non white matter/background area. Should be in mm
+    double m_EndPointSearchRadius;
 
     //////////////////////// IDs ////////////////////////////
 

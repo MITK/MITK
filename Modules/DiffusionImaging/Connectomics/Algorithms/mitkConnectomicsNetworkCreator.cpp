@@ -693,7 +693,7 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
           finalDistance.resize( singleTract->front().Size() );
           for( int index = 0; index < singleTract->front().Size(); index++ )
           {
-            finalDistance[ index ] = foundPointSegmentation.GetElement( index ) - endPoint.GetElement( index );
+            finalDistance[ index ] = foundPointFiber.GetElement( index ) - endPoint.GetElement( index );
           }
 
           // calculate length of direction vector
@@ -706,8 +706,6 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
             finalSum = finalSum + finalDistance[ index ] * finalDistance[ index ];
           }
           finalLength = std::sqrt( finalSum );
-
-          std::cout << "Distance is " << finalLength << "\n";
 
           if( finalLength > m_EndPointSearchRadius )
           {

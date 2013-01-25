@@ -25,21 +25,23 @@ mitk::InformerService::InformerService()
 {
 }
 
-void mitk::InformerService::RegisterObserver(EventObserver::Pointer eventObserver)
+void mitk::InformerService::RegisterObserver(EventObserver* eventObserver)
 {
+  EventObserver::Pointer pEventObserver = eventObserver;
   for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
   {
-    if (*it == eventObserver)
+    if (*it == pEventObserver)
     {
       return;
     }
   }
-  m_ListObserver.push_back(eventObserver);
+  m_ListObserver.push_back(pEventObserver);
 }
 
-void mitk::InformerService::UnRegisterObserver(EventObserver::Pointer eventObserver)
+void mitk::InformerService::UnRegisterObserver(EventObserver* eventObserver)
 {
-  m_ListObserver.remove(eventObserver);
+  EventObserver::Pointer pEventObserver = eventObserver;
+  m_ListObserver.remove(pEventObserver);
 }
 
 void mitk::InformerService::NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled)

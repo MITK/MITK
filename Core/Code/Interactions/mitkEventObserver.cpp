@@ -27,3 +27,8 @@ mitk::EventObserver::EventObserver()
 mitk::EventObserver::~EventObserver()
 {
 }
+
+bool mitk::EventObserver::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
+{
+  return true;
+}

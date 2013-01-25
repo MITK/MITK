@@ -32,8 +32,8 @@ namespace mitk
   class MITK_CORE_EXPORT InformerService: public itk::Object
   {
   public:
-    void RegisterObserver(EventObserver::Pointer eventObserver);
-    void UnRegisterObserver(EventObserver::Pointer eventObserver);
+    void RegisterObserver(EventObserver* eventObserver);
+    void UnRegisterObserver(EventObserver* eventObserver);
     void NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled);
 
     InformerService();

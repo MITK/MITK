@@ -15,71 +15,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
-#define MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB
+#ifndef mitkDisplayVectorInteractor_h
+#define mitkDisplayVectorInteractor_h
 
 #include <MitkExports.h>
-#include "mitkBaseRenderer.h"
-#include "mitkStateMachine.h"
+#include "mitkEventObserver.h"
 
 namespace mitk {
-
-  class Operation;
-  class OperationActor;
-
   /**
   *@brief Interactor for displaying different slices in orthogonal views.
   * This includes the interaction of Zooming and Panning.
   * @ingroup Interaction
   **/
-  class MITK_CORE_EXPORT DisplayVectorInteractor : public StateMachine
+  class MITK_CORE_EXPORT DisplayVectorInteractor : public EventObserver
   {
   public:
     mitkClassMacro(DisplayVectorInteractor, StateMachine);
-    mitkNewMacro2Param(Self, const char*, OperationActor*);
+    itkNewMacro(Self);
 
-    /**
-    * @brief Method derived from OperationActor to recieve and execute operations
-    **/
-    virtual void ExecuteOperation(Operation* operation);
-
-    /**
-     * @brief Method that returns how well this event can be handled by the DisplayVectorInteractor
-     *        a right click into a 2D renderwindow can be handled very well!
-     **/
-    float CanHandleEvent(const StateEvent *stateEvent) const;
-
+    virtual void Notify(InteractionEvent::Pointer interactionEvent,bool isHandled);
   protected:
-    /**
-    * @brief Default Constructor
-    **/
-    DisplayVectorInteractor(const char * type, mitk::OperationActor* destination=NULL);
-
-    /**
-    * @brief Default Destructor
-    **/
+    DisplayVectorInteractor();
     virtual ~DisplayVectorInteractor();
 
-    /**
-    * @brief Method derived from StateMachine to implement the own actions
-    **/
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    void ConnectActionsAndFunctions();
+    virtual bool Init(StateMachineAction*, InteractionEvent*);
+    virtual bool Move(StateMachineAction*, InteractionEvent*);
+    virtual bool Zoom(StateMachineAction*, InteractionEvent*);
 
   private:
-    BaseRenderer::Pointer m_Sender;
-
     mitk::Point2D m_StartDisplayCoordinate;
     mitk::Point2D m_LastDisplayCoordinate;
     mitk::Point2D m_CurrentDisplayCoordinate;
     mitk::Point2D m_StartCoordinateInMM;
-
-    OperationActor* m_Destination;
   };
-
 } // namespace mitk
-
-
-
-#endif /* MITKDISPLAYVECTORINTERACTOR_H_HEADER_INCLUDED_C10DC4EB */
-
-
+#endif

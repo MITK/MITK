@@ -93,7 +93,7 @@ namespace mitk
    *
    */
 
-  class MITK_CORE_EXPORT EventStateMachine: public EventHandler
+  class MITK_CORE_EXPORT EventStateMachine: public virtual EventHandler
   {
 
   public:

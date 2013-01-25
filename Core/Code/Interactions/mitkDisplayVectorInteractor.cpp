@@ -1,166 +1,140 @@
 /*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+ The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+ Copyright (c) German Cancer Research Center,
+ Division of Medical and Biological Informatics.
+ All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+ This software is distributed WITHOUT ANY WARRANTY; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.
 
-See LICENSE.txt or http://www.mitk.org for details.
+ See LICENSE.txt or http://www.mitk.org for details.
 
-===================================================================*/
-
+ ===================================================================*/
 
 #include "mitkDisplayVectorInteractor.h"
-#include "mitkOperation.h"
-#include "mitkDisplayCoordinateOperation.h"
-#include "mitkDisplayPositionEvent.h"
-#include "mitkUndoController.h"
-#include "mitkStateEvent.h"
-#include "mitkInteractionConst.h"
-#include "mitkAction.h"
+#include "mitkBaseRenderer.h"
+#include "mitkInteractionPositionEvent.h"
+#include "mitkPropertyList.h"
+#include <string.h>
 
-void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( operation ) )
+void mitk::DisplayVectorInteractor::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
 {
-  /*DisplayCoordinateOperation* dcOperation = static_cast<DisplayCoordinateOperation*>(operation);
-  if(dcOperation==NULL) return;
-
-  switch(operation->GetOperationType())
+  // to use the state machine pattern,
+  // the event is passed to the state machine interface to be handled
+  if (!isHandled)
   {
-  case OpSELECTPOINT:
-    m_Sender=dcOperation->GetRenderer();
-    m_StartDisplayCoordinate=dcOperation->GetStartDisplayCoordinate();
-    m_LastDisplayCoordinate=dcOperation->GetLastDisplayCoordinate();
-    m_CurrentDisplayCoordinate=dcOperation->GetCurrentDisplayCoordinate();
-//    MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
-
-    MITK_INFO<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
-      << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate
-      << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate
-      << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate
-      << std::endl;
-
-    break;
-  }*/
-
-}
-
-float mitk::DisplayVectorInteractor::CanHandleEvent(const StateEvent *stateEvent) const
-{
-  const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-  if(posEvent==NULL) return 0.0;
-
-  //StateEvents from "moveNzoom", "alternativePan", "alternativeZoom" interaction pattern. If EventID can be handled by these statemachine patterns return a high value
-  if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
-      stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
-      stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
-  {
-    return 0.9;
-  }
-  else
-  {
-    return 0.0;
+    this->HandleEvent(interactionEvent, NULL);
   }
 }
 
-bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
+void mitk::DisplayVectorInteractor::ConnectActionsAndFunctions()
 {
-  bool ok=false;
-
-  const DisplayPositionEvent* posEvent=dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
-  if(posEvent==NULL) return false;
-
-  int actionId = action->GetActionId();
-  //initzoom and initmove is the same!
-  if (actionId == AcINITZOOM)
-    actionId = AcINITMOVE;
-  switch(actionId)
-  {
-  //case 0:
-  //  {
-  //    DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
-  //
-  //    //execute the Operation
-  //    m_Destination->ExecuteOperation(doOp);
-  //    ok = true;
-  //    break;
-  //  }
-  case AcSENDCOORDINATES:
-    {
-      DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpSENDCOORDINATES,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
-      m_Destination->ExecuteOperation(doOp);
-      ok = true;
-      break;
-    }
-  case AcINITMOVE:
-    {
-      m_Sender=posEvent->GetSender();
-
-      mitk::Vector2D origin = m_Sender->GetDisplayGeometry()->GetOriginInMM();
-       double scaleFactorMMPerDisplayUnit = m_Sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
-
-      m_StartDisplayCoordinate=posEvent->GetDisplayPosition();
-      m_LastDisplayCoordinate=posEvent->GetDisplayPosition();
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-      m_StartCoordinateInMM=mitk::Point2D( ( origin+m_StartDisplayCoordinate.GetVectorFromOrigin()*scaleFactorMMPerDisplayUnit ).GetDataPointer() );
-      ok = true;
-      break;
-    }
-  case AcMOVE:
-    {
-      DisplayCoordinateOperation doOp(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_CurrentDisplayCoordinate, posEvent->GetDisplayPosition());
-      //make Operation
-      m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-
-      //execute the Operation
-      m_Destination->ExecuteOperation(&doOp);
-      ok = true;
-      break;
-    }
-  case AcFINISHMOVE:
-    {
-      ok = true;
-      break;
-    }
-  case AcZOOM:
-    {
-      DisplayCoordinateOperation doOp(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition(),m_StartCoordinateInMM);
-
-      //make Operation
-      m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
-      m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-      //MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
-
-      //execute the Operation
-      m_Destination->ExecuteOperation(&doOp);
-      ok = true;
-      break;
-    }
-  default:
-    ok = false;
-    break;
-  }
-  return ok;
+  CONNECT_FUNCTION("init", Init);
+  CONNECT_FUNCTION("move", Move);
+  CONNECT_FUNCTION("zoom", Zoom);
 }
 
-mitk::DisplayVectorInteractor::DisplayVectorInteractor(const char * type, mitk::OperationActor* destination)
-  : mitk::StateMachine(type), m_Sender(NULL), m_Destination(destination)
+mitk::DisplayVectorInteractor::DisplayVectorInteractor()
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
-
-  if(m_Destination==NULL)
-    m_Destination=this;
 }
-
 
 mitk::DisplayVectorInteractor::~DisplayVectorInteractor()
 {
 }
 
+bool mitk::DisplayVectorInteractor::Init(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == NULL)
+  {
+    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    return false;
+  }
+
+  Vector2D origin = sender->GetDisplayGeometry()->GetOriginInMM();
+  double scaleFactorMMPerDisplayUnit = sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
+  m_StartDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  m_StartCoordinateInMM = mitk::Point2D(
+      (origin + m_StartDisplayCoordinate.GetVectorFromOrigin() * scaleFactorMMPerDisplayUnit).GetDataPointer());
+  return true;
+}
+
+bool mitk::DisplayVectorInteractor::Move(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == NULL)
+  {
+    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    return false;
+  }
+
+  // perform translation
+  sender->GetDisplayGeometry()->MoveBy((positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * (-1.0));
+  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+
+  //m_LastDisplayCoordinate =positionEvent->GetPointerPositionOnScreen();
+
+  MITK_INFO << "dist to last" << (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate);
+  MITK_INFO << "dist to start" << (positionEvent->GetPointerPositionOnScreen() - m_StartDisplayCoordinate);
+
+  m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  return true;
+}
+
+bool mitk::DisplayVectorInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == NULL)
+  {
+    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    return false;
+  }
+
+  mitk::PropertyList::Pointer properties = GetPropertyList();
+  std::string strScrollDirection = "", strZoomFactor = "";
+
+  properties->GetStringProperty("zoomFactor", strZoomFactor);
+  float factor = 1.0, zoomFactor = .05;
+  if (atoi(strZoomFactor.c_str()) > 0)
+  {
+    zoomFactor = 1.0 + (atoi(strZoomFactor.c_str()) / 100.0);
+  }
+
+  float distance = 0;
+  properties->GetStringProperty("scrollDirection", strScrollDirection);
+  if (strScrollDirection == "leftright")
+  {
+
+    distance = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
+  }
+  else
+  {
+    distance = m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0];
+  }
+
+  if (distance < 0.0)
+  {
+    factor = 1.0 / zoomFactor;
+  }
+  else if (distance > 0.0)
+  {
+    factor = 1.0 * zoomFactor; // 5%
+  }
+  sender->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, m_StartDisplayCoordinate, m_StartCoordinateInMM);
+  sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
+  m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
+  m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  return true;
+}

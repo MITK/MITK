@@ -19,9 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 
 #include "MitkExports.h"
+#include <itkObject.h>
+
+#include "mitkDisplayVectorInteractor.h"
 #include "mitkGlobalInteraction.h"
 
-#include <itkObject.h>
 
 namespace mitk {
 
@@ -136,6 +138,8 @@ namespace mitk {
     ListenerList m_ListenersForPACS;
 
     StateMachine::Pointer m_LeftMouseButtonHandler;
+
+    DisplayVectorInteractor::Pointer m_CurrentObserver;
 
   };
 

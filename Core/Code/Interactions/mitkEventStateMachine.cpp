@@ -128,8 +128,12 @@ mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
   return m_CurrentState.GetPointer();
 }
 
-bool mitk::EventStateMachine::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* dataNode)
+bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode)
 {
+  if (dataNode == NULL) {
+    MITK_WARN << "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
+    return false;
+  }
   bool visible = false;
   if (dataNode->GetPropertyList()->GetBoolProperty("visible", visible) == false)
   { //property doesn't exist

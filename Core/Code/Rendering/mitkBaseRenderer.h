@@ -443,9 +443,10 @@ namespace mitk
     virtual mitk::RenderingManager* GetRenderingManager() const;
 
     /**
-     * \brief Provides world coordinates for a given mouse position.
+     * \brief Provides (1) world coordinates for a given mouse position and (2)
+     * translates mousePosition to Display coordinates
      */
-    virtual Point3D Map2DRendererPositionTo3DWorldPosition(Point2D mousePosition) const;
+    virtual Point3D Map2DRendererPositionTo3DWorldPosition(Point2D* mousePosition) const;
 
   protected:
 

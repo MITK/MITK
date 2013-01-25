@@ -244,6 +244,7 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
+#  Interactions/mitkStatedEventObserver.cpp
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp

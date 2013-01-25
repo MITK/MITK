@@ -24,7 +24,7 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
 {
   if (GetSender() != NULL)
   {
-    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(m_PointerPosition);
+    m_WorldPosition = GetSender()->Map2DRendererPositionTo3DWorldPosition(&m_PointerPosition);
   }
   else
   {

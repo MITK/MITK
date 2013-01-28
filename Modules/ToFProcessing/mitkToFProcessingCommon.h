@@ -313,9 +313,23 @@ namespace mitk
 
     inline static ToFProcessingCommon::ToFPoint3D CartesianToKinectIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength, ToFPoint2D  principalPoint, bool calculateDistance=true)
     {
-        return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
+      return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
     }
     /** @}*/
+    /**
+     * @brief ContinuousKinectIndexToCartesianCoordinates This method is escpially meant for reconstructing a Kinect point
+     * with continuous index coordinates (i.e. not exactly a pixel position, but a point interpolated between two pixels).
+     * The only difference to KinectIndexToCartesianCoordinates() is that ContinuousKinectIndexToCartesianCoordinates does not
+     * cast to unsigned int for the index.
+     * @param continuousIndex The continuous coordinates (e.g. 0.5; 0.5).
+     * @param distance Distance value d in mm as obtained from OpenNI.
+     * @param focalLengthX x value of the focal length (from calibration).
+     * @param focalLengthY y value of the focal length (from calibration)
+     * @param principalPointX x value of the principal point (from calibration).
+     * @param principalPointY y value of the principal point (from calibration).
+     * @return a ToFPoint3D. The point in world coordinates (mm).
+     */
+    static ToFProcessingCommon::ToFPoint3D ContinuousKinectIndexToCartesianCoordinates(mitk::Point2D continuousIndex, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY);
   };
 }
 #endif

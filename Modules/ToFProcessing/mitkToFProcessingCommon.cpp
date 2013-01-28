@@ -125,7 +125,6 @@ namespace mitk
     return indexCoordinatesAndDistanceValue;
   }
 
-
   ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::CartesianToIndexCoordinatesWithInterpixdist(ToFScalarType cartesianPointX, ToFScalarType cartesianPointY,ToFScalarType cartesianPointZ,
     ToFScalarType focalLength, ToFScalarType interPixelDistanceX, ToFScalarType interPixelDistanceY,
     ToFScalarType principalPointX, ToFScalarType principalPointY, bool calculateDistance)
@@ -149,5 +148,16 @@ namespace mitk
       indexCoordinatesAndDistanceValue[2] = 0.0;
     }
     return indexCoordinatesAndDistanceValue;
+  }
+
+  ToFProcessingCommon::ToFPoint3D ToFProcessingCommon::ContinuousKinectIndexToCartesianCoordinates(mitk::Point2D continuousIndex, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY)
+  {
+    ToFPoint3D cartesianCoordinates;
+
+    cartesianCoordinates[0] = distance * (continuousIndex[0] - principalPointX) / focalLengthX;
+    cartesianCoordinates[1] = distance * (continuousIndex[1] - principalPointY) / focalLengthY;
+    cartesianCoordinates[2] = distance;
+
+    return cartesianCoordinates;
   }
 }

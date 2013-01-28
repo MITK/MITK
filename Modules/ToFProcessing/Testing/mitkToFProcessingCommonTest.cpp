@@ -72,11 +72,19 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
     index[2] = 0;
 
     mitk::ToFProcessingCommon::ToFPoint3D kinectReconstructionResult = mitk::ToFProcessingCommon::KinectIndexToCartesianCoordinates(index,distance, focalLength_XY,principalPoint);
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedKinectCoordinate,kinectReconstructionResult),"Testing KinectIndexToCartesianCoordinates()");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedKinectCoordinate,kinectReconstructionResult),"Compare the expected result with the result of reconstruction from KinectIndexToCartesianCoordinates()");
 
     mitk::ToFProcessingCommon::ToFPoint3D kinectReconstructionResultBackward = mitk::ToFProcessingCommon::CartesianToKinectIndexCoordinates(kinectReconstructionResult, focalLength_XY, principalPoint);
 
-    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedIndex,kinectReconstructionResultBackward),"Testing CartesianToKinectIndexCoordinates()");
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedIndex,kinectReconstructionResultBackward),"Transform everything back to distance image and compare it to the original input");
+
+    mitk::Point2D continuousIndex;
+    continuousIndex[0] = i;
+    continuousIndex[1] = j;
+    mitk::ToFProcessingCommon::ToFPoint3D continuousKinectReconstructionResult = mitk::ToFProcessingCommon::ContinuousKinectIndexToCartesianCoordinates(continuousIndex,distance, focalLength_XY,principalPoint);
+
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedKinectCoordinate,continuousKinectReconstructionResult),"Compare the expected result with the result of reconstruction from ContinuousKinectIndexToCartesianCoordinates(). Since the index is not continuous, the result has to be the same like for KinectIndexToCartesianCoordinates().");
+
     //########## End Kinect Reconstruction #############
 
     MITK_TEST_END();

@@ -58,6 +58,8 @@ bool mitk::StateMachineContainer::LoadBehavior(std::string fileName)
   if (fileName.empty())
     return false;
 
+  m_Filename = fileName;
+
   this->SetFileName(fileName.c_str());
 
   return this->Parse() && !m_errors;
@@ -141,7 +143,7 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
     if (m_CurrTransition)
       m_CurrTransition->AddAction(action);
     else
-      MITK_WARN<< "Malformed Statemachine Pattern. Action without transition. \n Will be ignored.";
+      MITK_WARN<< "Malformed state machine Pattern. Action without transition. \n Will be ignored.";
     }
 
   }
@@ -152,6 +154,9 @@ void mitk::StateMachineContainer::EndElement(const char* elementName)
 
   if (name == CONFIG)
   {
+    if (m_StartState.IsNull()) {
+      MITK_ERROR << "State machine pattern has no start state and cannot be used: " << m_Filename;
+    }
     ConnectStates();
   }
   else if (name == TRANSITION)

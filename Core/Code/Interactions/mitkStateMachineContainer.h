@@ -112,7 +112,7 @@ namespace mitk {
     StateMachineCollectionType m_States;
     bool m_StartStateFound;
     bool m_errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
-
+    std::string m_Filename; // store file name for debug purposes.
   };
 
 } // namespace mitk

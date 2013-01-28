@@ -394,6 +394,14 @@ function myMouseMove()
 {
   var infobox = d3.select(".infobox");
   var coords = d3.mouse(this);
-  infobox.style("left", coords[0] + 75 + "px");
-  infobox.style("top", coords[1] + "px");
+  if ((coords[0]+120)<(width-margin.right))
+  {
+    infobox.style("left", coords[0] + 75 + "px");
+    infobox.style("top", coords[1] + "px");
+  }
+  else
+  {
+    infobox.style("left", coords[0] - 90 + "px");
+    infobox.style("top",coords[1] + "px");
+  }
 }

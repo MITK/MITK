@@ -218,6 +218,15 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
+    bool isBinary = false;
+    selectedNodes.value(0)->GetBoolProperty("binary",isBinary);
+    if(isBinary)
+    {
+      m_Controls->m_JSHistogram->clearHistogram();
+      m_Controls->m_lineRadioButton->setEnabled(true);
+      m_Controls->m_barRadioButton->setEnabled(true);
+      m_Controls->m_InfoLabel->setText(QString(""));
+    }
     for (int i= 0; i< selectedNodes.size(); ++i)
     {
       this->m_SelectedDataNodes.push_back(selectedNodes.at(i));

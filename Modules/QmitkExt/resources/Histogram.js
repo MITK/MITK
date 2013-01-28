@@ -112,7 +112,7 @@ function calcBinSize()
 {
   var min = d3.min(histogramData.measurement);
   var max = d3.max(histogramData.measurement);
-  binSize = Math.round((max - min) / (histogramData.measurement.length));
+  binSize = ((max - min) / (histogramData.measurement.length));
 }
 
 // method to display histogram as barchart

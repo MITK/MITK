@@ -115,6 +115,8 @@ public:
     */
     void ChangeGUI();
 
+    void SelectInterpolator(int interpolator);
+
 private:
 
   /*
@@ -181,7 +183,8 @@ private:
   } m_SelectedOperation;
 
   enum InterpolationType{
-    LINEAR
+    LINEAR,
+    NEAREST
   } m_SelectedInterpolation;
 };
 

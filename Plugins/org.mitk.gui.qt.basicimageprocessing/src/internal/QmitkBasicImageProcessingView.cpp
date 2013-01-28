@@ -133,7 +133,8 @@ typedef itk::XorImageFilter< ImageType, ImageType >                             
 
 typedef itk::FlipImageFilter< ImageType >                                               FlipImageFilterType;
 
-typedef itk::LinearInterpolateImageFunction< ImageType, double >                       LinearInterpolatorType;
+typedef itk::LinearInterpolateImageFunction< ImageType, double >                        LinearInterpolatorType;
+typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >               NearestInterpolatorType;
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
@@ -185,6 +186,8 @@ void QmitkBasicImageProcessing::CreateConnections()
 
     connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
+
+    connect( (QObject*)(m_Controls->cbParam4), SIGNAL( activated(int) ), this, SLOT( SelectInterpolator(int) ) );
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime,
@@ -232,19 +235,19 @@ void QmitkBasicImageProcessing::Activated()
 
   this->m_Controls->cbParam4->clear();
   this->m_Controls->cbParam4->insertItem( LINEAR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Linear", 0, QApplication::UnicodeUTF8) ) );
-}
+  this->m_Controls->cbParam4->insertItem( NEAREST, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Nearest neighbor", 0, QApplication::UnicodeUTF8) ) );
 
-//datamanager selection changed
-void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
-{
   m_Controls->dsbParam1->hide();
   m_Controls->dsbParam2->hide();
   m_Controls->dsbParam3->hide();
   m_Controls->tlParam3->hide();
   m_Controls->tlParam4->hide();
-  m_Controls->sbParam1->show();
-  m_Controls->sbParam2->show();
   m_Controls->cbParam4->hide();
+}
+
+//datamanager selection changed
+void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+{
   //any nodes there?
   if (!nodes.empty())
   {
@@ -377,6 +380,17 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   QString text3 = "No Parameters";
   QString text4 = "No Parameters";
 
+  if (action != 19)
+  {
+    m_Controls->dsbParam1->hide();
+    m_Controls->dsbParam2->hide();
+    m_Controls->dsbParam3->hide();
+    m_Controls->tlParam3->hide();
+    m_Controls->tlParam4->hide();
+    m_Controls->sbParam1->show();
+    m_Controls->sbParam2->show();
+    m_Controls->cbParam4->hide();
+  }
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (action)
   {
@@ -863,8 +877,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       ResampleImageFilterType::Pointer downsampler = ResampleImageFilterType::New();
       downsampler->SetInput( itkImage );
 
-      typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
-      InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      NearestInterpolatorType::Pointer interpolator = NearestInterpolatorType::New();
       downsampler->SetInterpolator( interpolator );
 
       downsampler->SetDefaultPixelValue( 0 );
@@ -915,6 +928,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   case RESAMPLING:
     {
+      std::string selectedInterpolator;
       ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
       switch (m_SelectedInterpolation)
       {
@@ -922,6 +936,21 @@ void QmitkBasicImageProcessing::StartButtonClicked()
         {
           LinearInterpolatorType::Pointer interpolator = LinearInterpolatorType::New();
           resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Linear";
+          break;
+        }
+      case NEAREST:
+        {
+          NearestInterpolatorType::Pointer interpolator = NearestInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Nearest";
+          break;
+        }
+      default:
+        {
+          LinearInterpolatorType::Pointer interpolator = LinearInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Linear";
           break;
         }
       }
@@ -950,7 +979,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       ImageType::Pointer resampledImage = resampler->GetOutput();
 
       newImage = mitk::ImportItkImage( resampledImage );
-      nameAddition << "_Resampled";
+      nameAddition << "_Resampled_" << selectedInterpolator;
+      std::cout << "Resampling successful." << std::endl;
       break;
     }
 
@@ -1255,3 +1285,19 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   this->BusyCursorOff();
 }
 
+void QmitkBasicImageProcessing::SelectInterpolator(int interpolator)
+{
+  switch (interpolator)
+  {
+  case 0:
+    {
+      m_SelectedInterpolation = LINEAR;
+      break;
+    }
+  case 1:
+    {
+      m_SelectedInterpolation = NEAREST;
+      break;
+    }
+  }
+}

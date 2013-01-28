@@ -74,19 +74,12 @@ bool mitk::DisplayVectorInteractor::Move(StateMachineAction*, InteractionEvent* 
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor: cannot process the event in Move action: " << interactionEvent->GetEventClass();
     return false;
   }
-
   // perform translation
   sender->GetDisplayGeometry()->MoveBy((positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * (-1.0));
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
-
-  //m_LastDisplayCoordinate =positionEvent->GetPointerPositionOnScreen();
-
-  MITK_INFO << "dist to last" << (positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate);
-  MITK_INFO << "dist to start" << (positionEvent->GetPointerPositionOnScreen() - m_StartDisplayCoordinate);
-
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   return true;
 }

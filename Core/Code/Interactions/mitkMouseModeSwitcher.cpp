@@ -1,19 +1,18 @@
 /*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+ The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+ Copyright (c) German Cancer Research Center,
+ Division of Medical and Biological Informatics.
+ All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+ This software is distributed WITHOUT ANY WARRANTY; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.
 
-See LICENSE.txt or http://www.mitk.org for details.
+ See LICENSE.txt or http://www.mitk.org for details.
 
-===================================================================*/
-
+ ===================================================================*/
 
 #include "mitkMouseModeSwitcher.h"
 
@@ -28,24 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleRegistry.h"
 #include "mitkInformer.h"
 
-
-mitk::MouseModeSwitcher::MouseModeSwitcher( mitk::GlobalInteraction* gi )
-: m_GlobalInteraction( gi )
-, m_ActiveInteractionScheme( MITK )
-, m_ActiveMouseMode( MousePointer )
-, m_LeftMouseButtonHandler( NULL )
+mitk::MouseModeSwitcher::MouseModeSwitcher(mitk::GlobalInteraction* gi) :
+    m_GlobalInteraction(gi), m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_LeftMouseButtonHandler(NULL)
 {
   assert(gi);
-
+  m_CurrentObserver = NULL;
   //this->InitializeListeners();
-  this->SetInteractionScheme( m_ActiveInteractionScheme );
+  this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
-
 
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
 {
 }
-
 
 void mitk::MouseModeSwitcher::InitializeListeners()
 {
@@ -74,22 +67,22 @@ void mitk::MouseModeSwitcher::InitializeListeners()
 //  listener = crtlZoomInteractor;
 //  m_ListenersForPACS.push_back( listener );
 
-
 }
 
-void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
+void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
 {
+  if (m_CurrentObserver.IsNull())
+  {
+    m_CurrentObserver = mitk::DisplayVectorInteractor::New();
 
+    m_CurrentObserver->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/DisplayInteraction.xml");
+    m_CurrentObserver->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/DisplayConfig.xml");
 
-  m_CurrentObserver = mitk::DisplayVectorInteractor::New();
-
-  m_CurrentObserver->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/DisplayInteraction.xml");
-  m_CurrentObserver->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/DisplayConfig.xml");
-
-  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
-  mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
-  service->RegisterObserver(m_CurrentObserver.GetPointer());
+    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
+    mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
+    service->RegisterObserver(m_CurrentObserver.GetPointer());
+  }
 
 //  switch ( scheme )
 //  {
@@ -125,11 +118,10 @@ void mitk::MouseModeSwitcher::SetInteractionScheme( InteractionScheme scheme )
 //    } // case PACS
 //  } // switch
 
-
   m_ActiveInteractionScheme = scheme;
 }
 
-void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode /*mode*/ )
+void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode /*mode*/)
 {
 //  if ( m_ActiveInteractionScheme != PACS )
 //    return;
@@ -198,10 +190,8 @@ void mitk::MouseModeSwitcher::SelectMouseMode( MouseMode /*mode*/ )
 
 }
 
-
 mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode() const
 {
   return m_ActiveMouseMode;
 }
-
 

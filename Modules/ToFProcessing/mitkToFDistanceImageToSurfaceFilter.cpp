@@ -105,6 +105,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
+  textureCoords->Allocate(size);
 
   //Make a vtkIdList to save the ID's of the polyData corresponding to the image
   //pixel ID's. See below for more documentation.
@@ -218,15 +219,15 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
-              polys->InsertNextCell(3);
-              polys->InsertCellPoint(x_1yV);
-              polys->InsertCellPoint(xyV);
-              polys->InsertCellPoint(x_1y_1V);
+            polys->InsertNextCell(3);
+            polys->InsertCellPoint(x_1yV);
+            polys->InsertCellPoint(xyV);
+            polys->InsertCellPoint(x_1y_1V);
 
-              polys->InsertNextCell(3);
-              polys->InsertCellPoint(x_1y_1V);
-              polys->InsertCellPoint(xyV);
-              polys->InsertCellPoint(xy_1V);
+            polys->InsertNextCell(3);
+            polys->InsertCellPoint(x_1y_1V);
+            polys->InsertCellPoint(xyV);
+            polys->InsertCellPoint(xy_1V);
           }
         }
         //Scalar values are necessary for mapping colors/texture onto the surface
@@ -235,13 +236,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           scalarArray->InsertTuple1(vertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
         }
         //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-        if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-        {
-
-          float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-          float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-          textureCoords->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
-        }
+        float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+        float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+        textureCoords->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
       }
     }
   }
@@ -254,11 +251,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     mesh->GetPointData()->SetScalars(scalarArray);
   }
-  //Pass the TextureCoords to the polydata (if they were set).
-  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-  {
-    mesh->GetPointData()->SetTCoords(textureCoords);
-  }
+  //Pass the TextureCoords to the polydata anyway (to save them).
+  mesh->GetPointData()->SetTCoords(textureCoords);
   output->SetVtkPolyData(mesh);
 }
 

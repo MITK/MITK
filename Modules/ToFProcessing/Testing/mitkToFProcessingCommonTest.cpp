@@ -81,7 +81,7 @@ int mitkToFProcessingCommonTest(int /* argc */, char* /*argv*/[])
     mitk::Point2D continuousIndex;
     continuousIndex[0] = i;
     continuousIndex[1] = j;
-    mitk::ToFProcessingCommon::ToFPoint3D continuousKinectReconstructionResult = mitk::ToFProcessingCommon::ContinuousKinectIndexToCartesianCoordinates(continuousIndex,distance, focalLength_XY,principalPoint);
+    mitk::ToFProcessingCommon::ToFPoint3D continuousKinectReconstructionResult = mitk::ToFProcessingCommon::ContinuousKinectIndexToCartesianCoordinates(continuousIndex,distance, focalLength_XY[0], focalLength_XY[1], principalPoint[0], principalPoint[1]);
 
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(expectedKinectCoordinate,continuousKinectReconstructionResult),"Compare the expected result with the result of reconstruction from ContinuousKinectIndexToCartesianCoordinates(). Since the index is not continuous, the result has to be the same like for KinectIndexToCartesianCoordinates().");
 

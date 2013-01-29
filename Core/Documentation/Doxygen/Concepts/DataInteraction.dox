@@ -5,21 +5,37 @@
 
 \section InteractionPage_Introduction Introduction to Interaction in MITK
 
-The interaction framework in MITK has been completely redesigned in order to facilitate the process of handling interaction and to provide
-easier means of configuration. For now these two frameworks co-exist, and this page describes the new framework. The documentation for the old
-and deprecated version can be found here \ref InteractionPage.
-
 Interaction is a very important task in medical image processing software. Therefore MITK provides a special interaction concept
 that provides the developer with an easy way to develop and maintain user interaction separately from the algorithms processing the input.
 This allows e.g. for common interaction schemes to be re-used in different contexts.
 
 The core of the interaction concept is based on entities called \b DataInteractors that listen for certain pre-defined events and execute
-actions when such an event is triggered. In the following the different components of the interaction concept are explained, then in the
-end an high-level overview about how the different components interact is given.
+actions when such an event is triggered.\n
+
+In the following the different components of the interaction concept are explained.
+First a a high-level overview about how the different components interact is given, then some parts are explained in more detail.
 
 See the \ref DataInteractionTechnicalPage page for a more technical explanation. \n
-//TODO: See here for an example on how to use an existing DataInteractor \n
-TODO: See here for an example on how to implement a new DataInteractor \n
+Consult \ref HowToUseDataInteractor for usage information.\n
+See \ref HowToDataInteractor for an example on how to implement a new DataInteractor \n
+The documentation of the depricated former concept is found at \ref InteractionPage.
+
+
+\section HandlingSection Event Handling & Window Manager Abstraction
+
+The following sequence diagram gives an examplary overview of the process from creating an event until executing an action in the DataInteractor.
+This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific window manager.
+
+\image html event_handling.png
+<ol>
+  <li>a user event is triggered and send to MITK
+  <li>this layler serves as an adapter from window manager (here Qt) events to MITK internal events (later refered to as InteractionEvents).
+  <li>once the event is adapted it is send to a Dispatcher, which is linked to a render window, to be handled.
+  <li>on Dispatcher level all objects are known that can react to incoming events (DataInteractors)
+  <li>a DataInteractor is offered an event and checks its EventConfig object, which returns if a variant if this event has been defined for this DataInteractor.
+  <li>if the DataInteractor has a variant for the event, it consults its state machine to check if the input can be handled in the current state
+  <li>the actions asociated with a state change (transition) are executed and the event is successfully handled.
+</ol>
 
 \section EventPage Events
 
@@ -33,73 +49,44 @@ For an overview of available Events see mitk::InteractionEvent, for on overview 
 
 \section EventHandlerSection EventHandler
 Is the term describing objects in general that can handle events. These objects can be devided into two groups, namely
-DataInteractors and EventObserver.
+DataInteractors and EventObserver. Their difference is that DataInteractors are linked with a DataNode which they manipulate,
+whereas EventObserver do not have a DataNode and therefore are not supposed to manipulate any data.
 
 \dot
 digraph linker_deps {
   node [shape=record, fontname=Helvetica, fontsize=10];
   a [ label="EventHandler" ];
-  b [ label="DataInteractor" ];
-  c [ label="EventObserver" ];
-  a -> b;
-  a -> c;
+  d [ label="{StateMachine|HandleEvent()}" ];
+  b [ label="{DataInteractor|HandleEvent()}" ];
+  c [ label="{EventObserver|Notify()}" ];
+  a -> d;
+  d -> b;
+  d -> c;
 }
 \enddot
-
-
-\subsection ConfigurationSection Configuration
-EventHandler provide an interface to modify the user input that triggers an action by loading a different configuration, this allows to implement
-user-specific behavior of the software on an abstract level and to switch in on run-time.
-This is achieved through XML files describing a configuration. These files can be loaded by the EventHandler and will lead to an internal mapping
-from specific user input to an absract description of the event given in the config file.
-
-In order to do this we distinguish between a spefic event and an event variant. A specific event is described by its event class, which determines the
-category of an event, e.g. the class MousePressEvent, and its parameter which make this event unique, e.g. LeftMouseButton pressed and no modifier keys pressed.
-The event variant is a name that is assigned to a spefific event, and to which an EventHandler listens.
-
-To illustrate this an example is given here for two different configuration files. We assume an EventHandler that listens to the event variant 'AddPoint',
-two possible config files could then look like this:
-
-\code
-<config name="one">
- <input event_class="MousePressEvent" event_variant="AddPoint">
-  <attribute name="EventButton" value="LeftMouseButton"/>
- </input>
-</config>
-\endcode
-
-and
-
-\code
-<config name="two">
- <input event_class="MousePressEvent" event_variant="AddPoint">
-  <attribute name="EventButton" value="RightMouseButton"/>
-  <attribute name="Modifiers" value="shift"/>
- </input>
-</config>
-\endcode
-
-If the EventHandler is loaded with the first configuration the event variant 'AddPoint' is triggered when the user performs a mouse click,
-while when the second configuration is loaded 'AddPoint' is triggered when the user performs a right click while pressing the shift button.
-In this way all objects derived by EventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
-
-
-
 
 \subsection DataInteractorsSection DataInteractors
 DataInteractors are specialized EventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
 \subsubsection StateMachinesSection StateMachines
+
+A specific events action is usually desired to dependent on the content of the data object the state of the interaction.
+For example if the when adding a line by clicking with the mouse, the first to clicks are supposed to add a point.
+But the second click should additionally finish the interaction and a subsequent third click should be ignored.
+State machines provide a great way to model such interaction in which the same user interaction can trigger different actions
+depending on the current state. Therefore DataInteractors work with so called state machine patterns.
 The basic idea here is that each interaction can be described by states
-and transitions which in turn trigger actions. This principle is best described by an example.
+and transitions which in turn trigger actions.
+These patterns define a workflow and different patterns can be applied to the same DataInteractor and cause this DataInteractor
+to perform different user interactions.
+This principle is best described by an example.
 Imagine a DataInteractor with the functionality (1) to add Points at a given mouse position and connect them by a line and (2) check if two
-points are on the same position. Using this DataInteractor different StateMachine descriptions
+points are on the same position. Using this DataInteractor, different StateMachine patterns/descriptions
 can be given which each cause the DataInteractor to perform different interaction schemes.
 
-Example 1:
-We want the user to draw a line. A simple state machine could express this by three states like this:
-
+<b>State machine pattern 1:
+We want the user to draw a line. A simple state machine could express this by three states like this:</b>
 \dot
 digraph linker_deps {
   node [shape=circle, fontname=Helvetica, fontsize=10];
@@ -113,9 +100,9 @@ digraph linker_deps {
 \enddot
  With each MousePress event the AddPoint function is called and adds a point at the mouse position, unless two points already exist.
 
-Example 2:
+<b>State machine pattern 2:
 The same DataInteractor can also operate after the following state machine, which models the interaction to input a closed contour.
-The DataInteractor can detect an AddPoint event on an already existing point and will trigger a PointsMatch event.
+The DataInteractor can detect an AddPoint event on an already existing point and will trigger a PointsMatch event.</b>
 
 \dot
 digraph  {
@@ -156,12 +143,55 @@ An example of a state machine describing the interaction of example 2 looks like
     <state name="ClosedContour"/>
 </statemachine>
 \endcode
+<b>Example 1: State machine pattern, that describes adding points to a contour until the PointsMatch event is triggered.</b>
 
-For a more detailed desciption of state machine patterns see here. TODO
+For a more detailed desciption of state machine patterns see here.
 
 \subsection EventObserverSection EventObserver
 
 EventObserver are objects which will receive all user input and are intented for observation only, they should never modify any DataNodes.
+For EventObserver it is optional to use the state machine functionality, the default is without. How to use the state machine functionality
+ is described in the documentation of mitk::EventObserver::Notify.
+
+\subsection ConfigurationSection Configuration
+In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that is it possible
+to easily change this. This is achieved through configuration of EventHandlers. This allows to change the behavior at runtime.
+The EventHandler provides an interface to easily modify the user input that triggers an action by loading a different configuration, this allows to implement
+user-specific behavior of the software on an abstract level and to switch in at runtime.
+This is achieved through XML files describing a configuration. These files can be loaded by the EventHandler and will lead to an internal mapping
+from specific user input to an absract description of the event given in the config file.
+
+In order to do this we distinguish between a spefic event and an event variant. A specific event is described by its event class, which determines the
+category of an event, e.g. the class MousePressEvent, and its parameter which make this event unique, e.g. LeftMouseButton pressed and no modifier keys pressed.
+The event variant is a name that is assigned to a spefific event, and to which an EventHandler listens.
+
+To illustrate this, an example is given here for two different configuration files. We assume an EventHandler that listens to the event variant 'AddPoint',
+two possible config files could then look like this:
+
+\code
+<config name="one">
+ <input event_class="MousePressEvent" event_variant="MousePress">
+  <attribute name="EventButton" value="LeftMouseButton"/>
+ </input>
+</config>
+\endcode
+<b>Example 2: Event description of a left click with the mouse</b>
+
+and
+
+\code
+<config name="two">
+ <input event_class="MousePressEvent" event_variant="MousePress">
+  <attribute name="EventButton" value="RightMouseButton"/>
+  <attribute name="Modifiers" value="shift"/>
+ </input>
+</config>
+\endcode
+<b>Example 3: Event description of a left click with the mouse while pressing the shift-key</b>
+
+If the EventHandler is loaded with the first configuration the event variant 'MousePress' is triggered when the user performs a mouse click,
+while when the second configuration is loaded 'MousePress' is triggered when the user performs a right click while pressing the shift button.
+In this way all objects derived by EventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
 
 
 \section DispatcherSection Dispatcher
@@ -169,12 +199,4 @@ EventObserver are objects which will receive all user input and are intented for
 This unit receives all events and distributes them to the DataInteractors. This is done by ordering the DataInteractors according to the layer of their
 DataNode in descending order. Then the event is offered to the first DataInteractor, which in turn checks if it can handle the event. This is done
 for each DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all EventObservers are notified.
-The Dispatcher provides some special modi of event distribution, for more details see here TODO LINK.
-
-\section HandlingSection Sequence Diagram of Event Handling
-
-The following sequence diagram gives an examplary overview of the process from creating an event until executing an action in the DataInteractor.
-
-\image html event_handling.png
-
  */

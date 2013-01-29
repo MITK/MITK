@@ -579,8 +579,17 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->cbParam4->show();
       m_Controls->cbParam4->setEnabled(true);
 
+      m_Controls->dsbParam1->setMinimum(0.01);
+      m_Controls->dsbParam1->setMaximum(10.0);
+      m_Controls->dsbParam1->setSingleStep(0.1);
       m_Controls->dsbParam1->setValue(0.3);
+      m_Controls->dsbParam2->setMinimum(0.01);
+      m_Controls->dsbParam2->setMaximum(10.0);
+      m_Controls->dsbParam2->setSingleStep(0.1);
       m_Controls->dsbParam2->setValue(0.3);
+      m_Controls->dsbParam3->setMinimum(0.01);
+      m_Controls->dsbParam3->setMaximum(10.0);
+      m_Controls->dsbParam3->setSingleStep(0.1);
       m_Controls->dsbParam3->setValue(1.5);
 
       text1 = "x-spacing:";

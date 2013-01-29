@@ -177,8 +177,21 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     virtual void ULDisplayToDisplay(const Vector2D &vec_ULdisplay, Vector2D &vec_display) const;
     virtual void DisplayToULDisplay(const Vector2D &vec_display, Vector2D &vec_ULdisplay) const;
 
+    /**
+    * \brief projects the given point onto current 2D world geometry plane
+    */
     virtual bool Project(const Point3D &pt3d_mm, Point3D &projectedPt3d_mm) const;
+
+    /**
+    * \brief projects the given vector onto current 2D world geometry plane.
+    * \warning DEPRECATED, please use Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) instead
+    */
     virtual bool Project(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
+
+    /**
+    * \brief projects the given vector onto current 2D world geometry plane
+    */
+    virtual bool Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
 
     virtual bool Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const;
     virtual void Map(const Point2D &pt2d_mm, Point3D &pt3d_mm) const;

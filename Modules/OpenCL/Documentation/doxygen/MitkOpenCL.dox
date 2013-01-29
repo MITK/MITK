@@ -1,0 +1,49 @@
+
+/**
+
+\page MitkOpenCL_Example Examples
+
+This is a list of available examples:
+- \subpage MitkOpenCL_BinaryThresholdFilter
+
+*/
+
+
+/**
+
+\page MitkOpenCL_Overview The MITK OpenCL Module
+
+The MITK OpenCL Module provides a basic class structure to allow usage of OpenCL-accelerated parallel computing.
+
+<h1> Build Instructions </h1>
+
+The MITK OpenCL module needs an OpenCL Device ( most likely a graphics card, but works also on some CPUs ) and the corresponding driver. Furthermore the OpenCL library and the headers are needed. A list of supported hardware is provided by <a href="http://www.khronos.org/conformance/adopters/conformant-products#topencl"> Khronos.org </a>. For the driver and the libraries please look at the support pages of the hardware manufacturer. Quick Links to the most likely of them:
+- <a href="https://developer.nvidia.com/opencl"> NVIDIA OpenCL Page </a>
+- <a href="http://www.amd.com/de/products/technologies/stream-technology/opencl/pages/opencl.aspx"> AMD/ATI OpenCL Page </a>
+- <a href="http://software.intel.com/en-us/vcsource/tools/opencl-sdk"> Intel OpenCL SDK </a>
+
+To activate the module, you have to activate the CMake option
+
+\verbatim
+MITK_USE_OpenCL
+\endverbatim
+
+The build system tries to find the OpenCL library and the include path automatically. If this attempt failes, you will be prompted to manually specify following variables:
+
+\verbatim
+OpenCL_INCLUDE_DIR
+OpenCL_LIBRARY
+\endverbatim
+
+
+
+<h1> Detailed description </h1>
+
+For own implementations, the OpenCL Module allows for building up a filtering pipeline in MITK Style ( see more in \ref PipelineingConceptPage ). The OpenCL filter can be simply connected also to an existing MITK image filtering pipeline since the mitk::OclImageToImageFilter provide a SetInput and GetOutput methods expecting an mitk::Image and returning it respectively.
+
+<h1> Examples </h1>
+
+Here is a list of \subpage MitkOpenCL_Example "examples":
+ - \ref MitkOpenCL_BinaryThresholdFilter
+
+ */

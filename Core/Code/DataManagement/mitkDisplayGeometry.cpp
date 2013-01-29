@@ -359,6 +359,18 @@ bool mitk::DisplayGeometry::Project(const Point3D & atPt3d_mm, const Vector3D &v
   }
 }
 
+bool mitk::DisplayGeometry::Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const
+{
+   if(m_WorldGeometry.IsNotNull())
+   {
+      return m_WorldGeometry->Project(vec3d_mm, projectedVec3d_mm);
+   }
+   else
+   {
+      return false;
+   }
+}
+
 bool mitk::DisplayGeometry::Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const
 {
   if(m_WorldGeometry.IsNotNull())

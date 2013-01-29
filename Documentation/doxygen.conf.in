@@ -198,6 +198,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "endBlueBerry=\endif" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
+                         "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" "
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
@@ -734,6 +735,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ann/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
                          @MITK_BINARY_DIR@/Core/Code/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/BlueBerry/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
@@ -778,12 +780,14 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
+                        @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
                          @MITK_SOURCE_DIR@/Core/Code/ \
                          @MITK_SOURCE_DIR@/Core/Code/CppMicroServices/Documentation/Snippets/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
                          @MITK_SOURCE_DIR@/Documentation/Snippets/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
+                         @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp

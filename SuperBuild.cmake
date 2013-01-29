@@ -173,6 +173,7 @@ set(mitk_cmake_boolean_args
   MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
   MITK_USE_Python
+  MITK_USE_OpenCL
   )
 
 #-----------------------------------------------------------------------------

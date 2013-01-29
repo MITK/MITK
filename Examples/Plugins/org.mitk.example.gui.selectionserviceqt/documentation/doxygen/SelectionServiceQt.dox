@@ -1,0 +1,47 @@
+/**
+
+\page BlueBerryExampleSelectionServiceQt Qt Model/View selections
+
+  \brief An example application plug-in with a minimal selection service based on Qt selection models.
+
+  \image html SelectionServiceQT.png
+
+  In this example the selection service is used to connect the selection of the radio buttons from one
+  view with the selection of the list of the other view. The SelectionView holds a QListWidget that provides
+  the user selection (qt selection provider) for the selection listener (ListenerView). The radio buttons of
+  the listener view are changed according to the selection in the QListWidget. Vice versa the radio buttons
+  (the selection listener) does not provide any selection events. If the user changes the radio button state
+  the QListWidget is not altered.
+
+  For additional informations on the selection service concept see http://www.mitk.org/wiki/Article_Using_the_Selection_Service
+
+  The berry::QtSelectionProvider class implements the interface berry::ISelectionProvider. Due to the model/view concept in Qt, the workbench
+  provides the berry::QtSelectionProvider class for Qt viewers which must be provided with a QItemSelectionModel.
+
+  In the SelectionView.h we declare a pointer that holds the selection provider...
+  \snippet SelectionView.h Qt Selection Provider
+
+  ...and in the SelectionView.cpp we set the selection model to the model of the QListWidget (m_SelectionList)
+  \snippet SelectionView.cpp Qt Selection Provider registration
+
+  Now that the QListWidget of the SelectionView sends out selection events we need a listener implementation. In the ListenerView.h
+  we need to include the ISelectionListener which is a simple class with just one method.
+
+  The method that implements the selection listener functionality of ISelectionListener and the pointer that holds the selection listener is declared...
+  \snippet ListenerView.h Qt Selection Listener method and pointer
+
+  ...and implemented in the cpp-file:
+  \snippet ListenerView.cpp Qt Selection Listener method implementation
+
+  Now the name of the selected list element is passed to a method that toggles the radio buttons of the ListenerView accordingly.
+
+
+  View complete source files:
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/SelectionView.cpp,SelectionView.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/SelectionView.h,SelectionView.h}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.cpp,ListenerView.cpp}
+  \li \github{Examples/Plugins/org.mitk.example.gui.selectionserviceqt/src/internal/ListenerView.h,ListenerView.h}
+
+[\ref BlueBerrySelectionServiceIntro] [Next: \ref BlueBerryExampleSelectionServiceMitk] [\ref BlueBerryExamples]
+
+*/

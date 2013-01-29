@@ -65,13 +65,26 @@ public:
   //## AbstractTransformGeometry
   itkGetConstObjectMacro(Plane, PlaneGeometry);
 
+  /**
+  * \brief projects the given point onto the curved plane
+  */
   virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
+
+  /**
+  * \brief projects a given vector starting from given point onto the curved plane
+  * \warning no satisfiyng implementation existing yet
+  */
+  virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+
+  /**
+  * \brief projects a given vector starting from standard point onto the curved plane
+  * \warning no satisfying implementation existing yet
+  */
+  virtual bool Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
   virtual bool Map(const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const;
 
   virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const;
-
-  virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
   virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 

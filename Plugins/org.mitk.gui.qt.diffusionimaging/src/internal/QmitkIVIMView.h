@@ -62,7 +62,7 @@ public:
 
   void OnSliceChanged(const itk::EventObject& e);
   void OutputToDatastorage(std::vector<mitk::DataNode*> nodes);
-  void FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos);
+  bool FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos);
 
   void Activated();
   void Deactivated();

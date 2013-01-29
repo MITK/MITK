@@ -46,6 +46,8 @@ class ImagePixelReadAccessor : public ImagePixelAccessor<TPixel, VDimension>
   friend class Image;
 
 public:
+   typedef ImagePixelAccessor<TPixel,VDimension> ImagePixelAccessorType;
+
   /** \brief Instantiates a mitk::ImageReadAccessor (see its doxygen page for more details)
      *  \param Image::Pointer specifies the associated Image
      *  \param ImageDataItem* specifies the allocated image part
@@ -75,7 +77,7 @@ public:
     }
 
     // Check if PixelType is correct
-    if(!(m_ReadAccessor.m_Image->GetPixelType() !=  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
+    if(!(m_ReadAccessor.m_Image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
     {
       mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
     }
@@ -89,9 +91,9 @@ public:
   }
 
   /** Returns a const reference to the pixel at given index. */
-  const TPixel & GetPixelByIndex(const IndexType & idx) const
+  const TPixel & GetPixelByIndex(const itk::Index<VDimension>& idx) const
   {
-    unsigned int offset = PixelAccessorType::GetOffset(idx);
+     unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 
     return *(((TPixel*)m_ReadAccessor.m_AddressBegin) + offset);
   }
@@ -99,9 +101,9 @@ public:
   /** Extends GetPixel by integrating index validation to prevent overflow.
     * \throws mitk::Exception in case of overflow
     */
-  const TPixel & GetPixelByIndexSafe(const IndexType& idx) const
+  const TPixel & GetPixelByIndexSafe(const itk::Index<VDimension>& idx) const
   {
-    unsigned int offset = PixelAccessorType::GetOffset(idx);
+    unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 
     TPixel* targetAddress = ((TPixel*)m_ReadAccessor.m_AddressBegin) + offset;
 

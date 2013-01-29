@@ -1,0 +1,73 @@
+/**
+
+\page BlueBerryIntro BlueBerry Application Framework
+
+BlueBerry is an application framework used in MITK for creating modular and extensible end-user applications.
+
+More high-level documentation can be found below:
+
+- \subpage BlueBerryWorkbench
+
+Please see the \ref BlueBerryExamples for code examples demonstrating different features of the appication framework.
+
+
+\page BlueBerryWorkbench The Workbench: What are Views, Editors, Perspectives?
+
+BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how to build up a GUI. The different objects of the platform UI shall be described here:
+
+\section Workbench Workbench
+\li root object of the platform UI
+\li collection of \ref WorkbenchWindow "windows"
+\image html workbench.jpg "The Workbech"
+
+\section WorkbenchWindow WorkbenchWindow
+\li has one \ref Workbench-Page "page"
+\image html workbench-window.jpg "Worbench Windows"
+
+\section WorkbenchPage Workbench Page
+\li denotes to the inner part of the \ref WorkbenchWindow "window", that is: everything except the title bar
+\li may have one menu bar, one toolbar, one shortcut bar, and one statusbar
+\li has one or more \ref Perspective "perspectives"
+\image html workbench-page.jpg "Workbench Page"
+
+\section Perspective Perspective
+<UL>
+<LI> A visual container for a set of \ref Views "views" and content \ref Editors "editors" </LI>
+<LI> Shows \ref Views "views" and \ref Editors "editors" in a certain layout </LI>
+<LI> Like a page within a book: </LI>
+    <UL>
+    <LI> Only one perspective is visible at any time </LI>
+    <LI> There are several perspectives inside a \ref Workbench-Page "page" </LI>
+    </UL>
+</UL>
+\image html workbench-window-perspective.png "A Perspective"
+
+\section Part Part
+\li every \ref Views "View" or \ref Editors "Editor" is called \b Part
+
+\subsection Editors Editors
+\li the StdMultiWidget is an example for an editor in our MainApp
+\li Contains the primary content, such as a document or image data, which users interact with
+\li content is the primary focus of attention and a reflection of the primary task
+\li primary position in the UI
+\li contributes commands to the workbench's main menu bar and toolbar
+\li shared in other perspectives
+\image html workbench-window-editor-area.png "Editor Area"
+
+\subsection Views Views
+<UL>
+<LI> support the primary task </LI>
+    <UL>
+    <LI> navigate a hierarchy of information </LI>
+    <LI> open an \ref Editors "editor" </LI>
+    <LI> view/edit properties </LI>
+    </UL>
+<LI> The views exist wholly within the perspective (not shared, one instance at a time) </LI>
+<LI> Every functionality is a view- it supports medical image processing </LI>
+</UL>
+\image html workbench-window-views.png "Views"
+
+\section ClassDiagram Summary as class diagram
+\image html workbench-class-diagram.jpg "class diagram"
+
+*/

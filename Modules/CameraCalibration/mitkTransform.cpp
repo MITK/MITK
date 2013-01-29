@@ -462,6 +462,17 @@ namespace mitk
     tmp->GetMatrix(matrix);
   }
 
+  mitk::Point3D Transform::TransformPoint(mitk::Point3D point) const
+  {
+      itk::Matrix<mitk::ScalarType,3,3> R(GetVnlRotationMatrix());
+      itk::Point<mitk::ScalarType,3> pointR = (R * point);
+      mitk::Point3D retPoint = pointR;
+      retPoint[0] = pointR[0] + GetPosition()[0];
+      retPoint[1] = pointR[1] + GetPosition()[1];
+      retPoint[2] = pointR[2] + GetPosition()[2];
+      return retPoint;
+  }
+
   //# cv getter
   cv::Mat Transform::GetCvTranslation() const
   {

@@ -87,6 +87,11 @@ void mitk::PicFileReader::GenerateOutputInformation()
             return;
         }
 
+        // if pic image only 2D, the n[2] value is not initialized
+        unsigned int slices = 1;
+        if( header->dim == 2 )
+            header->n[2] = slices;
+
         // First initialize the geometry of the output image by the pic-header
         SlicedGeometry3D::Pointer slicedGeometry = mitk::SlicedGeometry3D::New();
         PicHelper::InitializeEvenlySpaced(header, header->n[2], slicedGeometry);

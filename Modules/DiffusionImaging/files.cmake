@@ -222,6 +222,7 @@ set(H_FILES
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkResampleDwiImageFilter.h
 
   # Algorithms Connectomics
   Algorithms/Connectomics/mitkConnectomicsNetworkCreator.h
@@ -244,6 +245,9 @@ set(H_FILES
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
+  SignalModels/mitkKspaceArtifact.h
+  SignalModels/mitkGibbsRingingArtifact.h
+  SignalModels/mitkT2SmearingArtifact.h
 )
 
 set( TOOL_FILES

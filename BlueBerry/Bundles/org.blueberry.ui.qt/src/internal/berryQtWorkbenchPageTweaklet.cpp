@@ -40,8 +40,7 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);
   QtControlWidget* client = new QtControlWidget(parent, 0);
-  client->setObjectName("Client Composite");
-  parent->layout()->setContentsMargins(3, 3, 3, 3);
+  client->setObjectName("ClientComposite");
   parent->layout()->addWidget(client);
 
   // we have to enable visibility to get a proper layout (see bug #1654)

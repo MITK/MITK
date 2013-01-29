@@ -6,773 +6,1749 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>741</height>
+    <width>493</width>
+    <height>909</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="3" column="0">
-    <widget class="QCommandLinkButton" name="m_GenerateFibersButton">
-     <property name="enabled">
-      <bool>false</bool>
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <property name="text">
-      <string>Generate Fibers</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Image Generation</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="2" rowspan="2">
-       <widget class="QDoubleSpinBox" name="m_SpacingY">
-        <property name="minimum">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>50.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.500000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3" rowspan="2">
-       <widget class="QSpinBox" name="m_SizeZ">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" rowspan="2">
-       <widget class="QDoubleSpinBox" name="m_SpacingX">
-        <property name="minimum">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>50.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.500000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" rowspan="2">
-       <widget class="QSpinBox" name="m_SizeX">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>11</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3" rowspan="2">
-       <widget class="QDoubleSpinBox" name="m_SpacingZ">
-        <property name="minimum">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>50.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>2.500000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" rowspan="2">
-       <widget class="QSpinBox" name="m_SizeY">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="value">
-         <number>11</number>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Image Spacing:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Image Dimensions:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="4">
-       <widget class="QFrame" name="m_TensorsToDWIFrame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QFormLayout" name="formLayout_3">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Fiber Generation</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="m_RealTimeFibers">
+         <property name="toolTip">
+          <string>Disable to only generate fibers if &quot;Generate Fibers&quot; button is pressed.</string>
          </property>
-         <property name="horizontalSpacing">
-          <number>6</number>
+         <property name="text">
+          <string>Real Time Fibers</string>
          </property>
-         <property name="verticalSpacing">
-          <number>6</number>
+         <property name="checked">
+          <bool>true</bool>
          </property>
-         <property name="margin">
-          <number>0</number>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="m_FiberGenMessage">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 0, 0);</string>
          </property>
-         <item row="1" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_2">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Image Name:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="m_ImageName">
-           <property name="text">
-            <string>phantom</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>b-value:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="m_TensorsToDWIBValueEdit">
-           <property name="minimum">
-            <number>0</number>
-           </property>
-           <property name="maximum">
-            <number>10000</number>
-           </property>
-           <property name="singleStep">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>1000</number>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel">
-           <property name="text">
-            <string>#Gradient Directions:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QSpinBox" name="m_NumGradientsBox">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>10000</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>60</number>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="m_NoiseLabel">
-           <property name="text">
-            <string>SNR:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="m_NoiseLevel">
-           <property name="toolTip">
-            <string>Signal to noise ratio (for values &gt; 99, no noise at all is added to the image).</string>
-           </property>
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="minimum">
-            <double>0.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.001000000000000</double>
-           </property>
-           <property name="value">
-            <double>15.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
-           <property name="text">
-            <string>Kernel FA:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QDoubleSpinBox" name="m_MaxFaBox">
-           <property name="minimum">
-            <double>0.010000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.700000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_3">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Tissue Mask:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="m_TissueMaskLabel">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>-</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QCommandLinkButton" name="m_GenerateImageButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Generate Image</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Fiber Generation</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="2" column="0">
-       <widget class="QFrame" name="frame_3">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_5">
-         <property name="margin">
-          <number>0</number>
+         <property name="text">
+          <string>Please select an image to draw the fiber fiducials. If you can't provide a suitable image, generate one using the &quot;Signal Generation&quot; tab.</string>
          </property>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="m_DistributionBox">
-           <item>
-            <property name="text">
-             <string>Uniform</string>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="m_ConstantRadiusBox">
+         <property name="toolTip">
+          <string>All fiducials are treated as circles with the same radius as the first fiducial. </string>
+         </property>
+         <property name="text">
+          <string>Use Constant Fiducial Radius</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Fiber Operations</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="3" column="0">
+           <widget class="QCommandLinkButton" name="m_TransformBundlesButton">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-           </item>
-           <item>
             <property name="text">
-             <string>Gaussian</string>
+             <string>Transform Bundles</string>
             </property>
-           </item>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_9">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Fiber Distribution:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QDoubleSpinBox" name="m_VarianceBox">
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>0.001000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>10.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.010000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.100000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QFrame" name="frame">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <property name="margin">
-          <number>0</number>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QFrame" name="frame_4">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="1">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>X</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_18">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Y</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_21">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Translation:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Rotation:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Z</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_22">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Axis:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="m_XrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around x-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QDoubleSpinBox" name="m_YrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around y-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around z-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="m_XtransBox">
+               <property name="toolTip">
+                <string>Translation (in mm) in direction of the x-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QDoubleSpinBox" name="m_YtransBox">
+               <property name="toolTip">
+                <string>Translation (in mm) in direction of the y-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZtransBox">
+               <property name="toolTip">
+                <string>Translation (in mm) in direction of the z-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCommandLinkButton" name="m_CopyBundlesButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Copy Bundles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCommandLinkButton" name="m_JoinBundlesButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Join Bundles</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="m_CircleButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Draw elliptical fiducial.</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="m_FlipButton">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Flip fiber waypoints of selcted fiducial around one axis.</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-             <normaloff>:/QmitkDiffusionImaging/refresh.xpm</normaloff>:/QmitkDiffusionImaging/refresh.xpm</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QFrame" name="frame_2">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QFormLayout" name="formLayout_2">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="verticalSpacing">
-          <number>6</number>
+        </spacer>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QFrame" name="frame_5">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="margin">
-          <number>0</number>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
-         <item row="1" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_4">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>#Fibers:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="m_FiberDensityBox">
-           <property name="toolTip">
-            <string>Select number of fibers to generate for the selected bundle.</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>1000000</number>
-           </property>
-           <property name="singleStep">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_8">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Fiber Sampling:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QSpinBox" name="m_FiberSamplingBox">
-           <property name="toolTip">
-            <string>Points per cm</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>10</number>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_5">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Tension:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QDoubleSpinBox" name="m_TensionBox">
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-1.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_6">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Continuity:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="m_ContinuityBox">
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-1.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="m_TensorsToDWIBValueLabel_7">
-           <property name="toolTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="statusTip">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="whatsThis">
-            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
-           </property>
-           <property name="text">
-            <string>Bias:</string>
-           </property>
-           <property name="wordWrap">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="m_BiasBox">
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-1.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="m_RealTimeFibers">
-     <property name="text">
-      <string>Real Time Fibers</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QCommandLinkButton" name="m_JoinBundlesButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Join Bundles</string>
-     </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QFrame" name="frame_2">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_2">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <property name="verticalSpacing">
+              <number>6</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_4">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>#Fibers:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="m_FiberDensityBox">
+               <property name="toolTip">
+                <string>Specify number of fibers to generate for the selected bundle.</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>1000000</number>
+               </property>
+               <property name="singleStep">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_8">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Fiber Sampling:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="m_FiberSamplingBox">
+               <property name="toolTip">
+                <string>Fiber sampling points (per cm)</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>10</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_5">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Tension:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="m_TensionBox">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>-1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_6">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Continuity:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="m_ContinuityBox">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>-1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_7">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Bias:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QDoubleSpinBox" name="m_BiasBox">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>-1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QFrame" name="frame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="m_CircleButton">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Draw elliptical fiducial.</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                 <normaloff>:/QmitkDiffusionImaging/circle.png</normaloff>:/QmitkDiffusionImaging/circle.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="m_FlipButton">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Flip fiber waypoints of selcted fiducial around one axis.</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+                 <normaloff>:/QmitkDiffusionImaging/refresh.xpm</normaloff>:/QmitkDiffusionImaging/refresh.xpm</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>32</width>
+                 <height>32</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QFrame" name="frame_3">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_DistributionBox">
+               <property name="toolTip">
+                <string>Select fiber distribution inside of the fiducials.</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Uniform</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Gaussian</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_9">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Fiber Distribution:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QDoubleSpinBox" name="m_VarianceBox">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCommandLinkButton" name="m_GenerateFibersButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Generate Fibers</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Signal Generation</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="2" column="0">
+        <widget class="QCommandLinkButton" name="m_GenerateImageButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>Start DWI generation from selected fiebr bundle. If no fiber bundle is selected, a grayscale image containing a simple gradient is generated.</string>
+         </property>
+         <property name="text">
+          <string>Generate Image</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Noise and Artifacts</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_KspaceParamFrame">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_4">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_14">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>k-Space undersampling:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_KspaceUndersamplingBox">
+               <property name="toolTip">
+                <string>Image is upsampled using this factor, afterwards fourier transformed, cropped to the original size and then inverse fourier transformed.</string>
+               </property>
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>64</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>128</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>256</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="m_AddT2Smearing">
+            <property name="text">
+             <string>Add T2 Blurring</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QFrame" name="frame_7">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_5">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel">
+               <property name="text">
+                <string>SNR:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="m_NoiseLevel">
+               <property name="toolTip">
+                <string>Signal to noise ratio (for values &gt; 99, no noise at all is added to the image). Value relative to the fiber signal scaling factor.</string>
+               </property>
+               <property name="decimals">
+                <number>4</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="value">
+                <double>15.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QFrame" name="m_T2bluringParamFrame">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_10">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Fiber T2:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="m_FiberRelaxationT2Box">
+               <property name="toolTip">
+                <string>T2 of fiber tissue (in milliseconds).</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>90</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_11">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Non Fiber T2:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="m_NonFiberRelaxationT2Box">
+               <property name="toolTip">
+                <string>T2 of non-fiber tissue (in milliseconds).</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>2200</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="m_AddGibbsRinging">
+            <property name="text">
+             <string>Add Gibbs ringing</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Data</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="0" rowspan="2" colspan="2">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_16">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Fiber Bundle:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" rowspan="2">
+           <widget class="QLabel" name="m_FiberBundleLabel">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_2">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Output Name:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="m_ImageName">
+            <property name="text">
+             <string>phantom</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLabel" name="m_TensorsToDWIBValueLabel_3">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Tissue Mask:</string>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="m_TissueMaskLabel">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Image Settings</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="3" column="0">
+           <widget class="QFrame" name="m_GeometryFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_7">
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="1" column="3">
+              <widget class="QDoubleSpinBox" name="m_SpacingZ">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QDoubleSpinBox" name="m_SpacingY">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Image Spacing:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Image Dimensions:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QComboBox" name="m_SizeY">
+               <property name="currentIndex">
+                <number>4</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>64</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>128</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>256</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>512</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1024</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2048</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4096</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QComboBox" name="m_SizeZ">
+               <property name="currentIndex">
+                <number>4</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>1</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>64</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>128</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>256</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>512</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1024</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2048</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4096</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="m_SpacingX">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>50.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>2.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_SizeX">
+               <property name="currentIndex">
+                <number>4</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>4</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>64</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>128</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>256</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>512</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>1024</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>2048</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>4096</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="m_KspaceImageBox">
+            <property name="text">
+             <string>Output k-space image</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_TensorsToDWIFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_3">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>6</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel">
+               <property name="text">
+                <string>#Gradient Directions:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="m_NumGradientsBox">
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>60</number>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>b-value:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QSpinBox" name="m_BvalueBox">
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
+               <property name="text">
+                <string>Kernel FA:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QDoubleSpinBox" name="m_MaxFaBox">
+               <property name="toolTip">
+                <string>Signal model parameter. Determins anisotropy of kernel tensor.</string>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.700000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Fiber S0:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="1">
+              <widget class="QSpinBox" name="m_FiberS0Box">
+               <property name="toolTip">
+                <string>Scaling factor of fiber signal.</string>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>200</number>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_13">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Non Fiber S0:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QSpinBox" name="m_NonFiberS0Box">
+               <property name="toolTip">
+                <string>Scaling factor of non-fiber signal.</string>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>1000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Volume Accuracy:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <widget class="QSpinBox" name="m_VolumeAccuracyBox">
+               <property name="toolTip">
+                <string>Fiber sampling factor which determines the accuracy of the calculated fiber and non-fiber volume fractions.</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_2">
+               <property name="text">
+                <string>Repetitions:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QSpinBox" name="m_RepetitionsBox">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>1</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="m_GeometryMessage">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>Using mask image geometry!</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="m_EnforcePureFiberVoxelsBox">
+            <property name="toolTip">
+             <string>Treat voxel content as fiber-only if at least one fiber is present.</string>
+            </property>
+            <property name="text">
+             <string>Enforce Pure Fiber Voxels</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="m_DiffusionPropsMessage">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 0, 0);</string>
+            </property>
+            <property name="text">
+             <string>Using  gradients of selected DWI!</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>m_RealTimeFibers</tabstop>
+  <tabstop>m_CircleButton</tabstop>
+  <tabstop>m_FlipButton</tabstop>
+  <tabstop>m_FiberDensityBox</tabstop>
+  <tabstop>m_FiberSamplingBox</tabstop>
+  <tabstop>m_TensionBox</tabstop>
+  <tabstop>m_ContinuityBox</tabstop>
+  <tabstop>m_BiasBox</tabstop>
+  <tabstop>m_DistributionBox</tabstop>
+  <tabstop>m_VarianceBox</tabstop>
+  <tabstop>m_GenerateFibersButton</tabstop>
   <tabstop>m_ImageName</tabstop>
-  <tabstop>m_TensorsToDWIBValueEdit</tabstop>
-  <tabstop>m_NumGradientsBox</tabstop>
-  <tabstop>m_NoiseLevel</tabstop>
+  <tabstop>m_GenerateImageButton</tabstop>
+  <tabstop>m_KspaceImageBox</tabstop>
   <tabstop>m_SizeX</tabstop>
   <tabstop>m_SizeY</tabstop>
   <tabstop>m_SizeZ</tabstop>
   <tabstop>m_SpacingX</tabstop>
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>
+  <tabstop>m_NumGradientsBox</tabstop>
+  <tabstop>m_BvalueBox</tabstop>
+  <tabstop>m_MaxFaBox</tabstop>
+  <tabstop>m_FiberS0Box</tabstop>
+  <tabstop>m_NonFiberS0Box</tabstop>
+  <tabstop>m_VolumeAccuracyBox</tabstop>
+  <tabstop>m_NoiseLevel</tabstop>
+  <tabstop>m_AddT2Smearing</tabstop>
+  <tabstop>m_FiberRelaxationT2Box</tabstop>
+  <tabstop>m_NonFiberRelaxationT2Box</tabstop>
+  <tabstop>m_AddGibbsRinging</tabstop>
+  <tabstop>m_KspaceUndersamplingBox</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

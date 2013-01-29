@@ -77,6 +77,7 @@ ConfigurationElement
     Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
     for (unsigned long i = 0; i < ch->length(); ++i)
     {
+      if (ch->item(i)->nodeType() != Poco::XML::Node::ELEMENT_NODE) continue;
       IConfigurationElement::Pointer xelem(new ConfigurationElement(IConfigurationElement::m_ClassLoader, ch->item(i), m_Contributor, m_Extension, this));
       children.push_back(xelem);
     }
@@ -112,7 +113,21 @@ ConfigurationElement
 std::string
 ConfigurationElement::GetValue() const
 {
-  return m_ConfigurationNode->nodeValue();
+  std::string value;
+  if (m_ConfigurationNode->hasChildNodes())
+  {
+    Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
+    for (unsigned long i = 0; i < ch->length(); ++i)
+    {
+      if (ch->item(i)->nodeType() == Poco::XML::Node::TEXT_NODE)
+      {
+        value = ch->item(i)->nodeValue();
+        break;
+      }
+    }
+    ch->release();
+  }
+  return value;
 }
 
 std::string

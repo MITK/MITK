@@ -457,29 +457,18 @@ int testRestorePlanePostionOperation ()
     sliceCtrl1->Update();
     mitk::Geometry2D* planeRotated = slicedgeometry2->GetGeometry2D(178);
     mitk::Geometry2D* planeRestored = dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetGeometry2D(178);
-    bool error = ( !mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()) ||
-                   !mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin()) ||
-                   !mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()) ||
-                   !mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()) ||
-                   !mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()) ||
-                   !mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix())
-                   );
 
-    if (error)
+    try{
+        MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin(),2*mitk::eps),"Testing for origin");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()),"Testing for spacing");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()),"Testing for directionvector");
+        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()),"Testing for numslices");
+        MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
+    }
+    catch(...)
     {
-        MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(planeRotated->GetIndexToWorldTransform()->GetMatrix(), planeRestored->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
-        MITK_INFO<<"Rotated: \n"<<planeRotated->GetIndexToWorldTransform()->GetMatrix()<<" Restored: \n"<<planeRestored->GetIndexToWorldTransform()->GetMatrix();
-        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetOrigin(), planeRestored->GetOrigin()),"Testing for origin");
-        MITK_INFO<<"Rotated: \n"<<planeRotated->GetOrigin()<<" Restored: \n"<<planeRestored->GetOrigin();
-        MITK_TEST_CONDITION(mitk::Equal(planeRotated->GetSpacing(), planeRestored->GetSpacing()),"Testing for spacing");
-        MITK_INFO<<"Rotated: \n"<<planeRotated->GetSpacing()<<" Restored: \n"<<planeRestored->GetSpacing();
-        MITK_TEST_CONDITION(mitk::Equal(slicedgeometry2->GetDirectionVector(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector()),"Testing for directionvector");
-        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetDirectionVector()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetDirectionVector();
-        MITK_TEST_CONDITION(mitk::Equal(slicedgeometry2->GetSlices(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices()),"Testing for numslices");
-        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetSlices()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetSlices();
-        MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(slicedgeometry2->GetIndexToWorldTransform()->GetMatrix(), dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix()),"Testing for IndexToWorld");
-        MITK_INFO<<"Rotated: \n"<<slicedgeometry2->GetIndexToWorldTransform()->GetMatrix()<<" Restored: \n"<<dynamic_cast< const mitk::SlicedGeometry3D*>(sliceCtrl1->GetCurrentGeometry3D())->GetIndexToWorldTransform()->GetMatrix();
-        return EXIT_FAILURE;
+      return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

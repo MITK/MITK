@@ -855,7 +855,7 @@ void mitk::Image::Initialize(const mitk::Image* image)
   Initialize(image->GetPixelType(), *image->GetTimeSlicedGeometry());
 }
 
-void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
+void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim, int pDim)
 {
   if(vtkimagedata==NULL) return;
 
@@ -869,6 +869,12 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
       *p=1;
   }
 
+  if(pDim>=0)
+  {
+     tmpDimensions[1]=pDim;
+     if(m_Dimension < 2)
+        m_Dimension = 2;
+  }
   if(sDim>=0)
   {
     tmpDimensions[2]=sDim;

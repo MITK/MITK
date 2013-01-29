@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkToFImageGrabber.h"
-#include "mitkToFCameraPMDCamCubeDevice.h"
+//#include "mitkToFCameraPMDCamCubeDevice.h"
 
 #include "itkCommand.h"
 

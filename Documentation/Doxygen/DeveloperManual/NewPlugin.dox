@@ -68,7 +68,7 @@ Here is an example call to the Plugin Generator, creating the same plug-in as ab
 The generated project is completely self-contained and can be configured via CMake immediately. When building the
 generated project, it will first download all required dependencies (like MITK itself). For an explanation of the
 project's build directory layout and how to configure MITK from your project's superbuild CMake configuration,
-see <a href="http://www.mitk.org/wiki/SetupAMitkBasedProject">SetupAMITKBasedProject</a>.
+see \ref HowToNewProject.
 
 
 \subsection NewPluginLimitations Limitations

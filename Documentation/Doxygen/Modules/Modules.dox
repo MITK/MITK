@@ -1,6 +1,6 @@
 /**
   \defgroup Core Core Classes
-  
+
   \brief This category includes classes of the MITK Core library.
 */
 
@@ -8,10 +8,10 @@
   \defgroup Data Data Classes
   \ingroup DataManagement
 
-  \brief This subcategory includes the data classes, e.g., for images (mitk::Image), 
-  surfaces (mitk::Surface), vessel-trees (mitk::VesselTreeData), etc. 
+  \brief This subcategory includes the data classes, e.g., for images (mitk::Image),
+  surfaces (mitk::Surface), vessel-trees (mitk::VesselTreeData), etc.
 
-  Data access classes are only included, if there is no equivalent in itk (see 
+  Data access classes are only included, if there is no equivalent in itk (see
   \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).
 */
 
@@ -34,8 +34,8 @@
   \ingroup Core
   \anchor ProcessAndAdaptorClasses
 
-  \brief This category includes process (algorithm) classes developed specifically for mitk and 
-  (mainly) adaptor classes for the integration of algorithms from other toolkits 
+  \brief This category includes process (algorithm) classes developed specifically for mitk and
+  (mainly) adaptor classes for the integration of algorithms from other toolkits
   (currently vtk, itk).
 
   The itk adaptor classes are also useful for data access to mitk data objects.
@@ -52,12 +52,12 @@
   \defgroup InteractionUndo Interaction and Undo Classes
   \ingroup Core
 
-  \brief This category includes classes that support the developer to create 
-  software that allows the user to interact with the data. 
-  
-  This includes complex interactions that have multiple states (e.g., moving a handle of an 
+  \brief This category includes classes that support the developer to create
+  software that allows the user to interact with the data.
+
+  This includes complex interactions that have multiple states (e.g., moving a handle of an
   active contour vs changing its local elasicity) and a concept to realize an undo/redo-mechanism.
-     
+
   A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
@@ -67,11 +67,11 @@
   \ingroup InteractionUndo
 
   \brief This subcategory includes interaction classes (subclasses of mitk::StateMachine) that change
-  the data according to the input of the user. 
-  
-  For undo-support, the change is done by sending an OperationEvent to the respective 
+  the data according to the input of the user.
+
+  For undo-support, the change is done by sending an OperationEvent to the respective
   data object, which changes itself accordingly.
-   
+
   A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
@@ -80,15 +80,15 @@
   \defgroup Undo Undo Classes
   \ingroup InteractionUndo
 
-  \brief This subcategory includes the undo/redo-specific classes. 
-  
-  For undo-support, the change is done by sending an OperationEvent to the respective data object, 
+  \brief This subcategory includes the undo/redo-specific classes.
+
+  For undo-support, the change is done by sending an OperationEvent to the respective data object,
   which changes itself accordingly.
-  
+
   A detailed description of the rationale for these classes can be found in
   \ref InteractionPage.
 */
- 
+
 /**
   \defgroup ToolManagerEtAl Classes related to the Segmentation plugin
 
@@ -105,19 +105,25 @@
 /**
   \defgroup RigidRegistration Classes related to rigid registration
   \ingroup Registration
-  
+
   \brief A couple of classes related to rigid registration.
 */
 
 /**
   \defgroup PointBasedRegistration Classes related to point based registration
   \ingroup Registration
-  
+
   \brief A couple of classes related to point based registration.
 */
 
 /**
   \defgroup MITKPlugins MITK Plugins
-  
-  \brief This group includes all MITK Plugins
+
+  \brief This group includes all MITK Plugins.
+*/
+
+/**
+  \defgroup MITKExamplePlugins MITK Example Plugins
+
+  \brief This group includes all MITK example plugins demonstrating specific framework features.
 */

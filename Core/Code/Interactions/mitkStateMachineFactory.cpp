@@ -120,7 +120,7 @@ bool mitk::StateMachineFactory::LoadBehaviorString(std::string xmlString)
 
   m_LastLoadedBehavior = "String";
 
-  return ( this->Parse(xmlString.c_str(), xmlString.length()) );
+  return ( this->Parse(xmlString.c_str(), (unsigned int) xmlString.length()) );
 }
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()

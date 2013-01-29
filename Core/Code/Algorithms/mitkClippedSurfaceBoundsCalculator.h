@@ -46,15 +46,23 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
   public:
 
+    typedef std::vector<mitk::Point3D> PointListType;
+
     ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL,
                                    mitk::Image::Pointer image = NULL);
     ClippedSurfaceBoundsCalculator(const mitk::Geometry3D* geometry,
                                    mitk::Image::Pointer image);
+    ClippedSurfaceBoundsCalculator(const PointListType pointlist,
+                                   mitk::Image::Pointer image);
+
+    void InitializeOutput();
+
     virtual ~ClippedSurfaceBoundsCalculator();
 
 
     void SetInput(const mitk::PlaneGeometry* geometry, mitk::Image* image);
     void SetInput(const mitk::Geometry3D *geometry, mitk::Image *image);
+    void SetInput(const PointListType pointlist, mitk::Image *image);
 
     /**
       \brief Request calculation.
@@ -91,10 +99,19 @@ class MITK_CORE_EXPORT ClippedSurfaceBoundsCalculator
 
   protected:
     void CalculateIntersectionPoints(const mitk::PlaneGeometry* geometry);
+    void CalculateIntersectionPoints( PointListType pointList );
+
+    /**
+    * \brief Clips the resulting index-coordinates to make sure they do
+    * not exceed the imagebounds.
+    */
+    void EnforceImageBounds();
+
 
     mitk::PlaneGeometry::ConstPointer m_PlaneGeometry;
     mitk::Geometry3D::ConstPointer m_Geometry3D;
     mitk::Image::Pointer m_Image;
+    std::vector<mitk::Point3D> m_ObjectPointsInWorldCoordinates;
     std::vector< OutputType > m_MinMaxOutput;
 
 };

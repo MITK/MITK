@@ -1,0 +1,22 @@
+/**
+
+\page BlueBerryExamples BlueBerry Examples
+
+The following examples give an introduction to Blueberry.
+
+The source code of the examples can be found in mitk/Examples/Plugins/
+
+Run the examples by executing startBlueBerryExampleLauncher_release.bat
+(or startBlueBerryExampleLauncher_debug.bat depending on the configured build type).
+
+\image html BlueBerryExampleLauncherDialog.png
+
+All examples can be found among the shown list.
+
+\li \subpage BlueBerryExampleMinimalApplication
+\li \subpage BlueBerryExampleMultiplePerspectives
+\li \subpage BlueBerrySelectionServiceIntro
+\li \subpage BlueBerryExampleExtensionPoint
+\li \subpage BlueBerryExampleCustomViewer
+
+*/

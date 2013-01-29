@@ -291,12 +291,12 @@ void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
 // specified time step.
 void mitk::StateMachine::ExpandStartStateVector(unsigned int timeSteps)
 {
-  unsigned int oldSize = m_CurrentStateVector.size();
+  size_t oldSize = m_CurrentStateVector.size();
 
   if ( timeSteps > oldSize )
   {
     State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState(m_Type.c_str());
-    for ( unsigned int i = oldSize; i < timeSteps; ++i )
+    for ( size_t i = oldSize; i < timeSteps; ++i )
       m_CurrentStateVector.insert(m_CurrentStateVector.end(), startState);
   }
 }

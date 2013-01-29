@@ -326,6 +326,10 @@ bool SlicesRotator::DoDecideBetweenRotationAndSliceSelection(Action*, const Stat
 
   for (SNCVector::iterator iter = m_RotatableSNCs.begin(); iter != m_RotatableSNCs.end(); ++iter)
   {
+     // If the mouse cursor is in 3D Renderwindow, do not check for intersecting planes.
+     if (clickedRenderer->GetMapperID() == BaseRenderer::Standard3D)
+        break;
+
     const PlaneGeometry* otherRenderersRenderPlane = (*iter)->GetCurrentPlaneGeometry();
     if (otherRenderersRenderPlane == NULL) continue; // ignore, we don't see a plane
     MITK_DEBUG << "  Checking plane of renderer " << (*iter)->GetRenderer()->GetName();

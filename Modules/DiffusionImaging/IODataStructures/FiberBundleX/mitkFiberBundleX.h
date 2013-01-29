@@ -36,11 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  /**
+/**
    * \brief Base Class for Fiber Bundles;   */
-  class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
-  {
-  public:
+class  MitkDiffusionImaging_EXPORT FiberBundleX : public BaseData
+{
+public:
 
     // fiber colorcodings
     static const char* COLORCODING_ORIENTATION_BASED;
@@ -74,6 +74,8 @@ namespace mitk {
     bool RemoveLongFibers(float lengthInMM);
     bool ApplyCurvatureThreshold(float minRadius, bool deleteFibers);
     void MirrorFibers(unsigned int axis);
+    void RotateAroundAxis(double x, double y, double z);
+    void TranslateFibers(double x, double y, double z);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
@@ -93,6 +95,7 @@ namespace mitk {
     QStringList GetAvailableColorCodings();
     char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
+    itkGetMacro( FiberSampling, int)
     itkGetMacro( MinFiberLength, float )
     itkGetMacro( MaxFiberLength, float )
     itkGetMacro( MeanFiberLength, float )
@@ -101,7 +104,7 @@ namespace mitk {
 
     std::vector<int> GetPointsRoi()
     {
-      return m_PointsRoi;
+        return m_PointsRoi;
     }
 
     // copy fiber bundle
@@ -110,7 +113,7 @@ namespace mitk {
     // compare fiber bundles
     bool Equals(FiberBundleX* fib);
 
-  protected:
+protected:
 
     FiberBundleX( vtkPolyData* fiberPolyData = NULL );
     virtual ~FiberBundleX();
@@ -123,7 +126,7 @@ namespace mitk {
     // calculate colorcoding values according to m_CurrentColorCoding
     void UpdateColorCoding();
 
-  private:
+private:
 
     // actual fiber container
     vtkSmartPointer<vtkPolyData>  m_FiberPolyData;
@@ -135,16 +138,16 @@ namespace mitk {
     int   m_NumFibers;
 
     std::vector< float > m_FiberLengths;
-    float m_MinFiberLength;
-    float m_MaxFiberLength;
-    float m_MeanFiberLength;
-    float m_MedianFiberLength;
-    float m_LengthStDev;
-
+    float   m_MinFiberLength;
+    float   m_MaxFiberLength;
+    float   m_MeanFiberLength;
+    float   m_MedianFiberLength;
+    float   m_LengthStDev;
+    int     m_FiberSampling;
 
     std::vector<int> m_PointsRoi; // this global variable needs to be refactored
 
-  };
+};
 
 } // namespace mitk
 

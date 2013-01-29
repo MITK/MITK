@@ -183,10 +183,20 @@ public:
    * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
    * geometry. The result is a 3D vector in mm (\a projectedVec3d_mm).
    *
+   * DEPRECATED. Use Project(vector,vector) instead
+   *
    * \return true projection was possible
    */
   virtual bool Project(const mitk::Point3D & atPt3d_mm,
     const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+
+  /**
+  * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
+  * geometry. The result is a 3D vector in mm (\a projectedVec3d_mm).
+  *
+  * \return true projection was possible
+  */
+  virtual bool Project( const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
 
   /**
    * \brief Distance of the point from the geometry

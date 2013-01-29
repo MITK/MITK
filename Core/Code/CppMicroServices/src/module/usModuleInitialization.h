@@ -58,6 +58,12 @@
  * \param _module_libname The physical name of the module, withou prefix or suffix.
  * \param _module_depends A list of module dependencies. This is meta-data only.
  * \param _module_version A version string in the form of "<major>.<minor>.<micro>.<qualifier>".
+ *
+ * \note If you use this macro in a source file compiled into an executable, additional
+ * requirements for the macro arguments apply:
+ *  - The \c _module_name argument must be a valid C-identifier (no spaces etc.).
+ *  - The \c _module_libname argument must be an empty string.
+ *
  */
 #define US_INITIALIZE_MODULE(_module_name, _module_libname, _module_depends, _module_version) \
   US_INITIALIZE_MODULE_WITH_CUSTOM_AUTOLOADDIR(_module_name, _module_libname, _module_libname, _module_depends, _module_version)
@@ -123,6 +129,14 @@ public:                                                                         
       location.clear();                                                                      \
     }                                                                                        \
     moduleInfo()->activatorHook = reinterpret_cast<ModuleInfo::ModuleActivatorHook>(ModuleUtils::GetSymbol(location, activator_func.c_str())); \
+                                                                                             \
+    std::string init_res_func = "us_init_resources_";                                        \
+    init_res_func.append(moduleInfo()->libName);                                             \
+    ModuleInfo::InitResourcesHook initResourcesHook = reinterpret_cast<ModuleInfo::InitResourcesHook>(ModuleUtils::GetSymbol(location, init_res_func.c_str())); \
+    if (initResourcesHook)                                                                   \
+    {                                                                                        \
+      initResourcesHook(moduleInfo());                                                       \
+    }                                                                                        \
                                                                                              \
     Register();                                                                              \
   }                                                                                          \

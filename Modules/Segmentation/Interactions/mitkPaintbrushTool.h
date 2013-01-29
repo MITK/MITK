@@ -73,6 +73,12 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
      */
     void UpdateContour(const StateEvent* stateEvent);
 
+
+    /**
+    *   Little helper function. Returns the upper left corner of the given pixel.
+    */
+    mitk::Point2D upperLeft(mitk::Point2D p);
+
     /**
       * Checks  if the current slice has changed
       */

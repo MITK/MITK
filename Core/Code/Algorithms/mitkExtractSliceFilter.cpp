@@ -346,7 +346,11 @@ void mitk::ExtractSliceFilter::GenerateData(){
     } // ELSE we use the default values
   }
 
-  m_Reslicer->SetOutputExtent(xMin, xMax-1, yMin, yMax-1, m_ZMin, m_ZMax );
+  // Set the output extents! First included pixel index and last included pixel index
+  // xMax and yMax are one after the last pixel. so they have to be decremented by 1.
+  // In case we have a 2D image, xMax or yMax might be 0. in this case, do not decrement, but take 0.
+
+  m_Reslicer->SetOutputExtent(xMin, std::max(0, xMax-1), yMin, std::max(0, yMax-1), m_ZMin, m_ZMax );
   /*========== END setup extent of the slice ==========*/
 
 
@@ -387,7 +391,17 @@ void mitk::ExtractSliceFilter::GenerateData(){
     mitk::Image::Pointer resultImage = this->GetOutput();
 
     //initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
-    resultImage->Initialize(reslicedImage);
+    if (reslicedImage->GetDataDimension() == 1)
+    {
+       // If original image was 2D, the slice might have an y extent of 0.
+       // Still i want to ensure here that Image is 2D
+         resultImage->Initialize(reslicedImage,1,-1,-1,1);
+    }
+    else
+    {
+       resultImage->Initialize(reslicedImage);
+    }
+
 
     //transfer the voxel data
     resultImage->SetVolume(reslicedImage->GetScalarPointer());

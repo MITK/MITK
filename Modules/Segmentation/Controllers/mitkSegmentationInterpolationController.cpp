@@ -47,6 +47,11 @@ mitk::SegmentationInterpolationController::SegmentationInterpolationController()
 {
 }
 
+void mitk::SegmentationInterpolationController::Activate2DInterpolation(bool status)
+{
+  m_2DInterpolationActivated = status;
+}
+
 mitk::SegmentationInterpolationController::~SegmentationInterpolationController()
 {
   // remove this from the list of interpolators
@@ -64,7 +69,7 @@ mitk::SegmentationInterpolationController::~SegmentationInterpolationController(
 
 void mitk::SegmentationInterpolationController::OnImageModified(const itk::EventObject&)
 {
-  if (!m_BlockModified  && m_Segmentation.IsNotNull() )
+  if (!m_BlockModified  && m_Segmentation.IsNotNull() && m_2DInterpolationActivated )
   {
     SetSegmentationVolume( m_Segmentation );
   }

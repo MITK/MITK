@@ -177,6 +177,10 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // and the geometry of the image that is to be rendered.
   if ( !RenderingGeometryIntersectsImage( worldGeometry, input->GetSlicedGeometry() ) )
   {
+    // set image to NULL, to clear the texture in 3D, because
+    // the latest image is used there if the plane is out of the geometry
+    // see bug-13275
+    localStorage->m_ReslicedImage = NULL;
     localStorage->m_Mapper->SetInput( localStorage->m_EmptyPolyData );
     return;
   }

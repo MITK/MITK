@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkToFImageDownsamplingFilterTest(int argc , char* argv[])
 {
+  MITK_TEST_BEGIN("mitkToFImageDownSamplingFilterFilter");
+
+  MITK_TEST_CONDITION_REQUIRED(argc>=1, "Missing Parameters");
+
   //Defining constants
   const int XDIM = 127;
   const int YDIM = 96;
@@ -35,14 +39,11 @@ int mitkToFImageDownsamplingFilterTest(int argc , char* argv[])
 
   // always start with this
 
-  MITK_TEST_BEGIN("mitkToFImageDownSamplingFilterFilter");
-
   // create a new instance of filter and new image
   mitk::ToFImageDownsamplingFilter::Pointer testDownSampler = mitk::ToFImageDownsamplingFilter::New();
 
   // make sure new filter ins't null
   MITK_TEST_CONDITION_REQUIRED(testDownSampler.IsNotNull(), "Testing instantiation!");
-
 
   // Load ToF image
   MITK_INFO<<"Loading test image file: " << argv[1] << "\n"; // update with proper path and figure out how iti s passed from the test driver

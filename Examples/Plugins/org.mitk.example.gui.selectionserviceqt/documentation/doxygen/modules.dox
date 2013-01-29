@@ -1,0 +1,15 @@
+/**
+  \defgroup org_mitk_example_gui_selectionserviceqt org.mitk.example.gui.selectionserviceqt
+  \ingroup MITKExamplePlugins
+
+  \brief An example application plug-in with a minimal selection service based on QT elements.
+*/
+
+/**
+  \defgroup org_mitk_example_gui_selectionserviceqt_internal Internal
+  \ingroup org_mitk_example_gui_selectionserviceqt
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.selectionserviceqt plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

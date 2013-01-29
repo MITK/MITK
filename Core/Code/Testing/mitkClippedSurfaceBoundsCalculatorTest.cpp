@@ -29,7 +29,7 @@ static void CheckPlanesInsideBoundingBoxOnlyOnOneSlice(mitk::Geometry3D::Pointer
 
   mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
   mitk::Image::Pointer image = mitk::Image::New();
-  image->SetGeometry(geometry3D);
+  image->Initialize( mitk::MakePixelType<int, int, 1>(), *(geometry3D.GetPointer()) );
 
   //Check planes which are only on one slice:
 
@@ -107,7 +107,7 @@ static void CheckPlanesInsideBoundingBox(mitk::Geometry3D::Pointer geometry3D)
 
   mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
   mitk::Image::Pointer image = mitk::Image::New();
-  image->SetGeometry(geometry3D);
+  image->Initialize( mitk::MakePixelType<int, int, 1>(), *(geometry3D.GetPointer()) );
 
   //Check planes which are only on one slice:
   //Slice 0
@@ -224,7 +224,7 @@ static void CheckPlanesOutsideOfBoundingBox(mitk::Geometry3D::Pointer geometry3D
 
   mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
   mitk::Image::Pointer image = mitk::Image::New();
-  image->SetGeometry(geometry3D);
+  image->Initialize( mitk::MakePixelType<int, int, 1>(), *(geometry3D.GetPointer()) );
 
   //In front of the bounding box
   mitk::Point3D origin;
@@ -329,7 +329,7 @@ static void CheckIntersectionPointsOfTwoGeometry3D(mitk::Geometry3D::Pointer fir
 {
   mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
   mitk::Image::Pointer firstImage = mitk::Image::New();
-  firstImage->SetGeometry(firstGeometry3D);
+  firstImage->Initialize( mitk::MakePixelType<int, int, 1>(), *(firstGeometry3D.GetPointer()) );
 
   calculator->SetInput( secondGeometry3D, firstImage);
   calculator->Update();
@@ -339,6 +339,62 @@ static void CheckIntersectionPointsOfTwoGeometry3D(mitk::Geometry3D::Pointer fir
   MITK_INFO << "min: " << minMax.first << " max: " << minMax.second;
 
   MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 19, "Check if plane is from slice 0 to slice 19");
+}
+
+
+static void CheckIntersectionWithPointCloud( mitk::Geometry3D::Pointer geometry3D )
+{
+  //Check planes which are inside the bounding box
+
+  mitk::Image::Pointer image = mitk::Image::New();
+  image->Initialize( mitk::MakePixelType<int, int, 1>(), *(geometry3D.GetPointer()) );
+
+  {
+    mitk::Point3D pnt1, pnt2;
+    pnt1[0] = 3;
+    pnt1[1] = 5;
+    pnt1[2] = 3;
+    pnt2[0] = 8;
+    pnt2[1] = 3;
+    pnt2[2] = 8;
+
+    mitk::ClippedSurfaceBoundsCalculator::PointListType pointlist;
+    pointlist.push_back( pnt1 );
+    pointlist.push_back( pnt2 );
+
+    mitk::ClippedSurfaceBoundsCalculator calculator;
+    calculator.SetInput( pointlist, image );
+    calculator.Update();
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMaxZ = calculator.GetMinMaxSpatialDirectionZ();
+    MITK_TEST_CONDITION(minMaxZ.first == 3 && minMaxZ.second == 8, "Check if points span from slice 3 to slice 8 in axial");
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMaxX = calculator.GetMinMaxSpatialDirectionX();
+    MITK_TEST_CONDITION(minMaxX.first == 3 && minMaxX.second == 5, "Check if points span from slice 3 to slice 5 in sagittal");
+  }
+
+  {
+    mitk::Point3D pnt1, pnt2;
+    pnt1.Fill( -3 );
+    pnt2.Fill( 600 );
+
+    mitk::ClippedSurfaceBoundsCalculator::PointListType pointlist;
+    pointlist.push_back( pnt1 );
+    pointlist.push_back( pnt2 );
+
+    mitk::ClippedSurfaceBoundsCalculator calculator;
+    calculator.SetInput( pointlist, image );
+    calculator.Update();
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMaxZ = calculator.GetMinMaxSpatialDirectionZ();
+    MITK_TEST_CONDITION(minMaxZ.first == 0 && minMaxZ.second == 19, "Check if points are correctly clipped to slice 0 and slice 19 in axial");
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMaxX = calculator.GetMinMaxSpatialDirectionX();
+    MITK_TEST_CONDITION(minMaxX.first == 0 && minMaxX.second == 511, "Check if points are correctly clipped to slice 0 and slice 511 in sagittal");
+  }
+
+
+
 }
 
 
@@ -417,6 +473,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
   CheckPlanesOutsideOfBoundingBox(geometry3D);
   CheckPlanesInsideBoundingBox(geometry3D);
   CheckIntersectionPointsOfTwoGeometry3D(geometry3D, secondGeometry3D);
+  CheckIntersectionWithPointCloud( geometry3D );
 
 
   /** ToDo:

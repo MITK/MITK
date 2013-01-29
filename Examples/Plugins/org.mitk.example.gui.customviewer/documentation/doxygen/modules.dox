@@ -1,0 +1,17 @@
+/**
+  \defgroup org_mitk_example_gui_customviewer org.mitk.example.gui.customviewer
+  \ingroup MITKExamplePlugins
+
+  \brief The custom viewer plug-in implements simple viewer functionality presented in a customized look and feel. It was developed to demonstrate extensibility and customizability of the BlueBerry application framework.
+
+  As an example for the GUI customization capabilities provided by the BlueBerry application framework, the custom viewer plug-in was developed. It features simple viewer functionality presented in a customized look and feel. The custom viewer consists of two perspectives, i.e. a viewer perspective and a DICOM perspective. As part of the viewer perspective, an instance of QmitkDataManagerView allows for data selection. Visualization of the selected data is then performed by a simple render window view. According data can either be directly loaded from file or be imported as DICOM data. DICOM import functionality is accessible from the DICOM perspective incorporating the QmitkDicomExternalDataWidget. The customization of Qt Stylesheets is used to give the application a non-native look and feel. This is further emphasized by a Tab-Widget-like unification of the perspectives with the according perspective bar. In addition to an absence of menu-, tool- and status-bars, simplicity is accentuated by a proper view and perspective design, i.e. the editor area being invisible and views being fixated.
+*/
+
+/**
+  \defgroup org_mitk_example_gui_customviewer_internal Internal
+  \ingroup org_mitk_example_gui_customviewer
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.customviewer plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

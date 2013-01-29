@@ -39,8 +39,10 @@ typename BallModel< ScalarType >::PixelType BallModel< ScalarType >::SimulateMea
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        if (g.GetNorm()>0.0001)
-            signal[i] = exp( -m_BValue * m_Diffusivity );
+        double bVal = g.GetNorm(); bVal *= bVal;
+
+        if (bVal>0.0001)
+            signal[i] = exp( -m_BValue * bVal * m_Diffusivity );
         else
             signal[i] = 1;
     }

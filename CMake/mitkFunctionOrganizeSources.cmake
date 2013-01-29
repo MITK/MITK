@@ -51,14 +51,19 @@ function(ORGANIZE_SOURCES)
   #_MACRO_APPEND_TO_LIST(_ORG_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/")
   source_group("== Header Files ==" FILES ${_ORG_HEADER} ${_ORG_HEADER} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES})
 
+  if(_ORG_UI)
+    #_MACRO_APPEND_TO_LIST(_ORG_UI "${CMAKE_CURRENT_SOURCE_DIR}/")
+    source_group("QT UI Files" FILES ${_ORG_UI})
+  endif()
 
-  #_MACRO_APPEND_TO_LIST(_ORG_UI "${CMAKE_CURRENT_SOURCE_DIR}/")
-  source_group("QT UI Files" FILES ${_ORG_UI})
+  if(_ORG_DOC)
+    #_MACRO_APPEND_TO_LIST(_ORG_DOC "${CMAKE_CURRENT_SOURCE_DIR}/")
+    source_group("Doxygen Files" FILES ${_ORG_DOC})
+  endif()
 
-  #_MACRO_APPEND_TO_LIST(_ORG_DOC "${CMAKE_CURRENT_SOURCE_DIR}/")
-  source_group("Doxygen Files" FILES ${_ORG_DOC})
-
-  #_MACRO_APPEND_TO_LIST(_ORG_QRC "${CMAKE_CURRENT_SOURCE_DIR}/")
-  source_group("Qt Resource Files" FILES ${_ORG_QRC})
+  if(_ORG_QRC)
+    #_MACRO_APPEND_TO_LIST(_ORG_QRC "${CMAKE_CURRENT_SOURCE_DIR}/")
+    source_group("Qt Resource Files" FILES ${_ORG_QRC})
+  endif()
 
 endfunction(ORGANIZE_SOURCES)

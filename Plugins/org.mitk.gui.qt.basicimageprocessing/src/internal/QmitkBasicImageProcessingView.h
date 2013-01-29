@@ -115,6 +115,8 @@ public:
     */
     void ChangeGUI();
 
+    void SelectInterpolator(int interpolator);
+
 private:
 
   /*
@@ -162,7 +164,8 @@ private:
     THRESHOLD,
     INVERSION,
     DOWNSAMPLING,
-    FLIPPING
+    FLIPPING,
+    RESAMPLING
   } m_SelectedAction;
 
   enum OperationType{
@@ -179,6 +182,10 @@ private:
     XOR
   } m_SelectedOperation;
 
+  enum InterpolationType{
+    LINEAR,
+    NEAREST
+  } m_SelectedInterpolation;
 };
 
 #endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)

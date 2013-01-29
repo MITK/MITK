@@ -38,7 +38,7 @@ mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
   std::string sname = smc->GetStartState()->GetName();
 
   MITK_TEST_CONDITION_REQUIRED(
-      sname == "state1"
+      sname == "STATE1"
       , "02 Check if start state is correct" );
 
   /*
@@ -60,7 +60,7 @@ mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
   MITK_TEST_CONDITION_REQUIRED(
       s1.IsNotNull() &&
       s2.IsNull() &&
-      st2->GetName() == "state2" &&
+      st2->GetName() == "STATE2" &&
       action1 == "doaction7" &&
       action2 == "doaction2" &&
       it == actions.end()

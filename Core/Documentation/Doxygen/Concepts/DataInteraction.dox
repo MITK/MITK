@@ -23,9 +23,12 @@ TODO: See here for an example on how to implement a new DataInteractor \n
 
 \section EventPage Events
 
-Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures. These events are mapped from an UI framework like Qt to an MITK internal representation
+Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures.
+These events are mapped from an UI framework like Qt to an MITK internal representation
 and send to the Dispatcher which in turn deals with further processing of the event.
-For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \ref ConfigurationTechnical page.
+These events are not limited to classical input devices but can be extened at will, by introducing new classes which e.g. describe
+events from tracking devices, etc. Refer to \ref ImplementNewEventsPage to see how new events and thereby input devices can be integrated.
+For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \ref DataInteractionTechnicalPage.
 
 
 \section EventHandlerSection EventHandler

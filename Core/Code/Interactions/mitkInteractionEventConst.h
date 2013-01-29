@@ -95,7 +95,7 @@ namespace mitk
   const std::string EVENTBUTTON = "EventButton";
   const std::string BUTTONSTATE = "ButtonState";
   const std::string KEY = "Key";
-  const std::string WHEELDELTA = "WheelDelta";
+  const std::string WHEELDELTA = "ScrollDirection";
   const std::string SIGNALNAME = "SignalName";
 
 }     //namespace mitk

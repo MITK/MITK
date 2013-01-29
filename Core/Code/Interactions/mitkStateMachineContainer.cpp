@@ -94,7 +94,9 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
   else if (name == STATE)
   {
     std::string stateName = ReadXMLStringAttribut(NAME, atts);
+    std::transform(stateName.begin(), stateName.end(), stateName.begin(), ::toupper);
     std::string stateMode = ReadXMLStringAttribut(STATEMODE, atts);
+    std::transform(stateMode.begin(), stateMode.end(), stateMode.begin(), ::toupper);
     bool isStartState = ReadXMLBooleanAttribut(STARTSTATE, atts);
 
     if (isStartState)
@@ -122,6 +124,7 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
     std::string eventClass = ReadXMLStringAttribut(EVENTCLASS, atts);
     std::string eventVariant = ReadXMLStringAttribut(EVENTVARIANT, atts);
     std::string target = ReadXMLStringAttribut(TARGET, atts);
+    std::transform(target.begin(), target.end(), target.begin(), ::toupper);
 
     mitk::StateMachineTransition::Pointer transition = mitk::StateMachineTransition::New(target, eventClass, eventVariant);
     if (m_CurrState)

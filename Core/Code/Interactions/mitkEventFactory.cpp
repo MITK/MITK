@@ -73,21 +73,22 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     std::vector<std::string> mods = split(strModifiers, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
     {
-      if (*it == "ctrl")
+      std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
+      if (*it == "CTRL")
       {
         modifiers = modifiers | ControlKey;
       }
-      else if (*it == "alt")
+      else if (*it == "ALT")
       {
         modifiers = modifiers | AltKey;
       }
-      else if (*it == "shift")
+      else if (*it == "SHIFT")
       {
         modifiers = modifiers | ShiftKey;
       }
       else
       {
-        MITK_WARN<< "mitkEventFactory: Invalid event modifier in config file:" << modifiers;
+        MITK_WARN<< "mitkEventFactory: Invalid event modifier in config file :" << (*it);
       }
     }
   }
@@ -95,21 +96,22 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   // Set EventButton
   if (list->GetStringProperty(EVENTBUTTON.c_str(), strEventButton))
   {
-    if (strEventButton == "MiddleMouseButton")
+    std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
+    if (strEventButton == "MIDDLEMOUSEBUTTON")
     {
       eventButton = MiddleMouseButton;
     }
-    else if (strEventButton == "LeftMouseButton")
+    else if (strEventButton == "LEFTMOUSEBUTTON")
     {
       eventButton = LeftMouseButton;
     }
-    else if (strEventButton == "RightMouseButton")
+    else if (strEventButton == "RIGHTMOUSEBUTTON")
     {
       eventButton = RightMouseButton;
     }
     else
     {
-      MITK_WARN<< "mitkEventFactory: Invalid event button in config file:" << eventButton;
+      MITK_WARN<< "mitkEventFactory: Invalid event button in config file: " << strEventButton;
     }
   }
 
@@ -119,21 +121,22 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     std::vector<std::string> mods = split(strButtonState, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
     {
-      if (*it == "MiddleMouseButton")
+      std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
+      if (*it == "MIDDLEMOUSEBUTTON")
       {
         buttonState = buttonState | MiddleMouseButton;
       }
-      else if (*it == "LeftMouseButton")
+      else if (*it == "LEFTMOUSEBUTTON")
       {
         buttonState = buttonState | LeftMouseButton;
       }
-      else if (*it == "RightMouseButton")
+      else if (*it == "RIGHTMOUSEBUTTON")
       {
         buttonState = buttonState | RightMouseButton;
       }
       else
       {
-        MITK_WARN<< "mitkEventFactory: Invalid event buttonstate in config file:" << eventButton;
+        MITK_WARN<< "mitkEventFactory: Invalid event buttonstate in config file:" << (*it);
       }
     }
   }
@@ -154,7 +157,15 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else
   {
-    wheelDelta = atoi(strWheelDelta.c_str());
+    std::transform(strWheelDelta.begin(), strWheelDelta.end(), strWheelDelta.begin(), ::toupper);
+    if (strWheelDelta == "DOWN")
+    {
+      wheelDelta = -1;
+    }
+    else
+    {
+      wheelDelta = 1;
+    }
   }
   // Internal Signals Name
   list->GetStringProperty(SIGNALNAME.c_str(), strSignalName);
@@ -164,39 +175,41 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
    */
 
   mitk::InteractionEvent::Pointer event;
+  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
 
-  if (eventClass == "MousePressEvent")
+  if (eventClass == "MOUSEPRESSEVENT")
   {
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
     event = MousePressEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "MouseMoveEvent")
+  else if (eventClass == "MOUSEMOVEEVENT")
   {
     event = MouseMoveEvent::New(NULL, pos, buttonState, modifiers);
   }
-  else if (eventClass == "MouseReleaseEvent")
+  else if (eventClass == "MOUSERELEASEEVENT")
   {
     event = MouseReleaseEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "KeyEvent")
+  else if (eventClass == "KEYEVENT")
   {
     event = InteractionKeyEvent::New(NULL, key, modifiers);
   }
-  else if (eventClass == "MouseWheelEvent")
+  else if (eventClass == "MOUSEWHEELEVENT")
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
   }
-  else if (eventClass == "PositionEvent")
+  else if (eventClass == "POSITIONEVENT")
   {
     event = InteractionPositionEvent::New(NULL, pos, "PositionEvent");
   }
-  else if (eventClass == "InternalEvent")
+  else if (eventClass == "INTERNALEVENT")
   {
     event = InternalEvent::New(NULL, NULL, strSignalName);
   }
-  if (event.IsNull()) {
-    MITK_WARN << "Event couldn't be constructed. Please check your StateMachine patterns and config files\n for the following event class, which is not valid: " << eventClass;
+  if (event.IsNull())
+  {
+    MITK_WARN<< "Event couldn't be constructed. Please check your StateMachine patterns and config files\n for the following event class, which is not valid: " << eventClass;
   }
   return event;
 }

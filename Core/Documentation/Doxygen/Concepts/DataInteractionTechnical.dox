@@ -151,16 +151,15 @@ this would be described as follows:
 
 Note: Technically the LeftMouseButton is also pressed and should be listed in the ButtonState, but this is taken care of by the mitk:EventFactory .
 
-\b WheelDelta \n
+\b ScrollDirection \n
 
-This attribute is unique to the mitk::MouseWheelEvent and describes the direction in which the mouse wheel is rotated. Up is represented by a positive number
-and down by a negative one. Be aware that therefore a wheel delta of 1 is equivaltent to one of 7. In the event description actual value is irrelevant
-by the event is generated with the actual value, and this value can be retrieved from the object.
+This attribute is unique to the mitk::MouseWheelEvent and describes the direction in which the mouse wheel is rotated. In the event description actual only the direction is provided,
+but the event is generated with the actual value, and this value can be retrieved from the object.
 
 \code
- <attribute name="WheelDelta" value="-1"/>
+ <attribute name="ScrollDirection" value="up"/>
  <!-- or -->
- <attribute name="WheelDelta" value="1"/>
+ <attribute name="ScrollDirection" value="down"/>
 \endcode
 
 

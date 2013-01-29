@@ -39,10 +39,20 @@ namespace mitk
     BaseRenderer* GetSender();
 
     /**
-     * Implementation of equality for each event class
+     * Implementation of equality for each event class.
+     * Equality does \b not mean an exact copy or pointer equality.
+     *
+     * Equality is determined by agreement in all attributes that are necessary to describe
+     * the event for a state machine transition.
+     * E.g. for a mouse event press event, it is important which modifiers are used,
+     * which mouse button was used to triggered the event, but the mouse position is irrelevant.
      */
     virtual bool isEqual(InteractionEvent::Pointer);
     std::string GetEventClass();
+    /**
+     * This class implements an up cast to check if the provided baseClass object is derived from this class.
+     * This function is used to support polymorphism on state machine pattern (XML) level.
+     */
     virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:

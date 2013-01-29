@@ -31,7 +31,6 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
     m_WorldPosition[0] = 0;
     m_WorldPosition[1] = 0;
     m_WorldPosition[2] = 0;
-    //MITK_WARN<< "Renderer not initialized. WorldCoordinates bogus!";
   }
 }
 

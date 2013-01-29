@@ -572,10 +572,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
-      // TODO: enable line profile widget
       m_Controls->m_JSHistogram->setImage(this->m_CalculationThread->GetStatisticsImage());
       m_Controls->m_JSHistogram->setPlanarFigure(m_SelectedPlanarFigure);
-      m_Controls->m_JSHistogram->ComputeHistogramOfPlanarFigure();
+      m_Controls->m_JSHistogram->ComputeIntensityProfile();
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
       std::stringstream message;

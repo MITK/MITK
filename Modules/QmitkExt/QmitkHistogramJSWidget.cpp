@@ -129,11 +129,6 @@ void QmitkHistogramJSWidget::histogramToLineGraph()
   this->GraphChanged();
 }
 
-void QmitkHistogramJSWidget::resetView()
-{
-  this->reload();
-}
-
 void QmitkHistogramJSWidget::setImage(mitk::Image* image)
 {
   m_Image = image;
@@ -144,7 +139,7 @@ void QmitkHistogramJSWidget::setPlanarFigure(const mitk::PlanarFigure* planarFig
   m_PlanarFigure = planarFigure;
 }
 
-void QmitkHistogramJSWidget::ComputeHistogramOfPlanarFigure()
+void QmitkHistogramJSWidget::ComputeIntensityProfile()
 {
   this->clearData();
   m_ParametricPath->Initialize();

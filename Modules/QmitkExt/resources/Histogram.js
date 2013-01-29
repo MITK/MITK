@@ -27,7 +27,9 @@ var connected = false;
 var dur = 1000;
 var binSize = 10;
 
-// connecting signal from qt side with JavaScript method
+/*
+ * Connecting signals from qt side with JavaScript methods.
+ */
 if (!connected)
 {
   connected = true;
@@ -35,6 +37,9 @@ if (!connected)
   histogramData.GraphChanged.connect(updateHistogram);
 }
 
+/*
+ * Predefinition of scales.
+ */
 var xScale = d3.scale.linear()
   .domain([d3.min(histogramData.measurement)-binSize/2,d3.max(histogramData.measurement)+binSize/2])
   .range([0,width]);
@@ -43,6 +48,9 @@ var yScale = d3.scale.linear()
   .domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)])
   .range([height,margin.top]);
 
+/*
+ * Predefinition of axis elements.
+ */
 var xAxis = d3.svg.axis()
   .scale(xScale)
   .orient("bottom")
@@ -53,8 +61,14 @@ var yAxis = d3.svg.axis()
   .orient("left")
   .tickFormat(d3.format("s"));
 
+/*
+ * Predefinition of the zoom.
+ */
 var zoombie = d3.behavior.zoom().x(xScale).scaleExtent([1, 50]).on("zoom", zoom);
 
+/*
+ * Creation of the svg element, which holds the complete histogram.
+ */
 var svg = d3.select("body")
   .append("svg")
   .attr("class", "svg")
@@ -65,15 +79,25 @@ var svg = d3.select("body")
   .call(zoombie)
   .on("mousemove", myMouseMove);
 
+/*
+ * Appending a rectangle to the svg, to guarantee the possibility
+ * of zooming on the whole histogram.
+ */
 svg.append("rect")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
   .attr("opacity", 0);
 
+/*
+ * Appending a second svg to main svg, which holds only the graph.
+ */
 var vis = svg.append("svg")
   .attr("width", width)
   .attr("height", height);
 
+/*
+ * Predefinition of the lines.
+ */
 var line = d3.svg.line()
   .interpolate("linear")
   .x(function(d,i) {
@@ -94,7 +118,10 @@ var linenull = d3.svg.line()
 
 updateHistogram();
 
-// method to update and choose histogram
+/*
+ * Method to update the histogram data
+ * and to change the displayed graph.
+ */
 function updateHistogram()
 {
   calcBinSize();
@@ -108,6 +135,9 @@ function updateHistogram()
   }
 }
 
+/*
+ * Calculation of the bin size.
+ */
 function calcBinSize()
 {
   var min = d3.min(histogramData.measurement);
@@ -115,20 +145,34 @@ function calcBinSize()
   binSize = ((max - min) / (histogramData.measurement.length));
 }
 
-// method to display histogram as barchart
+/*
+ * Method to display histogram as a barchart.
+ */
 function barChart()
 {
   definition();
+
+  /*
+   * Change zoom to a fixed y-axis.
+   */
   zoombie = d3.behavior.zoom().x(xScale).scaleExtent([1, 50]).on("zoom", zoom);
 
   svg.call(zoombie);
 
-// element to animate transition from linegraph to barchart
+  /*
+   * Element to animate transition from linegraph to barchart.
+   */
   vis.selectAll("path.line").remove();
   vis.selectAll("circle").remove();
 
+  /*
+   * Definition of the bar elements.
+   */
   var bar = vis.selectAll("rect.bar").data(histogramData.frequency);
 
+  /*
+   * Definition how to handle new bar elements.
+   */
   bar.enter().append("rect")
     .attr("class", "bar")
     .on("mouseover", myMouseOver)
@@ -140,6 +184,9 @@ function barChart()
     .attr("height", 0)
     .attr("width", barWidth)
 
+  /*
+   * Definition how to handle changed bar elements.
+   */
   bar.transition()
     .duration(dur)
     .attr("x", function(d,i) {
@@ -149,6 +196,9 @@ function barChart()
     .attr("height", barHeight)
     .attr("width", barWidth);
 
+  /*
+   * Definition how to handle bar elements which doesn't exist anymore.'
+   */
   bar.exit()
     .transition()
     .duration(dur)
@@ -156,6 +206,10 @@ function barChart()
     .attr("height", 0)
     .remove();
 
+  /*
+   * Update of axis elements.
+   * First delete old ones, then generate new.
+   */
   svg.selectAll("g")
     .remove();
 
@@ -169,14 +223,23 @@ function barChart()
     .call(yAxis);
 }
 
-// method to display histogram as linegraph
+/*
+ * Method to display histogram as a linegraph.
+ */
 function linePlot()
 {
   definition();
+
+  /*
+   * Change zoom to a zoomable y-axis.
+   */
   zoombie = d3.behavior.zoom().x(xScale).y(yScale).scaleExtent([1, 50]).on("zoom", zoom);
 
   svg.call(zoombie);
-// element to animate transition from barchart to linegraph
+  /*
+   * Elements to animate transitions from barchart to linegraph.
+   * Different transition when an intesity profile is generated.
+   */
   if(!histogramData.intensityProfile)
   {
     vis.selectAll("rect.bar")
@@ -190,15 +253,22 @@ function linePlot()
     vis.selectAll("rect.bar")
       .transition()
       .duration(dur)
-      .attr("y", height)
+      .attr("y", height) // <--
       .attr("height", 0)
       .remove();
   }
 
+  /*
+   * Creating circle elements, when an intensity profile is generated to show tooltips.
+   * Due performance losses tooltips are not supported for line histograms.
+   */
   if(histogramData.intensityProfile)
   {
   var circles = vis.selectAll("circle").data(histogramData.frequency);
 
+  /*
+   * Definition how to handle new circle elements.
+   */
   circles.enter()
     .append("circle")
     .on("mouseover", myMouseOverLine)
@@ -215,16 +285,28 @@ function linePlot()
     .style("stroke-width", 1)
     .style("fill-opacity", 0);
 
+  /*
+   * Definition how to handle bar elements which doesn't exist anymore.
+   */
   circles.exit().remove();
   }
   else
   {
+    /*
+     * Removing of all circle elements if a line histogram is generated.
+     */
     vis.selectAll("circle").remove();
   }
 
+  /*
+   * Creating a new path element.
+   */
   var graph = vis.selectAll("path.line")
     .data([histogramData.frequency]);
 
+/*
+ * Definition how to handle a new path element, using predefined lines.
+ */
   graph.enter()
     .append("path")
     .attr("class", "line")
@@ -232,10 +314,17 @@ function linePlot()
     .duration(dur)
     .attr("d", line);
 
+/*
+ * Definition how to handle change points in an existing path element.
+ */
   graph.transition()
     .duration(dur)
     .attr("d", line);
 
+  /*
+   * Update of axis elements.
+   * First delete old ones, then generate new.
+   */
   svg.selectAll("g")
     .remove();
 
@@ -251,7 +340,9 @@ function linePlot()
 
 function definition()
 {
-// match scale to current data
+/*
+ * Match scale to current data.
+ */
   xScale = d3.scale.linear()
     .domain([d3.min(histogramData.measurement)-binSize/2,d3.max(histogramData.measurement)+binSize/2])
     .range([0,width]);
@@ -260,6 +351,9 @@ function definition()
     .domain([d3.min(histogramData.frequency),d3.max(histogramData.frequency)])
     .range([height,margin.top]);
 
+/*
+ * Match axes to current scale
+ */
   xAxis = d3.svg.axis()
     .scale(xScale)
     .orient("bottom")
@@ -271,7 +365,9 @@ function definition()
     .tickFormat(d3.format("s"));
 }
 
-// method to ensure barwidth is not smaller than 1px
+/*
+ * Method to calculate barwidth in px.
+ */
 function barWidth(d, i)
 {
   var bw;
@@ -283,10 +379,17 @@ function barWidth(d, i)
   {
     bw =(xScale(histogramData.measurement[i]) - xScale(histogramData.measurement[i - 1])) * (histogramData.frequency.length / (histogramData.frequency.length + 1)) - 1;
   }
+  /*
+   * Ensure barwidth is not smaller than 1px.
+   */
   bw = bw > 1 ? bw : 1;
   return bw;
 }
 
+/*
+ * Method to calculate barheight in px.
+ * Ensure barheight is not smaller than 1px.
+ */
 function barHeight(d)
 {
   var bh;
@@ -295,6 +398,9 @@ function barHeight(d)
   return bh;
 }
 
+/*
+ * Method to calculate dynamical y positions.
+ */
 function myYPostion(d)
 {
   var myy = yScale(d);
@@ -306,7 +412,11 @@ function myYPostion(d)
   return myy;
 }
 
-// zoom function, with plot focus by scale 1 and different zooming mode
+/*
+ * Method to fit parameters of bars/line when zoomed.
+ * Update axes elements.
+ * Resets the view if scale is 1.
+ */
 function zoom()
 {
   if (zoombie.scale() == 1)
@@ -341,7 +451,9 @@ function zoom()
   }
 }
 
-// method to show infobox, while mouse is over a bin
+/*
+ * Method to show infobox, while mouse is over a bin.
+ */
 function myMouseOver()
 {
   var myBar = d3.select(this);
@@ -357,7 +469,9 @@ function myMouseOver()
   d3.select(".frequency").text("Frequency: " + y);
 }
 
-// hide infobox, when mouse not over a bin
+/*
+ * Hide infobox, when mouse not over a bin.
+ */
 function myMouseOut()
 {
   var myBar = d3.select(this);
@@ -365,6 +479,9 @@ function myMouseOut()
   d3.select(".infobox").style("display", "none");
 }
 
+/*
+ * Show tooltip, while mouse is over a circle in an intesity profile.
+ */
 function myMouseOverLine()
 {
   var myCircle = d3.select(this)
@@ -382,6 +499,9 @@ function myMouseOverLine()
   d3.select(".frequency").text("Intesity: " + y);
 }
 
+/*
+ * Hide infobox, when mouse not over a circle.
+ */
 function myMouseOutLine()
 {
   var myCircle = d3.select(this);
@@ -389,7 +509,11 @@ function myMouseOutLine()
   d3.select(".infobox").style("display", "none");
 }
 
-// update mousecoordinates by mousemove
+/*
+ * Update mousecoordinates when mouse is moved.
+ * Tooltip is shown on the right side of the mouse until it reaches the right boundary,
+ * the it switches to the left side.
+ */
 function myMouseMove()
 {
   var infobox = d3.select(".infobox");

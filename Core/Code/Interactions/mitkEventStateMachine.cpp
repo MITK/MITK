@@ -20,6 +20,11 @@
 #include "mitkStateMachineAction.h"
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineState.h"
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+#include "mitkModuleRegistry.h"
 
 mitk::EventStateMachine::EventStateMachine()
 {
@@ -27,7 +32,7 @@ mitk::EventStateMachine::EventStateMachine()
   m_CurrentState = NULL;
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(std::string filename)
+bool mitk::EventStateMachine::LoadStateMachine(std::string filename, std::string moduleName)
 {
   if (m_StateMachineContainer != NULL)
   {
@@ -35,7 +40,7 @@ bool mitk::EventStateMachine::LoadStateMachine(std::string filename)
   }
   m_StateMachineContainer = StateMachineContainer::New();
 
-  if (m_StateMachineContainer->LoadBehavior(filename))
+  if (m_StateMachineContainer->LoadBehavior(filename,moduleName))
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 

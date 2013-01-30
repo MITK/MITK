@@ -1,0 +1,49 @@
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="PositionEvent" event_variant="AddPointClick" target="start">
+            <action name="addpoint"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
+        </transition>
+                <transition event_class="InternalEvent" event_variant="ClosedContour" target="final">
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="selected">
+            <action name="selectpoint"/>
+        </transition>
+        <transition event_class="KeyEvent" event_variant="Abort" target="start">
+            <action name="abort"/>
+        </transition>
+    </state>
+    <state name="selected">
+        <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
+            <action name="colourme"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="start">
+            <action name="unselect"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="PointSetMoveClick" target="MovementInitalized">
+            <action name="initMovePointSet"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="DeletePoint" target="start">
+            <action name="removePoint"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="AddPointClick" target="MovementInitalized">
+            <action name="initMove"/>
+        </transition>
+    </state>
+    <state name="MovementInitalized">
+      <transition event_class="MouseMoveEvent" event_variant="PointSetMove" target="MovementInitalized">
+          <action name="movePointSet"/>
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="PointMove" target="MovementInitalized">
+          <action name="movePoint"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="EndMovement" target="selected">
+          <action name="finishMovement"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="EndPointSetMovement" target="selected">
+          <action name="finishMovement"/>
+      </transition>
+    </state>
+    <state name="final"/>
+</statemachine>

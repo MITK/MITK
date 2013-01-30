@@ -25,7 +25,6 @@
 #include "mitkInteractionEventConst.h"
 
 // us
-//#include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
@@ -62,7 +61,7 @@ int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
 
 
 
-  interactor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
+  interactor->LoadStateMachine("Tests/AddAndRemovePoints.xml");
 
   // execption für file exist nicht, und Modulname exist nicht
   // get modul in LoadConfig integrieren
@@ -88,7 +87,7 @@ int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
   mitk::ModuleResourceStream stream(resource);
 
   //interactor->LoadEventConfig(&stream); //neu
-  interactor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+  interactor->LoadEventConfig("Tests/globalConfig.xml");
   interactor->SetDataNode(dn);
   renderer->SetDataStorage(ds);
   ds->Add(dn);

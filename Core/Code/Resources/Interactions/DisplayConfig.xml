@@ -1,0 +1,22 @@
+<config>
+  <param name="zoomFactor" value="5"/>
+  <param name="scrollDirection" value="leftright"/>
+   <input event_class="MousePressEvent" event_variant="StartMove">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </input>
+   <input event_class="MousePressEvent" event_variant="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="Moving">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </input>
+   <input event_class="MouseMoveEvent" event_variant="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </input>
+    <input event_class="MouseReleaseEvent" event_variant="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+</config>

@@ -23,6 +23,11 @@
 #include "mitkEventFactory.h"
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+#include "mitkModuleRegistry.h"
 
 namespace mitk
 {
@@ -55,14 +60,16 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-bool mitk::EventConfig::LoadConfig(std::string fileName)
+bool mitk::EventConfig::LoadConfig(std::string fileName, std::string moduleName)
 {
-  if (fileName.empty())
-  {
-    return false;
-  }
-  this->SetFileName(fileName.c_str());
-  return this->Parse() && !m_errors;
+    mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
+    mitk::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
+    if (!resource.IsValid() ) {
+      mitkThrow() << ("Resource not valid. State machine pattern not found:" + fileName);
+    }
+    mitk::ModuleResourceStream stream(resource);
+    this->SetStream(&stream);
+    return this->Parse() && !m_errors;
 }
 
 void mitk::EventConfig::StartElement(const char* elementName, const char **atts)

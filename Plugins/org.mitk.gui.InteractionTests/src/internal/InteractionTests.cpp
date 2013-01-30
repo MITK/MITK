@@ -66,15 +66,15 @@ void InteractionTests::ToggleConfig()
     {
       if (!m_ConfigChoice)
       {
-        (*it)->GetDataInteractor()->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
-        (*it)->GetDataInteractor()->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+        (*it)->GetDataInteractor()->LoadEventConfig("globalConfig.xml");
+        (*it)->GetDataInteractor()->AddEventConfig("PointSetConfig.xml");
         m_Controls.buttonPerformImageProcessing->setText(QString("Line Interactor (Left Click)"));
         m_ConfigChoice = true;
       }
       else
       {
-        (*it)->GetDataInteractor()->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfigRightClick.xml");
-        (*it)->GetDataInteractor()->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+        (*it)->GetDataInteractor()->LoadEventConfig("globalConfig.xml");
+        (*it)->GetDataInteractor()->AddEventConfig("PointSetConfig.xml");
         m_Controls.buttonPerformImageProcessing->setText(QString("Line Interactor (Right Click)"));
         m_ConfigChoice = false;
       }
@@ -84,17 +84,17 @@ void InteractionTests::ToggleConfig()
 
 void InteractionTests::GrabInput()
 {
-  m_CurrentDataNode = mitk::DataNode::New();
-  GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
-
-  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
-  if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSMGrab.xml"))
-  {
-    return;
-  }
-  m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
-  m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
-  m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
+//  m_CurrentDataNode = mitk::DataNode::New();
+//  GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
+//
+//  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+//  if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSMGrab.xml"))
+//  {
+//    return;
+//  }
+//  m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
+//  m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
+//  m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
 }
 
 void InteractionTests::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/, const QList<mitk::DataNode::Pointer>& nodes)
@@ -119,21 +119,17 @@ void InteractionTests::DrawLines()
   GetDataStorage()->Add(m_CurrentDataNode.GetPointer(), m_CurrentImage);
   //m_CurrentInteractor = mitk::TestInteractor::New();
   m_CurrentInteractor = mitk::PointSetDataInteractor::New();
-  m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/PointSet.xml");
-  /* if (!m_CurrentInteractor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/LineSM.xml"))
-   {
-   return;
-   }*/
+  m_CurrentInteractor->LoadStateMachine("PointSet.xml");
 
   if (m_ConfigChoice)
   {
-    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
-    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfig.xml");
+    m_CurrentInteractor->LoadEventConfig("globalConfig.xml");
+    m_CurrentInteractor->AddEventConfig("PointSetConfig.xml");
   }
   else
   {
-    m_CurrentInteractor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
-    m_CurrentInteractor->AddEventConfig("/home.local/webechr.local/EclipseTest/test/PointsConfigRightClick.xml");
+    m_CurrentInteractor->LoadEventConfig("globalConfig.xml");
+    m_CurrentInteractor->AddEventConfig("PointSetConfig.xml");
   }
   m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
 

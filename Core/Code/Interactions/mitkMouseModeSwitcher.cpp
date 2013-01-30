@@ -74,10 +74,10 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
   if (m_CurrentObserver.IsNull())
   {
     m_CurrentObserver = mitk::DisplayVectorInteractor::New();
+    m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
+    m_CurrentObserver->LoadEventConfig("DisplayConfig.xml");
 
-    m_CurrentObserver->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/DisplayInteraction.xml");
-    m_CurrentObserver->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/DisplayConfig.xml");
-
+    // Register as listener
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
     mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
     mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));

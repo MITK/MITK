@@ -59,14 +59,13 @@ namespace mitk {
     StateMachineState::Pointer GetStartState();
 
     /**
-    * @brief loads the xml file filename and generates the necessary instances
+    * @brief Loads XML resource
+    *
+    * Loads a XML resource file in the given module context.
+    * The files have to be placed in the Resources/Interaction folder of their respective module.
     **/
-    bool LoadBehavior(std::string fileName);
+    bool LoadBehavior(std::string fileName , std::string moduleName = "Mitk");
 
-    /**
-    * @brief loads the xml string and generates the necessary instances
-    **/
-    bool LoadBehaviorString(std::string xmlString);
 
     /**
     * brief To enable StateMachine to access states

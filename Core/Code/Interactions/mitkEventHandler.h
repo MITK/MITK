@@ -41,15 +41,20 @@ namespace mitk
     virtual bool LoadEventConfig();
 
     /**
-     * Load an event configuration from file.
-     */
-    virtual bool LoadEventConfig(std::string filename);
+    * @brief Loads XML resource
+    *
+    * Loads a XML resource file in the given module context.
+    * Default is the Mitk module (core).
+    * The files have to be placed in the Resources/Interaction folder of their respective module.
+    * This method will remove all existing configuration and replaces it with the new one.
+    */
+    virtual bool LoadEventConfig(std::string filename, std::string moduleName = "Mitk");
     /**
-     * Can be used to combine several config files.
-     * For example to LOAD the standard configuration then ADD some additional definitions.
-     * The configuration loaded last takes priority
+     * This method EXTENDs the configuration.
+     * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configuration files can be combined
      */
-    virtual bool AddEventConfig(std::string filename);
+    virtual bool AddEventConfig(std::string filename, std::string moduleName = "Mitk");
 
     /**
      * Returns a PropertyList in which the parameters defined in the config file are listed.

@@ -1,0 +1,22 @@
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="PositionEvent" event_variant="StartMove" target="move">
+            <action name="init"/>
+        </transition>
+        <transition event_class="PositionEvent" event_variant="StartZoom" target="zoom">
+            <action name="init"/>
+        </transition>
+    </state>
+    <state name="move">
+      <transition event_class="PositionEvent" event_variant="Moving" target="move">
+            <action name="move"/>
+      </transition>
+      <transition event_class="PositionEvent" event_variant="EndMoving" target="start"/>
+    </state>
+    <state name="zoom">
+      <transition event_class="PositionEvent" event_variant="Zooming" target="zoom">
+            <action name="zoom"/>
+      </transition>
+      <transition event_class="PositionEvent" event_variant="EndZooming" target="start"/>
+    </state>
+</statemachine>

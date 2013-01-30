@@ -249,7 +249,6 @@ set(CPP_FILES
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
   Interactions/mitkStateMachineFactory.cpp
-  Interactions/mitkTestInteractor.cpp
   Interactions/mitkTransition.cpp
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkKeyEvent.cpp
@@ -339,4 +338,12 @@ list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
 
 set(RESOURCE_FILES
 Interactions/globalConfig.xml
+Interactions/DisplayInteraction.xml
+Interactions/DisplayConfig.xml
+Interactions/PointSet.xml
+Interactions/PointSetConfig.xml
+Interactions/Tests/AddAndRemovePoints.xml
+Interactions/Tests/globalConfig.xml
+Interactions/Tests/StatemachineTest.xml
+Interactions/Tests/StatemachineConfigTest.xml
 )

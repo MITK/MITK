@@ -50,13 +50,12 @@ namespace mitk
     typedef itk::SmartPointer<InteractionEvent> EventType;
 
     /**
-     * @brief loads the xml file filename
-     **/
-    bool LoadConfig(std::string fileName);
-    /**
-     * @brief loads the xml config file as string
-     **/
-    bool LoadConfigString(std::string xmlString);
+    * @brief Loads XML resource
+    *
+    * Loads a XML resource file in the given module context.
+    * The files have to be placed in the Resources/Interaction folder of their respective module.
+    **/
+    bool LoadConfig(std::string fileName, std::string moduleName = "Mitk");
 
     void ClearConfig();
     /**

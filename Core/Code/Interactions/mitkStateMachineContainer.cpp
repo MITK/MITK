@@ -20,6 +20,13 @@
 #include <vtkObjectFactory.h>
 #include <algorithm>
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+#include "mitkModuleRegistry.h"
+
+
 /**
  * @brief This class builds up all the necessary structures for a statemachine.
  * and stores one start-state for all built statemachines.
@@ -53,15 +60,16 @@ mitk::StateMachineContainer::~StateMachineContainer()
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-bool mitk::StateMachineContainer::LoadBehavior(std::string fileName)
+bool mitk::StateMachineContainer::LoadBehavior(std::string fileName, std::string moduleName)
 {
-  if (fileName.empty())
-    return false;
-
+  mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
+  mitk::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
+  if (!resource.IsValid() ) {
+    mitkThrow() << ("Resource not valid. State machine pattern not found:" + fileName);
+  }
+  mitk::ModuleResourceStream stream(resource);
+  this->SetStream(&stream);
   m_Filename = fileName;
-
-  this->SetFileName(fileName.c_str());
-
   return this->Parse() && !m_errors;
 }
 
@@ -69,6 +77,7 @@ mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState()
 {
   return m_StartState;
 }
+
 
 /**
  * @brief sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content

@@ -38,7 +38,7 @@ int mitkEventConfigTest(int /*argc*/, char* /*argv*/[])
     mitk::EventConfig* smc = mitk::EventConfig::New();
 
   MITK_TEST_CONDITION_REQUIRED(
-      smc->LoadConfig("/home.local/webechr.local/EclipseTest/test/StatemachineConfigTest.xml") == true
+      smc->LoadConfig("Tests/StatemachineConfigTest.xml") == true
        , "01 Check if file can be loaded" );
 
   /*

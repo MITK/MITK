@@ -36,19 +36,23 @@ bool mitk::EventHandler::LoadEventConfig()
   return false;
 }
 
-bool mitk::EventHandler::LoadEventConfig(std::string filename)
+bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string moduleName)
 {
   if (m_EventConfig != NULL)
   {
     m_EventConfig->Delete();
   }
   m_EventConfig = EventConfig::New();
-  return m_EventConfig->LoadConfig(filename);
+  return m_EventConfig->LoadConfig(filename, moduleName);
 }
 
-bool mitk::EventHandler::AddEventConfig(std::string filename)
+bool mitk::EventHandler::AddEventConfig(std::string filename, std::string moduleName)
 {
-  return m_EventConfig->LoadConfig(filename);
+  if (m_EventConfig == NULL) {
+    MITK_ERROR << "LoadEventConfig has to be called before AddEventConfig can be used.";
+    return false;
+  }
+  return m_EventConfig->LoadConfig(filename, moduleName);
 }
 
 mitk::PropertyList::Pointer mitk::EventHandler::GetPropertyList()

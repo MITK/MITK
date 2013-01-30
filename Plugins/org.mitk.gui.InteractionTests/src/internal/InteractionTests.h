@@ -21,7 +21,6 @@
 
 #include <QmitkFunctionality.h>
 
-#include <mitkTestInteractor.h>
 #include "mitkPointSetDataInteractor.h"
 
 #include "ui_InteractionTestsControls.h"

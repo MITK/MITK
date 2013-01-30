@@ -102,7 +102,14 @@ namespace mitk
     typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
-    bool LoadStateMachine(std::string filename);
+    /**
+      * @brief Loads XML resource
+      *
+      * Loads a XML resource file in the given module context.
+      * Default is the Mitk module (core).
+      * The files have to be placed in the Resources/Interaction folder of their respective module.
+      **/
+    bool LoadStateMachine(std::string filename, std::string moduleName="Mitk");
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for

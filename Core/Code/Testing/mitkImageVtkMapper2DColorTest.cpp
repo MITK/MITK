@@ -40,7 +40,7 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
     //Set the opacity for all images
-    renderingHelper.SetProperty("color", mitk::ColorProperty::New(0.0f, 0.0f, 255.0f));
+    renderingHelper.SetImageProperty("color", mitk::ColorProperty::New(0.0f, 0.0f, 255.0f));
     //for now this test renders in sagittal view direction
     renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();

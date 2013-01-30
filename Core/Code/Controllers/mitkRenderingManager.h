@@ -403,7 +403,7 @@ public:
 protected:
   virtual void GenerateRenderingRequestEvent()
   {
-    ForceImmediateUpdateAll();
+   // ForceImmediateUpdateAll();
   };
 
 };

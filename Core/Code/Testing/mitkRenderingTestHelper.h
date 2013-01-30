@@ -66,6 +66,9 @@ public:
     /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
     **/
     void Render();
+     /** @brief Calls PrepareRender function of mitkRenderWindow
+    **/
+    void PrepareRender();
 
     /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/

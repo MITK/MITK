@@ -46,7 +46,7 @@ mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc
     this->GetVtkRenderWindow()->SetSize( width, height );
     m_RenderWindow->GetRenderer()->Resize( width, height);
 
-    this->GetVtkRenderWindow()->DoubleBufferOff( );
+    //this->GetVtkRenderWindow()->DoubleBufferOff( );
     this->SetInputFileNames(argc, argv);
     // prints the glinfo after creation of the vtkrenderwindow
     this->PrintGLInfo();
@@ -82,10 +82,10 @@ void mitkRenderingTestHelper::Render()
     {
         //perform global reinit:
       m_RenderWindow->GetRenderer()->PrepareRender();
-      mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
+   //   mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetVtkRenderWindow());
 
       //use this to actually show the iamge in a renderwindow
-//        this->GetVtkRenderWindow()->Render();
+        this->GetVtkRenderWindow()->Render();
 //        this->GetVtkRenderWindow()->GetInteractor()->Start();
     }
     else
@@ -93,6 +93,12 @@ void mitkRenderingTestHelper::Render()
         MITK_ERROR << "No images loaded in data storage!";
     }
 
+}
+
+void mitkRenderingTestHelper::PrepareRender()
+{
+  //perform global reinit:
+  m_RenderWindow->GetRenderer()->PrepareRender();
 }
 
 mitk::DataStorage::Pointer mitkRenderingTestHelper::GetDataStorage()

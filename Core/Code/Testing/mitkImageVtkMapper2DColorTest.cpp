@@ -60,6 +60,7 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
+    renderingHelper.PrepareRender();
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

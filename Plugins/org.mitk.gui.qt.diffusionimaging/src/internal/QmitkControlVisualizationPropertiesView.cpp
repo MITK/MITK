@@ -1499,7 +1499,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     mitk::PlanarFigure* _PlanarFigure = 0;
     _PlanarFigure = dynamic_cast<mitk::PlanarFigure*> (m_SelectedNode->GetData());
 
-    if (_PlanarFigure)
+    if (_PlanarFigure && _PlanarFigure->GetGeometry2D())
     {
 
       QmitkRenderWindow* selectedRenderWindow = 0;
@@ -1547,6 +1547,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       const mitk::PlaneGeometry
           * _PlaneGeometry =
           dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
       mitk::Geometry2D::ConstPointer worldGeometry1 =

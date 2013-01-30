@@ -45,6 +45,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
 
+#include <itkImageFileWriter.h>
+#include <itkRescaleIntensityImageFilter.h>
+
 #include <list>
 
 #if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
@@ -955,24 +958,17 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   unsigned long observerTag = labelStatisticsFilter->AddObserver(
     itk::ProgressEvent(), progressListener );
 
-
   // Execute filter
   this->InvokeEvent( itk::StartEvent() );
-
 
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
   labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
-
   // Execute the filter
   labelStatisticsFilter->Update();
-
   this->InvokeEvent( itk::EndEvent() );
-
   labelStatisticsFilter->RemoveObserver( observerTag );
-
-
 
   // Find all relevant labels of mask (other than 0)
   std::list< int > relevantLabels;
@@ -986,23 +982,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       maskNonEmpty = true;
     }
   }
-
-  typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
-  typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
-  masker->SetOutsideValue( (statisticsFilter->GetMinimum()+statisticsFilter->GetMaximum())/2 );
-  masker->SetInput1(adaptedImage);
-  masker->SetInput2(adaptedMaskImage);
-  masker->Update();
-
-  // Calculate minimum and maximum
-  typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
-  typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
-  minMaxFilter->SetImage( masker->GetOutput() );
-  unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
-  minMaxFilter->Compute();
-  minMaxFilter->RemoveObserver( observerTag2 );
-  this->InvokeEvent( itk::EndEvent() );
-
   if ( maskNonEmpty )
   {
     std::list< int >::iterator it;
@@ -1022,6 +1001,22 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
+
+      // restrict image to mask area for min/max index calculation
+      typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
+      typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
+      masker->SetOutsideValue( (statistics.Min+statistics.Max)/2 );
+      masker->SetInput1(adaptedImage);
+      masker->SetInput2(adaptedMaskImage);
+      masker->Update();
+      // get index of minimum and maximum
+      typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
+      typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+      minMaxFilter->SetImage( masker->GetOutput() );
+      unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
+      minMaxFilter->Compute();
+      minMaxFilter->RemoveObserver( observerTag2 );
+      this->InvokeEvent( itk::EndEvent() );
 
         statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());

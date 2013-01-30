@@ -51,16 +51,9 @@ itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
 bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
 
 // Defs to assure dead lock prevention only in case of possible thread handling.
-#ifdef ITK_USE_SPROC
+#if defined(ITK_USE_SPROC) || defined(ITK_USE_PTHREADS) || defined(ITK_USE_WIN32_THREADS)
   #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
 #endif
-#ifdef ITK_USE_PTHREADS
-  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
-#endif
-#ifdef ITK_USE_WIN32_THREADS
-  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
-#endif
-
 
 class MITK_CORE_EXPORT ImageAccessorBase {
 

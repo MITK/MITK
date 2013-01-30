@@ -17,21 +17,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessorBase.h"
 #include "mitkImage.h"
 
+itk::ThreadProcessIDType mitk::CurrentThreadHandle()
+{
+  #ifdef ITK_USE_SPROC
+    return GetCurrentThread();
+  #endif
+
+  #ifdef ITK_USE_PTHREADS
+    return pthread_self();
+  #endif
+
+  #ifdef ITK_USE_WIN32_THREADS
+    return GetCurrentThread();
+  #endif
+}
+
+bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadProcessIDType handle2)
+{
+  #ifdef ITK_USE_SPROC
+    return GetThreadId(handle1) == GetThreadId(handle2);
+  #endif
+
+  #ifdef ITK_USE_WIN32_THREADS
+    return GetThreadId(handle1) == GetThreadId(handle2);
+  #endif
+
+  #ifdef ITK_USE_PTHREADS
+    return handle1 == handle2;
+  #endif
+}
+
   mitk::ImageAccessorBase::ImageAccessorBase(
       ImagePointer iP,
       ImageDataItem* imageDataItem,
       int OptionFlags
     ) :
     m_Image(iP),
-//    imageDataItem(iDI),
+    // imageDataItem(iDI),
     m_SubRegion(NULL),
     m_Options(OptionFlags),
     m_CoherentMemory(false)
     {
+      m_Thread = mitk::CurrentThreadHandle();
+
       // Initialize WaitLock
       m_WaitLock = new ImageAccessorWaitLock();
       m_WaitLock->m_WaiterCount = 0;
-
 
       // Check validity of ImageAccessor
 
@@ -115,7 +146,10 @@ See LICENSE.txt or http://www.mitk.org for details.
       }
 
     }
-    else mitkThrow() << "ImageAccessor: incoherent memory area is not supported yet";
+    else {
+      m_Image->m_ReadWriteLock.Unlock();
+      mitkThrow() << "ImageAccessor: incoherent memory area is not supported yet";
+    }
 
     return false;
   }
@@ -140,3 +174,14 @@ See LICENSE.txt or http://www.mitk.org for details.
     }
   }
 
+  void mitk::ImageAccessorBase::PreventRecursiveMutexLock(mitk::ImageAccessorBase* iAB)
+  {
+    #ifdef MITK_USE_RECURSIVE_MUTEX_PREVENTION
+    // Prevent deadlock
+    itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
+    if(mitk::CompareThreadHandles(id,iAB->m_Thread)) {
+      m_Image->m_ReadWriteLock.Unlock();
+      mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
+    }
+    #endif
+  }

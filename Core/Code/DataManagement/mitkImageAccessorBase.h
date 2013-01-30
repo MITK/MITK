@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegion.h>
 #include <itkSimpleFastMutexLock.h>
 #include <itkSmartPointer.h>
+#include <itkMultiThreader.h>
 
 #include "mitkImageDataItem.h"
 
@@ -43,6 +44,17 @@ struct ImageAccessorWaitLock {
   itk::SimpleFastMutexLock m_Mutex;
 };
 
+
+/** \brief System dependend thread method, to prevent recursive mutex access */
+itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
+/** \brief System dependend thread method, to prevent recursive mutex access */
+bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
+
+// Defs to assure dead lock prevention only in case of possible thread handling.
+#if defined(ITK_USE_SPROC) || defined(ITK_USE_PTHREADS) || defined(ITK_USE_WIN32_THREADS)
+  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
+#endif
+
 class MITK_CORE_EXPORT ImageAccessorBase {
 
   friend class Image;
@@ -52,6 +64,7 @@ class MITK_CORE_EXPORT ImageAccessorBase {
 
   template <class TPixel, unsigned int VDimension>
   friend class ImagePixelReadAccessor;
+
   template <class TPixel, unsigned int VDimension>
   friend class ImagePixelWriteAccessor;
 
@@ -124,6 +137,11 @@ protected:
 
   /** \brief Uses the WaitLock to wait for another ImageAccessor*/
   void WaitForReleaseOf(ImageAccessorWaitLock* wL);
+
+  itk::ThreadProcessIDType m_Thread;
+
+  /** \brief Prevents a recursive mutex lock by comparing thread ids of competing image accessors */
+  void PreventRecursiveMutexLock(ImageAccessorBase* iAB);
 
 };
 

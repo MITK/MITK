@@ -106,6 +106,9 @@ private:
         if(Overlap(r))
         {
           // An Overlap was detected.
+
+          PreventRecursiveMutexLock(r);
+
           readOverlap = true;
           overlapLock = r->m_WaitLock;
           break;
@@ -129,11 +132,7 @@ private:
         {
           // An Overlap was detected.
 
-          // Prevent deadlock
-          itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
-          if(mitk::CompareThreadHandles(id,w->m_Thread)) {
-            mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
-          }
+          PreventRecursiveMutexLock(w);
 
           // save overlapping Waitlock
           writeOverlap = true;

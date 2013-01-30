@@ -146,7 +146,10 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
       }
 
     }
-    else mitkThrow() << "ImageAccessor: incoherent memory area is not supported yet";
+    else {
+      m_Image->m_ReadWriteLock.Unlock();
+      mitkThrow() << "ImageAccessor: incoherent memory area is not supported yet";
+    }
 
     return false;
   }
@@ -171,3 +174,14 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
     }
   }
 
+  void mitk::ImageAccessorBase::PreventRecursiveMutexLock(mitk::ImageAccessorBase* iAB)
+  {
+    #ifdef MITK_USE_RECURSIVE_MUTEX_PREVENTION
+    // Prevent deadlock
+    itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
+    if(mitk::CompareThreadHandles(id,iAB->m_Thread)) {
+      m_Image->m_ReadWriteLock.Unlock();
+      mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
+    }
+    #endif
+  }

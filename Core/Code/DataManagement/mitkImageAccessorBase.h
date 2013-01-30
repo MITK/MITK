@@ -44,8 +44,22 @@ struct ImageAccessorWaitLock {
   itk::SimpleFastMutexLock m_Mutex;
 };
 
+
+/** \brief System dependend thread method, to prevent recursive mutex access */
 itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
+/** \brief System dependend thread method, to prevent recursive mutex access */
 bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
+
+// Defs to assure dead lock prevention only in case of possible thread handling.
+#ifdef ITK_USE_SPROC
+  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
+#endif
+#ifdef ITK_USE_PTHREADS
+  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
+#endif
+#ifdef ITK_USE_WIN32_THREADS
+  #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
+#endif
 
 
 class MITK_CORE_EXPORT ImageAccessorBase {
@@ -54,6 +68,12 @@ class MITK_CORE_EXPORT ImageAccessorBase {
 
   friend class ImageReadAccessor;
   friend class ImageWriteAccessor;
+
+  template <class TPixel, unsigned int VDimension>
+  friend class ImagePixelReadAccessor;
+
+  template <class TPixel, unsigned int VDimension>
+  friend class ImagePixelWriteAccessor;
 
 public:
 
@@ -126,6 +146,9 @@ protected:
   void WaitForReleaseOf(ImageAccessorWaitLock* wL);
 
   itk::ThreadProcessIDType m_Thread;
+
+  /** \brief Prevents a recursive mutex lock by comparing thread ids of competing image accessors */
+  void PreventRecursiveMutexLock(ImageAccessorBase* iAB);
 
 };
 

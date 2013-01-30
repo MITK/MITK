@@ -169,7 +169,6 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
 
-  MITK_INFO << "PropREnderer";
   // Do we have objects to render?
   if ( this->GetEmptyWorldGeometry())
     return 0;

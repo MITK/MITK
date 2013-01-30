@@ -27,7 +27,12 @@
 
 namespace mitk
 {
-  /** Base class from with interactors that handle DataNodes are to be derived.
+  /**
+   * \class DataInteractor
+   *
+   * \brief Base class from with interactors that handle DataNodes are to be derived.
+   *
+   * Base class from with interactors that handle DataNodes are to be derived.
    * Provides an interface that is relevant for the interactor to work together with the dispatcher.
    * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
    */
@@ -40,7 +45,11 @@ namespace mitk
     typedef itk::SmartPointer<DataNode> NodeType;mitkClassMacro(DataInteractor, EventStateMachine);
     itkNewMacro(Self);
 
+    /**
+     * Set/Change the DataNode of the DataInteractor
+     */
     void SetDataNode(NodeType);
+
     /**
      * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
      */

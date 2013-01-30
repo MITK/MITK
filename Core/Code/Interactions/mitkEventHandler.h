@@ -39,13 +39,21 @@ namespace mitk
     mitkClassMacro(EventHandler, itk::Object);
     itkNewMacro(Self);
     virtual bool LoadEventConfig();
+
+    /**
+     * Load an event configuration from file.
+     */
     virtual bool LoadEventConfig(std::string filename);
     /**
      * Can be used to combine several config files.
-     * For example to load the standard configuration plus some additional definitions.
+     * For example to LOAD the standard configuration then ADD some additional definitions.
+     * The configuration loaded last takes priority
      */
     virtual bool AddEventConfig(std::string filename);
 
+    /**
+     * Returns a PropertyList in which the parameters defined in the config file are listed.
+     */
     PropertyList::Pointer GetPropertyList();
 
   protected:

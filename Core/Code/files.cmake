@@ -336,3 +336,7 @@ set(CPP_FILES
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
+
+set(RESOURCE_FILES
+Interactions/globalConfig.xml
+)

@@ -29,18 +29,33 @@
 
 namespace mitk
 {
+  /**
+   * \class InformerService
+   *
+   * MicroService that handles informing the EventObservers about InteractionEvents.
+   * Also provides an interface to register and unregister EventObservers for InteractionEvents
+   */
   class MITK_CORE_EXPORT InformerService: public itk::Object
   {
   public:
+    /**
+     * \brief Register a new EventObserver
+     */
     void RegisterObserver(EventObserver* eventObserver);
+    /**
+     * \brief Unregister an EventObserver
+     */
     void UnRegisterObserver(EventObserver* eventObserver);
+    /**
+     * \brief Distributes an event to all registered observers
+     */
     void NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled);
 
     InformerService();
     ~InformerService();
 
   private:
-    std::list<EventObserver::Pointer> m_ListObserver;
+    std::list<EventObserver::Pointer> m_ListObserver; // list that stores all registered observers
   };
 
 } /* namespace mitk */

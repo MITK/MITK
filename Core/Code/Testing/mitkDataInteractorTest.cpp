@@ -24,6 +24,13 @@
 #include "mitkMouseMoveEvent.h"
 #include "mitkInteractionEventConst.h"
 
+// us
+//#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+#include "mitkModuleRegistry.h"
+
 int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("DataInteractor")
@@ -53,7 +60,34 @@ int mitkDataInteractorTest(int /*argc*/, char* /*argv*/[])
   mitk::DataNode::Pointer dn2 = mitk::DataNode::New();
   mitk::TestInteractor::Pointer interactor = mitk::TestInteractor::New();
 
+
+
   interactor->LoadStateMachine("/home.local/webechr.local/EclipseTest/test/AddAndRemovePoints.xml");
+
+  // execption für file exist nicht, und Modulname exist nicht
+  // get modul in LoadConfig integrieren
+
+  // zum laden mit methode für input stream benutzen (vtkXmlparser=
+  // das ganze in die LoadMethode mit rein machen, damit user das GetModule krams erpsart bleibt
+  // also modul context Mitk defaulten, wenn nicht angegeben
+
+  // side note:
+  // Informer krams, rollen sind vertauscht
+  // interface machen das eventobserver registrieren lässtm
+  // der jetzt-informer service,  hört nur auf registrier events und upateded seine liste dann
+
+
+  mitk::Module* module = mitk::ModuleRegistry::GetModule("Mitk");
+  MITK_TEST_CONDITION_REQUIRED(
+      module != NULL, "01 Check that Module exists");
+  mitk::ModuleResource resource =  module->GetResource("Interactions/globalConfig.xml");
+
+  MITK_TEST_CONDITION_REQUIRED(
+        resource.IsValid() == true, "02 Check if resource is valid");
+
+  mitk::ModuleResourceStream stream(resource);
+
+  //interactor->LoadEventConfig(&stream); //neu
   interactor->LoadEventConfig("/home.local/webechr.local/EclipseTest/test/globalConfig.xml");
   interactor->SetDataNode(dn);
   renderer->SetDataStorage(ds);

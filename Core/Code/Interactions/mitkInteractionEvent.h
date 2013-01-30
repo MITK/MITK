@@ -48,6 +48,10 @@ namespace mitk
      * which mouse button was used to triggered the event, but the mouse position is irrelevant.
      */
     virtual bool isEqual(InteractionEvent::Pointer);
+
+    /**
+     * Return unique string identifier that gives the event class of this object, as it can be used in a state machine pattern.
+     */
     std::string GetEventClass();
     /**
      * This class implements an up cast to check if the provided baseClass object is derived from this class.

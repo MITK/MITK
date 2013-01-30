@@ -24,6 +24,9 @@
 
 namespace mitk
 {
+  /**
+   * Serves as an interface for the micro service that takes care of informing/registering EventObserver
+   */
   struct EventInformerService
   {
     virtual ~EventInformerService()

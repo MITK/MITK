@@ -46,9 +46,10 @@ namespace mitk
     mitkNewMacro3Param(Self, BaseRenderer*, std::string , ModifierKeys);
 
     virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
+
     ModifierKeys GetModifiers() const;
     std::string GetKey() const;
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     InteractionKeyEvent(BaseRenderer*, std::string key, ModifierKeys modifiers);

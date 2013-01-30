@@ -1,6 +1,6 @@
 /**
 
-\page OverviewPage Introduction: Overview on the Medical Imaging Interaction Toolkit (MITK)
+\page Architecture The Architecture of MITK
  
 MITK is an open source software toolkit for medical image processing, subsequent data analysis and integration of medical hardware. 
 It is designed with the aim of providing a modular and heavily reusable code base to enable rapid development of new features. Following 

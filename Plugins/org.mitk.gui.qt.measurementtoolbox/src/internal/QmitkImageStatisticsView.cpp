@@ -598,15 +598,22 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
         m_SelectedImage->GetGeometry()->IndexToWorld(index, m_WorldMin);
     }
 
+    int decimals = 2;
+
+    mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
+    mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
+    if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
+        decimals = 5;
+
   this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
-    QString("%1").arg(s.Mean, 0, 'f', 2) ) );
+    QString("%1").arg(s.Mean, 0, 'f', decimals) ) );
   this->m_Controls->m_StatisticsTable->setItem( 0, 1, new QTableWidgetItem(
-    QString("%1").arg(s.Sigma, 0, 'f', 2) ) );
+    QString("%1").arg(s.Sigma, 0, 'f', decimals) ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 2, new QTableWidgetItem(
-    QString("%1").arg(s.RMS, 0, 'f', 2) ) );
+    QString("%1").arg(s.RMS, 0, 'f', decimals) ) );
 
-    QString max; max.append(QString("%1").arg(s.Max, 0, 'f', 2));
+    QString max; max.append(QString("%1").arg(s.Max, 0, 'f', decimals));
     max += " (";
     for (int i=0; i<s.MaxIndex.size(); i++)
     {
@@ -617,7 +624,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     max += ")";
   this->m_Controls->m_StatisticsTable->setItem( 0, 3, new QTableWidgetItem( max ) );
 
-    QString min; min.append(QString("%1").arg(s.Min, 0, 'f', 2));
+    QString min; min.append(QString("%1").arg(s.Min, 0, 'f', decimals));
     min += " (";
     for (int i=0; i<s.MinIndex.size(); i++)
     {
@@ -637,7 +644,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
     double volume = spacing[0] * spacing[1] * spacing[2] * (double) s.N;
     this->m_Controls->m_StatisticsTable->setItem( 0, 6, new QTableWidgetItem(
-      QString("%1").arg(volume, 0, 'f', 2) ) );
+      QString("%1").arg(volume, 0, 'f', decimals) ) );
   }
   else
   {

@@ -57,12 +57,12 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapp
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 )
 
-#mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVtkMapper3DTest
-#                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom.vtp
-#                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom_RGBImage.nrrd
-#                        -V
-#                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedLiver640x480REF.png #corresponding reference screenshot
-#)
+mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVtkMapper3DTest
+                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom.vtp
+                        ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom_RGBImage.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedLiver640x480REF.png #corresponding reference screenshot
+)
 
 #mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTexturedSphereTest_Football mitkSurfaceVtkMapper3DTexturedSphereTest
 #                        ${MITK_DATA_DIR}/RenderingTestData/texture.jpg #input texture

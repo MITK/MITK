@@ -24,7 +24,7 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   m_UseLineGraph = false;
 
   // prepare html for use
-  connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(addJSObject()));
+  connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
   setUrl(myUrl);
 
@@ -41,7 +41,7 @@ QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 }
 
 // adds an Object of Type QmitkHistogramJSWidget to the JavaScript
-void QmitkHistogramJSWidget::addJSObject()
+void QmitkHistogramJSWidget::AddJSObject()
 {
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
@@ -61,7 +61,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
   HistogramConstIteratorType it;
-  clearData();
+  ClearData();
   unsigned int i = 0;
   bool firstValue = false;
   // filter frequencies of 0 to guarantee a better view while using a mask
@@ -86,62 +86,61 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
     m_Measurement.insert(i, measurement);
   }
   m_IntensityProfile = false;
-  this->DataChanged();
+  this->SignalDataChanged();
 }
 
-void QmitkHistogramJSWidget::clearData()
+void QmitkHistogramJSWidget::ClearData()
 {
   m_Frequency.clear();
   m_Measurement.clear();
 }
 
-void QmitkHistogramJSWidget::clearHistogram()
+void QmitkHistogramJSWidget::ClearHistogram()
 {
-  this->clearData();
-  this->DataChanged();
+  this->ClearData();
+  this->SignalDataChanged();
 }
 
-QList<QVariant> QmitkHistogramJSWidget::getFrequency()
+QList<QVariant> QmitkHistogramJSWidget::GetFrequency()
 {
   return m_Frequency;
 }
 
-QList<QVariant> QmitkHistogramJSWidget::getMeasurement()
+QList<QVariant> QmitkHistogramJSWidget::GetMeasurement()
 {
   return m_Measurement;
 }
 
-bool QmitkHistogramJSWidget::getUseLineGraph()
+bool QmitkHistogramJSWidget::GetUseLineGraph()
 {
   return m_UseLineGraph;
 }
 
-// slots for radiobuttons
-void QmitkHistogramJSWidget::histogramToBarChart()
+void QmitkHistogramJSWidget::OnBarRadioButtonSelected()
 {
   m_UseLineGraph = false;
-  this->GraphChanged();
+  this->SignalGraphChanged();
 }
 
-void QmitkHistogramJSWidget::histogramToLineGraph()
+void QmitkHistogramJSWidget::OnLineRadioButtonSelected()
 {
   m_UseLineGraph = true;
-  this->GraphChanged();
+  this->SignalGraphChanged();
 }
 
-void QmitkHistogramJSWidget::setImage(mitk::Image* image)
+void QmitkHistogramJSWidget::SetImage(mitk::Image* image)
 {
   m_Image = image;
 }
 
-void QmitkHistogramJSWidget::setPlanarFigure(const mitk::PlanarFigure* planarFigure)
+void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFigure)
 {
   m_PlanarFigure = planarFigure;
 }
 
 void QmitkHistogramJSWidget::ComputeIntensityProfile()
 {
-  this->clearData();
+  this->ClearData();
   m_ParametricPath->Initialize();
 
   if (m_PlanarFigure.IsNull())
@@ -230,10 +229,10 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile()
 
   m_IntensityProfile = true;
   m_UseLineGraph = true;
-  this->DataChanged();
+  this->SignalDataChanged();
 }
 
-bool QmitkHistogramJSWidget::getIntensityProfile()
+bool QmitkHistogramJSWidget::GetIntensityProfile()
 {
   return m_IntensityProfile;
 }

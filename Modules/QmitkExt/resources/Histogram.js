@@ -33,8 +33,8 @@ var binSize = 10;
 if (!connected)
 {
   connected = true;
-  histogramData.DataChanged.connect(updateHistogram);
-  histogramData.GraphChanged.connect(updateHistogram);
+  histogramData.SignalDataChanged.connect(updateHistogram);
+  histogramData.SignalGraphChanged.connect(updateHistogram);
 }
 
 /*

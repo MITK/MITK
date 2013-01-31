@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFHardwareExports.h"
 #include "mitkToFCameraMITKPlayerDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
+#include <mitkCameraIntrinsics.h>
+#include <mitkCameraIntrinsicsProperty.h>
+#include <mitkToFConfig.h>
 
 namespace mitk
 {
@@ -69,6 +72,17 @@ private:
    ToFCameraDevice::Pointer createToFCameraDevice()
    {
      ToFCameraMITKPlayerDevice::Pointer device = ToFCameraMITKPlayerDevice::New();
+
+//-------------------------If no Intrinsics are specified------------------------------
+      //Set default camera intrinsics for the MITK-Player.
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
+
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/Default_Parameters.xml");
+      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
+      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+
+//------------------------------------------------------------------------------------------
 
      return device.GetPointer();
    }

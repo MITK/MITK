@@ -104,6 +104,8 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
         connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(TransformBundles()));
+        connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
+
     }
 }
 
@@ -172,6 +174,125 @@ void QmitkFiberfoxView::OnContinuityChanged(double value)
 
 void QmitkFiberfoxView::OnBiasChanged(double value)
 {
+    if (m_Controls->m_RealTimeFibers->isChecked())
+        GenerateFibers();
+}
+
+void QmitkFiberfoxView::AlignOnGrid()
+{
+    for (int i=0; i<m_SelectedFiducials.size(); i++)
+    {
+        mitk::PlanarEllipse::Pointer pe = dynamic_cast<mitk::PlanarEllipse*>(m_SelectedFiducials.at(i)->GetData());
+        mitk::Point3D wc0 = pe->GetWorldControlPoint(0);
+
+        mitk::DataStorage::SetOfObjects::ConstPointer parentFibs = GetDataStorage()->GetSources(m_SelectedFiducials.at(i));
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = parentFibs->begin(); it != parentFibs->end(); ++it )
+        {
+            mitk::DataNode::Pointer pFibNode = *it;
+            if ( pFibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pFibNode->GetData()) )
+            {
+                mitk::DataStorage::SetOfObjects::ConstPointer parentImgs = GetDataStorage()->GetSources(pFibNode);
+                for( mitk::DataStorage::SetOfObjects::const_iterator it2 = parentImgs->begin(); it2 != parentImgs->end(); ++it2 )
+                {
+                    mitk::DataNode::Pointer pImgNode = *it2;
+                    if ( pImgNode.IsNotNull() && dynamic_cast<mitk::Image*>(pImgNode->GetData()) )
+                    {
+                        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(pImgNode->GetData());
+                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        itk::Index<3> idx;
+                        geom->WorldToIndex(wc0, idx);
+
+                        mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
+                        mitk::Point3D world;
+                        geom->IndexToWorld(cIdx,world);
+
+                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
+                        mitk::Point2D point2D;
+                        geom2d->Map( world, point2D );
+
+                        pe->SetControlPoint(0,point2D);
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    for( int i=0; i<m_SelectedBundles2.size(); i++ )
+    {
+        mitk::DataNode::Pointer fibNode = m_SelectedBundles2.at(i);
+
+        mitk::DataStorage::SetOfObjects::ConstPointer sources = GetDataStorage()->GetSources(fibNode);
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = sources->begin(); it != sources->end(); ++it )
+        {
+            mitk::DataNode::Pointer imgNode = *it;
+            if ( imgNode.IsNotNull() && dynamic_cast<mitk::Image*>(imgNode->GetData()) )
+            {
+                mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(fibNode);
+                for( mitk::DataStorage::SetOfObjects::const_iterator it2 = derivations->begin(); it2 != derivations->end(); ++it2 )
+                {
+                    mitk::DataNode::Pointer fiducialNode = *it2;
+                    if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
+                    {
+                        mitk::PlanarEllipse::Pointer pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData());
+                        mitk::Point3D wc0 = pe->GetWorldControlPoint(0);
+
+                        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(imgNode->GetData());
+                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        itk::Index<3> idx;
+                        geom->WorldToIndex(wc0, idx);
+                        mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
+                        mitk::Point3D world;
+                        geom->IndexToWorld(cIdx,world);
+                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
+                        mitk::Point2D point2D;
+                        geom2d->Map( world, point2D );
+                        pe->SetControlPoint(0,point2D);
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    for( int i=0; i<m_SelectedImages.size(); i++ )
+    {
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_SelectedImages.at(i)->GetData());
+
+        mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(m_SelectedImages.at(i));
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = derivations->begin(); it != derivations->end(); ++it )
+        {
+            mitk::DataNode::Pointer fibNode = *it;
+            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(fibNode->GetData()) )
+            {
+                mitk::DataStorage::SetOfObjects::ConstPointer derivations2 = GetDataStorage()->GetDerivations(fibNode);
+                for( mitk::DataStorage::SetOfObjects::const_iterator it2 = derivations2->begin(); it2 != derivations2->end(); ++it2 )
+                {
+                    mitk::DataNode::Pointer fiducialNode = *it2;
+                    if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
+                    {
+                        mitk::PlanarEllipse::Pointer pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData());
+                        mitk::Point3D wc0 = pe->GetWorldControlPoint(0);
+
+                        mitk::Geometry3D::Pointer geom = img->GetGeometry();
+                        itk::Index<3> idx;
+                        geom->WorldToIndex(wc0, idx);
+                        mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
+                        mitk::Point3D world;
+                        geom->IndexToWorld(cIdx,world);
+                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
+                        mitk::Point2D point2D;
+                        geom2d->Map( world, point2D );
+                        pe->SetControlPoint(0,point2D);
+                    }
+                }
+            }
+        }
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     if (m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
 }
@@ -709,14 +830,19 @@ void QmitkFiberfoxView::UpdateGui()
     m_Controls->m_BvalueBox->setEnabled(true);
     m_Controls->m_NumGradientsBox->setEnabled(true);
     m_Controls->m_JoinBundlesButton->setEnabled(false);
+    m_Controls->m_AlignOnGrid->setEnabled(false);
 
     if (m_SelectedFiducial.IsNotNull())
+    {
         m_Controls->m_FlipButton->setEnabled(true);
+        m_Controls->m_AlignOnGrid->setEnabled(true);
+    }
 
     if (m_SelectedImage.IsNotNull() || m_SelectedBundle.IsNotNull())
     {
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
+        m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
     if (m_TissueMask.IsNotNull())
@@ -748,6 +874,9 @@ void QmitkFiberfoxView::UpdateGui()
 
 void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
 {
+    m_SelectedBundles2.clear();
+    m_SelectedImages.clear();
+    m_SelectedFiducials.clear();
     m_SelectedFiducial = NULL;
     m_TissueMask = NULL;
     m_SelectedBundles.clear();
@@ -765,9 +894,11 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         {
             m_SelectedDWI = node;
             m_SelectedImage = node;
+            m_SelectedImages.push_back(node);
         }
         else if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
+            m_SelectedImages.push_back(node);
             m_SelectedImage = node;
             bool isBinary = false;
             node->GetPropertyValue<bool>("binary", isBinary);
@@ -779,6 +910,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
+            m_SelectedBundles2.push_back(node);
             if (m_Controls->m_RealTimeFibers->isChecked() && node!=m_SelectedBundle)
             {
                 m_SelectedBundle = node;
@@ -795,6 +927,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
         {
+            m_SelectedFiducials.push_back(node);
             m_SelectedFiducial = node;
             m_SelectedBundles.clear();
             mitk::DataStorage::SetOfObjects::ConstPointer parents = GetDataStorage()->GetSources(node);

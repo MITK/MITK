@@ -63,14 +63,15 @@ public:
 
 protected slots:
 
-    void OnDrawROI();       ///< adds new ROI, handles interactors etc.
-    void OnAddBundle();     ///< adds new fiber bundle to datastorage
-    void OnFlipButton();    ///< negate one coordinate of the fiber waypoints in the selcted planar figure. needed in case of unresolvable twists
-    void GenerateFibers();  ///< generate fibers from the selected ROIs
-    void GenerateImage();   ///< generate artificial image from the selected fiber bundle
-    void JoinBundles();     ///< merges selcted fiber bundles into one
-    void CopyBundles();      ///< add copy of the selected bundle to the datamanager
-    void TransformBundles(); ///< rotate and shift selected bundles
+    void OnDrawROI();           ///< adds new ROI, handles interactors etc.
+    void OnAddBundle();         ///< adds new fiber bundle to datastorage
+    void OnFlipButton();        ///< negate one coordinate of the fiber waypoints in the selcted planar figure. needed in case of unresolvable twists
+    void GenerateFibers();      ///< generate fibers from the selected ROIs
+    void GenerateImage();       ///< generate artificial image from the selected fiber bundle
+    void JoinBundles();         ///< merges selcted fiber bundles into one
+    void CopyBundles();         ///< add copy of the selected bundle to the datamanager
+    void TransformBundles();    ///< rotate and shift selected bundles
+    void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
@@ -127,4 +128,7 @@ protected:
     mitk::DataNode::Pointer                             m_SelectedBundle;
     mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
+    vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
+    vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
+    vector< mitk::DataNode::Pointer >                   m_SelectedImages;
 };

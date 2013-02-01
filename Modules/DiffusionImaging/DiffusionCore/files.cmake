@@ -103,7 +103,7 @@ set(H_FILES
   Algorithms/itkFiniteDiffOdfMaximaExtractionFilter.h
   Algorithms/itkMrtrixPeakImageConverter.h
   Algorithms/itkFslPeakImageConverter.h
-  Algorithms/itkFslShCoefficientImageConverter.h
+  Algorithms/itkShCoefficientImageImporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
 

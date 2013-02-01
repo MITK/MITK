@@ -70,6 +70,14 @@ void MrtrixPeakImageConverter< PixelType >
     int z = m_InputImage->GetLargestPossibleRegion().GetSize(2);
     int numDirs = m_InputImage->GetLargestPossibleRegion().GetSize(3)/3;
 
+    m_NumDirectionsImage = ItkUcharImgType::New();
+    m_NumDirectionsImage->SetSpacing( spacing3 );
+    m_NumDirectionsImage->SetOrigin( origin3 );
+    m_NumDirectionsImage->SetDirection( direction3 );
+    m_NumDirectionsImage->SetRegions( imageRegion3 );
+    m_NumDirectionsImage->Allocate();
+    m_NumDirectionsImage->FillBuffer(0);
+
     for (int i=0; i<numDirs; i++)
     {
         ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
@@ -142,6 +150,9 @@ void MrtrixPeakImageConverter< PixelType >
                     pixel.SetElement(1, dirVec[1]);
                     pixel.SetElement(2, dirVec[2]);
                     directionImage->SetPixel(index2, pixel);
+
+                    if (dirVec.magnitude()>0.0001)
+                        m_NumDirectionsImage->SetPixel(index2, m_NumDirectionsImage->GetPixel(index2)+1);
                 }
         m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), directionImage);
     }

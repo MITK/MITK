@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFiniteDiffOdfMaximaExtractionFilter.h>
 #include <itkMrtrixPeakImageConverter.h>
 #include <itkFslPeakImageConverter.h>
-#include <itkFslShCoefficientImageConverter.h>
+#include <itkShCoefficientImageImporter.h>
 #include <itkDiffusionTensorPrincipalDirectionImageFilter.h>
 
 const std::string QmitkOdfMaximaExtractionView::VIEW_ID = "org.mitk.views.odfmaximaextractionview";
@@ -73,9 +73,8 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_StartTensor, SIGNAL(clicked()), (QObject*) this, SLOT(StartTensor()));
         connect((QObject*) m_Controls->m_StartFiniteDiff, SIGNAL(clicked()), (QObject*) this, SLOT(StartFiniteDiff()));
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
-        connect((QObject*) m_Controls->m_ConvertFromFsl, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaksFromFsl()));
-        connect((QObject*) m_Controls->m_ConvertShFromFsl, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertShCoeffsFromFsl()));
-        connect((QObject*) m_Controls->m_MrtrixPeaks, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaksFromMrtrix()));
+        connect((QObject*) m_Controls->m_ImportPeaks, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaks()));
+        connect((QObject*) m_Controls->m_ImportShCoeffs, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertShCoeffs()));
     }
 }
 
@@ -113,13 +112,13 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
 
     if (m_ImageNodes.empty())
     {
-        m_Controls->m_ConvertFromFsl->setEnabled(false);
-        m_Controls->m_ConvertShFromFsl->setEnabled(false);
+        m_Controls->m_ImportPeaks->setEnabled(false);
+        m_Controls->m_ImportShCoeffs->setEnabled(false);
     }
     else
     {
-        m_Controls->m_ConvertFromFsl->setEnabled(true);
-        m_Controls->m_ConvertShFromFsl->setEnabled(true);
+        m_Controls->m_ImportPeaks->setEnabled(true);
+        m_Controls->m_ImportShCoeffs->setEnabled(true);
     }
 
     if (!m_BinaryImageNodes.empty())
@@ -133,15 +132,28 @@ void QmitkOdfMaximaExtractionView::UpdateGui()
 }
 
 template<int shOrder>
-void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffsFromFsl(mitk::Image* mitkImg)
+void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg)
 {
-    typedef itk::FslShCoefficientImageConverter< float, shOrder > FilterType;
+    typedef itk::ShCoefficientImageImporter< float, shOrder > FilterType;
     typedef mitk::ImageToItk< itk::Image< float, 4 > > CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput(mitkImg);
     caster->Update();
 
     typename FilterType::Pointer filter = FilterType::New();
+
+    switch (m_Controls->m_ToolkitBox->currentIndex())
+    {
+    case 0:
+        filter->SetToolkit(FilterType::FSL);
+        break;
+    case 1:
+        filter->SetToolkit(FilterType::MRTRIX);
+        break;
+    default:
+        filter->SetToolkit(FilterType::FSL);
+    }
+
     filter->SetInputImage(caster->GetOutput());
     filter->GenerateData();
     typename FilterType::QballImageType::Pointer itkQbi = filter->GetQballImage();
@@ -153,7 +165,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffsFromFsl(mitk::Image* 
         img->SetVolume( itkCi->GetBufferPointer() );
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
-        node->SetName("FSL_ShCoefficientImage");
+        node->SetName("_ShCoefficientImage");
         GetDataStorage()->Add(node);
     }
 
@@ -163,12 +175,12 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffsFromFsl(mitk::Image* 
         img->SetVolume( itkQbi->GetBufferPointer() );
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
-        node->SetName("FSL_QballImage");
+        node->SetName("_QballImage");
         GetDataStorage()->Add(node);
     }
 }
 
-void QmitkOdfMaximaExtractionView::ConvertShCoeffsFromFsl()
+void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 {
     if (m_ImageNodes.empty())
         return;
@@ -198,143 +210,147 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffsFromFsl()
     switch (shOrder)
     {
     case 4:
-        TemplatedConvertShCoeffsFromFsl<4>(mitkImg);
+        TemplatedConvertShCoeffs<4>(mitkImg);
         break;
     case 6:
-        TemplatedConvertShCoeffsFromFsl<6>(mitkImg);
+        TemplatedConvertShCoeffs<6>(mitkImg);
         break;
     case 8:
-        TemplatedConvertShCoeffsFromFsl<8>(mitkImg);
+        TemplatedConvertShCoeffs<8>(mitkImg);
         break;
     case 10:
-        TemplatedConvertShCoeffsFromFsl<10>(mitkImg);
+        TemplatedConvertShCoeffs<10>(mitkImg);
         break;
     case 12:
-        TemplatedConvertShCoeffsFromFsl<12>(mitkImg);
+        TemplatedConvertShCoeffs<12>(mitkImg);
         break;
     default:
         MITK_INFO << "SH-order " << shOrder << " not supported";
     }
 }
 
-void QmitkOdfMaximaExtractionView::ConvertPeaksFromFsl()
+void QmitkOdfMaximaExtractionView::ConvertPeaks()
 {
     if (m_ImageNodes.empty())
         return;
 
-    typedef itk::Image< float, 4 > ItkImageType;
-    typedef itk::FslPeakImageConverter< float > FilterType;
-    FilterType::Pointer filter = FilterType::New();
-    FilterType::InputType::Pointer inputVec = FilterType::InputType::New();
-    mitk::Geometry3D::Pointer geom;
-
-    for (int i=0; i<m_ImageNodes.size(); i++)
+    switch (m_Controls->m_ToolkitBox->currentIndex())
     {
-        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(i)->GetData());
-        geom = mitkImg->GetGeometry();
+    case 0:
+    {
+        typedef itk::Image< float, 4 > ItkImageType;
+        typedef itk::FslPeakImageConverter< float > FilterType;
+        FilterType::Pointer filter = FilterType::New();
+        FilterType::InputType::Pointer inputVec = FilterType::InputType::New();
+        mitk::Geometry3D::Pointer geom;
+
+        for (int i=0; i<m_ImageNodes.size(); i++)
+        {
+            mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(i)->GetData());
+            geom = mitkImg->GetGeometry();
+            typedef mitk::ImageToItk< FilterType::InputImageType > CasterType;
+            CasterType::Pointer caster = CasterType::New();
+            caster->SetInput(mitkImg);
+            caster->Update();
+            FilterType::InputImageType::Pointer itkImg = caster->GetOutput();
+            inputVec->InsertElement(inputVec->Size(), itkImg);
+        }
+
+        filter->SetInputImages(inputVec);
+        filter->GenerateData();
+
+        mitk::Vector3D outImageSpacing = geom->GetSpacing();
+        float maxSpacing = 1;
+        if(outImageSpacing[0]>outImageSpacing[1] && outImageSpacing[0]>outImageSpacing[2])
+            maxSpacing = outImageSpacing[0];
+        else if (outImageSpacing[1] > outImageSpacing[2])
+            maxSpacing = outImageSpacing[1];
+        else
+            maxSpacing = outImageSpacing[2];
+
+        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        directions->SetGeometry(geom);
+        DataNode::Pointer node = DataNode::New();
+        node->SetData(directions);
+        node->SetName("_VectorField");
+        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
+        node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
+        GetDataStorage()->Add(node);
+
+        typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
+        DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
+        for (int i=0; i<container->Size(); i++)
+        {
+            ItkDirectionImage3DType::Pointer itkImg = container->GetElement(i);
+            mitk::Image::Pointer img = mitk::Image::New();
+            img->InitializeByItk( itkImg.GetPointer() );
+            img->SetVolume( itkImg->GetBufferPointer() );
+            DataNode::Pointer node = DataNode::New();
+            node->SetData(img);
+            QString name(m_ImageNodes.at(i)->GetName().c_str());
+            name += "_Direction";
+            name += QString::number(i+1);
+            node->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node);
+        }
+        break;
+    }
+    case 1:
+    {
+        typedef itk::Image< float, 4 > ItkImageType;
+        typedef itk::MrtrixPeakImageConverter< float > FilterType;
+        FilterType::Pointer filter = FilterType::New();
+
+        // cast to itk
+        mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(0)->GetData());
+        mitk::Geometry3D::Pointer geom = mitkImg->GetGeometry();
         typedef mitk::ImageToItk< FilterType::InputImageType > CasterType;
         CasterType::Pointer caster = CasterType::New();
         caster->SetInput(mitkImg);
         caster->Update();
         FilterType::InputImageType::Pointer itkImg = caster->GetOutput();
-        inputVec->InsertElement(inputVec->Size(), itkImg);
-    }
 
-    filter->SetInputImages(inputVec);
-    filter->GenerateData();
+        filter->SetInputImage(itkImg);
+        filter->GenerateData();
 
-    mitk::Vector3D outImageSpacing = geom->GetSpacing();
-    float maxSpacing = 1;
-    if(outImageSpacing[0]>outImageSpacing[1] && outImageSpacing[0]>outImageSpacing[2])
-        maxSpacing = outImageSpacing[0];
-    else if (outImageSpacing[1] > outImageSpacing[2])
-        maxSpacing = outImageSpacing[1];
-    else
-        maxSpacing = outImageSpacing[2];
+        mitk::Vector3D outImageSpacing = geom->GetSpacing();
+        float maxSpacing = 1;
+        if(outImageSpacing[0]>outImageSpacing[1] && outImageSpacing[0]>outImageSpacing[2])
+            maxSpacing = outImageSpacing[0];
+        else if (outImageSpacing[1] > outImageSpacing[2])
+            maxSpacing = outImageSpacing[1];
+        else
+            maxSpacing = outImageSpacing[2];
 
-    mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-    directions->SetGeometry(geom);
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(directions);
-    node->SetName("FSL_VectorField");
-    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
-    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node);
-
-    typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
-    DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
-    for (int i=0; i<container->Size(); i++)
-    {
-        ItkDirectionImage3DType::Pointer itkImg = container->GetElement(i);
-        mitk::Image::Pointer img = mitk::Image::New();
-        img->InitializeByItk( itkImg.GetPointer() );
-        img->SetVolume( itkImg->GetBufferPointer() );
+        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
-        node->SetData(img);
-        QString name(m_ImageNodes.at(i)->GetName().c_str());
-        name += "_Direction";
-        name += QString::number(i+1);
-        node->SetName(name.toStdString().c_str());
-        GetDataStorage()->Add(node);
-    }
-}
-
-void QmitkOdfMaximaExtractionView::ConvertPeaksFromMrtrix()
-{
-    if (m_ImageNodes.empty())
-        return;
-
-    typedef itk::Image< float, 4 > ItkImageType;
-    typedef itk::MrtrixPeakImageConverter< float > FilterType;
-    FilterType::Pointer filter = FilterType::New();
-
-    // cast to itk
-    mitk::Image::Pointer mitkImg = dynamic_cast<mitk::Image*>(m_ImageNodes.at(0)->GetData());
-    mitk::Geometry3D::Pointer geom = mitkImg->GetGeometry();
-    typedef mitk::ImageToItk< FilterType::InputImageType > CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(mitkImg);
-    caster->Update();
-    FilterType::InputImageType::Pointer itkImg = caster->GetOutput();
-
-    filter->SetInputImage(itkImg);
-    filter->GenerateData();
-
-    mitk::Vector3D outImageSpacing = geom->GetSpacing();
-    float maxSpacing = 1;
-    if(outImageSpacing[0]>outImageSpacing[1] && outImageSpacing[0]>outImageSpacing[2])
-        maxSpacing = outImageSpacing[0];
-    else if (outImageSpacing[1] > outImageSpacing[2])
-        maxSpacing = outImageSpacing[1];
-    else
-        maxSpacing = outImageSpacing[2];
-
-    mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-    directions->SetGeometry(geom);
-    DataNode::Pointer node = DataNode::New();
-    node->SetData(directions);
-    QString name(m_ImageNodes.at(0)->GetName().c_str());
-    name += "_VectorField";
-    node->SetName(name.toStdString().c_str());
-    node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
-    node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node);
-
-    typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
-    DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
-    for (int i=0; i<container->Size(); i++)
-    {
-        ItkDirectionImage3DType::Pointer itkImg = container->GetElement(i);
-        mitk::Image::Pointer img = mitk::Image::New();
-        img->InitializeByItk( itkImg.GetPointer() );
-        img->SetVolume( itkImg->GetBufferPointer() );
-        DataNode::Pointer node = DataNode::New();
-        node->SetData(img);
+        node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
-        name += "_Direction";
-        name += QString::number(i+1);
+        name += "_VectorField";
         node->SetName(name.toStdString().c_str());
+        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
+        node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         GetDataStorage()->Add(node);
+
+        typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
+        DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
+        for (int i=0; i<container->Size(); i++)
+        {
+            ItkDirectionImage3DType::Pointer itkImg = container->GetElement(i);
+            mitk::Image::Pointer img = mitk::Image::New();
+            img->InitializeByItk( itkImg.GetPointer() );
+            img->SetVolume( itkImg->GetBufferPointer() );
+            DataNode::Pointer node = DataNode::New();
+            node->SetData(img);
+            QString name(m_ImageNodes.at(0)->GetName().c_str());
+            name += "_Direction";
+            name += QString::number(i+1);
+            node->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node);
+        }
+        break;
+    }
     }
 }
 
@@ -436,6 +452,18 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
 {
     typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, shOrder, 20242 > MaximaExtractionFilterType;
     typename MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+
+    switch (m_Controls->m_ToolkitBox->currentIndex())
+    {
+    case 0:
+        filter->SetToolkit(MaximaExtractionFilterType::FSL);
+        break;
+    case 1:
+        filter->SetToolkit(MaximaExtractionFilterType::MRTRIX);
+        break;
+    default:
+        filter->SetToolkit(MaximaExtractionFilterType::FSL);
+    }
 
     mitk::Geometry3D::Pointer geometry;
     try{

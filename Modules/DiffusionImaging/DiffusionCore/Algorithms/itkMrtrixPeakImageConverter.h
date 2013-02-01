@@ -56,11 +56,13 @@ public:
   typedef Image< float, 4 >                                             InputImageType;
   typedef Image< Vector< float, 3 >, 3>                                 ItkDirectionImageType;
   typedef VectorContainer< int, ItkDirectionImageType::Pointer >        DirectionImageContainerType;
+  typedef itk::Image<unsigned char, 3>                                  ItkUcharImgType;
 
   itkSetMacro( NormalizationMethod, NormalizationMethods)                       ///< normalization method of ODF peaks
   itkSetMacro( InputImage, InputImageType::Pointer)                             ///< MRtrix direction image of type itk::Image< float, 4 >
   itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
   itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
+  itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
 
   void GenerateData();
 
@@ -72,6 +74,7 @@ protected:
   mitk::FiberBundleX::Pointer           m_OutputFiberBundle;            ///< vector field (peak sizes rescaled for visualization purposes)
   InputImageType::Pointer               m_InputImage;                   ///< MRtrix direction image of type itk::Image< float, 4 >
   DirectionImageContainerType::Pointer  m_DirectionImageContainer;      ///< container for output peaks
+  ItkUcharImgType::Pointer              m_NumDirectionsImage;           ///< number of peaks per voxel
 
 private:
 

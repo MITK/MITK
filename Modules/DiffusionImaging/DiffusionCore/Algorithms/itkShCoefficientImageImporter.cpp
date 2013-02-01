@@ -1,12 +1,12 @@
 
-#ifndef __itkFslShCoefficientImageConverter_cpp
-#define __itkFslShCoefficientImageConverter_cpp
+#ifndef __itkShCoefficientImageImporter_cpp
+#define __itkShCoefficientImageImporter_cpp
 
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "itkFslShCoefficientImageConverter.h"
+#include "itkShCoefficientImageImporter.h"
 #include <itkImageRegionIterator.h>
 #include <boost/math/special_functions.hpp>
 
@@ -15,16 +15,17 @@ using namespace boost::math;
 namespace itk {
 
 template< class PixelType, int ShOrder >
-FslShCoefficientImageConverter< PixelType, ShOrder >::FslShCoefficientImageConverter()
+ShCoefficientImageImporter< PixelType, ShOrder >::ShCoefficientImageImporter()
+    : m_Toolkit(FSL)
 {
     m_ShBasis.set_size(QBALL_ODFSIZE, (ShOrder+1)*(ShOrder+2)/2);
-    CalcShBasis();
 }
 
 template< class PixelType, int ShOrder >
-void FslShCoefficientImageConverter< PixelType, ShOrder >
+void ShCoefficientImageImporter< PixelType, ShOrder >
 ::GenerateData()
 {
+    CalcShBasis();
     if (m_InputImage.IsNull())
         return;
 
@@ -94,18 +95,18 @@ void FslShCoefficientImageConverter< PixelType, ShOrder >
                 index2.SetElement(2,c);
                 m_CoefficientImage->SetPixel(index2, pix);
 
-                vnl_matrix<double> odf = m_ShBasis*coeffs;
                 typename QballImageType::PixelType pix2;
+                vnl_matrix<double> odf = m_ShBasis*coeffs;
                 for (int d=0; d<QBALL_ODFSIZE; d++)
                     pix2[d] = odf(d,0)*M_PI*4/QBALL_ODFSIZE;
+
                 m_QballImage->SetPixel(index2,pix2);
             }
-
 }
 
 // generate spherical harmonic values of the desired order for each input direction
 template< class PixelType, int ShOrder >
-void FslShCoefficientImageConverter< PixelType, ShOrder >
+void ShCoefficientImageImporter< PixelType, ShOrder >
 ::CalcShBasis()
 {
     vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> sphCoords = GetSphericalOdfDirections();
@@ -117,15 +118,30 @@ void FslShCoefficientImageConverter< PixelType, ShOrder >
         for (int l=0; l<=ShOrder; l=l+2)
             for (m=-l; m<=l; m++)
             {
-                plm = legendre_p<double>(l,abs(m),cos(sphCoords(0,p)));
-                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                switch (m_Toolkit)
+                {
+                case FSL:
+                    plm = legendre_p<double>(l,abs(m),cos(sphCoords(0,p)));
+                    mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                    if (m<0)
+                        m_ShBasis(p,j) = sqrt(2.0)*mag*cos(-m*sphCoords(1,p));
+                    else if (m==0)
+                        m_ShBasis(p,j) = mag;
+                    else
+                        m_ShBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(1,p));
+                    break;
+                case MRTRIX:
+                    plm = legendre_p<double>(l,abs(m),-cos(sphCoords(0,p)));
+                    mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                    if (m>0)
+                        m_ShBasis(p,j) = mag*cos(m*sphCoords(1,p));
+                    else if (m==0)
+                        m_ShBasis(p,j) = mag;
+                    else
+                        m_ShBasis(p,j) = mag*sin(-m*sphCoords(1,p));
+                    break;
+                }
 
-                if (m<0)
-                    m_ShBasis(p,j) = sqrt(2.0)*mag*cos(-m*sphCoords(1,p));
-                else if (m==0)
-                    m_ShBasis(p,j) = mag;
-                else
-                    m_ShBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(1,p));
                 j++;
             }
     }
@@ -133,7 +149,7 @@ void FslShCoefficientImageConverter< PixelType, ShOrder >
 
 // convert cartesian to spherical coordinates
 template< class PixelType, int ShOrder >
-vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> FslShCoefficientImageConverter< PixelType, ShOrder >
+vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> ShCoefficientImageImporter< PixelType, ShOrder >
 ::GetSphericalOdfDirections()
 {
     itk::OrientationDistributionFunction< PixelType, QBALL_ODFSIZE > odf;
@@ -160,4 +176,4 @@ vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> FslShCoefficientImageConverter< Pixel
 
 }
 
-#endif // __itkFslShCoefficientImageConverter_cpp
+#endif // __itkShCoefficientImageImporter_cpp

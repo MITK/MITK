@@ -14,18 +14,18 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkFslShCoefficientImageConverter_h_
-#define __itkFslShCoefficientImageConverter_h_
+#ifndef __itkShCoefficientImageImporter_h_
+#define __itkShCoefficientImageImporter_h_
 
 #include <itkOrientationDistributionFunction.h>
 
 namespace itk{
-/** \class FslShCoefficientImageConverter
+/** \class ShCoefficientImageImporter
   Converts FSL reconstructions of diffusionweighted images (4D images containing the sh coefficients) to qball images or 3D sh-coefficient images.
 */
 
 template< class PixelType, int ShOrder >
-class FslShCoefficientImageConverter : public ProcessObject
+class ShCoefficientImageImporter : public ProcessObject
 {
 
 public:
@@ -36,7 +36,12 @@ public:
         SPACING_COMPENSATION
     };
 
-    typedef FslShCoefficientImageConverter Self;
+    enum Toolkit {  ///< SH coefficient convention (depends on toolkit)
+        FSL,
+        MRTRIX
+    };
+
+    typedef ShCoefficientImageImporter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ProcessObject                           Superclass;
@@ -48,7 +53,7 @@ public:
     itkNewMacro(Self)
 
     /** Runtime information support. */
-    itkTypeMacro(FslShCoefficientImageConverter, ProcessObject)
+    itkTypeMacro(ShCoefficientImageImporter, ProcessObject)
 
     // input
     itkSetMacro( InputImage, InputImageType::Pointer) ///< sh coefficient image in FSL file format
@@ -57,14 +62,14 @@ public:
     itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
     itkGetMacro( QballImage, typename QballImageType::Pointer)                ///< mitk Q-Ball image generated from the coefficients
 
-    itkSetMacro( Toolkit, int)
-    itkGetMacro( Toolkit, int)
+    itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
+    itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
     void GenerateData();
 
 protected:
-    FslShCoefficientImageConverter();
-    ~FslShCoefficientImageConverter(){}
+    ShCoefficientImageImporter();
+    ~ShCoefficientImageImporter(){}
 
     void CalcShBasis();
     vnl_matrix_fixed<double, 2, QBALL_ODFSIZE> GetSphericalOdfDirections();
@@ -73,7 +78,7 @@ protected:
     typename CoefficientImageType::Pointer    m_CoefficientImage; ///< mitk style image containing the SH coefficients
     typename QballImageType::Pointer          m_QballImage;       ///< mitk Q-Ball image generated from the coefficients
     vnl_matrix<double>                        m_ShBasis;
-    int                                       m_Toolkit;
+    Toolkit                                   m_Toolkit;
 
 private:
 
@@ -82,8 +87,8 @@ private:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkFslShCoefficientImageConverter.cpp"
+#include "itkShCoefficientImageImporter.cpp"
 #endif
 
-#endif //__itkFslShCoefficientImageConverter_h_
+#endif //__itkShCoefficientImageImporter_h_
 

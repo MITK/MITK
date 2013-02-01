@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>392</width>
-    <height>769</height>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -344,20 +344,37 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_7">
       <item row="2" column="0">
-       <widget class="QCommandLinkButton" name="m_ConvertShFromFsl">
+       <widget class="QCommandLinkButton" name="m_ImportShCoeffs">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>Generate Q-Ball image and MITK compatible SH coefficient from the FSL qboot SH output.</string>
+         <string>Generate Q-Ball image and MITK compatible SH coefficient from other toolkits.</string>
         </property>
         <property name="text">
-         <string>Convert FSL SH - Coefficients</string>
+         <string>Import SH - Coefficients</string>
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="m_ToolkitBox">
+        <property name="toolTip">
+         <string>Define SH coefficient convention (depends on toolkit)</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>FSL</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MRtrix</string>
+         </property>
+        </item>
+       </widget>
+      </item>
       <item row="1" column="0">
-       <widget class="QCommandLinkButton" name="m_ConvertFromFsl">
+       <widget class="QCommandLinkButton" name="m_ImportPeaks">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -365,20 +382,7 @@
          <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
         </property>
         <property name="text">
-         <string>Convert FSL Peaks</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCommandLinkButton" name="m_MrtrixPeaks">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Convert MRtrix Peaks</string>
+         <string>Import Peak Image</string>
         </property>
        </widget>
       </item>

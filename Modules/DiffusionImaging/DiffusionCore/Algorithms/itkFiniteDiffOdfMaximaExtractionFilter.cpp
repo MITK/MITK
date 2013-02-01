@@ -33,7 +33,8 @@ static bool CompareVectors(const vnl_vector_fixed< double, 3 >& v1, const vnl_ve
 template< class PixelType, int ShOrder, int NrOdfDirections >
 FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::FiniteDiffOdfMaximaExtractionFilter()
-    : m_MaxNumPeaks(2)
+    : m_Toolkit(FSL)
+    , m_MaxNumPeaks(2)
     , m_PeakThreshold(0.4)
     , m_ClusteringThreshold(0.9)
     , m_AngularThreshold(0.7)
@@ -460,15 +461,20 @@ vnl_matrix<double> FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOd
         for (int l=0; l<=ShOrder; l=l+2)
             for (m=-l; m<=l; m++)
             {
-//                plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
-//                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
+                switch (m_Toolkit)
+                {
+                case FSL:
+                plm = legendre_p<double>(l,abs(m),cos(sphCoords(p,0)));
+                mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
 
-//                if (m<0)
-//                    shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));
-//                else if (m==0)
-//                    shBasis(p,j) = mag;
-//                else
-//                    shBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(p,1));
+                if (m<0)
+                    shBasis(p,j) = sqrt(2.0)*mag*cos(fabs((double)m)*sphCoords(p,1));
+                else if (m==0)
+                    shBasis(p,j) = mag;
+                else
+                    shBasis(p,j) = pow(-1.0, m)*sqrt(2.0)*mag*sin(m*sphCoords(p,1));
+                    break;
+                case MRTRIX:
 
                 plm = legendre_p<double>(l,abs(m),-cos(sphCoords(p,0)));
                 mag = sqrt((double)(2*l+1)/(4.0*M_PI)*factorial<double>(l-abs(m))/factorial<double>(l+abs(m)))*plm;
@@ -478,6 +484,8 @@ vnl_matrix<double> FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOd
                     shBasis(p,j) = mag;
                 else
                     shBasis(p,j) = mag*sin(-m*sphCoords(p,1));
+                    break;
+                }
 
                 j++;
             }

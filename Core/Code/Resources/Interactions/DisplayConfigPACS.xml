@@ -6,20 +6,23 @@
   <!-- scrolling either by moving mouse leftright or updown -->
   <param name="scrollDirection" value="leftright"/>
   <!-- Sets how many pixel the mouse has to be moved for scrolling 1 slice-->
-  <param name="pixelPerSlice" value="6"/>
+  <param name="pixelPerSlice" value="3"/>
   <!-- when scrolling restart at beginning of volume, when end is reached-->
   <param name="autoRepeat" value="true"/>
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
-  <param name="alwaysReact" value="false"/>
+  <param name="alwaysReact" value="true"/>
   <!-- Moving -->
    <input event_class="MousePressEvent" event_variant="StartMove">
-    <attribute name="EventButton" value="MiddleMouseButton"/>
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
   </input>
   <input event_class="MouseReleaseEvent" event_variant="EndMoving">
-    <attribute name="EventButton" value="MiddleMouseButton"/>
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
   </input>
   <input event_class="MouseMoveEvent" event_variant="Moving">
-    <attribute name="ButtonState" value="MiddleMouseButton"/>
+    <attribute name="ButtonState" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
   </input>
   <!-- Zooming -->
   <input event_class="MousePressEvent" event_variant="StartZoom">
@@ -35,32 +38,16 @@
     <attribute name="Modifiers" value="ctrl"/>
   </input>
   <!-- scrolling -->
-  <!--
   <input event_class="MousePressEvent" event_variant="StartScroll">
-    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="EventButton" value="MiddleMouseButton"/>
   </input>
   <input event_class="MouseReleaseEvent" event_variant="EndScrolling">
-    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="EventButton" value="MiddleMouseButton"/>
   </input>
   <input event_class="MouseMoveEvent" event_variant="Scrolling">
-    <attribute name="ButtonState" value="RightMouseButton"/>
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
   </input>
-  -->
-  <!-- PlaneUP and -Down are described twice, this means the transition
-  can be triggered by both events -->
-  <input event_class="MouseWheelEvent" event_variant="PlaneUP">
-    <attribute name="ScrollDirection" value="up"/>
-  </input>
-  <input event_class="MouseWheelEvent" event_variant="PlaneDown">
-    <attribute name="ScrollDirection" value="down"/>
-  </input>
-    <input event_class="KeyEvent" event_variant="PlaneUP">
-    <attribute name="Key" value="ArrowUp"/>
-  </input>
-  <input event_class="KeyEvent" event_variant="PlaneDown">
-    <attribute name="Key" value="ArrowDown"/>
-  </input>
-  <!-- LevelWindow -->
+   <!-- LevelWindow -->
   <input event_class="MousePressEvent" event_variant="StartAdjustLevelWindow">
     <attribute name="EventButton" value="RightMouseButton"/>
   </input>

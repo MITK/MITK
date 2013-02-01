@@ -67,6 +67,7 @@ namespace mitk
      * This overwrites the FilterEvents function of the EventStateMachine to ignore the DataNode, since EventObservers are not associated with one.
      */
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
+
   protected:
 
 

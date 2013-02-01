@@ -42,40 +42,11 @@ mitk::MouseModeSwitcher::~MouseModeSwitcher()
 
 void mitk::MouseModeSwitcher::InitializeListeners()
 {
-//  mitk::DisplayVectorInteractor::Pointer moveAndZoomInteractor = mitk::DisplayVectorInteractor::New(
-//    "moveNzoom", new mitk::DisplayInteractor() );
-//  mitk::StateMachine::Pointer listener = moveAndZoomInteractor.GetPointer();
-//  m_ListenersForMITK.push_back( listener );
-//
-//
-//  mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New(
-//    "alternativeScroll", new mitk::DisplayInteractor() );
-//  listener = scrollInteractor;
-//  m_ListenersForPACS.push_back( listener );
-//
-//  mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New("alternativeLevelWindow");
-//  listener = lwInteractor;
-//  m_ListenersForPACS.push_back( listener );
-//
-//  mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New(
-//    "alternativePan", new mitk::DisplayInteractor() );
-//  listener = panInteractor;
-//  m_ListenersForPACS.push_back( listener );
-//
-//  mitk::DisplayVectorInteractor::Pointer crtlZoomInteractor = mitk::DisplayVectorInteractor::New(
-//    "alternativeZoom", new mitk::DisplayInteractor() );
-//  listener = crtlZoomInteractor;
-//  m_ListenersForPACS.push_back( listener );
-
-}
-
-void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
-{
   if (m_CurrentObserver.IsNull())
   {
     m_CurrentObserver = mitk::DisplayVectorInteractor::New();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
-    m_CurrentObserver->LoadEventConfig("DisplayConfig.xml");
+    m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
 
     // Register as listener
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
@@ -83,40 +54,23 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
     service->RegisterObserver(m_CurrentObserver.GetPointer());
   }
+}
 
-//  switch ( scheme )
-//  {
-//  case MITK :
-//    {
-//      ListenerList::iterator iter;
-//      for ( iter=m_ListenersForPACS.begin(); iter!=m_ListenersForPACS.end(); iter++ )
-//      {
-//        m_GlobalInteraction->RemoveListener( (*iter) );
-//      }
-//
-//      for ( iter=m_ListenersForMITK.begin(); iter!=m_ListenersForMITK.end(); iter++ )
-//      {
-//        m_GlobalInteraction->AddListener( (*iter) );
-//      }
-//      break;
-//    } // case MITK
-//  case PACS :
-//    {
-//      ListenerList::iterator iter;
-//      for ( iter=m_ListenersForMITK.begin(); iter!=m_ListenersForMITK.end(); iter++ )
-//      {
-//        m_GlobalInteraction->RemoveListener( (*iter) );
-//      }
-//
-//      for ( iter=m_ListenersForPACS.begin(); iter!=m_ListenersForPACS.end(); iter++ )
-//      {
-//        m_GlobalInteraction->AddListener( (*iter) );
-//      }
-//
-//      this->SelectMouseMode( MousePointer );
-//      break;
-//    } // case PACS
-//  } // switch
+void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
+{
+  switch ( scheme )
+  {
+  case MITK :
+    {
+     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
+    }
+    break;
+  case PACS :
+    {
+      m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
+    }
+    break;
+  }
 
   m_ActiveInteractionScheme = scheme;
 }

@@ -30,12 +30,6 @@ mitk::EventHandler::~EventHandler()
   }
 }
 
-bool mitk::EventHandler::LoadEventConfig()
-{
-  // TODO:: implement standard file location, for standard events
-  return false;
-}
-
 bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string moduleName)
 {
   if (m_EventConfig != NULL)
@@ -43,16 +37,23 @@ bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string modul
     m_EventConfig->Delete();
   }
   m_EventConfig = EventConfig::New();
-  return m_EventConfig->LoadConfig(filename, moduleName);
+  // notify sub-classes that new config is set
+  bool success = m_EventConfig->LoadConfig(filename, moduleName);
+  ConfigurationChanged();
+  return success;
 }
 
 bool mitk::EventHandler::AddEventConfig(std::string filename, std::string moduleName)
 {
-  if (m_EventConfig == NULL) {
-    MITK_ERROR << "LoadEventConfig has to be called before AddEventConfig can be used.";
+  if (m_EventConfig == NULL)
+  {
+    MITK_ERROR<< "LoadEventConfig has to be called before AddEventConfig can be used.";
     return false;
   }
-  return m_EventConfig->LoadConfig(filename, moduleName);
+  // notify sub-classes that new config is set
+  bool success = m_EventConfig->LoadConfig(filename, moduleName);
+  ConfigurationChanged();
+  return success;
 }
 
 mitk::PropertyList::Pointer mitk::EventHandler::GetPropertyList()
@@ -70,4 +71,8 @@ std::string mitk::EventHandler::GetMappedEvent(InteractionEvent* interactionEven
   {
     return "";
   }
+}
+
+void mitk::EventHandler::ConfigurationChanged()
+{
 }

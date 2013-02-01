@@ -42,11 +42,11 @@ namespace mitk {
 *
 * - PACS : an alternative interaction scheme that behaves more like a
 *          PACS workstation
-*   - left mouse button   : behaviour depends on current MouseMode
-*   - middle mouse button : fast scrolling
-*   - right mouse button  : level-window
-*   - ctrl + right button : zooming
-*   - shift+ right button : panning
+*   - left mouse button   : behavior depends on current MouseMode
+*   - middle mouse button : fast scrolling ok
+*   - right mouse button  : level-window ok
+*   - ctrl + right button : zooming ok
+*   - shift+ right button : panning ok
 *
 *   There are 5 different MouseModes that are available in the PACS scheme.
 *   Each MouseMode defines the interaction that is performed on a left
@@ -59,7 +59,7 @@ namespace mitk {
 *
 * When the interaction scheme or the MouseMode is changed, this class
 * manages the adding and removing of the relevant listeners offering
-* a convenient way to modify the interaction behaviour.
+* a convenient way to modify the interaction behavior.
 *
 ***********************************************************************/
   class MITK_CORE_EXPORT MouseModeSwitcher : public itk::Object

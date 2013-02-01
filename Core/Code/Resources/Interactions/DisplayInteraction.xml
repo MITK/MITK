@@ -1,9 +1,39 @@
+<!--
+State machine pattern for display interactions:
+-Zooming
+-Panning
+-Scrolling through planes
+-Adjusting the LevelWindow
+
+For some interactions several transitions exists, which one is used can be determined by the configuration file.
+If an event_variant is not declared in the configuration file it is disabled.
+
+For example scrolling can be triggered by Key-, Wheel- or MouseMove events, where the latter needs an extra state for scrolling.
+So they are triggered by different event_variants, to choose which one is used, describe the desired event_variant in a config file
+and omit the others. See DisplayConfig___ for examples and also for parameters for the interaction behaviour.
+
+
+TODO Std move to abort interaction of scroll/pan/zoom
+-->
 <statemachine>
     <state name="start" startstate="true" >
         <transition event_class="PositionEvent" event_variant="StartMove" target="move">
             <action name="init"/>
         </transition>
         <transition event_class="PositionEvent" event_variant="StartZoom" target="zoom">
+            <action name="init"/>
+        </transition>
+        <!-- mitkDispplayInteractor.cpp implements this for all events -->
+        <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
+            <action name="ScrollOneUp"/>
+        </transition>
+        <transition event_class="InteractionEvent" event_variant="PlaneDown" target="start">
+            <action name="ScrollOneDown"/>
+        </transition>
+        <transition event_class="MousePressEvent"  event_variant="StartScroll" target="scroll">
+            <action name="init"/>
+        </transition>
+        <transition event_class="MousePressEvent"  event_variant="StartAdjustLevelWindow" target="adjustlevelwindow">
             <action name="init"/>
         </transition>
     </state>
@@ -18,5 +48,18 @@
             <action name="zoom"/>
       </transition>
       <transition event_class="PositionEvent" event_variant="EndZooming" target="start"/>
+    </state>
+    <state name="scroll">
+      <transition event_class="PositionEvent" event_variant="Scrolling" target="scroll">
+            <action name="scroll"/>
+      </transition>
+      <transition event_class="PositionEvent" event_variant="EndScrolling" target="start"/>
+      <transition event_class="PositionEvent" event_variant="EndScrollingVar" target="start"/>
+    </state>
+    <state name="adjustlevelwindow">
+      <transition event_class="PositionEvent" event_variant="adjustlevelwindow" target="adjustlevelwindow">
+            <action name="levelWindow"/>
+      </transition>
+      <transition event_class="PositionEvent" event_variant="EndLevelWindow" target="start"/>
     </state>
 </statemachine>

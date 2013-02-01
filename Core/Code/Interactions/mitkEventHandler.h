@@ -29,7 +29,9 @@
 
 namespace mitk
 {
-  /** Base Class for Interaction handling classes.
+  /**
+   * \class EventHandler
+   *  Base Class for Interaction handling classes.
    *  Handles loading of configuration object and mapping of events to variant names.
    */
   class InteractionEvent;
@@ -38,8 +40,6 @@ namespace mitk
   public:
     mitkClassMacro(EventHandler, itk::Object);
     itkNewMacro(Self);
-    virtual bool LoadEventConfig();
-
     /**
     * @brief Loads XML resource
     *
@@ -65,6 +65,12 @@ namespace mitk
     EventHandler();
     virtual ~EventHandler();
     std::string GetMappedEvent(InteractionEvent* interactionEvent);
+
+    /**
+     * Is called whenever a new config object ist set.
+     * Overwrite this method e.g. to initialize EventHandler with parameters in configuration file.
+     */
+    virtual void ConfigurationChanged();
 
   private:
     EventConfig* m_EventConfig;

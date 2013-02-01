@@ -113,34 +113,6 @@ void mitk::RenderWindowBase::wheelMitkEvent(mitk::WheelEvent *we)
     return;
   }
 
-  if ( !GetSliceNavigationController()->GetSliceLocked() )
-  {
-    mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
-
-    if (stepper->GetSteps() <= 1)
-    {
-      stepper = GetSliceNavigationController()->GetTime();
-    }
-
-    // get the desired delta
-    int delta = we->GetDelta();
-    if ( m_InvertScrollingDirection )
-      delta *= -1;  // If we want to invert the scrolling direction -> delta * -1
-
-    if ( delta < 0 )
-    {
-      stepper->Next();
-    }
-    else
-    {
-      stepper->Previous();
-    }
-
-    //also send to Renderer to send if to MITK interaction mechanism
-    if(m_Renderer.IsNotNull())
-      m_Renderer->WheelEvent(we);
-
-  }
 }
 
 void mitk::RenderWindowBase::keyPressMitkEvent(mitk::KeyEvent* mke)

@@ -37,7 +37,10 @@ namespace mitk
 mitk::EventConfig::EventConfig() :
     m_errors(false)
 {
-  m_PropertyList = PropertyList::New();
+  if (m_PropertyList.IsNull())
+  {
+    m_PropertyList = PropertyList::New();
+  }
 }
 
 mitk::EventConfig::~EventConfig()
@@ -50,6 +53,7 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
   {
     if ((*it).interactionEvent->isEqual(mapping.interactionEvent))
     {
+      MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
       m_EventList.erase(it);
       break;
     }
@@ -62,14 +66,15 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
  **/
 bool mitk::EventConfig::LoadConfig(std::string fileName, std::string moduleName)
 {
-    mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
-    mitk::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
-    if (!resource.IsValid() ) {
-      mitkThrow() << ("Resource not valid. State machine pattern not found:" + fileName);
-    }
-    mitk::ModuleResourceStream stream(resource);
-    this->SetStream(&stream);
-    return this->Parse() && !m_errors;
+  mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
+  mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
+  if (!resource.IsValid())
+  {
+    mitkThrow()<< ("Resource not valid. State machine pattern not found:" + fileName);
+  }
+  mitk::ModuleResourceStream stream(resource);
+  this->SetStream(&stream);
+  return this->Parse() && !m_errors;
 }
 
 void mitk::EventConfig::StartElement(const char* elementName, const char **atts)

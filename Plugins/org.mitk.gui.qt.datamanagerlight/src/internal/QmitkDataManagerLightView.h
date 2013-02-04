@@ -54,6 +54,8 @@ public:
 
 protected slots:
   void on_DataItemList_currentRowChanged ( int currentRow );
+  void on_Remove_pressed();
+  void on_Load_pressed();
 
 protected:
 
@@ -65,7 +67,10 @@ protected:
   ///
   /// evaluate the new label string
   ///
-  void EvaluateLabelString();
+  void ListSelectionChanged();
+  void FileOpen(const char *fileName, mitk::DataNode *parentNode);
+  void RemoveNode(mitk::DataNode *node);
+  void GlobalReinit();
 
   ///
   /// focus on load image

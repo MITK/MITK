@@ -17,6 +17,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.common.legacy:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.datamanagerlight">
+        <file>DataManagerLight.png</file>
+        <file>Image_24.png</file>
+        <file>Load_48.png</file>
+        <file>Remove_48.png</file>
+    </qresource>
+</RCC>

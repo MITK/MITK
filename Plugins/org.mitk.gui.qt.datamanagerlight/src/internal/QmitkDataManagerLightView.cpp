@@ -73,18 +73,25 @@ void QmitkDataManagerLightView::NodeRemoved(const mitk::DataNode *node)
     this->RemoveNode( const_cast<mitk::DataNode*>(node) );
 }
 
+void QmitkDataManagerLightView::NodeChanged(const mitk::DataNode *node)
+{
+    MITK_DEBUG << "NodeChanged";
+    if( d->m_DataNodes.contains(const_cast<mitk::DataNode*>(node)) )
+        this->ToggleVisibility();
+}
+
 void QmitkDataManagerLightView::RemoveNode(mitk::DataNode *node)
 {
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     int index = d->m_DataNodes.indexOf(nonConstNode);
     if( index >= 0 )
     {
-        MITK_INFO << "removing node at: " << index;
+        MITK_DEBUG << "removing node at: " << index;
         QListWidgetItem* item = d->m_ListWidget->takeItem(index);
         delete item;
 
         d->m_DataNodes.removeAt(index);
-        MITK_INFO << "item deleted";
+        MITK_DEBUG << "item deleted";
     }
 }
 
@@ -116,11 +123,12 @@ void QmitkDataManagerLightView::CreateQtPartControl(QWidget* parent)
 
 void QmitkDataManagerLightView::SetFocus()
 {
+    d->m_ListWidget->setFocus();
 }
 
 void QmitkDataManagerLightView::on_DataItemList_currentRowChanged(int currentRow)
 {
-    MITK_INFO << "DataItemList currentRowChanged: " << currentRow;
+    MITK_DEBUG << "DataItemList currentRowChanged: " << currentRow;
     Q_UNUSED(currentRow)
 
     this->ListSelectionChanged();
@@ -129,7 +137,7 @@ void QmitkDataManagerLightView::on_DataItemList_currentRowChanged(int currentRow
 void QmitkDataManagerLightView::ListSelectionChanged()
 {
     d->m_CurrentIndex = d->m_ListWidget->currentRow();
-    MITK_INFO << "the currently selected index: " << d->m_CurrentIndex;
+    MITK_DEBUG << "the currently selected index: " << d->m_CurrentIndex;
 
     QString newLabelText = "Current patient: ";
     if( d->m_CurrentIndex >= 0 )
@@ -150,7 +158,7 @@ void QmitkDataManagerLightView::ListSelectionChanged()
 
 void QmitkDataManagerLightView::on_Load_pressed()
 {
-    MITK_INFO << "on_Load_pressed";
+    MITK_DEBUG << "on_Load_pressed";
   QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
@@ -194,7 +202,7 @@ void QmitkDataManagerLightView::FileOpen( const char * fileName, mitk::DataNode*
 void QmitkDataManagerLightView::on_Remove_pressed()
 {
     d->m_CurrentIndex = d->m_ListWidget->currentRow();
-    MITK_INFO << "the currently selected index: " << d->m_CurrentIndex;
+    MITK_DEBUG << "the currently selected index: " << d->m_CurrentIndex;
 
     mitk::DataNode* node = d->m_DataNodes.at(d->m_CurrentIndex);
     QString question = tr("Do you really want to remove ");
@@ -236,13 +244,25 @@ void QmitkDataManagerLightView::GlobalReinit()
 
 void QmitkDataManagerLightView::ToggleVisibility()
 {
+    bool changedAnything = false;
+    bool isVisible = false;
     for(size_t i=0; i<d->m_DataNodes.size(); ++i)
     {
-        if( d->m_CurrentIndex == i )
+        isVisible = false;
+        d->m_DataNodes.at(i)->GetVisibility(isVisible, 0 );
+
+        if( d->m_CurrentIndex == i && isVisible == false )
+        {
             d->m_DataNodes.at(i)->SetVisibility(true);
-        else
+            changedAnything = true;
+        }
+        else if( d->m_CurrentIndex != i && isVisible == true )
+        {
             d->m_DataNodes.at(i)->SetVisibility(false);
+            changedAnything = true;
+        }
     }
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    if( changedAnything )
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

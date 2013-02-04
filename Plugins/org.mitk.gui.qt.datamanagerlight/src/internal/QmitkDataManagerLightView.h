@@ -52,6 +52,12 @@ public:
   ///
   virtual void NodeRemoved(const mitk::DataNode* node);
 
+  /**
+   * Called when a DataStorage Changed event was thrown. May be reimplemented
+   * by deriving classes.
+   */
+  virtual void NodeChanged(const mitk::DataNode* node);
+
 protected slots:
   void on_DataItemList_currentRowChanged ( int currentRow );
   void on_Remove_pressed();

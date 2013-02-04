@@ -19,14 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /// Qmitk
 #include <QmitkAbstractView.h>
-#include <org_mitk_gui_qt_datamanagerlight_Export.h>
+
+struct QmitkDataManagerLightViewData;
 
 ///
-/// \ingroup org_mitk_gui_qt_datamanager_internal
+/// \brief Data management view with reduced functions ("light")
 ///
-/// \brief A View class that can show all data tree nodes of a certain DataStorage
-///
-class MITK_QT_DATAMANAGER QmitkDataManagerLightView : public QmitkAbstractView
+class QmitkDataManagerLightView : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -54,6 +53,9 @@ protected:
   ///
   ///
   void SetFocus();
+
+private:
+  QmitkDataManagerLightViewData* d;
 };
 
 #endif /*QmitkDataManagerLightView_H_*/

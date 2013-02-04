@@ -2,15 +2,15 @@
 <?eclipse version="3.0"?>
 <plugin>
   <extension point="org.blueberry.ui.views">
-    <category 
-      id="org.mitk.views.general" 
-      name="MITK General"/> 
-    <view 
-      id="org.mitk.views.datamanagerlight" 
-      name="Datamanager" 
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view
+      id="org.mitk.views.datamanagerlight"
+      name="Data  Manager Light"
       category="org.mitk.views.general"
-      icon="resources/datamanagerlight.png"
+      icon="resources/DataManagerLight.png"
       class="QmitkDataManagerLightView" />
   </extension>
-  
+
 </plugin>

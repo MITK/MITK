@@ -22,6 +22,7 @@
 #include <sstream>
 #include "mitkEventFactory.h"
 #include "mitkInteractionEvent.h"
+#include "mitkInternalEvent.h"
 #include "mitkInteractionEventConst.h"
 // us
 #include "mitkModule.h"
@@ -156,6 +157,12 @@ const mitk::PropertyList::Pointer mitk::EventConfig::GetPropertyList()
 
 std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent)
 {
+  // internal events are excluded from mapping
+  if (interactionEvent->GetEventClass() == "InternalEvent") {
+    InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent);
+    return internalEvent->GetSignalName();
+  }
+
   for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
     if ((*it).interactionEvent->isEqual(interactionEvent))

@@ -25,7 +25,6 @@
 #include "mitkBaseRenderer.h"
 #include <string>
 
-
 #include <MitkExports.h>
 
 namespace mitk
@@ -37,11 +36,14 @@ namespace mitk
    * These events can target a specific DataInteractor, if this DataInteractor is specified in the constructor;
    * else this parameter is set to NULL and the event is treated as a regular event.
    */
-  // Constants for Internal commands that are understood by the Dispatcher
-  const std::string INTERNALDeactivateMe = "DeactivateMe";
+  // Constants for Internal commands which are predefined.
+  const std::string IntDeactivateMe = "DeactivateMe";
+  const std::string IntLeaveWidget = "LeaveWidget";
+  const std::string IntEnterWidget = "EnterWidget";
 
   class DataInteracor;
-  class MITK_CORE_EXPORT InternalEvent : public InteractionEvent {
+  class MITK_CORE_EXPORT InternalEvent: public InteractionEvent
+  {
 
   public:
     mitkClassMacro(InternalEvent,InteractionEvent);
@@ -54,15 +56,12 @@ namespace mitk
     virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
-
     InternalEvent(BaseRenderer*, DataInteractor* destInteractor, std::string signalName);
     virtual ~InternalEvent();
-
 
   private:
     DataInteractor* m_DataInteractor;
     std::string m_SignalName;
   };
-} /* namespace mitk */
-
+}
 #endif /* mitkInternalEvent_h */

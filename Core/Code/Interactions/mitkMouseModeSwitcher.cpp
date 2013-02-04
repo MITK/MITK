@@ -15,12 +15,6 @@
  ===================================================================*/
 
 #include "mitkMouseModeSwitcher.h"
-
-#include "mitkDisplayInteractor.h"
-#include "mitkDisplayVectorInteractor.h"
-#include "mitkDisplayVectorInteractorLevelWindow.h"
-#include "mitkDisplayVectorInteractorScroll.h"
-
 // us
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
@@ -43,7 +37,7 @@ void mitk::MouseModeSwitcher::InitializeListeners()
 {
   if (m_CurrentObserver.IsNull())
   {
-    m_CurrentObserver = mitk::DisplayVectorInteractor::New();
+    m_CurrentObserver = mitk::DisplayInteractor::New();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
     // Register as listener

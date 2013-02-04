@@ -30,6 +30,7 @@
 #include "mitkMouseReleaseEvent.h"
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMouseWheelEvent.h"
+#include "mitkInternalEvent.h"
 
 #include "QmitkRenderWindowMenu.h"
 
@@ -183,6 +184,10 @@ void QmitkRenderWindow::DeferredHideMenu()
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
+
+  if (!this->HandleEvent(internalEvent.GetPointer()))
+
   // TODO implement new event
   MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
 

@@ -242,7 +242,7 @@ bool mitk::PointSetDataInteractor::UnSelectPoint(StateMachineAction*, Interactio
 
 bool mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  InternalEvent::Pointer event = InternalEvent::New(NULL, this, INTERNALDeactivateMe);
+  InternalEvent::Pointer event = InternalEvent::New(NULL, this, IntDeactivateMe);
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
   return true;
 }

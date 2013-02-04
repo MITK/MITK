@@ -345,19 +345,16 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
   {
   case vtkCommand::LeftButtonReleaseEvent:
     button = mitk::LeftMouseButton;
-    modifiers = buttonState;
     // remove left mouse button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
   case vtkCommand::MiddleButtonReleaseEvent:
     button = mitk::MiddleMouseButton;
-    modifiers = buttonState;
     // remove middle button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
   case vtkCommand::RightButtonReleaseEvent:
     button = mitk::RightMouseButton;
-    modifiers = buttonState;
     // remove right mouse button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
@@ -374,6 +371,11 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
   if (rwi->GetAltKey())
   {
     modifiers |= mitk::AltKey;
+  }
+
+  // after releasing button is no longer pressed, to update it
+  if (buttonStateMap.find(sender) != buttonStateMap.end()) {
+    buttonState = buttonStateMap.find(sender)->second;
   }
 
   MouseReleaseEvent::Pointer mre = MouseReleaseEvent::New(sender, point, (MouseButtons) buttonState, (ModifierKeys) modifiers,
@@ -403,10 +405,12 @@ mitk::MouseWheelEvent::Pointer mitk::VtkEventAdapter::AdaptMouseWheelEvent(mitk:
   int modifiers = 0;
   if (rwi->GetShiftKey())
   {
-    modifiers |= mitk::BS_ShiftButton;}
+    modifiers |= mitk::BS_ShiftButton;
+  }
   if (rwi->GetControlKey())
   {
-    modifiers |= mitk::BS_ControlButton;}
+    modifiers |= mitk::BS_ControlButton;
+  }
   if (rwi->GetAltKey())
   {
     modifiers |= mitk::BS_AltButton;

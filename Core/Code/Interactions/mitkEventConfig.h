@@ -67,6 +67,8 @@ namespace mitk
     /**
      * Checks if the config object has a definition for the given event. If it has the corresponding variant name is return, else
      * an empty string is returned.
+     * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
+     * to configure them in a config file.
      */
     std::string GetMappedEvent(InteractionEvent* interactionEvent);
 

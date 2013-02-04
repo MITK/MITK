@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkExports.h"
 #include <itkObject.h>
-#include "mitkDisplayVectorInteractor.h"
+#include "mitkDisplayInteractor.h"
 
 namespace mitk {
 
@@ -70,6 +70,8 @@ namespace mitk {
 #pragma GCC visibility pop
 
     mitkClassMacro( MouseModeSwitcher, itk::Object );
+    itkNewMacro(Self);
+
     // enum of the different interaction schemes that are available
     enum InteractionScheme
     {
@@ -113,7 +115,7 @@ namespace mitk {
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
-    DisplayVectorInteractor::Pointer m_CurrentObserver;
+    DisplayInteractor::Pointer m_CurrentObserver;
   };
 } // namespace mitk
 

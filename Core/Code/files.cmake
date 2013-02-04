@@ -210,9 +210,8 @@ set(CPP_FILES
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPositionEvent.cpp
-  Interactions/mitkDisplayVectorInteractor.cpp
-  Interactions/mitkDisplayVectorInteractorLevelWindow.cpp
-  Interactions/mitkDisplayVectorInteractorScroll.cpp
+#  Interactions/mitkDisplayVectorInteractorLevelWindow.cpp # legacy, prob even now unneeded
+#  Interactions/mitkDisplayVectorInteractorScroll.cpp
   Interactions/mitkEvent.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp

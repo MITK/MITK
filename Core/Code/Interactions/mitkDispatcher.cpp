@@ -214,7 +214,7 @@ void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataIntera
 
 bool mitk::Dispatcher::HandleInternalEvent(InternalEvent* internalEvent)
 {
-  if (internalEvent->GetSignalName() == INTERNALDeactivateMe && internalEvent->GetTargetInteractor() != NULL)
+  if (internalEvent->GetSignalName() == IntDeactivateMe && internalEvent->GetTargetInteractor() != NULL)
   {
     internalEvent->GetTargetInteractor()->GetDataNode()->SetDataInteractor(NULL);
     internalEvent->GetTargetInteractor()->SetDataNode(NULL);

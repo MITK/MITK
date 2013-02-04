@@ -71,6 +71,7 @@ protected:
   void FileOpen(const char *fileName, mitk::DataNode *parentNode);
   void RemoveNode(mitk::DataNode *node);
   void GlobalReinit();
+  void ToggleVisibility();
 
   ///
   /// focus on load image

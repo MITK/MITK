@@ -145,6 +145,7 @@ void QmitkDataManagerLightView::ListSelectionChanged()
         d->m_RemoveButton->setEnabled(false);
     }
     d->m_ImageInfoLabel->setText(newLabelText);
+    this->ToggleVisibility();
 }
 
 void QmitkDataManagerLightView::on_Load_pressed()
@@ -231,4 +232,17 @@ void QmitkDataManagerLightView::GlobalReinit()
 
   // initialize the views to the bounding geometry
   renderWindow->GetRenderingManager()->InitializeViews(bounds);
+}
+
+void QmitkDataManagerLightView::ToggleVisibility()
+{
+    for(size_t i=0; i<d->m_DataNodes.size(); ++i)
+    {
+        if( d->m_CurrentIndex == i )
+            d->m_DataNodes.at(i)->SetVisibility(true);
+        else
+            d->m_DataNodes.at(i)->SetVisibility(false);
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

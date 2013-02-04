@@ -27,12 +27,11 @@
 #include "mitkModuleRegistry.h"
 #include "mitkInformer.h"
 
-mitk::MouseModeSwitcher::MouseModeSwitcher(mitk::GlobalInteraction* gi) :
-    m_GlobalInteraction(gi), m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_LeftMouseButtonHandler(NULL)
+mitk::MouseModeSwitcher::MouseModeSwitcher() :
+    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
 {
-  assert(gi);
   m_CurrentObserver = NULL;
-  //this->InitializeListeners();
+  this->InitializeListeners();
   this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
 
@@ -47,7 +46,6 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver = mitk::DisplayVectorInteractor::New();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
-
     // Register as listener
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
     mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
@@ -58,90 +56,59 @@ void mitk::MouseModeSwitcher::InitializeListeners()
 
 void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
 {
-  switch ( scheme )
+  switch (scheme)
   {
-  case MITK :
-    {
-     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
-    }
+  case MITK:
+  {
+    m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
+  }
     break;
-  case PACS :
-    {
-      m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
-    }
+  case PACS:
+  {
+    m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
+  }
     break;
   }
-
   m_ActiveInteractionScheme = scheme;
+  this->InvokeEvent( MouseModeChangedEvent() );
 }
 
-void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode /*mode*/)
+void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
 {
-//  if ( m_ActiveInteractionScheme != PACS )
-//    return;
-//
-//  switch ( mode )
-//  {
-//  case MousePointer :
-//    {
-//      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
-//      break;
-//    } // case 0
-//  case Scroll :
-//    {
-//      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
-//
-//      mitk::DisplayVectorInteractorScroll::Pointer scrollInteractor = mitk::DisplayVectorInteractorScroll::New(
-//        "Scroll", new mitk::DisplayInteractor() );
-//      m_LeftMouseButtonHandler = scrollInteractor;
-//
-//      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
-//
-//      break;
-//    } // case 1
-//  case LevelWindow :
-//    {
-//      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
-//
-//      mitk::DisplayVectorInteractorLevelWindow::Pointer lwInteractor = mitk::DisplayVectorInteractorLevelWindow::New(
-//        "LevelWindow" );
-//      m_LeftMouseButtonHandler = lwInteractor;
-//
-//      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
-//
-//      break;
-//    } // case 2
-//  case Zoom :
-//    {
-//      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
-//
-//      mitk::DisplayVectorInteractor::Pointer zoomInteractor = mitk::DisplayVectorInteractor::New(
-//        "Zoom", new mitk::DisplayInteractor() );
-//      m_LeftMouseButtonHandler = zoomInteractor;
-//
-//      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
-//
-//      break;
-//    } // case 3
-//  case Pan :
-//    {
-//      m_GlobalInteraction->RemoveListener( m_LeftMouseButtonHandler );
-//
-//      mitk::DisplayVectorInteractor::Pointer panInteractor = mitk::DisplayVectorInteractor::New(
-//        "Pan", new mitk::DisplayInteractor() );
-//      m_LeftMouseButtonHandler = panInteractor;
-//
-//      m_GlobalInteraction->AddListener( m_LeftMouseButtonHandler );
-//
-//      break;
-//    } // case 4
-//
-//  } // switch (mode)
-//
-//  m_ActiveMouseMode = mode;
-//
-//  this->InvokeEvent( MouseModeChangedEvent() );
+  if (m_ActiveInteractionScheme != PACS)
+    return;
 
+  switch (mode)
+  {
+  case MousePointer:
+  {
+    m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
+    break;
+  } // case 0
+  case Scroll:
+  {
+    m_CurrentObserver->AddEventConfig("DisplayConfigPACSScroll.xml");
+
+    break;
+  }
+  case LevelWindow:
+  {
+    m_CurrentObserver->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
+    break;
+  }
+  case Zoom:
+  {
+    m_CurrentObserver->AddEventConfig("DisplayConfigPACSZoom.xml");
+    break;
+  }
+  case Pan:
+  {
+    m_CurrentObserver->AddEventConfig("DisplayConfigPACSPan.xml");
+    break;
+  }
+  } // end switch (mode)
+  m_ActiveMouseMode = mode;
+  this->InvokeEvent( MouseModeChangedEvent() );
 }
 
 mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode() const

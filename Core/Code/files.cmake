@@ -340,6 +340,12 @@ set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
+Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigPACSPan.xml
+Interactions/DisplayConfigPACSScroll.xml
+Interactions/DisplayConfigPACSZoom.xml
+Interactions/DisplayConfigPACSLevelWindow.xml
+Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
 Interactions/PointSetConfig.xml
 Interactions/Tests/AddAndRemovePoints.xml

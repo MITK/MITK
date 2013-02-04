@@ -63,6 +63,11 @@ protected:
   virtual void CreateQtPartControl(QWidget* parent);
 
   ///
+  /// evaluate the new label string
+  ///
+  void EvaluateLabelString();
+
+  ///
   /// focus on load image
   ///
   void SetFocus();

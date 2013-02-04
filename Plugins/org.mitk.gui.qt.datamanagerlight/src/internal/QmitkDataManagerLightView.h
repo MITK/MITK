@@ -42,6 +42,19 @@ public:
   ///
   virtual ~QmitkDataManagerLightView();
 
+  ///
+  /// add the node to the list ...
+  ///
+  virtual void NodeAdded(const mitk::DataNode* node);
+
+  ///
+  /// remove the node
+  ///
+  virtual void NodeRemoved(const mitk::DataNode* node);
+
+protected slots:
+  void on_DataItemList_currentRowChanged ( int currentRow );
+
 protected:
 
   ///
@@ -50,7 +63,7 @@ protected:
   virtual void CreateQtPartControl(QWidget* parent);
 
   ///
-  ///
+  /// focus on load image
   ///
   void SetFocus();
 

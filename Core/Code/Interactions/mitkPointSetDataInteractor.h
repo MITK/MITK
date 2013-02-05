@@ -29,7 +29,7 @@ namespace mitk
 {
   /**
    * Class PointSetDataInteractor
-   * \brief Implementation of the PointSetInteractor (adapted to new interaction concept)
+   * \brief Implementation of the PointSetInteractor
    *
    * Interactor operates on a point set and supports to:
    * - add points
@@ -41,6 +41,7 @@ namespace mitk
    * in 2d and 3d render windows.
    */
 
+  // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
   class MITK_CORE_EXPORT PointSetDataInteractor: public DataInteractor
   {
 
@@ -52,8 +53,8 @@ namespace mitk
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
     /**
-     * Here actions string from the loaded state machine pattern are mapped to functions of
-     * the Interactor.
+     * Here actions strings from the loaded state machine pattern are mapped to functions of
+     * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
      */
     virtual void ConnectActionsAndFunctions();
     /**
@@ -75,12 +76,20 @@ namespace mitk
      * if so, trigger the ClosedContour signal which can be caught by the state machine.
      */
     virtual bool IsClosedContour(StateMachineAction*, InteractionEvent*);
-
+    /**
+     * Moves the currenlty selected point to the new coodinates.
+     */
     virtual bool MovePoint(StateMachineAction*, InteractionEvent*);
+    /**
+     * Initializes the movement, stores starting position.
+     */
     virtual bool InitMove(StateMachineAction*, InteractionEvent*);
+    /**
+     * Is called when a movement is finished, changes back to regular color.
+     */
     virtual bool FinishMove(StateMachineAction*, InteractionEvent*);
     /**
-     * Stores original position from which movement can be calculated
+     * Stores original position from which movement can be calculated.
      */
     virtual bool InitMoveAll(StateMachineAction*, InteractionEvent*);
     /**
@@ -88,8 +97,17 @@ namespace mitk
      * initialization point.
      */
     virtual bool MoveSet(StateMachineAction*, InteractionEvent*);
+    /**
+     * Selects a point from the PointSet as currently active.
+     */
     virtual bool SelectPoint(StateMachineAction*, InteractionEvent*);
+    /**
+     * Unselects a point, e.g. the pointer coordinates point to empty space.
+     */
     virtual bool UnSelectPoint(StateMachineAction*, InteractionEvent*);
+    /**
+     * Calls for inactivation of the DataInteractor
+     */
     virtual bool Abort(StateMachineAction*, InteractionEvent*);
 
   private:

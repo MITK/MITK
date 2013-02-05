@@ -168,8 +168,7 @@ bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAct
     GetDataNode()->SetData(m_PointSet);
     GetDataNode()->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    // TODO implement logic around this:
-    // notify if last added point closed the contour
+    IsClosedContour(stateMachineAction,interactionEvent);
     return true;
   }
   else

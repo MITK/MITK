@@ -41,13 +41,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHash>
 #include <QVariant>
 
-/*!
-\brief QmitkDicomExternalDataWidget
-
-\warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-\sa QmitkFunctionality
-\ingroup Functionalities
+/**
+* \brief QmitkDicomExternalDataWidget is a QWidget providing functionality for dicom import.
+*
+* \sa QmitkFunctionality
+* \ingroup Functionalities
 */
 class MITK_DICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
 {
@@ -59,15 +57,27 @@ public:
 
    static const std::string Widget_ID;
 
+   /**
+   * \brief QmitkDicomExternalDataWidget(QWidget *parent) constructor.
+   *
+   * \param parent is a pointer to the parent widget
+   */
    QmitkDicomExternalDataWidget(QWidget *parent);
+
+   /**
+   * \brief QmitkDicomExternalDataWidget destructor.
+   */
    virtual ~QmitkDicomExternalDataWidget();
 
+   /**
+   * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomExternalDataWidgetControls.h.
+   *
+   * \param parent is a pointer to the parent widget
+   */
    virtual void CreateQtPartControl(QWidget *parent);
 
-   /* @brief   Initializes the widget. This method has to be called before widget can start.
-   * @param dataStorage The data storage the widget should work with.
-   * @param multiWidget The corresponding multiwidget were the ct Image is displayed and the user should define his path.
-   * @param imageNode  The image node which will be the base of mitral processing
+   /**
+   * \brief Initializes the widget. This method has to be called before widget can start.
    */
    void Initialize();
 
@@ -76,13 +86,19 @@ signals:
     /// @brief emitted when import into database is finished.
     void SignalStartDicomImport(const QStringList&);
 
-        /// @brief emitted when import into database is finished.
+    /// @brief emitted when import into database is finished.
     void SignalFinishedImport();
 
     /// @brief emitted when view button is clicked.
     void SignalDicomToDataManager(QHash<QString,QVariant>);
+
+    /// \brief emitted when import progress changes.
     void SignalProgress(int);
+
+    /// \brief emitted when anoter file is processed.
     void SignalProcessingFile(QString);
+
+    /// \brief emitted if cancel button is pressed.
     void SignalCancelImport();
 
 public slots:

@@ -42,13 +42,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QProgressDialog>
 #include <ctkFileDialog.h>
 #include <org_mitk_gui_qt_dicom_Export.h>
-/*!
-\brief QmitkDicomEditor
 
-\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-\sa QmitkFunctionality
-\ingroup ${plugin_target}_internal
+/**
+* \brief QmitkDicomEditor is an editor providing functionality for dicom storage and import and query retrieve functionality.
+*
+* \sa berry::IPartListener
+* \ingroup ${plugin_target}_internal
 */
 class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
@@ -62,10 +61,19 @@ public:
     static const std::string EDITOR_ID;
     static const QString TEMP_DICOM_FOLDER_SUFFIX;
 
+   /**
+    * \brief QmitkDicomEditor constructor.
+    */
     QmitkDicomEditor();
 
+   /**
+    * \brief QmitkDicomEditor destructor.
+    */
     virtual ~QmitkDicomEditor();
 
+   /**
+    * \brief Init initialize the editor.
+    */
     void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
 
     void SetFocus();
@@ -76,13 +84,17 @@ public:
 
 signals:
 
+   /**
+    * \brief SignalStartDicomImport is enitted when dicom directory for import was selected.
+    */
     void SignalStartDicomImport(const QString&);
 
 protected slots:
 
+    /// \brief Called when import process changes.
     void OnImportProgress(int progress);
 
-    /// \brief Called when import is finished
+    /// \brief Called when import is finished.
     void OnDicomImportFinished();
 
     /// \brief Called when Query Retrieve or Import Folder was clicked.
@@ -100,48 +112,58 @@ protected slots:
     /// \brief Called when view button is clicked. Sends out an event for adding the current selected file to the mitkDataStorage.
     void OnViewButtonAddToDataManager(QHash<QString, QVariant> eventProperties);
 
+    /// \brief Called when cd or folder or query retrieve button is clicked or SignalChangePage is emitted.
     void OnChangePage(int);
 
+    /// \brief Called when status of dicom storage provider changes.
     void OnStoreSCPStatusChanged(const QString& status);
 
+    /// \brief Called when dicom storage provider emits a network error.
     void OnDicomNetworkError(const QString& status);
 
 protected:
 
-    /// \brief Called when StoreSCP shold start
+    /// \brief StartStoreSCP starts  dicom storage provider.
     void StartStoreSCP();
 
-    /// \brief Called when StoreSCP should stop
+    /// \brief StopStoreSCP stops dicom storage provider.
     void StopStoreSCP();
 
+    /// \brief TestHandler initializes event handler.
     void TestHandler();
 
+    /// \brief Sets database directory.
     void SetDatabaseDirectory(const QString& databaseDirectory);
 
+    /// \brief CreateTemporaryDirectory creates temporary directory in which temorary dicom objects are stored.
     void CreateTemporaryDirectory();
 
+    /// \brief StartDicomDirectoryListener starts dicom directory listener.
     void StartDicomDirectoryListener();
 
+    /// \brief SetupProgressDialog Sets up progress dialog.
     void SetupProgressDialog(QWidget* parent);
 
+    /// \brief SetupImportDialog Sets up import dialog.
     void SetupImportDialog();
 
-    ctkFileDialog* m_ImportDialog;
-
-    QProgressDialog* m_ProgressDialog;
-
-    QLabel* m_ProgressDialogLabel;
-
+   /**
+    * \brief CreateQtPartControl(QWidget *parent) sets the view objects from ui_QmitkDicomeditorControls.h.
+    *
+    * \param parent is a pointer to the parent widget
+    */
     void CreateQtPartControl(QWidget *parent);
 
+    /// \brief SetPluginDirectory Sets plugin directory.
     void SetPluginDirectory();
 
     Events::Types GetPartEventTypes() const;
 
+    ctkFileDialog* m_ImportDialog;
+    QProgressDialog* m_ProgressDialog;
+    QLabel* m_ProgressDialogLabel;
     Ui::QmitkDicomEditorControls m_Controls;
-
     QThread m_Thread;
-
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
     QmitkStoreSCPLauncherBuilder m_Builder;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;

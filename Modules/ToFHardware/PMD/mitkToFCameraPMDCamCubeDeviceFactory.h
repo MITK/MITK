@@ -73,10 +73,11 @@ private:
       //Set default camera intrinsics for the CamCube Amplitude Camera.
       mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
       std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/CamCube_camera.xml");
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamCube3_camera.xml");
+      MITK_INFO <<pathToDefaulCalibrationFile;
       cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
       device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+
 
      return device.GetPointer();
    }

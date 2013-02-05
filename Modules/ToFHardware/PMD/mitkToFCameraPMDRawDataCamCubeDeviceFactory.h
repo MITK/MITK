@@ -74,7 +74,7 @@ private:
       mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
       std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
 
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/CamCube_camera.xml");
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamCube3_camera.xml");
       cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
       device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 

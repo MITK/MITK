@@ -71,7 +71,7 @@ private:
    {
      ToFCameraPMDO3Device::Pointer device = ToFCameraPMDO3Device::New();
 
-//-------------------------Intrinsics Missing for 03 are missing----------------------------------------------------
+//-------------------------Intrinsics for 03 are missing-----------------------------------
       //Set default camera intrinsics for the CamBoard-camera.
       mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
       std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);

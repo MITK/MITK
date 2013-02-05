@@ -29,9 +29,16 @@ namespace mitk
 {
   /**
    * Class PointSetDataInteractor
-   * \brief Implementation of the PointSetInteractor using the new interaction concept
+   * \brief Implementation of the PointSetInteractor (adapted to new interaction concept)
    *
-   *TODO rest of expl
+   * Interactor operates on a point set and supports to:
+   * - add points
+   * - remove points
+   * - move single points
+   * - move complete pointset
+   * - select/unselect a point
+   *
+   * in 2d and 3d render windows.
    */
 
   class MITK_CORE_EXPORT PointSetDataInteractor: public DataInteractor
@@ -44,11 +51,24 @@ namespace mitk
   protected:
     PointSetDataInteractor();
     virtual ~PointSetDataInteractor();
+    /**
+     * Here actions string from the loaded state machine pattern are mapped to functions of
+     * the Interactor.
+     */
     virtual void ConnectActionsAndFunctions();
+    /**
+     * This function is called when a DataNode has been set/changed.
+     * It is used to initialize the DataNode, e.g. if no PointSet exists yet it is created
+     * and added to the DataNode.
+     */
     virtual void DataNodeChanged();
 
-    /* PointSet Interactor functionality */
+    /** Adds a point at the given coordinates.
+     *  Every time a point is added it is also checked if the maximal number of points is reached,
+     *  and if so an InternalEvent with the signal name "MaxNumberOfPoints" is triggered.
+     */
     virtual bool AddPoint(StateMachineAction*, InteractionEvent*);
+    /** Removes point that is selected */
     virtual bool RemovePoint(StateMachineAction*, InteractionEvent*);
     /**
      * Checks if new point is close enough to an old one,
@@ -75,9 +95,9 @@ namespace mitk
   private:
 
     PointSet::Pointer m_PointSet;
-    int m_NumberOfPoints;
-    int m_MaxNumberOfPoints;
-    int m_SelectedPointIndex;
+    int m_NumberOfPoints; // to keep track of number of points in pointset
+    int m_MaxNumberOfPoints; // maximum of allowed number of points
+    int m_SelectedPointIndex; // index of currently selected point in PointSet
     /** member to keep track of PointSet movements */
     Point3D m_LastMovePosition;
   };

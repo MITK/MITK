@@ -2,94 +2,56 @@
 
 \page Step10Page MITK Tutorial - Step 10: Adding new Interaction
 
+\tableofcontents
+
+
+
+steo 5 usage:
+
+<b>This code demonstrates the use exemplary with the PointSetDataInteractor:</b>
+
+First we need a DataNode that is added to the DataStorage.
+\code
+
+  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  GetDataStorage()->Add(dataNode.GetPointer());
+\endcode
+
+Then we create an instance of to PointSetDataInteractor and load a statemachine pattern as well as a configuration
+for it:
+
+\code
+  m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+  m_CurrentInteractor->LoadStateMachine("PointSet.xml");
+  m_CurrentInteractor->AddEventConfig("PointSetConfig.xml");
+\endcode
+
+Lastly the DataNode is added to the DataInteractor
+
+\code
+  m_CurrentInteractor->SetDataNode(dataNode);
+\endcode
+
+now the DataInteractor is ready for usage.
+--
+
+
 This tutorial step goes beyond the activation of an interactor (class/object, that modifies a data by user interaction) as shown in \ref Step05Page and shows what needs to be implemented to add a new way of interaction within your MITK application.
-Please see \ref InteractionPage as an introduction to the MITK interaction mechanism.
+Please see \ref DataInteractionPage as an introduction to the MITK interaction mechanism, you may also want to read \ref DataInteractionTechnicalPage.
 
-The beginning of a new interaction is the idea or the feature request. To lighten things up, let's say, that we want to enable the user to move a surface by using the arrow keys. So a new interactor needs to be implemented, that will be associated to a surface (data of a data node) and on an arrow event modifies the geometry of the data to move it in virtual 3D world space.
+This tutorial is structured as follows: The first section deals with config files, describing all the parameters of events and how to use them
+in a configuration file. In the second section the basics are described that are needed to write a state machine pattern. The last section
+deals with brining configuration, state machine pattern and code together and gives an examplary implementation of a DataInteractor.
 
- \image html step10_result.png 
 
-We start with the definition of the state machine pattern to see what actions need to be implemented within the interactor.
- 
- \dontinclude StateMachine.xml
- \skip TutorialStep10Begin
- \until TutorialStep10End
+\section HowToUseDataInteractor How to use an existing DataInteractor
 
- The pattern can be read like this: 
-\li The state machine pattern starts in state 1. It's the start state.
-\li An event with the ID = 1 (left mouse button click, see corresponding definition in StateMachine.xml) leads to a state 2 and the action 30 ( \c AcCHECKELEMENT) is processed.
-\li State 2 is a guard state and thus the state machine will only temporarily be in this state. \c AcCHECKELEMENT needs to check if the surface was hit by the mouse position (picking) and has to send the answer (\c EIDYES / \c EIDNO) to itself. If the answer is \c YES, then the current state will be changed to state 10 and the actions \c AcSELECT and \c AcMODE_SELECT will be processed. \c AcSELECT has to change the data to show that it is selected (e.g. change the color). \c AcMODE_SELECT causes a change in a special selection mode (for state machines) so that mitk::GlobalInteraction will favour this state machine. If the answer is \c NO, the current state will be changed to state 1 and actions \c AcDESELECT, that needs to deselect (change color) the data, and \c AcMODE_DESELECT is executed. \c AcMODE_DESELECT sets the mode of this state machine to deselected, so it will not be favoured by mitk::GlobalInteraction.
-\li From state 10 a left mouse button click event will check if it still is picked by going to state 2 and executing \c AcCHECKELEMENT. Furthermore we have several transitions, that don't leave the state 10 and wait for arrow keys (up, down, shift+up, shift+down, left, right). They all lead to action \c AcMove which will implement the movement of the surface in 3D. Within the transitions three parameters define a movement vector that can be read within the implementation and used for the direction of movement. Several parameter types are supported. See mitkStateMachineFactory.cpp for supported types (\c BOOL_PARAMETER, \c INT_PARAMETER, \c FLOAT_PARAMETER, \c DOUBLE_PARAMETER, \c STRING_PARAMETER).
+A DataInteractor consists of four parts. The class describing the functionality and two XML files; one describes the state machine pattern, that is the workflow of an interaction and
+the second describes the user events which trigger an action. Lastly every DataInteractor works on a DataNode in which it stores and manipulates data.
+To use a DataInteractor these parts have to be brought together.
 
-Note, that the state id's need to be unique within the scope (state machine) but don't need to be continuous.
 
-Now we have a definition of states, transitions and actions, that describe the interaction of selecting a surface, highlighting the selected surface and moving the surface according to arrow keys. To later change the interaction states can be inserted that check for different conditions (e.g. if a surface may not be moved: use data node properties as a flag). To change the keys, the \c EVENT_ID's will have to be adapted. Furthermore, the parameters can be used for a change. Because the file StateMachine.xml is loaded during runtime the interaction will change without a recompile of the application.
-Note, if the application fails to read StateMachine.xml, the interaction will not be possible and a error warning will be displayed.
 
-So now we take a look what needs to be implemented within the new interactor:
-
-mitkMoveSurfaceInteractor.h
-
-Add includes:
- 
- \dontinclude mitkMoveSurfaceInteractor.h
- \skipline mitkInteractor.h
-
- 
-We derive the new interactor from class Interactor and add some macros for convenience:
- \skip MoveSurfaceInteractor : public
- \until mitkNewMacro2Param
-
-The next method is called by mitk::GlobalInteraction and returns a value between 0 and 1 that represents how good a given event can be handled in the current state of the interactor. Superclass mitk::Interactor already tries to answer this question as good as possible by comparing the picked 3D world position stored within mitk::StateEvent to the center of the data bounding box, but this answer always needs to be adjusted to the corresponding data. In case of a point set the distance to the closest point can be used to rate how good this event can be handled and in case of a mitk::Surface IsInside(...) could be used. Furthermore if the data was picked and is currently selected, a higher value can be returned. Just take care, that your interactor answers CanHandleEvent(..) right and it will get the event! But also be fair to other interactors or your interactor will get all events!
-For this example we use the implementation that is given by mitk::Interactor, so we don't derive it here.
-
- \skip CanHandleEvent
- \until used from mitkInteractor
-
-The following method is used for the case when someone sets a new data to the corresponding data node. Here reinitialization of this interactor can be done. Note that this method is not called if the data gets modified (points moved / added / removed). Here we don't need the method, so we neglect it.
-
- \skipline DataChanged
-    
-Default constructor and destructor specified as protected to fulfill SmartPointer conventions.
-
- \skip protected
- \until ~MoveSurfaceInteractor
-
-This is followed by one of the most important methods which is implemented in the body and thus will be explained later:
-
- \skipline ExecuteAction
-
-See mitkMoveSurfaceInteractor.h for whole header definition.
-
- \dontinclude mitkMoveSurfaceInteractor.cpp
-
-Now we come to the implementation within mitkMoveSurfaceInteractor.cpp and after includes we begin with constructor and destructor. Nothing special here! *boring*
-
- \skip Constructor
- \until ~MoveSurfaceInteractor
- \line {
- \line }
-
-Remember, that events, that were sent to this interactor got handled within \c StateMachine::HandleEvent(...) according to the current state specified by the state machine pattern. If an appropriate transition is defined within the current state that waits for this event, a state change is performed. Also, all actions specified within the transition are processed by sending the action to the method <tt> ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)</tt>. And here we need to take care, that the actions are transformed to operations, that contain all necessary parameters so they can be sent to the data. The method \c ExecuteOperation(...) from the data object then changes the data accordingly.
-
- \skip ExecuteAction
- \until return ok;
- \line }
-
-Likewise to maintain readable code and to not implement too large methods, the case statements within \c ExecuteAction(...) can be divided into several methods that are connected to the method by using the \c CONNECT_ACTION macro. See doxygen documentation on \c mitk::StateMachine for an example.
-
-To add the newly written class to our project, we add it to the corresponding files.cmake. 
-
-Furthermore we take care of instantiating the interactor and setting its instance to the dedicated DataNode.
- 
-See Step10.cpp for adding the interactor to the interaction controller called mitk::GlobalInteraction and test Step10.cpp to see what the new interactor does.
-
- \dontinclude Step10.cpp
- \skip create interactor
- \until AddInteractor
- 
-The implementation of Step10 is equal to Step1 except of loading two or more STL files, displaying the scene in 3D.
-To see what mitk::MoveSurfaceInteractor does, start Step10 with the command arguments and click onto one of the displayed surfaces. It turns yellow. If it doesn't, it is probably inside another surface. Then use arrow keys (+shift key) to move the surface. Click onto the other surface to deselect the first surface and once more to select the other surface. Now use arrow keys to move the second surface.
 
 Have fun with creating your own interaction and please think about a contribution to MITK!
 

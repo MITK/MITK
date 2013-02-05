@@ -52,7 +52,7 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
 {
   for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
-    if ((*it).interactionEvent->isEqual(mapping.interactionEvent))
+    if ((*it).interactionEvent->MatchesTemplate(mapping.interactionEvent))
     {
       MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
       m_EventList.erase(it);
@@ -165,7 +165,7 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
 
   for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
-    if ((*it).interactionEvent->isEqual(interactionEvent))
+    if ((*it).interactionEvent->MatchesTemplate(interactionEvent))
     {
       return (*it).variantName;
     }

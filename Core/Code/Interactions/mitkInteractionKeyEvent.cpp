@@ -45,7 +45,7 @@ mitk::InteractionKeyEvent::~InteractionKeyEvent()
 {
 }
 
-bool mitk::InteractionKeyEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::InteractionKeyEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
 {
   mitk::InteractionKeyEvent* keyEvent = dynamic_cast<mitk::InteractionKeyEvent*>(interactionEvent.GetPointer());
   if (keyEvent == NULL)

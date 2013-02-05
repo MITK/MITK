@@ -42,12 +42,12 @@ namespace mitk
      * Implementation of equality for each event class.
      * Equality does \b not mean an exact copy or pointer equality.
      *
-     * Equality is determined by agreement in all attributes that are necessary to describe
+     * A match is determined by agreement in all attributes that are necessary to describe
      * the event for a state machine transition.
      * E.g. for a mouse event press event, it is important which modifiers are used,
      * which mouse button was used to triggered the event, but the mouse position is irrelevant.
      */
-    virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool MatchesTemplate(InteractionEvent::Pointer);
 
     /**
      * Return unique string identifier that gives the event class of this object, as it can be used in a state machine pattern.

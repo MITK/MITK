@@ -69,7 +69,7 @@ mitk::MouseWheelEvent::~MouseWheelEvent()
 {
 }
 
-bool mitk::MouseWheelEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseWheelEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
 {
   const mitk::MouseWheelEvent* mwe = dynamic_cast<const MouseWheelEvent*>(interactionEvent.GetPointer());
   if (mwe == NULL)

@@ -295,7 +295,6 @@ bool mitk::PointSetDataInteractor::InitMoveAll(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    MITK_INFO<< "Set lastMovePosition";
     m_LastMovePosition = positionEvent->GetPositionInWorld();
     return true;
   }

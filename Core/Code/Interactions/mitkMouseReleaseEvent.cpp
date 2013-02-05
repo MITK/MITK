@@ -70,7 +70,7 @@ mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 }
 
-bool mitk::MouseReleaseEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseReleaseEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
 {
   mitk::MouseReleaseEvent* mre = dynamic_cast<mitk::MouseReleaseEvent*>(interactionEvent.GetPointer());
   if (mre == NULL)

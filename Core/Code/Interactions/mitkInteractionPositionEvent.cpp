@@ -44,7 +44,7 @@ mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld()
   return m_WorldPosition;
 }
 
-bool mitk::InteractionPositionEvent::isEqual(InteractionEvent::Pointer)
+bool mitk::InteractionPositionEvent::MatchesTemplate(InteractionEvent::Pointer)
 {
   return true;
 }

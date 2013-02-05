@@ -172,23 +172,17 @@
     <event NAME="middle mbtn + MouseMove + shift" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
     <!-- shift + middleMouseButtonRelease -->
     <event NAME="middle mbtn release + shift" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
-        
     <event NAME="right mbtn + alt" ID="2006" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn + Mousemove + alt" ID="2007" TYPE="Type_MouseMove" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn release + alt" ID="2008" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
-    
-        <!-- alt + shift + right MouseButton -->
+    <!-- alt + shift + right MouseButton -->
     <event NAME="right mbtn + shift + ctrl" ID="2010" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButton and MouseMove -->
     <event NAME="right mbtn + MouseMove + shift + ctrl" ID="2011" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButtonRelease -->
     <event NAME="right mbtn release + shift + ctrl" ID="2012" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
-
-        <!-- alt + MouseWheel -->
+    <!-- alt + MouseWheel -->
     <event NAME="MouseWheel + shift" ID="2015" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_none" />
-
-    
-    
     <!-- -->
     <!-- -->
     <!-- own thrown events -->
@@ -242,47 +236,46 @@
     <!-- K-->
     <event NAME="K" ID="4009" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_K" />
     <!-- L-->
-    <event NAME="L" ID="4010" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_L" />        
+    <event NAME="L" ID="4010" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_L" />
     <!-- M-->
-    <event NAME="M" ID="4011" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_M" />        
+    <event NAME="M" ID="4011" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_M" />
     <!-- O-->
-    <event NAME="O" ID="4012" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_O" />        
+    <event NAME="O" ID="4012" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_O" />
     <!-- Q-->
-    <event NAME="Q" ID="4013" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Q" />        
+    <event NAME="Q" ID="4013" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Q" />
     <!-- U-->
-    <event NAME="U" ID="4014" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_U" />        
+    <event NAME="U" ID="4014" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_U" />
     <!-- V-->
     <event NAME="V" ID="4015" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_V" />
     <!-- W-->
-    <event NAME="W" ID="4016" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_W" />                    
+    <event NAME="W" ID="4016" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_W" />
     <!-- X-->
-    <event NAME="X" ID="4017" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_X" />                    
+    <event NAME="X" ID="4017" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_X" />
     <!-- Y-->
-    <event NAME="Y" ID="4018" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Y" />                    
+    <event NAME="Y" ID="4018" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Y" />
     <!-- Z-->
     <event NAME="Z" ID="4019" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Z" />
     <!-- 1-->
-    <event NAME="1" ID="4020" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_1" />                    
+    <event NAME="1" ID="4020" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_1" />
     <!-- 2-->
-    <event NAME="2" ID="4021" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_2" />                    
+    <event NAME="2" ID="4021" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_2" />
     <!-- 3-->
-    <event NAME="3" ID="4022" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_3" />                    
+    <event NAME="3" ID="4022" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_3" />
     <!-- 4-->
-    <event NAME="4" ID="4023" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_4" />                    
+    <event NAME="4" ID="4023" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_4" />
     <!-- 5-->
-    <event NAME="5" ID="4024" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_5" />                    
+    <event NAME="5" ID="4024" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_5" />
     <!-- 6-->
-    <event NAME="6" ID="4025" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_6" />                    
+    <event NAME="6" ID="4025" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_6" />
     <!-- 7-->
-    <event NAME="7" ID="4026" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_7" />                    
+    <event NAME="7" ID="4026" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_7" />
     <!-- 8-->
-    <event NAME="8" ID="4027" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_8" />                    
+    <event NAME="8" ID="4027" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_8" />
     <!-- 9-->
     <event NAME="9" ID="4028" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_9" />
     <!-- 0 (zero) -->
-    <event NAME="0" ID="4029" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_0" />                                        
+    <event NAME="0" ID="4029" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_0" />
   </events>
-  
   <!-- Beginning of state machine patterns-->
   <!-- TutorialStep10Begin -->
   <stateMachine NAME="SelectAndMoveObjectWithArrowKeys">
@@ -840,6 +833,7 @@
       <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
         <action ID="80" />
         <action ID="49014" />
+        <action ID="80" />
       </transition>
       <transition NAME="move w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
@@ -1109,6 +1103,53 @@
         </action>
       </transition>
       <transition NAME="no-vessel-picked" NEXT_STATE_ID="2" EVENT_ID="1003" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="TubeGraphInteraction">
+  <!--state machine for tube graph interactions with multiple selection-->
+    <state NAME="noTubePicked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkTubePickedGuardState" ID="1" X_POS="91" Y_POS="" WIDTH="347" HEIGHT="50">
+      <transition NAME="pickedTube" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="75">
+          <!--AcDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="tubeSelected" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkPicked" NEXT_STATE_ID="3" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkPicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="addTubeToSelectionGuardState" ID="3" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="tubePicked" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="2" EVENT_ID="1003" />
     </state>
   </stateMachine>
   <stateMachine NAME="AriadneAssistent">
@@ -3556,6 +3597,19 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="Zoom">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="1011" />
+      </transition>
+    </state>
+    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="1012" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+    </state>
+  </stateMachine>
   <stateMachine NAME="alternativeZoom">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initzoom" NEXT_STATE_ID="1" EVENT_ID="7">
@@ -3958,4 +4012,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

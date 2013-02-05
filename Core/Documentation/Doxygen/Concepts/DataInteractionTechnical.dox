@@ -7,12 +7,6 @@
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
 
-
-
-\section HowToUseDataInteractor How to use an existing DataInteractor
-TODO
-
-
 \section DispatcherSection Dispatcher
 
 Each BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the DataStorage and the Dispatcher,
@@ -316,6 +310,8 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 \endcode
 
 \section HowToDataInteractor HowTo Implement a new DataInteractor
+
+TODO ref PointSetInteractor / Observer -> DisplayInteractor
 
 This HowTo assumes knowlege of the Interaction concept described in \ref DataInteractionPage , State Machines and Configuration described in
 \ref StateMachineSection, \ref HOW TO Config, HOW TO StateMachine.

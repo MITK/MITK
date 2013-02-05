@@ -50,7 +50,7 @@ namespace mitk
 
   protected:
     InteractionPositionEvent(BaseRenderer* baseRenderer, Point2D mousePosition, std::string eventClass);
-    virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool MatchesTemplate(InteractionEvent::Pointer);
     virtual ~InteractionPositionEvent();
 
 

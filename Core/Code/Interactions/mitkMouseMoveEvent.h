@@ -40,7 +40,7 @@ namespace mitk
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
 
-    virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool MatchesTemplate(InteractionEvent::Pointer);
     virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:

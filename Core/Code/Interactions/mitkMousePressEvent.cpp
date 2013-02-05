@@ -71,7 +71,7 @@ mitk::MousePressEvent::~MousePressEvent()
 {
 }
 
-bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MousePressEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
 {
   mitk::MousePressEvent* mpe = dynamic_cast<mitk::MousePressEvent*>(interactionEvent.GetPointer());
   if (mpe == NULL)

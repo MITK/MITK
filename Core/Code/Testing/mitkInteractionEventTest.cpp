@@ -50,10 +50,10 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      me1->isEqual(me2.GetPointer()) &&
-      me1->isEqual(me3.GetPointer()) &&
-      (me2->isEqual(me3.GetPointer())) &&
-      !(me3->isEqual(me4.GetPointer()))
+      me1->MatchesTemplate(me2.GetPointer()) &&
+      me1->MatchesTemplate(me3.GetPointer()) &&
+      (me2->MatchesTemplate(me3.GetPointer())) &&
+      !(me3->MatchesTemplate(me4.GetPointer()))
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MousePressEvent");
 
   // MouseReleaseEvents
@@ -67,10 +67,10 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      mr1->isEqual(mr2.GetPointer()) &&
-      mr1->isEqual(mr3.GetPointer()) &&
-      (mr2->isEqual(mr3.GetPointer())) &&
-      !(mr3->isEqual(mr4.GetPointer()))
+      mr1->MatchesTemplate(mr2.GetPointer()) &&
+      mr1->MatchesTemplate(mr3.GetPointer()) &&
+      (mr2->MatchesTemplate(mr3.GetPointer())) &&
+      !(mr3->MatchesTemplate(mr4.GetPointer()))
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MouseReleaseEvent");
 
 
@@ -85,8 +85,8 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      mm1->isEqual(mm3.GetPointer()) &&
-      !(mm3->isEqual(mm4.GetPointer()))
+      mm1->MatchesTemplate(mm3.GetPointer()) &&
+      !(mm3->MatchesTemplate(mm4.GetPointer()))
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MouseMoveEvent");
 
 

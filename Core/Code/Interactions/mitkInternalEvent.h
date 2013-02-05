@@ -52,7 +52,7 @@ namespace mitk
     std::string GetSignalName();
     DataInteractor* GetTargetInteractor();
 
-    virtual bool isEqual(InteractionEvent::Pointer);
+    virtual bool MatchesTemplate(InteractionEvent::Pointer);
     virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:

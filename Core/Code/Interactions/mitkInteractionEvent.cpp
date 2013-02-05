@@ -32,7 +32,7 @@ mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
   return m_Sender;
 }
 
-bool mitk::InteractionEvent::isEqual(InteractionEvent::Pointer)
+bool mitk::InteractionEvent::MatchesTemplate(InteractionEvent::Pointer)
 {
   return false;
 }

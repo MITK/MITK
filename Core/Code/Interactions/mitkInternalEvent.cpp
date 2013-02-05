@@ -22,7 +22,7 @@ mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInterac
 {
 }
 
-bool mitk::InternalEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::InternalEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
 {
   mitk::InternalEvent* internalEvent = dynamic_cast<mitk::InternalEvent*>(interactionEvent.GetPointer());
   if (internalEvent == NULL)

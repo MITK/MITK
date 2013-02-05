@@ -70,7 +70,7 @@ protected slots:
     void GenerateImage();       ///< generate artificial image from the selected fiber bundle
     void JoinBundles();         ///< merges selcted fiber bundles into one
     void CopyBundles();         ///< add copy of the selected bundle to the datamanager
-    void TransformBundles();    ///< rotate and shift selected bundles
+    void ApplyTransform();    ///< rotate and shift selected bundles
     void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
 
     /** update fibers if any parameter changes */

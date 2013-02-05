@@ -517,7 +517,10 @@ void QmitkFiberfoxView::GenerateFibers()
                     mitk::Point2D p = ellipse->GetControlPoint(1);
                     mitk::Vector2D v = p-c;
                     if (count==0)
+                    {
                         radius = v.GetVnlVector().magnitude();
+                        ellipse->SetControlPoint(1, p);
+                    }
                     else
                     {
                         v.Normalize();

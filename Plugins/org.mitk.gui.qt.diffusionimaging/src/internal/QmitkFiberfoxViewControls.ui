@@ -97,13 +97,23 @@
           <string>Operations</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
+          <item row="4" column="0">
+           <widget class="QCommandLinkButton" name="m_CopyBundlesButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Copy Bundles</string>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="0">
            <widget class="QCommandLinkButton" name="m_TransformBundlesButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Transform Bundles</string>
+             <string>Transform Selection</string>
             </property>
            </widget>
           </item>
@@ -119,26 +129,7 @@
              <property name="margin">
               <number>0</number>
              </property>
-             <item row="0" column="1">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>X</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
+             <item row="1" column="2">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_18">
                <property name="toolTip">
                 <string/>
@@ -157,64 +148,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_21">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Translation:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Rotation:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="3">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Z</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_22">
                <property name="toolTip">
                 <string/>
@@ -233,23 +167,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="m_XrotBox">
-               <property name="toolTip">
-                <string>Rotation angle (in degree) around x-axis.</string>
-               </property>
-               <property name="minimum">
-                <double>-360.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2">
+             <item row="2" column="2">
               <widget class="QDoubleSpinBox" name="m_YrotBox">
                <property name="toolTip">
                 <string>Rotation angle (in degree) around y-axis.</string>
@@ -265,10 +183,10 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <widget class="QDoubleSpinBox" name="m_ZrotBox">
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="m_XrotBox">
                <property name="toolTip">
-                <string>Rotation angle (in degree) around z-axis.</string>
+                <string>Rotation angle (in degree) around x-axis.</string>
                </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
@@ -281,23 +199,45 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="m_XtransBox">
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
                <property name="toolTip">
-                <string>Translation (in mm) in direction of the x-axis.</string>
+                <string/>
                </property>
-               <property name="minimum">
-                <double>-100.000000000000000</double>
+               <property name="statusTip">
+                <string/>
                </property>
-               <property name="maximum">
-                <double>100.000000000000000</double>
+               <property name="whatsThis">
+                <string/>
                </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
+               <property name="text">
+                <string>Rotation:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="2" column="2">
+             <item row="3" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_21">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Translation:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
               <widget class="QDoubleSpinBox" name="m_YtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the y-axis.</string>
@@ -313,7 +253,26 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
+             <item row="1" column="1">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_17">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>X</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
               <widget class="QDoubleSpinBox" name="m_ZtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the z-axis.</string>
@@ -329,17 +288,58 @@
                </property>
               </widget>
              </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="m_XtransBox">
+               <property name="toolTip">
+                <string>Translation (in mm) in direction of the x-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around z-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Z</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QCommandLinkButton" name="m_CopyBundlesButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Copy Bundles</string>
-            </property>
            </widget>
           </item>
           <item row="5" column="0">
@@ -349,6 +349,19 @@
             </property>
             <property name="text">
              <string>Join Bundles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="m_IncludeFiducials">
+            <property name="toolTip">
+             <string>If checked, the fiducials belonging to the modified bundle are also modified.</string>
+            </property>
+            <property name="text">
+             <string>Include Fiducials</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

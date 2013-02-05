@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRicianNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
 #include <mitkT2SmearingArtifact.h>
+#include <itkScalableAffineTransform.h>
 
 #include <QMessageBox>
 
@@ -103,7 +104,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
-        connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(TransformBundles()));
+        connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(ApplyTransform()));
         connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
 
     }
@@ -206,11 +207,9 @@ void QmitkFiberfoxView::AlignOnGrid()
                         mitk::Point3D world;
                         geom->IndexToWorld(cIdx,world);
 
-                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
-                        mitk::Point2D point2D;
-                        geom2d->Map( world, point2D );
+                        mitk::Vector3D trans = world - wc0;
+                        pe->GetGeometry()->Translate(trans);
 
-                        pe->SetControlPoint(0,point2D);
                         break;
                     }
                 }
@@ -245,10 +244,9 @@ void QmitkFiberfoxView::AlignOnGrid()
                         mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
                         mitk::Point3D world;
                         geom->IndexToWorld(cIdx,world);
-                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
-                        mitk::Point2D point2D;
-                        geom2d->Map( world, point2D );
-                        pe->SetControlPoint(0,point2D);
+
+                        mitk::Vector3D trans = world - wc0;
+                        pe->GetGeometry()->Translate(trans);
                     }
                 }
 
@@ -282,10 +280,9 @@ void QmitkFiberfoxView::AlignOnGrid()
                         mitk::Point3D cIdx; cIdx[0]=idx[0]; cIdx[1]=idx[1]; cIdx[2]=idx[2];
                         mitk::Point3D world;
                         geom->IndexToWorld(cIdx,world);
-                        const mitk::Geometry2D* geom2d = pe->GetGeometry2D();
-                        mitk::Point2D point2D;
-                        geom2d->Map( world, point2D );
-                        pe->SetControlPoint(0,point2D);
+
+                        mitk::Vector3D trans = world - wc0;
+                        pe->GetGeometry()->Translate(trans);
                     }
                 }
             }
@@ -744,20 +741,141 @@ void QmitkFiberfoxView::GenerateImage()
     }
 }
 
-void QmitkFiberfoxView::TransformBundles()
+void QmitkFiberfoxView::ApplyTransform()
 {
-    if ( m_SelectedBundles.size()<1 ){
-        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
-        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
-        return;
-    }
-
-    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
-    for (it; it!=m_SelectedBundles.end(); ++it)
+    vector< mitk::DataNode::Pointer > selectedBundles;
+    for( int i=0; i<m_SelectedImages.size(); i++ )
     {
-        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
-        fib->RotateAroundAxis(m_Controls->m_XrotBox->value(), m_Controls->m_YrotBox->value(), m_Controls->m_ZrotBox->value());
-        fib->TranslateFibers(m_Controls->m_XtransBox->value(), m_Controls->m_YtransBox->value(), m_Controls->m_ZtransBox->value());
+        mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(m_SelectedImages.at(i));
+        for( mitk::DataStorage::SetOfObjects::const_iterator it = derivations->begin(); it != derivations->end(); ++it )
+        {
+            mitk::DataNode::Pointer fibNode = *it;
+            if ( fibNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(fibNode->GetData()) )
+                selectedBundles.push_back(fibNode);
+        }
+    }
+    if (selectedBundles.empty())
+        selectedBundles = m_SelectedBundles2;
+
+    if (!selectedBundles.empty())
+    {
+        std::vector<mitk::DataNode::Pointer>::const_iterator it = selectedBundles.begin();
+        for (it; it!=selectedBundles.end(); ++it)
+        {
+            mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+            fib->RotateAroundAxis(m_Controls->m_XrotBox->value(), m_Controls->m_YrotBox->value(), m_Controls->m_ZrotBox->value());
+            fib->TranslateFibers(m_Controls->m_XtransBox->value(), m_Controls->m_YtransBox->value(), m_Controls->m_ZtransBox->value());
+
+            // handle child fiducials
+            if (m_Controls->m_IncludeFiducials->isChecked())
+            {
+                mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(*it);
+                for( mitk::DataStorage::SetOfObjects::const_iterator it2 = derivations->begin(); it2 != derivations->end(); ++it2 )
+                {
+                    mitk::DataNode::Pointer fiducialNode = *it2;
+                    if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
+                    {
+                        mitk::PlanarEllipse* pe = dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData());
+                        mitk::Geometry3D* geom = pe->GetGeometry();
+
+                        // translate
+                        mitk::Vector3D world;
+                        world[0] = m_Controls->m_XtransBox->value();
+                        world[1] = m_Controls->m_YtransBox->value();
+                        world[2] = m_Controls->m_ZtransBox->value();
+                        geom->Translate(world);
+
+                        // calculate rotation matrix
+                        double x = m_Controls->m_XrotBox->value()*M_PI/180;
+                        double y = m_Controls->m_YrotBox->value()*M_PI/180;
+                        double z = m_Controls->m_ZrotBox->value()*M_PI/180;
+
+                        itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+                        rotX[1][1] = cos(x);
+                        rotX[2][2] = rotX[1][1];
+                        rotX[1][2] = -sin(x);
+                        rotX[2][1] = -rotX[1][2];
+
+                        itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+                        rotY[0][0] = cos(y);
+                        rotY[2][2] = rotY[0][0];
+                        rotY[0][2] = sin(y);
+                        rotY[2][0] = -rotY[0][2];
+
+                        itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+                        rotZ[0][0] = cos(z);
+                        rotZ[1][1] = rotZ[0][0];
+                        rotZ[0][1] = -sin(z);
+                        rotZ[1][0] = -rotZ[0][1];
+
+                        itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+
+                        // transform control point coordinate into geometry translation
+                        geom->SetOrigin(pe->GetWorldControlPoint(0));
+                        mitk::Point2D cp; cp.Fill(0.0);
+                        pe->SetControlPoint(0, cp);
+
+                        // rotate fiducial
+                        geom->GetIndexToWorldTransform()->SetMatrix(rot*geom->GetIndexToWorldTransform()->GetMatrix());
+
+                        // implicit translation
+                        mitk::Vector3D trans;
+                        trans[0] = geom->GetOrigin()[0]-fib->GetGeometry()->GetCenter()[0];
+                        trans[1] = geom->GetOrigin()[1]-fib->GetGeometry()->GetCenter()[1];
+                        trans[2] = geom->GetOrigin()[2]-fib->GetGeometry()->GetCenter()[2];
+                        mitk::Vector3D newWc = rot*trans;
+                        newWc = newWc-trans;
+                        geom->Translate(newWc);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int i=0; i<m_SelectedFiducials.size(); i++)
+        {
+            mitk::PlanarEllipse* pe = dynamic_cast<mitk::PlanarEllipse*>(m_SelectedFiducials.at(i)->GetData());
+            mitk::Geometry3D* geom = pe->GetGeometry();
+
+            // translate
+            mitk::Vector3D world;
+            world[0] = m_Controls->m_XtransBox->value();
+            world[1] = m_Controls->m_YtransBox->value();
+            world[2] = m_Controls->m_ZtransBox->value();
+            geom->Translate(world);
+
+            // calculate rotation matrix
+            double x = m_Controls->m_XrotBox->value()*M_PI/180;
+            double y = m_Controls->m_YrotBox->value()*M_PI/180;
+            double z = m_Controls->m_ZrotBox->value()*M_PI/180;
+            itk::Matrix< float, 3, 3 > rotX; rotX.SetIdentity();
+            rotX[1][1] = cos(x);
+            rotX[2][2] = rotX[1][1];
+            rotX[1][2] = -sin(x);
+            rotX[2][1] = -rotX[1][2];
+            itk::Matrix< float, 3, 3 > rotY; rotY.SetIdentity();
+            rotY[0][0] = cos(y);
+            rotY[2][2] = rotY[0][0];
+            rotY[0][2] = sin(y);
+            rotY[2][0] = -rotY[0][2];
+            itk::Matrix< float, 3, 3 > rotZ; rotZ.SetIdentity();
+            rotZ[0][0] = cos(z);
+            rotZ[1][1] = rotZ[0][0];
+            rotZ[0][1] = -sin(z);
+            rotZ[1][0] = -rotZ[0][1];
+            itk::Matrix< float, 3, 3 > rot = rotZ*rotY*rotX;
+
+            // transform control point coordinate into geometry translation
+            geom->SetOrigin(pe->GetWorldControlPoint(0));
+            mitk::Point2D cp; cp.Fill(0.0);
+            pe->SetControlPoint(0, cp);
+
+            // rotate fiducial
+            geom->GetIndexToWorldTransform()->SetMatrix(rot*geom->GetIndexToWorldTransform()->GetMatrix());
+        }
+        if (m_Controls->m_RealTimeFibers->isChecked())
+            GenerateFibers();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -773,6 +891,19 @@ void QmitkFiberfoxView::CopyBundles()
     std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedBundles.begin();
     for (it; it!=m_SelectedBundles.end(); ++it)
     {
+        // find parent image
+        mitk::DataNode::Pointer parentNode;
+        mitk::DataStorage::SetOfObjects::ConstPointer parentImgs = GetDataStorage()->GetSources(*it);
+        for( mitk::DataStorage::SetOfObjects::const_iterator it2 = parentImgs->begin(); it2 != parentImgs->end(); ++it2 )
+        {
+            mitk::DataNode::Pointer pImgNode = *it2;
+            if ( pImgNode.IsNotNull() && dynamic_cast<mitk::Image*>(pImgNode->GetData()) )
+            {
+                parentNode = pImgNode;
+                break;
+            }
+        }
+
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
         mitk::FiberBundleX::Pointer newBundle = fib->GetDeepCopy();
         QString name((*it)->GetName().c_str());
@@ -782,7 +913,29 @@ void QmitkFiberfoxView::CopyBundles()
         fbNode->SetData(newBundle);
         fbNode->SetName(name.toStdString());
         fbNode->SetVisibility(true);
-        GetDataStorage()->Add(fbNode);
+        if (parentNode.IsNotNull())
+            GetDataStorage()->Add(fbNode, parentNode);
+        else
+            GetDataStorage()->Add(fbNode);
+
+        // copy child fiducials
+        if (m_Controls->m_IncludeFiducials->isChecked())
+        {
+            mitk::DataStorage::SetOfObjects::ConstPointer derivations = GetDataStorage()->GetDerivations(*it);
+            for( mitk::DataStorage::SetOfObjects::const_iterator it2 = derivations->begin(); it2 != derivations->end(); ++it2 )
+            {
+                mitk::DataNode::Pointer fiducialNode = *it2;
+                if ( fiducialNode.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()) )
+                {
+                    mitk::PlanarEllipse::Pointer pe = mitk::PlanarEllipse::New();
+                    pe->DeepCopy(dynamic_cast<mitk::PlanarEllipse*>(fiducialNode->GetData()));
+                    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+                    newNode->SetData(pe);
+                    newNode->SetName(fiducialNode->GetName());
+                    GetDataStorage()->Add(newNode, fbNode);
+                }
+            }
+        }
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -834,12 +987,14 @@ void QmitkFiberfoxView::UpdateGui()
 
     if (m_SelectedFiducial.IsNotNull())
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(true);
         m_Controls->m_FlipButton->setEnabled(true);
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
     if (m_SelectedImage.IsNotNull() || m_SelectedBundle.IsNotNull())
     {
+        m_Controls->m_TransformBundlesButton->setEnabled(true);
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
         m_Controls->m_AlignOnGrid->setEnabled(true);
@@ -862,7 +1017,6 @@ void QmitkFiberfoxView::UpdateGui()
 
     if (m_SelectedBundle.IsNotNull())
     {
-        m_Controls->m_TransformBundlesButton->setEnabled(true);
         m_Controls->m_CopyBundlesButton->setEnabled(true);
         m_Controls->m_GenerateFibersButton->setEnabled(true);
         m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());

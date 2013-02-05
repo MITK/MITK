@@ -15,6 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkPythonVariableStackTableModel.h"
+#include <QMimeData>
+#include <mitkImage.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkIOUtil.h>
+#include <mitkDataNode.h>
+#include <QDir>
+#include <QDateTime>
+#include "mitkPluginActivator.h"
+#include <ctkAbstractPythonManager.h>
+
 
 QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *parent)
     :QAbstractTableModel(parent)
@@ -27,7 +37,6 @@ QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
 
 bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent )
 {
-    /*
     // Early exit, returning true, but not actually doing anything (ignoring data).
     if (action == Qt::IgnoreAction)
         return true;
@@ -37,6 +46,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
     if(data->hasFormat("application/x-mitk-datanodes"))
     {
+        MITK_INFO << "dropped MITK DataNode";
         returnValue = true;
 
         QString arg = QString(data->data("application/x-mitk-datanodes").data());
@@ -49,7 +59,58 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
         {
           long val = (*slIter).toLong();
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
+          mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
 
+          // save image
+          QString tmpFolder = QDir::tempPath();
+          QDateTime dateTime = QDateTime::currentDateTime();
+          QString fileName = tmpFolder + QDir::separator() + dateTime.toString("yy.MM.dd.hh.ss.zzz") + ".nrrd";
+
+          MITK_INFO << "Saving temporary file " << fileName.toStdString();
+          if( !mitk::IOUtil::SaveImage(mitkImage, fileName.toStdString()) )
+          {
+              MITK_ERROR << "Temporary file could not be created.";
+          }
+
+          QString command;
+          command.append("import itk\n");
+          command.append("dim = 3\n");
+          command.append("pixelType = itk.UC\n");
+          command.append("imageType = itk.Image[pixelType, dim]\n");
+          command.append("readerType = itk.ImageFileReader[imageType]\n");
+          command.append("reader = readerType.New()\n");
+          command.append(QString("reader.SetFileName( \"%1\" )\n").arg(fileName));
+          command.append("reader.Update()\n");
+          command.append("itkImage = reader.GetOutput()\n");
+          MITK_INFO << "Issuing python command " << command.toStdString();
+          mitk::PluginActivator::GetPythonManager()->executeString(command, ctkAbstractPythonManager::FileInput );
+          this->Update();
+
+          QFile file(fileName);
+          MITK_INFO << "Removing file " << fileName.toStdString();
+          file.remove();
+
+          /*
+          if( mitkImage )
+          {
+              MITK_INFO << "found MITK image";
+              switch(mitkImage->GetDimension())
+              {
+                  case 2:
+                    {
+                      AccessFixedDimensionByItk( mitkImage, ItkImageProcessing, 2 ); break;
+                    }
+                  case 3:
+                    {
+                      AccessFixedDimensionByItk( mitkImage, ItkImageProcessing, 3 ); break;
+                    }
+                  case 4:
+                    {
+                      AccessFixedDimensionByItk( mitkImage, ItkImageProcessing, 4 ); break;
+                    }
+                  default: break;
+              }
+          }
           itk::SmartPointer<mitk::DataNode > * resultptr;
           resultptr = new itk::SmartPointer<mitk::DataNode >((itk::SmartPointer<mitk::DataNode > &)node);
 
@@ -73,11 +134,10 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               }
               setVariableStack(this->getAttributeList());
           }
+          */
         }
-
     }
     return returnValue;
-    */
 }
 
 QVariant QmitkPythonVariableStackTableModel::headerData(int section, Qt::Orientation orientation,
@@ -214,12 +274,10 @@ QMimeData * QmitkPythonVariableStackTableModel::mimeData(const QModelIndexList &
 QStringList QmitkPythonVariableStackTableModel::mimeTypes() const
 {
     return QAbstractTableModel::mimeTypes();
-    /*
     QStringList types;
     types << "application/x-mitk-datanodes";
     types << "application/x-qabstractitemmodeldatalist";
     return types;
-    */
 }
 
 Qt::DropActions QmitkPythonVariableStackTableModel::supportedDropActions() const

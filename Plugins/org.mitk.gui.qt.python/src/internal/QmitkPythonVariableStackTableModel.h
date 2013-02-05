@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QModelIndex>
 #include <QModelIndex>
 #include <Python.h>
+#include <itkImage.h>
 
 ///
 /// implements a table model to show the variables of the Python "__main__" dictionary
@@ -59,6 +60,7 @@ protected:
   QList<QStringList> getAttributeList();
   PyObject* getPyObject(PyObject* object);
   PyObject* getPyObjectString(const QString& objectName);
+
 private:
   QList<QStringList> m_VariableStack;
 };

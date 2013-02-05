@@ -45,15 +45,24 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
     d->m_VariableStackTableModel = new QmitkPythonVariableStackTableModel(parent);
     d->m_VariableStackTableModel->Update();
 
-    QSplitter* splitter = new QSplitter;
     QTableView* variableStackView = new QTableView;
+    variableStackView->setSelectionBehavior( QAbstractItemView::SelectRows );
+    variableStackView->setAlternatingRowColors(true);
+    variableStackView->setDragEnabled(true);
+    variableStackView->setDropIndicatorShown(true);
+    variableStackView->setAcceptDrops(true);
     variableStackView->setModel( d->m_VariableStackTableModel );
 
     d->m_PythonShell = new QmitkCtkPythonShell;
     d->m_PythonShell->SetPythonManager( mitk::PluginActivator::GetPythonManager() );
 
+    QList<int> sizes;
+    sizes << 1 << 3;
+    QSplitter* splitter = new QSplitter;
     splitter->addWidget(variableStackView);
     splitter->addWidget(d->m_PythonShell);
+    splitter->setStretchFactor ( 0, 1 );
+    splitter->setStretchFactor ( 1, 3 );
 
     QGridLayout* layout = new QGridLayout;
     layout->addWidget( splitter, 0, 0 );

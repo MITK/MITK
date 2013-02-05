@@ -24,23 +24,23 @@ namespace mitk
 
     void PluginActivator::start(ctkPluginContext* context)
     {
-      MITK_INFO << "registering python paths";
+      MITK_DEBUG << "registering python paths";
 
       QString itkLibDirs(PYTHONPATH_ITK_LIBRARY_DIRS);
-      MITK_INFO << "itkLibDirs" << itkLibDirs.toStdString();
+      MITK_DEBUG << "itkLibDirs" << itkLibDirs.toStdString();
       QString itkWrapItkDir(PYTHONPATH_WRAP_ITK_DIR);
-      MITK_INFO << "itkWrapItkDir" << itkWrapItkDir.toStdString();
+      MITK_DEBUG << "itkWrapItkDir" << itkWrapItkDir.toStdString();
 
       QString basecommand = "sys.path.append('%1');";
       QString pythonCommand;
       if( ! itkWrapItkDir.isEmpty() )
       {
          pythonCommand = basecommand.arg(itkLibDirs);
-         MITK_INFO << "issuing command " << pythonCommand.toStdString();
+         MITK_DEBUG << "issuing command " << pythonCommand.toStdString();
          GetPythonManager()->executeString(pythonCommand, ctkAbstractPythonManager::SingleInput );
 
          pythonCommand = basecommand.arg(itkWrapItkDir);
-         MITK_INFO << "issuing command " << pythonCommand.toStdString();
+         MITK_DEBUG << "issuing command " << pythonCommand.toStdString();
          GetPythonManager()->executeString(pythonCommand, ctkAbstractPythonManager::SingleInput );
       }
       else

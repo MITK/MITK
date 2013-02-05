@@ -50,6 +50,7 @@ protected:
 
 signals:
   void executeCommandSignal(const QString&);
+  void newCommandExecuted();
 
 private:
   QmitkCtkPythonShellData* d;

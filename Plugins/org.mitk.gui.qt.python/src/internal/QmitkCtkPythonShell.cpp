@@ -66,4 +66,6 @@ void QmitkCtkPythonShell::executeCommand(const QString& command)
 {
   emit executeCommandSignal(command);
   ctkPythonConsole::executeCommand(command);
+
+  emit newCommandExecuted();
 }

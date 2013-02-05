@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.python">
+        <file>Python.png</file>
+    </qresource>
+</RCC>

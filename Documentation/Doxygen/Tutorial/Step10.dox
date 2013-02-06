@@ -250,14 +250,9 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
-\section HowToDataInteractor HowTo Implement a new DataInteractor
+\section HowToDataInteractor Implementation a new DataInteractor
 
-TODO ref PointSetInteractor / Observer -> DisplayInteractor
-
-This HowTo assumes knowlege of the Interaction concept described in \ref DataInteractionPage , State Machines and Configuration described in
-\ref StateMachineSection, \ref HOW TO Config, HOW TO StateMachine.
-
-DataInteractor are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
+DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
 \code
 bool SomeFunctionality(StateMachineAction* , InteractionEvent*);
 \endcode
@@ -274,41 +269,16 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 
 Now all that is left it to write a state machine pattern and a config file as is described in the tutorials.
 
-\subsection ExampleInternalEvent Example Interactor using InternalEvent
+\subsection ExampleInternalEvent PointSetDataInteractor
+To provide a useful example the mitk::PointSetDataInteractor is annotated with comments that describe the important parts for an implementation
+of a DataInteractor.
 
-A useful tool in creating DataInteractors are mitk::InternalEvents which allow to the DataInteractor send signals on its own.
-The following will describe how to build a DataInteractor that allows to add points until a certain number of points is reached.
-The number of accepted points is provided in the config file as a parameter.
-So we start by writing a state machine pattern that add points until it receives an InternalEvent telling it, that enough points
-have been added.
 
-\code
-<statemachine>
-    <state name="start" startstate="true" >
-        <transition event_class="MousePressEvent" event_variant="AddPointClick" target="start">
-            <action name="addPoint"/>
-        </transition>
-        <transition event_class="InternalEvent" event_variant="SetIsFull" target="final">
-            <action name="enoughPoints"/>
-        </transition>
-    </state>
-    <state name="final">
-    <!-- dead state, nothing happens any more, once we reached this -->
-    </state>
-</statemachine>
-\endcode
 
-In our config file we set the number of maximal points to 10, and define AddPointClick as a right mouse click with the
-ctrl button pressed.
-\code
-<config>
-  <param name="NumberOfPoints" value="10">
-   <input event_class="MousePressEvent" event_variant="AddPointClick">
-    <attribute name="EventButton" value="RightMouseButton"/>
-    <attribute name="Modifiers" value="ctrl"/>
-  </input>
-</config>
-\endcode
+See \ref PointSet.xml for complete file.
+
+
+
 
 The header file of the DataInteractor looks like this:
 

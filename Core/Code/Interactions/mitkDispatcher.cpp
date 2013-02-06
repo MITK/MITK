@@ -36,6 +36,7 @@ mitk::Dispatcher::Dispatcher()
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
 {
+  MITK_INFO<< "got called removed interactor";
   RemoveDataInteractor(dataNode);
   RemoveOrphanedInteractors();
   DataInteractor::Pointer dataInteractor = dataNode->GetDataInteractor();
@@ -104,17 +105,17 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     // give event to selected interactor
     if (eventIsHandled == false)
     {
-      eventIsHandled = m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode());
+      eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
     }
     break;
 
   case GRABINPUT:
-    eventIsHandled = m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode());
+    eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
     SetEventProcessingMode(m_SelectedInteractor);
     break;
 
   case PREFERINPUT:
-    if (m_SelectedInteractor->HandleEvent(event,m_SelectedInteractor->GetDataNode()) == true)
+    if (m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode()) == true)
     {
       SetEventProcessingMode(m_SelectedInteractor);
       eventIsHandled = true;
@@ -129,18 +130,21 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   {
 
     m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
-    for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end() && eventIsHandled == false;
-        ++it)
+    for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
     {
-      if ((*it)->HandleEvent(event, (*it)->GetDataNode()))
+      // explicit copy of pointer because HandleEvent function causes the m_Interactors list to be updated,
+      // which in turn invalidates the iterator.
+      DataInteractor::Pointer dataInteractor = *it;
+      if (dataInteractor->HandleEvent(event, dataInteractor->GetDataNode()))
       { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
-        SetEventProcessingMode(*it);
+        SetEventProcessingMode(dataInteractor);
         if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)
         {
-          m_SelectedInteractor = *it;
+          m_SelectedInteractor = dataInteractor;
           m_ProcessingMode = CONNECTEDMOUSEACTION;
         }
         eventIsHandled = true;
+        break;
       }
     }
   }

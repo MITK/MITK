@@ -44,6 +44,8 @@ namespace mitk
   DataStorageChanged() listens to the DataStorage for new or removed images. Depending on how m_AutoTopMost is set,
   the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
   there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
+
+  Note that this class is not thread safe at the moment!
 */
 
   class MITK_CORE_EXPORT LevelWindowManager : public itk::Object
@@ -80,10 +82,16 @@ namespace mitk
     /// true if changes on slider or line-edits will affect always the topmost layer image
     bool isAutoTopMost();
 
-    /** @brief This method is called when a node is added to the data storage. */
+    /** @brief This method is called when a node is added to the data storage.
+      *        A listener on the data storage is used to call this method automatically after a node was added.
+      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
+      */
     void DataStorageAddedNode(const DataNode* n = NULL);
 
-    /** @brief This method is called when a node is removed to the data storage. */
+    /** @brief This method is called when a node is removed to the data storage.
+      *        A listener on the data storage is used to call this method automatically directly before a node will be removed.
+      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
+      */
     void DataStorageRemovedNode(const DataNode* removedNode = NULL);
 
     /// change notifications from mitkLevelWindowProperty
@@ -118,9 +126,10 @@ namespace mitk
 
     ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
+    void UpdateObservers();                             ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete
     void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
     void CreatePropObserverLists();                     ///< internal help method to create both lists/maps.
-    const mitk::DataNode*        m_NoteMarkedToDelete;  ///< this variable holds a data node which will be deleted from the datastorage immedeately (if there is one, NULL otherways)
+    const mitk::DataNode*        m_NodeMarkedToDelete;  ///< this variable holds a data node which will be deleted from the datastorage immedeately (if there is one, NULL otherways)
 
     bool                         m_AutoTopMost;
     unsigned long                m_ObserverTag;

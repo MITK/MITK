@@ -221,14 +221,21 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
 
 void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 {
-  this->DataStorageRemovedNode();
+  //update observers with new data storage
+  UpdateObservers();
+
+  //check if everything is still ok
+  if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
+     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
 }
 
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
 {
-  m_NoteMarkedToDelete = removedNode;
-  this->ClearPropObserverLists(); //remove old observers
-  CreatePropObserverLists(); //create new observer lists
+  //remember node which will be removed
+  m_NodeMarkedToDelete = removedNode;
+
+  //update observers
+  UpdateObservers();
 
   /* search image than belongs to the property */
   if (m_LevelWindowProperty.IsNull())
@@ -244,15 +251,29 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
       SetAutoTopMostImage(true, removedNode);
     }
   }
-  m_NoteMarkedToDelete = NULL;
+
+  //reset variable
+  m_NodeMarkedToDelete = NULL;
+
+  //check if everything is still ok
+  if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != (this->GetRelevantNodes()->size()-1)))
+     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+}
+
+void mitk::LevelWindowManager::UpdateObservers()
+{
+  this->ClearPropObserverLists(); //remove old observers
+  CreatePropObserverLists(); //create new observer lists
+
+
+
+
 }
 
 
 int mitk::LevelWindowManager::GetNumberOfObservers()
 {
-if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
-  {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
-return m_PropObserverToNode.size();
+  return m_PropObserverToNode.size();
 }
 
 mitk::DataStorage* mitk::LevelWindowManager::GetDataStorage()
@@ -372,7 +393,7 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
        it != all->End();
        ++it)
   {
-    if ((it->Value().IsNull()) || (it->Value() == m_NoteMarkedToDelete))
+    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
       {continue;}
 
     /* register listener for changes in visible property */
@@ -387,7 +408,7 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
        it != all->End();
        ++it)
   {
-    if ((it->Value().IsNull()) || (it->Value() == m_NoteMarkedToDelete))
+    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
       {continue;}
     /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();

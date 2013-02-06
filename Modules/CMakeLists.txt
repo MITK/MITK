@@ -34,6 +34,7 @@ set(module_dirs
     ClippingTools
     USUI
     DicomUI
+    Python
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

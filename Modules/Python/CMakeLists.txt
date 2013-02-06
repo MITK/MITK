@@ -1,0 +1,8 @@
+MITK_CREATE_MODULE(mitkPython
+  DEPENDS Mitk CTK
+  EXPORT_DEFINE MITK_PYTHON_EXPORT
+  PACKAGE_DEPENDS QT
+  QT_MODULE
+)
+configure_file(PythonPath.h.in
+  "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)

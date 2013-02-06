@@ -161,7 +161,8 @@ namespace mitk {
       /** \brief The texture which is used to render the current slice. */
       vtkSmartPointer<vtkTexture> m_Texture;
       /** \brief The lookuptable for colors and level window */
-      vtkSmartPointer<vtkLookupTable> m_LookupTable;
+      vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
+      vtkSmartPointer<vtkLookupTable> m_BinaryLookupTable;
       /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */

@@ -664,21 +664,19 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds )
 {
   bool binary = false;
-  bool CTFcanBeApplied = false;
+
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   //default lookuptable
   //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 
+  vtkLookupTable *usedLookupTable = localStorage->m_DefaultLookupTable;
+  vtkScalarsToColors *usedScalarsToColors = localStorage->m_DefaultLookupTable;
+
   if(binary)
   {
-    //currently we do not allow a lookuptable if it is a binary image
-    //default lookuptable for binary images
-    localStorage->m_LookupTable->SetRange(0.0, 1.0);
-    double rgba[4];
-    localStorage->m_LookupTable->GetTableValue(0, rgba);
-    localStorage->m_LookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0); // background to 0
+    usedScalarsToColors = usedLookupTable = localStorage->m_BinaryLookupTable;
   }
   else
   {
@@ -687,10 +685,11 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     if((!useColor))
     {
       //BEGIN PROPERTY user-defined lut
-      // If lookup table use is requested...
-      mitk::LookupTableProperty::Pointer LookupTableProp;
-      LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
-        (this->GetDataNode()->GetProperty("LookupTable"));
+
+      // If lookup table or transferfunction use is requested...
+      mitk::LookupTableProperty::Pointer LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
+      mitk::TransferFunctionProperty::Pointer transferFunctionProperty = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("TransferFunction",renderer ));
+
       //...check if there is a lookuptable provided by the user
       if ( LookupTableProp.IsNotNull() )
       {
@@ -704,23 +703,23 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
         }
         //we use the user-defined lookuptable
         //localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
-        localStorage->m_LookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
+        usedScalarsToColors = usedLookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
+      }
+      else if(transferFunctionProperty.IsNotNull())
+      {
+        usedScalarsToColors = transferFunctionProperty->GetValue()->GetColorTransferFunction();
+        usedLookupTable = 0;
       }
       else
       {
-        CTFcanBeApplied = true;
+        MITK_WARN << "Neither a lookuptable nor a transfer function is set and 'use color property' is disabled.";
       }
     }//END PROPERTY user-defined lut
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
     //set up the lookuptable with the level window range
-    localStorage->m_LookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-  }
-  //the color function can be applied if the user does not want to use color
-  //and does not provide a lookuptable
-  if(CTFcanBeApplied)
-  {
-    ApplyColorTransferFunction(renderer);
+    if(usedLookupTable)
+      usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
 
   mitk::LevelWindow opacLevelWindow;
@@ -735,7 +734,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
   }
 
-  localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_LookupTable);
+  localStorage->m_LevelWindowFilter->SetLookupTable(usedScalarsToColors);
   // TODO check opacity handling
   localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
   localStorage->m_LevelWindowFilter->SetClippingBounds(bounds);
@@ -746,21 +745,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
  // localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
 }
 
-void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* renderer)
-{
-  // TODO use m_LevelWindowFilter
-  mitk::TransferFunctionProperty::Pointer transferFunctionProperty =
-    dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
-  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  if(transferFunctionProperty.IsNotNull())
-  {
-    localStorage->m_Texture->SetLookupTable(transferFunctionProperty->GetValue()->GetColorTransferFunction());
-  }
-  else
-  {
-    MITK_WARN << "Neither a lookuptable nor a transfer function is set and use color is off.";
-  }
-}
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
@@ -1178,7 +1162,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
-  m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_BinaryLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
@@ -1193,13 +1178,24 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_TSFilter->ReleaseDataFlagOn();
 
   //built a default lookuptable
-  m_LookupTable->SetRampToLinear();
-  m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_LookupTable->SetHueRange( 0.0, 0.0 );
-  m_LookupTable->SetValueRange( 0.0, 1.0 );
-  m_LookupTable->Build();
-  //map all black values to transparent !STUPID
-  //m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+  m_DefaultLookupTable->SetRampToLinear();
+  m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
+  m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
+  m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
+  m_DefaultLookupTable->Build();
+
+  m_BinaryLookupTable->SetRampToLinear();
+  m_BinaryLookupTable->SetSaturationRange( 0.0, 0.0 );
+  m_BinaryLookupTable->SetHueRange( 0.0, 0.0 );
+  m_BinaryLookupTable->SetValueRange( 0.0, 1.0 );
+  m_BinaryLookupTable->SetRange(0.0, 1.0);
+  // make first value transparent
+  {
+    double rgba[4];
+    m_BinaryLookupTable->GetTableValue(0, rgba);
+    m_BinaryLookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0); // background to 0
+  }
+  m_BinaryLookupTable->Build();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

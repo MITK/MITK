@@ -90,7 +90,7 @@ Due to the sheer number of MITK plugins not every plugin is activated by default
 \note If you want to use an application provided by MITK (e.g. MITK Workbench) you have to tick the appropriate checkbox as well (in this case MITK_BUILD_APP_mitkWorkbench ) and build MITK. Do note, that this application will be located in the bin directory of the "D:\AwesomeProject-superbuild\MITK-superbuild\MITK-build\" folder.
 
 
-\section HowToNewProjectAdvancedInformation Information for avanced users
+\section HowToNewProjectAdvancedInformation Information for advanced users
 
 \subsection HowToNewProjectCustomizingMITK Customizing MITK
 

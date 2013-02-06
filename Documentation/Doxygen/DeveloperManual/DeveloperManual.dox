@@ -10,11 +10,11 @@ Depending on whether you are working with the \link DevelopmentToolkit Toolkit\e
 <ul>
   <li> \subpage StartingDevelopment </li>
   <ul>
-    <li> \subpage Architecture </li>
-    <li> \subpage SettingUpMitk </li>
-    <li> \subpage GettingToKnowMitk </li>
-	<li> \subpage FirstSteps </li>
-	<li> \subpage Testing </li>
+    <li> \ref Architecture </li>
+    <li> \ref SettingUpMITK </li>
+    <li> \ref GettingToKnowMITK </li>
+	<li> \ref FirstSteps </li>
+	<li> \ref Testing </li>
   </ul>
   <li> \subpage DevelopmentToolkit </li>
   <li> \subpage DevelopmentApplication </li>

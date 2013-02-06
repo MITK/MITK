@@ -2,7 +2,23 @@
 
 \page StartingDevelopment Starting your MITK Development
 
-This Introduction will aquaint you with the most important workflows to get you started with your MITK Development.
+This Introduction will acquaint you with the most important workflows to get you started with your MITK Development.
+
+<ul>
+  <li> \subpage Architecture </li>
+  <li> \subpage SettingUpMITK </li>
+  <ul>
+    <li> \ref SupportedPlatformsPage </li>
+    <li> \ref BuildInstructionsPage </li>
+    <li> \ref thirdpartylibs </li>
+	<li> \ref HowToNewProject </li>
+	<li> \ref Testing </li>
+  </ul>
+  <li> \subpage GettingToKnowMITK </li>
+  <li> \subpage FirstSteps </li>
+  <li> \subpage Testing </li>
+</ul>
+
 
 
 */

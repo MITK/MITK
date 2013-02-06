@@ -1,5 +1,14 @@
 /**
-\page SettingUpMitk Setting Up Mitk
+\page SettingUpMITK Setting Up Mitk
 
 TODO
+
+<ul>
+  <li> \subpage SupportedPlatformsPage </li>
+  <li> \subpage BuildInstructionsPage </li>
+  <li> \subpage thirdpartylibs </li>
+  <li> \subpage HowToNewProject </li>
+  <li> \subpage Testing </li>
+</ul>
+
 */

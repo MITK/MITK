@@ -2,4 +2,12 @@
 \page FirstSteps First steps in Development
 
 TODO
+
+<ul>
+  <li> \subpage NewPluginPage </li>
+  <li> \subpage NewModulePage</li>
+  <li> \subpage CMAKE_FAQ </li>
+  <li> \subpage StatemachineEditor </li>
+</ul>
+
 */

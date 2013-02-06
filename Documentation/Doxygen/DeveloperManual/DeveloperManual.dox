@@ -1,11 +1,11 @@
 /**
 \page DeveloperManual Developer Manual
 
-Development with MITK can happen under several disctinct conditions. Depending on whether you are using the Toolkit or the entire Application, different sections may apply to you. In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink. An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
+Development with MITK can happen under several disctinct conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you. In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink. An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
 
 Depending on whether you are working with the \link DevelopmentToolkit Toolkit\endlink or the \link DevelopmentApplication Application\endlink, you can refer to their respective pages. Generated API-Documentation can be found \link DevelopmentAPI here\endlink.
 
-\section Starting your MITK Development
+\section DeveloperManualStarting Starting your MITK Development
 
 <ul>
   <li> \subpage StartingDevelopment </li>

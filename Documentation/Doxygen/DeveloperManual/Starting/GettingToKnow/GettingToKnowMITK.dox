@@ -2,13 +2,13 @@
 \page GettingToKnowMITK Getting to know MITK
 
 TODO
-
+<ul>
   <li> \subpage DirectoryStructurePage </li>
   <li> \subpage TutorialPage</li>
   <li> \subpage CMAKE_FAQ </li>
   <li> \subpage StyleGuideAndNotesPage </li>
   <li> \subpage DocumentationGuide </li>
-  <li> \subpage Coding?? </li>
+  <li> \subpage CodingPage </li>
   <li> \subpage KnownProblemsPage </li>
-
+</ul>
 */

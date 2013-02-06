@@ -32,10 +32,7 @@ class MITK_PYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTa
   Q_OBJECT
 
 public:
-  static const QString m_PythonImagesDictName;
-  static QString CreateDictionaryCommandIfNecessary();
-  static QString GetDictionaryVarNameForNodeName(const std::string& nodeName);
-  static std::string GetNodeNameForDictionaryVarName(const QString& varName);
+  static const QString MITK_IMAGE_VAR_NAME;
 
   QmitkPythonVariableStackTableModel(QObject *parent = 0);
   virtual ~QmitkPythonVariableStackTableModel();

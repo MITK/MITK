@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGetModuleContext.h>
 #include <QStringList>
 
-const QString QmitkPythonVariableStackTableModel::m_PythonImagesDictName("images");
-
+const QString QmitkPythonVariableStackTableModel::MITK_IMAGE_VAR_NAME = "mitkImage";
 QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
@@ -54,6 +53,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
         QStringList listOfDataNodeAddressPointers = arg.split(",");
 
         QStringList::iterator slIter;
+        int i = 0;
         for (slIter = listOfDataNodeAddressPointers.begin();
              slIter != listOfDataNodeAddressPointers.end();
              slIter++)
@@ -61,14 +61,13 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           long val = (*slIter).toLong();
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
-
-          QString command = CreateDictionaryCommandIfNecessary();
-
-          m_PythonService->Execute(command, mitk::IPythonService::MULTI_LINE_COMMAND );
-
-          QString varName = GetDictionaryVarNameForNodeName(node->GetName());
+//QString::fromStdString((node->GetName());
+          QString varName = MITK_IMAGE_VAR_NAME;
+          if( i > 0 )
+            varName = QString("%1%2).arg(MITK_IMAGE_VAR_NAME).arg(i);
           MITK_DEBUG("varName") << "varName" << varName;
-          //m_PythonService->CopyToPythonAsItkImage( mitkImage, varName );
+          m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME );
+          ++i;
         }
     }
     return returnValue;
@@ -172,19 +171,4 @@ QString QmitkPythonVariableStackTableModel::CreateDictionaryCommandIfNecessary()
     command.append( QString("except NameError:\n") );
     command.append( QString("  %1 = {}\n") .arg( m_PythonImagesDictName ) );
     return command;
-}
-
-QString QmitkPythonVariableStackTableModel::GetDictionaryVarNameForNodeName(const std::string &nodeName)
-{
-    QString varName = QString("%1['%2']") .arg( m_PythonImagesDictName ) .arg( QString::fromStdString( nodeName ) );
-    return varName;
-}
-
-std::string QmitkPythonVariableStackTableModel::GetNodeNameForDictionaryVarName(const QString &varName)
-{
-    QString qNodeName = varName;
-    qNodeName = qNodeName.replace( m_PythonImagesDictName+"['", "" );
-    qNodeName = qNodeName.replace("']", "");
-    MITK_DEBUG("QmitkPythonVariableStackTableModel") << "qNodeName " << qNodeName.toStdString();
-    return qNodeName.toStdString();
 }

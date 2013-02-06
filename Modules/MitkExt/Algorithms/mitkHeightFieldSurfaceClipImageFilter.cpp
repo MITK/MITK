@@ -321,21 +321,15 @@ namespace mitk
               q10 = heightField[y1 * m_HeightFieldResolutionX + x0];
               q11 = heightField[y1 * m_HeightFieldResolutionX + x1];
 
-              /*
-              !!!!!The bilinear interpolation doesn't work at the moment: If the plane is deformed there are some strange artefacts!!!
-              The problem is the scaling of the planeP0 and the x/y values
+              double p00 = ((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
+              double p01 = ((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
 
               ScalarType q =
-              q00 * ((double) x1 - planeP0[0]) * ((double) y1 - planeP0[1])
-              + q01 * (planeP0[0] - (double) x0) * ((double) y1 - planeP0[1])
-              + q10 * ((double) x1 - planeP0[0]) * (planeP0[1] - (double) y0)
-              + q11 * (planeP0[0] - (double) x0) * (planeP0[1] - (double) y0);
-              */
+              q00 * ((double) x1 - p00) * ((double) y1 - p01)
+              + q01 * (p00 - (double) x0) * ((double) y1 - p01)
+              + q10 * ((double) x1 - p00) * (p01 - (double) y0)
+              + q11 * (p00 - (double) x0) * (p01 - (double) y0);
 
-              //ATM: set the value direct, without interpolation: stepped view (only by the deformed plane)
-              ScalarType q = heightField[y0 * m_HeightFieldResolutionX + x0];
-
-              //decide, whether the point is on the one side of the plane or on the other
               if ( q - planeP0[2] < 0 )
               {
                 clip = true;

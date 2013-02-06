@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/algo/vnl_qr.h"
 
-#include "itkImage.h"
+#include "itkImageBase.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkNeighborhoodIterator.h"
 
@@ -131,7 +131,7 @@ namespace mitk {
     */
     void SetProgressStepSize(unsigned int stepSize);
 
-    void SetReferenceImage( itk::Image<double, 3>::Pointer referenceImage );
+    void SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage );
 
 
   protected:
@@ -175,7 +175,7 @@ namespace mitk {
     SolutionMatrix m_SolutionMatrix;
     double m_DistanceImageSpacing;
 
-    itk::Image<double, 3>::Pointer m_ReferenceImage;
+    itk::ImageBase<3>::Pointer m_ReferenceImage;
 
     unsigned int m_DistanceImageVolume;
 

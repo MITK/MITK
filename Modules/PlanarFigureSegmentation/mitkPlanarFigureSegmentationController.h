@@ -121,6 +121,8 @@ class PlanarFigureSegmentation_EXPORT PlanarFigureSegmentationController : publi
 
     void InitializeFilters();
 
+    template<typename TPixel, unsigned int VImageDimension>
+    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
 
     PlanarFigureListType m_PlanarFigureList;
     SurfaceListType m_SurfaceList;

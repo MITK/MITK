@@ -63,8 +63,8 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
           // save image
           QString tmpFolder = QDir::tempPath();
-          QDateTime dateTime = QDateTime::currentDateTime();
-          QString fileName = tmpFolder + QDir::separator() + dateTime.toString("yy.MM.dd.hh.ss.zzz") + ".nrrd";
+          QString nodeName = QString::fromStdString(node->GetName());
+          QString fileName = tmpFolder + QDir::separator() + nodeName + ".nrrd";
 
           MITK_INFO << "Saving temporary file " << fileName.toStdString();
           if( !mitk::IOUtil::SaveImage(mitkImage, fileName.toStdString()) )
@@ -74,14 +74,14 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
           QString command;
           command.append("import itk\n");
-          command.append("dim = 3\n");
-          command.append("pixelType = itk.UC\n");
-          command.append("imageType = itk.Image[pixelType, dim]\n");
-          command.append("readerType = itk.ImageFileReader[imageType]\n");
-          command.append("reader = readerType.New()\n");
-          command.append(QString("reader.SetFileName( \"%1\" )\n").arg(fileName));
+          command.append( QString("dim_%1 = 3\n").arg( nodeName ) );
+          command.append( QString("pixelType_%1 = itk.US\n").arg( nodeName ) );
+          command.append( QString("imageType_%1 = itk.Image[pixelType_%2, dim_%3]\n").arg( nodeName ).arg( nodeName ).arg( nodeName ) );
+          command.append( QString("readerType = itk.ImageFileReader[imageType_%1]\n").arg( nodeName ) );
+          command.append( "reader = readerType.New()\n" );
+          command.append( QString("reader.SetFileName( \"%1\" )\n").arg(fileName) );
           command.append("reader.Update()\n");
-          command.append("itkImage = reader.GetOutput()\n");
+          command.append( QString("image_%1 = reader.GetOutput()\n").arg( nodeName ).arg( nodeName ) );
           MITK_INFO << "Issuing python command " << command.toStdString();
           mitk::PluginActivator::GetPythonManager()->executeString(command, ctkAbstractPythonManager::FileInput );
           this->Update();
@@ -213,9 +213,43 @@ void QmitkPythonVariableStackTableModel::setVariableStack(QList<QStringList> var
     QAbstractTableModel::reset();
 }
 
+QList<QStringList> QmitkPythonVariableStackTableModel::getVariableStack()
+{
+    return m_VariableStack;
+}
+
+/*
 QMimeData * QmitkPythonVariableStackTableModel::mimeData(const QModelIndexList & indexes) const
 {
-    return QAbstractTableModel::mimeData(indexes);
+    QMimeData * ret = new QMimeData;
+
+    QString command;
+    QString tmpFolder = QDir::tempPath();
+    for (int indexesCounter = 0; indexesCounter < indexes.size(); indexesCounter++)
+    {
+      QString name = m_VariableStack[indexes.at(indexesCounter).row()][0];
+      QString fileName = tmpFolder + QDir::separator() + name + ".nrrd";
+
+      MITK_INFO << "Saving temporary file with python itk code " << fileName.toStdString();
+      command.append("import itk\n");
+      command.append("writer = itk.ImageFileWriter[ image ].New()\n");
+      command.append( QString( "reader.SetFileName( \"%1\" )\n").arg(fileName) );
+      command.append( QString( "writer.SetInput( \"%1\" )\n").arg(fileName) );
+      command.append("writer.Update()\n");
+
+      MITK_INFO << "Loading temporary file " << fileName.toStdString() << " as MITK image";
+      mitk::Image::Pointer mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
+
+      if( mitkImage.IsNotNull() )
+      {
+      }
+      else
+      {
+          MITK_ERROR << "Temporary image could not be written or was invalid.";
+      }
+    }
+
+    return ret;
 
     /*
     QMimeData * ret = new QMimeData;
@@ -268,8 +302,9 @@ QMimeData * QmitkPythonVariableStackTableModel::mimeData(const QModelIndexList &
     }
 
     return ret;
-    */
+
 }
+*/
 
 QStringList QmitkPythonVariableStackTableModel::mimeTypes() const
 {
@@ -285,10 +320,6 @@ Qt::DropActions QmitkPythonVariableStackTableModel::supportedDropActions() const
     return Qt::CopyAction | Qt::MoveAction;
 }
 
-Qt::DropActions QmitkPythonVariableStackTableModel::supportedDragActions() const
-{
-    return Qt::CopyAction | Qt::MoveAction;
-}
 
 void QmitkPythonVariableStackTableModel::Update()
 {

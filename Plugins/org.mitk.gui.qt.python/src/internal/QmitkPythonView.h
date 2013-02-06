@@ -45,6 +45,12 @@ public:
   ///
   virtual ~QmitkPythonView();
 
+  ///
+  /// \brief Standard dtor.
+  ///
+public slots:
+  void OnVariableStackDoubleClicked( const QModelIndex & index );
+
 protected:
 
   ///

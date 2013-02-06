@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QModelIndex>
 #include <Python.h>
 #include <itkImage.h>
+#include <mitkDataNode.h>
 
 ///
 /// implements a table model to show the variables of the Python "__main__" dictionary
@@ -49,7 +50,6 @@ public:
   void setVariableStack(QList<QStringList>);
   QList<QStringList> getVariableStack();
 
-  QMimeData * mimeData(const QModelIndexList &) const;
   bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & );
   Qt::DropActions supportedDropActions() const;
   Qt::DropActions supportedDragActions() const;

@@ -24,7 +24,7 @@ if(NOT DEFINED ITK_DIR)
         -DCMAKE_USE_PTHREADS:BOOL=OFF)
   endif()
 
-  if(MITK_USE_Python OR MITK_BUILD_org.mitk.gui.qt.python)
+  if(MITK_USE_Python)
     list(APPEND additional_cmake_args
          -DUSE_WRAP_ITK:BOOL=ON
          -DITK_USE_REVIEW:BOOL=ON

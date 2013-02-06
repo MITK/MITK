@@ -152,7 +152,6 @@ option(MITK_DCMTK_BUILD_SHARED_LIBS "EXPERIMENTAL, superbuild only: build DCMTK 
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
-set(MITK_USE_CableSwig ${MITK_USE_Python})
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CTK
@@ -737,10 +736,7 @@ endif()
 
 set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
 set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
-if(MITK_USE_Python)
-  add_subdirectory(Wrapping)
-endif()
+option(MITK_USE_Python "Build Python integration for MITK)." OFF)
 
 #-----------------------------------------------------------------------------
 # Documentation

@@ -55,7 +55,8 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
 
   mitk::UIDGenerator uidGen("UID_",6);
 
-  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
+  //std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
+  std::string returnValue = Poco::Path::temp() + "SceneIOTemp" + uidGen.GetUID();
   std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
 

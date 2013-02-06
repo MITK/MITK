@@ -30,7 +30,8 @@ if(NOT DEFINED ITK_DIR)
          -DITK_USE_REVIEW:BOOL=ON
          -DCableSwig_DIR:PATH=${CableSwig_DIR}
          -DWRAP_ITK_JAVA:BOOL=OFF
-         -DWRAP_ITK_TCL:BOOL=OFF
+         -DWRAP_ITK_TCL:BOOL=OFFF
+         -DWRAP_unsigned_char:BOOL=ON
         )
   endif()
 

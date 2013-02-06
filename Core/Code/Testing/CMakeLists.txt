@@ -31,6 +31,11 @@ mitkAddCustomModuleTest(mitkIOUtilTest mitkIOUtilTest #test for a randomly chose
 )
 
 
+mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+)
+
+
 if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_GUI_TESTING
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage

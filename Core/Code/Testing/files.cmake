@@ -20,7 +20,6 @@ set(MODULE_TESTS
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp
-  mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
@@ -106,6 +105,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkIOUtilTest.cpp
+    mitkLevelWindowManagerTest.cpp
 )
 
 # Create an artificial module initializing class for

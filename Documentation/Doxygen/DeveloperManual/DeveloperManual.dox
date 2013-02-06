@@ -1,7 +1,14 @@
 /**
 \page DeveloperManual Developer Manual
 
-The following items are concerned with the practical use of the MITK library for software development.
+Development with MITK can happen under several disctinct conditions. Depending on whether you are using the Toolkit or the entire Application, different sections may apply to you. In case you are unsure about what you need, please refer to \link The Architecture of MITK text\endlink. An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
+
+Depending on whether you are working with the \link DevelopmentToolkit Toolkit\endlink or the \link DevelopmentApplication Application\endlink, you can refer to their respective pages.
+
+
+
+OLD TEXT BELOW
+
 
 Some abstract concepts of MITK are described in \ref Concepts
 

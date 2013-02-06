@@ -231,13 +231,6 @@ void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
 {
-  //first: check if deleted node is part of relevant nodes. If not, abort method because there is no need change anything.
-  if ((this->GetRelevantNodes()->size() == 0)) return;
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = this->GetRelevantNodes()->Begin();
-       it != this->GetRelevantNodes()->End();
-       ++it)
-  {if (it->Value() == removedNode) {return;}}
-
   //remember node which will be removed
   m_NodeMarkedToDelete = removedNode;
 
@@ -264,11 +257,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
 
   //check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != (this->GetRelevantNodes()->size()-1)))
-     {
-     MITK_ERROR << "Wrong number of observers in Level Window Manager!";
-     mitkThrow() << "Wrong number of observers in Level Window Manager!";
-     }
-
+     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
 }
 
 void mitk::LevelWindowManager::UpdateObservers()

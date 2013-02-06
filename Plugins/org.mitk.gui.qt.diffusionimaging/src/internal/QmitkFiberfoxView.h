@@ -74,6 +74,7 @@ protected slots:
     void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
     void FiberModelFrameVisibility(int index);///< only show parameters of selected fiber model type
     void NonFiberModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void ShowAdvancedFiberOptions(int state);
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);

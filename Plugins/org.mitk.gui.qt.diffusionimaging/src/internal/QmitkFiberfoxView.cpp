@@ -88,6 +88,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_T2bluringParamFrame->setVisible(false);
         m_Controls->m_KspaceParamFrame->setVisible(false);
         m_Controls->m_StickModelFrame->setVisible(false);
+        m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -109,7 +110,16 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
         connect((QObject*) m_Controls->m_FiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
         connect((QObject*) m_Controls->m_NonFiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
+        connect((QObject*) m_Controls->m_AdvancedFiberOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedFiberOptions(int)));
     }
+}
+
+void QmitkFiberfoxView::ShowAdvancedFiberOptions(int state)
+{
+    if (state)
+        m_Controls->m_AdvancedFiberOptionsFrame->setVisible(true);
+    else
+        m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::FiberModelFrameVisibility(int index)
@@ -652,9 +662,19 @@ void QmitkFiberfoxView::GenerateImage()
     }
 
     // signal models
+    QString signalModelString("_Ball");
     itk::TractsToDWIImageFilter::DiffusionModelList fiberModelList, nonFiberModelList;
     mitk::TensorModel<double> tensorModel;
     mitk::StickModel<double> stickModel;
+
+    // free diffusion
+    mitk::BallModel<double> ballModel;
+    ballModel.SetGradientList(gradientList);
+    ballModel.SetBvalue(bVal);
+    ballModel.SetDiffusivity(m_Controls->m_BallD->value());
+    ballModel.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
+    ballModel.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
+    nonFiberModelList.push_back(&ballModel);
 
     // intra-axonal diffusion
     switch (m_Controls->m_FiberCompartmentModelBox->currentIndex())
@@ -667,6 +687,7 @@ void QmitkFiberfoxView::GenerateImage()
         tensorModel.SetSignalScale(m_Controls->m_FiberS0Box->value());
         tensorModel.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
         fiberModelList.push_back(&tensorModel);
+        signalModelString += "-Zeppelin";
         break;
     case 1:
         MITK_INFO << "Using stick model";
@@ -675,17 +696,9 @@ void QmitkFiberfoxView::GenerateImage()
         stickModel.SetSignalScale(m_Controls->m_FiberS0Box->value());
         stickModel.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
         fiberModelList.push_back(&stickModel);
+        signalModelString += "-Stick";
         break;
     }
-
-    // free diffusion
-    mitk::BallModel<double> ballModel;
-    ballModel.SetGradientList(gradientList);
-    ballModel.SetBvalue(bVal);
-    ballModel.SetDiffusivity(m_Controls->m_BallD->value());
-    ballModel.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
-    ballModel.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
-    nonFiberModelList.push_back(&ballModel);
 
     itk::TractsToDWIImageFilter::KspaceArtifactList artifactList;
 
@@ -734,7 +747,6 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetNonFiberModels(nonFiberModelList);
         filter->SetNoiseModel(&noiseModel);
         filter->SetKspaceArtifacts(artifactList);
-        filter->SetVolumeAccuracy(m_Controls->m_VolumeAccuracyBox->value());
         filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
 
@@ -753,7 +765,7 @@ void QmitkFiberfoxView::GenerateImage()
         image->InitializeFromVectorImage();
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );
-        node->SetName(m_SelectedBundle->GetName()+"_Phantom");
+        node->SetName(m_SelectedBundle->GetName()+"_b"+QString::number(bVal).toStdString()+"_SNR"+QString::number(snr).toStdString()+"_RPTS"+QString::number(m_Controls->m_RepetitionsBox->value()).toStdString()+signalModelString.toStdString());
         GetDataStorage()->Add(node);
 
         if (m_Controls->m_KspaceImageBox->isChecked())

@@ -29,11 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static const double PI = itk::Math::pi;
 
-vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOqacity(0.0),m_MaxOpacity(255.0)
+vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOpacity(0.0),m_MaxOpacity(255.0)
 {
-  //  SetNumberOfThreads(1);
-
-  MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
+  //MITK_INFO << "mitk level/window filter uses " << GetNumberOfThreads() << " thread(s)";
 }
 
 vtkMitkLevelWindowFilter::~vtkMitkLevelWindowFilter()
@@ -255,20 +253,22 @@ void vtkApplyLookupTableOnScalarsFast(vtkMitkLevelWindowFilter *self,
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<unsigned char> outputIt(outData, outExt);
-  vtkLookupTable* lookupTable;
 
   double tableRange[2];
 
-  lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
+  // access vtkLookupTable
+  vtkLookupTable* lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
   lookupTable->GetTableRange(tableRange);
 
-  float scale,bias;
-
+  // access elements of the vtkLookupTable
   int * realLookupTable = reinterpret_cast<int*>(lookupTable->GetTable()->GetPointer(0));
   int maxIndex = lookupTable->GetNumberOfColors() - 1;
 
-  scale = (tableRange[1] -tableRange[0] > 0 ? (maxIndex + 1) / (tableRange[1] - tableRange[0]) : 0.0);
-  bias = - tableRange[0] * scale;
+
+  float scale = (tableRange[1] -tableRange[0] > 0 ? (maxIndex + 1) / (tableRange[1] - tableRange[0]) : 0.0);
+  // ensuring that starting point is zero
+  float bias = - tableRange[0] * scale;
+  // due to later conversion to int for rounding
   bias += 0.5f;
 
 
@@ -328,6 +328,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
     unsigned char* outputSI = outputIt.BeginSpan();
     unsigned char* outputSIEnd = outputIt.EndSpan();
 
+    // do we iterate over the inner vertical clipping bounds
     if( y >= clippingBounds[2] && y < clippingBounds[3] )
     {
       T* inputSI = inputIt.BeginSpan();
@@ -336,41 +337,33 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
 
       while (outputSI != outputSIEnd)
       {
+        // is this pixel within horizontal clipping bounds
         if ( x >= clippingBounds[0] && x < clippingBounds[1])
         {
-
           // fetching original value
           double grayValue = static_cast<double>(*inputSI);
-
-          // applying lookuptable
-          int *RGBA = reinterpret_cast<int *>(lookupTable->MapValue( grayValue ));
-
-          // storing
-          * reinterpret_cast<int*>(outputSI) = *RGBA;
-
-          outputSI+=4;
+          // applying lookuptable - copy the 4 (RGBA) chars as a single int
+          *reinterpret_cast<int*>(outputSI) = *reinterpret_cast<int *>(lookupTable->MapValue( grayValue ));
         }
         else
         {
-          *outputSI = 0; outputSI++;
-          *outputSI = 0; outputSI++;
-          *outputSI = 0; outputSI++;
-          *outputSI = 0; outputSI++;
+          // outer horizontal clipping bounds - write a transparent RGBA pixel as a single int
+          *reinterpret_cast<int*>(outputSI) = 0;
         }
 
         inputSI++;
+        outputSI+=4;
         x++;
       }
 
     }
     else
     {
+      // outer vertical clipping bounds - write a transparent RGBA line as ints
       while (outputSI != outputSIEnd)
       {
-        *outputSI = 0; outputSI++;
-        *outputSI = 0; outputSI++;
-        *outputSI = 0; outputSI++;
-        *outputSI = 0; outputSI++;
+        *reinterpret_cast<int*>(outputSI) = 0;
+        outputSI+=4;
       }
     }
 
@@ -475,12 +468,12 @@ void vtkMitkLevelWindowFilter::ExecuteInformation(
 
 void vtkMitkLevelWindowFilter::SetMinOpacity(double minOpacity)
 {
-  m_MinOqacity = minOpacity;
+  m_MinOpacity = minOpacity;
 }
 
 inline double vtkMitkLevelWindowFilter::GetMinOpacity() const
 {
-  return m_MinOqacity;
+  return m_MinOpacity;
 }
 
 void vtkMitkLevelWindowFilter::SetMaxOpacity(double maxOpacity)

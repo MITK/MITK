@@ -23,9 +23,9 @@ class vtkScalarsToColors;
 
 #include <MitkExports.h>
 /** Documentation
-* \brief Applies the color and opacity level window to RGB(A) images.
+* \brief Applies the grayvalue or color/opacity level window to scalar or RGB(A) images.
 *
-* This filter is used to apply the color level window to RBG images (e.g.
+* This filter is used to apply the color level window to RGB images (e.g.
 * diffusion tensor images). Therefore, the RGB channels are converted to
 * the HSI color space, where the level window can be applied. Afterwards,
 * the HSI values transformed back to the RGB space.
@@ -51,6 +51,7 @@ public:
   void SetMaxOpacity(double maxOpacity);
   inline double GetMaxOpacity() const;
 
+  /** \brief Set clipping bounds for the opaque part of the resliced 2d image */
   void SetClippingBounds(vtkFloatingPointType*);
 
   /** Default constructor. */
@@ -75,9 +76,9 @@ protected:
 private:
   /** m_LookupTable contains the lookup table for the RGB level window.*/
   vtkScalarsToColors* m_LookupTable;
-  /** m_MinOqacity contains the lower bound for the alpha level window.*/
-  double m_MinOqacity;
-  /** m_MinOqacity contains the upper bound for the alpha level window.*/
+  /** m_MinOpacity contains the lower bound for the alpha level window.*/
+  double m_MinOpacity;
+  /** m_MaxOpacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
 
   vtkFloatingPointType m_ClippingBounds[4];

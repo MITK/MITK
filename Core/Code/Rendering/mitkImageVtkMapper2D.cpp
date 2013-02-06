@@ -673,6 +673,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
 
   if(binary)
   {
+    //currently we do not allow a lookuptable if it is a binary image
     //default lookuptable for binary images
     localStorage->m_LookupTable->SetRange(0.0, 1.0);
     double rgba[4];
@@ -686,7 +687,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     if((!useColor))
     {
       //BEGIN PROPERTY user-defined lut
-      //currently we do not allow a lookuptable if it is a binary image
       // If lookup table use is requested...
       mitk::LookupTableProperty::Pointer LookupTableProp;
       LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
@@ -720,7 +720,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   //and does not provide a lookuptable
   if(CTFcanBeApplied)
   {
-    //ApplyColorTransferFunction(renderer);
+    ApplyColorTransferFunction(renderer);
   }
 
   mitk::LevelWindow opacLevelWindow;
@@ -735,20 +735,10 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
   }
 
-  // TODO use filter thing to create RGBA texture
-  // ... set outside pixels to alpha=0
-  //pass the LuT to the RBG filter
-  // TODO check whether setting LUT on BOTH texture and our filter is useful
-
-  //localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_Texture->GetLookupTable());
-
   localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_LookupTable);
-  //localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
   // TODO check opacity handling
   localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
-
   localStorage->m_LevelWindowFilter->SetClippingBounds(bounds);
-
   //connect the texture with the output of the RGB filter
   localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
   // TODO use filter thing to create RGBA texture
@@ -772,29 +762,6 @@ void mitk::ImageVtkMapper2D::ApplyColorTransferFunction(mitk::BaseRenderer* rend
   }
 }
 
-
-/*
-void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer )
-{
-  LocalStorage* localStorage = this->GetLocalStorage( renderer );
-  //pass the LuT to the RBG filter
-  //localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
-  mitk::LevelWindow opacLevelWindow;
-  if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-  {//pass the opaque level window to the filter
-    localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
-    localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
-  }
-  else
-  {//no opaque level window
-    localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(0.0);
-    localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(255.0);
-  }
-  localStorage->m_LevelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
-  //connect the texture with the output of the RGB filter
-  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowToRGBFilterObject->GetOutputPort());
-}
-*/
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
   if ( !this->IsVisible( renderer ) )

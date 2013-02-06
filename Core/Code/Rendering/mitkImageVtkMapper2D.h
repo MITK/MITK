@@ -178,7 +178,7 @@ namespace mitk {
       /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
       mitk::ScalarType* m_mmPerPixel;
 
-      /** \brief This filter is used to apply the level window to RBG(A) images. */
+      /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
       vtkMitkLevelWindowFilter* m_LevelWindowFilter;
 
       /** \brief Default constructor of the local storage. */

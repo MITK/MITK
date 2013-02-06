@@ -33,6 +33,11 @@ mitk::PythonService::~PythonService()
 
 QVariant mitk::PythonService::Execute(const QString &pythonCommand, int commandType)
 {
+    {
+        MITK_DEBUG("mitk::PythonService") << "pythonCommand = " << pythonCommand.toStdString();
+        MITK_DEBUG("mitk::PythonService") << "commandType = " << commandType;
+    }
+
     QVariant result;
     bool commandIssued = true;
 

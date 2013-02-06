@@ -47,7 +47,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
     if(data->hasFormat("application/x-mitk-datanodes"))
     {
-        MITK_INFO << "dropped MITK DataNode";
+        MITK_DEBUG("QmitkPythonVariableStackTableModel") << "dropped MITK DataNode";
         returnValue = true;
 
         QString arg = QString(data->data("application/x-mitk-datanodes").data());
@@ -62,11 +62,13 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
 
-          m_PythonService->Execute(CreateDictionaryCommandIfNecessary(), mitk::IPythonService::MULTI_LINE_COMMAND );
+          QString command = CreateDictionaryCommandIfNecessary();
+
+          m_PythonService->Execute(command, mitk::IPythonService::MULTI_LINE_COMMAND );
 
           QString varName = GetDictionaryVarNameForNodeName(node->GetName());
           MITK_DEBUG("varName") << "varName" << varName;
-          m_PythonService->CopyToPythonAsItkImage( mitkImage, varName );
+          //m_PythonService->CopyToPythonAsItkImage( mitkImage, varName );
         }
     }
     return returnValue;
@@ -161,6 +163,9 @@ QList<mitk::PythonVariable> QmitkPythonVariableStackTableModel::GetVariableStack
 
 QString QmitkPythonVariableStackTableModel::CreateDictionaryCommandIfNecessary()
 {
+    MITK_DEBUG("QmitkPythonVariableStackTableModel") << "CreateDictionaryCommandIfNecessary()";
+    MITK_DEBUG("QmitkPythonVariableStackTableModel") << "m_PythonImagesDictName = " << m_PythonImagesDictName.toStdString();
+
     QString command;
     command.append( QString("try:\n") );
     command.append( QString("  %1" ) .arg( m_PythonImagesDictName ) );

@@ -74,6 +74,6 @@ namespace mitk
     };
 }
 
-//US_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")
+US_DECLARE_SERVICE_INTERFACE(mitk::IPythonService, "org.mitk.services.IPythonService")
 
 #endif

@@ -45,7 +45,7 @@ const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = GetModuleContext();
+    ModuleContext* context = mitk::GetModuleContext();
     const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());

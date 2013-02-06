@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <QDir>
 
+const QString mitk::PythonService::m_TmpImageName("temp_mitk_image");
+
 mitk::PythonService::PythonService()
 {
     m_PythonManager.initialize();
@@ -102,41 +104,44 @@ void mitk::PythonService::NotifyObserver(const QString &command)
     }
 }
 
+QString mitk::PythonService::GetTempImageName(const QString& ext) const
+{
+    QString tmpFolder = QDir::tempPath();
+    QString fileName = tmpFolder + QDir::separator() + m_TmpImageName + ext;
+    return fileName;
+}
+
 bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QString &varName)
 {
     // save image
-    QString tmpFolder = QDir::tempPath();
-    QString fileName = tmpFolder + QDir::separator() + varName + ".nrrd";
+    QString fileName = this->GetTempImageName( QString::fromStdString(mitk::IOUtil::DEFAULTIMAGEEXTENSION) );
 
-    MITK_DEBUG << "Saving temporary file " << fileName.toStdString();
+    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
     if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
     {
         MITK_ERROR << "Temporary file could not be created.";
     }
     else
     {
-        // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG MITK_DEBUG
+        // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
         int dim = 3;
         QString type = "US";
         QString command;
-        command.append( "import itk\n" );
-        command.append( "try:\n" );
-        command.append( "  mitkImages" );
-        command.append( "except NameError:\n" );
-        command.append( "  mitkImages = {}\n" );
-        //command.append( QString("mitkImages['%1_dim''] = %2\n").arg( varName ).arg(dim) );
-        //command.append( QString("mitkImages['%1_pixelType'] = itk.%2\n").arg( varName ).argtype( type ) );
-        command.append( QString("mitkImages['%1_imageType'] = itk.Image[%2, %3]\n").arg( varName ).arg( type ).arg( dim ) );
-        command.append( QString("readerType = itk.ImageFileReader[mitkImages['%1_imageType']]\n").arg( varName ) );
-        command.append( "reader = readerType.New()\n" );
-        command.append( QString("reader.SetFileName( \"%1\" )\n").arg(fileName) );
-        command.append( "reader.Update()\n" );
-        command.append( QString("mitkImages['%1'] = reader.GetOutput()\n").arg( varName ));
-        MITK_DEBUG << "Issuing python command " << command.toStdString();
-        this->Execute(command, IPythonService::SINGLE_LINE_COMMAND );
+
+        command.append( QString("import itk\n") );
+        command.append( QString("imageType = itk.Image[%1, %2]\n") .arg( type ).arg( dim ) );
+
+        command.append( QString("readerType = itk.ImageFileReader[imageType]\n") );
+        command.append( QString("reader = readerType.New()\n") );
+        command.append( QString("reader.SetFileName( \"%1\" )\n") .arg(fileName) );
+        command.append( QString("reader.Update()\n") );
+        command.append( QString("%1 = reader.GetOutput()\n").arg( varName ) );
+
+        MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+        this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
 
         QFile file(fileName);
-        MITK_DEBUG << "Removing file " << fileName.toStdString();
+        MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
         file.remove();
         return true;
     }
@@ -146,5 +151,42 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QStri
 
 mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &varName)
 {
-    return 0;
+    mitk::Image::Pointer mitkImage;
+    QString command;
+    QString fileName = GetTempImageName( QString::fromStdString( mitk::IOUtil::DEFAULTIMAGEEXTENSION ) );
+
+    MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
+    command.append( QString("import itk\n") );
+
+    command.append( QString( "writer = itk.ImageFileWriter[ %1 ].New()\n").arg( varName ) );
+    command.append( QString( "writer.SetFileName( \"%1\" )\n").arg(fileName) );
+    command.append( QString( "writer.SetInput( %1 )\n").arg(varName) );
+    command.append( QString( "writer.Update()\n" ) );
+
+    MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+    this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+
+    try
+    {
+        MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
+        mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
+    }
+    catch(std::exception& e)
+    {
+      MITK_ERROR << e.what();
+    }
+
+    QFile file(fileName);
+    if( file.exists() )
+    {
+        MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
+        file.remove();
+    }
+
+    return mitkImage;
+}
+
+ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
+{
+    return &m_PythonManager;
 }

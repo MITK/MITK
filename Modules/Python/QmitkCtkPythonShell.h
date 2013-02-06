@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPythonConsole.h>
 #include <QString>
+#include "mitkPythonExports.h"
 
 ///
 /// forward declarations
@@ -31,26 +32,20 @@ class QMimeData;
 
 ///
 /// Reimplements the ctkPythonConsole with drag and drop functionality for text
+/// Furthermore it calls NotifyObserver() on the IPythonService to inform listeners
 ///
-class QmitkCtkPythonShell : public ctkPythonConsole
+class MITK_PYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
 {
   Q_OBJECT
 
 public:
   QmitkCtkPythonShell(QWidget* parent = 0);
   ~QmitkCtkPythonShell();
-
-  void SetPythonManager( ctkAbstractPythonManager* _PythonManager );
-
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);
   bool canInsertFromMimeData( const QMimeData *source ) const;
   void executeCommand(const QString& command);
-
-signals:
-  void executeCommandSignal(const QString&);
-  void newCommandExecuted();
 
 private:
   QmitkCtkPythonShellData* d;

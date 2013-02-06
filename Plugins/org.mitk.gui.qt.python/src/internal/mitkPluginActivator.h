@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 #include <mitkExportMacros.h>
-class ctkAbstractPythonManager;
 
 namespace mitk {
 
@@ -29,8 +28,6 @@ class MITK_LOCAL PluginActivator :
   Q_INTERFACES(ctkPluginActivator)
 
 public:
-    static ctkAbstractPythonManager* GetPythonManager();
-
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 

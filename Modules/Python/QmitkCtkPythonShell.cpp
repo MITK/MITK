@@ -21,27 +21,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDropEvent>
 #include <QMimeData>
 #include <QUrl>
+#include "mitkPythonService.h"
+#include <mitkModuleContext.h>
+#include <usServiceReference.h>
+#include <mitkGetModuleContext.h>
 
 struct QmitkCtkPythonShellData
 {
-    ctkAbstractPythonManager *m_PythonManager;
+    mitk::PythonService* m_PythonService;
 };
 
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
     : ctkPythonConsole(parent), d( new QmitkCtkPythonShellData )
 {
-    d->m_PythonManager = 0;
+    mitk::ModuleContext* context = mitk::GetModuleContext();
+    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
+    d->m_PythonService = dynamic_cast<mitk::PythonService*> ( context->GetService<mitk::IPythonService>(serviceRef) );
+
+    assert( d->m_PythonService );
+    this->initialize( d->m_PythonService->GetPythonManager() );
 }
 
 QmitkCtkPythonShell::~QmitkCtkPythonShell()
 {
     delete d;
-}
-
-void QmitkCtkPythonShell::SetPythonManager(ctkAbstractPythonManager *_PythonManager)
-{
-    d->m_PythonManager = _PythonManager;
-    this->initialize( _PythonManager );
 }
 
 void QmitkCtkPythonShell::dragEnterEvent(QDragEnterEvent *event)
@@ -53,7 +56,7 @@ void QmitkCtkPythonShell::dropEvent(QDropEvent *event)
   QList<QUrl> urls = event->mimeData()->urls();
   for(int i = 0; i < urls.size(); i++)
   {
-    d->m_PythonManager->executeString(urls[i].toString());
+    d->m_PythonService->Execute( urls[i].toString(), mitk::IPythonService::SINGLE_LINE_COMMAND );
   }
 }
 
@@ -64,8 +67,6 @@ bool QmitkCtkPythonShell::canInsertFromMimeData( const QMimeData *source ) const
 
 void QmitkCtkPythonShell::executeCommand(const QString& command)
 {
-  emit executeCommandSignal(command);
   ctkPythonConsole::executeCommand(command);
-
-  emit newCommandExecuted();
+  d->m_PythonService->NotifyObserver(command);
 }

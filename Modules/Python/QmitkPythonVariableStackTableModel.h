@@ -18,23 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPythonVariableStackTableModel_h
 
 #include <QAbstractTableModel>
-#include <QStringList>
 #include <QVariant>
 #include <QModelIndex>
-#include <QModelIndex>
-#include <Python.h>
-#include <itkImage.h>
-#include <mitkDataNode.h>
+#include "mitkIPythonService.h"
+#include "mitkPythonExports.h"
 
 ///
 /// implements a table model to show the variables of the Python "__main__" dictionary
 /// furthermore implements dragging and dropping of datanodes (conversion from and to python)
 ///
-class QmitkPythonVariableStackTableModel : public QAbstractTableModel
+class MITK_PYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTableModel, public mitk::PythonCommandObserver
 {
   Q_OBJECT
 
 public:
+  static const QString m_PythonImagesDictName;
+  static QString CreateDictionaryCommandIfNecessary();
+  static QString GetDictionaryVarNameForNodeName(const std::string& nodeName);
+  static std::string GetNodeNameForDictionaryVarName(const QString& varName);
+
   QmitkPythonVariableStackTableModel(QObject *parent = 0);
   virtual ~QmitkPythonVariableStackTableModel();
 
@@ -44,25 +46,18 @@ public:
   Qt::ItemFlags flags( const QModelIndex& index ) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role) const;
+
   QStringList mimeTypes() const;
-
-  void clear();
-  void setVariableStack(QList<QStringList>);
-  QList<QStringList> getVariableStack();
-
   bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & );
   Qt::DropActions supportedDropActions() const;
   Qt::DropActions supportedDragActions() const;
 
-public slots:
-  void Update();
-protected:
-  QList<QStringList> getAttributeList();
-  PyObject* getPyObject(PyObject* object);
-  PyObject* getPyObjectString(const QString& objectName);
+  void CommandExecuted(const QString& pythonCommand);
 
+  QList<mitk::PythonVariable> GetVariableStack() const;
 private:
-  QList<QStringList> m_VariableStack;
+  QList<mitk::PythonVariable> m_VariableStack;
+  mitk::IPythonService* m_PythonService;
 };
 
 #endif // QmitkPythonVariableStackTableModel_h

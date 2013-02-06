@@ -4,15 +4,11 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkPythonView.cpp
-  QmitkCtkPythonShell.cpp
-  QmitkPythonVariableStackTableModel.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkPythonView.h
-  src/internal/QmitkCtkPythonShell.h
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkPythonVariableStackTableModel.h
 )
 
 set(CPP_FILES )

@@ -263,9 +263,6 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
   m_NodeMarkedToDelete = NULL;
 
   //check if everything is still ok
-  MITK_INFO << "Size Observers 1: " << m_PropObserverToNode.size();
-  MITK_INFO << "Size Observers 2: " << m_PropObserverToNode2.size();
-  MITK_INFO << "Size Observers Relevant Nodes: " << GetRelevantNodes()->size();
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != (this->GetRelevantNodes()->size()-1)))
      {
      MITK_ERROR << "Wrong number of observers in Level Window Manager!";

@@ -4,7 +4,7 @@ namespace mitk
 \defgroup Adaptor Adaptor Classes
 \ingroup ProcessAdaptor
 
-\brief This subcategory includes adaptor classes for the integration of algorithms from 
+\brief This subcategory includes adaptor classes for the integration of algorithms from
 other toolkits, especially ITK.
 
 The task of most of the classes in this category is to deal with the conversion between
@@ -18,7 +18,7 @@ Care has to be taken regarding the involved coordinate systems, see \ref ItkToMi
 For limitations on ITK-type conversion see the section \ref ModuleAdaptorLimitations.
 
 VTK-based access to MITK images is straightforward: simply ask your mitk::Image for a
-\a vtkImageData by calling Image:GetVtkImageData. Similarily, to get a \a vtkPolyData 
+\a vtkImageData by calling Image:GetVtkImageData. Similarily, to get a \a vtkPolyData
 from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
 
 \section MitkToItk MITK to ITK adaptors
@@ -40,7 +40,7 @@ If you know the type (pixel type and dimension) of the MITK image you have two o
     \a TOutputImage an exception will be thrown.
 \li mitk::CastToItkImage: this function has two parameters, the mitk::Image (input) and a
     smartpointer to an itk::Image (output, does not need to be initialized). In case the
-    MITK image does not have the same type as the ITK image it will be casted 
+    MITK image does not have the same type as the ITK image it will be casted
     (if possible; done via itk::CastImageFilter).
 
 Thus, mitk::CastToItkImage is the more powerful variant: here it is sufficient that you know

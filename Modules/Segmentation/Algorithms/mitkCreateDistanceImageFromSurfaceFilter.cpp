@@ -517,7 +517,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned in
   this->m_ProgressStepSize = stepSize;
 }
 
-void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage( itk::Image<double, 3>::Pointer referenceImage )
+void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage )
 {
  m_ReferenceImage = referenceImage;
 }

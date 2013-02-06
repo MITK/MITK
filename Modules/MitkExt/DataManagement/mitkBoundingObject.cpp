@@ -50,19 +50,23 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
   // specifies it's actual bounds. This behavior needs to be analyzed and maybe changed.
   // Check also BUG 11406
 
-  if (aGeometry3D->GetImageGeometry())
-  {
-    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false);
-  }
 
   GetGeometry()->SetIdentity();
   GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
 
-  GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
+  // Since aGeometry (which should actually be const), is an imagegeometry and boundingObject is NOT an image,
+  // we have to adjust the Origin by shifting it half pixel
+  mitk::Point3D myOrigin = aGeometry3D->GetCenter();
+  myOrigin[0] -= (aGeometry3D->GetSpacing()[0] / 2.0);
+  myOrigin[1] -= (aGeometry3D->GetSpacing()[1] / 2.0);
+  myOrigin[2] -= (aGeometry3D->GetSpacing()[2] / 2.0);
+
+  GetGeometry()->SetOrigin(myOrigin);
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)
-    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0) -1;
+    size[i] = (aGeometry3D->GetExtentInMM(i)/2.0);
   GetGeometry()->SetSpacing( size );
   GetTimeSlicedGeometry()->UpdateInformation();
+
 }

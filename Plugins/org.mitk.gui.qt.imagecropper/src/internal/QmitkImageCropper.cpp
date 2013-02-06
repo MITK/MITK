@@ -269,6 +269,14 @@ void QmitkImageCropper::CropImage()
     return;
   }
 
+
+/*
+  mitk::Point3D myOrigin = m_CroppingObject->GetGeometry()->GetOrigin();
+  myOrigin[0] += ( m_ImageToCrop->GetGeometry()->GetSpacing()[0] / 2.0);
+  myOrigin[1] += ( m_ImageToCrop->GetGeometry()->GetSpacing()[1] / 2.0);
+  myOrigin[2] += ( m_ImageToCrop->GetGeometry()->GetSpacing()[2] / 2.0);
+  m_CroppingObject->GetGeometry()->SetOrigin(myOrigin);
+*/
   // image and bounding object ok
   mitk::BoundingObjectCutter::Pointer cutter = mitk::BoundingObjectCutter::New();
   cutter->SetBoundingObject( m_CroppingObject );

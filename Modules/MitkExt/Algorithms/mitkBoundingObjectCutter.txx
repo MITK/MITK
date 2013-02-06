@@ -76,7 +76,7 @@ void CutImageWithOutputTypeSelect
   // PART 3: iterate over input and output using ITK iterators
 
   // create the iterators
-  ItkInputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
+  ItkInputImageIteratorType  inputIt( inputItkImage, inputItk->GetLargetPossibleRegion() );
   ItkOutputImageIteratorType outputIt( outputItkImage, outputItkImage->GetLargestPossibleRegion() );
 
   // Cut the boundingbox out of the image by iterating through

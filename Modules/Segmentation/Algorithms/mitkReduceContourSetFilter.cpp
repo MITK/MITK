@@ -27,6 +27,9 @@ mitk::ReduceContourSetFilter::ReduceContourSetFilter()
   this->m_UseProgressBar = false;
   this->m_ProgressStepSize = 1;
   m_NumberOfPointsAfterReduction = 0;
+
+  mitk::Surface::Pointer output = mitk::Surface::New();
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
@@ -35,7 +38,7 @@ mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
 
 void mitk::ReduceContourSetFilter::GenerateData()
 {
-  unsigned int numberOfInputs = this->GetNumberOfInputs();
+  unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
   unsigned int numberOfOutputs (0);
 
   vtkSmartPointer<vtkPolyData> newPolyData;
@@ -100,14 +103,17 @@ void mitk::ReduceContourSetFilter::GenerateData()
       newPolyData->SetPoints(newPoints);
       newPolyData->BuildLinks();
 
-      Surface::Pointer surface = this->GetOutput(numberOfOutputs);
+      this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedOutputs() + 1);
+      mitk::Surface::Pointer surface = mitk::Surface::New();
+      this->SetNthOutput(numberOfOutputs, surface.GetPointer());
+
       surface->SetVtkPolyData(newPolyData);
       numberOfOutputs++;
     }
 
   }
 //  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
-  this->SetNumberOfOutputs(numberOfOutputs);
+  this->SetNumberOfIndexedOutputs(numberOfOutputs);
 
   //Setting progressbar
   if (this->m_UseProgressBar)
@@ -348,7 +354,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
   - That mean we can just reduce the current polygons points without considering any intersections
   */
 
-  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     //Don't check for intersection with the polygon itself
     if (i == currentInputIndex) continue;
@@ -472,12 +478,16 @@ void mitk::ReduceContourSetFilter::GenerateOutputInformation()
 
 void mitk::ReduceContourSetFilter::Reset()
 {
-  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     this->PopBackInput();
   }
-  this->SetNumberOfInputs(0);
-  this->SetNumberOfOutputs(0);
+  this->SetNumberOfIndexedInputs(0);
+  this->SetNumberOfIndexedOutputs(0);
+
+  mitk::Surface::Pointer output = mitk::Surface::New();
+  this->SetNthOutput(0, output.GetPointer());
+
   m_NumberOfPointsAfterReduction = 0;
 }
 

@@ -65,8 +65,8 @@ const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput( unsigned int idx)
 
 void mitk::SurfaceToSurfaceFilter::CreateOutputsForAllInputs(unsigned int  /*idx*/)
 {
-  this->SetNumberOfIndexedOutputs( this->GetNumberOfInputs() );
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  this->SetNumberOfIndexedOutputs( this->GetNumberOfIndexedInputs() );
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
   {
     if (this->GetOutput(idx) == NULL)
     {

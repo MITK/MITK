@@ -562,18 +562,19 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
 {
   double sampling = 300;
   QmitkVtkHistogramWidget::HistogramType::Pointer histogram = QmitkVtkHistogramWidget::HistogramType::New();
-  itk::Size<1> siz;
-  siz[0] = sampling;
-  itk::FixedArray<double,1> lower, higher;
+  QmitkVtkHistogramWidget::HistogramType::SizeType size;
+  size.Fill(1);
+  size[0] = sampling;
+  itk::Array<double> lower, higher;
   lower.Fill(0);
   mitk::Point3D begin = line->GetWorldControlPoint(0);
   mitk::Point3D end = line->GetWorldControlPoint(1);
   itk::Vector<double,3> direction = (end - begin);
   higher.Fill(direction.GetNorm());
-  histogram->Initialize(siz, lower, higher);
+  histogram->Initialize(size, lower, higher);
   for(int i = 0; i < sampling; i++)
   {
-    double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + double(i)/sampling * direction);
+    double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + mitk::Point3D::VectorType(double(i)/sampling * direction));
     histogram->SetFrequency(i,d);
   }
   m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();

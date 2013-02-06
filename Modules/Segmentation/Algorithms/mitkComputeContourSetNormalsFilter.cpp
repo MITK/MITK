@@ -19,9 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
 {
-    m_MaxSpacing = 5;
-    this->m_UseProgressBar = false;
-    this->m_ProgressStepSize = 1;
+  m_MaxSpacing = 5;
+  this->m_UseProgressBar = false;
+  this->m_ProgressStepSize = 1;
+
+  mitk::Surface::Pointer output = mitk::Surface::New();
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
@@ -30,7 +33,7 @@ mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
 
 void mitk::ComputeContourSetNormalsFilter::GenerateData()
 {
-  unsigned int numberOfInputs = this->GetNumberOfInputs();
+  unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
   this->CreateOutputsForAllInputs(numberOfInputs);
 
   //Iterating over each input
@@ -218,7 +221,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
   unsigned int idCounter (0);
   //Debug end
 
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); i++)
   {
     Surface* currentSurface = const_cast<Surface*>( this->GetOutput(i) );
     vtkPolyData* polyData = currentSurface->GetVtkPolyData();
@@ -286,12 +289,15 @@ void mitk::ComputeContourSetNormalsFilter::GenerateOutputInformation()
 
 void mitk::ComputeContourSetNormalsFilter::Reset()
 {
-  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     this->PopBackInput();
   }
   this->SetNumberOfIndexedInputs(0);
   this->SetNumberOfIndexedOutputs(0);
+
+  mitk::Surface::Pointer output = mitk::Surface::New();
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 void mitk::ComputeContourSetNormalsFilter::SetUseProgressBar(bool status)

@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
+#include <mitkExtractSliceFilter.h>
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
 
@@ -438,29 +438,27 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
   try
   {
   // extract the two neighoring slices from the segmentation volume
-    ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( lowerBound );
-    extractor->SetTimeStep( timeStep );
+    mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
+    extractor->SetInput(m_Segmentation);
+    extractor->SetTimeStep(timeStep);
+    extractor->SetWorldGeometry(m_Segmentation->GetSlicedGeometry(timeStep)->GetGeometry2D(lowerBound));
+    extractor->SetVtkOutputRequest(false);
+    extractor->Modified();
     extractor->Update();
     lowerMITKSlice = extractor->GetOutput();
-    lowerMITKSlice->DisconnectPipeline(); // otherwise the next output of the filter will overwrite this pointer, too
+    lowerMITKSlice->DisconnectPipeline();
 
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( sliceIndex );
-    extractor->SetTimeStep( timeStep );
+    extractor->SetWorldGeometry(m_Segmentation->GetSlicedGeometry(timeStep)->GetGeometry2D(sliceIndex));
+    extractor->Modified();
     extractor->Update();
     resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
 
-    extractor->SetInput( m_Segmentation );
-    extractor->SetSliceDimension( sliceDimension );
-    extractor->SetSliceIndex( upperBound );
-    extractor->SetTimeStep( timeStep );
+    extractor->SetWorldGeometry(m_Segmentation->GetSlicedGeometry(timeStep)->GetGeometry2D(upperBound));
+    extractor->Modified();
     extractor->Update();
     upperMITKSlice = extractor->GetOutput();
+    upperMITKSlice->DisconnectPipeline();
 
     if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;
   }

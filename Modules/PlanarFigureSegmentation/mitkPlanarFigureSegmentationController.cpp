@@ -164,6 +164,11 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
   m_SurfaceList.erase( surfaceIter );
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::PlanarFigureSegmentationController::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
+{
+  result = input;
+}
 
 mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationResult()
 {
@@ -172,21 +177,27 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
   if ( m_PlanarFigureList.size() == 0 )
   {
     m_SegmentationAsImage = mitk::Image::New();
-    //m_SegmentationAsImage->Initialize(m_ReferenceImage);
     m_SegmentationAsImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *m_ReferenceImage->GetTimeSlicedGeometry());
 
     return m_SegmentationAsImage;
   }
 
-  itk::Image<double, 3>::Pointer itkImage;
-  CastToItkImage( m_ReferenceImage, itkImage );
-  m_DistanceImageCreator->SetReferenceImage( itkImage );
+  itk::ImageBase<3>::Pointer itkImage;
+  AccessFixedDimensionByItk_1( m_ReferenceImage.GetPointer(), GetImageBase, 3, itkImage );
+  m_DistanceImageCreator->SetReferenceImage( itkImage.GetPointer() );
 
   m_ReduceFilter->Update();
   m_NormalsFilter->Update();
   m_DistanceImageCreator->Update();
 
   mitk::Image::Pointer distanceImage = m_DistanceImageCreator->GetOutput();
+
+  // Cleanup the pipeline
+  distanceImage->DisconnectPipeline();
+  m_DistanceImageCreator = NULL;
+  m_NormalsFilter = NULL;
+  m_ReduceFilter = NULL;
+  itkImage = NULL;
 
   // If this bool flag is true, the distanceImage will be written to the
   // filesystem as nrrd-image and as surface-representation.
@@ -207,6 +218,10 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   mitk::Surface::Pointer segmentationAsSurface = imageToSurfaceFilter->GetOutput();
 
+  // Cleanup the pipeline
+  segmentationAsSurface->DisconnectPipeline();
+  imageToSurfaceFilter = NULL;
+
   if ( debugOutput )
   {
     mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer surfaceWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
@@ -225,6 +240,9 @@ mitk::Image::Pointer mitk::PlanarFigureSegmentationController::GetInterpolationR
 
   m_SegmentationAsImage = surfaceToImageFilter->GetOutput();
 
+  // Cleanup the pipeline
+  m_SegmentationAsImage->DisconnectPipeline();
+
   return m_SegmentationAsImage;
 }
 
@@ -239,10 +257,10 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
 
   mitk::Surface::Pointer newSurface = mitk::Surface::New();
 
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
-  vtkSmartPointer<vtkCellArray> cells = vtkCellArray::New();
-  vtkSmartPointer<vtkPolyData> polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
 
   const mitk::Geometry2D* figureGeometry = figure->GetGeometry2D();
 

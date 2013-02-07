@@ -84,6 +84,8 @@ set(CPP_FILES
   IO/mitkPACSPlugin.cpp
   IO/mitkParRecFileIOFactory.cpp
   IO/mitkParRecFileReader.cpp
+  IO/mitkPropertyListExportToXmlFile.cpp
+  IO/mitkPropertyListImportFromXmlFile.cpp
   IO/mitkStlVolumeTimeSeriesIOFactory.cpp
   IO/mitkStlVolumeTimeSeriesReader.cpp
   IO/mitkUnstructuredGridVtkWriter.cpp

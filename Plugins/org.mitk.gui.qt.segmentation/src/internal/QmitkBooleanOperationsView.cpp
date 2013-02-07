@@ -347,3 +347,37 @@ void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
 
   AddToDataStorage(image3, "Intersection_");
 }
+
+template<typename _BinaryOperation>
+void QmitkBooleanOperationsView::ApplyBooleanOperationToImagesDifferentSize(mitk::Image* smallImage, mitk::Image* bigImage, mitk::Image* resultImage,
+                                                                            _BinaryOperation logicalOperator)
+{
+  for (unsigned int i = 0; i < smallImage->GetDimensions()[0]; i++)
+  {
+    for (unsigned int j = 0; j < smallImage->GetDimensions()[1]; j++)
+    {
+      for (unsigned int k = 0; k < smallImage->GetDimensions()[2]; k++)
+      {
+        mitk::Index3D currentIndexSmall;
+        currentIndexSmall[0] = i;
+        currentIndexSmall[1] = j;
+        currentIndexSmall[2] = k;
+
+        unsigned char smallValue = smallImage->GetPixelValueByIndex(currentIndexSmall);
+        mitk::Point3D worldPoint;
+        mitk::Point3D indexPoint;
+        indexPoint[0] = i;
+        indexPoint[1] = j;
+        indexPoint[2] = k;
+        smallImage->GetGeometry()->IndexToWorld(indexPoint, worldPoint);
+        itk::Image<unsigned char, 3>::IndexType currentIndexBig;
+        resultImage->GetGeometry()->WorldToIndex(worldPoint,currentIndexBig);
+        unsigned char bigValue = bigImage->GetPixelValueByIndex(currentIndexBig);
+        bool result = logicalOperator (bigValue,smallValue);
+        mitk::ImagePixelWriteAccessor<unsigned char, 3> writeAccess(resultImage);
+
+        writeAccess.SetPixelByIndex(currentIndexBig, result);
+      }
+    }
+  }
+}

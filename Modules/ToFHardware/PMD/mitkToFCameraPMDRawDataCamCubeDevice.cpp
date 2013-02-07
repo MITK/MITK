@@ -40,7 +40,7 @@ namespace mitk
     signed short* channel3;
     signed short* channel4;
 
-    vtkSmartPointer<vtkShortArray> tempVTKChannelArray = vtkShortArray::New();
+    vtkSmartPointer<vtkShortArray> tempVTKChannelArray = vtkSmartPointer<vtkShortArray>::New();
     tempVTKChannelArray->SetNumberOfComponents(channelSize);
     tempVTKChannelArray->SetNumberOfTuples(4);
     tempVTKChannelArray->Allocate(1);

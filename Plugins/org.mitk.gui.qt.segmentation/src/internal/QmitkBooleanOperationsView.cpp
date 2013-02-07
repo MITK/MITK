@@ -202,7 +202,6 @@ void QmitkBooleanOperationsView::OnDifferenceButtonClicked()
     andFilter->SetInput2(notFilter->GetOutput());
     andFilter->UpdateLargestPossibleRegion();
 
-    mitk::Image::Pointer image3 = mitk::Image::New();
     mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
 
     image3->DisconnectPipeline();
@@ -296,7 +295,6 @@ void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
     andFilter->SetInput2(itkImage2);
     andFilter->UpdateLargestPossibleRegion();
 
-    mitk::Image::Pointer image3 = mitk::Image::New();
     mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
     image3->DisconnectPipeline();
   }

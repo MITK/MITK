@@ -45,8 +45,13 @@ private:
   void EnableButtons(bool enable = true);
   void DisableButtons();
 
+  template<typename _BinaryOperation>
+  void ApplyBooleanOperationToImagesDifferentSize(mitk::Image* smallImage, mitk::Image* bigImage, mitk::Image* resultImage,
+                                                  _BinaryOperation logicalOperator);
+
   QWidget *m_Parent;
   Ui::QmitkBooleanOperationsView m_Controls;
+
 };
 
 #endif

@@ -340,7 +340,13 @@ The header file of the DataInteractor looks like this:
 
 The header file looks like this:
 
-\code
+\dontinclude Step10.h
+
+\skipline class
+\until }
+
+
+\dontinclude Step10.cpp
 
 
 

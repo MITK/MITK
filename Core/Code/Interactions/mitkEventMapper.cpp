@@ -542,9 +542,11 @@ bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
-
-
   Module* module = ModuleRegistry::GetModule("Mitk");
+  if (module == NULL) {
+    mitkThrow()<< ("Module Mitk unavailable." );
+    return false;
+  }
   ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
   if (!resource.IsValid())
   {

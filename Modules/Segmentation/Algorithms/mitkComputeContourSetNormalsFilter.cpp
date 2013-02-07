@@ -212,9 +212,9 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface()
 {
   //Just for debugging:
-  vtkSmartPointer<vtkPolyData> newPolyData = vtkPolyData::New();
-  vtkSmartPointer<vtkCellArray> newLines = vtkCellArray::New();
-  vtkSmartPointer<vtkPoints> newPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkCellArray> newLines = vtkSmartPointer<vtkCellArray>::New();
+  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
   unsigned int idCounter (0);
   //Debug end
 
@@ -240,7 +240,7 @@ mitk::Surface::Pointer mitk::ComputeContourSetNormalsFilter::GetNormalsAsSurface
       {
         double currentNormal[3];
         currentCellNormals->GetTuple(cell[j], currentNormal);
-        vtkSmartPointer<vtkLine> line = vtkLine::New();
+        vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
         line->GetPointIds()->SetNumberOfIds(2);
         double newPoint[3];
         double p0[3];

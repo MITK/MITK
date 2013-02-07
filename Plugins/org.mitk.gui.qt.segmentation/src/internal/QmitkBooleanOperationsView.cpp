@@ -165,50 +165,48 @@ void QmitkBooleanOperationsView::OnDifferenceButtonClicked()
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();
 
+  mitk::Image::Pointer image3 = mitk::Image::New();
+
   mitk::CastToItkImage(image1, itkImage1);
   mitk::CastToItkImage(image2, itkImage2);
 
-  for (unsigned int i = 0; i < image1->GetDimensions()[0]; i++)
+  itk::NotImageFilter<ImageType, ImageType>::Pointer notFilter = itk::NotImageFilter<ImageType, ImageType>::New();
+
+  if ( image1->GetDimensions()[0] != image2->GetDimensions()[0] || image1->GetDimensions()[1] != image2->GetDimensions()[1] ||
+       image1->GetDimensions()[2] != image2->GetDimensions()[2] )
   {
-    for (unsigned int j = 0; j < image1->GetDimensions()[1]; j++)
+    mitk::Image::Pointer smallInvertedImage = mitk::Image::New();
+    if (itkImage1->GetLargestPossibleRegion().IsInside(itkImage2->GetLargestPossibleRegion()))
     {
-      for (unsigned int k = 0; k < image1->GetDimensions()[2]; k++)
-      {
-        mitk::Index3D p;
-        p[0] = i;
-        p[1] = j;
-        p[2] = k;
-
-        if (image1->GetPixelValueByIndex(p) != 0)
-        {
-          mitk::Point3D wp;
-          mitk::Point3D ip;
-          ip[0] = i;
-          ip[1] = j;
-          ip[2] = k;
-          image1->GetGeometry()->IndexToWorld(ip, wp);
-          ImageType::IndexType index;
-          image2->GetGeometry()->WorldToIndex(wp,index);
-          itkImage2->SetPixel(index, 0);
-        }
-
-      }
+      image3 = image1->Clone();
+      notFilter->SetInput(itkImage2);
+      notFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage<ImageType>(notFilter->GetOutput(), smallInvertedImage);
+      this->ApplyBooleanOperationToImagesDifferentSize(smallInvertedImage, image1, image3, std::logical_and<unsigned char>());
+    }
+    else
+    {
+      image3 = image2->Clone();
+      notFilter->SetInput(itkImage1);
+      notFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage<ImageType>(notFilter->GetOutput(), smallInvertedImage);
+      this->ApplyBooleanOperationToImagesDifferentSize(smallInvertedImage, image2, image3, std::logical_and<unsigned char>());
     }
   }
+  else
+  {
+    notFilter->SetInput(itkImage2);
 
+    itk::AndImageFilter<ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType>::New();
+    andFilter->SetInput1(itkImage1);
+    andFilter->SetInput2(notFilter->GetOutput());
+    andFilter->UpdateLargestPossibleRegion();
 
+    mitk::Image::Pointer image3 = mitk::Image::New();
+    mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
 
-
-//  itk::OrImageFilter<ImageType>::Pointer orFilter = itk::OrImageFilter<ImageType>::New();
-//  orFilter->SetInput1(itkImage1);
-//  orFilter->SetInput2(itkImage2);
-//  orFilter->UpdateLargestPossibleRegion();
-
-  mitk::Image::Pointer image3 = mitk::Image::New();
-  mitk::CastToMitkImage<ImageType>(itkImage2, image3);
-
-  image3->DisconnectPipeline();
-
+    image3->DisconnectPipeline();
+  }
 
 
   AddToDataStorage(image3, "Difference_");
@@ -232,55 +230,19 @@ void QmitkBooleanOperationsView::OnUnionButtonClicked()
   mitk::CastToItkImage(image1, itkImage1);
   mitk::CastToItkImage(image2, itkImage2);
 
-  MITK_INFO << "Size: " <<image1->GetDimensions()[0]<<","<<image1->GetDimensions()[1]<<","<<image1->GetDimensions()[2];
-  MITK_INFO << "Size: " <<image2->GetDimensions()[0]<<","<<image2->GetDimensions()[1]<<","<<image2->GetDimensions()[2];
-
   if ( image1->GetDimensions()[0] != image2->GetDimensions()[0] || image1->GetDimensions()[1] != image2->GetDimensions()[1] ||
        image1->GetDimensions()[2] != image2->GetDimensions()[2] )
   {
-
-    mitk::Image* smallMitkImage;
-
     if (itkImage1->GetLargestPossibleRegion().IsInside(itkImage2->GetLargestPossibleRegion()))
     {
       image3 = image1->Clone();
-      smallMitkImage = image2;
+      this->ApplyBooleanOperationToImagesDifferentSize(image2, image1, image3, std::logical_or<unsigned char>());
     }
     else
     {
       image3 = image2->Clone();
-      smallMitkImage = image1;
+      this->ApplyBooleanOperationToImagesDifferentSize(image1, image2, image3, std::logical_or<unsigned char>());
     }
-
-    for (unsigned int i = 0; i < smallMitkImage->GetDimensions()[0]; i++)
-    {
-      for (unsigned int j = 0; j < smallMitkImage->GetDimensions()[1]; j++)
-      {
-        for (unsigned int k = 0; k < smallMitkImage->GetDimensions()[2]; k++)
-        {
-          mitk::Index3D currentIndexSmall;
-          currentIndexSmall[0] = i;
-          currentIndexSmall[1] = j;
-          currentIndexSmall[2] = k;
-
-          if (smallMitkImage->GetPixelValueByIndex(currentIndexSmall) != 0)
-          {
-            mitk::Point3D worldPoint;
-            mitk::Point3D indexPoint;
-            indexPoint[0] = i;
-            indexPoint[1] = j;
-            indexPoint[2] = k;
-            smallMitkImage->GetGeometry()->IndexToWorld(indexPoint, worldPoint);
-            ImageType::IndexType currentIndexBig;
-            image3->GetGeometry()->WorldToIndex(worldPoint,currentIndexBig);
-            mitk::ImagePixelWriteAccessor<unsigned char, 3> writeAccess(image3);
-            writeAccess.SetPixelByIndex(currentIndexBig, 1);
-          }
-
-        }
-      }
-    }
-    smallMitkImage = 0;
   }
   else
   {
@@ -289,35 +251,11 @@ void QmitkBooleanOperationsView::OnUnionButtonClicked()
     orFilter->SetInput2(itkImage2);
     orFilter->UpdateLargestPossibleRegion();
     mitk::CastToMitkImage<ImageType>(orFilter->GetOutput(), image3);
+    image3->DisconnectPipeline();
   }
-
-  image3->DisconnectPipeline();
 
   AddToDataStorage(image3, "Union_");
 }
-
-//template<typename TPixel, unsigned int VImageDimension>
-//void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* imageBig, itk::Image<TPixel,VImageDimension>* imageSmall)
-//{
-//  typedef itk::Image<TPixel, VImageDimension> ImageType;
-//  typedef itk::ImageRegionIteratorWithIndex<ImageType> ImageIterator;
-
-//  ImageIterator imgRegionIterator (imageSmall, imageSmall->GetLargestPossibleRegion());
-//  imgRegionIterator.GoToBegin();
-
-//  while (!imgRegionIterator.IsAtEnd())
-//  {
-//    if (imgRegionIterator.GetPixel() == 1)
-//    {
-//      typename ImageType::IndexType index = imgRegionIterator.GetIndex();
-//      imageBig->Transform
-//      mitk::Point3D worldP;
-//      m_geoSmall->IndexToWorld(index, worldP);
-//      m_geoBig->WorldToIndex(worldP, index);
-//      imageBig->SetPixel(index, 1);
-//    }
-//  }
-//}
 
 void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
 {
@@ -332,18 +270,36 @@ void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();
 
+  mitk::Image::Pointer image3 = mitk::Image::New();
+
   mitk::CastToItkImage(image1, itkImage1);
   mitk::CastToItkImage(image2, itkImage2);
 
-  itk::AndImageFilter<ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType>::New();
-  andFilter->SetInput1(itkImage1);
-  andFilter->SetInput2(itkImage2);
-  andFilter->UpdateLargestPossibleRegion();
+  if ( image1->GetDimensions()[0] != image2->GetDimensions()[0] || image1->GetDimensions()[1] != image2->GetDimensions()[1] ||
+       image1->GetDimensions()[2] != image2->GetDimensions()[2] )
+  {
+    if (itkImage1->GetLargestPossibleRegion().IsInside(itkImage2->GetLargestPossibleRegion()))
+    {
+      image3 = image1->Clone();
+      this->ApplyBooleanOperationToImagesDifferentSize(image2, image1, image3, std::logical_and<unsigned char>());
+    }
+    else
+    {
+      image3 = image2->Clone();
+      this->ApplyBooleanOperationToImagesDifferentSize(image1, image2, image3, std::logical_and<unsigned char>());
+    }
+  }
+  else
+  {
+    itk::AndImageFilter<ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType>::New();
+    andFilter->SetInput1(itkImage1);
+    andFilter->SetInput2(itkImage2);
+    andFilter->UpdateLargestPossibleRegion();
 
-  mitk::Image::Pointer image3 = mitk::Image::New();
-  mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
-
-  image3->DisconnectPipeline();
+    mitk::Image::Pointer image3 = mitk::Image::New();
+    mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
+    image3->DisconnectPipeline();
+  }
 
   AddToDataStorage(image3, "Intersection_");
 }

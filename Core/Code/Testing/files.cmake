@@ -110,6 +110,7 @@ set(MODULE_CUSTOM_TESTS
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
+    mitkVolumeCalculatorTest.cpp
 )
 
 # Create an artificial module initializing class for

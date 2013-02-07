@@ -235,7 +235,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
       // Use a combination of the InputGeometry *and* the possible non-rigid
       // AbstractTransformGeometry for reslicing the 3D Image
-      vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkGeneralTransform::New();
+      vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkSmartPointer<vtkGeneralTransform>::New();
       composedResliceTransform->Identity();
       composedResliceTransform->Concatenate(
         inputTimeGeometry->GetGeometry3D( m_TimeStep )->GetVtkTransform()->GetLinearInverse() );
@@ -244,7 +244,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
         );
 
       m_Reslicer->SetResliceTransform( composedResliceTransform );
-      composedResliceTransform->UnRegister( NULL ); // decrease RC
 
       // Set background level to BLACK instead of translucent, to avoid
       // boundary artifacts (see Geometry2DDataVtkMapper3D)

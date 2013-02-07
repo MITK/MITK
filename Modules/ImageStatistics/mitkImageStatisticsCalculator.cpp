@@ -1150,7 +1150,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->Update();
 
   // Export from VTK back to ITK
-  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New();
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New(); // TODO: this is WRONG, should be vtkSmartPointer<vtkImageExport>::New(), but bug # 14455
   vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 

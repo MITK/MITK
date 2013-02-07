@@ -35,11 +35,20 @@ namespace mitk
     ExampleInteractor();
     virtual ~ExampleInteractor();
     virtual void ConnectActionsAndFunctions();
+    /**
+     * Derived function.
+     * Is executed when config object is set / changed.
+     * Here it is used to read out the parameters set in the configuration file,
+     * and set the member variables accordingly.
+     */
+    virtual void ConfigurationChanged();
 
   private:
     bool AddPoint(StateMachineAction* , InteractionEvent*); // function to add new points
     bool EnoughPoints(StateMachineAction* , InteractionEvent*); // function changes color of pointset to indicate, it is full
+
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;
+    int m_MaximalNumberOfPoints;
   };
 }

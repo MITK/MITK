@@ -188,8 +188,8 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 
   if (!this->HandleEvent(internalEvent.GetPointer()))
 
-  // TODO implement new event
-  MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
+    // TODO implement new event
+    MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
 
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();
@@ -450,7 +450,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
   int tkey = ke->key();
   if (tkey < 128)
   { //standard ascii letter
-    key = (char) tkey;
+    key = (char) toupper(tkey);
   }
   else
   { // special keys
@@ -480,6 +480,59 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
     case Qt::Key_Right:
       key = mitk::KEYARROWRIGHT;
       break;
+
+    case Qt::Key_F1:
+      key = mitk::KEYF1;
+      break;
+    case Qt::Key_F2:
+      key = mitk::KEYF2;
+      break;
+    case Qt::Key_F3:
+      key = mitk::KEYF3;
+      break;
+    case Qt::Key_F4:
+      key = mitk::KEYF4;
+      break;
+    case Qt::Key_F5:
+      key = mitk::KEYF5;
+      break;
+    case Qt::Key_F6:
+      key = mitk::KEYF6;
+      break;
+    case Qt::Key_F7:
+      key = mitk::KEYF7;
+      break;
+    case Qt::Key_F8:
+      key = mitk::KEYF8;
+      break;
+    case Qt::Key_F9:
+      key = mitk::KEYF9;
+      break;
+    case Qt::Key_F10:
+      key = mitk::KEYF10;
+      break;
+    case Qt::Key_F11:
+      key = mitk::KEYF11;
+      break;
+    case Qt::Key_F12:
+      key = mitk::KEYF12;
+      break;
+
+    case Qt::Key_End:
+          key = mitk::KEYEND;
+          break;
+    case Qt::Key_Home:
+          key = mitk::KEYPOS1;
+          break;
+    case Qt::Key_Insert:
+          key = mitk::KEYINSERT;
+          break;
+    case Qt::Key_PageDown:
+          key = mitk::KEYPAGEDOWN;
+          break;
+    case Qt::Key_PageUp:
+          key = mitk::KEYPAGEUP;
+          break;
     }
   }
   return key;

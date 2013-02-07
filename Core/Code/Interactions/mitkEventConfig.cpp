@@ -23,6 +23,7 @@
 #include "mitkEventFactory.h"
 #include "mitkInteractionEvent.h"
 #include "mitkInternalEvent.h"
+#include "mitkInteractionKeyEvent.h"
 #include "mitkInteractionEventConst.h"
 // us
 #include "mitkModule.h"
@@ -158,7 +159,8 @@ const mitk::PropertyList::Pointer mitk::EventConfig::GetPropertyList()
 std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent)
 {
   // internal events are excluded from mapping
-  if (interactionEvent->GetEventClass() == "InternalEvent") {
+  if (interactionEvent->GetEventClass() == "InternalEvent")
+  {
     InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent);
     return internalEvent->GetSignalName();
   }
@@ -169,6 +171,14 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
     {
       return (*it).variantName;
     }
+  }
+  // if this part is reached, no mapping has been found,
+  // so here we handle key events and map a key event to the string "Std" + letter/code
+  // so "A" will be returned as "StdA"
+  if (interactionEvent->GetEventClass() == "KeyEvent")
+  {
+    InteractionKeyEvent* keyEvent = dynamic_cast<InteractionKeyEvent*>(interactionEvent);
+    return ("Std" + keyEvent->GetKey());
   }
   return "";
 }

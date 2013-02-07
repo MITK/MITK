@@ -7,7 +7,7 @@
 
 \section HowToUseDataInteractor How to use an existing DataInteractor
 
-MITK provides finished DataInteractors for a variety of task, they can be found in Code/Core/Interactors. They can be used with
+MITK provides finished DataInteractors for a variety of tasks, they can be found in Code/Core/Interactors. They can be used with
 state machine patterns and config files located under Resources/Interaction.
 
 
@@ -16,7 +16,7 @@ the second describes the user events which trigger an action. Lastly every DataI
 To use a DataInteractor these parts have to be brought together.
 
 
-<b>This code demonstrates the use exemplary with the PointSetDataInteractor:</b>
+<b>This code demonstrates the use of an existing DataInteractor exemplary for the PointSetDataInteractor:</b>
 
 First we need a DataNode that is added to the DataStorage.
 \code
@@ -44,7 +44,7 @@ now the DataInteractor is ready for usage.
 
 \section SectionImplementationDataInteractor How to implement a new DataInteractor
 
-This tutorial step goes beyond the activation of an interactor , that modifies data by user interaction) as shown above. It shows what needs to be implemented to add a new way of interaction within your MITK application.
+This second part of the tutorial step goes beyond the activation of an interactor, that modifies data by user interaction) as shown above. It shows what needs to be implemented to add a new way of interaction within your MITK application.
 Please see \ref DataInteractionPage as an introduction to the MITK interaction mechanism, you may also want to read \ref DataInteractionTechnicalPage.
 
 This tutorial is structured as follows: The first section deals with config files, describing all the parameters of events and how to use them
@@ -62,16 +62,6 @@ events have is decribed in their respective documentation.
 Mandatory for each event description is the event class and the event variant. The parameters of an event are set by attribute tags.
 \note Refer to \ref EventClassSection for the meaning of event class.
 
-\b Modifier \b Keys \n
-
-mitk::ModifierKeys represent the combination of pressed modifier keys, several modifier keys pressed at the same time
-are denoted by listing them all separated by commas.
-
-\code
-<!-- shift and control key are pressed -->
-<attribute name="Modifiers" value="shift,ctrl"/>
-\endcode
-
 \b Mouse \b Buttons \n
 
 mitk::MouseButtons represent the buttons. They can be used for two attributes. First the EventButton which describes the button that triggered the event,
@@ -85,6 +75,41 @@ this would be described as follows:
 \endcode
 
 Note: Technically the LeftMouseButton is also pressed and should be listed in the ButtonState, but this is taken care of by the mitk:EventFactory .
+
+
+
+<b> Key Events</b> \n
+
+mitk::InteractionKeyEvent represents a pressed key, which key is pressed is provided with the Key attribute like this
+
+\code
+    <attribute name="Key" value="A"/>
+\endcode
+or
+\code
+    <attribute name="Key" value="Escape"/>
+\endcode
+
+\note Key Events do not require an explicit configuration all, for all key events there exists
+a predefined event variant with the name 'Std' + value, that is key a is named 'StdA'.
+
+The names for special keys are listed here:
+
+\dontinclude mitkInteractionEventConst.h
+\skipline  // Special Keys
+\until // End special keys
+
+
+<b> Modifier Keys</b> \n
+
+mitk::ModifierKeys represent the combination of pressed modifier keys, several modifier keys pressed at the same time
+are denoted by listing them all separated by commas.
+
+\code
+<!-- shift and control key are pressed -->
+<attribute name="Modifiers" value="shift,ctrl"/>
+\endcode
+
 
 \b ScrollDirection \n
 
@@ -201,7 +226,7 @@ digraph {
   a [ label="{PositionEvent}"];
   b [ label="{MousePressEvent}" ];
   c [ label="MouseReleaseEvent" ];
-  d [ label="+TouchEvent" ];
+  d [ label="TouchEvent", style=dotted ];
   a -> b;
   a -> c;
   a -> d;
@@ -273,12 +298,11 @@ Now all that is left it to write a state machine pattern and a config file as is
 To provide a useful example the mitk::PointSetDataInteractor is annotated with comments that describe the important parts for an implementation
 of a DataInteractor.
 
+This step assumes knowlege of the Interaction concept described in \ref DataInteractionPage and some background of the implementation which is described in
+\ref DataInteractionPageTechnical. Please refer to these pages before proceeding.
 
 
-TODO ref PointSetInteractor / Observer > DisplayInteractor
 
-This HowTo assumes knowlege of the Interaction concept described in \ref DataInteractionPage , State Machines and Configuration described in
-\ref StateMachineSection, \ref HOW TO Config, HOW TO StateMachine.
 
 DataInteractor are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
 \code
@@ -316,7 +340,7 @@ have been added.
         </transition>
     </state>
     <state name="final">
-    <! dead state, nothing happens any more, once we reached this >
+    <--! dead state, nothing happens any more, once we reached this -->
     </state>
 </statemachine>
 \endcode
@@ -334,30 +358,75 @@ ctrl button pressed.
 </config>
 \endcode
 
-The header file of the DataInteractor looks like this:
 
+The implementation is desribed in the following. \see Step10.h \see Step10.cpp
 
-
-The header file looks like this:
 
 \dontinclude Step10.h
 
-\skipline class
+Implementation of protected functions:
+\skipline protected:
+\until virtual void ConfigurationChanged();
+
+<b> ConnectActionsAndFunctions </b> - Is inherited from mitk::InteractionStateMachine, here action strings from the xml are connected with
+functions in the Interactor (as seen above). In our example this looks like this:
+
+\dontinclude Step10.cpp
+
+\skipline void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 \until }
+
+
+<b> ConfigurationChanged </b> - Is called whenever a new configuration file is loaded (by the mitk::EventHandler super class),
+this function allows to implement initialization code that depends on configuration values. In our example we want to set the limit of
+allowed points:
 
 
 \dontinclude Step10.cpp
 
+\skipline void mitk::ExampleInteractor::ConfigurationChang
+\until }
+
+Next the actual functionality of the DataInteractor is implemented, by providing one function per action, following this prototype:
+
+\code
+bool FUNCTION_NAME (StateMachineAction* , InteractionEvent*);
+\endcode
+
+\dontinclude Step10.h
+
+\skipline private:
+\until bool EnoughPoints(StateMac
+
+Each function has to return a boolean value. True if the action has been executed, and false if the action has not been executed.
 
 
+\dontinclude Step10.cpp
+
+\skipline bool mitk::ExampleInteractor::AddPoint(StateM
+\until //-
+
+Here we see an internal event used to signal that the point set reached the maximal number of allowed points.
+The event is created and added to the Dispatchers event queue.
+
+\dontinclude Step10.cpp
+\skipline  // create internal
+\until positionEvent->GetSender(
+
+\note That internal events do not need any mapping to event variants. Their signal same is equivalent with the event variant.
+
+
+<b> There are also two documented classes implementing a DataInteractor and an EventObserver which can be looked at for further
+understanding: </b>
+\see mitk::PointSetDataInteractor
+\see mitk::DisplayInteractor
 
 
 Have fun with creating your own interaction and please think about contributing it to MITK!
 
+<b>
 If you meet any difficulties during this step, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
-People there are kind and will try to help you.
-
+People there are kind and will try to help you. </b>
 
 \ref Step09Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"
-
 */

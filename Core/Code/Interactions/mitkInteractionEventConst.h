@@ -69,6 +69,7 @@ namespace mitk
   /**
    * KeyConstants Constants for special keys
    */
+  // Special Keys
   const std::string KEYESC = "Escape";
   const std::string KEYENTER = "Enter";
   const std::string KEYRETURN = "Return";
@@ -77,6 +78,26 @@ namespace mitk
   const std::string KEYARROWDOWN = "ArrowDown";
   const std::string KEYARROWLEFT = "ArrowLeft";
   const std::string KEYARROWRIGHT = "ArrowRight";
+
+  const std::string KEYF1 = "F1";
+  const std::string KEYF2 = "F2";
+  const std::string KEYF3 = "F3";
+  const std::string KEYF4 = "F4";
+  const std::string KEYF5 = "F5";
+  const std::string KEYF6 = "F6";
+  const std::string KEYF7 = "F7";
+  const std::string KEYF8 = "F8";
+  const std::string KEYF9 = "F9";
+  const std::string KEYF10 = "F10";
+  const std::string KEYF11 = "F11";
+  const std::string KEYF12 = "F12";
+
+  const std::string KEYPOS1 = "POS1";
+  const std::string KEYEND = "END";
+  const std::string KEYINSERT = "INSERT";
+  const std::string KEYPAGEUP = "PAGEUP";
+  const std::string KEYPAGEDOWN = "PAGEDOWN";
+  // End special keys
 
   // XML Tags
   const std::string CONFIG = "config";

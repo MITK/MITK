@@ -69,6 +69,8 @@ namespace mitk
      * an empty string is returned.
      * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
      * to configure them in a config file.
+     * \note mitk::InteractionKeys my have a defined event variant, if this is the case, this function returns it. If no
+     * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
     std::string GetMappedEvent(InteractionEvent* interactionEvent);
 

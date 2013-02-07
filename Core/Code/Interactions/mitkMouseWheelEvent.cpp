@@ -20,8 +20,11 @@ mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer = NULL,
     Point2D mousePosition = NULL,
     MouseButtons buttonStates = NoButton,
     ModifierKeys modifiers = NoKey,
-    int wheelDelta = 0) :
-    InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent"), m_WheelDelta(wheelDelta) , m_ButtonStates(buttonStates), m_Modifiers(modifiers)
+    int wheelDelta = 0)
+: InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent")
+, m_WheelDelta(wheelDelta)
+, m_ButtonStates(buttonStates)
+, m_Modifiers(modifiers)
 {
 }
 
@@ -37,12 +40,7 @@ void mitk::MouseWheelEvent::SetWheelDelta(int delta)
 
 bool mitk::MouseWheelEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
 {
-  MouseWheelEvent* event = dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
+  return dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL;
 }
 
 mitk::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const

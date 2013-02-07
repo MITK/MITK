@@ -27,15 +27,10 @@ mitk::InformerService::InformerService()
 
 void mitk::InformerService::RegisterObserver(EventObserver* eventObserver)
 {
-  EventObserver::Pointer pEventObserver = eventObserver;
-  for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
+  if ( std::find( m_ListObserver.begin(), m_ListObserver.end(), eventObserver ) != m_ListObserver.end() )
   {
-    if (*it == pEventObserver)
-    {
-      return;
-    }
+    m_ListObserver.push_back(eventObserver);
   }
-  m_ListObserver.push_back(pEventObserver);
 }
 
 void mitk::InformerService::UnRegisterObserver(EventObserver* eventObserver)

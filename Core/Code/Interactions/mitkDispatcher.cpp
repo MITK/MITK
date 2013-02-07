@@ -157,7 +157,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   {
     InteractionEvent::Pointer e = m_QueuedEvents.front();
     m_QueuedEvents.pop_front();
-    ProcessEvent(e.GetPointer());
+    ProcessEvent(e);
   }
   return eventIsHandled;
 }
@@ -177,8 +177,8 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
     }
     else
     {
-      mitk::DataInteractor::Pointer interactor = dn->GetDataInteractor();
-      if (!(interactor == (*it).GetPointer()))
+      DataInteractor::Pointer interactor = dn->GetDataInteractor();
+      if ( interactor != it->GetPointer() )
       {
         it = m_Interactors.erase(it);
       }
@@ -192,8 +192,7 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
 
 void mitk::Dispatcher::QueueEvent(InteractionEvent* event)
 {
-  InteractionEvent::Pointer e = event;
-  m_QueuedEvents.push_back(e);
+  m_QueuedEvents.push_back(event);
 }
 
 void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataInteractor)

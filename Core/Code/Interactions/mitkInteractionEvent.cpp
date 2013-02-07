@@ -17,8 +17,9 @@
 #include "mitkException.h"
 #include "mitkInteractionEvent.h"
 
-mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string eventClass) :
-    m_Sender(baseRenderer), m_EventClass(eventClass)
+mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string eventClass)
+: m_Sender(baseRenderer)
+, m_EventClass(eventClass)
 {
 }
 

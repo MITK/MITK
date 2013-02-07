@@ -126,7 +126,7 @@ namespace mitk
      * Stores InteractionEvents and their corresponding VariantName
      */
     EventListType m_EventList;
-    bool m_errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
+    bool m_Errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
   };
 
 } // namespace mitk

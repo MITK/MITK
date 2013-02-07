@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
-  <!-- ***WARNING*** do not use any &, % and so on in NAME -->
+  <!--  ***WARNING*** do not use any &, % and so on in NAME -->
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->
@@ -806,6 +806,7 @@
         <action ID="80" />
       </transition>
       <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
+        <action ID="80" />
         <action ID="49014" />
         <action ID="80" />
       </transition>
@@ -2192,9 +2193,8 @@
       <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="4" EVENT_ID="1015" />
       <!-- If points have been loaded, goto right state; checked in constructor -->
       <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
-        <action ID="1101">
-          <!--AcMODE_SELECT-->
-        </action>
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
         <action ID="32" />
       </transition>
       <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
@@ -2202,14 +2202,12 @@
         <!--AcCHECKNUMBEROFPOINTS-->
       </transition>
       <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
-        <action ID="1101">
-          <!--AcMODE_SELECT-->
-        </action>
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
       </transition>
       <transition NAME="SetThisStatemachineOnDeselected" NEXT_STATE_ID="1" EVENT_ID="1031">
-        <action ID="1100">
-          <!--AcMODE_DESELECT-->
-        </action>
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="space left" ID="2" X_POS="659" Y_POS="257" WIDTH="100" HEIGHT="50">
@@ -2225,12 +2223,10 @@
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
         <!--Event = ESC-->
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODE_DESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="checkedN" ID="3" X_POS="745" Y_POS="744" WIDTH="100" HEIGHT="50">
@@ -2243,41 +2239,33 @@
     </state>
     <state NAME="set full" ID="4" X_POS="267" Y_POS="633" WIDTH="100" HEIGHT="50">
       <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
-        <action ID="30">
-          <!--AcCHECKELEMENT-->
-        </action>
+        <action ID="30" />
+        <!--AcCHECKELEMENT-->
       </transition>
       <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="330">
-          <!--AcCHECKNUMBEROFPOINTS-->
-        </action>
+        <action ID="330" />
+        <!--AcCHECKNUMBEROFPOINTS-->
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
         <!--Event = ESC-->
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
     </state>
     <state NAME="picked NotFull" ID="10" X_POS="903" Y_POS="38" WIDTH="100" HEIGHT="50">
       <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
       <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
-        <action ID="34">
-          <!--AcCHECKSELECTED-->
-        </action>
-        <action ID="1101">
-          <!--AcMODESELECT-->
-        </action>
+        <action ID="34" />
+        <!--AcCHECKSELECTED-->
+        <action ID="1101" />
+        <!--AcMODESELECT-->
       </transition>
     </state>
     <state NAME="already selected Space" ID="11" X_POS="391" Y_POS="11" WIDTH="100" HEIGHT="50">
@@ -2301,32 +2289,26 @@
     </state>
     <state NAME="picked Full" ID="20" X_POS="122" Y_POS="766" WIDTH="100" HEIGHT="50">
       <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
       <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
-        <action ID="34">
-          <!--AcCHECKSELECTED-->
-        </action>
-        <action ID="1101">
-          <!--AcMODESELECT-->
-        </action>
+        <action ID="34" />
+        <!--AcCHECKSELECTED-->
+        <action ID="1101" />
+        <!--AcMODESELECT-->
       </transition>
     </state>
     <state NAME="selected Full" ID="21" X_POS="23" Y_POS="485" WIDTH="100" HEIGHT="50">
       <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="60">
-          <!--AcSELECTPICKEDOBJECT-->
-        </action>
+        <action ID="60" />
+        <!--AcSELECTPICKEDOBJECT-->
       </transition>
       <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
-        <action ID="8">
-          <!--AcINITMOVEMENT-->
-        </action>
+        <action ID="8" />
+        <!--AcINITMOVEMENT-->
       </transition>
     </state>
     <state NAME="move Point Full" ID="22" X_POS="67" Y_POS="255" WIDTH="100" HEIGHT="50">
@@ -2344,16 +2326,17 @@
     <state NAME="checkn Delete" ID="30" X_POS="1124" Y_POS="708" WIDTH="100" HEIGHT="50">
       <transition NAME="StillFull" NEXT_STATE_ID="4" EVENT_ID="1015">
         <action ID="100" />
+        <!--AcREMOVEPOINT-->
       </transition>
       <transition NAME="NotEmptyNotFull" NEXT_STATE_ID="2" EVENT_ID="1014">
         <action ID="100" />
+        <!--AcREMOVEPOINT-->
       </transition>
       <transition NAME="WillBeEmpty" NEXT_STATE_ID="1" EVENT_ID="1017">
         <action ID="100" />
         <!--AcREMOVEPOINT-->
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
     </state>
     <state NAME="selected space left" ID="31" X_POS="22" Y_POS="480" WIDTH="90" HEIGHT="50">
@@ -3089,7 +3072,7 @@
           <!-- AcONWIIMOTEBUTTONRELEASED -->
         </action>
       </transition>
-      <transition NAME="input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003">
+      <transition NAME="Input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003">
         <!--EIDWIIMOTEINPUT-->
         <action ID="4003">
           <!--AcONWIIMOTEINPUT-->
@@ -3942,4 +3925,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

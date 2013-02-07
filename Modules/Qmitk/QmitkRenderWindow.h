@@ -1,29 +1,31 @@
 /*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+ The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+ Copyright (c) German Cancer Research Center,
+ Division of Medical and Biological Informatics.
+ All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+ This software is distributed WITHOUT ANY WARRANTY; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.
 
-See LICENSE.txt or http://www.mitk.org for details.
+ See LICENSE.txt or http://www.mitk.org for details.
 
-===================================================================*/
-
+ ===================================================================*/
 
 #ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 #define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 
-#include <QmitkExports.h>
-
 #include "mitkRenderWindowBase.h"
 
+#include <QmitkExports.h>
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
+
+#include "mitkInteractionEventConst.h"
+#include <string.h>
+
 
 class QmitkStdMultiWidget;
 class QDragEnterEvent;
@@ -33,13 +35,14 @@ class QDropEvent;
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
  */
-class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget , public mitk::RenderWindowBase
+class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
 
-  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL, mitk::RenderingManager* renderingManager = NULL);
+  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL,
+      mitk::RenderingManager* renderingManager = NULL);
   virtual ~QmitkRenderWindow();
 
   /**
@@ -61,66 +64,71 @@ public:
   virtual void SetResendQtEvents(bool resend);
 
   // Set Layout Index to define the Layout Type
-  void SetLayoutIndex( unsigned int layoutIndex );
+  void SetLayoutIndex(unsigned int layoutIndex);
 
   // Get Layout Index to define the Layout Type
   unsigned int GetLayoutIndex();
 
   //MenuWidget need to update the Layout Design List when Layout had changed
-  void LayoutDesignListChanged( int layoutDesignIndex );
+  void LayoutDesignListChanged(int layoutDesignIndex);
 
-
-  void HideRenderWindowMenu( );
+  void HideRenderWindowMenu();
 
   //Activate or Deactivate MenuWidget.
-  void ActivateMenuWidget( bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
+  void ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdMultiWidget = 0);
 
   bool GetActivateMenuWidgetFlag()
-  {  return m_MenuWidgetActivated; }
+  {
+    return m_MenuWidgetActivated;
+  }
 
   // Get it from the QVTKWidget parent
   virtual vtkRenderWindow* GetVtkRenderWindow()
-  {  return GetRenderWindow();}
+  {
+    return GetRenderWindow();
+  }
 
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor()
-  {  return NULL;}
+  {
+    return NULL;
+  }
 
-  void FullScreenMode( bool state );
+  void FullScreenMode(bool state);
 
 protected:
-    // overloaded move handler
-    virtual void moveEvent( QMoveEvent* event );
-    // overloaded show handler
-    void showEvent( QShowEvent* event );
-    // overloaded resize handler
-    virtual void resizeEvent(QResizeEvent* event);
-    // overloaded paint handler
-    virtual void paintEvent(QPaintEvent* event);
-    // overloaded mouse press handler
-    virtual void mousePressEvent(QMouseEvent* event);
-    // overloaded mouse move handler
-    virtual void mouseMoveEvent(QMouseEvent* event);
-    // overloaded mouse release handler
-    virtual void mouseReleaseEvent(QMouseEvent* event);
-    // overloaded key press handler
-    virtual void keyPressEvent(QKeyEvent* event);
-    // overloaded enter handler
-    virtual void enterEvent(QEvent*);
-    // overloaded leave handler
-    virtual void leaveEvent(QEvent*);
+  // overloaded move handler
+  virtual void moveEvent(QMoveEvent* event);
+  // overloaded show handler
+  void showEvent(QShowEvent* event);
+  // overloaded resize handler
+  virtual void resizeEvent(QResizeEvent* event);
+  // overloaded paint handler
+  virtual void paintEvent(QPaintEvent* event);
+  // overloaded mouse press handler
+  virtual void mousePressEvent(QMouseEvent* event);
+  // overloaded mouse move handler
+  virtual void mouseMoveEvent(QMouseEvent* event);
+  // overloaded mouse release handler
+  virtual void mouseReleaseEvent(QMouseEvent* event);
+  // overloaded key press handler
+  virtual void keyPressEvent(QKeyEvent* event);
+  // overloaded enter handler
+  virtual void enterEvent(QEvent*);
+  // overloaded leave handler
+  virtual void leaveEvent(QEvent*);
 
-    /// \brief Simply says we accept the event type.
-    virtual void dragEnterEvent( QDragEnterEvent *event );
+  /// \brief Simply says we accept the event type.
+  virtual void dragEnterEvent(QDragEnterEvent *event);
 
-    /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
-    virtual void dropEvent( QDropEvent * event );
+  /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
+  virtual void dropEvent(QDropEvent * event);
 
 #ifndef QT_NO_WHEELEVENT
-    // overload wheel mouse event
-    virtual void wheelEvent(QWheelEvent*);
+  // overload wheel mouse event
+  virtual void wheelEvent(QWheelEvent*);
 #endif
 
-    void AdjustRenderWindowMenuVisibility( const QPoint& pos );
+  void AdjustRenderWindowMenuVisibility(const QPoint& pos);
 
 signals:
 
@@ -128,7 +136,7 @@ signals:
   // \brief int parameters are enum from QmitkStdMultiWidget
   void ChangeCrosshairRotationMode(int);
 
-  void SignalLayoutDesignChanged( int layoutDesignIndex );
+  void SignalLayoutDesignChanged(int layoutDesignIndex);
 
   void moved();
 
@@ -141,19 +149,32 @@ protected slots:
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
-  void OnWidgetPlaneModeChanged( int );
+  void OnWidgetPlaneModeChanged(int);
 
   void DeferredHideMenu();
 
 private:
 
-  bool                           m_ResendQtEvents;
+  // Helper Functions to Convert Qt-Events to Mitk-Events
 
-  QmitkRenderWindowMenu*         m_MenuWidget;
+  mitk::Point2D GetMousePosition(QMouseEvent* me);
+  mitk::Point2D GetMousePosition(QWheelEvent* we);
+  mitk::MouseButtons GetEventButton(QMouseEvent* me);
+  mitk::MouseButtons GetButtonState(QMouseEvent* me);
+  mitk::ModifierKeys GetModifiers(QMouseEvent* me);
+  mitk::MouseButtons GetButtonState(QWheelEvent* we);
+  mitk::ModifierKeys GetModifiers(QWheelEvent* we);
+  mitk::ModifierKeys GetModifiers(QKeyEvent* ke);
+  std::string GetKeyLetter(QKeyEvent* ke);
+  int GetDelta(QWheelEvent* we);
 
-  bool                           m_MenuWidgetActivated;
+  bool m_ResendQtEvents;
 
-  unsigned int                   m_LayoutIndex;
+  QmitkRenderWindowMenu* m_MenuWidget;
+
+  bool m_MenuWidgetActivated;
+
+  unsigned int m_LayoutIndex;
 
 };
 

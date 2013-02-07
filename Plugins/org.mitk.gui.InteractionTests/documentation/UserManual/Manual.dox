@@ -1,0 +1,18 @@
+/**
+\page org_mitk_gui_InteractionTests InteractionTests
+
+\image html icon.xpm "Icon of InteractionTests"
+
+Available sections:
+  - \ref org_mitk_gui_InteractionTestsOverview
+
+\section org_mitk_gui_InteractionTestsOverview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

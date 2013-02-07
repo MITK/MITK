@@ -172,23 +172,17 @@
     <event NAME="middle mbtn + MouseMove + shift" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
     <!-- shift + middleMouseButtonRelease -->
     <event NAME="middle mbtn release + shift" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
-
     <event NAME="right mbtn + alt" ID="2006" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn + Mousemove + alt" ID="2007" TYPE="Type_MouseMove" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn release + alt" ID="2008" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
-
-        <!-- alt + shift + right MouseButton -->
+    <!-- alt + shift + right MouseButton -->
     <event NAME="right mbtn + shift + ctrl" ID="2010" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButton and MouseMove -->
     <event NAME="right mbtn + MouseMove + shift + ctrl" ID="2011" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButtonRelease -->
     <event NAME="right mbtn release + shift + ctrl" ID="2012" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
-
-        <!-- alt + MouseWheel -->
+    <!-- alt + MouseWheel -->
     <event NAME="MouseWheel + shift" ID="2015" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_none" />
-
-
-
     <!-- -->
     <!-- -->
     <!-- own thrown events -->
@@ -1109,6 +1103,53 @@
         </action>
       </transition>
       <transition NAME="no-vessel-picked" NEXT_STATE_ID="2" EVENT_ID="1003" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="TubeGraphInteraction">
+  <!--state machine for tube graph interactions with multiple selection-->
+    <state NAME="noTubePicked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkTubePickedGuardState" ID="1" X_POS="91" Y_POS="" WIDTH="347" HEIGHT="50">
+      <transition NAME="pickedTube" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="75">
+          <!--AcDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="tubeSelected" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkPicked" NEXT_STATE_ID="3" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkPicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="addTubeToSelectionGuardState" ID="3" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="tubePicked" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="2" EVENT_ID="1003" />
     </state>
   </stateMachine>
   <stateMachine NAME="AriadneAssistent">
@@ -3556,6 +3597,19 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="Zoom">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="1011" />
+      </transition>
+    </state>
+    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="1012" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+    </state>
+  </stateMachine>
   <stateMachine NAME="alternativeZoom">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initzoom" NEXT_STATE_ID="1" EVENT_ID="7">
@@ -4015,4 +4069,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

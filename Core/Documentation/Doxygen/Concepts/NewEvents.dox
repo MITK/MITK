@@ -1,0 +1,72 @@
+/**
+
+\page ImplementNewEventsPage What needs to be done to implement a new event?
+
+\tableofcontents
+
+\section WhenUseEvents When to use this guide
+
+In general there are no restriction about how events are created and processed. The intention of this page is to provide how to contruct Events
+in order to use them with the MITK Interaction Concept.
+
+\section OriginEvents Origin and processing of Events
+
+\ref DataInteractionPage gives a brief description of how events are generated and proccessed. After events are created they need to be send
+via mitk::RenderWindowBase::HandleEvent() so that they are relayed to a Dispatcher which handles the event distribution to the DataInteractors.
+
+\section EventImplementation Event Implementation
+
+The only prerequisite for a new event to be accepted is that it is derived from the mitk::InteractionEvent class.
+Further it is neccessary to provide a unique string identifier for this event class
+(this string will identify this class/super-class in a state machine pattern by the event_class tag), and it needs to implement two functions,
+as shown at the example of the MousePressEvent.
+
+Implementation of equality for each event class by implementing isEqual.
+Equality does \b not mean an exact copy or pointer equality.
+Equality is determined by agreement in all attributes that are necessary to describe
+the event for a state machine transition.
+Here, for example, for the a mouse event press event, it is important which modifiers are used,
+which mouse button was used to triggered the event, but the mouse position is irrelevant.
+
+\code
+bool mitk::MousePressEvent::isEqual(mitk::InteractionEvent::Pointer interactionEvent)
+{
+  // cast to your event class here
+  mitk::MousePressEvent* mpe = dynamic_cast<mitk::MousePressEvent*>(interactionEvent.GetPointer());
+  if (mpe == NULL)
+  {
+    return false;
+  }
+  // Checking relevant attributes, such as EventButton and Modifiers, but omitting the mouse coordinates
+  // Replace this to check for your event class' attributes
+  return (this->GetEventButton() == mpe->GetEventButton() && this->GetModifiers() == mpe->GetModifiers()
+      && this->GetButtonStates() == mpe->GetButtonStates());
+}
+\endcode
+
+The function IsSuperClassOf() implements an up cast to check if the provided baseClass object is derived from this class.
+This function is used to support polymorphism on state machine pattern (XML) level.
+
+\code
+bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  // Replace with your class, or implement some rules which classes are accepted.
+  MousePressEvent* event = dynamic_cast<MousePressEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
+}
+\endcode
+
+\section EventConstruction Configuration File & Event Factory
+
+Regarding the state machine and the state machine pattern parser there are no changes necessary. To be able to parse the new event,
+changes have to be made in the mitk::EventConfig and mitk::EventFactory classes.
+
+The mitk::EventConfig class has to be adapted in a way such that the parameters that describe the event are parsed. The parsing can be easily extended,
+and should provide a mitk::PropertyList for each event parsed.
+Lastly the mitk::EventFactory has to be extended to use this mitk::PropertyList and construct an event based on it.
+
+*/

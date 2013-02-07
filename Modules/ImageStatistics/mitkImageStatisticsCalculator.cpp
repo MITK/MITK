@@ -1082,7 +1082,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // store the polyline contour as vtkPoints object
   bool outOfBounds = false;
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   typename PlanarFigure::PolyLineType::const_iterator it;
   for ( it = planarFigurePolyline.begin();
         it != planarFigurePolyline.end();
@@ -1127,7 +1127,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   }
 
   // create a vtkLassoStencilSource and set the points of the Polygon
-  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkLassoStencilSource::New();
+  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
@@ -1138,11 +1138,11 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( castFilter->GetOutput() );
 
-  vtkSmartPointer<vtkImageImport> vtkImporter = vtkImageImport::New();
+  vtkSmartPointer<vtkImageImport> vtkImporter = vtkSmartPointer<vtkImageImport>::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
 
   // Apply the generated image stencil to the input image
-  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkImageStencil::New();
+  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
   imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
   imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
   imageStencilFilter->ReverseStencilOff();
@@ -1160,11 +1160,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Store mask
   m_InternalImageMask2D = itkImporter->GetOutput();
-
-  // Clean up VTK objects
-  vtkImporter->Delete();
-  imageStencilFilter->Delete();
-  //vtkExporter->Delete(); // TODO: crashes when outcommented; memory leak??
 }
 
 

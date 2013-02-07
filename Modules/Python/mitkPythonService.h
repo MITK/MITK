@@ -36,6 +36,10 @@ namespace mitk
 
       bool CopyToPythonAsItkImage( mitk::Image* image, const QString& varName );
       mitk::Image::Pointer CopyItkImageFromPython( const QString& varName );
+
+      bool CopyToPythonAsCvImage( mitk::Image* image, const QString& varName );
+      mitk::Image::Pointer CopyCvImageFromPython( const QString& varName );
+
       ctkAbstractPythonManager* GetPythonManager();
   protected:
       QString GetTempImageName(const QString &ext) const;

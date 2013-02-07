@@ -190,6 +190,20 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &
 
     return mitkImage;
 }
+bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QString& varName )
+{
+  bool convert = false;
+  if(image->GetDimension() != 2)
+  {
+    MITK_ERROR << "Only 2D images allowed for OpenCV images";
+    return convert;
+  }
+}
+
+mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& varName )
+{
+return 0;
+}
 
 ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
 {

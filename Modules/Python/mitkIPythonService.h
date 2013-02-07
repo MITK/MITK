@@ -71,6 +71,9 @@ namespace mitk
 
         virtual bool CopyToPythonAsItkImage( mitk::Image* image, const QString& varName ) = 0;
         virtual mitk::Image::Pointer CopyItkImageFromPython( const QString& varName ) = 0;
+
+        virtual bool CopyToPythonAsCvImage( mitk::Image* image, const QString& varName ) = 0;
+        virtual mitk::Image::Pointer CopyCvImageFromPython( const QString& varName ) = 0;
     };
 }
 

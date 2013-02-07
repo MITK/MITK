@@ -137,7 +137,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
-  vtkSmartPointer<vtkMarchingCubes> mcFilter = vtkMarchingCubes::New();
+  vtkSmartPointer<vtkMarchingCubes> mcFilter = vtkSmartPointer<vtkMarchingCubes>::New();
   mcFilter->SetInput(distanceImage->GetVtkImageData());
   mcFilter->SetValue(0,0);
   mcFilter->Update();

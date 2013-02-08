@@ -36,7 +36,6 @@ mitk::Dispatcher::Dispatcher()
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
 {
-  MITK_INFO<< "got called removed interactor";
   RemoveDataInteractor(dataNode);
   RemoveOrphanedInteractors();
   DataInteractor::Pointer dataInteractor = dataNode->GetDataInteractor();

@@ -173,7 +173,6 @@ bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
     int maxSlices = sliceNaviController->GetSlice()->GetSteps();
     if (m_AutoRepeat)
     {
-      MITK_INFO<< m_AutoRepeat;
       while (newPos < 0)
       {
         newPos += maxSlices;
@@ -243,7 +242,6 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
   }
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
-  MITK_INFO<< "levelwindow";
   // search for active image
   mitk::DataStorage::Pointer storage = sender->GetDataStorage();
   mitk::DataNode::Pointer node = NULL;
@@ -267,7 +265,6 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
   {
     return false;
   }
-  MITK_INFO<< "still here";
 
   mitk::LevelWindow lv = mitk::LevelWindow();
   node->GetLevelWindow(lv);
@@ -291,7 +288,6 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   std::string strAutoRepeat = "";
   if (properties->GetStringProperty("autoRepeat", strAutoRepeat))
   {
-    MITK_INFO<< strAutoRepeat;
     if (strAutoRepeat == "true")
     {
       m_AutoRepeat = true;
@@ -305,7 +301,6 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   std::string strPixelPerSlice = "";
   if (properties->GetStringProperty("pixelPerSlice", strPixelPerSlice))
   {
-    MITK_INFO<< "pix"; //kommt nicht an
     m_IndexToSliceModifier = atoi(strPixelPerSlice.c_str());
   }
   else

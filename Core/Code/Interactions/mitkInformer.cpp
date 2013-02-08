@@ -27,10 +27,17 @@ mitk::InformerService::InformerService()
 
 void mitk::InformerService::RegisterObserver(EventObserver* eventObserver)
 {
-  if ( std::find( m_ListObserver.begin(), m_ListObserver.end(), eventObserver ) != m_ListObserver.end() )
+  // explicitly use smart pointer, else the search for it will fail
+  // especially std::find() seems to fail on list of smart pointer objects
+  EventObserver::Pointer pEventObserver = eventObserver;
+  for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
   {
-    m_ListObserver.push_back(eventObserver);
+    if (*it == pEventObserver)
+    {
+      return;
+    }
   }
+  m_ListObserver.push_back(pEventObserver);
 }
 
 void mitk::InformerService::UnRegisterObserver(EventObserver* eventObserver)

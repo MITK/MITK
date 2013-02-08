@@ -32,8 +32,6 @@ mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
 
   if (!serviceRef)
   {
-    // TODO: service object is not destroyed anywhere,
-    // registration persists forever until a good place to destroy and unregister is found
     m_InformerService = new InformerService();
     context->RegisterService<InformerService>(m_InformerService);
   }

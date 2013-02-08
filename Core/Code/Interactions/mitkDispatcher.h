@@ -28,15 +28,6 @@
 
 namespace mitk
 {
-
-  enum ProcessEventMode
-  {
-    REGULAR,
-    GRABINPUT,
-    PREFERINPUT,
-    CONNECTEDMOUSEACTION
-  };
-
   class InternalEvent;
   class InteractionEvent;
   class InformerService;
@@ -48,6 +39,8 @@ namespace mitk
   * Receives Events (Mouse-,Key-, ... Events) and dispatches them to the registered DataInteractor Objects.
   * The order in which DataInteractors are offered to handle an event is determined by layer of their associated DataNode.
   * Higher layers are preferred.
+  *
+  * \ingroup Interaction
   */
 
   class MITK_CORE_EXPORT Dispatcher: public itk::Object

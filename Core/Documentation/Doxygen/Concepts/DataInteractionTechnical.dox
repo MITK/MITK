@@ -4,10 +4,22 @@
 
 \tableofcontents
 
+This page describes some technicalities of the implementation and the workflow, for a detailed list of tutorials see \ref FurtherReadingInteraction .
+
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
 
 \section DispatcherSection Dispatcher
+
+After an event is received by the Dispatcher it is given to a DataInteractor that has to decide if it can process this event.
+On a high level this is done by the mitk::EventStateMachine.
+First the state machine asks if the received event is known in the
+configuration. If it does the matching variant name is returned. Then the state machine checks if there exists a transition
+in its current state that is triggered by this event variant. If this is the case all actions that are associated with this transition
+are queried and executed. The actions themselves are implemented on DataInteractor level. The following diagram illustrates the process:
+
+\image html sm_and_config.png
+
 
 Each BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the DataStorage and the Dispatcher,
 and thereby allowing a DataInteractor to register with a Dispatcher when only knowing the DataNode.
@@ -100,14 +112,5 @@ digraph {
   b -> c [label="1 : n"];
 }
 \enddot
-
-After an event is received by the Dispatcher it is given to a DataInteractor that has to decide if it can process this event.
-On a high level this is done by the mitk::EventStateMachine.
-First the state machine asks if the received event is known in the
-configuration. If it does the matching variant name is returned. Then the state machine checks if there exists a transition
-in its current state that is triggered by this event variant. If this is the case all actions that are associated with this transition
-are queried and executed. The actions themselves are implemented on DataInteractor level. The following diagram illustrates the process:
-
-\image html sm_and_config.png
 
  */

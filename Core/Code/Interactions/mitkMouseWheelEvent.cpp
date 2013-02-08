@@ -38,11 +38,6 @@ void mitk::MouseWheelEvent::SetWheelDelta(int delta)
   m_WheelDelta = delta;
 }
 
-bool mitk::MouseWheelEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
-{
-  return dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL;
-}
-
 mitk::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
 {
   return m_Modifiers;

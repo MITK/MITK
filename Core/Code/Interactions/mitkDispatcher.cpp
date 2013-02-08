@@ -178,7 +178,7 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
     else
     {
       DataInteractor::Pointer interactor = dn->GetDataInteractor();
-      if ( interactor != it->GetPointer() )
+      if (interactor != it->GetPointer())
       {
         it = m_Interactors.erase(it);
       }
@@ -197,20 +197,9 @@ void mitk::Dispatcher::QueueEvent(InteractionEvent* event)
 
 void mitk::Dispatcher::SetEventProcessingMode(DataInteractor::Pointer dataInteractor)
 {
-  if (dataInteractor->GetMode() == "REGULAR")
+  m_ProcessingMode = dataInteractor->GetMode();
+  if (dataInteractor->GetMode() != REGULAR)
   {
-    m_ProcessingMode = REGULAR;
-  }
-
-  // prefer/grab input overrule connected mouse action
-  if (dataInteractor->GetMode() == "PREFER_INPUT")
-  {
-    m_ProcessingMode = PREFERINPUT;
-    m_SelectedInteractor = dataInteractor;
-  }
-  if (dataInteractor->GetMode() == "GRAB_INPUT")
-  {
-    m_ProcessingMode = GRABINPUT;
     m_SelectedInteractor = dataInteractor;
   }
 }

@@ -45,7 +45,7 @@ int mitkEventConfigTest(int /*argc*/, char* /*argv*/[])
    * Test the global properties:
    * Test if stored values match the ones in the test config file.
    */
-  mitk::PropertyList::Pointer properties = smc->GetPropertyList();
+  mitk::PropertyList::Pointer properties = smc->GetAttributes();
   std::string prop1, prop2;
 
   MITK_TEST_CONDITION_REQUIRED(

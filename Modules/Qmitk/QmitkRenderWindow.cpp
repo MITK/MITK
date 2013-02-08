@@ -457,81 +457,81 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
     switch (tkey)
     {
     case Qt::Key_Return:
-      key = mitk::KEYRETURN;
+      key = mitk::KeyReturn;
       break;
     case Qt::Key_Enter:
-      key = mitk::KEYENTER;
+      key = mitk::KeyEnter;
       break;
     case Qt::Key_Escape:
-      key = mitk::KEYENTER;
+      key = mitk::KeyEnter;
       break;
     case Qt::Key_Delete:
-      key = mitk::KEYDELETE;
+      key = mitk::KeyDelete;
       break;
     case Qt::Key_Up:
-      key = mitk::KEYARROWUP;
+      key = mitk::KeyArrowUp;
       break;
     case Qt::Key_Down:
-      key = mitk::KEYARROWDOWN;
+      key = mitk::KeyArrowDown;
       break;
     case Qt::Key_Left:
-      key = mitk::KEYARROWLEFT;
+      key = mitk::KeyArrowLeft;
       break;
     case Qt::Key_Right:
-      key = mitk::KEYARROWRIGHT;
+      key = mitk::KeyArrowRight;
       break;
 
     case Qt::Key_F1:
-      key = mitk::KEYF1;
+      key = mitk::KeyF1;
       break;
     case Qt::Key_F2:
-      key = mitk::KEYF2;
+      key = mitk::KeyF2;
       break;
     case Qt::Key_F3:
-      key = mitk::KEYF3;
+      key = mitk::KeyF3;
       break;
     case Qt::Key_F4:
-      key = mitk::KEYF4;
+      key = mitk::KeyF4;
       break;
     case Qt::Key_F5:
-      key = mitk::KEYF5;
+      key = mitk::KeyF5;
       break;
     case Qt::Key_F6:
-      key = mitk::KEYF6;
+      key = mitk::KeyF6;
       break;
     case Qt::Key_F7:
-      key = mitk::KEYF7;
+      key = mitk::KeyF7;
       break;
     case Qt::Key_F8:
-      key = mitk::KEYF8;
+      key = mitk::KeyF8;
       break;
     case Qt::Key_F9:
-      key = mitk::KEYF9;
+      key = mitk::KeyF9;
       break;
     case Qt::Key_F10:
-      key = mitk::KEYF10;
+      key = mitk::KeyF10;
       break;
     case Qt::Key_F11:
-      key = mitk::KEYF11;
+      key = mitk::KeyF11;
       break;
     case Qt::Key_F12:
-      key = mitk::KEYF12;
+      key = mitk::KeyF12;
       break;
 
     case Qt::Key_End:
-          key = mitk::KEYEND;
+          key = mitk::KeyEend;
           break;
     case Qt::Key_Home:
-          key = mitk::KEYPOS1;
+          key = mitk::KeyPos1;
           break;
     case Qt::Key_Insert:
-          key = mitk::KEYINSERT;
+          key = mitk::KeyInsert;
           break;
     case Qt::Key_PageDown:
-          key = mitk::KEYPAGEDOWN;
+          key = mitk::KeyPageDown;
           break;
     case Qt::Key_PageUp:
-          key = mitk::KEYPAGEUP;
+          key = mitk::KeyPageUp;
           break;
     }
   }

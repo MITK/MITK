@@ -27,16 +27,17 @@
 #include "mitkDispatcher.h"
 
 
-
-
 namespace mitk
 {
   class InformerService;
 /**
+ * \class BindDispatcherInteractor
  * \brief This Class is used to connect a DataStorage with the Dispatcher.
  * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
  * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
  * Also this class registers the MicroService at which EventObservers can register to receive events.
+ *
+ * \ingroup Interaction
  */
   class MITK_CORE_EXPORT BindDispatcherInteractor: public itk::Object
   {

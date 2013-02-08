@@ -48,7 +48,6 @@ namespace mitk
     void SetWheelDelta(int delta);
 
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     MouseWheelEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers, int  wheelDelta);

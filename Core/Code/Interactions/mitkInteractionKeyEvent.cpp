@@ -31,15 +31,6 @@ std::string mitk::InteractionKeyEvent::GetKey() const
   return m_Key;
 }
 
-bool mitk::InteractionKeyEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
-{
-  InteractionKeyEvent* event = dynamic_cast<InteractionKeyEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
-}
 
 mitk::InteractionKeyEvent::~InteractionKeyEvent()
 {

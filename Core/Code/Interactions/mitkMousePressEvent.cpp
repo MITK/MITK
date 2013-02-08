@@ -39,11 +39,6 @@ void mitk::MousePressEvent::SetEventButton(MouseButtons buttons)
   m_EventButton = buttons;
 }
 
-bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
-{
-  return dynamic_cast<MousePressEvent*>(baseClass.GetPointer()) != NULL;
-}
-
 mitk::ModifierKeys mitk::MousePressEvent::GetModifiers() const
 {
   return m_Modifiers;

@@ -33,10 +33,13 @@ namespace mitk
   class InteractionEvent;
 
   /**
-   *@brief Configuration Object for Statemachines.
+   * \class EventConfig
+   * \brief Configuration Object for Statemachines.
    *
    * Reads given config file, which translates specific user inputs (InteractionEvents) into EventVariants that can be processed
    * by the StateMachine.
+   * Refer to \ref ConfigFileDescriptionSection .
+   *
    * @ingroup Interaction
    **/
 
@@ -62,7 +65,7 @@ namespace mitk
      * Returns a PropertyList that contains the properties set in the configuration file.
      * All properties are stored as strings.
      */
-    const PropertyList::Pointer GetPropertyList();
+    const PropertyList::Pointer GetAttributes();
 
     /**
      * Checks if the config object has a definition for the given event. If it has the corresponding variant name is return, else

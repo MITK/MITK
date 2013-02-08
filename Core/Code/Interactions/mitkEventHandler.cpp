@@ -17,26 +17,18 @@
 #include "mitkEventHandler.h"
 #include "mitkInteractionEvent.h"
 
-mitk::EventHandler::EventHandler()
+mitk::EventHandler::EventHandler():
+  m_EventConfig(NULL)
 {
-  m_EventConfig = NULL;
 }
 
 mitk::EventHandler::~EventHandler()
 {
-  if (m_EventConfig != NULL)
-  {
-    m_EventConfig->Delete();
-  }
 }
 
 bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string moduleName)
 {
-  if (m_EventConfig != NULL)
-  {
-    m_EventConfig->Delete();
-  }
-  m_EventConfig = EventConfig::New();
+  m_EventConfig = vtkSmartPointer<EventConfig>::New();
   // notify sub-classes that new config is set
   bool success = m_EventConfig->LoadConfig(filename, moduleName);
   ConfigurationChanged();
@@ -56,12 +48,17 @@ bool mitk::EventHandler::AddEventConfig(std::string filename, std::string module
   return success;
 }
 
-mitk::PropertyList::Pointer mitk::EventHandler::GetPropertyList()
+mitk::PropertyList::Pointer mitk::EventHandler::GetAttributes()
 {
-  return m_EventConfig->GetPropertyList();
+  if (m_EventConfig != NULL) {
+  return m_EventConfig->GetAttributes();
+  } else {
+    MITK_ERROR << "EventHandler::GetAttributes() requested, but not configuration loaded.";
+    return NULL;
+  }
 }
 
-std::string mitk::EventHandler::GetMappedEvent(InteractionEvent* interactionEvent)
+std::string mitk::EventHandler::MapToEventVariant(InteractionEvent* interactionEvent)
 {
   if (m_EventConfig != NULL)
   {

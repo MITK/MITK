@@ -37,6 +37,15 @@ namespace mitk
    * To implement a new interactor overwrite the ConnectActionsAndFunctions to connect the actions.
    */
 
+  // Public 'cause it's also used by the mitk::Dispatcher
+  enum ProcessEventMode
+  {
+    REGULAR = 0,
+    GRABINPUT = 1,
+    PREFERINPUT = 2,
+    CONNECTEDMOUSEACTION = 3 // only used by mitk::Dispatcher
+  };
+
   class DataNode;
   class MITK_CORE_EXPORT DataInteractor: public EventStateMachine
   {
@@ -59,7 +68,7 @@ namespace mitk
     /**
      * @brief Returns the mode the DataInteractor currently is in. See in mitkDispatcher the description of m_ProcessingMode for further details.
      */
-    std::string GetMode();
+    ProcessEventMode GetMode();
 
     NodeType GetDataNode();
     int GetLayer();

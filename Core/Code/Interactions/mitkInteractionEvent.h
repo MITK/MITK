@@ -57,14 +57,18 @@ namespace mitk
      * This class implements an up cast to check if the provided baseClass object is derived from this class.
      * This function is used to support polymorphism on state machine pattern (XML) level.
      */
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
+    template <class T>
+    bool IsSubClassOf(T *baseClass)
+    {
+      return dynamic_cast<T*>(baseClass) != NULL;
+    }
 
   protected:
     InteractionEvent(BaseRenderer*, std::string);
     virtual ~InteractionEvent();
 
   private:
-    BaseRenderer* m_Sender;
+    BaseRenderer::Pointer m_Sender;
     std::string m_EventClass;
   };
 

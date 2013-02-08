@@ -83,31 +83,31 @@ void mitk::EventConfig::StartElement(const char* elementName, const char **atts)
 {
   std::string name(elementName);
 
-  if (name == CONFIG)
+  if (name == xmlTagConfigRoot)
   {
     //
   }
-  else if (name == PARAM)
+  else if (name == xmlTagParam)
   {
-    std::string name = ReadXMLStringAttribut(NAME, atts);
-    std::string value = ReadXMLStringAttribut(VALUE, atts);
+    std::string name = ReadXMLStringAttribut(xmlParameterName, atts);
+    std::string value = ReadXMLStringAttribut(xmlParameterValue, atts);
     m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
-  else if (name == INPUT)
+  else if (name == xmlTagInput)
   {
-    std::string eventClass = ReadXMLStringAttribut(EVENTCLASS, atts);
-    std::string eventVariant = ReadXMLStringAttribut(EVENTVARIANT, atts);
+    std::string eventClass = ReadXMLStringAttribut(xmlParameterEventClass, atts);
+    std::string eventVariant = ReadXMLStringAttribut(xmlParameterEventVariant, atts);
     // New list in which all parameters are stored that are given within the <input/> tag
     m_EventPropertyList = PropertyList::New();
-    m_EventPropertyList->SetStringProperty(EVENTCLASS.c_str(), eventClass.c_str());
-    m_EventPropertyList->SetStringProperty(EVENTVARIANT.c_str(), eventVariant.c_str());
+    m_EventPropertyList->SetStringProperty(xmlParameterEventClass.c_str(), eventClass.c_str());
+    m_EventPropertyList->SetStringProperty(xmlParameterEventVariant.c_str(), eventVariant.c_str());
     m_CurrEventMapping.variantName = eventVariant;
   }
-  else if (name == ATTRIBUTE)
+  else if (name == xmlTagAttribute)
   {
     // Attributes that describe an Input Event, such as which MouseButton triggered the event,or which modifier keys are pressed
-    std::string name = ReadXMLStringAttribut(NAME, atts);
-    std::string value = ReadXMLStringAttribut(VALUE, atts);
+    std::string name = ReadXMLStringAttribut(xmlParameterName, atts);
+    std::string value = ReadXMLStringAttribut(xmlParameterValue, atts);
     m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
 }
@@ -116,7 +116,7 @@ void mitk::EventConfig::EndElement(const char* elementName)
 {
   std::string name(elementName);
   // At end of input section, all necessary infos are collected to created an interaction event.
-  if (name == INPUT)
+  if (name == xmlTagInput)
   {
     InteractionEvent::Pointer event = EventFactory::CreateEvent(m_EventPropertyList);
     if (event.IsNotNull())
@@ -150,7 +150,7 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
   return std::string();
 }
 
-const mitk::PropertyList::Pointer mitk::EventConfig::GetPropertyList()
+const mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes()
 {
   return m_PropertyList;
 }

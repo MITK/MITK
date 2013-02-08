@@ -34,12 +34,6 @@ bool mitk::InternalEvent::MatchesTemplate(mitk::InteractionEvent::Pointer intera
   return (m_SignalName == internalEvent->GetSignalName());
 }
 
-bool mitk::InternalEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
-{
-  InternalEvent* event = dynamic_cast<InternalEvent*>(baseClass.GetPointer());
-
-  return event != NULL;
-}
 
 mitk::InternalEvent::~InternalEvent()
 {
@@ -52,5 +46,5 @@ std::string mitk::InternalEvent::GetSignalName()
 
 mitk::DataInteractor* mitk::InternalEvent::GetTargetInteractor()
 {
-  return m_DataInteractor;
+  return m_DataInteractor.GetPointer();
 }

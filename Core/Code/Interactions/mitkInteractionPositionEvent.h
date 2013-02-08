@@ -46,7 +46,6 @@ namespace mitk
 
     Point2D GetPointerPositionOnScreen();
     Point3D GetPositionInWorld();
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     InteractionPositionEvent(BaseRenderer* baseRenderer, Point2D mousePosition, std::string eventClass);

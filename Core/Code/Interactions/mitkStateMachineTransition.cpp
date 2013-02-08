@@ -24,7 +24,7 @@ mitk::StateMachineTransition::StateMachineTransition(std::string nextStateName, 
     m_EventClass(eventClass), m_EventVariant(eventVariant), m_NextStateName(nextStateName)
 {
   PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->SetStringProperty(EVENTCLASS.c_str(), eventClass.c_str());
+  propertyList->SetStringProperty(xmlParameterEventClass.c_str(), eventClass.c_str());
   m_TransitionEvent = EventFactory::CreateEvent(propertyList);
 }
 
@@ -40,9 +40,10 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
     return false;
   }
   PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->SetStringProperty(EVENTCLASS.c_str(), transition.m_EventClass.c_str());
+  propertyList->SetStringProperty(xmlParameterEventClass.c_str(), transition.m_EventClass.c_str());
   InteractionEvent::Pointer tmpEvent = EventFactory::CreateEvent(propertyList);
-  if (m_TransitionEvent->IsSuperClassOf(tmpEvent))
+
+  if (tmpEvent->IsSubClassOf(m_TransitionEvent.GetPointer()))
   {
     return (this->m_EventVariant == transition.m_EventVariant);
   }
@@ -51,8 +52,9 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
     // if event variants match, but super class condition is violated
     // this means that the configuration file, implements a class that does not
     // support the type in the state machine.
-    if (this->m_EventVariant == transition.m_EventVariant) {
-      MITK_WARN << "Event type in Statemachine " << m_EventClass << " is not compatible to configuration class " << transition.m_EventClass;
+    if (this->m_EventVariant == transition.m_EventVariant)
+    {
+      MITK_WARN<< "Event type in Statemachine " << m_EventClass << " is not compatible to configuration class " << transition.m_EventClass;
     }
     return false;
   }

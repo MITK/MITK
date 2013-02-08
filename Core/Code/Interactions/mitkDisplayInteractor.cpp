@@ -286,7 +286,7 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
 
 void mitk::DisplayInteractor::ConfigurationChanged()
 {
-  mitk::PropertyList::Pointer properties = GetPropertyList();
+  mitk::PropertyList::Pointer properties = GetAttributes();
   // auto repeat
   std::string strAutoRepeat = "";
   if (properties->GetStringProperty("autoRepeat", strAutoRepeat))

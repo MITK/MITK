@@ -32,7 +32,8 @@ mitk::DataNode::Pointer mitk::DataInteractor::GetDataNode()
 
 void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
-  if ( dataNode == m_DataNode ) return;
+  if (dataNode == m_DataNode)
+    return;
 
   if (m_DataNode.IsNotNull())
   { // if DataInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
@@ -78,9 +79,17 @@ void mitk::DataInteractor::ConnectActionsAndFunctions()
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
-std::string mitk::DataInteractor::GetMode()
+mitk::ProcessEventMode mitk::DataInteractor::GetMode()
 {
-  return GetCurrentState()->GetMode();
+  if (GetCurrentState()->GetMode() == "PREFER_INPUT")
+  {
+    return PREFERINPUT;
+  }
+  if (GetCurrentState()->GetMode() == "GRAB_INPUT")
+  {
+    return GRABINPUT;
+  }
+  return REGULAR;
 }
 
 int mitk::DataInteractor::GetPointIndexByPosition(Point3D position, int time)

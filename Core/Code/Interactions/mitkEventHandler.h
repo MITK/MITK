@@ -24,6 +24,7 @@
 #include <MitkExports.h>
 #include "mitkEventConfig.h"
 #include "mitkPropertyList.h"
+#include <vtkSmartPointer.h>
 #include <string>
 
 
@@ -56,15 +57,16 @@ namespace mitk
      */
     virtual bool AddEventConfig(std::string filename, std::string moduleName = "Mitk");
 
-    /**
-     * Returns a PropertyList in which the parameters defined in the config file are listed.
-     */
-    PropertyList::Pointer GetPropertyList();
 
   protected:
     EventHandler();
     virtual ~EventHandler();
-    std::string GetMappedEvent(InteractionEvent* interactionEvent);
+    /**
+     * Returns a PropertyList in which the parameters defined in the config file are listed.
+     */
+    PropertyList::Pointer GetAttributes();
+
+    std::string MapToEventVariant(InteractionEvent* interactionEvent);
 
     /**
      * Is called whenever a new config object ist set.
@@ -73,7 +75,7 @@ namespace mitk
     virtual void ConfigurationChanged();
 
   private:
-    EventConfig* m_EventConfig;
+    vtkSmartPointer<EventConfig> m_EventConfig;
 
   };
 

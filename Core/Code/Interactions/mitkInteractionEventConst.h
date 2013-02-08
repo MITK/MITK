@@ -70,54 +70,59 @@ namespace mitk
    * KeyConstants Constants for special keys
    */
   // Special Keys
-  const std::string KEYESC = "Escape";
-  const std::string KEYENTER = "Enter";
-  const std::string KEYRETURN = "Return";
-  const std::string KEYDELETE = "Delete";
-  const std::string KEYARROWUP = "ArrowUp";
-  const std::string KEYARROWDOWN = "ArrowDown";
-  const std::string KEYARROWLEFT = "ArrowLeft";
-  const std::string KEYARROWRIGHT = "ArrowRight";
+  const std::string KeyEsc = "Escape";
+  const std::string KeyEnter = "Enter";
+  const std::string KeyReturn = "Return";
+  const std::string KeyDelete = "Delete";
+  const std::string KeyArrowUp = "ArrowUp";
+  const std::string KeyArrowDown = "ArrowDown";
+  const std::string KeyArrowLeft = "ArrowLeft";
+  const std::string KeyArrowRight = "ArrowRight";
 
-  const std::string KEYF1 = "F1";
-  const std::string KEYF2 = "F2";
-  const std::string KEYF3 = "F3";
-  const std::string KEYF4 = "F4";
-  const std::string KEYF5 = "F5";
-  const std::string KEYF6 = "F6";
-  const std::string KEYF7 = "F7";
-  const std::string KEYF8 = "F8";
-  const std::string KEYF9 = "F9";
-  const std::string KEYF10 = "F10";
-  const std::string KEYF11 = "F11";
-  const std::string KEYF12 = "F12";
+  const std::string KeyF1 = "F1";
+  const std::string KeyF2 = "F2";
+  const std::string KeyF3 = "F3";
+  const std::string KeyF4 = "F4";
+  const std::string KeyF5 = "F5";
+  const std::string KeyF6 = "F6";
+  const std::string KeyF7 = "F7";
+  const std::string KeyF8 = "F8";
+  const std::string KeyF9 = "F9";
+  const std::string KeyF10 = "F10";
+  const std::string KeyF11 = "F11";
+  const std::string KeyF12 = "F12";
 
-  const std::string KEYPOS1 = "POS1";
-  const std::string KEYEND = "END";
-  const std::string KEYINSERT = "INSERT";
-  const std::string KEYPAGEUP = "PAGEUP";
-  const std::string KEYPAGEDOWN = "PAGEDOWN";
+  const std::string KeyPos1 = "Pos1";
+  const std::string KeyEend = "End";
+  const std::string KeyInsert = "Insert";
+  const std::string KeyPageUp = "PageUp";
+  const std::string KeyPageDown = "PageDown";
   // End special keys
 
   // XML Tags
-  const std::string CONFIG = "config";
-  const std::string PARAM = "param";
-  const std::string INPUT = "input";
-  const std::string ATTRIBUTE = "attribute";
+  const std::string xmlTagConfigRoot = "config";
+  const std::string xmlTagParam = "param";
+  const std::string xmlTagInput = "input";
+  const std::string xmlTagAttribute = "attribute";
 
   // XML Param
-  const std::string NAME = "name";
-  const std::string VALUE = "value";
-  const std::string EVENTVARIANT = "event_variant";
-  const std::string EVENTCLASS = "event_class";
+  const std::string xmlParameterName = "name";
+  const std::string xmlParameterValue = "value";
+  const std::string xmlParameterEventVariant = "event_variant";
+  const std::string xmlParameterEventClass = "event_class";
 
   // Event Description
-  const std::string MODIFIERS = "Modifiers";
-  const std::string EVENTBUTTON = "EventButton";
-  const std::string BUTTONSTATE = "ButtonState";
-  const std::string KEY = "Key";
-  const std::string WHEELDELTA = "ScrollDirection";
-  const std::string SIGNALNAME = "SignalName";
+  const std::string xmlEventPropertyModifier = "Modifiers";
+  const std::string xmlEventPropertyEventButton = "EventButton";
+  const std::string xmlEventPropertyButtonState = "ButtonState";
+  const std::string xmlEventPropertyKey = "Key";
+  const std::string xmlEventPropertyScrollDirection = "ScrollDirection";
+  const std::string xmlEventPropertySignalName = "SignalName";
+
+  // Predefined internal events/signals
+  const std::string IntDeactivateMe = "DeactivateMe";
+  const std::string IntLeaveWidget = "LeaveWidget";
+  const std::string IntEnterWidget = "EnterWidget";
 
 }     //namespace mitk
 #endif //ifndef MITKINTERACTEVENTCONST_H

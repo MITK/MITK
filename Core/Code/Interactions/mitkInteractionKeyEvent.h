@@ -36,8 +36,9 @@ namespace mitk
   /**
    * \class InteractionKeyEvent
    * \brief Handles key events.
+   * \input std::string for pressed key or special key description , mitk::ModifierKeys for modifiers
+   * \ingroup Interaction.
    */
-
 
   class MITK_CORE_EXPORT InteractionKeyEvent : public InteractionEvent {
 
@@ -46,7 +47,6 @@ namespace mitk
     mitkNewMacro3Param(Self, BaseRenderer*, std::string , ModifierKeys);
 
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
     ModifierKeys GetModifiers() const;
     std::string GetKey() const;

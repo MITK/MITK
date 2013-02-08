@@ -15,10 +15,12 @@ actions when such an event is triggered.\n
 In the following the different components of the interaction concept are explained.
 First a a high-level overview about how the different components interact is given, then some parts are explained in more detail.
 
+\subsection FurtherReadingInteraction Topics related to interaction - further information:
 See the \ref DataInteractionTechnicalPage page for a more technical explanation. \n
 Consult \ref HowToUseDataInteractor for usage information.\n
-See \ref HowToDataInteractor for an example on how to implement a new DataInteractor \n
-The documentation of the depricated former concept is found at \ref InteractionPage.
+See \ref SectionImplementationDataInteractor for an example on how to implement a new DataInteractor \n
+for information about how to create new events refer to ImplementNewEventsPage.\n
+The documentation of the depricated former concept can be found at \ref InteractionPage.
 
 
 \section HandlingSection Event Handling & Window Manager Abstraction

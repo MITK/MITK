@@ -70,16 +70,16 @@ int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
 
   // Switching the DataNode of an Interactor also must not result in extra registered Interactors in Dispatcher
   // since dn2 is not connected to DataStorage
-  // ei would still reveive dispatcher events for ds 1 !! TODO: FiXMe?
+  // ei will be dropped from dispatcher
   ei->SetDataNode(dn2);
 
   num = renderer->GetDispatcher()->GetNumberOfInteractors();
   MITK_TEST_CONDITION_REQUIRED(
-      num == 1
-      , "04 Number of registered Interactors " << num << " , expected 1" );
+      num == 0
+      , "04 Number of registered Interactors " << num << " , expected 0" );
 
   // DataNode Added to DataStorage, now Interactor entry in Dispatcher should be replaced,
-  // hence no additional Interactor in the Dispatcher
+  // hence we restore Interactor in the Dispatcher
   ds->Add(dn2);
 
   num = renderer->GetDispatcher()->GetNumberOfInteractors();

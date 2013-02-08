@@ -27,7 +27,8 @@
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
 
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
+
+std::vector<std::string> &mitk::EventFactory::split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
   std::stringstream ss(s);
   std::string item;
@@ -38,7 +39,7 @@ std::vector<std::string> &split(const std::string &s, char delim, std::vector<st
   return elems;
 }
 
-std::vector<std::string> split(const std::string &s, char delim)
+std::vector<std::string> mitk::EventFactory::split(const std::string &s, char delim)
 {
   std::vector<std::string> elems;
   return split(s, delim, elems);
@@ -48,8 +49,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 {
   //
   std::string eventClass, eventVariant;
-  list->GetStringProperty(EVENTCLASS.c_str(), eventClass);
-  list->GetStringProperty(EVENTVARIANT.c_str(), eventVariant);
+  list->GetStringProperty(xmlParameterEventClass.c_str(), eventClass);
+  list->GetStringProperty(xmlParameterEventVariant.c_str(), eventVariant);
 
   // Query all possible attributes, if they are not present, set their default values.
   // Position Events & Key Events
@@ -68,7 +69,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   Point2D pos;
 
   // Parse modifier information
-  if (list->GetStringProperty(MODIFIERS.c_str(), strModifiers))
+  if (list->GetStringProperty(xmlEventPropertyModifier.c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -94,7 +95,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
   // Set EventButton
-  if (list->GetStringProperty(EVENTBUTTON.c_str(), strEventButton))
+  if (list->GetStringProperty(xmlEventPropertyEventButton.c_str(), strEventButton))
   {
     std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
     if (strEventButton == "MIDDLEMOUSEBUTTON")
@@ -116,7 +117,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
   // Parse ButtonStates
-  if (list->GetStringProperty(BUTTONSTATE.c_str(), strButtonState))
+  if (list->GetStringProperty(xmlEventPropertyButtonState.c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -142,7 +143,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
   // Key
-  if (!list->GetStringProperty(KEY.c_str(), strKey))
+  if (!list->GetStringProperty(xmlEventPropertyKey.c_str(), strKey))
   {
     key = "";
   }
@@ -151,7 +152,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     key = strKey;
   }
   // WheelDelta
-  if (!list->GetStringProperty(WHEELDELTA.c_str(), strWheelDelta))
+  if (!list->GetStringProperty(xmlEventPropertyScrollDirection.c_str(), strWheelDelta))
   {
     wheelDelta = 0;
   }
@@ -168,7 +169,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
   // Internal Signals Name
-  list->GetStringProperty(SIGNALNAME.c_str(), strSignalName);
+  list->GetStringProperty(xmlEventPropertySignalName.c_str(), strSignalName);
 
   /*
    * Here the objects are created

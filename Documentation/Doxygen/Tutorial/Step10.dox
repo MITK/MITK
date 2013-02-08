@@ -51,7 +51,7 @@ This tutorial is structured as follows: The first section deals with config file
 in a configuration file. In the second section the basics are described that are needed to write a state machine pattern. The last section
 deals with brining configuration, state machine pattern and code together and gives an examplary implementation of a DataInteractor.
 
-\section ConfigFileDescriptionSection HowTo Create a Config-File
+\section ConfigFileDescriptionSection How to create a Config-File
 
 \subsection EventDescriptionSection Event Description
 
@@ -176,7 +176,7 @@ Within the application these properties can then be access via a mitk::PropertyL
 \code
   // sm - state machine loaded with config file example2
 
-  mitk::PropertyList::Pointer properties = GetPropertyList();
+  mitk::PropertyList::Pointer properties = GetAttributes();
   std::string prop1;
   properties->GetStringProperty("property1",prop1);
 \endcode

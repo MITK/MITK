@@ -42,7 +42,6 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
   PropertyList::Pointer propertyList = PropertyList::New();
   propertyList->SetStringProperty(EVENTCLASS.c_str(), transition.m_EventClass.c_str());
   InteractionEvent::Pointer tmpEvent = EventFactory::CreateEvent(propertyList);
-  //if (m_TransitionEvent->IsSuperClassOf(tmpEvent))
   if (m_TransitionEvent->IsSuperClassOf(tmpEvent))
   {
     return (this->m_EventVariant == transition.m_EventVariant);

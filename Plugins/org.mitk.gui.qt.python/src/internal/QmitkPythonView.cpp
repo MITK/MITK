@@ -16,9 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPythonView.h"
 #include <QtGui>
-#include "QmitkCtkPythonShell.h"
+#include <QmitkCtkPythonShell.h>
 #include "mitkPluginActivator.h"
-#include "QmitkPythonVariableStackTableView.h"
+#include <QmitkPythonVariableStackTableView.h>
+#include <QmitkPythonTextEditor.h>
+#include <QmitkPythonSnippets.h>
 
 const std::string QmitkPythonView::VIEW_ID = "org.mitk.views.python";
 
@@ -26,7 +28,10 @@ struct QmitkPythonViewData
 {
     // widget
     QmitkPythonVariableStackTableView* m_PythonVariableStackTableView;
+    QmitkPythonSnippets* m_PythonSnippets;
+
     QmitkCtkPythonShell* m_PythonShell;
+    QmitkPythonTextEditor* m_TextEditor;
 };
 
 QmitkPythonView::QmitkPythonView()
@@ -46,13 +51,27 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
     d->m_PythonVariableStackTableView = new QmitkPythonVariableStackTableView;
     d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
 
+    d->m_PythonSnippets = new QmitkPythonSnippets;
+
+    QTabWidget* varStackSnippetsTab = new QTabWidget;
+    varStackSnippetsTab->addTab( d->m_PythonVariableStackTableView, "Variable Stack" );
+    varStackSnippetsTab->addTab( d->m_PythonSnippets, "Snippets" );
+    varStackSnippetsTab->setTabPosition( QTabWidget::South );
+
     d->m_PythonShell = new QmitkCtkPythonShell;
+
+    d->m_TextEditor = new QmitkPythonTextEditor;
+
+    QTabWidget* tabWidgetConsoleEditor = new QTabWidget;
+    tabWidgetConsoleEditor->addTab( d->m_PythonShell, "Console" );
+    tabWidgetConsoleEditor->addTab( d->m_TextEditor, "Text Editor" );
+    tabWidgetConsoleEditor->setTabPosition( QTabWidget::South );
 
     QList<int> sizes;
     sizes << 1 << 3;
     QSplitter* splitter = new QSplitter;
-    splitter->addWidget(d->m_PythonVariableStackTableView);
-    splitter->addWidget(d->m_PythonShell);
+    splitter->addWidget(varStackSnippetsTab);
+    splitter->addWidget(tabWidgetConsoleEditor);
     splitter->setStretchFactor ( 0, 1 );
     splitter->setStretchFactor ( 1, 3 );
 

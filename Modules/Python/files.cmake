@@ -5,19 +5,24 @@ SET(CPP_FILES
   QmitkCtkPythonShell.cpp
   QmitkPythonVariableStackTableModel.cpp
   QmitkPythonVariableStackTableView.cpp
+  QmitkPythonScriptEditorHighlighter.cpp
+  QmitkPythonTextEditor.cpp
+  QmitkPythonSnippets.cpp
 )
 
 #SET(UI_FILES
-  #Qmitk/QmitkKinectParameterWidgetControls.ui
+#  QmitkPythonSnippets.ui
 #)
 
 SET(MOC_H_FILES
   QmitkCtkPythonShell.h
   QmitkPythonVariableStackTableModel.h
   QmitkPythonVariableStackTableView.h
+  QmitkPythonScriptEditorHighlighter.h
+  QmitkPythonTextEditor.h
+  QmitkPythonSnippets.h
 )
 
-# uncomment the following line if you want to use Qt resources
-#set(QRC_FILES
-  #resources/QmitkToFUtilWidget.qrc
-#)
+set(QRC_FILES
+  resources/mitkPython.qrc
+)

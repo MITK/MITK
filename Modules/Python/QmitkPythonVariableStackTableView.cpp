@@ -65,7 +65,7 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     if( mitkImage.IsNotNull() )
     {
         std::string nodeName = varName.toStdString();
-        node = mitk::DataNode::New();
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
         m_DataStorage->Add(node);
 
         node->SetData( mitkImage );

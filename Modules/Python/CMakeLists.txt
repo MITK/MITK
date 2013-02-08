@@ -6,3 +6,5 @@ MITK_CREATE_MODULE(mitkPython
 )
 configure_file(PythonPath.h.in
   "${CMAKE_CURRENT_BINARY_DIR}/PythonPath.h" @ONLY)
+
+add_subdirectory(Testing)

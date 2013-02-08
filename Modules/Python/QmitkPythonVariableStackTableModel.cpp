@@ -29,10 +29,12 @@ QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *
     mitk::ModuleContext* context = mitk::GetModuleContext();
     mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
     m_PythonService = context->GetService<mitk::IPythonService>(serviceRef);
+    m_PythonService->AddPythonCommandObserver( this );
 }
 
 QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
 {
+  m_PythonService->RemovePythonCommandObserver( this );
 }
 
 bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, Qt::DropAction action, int row, int column, const QModelIndex & parent )
@@ -64,7 +66,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 //QString::fromStdString((node->GetName());
           QString varName = MITK_IMAGE_VAR_NAME;
           if( i > 0 )
-            varName = QString("%1%2).arg(MITK_IMAGE_VAR_NAME).arg(i);
+            varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
           MITK_DEBUG("varName") << "varName" << varName;
           m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME );
           ++i;
@@ -150,6 +152,7 @@ Qt::DropActions QmitkPythonVariableStackTableModel::supportedDropActions() const
 
 void QmitkPythonVariableStackTableModel::CommandExecuted(const QString &pythonCommand)
 {
+  MITK_DEBUG("QmitkPythonVariableStackTableModel") << "command was executed " << pythonCommand.toStdString();
     m_VariableStack = m_PythonService->GetVariableStack();
     QAbstractTableModel::reset();
 }
@@ -157,18 +160,4 @@ void QmitkPythonVariableStackTableModel::CommandExecuted(const QString &pythonCo
 QList<mitk::PythonVariable> QmitkPythonVariableStackTableModel::GetVariableStack() const
 {
     return m_VariableStack;
-}
-
-
-QString QmitkPythonVariableStackTableModel::CreateDictionaryCommandIfNecessary()
-{
-    MITK_DEBUG("QmitkPythonVariableStackTableModel") << "CreateDictionaryCommandIfNecessary()";
-    MITK_DEBUG("QmitkPythonVariableStackTableModel") << "m_PythonImagesDictName = " << m_PythonImagesDictName.toStdString();
-
-    QString command;
-    command.append( QString("try:\n") );
-    command.append( QString("  %1" ) .arg( m_PythonImagesDictName ) );
-    command.append( QString("except NameError:\n") );
-    command.append( QString("  %1 = {}\n") .arg( m_PythonImagesDictName ) );
-    return command;
 }

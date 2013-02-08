@@ -43,22 +43,44 @@ namespace mitk
 
             context->RegisterService<mitk::IPythonService>(m_PythonService, _PythonServiceProps);
 
-            MITK_DEBUG << "registering python paths";
+            MITK_DEBUG("PythonActivator") << "registering python paths";
 
-            QString itkLibDirs(PYTHONPATH_ITK_LIBRARY_DIRS);
-            MITK_DEBUG << "itkLibDirs" << itkLibDirs.toStdString();
+            QString _PYTHONPATH_ITK_LIBRARY_DIRS(PYTHONPATH_ITK_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "_PYTHONPATH_ITK_LIBRARY_DIRS" << _PYTHONPATH_ITK_LIBRARY_DIRS.toStdString();
 
-            QString itkWrapItkDir(PYTHONPATH_WRAP_ITK_DIR);
-            MITK_DEBUG << "itkWrapItkDir" << itkWrapItkDir.toStdString();
+            QString _PYTHONPATH_WRAP_ITK_DIR(PYTHONPATH_WRAP_ITK_DIR);
+            MITK_DEBUG("PythonActivator") << "_PYTHONPATH_WRAP_ITK_DIR" << _PYTHONPATH_WRAP_ITK_DIR.toStdString();
+
+            QString _PYTHONPATH_VTK_LIBRARY_DIRS(PYTHONPATH_VTK_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "_PYTHONPATH_VTK_LIBRARY_DIRS" << _PYTHONPATH_VTK_LIBRARY_DIRS.toStdString();
+
+            QString _PYTHONPATH_VTK_PYTHON_WRAPPING_DIR(PYTHONPATH_VTK_PYTHON_WRAPPING_DIR);
+            MITK_DEBUG("PythonActivator") << "_PYTHONPATH_VTK_PYTHON_WRAPPING_DIR" << _PYTHONPATH_VTK_PYTHON_WRAPPING_DIR.toStdString();
+
+            QString _PYTHONPATH_OPEN_CV_LIBRARY_DIRS(PYTHONPATH_OPEN_CV_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "_PYTHONPATH_OPEN_CV_LIBRARY_DIRS" << _PYTHONPATH_OPEN_CV_LIBRARY_DIRS.toStdString();
 
             QString basecommand = "sys.path.append('%1');";
             QString pythonCommand;
-            pythonCommand = basecommand.arg(itkLibDirs);
-            MITK_DEBUG << "issuing command " << pythonCommand.toStdString();
+
+            pythonCommand = basecommand.arg(_PYTHONPATH_ITK_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "issuing command " << pythonCommand.toStdString();
             m_PythonService->Execute(pythonCommand, mitk::IPythonService::SINGLE_LINE_COMMAND );
 
-            pythonCommand = basecommand.arg(itkWrapItkDir);
-            MITK_DEBUG << "issuing command " << pythonCommand.toStdString();
+            pythonCommand = basecommand.arg(_PYTHONPATH_WRAP_ITK_DIR);
+            MITK_DEBUG("PythonActivator") << "issuing command " << pythonCommand.toStdString();
+            m_PythonService->Execute(pythonCommand, mitk::IPythonService::SINGLE_LINE_COMMAND );
+
+            pythonCommand = basecommand.arg(_PYTHONPATH_VTK_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "issuing command " << pythonCommand.toStdString();
+            m_PythonService->Execute(pythonCommand, mitk::IPythonService::SINGLE_LINE_COMMAND );
+
+            pythonCommand = basecommand.arg(_PYTHONPATH_VTK_PYTHON_WRAPPING_DIR);
+            MITK_DEBUG("PythonActivator") << "issuing command " << pythonCommand.toStdString();
+            m_PythonService->Execute(pythonCommand, mitk::IPythonService::SINGLE_LINE_COMMAND );
+
+            pythonCommand = basecommand.arg(_PYTHONPATH_OPEN_CV_LIBRARY_DIRS);
+            MITK_DEBUG("PythonActivator") << "issuing command " << pythonCommand.toStdString();
             m_PythonService->Execute(pythonCommand, mitk::IPythonService::SINGLE_LINE_COMMAND );
         }
 

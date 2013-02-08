@@ -92,7 +92,7 @@ QList<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
 
 void mitk::PythonService::AddPythonCommandObserver(mitk::PythonCommandObserver *observer)
 {
-    if(m_Observer.contains(observer))
+    if(!m_Observer.contains(observer))
         m_Observer.append(observer);
 }
 
@@ -103,6 +103,7 @@ void mitk::PythonService::RemovePythonCommandObserver(mitk::PythonCommandObserve
 
 void mitk::PythonService::NotifyObserver(const QString &command)
 {
+  MITK_DEBUG("mitk::PythonService") << "number of observer " << m_Observer.size();
     foreach(mitk::PythonCommandObserver* observer, m_Observer)
     {
         observer->CommandExecuted(command);
@@ -129,8 +130,42 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QStri
     else
     {
         // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
-        int dim = 3;
+        int dim = image->GetDimension();
+        mitk::PixelType pixelType = image->GetPixelType();
+        itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelTypeId();
+
+        // default pixeltype: unsigned short
         QString type = "US";
+        if( ioPixelType == itk::ImageIOBase::SCALAR )
+        {
+          if( pixelType.GetTypeId() == typeid(double) )
+            type = "D";
+          else if( pixelType.GetTypeId() == typeid(float) )
+            type = "F";
+          if( pixelType.GetTypeId() == typeid(long double) )
+            type = "LD";
+          else if( pixelType.GetTypeId() == typeid(short) )
+            type = "SS";
+          else if( pixelType.GetTypeId() == typeid(signed char) )
+            type = "SC";
+          else if( pixelType.GetTypeId() == typeid(signed int) )
+            type = "SI";
+          else if( pixelType.GetTypeId() == typeid(signed long) )
+            type = "SL";
+          else if( pixelType.GetTypeId() == typeid(signed short) )
+            type = "SS";
+          else if( pixelType.GetTypeId() == typeid(unsigned char) )
+            type = "UC";
+          else if( pixelType.GetTypeId() == typeid(unsigned int) )
+            type = "UI";
+          else if( pixelType.GetTypeId() == typeid(unsigned long) )
+            type = "UL";
+          else if( pixelType.GetTypeId() == typeid(unsigned short) )
+            type = "US";
+        }
+
+        MITK_DEBUG("PythonService") << "Got mitk image with type " << type.toStdString() << " and dim " << dim;
+
         QString command;
 
         command.append( QString("import itk\n") );
@@ -198,14 +233,65 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
     MITK_ERROR << "Only 2D images allowed for OpenCV images";
     return convert;
   }
+
+  // try to save mitk image
+  QString fileName = this->GetTempImageName( QString::fromStdString(".bmp") );
+  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
+  if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
+  {
+    MITK_ERROR << "Temporary file " << fileName.toStdString() << " could not be created.";
+    return convert;
+  }
+
+  QString command;
+  command.append( QString("import cv\n") );
+  command.append( QString("%1 = cv.LoadImage(\"%2\")\n") .arg( varName ).arg( fileName ) );
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+
+  MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
+  QFile file(fileName);
+  file.remove();
+  return true;
+
 }
 
 mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& varName )
 {
-return 0;
+
+  mitk::Image::Pointer mitkImage;
+  QString command;
+  QString fileName = GetTempImageName( QString::fromStdString( ".bmp" ) );
+
+  MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
+  command.append( QString("import cv\n") );
+  command.append( QString( "cv.SaveImage(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+
+  try
+  {
+      MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
+      mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
+  }
+  catch(std::exception& e)
+  {
+    MITK_ERROR << e.what();
+  }
+
+  QFile file(fileName);
+  if( file.exists() )
+  {
+      MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
+      file.remove();
+  }
+
+  return mitkImage;
 }
 
 ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
 {
-    return &m_PythonManager;
+  return &m_PythonManager;
 }
+

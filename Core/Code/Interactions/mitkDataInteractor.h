@@ -42,7 +42,8 @@ namespace mitk
   {
 
   public:
-    typedef itk::SmartPointer<DataNode> NodeType;mitkClassMacro(DataInteractor, EventStateMachine);
+    typedef itk::SmartPointer<DataNode> NodeType;
+    mitkClassMacro(DataInteractor, EventStateMachine);
     itkNewMacro(Self);
 
     /**

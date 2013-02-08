@@ -22,7 +22,6 @@
 
 mitk::DataInteractor::DataInteractor()
 {
-  m_DataNode = NULL;
   m_SelectionAccuracy = 3.5;
 }
 
@@ -33,16 +32,20 @@ mitk::DataNode::Pointer mitk::DataInteractor::GetDataNode()
 
 void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
 {
-  mitk::DataNode::Pointer tmpDN = m_DataNode;
-  m_DataNode = dataNode;
-  if (dataNode.IsNotNull())
-  {
-    dataNode->SetDataInteractor(this);
-  }
-  else if (tmpDN.IsNotNull())
+  if ( dataNode == m_DataNode ) return;
+
+  if (m_DataNode.IsNotNull())
   { // if DataInteractors' DataNode is set to null, the "old" DataNode has to be notified (else the Dispatcher won't be notified either)
-    tmpDN->SetDataInteractor(NULL);
+    m_DataNode->SetDataInteractor(NULL);
   }
+
+  m_DataNode = dataNode;
+
+  if (m_DataNode.IsNotNull())
+  {
+    m_DataNode->SetDataInteractor(this);
+  }
+
   // notify implementations ...
   DataNodeChanged();
 }
@@ -62,7 +65,6 @@ mitk::DataInteractor::~DataInteractor()
   if (m_DataNode.IsNotNull())
   {
     m_DataNode->SetInteractor(NULL);
-    m_DataNode = NULL;
   }
 }
 

@@ -157,12 +157,8 @@ namespace mitk
      * 3d windows like this:
      \code
       bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
-        if (interactionEvent->GetSender()->GetMapperID() != 1) // 1 - 2D window
-        {
-          return false;
-        } else {
-          return true;
-        }
+      {
+        return interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D; // only 2D mappers
       }
      \endcode
      * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager view..

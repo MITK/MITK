@@ -21,9 +21,11 @@ mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer = NULL,
     mitk::Point2D mousePosition = NULL,
     mitk::MouseButtons buttonStates = NoButton,
     mitk::ModifierKeys modifiers = NoKey,
-    mitk::MouseButtons eventButton = NoButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, "MousePressEvent"), m_EventButton(eventButton), m_ButtonStates(buttonStates), m_Modifiers(
-        modifiers)
+    mitk::MouseButtons eventButton = NoButton)
+: InteractionPositionEvent(baseRenderer, mousePosition, "MousePressEvent")
+, m_EventButton(eventButton)
+, m_ButtonStates(buttonStates)
+, m_Modifiers( modifiers)
 {
 }
 
@@ -39,12 +41,7 @@ void mitk::MousePressEvent::SetEventButton(MouseButtons buttons)
 
 bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
 {
-  MousePressEvent* event = dynamic_cast<MousePressEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
+  return dynamic_cast<MousePressEvent*>(baseClass.GetPointer()) != NULL;
 }
 
 mitk::ModifierKeys mitk::MousePressEvent::GetModifiers() const

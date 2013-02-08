@@ -21,8 +21,11 @@ mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer = NU
     mitk::Point2D mousePosition = NULL,
     mitk::MouseButtons buttonStates = NoButton,
     mitk::ModifierKeys modifiers = NoKey,
-    mitk::MouseButtons eventButton = NoButton) :
-    InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent"), m_EventButton(eventButton),m_ButtonStates(buttonStates), m_Modifiers(modifiers)
+    mitk::MouseButtons eventButton = NoButton)
+: InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent")
+, m_EventButton(eventButton)
+,m_ButtonStates(buttonStates)
+, m_Modifiers(modifiers)
 {
 }
 
@@ -38,12 +41,7 @@ void mitk::MouseReleaseEvent::SetEventButton(MouseButtons buttons)
 
 bool mitk::MouseReleaseEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
 {
-  MouseReleaseEvent* event = dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
+  return dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer()) != NULL;
 }
 
 mitk::ModifierKeys mitk::MouseReleaseEvent::GetModifiers() const

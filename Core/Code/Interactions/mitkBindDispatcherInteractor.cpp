@@ -25,8 +25,8 @@
 #include "mitkInformer.h"
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor()
+:m_InformerService(NULL)
 {
-  m_InformerService = NULL;
   ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
   ServiceReference serviceRef = context->GetServiceReference<InformerService>();
 

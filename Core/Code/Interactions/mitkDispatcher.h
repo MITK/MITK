@@ -31,7 +31,10 @@ namespace mitk
 
   enum ProcessEventMode
   {
-    REGULAR, GRABINPUT, PREFERINPUT, CONNECTEDMOUSEACTION
+    REGULAR,
+    GRABINPUT,
+    PREFERINPUT,
+    CONNECTEDMOUSEACTION
   };
 
   class InternalEvent;

@@ -19,8 +19,9 @@
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer,
     mitk::Point2D mousePosition,
-    std::string eventClass) :
-    InteractionEvent(baseRenderer, eventClass), m_PointerPosition(mousePosition)
+    std::string eventClass)
+: InteractionEvent(baseRenderer, eventClass)
+, m_PointerPosition(mousePosition)
 {
   if (GetSender() != NULL)
   {
@@ -28,9 +29,7 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
   }
   else
   {
-    m_WorldPosition[0] = 0;
-    m_WorldPosition[1] = 0;
-    m_WorldPosition[2] = 0;
+    m_WorldPosition.Fill(0);
   }
 }
 
@@ -51,12 +50,7 @@ bool mitk::InteractionPositionEvent::MatchesTemplate(InteractionEvent::Pointer)
 
 bool mitk::InteractionPositionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
 {
-  InteractionPositionEvent* event = dynamic_cast<InteractionPositionEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
+  return dynamic_cast<InteractionPositionEvent*>(baseClass.GetPointer()) != NULL;
 }
 
 mitk::InteractionPositionEvent::~InteractionPositionEvent()

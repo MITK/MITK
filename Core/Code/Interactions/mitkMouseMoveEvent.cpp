@@ -18,19 +18,16 @@
 #include "mitkMouseMoveEvent.h"
 
 mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition = NULL, mitk::MouseButtons buttonStates =
-    NoButton, mitk::ModifierKeys modifiers = NoKey) :
-    InteractionPositionEvent(baseRenderer, mousePosition,  "MouseMoveEvent"),m_ButtonStates(buttonStates),m_Modifiers(modifiers)
+    NoButton, mitk::ModifierKeys modifiers = NoKey)
+: InteractionPositionEvent(baseRenderer, mousePosition,  "MouseMoveEvent")
+, m_ButtonStates(buttonStates)
+, m_Modifiers(modifiers)
 {
 }
 
 bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
 {
-  MouseMoveEvent* event = dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer());
-  if (event != NULL)
-  {
-    return true;
-  }
-  return false;
+  return dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer()) != NULL;
 }
 
 mitk::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const

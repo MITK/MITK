@@ -36,8 +36,8 @@ namespace mitk
   vtkStandardNewMacro(EventConfig);
 }
 
-mitk::EventConfig::EventConfig() :
-    m_errors(false)
+mitk::EventConfig::EventConfig()
+:m_Errors(false)
 {
   if (m_PropertyList.IsNull())
   {
@@ -76,7 +76,7 @@ bool mitk::EventConfig::LoadConfig(std::string fileName, std::string moduleName)
   }
   mitk::ModuleResourceStream stream(resource);
   this->SetStream(&stream);
-  return this->Parse() && !m_errors;
+  return this->Parse() && !m_Errors;
 }
 
 void mitk::EventConfig::StartElement(const char* elementName, const char **atts)
@@ -144,8 +144,7 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
         attsIter++;
         return *attsIter;
       }
-      attsIter++;
-      attsIter++;
+      attsIter += 2;
     }
   }
   return std::string();
@@ -192,8 +191,6 @@ bool mitk::EventConfig::ReadXMLBooleanAttribut(std::string name, const char** at
 {
   std::string s = ReadXMLStringAttribut(name, atts);
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-  if (s == "TRUE")
-    return true;
-  else
-    return false;
+
+  return s == "TRUE";
 }

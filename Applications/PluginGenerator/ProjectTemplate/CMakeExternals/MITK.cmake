@@ -34,6 +34,7 @@ if(NOT MITK_DIR)
     set(MITK_USE_QT ON CACHE BOOL "Use Nokia's Qt library in MITK" FORCE)
   endif()
 
+  set(MITK_USE_CableSwig ${MITK_USE_Python})
   set(MITK_USE_GDCM 1)
   set(MITK_USE_ITK 1)
   set(MITK_USE_VTK 1)
@@ -90,7 +91,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK GDCM VTK ITK OpenCV)
+  foreach(proj CTK DCMTK GDCM VTK ITK OpenCV CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

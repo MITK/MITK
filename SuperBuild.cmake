@@ -39,6 +39,7 @@ endif()
 set(external_projects
   VTK
   GDCM
+  CableSwig
   ITK
   Boost
   DCMTK
@@ -47,12 +48,12 @@ set(external_projects
   MITKData
   )
 
-
+set(MITK_USE_CableSwig ${MITK_USE_Python})
 set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK GDCM ITK DCMTK CTK OpenCV)
+foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV)
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)

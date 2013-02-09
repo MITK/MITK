@@ -9,6 +9,9 @@ endif()
 
 set(proj ITK)
 set(proj_DEPENDENCIES GDCM)
+if(MITK_USE_Python)
+  list(APPEND proj_DEPENDENCIES CableSwig)
+endif()
 
 set(ITK_DEPENDS ${proj})
 

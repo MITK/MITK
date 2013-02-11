@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
+// TODO Legacy , no longer necessary when after migrating all DisplayInteractions to new Interactions.
+// Coordinate supplier can probably also be removed then.
 
   //##Documentation
   //## @brief Operation with informations necessary for operations of DisplayVectorInteractor

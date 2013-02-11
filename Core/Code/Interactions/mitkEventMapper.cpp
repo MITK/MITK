@@ -41,10 +41,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkOutputWindow.h>
 #include <itkMacro.h>
-
 #include <vtkObjectFactory.h>
-
 #include <vector>
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+#include "mitkModuleRegistry.h"
 
 namespace mitk
 {
@@ -539,13 +542,19 @@ bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
-  // Search for StateMachine.xml, bypass relative path in mitkSourceTree for additional search
-
-  std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions");
-  if(xmlFileName != "")
-    return LoadBehavior(xmlFileName);
-
-  return false;
+  Module* module = ModuleRegistry::GetModule("Mitk");
+  if (module == NULL) {
+    mitkThrow()<< ("Module Mitk unavailable." );
+    return false;
+  }
+  ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
+  if (!resource.IsValid())
+  {
+    mitkThrow()<< ("Resource not valid. State machine pattern not found:Interactions/Legacy/StateMachine.xml" );
+  }
+  mitk::ModuleResourceStream stream(resource);
+  std::string patternString((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+  return LoadBehaviorString(patternString);
 }
 
 //##Documentation

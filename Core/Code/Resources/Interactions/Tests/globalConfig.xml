@@ -1,0 +1,70 @@
+<!--
+Standard Configuration // Global Visibility!
+
+Naming Convention:
+      Std         MousePress    PrimaryButton   Ctrl
+
+Global variant    Event class   Button/Key      Modifiers
+-->
+
+<config>
+  <!-- Undeclared tags are filled with standard values -->
+  <!-- Mouse Events -->
+  <!-- MousePressEvents -->
+  <input event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="StdMousePressSecondaryButton">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="StdMousePressPrimaryButtonCtrl">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="StdMousePressSecondaryButtonCtrl">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <!-- MouseMoveEvents -->
+  <input event_class="MouseMoveEvent" event_variant="StdMouseMove"/>
+  <input event_class="MouseMoveEvent" event_variant="StdMouseMovePrimaryButton">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="StdMouseMoveCtrl">
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="StdMouseMovePrimaryButtonCtrl">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <!-- MouseReleaseEvents -->
+  <input event_class="MouseReleaseEvent" event_variant="StdMouseReleasePrimaryButton">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="StdMouseReleaseSecondaryButton">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="StdMouseReleasePrimaryButtonCtrl">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="StdMouseReleaseSecondaryButtonCtrl">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+   <!-- MouseWheelEvents -->
+  <input event_class="MouseWheelEvent" event_variant="StdMouseWheelUp">
+    <attribute name="ScrollDirection" value="up"/>
+  </input>
+  <input event_class="MouseWheelEvent" event_variant="StdMouseWheelDown">
+    <attribute name="ScrollDirection" value="down"/>
+  </input>
+  <!-- Key Events -->
+  <input event_class="KeyEvent" event_variant="StdA">
+    <attribute name="Key" value="A"/>
+  </input>
+  <input event_class="KeyEvent" event_variant="StdB">
+    <attribute name="Key" value="B"/>
+  </input>
+  <!-- ... -->
+</config>

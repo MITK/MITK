@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
 #include "mitkInteractor.h"
+#include "mitkDataInteractor.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
 #define MBI_STD
@@ -97,6 +98,9 @@ public:
   //##Documentation
   //## @brief Set the Interactor
   virtual void SetInteractor(Interactor* interactor);
+
+  virtual void SetDataInteractor(DataInteractor::Pointer interactor);
+  virtual DataInteractor::Pointer GetDataInteractor() const;
 
   mitk::DataNode& operator=(const DataNode& right);
 
@@ -495,7 +499,10 @@ protected:
 
   //##Documentation
   //## @brief Interactor, that handles the Interaction
-  Interactor::Pointer m_Interactor;
+  Interactor::Pointer m_Interactor; // TODO: INTERACTION_LEGACY
+
+  DataInteractor::Pointer m_DataInteractor;
+
 
   //##Documentation
   //## @brief Timestamp of the last change of m_Data

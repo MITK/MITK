@@ -1,0 +1,43 @@
+<!--
+* - MITK : The original interaction scheme
+*   - left mouse button   : setting the cross position in the MPR view
+*   - middle mouse button : panning
+*   - right mouse button  : zooming
+*   - wheel               : scrolling
+-->
+<config>
+  <!-- Zoom sensitivity -->
+  <param name="zoomFactor" value="5"/>
+  <!-- Zoom either by moving mouse leftright or updown -->
+  <param name="zoomDirection" value="leftright"/>
+  <!-- react to an event, even tough is was already processed by a DataInteractor-->
+  <param name="alwaysReact" value="false"/>
+  <!-- Moving -->
+   <input event_class="MousePressEvent" event_variant="StartMove">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="Moving">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </input>
+  <!-- Zooming -->
+  <input event_class="MousePressEvent" event_variant="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+   <input event_class="MouseMoveEvent" event_variant="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </input>
+  <!-- PlaneUP and -Down are described twice, this means the transition
+  can be triggered by both events -->
+  <input event_class="MouseWheelEvent" event_variant="PlaneUP">
+    <attribute name="ScrollDirection" value="up"/>
+  </input>
+  <input event_class="MouseWheelEvent" event_variant="PlaneDown">
+    <attribute name="ScrollDirection" value="down"/>
+  </input>
+</config>

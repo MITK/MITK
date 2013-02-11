@@ -370,7 +370,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget4->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
-  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New( mitk::GlobalInteraction::GetInstance() );
+  m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
   m_LastLeftClickPositionSupplier =
     mitk::CoordinateSupplier::New("navigation", NULL);

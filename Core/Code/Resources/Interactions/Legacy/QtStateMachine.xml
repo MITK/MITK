@@ -111,7 +111,9 @@
     <!-- right MouseButton and MouseWheel -->
     <event NAME="right mbtn + MouseWheel" ID="522" TYPE="Type_Wheel" BUTTON="BS_RightButton" BUTTONSTATE="0x0002" KEY="Key_none" />
     <!-- middle MouseButton and MouseWheel -->
-    <event NAME="middle mbtn + MouseWheel" ID="523" TYPE="Type_Wheel" BUTTON="BS_MidButton" BUTTONSTATE="0x0004" KEY="Key_none" />
+    <event NAME="middleBN+MouseWheel" ID="523" TYPE="Type_Wheel" BUTTON="BS_MidButton" BUTTONSTATE="0x0004" KEY="Key_none" />
+  <!-- CTRL and MouseMove -->
+    <event NAME="CTRL+MouseMove" ID="529" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- left MouseButton and MouseMove -->
     <event NAME="left mbtn + MouseMove" ID="530" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0001" KEY="Key_none" />
     <!-- right MouseButton and MouseMove -->
@@ -172,23 +174,17 @@
     <event NAME="middle mbtn + MouseMove + shift" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
     <!-- shift + middleMouseButtonRelease -->
     <event NAME="middle mbtn release + shift" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
-
     <event NAME="right mbtn + alt" ID="2006" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn + Mousemove + alt" ID="2007" TYPE="Type_MouseMove" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
     <event NAME="right mbtn release + alt" ID="2008" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
-
-        <!-- alt + shift + right MouseButton -->
+    <!-- alt + shift + right MouseButton -->
     <event NAME="right mbtn + shift + ctrl" ID="2010" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButton and MouseMove -->
     <event NAME="right mbtn + MouseMove + shift + ctrl" ID="2011" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
     <!-- alt + shift + right MouseButtonRelease -->
     <event NAME="right mbtn release + shift + ctrl" ID="2012" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
-
-        <!-- alt + MouseWheel -->
+    <!-- alt + MouseWheel -->
     <event NAME="MouseWheel + shift" ID="2015" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_none" />
-
-
-
     <!-- -->
     <!-- -->
     <!-- own thrown events -->
@@ -282,7 +278,6 @@
     <!-- 0 (zero) -->
     <event NAME="0" ID="4029" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_0" />
   </events>
-
   <!-- Beginning of state machine patterns-->
   <!-- TutorialStep10Begin -->
   <stateMachine NAME="SelectAndMoveObjectWithArrowKeys">
@@ -847,38 +842,45 @@
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
       </transition>
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
+    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+        <action ID="90" />
+        <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+move  w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="90" />
         <action ID="49014" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
-      </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="49014" />
-        <action ID="42" />
-        <action ID="49014" />
       </transition>
     </state>
     <state NAME="inverted" ID="2">
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
-        <action ID="90" />
-      </transition>
-      <transition NAME="move w/o left button" NEXT_STATE_ID="1" EVENT_ID="520">
+      <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
         <action ID="49014" />
       </transition>
-      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
+        <action ID="49014" />
         <action ID="90" />
-        <action ID="49014" />
       </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="42" />
-        <action ID="49014" />
+      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+          <action ID="90" />
+      </transition>
+      <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
+        <action ID="80" />
+      </transition>
+      <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
+        <action ID="90" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
         <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+release" NEXT_STATE_ID="2" EVENT_ID="537">
+        <action ID="42" />
       </transition>
     </state>
   </stateMachine>
@@ -1109,6 +1111,53 @@
         </action>
       </transition>
       <transition NAME="no-vessel-picked" NEXT_STATE_ID="2" EVENT_ID="1003" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="TubeGraphInteraction">
+  <!--state machine for tube graph interactions with multiple selection-->
+    <state NAME="noTubePicked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="5">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkTubePicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+        <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="checkTubePickedGuardState" ID="1" X_POS="91" Y_POS="" WIDTH="347" HEIGHT="50">
+      <transition NAME="pickedTube" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="65">
+          <!--AcSELECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="75">
+          <!--AcDESELECT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="tubeSelected" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="checkPicked" NEXT_STATE_ID="3" EVENT_ID="5">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+      <transition NAME="checkPicked" NEXT_STATE_ID="1" EVENT_ID="8">
+        <action ID="30">
+          <!--AcCHECKELEMENT-->
+        </action>
+      </transition>
+    </state>
+    <state NAME="addTubeToSelectionGuardState" ID="3" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+      <transition NAME="tubePicked" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+        </action>
+      </transition>
+      <transition NAME="noTubePicked" NEXT_STATE_ID="2" EVENT_ID="1003" />
     </state>
   </stateMachine>
   <stateMachine NAME="AriadneAssistent">
@@ -2327,24 +2376,17 @@
       <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
         <action ID="10" />
         <!--AcADDPOINT-->
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
+        <action ID="0" />
       </transition>
     </state>
     <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="562" Y_POS="424" WIDTH="168" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
         <action ID="10" />
-        <!--AcADDPOINT-->
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
+        <action ID="0" />
       </transition>
     </state>
   </stateMachine>
@@ -3569,6 +3611,21 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="538" />
     </state>
   </stateMachine>
+  <stateMachine NAME="LeftClickScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="alternativePan">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="644">
@@ -3603,12 +3660,10 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="531">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" >
-        <action ID="43" />
-      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
-  <stateMachine NAME="LevelWindow">
+  <stateMachine NAME="LeftClickLevelWindow">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3618,9 +3673,17 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" >
-        <action ID="43" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="ToolCallbackInteraction">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
       </transition>
+    </state>
+    <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003" />
     </state>
   </stateMachine>
   <stateMachine NAME="PlanarFigureInteractor">
@@ -3740,9 +3803,8 @@
         <action ID="341" />
       </transition>
       <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
-        <!-- on EIDFIGUREHOVER go to HoverFiber and do nothing -->
-        <!-- previously: AcSELECTPICKEDOBJECT -->
-        <action ID="0" />
+        <!-- on EIDFIGUREHOVER go to HoverFiber and do AcSELECTPICKEDOBJECT -->
+        <action ID="60" />
       </transition>
     </state>
     <state NAME="HoverFiber" ID="123452" X_POS="340" Y_POS="170" WIDTH="100" HEIGHT="50">
@@ -3751,14 +3813,12 @@
         <action ID="341" />
       </transition>
       <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
-        <!-- on EIDFIGUREHOVER keep state and do nothing -->
-        <!-- previously: AcSELECTPICKEDOBJECT -->
-        <action ID="0" />
+        <!-- on EIDFIGUREHOVER keep state and do AcSELECTPICKEDOBJECT -->
+        <action ID="60" />
       </transition>
       <transition NAME="name" EVENT_ID="12341" NEXT_STATE_ID="123451">
-        <!-- on EIDNOFIGUREHOVER go to Start and do nothing -->
-        <!-- previously: AcDESELECTALL -->
-        <action ID="0" />
+        <!-- on EIDNOFIGUREHOVER go to Start and do AcDESELECTALL -->
+        <action ID="72" />
       </transition>
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="123452">
         <!-- on EIDLEFTMOUSEBTN keep state and do AcREMOVE -->
@@ -4015,4 +4075,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

@@ -119,45 +119,72 @@
     <!-- right MouseButton and MouseMove -->
     <event NAME="right mbtn + MouseMove" ID="531" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0002" KEY="Key_none" />
     <!-- middle MouseButton and MouseMove -->
-    <event NAME="middleBN+MouseMove" ID="533" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0004" KEY="Key_none" />
-    <!-- CTRL + left MouseButton and MouseMove -->
-    <event NAME="CTRL+leftBN+MouseMove" ID="534" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0201" KEY="Key_none" />
-    <!-- CTRL + right MouseButton and MouseMove -->
-    <event NAME="CTRL+rightBN+MouseMove" ID="535" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0202" KEY="Key_none" />
-    <!-- CTRL + middle MouseButton and MouseMove -->
-    <event NAME="CTRL+middleBN+MouseMove" ID="536" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0204" KEY="Key_none" />
-    <!-- CTRL + left MouseButtonRelease -->
-    <event NAME="CTRL+leftBNRelease" ID="537" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0201" KEY="Key_none" />
-    <!-- CTRL + right MouseButtonRelease -->
-    <event NAME="CTRL+rightBNRelease" ID="538" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0202" KEY="Key_none" />
-    <!-- CTRL + middle MouseButtonRelease -->
-    <event NAME="CTRL+middleBNRelease" ID="539" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0204" KEY="Key_none" />
-    <!-- Shift + Ctrl + left MouseButton -->
-    <event NAME="SHIFT+CTRL+MousePress" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
-    <!-- Shift + Ctrl + left MouseButtonMove -->
-    <event NAME="SHIFT+CTRL+MouseMove" ID="542" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
-    <!-- Shift + Ctrl + left MouseButtonRelease -->
-    <event NAME="SHIFT+CTRL+MouseRelease" ID="543" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0301" KEY="Key_none" />
-    <!-- Shift + left MouseButton and MouseMove -->
-    <event NAME="Shift+leftBN+MouseMove" ID="541" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_none" />
-    <!-- ALT + left MouseButton -->
-    <event NAME="ALT+leftBN" ID="600" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0400" KEY="Key_none" />
-    <!-- ALT + left MouseButton and MouseMove -->
-    <event NAME="ALT+leftBN+MouseMove" ID="610" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0401" KEY="Key_none" />
-    <!-- ALT + leftMouseButtonRelease -->
-    <event NAME="ALT+leftMouseRelease" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
-    <!-- SHIFT + rightMouseButtonPress -->
-    <event NAME="Shift+rightMousePress" ID="2000" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0100" KEY="Key_none" />
-    <!-- SHIFT + rightMouseButtonMove -->
-    <event NAME="Shift+rightMouseMove" ID="2001" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0102" KEY="Key_none" />
-    <!-- SHIFT + rightMouseButtonRelease -->
-    <event NAME="Shift+rightMouseRelease" ID="2002" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0102" KEY="Key_none" />
-    <!-- SHIFT + middleMouseButtonPress -->
-    <event NAME="Shift+middleMousePress" ID="2003" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0100" KEY="Key_none" />
-    <!-- SHIFT + middleMouseButtonMove -->
-    <event NAME="Shift+middleMouseMove" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
-    <!-- SHIFT + middleMouseButtonRelease -->
-    <event NAME="Shift+middleMouseRelease" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
+    <event NAME="middle mbtn + MouseMove" ID="533" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0004" KEY="Key_none" />
+    <!-- ctrl + left MouseButton and MouseMove -->
+    <event NAME="left mbtn + MouseMove + ctrl" ID="534" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0201" KEY="Key_none" />
+    <!-- ctrl + right MouseButton and MouseMove -->
+    <event NAME="right mbtn + MouseMove + ctrl" ID="535" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0202" KEY="Key_none" />
+    <!-- ctrl + middle MouseButton and MouseMove -->
+    <event NAME="middle mbtn + MouseMove + ctrl" ID="536" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0204" KEY="Key_none" />
+    <!-- ctrl + left MouseButtonRelease -->
+    <event NAME="left mbtn release + ctrl" ID="537" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0201" KEY="Key_none" />
+    <!-- ctrl + right MouseButtonRelease -->
+    <event NAME="right mbtn release + ctrl" ID="538" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0202" KEY="Key_none" />
+    <!-- ctrl + middle MouseButtonRelease -->
+    <event NAME="middle mbtn release + ctrl" ID="539" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0204" KEY="Key_none" />
+    <!-- shift + Ctrl + left MouseButton -->
+    <event NAME="left mbtn + shift + ctrl" ID="540" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0300" KEY="Key_none" />
+    <!-- shift + Ctrl + left MouseButtonMove -->
+    <event NAME="left mbtn + MouseMove + shift + ctrl" ID="542" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- shift + Ctrl + left MouseButtonRelease -->
+    <event NAME="left mbtn release + shift + ctrl" ID="543" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- shift + left MouseButton and MouseMove -->
+    <event NAME="left mbtn + MouseMove + shift" ID="541" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0101" KEY="Key_none" />
+    <!-- alt + left MouseButton -->
+    <event NAME="left mbtn + alt" ID="600" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- alt + left MouseButton and MouseMove -->
+    <event NAME="left mbtn + MouseMove + alt" ID="610" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0401" KEY="Key_none" />
+    <!-- alt + leftMouseButtonRelease -->
+    <event NAME="left mbtn release + alt" ID="620" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0401" KEY="Key_none" />
+    <!-- ctrl + MouseWheel -->
+    <event NAME="MouseWheel + ctrl" ID="630" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_none" />
+    <!-- alt + MouseWheel -->
+    <event NAME="MouseWheel + alt" ID="640" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- alt + middle MouseButton -->
+    <event NAME="middle mbtn + alt" ID="641" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- alt + middle MouseButton and MouseMove -->
+    <event NAME="middle mbtn + MouseMove + alt" ID="642" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0404" KEY="Key_none" />
+    <!-- alt + middle MouseButtonRelease -->
+    <event NAME="middle mbtn release + alt" ID="643" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0404" KEY="Key_none" />
+    <!-- alt + shift + right MouseButton -->
+    <event NAME="right mbtn + shift + alt" ID="644" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0500" KEY="Key_none" />
+    <!-- alt + shift + right MouseButton and MouseMove -->
+    <event NAME="right mbtn + MouseMove + shift + alt" ID="645" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0502" KEY="Key_none" />
+    <!-- alt + shift + right MouseButtonRelease -->
+    <event NAME="right mbtn release + shift + alt" ID="646" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0502" KEY="Key_none" />
+    <!-- shift + rightMouseButtonPress -->
+    <event NAME="right mbtn + shift" ID="2000" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0100" KEY="Key_none" />
+    <!-- shift + rightMouseButtonMove -->
+    <event NAME="right mbtn + MouseMove + shift" ID="2001" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0102" KEY="Key_none" />
+    <!-- shift + rightMouseButtonRelease -->
+    <event NAME="right mbtn release + shift" ID="2002" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0102" KEY="Key_none" />
+    <!-- shift + middleMouseButtonPress -->
+    <event NAME="middle mbtn + shift" ID="2003" TYPE="Type_MouseButtonPress" BUTTON="BS_MidButton" BUTTONSTATE="0x0100" KEY="Key_none" />
+    <!-- shift + middleMouseButtonMove -->
+    <event NAME="middle mbtn + MouseMove + shift" ID="2004" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0104" KEY="Key_none" />
+    <!-- shift + middleMouseButtonRelease -->
+    <event NAME="middle mbtn release + shift" ID="2005" TYPE="Type_MouseButtonRelease" BUTTON="BS_MidButton" BUTTONSTATE="0x0104" KEY="Key_none" />
+    <event NAME="right mbtn + alt" ID="2006" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <event NAME="right mbtn + Mousemove + alt" ID="2007" TYPE="Type_MouseMove" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <event NAME="right mbtn release + alt" ID="2008" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0400" KEY="Key_none" />
+    <!-- alt + shift + right MouseButton -->
+    <event NAME="right mbtn + shift + ctrl" ID="2010" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- alt + shift + right MouseButton and MouseMove -->
+    <event NAME="right mbtn + MouseMove + shift + ctrl" ID="2011" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- alt + shift + right MouseButtonRelease -->
+    <event NAME="right mbtn release + shift + ctrl" ID="2012" TYPE="Type_MouseButtonRelease" BUTTON="BS_RightButton" BUTTONSTATE="0x0301" KEY="Key_none" />
+    <!-- alt + MouseWheel -->
+    <event NAME="MouseWheel + shift" ID="2015" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_none" />
     <!-- -->
     <!-- -->
     <!-- own thrown events -->
@@ -806,8 +833,8 @@
         <action ID="80" />
       </transition>
       <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
-        <action ID="49014" />
         <action ID="80" />
+        <action ID="49014" />
       </transition>
       <transition NAME="move w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
@@ -815,45 +842,37 @@
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
       </transition>
-    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
-        <action ID="49014" />
+      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="90" />
-      </transition>
-      <transition NAME="CTRL+move  w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="49014" />
-        <action ID="90" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="42" />
+      </transition>
+      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
+        <action ID="49014" />
         <action ID="42" />
       </transition>
     </state>
     <state NAME="inverted" ID="2">
-      <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
+      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
+        <action ID="90" />
+      </transition>
+      <transition NAME="move w/o left button" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
         <action ID="49014" />
       </transition>
-      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="90" />
         <action ID="49014" />
-        <action ID="90" />
       </transition>
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
-          <action ID="90" />
-      </transition>
-      <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
-        <action ID="80" />
-      </transition>
-      <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="80" />
-      </transition>
-      <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
-        <action ID="90" />
+      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
+        <action ID="42" />
+        <action ID="49014" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
         <action ID="49014" />
-      </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="2" EVENT_ID="537">
-        <action ID="42" />
       </transition>
     </state>
   </stateMachine>
@@ -2192,9 +2211,8 @@
       <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="4" EVENT_ID="1015" />
       <!-- If points have been loaded, goto right state; checked in constructor -->
       <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
-        <action ID="1101">
-          <!--AcMODE_SELECT-->
-        </action>
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
         <action ID="32" />
       </transition>
       <transition NAME="checkn Delete" NEXT_STATE_ID="30" EVENT_ID="12">
@@ -2202,14 +2220,12 @@
         <!--AcCHECKNUMBEROFPOINTS-->
       </transition>
       <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
-        <action ID="1101">
-          <!--AcMODE_SELECT-->
-        </action>
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
       </transition>
       <transition NAME="SetThisStatemachineOnDeselected" NEXT_STATE_ID="1" EVENT_ID="1031">
-        <action ID="1100">
-          <!--AcMODE_DESELECT-->
-        </action>
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="space left" ID="2" X_POS="659" Y_POS="257" WIDTH="100" HEIGHT="50">
@@ -2225,12 +2241,10 @@
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
         <!--Event = ESC-->
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODE_DESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="checkedN" ID="3" X_POS="745" Y_POS="744" WIDTH="100" HEIGHT="50">
@@ -2243,41 +2257,33 @@
     </state>
     <state NAME="set full" ID="4" X_POS="267" Y_POS="633" WIDTH="100" HEIGHT="50">
       <transition NAME="Select or move point FULL" NEXT_STATE_ID="20" EVENT_ID="1">
-        <action ID="30">
-          <!--AcCHECKELEMENT-->
-        </action>
+        <action ID="30" />
+        <!--AcCHECKELEMENT-->
       </transition>
       <transition NAME="checkn Delete selected Point" NEXT_STATE_ID="30" EVENT_ID="12">
-        <action ID="330">
-          <!--AcCHECKNUMBEROFPOINTS-->
-        </action>
+        <action ID="330" />
+        <!--AcCHECKNUMBEROFPOINTS-->
       </transition>
       <transition NAME="DeselectAll" NEXT_STATE_ID="2" EVENT_ID="14">
         <!--Event = ESC-->
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
     </state>
     <state NAME="picked NotFull" ID="10" X_POS="903" Y_POS="38" WIDTH="100" HEIGHT="50">
       <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
       <transition NAME="StYes" NEXT_STATE_ID="11" EVENT_ID="1004">
-        <action ID="34">
-          <!--AcCHECKSELECTED-->
-        </action>
-        <action ID="1101">
-          <!--AcMODESELECT-->
-        </action>
+        <action ID="34" />
+        <!--AcCHECKSELECTED-->
+        <action ID="1101" />
+        <!--AcMODESELECT-->
       </transition>
     </state>
     <state NAME="already selected Space" ID="11" X_POS="391" Y_POS="11" WIDTH="100" HEIGHT="50">
@@ -2301,32 +2307,26 @@
     </state>
     <state NAME="picked Full" ID="20" X_POS="122" Y_POS="766" WIDTH="100" HEIGHT="50">
       <transition NAME="StNO" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="72">
-          <!--AcDESELECTALL-->
-        </action>
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="72" />
+        <!--AcDESELECTALL-->
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
       <transition NAME="StYES" NEXT_STATE_ID="21" EVENT_ID="1004">
-        <action ID="34">
-          <!--AcCHECKSELECTED-->
-        </action>
-        <action ID="1101">
-          <!--AcMODESELECT-->
-        </action>
+        <action ID="34" />
+        <!--AcCHECKSELECTED-->
+        <action ID="1101" />
+        <!--AcMODESELECT-->
       </transition>
     </state>
     <state NAME="selected Full" ID="21" X_POS="23" Y_POS="485" WIDTH="100" HEIGHT="50">
       <transition NAME="StNo" NEXT_STATE_ID="4" EVENT_ID="1003">
-        <action ID="60">
-          <!--AcSELECTPICKEDOBJECT-->
-        </action>
+        <action ID="60" />
+        <!--AcSELECTPICKEDOBJECT-->
       </transition>
       <transition NAME="StYes" NEXT_STATE_ID="22" EVENT_ID="1004">
-        <action ID="8">
-          <!--AcINITMOVEMENT-->
-        </action>
+        <action ID="8" />
+        <!--AcINITMOVEMENT-->
       </transition>
     </state>
     <state NAME="move Point Full" ID="22" X_POS="67" Y_POS="255" WIDTH="100" HEIGHT="50">
@@ -2344,16 +2344,17 @@
     <state NAME="checkn Delete" ID="30" X_POS="1124" Y_POS="708" WIDTH="100" HEIGHT="50">
       <transition NAME="StillFull" NEXT_STATE_ID="4" EVENT_ID="1015">
         <action ID="100" />
+        <!--AcREMOVEPOINT-->
       </transition>
       <transition NAME="NotEmptyNotFull" NEXT_STATE_ID="2" EVENT_ID="1014">
         <action ID="100" />
+        <!--AcREMOVEPOINT-->
       </transition>
       <transition NAME="WillBeEmpty" NEXT_STATE_ID="1" EVENT_ID="1017">
         <action ID="100" />
         <!--AcREMOVEPOINT-->
-        <action ID="1100">
-          <!--AcMODEDESELECT-->
-        </action>
+        <action ID="1100" />
+        <!--AcMODEDESELECT-->
       </transition>
     </state>
     <state NAME="selected space left" ID="31" X_POS="22" Y_POS="480" WIDTH="90" HEIGHT="50">
@@ -2367,17 +2368,24 @@
       <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
         <action ID="10" />
         <!--AcADDPOINT-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="562" Y_POS="424" WIDTH="168" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
         <action ID="10" />
+        <!--AcADDPOINT-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
   </stateMachine>
@@ -3089,7 +3097,7 @@
           <!-- AcONWIIMOTEBUTTONRELEASED -->
         </action>
       </transition>
-      <transition NAME="input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003">
+      <transition NAME="Input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003">
         <!--EIDWIIMOTEINPUT-->
         <action ID="4003">
           <!--AcONWIIMOTEINPUT-->
@@ -3589,19 +3597,6 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="Zoom">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
-        <action ID="1011" />
-      </transition>
-    </state>
-    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
-      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="530">
-        <action ID="1012" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
-    </state>
-  </stateMachine>
   <stateMachine NAME="alternativeZoom">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initzoom" NEXT_STATE_ID="1" EVENT_ID="7">
@@ -3685,10 +3680,12 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="531">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" >
+        <action ID="43" />
+      </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="LeftClickLevelWindow">
+  <stateMachine NAME="LevelWindow">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3698,10 +3695,12 @@
       <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="1014" />
       </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" >
+        <action ID="43" />
+      </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="ToolCallbackInteraction">
+<stateMachine NAME="ToolCallbackInteraction">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3875,6 +3874,71 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="Scroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="540">
+        <action ID="9" />
+      </transition>
+      <transition NAME="altinitmove" EVENT_ID="600" NEXT_STATE_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="542">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="543">
+        <action ID="43" />
+      </transition>
+      <transition NAME="altfinish" EVENT_ID="620" NEXT_STATE_ID="0">
+        <action ID="43" />
+      </transition>
+      <transition NAME="altscroll" EVENT_ID="610" NEXT_STATE_ID="1">
+        <action ID="1013" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="Zoom">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="1011" />
+      </transition>
+      <transition NAME="name" EVENT_ID="600" NEXT_STATE_ID="2">
+        <action ID="1011" />
+      </transition>
+    </state>
+    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="1012" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+      <transition NAME="name" EVENT_ID="620" NEXT_STATE_ID="0" />
+      <transition NAME="name" EVENT_ID="610" NEXT_STATE_ID="2">
+        <action ID="1012" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="MouseWheelScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="0">
+        <action ID="1015" />
+      </transition>
+      <transition NAME="name" EVENT_ID="640" NEXT_STATE_ID="0">
+        <action ID="1015" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="ContextMenuInteractor">
+    <state NAME="initial" ID="1" START_STATE="TRUE">
+      <transition NAME="press" NEXT_STATE_ID="2" EVENT_ID="2" />
+    </state>
+    <state NAME="contextmenu" ID="2" >
+      <transition NAME="moved" NEXT_STATE_ID="1" EVENT_ID="531" />
+      <transition NAME="contextmenu" NEXT_STATE_ID="1" EVENT_ID="507">
+        <action ID="30" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="ContourModelInteractor">
    <state NAME="Start" ID="1" START_STATE="TRUE">
     <transition NAME="checkPointClick" NEXT_STATE_ID="10" EVENT_ID="1"> <!-- left mbtn = 1 -->
@@ -3942,4 +4006,3 @@
 <!-- Question: the Application, that is loading this file doesn't act on the Interaction. Why? -->
 <!-- The QXMLFileLoader probably isn't able to load the file due to an error.-->
 <!-- Check the file for XML-Syntax like  "<" at beginning and "/>" at end -->
-

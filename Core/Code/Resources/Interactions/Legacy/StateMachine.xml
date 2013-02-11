@@ -842,37 +842,45 @@
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
       </transition>
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
+    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+        <action ID="90" />
+        <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+move  w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="90" />
         <action ID="49014" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="49014" />
         <action ID="42" />
       </transition>
     </state>
     <state NAME="inverted" ID="2">
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
-        <action ID="90" />
-      </transition>
-      <transition NAME="move w/o left button" NEXT_STATE_ID="1" EVENT_ID="520">
+      <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
         <action ID="49014" />
       </transition>
-      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
+        <action ID="49014" />
         <action ID="90" />
-        <action ID="49014" />
       </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="42" />
-        <action ID="49014" />
+      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+          <action ID="90" />
+      </transition>
+      <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
+        <action ID="80" />
+      </transition>
+      <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
+        <action ID="90" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
         <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+release" NEXT_STATE_ID="2" EVENT_ID="537">
+        <action ID="42" />
       </transition>
     </state>
   </stateMachine>

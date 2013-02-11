@@ -42,6 +42,9 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
   PropertyList::Pointer propertyList = PropertyList::New();
   propertyList->SetStringProperty(xmlParameterEventClass.c_str(), transition.m_EventClass.c_str());
   InteractionEvent::Pointer tmpEvent = EventFactory::CreateEvent(propertyList);
+  if (tmpEvent.IsNull()) {
+    return false;
+  }
 
   if (tmpEvent->IsSubClassOf(m_TransitionEvent.GetPointer()))
   {

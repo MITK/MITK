@@ -57,14 +57,17 @@ mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
   std::string action2 = (*it)->GetActionName();
   it++;// this should now point to the end of the vector, since only two actions are given
 
+  MITK_INFO << s2.IsNull();
+
   MITK_TEST_CONDITION_REQUIRED(
       s1.IsNotNull() &&
       s2.IsNull() &&
       st2->GetName() == "STATE2" &&
       action1 == "doaction7" &&
       action2 == "doaction2" &&
-      it == actions.end()
-      , "03 Check if transitions and Action identifier work." );
+      (it == actions.end())
+      , "03 Check if transitions and Action identifier work. \n Expected STATE2 , doaction7, doction2 got:\n" <<st2->GetName() << "," << action1
+      << "," << action2);
 
   // always end with this!
   MITK_TEST_END()

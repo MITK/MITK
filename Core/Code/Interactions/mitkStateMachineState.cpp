@@ -47,7 +47,7 @@ mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(std
   mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
-    if (**it == *t) // to not switch it and t, order matters, see  mitk::StateMachineTransition == operator
+    if (**it == *t) // do not switch it and t, order matters, see  mitk::StateMachineTransition == operator
       return *it;
   }
   return NULL;

@@ -19,7 +19,6 @@
 #include "QmitkGeneralPreferencePage.h"
 #include "QmitkEditorsPreferencePage.h"
 
-#include <mitkGlobalInteraction.h>
 #include <QmitkRegisterClasses.h>
 
 #include <QtPlugin>
@@ -41,17 +40,6 @@ namespace mitk
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
-
-    Module* module = ModuleRegistry::GetModule("Mitk");
-    ModuleResource resource = module->GetResource("Interactions/Legacy/QtStateMachine.xml");
-    if (!resource.IsValid())
-    {
-      mitkThrow()<< ("Resource not valid. State machine pattern not found:Interactions/Legacy/QtStateMachine.xml" );
-    }
-    mitk::ModuleResourceStream stream(resource);
-
-     std::string patternString((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-     mitk::GlobalInteraction::GetInstance()->Initialize("global", patternString);
 
     QmitkRegisterClasses();
   }

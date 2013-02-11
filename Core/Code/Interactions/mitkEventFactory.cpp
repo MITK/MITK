@@ -67,6 +67,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   std::string strSignalName = "";
 
   Point2D pos;
+  pos.Fill(0);
 
   // Parse modifier information
   if (list->GetStringProperty(xmlEventPropertyModifier.c_str(), strModifiers))

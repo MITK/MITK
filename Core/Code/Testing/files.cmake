@@ -5,8 +5,10 @@ set(MODULE_TESTS
   mitkCoreObjectFactoryTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
+  mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
+  mitkEventConfigTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -19,6 +21,7 @@ set(MODULE_TESTS
   #mitkImageToItkTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
+  mitkInteractionEventTest.cpp
   mitkITKThreadingTest.cpp
   # mitkLevelWindowManagerTest.cpp
   mitkLevelWindowTest.cpp
@@ -38,6 +41,7 @@ set(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
+  mitkStateMachineContainerTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp

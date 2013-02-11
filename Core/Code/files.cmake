@@ -203,26 +203,48 @@ set(CPP_FILES
   DataManagement/mitkMaterial.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
+  Interactions/mitkBindDispatcherInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
+  Interactions/mitkDataInteractor.cpp
+  Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPositionEvent.cpp
-  Interactions/mitkDisplayVectorInteractor.cpp
-  Interactions/mitkDisplayVectorInteractorLevelWindow.cpp
-  Interactions/mitkDisplayVectorInteractorScroll.cpp
+#  Interactions/mitkDisplayVectorInteractorLevelWindow.cpp # legacy, prob even now unneeded
+#  Interactions/mitkDisplayVectorInteractorScroll.cpp
   Interactions/mitkEvent.cpp
+  Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp
+  Interactions/mitkEventFactory.cpp
+  Interactions/mitkEventHandler.cpp
+  Interactions/mitkEventObserver.cpp
   Interactions/mitkEventMapper.cpp
+  Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
+  Interactions/mitkInformer.cpp
   Interactions/mitkInteractor.cpp
+  Interactions/mitkInternalEvent.cpp
+  Interactions/mitkInteractionEvent.cpp
+  Interactions/mitkInteractionPositionEvent.cpp
+  Interactions/mitkInteractionKeyEvent.cpp
+  Interactions/mitkMousePressEvent.cpp
+  Interactions/mitkMouseMoveEvent.cpp
+  Interactions/mitkMouseReleaseEvent.cpp
+  Interactions/mitkMouseWheelEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveBaseDataInteractor.cpp
   Interactions/mitkNodeDepententPointSetInteractor.cpp
+  Interactions/mitkPointSetDataInteractor.cpp
   Interactions/mitkPointSetInteractor.cpp
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp
+  Interactions/mitkStateMachineAction.cpp
+  Interactions/mitkStateMachineState.cpp
+  Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
+#  Interactions/mitkStatedEventObserver.cpp
+  Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
   Interactions/mitkStateMachineFactory.cpp
@@ -312,3 +334,23 @@ set(CPP_FILES
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
+
+set(RESOURCE_FILES
+Interactions/globalConfig.xml
+Interactions/DisplayInteraction.xml
+Interactions/DisplayConfig.xml
+Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigPACSPan.xml
+Interactions/DisplayConfigPACSScroll.xml
+Interactions/DisplayConfigPACSZoom.xml
+Interactions/DisplayConfigPACSLevelWindow.xml
+Interactions/DisplayConfigMITK.xml
+Interactions/PointSet.xml
+Interactions/Legacy/QtStateMachine.xml
+Interactions/Legacy/StateMachine.xml
+Interactions/PointSetConfig.xml
+Interactions/Tests/AddAndRemovePoints.xml
+Interactions/Tests/globalConfig.xml
+Interactions/Tests/StatemachineTest.xml
+Interactions/Tests/StatemachineConfigTest.xml
+)

@@ -40,6 +40,10 @@ class MITK_PYTHON_EXPORT QmitkPythonSnippets: public QWidget
 
     void SetFilePath( const QString& filePath );
 
+  signals:
+    void PasteCommandRequested(const QString& command);
+  protected slots:
+    void on_PasteSnippet_triggered( bool checked = false );
     /*
   protected slots:
     void on_Name_currentIndexChanged(int i);

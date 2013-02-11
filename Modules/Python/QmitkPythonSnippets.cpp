@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPythonSnippets.h"
 #include "QmitkPythonScriptEditorHighlighter.h"
-#include <ui_QmitkPythonSnippets.h>
 #include <QtGui>
 
 QmitkPythonSnippets::QStringMap QmitkPythonSnippets::CreateDefaultSnippets()
@@ -139,6 +138,11 @@ void QmitkPythonSnippets::SetFilePath(const QString &filePath)
   d->m_FilePath = filePath;
 }
 
+void QmitkPythonSnippets::on_PasteSnippet_triggered( bool )
+{
+  emit PasteCommandRequested( d->m_Content->toPlainText() );
+}
+
 /*
 void QmitkPythonSnippets::on_Name_currentIndexChanged(int i)
 {
@@ -202,17 +206,6 @@ void QmitkPythonSnippets::on_RemoveSnippet_clicked()
     }
     this->Update();
   }
-}
-
-void QmitkPythonSnippets::on_PasteNow_clicked()
-{
-  if( m_Controls->Name->count() == 0 )
-    return;
-
-  QString name = m_Controls->Name->currentText();
-  QString snippet = QString::fromStdString(m_Snippets[name.toStdString()]);
-  QmitkPythonMediator::getInstance()->paste( snippet );
-  QmitkPythonMediator::getInstance()->update();
 }
 
 void QmitkPythonSnippets::on_Content_textChanged()

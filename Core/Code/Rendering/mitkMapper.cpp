@@ -29,19 +29,18 @@ mitk::Mapper::Mapper()
 mitk::Mapper::~Mapper()
 {
 }
-
+//d
 mitk::BaseData* mitk::Mapper::GetData() const
 {
-  return m_DataNode->GetData();
+return m_DataNode->GetData();
 }
 
 mitk::DataNode* mitk::Mapper::GetDataNode() const
 {
-  itkDebugMacro("returning DataNode address " << this->m_DataNode );
   return this->m_DataNode.GetPointer();
 }
 
-
+//d
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -50,7 +49,7 @@ bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const ch
 
     return node->GetColor(rgb, renderer, name);
 }
-
+//d
 bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -59,7 +58,7 @@ bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, co
 
     return node->GetVisibility(visible, renderer, name);
 }
-
+//d
 bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -68,7 +67,7 @@ bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, cons
 
     return node->GetOpacity(opacity, renderer, name);
 }
-
+//d
 bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -78,14 +77,15 @@ bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRend
     return node->GetLevelWindow(levelWindow, renderer, name);
 }
 
+//d
 bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
 {
-    bool visible=true;
-    GetVisibility(visible, renderer, name);
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, name);
     return visible;
 }
 
-
+// eventuell weg
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
   if ( ( renderer != NULL ) && ( m_DataNode.GetPointer() != NULL ) )
@@ -123,7 +123,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   {
     // TimeSlicedGeometry or time step is not valid for this data:
     // reset mapper so that nothing is displayed
-    this->ResetMapper( renderer );
+    // this->ResetMapper( renderer );
     return;
   }
 
@@ -134,7 +134,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
       (renderer && (m_LastUpdateTime < renderer->GetTimeStepUpdateTime()))
     )
   {
-    this->GenerateData();
     m_LastUpdateTime.Modified();
   }
 

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkLevelWindow.h"
+#include "mitkCommon.h"
 
 #include <itkObject.h>
 #include <itkWeakPointer.h>
@@ -73,39 +74,44 @@ namespace mitk {
     *
     * Returns the mitk::BaseData object associated with this mapper.
     * \return the mitk::BaseData associated with this mapper.
+    * @deprecated Use GetDataNode()->GetData() instead to access the data
     */
-    BaseData* GetData() const;
+    DEPRECATED(BaseData* GetData() const);
 
     /** \brief Get the DataNode containing the data to map */
     virtual DataNode* GetDataNode() const;
 
-
     /** \brief Convenience access method for color properties (instances of
     * ColorProperty)
     * \return \a true property was found
+    * @deprecated Use GetDataNode()->GetColor(...) instead to get the color
     */
-    virtual bool GetColor(float rgb[3], BaseRenderer* renderer, const char* name = "color") const;
+    DEPRECATED(virtual bool GetColor(float rgb[3], BaseRenderer* renderer, const char* name = "color") const);
 
 
     /** \brief Convenience access method for visibility properties (instances
     * of BoolProperty)
     * \return \a true property was found
     * \sa IsVisible
+    * @deprecated Use GetDataNode()->GetVisibility(...) instead to get the visibility
     */
-    virtual bool GetVisibility(bool &visible, BaseRenderer* renderer, const char* name = "visible") const;
+    DEPRECATED(virtual bool GetVisibility(bool &visible, BaseRenderer* renderer, const char* name = "visible") const);
 
 
     /** \brief Convenience access method for opacity properties (instances of
     * FloatProperty)
     * \return \a true property was found
+    * @deprecated Use GetDataNode()->GetOpacity(...) instead to get the opacity
     */
-    virtual bool GetOpacity(float &opacity, BaseRenderer* renderer, const char* name = "opacity") const;
+    DEPRECATED(virtual bool GetOpacity(float &opacity, BaseRenderer* renderer, const char* name = "opacity") const);
+
 
     /** \brief Convenience access method for color properties (instances of
     * LevelWindoProperty)
     * \return \a true property was found
+    * @deprecated Use GetDataNode->GetLevelWindow(...) instead to get the levelwindow
     */
-    virtual bool GetLevelWindow(LevelWindow &levelWindow, BaseRenderer* renderer, const char* name = "levelwindow") const;
+    DEPRECATED(virtual bool GetLevelWindow(LevelWindow &levelWindow, BaseRenderer* renderer, const char* name = "levelwindow") const);
 
 
     /** \brief Convenience access method for visibility properties (instances
@@ -116,8 +122,9 @@ namespace mitk {
     * Thus, the return value has a different meaning than in the
     * GetVisibility method!
     * \sa GetVisibility
+    * @deprecated Use GetDataNode()->GetVisibility(...) instead
     */
-    virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const;
+    DEPRECATED(virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const);
 
 
     /** \brief Calls the time step of the input data for the specified renderer and checks
@@ -130,17 +137,10 @@ namespace mitk {
     */
     virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
-    /** \brief Returns whether this is an vtk-based mapper */
-     virtual bool IsVtkBased() const = 0;
-
-    /** \brief Returns true if this mapper owns the specified vtkProp for
-     * the given BaseRenderer.
-     *
-     * Note: returns false by default; should be implemented for VTK-based
-     * mapper subclasses. */
-    virtual bool HasVtkProp( const vtkProp* /*prop*/, BaseRenderer* /*renderer*/ ){ return false; };
-
-  //  virtual bool IsPickable() const = 0;
+    /** \brief Returns whether this is an vtk-based mapper
+    * @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
+    */
+    virtual bool IsVtkBased() const = 0;
 
     /**
     * \brief Release vtk-based graphics resources. Must be overwritten in
@@ -173,7 +173,8 @@ namespace mitk {
     virtual ~Mapper();
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer) */
-    virtual void GenerateData() { };
+    // @deprecated Use GenerateDataForRenderer() instead.
+    DEPRECATED( virtual void GenerateData() { });
 
     /** \brief Generate the data needed for rendering into \a renderer */
     virtual void GenerateDataForRenderer(BaseRenderer* /* renderer */) { };
@@ -187,6 +188,7 @@ namespace mitk {
     */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
 
+    //is not thread-safe
     itk::WeakPointer<DataNode> m_DataNode;
 
     /** \brief timestamp of last update of stored data */
@@ -242,7 +244,7 @@ namespace mitk {
 
         /** \brief Retrieves a LocalStorage for a specific BaseRenderer.
          *
-         * Should be used by mappers in GenerateData() and ApplyProperties()
+         * Should be used by mappers in GenerateDataForRenderer()
          */
         L *GetLocalStorage(mitk::BaseRenderer *forRenderer)
         {

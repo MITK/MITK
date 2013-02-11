@@ -179,8 +179,10 @@ m_MaximumNumberOfPoints = 80*80*80;
     //writer->Update();
   }
 
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if ( IsVisible( renderer ) == false )
+  if ( !visible )
   {
     if ( m_Glyph3DActor != NULL )
       m_Glyph3DActor->VisibilityOff();
@@ -200,6 +202,6 @@ m_MaximumNumberOfPoints = 80*80*80;
 */
 mitk::Image* mitk::VectorImageVtkGlyphMapper3D::GetInput()
 {
-  return const_cast<mitk::Image*>( dynamic_cast<mitk::Image*>( this->GetData() ) );
+  return const_cast<mitk::Image*>( dynamic_cast<mitk::Image*>( GetDataNode()->GetData() ) );
 }
 

@@ -51,8 +51,9 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
 
    /** \brief Returns  whether this is a vtk-based mapper
    *  \return false, since all mappers deriving from this class are OpenGL mappers
+   *  @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
    */
-   virtual bool IsVtkBased() const { return false; }
+   DEPRECATED( virtual bool IsVtkBased() const );
 
    /** \brief Returns whether this mapper allows picking in the renderwindow
    virtual bool IsPickable() const { return false; }*/

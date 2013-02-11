@@ -36,7 +36,10 @@ mitk::ContourMapper2D::~ContourMapper2D()
 
 void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
   {
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible) return;
 
   ////  @FIXME: Logik fuer update
   bool updateNeccesary=true;
@@ -125,5 +128,5 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 const mitk::Contour* mitk::ContourMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::Contour * > ( GetData() );
+  return static_cast<const mitk::Contour * > ( GetDataNode()->GetData() );
 }

@@ -44,14 +44,15 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
+
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible ) return;
 
   // Get PlanarFigure from input
   mitk::PlanarFigure *planarFigure = const_cast< mitk::PlanarFigure * >(
-    static_cast< const mitk::PlanarFigure * >( this->GetData() ) );
+    static_cast< const mitk::PlanarFigure * >( GetDataNode()->GetData() ) );
 
   // Check if PlanarFigure has already been placed; otherwise, do nothing
   if ( !planarFigure->IsPlaced() )

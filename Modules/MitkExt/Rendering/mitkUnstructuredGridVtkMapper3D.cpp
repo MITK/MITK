@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::UnstructuredGrid * > ( GetData() );
+  return static_cast<const mitk::UnstructuredGrid * > ( GetDataNode()->GetData() );
 }
 
 
@@ -151,7 +151,10 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
     }
   }
 
-  if(!IsVisible(renderer))
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
   {
     m_Assembly->VisibilityOff();
     return;

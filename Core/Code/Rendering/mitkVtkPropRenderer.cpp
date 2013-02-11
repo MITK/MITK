@@ -187,17 +187,20 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
-    if((mapper->IsVtkBased() == true) )
+
+    VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+
+    if(vtkmapper)
     {
       //sthVtkBased = true;
-      if(lastVtkBased == false)
+      if(!lastVtkBased)
       {
         Disable2DOpenGL();
         lastVtkBased = true;
       }
     }
     else
-      if((mapper->IsVtkBased() == false) && (lastVtkBased == true))
+      if(lastVtkBased)
       {
       Enable2DOpenGL();
       lastVtkBased = false;
@@ -285,8 +288,11 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     if ( mapper.IsNull() )
       continue;
 
+    bool visible = true;
+    node->GetVisibility(visible, this, "visible");
+
     // The information about LOD-enabled mappers is required by RenderingManager
-    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+    if ( mapper->IsLODEnabled( this ) && visible )
     {
       ++m_NumberOfVisibleLODEnabledMappers;
     }
@@ -587,13 +593,18 @@ mitk::DataNode *
       if ( node.IsNull() )
         continue;
 
-      mitk::Mapper::Pointer mapper = node->GetMapper( m_MapperID );
-      if ( mapper.IsNull() )
+      mitk::Mapper * mapper = node->GetMapper( m_MapperID );
+      if ( mapper == NULL)
         continue;
 
-      if ( mapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
-      {
-        return node;
+      mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
+
+      if(vtkmapper){
+        // wenn vtk-basiert, dann ............
+       if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
+       {
+          return node;
+       }
       }
     }
 

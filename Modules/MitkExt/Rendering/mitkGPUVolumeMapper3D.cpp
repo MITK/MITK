@@ -72,7 +72,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Image* mitk::GPUVolumeMapper3D::GetInput()
 {
-  return static_cast<const mitk::Image*> ( GetData() );
+  return static_cast<const mitk::Image*> ( GetDataNode()->GetData() );
 }
 
 void mitk::GPUVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer)
@@ -224,15 +224,19 @@ void mitk::GPUVolumeMapper3D::DeinitCommon()
 
 bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer* renderer)
 {
-  if(!IsVisible(renderer))
-    return false;
 
   if(!GetDataNode())
     return false;
 
-  bool value = false;
+  DataNode* node = GetDataNode();
 
-  if(!GetDataNode()->GetBoolProperty("volumerendering",value,renderer))
+  bool visible = true;
+  node->GetVisibility(visible, renderer, "visible");
+
+  if(!visible) return false;
+
+  bool value = false;
+  if(!node->GetBoolProperty("volumerendering",value,renderer));
     return false;
 
   if(!value)

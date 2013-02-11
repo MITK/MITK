@@ -35,11 +35,18 @@ void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRend
     }
 }
 
+bool mitk::VtkMapper::IsVtkBased() const
+{
+  return true;
+}
 
 void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 {
-  if ( this->IsVisible(renderer)==false )
-    return;
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
+
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
@@ -48,8 +55,10 @@ void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 
 void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
-  if ( this->IsVisible( renderer )==false )
-    return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
+
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
@@ -58,8 +67,10 @@ void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
 void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
-  if ( this->IsVisible(renderer)==false )
-    return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
+
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
@@ -68,8 +79,10 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false)
-    return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
+
   if ( GetVtkProp(renderer)->GetVisibility() )
   {
     GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
@@ -102,10 +115,12 @@ void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 void mitk::VtkMapper::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 {
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+  DataNode * node = GetDataNode();
+
   // check for color prop and use it for rendering if it exists
-  this->GetColor(rgba, renderer);
+  node->GetColor(rgba, renderer, "color");
   // check for opacity prop and use it for rendering if it exists
-  this->GetOpacity(rgba[3], renderer);
+  node->GetOpacity(rgba[3], renderer, "opacity");
 
   double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
   actor->GetProperty()->SetColor(drgba);

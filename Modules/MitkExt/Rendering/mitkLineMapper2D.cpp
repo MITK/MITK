@@ -37,13 +37,15 @@ mitk::LineMapper2D::~LineMapper2D()
 
 const mitk::PointSet *mitk::LineMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
 void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
-  if(IsVisible(renderer)==false)
-    return;
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if(!visible) return;
 
   bool updateNeccesary = true;//!!!! @TODO !??!!
 

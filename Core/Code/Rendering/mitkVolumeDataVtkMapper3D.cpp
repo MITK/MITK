@@ -63,7 +63,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Image*> ( GetData() );
+  return static_cast<const mitk::Image*> ( GetDataNode()->GetData() );
 }
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
@@ -211,7 +211,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
   bool volumeRenderingEnabled = true;
 
-  if (this->IsVisible(renderer)==false ||
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ||
       this->GetDataNode() == NULL ||
       dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))==NULL ||
       dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))->GetValue() == false
@@ -439,7 +443,7 @@ void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *r
 
     float rgb[3]={1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists
-    if(GetColor(rgb, renderer))
+    if(GetDataNode()->GetColor(rgb, renderer, "color"))
     {
       colorTransferFunction->AddRGBPoint( 0.0, 0.0, 0.0, 0.0 );
       colorTransferFunction->AddRGBPoint( 127.5, rgb[0], rgb[1], rgb[2] );

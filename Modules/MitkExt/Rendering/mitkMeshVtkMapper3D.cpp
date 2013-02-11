@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Mesh * > ( GetData() );
+  return static_cast<const mitk::Mesh * > ( GetDataNode()->GetData() );
 }
 
 vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
@@ -188,7 +188,10 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
   SetVtkMapperImmediateModeRendering(m_ContourMapper);
   SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 
-  if(IsVisible(renderer)==false)
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
   {
     m_SpheresActor->VisibilityOff();
     m_ContourActor->VisibilityOff();

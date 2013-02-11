@@ -80,7 +80,7 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     m_LineWidth = mitk::IntProperty::New(1);
   }
 
-  mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetData() );
+  mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( GetDataNode()->GetData() );
   assert( input );
 
   input->Update();
@@ -126,8 +126,9 @@ void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
 
 void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 {
-  if ( IsVisible( renderer ) == false )
-    return ;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if(!visible) return;
 
   vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform();
   vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();

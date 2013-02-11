@@ -46,7 +46,7 @@ mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 
 const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
 {
-  return static_cast<const Geometry2DData * > ( GetData() );
+  return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
 }
 
 void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* /* renderer */)
@@ -80,10 +80,11 @@ void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* /
 
 void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 {
-  if ( !this->IsVisible(renderer) )
-  {
-    return;
-  }
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible) return;
 
   Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 

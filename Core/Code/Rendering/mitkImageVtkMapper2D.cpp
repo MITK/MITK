@@ -103,7 +103,7 @@ float mitk::ImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer* renderer)
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 {
-  return static_cast< const mitk::Image * >( this->GetData() );
+  return static_cast< const mitk::Image * >( GetDataNode()->GetData() );
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
@@ -436,7 +436,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       }
       else
       {
-        GetColor( rgb, renderer );
+        GetDataNode()->GetColor(rgb, renderer, "color");
       }
     }
     if(selected)
@@ -448,12 +448,12 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
       }
       else
       {
-        GetColor( rgb, renderer );
+        GetDataNode()->GetColor(rgb, renderer, "color");
       }
     }
     if(!hover && !selected)
     {
-      GetColor( rgb, renderer );
+      GetDataNode()->GetColor(rgb, renderer, "color");
     }
 
     double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
@@ -486,7 +486,7 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   float opacity = 1.0f;
   // check for opacity prop and use it for rendering if it exists
-  GetOpacity( opacity, renderer );
+  GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   //set the opacity according to the properties
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
   if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
@@ -500,7 +500,14 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
   bool binary = false;
   bool CTFcanBeApplied = false;
-  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+
+  DataNode * node = GetDataNode();
+
+  if(node)
+  {
+  node->GetBoolProperty( "binary", binary, renderer );
+  }
+
   LocalStorage* localStorage = this->GetLocalStorage(renderer);
 
   //default lookuptable
@@ -514,7 +521,12 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   else
   {
     bool useColor = true;
-    this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
+
+    if(node)
+    {
+    node->GetBoolProperty( "use color", useColor, renderer );
+    }
+
     if((!useColor))
     {
       //BEGIN PROPERTY user-defined lut
@@ -543,7 +555,11 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
       }
     }//END PROPERTY user-defined lut
     LevelWindow levelWindow;
-    this->GetLevelWindow( levelWindow, renderer );
+
+    if(node){
+    node->GetLevelWindow( levelWindow, renderer );
+    }
+
     //set up the lookuptable with the level window range
     localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
@@ -579,7 +595,7 @@ void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer 
   //pass the LuT to the RBG filter
   localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
   mitk::LevelWindow opacLevelWindow;
-  if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+  if( GetDataNode()->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
   {//pass the opaque level window to the filter
     localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
     localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
@@ -596,7 +612,11 @@ void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer 
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  if ( !this->IsVisible( renderer ) )
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
   {
     return;
   }

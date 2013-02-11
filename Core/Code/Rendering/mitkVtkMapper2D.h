@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 
 namespace mitk {
-  // enables integration of mappers into the new mapper architecture
+
+ // typedef allows integration of mappers into the new mapper architecture
+ // @deprecated Use VtkMapper instead.
  typedef VtkMapper VtkMapper2D;
 
 } // namespace mitk

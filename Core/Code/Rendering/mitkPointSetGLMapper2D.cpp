@@ -48,7 +48,7 @@ mitk::PointSetGLMapper2D::~PointSetGLMapper2D()
 
 const mitk::PointSet *mitk::PointSetGLMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
 void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
@@ -104,7 +104,9 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   const int text2dDistance = 10;
 
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
 
   // @FIXME: Logik fuer update
   bool updateNeccesary=true;

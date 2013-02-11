@@ -29,7 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
 {
   Superclass::Paint ( renderer );
-  if ( IsVisible ( renderer ) == false )
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
     return;
 
   //

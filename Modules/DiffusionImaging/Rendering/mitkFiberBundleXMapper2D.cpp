@@ -67,7 +67,7 @@ mitk::FiberBundleXMapper2D::~FiberBundleXMapper2D()
 
 mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 {
-    return dynamic_cast< mitk::FiberBundleX * > ( GetData() );
+    return dynamic_cast< mitk::FiberBundleX * > ( GetDataNode()->GetData() );
 }
 
 
@@ -75,10 +75,11 @@ mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 {
 
-    if ( !this->IsVisible( renderer ) )
-    {
-        return;
-    }
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
+
 
  MITK_DEBUG << "MapperFBX 2D  update: ";
     // Calculate time step of the input data for the specified renderer (integer value)

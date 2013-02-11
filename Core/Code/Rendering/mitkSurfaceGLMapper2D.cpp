@@ -93,7 +93,7 @@ const mitk::Surface *mitk::SurfaceGLMapper2D::GetInput(void)
   if(m_Surface.IsNotNull())
     return m_Surface;
 
-  return static_cast<const Surface * > ( GetData() );
+  return static_cast<const Surface * > ( GetDataNode()->GetData() );
 }
 
 void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
@@ -143,7 +143,9 @@ void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode* node )
 
 void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if(!visible) return;
 
   Surface::Pointer input  = const_cast<Surface*>(this->GetInput());
 
@@ -498,45 +500,45 @@ void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   Superclass::ApplyProperties(renderer);
 
-  GetDataNode()->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
+  DataNode * node = GetDataNode();
+
+  if(node == NULL)
+  {
+    return;
+  }
+
+  node->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
 
   // check for color and opacity properties, use it for rendering if they exists
-  GetColor(m_LineColor, renderer /*, "color" */);
-  GetOpacity(m_LineColor[3], renderer /*, "color" */);
+  node->GetColor(m_LineColor, renderer, "color");
+  node->GetOpacity(m_LineColor[3], renderer, "opacity");
 
   bool invertNormals(false);
-  if (DataNode* node = GetDataNode())
-  {
-    node->GetBoolProperty("invert normals", invertNormals, renderer);
-  }
+  node->GetBoolProperty("invert normals", invertNormals, renderer);
 
   if (!invertNormals)
   {
-    GetColor(m_FrontSideColor, renderer, "front color");
-    GetOpacity(m_FrontSideColor[3], renderer);
+    node->GetColor(m_FrontSideColor, renderer, "front color");
+    node->GetOpacity(m_FrontSideColor[3], renderer, "opacity");
 
-    GetColor(m_BackSideColor, renderer, "back color");
-    GetOpacity(m_BackSideColor[3], renderer);
+    node->GetColor(m_BackSideColor, renderer, "back color");
+    node->GetOpacity(m_BackSideColor[3], renderer, "opacity");
 
-    if (DataNode* node = GetDataNode())
-    {
-      node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
-      node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-    }
+    node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
+    node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+
   }
   else
   {
-    GetColor(m_FrontSideColor, renderer, "back color");
-    GetOpacity(m_FrontSideColor[3], renderer);
+    node->GetColor(m_FrontSideColor, renderer, "back color");
+    node->GetOpacity(m_FrontSideColor[3], renderer, "opacity");
 
-    GetColor(m_BackSideColor, renderer, "front color");
-    GetOpacity(m_BackSideColor[3], renderer);
+    node->GetColor(m_BackSideColor, renderer, "front color");
+    node->GetOpacity(m_BackSideColor[3], renderer, "opacity");
 
-    if (DataNode* node = GetDataNode())
-    {
-      node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
-      node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
-    }
+    node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
+    node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );
+
   }
 }
 

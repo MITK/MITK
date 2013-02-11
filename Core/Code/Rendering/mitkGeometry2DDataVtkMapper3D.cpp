@@ -174,7 +174,7 @@ namespace mitk
 
   const Geometry2DData* Geometry2DDataVtkMapper3D::GetInput()
   {
-    return static_cast<const Geometry2DData * > ( GetData() );
+    return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
   }
 
   void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
@@ -209,7 +209,10 @@ namespace mitk
     // edge actor
     m_ImageAssembly->GetParts()->RemoveAllItems();
 
-    if ( !this->IsVisible(renderer) )
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if ( !visible )
     {
       // visibility has explicitly to be set in the single actors
       // due to problems when using cell picking:

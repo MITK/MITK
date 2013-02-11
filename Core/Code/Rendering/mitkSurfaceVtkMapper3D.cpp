@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Surface * > ( GetData() );
+  return static_cast<const mitk::Surface * > ( GetDataNode()->GetData() );
 }
 
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
@@ -58,9 +58,10 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  bool visible = IsVisible(renderer);
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(visible==false)
+  if(!visible)
   {
     ls->m_Actor->VisibilityOff();
     return;

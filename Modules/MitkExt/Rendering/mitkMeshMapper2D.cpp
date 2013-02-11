@@ -41,7 +41,7 @@ mitk::MeshMapper2D::~MeshMapper2D()
 
 const mitk::Mesh *mitk::MeshMapper2D::GetInput(void)
 {
-    return static_cast<const mitk::Mesh * > ( GetData() );
+    return static_cast<const mitk::Mesh * > ( GetDataNode()->GetData() );
 }
 
 // Return whether a point is "smaller" than the second
@@ -56,7 +56,12 @@ static bool point3DSmaller( const mitk::Point3D& elem1, const mitk::Point3D& ele
 
 void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  if ( !this->IsVisible(renderer) ) return;
+
+    bool visible = true;
+
+    GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if(!visible) return;
 
   //  @FIXME: Logik fuer update
   bool updateNeccesary = true;

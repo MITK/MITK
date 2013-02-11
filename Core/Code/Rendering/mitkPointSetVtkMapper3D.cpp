@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
@@ -365,7 +365,9 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
   this->ApplyProperties(m_ContourActor,renderer);
 
-  if(IsVisible(renderer)==false)
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if(!visible)
   {
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();

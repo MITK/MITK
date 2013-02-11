@@ -46,11 +46,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 {
-    if ( IsVisible( renderer ) == false )
-        return ;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if ( !visible ) return;
 
     // ok, das ist aus GenerateData kopiert
-    mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( GetData() );
+    mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( GetDataNode()->GetData() );
 
     assert( input );
 

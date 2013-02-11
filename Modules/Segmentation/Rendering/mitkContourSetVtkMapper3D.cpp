@@ -74,11 +74,15 @@ vtkProp* mitk::ContourSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer
 
 void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
-  if(IsVisible(renderer)==false)
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
   {
     m_Actor->VisibilityOff();
     return;
   }
+
   m_Actor->VisibilityOn();
 
   mitk::ContourSet::Pointer input  = const_cast<mitk::ContourSet*>(this->GetInput());
@@ -158,5 +162,5 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 
 const mitk::ContourSet* mitk::ContourSetVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::ContourSet* > ( GetData() );
+  return static_cast<const mitk::ContourSet* > ( GetDataNode()->GetData() );
 }

@@ -89,8 +89,10 @@ void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rende
     }
   }
 
+   bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if ( IsVisible( renderer ) == false )
+  if(!visible)
   {
     m_SplinesActor->VisibilityOff();
     m_SplineAssembly->VisibilityOff();

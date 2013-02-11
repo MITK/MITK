@@ -673,14 +673,14 @@ bool mitk::OdfVtkMapper2D<T,N>
   switch(GetIndex(renderer))
   {
   case 0:
-    retval = this->IsVisible(renderer, "VisibleOdfs_T");
-    break;
+  GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_T");
+  break;
   case 1:
-    retval = this->IsVisible(renderer, "VisibleOdfs_S");
-    break;
+  GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_S");
+  break;
   case 2:
-    retval = this->IsVisible(renderer, "VisibleOdfs_C");
-    break;
+  GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_C");
+  break;
   }
 
   return retval;

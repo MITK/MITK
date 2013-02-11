@@ -42,7 +42,7 @@ mitk::PlanarFigureMapper3D::~PlanarFigureMapper3D()
 
 const mitk::PlanarFigure* mitk::PlanarFigureMapper3D::GetInput()
 {
-    return static_cast<const mitk::PlanarFigure * > ( GetData() );
+    return static_cast<const mitk::PlanarFigure * > ( GetDataNode()->GetData() );
 }
 
 
@@ -50,7 +50,7 @@ void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 {
     try
     {
-        mitk::PlanarFigure* pf = dynamic_cast< mitk::PlanarFigure* > (this->GetData());
+        mitk::PlanarFigure* pf = dynamic_cast< mitk::PlanarFigure* > (GetDataNode()->GetData());
 
         const mitk::Geometry2D* pfgeometry = pf->GetGeometry2D();
         const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);

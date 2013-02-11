@@ -60,7 +60,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       tempCNFGeometryPoint.SetElement( dimension , vectorOfNodes[i].coordinates[dimension] );
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+    this->GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
 
     sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
     sphereSource->SetRadius(1.0);
@@ -89,7 +89,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.first.coordinates[dimension];
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+    this->GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
 
     lineSource->SetPoint1(tempWorldPoint[0], tempWorldPoint[1],tempWorldPoint[2]  );
 
@@ -98,7 +98,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.second.coordinates[dimension];
     }
 
-    this->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+    this->GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
 
     lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
 
@@ -125,7 +125,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
   }
 
-  (static_cast<mitk::ConnectomicsNetwork * > ( GetData() ) )->SetIsModified( false );
+  (static_cast<mitk::ConnectomicsNetwork * > ( GetDataNode()->GetData() ) )->SetIsModified( false );
 
   //this->UpdateVtkObjects();
 
@@ -135,7 +135,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
 {
 
-  return static_cast<const mitk::ConnectomicsNetwork * > ( GetData() );
+  return static_cast<const mitk::ConnectomicsNetwork * > ( GetDataNode()->GetData() );
 }
 
 

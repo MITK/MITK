@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  // enables integration of mappers into the new mapper architecture
+  // typedef allows integration of mappers into the new mapper architecture
+  // @deprecated Use GLMapper instead
   typedef GLMapper GLMapper2D;
 
 } // namespace mitk

@@ -28,22 +28,30 @@ mitk::GLMapper::~GLMapper()
 {
 }
 
-void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType /* type */){
+void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType /* type */)
+{
+  bool visible = true;
 
-  if(IsVisible(renderer)==false)
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
     return;
 
   Paint(renderer);
 }
 
+bool mitk::GLMapper::IsVtkBased() const
+{
+  return false;
+}
 
 void mitk::GLMapper::ApplyProperties(mitk::BaseRenderer* renderer)
 {
     float rgba[4]={1.0f,1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists
-    GetColor(rgba, renderer);
+    GetDataNode()->GetColor(rgba, renderer, "color");
     // check for opacity prop and use it for rendering if it exists
-    GetOpacity(rgba[3], renderer);
+    GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
     glColor4fv(rgba);
 }

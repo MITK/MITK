@@ -59,6 +59,10 @@ protected:
   //## if \a false a negative volume.
   //##
   bool m_Positive;
+
+private:
+  BoundingObject(const BoundingObject&);
+  BoundingObject& operator=(const BoundingObject&);
 };
 
 }

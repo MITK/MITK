@@ -31,21 +31,10 @@ namespace mitk
   class MITK_CORE_EXPORT Surface : public BaseData
   {
   public:
-    // not yet the best chioce of a region-type for surfaces, but it works for the time being
     typedef itk::ImageRegion<5> RegionType;
 
     mitkClassMacro(Surface, BaseData);
     itkNewMacro(Self);
-
-    friend void swap(Surface& first, Surface& second)
-    {
-      using std::swap;
-
-      swap(first.m_PolyDatas, second.m_PolyDatas);
-      swap(first.m_LargestPossibleRegion, second.m_LargestPossibleRegion);
-      swap(first.m_RequestedRegion, second.m_RequestedRegion);
-      swap(first.m_CalculateBoundingBox, second.m_CalculateBoundingBox);
-    }
 
     void CalculateBoundingBox();
     virtual void CopyInformation(const itk::DataObject *data);
@@ -63,6 +52,7 @@ namespace mitk
     virtual void SetRequestedRegion(Surface::RegionType *region);
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);
+    virtual void Swap(Surface& other);
     virtual void Update();
     virtual void UpdateOutputInformation();
     virtual bool VerifyRequestedRegion();

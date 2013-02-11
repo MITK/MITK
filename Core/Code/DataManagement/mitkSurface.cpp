@@ -38,6 +38,12 @@ static void Delete(vtkPolyData* polyData)
     polyData->Delete();
 }
 
+static void Update(vtkPolyData* polyData)
+{
+  if (polyData != NULL)
+    polyData->Update();
+}
+
 mitk::Surface::Surface()
   : m_CalculateBoundingBox(false)
 {
@@ -61,9 +67,17 @@ mitk::Surface::Surface(const mitk::Surface& other)
   }
 }
 
+void mitk::Surface::Swap(mitk::Surface& other)
+{
+  std::swap(m_PolyDatas, other.m_PolyDatas);
+  std::swap(m_LargestPossibleRegion, other.m_LargestPossibleRegion);
+  std::swap(m_RequestedRegion, other.m_RequestedRegion);
+  std::swap(m_CalculateBoundingBox, other.m_CalculateBoundingBox);
+}
+
 mitk::Surface& mitk::Surface::operator=(Surface other)
 {
-  swap(*this, other);
+  this->Swap(other);
   return *this;
 }
 
@@ -184,7 +198,7 @@ void mitk::Surface::CalculateBoundingBox()
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
   {
     vtkPolyData* polyData = m_PolyDatas[i];
-    vtkFloatingPointType bounds[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    vtkFloatingPointType bounds[6] = {0};
 
     if (polyData != NULL && polyData->GetNumberOfPoints() > 0)
     {
@@ -194,7 +208,10 @@ void mitk::Surface::CalculateBoundingBox()
     }
 
     mitk::Geometry3D::Pointer geometry = timeSlicedGeometry->GetGeometry3D(i);
-    assert(geometry.IsNotNull()); // TODO
+
+    if (geometry.IsNull())
+      mitkThrow() << "Time-sliced geometry is invalid (equals NULL).";
+
     geometry->SetFloatBounds(bounds);
   }
 
@@ -215,8 +232,10 @@ bool mitk::Surface::RequestedRegionIsOutsideOfTheBufferedRegion()
     return true;
 
   for(RegionType::IndexValueType t = m_RequestedRegion.GetIndex(3); t < end; ++t)
+  {
     if(m_PolyDatas[t] == NULL)
       return true;
+  }
 
   return false;
 }
@@ -236,37 +255,35 @@ void mitk::Surface::SetRequestedRegion(itk::DataObject* data)
   if (surface != NULL)
     m_RequestedRegion = surface->GetRequestedRegion();
   else
-    mitkThrow() << "mitk::Surface::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name() << " to " << typeid(Surface*).name();
+    mitkThrow() << "Data object used to get requested region is not a mitk::Surface.";
 }
 
 void mitk::Surface::SetRequestedRegion(Surface::RegionType* region)
 {
-  if(region != NULL)
-    m_RequestedRegion = *region;
-  else
-    mitkThrow() << "mitk::Surface::SetRequestedRegion(Surface::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(Surface*).name();
+  if (region == NULL)
+    mitkThrow() << "Requested region is invalid (equals NULL)";
+
+  m_RequestedRegion = *region;
 }
 
 void mitk::Surface::CopyInformation(const itk::DataObject* data)
 {
   Superclass::CopyInformation(data);
 
-  const mitk::Surface* surface = dynamic_cast<const mitk::Surface*>( data );
+  const mitk::Surface* surface = dynamic_cast<const mitk::Surface*>(data);
 
-  if (surface != NULL)
-    m_LargestPossibleRegion = surface->GetLargestPossibleRegion();
-  else
-    itkExceptionMacro( << "mitk::Surface::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(surface).name() );
+  if (surface == NULL)
+    mitkThrow() << "Data object used to get largest possible region is not a mitk::Surface.";
+
+  m_LargestPossibleRegion = surface->GetLargestPossibleRegion();
 }
 
 void mitk::Surface::Update()
 {
+  using ::Update;
+
   if (this->GetSource().IsNull())
-  {
-    for (std::vector<vtkPolyData*>::iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
-      if (*it != NULL)
-        (*it)->Update();
-  }
+    std::for_each(m_PolyDatas.begin(), m_PolyDatas.end(), Update);
 
   Superclass::Update();
 }
@@ -288,21 +305,22 @@ void mitk::Surface::ExecuteOperation(Operation* operation)
   {
     case OpSURFACECHANGED:
     {
-      mitk::SurfaceOperation* surfOp = dynamic_cast<mitk::SurfaceOperation*>(operation);
+      mitk::SurfaceOperation* surfaceOperation = dynamic_cast<mitk::SurfaceOperation*>(operation);
 
-      if(surfOp == NULL)
+      if(surfaceOperation == NULL)
         break;
 
-      unsigned int time = surfOp->GetTimeStep();
+      unsigned int timeStep = surfaceOperation->GetTimeStep();
 
-      if(m_PolyDatas[time] != NULL)
+      if(m_PolyDatas[timeStep] != NULL)
       {
-        vtkPolyData* updatePoly = surfOp->GetVtkPolyData();
+        vtkPolyData* updatedPolyData = surfaceOperation->GetVtkPolyData();
 
-        if(updatePoly != NULL)
+        if(updatedPolyData != NULL)
         {
-          this->SetVtkPolyData(updatePoly, time);
+          this->SetVtkPolyData(updatedPolyData, timeStep);
           this->CalculateBoundingBox();
+          this->Modified();
         }
       }
 
@@ -312,8 +330,6 @@ void mitk::Surface::ExecuteOperation(Operation* operation)
     default:
       return;
   }
-
-  this->Modified();
 }
 
 unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
@@ -323,10 +339,10 @@ unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
 
 void mitk::Surface::Graft(const DataObject* data)
 {
-  const Self* surface = dynamic_cast<const Self*>(data);
+  const Surface* surface = dynamic_cast<const Surface*>(data);
 
   if(surface == NULL)
-    mitkThrow() << "mitk::Surface::Graft cannot cast " << typeid(data).name() << " to " << typeid(const Self *).name();
+    mitkThrow() << "Data object used to graft surface is not a mitk::Surface.";
 
   this->CopyInformation(data);
   m_PolyDatas.clear();
@@ -345,22 +361,24 @@ void mitk::Surface::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << "\nNumber PolyDatas: " << m_PolyDatas.size() << "\n";
 
   unsigned int count = 0;
+
   for (std::vector<vtkPolyData*>::const_iterator it = m_PolyDatas.begin(); it != m_PolyDatas.end(); ++it)
   {
-    vtkPolyData* polyData = *it;
+    os << "\n";
 
-    if(polyData != NULL)
+    if(*it != NULL)
     {
-      os << "\n";
       os << indent << "PolyData at time step " << count << ":\n";
-      os << indent << "Number of cells " << polyData->GetNumberOfCells() << ": \n";
-      os << indent << "Number of points " << polyData->GetNumberOfPoints() << ": \n\n";
-      os << indent << "VTKPolyData : \n";
+      os << indent << "Number of cells: " << (*it)->GetNumberOfCells() << "\n";
+      os << indent << "Number of points: " << (*it)->GetNumberOfPoints() << "\n\n";
+      os << indent << "VTKPolyData:\n";
 
-      polyData->Print(os);
+      (*it)->Print(os);
     }
     else
-      os << indent << "\nEmpty PolyData at time step " << count << "\n";
+    {
+      os << indent << "Empty PolyData at time step " << count << "\n";
+    }
 
     ++count;
   }

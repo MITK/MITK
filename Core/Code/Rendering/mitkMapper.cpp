@@ -29,7 +29,7 @@ mitk::Mapper::Mapper()
 mitk::Mapper::~Mapper()
 {
 }
-//d
+
 mitk::BaseData* mitk::Mapper::GetData() const
 {
 return m_DataNode->GetData();
@@ -40,7 +40,7 @@ mitk::DataNode* mitk::Mapper::GetDataNode() const
   return this->m_DataNode.GetPointer();
 }
 
-//d
+
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -49,7 +49,7 @@ bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const ch
 
     return node->GetColor(rgb, renderer, name);
 }
-//d
+
 bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -58,7 +58,7 @@ bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, co
 
     return node->GetVisibility(visible, renderer, name);
 }
-//d
+
 bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -67,7 +67,7 @@ bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, cons
 
     return node->GetOpacity(opacity, renderer, name);
 }
-//d
+
 bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRenderer* renderer, const char* name) const
 {
     const mitk::DataNode* node=GetDataNode();
@@ -77,7 +77,7 @@ bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRend
     return node->GetLevelWindow(levelWindow, renderer, name);
 }
 
-//d
+
 bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
 {
     bool visible = true;
@@ -85,7 +85,6 @@ bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) con
     return visible;
 }
 
-// eventuell weg
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
   if ( ( renderer != NULL ) && ( m_DataNode.GetPointer() != NULL ) )

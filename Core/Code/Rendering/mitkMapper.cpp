@@ -123,7 +123,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   {
     // TimeSlicedGeometry or time step is not valid for this data:
     // reset mapper so that nothing is displayed
-    // this->ResetMapper( renderer );
+    this->ResetMapper( renderer );
     return;
   }
 

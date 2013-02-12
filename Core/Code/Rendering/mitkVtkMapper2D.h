@@ -24,7 +24,7 @@ namespace mitk {
 
  // typedef allows integration of mappers into the new mapper architecture
  // @deprecated Use VtkMapper instead.
- typedef VtkMapper VtkMapper2D;
+ DEPRECATED(typedef VtkMapper VtkMapper2D);
 
 } // namespace mitk
 

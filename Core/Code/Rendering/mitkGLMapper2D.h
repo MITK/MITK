@@ -24,7 +24,7 @@ namespace mitk {
 
   // typedef allows integration of mappers into the new mapper architecture
   // @deprecated Use GLMapper instead
-  typedef GLMapper GLMapper2D;
+  DEPRECATED(typedef GLMapper GLMapper2D);
 
 } // namespace mitk
 

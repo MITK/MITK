@@ -29,7 +29,7 @@ namespace mitk {
 /** \brief Base class of all OpenGL-based mappers.
 *
 * Those must implement the abstract method Paint(BaseRenderer), which is called by
-* MitkRender(...).
+* method MitkRender(...).
 * \ingroup Mapper
 */
 class MITK_CORE_EXPORT GLMapper : public Mapper
@@ -41,7 +41,6 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
     /** \brief Apply color and opacity read from the PropertyList */
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
-    // todo: virtual or not?
     /** \brief Checks visibility and calls the paint method
     *
     * Note: The enumeration is disregarded, since OpenGL rendering only needs a

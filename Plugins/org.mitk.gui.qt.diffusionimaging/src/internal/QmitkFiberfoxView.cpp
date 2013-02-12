@@ -604,7 +604,10 @@ void QmitkFiberfoxView::GenerateImage()
     spacing[1] = m_Controls->m_SpacingY->value();
     spacing[2] = m_Controls->m_SpacingZ->value();
 
-    mitk::Point3D                       origin; origin.Fill(0.0);
+    mitk::Point3D                       origin;
+    origin[0] = spacing[0]/2;
+    origin[1] = spacing[1]/2;
+    origin[2] = spacing[2]/2;
     itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
     if (m_SelectedBundle.IsNull())
@@ -779,8 +782,19 @@ void QmitkFiberfoxView::GenerateImage()
         image->SetDirections(gradientList);
         image->InitializeFromVectorImage();
         resultNode->SetData( image );
-        resultNode->SetName(m_SelectedBundle->GetName()+"_b"+QString::number(bVal).toStdString()+"_SNR"+QString::number(snr).toStdString()+"_RPTS"+QString::number(m_Controls->m_RepetitionsBox->value()).toStdString()+"_"+signalModelString.toStdString());
+        resultNode->SetName(m_SelectedBundle->GetName()
+                            +"_D"+QString::number(m_Controls->m_SizeX->value()).toStdString()
+                            +"-"+QString::number(m_Controls->m_SizeY->value()).toStdString()
+                            +"-"+QString::number(m_Controls->m_SizeZ->value()).toStdString()
+                            +"_S"+QString::number(spacing[0]).toStdString()
+                            +"-"+QString::number(spacing[1]).toStdString()
+                            +"-"+QString::number(spacing[2]).toStdString()
+                            +"_b"+QString::number(bVal).toStdString()
+                            +"_SNR"+QString::number(snr).toStdString()
+                            +"_"+signalModelString.toStdString());
         GetDataStorage()->Add(resultNode, m_SelectedBundle);
+
+        MITK_INFO << "ImageGeometry: " << image->GetGeometry()->GetOrigin();
 
         resultNode->AddProperty("Fiberfox.SNR", DoubleProperty::New(snr));
         resultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(m_Controls->m_RepetitionsBox->value()));

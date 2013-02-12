@@ -1783,24 +1783,56 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>m_CircleButton</tabstop>
   <tabstop>m_FlipButton</tabstop>
-  <tabstop>m_FiberDensityBox</tabstop>
+  <tabstop>m_RealTimeFibers</tabstop>
+  <tabstop>m_AdvancedFiberOptionsBox</tabstop>
   <tabstop>m_DistributionBox</tabstop>
   <tabstop>m_VarianceBox</tabstop>
+  <tabstop>m_FiberDensityBox</tabstop>
+  <tabstop>m_FiberSamplingBox</tabstop>
+  <tabstop>m_TensionBox</tabstop>
+  <tabstop>m_ContinuityBox</tabstop>
+  <tabstop>m_BiasBox</tabstop>
+  <tabstop>m_GenerateFibersButton</tabstop>
+  <tabstop>m_ConstantRadiusBox</tabstop>
+  <tabstop>m_AlignOnGrid</tabstop>
+  <tabstop>m_XrotBox</tabstop>
+  <tabstop>m_YrotBox</tabstop>
+  <tabstop>m_ZrotBox</tabstop>
+  <tabstop>m_XtransBox</tabstop>
+  <tabstop>m_YtransBox</tabstop>
+  <tabstop>m_ZtransBox</tabstop>
+  <tabstop>m_TransformBundlesButton</tabstop>
+  <tabstop>m_CopyBundlesButton</tabstop>
+  <tabstop>m_JoinBundlesButton</tabstop>
+  <tabstop>m_IncludeFiducials</tabstop>
   <tabstop>m_GenerateImageButton</tabstop>
+  <tabstop>m_SizeX</tabstop>
+  <tabstop>m_SizeY</tabstop>
+  <tabstop>m_SizeZ</tabstop>
   <tabstop>m_SpacingX</tabstop>
   <tabstop>m_SpacingY</tabstop>
   <tabstop>m_SpacingZ</tabstop>
   <tabstop>m_NumGradientsBox</tabstop>
   <tabstop>m_BvalueBox</tabstop>
+  <tabstop>m_RepetitionsBox</tabstop>
+  <tabstop>m_EnforcePureFiberVoxelsBox</tabstop>
+  <tabstop>m_KspaceImageBox</tabstop>
+  <tabstop>m_FiberCompartmentModelBox</tabstop>
+  <tabstop>m_TensorFaBox</tabstop>
+  <tabstop>m_StickDiffusivityBox</tabstop>
+  <tabstop>m_FiberS0Box</tabstop>
+  <tabstop>m_NonFiberCompartmentModelBox</tabstop>
+  <tabstop>m_BallD</tabstop>
+  <tabstop>m_NonFiberS0Box</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
   <tabstop>m_AddT2Smearing</tabstop>
   <tabstop>m_FiberRelaxationT2Box</tabstop>
   <tabstop>m_NonFiberRelaxationT2Box</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
   <tabstop>m_KspaceUndersamplingBox</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

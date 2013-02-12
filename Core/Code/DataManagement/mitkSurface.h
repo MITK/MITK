@@ -35,6 +35,7 @@ namespace mitk
 
     mitkClassMacro(Surface, BaseData);
     itkNewMacro(Self);
+    mitkCloneMacro(Surface);
 
     void CalculateBoundingBox();
     virtual void CopyInformation(const itk::DataObject *data);

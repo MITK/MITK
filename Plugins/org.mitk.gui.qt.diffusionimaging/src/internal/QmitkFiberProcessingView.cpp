@@ -1656,6 +1656,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
 // generate tract density image from fiber bundle
 mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute)
 {
+    const mitk::Geometry2D* bla = GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2D();
     typedef float OutPixType;
     typedef itk::Image<OutPixType, 3> OutImageType;
 

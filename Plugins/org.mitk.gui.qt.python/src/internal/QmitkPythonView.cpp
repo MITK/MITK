@@ -50,6 +50,7 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
 {
     d->m_PythonVariableStackTableView = new QmitkPythonVariableStackTableView;
     d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
+    d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
     d->m_PythonSnippets = new QmitkPythonSnippets;
 
@@ -78,6 +79,9 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
     QGridLayout* layout = new QGridLayout;
     layout->addWidget( splitter, 0, 0 );
     parent->setLayout(layout);
+
+    connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_PythonShell, SLOT(Paste(QString)) );
+    connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_TextEditor, SLOT(Paste(QString)) );
 }
 
 void QmitkPythonView::SetFocus()

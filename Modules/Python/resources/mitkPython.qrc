@@ -8,5 +8,6 @@
      <file>edit-find-replace.png</file>
      <file>edit-clear.png</file>
      <file>media-playback-start.png</file>
+     <file>PythonSnippets.xml</file>
  </qresource>
  </RCC>

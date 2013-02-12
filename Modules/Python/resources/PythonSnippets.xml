@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PythonSnippets>
+    <PythonSnippet key="medianfilter" value="filter = itk.MedianImageFilter[ IMAGE, IMAGE ].New()&#10;filter.SetRadius( 1 )&#10;filter.SetInput( IMAGE )&#10;filter.Update()&#10;IMAGE = filter.GetOutput()"/>
+</PythonSnippets>

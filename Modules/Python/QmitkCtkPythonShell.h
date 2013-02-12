@@ -41,6 +41,8 @@ class MITK_PYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
 public:
   QmitkCtkPythonShell(QWidget* parent = 0);
   ~QmitkCtkPythonShell();
+public slots:
+  void Paste( const QString& command );
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);

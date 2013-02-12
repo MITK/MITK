@@ -119,7 +119,10 @@ bool QmitkPythonTextEditor::canInsertFromMimeData( const QMimeData * ) const
 
 void QmitkPythonTextEditor::Paste(const QString &command)
 {
-  d->m_Content->insertPlainText(command + "\n");
+  if( this->isVisible() )
+  {
+    d->m_Content->insertPlainText(command + "\n");
+  }
 }
 
 

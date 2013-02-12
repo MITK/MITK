@@ -70,3 +70,11 @@ void QmitkCtkPythonShell::executeCommand(const QString& command)
   ctkPythonConsole::executeCommand(command);
   d->m_PythonService->NotifyObserver(command);
 }
+
+void QmitkCtkPythonShell::Paste(const QString &command)
+{
+  if( this->isVisible() )
+  {
+    this->executeCommand( command );
+  }
+}

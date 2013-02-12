@@ -346,7 +346,6 @@ Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
-Interactions/Legacy/QtStateMachine.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/PointSetConfig.xml
 Interactions/Tests/AddAndRemovePoints.xml

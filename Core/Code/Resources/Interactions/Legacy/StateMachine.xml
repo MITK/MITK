@@ -842,37 +842,45 @@
       <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
         <action ID="90" />
       </transition>
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
+    <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+        <action ID="90" />
+        <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+move  w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
         <action ID="90" />
         <action ID="49014" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="49014" />
         <action ID="42" />
       </transition>
     </state>
     <state NAME="inverted" ID="2">
-      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="534">
-        <action ID="90" />
-      </transition>
-      <transition NAME="move w/o left button" NEXT_STATE_ID="1" EVENT_ID="520">
+      <transition NAME="move  w/ left button" NEXT_STATE_ID="1" EVENT_ID="530">
         <action ID="90" />
         <action ID="49014" />
       </transition>
-      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="520">
+        <action ID="49014" />
         <action ID="90" />
-        <action ID="49014" />
       </transition>
-      <transition NAME="CTRL+release" NEXT_STATE_ID="1" EVENT_ID="537">
-        <action ID="42" />
-        <action ID="49014" />
+      <transition NAME="CTRL+move" NEXT_STATE_ID="2" EVENT_ID="529">
+          <action ID="90" />
+      </transition>
+      <transition NAME="CTRL+press" NEXT_STATE_ID="2" EVENT_ID="5">
+        <action ID="80" />
+      </transition>
+      <transition NAME="press" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="80" />
+      </transition>
+      <transition NAME="CTRL+move   w/ left button" NEXT_STATE_ID="2" EVENT_ID="534">
+        <action ID="90" />
       </transition>
       <transition NAME="release" NEXT_STATE_ID="1" EVENT_ID="505">
         <action ID="42" />
         <action ID="49014" />
+      </transition>
+      <transition NAME="CTRL+release" NEXT_STATE_ID="2" EVENT_ID="537">
+        <action ID="42" />
       </transition>
     </state>
   </stateMachine>
@@ -2368,24 +2376,17 @@
       <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
         <action ID="10" />
         <!--AcADDPOINT-->
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
+        <action ID="0" />
       </transition>
     </state>
     <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="562" Y_POS="424" WIDTH="168" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
         <action ID="10" />
-        <!--AcADDPOINT-->
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="1100" />
-        <!--AcMODE_DESELECT-->
+        <action ID="0" />
       </transition>
     </state>
   </stateMachine>
@@ -3625,6 +3626,21 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="alternativePan">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="2000">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="shiftmove" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="shiftmove" NEXT_STATE_ID="1" EVENT_ID="2001">
+        <action ID="92" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="2002">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
   <stateMachine NAME="alternativeScroll">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
@@ -3651,21 +3667,6 @@
         <action ID="92" />
       </transition>
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505">
-        <action ID="43" />
-      </transition>
-    </state>
-  </stateMachine>
-  <stateMachine NAME="alternativePan">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initshiftmove" NEXT_STATE_ID="1" EVENT_ID="2000">
-        <action ID="9" />
-      </transition>
-    </state>
-    <state NAME="shiftmove" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
-      <transition NAME="shiftmove" NEXT_STATE_ID="1" EVENT_ID="2001">
-        <action ID="92" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="2002">
         <action ID="43" />
       </transition>
     </state>
@@ -3700,7 +3701,7 @@
       </transition>
     </state>
   </stateMachine>
-<stateMachine NAME="ToolCallbackInteraction">
+  <stateMachine NAME="ToolCallbackInteraction">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3711,26 +3712,71 @@
     </state>
   </stateMachine>
   <stateMachine NAME="BinaryImageInteractor">
-    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="138" Y_POS="318" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+    <state START_STATE="TRUE" NAME="UndecidedState" ID="1" X_POS="374" Y_POS="98" WIDTH="139" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2" >
         <action ID="30" />
       </transition>
     </state>
-    <state NAME="IsOverImage" ID="2" X_POS="447" Y_POS="185" WIDTH="100" HEIGHT="50">
+    <state NAME="IsOverImage" ID="2" >
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
-      <transition NAME="isOverImage" EVENT_ID="1004" NEXT_STATE_ID="3" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="3" />
     </state>
-    <state NAME="PickImage" ID="3" X_POS="803" Y_POS="350" WIDTH="100" HEIGHT="50">
-      <transition NAME="SelectingImage" EVENT_ID="1" NEXT_STATE_ID="4">
+    <state NAME="Hovering" ID="3" >
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="30" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="11">
         <action ID="60" />
       </transition>
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
-        <action ID="30" />
+      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="3">
+        <action ID="61" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1013" NEXT_STATE_ID="6">
+        <action ID="6" />
       </transition>
     </state>
-    <state NAME="SelectImage" ID="4" X_POS="594" Y_POS="542" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="2">
-        <action ID="30" />
+    <state NAME="CorrectionMode" ID="6" X_POS="749" Y_POS="498" WIDTH="188" HEIGHT="51">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="7">
+        <action ID="8" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1002" NEXT_STATE_ID="1">
+        <action ID="40">
+          <!--End of correction mode - hide sphere-->
+        </action>
+      </transition>
+      <transition NAME="name" EVENT_ID="27" NEXT_STATE_ID="6">
+        <action ID="107" />
+      </transition>
+      <transition NAME="name" EVENT_ID="26" NEXT_STATE_ID="6">
+        <action ID="106" />
+      </transition>
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="6">
+        <action ID="49006" />
+      </transition>
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="6">
+        <action ID="49006" />
+      </transition>
+      <transition NAME="name" EVENT_ID="630" NEXT_STATE_ID="6">
+        <action ID="49007" />
+      </transition>
+    </state>
+    <state NAME="DragSegmentationSurface" ID="7" X_POS="95" Y_POS="473" WIDTH="202" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="7">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="7">
+        <action ID="43" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1002" NEXT_STATE_ID="1">
+        <action ID="40" />
+      </transition>
+    </state>
+    <state NAME="CheckIfImageIsSelected" ID="11" X_POS="771" Y_POS="201" WIDTH="255" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="6">
+        <action ID="6">
+          <!--Initialize correction mode, visualize a sphere-->
+        </action>
       </transition>
     </state>
   </stateMachine>

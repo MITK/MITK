@@ -100,7 +100,7 @@ set(MODULE_CUSTOM_TESTS
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
-#    mitkNodeDependentPointSetInteractorTest.cpp
+    mitkNodeDependentPointSetInteractorTest.cpp
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp

@@ -291,7 +291,7 @@ void QmitkFiberGenerateRandomWorker::run()
     }
 
     /* HOSTING POLYDATA FOR RANDOM FIBERSTRUCTURE */
-    vtkSmartPointer<vtkPolyData> PDRandom = vtkPolyData::New(); //could also be a standard pointer instead of smartpointer cuz ther is no need to delete because data is managed in datastorage.
+    vtkSmartPointer<vtkPolyData> PDRandom = vtkSmartPointer<vtkPolyData>::New(); //could also be a standard pointer instead of smartpointer cuz ther is no need to delete because data is managed in datastorage.
     PDRandom->SetPoints(pnts);
     PDRandom->SetLines(linesCell);
 
@@ -1403,7 +1403,7 @@ mitk::Geometry3D::Pointer QmitkFiberBundleDeveloperView::GenerateStandardGeometr
 
 
     // generate identity transform-matrix
-    vtkSmartPointer<vtkMatrix4x4> m = vtkMatrix4x4::New();
+    vtkSmartPointer<vtkMatrix4x4> m = vtkSmartPointer<vtkMatrix4x4>::New();
     geometry->SetIndexToWorldTransformByVtkMatrix(m);
 
     // generate boundingbox

@@ -2376,17 +2376,24 @@
       <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
         <action ID="10" />
         <!--AcADDPOINT-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
     <state NAME="checkedPositionEventGreaterN" ID="41" X_POS="562" Y_POS="424" WIDTH="168" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="4" EVENT_ID="1004">
         <action ID="10" />
+        <!--AcADDPOINT-->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
-        <action ID="0" />
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
       </transition>
     </state>
   </stateMachine>

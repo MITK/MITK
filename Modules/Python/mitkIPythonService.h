@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QString>
 #include <QVariant>
 #include <QList>
+#include "mitkSurface.h"
 
 namespace mitk
 {
@@ -91,6 +92,9 @@ namespace mitk
         virtual void NotifyObserver( const QString& command ) = 0;
 
         ///
+        /// \return true, if itk wrapping is available, false otherwise
+        virtual bool IsItkPythonWrappingAvailable() = 0;
+        ///
         /// copies an mitk image as itk image into the python interpreter process
         /// the image will be available as "varName" in python if everythin worked
         /// \return true if image was copied, else false
@@ -101,11 +105,24 @@ namespace mitk
         virtual mitk::Image::Pointer CopyItkImageFromPython( const QString& varName ) = 0;
 
         ///
+        /// \return true, if OpenCv wrapping is available, false otherwise
+        virtual bool IsOpenCvPythonWrappingAvailable() = 0;
+        ///
         /// \see CopyToPythonAsItkImage()
         virtual bool CopyToPythonAsCvImage( mitk::Image* image, const QString& varName ) = 0;
         ///
         /// \see CopyCvImageFromPython()
         virtual mitk::Image::Pointer CopyCvImageFromPython( const QString& varName ) = 0;
+
+        ///
+        /// \return true, if vtk wrapping is available, false otherwise
+        virtual bool IsVtkPythonWrappingAvailable() = 0;
+        ///
+        /// \see CopyToPythonAsItkImage()
+        virtual bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const QString& varName ) = 0;
+        ///
+        /// \see CopyCvImageFromPython()
+        virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const QString& varName ) = 0;
 
         ///
         /// nothing to do here

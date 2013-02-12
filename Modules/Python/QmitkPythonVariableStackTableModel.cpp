@@ -21,8 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkGetModuleContext.h>
 #include <QStringList>
+#include <QMessageBox>
 
 const QString QmitkPythonVariableStackTableModel::MITK_IMAGE_VAR_NAME = "mitkImage";
+const QString QmitkPythonVariableStackTableModel::MITK_SURFACE_VAR_NAME = "mitkSurface";
+
 QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *parent)
     :QAbstractTableModel(parent)
 {
@@ -56,6 +59,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
         QStringList::iterator slIter;
         int i = 0;
+        int j = 0;
         for (slIter = listOfDataNodeAddressPointers.begin();
              slIter != listOfDataNodeAddressPointers.end();
              slIter++)
@@ -63,13 +67,63 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           long val = (*slIter).toLong();
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
-//QString::fromStdString((node->GetName());
-          QString varName = MITK_IMAGE_VAR_NAME;
-          if( i > 0 )
-            varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
-          MITK_DEBUG("varName") << "varName" << varName;
-          m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME );
-          ++i;
+
+          if( mitkImage )
+          {
+            QString varName = MITK_IMAGE_VAR_NAME;
+            if( i > 0 )
+              varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
+            MITK_DEBUG("varName") << "varName" << varName;
+
+            bool exportAsCvImage = m_PythonService->IsOpenCvPythonWrappingAvailable();
+
+            if( mitkImage->GetDimension() == 2 && exportAsCvImage )
+            {
+              int ret = QMessageBox::question(this, "Export option",
+                "2D image detected. Export as OpenCV image to Python instead of an ITK image?",
+                QMessageBox::Yes|QMessageBox::No);
+              exportAsCvImage = ret == QMessageBox::Yes;
+              if(exportAsCvImage)
+              {
+                m_PythonService->CopyToPythonAsCvImage( mitkImage, MITK_IMAGE_VAR_NAME );
+                ++i;
+              }
+            }
+            if( !exportAsCvImage )
+            {
+              if( m_PythonService->IsItkPythonWrappingAvailable() )
+              {
+                m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME );
+                ++i;
+              }
+              else
+              {
+                MITK_ERROR << "ITK Python wrapping not available. Skipping export for image " << node->GetName();
+              }
+            }
+          }
+          else
+          {
+            mitk::Surface* surface = dynamic_cast<mitk::Surface*>(node->GetData());
+
+            if( surface )
+            {
+              QString varName = MITK_SURFACE_VAR_NAME;
+              if( j > 0 )
+                varName = QString("%1%2").arg(MITK_SURFACE_VAR_NAME).arg(j);
+              MITK_DEBUG("varName") << "varName" << varName;
+
+              if( m_PythonService->IsVtkPythonWrappingAvailable() )
+              {
+                m_PythonService->CopyToPythonAsVtkPolyData( surface, MITK_SURFACE_VAR_NAME );
+                ++j;
+              }
+              else
+              {
+                MITK_ERROR << "VTK Python wrapping not available. Skipping export for surface " << node->GetName();
+              }
+            }
+          }
         }
     }
     return returnValue;

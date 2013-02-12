@@ -225,6 +225,7 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &
 
     return mitkImage;
 }
+
 bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QString& varName )
 {
   bool convert = false;
@@ -252,8 +253,8 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
   MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
   QFile file(fileName);
   file.remove();
-  return true;
-
+  convert = true;
+  return convert;
 }
 
 mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& varName )
@@ -293,5 +294,86 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& 
 ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
 {
   return &m_PythonManager;
+}
+
+mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const QString& varName )
+{
+  mitk::Surface::Pointer newSurface;
+
+  QString command;
+  QString fileName = GetTempImageName( ".stl" );
+
+  MITK_DEBUG("PythonService") << "run python command to save polydata with vtk to " << fileName.toStdString();
+  command = QString (
+    "vtkStlWriter = vtk.vtkSTLWriter()\n"
+    "vtkStlWriter.SetInput(%1)\n"
+    "vtkStlWriter.SetFileName(\"%2\")\n"
+    "vtkStlWriter.Write()\n").arg(varName).arg(fileName);
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+
+  try
+  {
+    MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK Surface";
+    newSurface = mitk::IOUtil::LoadSurface( fileName.toStdString() );
+  }
+  catch(std::exception& e)
+  {
+    MITK_ERROR << e.what();
+  }
+
+  QFile file(fileName);
+  if( file.exists() )
+  {
+    MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
+    file.remove();
+  }
+
+  return newSurface;
+}
+
+bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, const QString& varName )
+{
+  bool convert = false;
+
+  // try to save mitk image
+  QString fileName = this->GetTempImageName( ".stl" );
+  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
+  if( !mitk::IOUtil::SaveSurface( surface, fileName.toStdString() ) )
+  {
+    MITK_ERROR << "Temporary file " << fileName.toStdString() << " could not be created.";
+    return convert;
+  }
+
+  QString command;
+  command.append( QString("import vtk\n") );
+  command.append( QString("vtkStlReader = vtk.vtkSTLReader()\n") );
+  command.append( QString("vtkStlReader.SetFileName(\"%1\")\n").arg( fileName ) );
+  command.append( QString("%1 = vtkStlReader.GetOutput()").arg( fileName ) );
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+
+  MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
+  QFile file(fileName);
+  file.remove();
+  convert = true;
+  return convert;
+}
+
+bool mitk::PythonService::IsItkPythonWrappingAvailable()
+{
+  return true; //TODO
+}
+
+bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
+{
+  return true; //TODO
+}
+
+bool mitk::PythonService::IsVtkPythonWrappingAvailable()
+{
+
+  return true; //TODO
 }
 

@@ -33,6 +33,7 @@ class MITK_PYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTa
 
 public:
   static const QString MITK_IMAGE_VAR_NAME;
+  static const QString MITK_SURFACE_VAR_NAME;
 
   QmitkPythonVariableStackTableModel(QObject *parent = 0);
   virtual ~QmitkPythonVariableStackTableModel();

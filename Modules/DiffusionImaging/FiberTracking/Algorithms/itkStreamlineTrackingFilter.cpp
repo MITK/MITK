@@ -568,8 +568,8 @@ TPDPixelType>
                        int threadId)
 {
     FiberPolyDataType poly = m_PolyDataContainer->GetElement(threadId);
-    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-    vtkSmartPointer<vtkCellArray> Cells = vtkCellArray::New();
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> Cells = vtkSmartPointer<vtkCellArray>::New();
 
     typedef itk::DiffusionTensor3D<TTensorPixelType>        TensorType;
     typedef ImageRegionConstIterator< InputImageType >      InputIteratorType;

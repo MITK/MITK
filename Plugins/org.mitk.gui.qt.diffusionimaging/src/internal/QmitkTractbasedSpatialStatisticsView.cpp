@@ -817,7 +817,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
 
   // initialize new vtk polydata
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
@@ -838,7 +838,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
     float minDistEnd = std::numeric_limits<float>::max();
 
 
-    vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+    vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
     int lineIndex=0;
 
 

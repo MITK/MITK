@@ -69,7 +69,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
       bool incorporatePolygon = this->CheckForIntersection(cell,cellSize,existingPoints, /*numberOfIntersections, intersectionPoints, */i);
       if ( !incorporatePolygon ) continue;
 
-      vtkSmartPointer<vtkPolygon> newPolygon = vtkPolygon::New();
+      vtkSmartPointer<vtkPolygon> newPolygon = vtkSmartPointer<vtkPolygon>::New();
 
       if(m_ReductionType == NTH_POINT)
       {

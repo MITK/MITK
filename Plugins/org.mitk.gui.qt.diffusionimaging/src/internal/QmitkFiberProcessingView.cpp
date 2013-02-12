@@ -1716,7 +1716,7 @@ void QmitkFiberProcessingView::MirrorFibers()
         {
             mitk::Surface::Pointer surf = m_SelectedSurfaces.at(i);
             vtkSmartPointer<vtkPolyData> poly = surf->GetVtkPolyData();
-            vtkSmartPointer<vtkPoints> vtkNewPoints = vtkPoints::New();
+            vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
 
             for (int i=0; i<poly->GetNumberOfPoints(); i++)
             {

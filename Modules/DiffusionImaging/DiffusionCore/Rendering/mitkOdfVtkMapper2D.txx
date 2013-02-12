@@ -394,7 +394,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     int index = GetIndex(renderer);
 
-    vtkSmartPointer<vtkTransform> inversetransform = vtkTransform::New();
+    vtkSmartPointer<vtkTransform> inversetransform = vtkSmartPointer<vtkTransform>::New();
     inversetransform->Identity();
     inversetransform->Concatenate(vtktransform->GetLinearInverse());
     double myscale[3];
@@ -581,7 +581,7 @@ void  mitk::OdfVtkMapper2D<T,N>
         {
             localStorage->m_OdfsPlanes[index]->RemoveAllInputs();
 
-            vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
+            vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
             normals->SetInputConnection( m_OdfSource->GetOutputPort() );
             normals->SplittingOff();
             normals->ConsistencyOff();
@@ -591,11 +591,11 @@ void  mitk::OdfVtkMapper2D<T,N>
             normals->FlipNormalsOff();
             normals->NonManifoldTraversalOff();
 
-            vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkTransformPolyDataFilter::New();
+            vtkSmartPointer<vtkTransformPolyDataFilter> trans = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
             trans->SetInputConnection( normals->GetOutputPort() );
             trans->SetTransform(m_OdfTransform);
 
-            vtkSmartPointer<vtkMaskedProgrammableGlyphFilter> glyphGenerator = vtkMaskedProgrammableGlyphFilter::New();
+            vtkSmartPointer<vtkMaskedProgrammableGlyphFilter> glyphGenerator = vtkSmartPointer<vtkMaskedProgrammableGlyphFilter>::New();
             glyphGenerator->SetMaximumNumberOfPoints(std::min(m_ShowMaxNumber,(int)cuttedPlane->GetNumberOfPoints()));
             glyphGenerator->SetRandomMode(0);
             glyphGenerator->SetUseMaskPoints(1);
@@ -842,7 +842,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     vtkLinearTransform * vtktransform =
             this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
-    vtkSmartPointer<vtkTransform> inversetransform = vtkTransform::New();
+    vtkSmartPointer<vtkTransform> inversetransform = vtkSmartPointer<vtkTransform>::New();
     inversetransform->Identity();
     inversetransform->Concatenate(vtktransform->GetLinearInverse());
     double* n = inversetransform->TransformNormal(vnormal);

@@ -58,28 +58,28 @@ namespace mitk
     void SetDataStorage(DataStorage* ds);
     DataStorage* GetDataStorage();  ///< returns the datastorage
 
-    /// if autoTopMost == true: sets the topmost layer image to be affected by changes
-    /// if removedNode != NULL a node was removed from DataStorage
+    /** @brief (Re-)Initializes the LevelWindowManager by setting the topmost image.
+     *         Use the removedNode parameter if a node was removed...
+     *  @param autoTopMost true: sets the topmost layer image to be affected by changes
+     *  @param removedNode != NULL a node was removed from DataStorage */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = NULL);
 
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
-    /**
-     * @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-     * @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this property.
-     */
+    /** @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+     *  @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this property.*/
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
-    /// sets new Level/Window values and informs all listeners about changes
+    /** @brief Sets new Level/Window values and informs all listeners about changes. */
     void SetLevelWindow(const LevelWindow& levelWindow);
 
-    /// returns Level/Window values for the current image
+    /** @return Returns Level/Window values for the current image.*/
     const LevelWindow& GetLevelWindow();
 
-    /// returns the current mitkLevelWindowProperty object from the image that is affected by changes
+    /** @return Returns the current mitkLevelWindowProperty object from the image that is affected by changes.*/
     LevelWindowProperty::Pointer GetLevelWindowProperty();
 
-    /// true if changes on slider or line-edits will affect always the topmost layer image
+    /** @return true if changes on slider or line-edits will affect always the topmost layer image. */
     bool isAutoTopMost();
 
     /** @brief This method is called when a node is added to the data storage.
@@ -94,7 +94,7 @@ namespace mitk
       */
     void DataStorageRemovedNode(const DataNode* removedNode = NULL);
 
-    /// change notifications from mitkLevelWindowProperty
+    /** @brief change notifications from mitkLevelWindowProperty */
     void OnPropertyModified(const itk::EventObject& e);
 
     Image* GetCurrentImage(); ///< return the currently active image

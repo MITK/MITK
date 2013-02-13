@@ -31,7 +31,7 @@ for it:
 \code
   m_CurrentInteractor = mitk::PointSetDataInteractor::New();
   m_CurrentInteractor->LoadStateMachine("PointSet.xml");
-  m_CurrentInteractor->AddEventConfig("PointSetConfig.xml");
+  m_CurrentInteractor->LoadEventConfig("PointSetConfig.xml");
 \endcode
 
 Lastly the DataNode is added to the DataInteractor

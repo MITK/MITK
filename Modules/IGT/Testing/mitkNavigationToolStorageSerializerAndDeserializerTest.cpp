@@ -331,6 +331,10 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
       {
       exceptionThrown = true;
       }
+    catch (std::exception& e)
+      {
+      MITK_ERROR << "Unexpected exception catched: " << e.what() << " / filename: " << toolFileName;
+      }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
     }
 

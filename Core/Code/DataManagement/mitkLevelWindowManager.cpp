@@ -226,7 +226,7 @@ void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
   UpdateObservers();
 
   //Initialize LevelWindowsManager to new image
-  SetAutoTopMostImage(true, NULL);
+  SetAutoTopMostImage(true);
 
   //check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))

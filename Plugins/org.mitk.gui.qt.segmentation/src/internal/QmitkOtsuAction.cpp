@@ -219,7 +219,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     resultNode->SetProperty( "levelwindow", levWinProp );
 
     //resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
-    resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
+    resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);

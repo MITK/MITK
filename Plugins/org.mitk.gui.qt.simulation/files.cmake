@@ -3,15 +3,18 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_simulation_Activator.cpp
+  QmitkSimulationPreferencePage.cpp
   QmitkSimulationView.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkSimulationPreferencePageControls.ui
   src/internal/QmitkSimulationViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_simulation_Activator.h
+  src/internal/QmitkSimulationPreferencePage.h
   src/internal/QmitkSimulationView.h
 )
 

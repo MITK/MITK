@@ -44,7 +44,7 @@ mitk::LevelWindowManager::~LevelWindowManager()
   if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->AddNodeEvent.RemoveListener(
-        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageAddedNode ));
     m_DataStorage->RemoveNodeEvent.RemoveListener(
         MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
     m_DataStorage = NULL;
@@ -56,19 +56,8 @@ mitk::LevelWindowManager::~LevelWindowManager()
     m_IsPropertyModifiedTagSet = false;
   }
 
-  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode.begin();
-       iter != m_PropObserverToNode.end();
-       ++iter )
-  {
-    (*iter).second->RemoveObserver((*iter).first);
-  }
-
-  for( std::map<unsigned long, mitk::BaseProperty::Pointer>::iterator iter = m_PropObserverToNode2.begin();
-       iter != m_PropObserverToNode2.end();
-       ++iter )
-  {
-    (*iter).second->RemoveObserver((*iter).first);
-  }
+  //clear both observer maps
+  this->ClearPropObserverLists();
 }
 
 
@@ -80,7 +69,7 @@ void mitk::LevelWindowManager::SetDataStorage( mitk::DataStorage* ds )
   if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->AddNodeEvent.RemoveListener(
-        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+        MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageAddedNode ));
     m_DataStorage->RemoveNodeEvent.RemoveListener(
         MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
   }
@@ -88,11 +77,11 @@ void mitk::LevelWindowManager::SetDataStorage( mitk::DataStorage* ds )
   /* register listener for new DataStorage */
   m_DataStorage = ds;  // register
   m_DataStorage->AddNodeEvent.AddListener(
-      MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageChanged ));
+      MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageAddedNode ));
   m_DataStorage->RemoveNodeEvent.AddListener(
       MessageDelegate1<LevelWindowManager, const mitk::DataNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
 
-  this->DataStorageChanged(); // update us with new DataStorage
+  this->DataStorageAddedNode(); // update us with new DataStorage
 }
 
 
@@ -191,7 +180,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   mitk::DataNode* n = m_DataStorage->GetNode(p);
   if (n == NULL)
   {
-    itkExceptionMacro("No Image in DataStorage that belongs to LevelWindow property " << m_LevelWindowProperty);
+    mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
   }
 
   m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());
@@ -230,63 +219,42 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
   this->Modified();
 }
 
-void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataNode* )
+void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 {
-  this->DataStorageRemovedNode();
+
+  //update observers with new data storage
+  UpdateObservers();
+
+  //Initialize LevelWindowsManager to new image
+  SetAutoTopMostImage(true);
+
+  //check if everything is still ok
+  if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
+     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+
 }
+
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
 {
-  /* remove old observers */
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin();
-       iter != m_PropObserverToNode.end();
-       ++iter)
-  {
-    (*iter).second->RemoveObserver((*iter).first);
-  }
-  m_PropObserverToNode.clear();
-
-  for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode2.begin();
-       iter != m_PropObserverToNode2.end();
-       ++iter)
-  {
-    (*iter).second->RemoveObserver((*iter).first);
-  }
-  m_PropObserverToNode2.clear();
-
-  if (m_DataStorage.IsNull())
-  {
-    itkExceptionMacro("DataStorage not set");
-  }
-
-  /* listen to changes  in visible property of all images */
-
-  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
-       it != all->End();
+  //first: check if deleted node is part of relevant nodes. If not, abort method because there is no need change anything.
+  if ((this->GetRelevantNodes()->size() == 0)) return;
+  bool removedNodeIsRelevant = false;
+  /* Iterator code: is crashing, don't know why... so using for loop
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = this->GetRelevantNodes()->Begin();
+       it != this->GetRelevantNodes()->End();
        ++it)
-  {
-    if (it->Value().IsNull())
-      continue;
+  {if (it->Value() == removedNode) {removedNodeIsRelevant=true;}}*/
+  for (unsigned int i=0; i<this->GetRelevantNodes()->size(); i++)
+    {
+    if (this->GetRelevantNodes()->at(i) == removedNode) {removedNodeIsRelevant=true;}
+    }
+  if (!removedNodeIsRelevant) return;
 
-    /* register listener for changes in visible property */
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-    command->SetCallbackFunction(this, &LevelWindowManager::Update);
-    m_PropObserverToNode[it->Value()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command )] = it->Value()->GetProperty("visible");
-  }
+  //remember node which will be removed
+  m_NodeMarkedToDelete = removedNode;
 
-  /* listen to changes  in layer property of all images */
-
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
-       it != all->End();
-       ++it)
-  {
-    if (it->Value().IsNull())
-      continue;
-    /* register listener for changes in layer property */
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-    command2->SetCallbackFunction(this, &LevelWindowManager::Update);
-    m_PropObserverToNode2[it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 )] = it->Value()->GetProperty("layer");
-  }
+  //update observers
+  UpdateObservers();
 
   /* search image than belongs to the property */
   if (m_LevelWindowProperty.IsNull())
@@ -298,10 +266,34 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
     mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
     mitk::DataNode* n = m_DataStorage->GetNode(p2);
     if (n == NULL || m_AutoTopMost) // if node was deleted, change our behaviour to AutoTopMost, if AutoTopMost is true change level window to topmost node
+    {
       SetAutoTopMostImage(true, removedNode);
-   }
+    }
+  }
+
+  //reset variable
+  m_NodeMarkedToDelete = NULL;
+
+  //check if everything is still ok
+  if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != (this->GetRelevantNodes()->size()-1)))
+     {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
 }
 
+void mitk::LevelWindowManager::UpdateObservers()
+{
+  this->ClearPropObserverLists(); //remove old observers
+  CreatePropObserverLists(); //create new observer lists
+
+
+
+
+}
+
+
+int mitk::LevelWindowManager::GetNumberOfObservers()
+{
+  return m_PropObserverToNode.size();
+}
 
 mitk::DataStorage* mitk::LevelWindowManager::GetDataStorage()
 {
@@ -378,6 +370,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   predicate->AddPredicate(predicateTypes);
 
   mitk::DataStorage::SetOfObjects::ConstPointer relevantNodes = m_DataStorage->GetSubset( predicate );
+
   return relevantNodes;
 }
 
@@ -385,4 +378,62 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
 mitk::Image* mitk::LevelWindowManager::GetCurrentImage()
 {
   return m_CurrentImage;
+}
+
+void mitk::LevelWindowManager::ClearPropObserverLists()
+{
+for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin();
+       iter != m_PropObserverToNode.end();
+       ++iter )
+  {
+    (*iter).second->RemoveObserver((*iter).first.first);
+    (*iter).second = 0;
+  }
+  m_PropObserverToNode.clear();
+
+  for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode2.begin();
+       iter != m_PropObserverToNode2.end();
+       ++iter )
+  {
+    (*iter).second->RemoveObserver((*iter).first.first);
+    (*iter).second = 0;
+  }
+  m_PropObserverToNode2.clear();
+}
+
+void mitk::LevelWindowManager::CreatePropObserverLists()
+{
+  if (m_DataStorage.IsNull())     //check if data storage is set
+    {itkExceptionMacro("DataStorage not set");}
+
+  /* add observers for all relevant nodes */
+  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
+       it != all->End();
+       ++it)
+  {
+    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
+      {continue;}
+
+    /* register listener for changes in visible property */
+    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    command->SetCallbackFunction(this, &LevelWindowManager::Update);
+    unsigned long idx = it->Value()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command );
+    m_PropObserverToNode[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("visible");
+  }
+
+  /* add observers for all layer properties*/
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
+       it != all->End();
+       ++it)
+  {
+    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
+      {continue;}
+    /* register listener for changes in layer property */
+    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    command2->SetCallbackFunction(this, &LevelWindowManager::Update);
+    unsigned long idx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
+    m_PropObserverToNode2[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("layer");
+  }
+
 }

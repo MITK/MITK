@@ -86,7 +86,9 @@ namespace mitk
       QList<PythonCommandObserver*> m_Observer;
       ctkAbstractPythonManager m_PythonManager;
       static const QString m_TmpImageName;
-
+      bool m_ItkWrappingAvailable;
+      bool m_OpenCVWrappingAvailable;
+      bool m_VtkWrappingAvailable;
   };
 }
 #endif

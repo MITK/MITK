@@ -19,12 +19,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <QFile>
 #include <QDir>
+#include <PythonQt.h>
+#include "PythonPath.h"
 
 const QString mitk::PythonService::m_TmpImageName("temp_mitk_image");
 
 mitk::PythonService::PythonService()
+  : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true )
 {
+  if( !m_PythonManager.isPythonInitialized() )
+  {
+    MITK_DEBUG("PythonService") << "initialize python";
+    m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
     m_PythonManager.initialize();
+
+    QVariant result = m_PythonManager.executeString( "sys.path", ctkAbstractPythonManager::EvalInput );
+    MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
+
+    QString pythonCommand(PYTHONPATH_COMMAND);
+    MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
+    m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
+
+    MITK_DEBUG("mitk::PythonService") << "Trying to import ITK";
+    m_PythonManager.executeString( "import itk", ctkAbstractPythonManager::SingleInput );
+    m_ItkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+    MITK_DEBUG("mitk::PythonService") << "m_ItkWrappingAvailable: " << (m_ItkWrappingAvailable? "yes": "no");
+    if( !m_ItkWrappingAvailable )
+    {
+      MITK_WARN << "ITK Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
+    }
+
+    MITK_DEBUG("mitk::PythonService") << "Trying to import OpenCv";
+    m_PythonManager.executeString( "import cv2", ctkAbstractPythonManager::SingleInput );
+    m_OpenCVWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+    MITK_DEBUG("mitk::PythonService") << "m_OpenCVWrappingAvailable: " << (m_OpenCVWrappingAvailable? "yes": "no");
+    if( !m_OpenCVWrappingAvailable )
+    {
+      MITK_WARN << "OpenCV Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
+    }
+
+    MITK_DEBUG("mitk::PythonService") << "Trying to import VTK";
+    m_PythonManager.executeString( "import vtk", ctkAbstractPythonManager::SingleInput );
+    m_VtkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+    MITK_DEBUG("mitk::PythonService") << "m_VtkWrappingAvailable: " << (m_VtkWrappingAvailable? "yes": "no");
+    if( !m_VtkWrappingAvailable )
+    {
+      MITK_WARN << "VTK Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
+    }
+
+  }
+  //QVariant result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
+  //MITK_DEBUG("mitk::PythonService") << "result of '5+5': " << result.toString().toStdString();
 }
 
 mitk::PythonService::~PythonService()
@@ -168,8 +213,7 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QStri
 
         QString command;
 
-        command.append( QString("import itk\n") );
-        command.append( QString("imageType = itk.Image[%1, %2]\n") .arg( type ).arg( dim ) );
+        command.append( QString("imageType = itk.Image[itk.%1, %2]\n") .arg( type ).arg( dim ) );
 
         command.append( QString("readerType = itk.ImageFileReader[imageType]\n") );
         command.append( QString("reader = readerType.New()\n") );
@@ -196,7 +240,6 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &
     QString fileName = GetTempImageName( QString::fromStdString( mitk::IOUtil::DEFAULTIMAGEEXTENSION ) );
 
     MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
-    command.append( QString("import itk\n") );
 
     command.append( QString( "writer = itk.ImageFileWriter[ %1 ].New()\n").arg( varName ) );
     command.append( QString( "writer.SetFileName( \"%1\" )\n").arg(fileName) );
@@ -245,7 +288,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
   }
 
   QString command;
-  command.append( QString("import cv\n") );
+
   command.append( QString("%1 = cv.LoadImage(\"%2\")\n") .arg( varName ).arg( fileName ) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
@@ -265,7 +308,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& 
   QString fileName = GetTempImageName( QString::fromStdString( ".bmp" ) );
 
   MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
-  command.append( QString("import cv\n") );
+
   command.append( QString( "cv.SaveImage(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
@@ -347,7 +390,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
   }
 
   QString command;
-  command.append( QString("import vtk\n") );
+
   command.append( QString("vtkStlReader = vtk.vtkSTLReader()\n") );
   command.append( QString("vtkStlReader.SetFileName(\"%1\")\n").arg( fileName ) );
   command.append( QString("%1 = vtkStlReader.GetOutput()").arg( fileName ) );
@@ -363,17 +406,17 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
-  return true; //TODO
+  return m_ItkWrappingAvailable; //TODO
 }
 
 bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 {
-  return true; //TODO
+  return m_OpenCVWrappingAvailable; //TODO
 }
 
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
 
-  return true; //TODO
+  return m_VtkWrappingAvailable; //TODO
 }
 

@@ -67,13 +67,14 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           long val = (*slIter).toLong();
           mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
+          MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
 
           if( mitkImage )
           {
             QString varName = MITK_IMAGE_VAR_NAME;
             if( i > 0 )
               varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
-            MITK_DEBUG("varName") << "varName" << varName;
+            MITK_DEBUG("varName") << "varName" << varName.toStdString();
 
             bool exportAsCvImage = m_PythonService->IsOpenCvPythonWrappingAvailable();
 

@@ -18,15 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <mitkGetModuleContext.h>
 #include <mitkTestingMacros.h>
-#include <mitkIPythonService.h>
+#include <mitkPythonService.h>
 
 int mitkPythonTest(int /*argc*/, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("DICOMTestingSanity")
+  MITK_TEST_BEGIN("PythonTest")
 
-  mitk::ModuleContext* context = mitk::GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
-  mitk::IPythonService* _PythonService = context->GetService<mitk::IPythonService>(serviceRef);
+  itk::SmartPointer<mitk::PythonService> _PythonService(new mitk::PythonService());
 
   std::string result = _PythonService->Execute( "5+5", mitk::IPythonService::EVAL_COMMAND );
   MITK_TEST_CONDITION( result == "10", "Testing if running python code 5+5 results in 10" )

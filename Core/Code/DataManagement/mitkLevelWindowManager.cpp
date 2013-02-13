@@ -231,6 +231,20 @@ void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
 {
+  //first: check if deleted node is part of relevant nodes. If not, abort method because there is no need change anything.
+  if ((this->GetRelevantNodes()->size() == 0)) return;
+  bool removedNodeIsRelevant = false;
+  /* Iterator code: is crashing, don't know why... so using for loop
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = this->GetRelevantNodes()->Begin();
+       it != this->GetRelevantNodes()->End();
+       ++it)
+  {if (it->Value() == removedNode) {removedNodeIsRelevant=true;}}*/
+  for (int i=0; i<this->GetRelevantNodes()->size(); i++)
+    {
+    if (this->GetRelevantNodes()->at(i) == removedNode) {removedNodeIsRelevant=true;}
+    }
+  if (!removedNodeIsRelevant) return;
+
   //remember node which will be removed
   m_NodeMarkedToDelete = removedNode;
 

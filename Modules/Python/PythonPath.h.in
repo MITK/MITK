@@ -1,7 +1,18 @@
+#ifdef _DEBUG
+#define PYTHON_PATH_BUILD_TYPE "/Debug"
+#else
+#define PYTHON_PATH_BUILD_TYPE "/Release"
+#endif
+
 #define PYTHONPATH_COMMAND "import sys\n"\
 "sys.path.append('@ITK_LIBRARY_DIRS@')\n"\
 "sys.path.append('@ITK_DIR@/Wrapping/WrapITK/Python')\n"\
-"sys.path.append('@ITK_LIBRARY_DIRS@')\n"\
+"sys.path.append('@ITK_LIBRARY_DIRS@" PYTHON_PATH_BUILD_TYPE "')\n"\
+"sys.path.append('@ITK_DIR@/Wrapping/WrapITK/Python" PYTHON_PATH_BUILD_TYPE "')\n"\
 "sys.path.append('@VTK_LIBRARY_DIRS@')\n"\
 "sys.path.append('@VTK_DIR@/Wrapping/Python')\n"\
-"sys.path.append('@OpenCV_DIR@/lib')"
+"sys.path.append('@VTK_LIBRARY_DIRS@" PYTHON_PATH_BUILD_TYPE "')\n"\
+"sys.path.append('@VTK_DIR@/Wrapping/Python" PYTHON_PATH_BUILD_TYPE "')\n"\
+"sys.path.append('@OpenCV_DIR@/lib')\n"\
+"sys.path.append('@OpenCV_DIR@/bin')\n"\
+"sys.path.append('@OpenCV_DIR@/bin" PYTHON_PATH_BUILD_TYPE "')"

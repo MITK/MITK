@@ -55,7 +55,11 @@ namespace mitk {
  * properties such as thick slices. This code was already present in the old version
  * (mitkImageMapperGL2D).
  *
- * Next, the obtained slice (m_ReslicedImage) is used to create a texture
+ * Next, the obtained slice (m_ReslicedImage) is put into a vtkMitkLevelWindowFilter
+ * and the scalar levelwindow, opacity levelwindow and optional clipping to
+ * local image bounds are applied
+ *
+ * Next, the output of the vtkMitkLevelWindowFilter is used to create a texture
  * (m_Texture) and a plane onto which the texture is rendered (m_Plane). For
  * mapping purposes, a vtkPolyDataMapper (m_Mapper) is utilized. Orthographic
  * projection is applied to create the effect of a 2D image. The mapper and the
@@ -102,7 +106,7 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
- *   - \b "Image Rendering.Transfer Function":  Undefined. Must be set by the user.
+ *   - \b "Image Rendering.Transfer Function":  Default color transfer function for CTs
  *   - \b "LookupTable":  Undefined. Must be set by the user.
 
  * If the modality-property is set for an image, the mapper uses modality-specific default properties,

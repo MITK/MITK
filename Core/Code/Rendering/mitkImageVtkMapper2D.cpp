@@ -661,12 +661,20 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   vtkLookupTable *usedLookupTable = localStorage->m_DefaultLookupTable;
   vtkScalarsToColors *usedScalarsToColors = localStorage->m_DefaultLookupTable;
 
+  // If lookup table or transferfunction use is requested...
+  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
+  mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
+
   if(binary) // is it a binary image?
   {
     usedScalarsToColors = usedLookupTable = localStorage->m_BinaryLookupTable;
   }
   else if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
   {
+    if( transferFunctionProp.IsNotNull() )
+    {
+      MITK_WARN << "A LookupTable and a transfer function TransferFunction property is set! Only the Image Rendering.Transfer Function will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
+    }
     //If a lookup table is supplied by the user:
     //only update the lut, when the properties have changed...
     if( lookupTableProp->GetLookupTable()->GetMTime()
@@ -680,9 +688,9 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     localStorage->m_Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
     usedScalarsToColors = usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
   }
-  else if(transferFunctionProperty.IsNotNull()) // is a color transfer function set?
+  else if(transferFunctionProp.IsNotNull()) // is a color transfer function set?
   {
-    usedScalarsToColors = transferFunctionProperty->GetValue()->GetColorTransferFunction();
+    usedScalarsToColors = transferFunctionProp->GetValue()->GetColorTransferFunction();
     usedLookupTable = 0;
   }
   else
@@ -690,15 +698,12 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     //default lookuptable
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
-    localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+    usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
     this->ApplyColor( renderer );
   }
 
   localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
-  if((transferFunctionProperty.IsNotNull()) && (lookupTableProp.IsNotNull()))
-  {
-    MITK_WARN << "A LookupTable and a transfer function Image Rendering.Transfer Function property is set! Only the LookupTable will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
-  }
+
   // check for texture interpolation property
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty( "texture interpolation", textureInterpolation, renderer );

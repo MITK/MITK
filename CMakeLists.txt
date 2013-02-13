@@ -736,6 +736,10 @@ endif()
 #-----------------------------------------------------------------------------
 option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
 
+if(MITK_USE_Python)
+  #message(STATUS "CTK_PYTHONQT_INSTALL_DIR: ${CTK_PYTHONQT_INSTALL_DIR}")
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
+endif()
 #-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------

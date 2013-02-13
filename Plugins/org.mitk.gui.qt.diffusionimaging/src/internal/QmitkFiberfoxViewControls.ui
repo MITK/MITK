@@ -148,6 +148,22 @@
                </property>
               </widget>
              </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="m_XrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around x-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-360.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_22">
                <property name="toolTip">
@@ -183,41 +199,6 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="m_XrotBox">
-               <property name="toolTip">
-                <string>Rotation angle (in degree) around x-axis.</string>
-               </property>
-               <property name="minimum">
-                <double>-360.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Rotation:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_21">
                <property name="toolTip">
@@ -234,6 +215,22 @@
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZtransBox">
+               <property name="toolTip">
+                <string>Translation (in mm) in direction of the z-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>-100.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
                </property>
               </widget>
              </item>
@@ -272,16 +269,54 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="3">
-              <widget class="QDoubleSpinBox" name="m_ZtransBox">
+             <item row="2" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_20">
                <property name="toolTip">
-                <string>Translation (in mm) in direction of the z-axis.</string>
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Rotation:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Z</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZrotBox">
+               <property name="toolTip">
+                <string>Rotation angle (in degree) around z-axis.</string>
                </property>
                <property name="minimum">
-                <double>-100.000000000000000</double>
+                <double>-360.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>100.000000000000000</double>
+                <double>360.000000000000000</double>
                </property>
                <property name="singleStep">
                 <double>0.100000000000000</double>
@@ -304,24 +339,8 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
-              <widget class="QDoubleSpinBox" name="m_ZrotBox">
-               <property name="toolTip">
-                <string>Rotation angle (in degree) around z-axis.</string>
-               </property>
-               <property name="minimum">
-                <double>-360.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_19">
+             <item row="4" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_24">
                <property name="toolTip">
                 <string/>
                </property>
@@ -332,10 +351,67 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Z</string>
+                <string>Scaling:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QDoubleSpinBox" name="m_XscaleBox">
+               <property name="toolTip">
+                <string>Scaling factor for selected fiber bundle along the x-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QDoubleSpinBox" name="m_YscaleBox">
+               <property name="toolTip">
+                <string>Scaling factor for selected fiber bundle along the y-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QDoubleSpinBox" name="m_ZscaleBox">
+               <property name="toolTip">
+                <string>Scaling factor for selected fiber bundle along the z-axis.</string>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -880,6 +956,9 @@
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="3" column="0" colspan="2">
@@ -905,6 +984,9 @@
            <widget class="QLabel" name="m_TissueMaskLabel">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1803,6 +1885,9 @@
   <tabstop>m_XtransBox</tabstop>
   <tabstop>m_YtransBox</tabstop>
   <tabstop>m_ZtransBox</tabstop>
+  <tabstop>m_XscaleBox</tabstop>
+  <tabstop>m_YscaleBox</tabstop>
+  <tabstop>m_ZscaleBox</tabstop>
   <tabstop>m_TransformBundlesButton</tabstop>
   <tabstop>m_CopyBundlesButton</tabstop>
   <tabstop>m_JoinBundlesButton</tabstop>

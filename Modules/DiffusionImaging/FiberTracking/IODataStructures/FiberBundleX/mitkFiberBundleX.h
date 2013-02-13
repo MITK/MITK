@@ -76,6 +76,7 @@ public:
     void MirrorFibers(unsigned int axis);
     void RotateAroundAxis(double x, double y, double z);
     void TranslateFibers(double x, double y, double z);
+    void ScaleFibers(double x, double y, double z);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);

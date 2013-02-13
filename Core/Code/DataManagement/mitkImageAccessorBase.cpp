@@ -81,8 +81,10 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
         {
           if(m_Image->GetSource().IsNull())
             mitkThrow() << "ImageAccessor: No image source is defined";
+          m_Image->m_ReadWriteLock.Lock();
           if(m_Image->GetSource()->Updating()==false)
             m_Image->GetSource()->UpdateOutputInformation();
+          m_Image->m_ReadWriteLock.Unlock();
         }
       }
 
@@ -94,7 +96,9 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
         m_CoherentMemory = true;
 
         // Organize first image channel
+        m_Image->m_ReadWriteLock.Lock();
         imageDataItem = m_Image->GetChannelData();
+        m_Image->m_ReadWriteLock.Unlock();
 
         // Set memory area
         m_AddressBegin = imageDataItem->m_Data;

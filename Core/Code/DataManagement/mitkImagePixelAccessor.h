@@ -58,10 +58,12 @@ class Image;
     {
 
       // let image organise its channel data
+      iP->m_ReadWriteLock.Lock();
       iP->GetData();
 
       if(iDI == NULL)
         m_ImageDataItem = iP->GetChannelData();
+      iP->m_ReadWriteLock.Unlock();
 
     }
 

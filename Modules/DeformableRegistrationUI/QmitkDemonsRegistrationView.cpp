@@ -130,7 +130,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       m_ResultImage = registration->GetOutput();
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
-      m_ResultDeformationField = mitk::ImportItkImage(deformationField);
+      m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();
     }
     else if(m_Controls.m_RegistrationSelection->currentIndex() == 1)
     {
@@ -176,7 +176,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       m_ResultImage = registration->GetOutput();
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
-      m_ResultDeformationField = mitk::ImportItkImage(deformationField);
+      m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();
     }
   }
 }

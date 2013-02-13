@@ -237,7 +237,7 @@ void mitk::RegionGrow3DTool::StartRegionGrowing(itk::Image<TPixel, VImageDimensi
 
   m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
 
-  mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
 
   m_FeedbackNode->SetData( resultImage );
   m_FeedbackNode->SetVisibility(true);

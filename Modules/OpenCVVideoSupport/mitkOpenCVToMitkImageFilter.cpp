@@ -172,7 +172,7 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
 
   output->DisconnectPipeline();
 
-  mitkImage = mitk::ImportItkImage( output );
+  mitkImage = mitk::ImportItkImage(output)->Clone();
 
   return mitkImage;
 }

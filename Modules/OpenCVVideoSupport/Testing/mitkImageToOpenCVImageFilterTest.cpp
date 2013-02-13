@@ -84,7 +84,7 @@ static void testGeneratedImage()
   //   writer->Update();
 
     // import rgb image as MITK image
-    mitk::Image::Pointer mitkImage = mitk::ImportItkImage( itkImage );
+    mitk::Image::Pointer mitkImage = mitk::ImportItkImage(itkImage)->Clone();
 
     mitk::ImageToOpenCVImageFilter::Pointer _ImageToOpenCVImageFilter =
       mitk::ImageToOpenCVImageFilter::New();

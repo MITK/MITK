@@ -593,7 +593,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       gaussianFilter->SetInput( itkImage );
       gaussianFilter->SetVariance( param1 );
       gaussianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(gaussianFilter->GetOutput());
+      newImage = mitk::ImportItkImage(gaussianFilter->GetOutput())->Clone();
       nameAddition << "_Gaussian_var_" << param1;
       std::cout << "Gaussian filtering successful." << std::endl;
       break;
@@ -607,7 +607,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       medianFilter->SetRadius( size );
       medianFilter->SetInput(itkImage);
       medianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(medianFilter->GetOutput());
+      newImage = mitk::ImportItkImage(medianFilter->GetOutput())->Clone();
       nameAddition << "_Median_radius_" << param1;
       std::cout << "Median Filtering successful." << std::endl;
       break;
@@ -624,7 +624,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
         TVFilter->SetLambda(double(param2)/1000.);
         TVFilter->UpdateLargestPossibleRegion();
 
-        newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        newImage = mitk::ImportItkImage(TVFilter->GetOutput())->Clone();
       }
       else
       {
@@ -637,7 +637,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
         TVFilter->SetLambda(double(param2)/1000.);
         TVFilter->UpdateLargestPossibleRegion();
 
-        newImage = mitk::ImportItkImage(TVFilter->GetOutput());
+        newImage = mitk::ImportItkImage(TVFilter->GetOutput())->Clone();
       }
 
       nameAddition << "_TV_Iter_" << param1 << "_L_" << param2;
@@ -655,7 +655,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       dilationFilter->SetInput( itkImage );
       dilationFilter->SetKernel( binaryBall );
       dilationFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(dilationFilter->GetOutput());
+      newImage = mitk::ImportItkImage(dilationFilter->GetOutput())->Clone();
       nameAddition << "_Dilated_by_" << param1;
       std::cout << "Dilation successful." << std::endl;
       break;
@@ -671,7 +671,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       erosionFilter->SetInput( itkImage );
       erosionFilter->SetKernel( binaryBall );
       erosionFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(erosionFilter->GetOutput());
+      newImage = mitk::ImportItkImage(erosionFilter->GetOutput())->Clone();
       nameAddition << "_Eroded_by_" << param1;
       std::cout << "Erosion successful." << std::endl;
       break;
@@ -687,7 +687,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       openFilter->SetInput( itkImage );
       openFilter->SetKernel( binaryBall );
       openFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(openFilter->GetOutput());
+      newImage = mitk::ImportItkImage(openFilter->GetOutput())->Clone();
       nameAddition << "_Opened_by_" << param1;
       std::cout << "Opening successful." << std::endl;
       break;
@@ -703,7 +703,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       closeFilter->SetInput( itkImage );
       closeFilter->SetKernel( binaryBall );
       closeFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(closeFilter->GetOutput());
+      newImage = mitk::ImportItkImage(closeFilter->GetOutput())->Clone();
       nameAddition << "_Closed_by_" << param1;
       std::cout << "Closing successful." << std::endl;
       break;
@@ -715,7 +715,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       gradientFilter->SetInput( itkImage );
       gradientFilter->SetSigma( param1 );
       gradientFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(gradientFilter->GetOutput());
+      newImage = mitk::ImportItkImage(gradientFilter->GetOutput())->Clone();
       nameAddition << "_Gradient_sigma_" << param1;
       std::cout << "Gradient calculation successful." << std::endl;
       break;
@@ -733,7 +733,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       LaplacianFilterType::Pointer laplacianFilter = LaplacianFilterType::New();
       laplacianFilter->SetInput( fImage );
       laplacianFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(laplacianFilter->GetOutput());
+      newImage = mitk::ImportItkImage(laplacianFilter->GetOutput())->Clone();
       nameAddition << "_Second_Derivative";
       std::cout << "Laplacian filtering successful." << std::endl;
       break;
@@ -751,7 +751,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       SobelFilterType::Pointer sobelFilter = SobelFilterType::New();
       sobelFilter->SetInput( fImage );
       sobelFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(sobelFilter->GetOutput());
+      newImage = mitk::ImportItkImage(sobelFilter->GetOutput())->Clone();
       nameAddition << "_Sobel";
       std::cout << "Edge Detection successful." << std::endl;
       break;
@@ -766,7 +766,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       thFilter->SetOutsideValue(0);
       thFilter->SetInput(itkImage);
       thFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(thFilter->GetOutput());
+      newImage = mitk::ImportItkImage(thFilter->GetOutput())->Clone();
       nameAddition << "_Threshold";
       std::cout << "Thresholding successful." << std::endl;
       break;
@@ -780,7 +780,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       invFilter->SetMaximum( max + min );
       invFilter->SetInput(itkImage);
       invFilter->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(invFilter->GetOutput());
+      newImage = mitk::ImportItkImage(invFilter->GetOutput())->Clone();
       nameAddition << "_Inverted";
       std::cout << "Image inversion successful." << std::endl;
       break;
@@ -812,7 +812,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       downsampler->SetSize( size );
       downsampler->UpdateLargestPossibleRegion();
 
-      newImage = mitk::ImportItkImage(downsampler->GetOutput());
+      newImage = mitk::ImportItkImage(downsampler->GetOutput())->Clone();
       nameAddition << "_Downsampled_by_" << param1;
       std::cout << "Downsampling successful." << std::endl;
       break;
@@ -836,7 +836,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       }
       flipper->SetFlipAxes(flipAxes);
       flipper->UpdateLargestPossibleRegion();
-      newImage = mitk::ImportItkImage(flipper->GetOutput());
+      newImage = mitk::ImportItkImage(flipper->GetOutput())->Clone();
       std::cout << "Image flipping successful." << std::endl;
       break;
     }
@@ -995,7 +995,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       addFilter->SetInput1( itkImage1 );
       addFilter->SetInput2( itkImage2 );
       addFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(addFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(addFilter->GetOutput())->Clone();
       nameAddition = "_Added";
     }
     break;
@@ -1006,7 +1006,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       subFilter->SetInput1( itkImage1 );
       subFilter->SetInput2( itkImage2 );
       subFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(subFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(subFilter->GetOutput())->Clone();
       nameAddition = "_Subtracted";
     }
     break;
@@ -1017,7 +1017,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       multFilter->SetInput1( itkImage1 );
       multFilter->SetInput2( itkImage2 );
       multFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(multFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(multFilter->GetOutput())->Clone();
       nameAddition = "_Multiplied";
     }
     break;
@@ -1028,7 +1028,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       divFilter->SetInput1( itkImage1 );
       divFilter->SetInput2( itkImage2 );
       divFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage<FloatImageType>(divFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage<FloatImageType>(divFilter->GetOutput())->Clone();
       nameAddition = "_Divided";
     }
     break;
@@ -1039,7 +1039,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       andFilter->SetInput1( itkImage1 );
       andFilter->SetInput2( itkImage2 );
       andFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(andFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(andFilter->GetOutput())->Clone();
       nameAddition = "_AND";
       break;
     }
@@ -1050,7 +1050,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       orFilter->SetInput1( itkImage1 );
       orFilter->SetInput2( itkImage2 );
       orFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(orFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(orFilter->GetOutput())->Clone();
       nameAddition = "_OR";
       break;
     }
@@ -1061,7 +1061,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       xorFilter->SetInput1( itkImage1 );
       xorFilter->SetInput2( itkImage2 );
       xorFilter->UpdateLargestPossibleRegion();
-      newImage1 = mitk::ImportItkImage(xorFilter->GetOutput());
+      newImage1 = mitk::ImportItkImage(xorFilter->GetOutput())->Clone();
       nameAddition = "_XOR";
       break;
     }
@@ -1079,7 +1079,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       resampleFilter->SetInterpolator( nn_interpolator );
       resampleFilter->SetDefaultPixelValue( 0 );
 
-      ImageType::Pointer resampledImage = resampleFilter->GetOutput();
+      ImageType::Pointer resampledImage = resampleFilter->GetOutput()->Clone();
 
       try
       {
@@ -1091,7 +1091,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
         MITK_WARN << "REASON: " << e.what();
       }
 
-      newImage1 = mitk::ImportItkImage( resampledImage );
+      newImage1 = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition = "_Resampled";
       break;
     }

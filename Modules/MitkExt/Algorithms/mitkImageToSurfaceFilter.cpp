@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 #include <vtkQuadricDecimation.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkCleanPolyData.h>
+
 #include "mitkProgressBar.h"
 
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter():
@@ -142,7 +146,20 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
   ProgressBar::GetInstance()->Progress();
 
-  surface->SetVtkPolyData(polydata, time);
+  // determine point_data normals for the poly data points.
+  vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+  normalsGenerator->SetInput( polydata );
+
+  vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+  cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+  cleanPolyDataFilter->PieceInvariantOff();
+  cleanPolyDataFilter->ConvertLinesToPointsOff();
+  cleanPolyDataFilter->ConvertPolysToLinesOff();
+  cleanPolyDataFilter->ConvertStripsToPolysOff();
+  cleanPolyDataFilter->PointMergingOn();
+  cleanPolyDataFilter->Update();
+
+  surface->SetVtkPolyData(cleanPolyDataFilter->GetOutput(), time);
   polydata->UnRegister(NULL);
 }
 

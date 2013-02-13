@@ -316,9 +316,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
 {
   vtkImageIterator<T> inputIt(inData, outExt);
   vtkImageIterator<unsigned char> outputIt(outData, outExt);
-  vtkLookupTable* lookupTable;
-
-  lookupTable = dynamic_cast<vtkLookupTable*>(self->GetLookupTable());
+  vtkScalarsToColors* lookupTable = self->GetLookupTable();
 
   int y = outExt[2];
 
@@ -427,7 +425,9 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
         && extent[0] >= m_ClippingBounds[0]
         && extent[1] <= m_ClippingBounds[1];
 
-    bool linearLookupTable = dynamic_cast<vtkLookupTable*>(this->GetLookupTable())->GetScale() == VTK_SCALE_LINEAR;
+    vtkLookupTable *vlt = dynamic_cast<vtkLookupTable*>(this->GetLookupTable());
+
+    bool linearLookupTable = vlt && vlt->GetScale() == VTK_SCALE_LINEAR;
 
     bool useFast = dontClip && linearLookupTable;
 

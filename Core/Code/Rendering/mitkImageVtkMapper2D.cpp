@@ -682,7 +682,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   {
     bool useColor = true;
     this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
-    if((!useColor))
+    if(!useColor)
     {
       //BEGIN PROPERTY user-defined lut
 
@@ -702,7 +702,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
           //LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
         }
         //we use the user-defined lookuptable
-        //localStorage->m_Texture->SetLookupTable( LookupTableProp->GetLookupTable()->GetVtkLookupTable() );
         usedScalarsToColors = usedLookupTable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
       }
       else if(transferFunctionProperty.IsNotNull())
@@ -712,7 +711,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
       }
       else
       {
-        MITK_WARN << "Neither a lookuptable nor a transfer function is set and 'use color property' is disabled.";
+        MITK_WARN << "Neither a lookup table nor a transfer function is set and 'use color property' has been disabled.";
       }
     }//END PROPERTY user-defined lut
     LevelWindow levelWindow;

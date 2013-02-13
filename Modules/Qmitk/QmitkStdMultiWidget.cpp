@@ -1607,26 +1607,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEvent()
   }
 }
 
-void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
 {
-  m_PendingCrosshairPositionEvent = false;
-
-  // find image with highest layer
   mitk::Point3D crosshairPos = this->GetCrossPosition();
-
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
-  std::string statusText;
-  mitk::Image::Pointer image;
+  mitk::DataNode::Pointer node;
   int  maxlayer = -32768;
 
-  mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
-  // find image with largest layer, that is the image shown on top in the render window
-  for (unsigned int x = 0; x < nodes->size(); x++)
+  if(nodes.IsNotNull())
   {
-    bool isBinaryImage = nodes->at(x)->GetProperty("binary");
-    if(!isBinaryImage){
+    mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
+    // find node with largest layer, that is the node shown on top in the render window
+    for (unsigned int x = 0; x < nodes->size(); x++)
+    {
     if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
          nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
     {
@@ -1636,17 +1628,49 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       {
         if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
         {
-          image = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+          node = nodes->at(x);
           maxlayer = layer;
         }
       }
     }
     }
   }
+  return node;
+}
 
+void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
+{
+  m_PendingCrosshairPositionEvent = false;
+
+  // find image with highest layer
+
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
+
+  mitk::DataNode::Pointer node;
+  mitk::Image::Pointer image;
+
+  node = this->GetTopLayerNode(nodes);
+  bool isBinary = false;
+  if(node.IsNotNull())
+  {
+    node->GetBoolProperty("binary",isBinary);
+    if(isBinary)
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
+      if(!sourcenodes->empty())
+      {
+        node = this->GetTopLayerNode(sourcenodes);
+      }
+    }
+    image = dynamic_cast<mitk::Image*>(node->GetData());
+  }
+
+  mitk::Point3D crosshairPos = this->GetCrossPosition();
+  std::string statusText;
   std::stringstream stream;
-
   mitk::Index3D p;
+  mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   int timestep = baseRenderer->GetTimeStep();
 
   if(image.IsNotNull() && (image->GetTimeSteps() > timestep ))

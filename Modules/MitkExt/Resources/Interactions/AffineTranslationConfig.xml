@@ -1,0 +1,10 @@
+<config>
+  <input event_class="PositionEvent" event_variant="MovePointer">
+  </input>
+  <input event_class="MousePressEvent" event_variant="InitTranslatation">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndTranslatation">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+</config>

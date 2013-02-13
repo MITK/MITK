@@ -98,6 +98,7 @@ set(CPP_FILES
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkAffineInteractor3D.cpp
+  Interactions/mitkAffineDataInteractor3D.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkInteractionDebug.cpp
@@ -146,5 +147,9 @@ if(WIN32 AND NOT MINGW)
   )
 endif(WIN32 AND NOT MINGW)
 
-
+set(RESOURCE_FILES
+Interactions/AffineInteraction3D.xml
+Interactions/AffineTranslationConfig.xml
+Interactions/AffineRotationConfig.xml
+)
 

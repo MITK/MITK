@@ -1,0 +1,45 @@
+<statemachine>
+    <state name="start" startstate="true" >
+        <transition event_class="PositionEvent" event_variant="MovePointer" target="start">
+            <action name="checkOverObject"/>
+        </transition>
+		<transition event_class="InternalEvent" event_variant="OverObject" target="select">
+            <action name="selectObject"/>
+        </transition>
+    </state>
+	<state name="select" >
+	    <transition event_class="PositionEvent" event_variant="MovePointer" target="start">
+            <action name="checkOverObject"/>
+        </transition>
+		<transition event_class="InternalEvent" event_variant="NotOverObject" target="start">
+            <action name="deselectObject"/>
+        </transition>
+		<transition event_class="PositionEvent" event_variant="InitTranslatation" target="translate">
+            <action name="initTranslate"/>
+        </transition>
+		<transition event_class="PositionEvent" event_variant="InitRotation" target="rotate">
+            <action name="initRotate"/>
+        </transition>
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+	</state>
+	<state name="translate" >
+		<transition event_class="PositionEvent" event_variant="ObjectTranslation" target="translate">
+            <action name="translateObject"/>
+        </transition>
+		<transition event_class="PositionEvent" event_variant="EndTranslation" target="start">
+            <action name="endTranslate"/>
+			<action name="checkOverObject"/>
+        </transition>
+	</state>
+		<state name="rotate" >
+		<transition event_class="PositionEvent" event_variant="ObjectRotatation" target="rotate">
+            <action name="rotateObject"/>
+        </transition>
+		<transition event_class="PositionEvent" event_variant="EndRotation" target="select">
+            <action name="endRotate"/>
+            <action name="checkOverObject"/>
+        </transition>
+	</state>
+</statemachine>

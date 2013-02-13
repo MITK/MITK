@@ -325,7 +325,8 @@ set(CPP_FILES
   Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
+  Rendering/vtkNeverTranslucentTexture.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

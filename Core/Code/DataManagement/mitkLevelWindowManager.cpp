@@ -221,12 +221,17 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
 
 void mitk::LevelWindowManager::DataStorageAddedNode( const mitk::DataNode* )
 {
+
   //update observers with new data storage
   UpdateObservers();
+
+  //Initialize LevelWindowsManager to new image
+  SetAutoTopMostImage(true, NULL);
 
   //check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) || (m_PropObserverToNode2.size() != this->GetRelevantNodes()->size()))
      {mitkThrow() << "Wrong number of observers in Level Window Manager!";}
+
 }
 
 void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* removedNode )
@@ -239,7 +244,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataNode* rem
        it != this->GetRelevantNodes()->End();
        ++it)
   {if (it->Value() == removedNode) {removedNodeIsRelevant=true;}}*/
-  for (int i=0; i<this->GetRelevantNodes()->size(); i++)
+  for (unsigned int i=0; i<this->GetRelevantNodes()->size(); i++)
     {
     if (this->GetRelevantNodes()->at(i) == removedNode) {removedNodeIsRelevant=true;}
     }

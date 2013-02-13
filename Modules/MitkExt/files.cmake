@@ -37,6 +37,7 @@ set(CPP_FILES
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
+  Controllers/mitkIPythonService.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
   Controllers/mitkToolManager.cpp

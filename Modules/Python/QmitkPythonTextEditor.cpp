@@ -176,5 +176,5 @@ void QmitkPythonTextEditor::on_RunScript_triggered( bool )
     return;
   }
 
-  d->m_PythonService->Execute( d->m_Content->toPlainText(), mitk::IPythonService::MULTI_LINE_COMMAND );
+  d->m_PythonService->Execute( d->m_Content->toPlainText().toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
 }

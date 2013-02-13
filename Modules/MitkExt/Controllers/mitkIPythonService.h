@@ -17,15 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIPythonService_h
 
 // mitk
-#include "mitkPythonExports.h"
+#include "MitkExtExports.h"
 #include "mitkImage.h"
 //for microservices
 #include <usServiceInterface.h>
-// Qt
-#include <QString>
-#include <QVariant>
-#include <QList>
 #include "mitkSurface.h"
+#include <vector>
 
 namespace mitk
 {
@@ -35,9 +32,9 @@ namespace mitk
     ///
     struct PythonVariable
     {
-      QString m_Name;
-      QString m_Type;
-      QString m_Value;
+      std::string m_Name;
+      std::string m_Type;
+      std::string m_Value;
     };
 
     ///
@@ -47,7 +44,7 @@ namespace mitk
     class PythonCommandObserver
     {
     public:
-      virtual void CommandExecuted(const QString& pythonCommand) = 0;
+      virtual void CommandExecuted(const std::string& pythonCommand) = 0;
     };
 
     ///
@@ -55,7 +52,7 @@ namespace mitk
     /// The class also enables to transfer mitk images to python as itk::Image and vice versa
     /// \see IPythonService::GetVariableStack()
     ///
-    class MITK_PYTHON_EXPORT IPythonService
+    class MitkExt_EXPORT IPythonService
     {
     public:
         ///
@@ -73,11 +70,11 @@ namespace mitk
 
         ///
         /// Executes a python command.
-        /// \return A variant containing the return value of the python code (if any)
-        virtual QVariant Execute( const QString& pythonCommand, int commandType = SINGLE_LINE_COMMAND ) = 0;
+        /// \return A variant containing the return value as string of the python code (if any)
+        virtual std::string Execute( const std::string& pythonCommand, int commandType = SINGLE_LINE_COMMAND ) = 0;
         ///
         /// \return The list of variables in the __main__ namespace
-        virtual QList<PythonVariable> GetVariableStack() const = 0;
+        virtual std::vector<PythonVariable> GetVariableStack() const = 0;
         ///
         /// adds a command observer which is informed after a command was issued with "Execute"
         virtual void AddPythonCommandObserver( PythonCommandObserver* observer ) = 0;
@@ -89,7 +86,7 @@ namespace mitk
         /// current python interpreter instance got another command from anywhere else
         /// the the Execute() method of this service, e.g. the shell widget uses this function
         /// since it does not use Execute()
-        virtual void NotifyObserver( const QString& command ) = 0;
+        virtual void NotifyObserver( const std::string& command ) = 0;
 
         ///
         /// \return true, if itk wrapping is available, false otherwise
@@ -98,31 +95,31 @@ namespace mitk
         /// copies an mitk image as itk image into the python interpreter process
         /// the image will be available as "varName" in python if everythin worked
         /// \return true if image was copied, else false
-        virtual bool CopyToPythonAsItkImage( mitk::Image* image, const QString& varName ) = 0;
+        virtual bool CopyToPythonAsItkImage( mitk::Image* image, const std::string& varName ) = 0;
         ///
         /// copies an itk image from the python process that is named "varName"
         /// \return the image or 0 if copying was not possible
-        virtual mitk::Image::Pointer CopyItkImageFromPython( const QString& varName ) = 0;
+        virtual mitk::Image::Pointer CopyItkImageFromPython( const std::string& varName ) = 0;
 
         ///
         /// \return true, if OpenCv wrapping is available, false otherwise
         virtual bool IsOpenCvPythonWrappingAvailable() = 0;
         ///
         /// \see CopyToPythonAsItkImage()
-        virtual bool CopyToPythonAsCvImage( mitk::Image* image, const QString& varName ) = 0;
+        virtual bool CopyToPythonAsCvImage( mitk::Image* image, const std::string& varName ) = 0;
         ///
         /// \see CopyCvImageFromPython()
-        virtual mitk::Image::Pointer CopyCvImageFromPython( const QString& varName ) = 0;
+        virtual mitk::Image::Pointer CopyCvImageFromPython( const std::string& varName ) = 0;
 
         ///
         /// \return true, if vtk wrapping is available, false otherwise
         virtual bool IsVtkPythonWrappingAvailable() = 0;
         ///
         /// \see CopyToPythonAsItkImage()
-        virtual bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const QString& varName ) = 0;
+        virtual bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const std::string& varName ) = 0;
         ///
         /// \see CopyCvImageFromPython()
-        virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const QString& varName ) = 0;
+        virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const std::string& varName ) = 0;
 
         ///
         /// nothing to do here

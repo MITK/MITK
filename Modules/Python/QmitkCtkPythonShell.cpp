@@ -56,7 +56,7 @@ void QmitkCtkPythonShell::dropEvent(QDropEvent *event)
   QList<QUrl> urls = event->mimeData()->urls();
   for(int i = 0; i < urls.size(); i++)
   {
-    d->m_PythonService->Execute( urls[i].toString(), mitk::IPythonService::SINGLE_LINE_COMMAND );
+    d->m_PythonService->Execute( urls[i].toString().toStdString(), mitk::IPythonService::SINGLE_LINE_COMMAND );
   }
 }
 
@@ -69,13 +69,14 @@ void QmitkCtkPythonShell::executeCommand(const QString& command)
 {
   MITK_DEBUG("QmitkCtkPythonShell") << "executing command " << command.toStdString();
   ctkPythonConsole::executeCommand(command);
-  d->m_PythonService->NotifyObserver(command);
+  d->m_PythonService->NotifyObserver(command.toStdString());
 }
 
 void QmitkCtkPythonShell::Paste(const QString &command)
 {
   if( this->isVisible() )
   {
-    this->executeCommand( command );
+    this->exec( command );
+    //this->executeCommand( command );
   }
 }

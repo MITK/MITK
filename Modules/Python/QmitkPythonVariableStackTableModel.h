@@ -50,11 +50,11 @@ public:
   Qt::DropActions supportedDropActions() const;
   Qt::DropActions supportedDragActions() const;
 
-  void CommandExecuted(const QString& pythonCommand);
+  void CommandExecuted(const std::string& pythonCommand);
 
-  QList<mitk::PythonVariable> GetVariableStack() const;
+  std::vector<mitk::PythonVariable> GetVariableStack() const;
 private:
-  QList<mitk::PythonVariable> m_VariableStack;
+  std::vector<mitk::PythonVariable> m_VariableStack;
   mitk::IPythonService* m_PythonService;
 };
 

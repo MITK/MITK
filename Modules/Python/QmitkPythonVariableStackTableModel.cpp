@@ -87,7 +87,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               exportAsCvImage = ret == QMessageBox::Yes;
               if(exportAsCvImage)
               {
-                m_PythonService->CopyToPythonAsCvImage( mitkImage, MITK_IMAGE_VAR_NAME );
+                m_PythonService->CopyToPythonAsCvImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
                 ++i;
               }
             }
@@ -95,7 +95,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             {
               if( m_PythonService->IsItkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME );
+                m_PythonService->CopyToPythonAsItkImage( mitkImage, MITK_IMAGE_VAR_NAME.toStdString() );
                 ++i;
               }
               else
@@ -117,7 +117,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
               if( m_PythonService->IsVtkPythonWrappingAvailable() )
               {
-                m_PythonService->CopyToPythonAsVtkPolyData( surface, MITK_SURFACE_VAR_NAME );
+                m_PythonService->CopyToPythonAsVtkPolyData( surface, MITK_SURFACE_VAR_NAME.toStdString() );
                 ++j;
               }
               else
@@ -182,11 +182,11 @@ QVariant QmitkPythonVariableStackTableModel::data(const QModelIndex &index, int 
         {
             mitk::PythonVariable item = m_VariableStack.at(index.row());
             if(index.column() == 0)
-                return item.m_Name;
+              return QString::fromStdString(item.m_Name);
             if(index.column() == 1)
-                return item.m_Value;
+                return QString::fromStdString(item.m_Value);
             if(index.column() == 2)
-                return item.m_Type;
+                return QString::fromStdString(item.m_Type);
         }
     }
     return QVariant();
@@ -206,14 +206,14 @@ Qt::DropActions QmitkPythonVariableStackTableModel::supportedDropActions() const
     return Qt::CopyAction | Qt::MoveAction;
 }
 
-void QmitkPythonVariableStackTableModel::CommandExecuted(const QString &pythonCommand)
+void QmitkPythonVariableStackTableModel::CommandExecuted(const std::string& pythonCommand)
 {
-  MITK_DEBUG("QmitkPythonVariableStackTableModel") << "command was executed " << pythonCommand.toStdString();
+  MITK_DEBUG("QmitkPythonVariableStackTableModel") << "command was executed " << pythonCommand;
     m_VariableStack = m_PythonService->GetVariableStack();
     QAbstractTableModel::reset();
 }
 
-QList<mitk::PythonVariable> QmitkPythonVariableStackTableModel::GetVariableStack() const
+std::vector<mitk::PythonVariable> QmitkPythonVariableStackTableModel::GetVariableStack() const
 {
     return m_VariableStack;
 }

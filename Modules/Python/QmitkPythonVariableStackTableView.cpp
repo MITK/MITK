@@ -57,18 +57,18 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     }
 
     int row = index.row();
-    QList<mitk::PythonVariable> variableStack = m_TableModel->GetVariableStack();
+    std::vector<mitk::PythonVariable> variableStack = m_TableModel->GetVariableStack();
     {
       MITK_DEBUG("QmitkPythonVariableStackTableView") << "row " << row;
       MITK_DEBUG("QmitkPythonVariableStackTableView") << "variableStack.size(): " << variableStack.size();
     }
 
-    QString varName = variableStack.at(row).m_Name;
+    QString varName = QString::fromStdString( variableStack.at(row).m_Name );
 
     {
       MITK_DEBUG("QmitkPythonVariableStackTableView") << varName.toStdString();
     }
-    mitk::Image::Pointer mitkImage = m_PythonService->CopyItkImageFromPython(varName);
+    mitk::Image::Pointer mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
 
     if( mitkImage.IsNotNull() )
     {

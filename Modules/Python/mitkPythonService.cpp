@@ -33,8 +33,8 @@ mitk::PythonService::PythonService()
     m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
     m_PythonManager.initialize();
 
-    QVariant result = m_PythonManager.executeString( "sys.path", ctkAbstractPythonManager::EvalInput );
-    MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
+    //std::string result = m_PythonManager.executeString( "sys.path", ctkAbstractPythonManager::EvalInput );
+    //MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
 
     QString pythonCommand(PYTHONPATH_COMMAND);
     MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
@@ -68,7 +68,7 @@ mitk::PythonService::PythonService()
     }
 
   }
-  //QVariant result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
+  //std::string result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
   //MITK_DEBUG("mitk::PythonService") << "result of '5+5': " << result.toString().toStdString();
 }
 
@@ -76,8 +76,10 @@ mitk::PythonService::~PythonService()
 {
 }
 
-QVariant mitk::PythonService::Execute(const QString &pythonCommand, int commandType)
+std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, int commandType)
 {
+  QString pythonCommand = QString::fromStdString(stdpythonCommand);
+
     {
         MITK_DEBUG("mitk::PythonService") << "pythonCommand = " << pythonCommand.toStdString();
         MITK_DEBUG("mitk::PythonService") << "commandType = " << commandType;
@@ -96,14 +98,14 @@ QVariant mitk::PythonService::Execute(const QString &pythonCommand, int commandT
         commandIssued = false;
 
     if(commandIssued)
-        this->NotifyObserver(pythonCommand);
+        this->NotifyObserver(pythonCommand.toStdString());
 
-    return result;
+    return result.toString().toStdString();
 }
 
-QList<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
+std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
 {
-    QList<mitk::PythonVariable> list;
+    std::vector<mitk::PythonVariable> list;
 
     PyObject* dict = PyImport_GetModuleDict();
     PyObject* object = PyDict_GetItemString(dict, "__main__");
@@ -112,13 +114,13 @@ QList<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
 
     if(dirMain)
     {
-      QString attr, attrValue, attrType;
+      std::string attr, attrValue, attrType;
 
       for(int i = 0; i<PyList_Size(dirMain); i++)
       {
         tempObject = PyList_GetItem(dirMain, i);
         attr = PyString_AsString(tempObject);
-        tempObject = PyObject_GetAttrString(object, attr.toLocal8Bit().data());
+        tempObject = PyObject_GetAttrString(object, attr.c_str());
         attrType = tempObject->ob_type->tp_name;
         if(PyUnicode_Check(tempObject) || PyString_Check(tempObject))
           attrValue = PyString_AsString(tempObject);
@@ -128,7 +130,7 @@ QList<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
         var.m_Name = attr;
         var.m_Value = attrValue;
         var.m_Type = attrType;
-        list.append(var);
+        list.push_back(var);
       }
     }
 
@@ -146,28 +148,29 @@ void mitk::PythonService::RemovePythonCommandObserver(mitk::PythonCommandObserve
     m_Observer.removeOne(observer);
 }
 
-void mitk::PythonService::NotifyObserver(const QString &command)
+void mitk::PythonService::NotifyObserver(const std::string &command)
 {
   MITK_DEBUG("mitk::PythonService") << "number of observer " << m_Observer.size();
-    foreach(mitk::PythonCommandObserver* observer, m_Observer)
+    for( size_t i=0; i< m_Observer.size(); ++i )
     {
-        observer->CommandExecuted(command);
+        m_Observer.at(i)->CommandExecuted(command);
     }
 }
 
-QString mitk::PythonService::GetTempImageName(const QString& ext) const
+QString mitk::PythonService::GetTempImageName(const std::string& ext) const
 {
     QString tmpFolder = QDir::tempPath();
-    QString fileName = tmpFolder + QDir::separator() + m_TmpImageName + ext;
+    QString fileName = tmpFolder + QDir::separator() + m_TmpImageName + QString::fromStdString(ext);
     return fileName;
 }
 
-bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QString &varName)
+bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::string &stdvarName)
 {
+  QString varName = QString::fromStdString( stdvarName );
     // save image
-    QString fileName = this->GetTempImageName( QString::fromStdString(mitk::IOUtil::DEFAULTIMAGEEXTENSION) );
+    QString fileName = this->GetTempImageName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
 
-    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
+    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName;
     if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
     {
         MITK_ERROR << "Temporary file could not be created.";
@@ -222,9 +225,9 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QStri
         command.append( QString("%1 = reader.GetOutput()\n").arg( varName ) );
 
         MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-        this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+        this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-        QFile file(fileName);
+        QFile file( fileName );
         MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
         file.remove();
         return true;
@@ -233,11 +236,12 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const QStri
     return false;
 }
 
-mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &varName)
+mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const std::string &stdvarName)
 {
+  QString varName = QString::fromStdString( stdvarName );
     mitk::Image::Pointer mitkImage;
     QString command;
-    QString fileName = GetTempImageName( QString::fromStdString( mitk::IOUtil::DEFAULTIMAGEEXTENSION ) );
+    QString fileName = GetTempImageName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
 
     MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
 
@@ -247,7 +251,7 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &
     command.append( QString( "writer.Update()\n" ) );
 
     MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-    this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+    this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
     try
     {
@@ -269,8 +273,10 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const QString &
     return mitkImage;
 }
 
-bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QString& varName )
+bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::string& stdvarName )
 {
+  QString varName = QString::fromStdString( stdvarName );
+
   bool convert = false;
   if(image->GetDimension() != 2)
   {
@@ -279,7 +285,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
   }
 
   // try to save mitk image
-  QString fileName = this->GetTempImageName( QString::fromStdString(".bmp") );
+  QString fileName = this->GetTempImageName( ".bmp" );
   MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
   if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
   {
@@ -291,7 +297,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
 
   command.append( QString("%1 = cv.LoadImage(\"%2\")\n") .arg( varName ).arg( fileName ) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
   QFile file(fileName);
@@ -300,19 +306,20 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const QStri
   return convert;
 }
 
-mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const QString& varName )
+mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::string& stdvarName )
 {
+  QString varName = QString::fromStdString( stdvarName );
 
   mitk::Image::Pointer mitkImage;
   QString command;
-  QString fileName = GetTempImageName( QString::fromStdString( ".bmp" ) );
+  QString fileName = GetTempImageName( ".bmp" );
 
   MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
 
   command.append( QString( "cv.SaveImage(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   try
   {
@@ -339,8 +346,9 @@ ctkAbstractPythonManager *mitk::PythonService::GetPythonManager()
   return &m_PythonManager;
 }
 
-mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const QString& varName )
+mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std::string& stdvarName )
 {
+  QString varName = QString::fromStdString( stdvarName );
   mitk::Surface::Pointer newSurface;
 
   QString command;
@@ -354,7 +362,7 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const QSt
     "vtkStlWriter.Write()\n").arg(varName).arg(fileName);
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   try
   {
@@ -376,8 +384,9 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const QSt
   return newSurface;
 }
 
-bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, const QString& varName )
+bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, const std::string& stdvarName )
 {
+  QString varName = QString::fromStdString( stdvarName );
   bool convert = false;
 
   // try to save mitk image
@@ -395,7 +404,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
   command.append( QString("vtkStlReader.SetFileName(\"%1\")\n").arg( fileName ) );
   command.append( QString("%1 = vtkStlReader.GetOutput()").arg( fileName ) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command, IPythonService::MULTI_LINE_COMMAND );
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
   QFile file(fileName);
@@ -406,17 +415,17 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
-  return m_ItkWrappingAvailable; //TODO
+  return m_ItkWrappingAvailable;
 }
 
 bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 {
-  return m_OpenCVWrappingAvailable; //TODO
+  return m_OpenCVWrappingAvailable;
 }
 
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
 
-  return m_VtkWrappingAvailable; //TODO
+  return m_VtkWrappingAvailable;
 }
 

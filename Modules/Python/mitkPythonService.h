@@ -37,10 +37,10 @@ namespace mitk
       ~PythonService();
       ///
       /// \see IPythonService::Execute()
-      QVariant Execute( const QString& pythonCommand, int commandType = SINGLE_LINE_COMMAND );
+      std::string Execute( const std::string& pythonCommand, int commandType = SINGLE_LINE_COMMAND );
       ///
       /// \see IPythonService::GetVariableStack()
-      QList<PythonVariable> GetVariableStack() const;
+      std::vector<PythonVariable> GetVariableStack() const;
       ///
       /// \see IPythonService::AddPythonCommandObserver()
       void AddPythonCommandObserver( PythonCommandObserver* observer );
@@ -49,39 +49,39 @@ namespace mitk
       void RemovePythonCommandObserver( PythonCommandObserver* observer );
       ///
       /// \see IPythonService::NotifyObserver()
-      void NotifyObserver( const QString& command );
+      void NotifyObserver( const std::string& command );
       ///
       /// \see IPythonService::IsItkPythonWrappingAvailable()
       bool IsItkPythonWrappingAvailable();
       ///
       /// \see IPythonService::CopyToPythonAsItkImage()
-      bool CopyToPythonAsItkImage( mitk::Image* image, const QString& varName );
+      bool CopyToPythonAsItkImage( mitk::Image* image, const std::string& varName );
       ///
       /// \see IPythonService::CopyItkImageFromPython()
-      mitk::Image::Pointer CopyItkImageFromPython( const QString& varName );
+      mitk::Image::Pointer CopyItkImageFromPython( const std::string& varName );
       ///
       /// \see IPythonService::IsOpenCvPythonWrappingAvailable()
       bool IsOpenCvPythonWrappingAvailable();
       ///
       /// \see IPythonService::CopyToPythonAsCvImage()
-      bool CopyToPythonAsCvImage( mitk::Image* image, const QString& varName );
+      bool CopyToPythonAsCvImage( mitk::Image* image, const std::string& varName );
       ///
       /// \see IPythonService::CopyCvImageFromPython()
-      mitk::Image::Pointer CopyCvImageFromPython( const QString& varName );
+      mitk::Image::Pointer CopyCvImageFromPython( const std::string& varName );
       ///
       /// \see IPythonService::IsVtkPythonWrappingAvailable()
       bool IsVtkPythonWrappingAvailable();
       ///
       /// \see IPythonService::CopyToPythonAsVtkPolyData()
-      bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const QString& varName );
+      bool CopyToPythonAsVtkPolyData( mitk::Surface* surface, const std::string& varName );
       ///
       /// \see IPythonService::CopyVtkPolyDataFromPython()
-      mitk::Surface::Pointer CopyVtkPolyDataFromPython( const QString& varName );
+      mitk::Surface::Pointer CopyVtkPolyDataFromPython( const std::string& varName );
       ///
       /// \return the ctk abstract python manager instance
       ctkAbstractPythonManager* GetPythonManager();
   protected:
-      QString GetTempImageName(const QString &ext) const;
+      QString GetTempImageName(const std::string &ext) const;
   private:
       QList<PythonCommandObserver*> m_Observer;
       ctkAbstractPythonManager m_PythonManager;

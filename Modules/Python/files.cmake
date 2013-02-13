@@ -1,6 +1,5 @@
 SET(CPP_FILES
   mitkPythonActivator.cpp
-  mitkIPythonService.cpp
   mitkPythonService.cpp
   QmitkCtkPythonShell.cpp
   QmitkPythonVariableStackTableModel.cpp

@@ -19,9 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+    QString PluginActivator::m_XmlFilePath;
 
     void PluginActivator::start(ctkPluginContext* context)
     {
+      m_XmlFilePath = context->getDataFile("PythonSnippets.xml").absoluteFilePath();
+
       BERRY_REGISTER_EXTENSION_CLASS(QmitkPythonView, context)
     }
 

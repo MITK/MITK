@@ -79,9 +79,10 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
             if( mitkImage->GetDimension() == 2 && exportAsCvImage )
             {
-              int ret = QMessageBox::question(this, "Export option",
+              int ret = QMessageBox::question(NULL, "Export option",
                 "2D image detected. Export as OpenCV image to Python instead of an ITK image?",
-                QMessageBox::Yes|QMessageBox::No);
+                                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
               exportAsCvImage = ret == QMessageBox::Yes;
               if(exportAsCvImage)
               {

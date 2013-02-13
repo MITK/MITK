@@ -62,7 +62,7 @@ signals:
     /// remove the current snippet, call update()
     void on_RemoveSnippet_triggered( bool checked = false );
     ///
-    /// call StringMapFromXmlFile with d->m_DefaultSnippetsAutoSaveFileName
+    /// call LoadStringMap with d->m_DefaultSnippetsAutoSaveFileName
     void on_RestoreDefaultSnippets_triggered( bool checked = false );
     ///
     /// update action state (enable/disable), update text box
@@ -80,10 +80,10 @@ signals:
   protected:
     ///
     /// write string map to xml file
-    void StringMapToXmlFile( const QString& filename, const QStringMap& map ) const;
+    void SaveStringMap( const QString& filename, const QStringMap& map ) const;
     ///
     /// read string map from xml file
-    bool StringMapFromXmlFile( const QString& filename, QStringMap& oldMap ) const;
+    bool LoadStringMap( const QString& filename, QStringMap& oldMap ) const;
     ///
     /// creates a name which does not exist in the list
     QString CreateUniqueName(const QString &name) const;

@@ -31,6 +31,7 @@ public:
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
+  static QString m_XmlFilePath;
 }; // PluginActivator
 
 }

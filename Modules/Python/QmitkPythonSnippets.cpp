@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPythonScriptEditorHighlighter.h"
 #include <QtGui>
 #include <mitkCommon.h>
+#include <memory>
 
 struct QmitkPythonSnippetsData
 {
@@ -135,9 +136,9 @@ QmitkPythonSnippets::QmitkPythonSnippets( const QString& _AutoSaveFileName, QWid
 
   d->m_AutoSaveFileName = _AutoSaveFileName;
 
-  if( !this->StringMapFromXmlFile( d->m_AutoSaveFileName, d->m_Snippets ) )
+  if( !this->LoadStringMap( d->m_AutoSaveFileName, d->m_Snippets ) )
   {
-    this->StringMapFromXmlFile( DEFAULT_SNIPPET_FILE, d->m_Snippets );
+    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
   }
 
   this->Update();
@@ -183,6 +184,7 @@ void QmitkPythonSnippets::on_RenameSnippet_triggered(bool)
         d->m_Snippets.remove(oldname);
         d->m_Snippets[name] = tmpSnippet;
         this->Update(name);
+        this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
         break;
       }
     }
@@ -210,6 +212,7 @@ void QmitkPythonSnippets::on_AddSnippet_triggered(bool)
     MITK_DEBUG("QmitkPythonSnippets") << "creating snippet " << name.toStdString();
     d->m_Snippets[name] = "";
     this->Update(name);
+    this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
   }
 }
 
@@ -240,6 +243,7 @@ void QmitkPythonSnippets::on_RemoveSnippet_triggered(bool)
   {
     d->m_Snippets.remove(name);
     this->Update();
+    this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
   }
 }
 
@@ -253,8 +257,9 @@ void QmitkPythonSnippets::on_RestoreDefaultSnippets_triggered(bool)
                                       QMessageBox::No );
   if( remove == QMessageBox::Yes || remove == QMessageBox::Ok )
   {
-    this->StringMapFromXmlFile( DEFAULT_SNIPPET_FILE, d->m_Snippets );
+    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
     this->Update();
+    this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
   }
 }
 
@@ -275,75 +280,79 @@ void QmitkPythonSnippets::on_Name_currentIndexChanged(int i)
   }
 }
 
-void QmitkPythonSnippets::StringMapToXmlFile(const QString &filename, const QmitkPythonSnippets::QStringMap &map) const
+void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPythonSnippets::QStringMap &map) const
 {
   MITK_DEBUG("QmitkPythonSnippets") << "saving to xml file " << filename.toStdString();
 
-  QXmlStreamWriter* xmlWriter;
-  QFile file;
-  QByteArray data;
-  if( filename.startsWith(":") )
+  if( filename.isEmpty() )
   {
-    QResource res( filename );
-    data = QByteArray( reinterpret_cast< const char* >( res.data() ), res.size() );
-    xmlWriter = new QXmlStreamWriter(&data);
-  }
-  else
-  {
-    QFile file(filename);
-    file.open(QIODevice::WriteOnly);
-    xmlWriter = new QXmlStreamWriter(&file);
+    MITK_WARN("QmitkPythonSnippets") << "empty auto save file path given. quit.";
+    return;
   }
 
-  xmlWriter->setAutoFormatting(true);
-  xmlWriter->writeStartDocument();
-  xmlWriter->writeStartElement(SNIPPETS_ROOT_XML_ELEMENT_NAME);
+  QFile file(filename);
+  file.open(QIODevice::WriteOnly);
+  QXmlStreamWriter xmlWriter(&file);
+
+  xmlWriter.setAutoFormatting(true);
+  xmlWriter.writeStartDocument();
+  xmlWriter.writeStartElement(SNIPPETS_ROOT_XML_ELEMENT_NAME);
 
   QStringMap::const_iterator it = d->m_Snippets.begin();
   while( it != d->m_Snippets.end() )
   {
     MITK_DEBUG("QmitkPythonSnippets") << "writing item " << it.key().toStdString();
-    xmlWriter->writeStartElement(SNIPPETS_XML_ELEMENT_NAME);
+    xmlWriter.writeStartElement(SNIPPETS_XML_ELEMENT_NAME);
 
-    xmlWriter->writeAttribute( "key", it.key() );
-    xmlWriter->writeAttribute( "value", it.value() );
+    xmlWriter.writeAttribute( "key", it.key() );
+    xmlWriter.writeAttribute( "value", it.value() );
 
     ++it;
   }
 
-  xmlWriter->writeEndElement();
-  xmlWriter->writeEndDocument();
+  xmlWriter.writeEndElement();
+  xmlWriter.writeEndDocument();
   if( file.isOpen() )
     file.close();
 
-  delete xmlWriter;
 }
 
-bool QmitkPythonSnippets::StringMapFromXmlFile( const QString& filename, QmitkPythonSnippets::QStringMap& oldMap ) const
+bool QmitkPythonSnippets::LoadStringMap( const QString& filename, QmitkPythonSnippets::QStringMap& oldMap ) const
 {
   MITK_DEBUG("QmitkPythonSnippets") << "loading from xml file " << filename.toStdString();
-
-  bool errorOccured = false;
   QStringMap map;
-  QFile file(filename);
-  if (!file.open(QFile::ReadOnly | QFile::Text))
+
+  QXmlStreamReader xmlReader;
+  QFile file;
+  QByteArray data;
+  // resource file
+  if( filename.startsWith(":") )
   {
-      MITK_ERROR << "Error: Cannot read file " << qPrintable(filename)
-       << ": " << qPrintable(file.errorString());
-      errorOccured = true;
+    QResource res( filename );
+    data = QByteArray( reinterpret_cast< const char* >( res.data() ), res.size() );
+    xmlReader.addData( data );
+  }
+  else
+  {
+    file.setFileName( filename );
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        MITK_ERROR << "Error: Cannot read file " << qPrintable(filename)
+         << ": " << qPrintable(file.errorString());
+        return false;
+    }
+    xmlReader.setDevice(&file);
   }
 
-  QXmlStreamReader Rxml;
-  Rxml.setDevice(&file);
-  Rxml.readNext();
+  xmlReader.readNext();
 
-  while(!Rxml.atEnd())
+  while(!xmlReader.atEnd())
   {
-    Rxml.readNext();
+    xmlReader.readNext();
 
-    if(Rxml.name() == SNIPPETS_XML_ELEMENT_NAME)
+    if(xmlReader.name() == SNIPPETS_XML_ELEMENT_NAME)
     {
-      QXmlStreamAttributes attributes = Rxml.attributes();
+      QXmlStreamAttributes attributes = xmlReader.attributes();
       QString key;
       QString value;
       if(attributes.hasAttribute("key"))
@@ -364,24 +373,26 @@ bool QmitkPythonSnippets::StringMapFromXmlFile( const QString& filename, QmitkPy
       }
     }
   }
-  file.close();
 
-  if (Rxml.hasError())
+  if (xmlReader.hasError())
   {
     MITK_ERROR << "Error: Failed to parse file "
       << qPrintable(filename) << ": "
-      << qPrintable(Rxml.errorString());
-    errorOccured = true;
+      << qPrintable(xmlReader.errorString());
+    return false;
   }
   else if (file.error() != QFile::NoError)
   {
     MITK_ERROR << "Error: Cannot read file " << qPrintable(filename)
       << ": " << qPrintable(file.errorString());
-    errorOccured = true;
+    return false;
   }
 
+  if( file.isOpen() )
+    file.close();
+
   oldMap = map;
-  return errorOccured;
+  return true;
 }
 
 void QmitkPythonSnippets::Update(const QString &name)
@@ -415,6 +426,7 @@ void QmitkPythonSnippets::on_Content_textChanged()
     QString name = d->m_Name->currentText();
     QString snippet = d->m_Content->toPlainText();
     d->m_Snippets[name] = snippet;
+    this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
   }
 }
 
@@ -424,7 +436,7 @@ void QmitkPythonSnippets::on_SaveSnippets_triggered(bool)
   if( !fileName.isEmpty() )
   {
     d->m_SaveFileName = fileName;
-    this->StringMapToXmlFile( d->m_SaveFileName, d->m_Snippets );
+    this->SaveStringMap( d->m_SaveFileName, d->m_Snippets );
   }
 }
 
@@ -444,8 +456,9 @@ void QmitkPythonSnippets::on_LoadSnippets_triggered(bool)
 
     if( overwrite == QMessageBox::Yes )
     {
-      this->StringMapFromXmlFile( d->m_SaveFileName, d->m_Snippets );
+      this->LoadStringMap( d->m_SaveFileName, d->m_Snippets );
       this->Update( d->m_Name->currentText() );
+      this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
     }
   }
 

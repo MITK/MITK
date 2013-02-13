@@ -52,7 +52,10 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
     d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
     d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
-    d->m_PythonSnippets = new QmitkPythonSnippets;
+    QString snippetsFilePath = mitk::PluginActivator::m_XmlFilePath;
+    MITK_DEBUG("QmitkPythonView") << "got snippetsFilePath " << snippetsFilePath.toStdString();
+
+    d->m_PythonSnippets = new QmitkPythonSnippets(snippetsFilePath);
 
     QTabWidget* varStackSnippetsTab = new QTabWidget;
     varStackSnippetsTab->addTab( d->m_PythonVariableStackTableView, "Variable Stack" );

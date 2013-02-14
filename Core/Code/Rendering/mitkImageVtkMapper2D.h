@@ -43,7 +43,7 @@ class vtkMitkApplyLevelWindowToRGBFilter;
 
 namespace mitk {
 
-  /** \brief Mapper to resample and display 2D slices of a 3D image.
+/** \brief Mapper to resample and display 2D slices of a 3D image.
  *
  * The following image gives a brief overview of the mapping and the involved parts.
  *
@@ -109,108 +109,108 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-  class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper2D
-  {
+class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper2D
+{
 
-  public:
-    /** Standard class typedefs. */
-    mitkClassMacro( ImageVtkMapper2D,VtkMapper2D );
+public:
+  /** Standard class typedefs. */
+  mitkClassMacro( ImageVtkMapper2D,VtkMapper2D );
 
-    /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
 
-    /** \brief Get the Image to map */
-    const mitk::Image *GetInput(void);
+  /** \brief Get the Image to map */
+  const mitk::Image *GetInput(void);
 
-    /** \brief Checks whether this mapper needs to update itself and generate
+  /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-    virtual void Update(mitk::BaseRenderer * renderer);
+  virtual void Update(mitk::BaseRenderer * renderer);
 
-    //### methods of MITK-VTK rendering pipeline
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  //### methods of MITK-VTK rendering pipeline
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer);
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
-    //### end of methods of MITK-VTK rendering pipeline
+  virtual void MitkRenderOverlay(BaseRenderer* renderer);
+  virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
+  virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
+  virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
+  //### end of methods of MITK-VTK rendering pipeline
 
 
-    /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-    /**
+  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
+  /**
      * To render transveral, coronal, and sagittal, the mapper is called three times.
      * For performance reasons, the corresponding data for each view is saved in the
      * internal helper class LocalStorage. This allows rendering n views with just
      * 1 mitkMapper using n vtkMapper.
      * */
-    class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
-    {
-    public:
-      /** \brief Actor of a 2D render window. */
-      vtkSmartPointer<vtkActor> m_Actor;
+  class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+  {
+  public:
+    /** \brief Actor of a 2D render window. */
+    vtkSmartPointer<vtkActor> m_Actor;
 
-      vtkSmartPointer<vtkPropAssembly> m_Actors;
-      /** \brief Mapper of a 2D render window. */
-      vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
-      /** \brief Current slice of a 2D render window.*/
-      vtkSmartPointer<vtkImageData> m_ReslicedImage;
-      /** \brief Empty vtkPolyData that is set when rendering geometry does not
+    vtkSmartPointer<vtkPropAssembly> m_Actors;
+    /** \brief Mapper of a 2D render window. */
+    vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+    /** \brief Current slice of a 2D render window.*/
+    vtkSmartPointer<vtkImageData> m_ReslicedImage;
+    /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
       *   \warning This member variable is set to NULL,
       *   if no image geometry is inside the plane geometry
       *   of the respective render window. Any user of this
       *   slice has to check whether it is set to NULL!
       */
-      vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
-      /** \brief Plane on which the slice is rendered as texture. */
-      vtkSmartPointer<vtkPlaneSource> m_Plane;
-      /** \brief The texture which is used to render the current slice. */
-      vtkSmartPointer<vtkTexture> m_Texture;
-      /** \brief The lookuptable for colors and level window */
-      vtkSmartPointer<vtkLookupTable> m_LookupTable;
-      /** \brief The actual reslicer (one per renderer) */
+    vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
+    /** \brief Plane on which the slice is rendered as texture. */
+    vtkSmartPointer<vtkPlaneSource> m_Plane;
+    /** \brief The texture which is used to render the current slice. */
+    vtkSmartPointer<vtkTexture> m_Texture;
+    /** \brief The lookuptable for colors and level window */
+    vtkSmartPointer<vtkLookupTable> m_LookupTable;
+    /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
     vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
-      /** \brief PolyData object containg all lines/points needed for outlining the contour.
+    /** \brief PolyData object containg all lines/points needed for outlining the contour.
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
-      vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+    vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
 
-      /** \brief Timestamp of last update of stored data. */
-      itk::TimeStamp m_LastUpdateTime;
+    /** \brief Timestamp of last update of stored data. */
+    itk::TimeStamp m_LastUpdateTime;
 
-      /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
-      mitk::ScalarType* m_mmPerPixel;
+    /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
+    mitk::ScalarType* m_mmPerPixel;
 
-      /** \brief This filter is used to apply the level window to RBG(A) images. */
-      vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
+    /** \brief This filter is used to apply the level window to RBG(A) images. */
+    vtkMitkApplyLevelWindowToRGBFilter* m_LevelWindowToRGBFilterObject;
 
-      /** \brief Default constructor of the local storage. */
-      LocalStorage();
-      /** \brief Default deconstructor of the local storage. */
-      ~LocalStorage()
-      {
-      }
-    };
+    /** \brief Default constructor of the local storage. */
+    LocalStorage();
+    /** \brief Default deconstructor of the local storage. */
+    ~LocalStorage()
+    {
+    }
+  };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
 
-    /** \brief Get the LocalStorage corresponding to the current renderer. */
-    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+  /** \brief Get the LocalStorage corresponding to the current renderer. */
+  LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
 
-    /** \brief Set the default properties for general image rendering. */
-    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  /** \brief Set the default properties for general image rendering. */
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  protected:
-    /** \brief Transforms the actor to the actual position in 3D.
+protected:
+  /** \brief Transforms the actor to the actual position in 3D.
     *   \param renderer The current renderer corresponding to the render window.
     */
-    void TransformActor(mitk::BaseRenderer* renderer);
+  void TransformActor(mitk::BaseRenderer* renderer);
 
-    /** \brief Generates a plane according to the size of the resliced image in milimeters.
+  /** \brief Generates a plane according to the size of the resliced image in milimeters.
     *
     * \image html texturedPlane.png
     *
@@ -225,20 +225,20 @@ namespace mitk {
     * in the XY-plane (even if they depict a YZ-slice of the volume).
     *
     */
-    void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
+  void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
-    /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
+  /** \brief Generates a vtkPolyData object containing the outline of a given binary slice.
       \param renderer: Pointer to the renderer containing the needed information
       \note This code is based on code from the iil library.
       */
-    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
+  vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 
-    /** Default constructor */
-    ImageVtkMapper2D();
-    /** Default deconstructor */
-    virtual ~ImageVtkMapper2D();
+  /** Default constructor */
+  ImageVtkMapper2D();
+  /** Default deconstructor */
+  virtual ~ImageVtkMapper2D();
 
-    /** \brief Does the actual resampling, without rendering the image yet.
+  /** \brief Does the actual resampling, without rendering the image yet.
     * All the data is generated inside this method. The vtkProp (or Actor)
     * is filled with content (i.e. the resliced image).
     *
@@ -250,33 +250,33 @@ namespace mitk {
     * \image html cameraPositioning3D.png
     *
     */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
 
 
-    /** \brief This method uses the vtkCamera clipping range and the layer property
+  /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used
     * to keep the correct order for the final VTK rendering.*/
-    float CalculateLayerDepth(mitk::BaseRenderer* renderer);
+  float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
-    /** \brief This method applies a level window on RBG(A) images.
+  /** \brief This method applies a level window on RBG(A) images.
     * It should only be called for internally for RGB(A) images. */
-    void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
+  void ApplyRBGALevelWindow( mitk::BaseRenderer* renderer );
 
-    /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer );
+  /** \brief This method applies (or modifies) the lookuptable for all types of images. */
+  void ApplyLookuptable( mitk::BaseRenderer* renderer );
 
-    /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
+  /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
     Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
     images (e.g. float) */
-    void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
+  void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
 
-    /** \brief Set the color of the image/polydata */
-    void ApplyColor( mitk::BaseRenderer* renderer );
+  /** \brief Set the color of the image/polydata */
+  void ApplyColor( mitk::BaseRenderer* renderer );
 
-    /** \brief Set the opacity of the actor. */
-    void ApplyOpacity( mitk::BaseRenderer* renderer );
+  /** \brief Set the opacity of the actor. */
+  void ApplyOpacity( mitk::BaseRenderer* renderer );
 
-    /**
+  /**
     * \brief Calculates whether the given rendering geometry intersects the
     * given SlicedGeometry3D.
     *
@@ -286,8 +286,8 @@ namespace mitk {
     * sign (all positive or all negative) there is no intersection.
     * If the distances have different sign, there is an intersection.
     **/
-    bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
-  };
+  bool RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry );
+};
 
 } // namespace mitk
 

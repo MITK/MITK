@@ -170,7 +170,7 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::
     // save image
     QString fileName = this->GetTempImageName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
 
-    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName;
+    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
     if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
     {
         MITK_ERROR << "Temporary file could not be created.";

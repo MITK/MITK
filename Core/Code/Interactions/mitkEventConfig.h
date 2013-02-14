@@ -19,9 +19,6 @@
 
 #include <vtkXMLParser.h>
 #include <iostream>
-#include "itkObject.h"
-
-#include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include <mitkPropertyList.h>
@@ -72,7 +69,7 @@ namespace mitk
      * an empty string is returned.
      * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
      * to configure them in a config file.
-     * \note mitk::InteractionKeys my have a defined event variant, if this is the case, this function returns it. If no
+     * \note mitk::InteractionKeys may have a defined event variant, if this is the case, this function returns it. If no
      * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
     std::string GetMappedEvent(InteractionEvent* interactionEvent);
@@ -101,7 +98,6 @@ namespace mitk
      **/
     bool ReadXMLBooleanAttribut(std::string name, const char** atts);
 
-
     /**
      * @brief List of all global properties of the config object.
      */
@@ -109,7 +105,7 @@ namespace mitk
 
     /**
      * @brief Temporal list of all properties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
-     * and </input> tags.
+     * and </event_variant> tags.
      */
     PropertyList::Pointer m_EventPropertyList;
 
@@ -118,6 +114,7 @@ namespace mitk
       std::string variantName;
       EventType interactionEvent;
     };
+
     /**
      * Checks if mapping with the same parameters already exists, if so, it is replaced,
      * else the new mapping added

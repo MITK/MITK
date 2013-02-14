@@ -1,21 +1,21 @@
 <config>
-  <input event_class="InternalEvent" event_variant="EnoughPoints">
+  <event_variant class="InternalEvent" name="EnoughPoints">
     <attribute name="SignalName" value="has3points"/>
-  </input>
-  <input event_class="InternalEvent" event_variant="IsLine">
+  </event_variant>
+  <event_variant class="InternalEvent" name="IsLine">
     <attribute name="SignalName" value="has2points"/>
-  </input>
-  <input event_class="InternalEvent" event_variant="NotEnoughPoints">
+  </event_variant>
+  <event_variant class="InternalEvent" name="NotEnoughPoints">
     <attribute name="SignalName" value="haslessthen3points"/>
-  </input>
-  <input event_class="KeyEvent" event_variant="Abort">
+  </event_variant>
+  <event_variant class="KeyEvent" name="Abort">
     <attribute name="Key" value="Escape"/>
-  </input>
-  <input event_class="MousePressEvent" event_variant="DeletePoint">
+  </event_variant>
+  <event_variant class="MousePressEvent" name="DeletePoint">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="shift"/>
-  </input>
-  <input event_class="MousePressEvent" event_variant="AddPointClick">
+  </event_variant>
+  <event_variant class="MousePressEvent" name="AddPointClick">
     <attribute name="EventButton" value="RightMouseButton"/>
-  </input>
+  </event_variant>
 </config>

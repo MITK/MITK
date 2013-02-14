@@ -1,13 +1,13 @@
 <config>
   <!-- scrolling either by moving mouse leftright or updown -->
   <param name="scrollDirection" value="leftright"/>
-   <input event_class="MousePressEvent" event_variant="StartScroll">
+   <event_variant class="MousePressEvent" name="StartScroll">
     <attribute name="EventButton" value="LeftMouseButton"/>
-  </input>
-  <input event_class="MouseReleaseEvent" event_variant="EndScrolling">
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndScrolling">
     <attribute name="EventButton" value="LeftMouseButton"/>
-  </input>
-  <input event_class="MouseMoveEvent" event_variant="Scrolling">
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Scrolling">
     <attribute name="ButtonState" value="LeftMouseButton"/>
-  </input>
+  </event_variant>
 </config>

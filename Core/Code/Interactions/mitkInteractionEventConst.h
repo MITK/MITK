@@ -102,14 +102,14 @@ namespace mitk
   // XML Tags
   const std::string xmlTagConfigRoot = "config";
   const std::string xmlTagParam = "param";
-  const std::string xmlTagInput = "input";
+  const std::string xmlTagEventVariant = "event_variant";
   const std::string xmlTagAttribute = "attribute";
 
   // XML Param
   const std::string xmlParameterName = "name";
   const std::string xmlParameterValue = "value";
   const std::string xmlParameterEventVariant = "event_variant";
-  const std::string xmlParameterEventClass = "event_class";
+  const std::string xmlParameterEventClass = "class";
 
   // Event Description
   const std::string xmlEventPropertyModifier = "Modifiers";

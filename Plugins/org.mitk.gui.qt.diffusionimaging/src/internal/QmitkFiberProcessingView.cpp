@@ -105,113 +105,52 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_CurvatureThresholdButton, SIGNAL(clicked()), this, SLOT(ApplyCurvatureThreshold()) );
         connect( m_Controls->m_MirrorFibersButton, SIGNAL(clicked()), this, SLOT(MirrorFibers()) );
 
+        connect( m_Controls->m_ExtractMask, SIGNAL(clicked()), this, SLOT(ExtractMask()) );
     }
 }
 
+void QmitkFiberProcessingView::ExtractMask()
+{
+    if (m_MaskImageNode.IsNull())
+        return;
+
+    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+    for (int i=0; i<m_SelectedFB.size(); i++)
+    {
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+
+        itkUCharImageType::Pointer mask = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, false);
+        DataNode::Pointer newNode = DataNode::New();
+        newNode->SetData(newFib);
+        name += "_ending-in-mask";
+        newNode->SetName(name.toStdString());
+        GetDefaultDataStorage()->Add(newNode);
+    }
+}
 
 void QmitkFiberProcessingView::Extract3d()
 {
-    std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-    if (nodes.empty())
+    if (m_MaskImageNode.IsNull())
         return;
 
-    mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New();
-    mitk::Surface::Pointer roi = mitk::Surface::New();
-    bool fibB = false;
-    bool roiB = false;
-    for (int i=0; i<nodes.size(); i++)
+    mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+    for (int i=0; i<m_SelectedFB.size(); i++)
     {
-        if (dynamic_cast<mitk::FiberBundleX*>(nodes.at(i)->GetData()))
-        {
-            fib = dynamic_cast<mitk::FiberBundleX*>(nodes.at(i)->GetData());
-            fibB = true;
-        }
-        else if (dynamic_cast<mitk::Surface*>(nodes.at(i)->GetData()))
-        {
-            roi = dynamic_cast<mitk::Surface*>(nodes.at(i)->GetData());
-            roiB = true;
-        }
+        mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData());
+        QString name(m_SelectedFB.at(i)->GetName().c_str());
+
+        itkUCharImageType::Pointer mask = itkUCharImageType::New();
+        mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
+        mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true);
+        DataNode::Pointer newNode = DataNode::New();
+        newNode->SetData(newFib);
+        name += "_passing-mask";
+        newNode->SetName(name.toStdString());
+        GetDefaultDataStorage()->Add(newNode);
     }
-    if (!fibB)
-        return;
-    if (!roiB)
-        return;
-
-    vtkSmartPointer<vtkPolyData> polyRoi = roi->GetVtkPolyData();
-    vtkSmartPointer<vtkPolyData> polyFib = fib->GetFiberPolyData();
-
-    vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints = vtkSmartPointer<vtkSelectEnclosedPoints>::New();
-    selectEnclosedPoints->SetInput(polyFib);
-    selectEnclosedPoints->SetSurface(polyRoi);
-    selectEnclosedPoints->Update();
-
-    vtkSmartPointer<vtkPolyData> newPoly = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkCellArray> newCellArray = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPoints>    newPoints = vtkSmartPointer<vtkPoints>::New();
-
-    vtkSmartPointer<vtkPolyData> newPolyComplement = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkCellArray> newCellArrayComplement = vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkPoints>    newPointsComplement = vtkSmartPointer<vtkPoints>::New();
-
-    vtkSmartPointer<vtkCellArray> vLines = polyFib->GetLines();
-
-    vLines->InitTraversal();
-    int numberOfLines = vLines->GetNumberOfCells();
-    // each line
-    for (int j=0; j<numberOfLines; j++)
-    {
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
-        bool isPassing = false;
-
-        // each point of this line
-        for (int k=0; k<numPoints; k++)
-        {
-            // is point inside polydata ?
-            if (selectEnclosedPoints->IsInside(points[k]))
-            {
-                isPassing = true;
-                // fill new polydata
-                vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-                for (int k=0; k<numPoints; k++)
-                {
-                    double* point = polyFib->GetPoint(points[k]);
-                    vtkIdType pointId = newPoints->InsertNextPoint(point);
-                    container->GetPointIds()->InsertNextId(pointId);
-                }
-                newCellArray->InsertNextCell(container);
-                break;
-            }
-        }
-        if (!isPassing)
-        {
-            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-            for (int k=0; k<numPoints; k++)
-            {
-                double* point = polyFib->GetPoint(points[k]);
-                vtkIdType pointId = newPointsComplement->InsertNextPoint(point);
-                container->GetPointIds()->InsertNextId(pointId);
-            }
-            newCellArrayComplement->InsertNextCell(container);
-        }
-    }
-
-    newPoly->SetPoints(newPoints);
-    newPoly->SetLines(newCellArray);
-    mitk::FiberBundleX::Pointer fb = mitk::FiberBundleX::New(newPoly);
-    DataNode::Pointer newNode = DataNode::New();
-    newNode->SetData(fb);
-    newNode->SetName("passing surface");
-    GetDefaultDataStorage()->Add(newNode);
-
-    newPolyComplement->SetPoints(newPointsComplement);
-    newPolyComplement->SetLines(newCellArrayComplement);
-    mitk::FiberBundleX::Pointer fbComplement = mitk::FiberBundleX::New(newPolyComplement);
-    DataNode::Pointer newNodeComplement = DataNode::New();
-    newNodeComplement->SetData(fbComplement);
-    newNodeComplement->SetName("not passing surface");
-    GetDefaultDataStorage()->Add(newNodeComplement);
 }
 void QmitkFiberProcessingView::GenerateRoiImage(){
 
@@ -736,6 +675,9 @@ void QmitkFiberProcessingView::StdMultiWidgetNotAvailable()
 
 void QmitkFiberProcessingView::UpdateGui()
 {
+    m_Controls->m_Extract3dButton->setEnabled(false);
+    m_Controls->m_ExtractMask->setEnabled(false);
+
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
@@ -745,7 +687,6 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_SubstractBundles->setEnabled(false);
         m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
         m_Controls->doExtractFibersButton->setEnabled(false);
-        m_Controls->m_Extract3dButton->setEnabled(false);
         m_Controls->m_ResampleFibersButton->setEnabled(false);
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
@@ -768,9 +709,6 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_CurvatureThresholdButton->setEnabled(true);
         m_Controls->m_MirrorFibersButton->setEnabled(true);
 
-        if (m_SelectedSurfaces.size()>0)
-            m_Controls->m_Extract3dButton->setEnabled(true);
-
         // one bundle and one planar figure needed to extract fibers
         if (!m_SelectedPF.empty())
         {
@@ -791,6 +729,12 @@ void QmitkFiberProcessingView::UpdateGui()
 
         if (m_SelectedImage.IsNotNull())
             m_Controls->m_FaColorFibersButton->setEnabled(true);
+
+        if (m_MaskImageNode.IsNotNull())
+        {
+            m_Controls->m_Extract3dButton->setEnabled(true);
+            m_Controls->m_ExtractMask->setEnabled(true);
+        }
     }
 
     // are planar figures selected?
@@ -831,6 +775,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
     m_SelectedPF.clear();
     m_SelectedSurfaces.clear();
     m_SelectedImage = NULL;
+    m_MaskImageNode = NULL;
 
     m_Controls->m_FibLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_PfLabel->setText("<font color='grey'>needed for extraction</font>");
@@ -849,7 +794,14 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             m_SelectedPF.push_back(node);
         }
         else if (dynamic_cast<mitk::Image*>(node->GetData()))
+        {
             m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
+
+            bool isBinary = false;
+            node->GetPropertyValue<bool>("binary", isBinary);
+            if (isBinary)
+                m_MaskImageNode = node;
+        }
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
         {
             m_Controls->m_PfLabel->setText(node->GetName().c_str());

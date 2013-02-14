@@ -734,9 +734,11 @@ void QmitkFiberfoxView::GenerateImage()
     noiseModel.SetNoiseVariance(noiseVariance);
 
     // artifact models
+    QString artifactModelString("");
     mitk::GibbsRingingArtifact<double> gibbsModel;
     if (m_Controls->m_AddGibbsRinging->isChecked())
     {
+        artifactModelString += "_Gibbs-ringing";
         resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
         gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
         artifactList.push_back(&gibbsModel);
@@ -745,6 +747,7 @@ void QmitkFiberfoxView::GenerateImage()
     mitk::T2SmearingArtifact<double> t2Model;
     if (m_Controls->m_AddT2Smearing->isChecked())
     {
+        artifactModelString += "_T2-blurring";
         t2Model.SetReadoutPulseLength(1);
         artifactList.push_back(&t2Model);
     }

@@ -263,36 +263,36 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
     {
       switch (section)
       {
-        case 0: return QVariant("Time");
-        case 1: return QVariant("Level");
-        case 2: return QVariant("Message");
-        case 3: return QVariant("Category");
-        case 4: return QVariant("Module");
-        case 5: return QVariant("Function");
-        case 6: return QVariant("File");
-        case 7: return QVariant("Line");
+        case 0: return QVariant(" Time ");
+        case 1: return QVariant(" Level ");
+        case 2: return QVariant(" Message ");
+        case 3: return QVariant(" Category ");
+        case 4: return QVariant(" Module ");
+        case 5: return QVariant(" Function ");
+        case 6: return QVariant(" File ");
+        case 7: return QVariant(" Line ");
       }
     }
     else if (m_ShowAdvancedFiels && !m_ShowCategory)
     {
       switch (section)
       {
-        case 0: return QVariant("Time");
-        case 1: return QVariant("Level");
-        case 2: return QVariant("Message");
-        case 3: return QVariant("Module");
-        case 4: return QVariant("Function");
-        case 5: return QVariant("File");
-        case 6: return QVariant("Line");
+        case 0: return QVariant(" Time ");
+        case 1: return QVariant(" Level ");
+        case 2: return QVariant(" Message ");
+        case 3: return QVariant(" Module ");
+        case 4: return QVariant(" Function ");
+        case 5: return QVariant(" File ");
+        case 6: return QVariant(" Line ");
       }
     }
     else //!m_ShowAdvancedFiels, m_ShowCategory is not handled seperately because it only activates case 2
     {
       switch (section)
       {
-        case 0: return QVariant("Level");
-        case 1: return QVariant("Message");
-        case 2: return QVariant("Category");
+        case 0: return QVariant(" Level ");
+        case 1: return QVariant(" Message ");
+        case 2: return QVariant(" Category ");
       }
     }
   }

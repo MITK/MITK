@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>596</width>
-    <height>282</height>
+    <height>292</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,7 +50,7 @@
      </property>
      <property name="font">
       <font>
-       <pointsize>8</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="verticalScrollBarPolicy">
@@ -172,9 +172,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../../resources/org_blueberry_ui_qt.qrc"/>
-  <include location="../../resources/org_blueberry_ui_qt.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

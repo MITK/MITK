@@ -35,7 +35,7 @@ public:
   mitkClassMacro(TensorImageSource,ImageSource);
   itkNewMacro(Self);
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
 protected:
   TensorImageSource();

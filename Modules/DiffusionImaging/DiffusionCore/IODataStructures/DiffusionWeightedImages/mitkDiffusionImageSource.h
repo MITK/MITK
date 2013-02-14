@@ -49,7 +49,7 @@ public:
   typedef DiffusionImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
 
   //void SetOutput(OutputType* output);

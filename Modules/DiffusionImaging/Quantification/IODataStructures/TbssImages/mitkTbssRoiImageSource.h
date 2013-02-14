@@ -46,7 +46,7 @@ public:
   typedef TbssRoiImage OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
   OutputType * GetOutput(unsigned int idx);
 

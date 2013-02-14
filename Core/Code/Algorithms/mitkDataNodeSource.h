@@ -53,6 +53,8 @@ public:
      */
     virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
 
+    virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
+
     /**
      * Allows to set the output of the base data source.
      * @param output the intended output of the base data source

@@ -46,6 +46,8 @@ namespace mitk
     */
     virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
 
+    virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
+
     /**
     * Allows to set the output of the point set source.
     * @param output the intended output of the point set source

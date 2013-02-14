@@ -45,7 +45,7 @@ public:
 
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
   void SetOutput(mitk::GeometryData* output);
 

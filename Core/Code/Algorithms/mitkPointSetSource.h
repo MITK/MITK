@@ -50,7 +50,9 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+    virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
 
     /**
      * Allows to set the output of the point set source.
@@ -59,7 +61,7 @@ public:
     virtual void SetOutput( OutputType* output );
 
     virtual void GraftOutput(OutputType *output);
-    virtual void GraftNthOutput(unsigned int idx, OutputType *output);
+    virtual void GraftNthOutput(DataObjectPointerArraySizeType idx, OutputType *output);
 
     /**
      * Returns the output with index 0 of the point set source
@@ -72,7 +74,7 @@ public:
      * @param idx the index of the wanted output
      * @returns the output with index idx.
      */
-    virtual OutputType* GetOutput ( unsigned int idx );
+    virtual OutputType* GetOutput ( DataObjectPointerArraySizeType idx );
 
 protected:
 

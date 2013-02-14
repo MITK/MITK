@@ -33,7 +33,7 @@ mitk::UnstructuredGridSource::~UnstructuredGridSource()
 {
 }
 
-mitk::UnstructuredGridSource::DataObjectPointer mitk::UnstructuredGridSource::MakeOutput(unsigned int /*idx*/)
+mitk::UnstructuredGridSource::DataObjectPointer mitk::UnstructuredGridSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
   return static_cast<itk::DataObject*>(mitk::UnstructuredGrid::New().GetPointer());
 }

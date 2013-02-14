@@ -224,7 +224,7 @@ public:
   //## region of the data object passed in as a parameter.
   //##
   //## This method is implemented in the concrete subclasses of BaseData.
-  virtual void SetRequestedRegion(itk::DataObject *data)=0;
+  virtual void SetRequestedRegion(const itk::DataObject *data)=0;
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).

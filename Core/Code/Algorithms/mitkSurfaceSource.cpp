@@ -33,10 +33,15 @@ mitk::SurfaceSource::~SurfaceSource()
 {
 }
 
-mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(unsigned int /*idx*/)
+mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
-  return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
+    return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
 }
+
+//mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(const DataObjectIdentifierType &/*idx*/)
+//{
+//    return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
+//}
 
 mitk::Surface* mitk::SurfaceSource::GetOutput()
 {

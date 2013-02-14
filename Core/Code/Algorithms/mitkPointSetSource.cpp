@@ -37,7 +37,7 @@ mitk::PointSetSource::~PointSetSource()
 
 
 
-itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( unsigned int /*idx */)
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput (DataObjectPointerArraySizeType /*idx */)
 {
     return OutputType::New().GetPointer();
 }
@@ -59,7 +59,7 @@ void mitk::PointSetSource::GraftOutput(OutputType *graft)
   this->GraftNthOutput(0, graft);
 }
 
-void mitk::PointSetSource::GraftNthOutput(unsigned int /*idx*/, OutputType* /*graft*/)
+void mitk::PointSetSource::GraftNthOutput(DataObjectPointerArraySizeType /*idx*/, OutputType* /*graft*/)
 {
   itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
   assert(false);
@@ -83,7 +83,7 @@ mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput()
 
 
 
-mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput ( unsigned int idx )
+mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput (DataObjectPointerArraySizeType idx )
 {
     return dynamic_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
 }

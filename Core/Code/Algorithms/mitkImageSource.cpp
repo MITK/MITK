@@ -30,7 +30,7 @@ mitk::ImageSource::ImageSource()
 /**
  *
  */
-mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
+mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(DataObjectPointerArraySizeType)
 {
   return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }

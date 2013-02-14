@@ -42,9 +42,9 @@ void mitk::BaseDataSource::SetOutput( OutputType* output )
 
 
 
-void mitk::BaseDataSource::SetOutput( unsigned int idx, OutputType* output )
+void mitk::BaseDataSource::SetOutput(const DataObjectIdentifierType &key, itk::DataObject *output )
 {
-    this->SetNthOutput(idx, output);
+    this->SetNthOutput(key, output);
 }
 
 

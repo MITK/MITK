@@ -88,7 +88,7 @@ protected:
 
   virtual void GenerateData();
 
-  virtual GeometryDataSource::DataObjectPointer MakeOutput(unsigned int idx);
+  virtual GeometryDataSource::DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
   ProjectionMode m_ProjectionMode;
 

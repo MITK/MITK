@@ -124,7 +124,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Returns the Dispatcher which handles Events for this BaseRenderer
-    Dispatcher::Pointer GetDispatcher();
+    const Dispatcher::Pointer GetDispatcher();
 
     //##Documentation
     //## @brief Default mapper id to use.
@@ -566,7 +566,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Helper class which establishes connection between Interactors and Dispatcher via a common DataStorage.
-    BindDispatcherInteractor::Pointer m_BindDispatcherInteractor;
+    BindDispatcherInteractor* m_BindDispatcherInteractor;
 
   protected:
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;

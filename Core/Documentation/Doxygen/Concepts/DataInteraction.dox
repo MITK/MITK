@@ -172,9 +172,9 @@ two possible config files could then look like this:
 
 \code
 <config name="one">
- <input event_class="MousePressEvent" event_variant="MousePress">
+ <event_variant name="MousePress" class="MousePressEvent">
   <attribute name="EventButton" value="LeftMouseButton"/>
- </input>
+ </event_variant>
 </config>
 \endcode
 <b>Example 2: Event description of a left click with the mouse</b>
@@ -183,10 +183,10 @@ and
 
 \code
 <config name="two">
- <input event_class="MousePressEvent" event_variant="MousePress">
+ <event_variant name="MousePress" class="MousePressEvent">
   <attribute name="EventButton" value="RightMouseButton"/>
   <attribute name="Modifiers" value="shift"/>
- </input>
+ </event_variant>
 </config>
 \endcode
 <b>Example 3: Event description of a left click with the mouse while pressing the shift-key</b>

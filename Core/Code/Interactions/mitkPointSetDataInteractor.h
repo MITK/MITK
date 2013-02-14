@@ -46,8 +46,8 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(PointSetDataInteractor, DataInteractor);
-    itkNewMacro(Self);
+    mitkClassMacro(PointSetDataInteractor, DataInteractor)
+    itkNewMacro(Self)
 
   protected:
     PointSetDataInteractor();
@@ -63,6 +63,21 @@ namespace mitk
      * and added to the DataNode.
      */
     virtual void DataNodeChanged();
+
+
+    /**
+     * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
+     */
+    void SetAccuracy(float accuracy);
+
+    /**
+     * @ brief Return index in PointSet of the point that is within given accuracy to the provided position.
+     *
+     * Assumes that the DataNode contains a PointSet, if so it iterates over all points
+     * in the DataNode to check if it contains a point near the pointer position.
+     * If a point is found its index-position is returned, else -1 is returned.
+     */
+    virtual int GetPointIndexByPosition(Point3D position, int time = 0);
 
     /** Adds a point at the given coordinates.
      *  Every time a point is added it is also checked if the maximal number of points is reached,
@@ -118,6 +133,8 @@ namespace mitk
     int m_SelectedPointIndex; // index of currently selected point in PointSet
     /** member to keep track of PointSet movements */
     Point3D m_LastMovePosition;
+
+    float m_SelectionAccuracy; // accuracy that's needed to select a point
   };
 
 }

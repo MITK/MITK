@@ -130,14 +130,14 @@ Examples for key events:
 \code
 <config>
   <!-- Event of key 'a' pressed -->
-  <input event_class="KeyEvent" event_variant="StdA">
+  <event_variant class="KeyEvent" name="StdA">
     <attribute name="Key" value="A"/>
-  </input>
+  </event_variant>
   <!-- Event of key 'b' pressed  while modifiers ctrl and shift are pressed-->
-  <input event_class="KeyEvent" event_variant="StdA">
+  <event_variant class="KeyEvent" name="StdA">
     <attribute name="Key" value="A"/>
     <attribute name="Modifiers" value="shift,ctrl"/>
-  </input>
+  </event_variant>
 </config>
 \endcode
 
@@ -146,14 +146,14 @@ Examples for MousePress events:
 \code
  <!-- Standard left click -->
 <config>
-  <input event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton">
+  <event_variant class="MousePressEvent" name="StdMousePressPrimaryButton">
     <attribute name="EventButton" value="LeftMouseButton"/>
-  </input>
+  </event_variant>
 <!-- right click with control key pressed-->
-  <input event_class="MousePressEvent" event_variant="RightWithCTRL">
+  <event_variant class="MousePressEvent" name="RightWithCTRL">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
-  </input>
+  </event_variant>
 </config>
 \endcode
 
@@ -351,10 +351,10 @@ ctrl button pressed.
 \code
 <config>
   <param name="NumberOfPoints" value="10">
-   <input event_class="MousePressEvent" event_variant="AddPointClick">
+   <event_variant class="MousePressEvent" name="AddPointClick">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
-  </input>
+  </event_variant>
 </config>
 \endcode
 

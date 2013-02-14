@@ -17,7 +17,7 @@
 #ifndef MITKEVENTHANDLER_H_
 #define MITKEVENTHANDLER_H_
 
-#include "itkObject.h"
+#include "itkLightObject.h"
 #include "itkObjectFactory.h"
 #include "mitkEvent.h"
 #include "mitkCommon.h"
@@ -36,11 +36,11 @@ namespace mitk
    *  Handles loading of configuration object and mapping of events to variant names.
    */
   class InteractionEvent;
-  class MITK_CORE_EXPORT EventHandler : public itk::Object {
+  class MITK_CORE_EXPORT EventHandler : public itk::LightObject {
 
   public:
-    mitkClassMacro(EventHandler, itk::Object);
-    itkNewMacro(Self);
+    mitkClassMacro(EventHandler, itk::LightObject)
+    itkNewMacro(Self)
     /**
     * @brief Loads XML resource
     *

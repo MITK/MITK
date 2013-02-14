@@ -97,8 +97,8 @@ namespace mitk
   {
 
   public:
-    mitkClassMacro(EventStateMachine, EventHandler);
-    itkNewMacro(Self);
+    mitkClassMacro(EventStateMachine, EventHandler)
+    itkNewMacro(Self)
     typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 

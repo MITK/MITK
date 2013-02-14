@@ -405,6 +405,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
         MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
     }
 
+    this->ApplyColor( renderer );
     this->ApplyOpacity( renderer );
     this->TransformActor( renderer );
 
@@ -537,6 +538,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
     if(binary) // is it a binary image?
     {
         //default lookuptable for binary images
+      localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
         localStorage->m_Texture->GetLookupTable()->SetRange(0.0, 1.0);
     }
     else if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
@@ -565,7 +567,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
         this->GetLevelWindow( levelWindow, renderer );
         localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
         localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-        this->ApplyColor( renderer );
     }
 
     localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );

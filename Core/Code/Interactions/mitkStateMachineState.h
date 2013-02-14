@@ -25,8 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStateMachineTransition.h"
 
 namespace mitk {
-
-  // Dispatcher and State Modes
+  /**
+   * \class StateMachineState
+   * Represents a state of a state machine pattern.
+   * It holds transitions to other states (mitk::StateMachineTransition) and the mode of the current state, see
+   * m_StateMode .
+   */
 
   class MITK_CORE_EXPORT StateMachineState : public itk::Object
   {

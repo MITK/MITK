@@ -26,7 +26,7 @@ namespace mitk
    *\class DisplayInteractor
    *@brief Observer that manages the interaction with the display.
    *
-   * This includes the interaction of Zooming, Panning and Scrolling.
+   * This includes the interaction of Zooming, Panning, Scrolling and adjusting the LevelWindow.
    *
    * @ingroup Interaction
    **/
@@ -37,8 +37,8 @@ namespace mitk
   class MITK_CORE_EXPORT DisplayInteractor: public EventObserver
   {
   public:
-    mitkClassMacro(DisplayInteractor, StateMachine);
-    itkNewMacro(Self);
+    mitkClassMacro(DisplayInteractor, StateMachine)
+    itkNewMacro(Self)
     /**
      * By this function the Observer gets notifier about new events.
      * Here it is adapted to pass the events to the state machine in order to use

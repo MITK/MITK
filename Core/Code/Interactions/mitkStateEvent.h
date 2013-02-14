@@ -32,6 +32,12 @@ namespace mitk {
   //## Not derived from event to hold only one object stateevent, pass it to the statemachines,
   //## set the next event and reuse this object
   //## @ingroup Interaction
+
+  /**
+  * \deprecatedSince{2013_03} mitk::StateEvent is deprecated. It becomes obsolete.
+  * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
+  */
+
   class MITK_CORE_EXPORT StateEvent
   {
   public:

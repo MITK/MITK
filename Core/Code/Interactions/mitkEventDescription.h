@@ -35,6 +35,12 @@ namespace mitk {
   //## A name and an ID is added to the information of an event, so the event can
   //## be processed futher on.
   //## @ingroup Interaction
+
+  /**
+   * \deprecatedSince{2013_03} EventDescription is deprecated. It will become obsolete.
+   * All necessary information is now store in the event classes derived from mitk::InteractionEvent .
+   * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
+   */
   class MITK_CORE_EXPORT EventDescription : public Event
   {
   public:

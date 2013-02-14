@@ -32,6 +32,7 @@ namespace mitk {
   class UndoController;
 
   // base class of statem machine functors
+
   class MITK_CORE_EXPORT TStateMachineFunctor
   {
     public:
@@ -130,6 +131,11 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
   map and call the appropriate method in your derived class.
 
 **/
+  /**
+    * \deprecatedSince{2013_03} mitk::StateMachine is deprecated. Use mitk::EventStateMachine instead.
+    * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+
   class MITK_CORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor
   {
 

@@ -46,6 +46,10 @@ class BaseData;
 //## the appropriate type of event to process the actions. Especially in guarding states (a state, that checks certain conditions (e.g. is picked)
 //## the according Event must be called to continue in states. No return false here!
 //## @ingroup Interaction
+/**
+ * \deprecatedSince{2013_03} mitk::Interactor is deprecated. Use mitk::DataInteractor instead.
+ * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
+ */
 class MITK_CORE_EXPORT Interactor : public StateMachine
 {
 public:

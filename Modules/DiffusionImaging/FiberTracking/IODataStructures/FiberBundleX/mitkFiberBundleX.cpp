@@ -535,12 +535,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
     vtkSmartPointer<vtkDoubleArray> faValues = vtkSmartPointer<vtkDoubleArray>::New();
     faValues->SetName(COLORCODING_FA_BASED);
     faValues->Allocate(m_FiberPolyData->GetNumberOfPoints());
-    //    MITK_DEBUG << faValues->GetNumberOfTuples();
-    //    MITK_DEBUG << faValues->GetSize();
-
     faValues->SetNumberOfValues(m_FiberPolyData->GetNumberOfPoints());
-    //    MITK_DEBUG << faValues->GetNumberOfTuples();
-    //    MITK_DEBUG << faValues->GetSize();
 
     vtkPoints* pointSet = m_FiberPolyData->GetPoints();
     for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); ++i)
@@ -550,11 +545,7 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
         px[1] = pointSet->GetPoint(i)[1];
         px[2] = pointSet->GetPoint(i)[2];
         double faPixelValue = 1-FAimage->GetPixelValueByWorldCoordinate(px);
-        //        faValues->InsertNextTuple1(faPixelValue);
         faValues->InsertValue(i, faPixelValue);
-        //        MITK_DEBUG << faPixelValue;
-        //        MITK_DEBUG << faValues->GetValue(i);
-
     }
 
     m_FiberPolyData->GetPointData()->AddArray(faValues);
@@ -562,12 +553,6 @@ void mitk::FiberBundleX::SetFAMap(mitk::Image::Pointer FAimage)
 
     if(m_FiberPolyData->GetPointData()->HasArray(COLORCODING_FA_BASED))
         MITK_DEBUG << "FA VALUE ARRAY SET";
-
-    //    vtkDoubleArray* valueArray = (vtkDoubleArray*) m_FiberPolyData->GetPointData()->GetArray(FA_VALUE_ARRAY);
-    //    for(long i=0; i<m_FiberPolyData->GetNumberOfPoints(); i++)
-    //    {
-    //        MITK_DEBUG << "value at pos "<<  i << ": " << valueArray->GetValue(i);
-    //    }
 }
 
 void mitk::FiberBundleX::GenerateFiberIds()
@@ -589,6 +574,100 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 }
 
+mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint)
+{
+    vtkSmartPointer<vtkPolyData> polyData = this->GetFiberPolyData();
+    if (anyPoint)
+    {
+        float minSpacing = 1;
+        if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])
+            minSpacing = mask->GetSpacing()[0];
+        else if (mask->GetSpacing()[1] < mask->GetSpacing()[2])
+            minSpacing = mask->GetSpacing()[1];
+        else
+            minSpacing = mask->GetSpacing()[2];
+
+        mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
+        fibCopy->ResampleFibers(minSpacing/2);
+        polyData = fibCopy->GetFiberPolyData();
+    }
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+    vtkSmartPointer<vtkCellArray> vLines = polyData->GetLines();
+    vLines->InitTraversal();
+
+    MITK_INFO << "Extracting fibers";
+    boost::progress_display disp(m_NumFibers);
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        ++disp;
+        vtkIdType   numPoints(0);
+        vtkIdType*  pointIds(NULL);
+        vLines->GetNextCell ( numPoints, pointIds );
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+
+        if (numPoints>1)
+        {
+            if (anyPoint)
+            {
+                for (int j=0; j<numPoints; j++)
+                {
+                    double* p = polyData->GetPoint(pointIds[j]);
+
+                    itk::Point<float, 3> itkP;
+                    itkP[0] = p[0]; itkP[1] = p[1]; p[2] = p[2];
+                    itk::Index<3> idx;
+                    mask->TransformPhysicalPointToIndex(itkP, idx);
+                    if ( mask->GetPixel(idx)>0 )
+                    {
+                        for (int j=0; j<numPoints; j++)
+                        {
+                            double* p = polyData->GetPoint(pointIds[j]);
+                            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                            container->GetPointIds()->InsertNextId(id);
+                        }
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                double* start = polyData->GetPoint(pointIds[0]);
+                itk::Point<float, 3> itkStart;
+                itkStart[0] = start[0]; itkStart[1] = start[1]; itkStart[2] = start[2];
+                itk::Index<3> idxStart;
+                mask->TransformPhysicalPointToIndex(itkStart, idxStart);
+
+                double* end = polyData->GetPoint(pointIds[numPoints-1]);
+                itk::Point<float, 3> itkEnd;
+                itkEnd[0] = end[0]; itkEnd[1] = end[1]; itkEnd[2] = end[2];
+                itk::Index<3> idxEnd;
+                mask->TransformPhysicalPointToIndex(itkEnd, idxEnd);
+
+                if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 )
+                {
+                    for (int j=0; j<numPoints; j++)
+                    {
+                        double* p = polyData->GetPoint(pointIds[j]);
+                        vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                        container->GetPointIds()->InsertNextId(id);
+                    }
+                }
+            }
+        }
+
+        vtkNewCells->InsertNextCell(container);
+    }
+
+    if (vtkNewCells->GetNumberOfCells()<=0)
+        return NULL;
+
+    vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
+    newPolyData->SetPoints(vtkNewPoints);
+    newPolyData->SetLines(vtkNewCells);
+    return mitk::FiberBundleX::New(newPolyData);
+}
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
 {

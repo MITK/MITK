@@ -126,9 +126,19 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
   protected:
 
+    /** constructor */
     VtkMapper();
 
+    /** virtual destructor in order to derive from this class */
     virtual ~VtkMapper();
+
+  private:
+
+    /** copy constructor */
+    VtkMapper( const VtkMapper &);
+
+    /** assignment operator */
+    VtkMapper & operator=(const VtkMapper &);
 
 };
 } // namespace mitk

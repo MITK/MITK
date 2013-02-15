@@ -70,8 +70,20 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
 
   protected:
 
+    /** constructor */
     GLMapper();
+
+    /** virtual destructor in order to derive from this class */
     virtual ~GLMapper();
+
+ private:
+
+   /** copy constructor */
+   GLMapper( const GLMapper &);
+
+   /** assignment operator */
+   GLMapper & operator=(const GLMapper &);
+
 };
 
 } // namespace mitk

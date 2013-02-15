@@ -174,8 +174,10 @@ namespace mitk {
 
   protected:
 
+    /** \brief explicit constructor which disallows implicit conversions */
     explicit Mapper();
 
+    /** \brief virtual destructor in order to derive from this class */
     virtual ~Mapper();
 
 
@@ -197,7 +199,7 @@ namespace mitk {
     */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
 
-    //is not thread-safe
+    //\brief not thread-safe
     itk::WeakPointer<DataNode> m_DataNode;
 
     /** \brief timestamp of last update of stored data */
@@ -210,6 +212,12 @@ namespace mitk {
     * The current timestep can be accessed via the GetTimestep() method.
     */
     int m_TimeStep;
+
+    /** \brief copy constructor */
+    Mapper( const Mapper &);
+
+    /** \brief assignment operator */
+    Mapper &operator=(const Mapper &);
 
 
   public:

@@ -140,6 +140,15 @@ public:
 
     m_CoreDataNodeReader = mitk::CoreDataNodeReader::New();
     context->RegisterService<mitk::IDataNodeReader>(m_CoreDataNodeReader);
+
+    /*
+    There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.
+    This code is left here as a reminder, just in case we might need to do that some time.
+
+    vtkNeverTranslucentTextureFactory* textureFactory = vtkNeverTranslucentTextureFactory::New();
+    vtkObjectFactory::RegisterFactory( textureFactory );
+    textureFactory->Delete();
+    */
   }
 
   void Unload(mitk::ModuleContext* )

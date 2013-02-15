@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __vtkMitkApplyLevelWindowToRGBFilter_h
-#define __vtkMitkApplyLevelWindowToRGBFilter_h
+#ifndef __vtkMitkLevelWindowFilter_h
+#define __vtkMitkLevelWindowFilter_h
 
 class vtkScalarsToColors;
 #include <vtkImageData.h>
@@ -23,9 +23,9 @@ class vtkScalarsToColors;
 
 #include <MitkExports.h>
 /** Documentation
-* \brief Applies the color and opacity level window to RGB(A) images.
+* \brief Applies the grayvalue or color/opacity level window to scalar or RGB(A) images.
 *
-* This filter is used to apply the color level window to RBG images (e.g.
+* This filter is used to apply the color level window to RGB images (e.g.
 * diffusion tensor images). Therefore, the RGB channels are converted to
 * the HSI color space, where the level window can be applied. Afterwards,
 * the HSI values transformed back to the RGB space.
@@ -34,9 +34,10 @@ class vtkScalarsToColors;
 *
 * \ingroup Renderer
 */
-class MITK_CORE_EXPORT vtkMitkApplyLevelWindowToRGBFilter : public vtkImageToImageFilter
+class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkImageToImageFilter
 {
 public:
+  virtual unsigned long int GetMTime();
   /** \brief Get the lookup table for the RGB level window */
   vtkScalarsToColors* GetLookupTable();
   /** \brief Set the lookup table for the RGB level window */
@@ -50,15 +51,18 @@ public:
   void SetMaxOpacity(double maxOpacity);
   inline double GetMaxOpacity() const;
 
+  /** \brief Set clipping bounds for the opaque part of the resliced 2d image */
+  void SetClippingBounds(vtkFloatingPointType*);
+
   /** Default constructor. */
-  vtkMitkApplyLevelWindowToRGBFilter();
+  vtkMitkLevelWindowFilter();
   /** Default deconstructor. */
-  ~vtkMitkApplyLevelWindowToRGBFilter();
+  ~vtkMitkLevelWindowFilter();
 protected:
   /** \brief Method for threaded execution of the filter.
    * \param *inData: The input.
    * \param *outData: The output of the filter.
-   * \param extent: Array[6] specifies the region of the image to be updated inside this thread.
+   * \param extent: Specifies the region of the image to be updated inside this thread.
    * It is a six-component array of the form (xmin, xmax, ymin, ymax, zmin, zmax).
    * \param id: The thread id.
    */
@@ -72,9 +76,11 @@ protected:
 private:
   /** m_LookupTable contains the lookup table for the RGB level window.*/
   vtkScalarsToColors* m_LookupTable;
-  /** m_MinOqacity contains the lower bound for the alpha level window.*/
-  double m_MinOqacity;
-  /** m_MinOqacity contains the upper bound for the alpha level window.*/
+  /** m_MinOpacity contains the lower bound for the alpha level window.*/
+  double m_MinOpacity;
+  /** m_MaxOpacity contains the upper bound for the alpha level window.*/
   double m_MaxOpacity;
+
+  vtkFloatingPointType m_ClippingBounds[4];
 };
 #endif

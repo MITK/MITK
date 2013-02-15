@@ -150,11 +150,12 @@ bool mitk::Surface::IsEmptyTimeStep(unsigned int t) const
 
   vtkPolyData* polyData = const_cast<Surface*>(this)->GetVtkPolyData(t);
 
-  return polyData == NULL ||
+  return polyData == NULL || (
     polyData->GetNumberOfLines() == 0 &&
     polyData->GetNumberOfPolys() == 0 &&
     polyData->GetNumberOfStrips() == 0 &&
-    polyData->GetNumberOfVerts() == 0;
+    polyData->GetNumberOfVerts() == 0
+  );
 }
 
 vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t)

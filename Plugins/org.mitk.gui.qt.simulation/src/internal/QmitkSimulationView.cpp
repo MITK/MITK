@@ -14,16 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
 #include <mitkNodePredicateDataType.h>
 #include <mitkSimulation.h>
 #include <mitkSimulationModel.h>
+#include <sofa/helper/system/PluginManager.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 
 QmitkSimulationView::QmitkSimulationView()
   : m_Timer(this)
 {
   connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTimeout()));
+  initSOFAPlugins();
 }
 
 QmitkSimulationView::~QmitkSimulationView()

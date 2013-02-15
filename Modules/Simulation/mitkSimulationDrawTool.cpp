@@ -383,34 +383,50 @@ void mitk::SimulationDrawTool::drawFrame(const Vector3& position, const Quaterni
   if (!m_Update)
     return;
 
-  const float radius = 0.05f;
+  float minSize = std::min(std::min(size.x(), size.y()), size.z());
+  float maxSize = std::max(std::max(size.x(), size.y()), size.z());
+
+  if (maxSize > minSize * 2.0f)
+  {
+    if (minSize > 0.0f)
+      maxSize = minSize * 2.0f;
+    else
+      minSize = maxSize * 0.707f;
+  }
+
+  const float radii[] = { minSize * 0.1f, maxSize * 0.2f };
 
   bool wireframeBackup = m_Wireframe;
   m_Wireframe = false;
 
-  std::vector<Vec4f> colors;
-  colors.push_back(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-  colors.push_back(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-  colors.push_back(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-
   if (size.x() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(size.x(), 0.0f, 0.0f));
-    this->drawArrow(position, point2, radius, colors.back());
-    colors.pop_back();
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(radii[1], 0.0f, 0.0f));
+    Vec4f red(1.0f, 0.0f, 0.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], red);
+    this->drawCone(point2, point3, radii[1], 0.0f, red);
   }
 
   if (size.y() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(0.0f, size.y(), 0.0f));
-    this->drawArrow(position, point2, radius, colors.back());
-    colors.pop_back();
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(0.0f, radii[1], 0.0f));
+    Vec4f green(0.0f, 1.0f, 0.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], green);
+    this->drawCone(point2, point3, radii[1], 0.0f, green);
   }
 
   if (size.z() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(0.0f, 0.0f, size.z()));
-    this->drawArrow(position, point2, radius, colors.back());
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(0.0f, 0.0f, radii[1]));
+    Vec4f blue(0.0f, 0.0f, 1.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], blue);
+    this->drawCone(point2, point3, radii[1], 0.0f, blue);
   }
 
   m_Wireframe = wireframeBackup;

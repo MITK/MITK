@@ -6,4 +6,9 @@
           class="QmitkSimulationView"
           icon="resources/icon.png" />
   </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.SimulationPreferencePage"
+          name="Simulation"
+          class="QmitkSimulationPreferencePage" />
+  </extension>
 </plugin>

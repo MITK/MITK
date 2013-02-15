@@ -38,8 +38,19 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
     /** \brief Do the painting into the \a renderer */
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
-    /** \brief Apply color and opacity read from the PropertyList */
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+     /** \brief Apply color and opacity properties read from the PropertyList
+    *  @deprecated Use ApplyColorAndOpacityProperties(...) instead
+    */
+     DEPRECATED(inline virtual void ApplyProperties(mitk::BaseRenderer* renderer)
+     {
+       ApplyColorAndOpacityProperties(renderer);
+     });
+
+    /** \brief Apply color and opacity properties read from the PropertyList.
+    * The actor is not used in the GLMappers. Called by mapper subclasses.
+    */
+     virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = NULL);
+
 
     /** \brief Checks visibility and calls the paint method
     *

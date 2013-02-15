@@ -81,6 +81,7 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
   m_ContourActor->ReleaseGraphicsResources(renWin);
 }
 
+
 void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 {
   m_vtkSelectedPointList = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -347,8 +348,6 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   // create new vtk render objects (e.g. sphere for a point)
   this->CreateVTKRenderObjects();
 
-  //apply props
-  this->ApplyProperties(m_ContourActor,NULL);
   SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
   SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
 
@@ -363,7 +362,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     }
   }
 
-  this->ApplyProperties(m_ContourActor,renderer);
+  this->ApplyAllProperties(renderer, m_ContourActor);
 
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
@@ -432,9 +431,9 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*render
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
-void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
 {
-  Superclass::ApplyProperties(actor,renderer);
+  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
   //check for color props and use it for rendering of selected/unselected points and contour
   //due to different params in VTK (double/float) we have to convert!
 

@@ -188,7 +188,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>(worldGeometry.GetPointer());
 
   //apply color and opacity read from the PropertyList
-  ApplyProperties(renderer);
+  this->ApplyAllProperties(renderer);
 
   if (m_DrawNormals)
   {
@@ -496,9 +496,9 @@ void mitk::SurfaceGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::SurfaceGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 {
-  Superclass::ApplyProperties(renderer);
+  ApplyColorAndOpacityProperties(renderer);
 
   DataNode * node = GetDataNode();
 

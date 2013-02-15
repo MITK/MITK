@@ -66,7 +66,7 @@ public:
 
   virtual void Paint(mitk::BaseRenderer * renderer);
 
-  virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+  virtual void ApplyAllProperties(mitk::BaseRenderer* renderer);
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 

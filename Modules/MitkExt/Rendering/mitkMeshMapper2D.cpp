@@ -111,7 +111,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldGeometry2D());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    ApplyColorAndOpacityProperties(renderer);
 
     vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 

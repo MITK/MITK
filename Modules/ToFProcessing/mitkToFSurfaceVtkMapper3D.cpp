@@ -291,7 +291,7 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 
   // Applying shading properties
   {
-    Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
+    ApplyColorAndOpacityProperties( ls->m_Actor, renderer ) ;
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
     // Shaders

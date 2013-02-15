@@ -94,7 +94,6 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     * Mapper subclasses. */
     virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
 
-
     /** \brief Set the vtkTransform of the m_Prop3D for
     * the current time step of \a renderer
     *
@@ -103,15 +102,27 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
     /**
-    * \brief Apply color and opacity read from the PropertyList
+    * \brief Apply color and opacity properties read from the PropertyList
+    * @deprecated Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) instead
     */
-    virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+    DEPRECATED(inline virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+    {
+      ApplyColorAndOpacityProperties(renderer, actor);
+    });
 
     /**
-    * \brief Release vtk-based graphics resources. Must be overwritten in
-    * subclasses if vtkProps additional to m_Prop3D are used.
+    * \brief Apply color and opacity properties read from the PropertyList.
+    * Called by mapper subclasses.
     */
-    virtual void ReleaseGraphicsResources(vtkWindow *renWin);
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor);
+
+    /**
+    * \brief  Release vtk-based graphics resources that are being consumed by this mapper.
+    * The parameter window could be used to determine which graphic
+    * resources to releases. Must be overwritten in individual subclasses
+    * if vtkProps are used.
+    */
+    virtual void ReleaseGraphicsResources(vtkWindow *renWin) { };
 
   protected:
 

@@ -53,7 +53,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    ApplyColorAndOpacityProperties(renderer);
 
     vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 

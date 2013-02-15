@@ -51,9 +51,9 @@ const mitk::PointSet *mitk::PointSetGLMapper2D::GetInput(void)
   return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
-void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::PointSetGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 {
-  GLMapper::ApplyProperties( renderer );
+  GLMapper::ApplyColorAndOpacityProperties( renderer );
 
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )
@@ -155,7 +155,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    this->ApplyAllProperties(renderer);
 
     vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 

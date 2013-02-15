@@ -91,7 +91,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   //
   // apply properties read from the PropertyList
   //
-  ApplyProperties(ls->m_Actor, renderer);
+  ApplyColorAndOpacityProperties(renderer, ls->m_Actor);
 
   if(visible)
     ls->m_Actor->VisibilityOn();
@@ -240,13 +240,13 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
 
 
 
-void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   // Applying shading properties
   {
-    Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
+    Superclass::ApplyColorAndOpacityProperties(renderer, ls->m_Actor) ;
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
     // Shaders

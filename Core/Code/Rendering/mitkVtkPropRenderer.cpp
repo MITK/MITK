@@ -556,8 +556,6 @@ mitk::DataNode *
       if ( !pickable )
         continue;
 
-      //VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
-      //                    ( node->GetMapper( m_MapperID ) );
       VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
@@ -600,7 +598,7 @@ mitk::DataNode *
       mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
 
       if(vtkmapper){
-        // wenn vtk-basiert, dann ............
+        //if vtk-based, then ...
        if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
        {
           return node;
@@ -685,7 +683,6 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
       Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
       if (mapper)
       {
-       // VtkMapper3D* vtkmapper = dynamic_cast<VtkMapper3D*>( mapper );
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
         if (vtkmapper)
         {
@@ -728,10 +725,16 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
     if ( node.IsNull() )
       continue;
 
-    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if(mapper.IsNotNull())
-      mapper->ReleaseGraphicsResources(renWin);
-  }
+      Mapper * mapper = node->GetMapper(m_MapperID);
+
+      if (mapper)
+      {
+        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
+
+       if(vtkmapper)
+         vtkmapper->ReleaseGraphicsResources(renWin);
+      }
+   }
 }
 
 

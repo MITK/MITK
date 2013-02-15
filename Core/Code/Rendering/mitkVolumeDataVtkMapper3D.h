@@ -70,8 +70,6 @@ public:
 
   virtual const mitk::Image* GetInput();
 
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-
   virtual void EnableMask();
   virtual void DisableMask();
   Image::Pointer GetMask();

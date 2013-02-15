@@ -70,6 +70,11 @@ namespace mitk {
     /** \brief Set the DataNode containing the data to map */
     itkSetObjectMacro(DataNode, DataNode);
 
+
+    /** \brief Get the DataNode containing the data to map */
+    virtual DataNode* GetDataNode() const;
+
+
     /**\brief Get the data to map
     *
     * Returns the mitk::BaseData object associated with this mapper.
@@ -77,9 +82,6 @@ namespace mitk {
     * @deprecated Use GetDataNode()->GetData() instead to access the data
     */
     DEPRECATED(BaseData* GetData() const);
-
-    /** \brief Get the DataNode containing the data to map */
-    virtual DataNode* GetDataNode() const;
 
     /** \brief Convenience access method for color properties (instances of
     * ColorProperty)
@@ -127,6 +129,12 @@ namespace mitk {
     DEPRECATED(virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const);
 
 
+     /** \brief Returns whether this is an vtk-based mapper
+    * @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
+    */
+    virtual bool IsVtkBased() const = 0;
+
+
     /** \brief Calls the time step of the input data for the specified renderer and checks
     * whether the time step is valid and calls method GenerateDataForRenderer()
     */
@@ -137,16 +145,14 @@ namespace mitk {
     */
     virtual void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) = 0;
 
-    /** \brief Returns whether this is an vtk-based mapper
-    * @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
-    */
-    virtual bool IsVtkBased() const = 0;
-
     /**
-    * \brief Release vtk-based graphics resources. Must be overwritten in
-    * subclasses if vtkProps are used.
+    * \brief Apply specific color and opacity properties read from the PropertyList.
+    * Reimplemented in GLmapper (does not use the actor) and the VtkMapper class.
+    * The function is called by the individual mapper (mostly in the ApplyProperties() or ApplyAllProperties()
+    * method).
     */
-    virtual void ReleaseGraphicsResources(vtkWindow*) { };
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = NULL) = 0;
+
 
     /** \brief Set default values of properties used by this mapper
     * to \a node
@@ -168,12 +174,13 @@ namespace mitk {
 
   protected:
 
-    Mapper();
+    explicit Mapper();
 
     virtual ~Mapper();
 
+
     /** \brief Generate the data needed for rendering (independent of a specific renderer) */
-    // @deprecated Use GenerateDataForRenderer() instead.
+    // @deprecated Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
     DEPRECATED( virtual void GenerateData() { });
 
     /** \brief Generate the data needed for rendering into \a renderer */
@@ -183,7 +190,9 @@ namespace mitk {
     virtual void CalculateTimeStep( BaseRenderer* renderer );
 
     /** \brief Reset the mapper (i.e., make sure that nothing is displayed) if no
-    * valid data is present.
+    * valid data is present. In most cases the reimplemented function
+    * disables the according actors (toggling visibility off)
+    *
     * To be implemented in sub-classes.
     */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };

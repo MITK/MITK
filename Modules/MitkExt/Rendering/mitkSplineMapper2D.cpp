@@ -179,7 +179,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
 
 void mitk::SplineMapper2D::ApplyProperties ( mitk::BaseRenderer* renderer )
 {
-  Superclass::ApplyProperties ( renderer );
+  ApplyColorAndOpacityProperties ( renderer );
 }
 
 mitk::SplineMapper2D::SplineMapper2D()

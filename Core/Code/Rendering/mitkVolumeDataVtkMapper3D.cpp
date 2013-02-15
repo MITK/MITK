@@ -570,10 +570,6 @@ void mitk::VolumeDataVtkMapper3D::DelClippingPlane()
   m_PlaneSet = false;
 }
 
-void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
-{
-
-}
 
 void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {

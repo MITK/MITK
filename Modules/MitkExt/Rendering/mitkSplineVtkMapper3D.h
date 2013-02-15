@@ -72,7 +72,7 @@ protected:
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer * renderer);
 
-    virtual void ApplyProperties(vtkActor *actor, BaseRenderer *renderer);
+    virtual void ApplyAllProperties(BaseRenderer *renderer, vtkActor *actor);
 
     vtkActor* m_SplinesActor;
 

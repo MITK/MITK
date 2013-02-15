@@ -211,8 +211,8 @@ void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ 
 void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::DataNode::Pointer node = this->GetDataNode();
-  Superclass::ApplyProperties(m_Actor, renderer);
-  Superclass::ApplyProperties(m_ActorWireframe, renderer);
+  ApplyColorAndOpacityProperties(renderer, m_Actor);
+  ApplyColorAndOpacityProperties(renderer, m_ActorWireframe);
 
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();

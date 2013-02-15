@@ -51,7 +51,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    ApplyColorAndOpacityProperties(renderer);
 
     mitk::ContourSet::Pointer input =  const_cast<mitk::ContourSet*>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();

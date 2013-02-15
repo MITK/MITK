@@ -473,9 +473,9 @@ void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoi
 }
 
 
-void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
+void mitk::Geometry2DDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 {
-  Superclass::ApplyProperties(renderer);
+  Superclass::ApplyColorAndOpacityProperties(renderer);
 
   PlaneOrientationProperty* decorationProperty;
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
@@ -527,7 +527,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
     dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldGeometry2D() );
 
   // Apply color and opacity read from the PropertyList.
-  this->ApplyProperties( renderer );
+  this->ApplyAllProperties( renderer );
 
   ScalarType gapSizeInParamUnits =
     1.0 / lengthInDisplayUnits * gapSizeInPixel;

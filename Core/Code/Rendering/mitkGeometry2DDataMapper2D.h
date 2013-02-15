@@ -63,7 +63,7 @@ public:
   virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 
   /** Applies properties specific to this mapper */
-  virtual void ApplyProperties( BaseRenderer *renderer );
+  virtual void ApplyAllProperties( BaseRenderer *renderer );
 
 
 protected:

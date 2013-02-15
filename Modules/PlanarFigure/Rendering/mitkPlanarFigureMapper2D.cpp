@@ -105,7 +105,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
   // Apply visual appearance properties from the PropertyList
-  this->ApplyProperties( renderer );
+  ApplyColorAndOpacityProperties( renderer );
 
   // Enable line antialiasing
   glEnable( GL_LINE_SMOOTH );

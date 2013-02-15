@@ -116,7 +116,7 @@ namespace mitk {
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     virtual void ResetMapper( BaseRenderer* renderer );
-    virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+    virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
     virtual void CreateContour();
     virtual void CreateVTKRenderObjects();
 

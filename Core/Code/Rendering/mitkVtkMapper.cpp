@@ -56,6 +56,7 @@ void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
 void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
   bool visible = true;
+
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if ( !visible) return;
 
@@ -112,7 +113,7 @@ void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
     prop->SetUserTransform(vtktransform);
 }
 
-void mitk::VtkMapper::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
+void mitk::VtkMapper::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor)
 {
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
   DataNode * node = GetDataNode();
@@ -125,12 +126,4 @@ void mitk::VtkMapper::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
   double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
   actor->GetProperty()->SetColor(drgba);
   actor->GetProperty()->SetOpacity(drgba[3]);
-}
-
-void mitk::VtkMapper::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
-{
-/*
-  if(m_Prop3D)
-    m_Prop3D->ReleaseGraphicsResources(renWin);
-*/
 }

@@ -119,7 +119,7 @@ public:
 
   static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  virtual void ApplyProperties(BaseRenderer* renderer);
+  virtual void ApplyAllProperties(BaseRenderer* renderer);
 
 protected:
 

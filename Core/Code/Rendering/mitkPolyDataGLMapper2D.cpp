@@ -128,7 +128,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
           //  float toGL=displayGeometry->GetSizeInDisplayUnits()[1];
 
           //apply color and opacity read from the PropertyList
-          ApplyProperties( renderer );
+          ApplyColorAndOpacityProperties( renderer );
 
           // traverse the cut contour
           vtkPolyData * contour = m_Cutter->GetOutput();

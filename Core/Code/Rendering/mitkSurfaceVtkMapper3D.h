@@ -97,7 +97,7 @@ public:
 
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
 
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+  virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 

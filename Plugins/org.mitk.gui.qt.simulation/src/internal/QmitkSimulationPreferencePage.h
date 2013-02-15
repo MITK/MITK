@@ -22,12 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_simulation_Export.h>
 #include <ui_QmitkSimulationPreferencePageControls.h>
 
+berry::IPreferences::Pointer getSimulationPreferences();
+void initSOFAPlugins(berry::IPreferences::Pointer preferences = getSimulationPreferences());
+
 class SIMULATION_EXPORT QmitkSimulationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
+  static const std::string PLUGIN_PATHS;
+
   QmitkSimulationPreferencePage();
   ~QmitkSimulationPreferencePage();
 
@@ -38,10 +43,15 @@ public:
   bool PerformOk();
   void Update();
 
+private slots:
+  void OnAddButtonClicked();
+  void OnPluginTreeWidgetItemSelectionChanged();
+  void OnRemoveButtonClicked();
+
 private:
+  berry::IPreferences::Pointer m_Preferences;
   QWidget* m_Control;
   Ui::QmitkSimulationPreferencePageControls m_Controls;
-  berry::IPreferences::Pointer m_Preferences;
 };
 
 #endif

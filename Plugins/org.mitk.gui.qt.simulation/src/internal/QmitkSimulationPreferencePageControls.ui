@@ -12,14 +12,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="lblPlugins">
+    <widget class="QLabel" name="pluginsLabel">
      <property name="text">
       <string>Plugins</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QTableView" name="tblPlugins">
+    <widget class="QTreeWidget" name="pluginsTreeWidget">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
@@ -29,42 +32,84 @@
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
-     <property name="showGrid">
+     <property name="indentation">
+      <number>0</number>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="itemsExpandable">
       <bool>false</bool>
      </property>
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
-     <property name="cornerButtonEnabled">
+     <property name="wordWrap">
       <bool>false</bool>
      </property>
-     <attribute name="verticalHeaderVisible">
+     <property name="columnCount">
+      <number>4</number>
+     </property>
+     <attribute name="headerCascadingSectionResizes">
       <bool>false</bool>
      </attribute>
+     <column>
+      <property name="text">
+       <string notr="true">1</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string notr="true">2</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string notr="true">3</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string notr="true">4</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="1">
-      <widget class="QListView" name="lstComponents"/>
-     </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="lblComponents">
+      <widget class="QLabel" name="componentsLabel">
        <property name="text">
         <string>Components</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="lblDescription">
+      <widget class="QLabel" name="descriptionLabel">
        <property name="text">
         <string>Description</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QPlainTextEdit" name="txtDescription">
+      <widget class="QPlainTextEdit" name="descriptionPlainTextEdit">
        <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QListWidget" name="componentsListWidget">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="sortingEnabled">
         <bool>true</bool>
        </property>
       </widget>
@@ -74,14 +119,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="btnAdd">
+      <widget class="QPushButton" name="addButton">
        <property name="text">
         <string>Add...</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnRemove">
+      <widget class="QPushButton" name="removeButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Remove</string>
        </property>

@@ -33,6 +33,7 @@ StickModel< ScalarType >::~StickModel()
 template< class ScalarType >
 typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateMeasurement()
 {
+    this->m_FiberDirection.Normalize();
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
 

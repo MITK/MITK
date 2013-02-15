@@ -1220,6 +1220,9 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
     MITK_INFO << "Scaling fibers";
     boost::progress_display disp(m_NumFibers);
 
+    mitk::Geometry3D* geom = this->GetGeometry();
+    mitk::Point3D c = geom->GetCenter();
+
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
 
@@ -1236,9 +1239,11 @@ void mitk::FiberBundleX::ScaleFibers(double x, double y, double z)
         for (int j=0; j<numPoints; j++)
         {
             double* p = m_FiberPolyData->GetPoint(pointIds[j]);
+            p[0] -= c[0]; p[1] -= c[1]; p[2] -= c[2];
             p[0] *= x;
             p[1] *= y;
             p[2] *= z;
+            p[0] += c[0]; p[1] += c[1]; p[2] += c[2];
             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
             container->GetPointIds()->InsertNextId(id);
         }

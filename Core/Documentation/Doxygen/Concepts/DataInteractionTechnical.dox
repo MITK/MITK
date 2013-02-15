@@ -87,12 +87,12 @@ Events that are generated within the scope of the BaseRenderer are sent to the a
       Whenever a DataInteractor performs a state change into a state that is marked by the grab input-tag, the Dispatcher switches into this mode.
       As long as it is in this mode ONLY the selected DataInteractor will receive the event. This mode is ended when the DataInteractor switches back to
       a state without a tag/ or the REGULAR-tag.\n
-      \note In this mode InteractionEventObservers will NOT receive the events.
+      \note In this mode EventObservers will NOT receive the events.
 
    <li> \b Prefer \b Input: \n
       Basically works as Grab Input, with the difference that if the Interactor in an prefer input state, cannot process the event offered,
       it will be offered to the other interactors in the regular way.\n
-      In this mode InteractionEventObservers ARE informed.
+      In this mode EventObservers ARE informed.
 
 </ul>
 \section StateMachineSection State Machine & Configuration

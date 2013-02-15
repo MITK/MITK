@@ -1693,6 +1693,29 @@
                </property>
               </widget>
              </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_3">
+               <property name="text">
+                <string>Interpolation Shrink:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QSpinBox" name="m_InterpolationShrink">
+               <property name="toolTip">
+                <string>Large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation).</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>10000</number>
+               </property>
+               <property name="value">
+                <number>10</number>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1865,6 +1888,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>tabWidget</tabstop>
   <tabstop>m_CircleButton</tabstop>
   <tabstop>m_FlipButton</tabstop>
   <tabstop>m_RealTimeFibers</tabstop>
@@ -1902,6 +1926,7 @@
   <tabstop>m_NumGradientsBox</tabstop>
   <tabstop>m_BvalueBox</tabstop>
   <tabstop>m_RepetitionsBox</tabstop>
+  <tabstop>m_InterpolationShrink</tabstop>
   <tabstop>m_EnforcePureFiberVoxelsBox</tabstop>
   <tabstop>m_KspaceImageBox</tabstop>
   <tabstop>m_FiberCompartmentModelBox</tabstop>
@@ -1917,7 +1942,6 @@
   <tabstop>m_NonFiberRelaxationT2Box</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
   <tabstop>m_KspaceUndersamplingBox</tabstop>
-  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

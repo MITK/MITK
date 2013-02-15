@@ -620,6 +620,9 @@ void QmitkFiberfoxView::GenerateImage()
                     m_Controls->m_SpacingY->value(),
                     m_Controls->m_SpacingZ->value());
 
+        mitk::Geometry3D* geom = image->GetGeometry();
+        geom->SetOrigin(origin);
+
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData( image );
         node->SetName("Dummy");
@@ -770,6 +773,7 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetKspaceArtifacts(artifactList);
         filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
+        filter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
 
         if (m_TissueMask.IsNotNull())
         {
@@ -784,18 +788,18 @@ void QmitkFiberfoxView::GenerateImage()
         image->SetB_Value(bVal);
         image->SetDirections(gradientList);
         image->InitializeFromVectorImage();
-//        image->GetGeometry()->SetImageGeometry(false);
         resultNode->SetData( image );
         resultNode->SetName(m_SelectedBundle->GetName()
-                            +"_D"+QString::number(m_Controls->m_SizeX->value()).toStdString()
-                            +"-"+QString::number(m_Controls->m_SizeY->value()).toStdString()
-                            +"-"+QString::number(m_Controls->m_SizeZ->value()).toStdString()
+                            +"_D"+QString::number(imageRegion.GetSize(0)).toStdString()
+                            +"-"+QString::number(imageRegion.GetSize(1)).toStdString()
+                            +"-"+QString::number(imageRegion.GetSize(2)).toStdString()
                             +"_S"+QString::number(spacing[0]).toStdString()
                             +"-"+QString::number(spacing[1]).toStdString()
                             +"-"+QString::number(spacing[2]).toStdString()
                             +"_b"+QString::number(bVal).toStdString()
                             +"_SNR"+QString::number(snr).toStdString()
-                            +"_"+signalModelString.toStdString());
+                            +"_"+signalModelString.toStdString()
+                            +artifactModelString.toStdString());
         GetDataStorage()->Add(resultNode, m_SelectedBundle);
 
         resultNode->AddProperty("Fiberfox.SNR", DoubleProperty::New(snr));

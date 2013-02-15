@@ -69,18 +69,18 @@ public:
      */
     virtual itk::DataObject::Pointer MakeOutput (const DataObjectIdentifierType &) = 0;
 
-    /**
-     * Allows to set the output of the base data source.
-     * @param output the intended output of the base data source
-     */
-    virtual void SetOutput( OutputType* output );
+//    /**
+//     * Allows to set the output of the base data source.
+//     * @param output the intended output of the base data source
+//     */
+//    virtual void SetOutput( OutputType* output );
 
-    /**
-     * Allows to set the n-th output of the base data source.
-     * @param idx The index of the output
-     * @param output The intended output of the base data source
-     */
-    virtual void SetOutput(const DataObjectIdentifierType & key, itk::DataObject *output);
+//    /**
+//     * Allows to set the n-th output of the base data source.
+//     * @param idx The index of the output
+//     * @param output The intended output of the base data source
+//     */
+//    virtual void SetOutput(const DataObjectIdentifierType & key, itk::DataObject *output);
 
     /**
      * Returns the output with index 0 of the base data source

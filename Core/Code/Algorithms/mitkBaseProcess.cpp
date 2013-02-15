@@ -129,6 +129,13 @@ void mitk::BaseProcess::SetNthOutput(DataObjectPointerArraySizeType idx, itk::Da
   this->UnRegister();
 }
 
+void mitk::BaseProcess::SetOutput(const itk::ProcessObject::DataObjectIdentifierType &key, itk::DataObject *output)
+{
+    this->Register();
+    Superclass::SetOutput(key, output);
+    this->UnRegister();
+}
+
 /**
 * Adds an output to the first null position in the output list.
 * Expands the list memory if necessary

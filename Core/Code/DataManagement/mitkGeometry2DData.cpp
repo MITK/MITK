@@ -80,7 +80,7 @@ bool mitk::Geometry2DData::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::Geometry2DData::SetRequestedRegion(itk::DataObject *)
+void mitk::Geometry2DData::SetRequestedRegion( const itk::DataObject *)
 {
 
 }

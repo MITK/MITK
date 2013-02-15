@@ -32,7 +32,13 @@ mitk::ImageSource::ImageSource()
  */
 mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(DataObjectPointerArraySizeType)
 {
-  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+    return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+}
+
+mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(const itk::ProcessObject::DataObjectIdentifierType &)
+{
+    //Does this make sense?
+    return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }
 
 /**
@@ -60,14 +66,14 @@ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(unsigned int id
 }
 
 
-/**
- *
- */
-void mitk::ImageSource::SetOutput(OutputImageType *output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
+///**
+// *
+// */
+//void mitk::ImageSource::SetOutput(OutputImageType *output)
+//{
+//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
+//  BaseProcess::SetNthOutput(0, output);
+//}
 
 
 /**

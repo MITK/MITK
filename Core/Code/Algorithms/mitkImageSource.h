@@ -57,12 +57,12 @@ public:
   OutputImageType * GetOutput(void);
   OutputImageType * GetOutput(unsigned int idx);
 
-  /** @brief Set the image output of this process object.
-   *
-   * This call is slated
-   * to be removed from ITK. You should GraftOutput() and possible
-   * DataObject::DisconnectPipeline() to properly change the output. */
-  void SetOutput(OutputImageType *output);
+//  /** @brief Set the image output of this process object.
+//   *
+//   * This call is slated
+//   * to be removed from ITK. You should GraftOutput() and possible
+//   * DataObject::DisconnectPipeline() to properly change the output. */
+//  void SetOutput(OutputImageType *output);
 
   /** @brief Graft the specified DataObject onto this ProcessObject's output.
    *
@@ -128,6 +128,8 @@ public:
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
   virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
+
+  virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
 //  virtual void* GetData();
 
   virtual vtkImageData* GetVtkImageData();

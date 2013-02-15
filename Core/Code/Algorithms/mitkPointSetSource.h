@@ -54,11 +54,11 @@ public:
 
     virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
 
-    /**
-     * Allows to set the output of the point set source.
-     * @param output the intended output of the point set source
-     */
-    virtual void SetOutput( OutputType* output );
+//    /**
+//     * Allows to set the output of the point set source.
+//     * @param output the intended output of the point set source
+//     */
+//    virtual void SetOutput( OutputType* output );
 
     virtual void GraftOutput(OutputType *output);
     virtual void GraftNthOutput(DataObjectPointerArraySizeType idx, OutputType *output);

@@ -331,7 +331,7 @@ namespace mitk
     /**
     \brief Inherit from base data - no region support available for contourModel objects.
     */
-    virtual void SetRequestedRegion (itk::DataObject *data);
+    virtual void SetRequestedRegion( const itk::DataObject *data);
 
     /**
     \brief Expand the timebounds of the TimeSlicedGeometry to given number of timesteps.

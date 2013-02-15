@@ -373,7 +373,7 @@ bool mitk::ManufacturerLogo::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::ManufacturerLogo::SetRequestedRegion(itk::DataObject*)
+void mitk::ManufacturerLogo::SetRequestedRegion( const itk::DataObject*)
 {
     //nothing to do
 }

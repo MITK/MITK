@@ -1600,7 +1600,7 @@ bool mitk::FiberBundleX::VerifyRequestedRegion()
 {
     return true;
 }
-void mitk::FiberBundleX::SetRequestedRegion( itk::DataObject *data )
+void mitk::FiberBundleX::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }

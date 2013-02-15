@@ -45,7 +45,7 @@ public:
 
   virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType&);
 
-  void SetOutput(mitk::Surface* output);
+//  void SetOutput(mitk::Surface* output);
 
   mitk::Surface* GetOutput();
 

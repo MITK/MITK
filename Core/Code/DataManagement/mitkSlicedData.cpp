@@ -166,7 +166,7 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
+void mitk::SlicedData::SetRequestedRegion( const itk::DataObject *data)
 {
   m_UseLargestPossibleRegion=false;
 

@@ -99,7 +99,7 @@ bool mitk::ContourSet::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::ContourSet::SetRequestedRegion(itk::DataObject*)
+void mitk::ContourSet::SetRequestedRegion( const itk::DataObject*)
 {
 }
 

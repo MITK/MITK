@@ -45,11 +45,11 @@ itk::DataObject::Pointer mitk::PointSetSource::MakeOutput (DataObjectPointerArra
 
 
 
-void mitk::PointSetSource::SetOutput( OutputType* output )
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-    this->ProcessObject::SetNthOutput( 0, output );
-}
+//void mitk::PointSetSource::SetOutput( OutputType* output )
+//{
+//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
+//    this->ProcessObject::SetNthOutput( 0, output );
+//}
 
 
 

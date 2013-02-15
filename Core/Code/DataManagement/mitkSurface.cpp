@@ -216,7 +216,7 @@ bool mitk::Surface::VerifyRequestedRegion()
   return false;
 }
 
-void mitk::Surface::SetRequestedRegion( itk::DataObject *data )
+void mitk::Surface::SetRequestedRegion(const itk::DataObject *data )
 {
   mitk::Surface *surfaceData;
 

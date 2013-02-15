@@ -108,7 +108,7 @@ public:
      * This method has no effect for lookup tables, since we do
      * not support the region-mechanism
      */
-    virtual void SetRequestedRegion( itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject *data );
 
     LookupTable();
     virtual ~LookupTable();

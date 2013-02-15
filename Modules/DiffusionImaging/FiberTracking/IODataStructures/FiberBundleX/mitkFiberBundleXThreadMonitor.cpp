@@ -247,7 +247,7 @@ bool mitk::FiberBundleXThreadMonitor::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::FiberBundleXThreadMonitor::SetRequestedRegion( itk::DataObject *data )
+void mitk::FiberBundleXThreadMonitor::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }

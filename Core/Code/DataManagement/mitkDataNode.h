@@ -110,7 +110,7 @@ public:
 
   virtual bool VerifyRequestedRegion();
 
-  virtual void SetRequestedRegion(itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data);
 
   virtual void CopyInformation(const itk::DataObject *data);
 

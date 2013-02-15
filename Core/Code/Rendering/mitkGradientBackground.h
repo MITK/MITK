@@ -126,7 +126,7 @@ public:
    * Empty implementation, since the GradientBackground doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegion(itk::DataObject*);
+  virtual void SetRequestedRegion( const itk::DataObject*);
 
 protected:
 

@@ -83,6 +83,15 @@ protected:
 
   //##Documentation
   //## @brief Protected methods for setting outputs.
+  //## TODO new implementation of setOutput
+  //## Subclasses make use of them for getting output.
+  //## These are only overwritten because of itk::DataObject::ConnectSource being
+  //## private and non-virtual: the important stuff is done in
+  //## mitk::BaseData::ConnectSource.
+  virtual void SetOutput(const DataObjectIdentifierType &key, itk::DataObject *output);
+
+  //##Documentation
+  //## @brief Protected methods for setting outputs.
   //##
   //## Subclasses make use of them for getting output.
   //## These are only overwritten because of itk::DataObject::ConnectSource being

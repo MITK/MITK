@@ -35,17 +35,17 @@ mitk::BaseDataSource::~BaseDataSource()
 
 
 
-void mitk::BaseDataSource::SetOutput( OutputType* output )
-{
-    this->SetNthOutput( 0, output );
-}
+//void mitk::BaseDataSource::SetOutput( OutputType* output )
+//{
+//    this->SetNthOutput( 0, output );
+//}
 
 
 
-void mitk::BaseDataSource::SetOutput(const DataObjectIdentifierType &key, itk::DataObject *output )
-{
-    this->SetNthOutput(key, output);
-}
+//void mitk::BaseDataSource::SetOutput(const DataObjectIdentifierType &key, itk::DataObject *output )
+//{
+//    this->SetOutput(key, output);
+//}
 
 
 

@@ -117,7 +117,7 @@ bool mitk::ConnectomicsNetwork::VerifyRequestedRegion()
 {
   return true;
 }
-void mitk::ConnectomicsNetwork::SetRequestedRegion( itk::DataObject *data )
+void mitk::ConnectomicsNetwork::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }

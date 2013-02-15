@@ -186,7 +186,7 @@ bool mitk::DataNode::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::DataNode::SetRequestedRegion(itk::DataObject * /*data*/)
+void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 {
 }
 

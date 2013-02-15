@@ -199,7 +199,7 @@ bool mitk::UnstructuredGrid::VerifyRequestedRegion()
   return false;
 }
 
-void mitk::UnstructuredGrid::SetRequestedRegion( itk::DataObject *data )
+void mitk::UnstructuredGrid::SetRequestedRegion(const itk::DataObject *data )
 {
   mitk::UnstructuredGrid *gridData;
 

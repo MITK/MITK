@@ -232,7 +232,7 @@ bool mitk::GradientBackground::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::GradientBackground::SetRequestedRegion(itk::DataObject*)
+void mitk::GradientBackground::SetRequestedRegion( const itk::DataObject*)
 {
     //nothing to do
 }

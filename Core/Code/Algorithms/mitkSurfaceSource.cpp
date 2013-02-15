@@ -60,11 +60,11 @@ mitk::Surface* mitk::SurfaceSource::GetOutput(unsigned int idx)
     (this->ProcessObject::GetOutput(idx));
 }
 
-void mitk::SurfaceSource::SetOutput(mitk::Surface* output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
+//void mitk::SurfaceSource::SetOutput(mitk::Surface* output)
+//{
+//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
+//  BaseProcess::SetNthOutput(0, output);
+//}
 
 void mitk::SurfaceSource::GraftOutput(mitk::Surface* graft)
 {

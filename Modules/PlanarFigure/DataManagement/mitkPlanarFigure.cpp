@@ -440,7 +440,7 @@ bool mitk::PlanarFigure::VerifyRequestedRegion()
 }
 
 
-void mitk::PlanarFigure::SetRequestedRegion( itk::DataObject * /*data*/ )
+void mitk::PlanarFigure::SetRequestedRegion(const itk::DataObject * /*data*/ )
 {
 
 }

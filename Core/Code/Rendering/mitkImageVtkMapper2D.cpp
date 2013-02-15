@@ -520,10 +520,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
   {
-    MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
+    MITK_WARN << "Unknown number of components!";
   }
-
-  //TODO MapColorScalarsThroughLookupTableOn testen Markus!!! Auf Bildern mit Verschiedenen Komponenten muss die LuT Funkionieren!
 
   this->ApplyLookuptable(renderer, textureClippingBounds);
 

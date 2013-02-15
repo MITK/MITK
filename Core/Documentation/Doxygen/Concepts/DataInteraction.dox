@@ -51,8 +51,8 @@ For an overview of available Events see mitk::InteractionEvent, for on overview 
 
 \section EventHandlerSection EventHandler
 Is the term describing objects in general that can handle events. These objects can be devided into two groups, namely
-DataInteractors and EventObserver. Their difference is that DataInteractors are linked with a DataNode which they manipulate,
-whereas EventObserver do not have a DataNode and therefore are not supposed to manipulate any data.
+DataInteractors and InteractionEventObserver. Their difference is that DataInteractors are linked with a DataNode which they manipulate,
+whereas InteractionEventObserver do not have a DataNode and therefore are not supposed to manipulate any data.
 
 \dot
 digraph linker_deps {
@@ -60,7 +60,7 @@ digraph linker_deps {
   a [ label="EventHandler" ];
   d [ label="{StateMachine|HandleEvent()}" ];
   b [ label="{DataInteractor|HandleEvent()}" ];
-  c [ label="{EventObserver|Notify()}" ];
+  c [ label="{InteractionEventObserver|Notify()}" ];
   a -> d;
   d -> b;
   d -> c;
@@ -149,11 +149,11 @@ An example of a state machine describing the interaction of example 2 looks like
 
 For a more detailed desciption of state machine patterns see here.
 
-\subsection EventObserverSection EventObserver
+\subsection InteractionEventObserverSection InteractionEventObserver
 
-EventObserver are objects which will receive all user input and are intented for observation only, they should never modify any DataNodes.
-For EventObserver it is optional to use the state machine functionality, the default is without. How to use the state machine functionality
- is described in the documentation of mitk::EventObserver::Notify.
+InteractionEventObserver are objects which will receive all user input and are intented for observation only, they should never modify any DataNodes.
+For InteractionEventObserver it is optional to use the state machine functionality, the default is without. How to use the state machine functionality
+ is described in the documentation of mitk::InteractionEventObserver::Notify.
 
 \subsection ConfigurationSection Configuration
 In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that is it possible
@@ -200,5 +200,5 @@ In this way all objects derived by EventHandler can be configured. For a detaile
 
 This unit receives all events and distributes them to the DataInteractors. This is done by ordering the DataInteractors according to the layer of their
 DataNode in descending order. Then the event is offered to the first DataInteractor, which in turn checks if it can handle the event. This is done
-for each DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all EventObservers are notified.
+for each DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all InteractionEventObservers are notified.
  */

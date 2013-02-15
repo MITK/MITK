@@ -18,8 +18,8 @@
 #include <string>
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer,
-    mitk::Point2D mousePosition,
-    std::string eventClass)
+    const mitk::Point2D mousePosition,
+    const std::string eventClass)
 : InteractionEvent(baseRenderer, eventClass)
 , m_PointerPosition(mousePosition)
 {
@@ -33,12 +33,12 @@ mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* bas
   }
 }
 
-mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen()
+const mitk::Point2D mitk::InteractionPositionEvent::GetPointerPositionOnScreen()
 {
   return m_PointerPosition;
 }
 
-mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld()
+const mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld()
 {
   return m_WorldPosition;
 }

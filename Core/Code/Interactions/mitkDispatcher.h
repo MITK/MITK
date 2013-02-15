@@ -120,9 +120,9 @@ namespace mitk
     bool HandleInternalEvent(InternalEvent* internalEvent);
 
     /**
-     * Hold microservice reference to object that takes care of informing the EventObservers about InteractionEvents
+     * Hold microservice reference to object that takes care of informing the InteractionEventObservers about InteractionEvents
      */
-    InformerService* m_InformerService;
+    mitk::ServiceTracker<InteractionEventObserver*> m_EventObserverTracker;
 
   };
 

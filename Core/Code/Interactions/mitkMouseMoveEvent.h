@@ -43,7 +43,7 @@ namespace mitk
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
 
   protected:
-    MouseMoveEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers);
+    MouseMoveEvent(BaseRenderer*, Point2D = Point2D(), MouseButtons buttonStates = NoButton, mitk::ModifierKeys modifiers = NoKey);
     virtual ~MouseMoveEvent();
 
   private:

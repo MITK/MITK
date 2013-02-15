@@ -26,13 +26,12 @@
 #include "mitkModuleResourceStream.h"
 #include "mitkModuleRegistry.h"
 
-mitk::EventStateMachine::EventStateMachine()
+mitk::EventStateMachine::EventStateMachine() :
+    m_StateMachineContainer(NULL), m_CurrentState(NULL)
 {
-  m_StateMachineContainer = NULL;
-  m_CurrentState = NULL;
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(std::string filename, std::string moduleName)
+bool mitk::EventStateMachine::LoadStateMachine(const std::string filename, const std::string moduleName)
 {
   if (m_StateMachineContainer != NULL)
   {
@@ -40,7 +39,7 @@ bool mitk::EventStateMachine::LoadStateMachine(std::string filename, std::string
   }
   m_StateMachineContainer = StateMachineContainer::New();
 
-  if (m_StateMachineContainer->LoadBehavior(filename,moduleName))
+  if (m_StateMachineContainer->LoadBehavior(filename, moduleName))
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 
@@ -64,7 +63,7 @@ mitk::EventStateMachine::~EventStateMachine()
   }
 }
 
-void mitk::EventStateMachine::AddActionFunction(std::string action, mitk::TActionFunctor* functor)
+void mitk::EventStateMachine::AddActionFunction(const std::string action, mitk::TActionFunctor* functor)
 {
   if (!functor)
     return;
@@ -135,8 +134,9 @@ mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
 
 bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode)
 {
-  if (dataNode == NULL) {
-    MITK_WARN << "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
+  if (dataNode == NULL)
+  {
+    MITK_WARN<< "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
     return false;
   }
   bool visible = false;

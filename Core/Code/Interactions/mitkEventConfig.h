@@ -29,6 +29,13 @@ namespace mitk
 
   class InteractionEvent;
 
+  class EventConfigReader: public vtkXMLParser
+  {
+  public:
+
+  private:
+  };
+
   /**
    * \class EventConfig
    * \brief Configuration Object for Statemachines.
@@ -40,21 +47,22 @@ namespace mitk
    * @ingroup Interaction
    **/
 
-  class MITK_CORE_EXPORT EventConfig: public vtkXMLParser
+  class EventConfig: public vtkXMLParser
   {
   public:
 
     static EventConfig *New();
-    vtkTypeMacro(EventConfig,vtkXMLParser);
+    vtkTypeMacro(EventConfig,vtkXMLParser)
+
 
     typedef itk::SmartPointer<InteractionEvent> EventType;
 
     /**
-    * @brief Loads XML resource
-    *
-    * Loads a XML resource file in the given module context.
-    * The files have to be placed in the Resources/Interaction folder of their respective module.
-    **/
+     * @brief Loads XML resource
+     *
+     * Loads a XML resource file in the given module context.
+     * The files have to be placed in the Resources/Interaction folder of their respective module.
+     **/
     bool LoadConfig(std::string fileName, std::string moduleName = "Mitk");
 
     void ClearConfig();

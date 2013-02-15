@@ -25,13 +25,14 @@
 
 #include "mitkInformer.h"
 
-mitk::Dispatcher::Dispatcher()
+mitk::Dispatcher::Dispatcher() :
+    m_ProcessingMode(REGULAR), m_EventObserverTracker(GetModuleContext())
 {
-  m_ProcessingMode = REGULAR;
-  // get service to inform EventObserver
+  // get service to inform InteractionEventObserver
   mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
   mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
-  m_InformerService = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
+
+  m_EventObserverTracker.Open();
 }
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
@@ -148,8 +149,23 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     }
   }
 
-  /* Notify EventObserver  */
-  m_InformerService->NotifyObservers(event, eventIsHandled);
+  /* Notify InteractionEventObserver  */
+  std::list<mitk::ServiceReference> listEventObserver;
+  m_EventObserverTracker.GetServiceReferences(listEventObserver);
+  for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+  {
+    Any patternName = it->GetProperty("org.mitk.statemachinepattern");
+    // TODO
+    // TOdo any erlauben als string, oder als liste von strings
+    if (!patternName || patternName.ToString() == "")
+    {
+      InteractionEventObserver* interactionEventObserver = m_EventObserverTracker.GetService(*it);
+      if (interactionEventObserver != NULL)
+      {
+        interactionEventObserver->Notify(event, eventIsHandled);
+      }
+    }
+  }
 
   // Process event queue
   if (!m_QueuedEvents.empty())

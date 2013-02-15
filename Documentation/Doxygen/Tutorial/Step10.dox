@@ -416,7 +416,7 @@ The event is created and added to the Dispatchers event queue.
 \note That internal events do not need any mapping to event variants. Their signal same is equivalent with the event variant.
 
 
-<b> There are also two documented classes implementing a DataInteractor and an EventObserver which can be looked at for further
+<b> There are also two documented classes implementing a DataInteractor and an InteractionEventObserver which can be looked at for further
 understanding: </b>
 \see mitk::PointSetDataInteractor
 \see mitk::DisplayInteractor

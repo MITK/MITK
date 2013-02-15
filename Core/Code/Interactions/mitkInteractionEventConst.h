@@ -49,10 +49,11 @@ namespace mitk
   {
     return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
   }
-  // TODO: FixME not working!
-  inline MouseButtons operator|=(MouseButtons a, MouseButtons b)
+
+  inline MouseButtons& operator|=(MouseButtons& a, MouseButtons& b)
   {
-    return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+    a = static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+    return a;
   }
 
   inline ModifierKeys operator|(ModifierKeys a, ModifierKeys b)
@@ -60,10 +61,10 @@ namespace mitk
     return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
   }
 
-// TODO: FixME not working!
-  inline ModifierKeys operator|=(ModifierKeys a, ModifierKeys b)
+  inline ModifierKeys& operator|=(ModifierKeys& a, ModifierKeys& b)
   {
-    return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
+    a = static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
+    return a;
   }
 
   /**

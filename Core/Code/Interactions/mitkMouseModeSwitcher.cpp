@@ -41,6 +41,24 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
     // Register as listener
+    class MyObserver : public EventStateMachine, public InteractionEventObserver
+    {
+    public:
+
+      void Notify(const InteractionEvent::Pointer& event, bool)
+      {
+        // do something
+      }
+    };
+
+    MyObserver observer;
+
+
+    mitk::ServiceRegistration serviceReg = GetModuleContext()->RegisterService<InteractionEventObserver>(&observer);
+
+    serviceReg.Unregister();
+
+
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
     mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
     mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));

@@ -17,7 +17,7 @@
 #ifndef MITKINTERACTIONEVENT_H_
 #define MITKINTERACTIONEVENT_H_
 
-#include "itkObject.h"
+#include "itkLightObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
@@ -28,13 +28,14 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT InteractionEvent: public itk::Object
+  class MITK_CORE_EXPORT InteractionEvent: public itk::LightObject
   {
 
 
   public:
-    mitkClassMacro(InteractionEvent,itk::Object);
-    mitkNewMacro2Param(Self,BaseRenderer*, std::string);
+    mitkClassMacro(InteractionEvent,itk::LightObject)
+    mitkNewMacro2Param(Self,BaseRenderer*, std::string)
+
     void SetSender(BaseRenderer* sender);
     BaseRenderer* GetSender();
 
@@ -51,8 +52,9 @@ namespace mitk
 
     /**
      * Return unique string identifier that gives the event class of this object, as it can be used in a state machine pattern.
+     * --- itk
      */
-    std::string GetEventClass();
+    const std::string GetEventClass();
     /**
      * This class implements an up cast to check if the provided baseClass object is derived from this class.
      * This function is used to support polymorphism on state machine pattern (XML) level.

@@ -32,8 +32,9 @@ namespace mitk
 {
   /**
    * \class EventHandler
-   *  Base Class for Interaction handling classes.
-   *  Handles loading of configuration object and mapping of events to variant names.
+   *  Serves as a base class for all objects and classes that handle mitk::InteractionEvents.
+   *
+   *  It provides an interface to load configuration objects map of events to variant names.
    */
   class InteractionEvent;
   class MITK_CORE_EXPORT EventHandler : public itk::LightObject {

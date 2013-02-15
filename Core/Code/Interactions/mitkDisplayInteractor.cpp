@@ -63,7 +63,7 @@ mitk::DisplayInteractor::~DisplayInteractor()
 
 bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
@@ -83,7 +83,7 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
@@ -99,7 +99,7 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  const BaseRenderer::Pointer sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
@@ -134,7 +134,6 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {

@@ -34,7 +34,7 @@ namespace mitk
  *
  * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
  * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
- * Also this class registers the MicroService at which EventObservers can register to receive events.
+ * Also this class registers the MicroService at which InteractionEventObservers can register to receive events.
  *
  * \ingroup Interaction
  */

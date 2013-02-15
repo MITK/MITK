@@ -35,7 +35,7 @@
 #include "mitkModuleRegistry.h"
 #include "mitkInformer.h"
 
-#include "mitkEventObserver.h"
+#include "mitkInteractionEventObserver.h"
 
 //#include "mitkInformerActivator.h"
 
@@ -133,7 +133,7 @@ void InteractionTests::DrawLines()
   }
   m_CurrentInteractor->SetDataNode(m_CurrentDataNode);
 
-  mitk::EventObserver::Pointer eO = mitk::EventObserver::New();
+  mitk::InteractionEventObserver::Pointer eO = mitk::InteractionEventObserver::New();
   mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
   mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
   mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));

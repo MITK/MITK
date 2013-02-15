@@ -42,7 +42,7 @@ mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
-std::string mitk::InteractionEvent::GetEventClass()
+const std::string mitk::InteractionEvent::GetEventClass()
 {
   return m_EventClass;
 }

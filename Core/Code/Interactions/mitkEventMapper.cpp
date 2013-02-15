@@ -48,6 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
 #include "mitkModuleRegistry.h"
+#include <mitkGetModuleContext.h>
+#include <mitkModuleContext.h>
 
 namespace mitk
 {
@@ -542,9 +544,9 @@ bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
-  Module* module = ModuleRegistry::GetModule("Mitk");
+  Module* module = GetModuleContext()->GetModule();
   if (module == NULL) {
-    mitkThrow()<< ("Module Mitk unavailable." );
+    mitkThrow()<< ("Module context unavailable." );
     return false;
   }
   ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
@@ -553,8 +555,8 @@ bool mitk::EventMapper::LoadStandardBehavior()
     mitkThrow()<< ("Resource not valid. State machine pattern not found:Interactions/Legacy/StateMachine.xml" );
   }
   mitk::ModuleResourceStream stream(resource);
-  std::string patternString((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-  return LoadBehaviorString(patternString);
+  this->SetStream(&stream);
+  return this->Parse();
 }
 
 //##Documentation

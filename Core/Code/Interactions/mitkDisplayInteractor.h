@@ -18,7 +18,7 @@
 #define mitkDisplayInteractor_h
 
 #include <MitkExports.h>
-#include "mitkEventObserver.h"
+#include "mitkInteractionEventObserver.h"
 
 namespace mitk
 {
@@ -31,10 +31,10 @@ namespace mitk
    * @ingroup Interaction
    **/
   /**
-   * Inherits from mitk::EventObserver since it doesn't alter any data (only their representation),
+   * Inherits from mitk::InteractionEventObserver since it doesn't alter any data (only their representation),
    * and its actions cannot be associated with a DataNode.
    */
-  class MITK_CORE_EXPORT DisplayInteractor: public EventObserver
+  class MITK_CORE_EXPORT DisplayInteractor: public InteractionEventObserver
   {
   public:
     mitkClassMacro(DisplayInteractor, StateMachine)
@@ -52,7 +52,7 @@ namespace mitk
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
-     * this EventObserver. This is only necessary here because the events are processed by the state machine.
+     * this InteractionEventObserver. This is only necessary here because the events are processed by the state machine.
      */
     void ConnectActionsAndFunctions();
     /**

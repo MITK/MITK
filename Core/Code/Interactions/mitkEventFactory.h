@@ -17,8 +17,6 @@
 #ifndef mitkEventFactory_h
 #define mitkEventFactory_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include "mitkInteractionEvent.h"
 #include "mitkPropertyList.h"
@@ -30,11 +28,11 @@ namespace mitk
 /**
  * \class EventFactory
  * \brief Generates InteractionEvent-Objects which are described by a PropertyList.
- * This call is used by the EventConfig object to parse configuration files and create Events based on the xml description.
+ * This class is used by the EventConfig object to parse configuration files and create Events based on the xml description.
  *
  * \ingroup Interaction
  */
-  class MITK_CORE_EXPORT EventFactory: public itk::Object
+  class MITK_CORE_EXPORT EventFactory
   {
   public:
     /**
@@ -43,9 +41,6 @@ namespace mitk
      * Finally the Event-Type is chosen by the ClassName property and the object is created using the collected information.
      */
     static InteractionEvent::Pointer CreateEvent(PropertyList::Pointer eventDescription);
-  private:
-    static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
-    static std::vector<std::string> split(const std::string &s, char delim);
   };
 }
 

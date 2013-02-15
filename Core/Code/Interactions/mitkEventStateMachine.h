@@ -93,7 +93,7 @@ namespace mitk
    *
    */
 
-  class MITK_CORE_EXPORT EventStateMachine: public virtual EventHandler
+  class MITK_CORE_EXPORT EventStateMachine: public EventHandler
   {
 
   public:
@@ -109,7 +109,7 @@ namespace mitk
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(std::string filename, std::string moduleName="Mitk");
+    bool LoadStateMachine(const std::string filename, const std::string moduleName="Mitk");
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for
@@ -129,7 +129,7 @@ namespace mitk
     /**
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
      */
-    void AddActionFunction(std::string action, TActionFunctor* functor);
+    void AddActionFunction(const std::string action, TActionFunctor* functor);
 
     StateMachineState* GetCurrentState();
 

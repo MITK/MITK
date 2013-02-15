@@ -27,33 +27,35 @@
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
 
-
-std::vector<std::string> &mitk::EventFactory::split(const std::string &s, char delim, std::vector<std::string> &elems)
+namespace
 {
-  std::stringstream ss(s);
-  std::string item;
-  while (std::getline(ss, item, delim))
+  std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
   {
-    elems.push_back(item);
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim))
+    {
+      elems.push_back(item);
+    }
+    return elems;
   }
-  return elems;
-}
 
-std::vector<std::string> mitk::EventFactory::split(const std::string &s, char delim)
-{
-  std::vector<std::string> elems;
-  return split(s, delim, elems);
+  std::vector<std::string> split(const std::string &s, char delim)
+  {
+    std::vector < std::string > elems;
+    return split(s, delim, elems);
+  }
 }
 
 mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Pointer list)
 {
-  //
+//
   std::string eventClass, eventVariant;
   list->GetStringProperty(xmlParameterEventClass.c_str(), eventClass);
   list->GetStringProperty(xmlParameterEventVariant.c_str(), eventVariant);
 
-  // Query all possible attributes, if they are not present, set their default values.
-  // Position Events & Key Events
+// Query all possible attributes, if they are not present, set their default values.
+// Position Events & Key Events
   std::string strModifiers;
   ModifierKeys modifiers = NoKey;
   std::string strEventButton;
@@ -69,7 +71,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   Point2D pos;
   pos.Fill(0);
 
-  // Parse modifier information
+// Parse modifier information
   if (list->GetStringProperty(xmlEventPropertyModifier.c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
@@ -95,7 +97,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Set EventButton
+// Set EventButton
   if (list->GetStringProperty(xmlEventPropertyEventButton.c_str(), strEventButton))
   {
     std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
@@ -117,7 +119,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Parse ButtonStates
+// Parse ButtonStates
   if (list->GetStringProperty(xmlEventPropertyButtonState.c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
@@ -143,7 +145,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Key
+// Key
   if (!list->GetStringProperty(xmlEventPropertyKey.c_str(), strKey))
   {
     key = "";
@@ -152,7 +154,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     key = strKey;
   }
-  // WheelDelta
+// WheelDelta
   if (!list->GetStringProperty(xmlEventPropertyScrollDirection.c_str(), strWheelDelta))
   {
     wheelDelta = 0;
@@ -169,7 +171,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       wheelDelta = 1;
     }
   }
-  // Internal Signals Name
+// Internal Signals Name
   list->GetStringProperty(xmlEventPropertySignalName.c_str(), strSignalName);
 
   /*

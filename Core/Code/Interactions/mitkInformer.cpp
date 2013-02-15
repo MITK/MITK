@@ -25,30 +25,30 @@ mitk::InformerService::InformerService()
 {
 }
 
-void mitk::InformerService::RegisterObserver(EventObserver* eventObserver)
+void mitk::InformerService::RegisterObserver(InteractionEventObserver* InteractionEventObserver)
 {
   // explicitly use smart pointer, else the search for it will fail
   // especially std::find() seems to fail on list of smart pointer objects
-  EventObserver::Pointer pEventObserver = eventObserver;
-  for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
+  InteractionEventObserver::Pointer pInteractionEventObserver = InteractionEventObserver;
+  for (std::list<InteractionEventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
   {
-    if (*it == pEventObserver)
+    if (*it == pInteractionEventObserver)
     {
       return;
     }
   }
-  m_ListObserver.push_back(pEventObserver);
+  m_ListObserver.push_back(pInteractionEventObserver);
 }
 
-void mitk::InformerService::UnRegisterObserver(EventObserver* eventObserver)
+void mitk::InformerService::UnRegisterObserver(InteractionEventObserver* InteractionEventObserver)
 {
-  EventObserver::Pointer pEventObserver = eventObserver;
-  m_ListObserver.remove(pEventObserver);
+  InteractionEventObserver::Pointer pInteractionEventObserver = InteractionEventObserver;
+  m_ListObserver.remove(pInteractionEventObserver);
 }
 
 void mitk::InformerService::NotifyObservers(InteractionEvent::Pointer interactionEvent, bool isHandled)
 {
-  for (std::list<EventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
+  for (std::list<InteractionEventObserver::Pointer>::iterator it = m_ListObserver.begin(); it != m_ListObserver.end(); ++it)
   {
     (*it)->Notify(interactionEvent, isHandled);
   }

@@ -14,67 +14,49 @@
 
  ===================================================================*/
 
-#ifndef EventObserver_h
-#define EventObserver_h
+#ifndef InteractionEventObserver_h
+#define InteractionEventObserver_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
-#include "mitkEventStateMachine.h"
 #include "mitkInteractionEvent.h"
 #include <MitkExports.h>
+#include "mitkServiceInterface.h"
 
 namespace mitk
 {
  /**
-  * \class EventObserver
-  * \brief Base class to implement EventObservers.
+  * \class InteractionEventObserver
+  * \brief Base class to implement InteractionEventObservers.
   *
   * This class also provides state machine infrastructure,
   * but usage thereof is optional. See the Notify method for more information.
   */
 
-  class MITK_CORE_EXPORT EventObserver : public EventStateMachine {
-
-  public:
-    mitkClassMacro(EventObserver,EventHandler);
-    itkNewMacro(Self);
-    /**
+  struct MITK_CORE_EXPORT InteractionEventObserver //: public EventStateMachine
+  {
+    virtual ~InteractionEventObserver();
+      /**
      * By this method all registered EventObersers are notified about every InteractionEvent,
      * the isHandled flag indicates if a DataInteractor has already handled that event.
-     * EventObserver that trigger an action when observing an event may consider
+     * InteractionEventObserver that trigger an action when observing an event may consider
      * this in order to not confuse the user by, triggering several independent action with one
      * single user event (such as a mouse click)
      *
-     * If you want to use the EventObserver as a state machine give the event to the state machine by implementing, e.g.
+     * If you want to use the InteractionEventObserver as a state machine give the event to the state machine by implementing, e.g.
      \code
-     void mitk::EventObserver::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
+     void mitk::InteractionEventObserver::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
       {
         if (!isHandled) {
           this->HandleEvent(interactionEvent, NULL);
         }
       }
       \endcode
-     */
-    virtual void Notify(InteractionEvent::Pointer interactionEvent,bool isHandled);
 
-
-  protected:
-    EventObserver();
-    virtual ~EventObserver();
-
-    /**
-     * This overwrites the FilterEvents function of the EventStateMachine to ignore the DataNode, since EventObservers are not associated with one.
-     */
+     * This overwrites the FilterEvents function of the EventStateMachine to ignore the DataNode, since InteractionEventObservers are not associated with one.
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
-
-  protected:
-
-
-  private:
-
+     */
+    virtual void Notify(const InteractionEvent::Pointer& interactionEvent,bool isHandled) = 0;
   };
 
 } /* namespace mitk */
-
-#endif /* EventObserver_h */
+US_DECLARE_SERVICE_INTERFACE(mitk::InteractionEventObserver, "org.mitk.InteractionEventObserver")
+#endif /* InteractionEventObserver_h */

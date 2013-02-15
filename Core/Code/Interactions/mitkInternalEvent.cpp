@@ -17,7 +17,7 @@
 #include "mitkInternalEvent.h"
 #include "mitkDataInteractor.h"
 
-mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, std::string signalName)
+mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, const std::string signalName)
 : InteractionEvent(baseRenderer, "InternalEvent")
 , m_DataInteractor(sourceInteractor)
 , m_SignalName(signalName)
@@ -39,7 +39,7 @@ mitk::InternalEvent::~InternalEvent()
 {
 }
 
-std::string mitk::InternalEvent::GetSignalName()
+const std::string mitk::InternalEvent::GetSignalName()
 {
   return m_SignalName;
 }

@@ -590,6 +590,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
     }
     //This mapper used to set a default lut "LookupTable" for images. However, this will
     //overwrite the default lut of the 2D image mapper. Thus, this property here is renamed.
+    /*
     if((overwrite) || (node->GetProperty("Volume.LookupTable", renderer)==NULL))
     {
       // add a default rainbow lookup table for color mapping
@@ -601,7 +602,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
       mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "Volume.LookupTable", mitkLutProp );
-    }
+    }*/
     if((overwrite) || (node->GetProperty("TransferFunction", renderer)==NULL))
     {
       // add a default transfer function

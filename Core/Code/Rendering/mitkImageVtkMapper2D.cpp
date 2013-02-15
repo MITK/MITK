@@ -30,11 +30,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include "mitkImageStatisticsHolder.h"
+#include "mitkPlaneClipping.h"
 
 //MITK Rendering
 #include "mitkImageVtkMapper2D.h"
 #include "vtkMitkThickSlicesFilter.h"
-#include "vtkMitkApplyLevelWindowToRGBFilter.h"
+#include "vtkMitkLevelWindowFilter.h"
+#include "vtkNeverTranslucentTexture.h"
 
 //VTK
 #include <vtkProperty.h>
@@ -48,7 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkTexture.h>
 #include <vtkCellArray.h>
 #include <vtkCamera.h>
 #include <vtkColorTransferFunction.h>
@@ -152,6 +153,7 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
   }
 }
 
+
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
@@ -208,7 +210,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(
-          resliceInterpolationProperty, "reslice interpolation" );
+      resliceInterpolationProperty, "reslice interpolation" );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -267,13 +269,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
   }
 
+  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
   if(thickSlicesMode > 0)
   {
     double dataZSpacing = 1.0;
 
     Vector3D normInIndex, normal;
-    const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
+
     if ( planeGeometry != NULL ){
       normal = planeGeometry->GetNormal();
     }else{
@@ -336,6 +339,22 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();
 
 
+  // calculate minimum bounding rect of IMAGE in texture
+  vtkFloatingPointType textureClippingBounds[6];
+  for ( int i = 0; i < 6; ++i )
+  {
+    textureClippingBounds[i] = 0.0;
+  }
+  // Calculate the actual bounds of the transformed plane clipped by the
+  // dataset bounding box; this is required for drawing the texture at the
+  // correct position during 3D mapping.
+  mitk::PlaneClipping::CalculateClippedPlaneBounds( input->GetGeometry(), planeGeometry, textureClippingBounds );
+
+  textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );
+  textureClippingBounds[2] = static_cast< int >( textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5 );
+  textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
+
   //get the number of scalar components to distinguish between different image types
   int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
   //get the binary property
@@ -361,7 +380,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
             datanode->GetFloatProperty( "outline shadow width", binaryOutlineShadowWidth, renderer );
 
             dynamic_cast<vtkActor*>(localStorage->m_Actors->GetParts()->GetItemAsObject(0))
-                ->GetProperty()->SetLineWidth( binaryOutlineWidth * binaryOutlineShadowWidth );
+              ->GetProperty()->SetLineWidth( binaryOutlineWidth * binaryOutlineShadowWidth );
           }
 
           localStorage->m_Actor->GetProperty()->SetLineWidth( binaryOutlineWidth );
@@ -370,7 +389,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
       else
       {
         binaryOutline = false;
-        this->ApplyLookuptable(renderer);
+        this->ApplyLookuptable(renderer, textureClippingBounds);
         MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
       }
     }
@@ -381,29 +400,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
         MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
       }
     }
-    this->ApplyLookuptable(renderer);
-    //Interpret the values as binary values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
   }
-  else if( numberOfComponents == 1 ) //gray images
-  {
-    //Interpret the values as gray values
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
 
-    this->ApplyLookuptable(renderer);
-  }
-  else if ( (numberOfComponents == 3) || (numberOfComponents == 4) ) //RBG(A) images
+  if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
   {
-    //Interpret the RGB(A) images values correctly
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+    MITK_WARN << "Unknown number of components!";
+  }
 
-    this->ApplyLookuptable(renderer);
-    this->ApplyRBGALevelWindow(renderer);
-  }
-  else
-  {
-    MITK_ERROR << "2D Reindering Error: Unknown number of components!!! Please report to rendering task force or check your data!";
-  }
+  this->ApplyLookuptable(renderer, textureClippingBounds);
+
+
+  // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
+  localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
   this->ApplyColor( renderer );
   this->ApplyOpacity( renderer );
@@ -457,7 +465,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   if(hover && !selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                ("binaryimage.hoveringcolor", renderer));
+      ("binaryimage.hoveringcolor", renderer));
     if(colorprop.IsNotNull())
     {
       memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
@@ -470,7 +478,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   if(selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                ("binaryimage.selectedcolor", renderer));
+      ("binaryimage.selectedcolor", renderer));
     if(colorprop.IsNotNull()) {
       memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
     }
@@ -492,7 +500,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
   {
     float rgb[3]= { 1.0f, 1.0f, 1.0f };
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                                                                ("outline binary shadow color", renderer));
+      ("outline binary shadow color", renderer));
     if(colorprop.IsNotNull())
     {
       memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
@@ -516,7 +524,7 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   }
 }
 
-void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
+void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds )
 {
   //Have the following 4 different use cases how to generate the lookuptable:
   //1. We have a binary image -> The lut range is set to 0.0, 1.0
@@ -526,82 +534,83 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
   //@Warning: If the user sets a lut and a transfer function the lut will be used!
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
   bool binary = false;
+
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
 
-  mitk::TransferFunctionProperty::Pointer transferFunctionProperty =
-      dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
+  vtkLookupTable *usedLookupTable = localStorage->m_DefaultLookupTable;
+  vtkScalarsToColors *usedScalarsToColors = localStorage->m_DefaultLookupTable;
 
-  mitk::LookupTableProperty::Pointer lookupTableProp;
-  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
-      (this->GetDataNode()->GetProperty("LookupTable"));
+  // If lookup table or transferfunction use is requested...
+  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
+  mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("Image Rendering.Transfer Function",renderer ));
 
   if(binary) // is it a binary image?
   {
-    //default lookuptable for binary images
-    localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
-    localStorage->m_Texture->GetLookupTable()->SetRange(0.0, 1.0);
+    usedScalarsToColors = usedLookupTable = localStorage->m_BinaryLookupTable;
   }
   else if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
   {
+    if( transferFunctionProp.IsNotNull() )
+    {
+      MITK_WARN << "A LookupTable and a transfer function TransferFunction property is set! Only the Image Rendering.Transfer Function will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
+    }
     //If a lookup table is supplied by the user:
     //only update the lut, when the properties have changed...
     if( lookupTableProp->GetLookupTable()->GetMTime()
-        <= this->GetDataNode()->GetPropertyList()->GetMTime() )
+      <= this->GetDataNode()->GetPropertyList()->GetMTime() )
     {
       lookupTableProp->GetLookupTable()->ChangeOpacityForAll( lookupTableProp->GetLookupTable()->GetVtkLookupTable()->GetAlpha()*localStorage->m_Actor->GetProperty()->GetOpacity() );
       lookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
     }
-    localStorage->m_Texture->SetLookupTable( lookupTableProp->GetLookupTable()->GetVtkLookupTable() );
     //If the user defines a lut, we dont want to use the color and take white instead.
     dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0))->GetProperty()->SetColor(1.0, 1.0, 1.0);
     localStorage->m_Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+    usedScalarsToColors = usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
   }
-  else if(transferFunctionProperty.IsNotNull()) // is a color transfer function set?
+  else if(transferFunctionProp.IsNotNull()) // is a color transfer function set?
   {
-    localStorage->m_Texture->SetLookupTable(transferFunctionProperty->GetValue()->GetColorTransferFunction());
+    usedScalarsToColors = transferFunctionProp->GetValue()->GetColorTransferFunction();
+    usedLookupTable = 0;
   }
   else
   {
     //default lookuptable
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
-    localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
-    localStorage->m_Texture->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+    usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+    this->ApplyColor( renderer );
   }
 
   localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
-  if((transferFunctionProperty.IsNotNull()) && (lookupTableProp.IsNotNull()))
-  {
-    MITK_WARN << "A LookupTable and a transfer function Image Rendering.Transfer Function property is set! Only the LookupTable will be used. If you want to use the color transfer function, remove or rename the LookupTable property.";
-  }
+
   // check for texture interpolation property
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty( "texture interpolation", textureInterpolation, renderer );
 
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
-}
 
-void mitk::ImageVtkMapper2D::ApplyRBGALevelWindow( mitk::BaseRenderer* renderer )
-{
-  LocalStorage* localStorage = this->GetLocalStorage( renderer );
-  //pass the LuT to the RBG filter
-  localStorage->m_LevelWindowToRGBFilterObject->SetLookupTable(localStorage->m_Texture->GetLookupTable());
   mitk::LevelWindow opacLevelWindow;
   if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-  {//pass the opaque level window to the filter
-    localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
-    localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+  {
+    //pass the opaque level window to the filter
+    localStorage->m_LevelWindowFilter->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+    localStorage->m_LevelWindowFilter->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
   }
   else
-  {//no opaque level window
-    localStorage->m_LevelWindowToRGBFilterObject->SetMinOpacity(0.0);
-    localStorage->m_LevelWindowToRGBFilterObject->SetMaxOpacity(255.0);
+  {
+    //no opaque level window
+    localStorage->m_LevelWindowFilter->SetMinOpacity(0.0);
+    localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
   }
-  localStorage->m_LevelWindowToRGBFilterObject->SetInput(localStorage->m_ReslicedImage);
-  //connect the texture with the output of the RGB filter
-  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowToRGBFilterObject->GetOutputPort());
+
+  localStorage->m_LevelWindowFilter->SetLookupTable(usedScalarsToColors);
+  localStorage->m_LevelWindowFilter->SetInput(localStorage->m_ReslicedImage);
+  localStorage->m_LevelWindowFilter->SetClippingBounds(bounds);
+  //connect the texture with the output of the levelwindow filter
+  localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 }
+
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
@@ -622,8 +631,8 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // Check if time step is valid
   const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
   if ( ( dataTimeGeometry == NULL )
-       || ( dataTimeGeometry->GetTimeSteps() == 0 )
-       || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( dataTimeGeometry->GetTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
   {
     return;
   }
@@ -634,11 +643,11 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
   //check if something important has changed and we need to rerender
   if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
-       || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-       || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
-       || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-       || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+    || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
     this->GenerateDataForRenderer( renderer );
   }
@@ -691,7 +700,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         // apply default LUT (black to white)
         node->SetProperty( "color", mitk::ColorProperty::New( 1,1,1 ), renderer );
       }
-    // PALETTE interpretation should be handled ok by RGB loading
+      // PALETTE interpretation should be handled ok by RGB loading
   }
 
   bool isBinaryImage(false);
@@ -759,7 +768,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       std::string sLevel;
       std::string sWindow;
       if ( image->GetPropertyList()->GetStringProperty( "dicom.voilut.WindowCenter", sLevel )
-           && image->GetPropertyList()->GetStringProperty( "dicom.voilut.WindowWidth", sWindow ) )
+        && image->GetPropertyList()->GetStringProperty( "dicom.voilut.WindowWidth", sWindow ) )
       {
         float level = atof( sLevel.c_str() );
         float window = atof( sWindow.c_str() );
@@ -769,7 +778,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
         std::string sLargestPixelValueInSeries;
 
         if ( image->GetPropertyList()->GetStringProperty( "dicom.series.SmallestPixelValueInSeries", sSmallestPixelValueInSeries )
-             && image->GetPropertyList()->GetStringProperty( "dicom.series.LargestPixelValueInSeries", sLargestPixelValueInSeries ) )
+          && image->GetPropertyList()->GetStringProperty( "dicom.series.LargestPixelValueInSeries", sLargestPixelValueInSeries ) )
         {
           float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
           float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );
@@ -786,8 +795,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       }
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
-       && (image->GetPixelType().GetPixelTypeId() == itk::ImageIOBase::RGBA)
-       && (image->GetPixelType().GetTypeId() == typeid( unsigned char)) )
+      && (image->GetPixelType().GetPixelTypeId() == itk::ImageIOBase::RGBA)
+      && (image->GetPixelType().GetTypeId() == typeid( unsigned char)) )
     {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0,255);
@@ -999,8 +1008,9 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-  m_Texture = vtkSmartPointer<vtkTexture>::New();
-  m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
+  m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_BinaryLookupTable = vtkSmartPointer<vtkLookupTable>::New();
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_Actors = vtkSmartPointer<vtkPropAssembly>::New();
@@ -1015,13 +1025,24 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_TSFilter->ReleaseDataFlagOn();
 
   //built a default lookuptable
-  m_LookupTable->SetRampToLinear();
-  m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-  m_LookupTable->SetHueRange( 0.0, 0.0 );
-  m_LookupTable->SetValueRange( 0.0, 1.0 );
-  m_LookupTable->Build();
-  //map all black values to transparent
-  m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+  m_DefaultLookupTable->SetRampToLinear();
+  m_DefaultLookupTable->SetSaturationRange( 0.0, 0.0 );
+  m_DefaultLookupTable->SetHueRange( 0.0, 0.0 );
+  m_DefaultLookupTable->SetValueRange( 0.0, 1.0 );
+  m_DefaultLookupTable->Build();
+
+  m_BinaryLookupTable->SetRampToLinear();
+  m_BinaryLookupTable->SetSaturationRange( 0.0, 0.0 );
+  m_BinaryLookupTable->SetHueRange( 0.0, 0.0 );
+  m_BinaryLookupTable->SetValueRange( 0.0, 1.0 );
+  m_BinaryLookupTable->SetRange(0.0, 1.0);
+  // make first value transparent
+  {
+    double rgba[4];
+    m_BinaryLookupTable->GetTableValue(0, rgba);
+    m_BinaryLookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0); // background to 0
+  }
+  m_BinaryLookupTable->Build();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();
@@ -1035,6 +1056,6 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actors->AddPart( outlineShadowActor );
   m_Actors->AddPart( m_Actor );
 
-  //filter for RGB(A) images
-  m_LevelWindowToRGBFilterObject = new vtkMitkApplyLevelWindowToRGBFilter();
+  //level window filter
+  m_LevelWindowFilter = new vtkMitkLevelWindowFilter();
 }

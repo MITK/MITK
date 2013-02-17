@@ -246,6 +246,7 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
     return;
 
   unsigned int numPoints = points.size();
+  unsigned int numNormals = numPoints / 3;
 
   vtkPoints* vtkPoints = vtkPoints::New();
   vtkPoints->SetNumberOfPoints(numPoints);
@@ -274,10 +275,11 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   vtkFloatArray* normals = vtkFloatArray::New();
   normals->SetNumberOfComponents(3);
+  normals->SetNumberOfTuples(numNormals);
   normals->SetName("Normals");
 
-  for (int i = 0; i < numPoints; i += 3)
-    normals->InsertNextTuple(normal.elems);
+  for (unsigned int i = 0; i < numNormals; ++i)
+    normals->SetTuple(i, normal.elems);
 
   polyData->GetCellData()->SetNormals(normals);
 
@@ -339,10 +341,11 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   vtkFloatArray* vtkNormals = vtkFloatArray::New();
   vtkNormals->SetNumberOfComponents(3);
+  vtkNormals->SetNumberOfTuples(numNormals);
   vtkNormals->SetName("Normals");
 
-  for (int i = 0; i < numNormals; ++i)
-    vtkNormals->InsertNextTuple(normals[i].elems);
+  for (unsigned int i = 0; i < numNormals; ++i)
+    vtkNormals->SetTuple(i, normals[i].elems);
 
   polyData->GetCellData()->SetNormals(vtkNormals);
 

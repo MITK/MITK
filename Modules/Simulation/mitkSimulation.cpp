@@ -15,10 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSimulation.h"
+#include "mitkSimulationPropAssemblyVisitor.h"
+#include <mitkDataNode.h>
+#include <mitkSurface.h>
 #include <sofa/core/visual/VisualParams.h>
 #include <sofa/simulation/bgl/BglSimulation.h>
 #include <sofa/simulation/graph/DAGSimulation.h>
 #include <sofa/simulation/tree/TreeSimulation.h>
+#include <vtkActor.h>
+#include <vtkAppendPolyData.h>
+#include <vtkMapper.h>
+#include <vtkPolyData.h>
+#include <vtkPropAssembly.h>
+#include <vtkPropCollection.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 const float mitk::Simulation::ScaleFactor = 1000.0f;
 
@@ -115,6 +126,44 @@ void mitk::Simulation::SetRequestedRegionToLargestPossibleRegion()
 void mitk::Simulation::SetRootNode(sofa::simulation::Node* rootNode)
 {
   m_RootNode.reset(rootNode);
+}
+
+mitk::Surface::Pointer mitk::Simulation::TakeSnapshot() const
+{
+  if (m_RootNode == NULL)
+    return NULL;
+
+  vtkSmartPointer<vtkPropAssembly> propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
+  SimulationPropAssemblyVisitor propAssemblyVisitor(propAssembly);
+
+  m_RootNode->executeVisitor(&propAssemblyVisitor);
+
+  vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
+
+  vtkPropCollection* propCollection = propAssembly->GetParts();
+  vtkProp* prop = NULL;
+
+  for (propCollection->InitTraversal(); (prop = propCollection->GetNextProp()) != NULL; )
+  {
+    vtkActor* actor = vtkActor::SafeDownCast(prop);
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(actor->GetMapper()->GetInput());
+
+    appendFilter->AddInput(polyData);
+  }
+
+  vtkSmartPointer<vtkTransform> scaleTransform = vtkSmartPointer<vtkTransform>::New();
+  scaleTransform->Scale(ScaleFactor, ScaleFactor, ScaleFactor);
+
+  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  transformFilter->SetInputConnection(appendFilter->GetOutputPort());
+  transformFilter->SetTransform(scaleTransform);
+
+  transformFilter->Update();
+
+  Surface::Pointer surface = Surface::New();
+  surface->SetVtkPolyData(vtkPolyData::SafeDownCast(transformFilter->GetOutputDataObject(0)));
+
+  return surface;
 }
 
 void mitk::Simulation::UpdateOutputInformation()

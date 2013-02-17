@@ -44,8 +44,9 @@ private:
 private slots:
   void OnAnimateButtonToggled(bool toggled);
   void OnDTSpinBoxValueChanged(double value);
-  void OnResetSceneButtonClicked();
+  void OnResetButtonClicked();
   void OnSimulationComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnSnapshotButtonClicked();
   void OnStepButtonClicked();
   void OnTimerTimeout();
 };

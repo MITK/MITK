@@ -128,9 +128,10 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   vtkFloatArray* vtkNormals = vtkFloatArray::New();
   vtkNormals->SetNumberOfComponents(3);
+  vtkNormals->SetNumberOfTuples(numNormals);
 
   for (unsigned int i = 0; i < numNormals; ++i)
-    vtkNormals->InsertNextTuple(normals[i].elems);
+    vtkNormals->SetTuple(i, normals[i].elems);
 
   polyData->GetPointData()->SetNormals(vtkNormals);
 
@@ -147,9 +148,10 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
     vtkFloatArray* vtkTexCoords = vtkFloatArray::New();
     vtkTexCoords->SetNumberOfComponents(2);
+    vtkTexCoords->SetNumberOfTuples(numTexCoords);
 
     for (unsigned int i = 0; i < numTexCoords; ++i)
-      vtkTexCoords->InsertNextTuple(texCoords[i].elems);
+      vtkTexCoords->SetTuple(i, texCoords[i].elems);
 
     polyData->GetPointData()->SetTCoords(vtkTexCoords);
 

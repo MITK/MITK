@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSimulation_h
 
 #include "mitkSimulationDrawTool.h"
-#include <mitkBaseData.h>
+#include <mitkSurface.h>
 #include <SimulationExports.h>
 #include <sofa/simulation/common/Simulation.h>
 
@@ -51,6 +51,7 @@ namespace mitk
     void SetRequestedRegion(itk::DataObject* data);
     void SetRequestedRegionToLargestPossibleRegion();
     void SetRootNode(sofa::simulation::Node* rootNode);
+    Surface::Pointer TakeSnapshot() const;
     void UpdateOutputInformation();
     bool VerifyRequestedRegion();
 

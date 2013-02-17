@@ -14,7 +14,6 @@ if(MITK_USE_DCMTK)
   set(DCMTK_DEPENDS ${proj})
 
 if(CMAKE_GENERATOR MATCHES Xcode)
-  message(Using Xcode Generator)
   set(DCMTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-20122202.cmake)
 endif()
 

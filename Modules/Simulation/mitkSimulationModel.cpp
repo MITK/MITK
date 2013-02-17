@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
+#include <vtkSmartPointer.h>
 #include <vtkTexture.h>
 
 mitk::SimulationModel::SimulationModel()
@@ -86,7 +87,7 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   const sofa::defaulttype::ResizableExtVector<Coord>& vertices = this->getVertices();
   unsigned int numVertices = vertices.size();
 
-  vtkPoints* points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetNumberOfPoints(numVertices);
 
   for (unsigned int i = 0; i < numVertices; ++i)
@@ -95,9 +96,7 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   vtkPolyData* polyData = vtkPolyData::New();
   polyData->SetPoints(points);
 
-  points->Delete();
-
-  vtkCellArray* polys = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
 
   int numTriangles = g.tri0 + g.nbt;
   int numQuads = g.quad0 + g.nbq;
@@ -121,12 +120,10 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   polyData->SetPolys(polys);
 
-  polys->Delete();
-
   const sofa::defaulttype::ResizableExtVector<Coord>& normals = this->getVnormals();
   unsigned int numNormals = normals.size();
 
-  vtkFloatArray* vtkNormals = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
   vtkNormals->SetNumberOfComponents(3);
   vtkNormals->SetNumberOfTuples(numNormals);
 
@@ -134,8 +131,6 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     vtkNormals->SetTuple(i, normals[i].elems);
 
   polyData->GetPointData()->SetNormals(vtkNormals);
-
-  vtkNormals->Delete();
 
   sofa::core::loader::Material m = g.materialId >= 0
     ? materials.getValue()[g.materialId]
@@ -146,7 +141,7 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     const sofa::defaulttype::ResizableExtVector<TexCoord>& texCoords = this->getVtexcoords();
     unsigned int numTexCoords = texCoords.size();
 
-    vtkFloatArray* vtkTexCoords = vtkFloatArray::New();
+    vtkSmartPointer<vtkFloatArray> vtkTexCoords = vtkSmartPointer<vtkFloatArray>::New();
     vtkTexCoords->SetNumberOfComponents(2);
     vtkTexCoords->SetNumberOfTuples(numTexCoords);
 
@@ -154,8 +149,6 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
       vtkTexCoords->SetTuple(i, texCoords[i].elems);
 
     polyData->GetPointData()->SetTCoords(vtkTexCoords);
-
-    vtkTexCoords->Delete();
   }
 
   vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
@@ -208,10 +201,10 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   if (!m_LastShowNormals)
    return;
 
-  points = vtkPoints::New();
+  points = vtkSmartPointer<vtkPoints>::New();
   points->SetNumberOfPoints(numVertices * 2);
 
-  vtkCellArray* lines = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
   for (unsigned int i = 0; i < numVertices; ++i)
   {
@@ -229,9 +222,6 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   polyData = vtkPolyData::New();
   polyData->SetPoints(points);
   polyData->SetLines(lines);
-
-  points->Delete();
-  lines->Delete();
 
   polyDataMapper = vtkPolyDataMapper::New();
   polyDataMapper->SetInput(polyData);

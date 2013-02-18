@@ -88,7 +88,14 @@ void mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
   vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
 
   if (snapshot != NULL)
-    surface->SetVtkPolyData(snapshot, surface->GetTimeSteps());
+  {
+    unsigned int timeStep = surface->GetSizeOfPolyDataSeries();
+
+    if (timeStep != 0 && surface->GetVtkPolyData(timeStep - 1) == NULL)
+      --timeStep;
+
+    surface->SetVtkPolyData(snapshot, timeStep);
+  }
 }
 
 vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const

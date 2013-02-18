@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationModel.h"
 #include <sofa/core/visual/DisplayFlags.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageReader2.h>
@@ -27,8 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkSmartPointer.h>
-#include <vtkTexture.h>
 
 mitk::SimulationModel::SimulationModel()
   : m_LastTime(-1.0),
@@ -40,28 +37,7 @@ mitk::SimulationModel::SimulationModel()
 
 mitk::SimulationModel::~SimulationModel()
 {
-  this->DeleteVtkTextures();
-  this->DeleteVtkObjects();
-}
-
-void mitk::SimulationModel::DeleteVtkObjects()
-{
-  for (std::vector<vtkObjectBase*>::const_iterator object = m_VtkObjects.begin(); object != m_VtkObjects.end(); ++object)
-    (*object)->Delete();
-
-  m_VtkObjects.clear();
-
-  for (std::vector<vtkActor*>::const_iterator actor = m_Actors.begin(); actor != m_Actors.end(); ++actor)
-    (*actor)->Delete();
-
   m_Actors.clear();
-}
-
-void mitk::SimulationModel::DeleteVtkTextures()
-{
-  for (std::map<unsigned int, vtkTexture*>::const_iterator texture = m_Textures.begin(); texture != m_Textures.end(); ++texture)
-    texture->second->Delete();
-
   m_Textures.clear();
 }
 
@@ -93,7 +69,7 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   for (unsigned int i = 0; i < numVertices; ++i)
     points->SetPoint(i, vertices[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
 
   vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
@@ -151,10 +127,10 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     polyData->GetPointData()->SetTCoords(vtkTexCoords);
   }
 
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
@@ -194,8 +170,6 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   if (vparams->displayFlags().getShowWireFrame())
     property->SetRepresentationToWireframe();
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 
   if (!m_LastShowNormals)
@@ -219,23 +193,21 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     lines->InsertCellPoint(k);
   }
 
-  polyData = vtkPolyData::New();
+  polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
   polyData->SetLines(lines);
 
-  polyDataMapper = vtkPolyDataMapper::New();
+  polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  actor = vtkActor::New();
+  actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
-std::vector<vtkActor*> mitk::SimulationModel::GetActors() const
+std::vector<vtkSmartPointer<vtkActor> > mitk::SimulationModel::GetActors() const
 {
   return m_Actors;
 }
@@ -260,7 +232,7 @@ void mitk::SimulationModel::internalDraw(const sofa::core::visual::VisualParams*
   if (transparent)
     return;
 
-  this->DeleteVtkObjects();
+  m_Actors.clear();
 
   if (!vparams->displayFlags().getShowVisualModels())
     return;
@@ -285,7 +257,7 @@ bool mitk::SimulationModel::loadTexture(const std::string& filename)
 
 bool mitk::SimulationModel::loadTextures()
 {
-  this->DeleteVtkTextures();
+  m_Textures.clear();
 
   std::vector<unsigned int> activatedTextures;
 
@@ -309,18 +281,17 @@ bool mitk::SimulationModel::loadTextures()
     if (!sofa::helper::system::DataRepository.findFile(textureFilename))
       return false;
 
-    vtkImageReader2* imageReader = vtkImageReader2Factory::CreateImageReader2(textureFilename.c_str());
+    vtkSmartPointer<vtkImageReader2> imageReader;
+    imageReader.TakeReference(vtkImageReader2Factory::CreateImageReader2(textureFilename.c_str()));
 
     if (imageReader == NULL)
       return false;
 
     imageReader->SetFileName(textureFilename.c_str());
 
-    vtkTexture* texture = vtkTexture::New();
+    vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
     texture->SetInput(imageReader->GetOutputDataObject(0));
     texture->InterpolateOn();
-
-    imageReader->Delete();
 
     m_Textures.insert(std::make_pair(activatedTextures[i], texture));
   }

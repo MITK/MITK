@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <SimulationExports.h>
 #include <sofa/simulation/common/Simulation.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -41,6 +43,7 @@ namespace mitk
 
     static const float ScaleFactor;
 
+    void AppendSnapshot(Surface::Pointer surface) const;
     double GetDefaultDT() const;
     SimulationDrawTool* GetDrawTool();
     sofa::simulation::Node::SPtr GetRootNode() const;
@@ -61,6 +64,8 @@ namespace mitk
 
     Simulation(Self&);
     Self& operator=(const Self&);
+
+    vtkSmartPointer<vtkPolyData> CreateSnapshot() const;
 
     sofa::simulation::Simulation::SPtr m_Simulation;
     sofa::simulation::Node::SPtr m_RootNode;

@@ -80,6 +80,55 @@ mitk::Simulation::~Simulation()
   }
 }
 
+void mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
+{
+  if (surface.IsNull())
+    return;
+
+  vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
+
+  if (snapshot != NULL)
+    surface->SetVtkPolyData(snapshot, surface->GetTimeSteps());
+}
+
+vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const
+{
+  if (m_RootNode == NULL)
+    return NULL;
+
+  vtkSmartPointer<vtkPropAssembly> propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
+  SimulationPropAssemblyVisitor propAssemblyVisitor(propAssembly);
+
+  m_RootNode->executeVisitor(&propAssemblyVisitor);
+
+  vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
+
+  vtkPropCollection* propCollection = propAssembly->GetParts();
+  vtkProp* prop = NULL;
+
+  for (propCollection->InitTraversal(); (prop = propCollection->GetNextProp()) != NULL; )
+  {
+    vtkActor* actor = vtkActor::SafeDownCast(prop);
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(actor->GetMapper()->GetInput());
+
+    appendFilter->AddInput(polyData);
+  }
+
+  vtkSmartPointer<vtkTransform> scaleTransform = vtkSmartPointer<vtkTransform>::New();
+  scaleTransform->Scale(ScaleFactor, ScaleFactor, ScaleFactor);
+
+  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  transformFilter->SetInputConnection(appendFilter->GetOutputPort());
+  transformFilter->SetTransform(scaleTransform);
+
+  transformFilter->Update();
+
+  vtkSmartPointer<vtkPolyData> snapshot = vtkSmartPointer<vtkPolyData>::New();
+  snapshot->ShallowCopy(transformFilter->GetOutputDataObject(0));
+
+  return snapshot;
+}
+
 double mitk::Simulation::GetDefaultDT() const
 {
   return m_DefaultDT;
@@ -130,38 +179,13 @@ void mitk::Simulation::SetRootNode(sofa::simulation::Node* rootNode)
 
 mitk::Surface::Pointer mitk::Simulation::TakeSnapshot() const
 {
-  if (m_RootNode == NULL)
+  vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
+
+  if (snapshot == NULL)
     return NULL;
 
-  vtkSmartPointer<vtkPropAssembly> propAssembly = vtkSmartPointer<vtkPropAssembly>::New();
-  SimulationPropAssemblyVisitor propAssemblyVisitor(propAssembly);
-
-  m_RootNode->executeVisitor(&propAssemblyVisitor);
-
-  vtkSmartPointer<vtkAppendPolyData> appendFilter = vtkSmartPointer<vtkAppendPolyData>::New();
-
-  vtkPropCollection* propCollection = propAssembly->GetParts();
-  vtkProp* prop = NULL;
-
-  for (propCollection->InitTraversal(); (prop = propCollection->GetNextProp()) != NULL; )
-  {
-    vtkActor* actor = vtkActor::SafeDownCast(prop);
-    vtkPolyData* polyData = vtkPolyData::SafeDownCast(actor->GetMapper()->GetInput());
-
-    appendFilter->AddInput(polyData);
-  }
-
-  vtkSmartPointer<vtkTransform> scaleTransform = vtkSmartPointer<vtkTransform>::New();
-  scaleTransform->Scale(ScaleFactor, ScaleFactor, ScaleFactor);
-
-  vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-  transformFilter->SetInputConnection(appendFilter->GetOutputPort());
-  transformFilter->SetTransform(scaleTransform);
-
-  transformFilter->Update();
-
   Surface::Pointer surface = Surface::New();
-  surface->SetVtkPolyData(vtkPolyData::SafeDownCast(transformFilter->GetOutputDataObject(0)));
+  surface->SetVtkPolyData(snapshot);
 
   return surface;
 }

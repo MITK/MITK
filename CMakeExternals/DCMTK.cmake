@@ -13,6 +13,10 @@ if(MITK_USE_DCMTK)
   set(proj_DEPENDENCIES )
   set(DCMTK_DEPENDS ${proj})
 
+if(CMAKE_GENERATOR MATCHES Xcode)
+  set(DCMTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchDCMTK-20122202.cmake)
+endif()
+
   if(NOT DEFINED DCMTK_DIR)
     if(UNIX)
       set(DCMTK_CXX_FLAGS "-fPIC")
@@ -36,6 +40,7 @@ if(MITK_USE_DCMTK)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20120222.tar.gz
       URL_MD5 86fa9e0f91e4e0c6b44d513ea48391d6
       INSTALL_DIR ${proj}-install
+      PATCH_COMMAND ${DCMTK_PATCH_COMMAND}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}

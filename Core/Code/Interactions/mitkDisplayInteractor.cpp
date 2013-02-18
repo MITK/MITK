@@ -25,7 +25,7 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
 
-void mitk::DisplayInteractor::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
+void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
   // to use the state machine pattern,
   // the event is passed to the state machine interface to be handled
@@ -46,15 +46,12 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
 }
 
-mitk::DisplayInteractor::DisplayInteractor()
+mitk::DisplayInteractor::DisplayInteractor() :
+    m_IndexToSliceModifier(4),m_AutoRepeat(false), m_AlwaysReact(false),  m_ZoomFactor(2)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
-  m_IndexToSliceModifier = 4;
-  m_AlwaysReact = false;
-  m_AutoRepeat = false;
-  m_ZoomFactor = 2;
 }
 
 mitk::DisplayInteractor::~DisplayInteractor()
@@ -341,4 +338,9 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   {
     m_AlwaysReact = false;
   }
+}
+
+bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
+{
+  return true;
 }

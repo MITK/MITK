@@ -24,13 +24,14 @@
 #include "mitkDataInteractor.h"
 #include <MitkExports.h>
 #include <list>
+#include "mitkServiceTracker.h"
 
 
 namespace mitk
 {
   class InternalEvent;
   class InteractionEvent;
-  class InformerService;
+  class InteractionEventObserver;
 
   /**
   * \class Dispatcher

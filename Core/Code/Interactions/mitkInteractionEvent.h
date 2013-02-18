@@ -31,7 +31,6 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionEvent: public itk::LightObject
   {
 
-
   public:
     mitkClassMacro(InteractionEvent,itk::LightObject)
     mitkNewMacro2Param(Self,BaseRenderer*, std::string)
@@ -54,7 +53,7 @@ namespace mitk
      * Return unique string identifier that gives the event class of this object, as it can be used in a state machine pattern.
      * --- itk
      */
-    const std::string GetEventClass();
+    std::string GetEventClass() const;
     /**
      * This class implements an up cast to check if the provided baseClass object is derived from this class.
      * This function is used to support polymorphism on state machine pattern (XML) level.
@@ -70,7 +69,7 @@ namespace mitk
     virtual ~InteractionEvent();
 
   private:
-    BaseRenderer::Pointer m_Sender;
+    BaseRenderer* m_Sender;
     std::string m_EventClass;
   };
 

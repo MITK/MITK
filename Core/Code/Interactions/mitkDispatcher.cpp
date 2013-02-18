@@ -23,7 +23,8 @@
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
 
-#include "mitkInformer.h"
+#include "mitkInteractionEventObserver.h"
+
 
 mitk::Dispatcher::Dispatcher() :
     m_ProcessingMode(REGULAR), m_EventObserverTracker(GetModuleContext())
@@ -157,7 +158,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
     Any patternName = it->GetProperty("org.mitk.statemachinepattern");
     // TODO
     // TOdo any erlauben als string, oder als liste von strings
-    if (!patternName || patternName.ToString() == "")
+    if (!patternName.Empty() || patternName.ToString() == "")
     {
       InteractionEventObserver* interactionEventObserver = m_EventObserverTracker.GetService(*it);
       if (interactionEventObserver != NULL)

@@ -17,9 +17,9 @@
 #ifndef InteractionEventObserver_h
 #define InteractionEventObserver_h
 
-#include "mitkInteractionEvent.h"
 #include <MitkExports.h>
 #include "mitkServiceInterface.h"
+#include "mitkInteractionEvent.h"
 
 namespace mitk
 {
@@ -31,7 +31,7 @@ namespace mitk
   * but usage thereof is optional. See the Notify method for more information.
   */
 
-  struct MITK_CORE_EXPORT InteractionEventObserver //: public EventStateMachine
+  struct MITK_CORE_EXPORT InteractionEventObserver
   {
     virtual ~InteractionEventObserver();
       /**
@@ -54,7 +54,7 @@ namespace mitk
      * This overwrites the FilterEvents function of the EventStateMachine to ignore the DataNode, since InteractionEventObservers are not associated with one.
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
      */
-    virtual void Notify(const InteractionEvent::Pointer& interactionEvent,bool isHandled) = 0;
+    virtual void Notify(InteractionEvent* interactionEvent,bool isHandled) = 0;
   };
 
 } /* namespace mitk */

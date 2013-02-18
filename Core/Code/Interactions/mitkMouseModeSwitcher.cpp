@@ -19,18 +19,18 @@
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
-#include "mitkInformer.h"
+#include "mitkInteractionEventObserver.h"
 
 mitk::MouseModeSwitcher::MouseModeSwitcher() :
-    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
+    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
 {
-  m_CurrentObserver = NULL;
   this->InitializeListeners();
   this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
 
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
 {
+//  m_ServiceRegistration.Unregister();
 }
 
 void mitk::MouseModeSwitcher::InitializeListeners()
@@ -40,29 +40,9 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver = mitk::DisplayInteractor::New();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
-    // Register as listener
-    class MyObserver : public EventStateMachine, public InteractionEventObserver
-    {
-    public:
-
-      void Notify(const InteractionEvent::Pointer& event, bool)
-      {
-        // do something
-      }
-    };
-
-    MyObserver observer;
-
-
-    mitk::ServiceRegistration serviceReg = GetModuleContext()->RegisterService<InteractionEventObserver>(&observer);
-
-    serviceReg.Unregister();
-
-
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
-    mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
-    service->RegisterObserver(m_CurrentObserver.GetPointer());
+    // Register as listener via micro services
+    ServiceRegistration m_ServiceRegistration = GetModuleContext()->RegisterService<InteractionEventObserver>(
+        m_CurrentObserver.GetPointer());
   }
 }
 
@@ -82,7 +62,7 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     break;
   }
   m_ActiveInteractionScheme = scheme;
-  this->InvokeEvent( MouseModeChangedEvent() );
+  this->InvokeEvent(MouseModeChangedEvent());
 }
 
 void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
@@ -120,7 +100,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
   }
   } // end switch (mode)
   m_ActiveMouseMode = mode;
-  this->InvokeEvent( MouseModeChangedEvent() );
+  this->InvokeEvent(MouseModeChangedEvent());
 }
 
 mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode() const

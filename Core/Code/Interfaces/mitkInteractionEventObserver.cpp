@@ -20,9 +20,3 @@
 mitk::InteractionEventObserver::~InteractionEventObserver()
 {
 }
-
-
-//bool mitk::InteractionEventObserver::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
-//{
-//  return true;
-//}

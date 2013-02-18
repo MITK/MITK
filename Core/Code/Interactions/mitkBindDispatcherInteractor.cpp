@@ -22,7 +22,7 @@
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
-#include "mitkInformer.h"
+//#include "mitkInformer.h"
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
     m_DataStorage(NULL),m_InformerService(NULL)
@@ -33,13 +33,7 @@ mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
     MITK_ERROR<< "BindDispatcherInteractor() - Context could not be obtained.";
     return;
   }
-  ServiceReference serviceRef = context->GetServiceReference<InformerService>();
 
-  if (!serviceRef)
-  { // the service should only be registered once
-    m_InformerService = new InformerService();
-    context->RegisterService<InformerService>(m_InformerService);
-  }
   m_Dispatcher = Dispatcher::New();
 }
 

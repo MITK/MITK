@@ -220,7 +220,6 @@ set(CPP_FILES
   Interactions/mitkEventMapper.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
-  Interactions/mitkInformer.cpp
   Interactions/mitkInteractor.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp

@@ -80,7 +80,7 @@ namespace mitk
      * \note mitk::InteractionKeys may have a defined event variant, if this is the case, this function returns it. If no
      * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
-    std::string GetMappedEvent(InteractionEvent* interactionEvent);
+    std::string GetMappedEvent(EventType interactionEvent);
 
   protected:
 

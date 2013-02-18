@@ -40,6 +40,9 @@ namespace mitk
       /// \see IPythonService::Execute()
       std::string Execute( const std::string& pythonCommand, int commandType = SINGLE_LINE_COMMAND );
       ///
+      /// \see IPythonService::ExecuteScript()
+      void ExecuteScript(const std::string &pathToPythonScript);
+      ///
       /// \see IPythonService::GetVariableStack()
       std::vector<PythonVariable> GetVariableStack() const;
       ///

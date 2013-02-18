@@ -50,7 +50,7 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
 {
     d->m_PythonVariableStackTableView = new QmitkPythonVariableStackTableView;
     d->m_PythonVariableStackTableView->SetDataStorage(this->GetDataStorage());
-    d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    d->m_PythonVariableStackTableView->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 
     QString snippetsFilePath = mitk::PluginActivator::m_XmlFilePath;
     MITK_DEBUG("QmitkPythonView") << "got snippetsFilePath " << snippetsFilePath.toStdString();

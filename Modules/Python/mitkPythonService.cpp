@@ -29,12 +29,17 @@ mitk::PythonService::PythonService()
 {
   if( !m_PythonManager.isPythonInitialized() )
   {
+    //system("export LD_LIBRARY_PATH=/local/muellerm/mitk/bugsquashing/bin-debug/VTK-build/bin:$LD_LIBRARY_PATH");
+
     MITK_DEBUG("PythonService") << "initialize python";
     m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
     m_PythonManager.initialize();
 
-    //std::string result = m_PythonManager.executeString( "sys.path", ctkAbstractPythonManager::EvalInput );
+    //m_PythonManager.executeString( "print sys.path", ctkAbstractPythonManager::SingleInput );
     //MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
+
+    m_PythonManager.executeString( "sys.path.append('/usr/share/pyshared/numpy')", ctkAbstractPythonManager::SingleInput );
+    m_PythonManager.executeString( "import numpy", ctkAbstractPythonManager::SingleInput );
 
     QString pythonCommand(PYTHONPATH_COMMAND);
     MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
@@ -66,6 +71,10 @@ mitk::PythonService::PythonService()
     {
       MITK_WARN << "VTK Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
     }
+
+    //m_PythonManager.executeString( "for path in sys.path:\n  print path\n", ctkAbstractPythonManager::SingleInput );
+    //m_PythonManager.executeString( "for k, v in os.environ.items():\n  print \"%s=%s\" % (k, v)", ctkAbstractPythonManager::SingleInput );
+    //m_PythonManager.executeFile("/local/muellerm/Dropbox/13-02-11-python-wrapping/interpreterInfo.py");
 
   }
   //std::string result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
@@ -101,6 +110,11 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
         this->NotifyObserver(pythonCommand.toStdString());
 
     return result.toString().toStdString();
+}
+
+void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
+{
+  m_PythonManager.executeFile(QString::fromStdString(pythonScript));
 }
 
 std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const

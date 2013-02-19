@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPMDModuleExports.h"
 #include "mitkToFCameraPMDRawDataCamBoardDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
+#include <mitkCameraIntrinsics.h>
+#include <mitkCameraIntrinsicsProperty.h>
+#include <mitkToFConfig.h>
 
 namespace mitk
 {
@@ -60,6 +63,14 @@ private:
    ToFCameraDevice::Pointer createToFCameraDevice()
    {
      ToFCameraPMDRawDataCamBoardDevice::Pointer device = ToFCameraPMDRawDataCamBoardDevice::New();
+
+      //Set default camera intrinsics for the RawDataCamBoard-camera
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
+
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamBoard_camera.xml");
+      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
+      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
      return device.GetPointer();
    }

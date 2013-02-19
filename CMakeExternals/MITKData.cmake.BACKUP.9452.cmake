@@ -13,7 +13,11 @@ set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
 
+<<<<<<< HEAD
+  set(revision_tag 16d96097)
+=======
   set(revision_tag 66dc8282)
+>>>>>>> bug-14224-DefaultCalibrationFiles
 
   #if(${proj}_REVISION_TAG)
   #  set(revision_tag ${${proj}_REVISION_TAG})

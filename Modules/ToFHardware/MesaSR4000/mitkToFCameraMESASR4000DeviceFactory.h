@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMESASR4000ModuleExports.h"
 #include "mitkToFCameraMESASR4000Device.h"
 #include "mitkAbstractToFDeviceFactory.h"
+#include <mitkCameraIntrinsics.h>
+#include <mitkCameraIntrinsicsProperty.h>
+#include <mitkToFConfig.h>
 
 namespace mitk
 {
@@ -65,6 +68,14 @@ namespace mitk
     ToFCameraDevice::Pointer createToFCameraDevice()
     {
       ToFCameraMESASR4000Device::Pointer device = ToFCameraMESASR4000Device::New();
+
+      //Set default camera intrinsics for the Mesa-SR4000-camera.
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
+
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/Mesa-SR4000_Camera.xml");
+      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
+      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
       return device.GetPointer();
     }

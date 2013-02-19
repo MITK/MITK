@@ -1,0 +1,89 @@
+/**
+\page GeneratingDeviceModulesPage How to generate ToF DeviceModules
+
+The <B> ToF-DeviceModule-Tutorial</B>  will help you implementing a new ToF-Device easily.
+Using MicroServices for this purpose will be one of our main goals, too.
+
+If you do not know much about MicroServices, please take a look at:
+
+\ref MicroServices_Overview
+
+\section GeneratingDeviceModulsPageSec1 Generating a ToF-Device-Module in MITK
+
+
+ In order to implement your own device, you need to code the following objects:
+ <ul>
+    <li>device (the device itself)
+    <li>device factory (a singleton which produces instances of your device)
+    <li>controller (connection to the Hardware-SDK)
+    <li>Module Activator (Important for the MicroServices. This class ensures the automatic loading of the device.)
+</ul>
+
+ The following example shows how to implement a device, here we take the Kinect.
+
+ <li> <B> Creating a Sub-Folder</B>
+  \n Following the Kinect-DeviceModule as a prototype, create a <EM>MODULENAME-Sub-Folder</EM> in your source directory. This MODULENAME-Folder is going to hold all the necessary files we will create in the next steps.
+
+ <li> <B> Create the <EM>CMake Files</EM> for our new camera-model in the MODULENAME-Folder <</B>
+   <ul>
+    <li>CMakeList.txt
+
+       In this file, the module is generated via CMake commands. The module name is set, the necessary libraries will be searched here in order to link them with your module. For the Kinect, we chose OpenNI and need the XnCppWrapper.h. Your device must inherit from the mitkToFCameraDevice and consequently your module must depend on mitkToFHardware -> what is the reason for the <EM>DEPENDS mitkToFHardware</EM> -line. For autoloading your Module with mitkToFHardware, insert the following CMake Macro: <EM>AUTOLOAD_WITH mitkToFHardware</EM> . We usually add an option for the user to activate the device module, but this is not essential (refer to <EM> OPTION(MITK_USE_TOF_KINECT "Enable support for Kinect camera" OFF)</EM>).
+       \n \arrow refer to CMakeList.text in the Kinect-Folder
+
+       \Warning The dll/so files are not automatically deleted.
+
+    \n<li>files.cmake
+        The files.cmake contains all the previously mentioned files (device, deviceFactory, controller, and ModuleActivator)
+       \n -> refer to mitkKinectActivator.cpp
+    </ul>
+
+
+ <li> <B> Creating the Code Files in the MODULENAME-Folder </B>
+   <ul>
+        <li>\a MODULENAMEController
+        \n -> While referring to mitkKinectcontroller.cpp and the mitkKinectcontroller.h, take a good look at the definition of the MITK_KINECTMODULE_EXPORT-class in the .h file
+
+        \n<li>\a MODULENAMEDevice
+        Your device must inherit from ToFCameraDevice (e.g. class MITK_KINECTMODULE_EXPORT KinectDevice : public ToFCameraDevice) and consequently implement the methods of the ToFCameraDevice MicroService-Interface. (See ToFCameraDevice.h). Make sure to give your device a specific name in the method GetDeviceName(). All instances of your device will automatically be available in the view "ToFUtil", if you generate it via the factory.
+        \n -> refer to mitkKinectDevice.cpp and the mitkKinectDevice.h.
+
+        \n<li>\a MODULENAMEDeviceFactory
+        Like the mitkToFCameraDevice, the mitkIToFDeviceFactory is a MicroService-Interface. The factory is meant for generation of devices of the same type. This concept allows for having multiple instances of the same camera connected. (Currently our GUI does not really support an actual connection of multiple devices, but the software framework, in principle, does.) Your factory must inherit from the mitkAbstractDeviceFactory, which provides some useful methods for device generation. Your factory instance should be registered as MicroService in order to be available in the view "ToF Device Generation".
+        \n -> refer to mitkKinectDeviceFactory.cpp and the mitkKinectDeviceFactory.h
+
+        \n<li>\a MODULENAMEActivator
+        The load() method of this class will be called when the module is activated. If you would like to have an instance of your device registered as MicroService, you should call deviceFactory->ConnectToFDevice(); here. In addition, you can generate devices anywhere in your code via this method. The factory will automatically be available in the view "ToF Device Generation" if you register it like we do with the Kinect. TODO: Code example:
+        \n ->refer to mitkKinectActivator.cpp and the mitkKinectActivator.h or the mitkPMDModuleActivator.cpp and the mitkPMDModuleActivator.h.
+     </ul>
+</ol>
+\n
+
+If you did everything correct, your Module should be implemented an executable MODULENAME-Project will be generated and a working device should show up in the ServiceListWidget in the Connection-Part of ToFUtil.
+<B>Warning</B>   The dll/so files are not automatically deleted. After deactivating a device, please delete the concerning files in <EM>SUPERBUILDDIR/MITK-build/bin/mitkToFHardware/BUILDTYPE</EM>
+
+
+\section GeneratingDeviceModulsPageSec2 [OPTIONAL] Adding a Testing Sub-Directory
+
+If you have any Tests you want to include, a <EM>Testing-Subdirectory</EM> in the newly created MODULENAME-Folder should be created. In this Folder we are going to put a CMakeLists.txt and a files.cmake the first one will just consist
+
+    \code
+    MITK_CREATE_MODULE_TESTS()
+    \endcode
+
+while the later one, the files.cmake holds Information about TestFiles you created and put in the Folder.
+E.g. for the Kinect:
+
+   \code
+    set(MODULE_TESTS
+    mitkKinectControllerTest.cpp
+    mitkKinectDeviceTest.cpp
+    )
+   \endcode
+
+As before, feel free to take a look at one of the existing Modules and their Testing-Subfolder as the Kinect´s.
+
+If you managed to implement your Module properly, an executable MODULENAMETestDriver will be generated.
+
+
+*/

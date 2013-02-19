@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkKinectModuleExports.h"
 #include "mitkKinectDevice.h"
 #include "mitkAbstractToFDeviceFactory.h"
+#include <mitkCameraIntrinsics.h>
+#include <mitkCameraIntrinsicsProperty.h>
 
 namespace mitk
 {
@@ -67,6 +69,15 @@ namespace mitk
     ToFCameraDevice::Pointer createToFCameraDevice()
     {
       KinectDevice::Pointer device = KinectDevice::New();
+
+      //Set default camera intrinsics for the kinect RGB camera.
+      //(OpenNI warps the distance data into the RGB space).
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
+      pathToDefaulCalibrationFile.append("/CalibrationFiles/Kinect_RGB_camera.xml");
+      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
+      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+
       return device.GetPointer();
     }
     //Member variable as variable for our DeviceNumber

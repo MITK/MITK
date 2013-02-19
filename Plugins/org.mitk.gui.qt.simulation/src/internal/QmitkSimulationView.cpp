@@ -23,14 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 
 QmitkSimulationView::QmitkSimulationView()
-  : m_Timer(this)
+  : m_SelectionWasRemovedFromDataStorage(false),
+    m_Timer(this)
 {
+  this->GetDataStorage()->RemoveNodeEvent.AddListener(
+    mitk::MessageDelegate1<QmitkSimulationView, const mitk::DataNode*>(this, &QmitkSimulationView::OnNodeRemovedFromDataStorage));
+
   connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTimeout()));
   initSOFAPlugins();
 }
 
 QmitkSimulationView::~QmitkSimulationView()
 {
+  this->GetDataStorage()->RemoveNodeEvent.RemoveListener(
+    mitk::MessageDelegate1<QmitkSimulationView, const mitk::DataNode*>(this, &QmitkSimulationView::OnNodeRemovedFromDataStorage));
 }
 
 void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
@@ -88,6 +94,12 @@ void QmitkSimulationView::OnDTSpinBoxValueChanged(double value)
     : value);
 }
 
+void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* node)
+{
+  if (m_Selection.IsNotNull() && m_Selection.GetPointer() == node)
+    m_SelectionWasRemovedFromDataStorage = true;
+}
+
 void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
 {
   if (!toggled)
@@ -137,10 +149,14 @@ void QmitkSimulationView::OnResetButtonClicked()
 
 void QmitkSimulationView::OnSimulationComboBoxSelectionChanged(const mitk::DataNode* node)
 {
-  // TODO: Assign NULL to m_Selection in case it was just removed from data storage.
-
   if (m_Controls.animateButton->isChecked())
     m_Controls.animateButton->setChecked(false);
+
+  if (m_SelectionWasRemovedFromDataStorage)
+  {
+    m_SelectionWasRemovedFromDataStorage = false;
+    m_Selection = NULL;
+  }
 
   if (m_Controls.recordButton->isChecked())
     m_Controls.recordButton->setChecked(false);
@@ -216,11 +232,9 @@ void QmitkSimulationView::SetFocus()
 
 bool QmitkSimulationView::SetSelectionAsCurrentSimulation() const
 {
-  mitk::DataNode::Pointer selectedNode = m_Controls.simulationComboBox->GetSelectedNode();
-
-  if (selectedNode.IsNotNull())
+  if (m_Selection.IsNotNull())
   {
-    static_cast<mitk::Simulation*>(m_Controls.simulationComboBox->GetSelectedNode()->GetData())->SetAsActiveSimulation();
+    static_cast<mitk::Simulation*>(m_Selection->GetData())->SetAsActiveSimulation();
     return true;
   }
 

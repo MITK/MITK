@@ -47,12 +47,14 @@ private:
   QmitkSimulationView(const QmitkSimulationView&);
   QmitkSimulationView& operator=(const QmitkSimulationView&);
 
+  void OnNodeRemovedFromDataStorage(const mitk::DataNode* node);
   bool SetSelectionAsCurrentSimulation() const;
 
   Ui::QmitkSimulationViewControls m_Controls;
-  QTimer m_Timer;
+  bool m_SelectionWasRemovedFromDataStorage;
   mitk::DataNode::Pointer m_Selection;
   mitk::Surface::Pointer m_Record;
+  QTimer m_Timer;
 };
 
 #endif

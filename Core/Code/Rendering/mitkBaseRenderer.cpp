@@ -253,7 +253,7 @@ void mitk::BaseRenderer::RegisterLocalStorageHandler(mitk::BaseLocalStorageHandl
 
 }
 
-const mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher()
+mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
 {
   return m_BindDispatcherInteractor->GetDispatcher();
 }

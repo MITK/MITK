@@ -49,7 +49,7 @@ events from tracking devices, etc. Refer to \ref ImplementNewEventsPage to see h
 For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \ref DataInteractionTechnicalPage.
 
 
-\section EventHandlerSection EventHandler
+\section InteractionEventHandlerSection InteractionEventHandler
 Is the term describing objects in general that can handle events. These objects can be devided into two groups, namely
 DataInteractors and InteractionEventObserver. Their difference is that DataInteractors are linked with a DataNode which they manipulate,
 whereas InteractionEventObserver do not have a DataNode and therefore are not supposed to manipulate any data.
@@ -57,7 +57,7 @@ whereas InteractionEventObserver do not have a DataNode and therefore are not su
 \dot
 digraph linker_deps {
   node [shape=record, fontname=Helvetica, fontsize=10];
-  a [ label="EventHandler" ];
+  a [ label="InteractionEventHandler" ];
   d [ label="{StateMachine|HandleEvent()}" ];
   b [ label="{DataInteractor|HandleEvent()}" ];
   c [ label="{InteractionEventObserver|Notify()}" ];
@@ -68,7 +68,7 @@ digraph linker_deps {
 \enddot
 
 \subsection DataInteractorsSection DataInteractors
-DataInteractors are specialized EventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
+DataInteractors are specialized InteractionEventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
 \subsubsection StateMachinesSection StateMachines
@@ -157,17 +157,17 @@ For InteractionEventObserver it is optional to use the state machine functionali
 
 \subsection ConfigurationSection Configuration
 In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that is it possible
-to easily change this. This is achieved through configuration of EventHandlers. This allows to change the behavior at runtime.
-The EventHandler provides an interface to easily modify the user input that triggers an action by loading a different configuration, this allows to implement
+to easily change this. This is achieved through configuration of InteractionEventHandlers. This allows to change the behavior at runtime.
+The InteractionEventHandler provides an interface to easily modify the user input that triggers an action by loading a different configuration, this allows to implement
 user-specific behavior of the software on an abstract level and to switch in at runtime.
-This is achieved through XML files describing a configuration. These files can be loaded by the EventHandler and will lead to an internal mapping
+This is achieved through XML files describing a configuration. These files can be loaded by the InteractionEventHandler and will lead to an internal mapping
 from specific user input to an absract description of the event given in the config file.
 
 In order to do this we distinguish between a spefic event and an event variant. A specific event is described by its event class, which determines the
 category of an event, e.g. the class MousePressEvent, and its parameter which make this event unique, e.g. LeftMouseButton pressed and no modifier keys pressed.
-The event variant is a name that is assigned to a spefific event, and to which an EventHandler listens.
+The event variant is a name that is assigned to a spefific event, and to which an InteractionEventHandler listens.
 
-To illustrate this, an example is given here for two different configuration files. We assume an EventHandler that listens to the event variant 'AddPoint',
+To illustrate this, an example is given here for two different configuration files. We assume an InteractionEventHandler that listens to the event variant 'AddPoint',
 two possible config files could then look like this:
 
 \code
@@ -191,9 +191,9 @@ and
 \endcode
 <b>Example 3: Event description of a left click with the mouse while pressing the shift-key</b>
 
-If the EventHandler is loaded with the first configuration the event variant 'MousePress' is triggered when the user performs a mouse click,
+If the InteractionEventHandler is loaded with the first configuration the event variant 'MousePress' is triggered when the user performs a mouse click,
 while when the second configuration is loaded 'MousePress' is triggered when the user performs a right click while pressing the shift button.
-In this way all objects derived by EventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
+In this way all objects derived by InteractionEventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
 
 
 \section DispatcherSection Dispatcher

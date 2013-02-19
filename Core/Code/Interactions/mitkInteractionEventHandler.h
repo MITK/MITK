@@ -37,10 +37,10 @@ namespace mitk
    *  It provides an interface to load configuration objects map of events to variant names.
    */
   class InteractionEvent;
-  class MITK_CORE_EXPORT EventHandler : public itk::LightObject {
+  class MITK_CORE_EXPORT InteractionEventHandler : public itk::LightObject {
 
   public:
-    mitkClassMacro(EventHandler, itk::LightObject)
+    mitkClassMacro(InteractionEventHandler, itk::LightObject)
     itkNewMacro(Self)
     /**
     * @brief Loads XML resource
@@ -60,8 +60,8 @@ namespace mitk
 
 
   protected:
-    EventHandler();
-    virtual ~EventHandler();
+    InteractionEventHandler();
+    virtual ~InteractionEventHandler();
     /**
      * Returns a PropertyList in which the parameters defined in the config file are listed.
      */

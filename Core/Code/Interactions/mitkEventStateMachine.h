@@ -20,7 +20,7 @@
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
-#include "mitkEventHandler.h"
+#include "mitkInteractionEventHandler.h"
 
 #include <MitkExports.h>
 #include <string>
@@ -93,11 +93,11 @@ namespace mitk
    *
    */
 
-  class MITK_CORE_EXPORT EventStateMachine: public EventHandler
+  class MITK_CORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
 
   public:
-    mitkClassMacro(EventStateMachine, EventHandler)
+    mitkClassMacro(EventStateMachine, InteractionEventHandler)
     itkNewMacro(Self)
     typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;

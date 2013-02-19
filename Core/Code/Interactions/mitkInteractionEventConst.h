@@ -21,6 +21,8 @@
 //## @file mitkInteractionEventConst.h
 //## @brief Constants to describe Mouse Events and special Key Events.
 
+#include <string>
+
 namespace mitk
 {
 

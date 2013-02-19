@@ -14,19 +14,19 @@
 
  ===================================================================*/
 
-#include "mitkEventHandler.h"
+#include "mitkInteractionEventHandler.h"
 #include "mitkInteractionEvent.h"
 
-mitk::EventHandler::EventHandler():
+mitk::InteractionEventHandler::InteractionEventHandler():
   m_EventConfig(NULL)
 {
 }
 
-mitk::EventHandler::~EventHandler()
+mitk::InteractionEventHandler::~InteractionEventHandler()
 {
 }
 
-bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::LoadEventConfig(std::string filename, std::string moduleName)
 {
   m_EventConfig = vtkSmartPointer<EventConfig>::New();
   // notify sub-classes that new config is set
@@ -35,7 +35,7 @@ bool mitk::EventHandler::LoadEventConfig(std::string filename, std::string modul
   return success;
 }
 
-bool mitk::EventHandler::AddEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::AddEventConfig(std::string filename, std::string moduleName)
 {
   if (m_EventConfig == NULL)
   {
@@ -48,17 +48,17 @@ bool mitk::EventHandler::AddEventConfig(std::string filename, std::string module
   return success;
 }
 
-mitk::PropertyList::Pointer mitk::EventHandler::GetAttributes()
+mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes()
 {
   if (m_EventConfig != NULL) {
   return m_EventConfig->GetAttributes();
   } else {
-    MITK_ERROR << "EventHandler::GetAttributes() requested, but not configuration loaded.";
+    MITK_ERROR << "InteractionEventHandler::GetAttributes() requested, but not configuration loaded.";
     return NULL;
   }
 }
 
-std::string mitk::EventHandler::MapToEventVariant(InteractionEvent* interactionEvent)
+std::string mitk::InteractionEventHandler::MapToEventVariant(InteractionEvent* interactionEvent)
 {
   if (m_EventConfig != NULL)
   {
@@ -70,6 +70,6 @@ std::string mitk::EventHandler::MapToEventVariant(InteractionEvent* interactionE
   }
 }
 
-void mitk::EventHandler::ConfigurationChanged()
+void mitk::InteractionEventHandler::ConfigurationChanged()
 {
 }

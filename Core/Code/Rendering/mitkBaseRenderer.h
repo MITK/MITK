@@ -109,7 +109,7 @@ namespace mitk
     virtual DataStorage::Pointer GetDataStorage() const
     {
       return m_DataStorage.GetPointer();
-    };
+    }
 
     //##Documentation
     //## @brief Access the RenderWindow into which this renderer renders.
@@ -124,7 +124,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Returns the Dispatcher which handles Events for this BaseRenderer
-    const Dispatcher::Pointer GetDispatcher();
+    Dispatcher::Pointer GetDispatcher() const;
 
     //##Documentation
     //## @brief Default mapper id to use.
@@ -178,17 +178,14 @@ namespace mitk
     virtual void SetWorldGeometry(Geometry3D* geometry);
 
     itkGetConstObjectMacro(WorldGeometry, Geometry3D)
-    ;
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
     itkGetConstObjectMacro(CurrentWorldGeometry, Geometry3D)
-    ;
 
     //##Documentation
     //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
     itkGetConstObjectMacro(CurrentWorldGeometry2D, Geometry2D)
-    ;
 
     //##Documentation
     //## Calculates the bounds of the DataStorage (if it contains any valid data),
@@ -211,10 +208,7 @@ namespace mitk
     virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
 
     itkGetConstObjectMacro(DisplayGeometry, DisplayGeometry)
-    ;
-
     itkGetObjectMacro(DisplayGeometry, DisplayGeometry)
-    ;
 
     //##Documentation
     //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
@@ -224,7 +218,6 @@ namespace mitk
     virtual void SetSlice(unsigned int slice);
 
     itkGetConstMacro(Slice, unsigned int)
-    ;
 
     //##Documentation
     //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
@@ -234,7 +227,6 @@ namespace mitk
     virtual void SetTimeStep(unsigned int timeStep);
 
     itkGetConstMacro(TimeStep, unsigned int)
-    ;
 
     //##Documentation
     //## @brief Get the time-step of a BaseData object which
@@ -274,24 +266,19 @@ namespace mitk
     //##Documentation
     //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
     itkGetObjectMacro(DisplayGeometryData, Geometry2DData)
-    ;
     //##Documentation
     //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
     itkGetObjectMacro(WorldGeometryData, Geometry2DData)
-    ;
 
     //##Documentation
     //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
     itkGetObjectMacro(WorldGeometryNode, DataNode)
-    ;
     //##Documentation
     //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
     itkGetObjectMacro(DisplayGeometryNode, DataNode)
-    ;
     //##Documentation
     //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
     itkGetObjectMacro(CurrentWorldGeometry2DNode, DataNode)
-    ;
 
     //##Documentation
     //## @brief Sets timestamp of CurrentWorldGeometry2D and DisplayGeometry and forces so reslicing in that renderwindow
@@ -303,21 +290,18 @@ namespace mitk
     {
       return m_CurrentWorldGeometry2DUpdateTime;
     }
-    ;
     //##Documentation
     //## @brief Get timestamp of last call of SetDisplayGeometry
     unsigned long GetDisplayGeometryUpdateTime()
     {
       return m_CurrentWorldGeometry2DUpdateTime;
     }
-    ;
     //##Documentation
     //## @brief Get timestamp of last change of current TimeStep
     unsigned long GetTimeStepUpdateTime()
     {
       return m_TimeStepUpdateTime;
     }
-    ;
 
     //##Documentation
     //## @brief Perform a picking: find the x,y,z world coordinate of a
@@ -337,28 +321,24 @@ namespace mitk
     {
       return NULL;
     }
-    ;
 
     //##Documentation
     //## @brief Get the MapperSlotId to use.
     itkGetMacro(MapperID, MapperSlotId)
-    ;itkGetConstMacro(MapperID, MapperSlotId)
-    ;
+    itkGetConstMacro(MapperID, MapperSlotId)
+
 
     //##Documentation
     //## @brief Set the MapperSlotId to use.
     itkSetMacro(MapperID, MapperSlotId)
-    ;
 
     //##Documentation
     //## @brief Has the renderer the focus?
     itkGetMacro(Focused, bool)
-    ;
     //##Documentation
     //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
     //## not the renderer itself.
     itkSetMacro(Focused, bool)
-    ;
 
     //##Documentation
     //## @brief Sets whether depth peeling is enabled or not
@@ -367,16 +347,14 @@ namespace mitk
     void SetMaxNumberOfPeels(int maxNumber);
 
     itkGetMacro(Size, int*)
-    ;
 
     void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
-    void SetCameraController(CameraController* cameraController);itkGetObjectMacro(CameraController, CameraController)
-    ;itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-    ;itkGetObjectMacro(CameraRotationController, CameraRotationController)
-    ;
+    void SetCameraController(CameraController* cameraController);
+    itkGetObjectMacro(CameraController, CameraController)
+    itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
+    itkGetObjectMacro(CameraRotationController, CameraRotationController)
 
     itkGetMacro(EmptyWorldGeometry, bool)
-    ;
 
     //##Documentation
     //## @brief Mouse event dispatchers

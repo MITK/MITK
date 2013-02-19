@@ -377,7 +377,7 @@ functions in the Interactor (as seen above). In our example this looks like this
 \until }
 
 
-<b> ConfigurationChanged </b> - Is called whenever a new configuration file is loaded (by the mitk::EventHandler super class),
+<b> ConfigurationChanged </b> - Is called whenever a new configuration file is loaded (by the mitk::InteractionEventHandler super class),
 this function allows to implement initialization code that depends on configuration values. In our example we want to set the limit of
 allowed points:
 

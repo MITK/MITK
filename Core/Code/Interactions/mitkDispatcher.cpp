@@ -29,10 +29,6 @@
 mitk::Dispatcher::Dispatcher() :
     m_ProcessingMode(REGULAR), m_EventObserverTracker(GetModuleContext())
 {
-  // get service to inform InteractionEventObserver
-  mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
-
   m_EventObserverTracker.Open();
 }
 
@@ -155,17 +151,17 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   m_EventObserverTracker.GetServiceReferences(listEventObserver);
   for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
   {
+
     Any patternName = it->GetProperty("org.mitk.statemachinepattern");
-    // TODO
-    // TOdo any erlauben als string, oder als liste von strings
-    if (!patternName.Empty() || patternName.ToString() == "")
-    {
+
+    //if (!patternName.Empty() || patternName.ToString() == "")
+    //{
       InteractionEventObserver* interactionEventObserver = m_EventObserverTracker.GetService(*it);
       if (interactionEventObserver != NULL)
       {
         interactionEventObserver->Notify(event, eventIsHandled);
       }
-    }
+    //}
   }
 
   // Process event queue

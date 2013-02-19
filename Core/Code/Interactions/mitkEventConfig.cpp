@@ -55,7 +55,7 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
   {
     if ((*it).interactionEvent->MatchesTemplate(mapping.interactionEvent))
     {
-      MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
+      //MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
       m_EventList.erase(it);
       break;
     }

@@ -14,9 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkImageToSurfaceFilter.h>
-
+#include "mitkException.h"
 #include <vtkImageData.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
@@ -24,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
 #include <vtkQuadricDecimation.h>
+
+#include <vtkSmartPointer.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkCleanPolyData.h>
 
 #include "mitkProgressBar.h"
 
@@ -142,7 +145,20 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   }
   ProgressBar::GetInstance()->Progress();
 
-  surface->SetVtkPolyData(polydata, time);
+  // determine point_data normals for the poly data points.
+  vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
+  normalsGenerator->SetInput( polydata );
+
+  vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+  cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+  cleanPolyDataFilter->PieceInvariantOff();
+  cleanPolyDataFilter->ConvertLinesToPointsOff();
+  cleanPolyDataFilter->ConvertPolysToLinesOff();
+  cleanPolyDataFilter->ConvertStripsToPolysOff();
+  cleanPolyDataFilter->PointMergingOn();
+  cleanPolyDataFilter->Update();
+
+  surface->SetVtkPolyData(cleanPolyDataFilter->GetOutput(), time);
   polydata->UnRegister(NULL);
 }
 
@@ -151,6 +167,9 @@ void mitk::ImageToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image        =  (mitk::Image*)GetInput();
+  if(image == NULL || !image->IsInitialized())
+    mitkThrow() << "No input image set, please set an valid input image!";
+
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
   int tstart=outputRegion.GetIndex(3);

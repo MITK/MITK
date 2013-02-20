@@ -16,11 +16,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
+#include <mitkIRenderingManager.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkSimulation.h>
 #include <mitkSimulationModel.h>
 #include <sofa/helper/system/PluginManager.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
+
+static void InitializeViews(mitk::IRenderWindowPart* renderWindowPart, mitk::Geometry3D* geometry)
+{
+  if (renderWindowPart == NULL || geometry == NULL)
+    return;
+
+  mitk::IRenderingManager* renderingManager = renderWindowPart->GetRenderingManager();
+
+  if (renderingManager != NULL)
+    renderingManager->InitializeViews(geometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+}
 
 QmitkSimulationView::QmitkSimulationView()
   : m_SelectionWasRemovedFromDataStorage(false),
@@ -55,6 +67,9 @@ void QmitkSimulationView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.simulationComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnSimulationComboBoxSelectionChanged(const mitk::DataNode*)));
   connect(m_Controls.dtSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDTSpinBoxValueChanged(double)));
   connect(m_Controls.snapshotButton, SIGNAL(clicked()), this, SLOT(OnSnapshotButtonClicked()));
+
+  if (m_Controls.simulationComboBox->GetSelectedNode().IsNotNull())
+    this->OnSimulationComboBoxSelectionChanged(m_Controls.simulationComboBox->GetSelectedNode());
 }
 
 void QmitkSimulationView::OnAnimateButtonToggled(bool toggled)
@@ -110,9 +125,10 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
       dataNode->SetData(m_Record);
       dataNode->SetName(m_Record->GetTimeSteps() == 1 ? "Snapshot" : "Record");
 
-      m_Record = NULL;
-
       this->GetDataStorage()->Add(dataNode, m_Selection);
+      InitializeViews(this->GetRenderWindowPart(), m_Record->GetTimeSlicedGeometry());
+
+      m_Record = NULL;
     }
 
     m_Controls.stepsRecordedLabel->hide();

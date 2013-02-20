@@ -76,6 +76,9 @@ namespace mitk
         /// Executes a python script.
         virtual void ExecuteScript( const std::string& pathToPythonScript ) = 0;
         ///
+        /// \return true if the last call to Execute...() resulted in an error, false otherwise
+        virtual bool PythonErrorOccured() const = 0;
+        ///
         /// \return The list of variables in the __main__ namespace
         virtual std::vector<PythonVariable> GetVariableStack() const = 0;
         ///

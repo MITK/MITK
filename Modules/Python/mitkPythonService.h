@@ -43,6 +43,9 @@ namespace mitk
       /// \see IPythonService::ExecuteScript()
       void ExecuteScript(const std::string &pathToPythonScript);
       ///
+      /// \see IPythonService::PythonErrorOccured()
+      bool PythonErrorOccured() const;
+      ///
       /// \see IPythonService::GetVariableStack()
       std::vector<PythonVariable> GetVariableStack() const;
       ///

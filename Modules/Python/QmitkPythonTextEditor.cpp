@@ -40,6 +40,7 @@ struct QmitkPythonTextEditorData
 
   QGridLayout* m_Layout;
   mitk::IPythonService* m_PythonService;
+  mitk::ServiceReference m_PythonServiceRef;
 
   QString m_FileName;
 };
@@ -48,8 +49,8 @@ QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
   :QWidget(parent), d(new QmitkPythonTextEditorData)
 {
   mitk::ModuleContext* context = mitk::GetModuleContext();
-  mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
-  d->m_PythonService = context->GetService<mitk::IPythonService>(serviceRef);
+  d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
+  d->m_PythonService = context->GetService<mitk::IPythonService>( d->m_PythonServiceRef );
 
   d->m_LoadScript = new QAction(this);
   d->m_LoadScript->setToolTip("Load script from disk.");
@@ -94,6 +95,9 @@ QmitkPythonTextEditor::QmitkPythonTextEditor(QWidget *parent)
 
 QmitkPythonTextEditor::~QmitkPythonTextEditor()
 {
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  context->UngetService( d->m_PythonServiceRef );
+
   delete d;
 }
 

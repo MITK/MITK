@@ -27,62 +27,104 @@ const QString mitk::PythonService::m_TmpImageName("temp_mitk_image");
 mitk::PythonService::PythonService()
   : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true )
 {
+  {
+    MITK_DEBUG << "will init python if necessary";
+  }
+  bool pythonInitialized = static_cast<bool>( Py_IsInitialized() ); //m_PythonManager.isPythonInitialized() );
+  {
+    MITK_DEBUG << "pythonInitialized " << pythonInitialized;
+    MITK_DEBUG << "m_PythonManager.isPythonInitialized() " << m_PythonManager.isPythonInitialized();
+  }
+
+  // due to strange static var behaviour on windows Py_IsInitialized() returns correct value while
+  // m_PythonManager.isPythonInitialized() does not because it has been constructed and destructed again
   if( !m_PythonManager.isPythonInitialized() )
   {
-    //system("export LD_LIBRARY_PATH=/local/muellerm/mitk/bugsquashing/bin-debug/VTK-build/bin:$LD_LIBRARY_PATH");
-
-    MITK_DEBUG("PythonService") << "initialize python";
-    m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
-    m_PythonManager.initialize();
-
-    //m_PythonManager.executeString( "print sys.path", ctkAbstractPythonManager::SingleInput );
-    //MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
-
-    m_PythonManager.executeString( "sys.path.append('/usr/share/pyshared/numpy')", ctkAbstractPythonManager::SingleInput );
-    m_PythonManager.executeString( "import numpy", ctkAbstractPythonManager::SingleInput );
-
-    QString pythonCommand(PYTHONPATH_COMMAND);
-    MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
-    m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
-
-    MITK_DEBUG("mitk::PythonService") << "Trying to import ITK";
-    m_PythonManager.executeString( "import itk", ctkAbstractPythonManager::SingleInput );
-    m_ItkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-    MITK_DEBUG("mitk::PythonService") << "m_ItkWrappingAvailable: " << (m_ItkWrappingAvailable? "yes": "no");
-    if( !m_ItkWrappingAvailable )
+    try
     {
-      MITK_WARN << "ITK Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
-    }
+      if( pythonInitialized )
+        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut|PythonQt::PythonAlreadyInitialized);
+      else
+        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
 
-    MITK_DEBUG("mitk::PythonService") << "Trying to import OpenCv";
-    m_PythonManager.executeString( "import cv2", ctkAbstractPythonManager::SingleInput );
-    m_OpenCVWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-    MITK_DEBUG("mitk::PythonService") << "m_OpenCVWrappingAvailable: " << (m_OpenCVWrappingAvailable? "yes": "no");
-    if( !m_OpenCVWrappingAvailable )
+      MITK_DEBUG("PythonService") << "initalizing python";
+      m_PythonManager.initialize();
+
+      MITK_DEBUG("PythonService") << "python initalized";
+
+      QString pythonCommand(PYTHONPATH_COMMAND);
+      MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
+      m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
+
+      /*
+      //system("export LD_LIBRARY_PATH=/local/muellerm/mitk/bugsquashing/bin-debug/VTK-build/bin:$LD_LIBRARY_PATH");
+      //m_PythonManager.executeString( "print sys.path", ctkAbstractPythonManager::SingleInput );
+      //MITK_DEBUG("mitk::PythonService") << "result of 'sys.path': " << result.toString().toStdString();
+
+      //m_PythonManager.executeString( "sys.path.append('/usr/share/pyshared/numpy')", ctkAbstractPythonManager::SingleInput );
+      //m_PythonManager.executeString( "import numpy", ctkAbstractPythonManager::SingleInput );
+
+      MITK_DEBUG("mitk::PythonService") << "Trying to import ITK";
+      m_PythonManager.executeString( "import itk", ctkAbstractPythonManager::SingleInput );
+      m_ItkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+      MITK_DEBUG("mitk::PythonService") << "m_ItkWrappingAvailable: " << (m_ItkWrappingAvailable? "yes": "no");
+      if( !m_ItkWrappingAvailable )
+      {
+        MITK_WARN << "ITK Python wrapping not available. Please check build settings or PYTHONPATH settings.";
+      }
+
+      {
+        MITK_DEBUG("mitk::PythonService") << "Trying to import OpenCv";
+        PyRun_SimpleString("import cv2\n");
+        if (PyErr_Occurred())
+        {
+          PyErr_Print();
+        }
+        else
+          m_OpenCVWrappingAvailable = true;
+
+        //m_PythonManager.executeString( "import cv2", ctkAbstractPythonManager::SingleInput );
+        MITK_DEBUG("mitk::PythonService") << "Investigate if an error occured while importing cv2";
+        //m_OpenCVWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+        MITK_DEBUG("mitk::PythonService") << "m_OpenCVWrappingAvailable: " << (m_OpenCVWrappingAvailable? "yes": "no");
+        if( !m_OpenCVWrappingAvailable )
+        {
+          MITK_WARN << "OpenCV Python wrapping not available. Please check build settings or PYTHONPATH settings.";
+        }
+      }
+
+      MITK_DEBUG("mitk::PythonService") << "Trying to import VTK";
+      m_PythonManager.executeString( "import vtk", ctkAbstractPythonManager::SingleInput );
+      m_VtkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
+      MITK_DEBUG("mitk::PythonService") << "m_VtkWrappingAvailable: " << (m_VtkWrappingAvailable? "yes": "no");
+      if( !m_VtkWrappingAvailable )
+      {
+        MITK_WARN << "VTK Python wrapping not available. Please check build settings or PYTHONPATH settings.";
+      }
+      */
+    }
+    catch (...)
     {
-      MITK_WARN << "OpenCV Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
+      MITK_DEBUG("PythonService") << "exception initalizing python";
     }
-
-    MITK_DEBUG("mitk::PythonService") << "Trying to import VTK";
-    m_PythonManager.executeString( "import vtk", ctkAbstractPythonManager::SingleInput );
-    m_VtkWrappingAvailable = !m_PythonManager.pythonErrorOccured();
-    MITK_DEBUG("mitk::PythonService") << "m_VtkWrappingAvailable: " << (m_VtkWrappingAvailable? "yes": "no");
-    if( !m_VtkWrappingAvailable )
-    {
-      MITK_WARN << "VTK Python wrapping not available. Please check build settings or PYTHON_PATH settings.";
-    }
-
-    //m_PythonManager.executeString( "for path in sys.path:\n  print path\n", ctkAbstractPythonManager::SingleInput );
-    //m_PythonManager.executeString( "for k, v in os.environ.items():\n  print \"%s=%s\" % (k, v)", ctkAbstractPythonManager::SingleInput );
-    //m_PythonManager.executeFile("/local/muellerm/Dropbox/13-02-11-python-wrapping/interpreterInfo.py");
 
   }
+
+  //m_PythonManager.executeString( "for path in sys.path:\n  print path\n", ctkAbstractPythonManager::SingleInput );
+  //m_PythonManager.executeString( "for k, v in os.environ.items():\n  print \"%s=%s\" % (k, v)", ctkAbstractPythonManager::SingleInput );
+  //m_PythonManager.executeFile("/local/muellerm/Dropbox/13-02-11-python-wrapping/interpreterInfo.py");
   //std::string result = m_PythonManager.executeString( "5+5", ctkAbstractPythonManager::EvalInput );
   //MITK_DEBUG("mitk::PythonService") << "result of '5+5': " << result.toString().toStdString();
 }
 
 mitk::PythonService::~PythonService()
 {
+  //QVariant result = m_PythonManager.executeString( "sys.getrefcount(cv2)", ctkAbstractPythonManager::EvalInput );
+  //MITK_DEBUG("mitk::PythonService") << "sys.getrefcount(cv2): " << result.toString().toStdString();
+
+  //m_PythonManager.executeString( "del sys.modules[\"cv2\"]", ctkAbstractPythonManager::SingleInput );
+  //m_PythonManager.executeString( "del cv2", ctkAbstractPythonManager::SingleInput );
+  MITK_DEBUG("mitk::PythonService") << "destructing PythonService";
 }
 
 std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, int commandType)
@@ -312,7 +354,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
   QString command;
 
-  command.append( QString("%1 = cv.LoadImage(\"%2\")\n") .arg( varName ).arg( fileName ) );
+  command.append( QString("%1 = cv2.imread(\"%2\")\n") .arg( varName ).arg( fileName ) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
@@ -334,7 +376,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
 
   MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
 
-  command.append( QString( "cv.SaveImage(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
+  command.append( QString( "cv2.imwrite(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -435,17 +477,30 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
+  this->Execute( "import itk", IPythonService::SINGLE_LINE_COMMAND );
+  m_ItkWrappingAvailable = !this->PythonErrorOccured();
+
   return m_ItkWrappingAvailable;
 }
 
 bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 {
+  this->Execute( "import cv2", IPythonService::SINGLE_LINE_COMMAND );
+  m_OpenCVWrappingAvailable = !this->PythonErrorOccured();
+
   return m_OpenCVWrappingAvailable;
 }
 
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
+  this->Execute( "import vtk", IPythonService::SINGLE_LINE_COMMAND );
+  m_VtkWrappingAvailable = !this->PythonErrorOccured();
 
   return m_VtkWrappingAvailable;
+}
+
+bool mitk::PythonService::PythonErrorOccured() const
+{
+  return m_PythonManager.pythonErrorOccured();
 }
 

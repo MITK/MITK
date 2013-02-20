@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QModelIndex>
 #include "mitkIPythonService.h"
 #include "mitkPythonExports.h"
+#include <usServiceReference.h>
 
 ///
 /// implements a table model to show the variables of the Python "__main__" dictionary
@@ -56,6 +57,7 @@ public:
 private:
   std::vector<mitk::PythonVariable> m_VariableStack;
   mitk::IPythonService* m_PythonService;
+  mitk::ServiceReference m_PythonServiceRef;
 };
 
 #endif // QmitkPythonVariableStackTableModel_h

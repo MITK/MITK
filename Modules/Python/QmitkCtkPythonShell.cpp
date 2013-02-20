@@ -29,22 +29,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct QmitkCtkPythonShellData
 {
     mitk::PythonService* m_PythonService;
+    mitk::ServiceReference m_PythonServiceRef;
 };
 
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
     : ctkPythonConsole(parent), d( new QmitkCtkPythonShellData )
 {
-    mitk::ModuleContext* context = mitk::GetModuleContext();
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
-    d->m_PythonService = dynamic_cast<mitk::PythonService*> ( context->GetService<mitk::IPythonService>(serviceRef) );
+  MITK_DEBUG("QmitkCtkPythonShell") << "retrieving  IPythonService";
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
+  d->m_PythonService = dynamic_cast<mitk::PythonService*> ( context->GetService<mitk::IPythonService>(d->m_PythonServiceRef) );
 
-    assert( d->m_PythonService );
-    this->initialize( d->m_PythonService->GetPythonManager() );
+  MITK_DEBUG("QmitkCtkPythonShell") << "checking  IPythonService";
+  Q_ASSERT( d->m_PythonService );
+
+  MITK_DEBUG("QmitkCtkPythonShell") << "initialize  m_PythonService";
+  this->initialize( d->m_PythonService->GetPythonManager() );
+
+  MITK_DEBUG("QmitkCtkPythonShell") << "m_PythonService initialized";
 }
 
 QmitkCtkPythonShell::~QmitkCtkPythonShell()
 {
-    delete d;
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  context->UngetService( d->m_PythonServiceRef );
+  delete d;
 }
 
 void QmitkCtkPythonShell::dragEnterEvent(QDragEnterEvent *event)

@@ -34,26 +34,32 @@ namespace mitk
 
         void Load(mitk::ModuleContext* context)
         {
+          MITK_DEBUG << "PythonActivator::Load";
           // Registering PythonService as MicroService
           m_PythonService = itk::SmartPointer<mitk::PythonService>(new PythonService());
 
           ServiceProperties _PythonServiceProps;
           _PythonServiceProps["Name"] = std::string("PythonService");
 
-          context->RegisterService<mitk::IPythonService>(m_PythonService, _PythonServiceProps);
+          m_PythonServiceRegistration = context->RegisterService<mitk::IPythonService>(m_PythonService, _PythonServiceProps);
         }
 
         void Unload(mitk::ModuleContext* context)
         {
-          m_PythonService = 0;
+          MITK_DEBUG("PythonActivator") << "PythonActivator::Unload";
+          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
+          m_PythonServiceRegistration.Unregister();
+          m_PythonService->Delete();
+          MITK_DEBUG("PythonActivator") << "m_PythonService GetReferenceCount " << m_PythonService->GetReferenceCount();
         }
 
-        ~PythonActivator()
+        virtual ~PythonActivator()
         {
         }
 
     private:
         itk::SmartPointer<mitk::PythonService> m_PythonService;
+        ServiceRegistration m_PythonServiceRegistration;
     };
 }
 

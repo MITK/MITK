@@ -57,15 +57,19 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
 
     d->m_PythonSnippets = new QmitkPythonSnippets(snippetsFilePath);
 
+    MITK_DEBUG("QmitkPythonView") << "initializing varStackSnippetsTab";
     QTabWidget* varStackSnippetsTab = new QTabWidget;
     varStackSnippetsTab->addTab( d->m_PythonVariableStackTableView, "Variable Stack" );
     varStackSnippetsTab->addTab( d->m_PythonSnippets, "Snippets" );
     varStackSnippetsTab->setTabPosition( QTabWidget::South );
 
+    MITK_DEBUG("QmitkPythonView") << "initializing m_PythonShell";
     d->m_PythonShell = new QmitkCtkPythonShell;
 
+    MITK_DEBUG("QmitkPythonView") << "initializing m_TextEditor";
     d->m_TextEditor = new QmitkPythonTextEditor;
 
+    MITK_DEBUG("QmitkPythonView") << "initializing tabWidgetConsoleEditor";
     QTabWidget* tabWidgetConsoleEditor = new QTabWidget;
     tabWidgetConsoleEditor->addTab( d->m_PythonShell, "Console" );
     tabWidgetConsoleEditor->addTab( d->m_TextEditor, "Text Editor" );
@@ -83,6 +87,7 @@ void QmitkPythonView::CreateQtPartControl(QWidget* parent)
     layout->addWidget( splitter, 0, 0 );
     parent->setLayout(layout);
 
+    MITK_DEBUG("QmitkPythonView") << "creating connections for m_PythonSnippets";
     connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_PythonShell, SLOT(Paste(QString)) );
     connect( d->m_PythonSnippets, SIGNAL(PasteCommandRequested(QString)), d->m_TextEditor, SLOT(Paste(QString)) );
 }

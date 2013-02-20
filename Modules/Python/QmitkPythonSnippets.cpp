@@ -52,6 +52,12 @@ QmitkPythonSnippets::QmitkPythonSnippets( const QString& _AutoSaveFileName, QWid
 : QWidget(parent), d(new QmitkPythonSnippetsData)
 {
   d->m_SaveFileName = QDir::currentPath();
+  d->m_AutoSaveFileName = _AutoSaveFileName;
+
+  if( !this->LoadStringMap( d->m_AutoSaveFileName, d->m_Snippets ) )
+  {
+    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
+  }
 
   d->m_PasteSnippet = new QAction(this);
   d->m_PasteSnippet->setObjectName(QString::fromUtf8("PasteSnippet"));
@@ -133,13 +139,6 @@ QmitkPythonSnippets::QmitkPythonSnippets( const QString& _AutoSaveFileName, QWid
 
   this->setLayout(d->m_Layout);
   QMetaObject::connectSlotsByName(this);
-
-  d->m_AutoSaveFileName = _AutoSaveFileName;
-
-  if( !this->LoadStringMap( d->m_AutoSaveFileName, d->m_Snippets ) )
-  {
-    this->LoadStringMap( DEFAULT_SNIPPET_FILE, d->m_Snippets );
-  }
 
   this->Update();
 }
@@ -276,7 +275,9 @@ void QmitkPythonSnippets::on_Name_currentIndexChanged(int i)
   if( validSelection )
   {
     QString name = d->m_Name->currentText();
+    MITK_DEBUG("QmitkPythonSnippets") << "selected snippet " << name.toStdString();
     d->m_Content->setText( d->m_Snippets[name] );
+    MITK_DEBUG("QmitkPythonSnippets") << "selected snippet content " <<  d->m_Snippets[name].toStdString();
   }
 }
 
@@ -292,6 +293,11 @@ void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPyth
 
   QFile file(filename);
   file.open(QIODevice::WriteOnly);
+  if( !file.isOpen() )
+  {
+    MITK_WARN("QmitkPythonSnippets") << "could not open file " << filename.toStdString() << " for writing";
+    return;
+  }
   QXmlStreamWriter xmlWriter(&file);
 
   xmlWriter.setAutoFormatting(true);
@@ -301,19 +307,29 @@ void QmitkPythonSnippets::SaveStringMap(const QString &filename, const QmitkPyth
   QStringMap::const_iterator it = d->m_Snippets.begin();
   while( it != d->m_Snippets.end() )
   {
-    MITK_DEBUG("QmitkPythonSnippets") << "writing item " << it.key().toStdString();
+
+    {
+      MITK_DEBUG("QmitkPythonSnippets") << "SNIPPETS_XML_ELEMENT_NAME " << SNIPPETS_XML_ELEMENT_NAME.toStdString();
+      MITK_DEBUG("QmitkPythonSnippets") << "writing item " << it.key().toStdString();
+    }
+
     xmlWriter.writeStartElement(SNIPPETS_XML_ELEMENT_NAME);
 
     xmlWriter.writeAttribute( "key", it.key() );
     xmlWriter.writeAttribute( "value", it.value() );
 
+    xmlWriter.writeEndElement();
+
     ++it;
   }
 
-  xmlWriter.writeEndElement();
   xmlWriter.writeEndDocument();
   if( file.isOpen() )
     file.close();
+
+  {
+    MITK_DEBUG("QmitkPythonSnippets") << "SaveStringMap successful ";
+  }
 
 }
 
@@ -426,7 +442,9 @@ void QmitkPythonSnippets::on_Content_textChanged()
     QString name = d->m_Name->currentText();
     QString snippet = d->m_Content->toPlainText();
     d->m_Snippets[name] = snippet;
+
     this->SaveStringMap( d->m_AutoSaveFileName, d->m_Snippets );
+    MITK_DEBUG("QmitkPythonSnippets") << "SaveStringMap successful";
   }
 }
 

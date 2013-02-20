@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPythonVariableStackTableModel.h"
 #include <QMimeData>
 #include <mitkModuleContext.h>
-#include <usServiceReference.h>
 #include <mitkDataNode.h>
 #include <mitkGetModuleContext.h>
 #include <QStringList>
@@ -30,13 +29,15 @@ QmitkPythonVariableStackTableModel::QmitkPythonVariableStackTableModel(QObject *
     :QAbstractTableModel(parent)
 {
     mitk::ModuleContext* context = mitk::GetModuleContext();
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::IPythonService>();
-    m_PythonService = context->GetService<mitk::IPythonService>(serviceRef);
+    m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
+    m_PythonService = context->GetService<mitk::IPythonService>(m_PythonServiceRef);
     m_PythonService->AddPythonCommandObserver( this );
 }
 
 QmitkPythonVariableStackTableModel::~QmitkPythonVariableStackTableModel()
 {
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  context->UngetService( m_PythonServiceRef );
   m_PythonService->RemovePythonCommandObserver( this );
 }
 
@@ -74,7 +75,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
             QString varName = MITK_IMAGE_VAR_NAME;
             if( i > 0 )
               varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
-            MITK_DEBUG("varName") << "varName" << varName.toStdString();
+            MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
 
             bool exportAsCvImage = m_PythonService->IsOpenCvPythonWrappingAvailable();
 
@@ -107,10 +108,13 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
           else
           {
             mitk::Surface* surface = dynamic_cast<mitk::Surface*>(node->GetData());
+            MITK_DEBUG("QmitkPythonVariableStackTableModel") << "found surface";
 
             if( surface )
             {
               QString varName = MITK_SURFACE_VAR_NAME;
+              MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
+
               if( j > 0 )
                 varName = QString("%1%2").arg(MITK_SURFACE_VAR_NAME).arg(j);
               MITK_DEBUG("varName") << "varName" << varName;

@@ -2,10 +2,7 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Portal"/>
-    <tab type="pages" visible="no" title="" intro=""/>
-    <tab type="user" url="@ref Overview" title="Overview"/>
-    <tab type="user" url="@ref UserManual" title="User's guide"/>
-    <tab type="user" url="@ref DeveloperManual" title="Developer's guide"/>
+    <tab type="pages" visible="yes" title="" intro=""/>
     <tab type="usergroup" title="MITK API Documentation">
       <tab type="modules" visible="yes" title="Groups" intro="Here is a list of all groups:"/>
       <tab type="namespaces" visible="yes" title="">

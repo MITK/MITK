@@ -10,6 +10,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage IGTGeneralModulePage
   \li \subpage MitkOpenCL_Overview
   \li \subpage SimulationManualPage
+  \li \subpage GeneratingDeviceModulesPage
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 

@@ -29,7 +29,16 @@ namespace mitk {
 /** \brief Base class of all OpenGL-based mappers.
 *
 * Those must implement the abstract method Paint(BaseRenderer), which is called by
-* method MitkRender(...).
+* method MitkRender().
+* The Paint() method should be used to paint into a renderer via OpenGL-drawing commands.
+* The OpenGL context matrices (GL_MODELVIEWMATRIX/GL_PROJECTIONMATRIX) are preinitialized by
+* the mitkVtkPropRenderer so that the origin of the 2D-coordinate system of the 2D render
+* window is located in the lower left corner and has the width and height in display pixels
+* of the respective renderwindow. The x-axis is horizontally oriented, while the y-axis is
+* vertically oriented. The drawing commands are directly interpreted as display coordinates.
+* ApplyColorAndOpacity() can be used in the subclasses to apply color and opacity properties
+* read from the PropertyList.
+*
 * \ingroup Mapper
 */
 class MITK_CORE_EXPORT GLMapper : public Mapper

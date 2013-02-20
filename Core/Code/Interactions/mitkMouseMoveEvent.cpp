@@ -57,3 +57,8 @@ bool mitk::MouseMoveEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inter
   }
   return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates());
 }
+
+bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer()) != NULL) ;
+}

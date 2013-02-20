@@ -47,9 +47,11 @@ namespace mitk
     const Point2D GetPointerPositionOnScreen();
     const Point3D GetPositionInWorld();
 
+    virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
+
   protected:
     InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D mousePosition, const std::string eventClass);
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
     virtual ~InteractionPositionEvent();
 
 

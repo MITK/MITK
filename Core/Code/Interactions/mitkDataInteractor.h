@@ -64,8 +64,8 @@ namespace mitk
      */
     ProcessEventMode GetMode();
 
-    const NodeType GetDataNode();
-    int GetLayer();
+    NodeType GetDataNode() const;
+    int GetLayer() const;
 
   protected:
     DataInteractor();

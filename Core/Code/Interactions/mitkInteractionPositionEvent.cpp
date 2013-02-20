@@ -51,3 +51,8 @@ bool mitk::InteractionPositionEvent::MatchesTemplate(InteractionEvent::Pointer)
 mitk::InteractionPositionEvent::~InteractionPositionEvent()
 {
 }
+
+bool mitk::InteractionPositionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<InteractionPositionEvent*>(baseClass.GetPointer()) != NULL) ;
+}

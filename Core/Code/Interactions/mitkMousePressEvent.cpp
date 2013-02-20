@@ -73,3 +73,8 @@ bool mitk::MousePressEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inte
   return (this->GetEventButton() == mpe->GetEventButton() && this->GetModifiers() == mpe->GetModifiers()
       && this->GetButtonStates() == mpe->GetButtonStates());
 }
+
+bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<MousePressEvent*>(baseClass.GetPointer()) != NULL) ;
+}

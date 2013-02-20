@@ -70,10 +70,10 @@ namespace mitk
      * Returns a PropertyList that contains the properties set in the configuration file.
      * All properties are stored as strings.
      */
-    const PropertyList::Pointer GetAttributes();
+    PropertyList::Pointer GetAttributes() const;
 
     /**
-     * Checks if the config object has a definition for the given event. If it has the corresponding variant name is return, else
+     * Checks if the config object has a definition for the given event. If it has, the corresponding variant name is returned, else
      * an empty string is returned.
      * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
      * to configure them in a config file.

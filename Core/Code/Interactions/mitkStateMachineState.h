@@ -48,14 +48,14 @@ namespace mitk {
     /**
     * @brief Return Transition which matches given event description.
     **/
-    StateMachineTransition::Pointer GetTransition(std::string eventClass, std::string eventVariant);
+    StateMachineTransition::Pointer GetTransition(const std::string eventClass,const std::string eventVariant);
 
     /**
     * @brief Returns the name.
     **/
-    std::string GetName();
+    std::string GetName() const;
 
-    std::string GetMode();
+    std::string GetMode() const;
 
     /**
     * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions.

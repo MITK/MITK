@@ -42,6 +42,11 @@ mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
+bool mitk::InteractionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<InteractionEvent*>(baseClass.GetPointer()) != NULL) ;
+}
+
 std::string mitk::InteractionEvent::GetEventClass() const
 {
   return m_EventClass;

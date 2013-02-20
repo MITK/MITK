@@ -49,6 +49,7 @@ namespace mitk
     DataInteractor* GetTargetInteractor();
 
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
   protected:
     InternalEvent(BaseRenderer*, DataInteractor* destInteractor, const std::string signalName);

@@ -150,7 +150,7 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
   return std::string();
 }
 
-const mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes()
+mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
 {
   return m_PropertyList;
 }

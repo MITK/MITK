@@ -48,3 +48,8 @@ mitk::DataInteractor* mitk::InternalEvent::GetTargetInteractor()
 {
   return m_DataInteractor.GetPointer();
 }
+
+bool mitk::InternalEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (NULL != dynamic_cast<InternalEvent*>(baseClass.GetPointer()) );
+}

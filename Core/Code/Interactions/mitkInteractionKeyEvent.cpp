@@ -45,3 +45,8 @@ bool mitk::InteractionKeyEvent::MatchesTemplate(mitk::InteractionEvent::Pointer 
   }
   return (this->GetModifiers() == keyEvent->GetModifiers() && this->GetKey() == keyEvent->GetKey());
 }
+
+bool mitk::InteractionKeyEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<InteractionKeyEvent*>(baseClass.GetPointer()) != NULL) ;
+}

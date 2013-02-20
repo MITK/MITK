@@ -24,7 +24,7 @@ mitk::DataInteractor::DataInteractor()
 {
 }
 
-const mitk::DataNode::Pointer mitk::DataInteractor::GetDataNode()
+mitk::DataInteractor::NodeType mitk::DataInteractor::GetDataNode() const
 {
   return m_DataNode;
 }
@@ -50,7 +50,7 @@ void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
   DataNodeChanged();
 }
 
-int mitk::DataInteractor::GetLayer()
+int mitk::DataInteractor::GetLayer() const
 {
   int layer = -1;
   if (m_DataNode.IsNotNull())

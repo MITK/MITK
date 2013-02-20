@@ -76,3 +76,8 @@ bool mitk::MouseReleaseEvent::MatchesTemplate(mitk::InteractionEvent::Pointer in
 
   );
 }
+
+bool mitk::MouseReleaseEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer()) != NULL) ;
+}

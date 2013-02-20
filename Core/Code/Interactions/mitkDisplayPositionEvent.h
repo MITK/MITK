@@ -57,7 +57,7 @@ public:
 
   void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
 
-  const Point3D& GetWorldPosition() const;
+  Point3D& GetWorldPosition() const;
 
   /** Returns node with object at the current position (NULL if not applicable) */
   mitk::DataNode *GetPickedObjectNode() const;

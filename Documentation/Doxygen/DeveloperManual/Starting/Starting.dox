@@ -11,8 +11,7 @@ This Introduction will acquaint you with the most important workflows to get you
     <li> \ref SupportedPlatformsPage </li>
     <li> \ref BuildInstructionsPage </li>
     <li> \ref thirdpartylibs </li>
-	<li> \ref HowToNewProject </li>
-	<li> \ref Testing </li>
+	  <li> \ref HowToNewProject </li>
   </ul>
   <li> \subpage GettingToKnowMITK </li>
   <ul>
@@ -30,7 +29,7 @@ This Introduction will acquaint you with the most important workflows to get you
     <li> \ref NewModulePage</li>
     <li> \ref StatemachineEditor </li>
   </ul>
-  <li> \subpage Testing </li>
+  <li> \subpage AboutTestingPage </li>
 </ul>
 
 

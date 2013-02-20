@@ -14,9 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkImageToSurfaceFilter.h>
-
+#include "mitkException.h"
 #include <vtkImageData.h>
 #include <vtkDecimatePro.h>
 #include <vtkImageChangeInformation.h>
@@ -168,6 +167,9 @@ void mitk::ImageToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image        =  (mitk::Image*)GetInput();
+  if(image == NULL || !image->IsInitialized())
+    mitkThrow() << "No input image set, please set an valid input image!";
+
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
   int tstart=outputRegion.GetIndex(3);

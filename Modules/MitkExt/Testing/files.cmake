@@ -15,7 +15,6 @@ set(MODULE_TESTS
   mitkUnstructuredGridTest.cpp
   mitkSimpleHistogramTest.cpp
   mitkToolManagerTest.cpp
-  mitkImageToSurfaceFilterTest.cpp
 )
 set(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
@@ -26,6 +25,7 @@ set(MODULE_IMAGE_TESTS
 )
 set(MODULE_CUSTOM_TESTS
   mitkLabeledImageToSurfaceFilterTest.cpp
+  mitkImageToSurfaceFilterTest.cpp
 )
 set(MODULE_TESTIMAGES
   US4DCyl.nrrd

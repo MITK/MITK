@@ -24,7 +24,6 @@
 #include "QmitkRenderWindowMenu.h"
 
 #include "mitkInteractionEventConst.h"
-#include <string.h>
 
 
 class QmitkStdMultiWidget;

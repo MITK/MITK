@@ -17,20 +17,21 @@
 #ifndef mitkDispatcher_h
 #define mitkDispatcher_h
 
-#include "itkObject.h"
+#include "itkLightObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkDataInteractor.h"
 #include <MitkExports.h>
 #include <list>
+#include "mitkServiceTracker.h"
 
 
 namespace mitk
 {
   class InternalEvent;
   class InteractionEvent;
-  class InformerService;
+  class InteractionEventObserver;
 
   /**
   * \class Dispatcher
@@ -43,11 +44,11 @@ namespace mitk
   * \ingroup Interaction
   */
 
-  class MITK_CORE_EXPORT Dispatcher: public itk::Object
+  class MITK_CORE_EXPORT Dispatcher: public itk::LightObject
   {
 
   public:
-    mitkClassMacro(Dispatcher, itk::Object);
+    mitkClassMacro(Dispatcher, itk::LightObject);
     itkNewMacro(Self);
 
     typedef std::list<DataInteractor::Pointer> ListInteractorType;
@@ -62,13 +63,14 @@ namespace mitk
 
     /**
      * Adds an Event to the Dispatchers EventQueue, these events will be processed after a a regular posted event has been fully handled.
-     * This allows Interactors to post their own events without interrupting regular Dispatching workflow.
-     * NOTES: 1) If an event is added from an other source than an Interactor / Listener its execution will be delayed until the next regular event
-     * comes in.
-     * 2) Make sure you're not causing infinite loops!
+     * This allows DataInteractors to post their own events without interrupting regular Dispatching workflow.
+     * It is important to note that the queued events will be processed AFTER the state change of a current transition (which queued the events)
+     * is performed.
      *
+     * \note 1) If an event is added from an other source than an DataInteractor / Observer its execution will be delayed until the next regular event
+     * comes in.
+     * \note 2) Make sure you're not causing infinite loops!
      */
-
     void QueueEvent(InteractionEvent* event);
 
     /**
@@ -119,9 +121,9 @@ namespace mitk
     bool HandleInternalEvent(InternalEvent* internalEvent);
 
     /**
-     * Hold microservice reference to object that takes care of informing the EventObservers about InteractionEvents
+     * Hold microservice reference to object that takes care of informing the InteractionEventObservers about InteractionEvents
      */
-    InformerService* m_InformerService;
+    mitk::ServiceTracker<InteractionEventObserver*> m_EventObserverTracker;
 
   };
 

@@ -16,11 +16,11 @@
 
 #include "mitkMouseWheelEvent.h"
 
-mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer = NULL,
-    Point2D mousePosition = NULL,
-    MouseButtons buttonStates = NoButton,
-    ModifierKeys modifiers = NoKey,
-    int wheelDelta = 0)
+mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer,
+    Point2D mousePosition,
+    MouseButtons buttonStates,
+    ModifierKeys modifiers,
+    int wheelDelta)
 : InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent")
 , m_WheelDelta(wheelDelta)
 , m_ButtonStates(buttonStates)

@@ -216,12 +216,10 @@ set(CPP_FILES
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventFactory.cpp
-  Interactions/mitkEventHandler.cpp
-  Interactions/mitkEventObserver.cpp
+  Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkEventMapper.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
-  Interactions/mitkInformer.cpp
   Interactions/mitkInteractor.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp
@@ -243,7 +241,6 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
-#  Interactions/mitkStatedEventObserver.cpp
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
@@ -254,6 +251,9 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
+
+  Interfaces/mitkInteractionEventObserver.cpp
+
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp

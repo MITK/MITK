@@ -30,22 +30,24 @@
 namespace mitk
 {
 
-  class MITK_CORE_EXPORT MousePressEvent : public InteractionPositionEvent {
+  class MITK_CORE_EXPORT MousePressEvent: public InteractionPositionEvent
+  {
 
   public:
-    mitkClassMacro(MousePressEvent,InteractionPositionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, MouseButtons);
+    mitkClassMacro(MousePressEvent,InteractionPositionEvent)
+    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D , MouseButtons , ModifierKeys, MouseButtons)
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
-    MouseButtons GetEventButton() const ;
-    void SetEventButton(MouseButtons buttons)  ;
+    MouseButtons GetEventButton() const;
+    void SetEventButton(MouseButtons buttons);
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
 
   protected:
-    MousePressEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers, MouseButtons eventButton);
+    MousePressEvent(BaseRenderer*, const Point2D = Point2D(), mitk::MouseButtons buttonStates = NoButton, mitk::ModifierKeys modifiers =
+        NoKey, mitk::MouseButtons eventButton = NoButton);
     virtual ~MousePressEvent();
 
   private:

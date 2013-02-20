@@ -36,6 +36,8 @@ namespace mitk {
  * mitk::DataNode corresponding to the picked object in the (3D) scene can
  * be retrieved.
  * \ingroup Interaction
+ * \deprecatedSince{2013_03} mitk::DisplayPositionEvent is deprecated. Use mitk::InteractionPositionEvent instead.
+ * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
  */
 class MITK_CORE_EXPORT DisplayPositionEvent : public Event
 {

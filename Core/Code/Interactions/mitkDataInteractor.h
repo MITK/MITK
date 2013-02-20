@@ -17,7 +17,6 @@
 #ifndef MITKEVENTINTERACTOR_H_
 #define MITKEVENTINTERACTOR_H_
 
-#include "itkObject.h"
 #include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
@@ -52,8 +51,8 @@ namespace mitk
 
   public:
     typedef itk::SmartPointer<DataNode> NodeType;
-    mitkClassMacro(DataInteractor, EventStateMachine);
-    itkNewMacro(Self);
+    mitkClassMacro(DataInteractor, EventStateMachine)
+    itkNewMacro(Self)
 
     /**
      * Set/Change the DataNode of the DataInteractor
@@ -61,16 +60,11 @@ namespace mitk
     void SetDataNode(NodeType);
 
     /**
-     * Sets the maximum distance that is accepted when looking for a point at a certain position using the GetPointIndexByPosition function.
-     */
-    void SetAccuracy(float accuracy);
-
-    /**
      * @brief Returns the mode the DataInteractor currently is in. See in mitkDispatcher the description of m_ProcessingMode for further details.
      */
     ProcessEventMode GetMode();
 
-    NodeType GetDataNode();
+    const NodeType GetDataNode();
     int GetLayer();
 
   protected:
@@ -90,36 +84,16 @@ namespace mitk
      */
     virtual void ConnectActionsAndFunctions();
 
-    /**
-     * @ brief Return index in PointSet of the point that is within given accuracy to the provided position.
-     *
-     * Assumes that the DataNode contains a PointSet, if so it iterates over all points
-     * in the DataNode to check if it contains a point near the pointer position.
-     * If a point is found its index-position is returned, else -1 is returned.
-     */
-    virtual int GetPointIndexByPosition(Point3D position, int time = 0);
-
     /** \brief Is called when a DataNode is initially set or changed
      *  To be implemented by sub-classes for initialization code which require a DataNode.
      *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest Layer,
      *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
      *  \note Is also called when the DataNode is set to NULL.
-     *
      */
     virtual void DataNodeChanged();
 
-    /** \brief Is called when a DataNode is initially set or changed
-     *
-     *  To be implemented by sub-classes for initialization code which require a DataNode.
-     *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest Layer,
-     *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
-     *  \note Is also called when the DataNode is set to NULL.
-     *
-     */
-
   private:
     NodeType m_DataNode;
-    float m_SelectionAccuracy;
   };
 
 } /* namespace mitk */

@@ -43,15 +43,15 @@ namespace mitk
 
   public:
     mitkClassMacro(InternalEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, DataInteractor*, std::string);
+    mitkNewMacro3Param(Self, BaseRenderer*, DataInteractor*, const std::string);
 
-    std::string GetSignalName();
+    const std::string GetSignalName();
     DataInteractor* GetTargetInteractor();
 
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
 
   protected:
-    InternalEvent(BaseRenderer*, DataInteractor* destInteractor, std::string signalName);
+    InternalEvent(BaseRenderer*, DataInteractor* destInteractor, const std::string signalName);
     virtual ~InternalEvent();
 
   private:

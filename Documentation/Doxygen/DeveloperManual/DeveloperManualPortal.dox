@@ -1,0 +1,33 @@
+/**
+\page DeveloperManualPortal MITK: Developer Manual
+
+Development with MITK can happen under several disctinct conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you. In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink. An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
+
+Depending on whether you are working with the \link DevelopmentToolkit Toolkit\endlink or the \link DevelopmentApplication Application\endlink, you can refer to their respective pages. Generated API-Documentation can be found \link DevelopmentAPI here\endlink.
+
+\section DeveloperManualStarting Starting your MITK Development
+
+<ul>
+  <li> \subpage StartingDevelopment </li>
+  <ul>
+    <li> \ref Architecture </li>
+    <li> \ref SettingUpMITK </li>
+    <li> \ref GettingToKnowMITK </li>
+	  <li> \ref FirstSteps </li>
+	  <li> \ref AboutTestingPage </li>
+  </ul>
+  <li> \subpage DevelopmentToolkit </li>
+  <ul>
+  <li> \ref Concepts </li>
+  <li> \ref MITKModuleManualsListPage </li>
+  </ul>
+  <li> \subpage DevelopmentApplication </li>
+  <ul>
+    <li> \ref mitkExtPointsIndex </li>
+    <li> \ref DeploymentPage </li>
+    <li> \ref BlueBerryExamples </li>
+    <li> \ref BlueBerryIntro </li>
+  </ul>
+</ul>
+
+*/

@@ -27,4 +27,3 @@ These interfaces are meant to be implemented by MITK module developers to enhanc
 aspects of the MITK toolkit. All implementations must be registered in the implementing module's
 \e activator (see mitk::ModuleActivator) using the module's mitk::ModuleContext instance.
 */
-

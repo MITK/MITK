@@ -35,7 +35,7 @@ The rendering process could be further simplified by making the DataTree automat
 
 \section implementationManagerVisualizationRenderer Platform-Specific Implementation
 
-MITK tries to integrate seamlessly into the normal VTK rendering pipeline. The whole MITK data(tree) is capsuled into one customized vtkProp, the so-called vtkMitkRenderProp which is then integrated into VTK pipeline. 
+MITK tries to integrate seamlessly into the normal VTK rendering pipeline. The whole MITK data(tree) is capsuled into one customized vtkProp, the so-called vtkMitkRenderProp which is then integrated into VTK pipeline.
 
 The VTK integration into GUI systems, like e.g. QT, is therefore equal to normal VTK usage. As an example, the MITK MainApp requires the QT-VTK widget (provided by VTK) for integration of renderWindows into GUI.
 Further information on this can be found in section "Related Pages" "Rendering in MITK by means of the QT-VTK widget".

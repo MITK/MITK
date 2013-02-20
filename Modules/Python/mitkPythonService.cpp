@@ -183,6 +183,7 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::
   QString varName = QString::fromStdString( stdvarName );
     // save image
     QString fileName = this->GetTempImageName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
+    fileName = QDir::fromNativeSeparators( fileName );
 
     MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
     if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
@@ -256,6 +257,7 @@ mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const std::stri
     mitk::Image::Pointer mitkImage;
     QString command;
     QString fileName = GetTempImageName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
+    fileName = QDir::fromNativeSeparators( fileName );
 
     MITK_DEBUG("PythonService") << "Saving temporary file with python itk code " << fileName.toStdString();
 
@@ -300,6 +302,7 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
   // try to save mitk image
   QString fileName = this->GetTempImageName( ".bmp" );
+  fileName = QDir::fromNativeSeparators( fileName );
   MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
   if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
   {
@@ -327,6 +330,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   mitk::Image::Pointer mitkImage;
   QString command;
   QString fileName = GetTempImageName( ".bmp" );
+  fileName = QDir::fromNativeSeparators( fileName );
 
   MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
 
@@ -367,6 +371,7 @@ mitk::Surface::Pointer mitk::PythonService::CopyVtkPolyDataFromPython( const std
 
   QString command;
   QString fileName = GetTempImageName( ".stl" );
+  fileName = QDir::fromNativeSeparators( fileName );
 
   MITK_DEBUG("PythonService") << "run python command to save polydata with vtk to " << fileName.toStdString();
   command = QString (
@@ -405,6 +410,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
   // try to save mitk image
   QString fileName = this->GetTempImageName( ".stl" );
+  fileName = QDir::fromNativeSeparators( fileName );
   MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
   if( !mitk::IOUtil::SaveSurface( surface, fileName.toStdString() ) )
   {

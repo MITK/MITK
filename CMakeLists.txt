@@ -153,6 +153,9 @@ option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
+if(MITK_USE_Python)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Cmake/PackageDepends/MITK_PythonLibs_Config.cmake")
+endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CTK

@@ -61,10 +61,10 @@ QtLogView::QtLogView(QWidget *parent)
   filterModel->setSourceModel(model);
   filterModel->setFilterKeyColumn(-1);
 
-#ifndef _APPLE_
-  QFont newFont = ui.tableView->font();
-  newFont.setPointSize(11);
-  ui.tableView->setFont(newFont);
+#ifdef __APPLE__
+  QFont fnt = ui.tableView->font();
+  fnt.setPointSize(11);
+  ui.tableView->setFont(fnt);
 #endif
   ui.tableView->setModel(filterModel);
   ui.tableView->verticalHeader()->setVisible(false);

@@ -52,7 +52,6 @@ QtLogView::QtLogView(QWidget *parent)
   prefs->PutBool("ShowCategory", true);
   bool showAdvancedFields = false;
 
-
   ui.setupUi(this);
 
   model = QtLogPlugin::GetInstance()->GetLogModel();
@@ -62,8 +61,12 @@ QtLogView::QtLogView(QWidget *parent)
   filterModel->setSourceModel(model);
   filterModel->setFilterKeyColumn(-1);
 
+#ifndef _APPLE_
+  QFont newFont = ui.tableView->font();
+  newFont.setPointSize(11);
+  ui.tableView->setFont(newFont);
+#endif
   ui.tableView->setModel(filterModel);
-
   ui.tableView->verticalHeader()->setVisible(false);
   ui.tableView->horizontalHeader()->setStretchLastSection(true);
 

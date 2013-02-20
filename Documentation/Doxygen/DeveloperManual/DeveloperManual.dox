@@ -16,8 +16,9 @@ Depending on whether you are working with the \link DevelopmentToolkit Toolkit\e
 	<li> \ref FirstSteps </li>
 	<li> \ref Testing </li>
   </ul>
-  <li> \ref DevelopmentToolkit </li>
-  <li> \ref DevelopmentApplication </li>
+  <ul>
+    <li> \ref DevelopmentToolkit </li>
+    <li> \ref DevelopmentApplication </li>
   <ul>
     <li> \ref mitkExtPointsIndex </li>
     <li> \ref DeploymentPage </li>

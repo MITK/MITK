@@ -41,6 +41,7 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_NumberOfRepetitions(1)
     , m_EnforcePureFiberVoxels(true)
     , m_InterpolationShrink(5)
+    , m_FiberRadius(10)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -321,6 +322,7 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // resample fiber bundle for sufficient voxel coverage
+    double segmentVolume = 1;
     float minSpacing = 1;
     if(m_UpsampledSpacing[0]<m_UpsampledSpacing[1] && m_UpsampledSpacing[0]<m_UpsampledSpacing[2])
         minSpacing = m_UpsampledSpacing[0];
@@ -328,12 +330,10 @@ void TractsToDWIImageFilter::GenerateData()
         minSpacing = m_UpsampledSpacing[1];
     else
         minSpacing = m_UpsampledSpacing[2];
-    FiberBundleType fiberBundle = m_FiberBundle;
-    if (m_FiberBundle->GetFiberSampling()<=0 || 10/m_FiberBundle->GetFiberSampling()>minSpacing*0.5/m_VolumeAccuracy)
-    {
-        fiberBundle = m_FiberBundle->GetDeepCopy();
-        fiberBundle->ResampleFibers(minSpacing/m_VolumeAccuracy);
-    }
+    FiberBundleType fiberBundle = m_FiberBundle->GetDeepCopy();
+    fiberBundle->ResampleFibers(minSpacing/m_VolumeAccuracy);
+    double mmRadius = m_FiberRadius/1000;
+    segmentVolume = M_PI*mmRadius*mmRadius*minSpacing/m_VolumeAccuracy;
 
     // generate double images to wokr with because we don't want to lose precision
     // we use a separate image for each compartment model
@@ -389,7 +389,6 @@ void TractsToDWIImageFilter::GenerateData()
         vLines->InitTraversal();
 
         MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
-        double maxFiberDensity = 0;
         boost::progress_display disp(numFibers);
         for( int i=0; i<numFibers; i++ )
         {
@@ -467,11 +466,7 @@ void TractsToDWIImageFilter::GenerateData()
                             {
                                 DoubleDwiType::Pointer doubleDwi = compartments.at(k);
                                 m_FiberModels[k]->SetFiberDirection(dir);
-                                doubleDwi->SetPixel(newIdx, doubleDwi->GetPixel(newIdx) + frac*m_FiberModels[k]->SimulateMeasurement());
-
-                                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(newIdx);
-                                if (pix[baselineIndex]>maxFiberDensity)
-                                    maxFiberDensity = pix[baselineIndex];
+                                doubleDwi->SetPixel(newIdx, doubleDwi->GetPixel(newIdx) + segmentVolume*frac*m_FiberModels[k]->SimulateMeasurement());
                             }
                         }
                     }
@@ -498,6 +493,7 @@ void TractsToDWIImageFilter::GenerateData()
         MITK_INFO << "Adjusting compartment signal intensities according to volume fraction";
         ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
         boost::progress_display disp3(m_TissueMask->GetLargestPossibleRegion().GetNumberOfPixels());
+        double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
         while(!it3.IsAtEnd())
         {
             ++disp3;
@@ -505,19 +501,23 @@ void TractsToDWIImageFilter::GenerateData()
 
             if (it3.Get()>0)
             {
-                // compartment weights are calculated according to fiber density
-                double w = compartments.at(0)->GetPixel(index)[baselineIndex]/maxFiberDensity;
-                if (m_EnforcePureFiberVoxels && w>0)
-                    w = 1;
+                double w = compartments.at(0)->GetPixel(index)[baselineIndex]; // fiber volume
+                double overflowCorrection = 1;
+                if (w>voxelVolume)  // more fiber than space in voxel?
+                    overflowCorrection = voxelVolume/w;
+
+                w = voxelVolume-w;
+                if (w<0)
+                {
+
+                    w = 0;
+                }
 
                 // adjust fiber signal
                 for (int i=0; i<m_FiberModels.size(); i++)
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i);
-                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    if (pix[baselineIndex]>0)
-                        pix /= pix[baselineIndex];
-                    pix *= w/m_FiberModels.size();
+                    DoubleDwiType::PixelType pix = overflowCorrection*doubleDwi->GetPixel(index)/m_FiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }
 
@@ -526,12 +526,9 @@ void TractsToDWIImageFilter::GenerateData()
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    if (pix[baselineIndex]>0)
-                        pix /= pix[baselineIndex];
-                    pix *= (1-w)/m_NonFiberModels.size();
+                    pix *= w/m_NonFiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }
-
             }
             ++it3;
         }

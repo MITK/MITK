@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFFTRealToComplexConjugateImageFilter.h>
 #include <itkFFTComplexConjugateToRealImageFilter.h>
 
+#include <cmath>
+
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
 namespace itk
@@ -64,6 +66,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( FiberRadius, double )
     itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
@@ -116,6 +119,7 @@ protected:
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;
+    double                              m_FiberRadius;
 };
 }
 

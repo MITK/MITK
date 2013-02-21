@@ -70,6 +70,12 @@
    </item>
    <item>
     <widget class="QLabel" name="lblSegmentationWarnings">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="palette">
       <palette>
        <active>
@@ -295,8 +301,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>44</height>
+        <width>222</width>
+        <height>323</height>
        </rect>
       </property>
       <attribute name="label">
@@ -349,8 +355,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>44</height>
+        <width>222</width>
+        <height>323</height>
        </rect>
       </property>
       <attribute name="label">
@@ -404,7 +410,7 @@
         <x>0</x>
         <y>0</y>
         <width>273</width>
-        <height>116</height>
+        <height>308</height>
        </rect>
       </property>
       <attribute name="label">

@@ -71,7 +71,7 @@ void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>& points, fl
 
   unsigned int numPoints = points.size();
 
-  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer<::vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -122,7 +122,7 @@ void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, con
 
   unsigned int numPoints = points.size();
 
-  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer<::vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
@@ -165,7 +165,7 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   unsigned int numPoints = points.size();
 
-  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer<::vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
@@ -213,7 +213,7 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
   unsigned int numPoints = points.size();
   unsigned int numNormals = numPoints / 3;
 
-  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer<::vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
@@ -265,7 +265,7 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   unsigned int numPoints = points.size();
 
-  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer<::vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)

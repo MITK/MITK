@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <cv.h>
 
+#include <vtkSmartPointer.h>
+#include <vtkIdList.h>
+
 namespace mitk
 {
   /**
@@ -56,6 +59,9 @@ namespace mitk
     itkSetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
     itkGetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
     itkSetMacro(TextureIndex,int);
+
+    itkSetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
+    itkGetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
 
 
     /**
@@ -158,6 +164,9 @@ namespace mitk
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
 
     ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
+
+    vtkSmartPointer<vtkIdList> m_VertexIdList; ///< Make a vtkIdList to save the ID's of the polyData corresponding to the image pixel ID's. This can be accessed after generate data to obtain the mapping.
+
   };
 } //END mitk namespace
 #endif

@@ -74,6 +74,7 @@ set(H_FILES
   Algorithms/Reconstruction/itkPointShell.h
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
+  Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h

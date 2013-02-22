@@ -21,6 +21,7 @@
 #include "mitkVtkPropRenderer.h"
 #include "mitkTestingMacros.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkDispatcher.h"
 
 int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
 {

@@ -521,7 +521,7 @@ bool mitk::LiveWireTool2D::OnLastSegmentDelete( Action* action, const StateEvent
 
 
     mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
-    newContour->Expand(m_Contour->GetTimeSteps()+1);
+    newContour->Expand(m_Contour->GetTimeSteps());
 
     mitk::ContourModel::VertexIterator begin = m_Contour->IteratorBegin();
 

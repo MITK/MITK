@@ -584,7 +584,12 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   double gradientMagnitude = 0.0;
   double maxGradientMagnitude = 0.0;
 
-    //maximum value in each direction for size
+  /*
+    the size and thus the region of 7x7 is only used to calculate the gradient magnitude in that region
+    not for searching the maximum value
+    */
+
+  //maximum value in each direction for size
   typename InputImageType::SizeType size;
   size[0] = 7;
   size[1] = 7;
@@ -622,11 +627,11 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   currentIndex[1] = 0;
 
   // search max (approximate) gradient magnitude
-  for( int x = -2; x <= 2; ++x)
+  for( int x = -1; x <= 1; ++x)
   {
     currentIndex[0] = index[0] + x;
 
-    for( int y = -2; y <= 2; ++y)
+    for( int y = -1; y <= 1; ++y)
     {
       currentIndex[1] = index[1] + y;
 

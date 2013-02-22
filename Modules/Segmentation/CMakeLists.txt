@@ -4,7 +4,7 @@
 
 MITK_CREATE_MODULE( Segmentation
                INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering
-               DEPENDS Mitk ipSegmentation mitkIpFunc MitkExt 
+               DEPENDS Mitk ipSegmentation mitkIpFunc MitkExt MitkGraphAlgorithms
 )
 
 add_subdirectory(Testing)

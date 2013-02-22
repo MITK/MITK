@@ -35,12 +35,13 @@ namespace mitk
   * that continuously grabs images from the controller. A buffer structure buffers the last acquired images
   * to provide the image data loss-less.
   *
+  * \throws mitkException In case of no connection, an exception is thrown!
+  *
   * @ingroup ToFHardware
   */
   class MITK_KINECTMODULE_EXPORT KinectDevice : public ToFCameraDevice
   {
   public:
-
 
     mitkClassMacro( KinectDevice , ToFCameraDevice );
 
@@ -48,6 +49,7 @@ namespace mitk
 
     /*!
     \brief opens a connection to the ToF camera
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual bool OnConnectCamera();
     /*!
@@ -57,6 +59,7 @@ namespace mitk
     /*!
     \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual void StartCamera();
     /*!
@@ -65,6 +68,7 @@ namespace mitk
     virtual void StopCamera();
     /*!
     \brief updates the camera for image acquisition
+    \throws mitkException In case of no connection, an exception is thrown!
     */
     virtual void UpdateCamera();
     /*!

@@ -111,7 +111,7 @@ void OclResourceServiceImpl::InsertProgram(cl_program _program_in, std::string n
     if( forceOverride )
     {
       // overwrite old instance
-      m_ProgramStorage.at(name) = _program_in;
+      m_ProgramStorage[name] = _program_in;
       overrideMsg +=" The old program was overwritten!";
     }
 

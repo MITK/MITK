@@ -24,9 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkChangeInformationImageFilter.h>
 #include <itkExtractImageFilter.h>
-
+#include <itkMinimumMaximumImageCalculator.h>
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
+#include <itkMaskImageFilter.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -43,6 +44,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
+
+#include <itkImageFileWriter.h>
+#include <itkRescaleIntensityImageFilter.h>
 
 #include <list>
 
@@ -726,23 +730,25 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     this->UnmaskedStatisticsProgressUpdate();
   }
 
-
-
   // Calculate statistics (separate filter)
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
-  unsigned long observerTag = statisticsFilter->AddObserver(
-    itk::ProgressEvent(), progressListener );
-
+  unsigned long observerTag = statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
   statisticsFilter->Update();
-
   statisticsFilter->RemoveObserver( observerTag );
-
-
   this->InvokeEvent( itk::EndEvent() );
 
-  Statistics statistics;
+  // Calculate minimum and maximum
+  typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
+  typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+  minMaxFilter->SetImage( image );
+  unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
+  minMaxFilter->Compute();
+  minMaxFilter->RemoveObserver( observerTag2 );
+  this->InvokeEvent( itk::EndEvent() );
+
+  Statistics statistics; statistics.Reset();
   statistics.Label = 1;
   statistics.N = image->GetBufferedRegion().GetNumberOfPixels();
   statistics.Min = statisticsFilter->GetMinimum();
@@ -750,8 +756,15 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statistics.Mean = statisticsFilter->GetMean();
   statistics.Median = 0.0;
   statistics.Sigma = statisticsFilter->GetSigma();
-  statistics.RMS = sqrt( statistics.Mean * statistics.Mean
-    + statistics.Sigma * statistics.Sigma );
+  statistics.RMS = sqrt( statistics.Mean * statistics.Mean + statistics.Sigma * statistics.Sigma );
+
+  statistics.MinIndex.set_size(image->GetImageDimension());
+  statistics.MaxIndex.set_size(image->GetImageDimension());
+  for (int i=0; i<statistics.MaxIndex.size(); i++)
+  {
+      statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
+      statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+  }
 
   statisticsContainer->push_back( statistics );
 
@@ -945,24 +958,17 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   unsigned long observerTag = labelStatisticsFilter->AddObserver(
     itk::ProgressEvent(), progressListener );
 
-
   // Execute filter
   this->InvokeEvent( itk::StartEvent() );
-
 
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
   labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
-
   // Execute the filter
   labelStatisticsFilter->Update();
-
   this->InvokeEvent( itk::EndEvent() );
-
   labelStatisticsFilter->RemoveObserver( observerTag );
-
-
 
   // Find all relevant labels of mask (other than 0)
   std::list< int > relevantLabels;
@@ -976,8 +982,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       maskNonEmpty = true;
     }
   }
-
-
   if ( maskNonEmpty )
   {
     std::list< int >::iterator it;
@@ -997,6 +1001,31 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
       statistics.Sigma = labelStatisticsFilter->GetSigma( *it );
       statistics.RMS = sqrt( statistics.Mean * statistics.Mean
         + statistics.Sigma * statistics.Sigma );
+
+      // restrict image to mask area for min/max index calculation
+      typedef itk::MaskImageFilter< ImageType, MaskImageType, ImageType > MaskImageFilterType;
+      typename MaskImageFilterType::Pointer masker = MaskImageFilterType::New();
+      masker->SetOutsideValue( (statistics.Min+statistics.Max)/2 );
+      masker->SetInput1(adaptedImage);
+      masker->SetInput2(adaptedMaskImage);
+      masker->Update();
+      // get index of minimum and maximum
+      typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
+      typename MinMaxFilterType::Pointer minMaxFilter = MinMaxFilterType::New();
+      minMaxFilter->SetImage( masker->GetOutput() );
+      unsigned long observerTag2 = minMaxFilter->AddObserver( itk::ProgressEvent(), progressListener );
+      minMaxFilter->Compute();
+      minMaxFilter->RemoveObserver( observerTag2 );
+      this->InvokeEvent( itk::EndEvent() );
+
+        statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
+        statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
+        for (int i=0; i<statistics.MaxIndex.size(); i++)
+        {
+            statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
+            statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+        }
+
       statisticsContainer->push_back( statistics );
     }
   }
@@ -1053,7 +1082,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // store the polyline contour as vtkPoints object
   bool outOfBounds = false;
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   typename PlanarFigure::PolyLineType::const_iterator it;
   for ( it = planarFigurePolyline.begin();
         it != planarFigurePolyline.end();
@@ -1098,7 +1127,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   }
 
   // create a vtkLassoStencilSource and set the points of the Polygon
-  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkLassoStencilSource::New();
+  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
@@ -1109,11 +1138,11 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( castFilter->GetOutput() );
 
-  vtkSmartPointer<vtkImageImport> vtkImporter = vtkImageImport::New();
+  vtkSmartPointer<vtkImageImport> vtkImporter = vtkSmartPointer<vtkImageImport>::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
 
   // Apply the generated image stencil to the input image
-  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkImageStencil::New();
+  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
   imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
   imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
   imageStencilFilter->ReverseStencilOff();
@@ -1121,7 +1150,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->Update();
 
   // Export from VTK back to ITK
-  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New();
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New(); // TODO: this is WRONG, should be vtkSmartPointer<vtkImageExport>::New(), but bug # 14455
   vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 
@@ -1131,11 +1160,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Store mask
   m_InternalImageMask2D = itkImporter->GetOutput();
-
-  // Clean up VTK objects
-  vtkImporter->Delete();
-  imageStencilFilter->Delete();
-  //vtkExporter->Delete(); // TODO: crashes when outcommented; memory leak??
 }
 
 

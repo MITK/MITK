@@ -77,6 +77,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkCastImageFilter.h>
+#include <itkLinearInterpolateImageFunction.h>
 
 // Image Arithmetics
 #include <itkAddImageFilter.h>
@@ -132,6 +133,9 @@ typedef itk::XorImageFilter< ImageType, ImageType >                             
 
 typedef itk::FlipImageFilter< ImageType >                                               FlipImageFilterType;
 
+typedef itk::LinearInterpolateImageFunction< ImageType, double >                        LinearInterpolatorType;
+typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >               NearestInterpolatorType;
+
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkFunctionality(),
@@ -182,6 +186,8 @@ void QmitkBasicImageProcessing::CreateConnections()
 
     connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
+
+    connect( (QObject*)(m_Controls->cbParam4), SIGNAL( activated(int) ), this, SLOT( SelectInterpolator(int) ) );
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime,
@@ -212,6 +218,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( FLIPPING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Flipping", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( RESAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Resample to", 0, QApplication::UnicodeUTF8) ));
 
   this->m_Controls->cbWhat2->clear();
   this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
@@ -226,6 +233,16 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat2->insertItem( OR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "OR", 0, QApplication::UnicodeUTF8) ) );
   this->m_Controls->cbWhat2->insertItem( XOR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "XOR", 0, QApplication::UnicodeUTF8) ) );
 
+  this->m_Controls->cbParam4->clear();
+  this->m_Controls->cbParam4->insertItem( LINEAR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Linear", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbParam4->insertItem( NEAREST, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Nearest neighbor", 0, QApplication::UnicodeUTF8) ) );
+
+  m_Controls->dsbParam1->hide();
+  m_Controls->dsbParam2->hide();
+  m_Controls->dsbParam3->hide();
+  m_Controls->tlParam3->hide();
+  m_Controls->tlParam4->hide();
+  m_Controls->cbParam4->hide();
 }
 
 //datamanager selection changed
@@ -314,11 +331,29 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
   m_Controls->tlParam->setEnabled(false);
   m_Controls->tlParam1->setEnabled(false);
   m_Controls->tlParam2->setEnabled(false);
+  m_Controls->tlParam3->setEnabled(false);
+  m_Controls->tlParam4->setEnabled(false);
 
   m_Controls->sbParam1->setEnabled(false);
   m_Controls->sbParam2->setEnabled(false);
+  m_Controls->dsbParam1->setEnabled(false);
+  m_Controls->dsbParam2->setEnabled(false);
+  m_Controls->dsbParam3->setEnabled(false);
+  m_Controls->cbParam4->setEnabled(false);
   m_Controls->sbParam1->setValue(0);
   m_Controls->sbParam2->setValue(0);
+  m_Controls->dsbParam1->setValue(0);
+  m_Controls->dsbParam2->setValue(0);
+  m_Controls->dsbParam3->setValue(0);
+
+  m_Controls->sbParam1->show();
+  m_Controls->sbParam2->show();
+  m_Controls->dsbParam1->hide();
+  m_Controls->dsbParam2->hide();
+  m_Controls->dsbParam3->hide();
+  m_Controls->cbParam4->hide();
+  m_Controls->tlParam3->hide();
+  m_Controls->tlParam4->hide();
 }
 
 void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
@@ -342,7 +377,20 @@ void QmitkBasicImageProcessing::SelectAction(int action)
 
   QString text1 = "No Parameters";
   QString text2 = "No Parameters";
+  QString text3 = "No Parameters";
+  QString text4 = "No Parameters";
 
+  if (action != 19)
+  {
+    m_Controls->dsbParam1->hide();
+    m_Controls->dsbParam2->hide();
+    m_Controls->dsbParam3->hide();
+    m_Controls->tlParam3->hide();
+    m_Controls->tlParam4->hide();
+    m_Controls->sbParam1->show();
+    m_Controls->sbParam2->show();
+    m_Controls->cbParam4->hide();
+  }
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (action)
   {
@@ -509,12 +557,56 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       break;
     }
 
+  case 19:
+    {
+      m_SelectedAction = RESAMPLING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(false);
+      m_Controls->sbParam1->hide();
+      m_Controls->dsbParam1->show();
+      m_Controls->dsbParam1->setEnabled(true);
+      m_Controls->tlParam2->setEnabled(true);
+      m_Controls->sbParam2->setEnabled(false);
+      m_Controls->sbParam2->hide();
+      m_Controls->dsbParam2->show();
+      m_Controls->dsbParam2->setEnabled(true);
+      m_Controls->tlParam3->show();
+      m_Controls->tlParam3->setEnabled(true);
+      m_Controls->dsbParam3->show();
+      m_Controls->dsbParam3->setEnabled(true);
+      m_Controls->tlParam4->show();
+      m_Controls->tlParam4->setEnabled(true);
+      m_Controls->cbParam4->show();
+      m_Controls->cbParam4->setEnabled(true);
+
+      m_Controls->dsbParam1->setMinimum(0.01);
+      m_Controls->dsbParam1->setMaximum(10.0);
+      m_Controls->dsbParam1->setSingleStep(0.1);
+      m_Controls->dsbParam1->setValue(0.3);
+      m_Controls->dsbParam2->setMinimum(0.01);
+      m_Controls->dsbParam2->setMaximum(10.0);
+      m_Controls->dsbParam2->setSingleStep(0.1);
+      m_Controls->dsbParam2->setValue(0.3);
+      m_Controls->dsbParam3->setMinimum(0.01);
+      m_Controls->dsbParam3->setMaximum(10.0);
+      m_Controls->dsbParam3->setSingleStep(0.1);
+      m_Controls->dsbParam3->setValue(1.5);
+
+      text1 = "x-spacing:";
+      text2 = "y-spacing:";
+      text3 = "z-spacing:";
+      text4 = "Interplation:";
+      break;
+    }
+
   default: return;
   }
 
   m_Controls->tlParam->setEnabled(true);
   m_Controls->tlParam1->setText(text1);
   m_Controls->tlParam2->setText(text2);
+  m_Controls->tlParam3->setText(text3);
+  m_Controls->tlParam4->setText(text4);
 
   m_Controls->btnDoIt->setEnabled(true);
   m_Controls->cbHideOrig->setEnabled(true);
@@ -581,6 +673,9 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   int param1 = m_Controls->sbParam1->value();
   int param2 = m_Controls->sbParam2->value();
+  double dparam1 = m_Controls->dsbParam1->value();
+  double dparam2 = m_Controls->dsbParam2->value();
+  double dparam3 = m_Controls->dsbParam3->value();
 
   try{
 
@@ -791,8 +886,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       ResampleImageFilterType::Pointer downsampler = ResampleImageFilterType::New();
       downsampler->SetInput( itkImage );
 
-      typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
-      InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      NearestInterpolatorType::Pointer interpolator = NearestInterpolatorType::New();
       downsampler->SetInterpolator( interpolator );
 
       downsampler->SetDefaultPixelValue( 0 );
@@ -838,6 +932,64 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       flipper->UpdateLargestPossibleRegion();
       newImage = mitk::ImportItkImage(flipper->GetOutput());
       std::cout << "Image flipping successful." << std::endl;
+      break;
+    }
+
+  case RESAMPLING:
+    {
+      std::string selectedInterpolator;
+      ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+      switch (m_SelectedInterpolation)
+      {
+      case LINEAR:
+        {
+          LinearInterpolatorType::Pointer interpolator = LinearInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Linear";
+          break;
+        }
+      case NEAREST:
+        {
+          NearestInterpolatorType::Pointer interpolator = NearestInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Nearest";
+          break;
+        }
+      default:
+        {
+          LinearInterpolatorType::Pointer interpolator = LinearInterpolatorType::New();
+          resampler->SetInterpolator(interpolator);
+          selectedInterpolator = "Linear";
+          break;
+        }
+      }
+      resampler->SetInput( itkImage );
+      resampler->SetOutputOrigin( itkImage->GetOrigin() );
+
+      ImageType::SizeType input_size = itkImage->GetLargestPossibleRegion().GetSize();
+      ImageType::SpacingType input_spacing = itkImage->GetSpacing();
+
+      ImageType::SizeType output_size;
+      ImageType::SpacingType output_spacing;
+
+      output_size[0] = input_size[0] * (input_spacing[0] / dparam1);
+      output_size[1] = input_size[1] * (input_spacing[1] / dparam2);
+      output_size[2] = input_size[2] * (input_spacing[2] / dparam3);
+      output_spacing [0] = dparam1;
+      output_spacing [1] = dparam2;
+      output_spacing [2] = dparam3;
+
+      resampler->SetSize( output_size );
+      resampler->SetOutputSpacing( output_spacing );
+      resampler->SetOutputDirection( itkImage->GetDirection() );
+
+      resampler->UpdateLargestPossibleRegion();
+
+      ImageType::Pointer resampledImage = resampler->GetOutput();
+
+      newImage = mitk::ImportItkImage( resampledImage );
+      nameAddition << "_Resampled_" << selectedInterpolator;
+      std::cout << "Resampling successful." << std::endl;
       break;
     }
 
@@ -1142,3 +1294,19 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   this->BusyCursorOff();
 }
 
+void QmitkBasicImageProcessing::SelectInterpolator(int interpolator)
+{
+  switch (interpolator)
+  {
+  case 0:
+    {
+      m_SelectedInterpolation = LINEAR;
+      break;
+    }
+  case 1:
+    {
+      m_SelectedInterpolation = NEAREST;
+      break;
+    }
+  }
+}

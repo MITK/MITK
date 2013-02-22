@@ -103,9 +103,12 @@ private:
       {
         ImageAccessorBase* r = *it;
 
-        if(/*r->m_Active &&*/  Overlap(r))
+        if(Overlap(r))
         {
           // An Overlap was detected.
+
+          PreventRecursiveMutexLock(r);
+
           readOverlap = true;
           overlapLock = r->m_WaitLock;
           break;
@@ -125,12 +128,17 @@ private:
       {
         ImageAccessorBase* w = *it;
 
-        if(/*w->m_Active &&*/  Overlap(w))
+        if(Overlap(w))
         {
           // An Overlap was detected.
+
+          PreventRecursiveMutexLock(w);
+
+          // save overlapping Waitlock
           writeOverlap = true;
           overlapLock = w->m_WaitLock;
           break;
+
         } // if
       } // for
     } // if
@@ -139,6 +147,7 @@ private:
       // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request afterwards.
       if(!(m_Options & ExceptionIfLocked))
       {
+
         // WAIT
         overlapLock->m_WaiterCount += 1;
         m_Image->m_ReadWriteLock.Unlock();

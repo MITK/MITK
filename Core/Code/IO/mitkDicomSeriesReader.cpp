@@ -396,6 +396,8 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
 
     // Image Pixel module
     dictionary["0028|0004"] = "dicom.pixel.PhotometricInterpretation";
+    dictionary["0028|0010"] = "dicom.pixel.Rows";
+    dictionary["0028|0011"] = "dicom.pixel.Columns";
 
     // Image Plane module
     dictionary["0028|0030"] = "dicom.PixelSpacing";

@@ -236,6 +236,7 @@ namespace mitk
     this->m_ToFCameraDevice->GetIntProperty("ModulationFrequency",modulationFrequency);
     return modulationFrequency;
   }
+
   void ToFImageGrabber::SetBoolProperty( const char* propertyKey, bool boolValue )
   {
     SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));

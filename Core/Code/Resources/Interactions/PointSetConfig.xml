@@ -1,0 +1,40 @@
+<config>
+  <param name="MaxPoints" value="4"/>
+  <input event_class="InternalEvent" event_variant="EnoughPoints">
+    <attribute name="SignalName" value="MaxNumberOfPoints"/>
+  </input>
+  <input event_class="InternalEvent" event_variant="IsLine">
+    <attribute name="SignalName" value="has2points"/>
+  </input>
+  <input event_class="InternalEvent" event_variant="NotEnoughPoints">
+    <attribute name="SignalName" value="haslessthen3points"/>
+  </input>
+  <input event_class="KeyEvent" event_variant="Abort">
+    <attribute name="Key" value="Escape"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="DeletePoint">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="AddPointClick">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndMovement">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndPointSetMovement">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="PointMove">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MousePressEvent" event_variant="PointSetMoveClick">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="PointSetMove">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </input>
+</config>

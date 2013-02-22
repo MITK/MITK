@@ -28,6 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourVtkMapper3D.h"
 
 
+#include "mitkContourModel.h"
+#include "mitkContourModelIOFactory.h"
+#include "mitkContourModelWriterFactory.h"
+#include "mitkContourModelWriter.h"
+#include "mitkContourModelMapper2D.h"
+#include "mitkContourModelGLMapper2D.h"
+#include "mitkContourModelMapper3D.h"
+
+
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
 {
@@ -36,7 +45,7 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   {
     MITK_DEBUG << "SegmentationObjectFactory c'tor" << std::endl;
 
-    //CreateFileExtensionsMap();
+    RegisterIOFactories();
 
     alreadyDone = true;
   }
@@ -59,6 +68,13 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetMapper2D::New();
       newMapper->SetDataNode(node);
     }
+
+    std::string classname("ContourModel");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ContourModelGLMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -72,6 +88,13 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
+
+    std::string classname("ContourModel");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::ContourModelMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
   return newMapper;
 }
@@ -83,6 +106,13 @@ void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
+
+  std::string classname("ContourModel");
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::ContourModelGLMapper2D::SetDefaultProperties(node);
+    mitk::ContourModelMapper3D::SetDefaultProperties(node);
+  }
 
 //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 //  if(image.IsNotNull() && image->IsInitialized())
@@ -116,6 +146,9 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
+
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
@@ -127,6 +160,14 @@ const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 
 void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
+  //register io classes of mitkContourModel
+  mitk::ContourModelIOFactory::RegisterOneFactory();
+
+  mitk::ContourModelWriterFactory::RegisterOneFactory();
+
+  this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+
+  CreateFileExtensionsMap();
 }
 
 void RegisterSegmentationObjectFactory()

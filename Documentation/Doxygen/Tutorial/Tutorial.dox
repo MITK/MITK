@@ -11,6 +11,7 @@ If you are absolutely new to MITK you might want to read up on setting up MITK t
 <ul>
  <li> \subpage HowToNewProject "A comprehensive guide to setting up your own MITK project"
  <li> \ref BuildInstructionsPage "Building MITK"
+ <li> \ref CMAKE_FAQ
 </ul>
 
 \section TutorialSection Tutorial chapters
@@ -38,7 +39,7 @@ This file contains a surface and is located in src/MITK/Modules/MitkExt/Testing/
 \li \subpage Step07Page "Step 7: Convert result of region growing into a surface"
 \li \subpage Step08Page "Step 8: Use QmitkStdMultiWidget as widget"
 \li \subpage Step09Page "Step 9: A plug-in"
-\li \subpage Step10Page "Step 10: A new Interaction"
+\li \subpage Step10Page "Step 10: How to use Interactor and how to implement new ones"
 
 Enjoy MITK!
 

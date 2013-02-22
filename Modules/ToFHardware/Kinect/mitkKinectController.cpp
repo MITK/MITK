@@ -61,7 +61,8 @@ bool KinectController::KinectControllerPrivate::ErrorText(unsigned int error)
 {
   if(error != XN_STATUS_OK)
   {
-    MITK_ERROR << "Camera Error " << xnGetStatusString(error);
+    MITK_ERROR << "Kinect Camera Error " << xnGetStatusString(error);
+    mitkThrow() << "Kinect Camera Error " << xnGetStatusString(error);
     return false;
   }
   else return true;

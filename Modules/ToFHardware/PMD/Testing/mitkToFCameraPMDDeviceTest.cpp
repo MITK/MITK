@@ -24,15 +24,17 @@ int mitkToFCameraPMDDeviceTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ToFCameraPMDDevice");
 
-  mitk::ToFCameraPMDDevice::Pointer tofCameraPMDDevice = mitk::ToFCameraPMDDevice::New();
+  mitk::ToFCameraPMDDevice::Pointer PMDDevice = mitk::ToFCameraPMDDevice::New();
+  try
+  {
   // No hardware attached for automatic testing -> test correct error handling
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDDevice->ConnectCamera(), "Test ConnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDDevice->IsCameraActive(), "Test IsCameraActive()");
+  MITK_TEST_CONDITION_REQUIRED(!PMDDevice->ConnectCamera(), "Test ConnectCamera()");
+  MITK_TEST_CONDITION_REQUIRED(!PMDDevice->IsCameraActive(), "Test IsCameraActive()");
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
-  tofCameraPMDDevice->StartCamera();
+  PMDDevice->StartCamera();
   MITK_TEST_OUTPUT(<<"Call UpdateCamera()");
-  tofCameraPMDDevice->UpdateCamera();
-  int numberOfPixels = tofCameraPMDDevice->GetCaptureWidth()*tofCameraPMDDevice->GetCaptureHeight();
+  PMDDevice->UpdateCamera();
+  int numberOfPixels = PMDDevice->GetCaptureWidth()*PMDDevice->GetCaptureHeight();
   MITK_INFO<<numberOfPixels;
   float* distances = new float[numberOfPixels];
   float* amplitudes = new float[numberOfPixels];
@@ -40,18 +42,24 @@ int mitkToFCameraPMDDeviceTest(int /* argc */, char* /*argv*/[])
   char* sourceData = new char[numberOfPixels];
   int requiredImageSequence = 0;
   int imageSequence = 0;
-  tofCameraPMDDevice->GetDistances(distances,imageSequence);
-  tofCameraPMDDevice->GetAmplitudes(amplitudes,imageSequence);
-  tofCameraPMDDevice->GetIntensities(intensities,imageSequence);
-  tofCameraPMDDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
+  PMDDevice->GetDistances(distances,imageSequence);
+  PMDDevice->GetAmplitudes(amplitudes,imageSequence);
+  PMDDevice->GetIntensities(intensities,imageSequence);
+  PMDDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
   MITK_TEST_OUTPUT(<<"Call StopCamera()");
-  tofCameraPMDDevice->StopCamera();
+  PMDDevice->StopCamera();
 
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDDevice->DisconnectCamera(), "Test DisonnectCamera()");
+  MITK_TEST_CONDITION_REQUIRED(!PMDDevice->DisconnectCamera(), "Test DisonnectCamera()");
   delete[] distances;
   delete[] amplitudes;
   delete[] intensities;
   delete[] sourceData;
+  }
+  catch(std::exception &e)
+  {
+      MITK_INFO << e.what();
+      MITK_TEST_CONDITION_REQUIRED(PMDDevice->IsCameraActive()==false, "Testing that no device could be connected.");
+  }
 
   MITK_TEST_END();
 

@@ -45,6 +45,7 @@ set(external_projects
   DCMTK
   CTK
   OpenCV
+  SOFA
   MITKData
   )
 
@@ -54,7 +55,7 @@ set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV)
+foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)
@@ -172,6 +173,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_DCMTK
   MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
+  MITK_USE_SOFA
   MITK_USE_Python
   MITK_USE_OpenCL
   )
@@ -208,6 +210,7 @@ ExternalProject_Add(${proj}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
+    ${SOFA_DEPENDS}
     ${MITK-Data_DEPENDS}
 )
 
@@ -251,6 +254,7 @@ ExternalProject_Add(${proj}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
+    -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}

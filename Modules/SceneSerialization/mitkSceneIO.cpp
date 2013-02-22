@@ -40,14 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
-#ifdef WIN32
-  #include <windows.h>
-#else
-  #include <sys/time.h>
-#endif
-
-int mitk::SceneIO::tempDiretoryID = 0;
-
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
  m_UnzipErrors(0)
@@ -60,26 +52,11 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-  mitk::SceneIO::tempDiretoryID++;
-  std::stringstream uniqueNumber;
 
-#ifdef WIN32
-  SYSTEMTIME st;
+  mitk::UIDGenerator uidGen("UID_",6);
 
-  GetSystemTime(&st);
-  srand ( st.wMilliseconds );
-#else
-  timeval time_microsec;
-
-  gettimeofday(&time_microsec, 0);
-  srand ( time_microsec.tv_usec );
-#endif
-
-  int randomNumber = rand() % 1000 + 1;
-
-  uniqueNumber << mitk::SceneIO::tempDiretoryID << randomNumber;
-  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
-  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
+  //std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
+  std::string returnValue = Poco::Path::temp() + "SceneIOTemp" + uidGen.GetUID();
   std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
 
@@ -89,22 +66,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
     if (!existsNot)
       {
       MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
-
-#ifdef WIN32
-      SYSTEMTIME st;
-
-      GetSystemTime(&st);
-      srand ( st.wMilliseconds );
-#else
-      timeval time_microsec;
-
-      gettimeofday(&time_microsec, 0);
-      srand ( time_microsec.tv_usec );
-#endif
-
-      randomNumber = rand() % 10000 + 1;
-      uniqueNumber << randomNumber;
-      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uidGen.GetUID();
       uniquename = returnValue + Poco::Path::separator();
       Poco::File tempdir2( uniquename );
       if (!tempdir2.createDirectory())

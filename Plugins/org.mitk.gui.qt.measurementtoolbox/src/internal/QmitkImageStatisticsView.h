@@ -88,6 +88,8 @@ protected slots:
   void OnIgnoreZerosCheckboxClicked(  );
   /** \brief Checks if update is possible and calls StatisticsUpdate() possible */
   void RequestStatisticsUpdate();
+  /** \brief Jump to coordinates stored in the double clicked cell */
+  void JumpToCoordinates(int row, int col);
 
 signals:
   /** \brief Method to set the data to the member and start the threaded statistics update */
@@ -158,5 +160,8 @@ protected:
   bool m_StatisticsIntegrationPending;
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
+
+  mitk::Point3D     m_WorldMin;
+  mitk::Point3D     m_WorldMax;
 };
 #endif // QmitkImageStatisticsView_H__INCLUDED

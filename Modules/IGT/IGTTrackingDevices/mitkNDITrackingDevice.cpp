@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNDITrackingDevice.h"
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 #include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
@@ -751,7 +751,7 @@ bool mitk::NDITrackingDevice::StartTracking()
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
-  mitk::TimeStamp::GetInstance()->Start(this);
+  mitk::IGTTimeStamp::GetInstance()->Start(this);
   return true;
 }
 

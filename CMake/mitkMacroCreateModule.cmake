@@ -103,7 +103,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       set(MODULE_IS_EXCLUDED 1)
     endif()
   endif()
-  if(NOT MODULE_IS_EXCLUDED)
+  if(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
     # first of all we check for the dependencies
     MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
     if(_MISSING_DEP)
@@ -121,230 +121,205 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       endforeach()
       if(MODULE_IS_ENABLED)
 
-        if(NOT MODULE_QT_MODULE OR MITK_USE_QT)
-          set(MODULE_IS_ENABLED 1)
-          _MITK_CREATE_MODULE_CONF()
-          if(NOT MODULE_EXPORT_DEFINE)
-            set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
-          endif(NOT MODULE_EXPORT_DEFINE)
+        # clear variables defined in files.cmake
+        set(RESOURCE_FILES )
+        set(CPP_FILES )
+        set(H_FILES )
+        set(TXX_FILES )
+        set(DOX_FILES )
+        set(UI_FILES )
+        set(MOC_H_FILES )
+        set(QRC_FILES )
 
-          if(MITK_GENERATE_MODULE_DOT)
-            message("MODULEDOTNAME ${MODULE_NAME}")
-            foreach(dep ${MODULE_DEPENDS})
-              message("MODULEDOT \"${MODULE_NAME}\" -> \"${dep}\" ; ")
-            endforeach(dep)
-          endif(MITK_GENERATE_MODULE_DOT)
+        # clear other variables
+        set(Q${KITNAME}_GENERATED_MOC_CPP )
+        set(Q${KITNAME}_GENERATED_QRC_CPP )
+        set(Q${KITNAME}_GENERATED_UI_CPP )
 
-          if(NOT MODULE_NO_INIT)
-            set(MODULE_LIBNAME ${MODULE_PROVIDES})
+        _MITK_CREATE_MODULE_CONF()
+        if(NOT MODULE_EXPORT_DEFINE)
+          set(MODULE_EXPORT_DEFINE ${MODULE_NAME}_EXPORT)
+        endif(NOT MODULE_EXPORT_DEFINE)
 
-            set(module_init_src_file)
-            usFunctionGenerateModuleInit(module_init_src_file
-                                         NAME ${MODULE_NAME}
-                                         LIBRARY_NAME ${MODULE_LIBNAME}
-                                         DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
-                                         #VERSION ${MODULE_VERSION}
-                                        )
-          endif()
+        if(MITK_GENERATE_MODULE_DOT)
+          message("MODULEDOTNAME ${MODULE_NAME}")
+          foreach(dep ${MODULE_DEPENDS})
+            message("MODULEDOT \"${MODULE_NAME}\" -> \"${dep}\" ; ")
+          endforeach(dep)
+        endif(MITK_GENERATE_MODULE_DOT)
 
-          set(DEPENDS "${MODULE_DEPENDS}")
-          set(DEPENDS_BEFORE "not initialized")
-          set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
-          MITK_USE_MODULE("${MODULE_DEPENDS}")
+        set(DEPENDS "${MODULE_DEPENDS}")
+        set(DEPENDS_BEFORE "not initialized")
+        set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
+        MITK_USE_MODULE("${MODULE_DEPENDS}")
 
-          # ok, now create the module itself
-          include_directories(. ${ALL_INCLUDE_DIRECTORIES})
-          include(files.cmake)
+        # ok, now create the module itself
+        include_directories(. ${ALL_INCLUDE_DIRECTORIES})
+        include(files.cmake)
 
-          set(module_compile_flags )
-          if(WIN32)
-            set(module_compile_flags "${module_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
-          endif()
+        set(module_compile_flags )
+        if(WIN32)
+          set(module_compile_flags "${module_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+        endif()
 
-          if(MODULE_GCC_DEFAULT_VISIBILITY)
-            set(use_visibility_flags 0)
-          else()
-            # We only support hidden visibility for gcc for now. Clang 3.0 still has troubles with
-            # correctly marking template declarations and explicit template instantiations as exported.
-            # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-            # and http://llvm.org/bugs/show_bug.cgi?id=10113
-            if(CMAKE_COMPILER_IS_GNUCXX)
-              set(use_visibility_flags 1)
-            else()
-            #  set(use_visibility_flags 0)
-            endif()
-          endif()
-
+        if(MODULE_GCC_DEFAULT_VISIBILITY)
+          set(use_visibility_flags 0)
+        else()
+          # We only support hidden visibility for gcc for now. Clang 3.0 still has troubles with
+          # correctly marking template declarations and explicit template instantiations as exported.
+          # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
+          # and http://llvm.org/bugs/show_bug.cgi?id=10113
           if(CMAKE_COMPILER_IS_GNUCXX)
-            # MinGW does not export all symbols automatically, so no need to set flags.
-            #
-            # With gcc < 4.5, RTTI symbols from classes declared in third-party libraries
-            # which are not "gcc visibility aware" are marked with hidden visibility in
-            # DSOs which include the class declaration and which are compiled with
-            # hidden visibility. This leads to dynamic_cast and exception handling problems.
-            # While this problem could be worked around by sandwiching the include
-            # directives for the third-party headers between "#pragma visibility push/pop"
-            # statements, it is generally safer to just use default visibility with
-            # gcc < 4.5.
-            if(${GCC_VERSION} VERSION_LESS "4.5" OR MINGW)
-              set(use_visibility_flags 0)
-            endif()
-          endif()
-
-          if(use_visibility_flags)
-            mitkFunctionCheckCompilerFlags("-fvisibility=hidden" module_compile_flags)
-            mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_compile_flags)
-          endif()
-
-          configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
-
-          if(MODULE_WARNINGS_AS_ERRORS)
-            if(MSVC_VERSION)
-              mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
-            else()
-              mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
-
-              # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
-              # versions to "static-member-init", see
-              # http://clang-developers.42468.n3.nabble.com/Wc-0x-static-nonintegral-init-gone-td3999651.html
-              #
-              # Also, older Clang and seemingly all gcc versions do not warn if unknown
-              # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
-              # command line. This may get confusing if unrelated compiler errors happen and
-              # the error output then additinally contains errors about unknown flags (which
-              # is not the case if there were no compile errors).
-              #
-              # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
-              # the compiler and if applicable, prints the specific warning as a real warning and
-              # not as an error (although -Werror was given).
-
-              mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
-              mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
-            endif()
-          endif(MODULE_WARNINGS_AS_ERRORS)
-
-          if(NOT MODULE_NO_INIT)
-            list(APPEND CPP_FILES ${module_init_src_file})
-          endif()
-
-          if(MODULE_FORCE_STATIC)
-            set(_STATIC STATIC)
+            set(use_visibility_flags 1)
           else()
-            set(_STATIC )
-          endif(MODULE_FORCE_STATIC)
+          #  set(use_visibility_flags 0)
+          endif()
+        endif()
 
-          if(NOT MODULE_QT_MODULE)
-            ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
-                             HEADER ${H_FILES}
-                             TXX ${TXX_FILES}
-                             DOC ${DOX_FILES}
-                            )
+        if(CMAKE_COMPILER_IS_GNUCXX)
+          # MinGW does not export all symbols automatically, so no need to set flags.
+          #
+          # With gcc < 4.5, RTTI symbols from classes declared in third-party libraries
+          # which are not "gcc visibility aware" are marked with hidden visibility in
+          # DSOs which include the class declaration and which are compiled with
+          # hidden visibility. This leads to dynamic_cast and exception handling problems.
+          # While this problem could be worked around by sandwiching the include
+          # directives for the third-party headers between "#pragma visibility push/pop"
+          # statements, it is generally safer to just use default visibility with
+          # gcc < 4.5.
+          if(${GCC_VERSION} VERSION_LESS "4.5" OR MINGW)
+            set(use_visibility_flags 0)
+          endif()
+        endif()
 
-            set(coverage_sources ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES} ${TOOL_CPPS})
-            if(MODULE_SUBPROJECTS)
-              set_property(SOURCE ${coverage_sources} APPEND PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-            endif()
+        if(use_visibility_flags)
+          mitkFunctionCheckCompilerFlags("-fvisibility=hidden" module_compile_flags)
+          mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_compile_flags)
+        endif()
 
-            if(NOT MODULE_HEADERS_ONLY)
-              if(ALL_LIBRARY_DIRS)
-              # LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
-                link_directories(${ALL_LIBRARY_DIRS})
-              endif(ALL_LIBRARY_DIRS)
-              add_library(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${DOX_FILES} ${UI_FILES})
-              if(MODULE_TARGET_DEPENDS)
-                add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
-              endif()
-              if(MODULE_SUBPROJECTS)
-                set_property(TARGET ${MODULE_PROVIDES} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-                foreach(subproject ${MODULE_SUBPROJECTS})
-                  add_dependencies(${subproject} ${MODULE_PROVIDES})
-                endforeach()
-              endif()
-              if(ALL_LIBRARIES)
-                target_link_libraries(${MODULE_PROVIDES} ${ALL_LIBRARIES})
-              endif(ALL_LIBRARIES)
+        configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
 
-              if(MINGW)
-                target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
-              endif()
-            endif()
+        if(MODULE_WARNINGS_AS_ERRORS)
+          if(MSVC_VERSION)
+            mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
+          else()
+            mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
 
-          else(NOT MODULE_QT_MODULE)
+            # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
+            # versions to "static-member-init", see
+            # http://clang-developers.42468.n3.nabble.com/Wc-0x-static-nonintegral-init-gone-td3999651.html
+            #
+            # Also, older Clang and seemingly all gcc versions do not warn if unknown
+            # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
+            # command line. This may get confusing if unrelated compiler errors happen and
+            # the error output then additinally contains errors about unknown flags (which
+            # is not the case if there were no compile errors).
+            #
+            # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
+            # the compiler and if applicable, prints the specific warning as a real warning and
+            # not as an error (although -Werror was given).
 
-            include(files.cmake)
-            if(NOT MODULE_NO_INIT)
-              list(APPEND CPP_FILES ${module_init_src_file})
-            endif()
+            mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
+            mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
+          endif()
+        endif(MODULE_WARNINGS_AS_ERRORS)
 
-            if(UI_FILES)
-              QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
-            endif(UI_FILES)
+        if(MODULE_FORCE_STATIC)
+          set(_STATIC STATIC)
+        else()
+          set(_STATIC )
+        endif(MODULE_FORCE_STATIC)
 
-            if(MOC_H_FILES)
-              QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES})
-            endif(MOC_H_FILES)
+        if(NOT MODULE_NO_INIT)
+          set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
-            if(QRC_FILES)
-              QT4_ADD_RESOURCES(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
-            endif(QRC_FILES)
+          usFunctionGenerateModuleInit(CPP_FILES
+                                       NAME ${MODULE_NAME}
+                                       LIBRARY_NAME ${MODULE_LIBNAME}
+                                       DEPENDS ${MODULE_DEPENDS} ${MODULE_DEPENDS_INTERNAL} ${MODULE_PACKAGE_DEPENDS}
+                                       #VERSION ${MODULE_VERSION}
+                                      )
 
-            set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
-
-            ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
-                             HEADER ${H_FILES}
-                             TXX ${TXX_FILES}
-                             DOC ${DOX_FILES}
-                             UI ${UI_FILES}
-                             QRC ${QRC_FILES}
-                             MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
-                             GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
-                             GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP})
-
-            # MITK_GENERATE_TOOLS_LIBRARY(Qmitk${LIBPOSTFIX} "NO")
-
-            set(coverage_sources ${CPP_FILES} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES} ${TXX_FILES} ${TOOL_GUI_CPPS})
-            set_property(SOURCE ${coverage_sources} APPEND PROPERTY LABELS ${MODULE_SUBPROJECTS})
-
-            if(NOT MODULE_HEADERS_ONLY)
-              if(ALL_LIBRARY_DIRS)
-                # LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
-                link_directories(${ALL_LIBRARY_DIRS})
-              endif(ALL_LIBRARY_DIRS)
-              add_library(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
-              target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES})
-              if(MODULE_TARGET_DEPENDS)
-                add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
-              endif()
-              if(MINGW)
-                target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
-              endif()
-              if(MODULE_SUBPROJECTS)
-                set_property(TARGET ${MODULE_PROVIDES} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-                foreach(subproject ${MODULE_SUBPROJECTS})
-                  add_dependencies(${subproject} ${MODULE_PROVIDES})
-                endforeach()
-              endif()
-            endif()
-
-          endif(NOT MODULE_QT_MODULE)
-
-          if(NOT MODULE_HEADERS_ONLY)
-            # Apply properties to the module target.
-            set_target_properties(${MODULE_PROVIDES} PROPERTIES
-              COMPILE_FLAGS "${module_compile_flags}"
-            )
+          if(RESOURCE_FILES)
+            usFunctionEmbedResources(CPP_FILES
+                                     LIBRARY_NAME ${MODULE_LIBNAME}
+                                     ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+                                     FILES ${RESOURCE_FILES})
           endif()
 
-          # install only if shared lib (for now)
-          if(NOT _STATIC OR MINGW)
-            if(NOT MODULE_HEADERS_ONLY)
-              # # deprecated: MITK_INSTALL_TARGETS(${MODULE_PROVIDES})
-            endif()
-          endif(NOT _STATIC OR MINGW)
+        endif()
 
-        endif(NOT MODULE_QT_MODULE OR MITK_USE_QT)
+        if(MODULE_QT_MODULE)
+          if(UI_FILES)
+            QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
+          endif(UI_FILES)
+
+          if(MOC_H_FILES)
+            QT4_WRAP_CPP(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES})
+          endif(MOC_H_FILES)
+
+          if(QRC_FILES)
+            QT4_ADD_RESOURCES(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
+          endif(QRC_FILES)
+
+          set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
+        endif()
+
+        ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
+                         HEADER ${H_FILES}
+                         TXX ${TXX_FILES}
+                         DOC ${DOX_FILES}
+                         UI ${UI_FILES}
+                         QRC ${QRC_FILES}
+                         MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
+                         GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
+                         GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP})
+
+        set(coverage_sources
+            ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}
+            ${TOOL_CPPS} ${TOOL_GUI_CPPS})
+
+        if(MODULE_SUBPROJECTS)
+          set_property(SOURCE ${coverage_sources} APPEND PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+        endif()
 
         if(NOT MODULE_HEADERS_ONLY)
+          if(ALL_LIBRARY_DIRS)
+            # LINK_DIRECTORIES applies only to targets which are added after the call to LINK_DIRECTORIES
+            link_directories(${ALL_LIBRARY_DIRS})
+          endif(ALL_LIBRARY_DIRS)
+
+          add_library(${MODULE_PROVIDES} ${_STATIC}
+                      ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP}
+                      ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
+
+          if(MODULE_TARGET_DEPENDS)
+            add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
+          endif()
+
+          if(MODULE_SUBPROJECTS)
+            set_property(TARGET ${MODULE_PROVIDES} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+            foreach(subproject ${MODULE_SUBPROJECTS})
+              add_dependencies(${subproject} ${MODULE_PROVIDES})
+            endforeach()
+          endif()
+
+          if(ALL_LIBRARIES)
+            target_link_libraries(${MODULE_PROVIDES} ${ALL_LIBRARIES})
+          endif(ALL_LIBRARIES)
+
+          if(MODULE_QT_MODULE AND QT_LIBRARIES)
+            target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES})
+          endif()
+
+          if(MINGW)
+            target_link_libraries(${MODULE_PROVIDES} ssp) # add stack smash protection lib
+          endif()
+
+          # Apply properties to the module target.
+          set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                COMPILE_FLAGS "${module_compile_flags}")
+
           # add the target name to a global property which is used in the top-level
           # CMakeLists.txt file to export the target
           set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_PROVIDES})
@@ -383,7 +358,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
       endif(MODULE_IS_ENABLED)
     endif(_MISSING_DEP)
-  endif(NOT MODULE_IS_EXCLUDED)
+  endif(NOT MODULE_IS_EXCLUDED AND NOT (MODULE_QT_MODULE AND NOT MITK_USE_QT))
 
   if(NOT MODULE_IS_ENABLED)
     _MITK_CREATE_MODULE_CONF()

@@ -24,22 +24,28 @@ int mitkKinectDeviceTest(int /* argc */, char* /*argv*/[])
 {
 
   MITK_TEST_BEGIN("KinectDevice");
-
-  mitk::KinectDevice::Pointer testObject = mitk::KinectDevice::New();
-
-  MITK_TEST_CONDITION_REQUIRED(!testObject.GetPointer()==NULL,"Testing initialzation!");
-  MITK_TEST_CONDITION_REQUIRED(testObject->ConnectCamera(),"Testing ConnectCamera()");
+  //Try to connect a device. In failure case an exception is thrown.
+  mitk::KinectDevice::Pointer kinectDevice = mitk::KinectDevice::New();
+  try
+  {
+  MITK_TEST_CONDITION_REQUIRED(kinectDevice.IsNotNull(),"Testing initialzation!");
+  MITK_TEST_CONDITION_REQUIRED(kinectDevice->ConnectCamera(),"Testing ConnectCamera()");
   MITK_TEST_OUTPUT(<<"Testing StartCamera()");
-  testObject->StartCamera();
-  int captureHeight = testObject->GetCaptureHeight();
-  int captureWidth = testObject->GetCaptureWidth();
+  kinectDevice->StartCamera();
+  int captureHeight = kinectDevice->GetCaptureHeight();
+  int captureWidth = kinectDevice->GetCaptureWidth();
   MITK_TEST_CONDITION_REQUIRED(captureHeight== 480 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(captureWidth== 640 ,"Testing initialization of CaptureWidth");
   //
   MITK_TEST_OUTPUT(<<"Testing StopCamera()");
-  testObject->StopCamera();
-  MITK_TEST_CONDITION_REQUIRED(testObject->DisconnectCamera(),"Testing DisconnectCamera()");
-
+  kinectDevice->StopCamera();
+  MITK_TEST_CONDITION_REQUIRED(kinectDevice->DisconnectCamera(),"Testing DisconnectCamera()");
+  }
+  catch(std::exception &e)
+  {
+      MITK_INFO << e.what();
+      MITK_TEST_CONDITION(!kinectDevice->IsCameraActive(), "Testing that no device could be connected.");
+  }
   MITK_TEST_END();
 
 }

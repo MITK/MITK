@@ -17,29 +17,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUIDGenerator.h>
 #include <mitkLogMacros.h>
 
-#include <ctime>
 #include <cstdlib>
 #include <sstream>
 #include <math.h>
 #include <stdexcept>
 #include <iostream>
 
-namespace mitk {
 
-UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
+
+
+
+mitk::UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 :m_Prefix(prefix),
- m_LengthOfRandomPart(lengthOfRandomPart)
+ m_LengthOfRandomPart(lengthOfRandomPart),
+ m_RandomGenerator(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
   if (lengthOfRandomPart < 5)
   {
-    MITK_ERROR << lengthOfRandomPart << " are not really unique, right?" << std::endl;
+    MITK_ERROR << "To few digits requested (" <<lengthOfRandomPart<< " digits)";
     throw std::invalid_argument("To few digits requested");
   }
 
-  std::srand((unsigned int) time( (time_t *)0 ));
+  m_RandomGenerator->Initialize();
+
 }
 
-std::string UIDGenerator::GetUID()
+std::string mitk::UIDGenerator::GetUID()
 {
   std::ostringstream s;
   s << m_Prefix;
@@ -48,6 +51,8 @@ std::string UIDGenerator::GetUID()
 
   if (t)
   {
+
+
     s << t->tm_year + 1900;
 
     if (t->tm_mon < 9) s << "0"; // add a 0 for months 1 to 9
@@ -66,11 +71,11 @@ std::string UIDGenerator::GetUID()
     s << t->tm_sec;
 
     std::ostringstream rs;
-    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(rand()) );
+    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(m_RandomGenerator->GetUniformVariate(0, RAND_MAX)) );
 
-    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i)
+    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i) //add zeros for non available digits
     {
-      s << "X";
+      s << "0";
     }
 
     s << rs.str();
@@ -79,5 +84,5 @@ std::string UIDGenerator::GetUID()
   return s.str();
 }
 
-}
+
 

@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactory.h"
 
 
+
 mitk::Mapper* mitk::DataNode::GetMapper(MapperSlotId id) const
 {
   if( (id >= m_Mappers.size()) || (m_Mappers[id].IsNull()) )
@@ -83,7 +84,7 @@ void mitk::DataNode::SetInteractor(mitk::Interactor* interactor)
 {
   m_Interactor = interactor;
   if(m_Interactor.IsNotNull())
-  m_Interactor->SetDataNode(this);
+    m_Interactor->SetDataNode(this);
 }
 
 mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
@@ -543,6 +544,17 @@ void mitk::DataNode::DisableInteractor()
 bool mitk::DataNode::IsInteractorEnabled() const
 {
   return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
+}
+
+void mitk::DataNode::SetDataInteractor(DataInteractor::Pointer interactor)
+{
+  m_DataInteractor = interactor;
+  Modified();
+}
+
+mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const
+{
+  return m_DataInteractor;
 }
 
 void mitk::DataNode::PropertyListModified( const itk::Object* /*caller*/, const itk::EventObject& )

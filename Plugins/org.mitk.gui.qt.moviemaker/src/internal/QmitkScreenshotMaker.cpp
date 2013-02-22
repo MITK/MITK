@@ -412,10 +412,10 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
     fileWriter->Write();
     fileWriter->Delete();
 
-    m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
-    m_MultiWidget->mitkWidget2->ActivateMenuWidget( true );
-    m_MultiWidget->mitkWidget3->ActivateMenuWidget( true );
-    m_MultiWidget->mitkWidget4->ActivateMenuWidget( true );
+    m_MultiWidget->mitkWidget1->ActivateMenuWidget( true, m_MultiWidget );
+    m_MultiWidget->mitkWidget2->ActivateMenuWidget( true, m_MultiWidget );
+    m_MultiWidget->mitkWidget3->ActivateMenuWidget( true, m_MultiWidget );
+    m_MultiWidget->mitkWidget4->ActivateMenuWidget( true, m_MultiWidget );
 
     m_MultiWidget->EnableColoredRectangles();
     m_MultiWidget->EnableDepartmentLogo();

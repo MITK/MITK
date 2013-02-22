@@ -22,11 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include "MitkIGTUIExports.h"
-#include "mitkNavigationTool.h"
-#include "mitkNavigationDataPlayer.h"
-#include "mitkNavigationDataSequentialPlayer.h"
-#include <mitkTimeStamp.h>
-
+#include <mitkNavigationTool.h>
+#include <mitkNavigationDataPlayer.h>
+#include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkPointSet.h>
 
 

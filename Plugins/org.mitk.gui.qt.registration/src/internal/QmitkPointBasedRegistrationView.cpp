@@ -69,8 +69,8 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
   void DoSelectionChanged(ISelection::ConstPointer selection)
   {
-//    if(!m_View->IsVisible())
-//      return;
+    //    if(!m_View->IsVisible())
+    //      return;
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 
@@ -105,7 +105,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
         mitk::DataNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
-          i != m_View->m_CurrentSelection->End(); ++i)
+             i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
           if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
@@ -125,43 +125,50 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
             // only look at interesting types
             for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-              ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+                 ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
             {
               if(nodeIt->Value().GetPointer() == node.GetPointer())
               {
-                if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+                // was - compare()
+                // use contain to allow other Image types to be selected, i.e. a diffusion image
+                if (QString( node->GetData()->GetNameOfClass() ).contains("Image") )
                 {
-                  if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
+                  // verify that the node selected by name is really an image or derived class
+                  mitk::Image* _image = dynamic_cast<mitk::Image*>(node->GetData());
+                  if (_image != NULL)
                   {
-                    m_View->m_Controls.m_StatusLabel->show();
-                    QMessageBox::information( NULL, "PointBasedRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
-                    return;
-                  }
-                  if (foundFixedImage == false)
-                  {
-                    fixedNode = node;
-                    foundFixedImage = true;
-                  }
-                  else
-                  {
-                    m_View->SetImagesVisible(selection);
-                    m_View->FixedSelected(fixedNode);
-                    m_View->MovingSelected(node);
-                    m_View->m_Controls.m_StatusLabel->hide();
-                    m_View->m_Controls.TextLabelFixed->show();
-                    m_View->m_Controls.m_FixedLabel->show();
-                    m_View->m_Controls.line2->show();
-                    m_View->m_Controls.m_FixedPointListWidget->show();
-                    m_View->m_Controls.TextLabelMoving->show();
-                    m_View->m_Controls.m_MovingLabel->show();
-                    m_View->m_Controls.line1->show();
-                    m_View->m_Controls.m_MovingPointListWidget->show();
-                    m_View->m_Controls.m_OpacityLabel->show();
-                    m_View->m_Controls.m_OpacitySlider->show();
-                    m_View->m_Controls.label->show();
-                    m_View->m_Controls.label_2->show();
-                    m_View->m_Controls.m_SwitchImages->show();
-                    m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
+                    if( _image->GetDimension() == 4)
+                    {
+                      m_View->m_Controls.m_StatusLabel->show();
+                      QMessageBox::information( NULL, "PointBasedRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                      return;
+                    }
+                    if (foundFixedImage == false)
+                    {
+                      fixedNode = node;
+                      foundFixedImage = true;
+                    }
+                    else
+                    {
+                      m_View->SetImagesVisible(selection);
+                      m_View->FixedSelected(fixedNode);
+                      m_View->MovingSelected(node);
+                      m_View->m_Controls.m_StatusLabel->hide();
+                      m_View->m_Controls.TextLabelFixed->show();
+                      m_View->m_Controls.m_FixedLabel->show();
+                      m_View->m_Controls.line2->show();
+                      m_View->m_Controls.m_FixedPointListWidget->show();
+                      m_View->m_Controls.TextLabelMoving->show();
+                      m_View->m_Controls.m_MovingLabel->show();
+                      m_View->m_Controls.line1->show();
+                      m_View->m_Controls.m_MovingPointListWidget->show();
+                      m_View->m_Controls.m_OpacityLabel->show();
+                      m_View->m_Controls.m_OpacitySlider->show();
+                      m_View->m_Controls.label->show();
+                      m_View->m_Controls.label_2->show();
+                      m_View->m_Controls.m_SwitchImages->show();
+                      m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
+                    }
                   }
                 }
 

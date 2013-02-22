@@ -7,19 +7,19 @@
               name="Help"/>
 
     <view id="org.blueberry.views.helpcontents"
-          name="Contents"
+          name="Help - Contents"
           category="org.blueberry.views.help"
           class="berry::HelpContentView"
           icon="resources/help.png" />
 
     <view id="org.blueberry.views.helpindex"
-          name="Index"
+          name="Help - Index"
           category="org.blueberry.views.help"
           class="berry::HelpIndexView"
           icon="resources/help.png" />
 
     <view id="org.blueberry.views.helpsearch"
-          name="Search"
+          name="Help - Search"
           category="org.blueberry.views.help"
           class="berry::HelpSearchView"
           icon="resources/help.png" />

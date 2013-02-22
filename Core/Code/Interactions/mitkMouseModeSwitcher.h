@@ -14,14 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 #define MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB
 
 #include "MitkExports.h"
-#include "mitkGlobalInteraction.h"
-
 #include <itkObject.h>
+#include "mitkDisplayInteractor.h"
 
 namespace mitk {
 
@@ -30,7 +28,7 @@ namespace mitk {
 * \brief Class that offers a convenient way to switch between different
 * interaction schemes
 *
-* This class offers the possibility to swtch between the two different
+* This class offers the possibility to switch between the two different
 * interaction schemes that are available:
 * - MITK : The original interaction scheme
 *   - left mouse button   : setting the cross position in the MPR view
@@ -40,7 +38,7 @@ namespace mitk {
 *
 * - PACS : an alternative interaction scheme that behaves more like a
 *          PACS workstation
-*   - left mouse button   : behaviour depends on current MouseMode
+*   - left mouse button   : behavior depends on current MouseMode
 *   - middle mouse button : fast scrolling
 *   - right mouse button  : level-window
 *   - ctrl + right button : zooming
@@ -57,7 +55,7 @@ namespace mitk {
 *
 * When the interaction scheme or the MouseMode is changed, this class
 * manages the adding and removing of the relevant listeners offering
-* a convenient way to modify the interaction behaviour.
+* a convenient way to modify the interaction behavior.
 *
 ***********************************************************************/
   class MITK_CORE_EXPORT MouseModeSwitcher : public itk::Object
@@ -72,7 +70,7 @@ namespace mitk {
 #pragma GCC visibility pop
 
     mitkClassMacro( MouseModeSwitcher, itk::Object );
-    mitkNewMacro1Param( Self, GlobalInteraction* );
+    itkNewMacro(Self);
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -107,41 +105,19 @@ namespace mitk {
     MouseMode GetCurrentMouseMode() const;
 
   protected:
-
-    /**
-    * \brief Constructor takes GlobalInteraction, MUST NOT be NULL.
-    **/
-    MouseModeSwitcher( GlobalInteraction* );
-
+    MouseModeSwitcher();
     virtual ~MouseModeSwitcher();
-
-
   private:
-
     /**
-    * \brief Initializes the listeners for the different interaction schemes
-    *
-    * This method creates all listeners that are required for the different
-    * interaction schemes. These are stored in two lists.
+    * \brief Initializes the listener with the MITK default behavior.
     */
     void InitializeListeners();
 
-    GlobalInteraction::Pointer m_GlobalInteraction;
-
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
-
-    typedef std::vector<StateMachine::Pointer>  ListenerList;
-    ListenerList m_ListenersForMITK;
-    ListenerList m_ListenersForPACS;
-
-    StateMachine::Pointer m_LeftMouseButtonHandler;
-
+    DisplayInteractor::Pointer m_CurrentObserver;
   };
-
 } // namespace mitk
-
-
 
 #endif /* MITKMouseModeSwitcher_H_HEADER_INCLUDED_C10DC4EB */
 

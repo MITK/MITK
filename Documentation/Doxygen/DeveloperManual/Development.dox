@@ -19,6 +19,7 @@ Some abstract concepts of MITK are described in \ref Concepts
 
 \section DevelopmentWith Developing With MITK
 
+\li \subpage CMAKE_FAQ
 \li \subpage DICOMTesting
 \li \subpage NewPluginPage
 \li \subpage StatemachineEditor

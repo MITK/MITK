@@ -1,0 +1,11 @@
+<config>
+   <input event_class="MousePressEvent" event_variant="StartZoom">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseReleaseEvent" event_variant="EndZooming">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </input>
+  <input event_class="MouseMoveEvent" event_variant="Zooming">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </input>
+</config>

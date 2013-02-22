@@ -103,6 +103,7 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this will download and build OpenCV 2.3)
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
+ - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will download and build SOFA 1.0 RC1)
  - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt installation
 
 If you are satisfied with the configuration of your MITK superbuild, generate the project files with
@@ -187,6 +188,7 @@ in ccmake may depend on specific MITK_USE_* options set to ON. You may also use 
  - <tt><b>EXTERNAL_GDCM_DIR</b></tt> Set this variable to your GDCM binary tree (the directory containing the GDCMConfig.cmake file)
  - <tt><b>EXTERNAL_ITK_DIR</b></tt> Set this variable to your ITK binary tree (the directory containing the ITKConfig.cmake file)
  - <tt><b>EXTERNAL_OpenCV_DIR</b></tt> Set this variable to your OpenCV binary tree (the directory containing the OpenCVConfig.cmake file)
+ - <tt><b>EXTERNAL_SOFA_DIR</b></tt> Set this variable to your SOFA binary tree (the directory containing the SOFAConfig.cmake file)
  - <tt><b>EXTERNAL_VTK_DIR</b></tt> Set this variable to your VTK binary tree (the directory containing the VTKConfig.cmake file)
 
 To set CMake options before the first configure step is invoked, supply them on the command line, i.e.

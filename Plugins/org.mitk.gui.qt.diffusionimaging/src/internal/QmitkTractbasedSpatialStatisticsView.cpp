@@ -817,7 +817,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 
 
   // initialize new vtk polydata
-  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
 
@@ -838,7 +838,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
     float minDistEnd = std::numeric_limits<float>::max();
 
 
-    vtkSmartPointer<vtkPolyLine> polyLine = vtkPolyLine::New();
+    vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
     int lineIndex=0;
 
 
@@ -1796,18 +1796,14 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 
     mitk::TbssRoiImage::Pointer tbssRoi = mitk::TbssRoiImage::New();
-    //mitk::CastToTbssImage(m_CurrentRoi.GetPointer(), tbssRoi);
+
     tbssRoi->SetRoi(roi);
     tbssRoi->SetImage(roiImg);
     tbssRoi->SetStructure(m_Controls->m_Structure->text().toStdString());
     tbssRoi->InitializeFromImage();
 
-
-   // mitk::Image::Pointer tbssRoi = mitk::Image::New();
-    //mitk::CastToTbssImage(m_CurrentRoi.GetPointer(), tbssRoi);
-   // mitk::CastToMitkImage(roiImg, tbssRoi);
-
     AddTbssToDataStorage(tbssRoi, m_Controls->m_RoiName->text().toStdString());
+
 
   }
 

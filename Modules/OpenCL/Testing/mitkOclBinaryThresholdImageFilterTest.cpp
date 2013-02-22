@@ -31,7 +31,7 @@ using namespace mitk;
 /**
   This function is testing the class mitk::OclContextManager.
   */
-int mitkOclBinaryThresholdImageFilterTest( int /*argc*/, char**/* argv[]*/ )
+int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
 {
   MITK_TEST_BEGIN("mitkOclBinaryThresholdImageFilterTest");
 

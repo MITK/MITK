@@ -230,7 +230,7 @@ ServiceReference ServiceTracker<S,T>::GetServiceReference() const
   US_DEBUG(d->DEBUG) << "ServiceTracker<S,T>::getServiceReference:" << d->filter;
   std::list<ServiceReference> references;
   GetServiceReferences(references);
-  int length = references.size();
+  std::size_t length = references.size();
   if (length == 0)
   { /* if no service is being tracked */
     throw ServiceException("No service is being tracked");
@@ -242,7 +242,7 @@ ServiceReference ServiceTracker<S,T>::GetServiceReference() const
     int count = 0;
     int maxRanking = std::numeric_limits<int>::min();
     std::list<ServiceReference>::const_iterator refIter = references.begin();
-    for (int i = 0; i < length; i++)
+    for (std::size_t i = 0; i < length; i++)
     {
       Any rankingAny = refIter->GetProperty(ServiceConstants::SERVICE_RANKING());
       int ranking = 0;
@@ -271,7 +271,7 @@ ServiceReference ServiceTracker<S,T>::GetServiceReference() const
     { /* if still more than one service, select lowest id */
       long int minId = std::numeric_limits<long int>::max();
       refIter = references.begin();
-      for (int i = 0; i < length; i++)
+      for (std::size_t i = 0; i < length; i++)
       {
         if (rankings[i] == maxRanking)
         {
@@ -381,7 +381,7 @@ int ServiceTracker<S,T>::Size() const
   }
   {
     typename _TrackedService::Lock l(t);
-    return t->Size();
+    return static_cast<int>(t->Size());
   }
 }
 

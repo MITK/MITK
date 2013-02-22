@@ -204,12 +204,23 @@ int mitkImageAccessorTest(int argc, char* argv[])
       return EXIT_FAILURE;
    }
 
+   // CHECK PROHIBITED AND UNAPPROPRIATE USE
+
+   // recursive mutex lock
+   MITK_TEST_OUTPUT( << "Testing a recursive mutex lock attempt, should end in an exception ...");
+
+   MITK_TEST_FOR_EXCEPTION_BEGIN(mitk::Exception)
+     mitk::ImageWriteAccessor first(image);
+     mitk::ImageWriteAccessor second(image);
+   MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
+
+
    // CREATE THREADS
 
    image->GetGeometry()->Initialize();
 
    itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-   unsigned int noOfThreads = 100;
+   unsigned int noOfThreads = 1;
 
    // initialize barrier
    itk::Barrier::Pointer barrier = itk::Barrier::New();

@@ -1,4 +1,3 @@
-IF(MITK_ENABLE_TOF_HARDWARE)
 #Begin Kinect hardware
 OPTION(MITK_USE_TOF_KINECT "Enable support for Kinect camera" OFF)
 
@@ -23,4 +22,3 @@ add_subdirectory(Testing)
 
 ENDIF(MITK_USE_TOF_KINECT)
 #End Kinect Hardware
-ENDIF(MITK_ENABLE_TOF_HARDWARE)

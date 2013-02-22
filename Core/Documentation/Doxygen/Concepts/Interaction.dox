@@ -1,7 +1,11 @@
 /**
 
+@depricated
 \page InteractionPage Interaction and Undo/Redo Concepts
  
+\note The following page refers to the depricated interaction frame work. Please refer to \ref DataInteractionPage for information about the current one.
+
+
 \section InteractionPage_Introduction Interaction in MITK 
 
 \b Interaction is one of the most important tasks in clinically useful image processing software. 

@@ -103,10 +103,17 @@ QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const QString& _
 {
   QmitkNodeDescriptor* _Descriptor = 0;
 
-  for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+  if( _ClassName == "Unknown" )
   {
-    if((*it)->GetClassName() == _ClassName)
-      _Descriptor = *it;
+      return m_UnknownDataNodeDescriptor;
+  }
+  else
+  {
+      for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+      {
+        if((*it)->GetClassName() == _ClassName)
+          _Descriptor = *it;
+      }
   }
 
   return _Descriptor;

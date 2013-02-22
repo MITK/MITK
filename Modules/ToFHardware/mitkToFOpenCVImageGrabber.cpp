@@ -160,9 +160,8 @@ namespace mitk
   {
     unsigned int numOfPixel = m_ImageGrabber->GetCaptureWidth()*m_ImageGrabber->GetCaptureHeight();
     float* floatData = (float*)mitkImage->GetSliceData(0, 0, 0)->GetData();
-    vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkColorTransferFunction::New();
-    vtkSmartPointer<vtkFloatArray> floatArrayInt;
-    floatArrayInt = vtkFloatArray::New();
+    vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+    vtkSmartPointer<vtkFloatArray> floatArrayInt = vtkSmartPointer<vtkFloatArray>::New();
     floatArrayInt->Initialize();
     floatArrayInt->SetArray(floatData, numOfPixel, 0);
     mitk::ScalarType min = mitkImage->GetStatistics()->GetScalarValueMin();

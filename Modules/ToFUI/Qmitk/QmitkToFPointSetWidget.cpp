@@ -260,6 +260,11 @@ void QmitkToFPointSetWidget::SetDistanceImage(mitk::Image::Pointer distanceImage
 //  m_DistanceImageChangedObserverTag = m_DistanceImage->AddObserver(itk::ModifiedEvent(), distanceImageChangedCommand);
 }
 
+void QmitkToFPointSetWidget::SetCameraIntrinsics(mitk::CameraIntrinsics::Pointer cameraIntrinsics)
+{
+  m_CameraIntrinsics = cameraIntrinsics;
+}
+
 void QmitkToFPointSetWidget::OnMeasurement()
 {
   // always show 2D PointSet in foreground

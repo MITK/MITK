@@ -86,6 +86,7 @@ protected slots:
   void DoImageColorCoding();        ///< color fibers by selected scalar image
   void Extract3d();                 ///< extract all fibers passing the selected surface mesh
   void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
+  void ExtractMask();                 ///< extract all fibers passing the selected surface mesh
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
@@ -160,6 +161,7 @@ protected:
   itkUCharImageType::Pointer            m_InternalImageMask3D;
   itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
+  mitk::DataNode::Pointer               m_MaskImageNode;
 
   void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
   void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );

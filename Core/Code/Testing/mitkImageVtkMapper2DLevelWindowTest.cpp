@@ -47,7 +47,7 @@ int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
     double level = levelWindowPreset->getLevel("Blood");
     double window = levelWindowPreset->getWindow("Blood");
     //apply level window to all images
-    renderingHelper.SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(level, window)) );
+    renderingHelper.SetImageProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(level, window)) );
     //for now this test renders Sagittal
     renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();
@@ -66,6 +66,7 @@ int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
+    renderingHelper.PrepareRender();
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

@@ -32,6 +32,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 // vtk includes
 #include <vtkImageData.h>
 
+// Checks if reference count is correct after using GetVtkImageData()
+bool ImageVtkDataReferenceCheck(const char* fname) {
+
+  const std::string filename = std::string(fname);
+  mitk::ItkImageFileReader::Pointer imageReader = mitk::ItkImageFileReader::New();
+  try
+  {
+    imageReader->SetFileName(filename);
+    imageReader->Update();
+  }
+  catch(...) {
+    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << filename);
+    return false;
+  }
+
+  {
+    mitk::Image::Pointer image = imageReader->GetOutput();
+    vtkImageData* vtk = image->GetVtkImageData();
+
+    if(vtk == NULL)
+      return false;
+
+    if(image->GetExternalReferenceCount() != 1)
+      return false;
+  }
+
+  return true;
+}
+
 int mitkImageTest(int argc, char* argv[])
 {
 
@@ -348,6 +377,8 @@ int mitkImageTest(int argc, char* argv[])
   mitk::Image::Pointer cloneThreeDImage = threeDImage->Clone();
   // check that the clone image has the same dimensionality as the source image
   MITK_TEST_CONDITION_REQUIRED( cloneThreeDImage->GetDimension() == 3, "Testing if the clone image initializes with 3D!");
+
+  MITK_TEST_CONDITION_REQUIRED( ImageVtkDataReferenceCheck(argv[1]), "Checking reference count of Image after using GetVtkImageData()");
 
   MITK_TEST_END();
 }

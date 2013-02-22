@@ -18,6 +18,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.cmdlinemodules:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
@@ -36,9 +37,11 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.python.console:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.segmentation:OFF
+  org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF
+  org.mitk.gui.InteractionTests:OFF
 )

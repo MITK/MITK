@@ -1,0 +1,52 @@
+/**
+\page org_mitk_views_fiberfoxview Fiberfox
+
+This view provides the user interface for Fiberfox, an interactive simulation tool for the generation of complex white matter tissue models and corresponding DW-MRI. Arbitrary fiber configurations like bended, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers. From these fibers, a DW-MRI signal is simulated according to the specified acquisition settings such as gradient direction, b-value, signal-to-noise ratio, image size, and resolution. Fiberfox incorporates different models of diffusion, noise, and artifacts to simulate realistic images.
+
+Available sections:
+  - \ref QmitkGibbsTrackingUserManualFiberDefinition
+  - \ref QmitkGibbsTrackingUserManualSignalGeneration
+  - \ref QmitkGibbsTrackingUserManualReferences
+
+\image html Fiberfox.png Screenshot of the Fiberfox framework. The four render windows display an axial, sagittal and coronal 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a closeup view on one of the circular fiducials.
+
+\section QmitkGibbsTrackingUserManualFiberDefinition Fiber Definition
+
+Fiber strands are defined simply by placing markers in a 3D image volume. The fibers are then interpolated between these fiducials.
+
+Example:
+\li Chose an image volume to place the markers used to define the fiber pathway. If you don't have such an image available switch to the "Signal Generation" tab, define the size and spacing of the desired image ang click "Generate Image". If no fiber bundle is selected, this will generate a dummy image that can be used to place the fiducials.
+\li Start placing fiducials at the desired positions to define the fiber pathway. To do that, click on the button with the circle pictogram, then click at the desired position and plane in the image volume and drag your mouse while keeping the button pressed to generate a circular shape. Adjust the shape using the control points. The position of the control point with the attached line connecting it to the center of the fiducial introduces a twist of the fibers between two successive fiducials. The actual fiber generation is triggered automatically as soon as you place the third control point.
+\li In some cases the fibers are entangled in a way that can't be resolved by introducing an additional fiber twist. Fiberfox tries to avoid these situations, which arise from different normal orientations of succeeding fiducials, automatically. In rare cases this is not successful. Use the PICTURE button to flip the fiber positions of the selected fiducial in one dimension. Either the problem is resolved now or you can resolve it manually by adjusting the twist-control point.
+
+Parameters:
+If not self-explanatory please refer to TODO.
+
+\image html FiberfoxExamples.png Examples of artificial crossing, fanning, highly curved, kissing and twisting fibers as well as of the corresponding tensor images generated with Fiberfox.
+
+\section QmitkGibbsTrackingUserManualSignalGeneration Signal Generation
+
+Fiberfox uses a ball-zeppelin model to generate the artificial signal. For details about the signal generation process please refer to TODO.
+A diffusion weighted image is generated from the fibers by selecting the according fiber bundle in the datamanager and clicking "Generate Image". Additionally to the fiber bundle a binary mask can be specified that defines the tissue area. Voxels outside of this mask will contain no signal, only noise. If no tissue mask is selected, the whole image volume is regarded as tissue. Fiberfox allows the addition of artifcats often present in EPI based diffusion weighted datasets like rician noise, Gibbs ringing and blurring introduced by the T2 signal decay.
+
+Image and Compartment Settings:
+\li Enforce Pure Fiber Voxels: Disable partial voluming. All voxels touched by at least one fiber are treated as pure fiber voxles.
+\li Output k-Space Image: Output an image of the fourier transformed baseline signal.
+\li Image Dimensions: The number of voxels in each image dimension.
+\li Image Spacing: The voxel size (in mm) in each dimension.
+\li #Gradient Directions: The number of gradient directions distributed over the half-sphere.
+\li b-value: The b-value (in mm/s²) used for the diffusion signal generation.
+\li Repetitions: Number of averaged repetitions. Used to suppress noise in real acquisitions.
+\li Volume Accuracy: The higher the value, the more accurate the volume fraction estimation for the compartments. Corresponds to the number of sampling points on a fiber over a distance of the minimum spacing value.
+\li Fractional anisotropy: Determins anisotropy of the zeppelin compartment.
+\li Diffusivity: Diffusivity parameter of the ball compartment.
+\li Signal Scale: Scaling factor for the raw signal.
+
+Noise and Artifacts:
+\li SNR: The signal-to-noise ratio relative to the fiber signal sacling factor. A rician noise model is used. If the SNR is larger than 99, no noise is added to the image.
+\li T2 Blurring: Simulate the exponential signal decay occurring during the application of the readout gradient. This is dependent on the tissue specific T2 relaxation times. The defaults correspond to values for white matter and water taken from literature.
+\li Gibbs Ringing: Ringing artifacts occurring on edges in the image due to the frequency low-pass filtering caused by the limited size of the k-space. The higher the oversampling factor, the larger the distance from the corresponding edge in which the ringing is still visible.
+
+If you want to use the same parameters (b-value, gradient directions, image geometry) as used for an already acquired dataset, simply select it additionally to the other input nodes. Fiberfox will automatically use these parameters for the signal generation.
+
+*/

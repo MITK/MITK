@@ -42,12 +42,12 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.dwisoftwarephantomview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
+  left->AddView("org.mitk.views.fiberfoxview");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberfoxview");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.fiberfoxview");
-  lo = layout->GetViewLayout("org.mitk.views.fiberfoxview");
+  left->AddView("org.mitk.views.dwisoftwarephantomview");
+  lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.segmentation");

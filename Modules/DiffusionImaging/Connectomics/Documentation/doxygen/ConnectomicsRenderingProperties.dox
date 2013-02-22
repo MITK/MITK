@@ -1,0 +1,5 @@
+/**
+\page ConnectomicsRenderingPropertiesPage Connectomics Rendering Properties
+
+The MITK connectomics module offers several different ways of visualizing connectomics network information. The corresponding properties are documented in \ref mitkConnectomicsRenderingProperties.h .
+*/

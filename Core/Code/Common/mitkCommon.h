@@ -76,7 +76,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc) \
 } \
 
 /**
-* Macro for Constructors with three parameters for classes derived from itk::Lightobject
+* Macro for Constructors with four parameters for classes derived from itk::Lightobject
 **/
 #define mitkNewMacro4Param(classname,typea,typeb,typec,typed) \
 static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
@@ -86,6 +86,27 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   return smartPtr; \
 } \
 
+/**
+* Macro for Constructors with five parameters for classes derived from itk::Lightobject
+**/
+#define mitkNewMacro5Param(classname,typea,typeb,typec,typed,typee) \
+static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd, typee _arge) \
+{ \
+  Pointer smartPtr = new classname ( _arga, _argb, _argc, _argd, _arge ); \
+  smartPtr->UnRegister(); \
+  return smartPtr; \
+} \
+
+/**
+* Macro for Constructors with six parameters for classes derived from itk::Lightobject
+**/
+#define mitkNewMacro6Param(classname,typea,typeb,typec,typed,typee, typef) \
+static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd, typee _arge, typef _argf) \
+{ \
+  Pointer smartPtr = new classname ( _arga, _argb, _argc, _argd, _arge, _argf ); \
+  smartPtr->UnRegister(); \
+  return smartPtr; \
+} \
 
 /** Get a smart const pointer to an object.  Creates the member
  * Get"name"() (e.g., GetPoints()). */

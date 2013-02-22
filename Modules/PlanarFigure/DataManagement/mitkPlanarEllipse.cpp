@@ -72,7 +72,6 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
         Vector2D vec1 = point - centerPoint;
         Vector2D vec2;
-        float r = centerPoint.EuclideanDistanceTo(otherPoint);
 
         if (index == 1 && m_TreatAsCircle )
         {
@@ -87,16 +86,29 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
 
             otherPoint = centerPoint+vec2;
             PlanarFigure::SetControlPoint( otherIndex, otherPoint, createIfDoesNotExist );
+            float r = centerPoint.EuclideanDistanceTo(otherPoint);
 
             // adjust additional third control point
+            Point2D p3 = this->GetControlPoint(3);
             Vector2D vec3;
-            vec3[0] = r;
-            vec3[1] = 0;
+            vec3[0] = p3[0]-centerPoint[0];
+            vec3[1] = p3[1]-centerPoint[1];
+            if (vec3[0]!=0 || vec3[1]!=0)
+            {
+                vec3.Normalize();
+                vec3 *= r;
+            }
+            else
+            {
+                vec3[0] = r;
+                vec3[1] = 0;
+            }
             point3 = centerPoint + vec3;
             PlanarFigure::SetControlPoint( 3, point3, createIfDoesNotExist );
         }
         else if ( vec1.GetNorm() > 0 )
         {
+            float r = centerPoint.EuclideanDistanceTo(otherPoint);
             float x = vec1[0];
             vec2[0] = vec1[1];
             vec2[1] = x;

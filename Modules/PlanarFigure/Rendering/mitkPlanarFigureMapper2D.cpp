@@ -337,14 +337,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   glColor4f( color[0], color[1], color[2], opacity );
   glLineWidth(lineWidth);
 
-  if ( closed )
-  {
-    glBegin( GL_LINE_LOOP );
-  }
-  else
-  {
-    glBegin( GL_LINE_STRIP );
-  }
+  glBegin( GL_LINE_STRIP );
 
   for ( PlanarFigure::PolyLineType::iterator iter = vertices.begin(); iter!=vertices.end(); iter++ )
   {
@@ -359,6 +352,14 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     glVertex3f( displayPoint[0], displayPoint[1], PLANAR_OFFSET );
   }
 
+  if(closed)
+  { // complete line loop to the first point again
+    mitk::Point2D displayPoint;
+    this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+
+    glVertex3f( displayPoint[0], displayPoint[1], PLANAR_OFFSET );
+  }
   glEnd();
 }
 
@@ -418,6 +419,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
+
   // Draw helper objects
   for ( unsigned int loop = 0; loop < figure->GetHelperPolyLinesSize(); ++loop )
   {

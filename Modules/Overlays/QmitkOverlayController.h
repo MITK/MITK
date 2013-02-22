@@ -79,6 +79,9 @@ public:
 
   void RemoveOverlay( QmitkOverlay* );
 
+  void RemoveAllOverlays();
+
+
   /**
   * \brief setting the visibility of all overlays
   */
@@ -102,12 +105,13 @@ public slots :
     * This method updates the position of all Widgets according to the position of the RenderWindow
     * and the extend of the overlays.
     */
-    void AdjustOverlayPosition();
+    void AdjustAllOverlayPosition();
+
+    void AdjustOverlayPosition( QmitkOverlay::DisplayPosition displayPosition );
 
     void UpdateAllOverlays();
 
     void UpdateOverlayData( QmitkOverlay* overlay );
-
 
 protected:
 
@@ -133,6 +137,7 @@ protected:
 
   void RestackOverlays( QmitkOverlay::DisplayPosition pos );
 
+  QSize GetMinimumSizeForWidget( QmitkOverlay::DisplayPosition displayPosition );
 
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;

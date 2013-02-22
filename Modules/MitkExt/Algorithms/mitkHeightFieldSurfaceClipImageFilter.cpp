@@ -185,6 +185,7 @@ namespace mitk
     outputimagetoitk->Update();
 
     typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
+                    std::vector< double > test;
 
 
     // create the iterators
@@ -325,10 +326,10 @@ namespace mitk
               The problem is the scaling of the planeP0 and the x/y values
 
               ScalarType q =
-                  q00 * ((double) x1 - planeP0[0]) * ((double) y1 - planeP0[1])
-                + q01 * (planeP0[0] - (double) x0) * ((double) y1 - planeP0[1])
-                + q10 * ((double) x1 - planeP0[0]) * (planeP0[1] - (double) y0)
-                + q11 * (planeP0[0] - (double) x0) * (planeP0[1] - (double) y0);
+              q00 * ((double) x1 - planeP0[0]) * ((double) y1 - planeP0[1])
+              + q01 * (planeP0[0] - (double) x0) * ((double) y1 - planeP0[1])
+              + q10 * ((double) x1 - planeP0[0]) * (planeP0[1] - (double) y0)
+              + q11 * (planeP0[0] - (double) x0) * (planeP0[1] - (double) y0);
               */
 
               //ATM: set the value direct, without interpolation: stepped view (only by the deformed plane)
@@ -360,6 +361,8 @@ namespace mitk
               {
                 if(inputIt.Get() != 0)
                   outputIt.Set( inputIt.Get() + m_MultiPlaneValue);
+                else
+                  outputIt.Set( inputIt.Get() );
               }
             }
             // the non-clipped pixel keeps his value

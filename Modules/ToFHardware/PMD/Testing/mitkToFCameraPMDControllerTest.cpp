@@ -29,6 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 //creating a concrete test implementation of the abstract class
 namespace mitk
 {
+/**
+   * @brief The ToFCameraPMDControllerTest class
+   * Special class to test the abstract class ToFCameraPMDController.
+   */
   class ToFCameraPMDControllerTest : public ToFCameraPMDController
   {
   public:
@@ -52,6 +56,9 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
 
   // initialize test
   mitk::ToFCameraPMDControllerTest::Pointer testObject = mitk::ToFCameraPMDControllerTest::New();
+  try
+  {
+
   MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
   MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
@@ -73,5 +80,10 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
   delete [] dataArray;
   delete [] sourceArray;
   delete [] shortSource;
+  }
+  catch(std::exception &e)
+  {
+      MITK_INFO << e.what();
+  }
   MITK_TEST_END();
 }

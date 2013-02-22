@@ -33,7 +33,7 @@ using namespace mitk;
 /**
   This function is testing the class mitk::OclContextManager.
   */
-int mitkOclResourceServiceTest( int /*argc*/, char** /*argv[]*/ )
+int mitkOclResourceServiceTest( int argc, char* argv[] )
 {
   MITK_TEST_BEGIN("mitkOclResourceServiceTest");
 

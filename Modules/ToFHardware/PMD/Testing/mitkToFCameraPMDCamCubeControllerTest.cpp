@@ -24,25 +24,33 @@ int mitkToFCameraPMDCamCubeControllerTest(int /* argc */, char* /*argv*/[])
 {
 
   MITK_TEST_BEGIN("ToFCameraPMDCamCubeController");
-  mitk::ToFCameraPMDCamCubeController::Pointer testObject = mitk::ToFCameraPMDCamCubeController::New();
-  MITK_TEST_CONDITION_REQUIRED(!testObject.GetPointer()==NULL,"Testing initialzation!");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
-  MITK_TEST_CONDITION_REQUIRED(testObject->OpenCameraConnection(),"Testing opening of camera connection!");
-  MITK_TEST_CONDITION_REQUIRED(testObject->UpdateCamera(),"Testing UpdateCamera()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetDistanceOffset(0.5f),"Testing SetDistanceOffset()");
+  mitk::ToFCameraPMDCamCubeController::Pointer camCubeController = mitk::ToFCameraPMDCamCubeController::New();
+  try
+  {
+
+  MITK_TEST_CONDITION_REQUIRED(camCubeController.IsNotNull(),"Testing initialzation!");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->OpenCameraConnection(),"Testing opening of camera connection!");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->UpdateCamera(),"Testing UpdateCamera()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetDistanceOffset(0.5f),"Testing SetDistanceOffset()");
   MITK_TEST_OUTPUT(<<"Call GetDistanceOffset()");
-  MITK_INFO<<testObject->GetDistanceOffset();
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetRegionOfInterest(3,5,200,201),"Testing SetRegionOfInterest()");
+  MITK_INFO<<camCubeController->GetDistanceOffset();
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetRegionOfInterest(3,5,200,201),"Testing SetRegionOfInterest()");
   MITK_TEST_OUTPUT(<<"Call GetRegionOfInterest()");
-  MITK_INFO<<testObject->GetRegionOfInterest();
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetExposureMode(0),"Testing SetExposureMode()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetFieldOfView(35.7f),"Testing SetFieldOfView()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetFPNCalibration(true),"Testing SetFPNCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetFPPNCalibration(true),"Testing SetFPPNCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetLinearityCalibration(true),"Testing SetLinearityCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetLensCalibration(true),"Testing SetLensCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->CloseCameraConnection(),"Testing closing of camera connection!");
+  MITK_INFO<<camCubeController->GetRegionOfInterest();
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetExposureMode(0),"Testing SetExposureMode()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetFieldOfView(35.7f),"Testing SetFieldOfView()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetFPNCalibration(true),"Testing SetFPNCalibration()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetFPPNCalibration(true),"Testing SetFPPNCalibration()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetLinearityCalibration(true),"Testing SetLinearityCalibration()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->SetLensCalibration(true),"Testing SetLensCalibration()");
+  MITK_TEST_CONDITION_REQUIRED(camCubeController->CloseCameraConnection(),"Testing closing of camera connection!");
+  }
+  catch(std::exception &e)
+  {
+      MITK_INFO << e.what();
+  }
 
   MITK_TEST_END();
 }

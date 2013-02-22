@@ -60,9 +60,8 @@ public:
 
   protected slots:
 
-  void ConvertShCoeffsFromFsl();    ///< convert fsl spherical harmonic coefficients to the according mitk datatype
-  void ConvertPeaksFromFsl();       ///< convert fsl peaks to the according mitk datatype
-  void ConvertPeaksFromMrtrix();    ///< convert mrtrix peaks to the according mitk datatype
+  void ConvertShCoeffs();           ///< convert spherical harmonic coefficients to the according mitk datatype
+  void ConvertPeaks();              ///< convert peak files from other toolkits to the according mitk datatype
   void GenerateImage();             ///< semicontinuous ODF maxima extraction
   void StartFiniteDiff();           ///< ODF maxima extraction using finite differences on the densely sampled sphere
   void StartTensor();               ///< extract principal eigenvectors from tensor image
@@ -81,7 +80,7 @@ protected:
 
   void UpdateGui();             ///< update button activity etc. dpending on current datamanager selection
   void GenerateDataFromDwi();   ///< semicontinuous ODF maxima extraction
-  template<int shOrder> void TemplatedConvertShCoeffsFromFsl(mitk::Image* mitkImg);
+  template<int shOrder> void TemplatedConvertShCoeffs(mitk::Image* mitkImg);
   template<int shOrder> void StartMaximaExtraction();   ///< ODF maxima extraction using finite differences on the densely sampled sphere
 
 private:

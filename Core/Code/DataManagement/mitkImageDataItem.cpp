@@ -142,7 +142,7 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
 
 void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
 {
-  mitk::ImageVtkAccessor *inData = ImageVtkAccessor::New(iP); //vtkImageData::New();
+  mitk::ImageVtkAccessor *inData = ImageVtkAccessor::New(iP,this); //vtkImageData::New();
   vtkDataArray *scalars = NULL;
 
   const unsigned int *dims = m_Dimensions;

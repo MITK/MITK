@@ -1,0 +1,29 @@
+/**
+\page ShortIntroductionToMITK A short introduction to MITK
+
+The Medical Imaging Interaction Toolkit (MITK) can be used in several different ways. If you are a new user to MITK the first question is in what manner you intend to use it. The following options are simplified and condensed versions of the most common usage scenarios.
+
+\tableofcontents
+
+\section ShortIntroductionToMITKAsToolkit I want to develop my own software framework, but use some of MITK's data structures and algorithms
+
+You will use MITK as a toolkit and probably benefit most from the \ref BuildInstructionsPage and <a
+href="modules.html">MITK API Documentation</a>.
+
+\section ShortIntroductionToMITKAsFramework I want to use the MITK and BlueBerry software framework to develop my own software
+
+Here you have again two options.
+
+\subsection ShortIntroductionToMITKAsFrameworkExtendingWorkbench I want use the MITK Workbench and extend its capabilities
+
+You are using MITK as software framework and writing your own modules and plugins for MITK. You want to read the \ref BuildInstructionsPage and further on \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
+
+\subsection ShortIntroductionToMITKAsFrameworkExternalProject I want to create my own application based on MITK but with major customizations and changes
+
+This is probably the most common way to use MITK. You are using MITK as software framework and building your own project and application using MITK. You want to read \ref HowToNewProject and the general information in \ref Development. Also you might want to take a look at our \ref CMAKE_FAQ.
+
+\section ShortIntroductionToMITKAsFrameworkEndUser I want to use the MITK Workbench to do image processing
+
+You are using MITK and the MITK Workbench as an end user and will find user manuals in \ref MITKUserManualPage and \ref PluginListPage.
+
+*/

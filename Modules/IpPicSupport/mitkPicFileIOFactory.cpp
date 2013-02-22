@@ -53,7 +53,7 @@ struct RegisterIpPicIOFactory{
   RegisterIpPicIOFactory()
     : m_Factory( mitk::PicFileIOFactory::New() )
   {
-    MITK_INFO << "Registering PicFileIOFactory ";
+    MITK_DEBUG << "Registering PicFileIOFactory ";
     itk::ObjectFactoryBase::RegisterFactory( m_Factory );
   }
 

@@ -109,7 +109,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter2->SetInput(nd1);
 
-  itk::Matrix<mitk::ScalarType,3,3> rotMatrix;
+  mitk::NavigationDataTransformFilter::TransformType::MatrixType rotMatrix;
   rotMatrix[0][0] = 0;
   rotMatrix[0][1] = 1;
   rotMatrix[0][2] = 0;
@@ -134,6 +134,29 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( mitk::Equal(output2->GetOrientation(), resultOri),"Testing if orientation after rotation is correctly caclculated  ");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
+
+  // test obscure rotation angle vs. ITK precision requirements
+  itk::QuaternionRigidTransform<mitk::NavigationDataTransformFilter::TransformType::ScalarType>::VnlQuaternionType obscureRotationQuat(37,29,71);
+  obscureRotationQuat.normalize();                 // Just to demonstrate that even normalizing doesn't help
+
+  itk::QuaternionRigidTransform<mitk::NavigationDataTransformFilter::TransformType::ScalarType>::Pointer rotation =
+      itk::QuaternionRigidTransform<mitk::NavigationDataTransformFilter::TransformType::ScalarType>::New();
+  rotation->SetRotation(obscureRotationQuat);
+
+  mitk::NavigationDataTransformFilter::TransformType::Pointer transform3 = mitk::NavigationDataTransformFilter::TransformType::New();
+  // For lack of an MITK Test macro that tests for *no* exception
+  try
+  {
+    MITK_TEST_OUTPUT_NO_ENDL(<< "Testing whether NavigationDataTransformFilter's internal transform has sufficient precision for ITK ")
+    transform3->SetMatrix(rotation->GetMatrix());
+    MITK_TEST_OUTPUT(<< " [PASSED]")
+    mitk::TestManager::GetInstance()->TestPassed();
+  }
+  catch(std::exception&)
+  {
+    MITK_TEST_OUTPUT(<< " [FAILED]")
+    mitk::TestManager::GetInstance()->TestFailed();
+  }
 
   //-----------------------------------------------------------------------------------------------------------
   /* now test the filter with multiple inputs */

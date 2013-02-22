@@ -108,15 +108,24 @@ void QmitkScalarBarOverlay::GetProperties( mitk::PropertyList::Pointer pl )
 
 void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
 {
-  if ( prop.IsNotNull() )
-  {
-    prop->RemoveObserver(m_ObserverTag);
 
-    typedef itk::SimpleMemberCommand< QmitkScalarBarOverlay > MemberCommandType;
-    MemberCommandType::Pointer propModifiedCommand;
-    propModifiedCommand = MemberCommandType::New();
-    propModifiedCommand->SetCallbackFunction( this, &QmitkScalarBarOverlay::SetScaleFactor );
-    m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+  if ( m_ObservedProperty != prop && m_ObserverTag == 0 )
+  {
+    if ( prop.IsNotNull() )
+    {
+      if ( m_ObservedProperty.IsNotNull() )
+      {
+        m_ObservedProperty->RemoveObserver( m_ObserverTag );
+      }
+
+      typedef itk::SimpleMemberCommand< QmitkScalarBarOverlay > MemberCommandType;
+      MemberCommandType::Pointer propModifiedCommand;
+      propModifiedCommand = MemberCommandType::New();
+      propModifiedCommand->SetCallbackFunction( this, &QmitkScalarBarOverlay::SetScaleFactor );
+      m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+    }
+
+    m_ObservedProperty = prop;
   }
   else
   {
@@ -124,3 +133,7 @@ void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
   }
 }
 
+QSize QmitkScalarBarOverlay::GetNeededSize()
+{
+  return m_Widget->size();
+}

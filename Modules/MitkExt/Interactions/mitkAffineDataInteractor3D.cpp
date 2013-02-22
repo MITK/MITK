@@ -90,10 +90,10 @@ void mitk::AffineDataInteractor3D::DataNodeChanged()
 
 bool mitk::AffineDataInteractor3D::CheckOverObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  //Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
-  //Re-enable VTK interactor (may have been disabled previously)
-  if ( renderWindowInteractor != NULL )
-    renderWindowInteractor->Enable();
+  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
+  ////Re-enable VTK interactor (may have been disabled previously)
+  //if ( renderWindowInteractor != NULL )
+  //  renderWindowInteractor->Enable();
 
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -150,12 +150,45 @@ bool mitk::AffineDataInteractor3D::DeselectObject(StateMachineAction*, Interacti
 
 bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
+  //// Disable VTK interactor until MITK interaction has been completed
+  //    if ( renderWindowInteractor != NULL )
+  //      renderWindowInteractor->Disable();
+
+  m_InitialPickedPoint = m_CurrentPickedPoint;
+  m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
+
+  // Get the timestep to also support 3D+t
+  int timeStep = 0;
+  if ((this->GetSender()).IsNotNull())
+    timeStep = this->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+  // Make deep copy of current Geometry3D of the plane
+  this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
+  m_OriginalGeometry = static_cast< Geometry3D * >(this->GetDataNode()->GetData()->GetGeometry( timeStep )->Clone().GetPointer() );
 
   return true;
 }
 
 bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  ////Is only a copy of the old AffineInteractor3D. Not sure if is still needed.
+  //// Disable VTK interactor until MITK interaction has been completed
+  //    if ( renderWindowInteractor != NULL )
+  //      renderWindowInteractor->Disable();
+
+  m_InitialPickedPoint = m_CurrentPickedPoint;
+  m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
+
+  // Get the timestep to also support 3D+t
+  int timeStep = 0;
+  if ((this->GetSender()).IsNotNull())
+    timeStep = this->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+  // Make deep copy of current Geometry3D of the plane
+  this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
+  m_OriginalGeometry = static_cast< Geometry3D * >(this->GetDataNode()->GetData()->GetGeometry( timeStep )->Clone().GetPointer() );
+
   return true;
 }
 

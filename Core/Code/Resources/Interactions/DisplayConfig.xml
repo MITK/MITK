@@ -12,62 +12,62 @@
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
   <param name="alwaysReact" value="false"/>
   <!-- Moving -->
-   <input event_class="MousePressEvent" event_variant="StartMove">
+   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
-  </input>
-  <input event_class="MouseReleaseEvent" event_variant="EndMoving">
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
     <attribute name="EventButton" value="MiddleMouseButton"/>
-  </input>
-  <input event_class="MouseMoveEvent" event_variant="Moving">
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
     <attribute name="ButtonState" value="MiddleMouseButton"/>
-  </input>
+  </event_variant>
   <!-- Zooming -->
-  <input event_class="MousePressEvent" event_variant="StartZoom">
+  <event_variant class="MousePressEvent" name="StartZoom">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
-  </input>
-   <input event_class="MouseMoveEvent" event_variant="Zooming">
+  </event_variant>
+   <event_variant class="MouseMoveEvent" name="Zooming">
     <attribute name="ButtonState" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
-  </input>
-  <input event_class="MouseReleaseEvent" event_variant="EndZooming">
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndZooming">
     <attribute name="EventButton" value="RightMouseButton"/>
     <attribute name="Modifiers" value="ctrl"/>
-  </input>
+  </event_variant>
   <!-- scrolling -->
   <!--
-  <input event_class="MousePressEvent" event_variant="StartScroll">
+  <event_variant class="MousePressEvent" name="StartScroll">
     <attribute name="EventButton" value="RightMouseButton"/>
-  </input>
-  <input event_class="MouseReleaseEvent" event_variant="EndScrolling">
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndScrolling">
     <attribute name="EventButton" value="RightMouseButton"/>
-  </input>
-  <input event_class="MouseMoveEvent" event_variant="Scrolling">
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Scrolling">
     <attribute name="ButtonState" value="RightMouseButton"/>
-  </input>
+  </event_variant>
   -->
   <!-- PlaneUP and -Down are described twice, this means the transition
   can be triggered by both events -->
-  <input event_class="MouseWheelEvent" event_variant="PlaneUP">
+  <event_variant class="MouseWheelEvent" name="PlaneUP">
     <attribute name="ScrollDirection" value="up"/>
-  </input>
-  <input event_class="MouseWheelEvent" event_variant="PlaneDown">
+  </event_variant>
+  <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
-  </input>
-    <input event_class="KeyEvent" event_variant="PlaneUP">
+  </event_variant>
+    <event_variant class="KeyEvent" name="PlaneUP">
     <attribute name="Key" value="ArrowUp"/>
-  </input>
-  <input event_class="KeyEvent" event_variant="PlaneDown">
+  </event_variant>
+  <event_variant class="KeyEvent" name="PlaneDown">
     <attribute name="Key" value="ArrowDown"/>
-  </input>
+  </event_variant>
   <!-- LevelWindow -->
-  <input event_class="MousePressEvent" event_variant="StartAdjustLevelWindow">
+  <event_variant class="MousePressEvent" name="StartAdjustLevelWindow">
     <attribute name="EventButton" value="RightMouseButton"/>
-  </input>
-  <input event_class="MouseReleaseEvent" event_variant="EndLevelWindow">
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndLevelWindow">
     <attribute name="EventButton" value="RightMouseButton"/>
-  </input>
-  <input event_class="MouseMoveEvent" event_variant="adjustlevelwindow">
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="adjustlevelwindow">
     <attribute name="ButtonState" value="RightMouseButton"/>
-  </input>
+  </event_variant>
 </config>

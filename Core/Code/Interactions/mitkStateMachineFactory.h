@@ -43,6 +43,11 @@ namespace mitk {
   *
   * @ingroup Interaction
   **/
+  /**
+   * \deprecatedSince{2013_03} StateMachineFactory is deprecated. Please use mitk::StateMachineContainer instead.
+   * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+   */
+
   class MITK_CORE_EXPORT StateMachineFactory : public vtkXMLParser
   {
   public:

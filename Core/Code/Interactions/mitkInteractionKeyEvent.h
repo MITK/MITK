@@ -43,16 +43,17 @@ namespace mitk
   class MITK_CORE_EXPORT InteractionKeyEvent : public InteractionEvent {
 
   public:
-    mitkClassMacro(InteractionKeyEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, std::string , ModifierKeys);
+    mitkClassMacro(InteractionKeyEvent,InteractionEvent)
+    mitkNewMacro3Param(Self, BaseRenderer*, const std::string , ModifierKeys)
 
     virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
 
     ModifierKeys GetModifiers() const;
     std::string GetKey() const;
 
   protected:
-    InteractionKeyEvent(BaseRenderer*, std::string key, ModifierKeys modifiers);
+    InteractionKeyEvent(BaseRenderer*, const std::string key, ModifierKeys modifiers);
     virtual ~InteractionKeyEvent();
 
   private:

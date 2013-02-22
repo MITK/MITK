@@ -14,21 +14,9 @@
 
  ===================================================================*/
 
-#include "mitkEventObserver.h"
+#include "mitkInteractionEventObserver.h"
 
-void mitk::EventObserver::Notify(InteractionEvent::Pointer /*interactionEvent*/, bool /*isHandled*/)
-{
-}
 
-mitk::EventObserver::EventObserver()
+mitk::InteractionEventObserver::~InteractionEventObserver()
 {
-}
-
-mitk::EventObserver::~EventObserver()
-{
-}
-
-bool mitk::EventObserver::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
-{
-  return true;
 }

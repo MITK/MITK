@@ -64,27 +64,18 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
   //if it is a key event that can be handled in the current state, then return 0.5
   mitk::DisplayPositionEvent const  *disPosEvent =
     dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-
   //Key event handling:
   if (disPosEvent == NULL)
   {
     //check, if the current state has a transition waiting for that key event.
     if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
-    {
-      return 0.5;
-    }
+    {return 0.5;}
     else
-    {
-      return 0;
-    }
+    {return 0;}
   }
-
   //on MouseMove do nothing!
   if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
-  {
-    return 0;
-  }
-
+  {return 0;}
   //get the time of the sender to look for the right transition.
   mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
   if (sender != NULL)
@@ -95,8 +86,6 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
     if (state!= NULL)
       if (state->GetTransition(stateEvent->GetId())!=NULL)
         returnValue = 0.5;//it can be understood
-
-
     mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
     if ( pointSet != NULL )
     {
@@ -104,9 +93,7 @@ float mitk::PointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) con
       if ( (pointSet->GetSize( timeStep ) > 0)
         && (pointSet->SearchPoint(
         disPosEvent->GetWorldPosition(), m_Precision, timeStep) > -1) )
-      {
-        returnValue = 1.0;
-      }
+      {returnValue = 1.0;}
     }
   }
   return returnValue;

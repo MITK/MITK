@@ -72,3 +72,8 @@ bool mitk::MouseWheelEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inte
   return ((this->GetWheelDelta() * mwe->GetWheelDelta() > 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
   && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates());
 }
+
+bool mitk::MouseWheelEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL) ;
+}

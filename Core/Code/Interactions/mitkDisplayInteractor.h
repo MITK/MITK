@@ -18,7 +18,7 @@
 #define mitkDisplayInteractor_h
 
 #include <MitkExports.h>
-#include "mitkEventObserver.h"
+#include "mitkInteractionEventObserver.h"
 
 namespace mitk
 {
@@ -26,33 +26,33 @@ namespace mitk
    *\class DisplayInteractor
    *@brief Observer that manages the interaction with the display.
    *
-   * This includes the interaction of Zooming, Panning and Scrolling.
+   * This includes the interaction of Zooming, Panning, Scrolling and adjusting the LevelWindow.
    *
    * @ingroup Interaction
    **/
   /**
-   * Inherits from mitk::EventObserver since it doesn't alter any data (only their representation),
-   * and its actions cannot be associated with a DataNode.
+   * Inherits from mitk::InteractionEventObserver since it doesn't alter any data (only their representation),
+   * and its actions cannot be associated with a DataNode. Also inherits from EventStateMachine
    */
-  class MITK_CORE_EXPORT DisplayInteractor: public EventObserver
+  class MITK_CORE_EXPORT DisplayInteractor: public EventStateMachine, public InteractionEventObserver
   {
   public:
-    mitkClassMacro(DisplayInteractor, StateMachine);
-    itkNewMacro(Self);
+    mitkClassMacro(DisplayInteractor, EventStateMachine)
+    itkNewMacro(Self)
     /**
      * By this function the Observer gets notifier about new events.
      * Here it is adapted to pass the events to the state machine in order to use
      * its infrastructure.
      * It also checks if event is to be accepted when i already has been processed by a DataInteractor.
      */
-    virtual void Notify(InteractionEvent::Pointer interactionEvent, bool isHandled);
+    virtual void Notify(InteractionEvent* interactionEvent, bool isHandled);
   protected:
     DisplayInteractor();
     virtual ~DisplayInteractor();
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
-     * this EventObserver. This is only necessary here because the events are processed by the state machine.
+     * this InteractionEventObserver. This is only necessary here because the events are processed by the state machine.
      */
     void ConnectActionsAndFunctions();
     /**
@@ -62,6 +62,15 @@ namespace mitk
      * and set the member variables accordingly.
      */
     virtual void ConfigurationChanged();
+
+    /**
+     * Derived function.
+     * Is executed when config object is set / changed.
+     * Here it is used to read out the parameters set in the configuration file,
+     * and set the member variables accordingly.
+     */
+    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
+
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
      */

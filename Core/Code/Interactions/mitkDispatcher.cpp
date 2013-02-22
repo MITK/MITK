@@ -74,6 +74,7 @@ size_t mitk::Dispatcher::GetNumberOfInteractors()
 mitk::Dispatcher::~Dispatcher()
 {
     if (m_EventObserverTracker != NULL) {
+        m_EventObserverTracker->Close();
         delete m_EventObserverTracker;
     }
 }

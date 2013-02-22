@@ -89,7 +89,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   // Get input gradient image pointer
   typename InputImageType::Pointer inputImage = static_cast< InputImageType * >(ProcessObject::GetInput(0));
   // ImageRegionIterator for the input image
-  ImageRegionConstIterator< InputImageType > iit(inputImage, outputRegionForThread);
+  ImageRegionIterator< InputImageType > iit(inputImage, outputRegionForThread);
   iit.GoToBegin();
 
   // Get output gradient image pointer
@@ -100,7 +100,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
   const int numShells = m_BValueMap.size()-1;
   BValueMap::iterator it = m_BValueMap.begin();
-  std::vector<double> adcVec = new Vector<double>(numShells);
+  //std::vector<double> adcVec = new Vector<double>(numShells);
 
 
   // create empty nxm SignalMatrix containing n->signals/directions (in case of interpolation ~ sizeAllDirections otherwise the size of any shell) for m->shells
@@ -126,7 +126,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
   // **
 
-
+  int vecLength;
 
   // initialize output image
   typename OutputImageType::Pointer outImage = OutputImageType::New();

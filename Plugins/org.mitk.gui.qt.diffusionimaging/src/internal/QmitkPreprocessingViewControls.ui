@@ -288,6 +288,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCommandLinkButton" name="m_AdcAverage">
+        <property name="text">
+         <string>ADC Average</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

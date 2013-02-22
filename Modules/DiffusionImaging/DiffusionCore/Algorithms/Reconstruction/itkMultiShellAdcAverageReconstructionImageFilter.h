@@ -52,8 +52,8 @@ namespace itk
     typedef MultiShellAdcAverageReconstructionImageFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< itk::VectorImage<TOutputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >
-      Superclass;
+    typedef ImageToImageFilter< itk::VectorImage<TOutputScalarType,3>, itk::VectorImage<TOutputScalarType,3> > Superclass;
+    typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self)
@@ -82,18 +82,20 @@ namespace itk
     itkGetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
     itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
 
-    itkGetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
-    itkSetMacro(GradientDirections, GradientDirectionContainerType::Pointer)
+    itkGetMacro(TargetGradientDirections, GradientDirectionContainerType::Pointer)
+    itkGetMacro(TargetBValue, float)
 
-    inline void SetOriginalBValueMap(BValueMap inp){m_OriginalBValueMap = inp;}
+    inline void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
 
   protected:
     MultiShellAdcAverageReconstructionImageFilter();
     ~MultiShellAdcAverageReconstructionImageFilter() {}
 
-    void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, int threadId);
+    void BeforeThreadedGenerateData();
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
 
-    GradientDirectionContainerType::Pointer m_GradientDirections;   ///< container for the subsampled output gradient directions
+
+    GradientDirectionContainerType::Pointer m_TargetGradientDirections;   ///< container for the subsampled output gradient directions
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions
 
     IndicesVector m_UsedGradientIndices;
@@ -101,6 +103,8 @@ namespace itk
     IndicesVector m_BaselineImageIndices;
 
     BValueMap m_BValueMap;
+
+    float m_TargetBValue;
 
     };
 

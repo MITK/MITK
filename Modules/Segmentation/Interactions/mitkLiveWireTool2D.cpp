@@ -46,7 +46,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetProperty("name", StringProperty::New("working contour node"));
   m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
-  m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
   m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
 
 
@@ -55,7 +55,7 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   //m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
-  m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
 
 

@@ -19,7 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "DiffusionCoreExports.h"
-
+#include "vector.h"
+#include "map.h"
+#include "vnl/vnl_vector.h"
+#include "vnl/vnl_vector_fixed.h"
+#include "itkVectorContainer.h"
 
 namespace mitk{
 
@@ -33,6 +37,24 @@ static double spherical_harmonic(int m,int l,double theta,double phi, bool compl
 static double Yj(int m, int k, double theta, double phi);
 
 };
+
+class DiffusionCore_EXPORT gradients
+{
+private:
+  typedef std::vector<unsigned int> IndiciesVector;
+  typedef std::map<double, IndiciesVector > BValueMap;
+  typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
+
+public:
+  static std::vector<unsigned int> GetAllUniqueDirections( std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer );
+
+  static bool CheckForDifferingShellDirections(std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer);
+
+  template<typename type>
+  static double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 );
+
+};
+
 }
 
 #endif //__mitkDiffusionFunctionCollection_h_

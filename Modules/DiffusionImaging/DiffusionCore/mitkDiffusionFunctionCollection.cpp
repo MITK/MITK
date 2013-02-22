@@ -28,66 +28,142 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/version.hpp>
 
-// Namespace ::vnl_function
+
+// Namespace ::Gradients
+#include "itkVectorContainer.h"
 #include "vnl/vnl_vector.h"
 
 //------------------------- SH-function ------------------------------------
 
 double mitk::sh::factorial(int number) {
-    if(number <= 1) return 1;
-    double result = 1.0;
-    for(int i=1; i<=number; i++)
-        result *= i;
-    return result;
+  if(number <= 1) return 1;
+  double result = 1.0;
+  for(int i=1; i<=number; i++)
+    result *= i;
+  return result;
 }
 
 void mitk::sh::Cart2Sph(double x, double y, double z, double *cart)
 {
-    double phi, th, rad;
-    rad = sqrt(x*x+y*y+z*z);
-    if( rad < mitk::eps )
-    {
-        th = M_PI/2;
-        phi = M_PI/2;
-    }
-    else
-    {
-        th = acos(z/rad);
-        phi = atan2(y, x);
-    }
-    cart[0] = phi;
-    cart[1] = th;
-    cart[2] = rad;
+  double phi, th, rad;
+  rad = sqrt(x*x+y*y+z*z);
+  if( rad < mitk::eps )
+  {
+    th = M_PI/2;
+    phi = M_PI/2;
+  }
+  else
+  {
+    th = acos(z/rad);
+    phi = atan2(y, x);
+  }
+  cart[0] = phi;
+  cart[1] = th;
+  cart[2] = rad;
 }
 
 double mitk::sh::legendre0(int l)
 {
-    if( l%2 != 0 )
-    {
-        return 0;
-    }
-    else
-    {
-        double prod1 = 1.0;
-        for(int i=1;i<l;i+=2) prod1 *= i;
-        double prod2 = 1.0;
-        for(int i=2;i<=l;i+=2) prod2 *= i;
-        return pow(-1.0,l/2.0)*(prod1/prod2);
-    }
+  if( l%2 != 0 )
+  {
+    return 0;
+  }
+  else
+  {
+    double prod1 = 1.0;
+    for(int i=1;i<l;i+=2) prod1 *= i;
+    double prod2 = 1.0;
+    for(int i=2;i<=l;i+=2) prod2 *= i;
+    return pow(-1.0,l/2.0)*(prod1/prod2);
+  }
 }
 
 
 double mitk::sh::Yj(int m, int l, double theta, double phi)
 {
   if (m<0)
-      return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
+    return sqrt(2.0)*::boost::math::spherical_harmonic_r(l, -m, theta, phi);
   else if (m==0)
-      return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
+    return ::boost::math::spherical_harmonic_r(l, m, theta, phi);
   else
-      return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
+    return pow(-1.0,m)*sqrt(2.0)*::boost::math::spherical_harmonic_i(l, m, theta, phi);
 
   return 0;
 }
 
+//------------------------- gradients-function ------------------------------------
+
+std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections( std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
+{
+
+  IndiciesVector directioncontainer;
+  BValueMap::iterator mapIterator = refBValueMap.begin();
+
+  if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
+    mapIterator++; //skip bzero Values
+
+  for( ; mapIterator != refBValueMap.end(); mapIterator++){
+
+    IndiciesVector currentShell = mapIterator->second;
+
+    while(currentShell.size()>0)
+    {
+      unsigned int wntIndex = currentShell.back();
+      currentShell.pop_back();
+
+      IndiciesVector::iterator containerIt = directioncontainer.begin();
+      bool directionExist = false;
+      while(containerIt != directioncontainer.end())
+      {
+        if (fabs(dot(refGradientsContainer->ElementAt(*containerIt), refGradientsContainer->ElementAt(wntIndex)))  > 0.9998)
+        {
+          directionExist = true;
+          break;
+        }
+        containerIt++;
+      }
+      if(!directionExist)
+      {
+        directioncontainer.push_back(wntIndex);
+      }
+    }
+  }
+
+  return directioncontainer;
+}
 
 
+bool mitk::gradients::CheckForDifferingShellDirections(std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer)
+{
+  BValueMap::iterator mapIterator = refBValueMap.begin();
+
+  if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
+    mapIterator++; //skip bzero Values
+
+  for( ; mapIterator != refBValueMap.end(); mapIterator++){
+
+    BValueMap::iterator mapIterator_2 = refBValueMap.begin();
+    if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
+      mapIterator_2++; //skip bzero Values
+
+    for( ; mapIterator_2 != refBValueMap.end(); mapIterator_2++){
+
+      if(mapIterator_2 == mapIterator) continue;
+
+      IndiciesVector currentShell = mapIterator->second;
+      IndiciesVector testShell = mapIterator_2->second;
+      for (unsigned int i = 0; i< currentShell.size(); i++)
+        if (fabs(dot(refGradientsContainer->ElementAt(currentShell[i]), refGradientsContainer->ElementAt(testShell[i])))  <= 0.9998) { return true; }
+
+    }
+  }
+  return false;
+}
+
+
+template<typename type>
+double mitk::gradients::dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 )
+{
+  double result = (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (v1.two_norm() * v2.two_norm());
+  return result ;
+}

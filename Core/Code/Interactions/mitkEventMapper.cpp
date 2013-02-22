@@ -544,19 +544,15 @@ bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
-  Module* module = GetModuleContext()->GetModule();
-  if (module == NULL) {
-    mitkThrow()<< ("Module context unavailable." );
-    return false;
-  }
+  Module* module = ModuleRegistry::GetModule("Mitk");
   ModuleResource resource = module->GetResource("Interactions/Legacy/StateMachine.xml");
   if (!resource.IsValid())
   {
     mitkThrow()<< ("Resource not valid. State machine pattern not found:Interactions/Legacy/StateMachine.xml" );
   }
   mitk::ModuleResourceStream stream(resource);
-  this->SetStream(&stream);
-  return this->Parse();
+  std::string patternString((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+  return this->LoadBehaviorString(patternString);
 }
 
 //##Documentation

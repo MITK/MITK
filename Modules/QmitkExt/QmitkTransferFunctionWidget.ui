@@ -28,7 +28,7 @@
      <item>
       <widget class="QmitkFloatingPointSpanSlider" name="m_RangeSlider">
        <property name="toolTip">
-        <string>modify actual seen window by dragging left and right slider. </string>
+        <string>Change transfer function window range.</string>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -90,7 +90,7 @@
         </property>
         <property name="toolTip">
          <string>Left-click to select a point or add a new point.
- Hold left mouse button to move selected point.
+Hold left mouse button to move selected point.
 Click right mouse button to delete a point.</string>
         </property>
        </widget>
@@ -152,6 +152,19 @@ Click right mouse button to delete a point.</string>
            <bool>false</bool>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QLabel" name="m_textLabelY">
@@ -245,7 +258,7 @@ Click right mouse button to delete a point.</string>
         </property>
         <property name="toolTip">
          <string>Left-click to select a point or add a new point.
- Hold left mouse button to move selected point.
+Hold left mouse button to move selected point.
 Click right mouse button to delete a point.
 Double-click left mouse button to change color of a point.</string>
         </property>
@@ -300,6 +313,19 @@ Double-click left mouse button to change color of a point.</string>
           </property>
          </widget>
         </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </item>
      </layout>
@@ -336,7 +362,7 @@ Double-click left mouse button to change color of a point.</string>
         </property>
         <property name="toolTip">
          <string>Left-click to select a point or add a new point.
- Hold left mouse button to move selected point.
+Hold left mouse button to move selected point.
 Click right mouse button to delete a point.</string>
         </property>
        </widget>
@@ -389,6 +415,19 @@ Click right mouse button to delete a point.</string>
            <bool>false</bool>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QLabel" name="m_textLabelY_2">

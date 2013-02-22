@@ -47,6 +47,9 @@
         <property name="text">
          <string>&lt;font color='red'&gt;mandatory&lt;/font&gt;</string>
         </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>

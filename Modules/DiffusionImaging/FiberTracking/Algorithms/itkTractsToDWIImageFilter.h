@@ -64,6 +64,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
     itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
@@ -114,6 +115,7 @@ protected:
     unsigned int                        m_Upsampling;
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
+    double                              m_InterpolationShrink;
 };
 }
 

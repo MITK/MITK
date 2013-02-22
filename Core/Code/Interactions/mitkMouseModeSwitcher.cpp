@@ -30,7 +30,7 @@ mitk::MouseModeSwitcher::MouseModeSwitcher() :
 
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
 {
-//  m_ServiceRegistration.Unregister();
+  m_ServiceRegistration.Unregister();
 }
 
 void mitk::MouseModeSwitcher::InitializeListeners()
@@ -41,7 +41,7 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
-    ServiceRegistration m_ServiceRegistration = GetModuleContext()->RegisterService<InteractionEventObserver>(
+    m_ServiceRegistration = GetModuleContext()->RegisterService<InteractionEventObserver>(
         m_CurrentObserver.GetPointer());
   }
 }

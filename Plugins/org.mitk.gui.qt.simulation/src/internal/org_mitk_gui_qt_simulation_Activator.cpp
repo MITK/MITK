@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_gui_qt_simulation_Activator.h"
+#include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
 #include <mitkNodePredicateDataType.h>
 #include <QmitkNodeDescriptorManager.h>
@@ -22,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::org_mitk_gui_qt_simulation_Activator::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationPreferencePage, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationView, context);
 
   QmitkNodeDescriptorManager* nodeDescriptorManager = QmitkNodeDescriptorManager::GetInstance();

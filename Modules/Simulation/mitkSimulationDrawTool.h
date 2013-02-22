@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <SimulationExports.h>
 #include <sofa/core/visual/DrawTool.h>
+#include <vtkActor.h>
+#include <vtkSmartPointer.h>
 
-class vtkActor;
-class vtkObjectBase;
 class vtkProperty;
 
 namespace mitk
@@ -51,7 +51,7 @@ namespace mitk
       *
       * \note Do not delete the VTK actors returned by this method.
       */
-    std::vector<vtkActor*> GetActors() const;
+    std::vector<vtkSmartPointer<vtkActor> > GetActors() const;
 
     /** \brief Clears internal lists of current VTK objects and enables creation of new VTK actors when calling draw methods.
       */
@@ -95,11 +95,9 @@ namespace mitk
     SimulationDrawTool(const SimulationDrawTool&);
     SimulationDrawTool& operator=(const SimulationDrawTool&);
 
-    void DeleteVtkObjects();
     void InitProperty(vtkProperty* property) const;
 
-    std::vector<vtkObjectBase*> m_VtkObjects;
-    std::vector<vtkActor*> m_Actors;
+    std::vector<vtkSmartPointer<vtkActor> > m_Actors;
     int m_PolygonMode;
     bool m_Wireframe;
     bool m_Update;

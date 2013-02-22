@@ -31,7 +31,7 @@ namespace mitk
 {
   class InternalEvent;
   class InteractionEvent;
-  class InteractionEventObserver;
+  struct InteractionEventObserver;
 
   /**
   * \class Dispatcher
@@ -123,7 +123,7 @@ namespace mitk
     /**
      * Hold microservice reference to object that takes care of informing the InteractionEventObservers about InteractionEvents
      */
-    mitk::ServiceTracker<InteractionEventObserver*> m_EventObserverTracker;
+    mitk::ServiceTracker<InteractionEventObserver*>* m_EventObserverTracker;
 
   };
 

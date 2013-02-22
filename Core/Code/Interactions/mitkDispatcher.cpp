@@ -27,9 +27,10 @@
 
 
 mitk::Dispatcher::Dispatcher() :
-    m_ProcessingMode(REGULAR), m_EventObserverTracker(GetModuleContext())
+    m_ProcessingMode(REGULAR)
 {
-  m_EventObserverTracker.Open();
+  m_EventObserverTracker = new mitk::ServiceTracker<InteractionEventObserver*>(GetModuleContext());
+  m_EventObserverTracker->Open();
 }
 
 void mitk::Dispatcher::AddDataInteractor(const DataNode* dataNode)
@@ -72,6 +73,8 @@ size_t mitk::Dispatcher::GetNumberOfInteractors()
 
 mitk::Dispatcher::~Dispatcher()
 {
+  m_EventObserverTracker->Close();
+  delete m_EventObserverTracker;
 }
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
@@ -148,7 +151,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 
   /* Notify InteractionEventObserver  */
   std::list<mitk::ServiceReference> listEventObserver;
-  m_EventObserverTracker.GetServiceReferences(listEventObserver);
+  m_EventObserverTracker->GetServiceReferences(listEventObserver);
   for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
   {
 
@@ -156,7 +159,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 
     //if (!patternName.Empty() || patternName.ToString() == "")
     //{
-      InteractionEventObserver* interactionEventObserver = m_EventObserverTracker.GetService(*it);
+      InteractionEventObserver* interactionEventObserver = m_EventObserverTracker->GetService(*it);
       if (interactionEventObserver != NULL)
       {
         interactionEventObserver->Notify(event, eventIsHandled);

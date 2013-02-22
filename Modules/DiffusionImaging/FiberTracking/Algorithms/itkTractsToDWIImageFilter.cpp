@@ -40,6 +40,7 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_Upsampling(1)
     , m_NumberOfRepetitions(1)
     , m_EnforcePureFiberVoxels(true)
+    , m_InterpolationShrink(5)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -381,6 +382,8 @@ void TractsToDWIImageFilter::GenerateData()
     }
     else
     {
+        double interpFact = 2*atan(-0.5*m_InterpolationShrink);
+
         vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
         vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
         vLines->InitTraversal();
@@ -432,6 +435,10 @@ void TractsToDWIImageFilter::GenerateData()
                     idx[2] -= 1;
                     frac_z += 1;
                 }
+
+                frac_x = atan((0.5-frac_x)*m_InterpolationShrink)/interpFact + 0.5;
+                frac_y = atan((0.5-frac_y)*m_InterpolationShrink)/interpFact + 0.5;
+                frac_z = atan((0.5-frac_z)*m_InterpolationShrink)/interpFact + 0.5;
 
                 // use trilinear interpolation
                 itk::Index<3> newIdx;

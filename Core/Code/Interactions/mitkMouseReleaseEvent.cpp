@@ -17,7 +17,7 @@
 #include "mitkException.h"
 #include "mitkMouseReleaseEvent.h"
 
-mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer = NULL,
+mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer,
     mitk::Point2D mousePosition,
     mitk::MouseButtons buttonStates,
     mitk::ModifierKeys modifiers,

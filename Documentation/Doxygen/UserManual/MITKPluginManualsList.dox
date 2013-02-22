@@ -23,6 +23,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_views_volumevisualization
   \li \subpage org_mitk_gui_qt_dicom
   \li \subpage org_mitk_gui_qt_ultrasound
+  \li \subpage org_mitk_views_fiberfoxview
 
 \section PluginListPageDevPluginList List of Plugins for Developer Use and Examples
 
@@ -32,6 +33,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitkexamplesopencv
   \li \ref org_mitk_gui_qt_igtexample
   \li \ref org_mitk_gui_qt_igttracking
+  \li \subpage org_mitk_gui_InteractionTests
 
 
 */

@@ -31,7 +31,7 @@ namespace mitk
 {
   class InternalEvent;
   class InteractionEvent;
-  class InteractionEventObserver;
+  struct InteractionEventObserver;
 
   /**
   * \class Dispatcher

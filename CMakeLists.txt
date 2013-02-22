@@ -154,7 +154,25 @@ option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
 if(MITK_USE_Python)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Cmake/PackageDepends/MITK_PythonLibs_Config.cmake")
+  #FIND_PACKAGE(PythonLibs REQUIRED)
+  #set(PYTHON_LIBRARY "" CACHE FILEPATH "Specify where to find the Python library for the superbuild")
+
+  #FIND_PACKAGE(PythonInterp REQUIRED)
+  #FIND_PACKAGE(PythonLibs REQUIRED)
+  #list(LENGTH PYTHON_LIBRARY pythLibsListLength)
+  # on windows PYTHON_LIBRARY is "optimized;C:/Python27/libs/python27.lib;debug;C:/Python27/libs/python27_d.lib"
+  # this struggles with passing the var through the superbuild
+  #SET(MITK_PYTHON_NO_OPTIMIZED_LIBRARY ${PYTHON_LIBRARY})
+  #if( pythLibsListLength EQUAL 4 )
+    #list(GET PYTHON_LIBRARY 1 MITK_PYTHON_NO_OPTIMIZED_LIBRARY)
+  #endif()
+  #message("PYTHON_LIBRARY ${PYTHON_LIBRARY}")
+  #message("MITK_PYTHON_PLAIN_LIBRARY ${MITK_PYTHON_NO_OPTIMIZED_LIBRARY}")
+  #message("PYTHON_INCLUDE_DIR ${PYTHON_INCLUDE_DIR}")
+  #message("PYTHON_DEBUG_LIBRARY ${PYTHON_DEBUG_LIBRARY}")
+  #message("PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE}")
+  #message("PYTHON_LIBRARIES ${PYTHON_LIBRARIES}")
+  #message("PYTHON_DEBUG_LIBRARIES ${PYTHON_DEBUG_LIBRARIES}")
 endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS

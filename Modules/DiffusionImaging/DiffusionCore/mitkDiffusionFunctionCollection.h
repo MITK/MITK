@@ -35,7 +35,6 @@ public:
   static double legendre0(int l);
   static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
   static double Yj(int m, int k, double theta, double phi);
-
 };
 
 class DiffusionCore_EXPORT gradients
@@ -49,6 +48,8 @@ public:
   static std::vector<unsigned int> GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer );
 
   static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
+  static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
+  static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, GradientDirectionContainerType::Pointer refGradientsContainer);
 
   template<typename type>
   static double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 );

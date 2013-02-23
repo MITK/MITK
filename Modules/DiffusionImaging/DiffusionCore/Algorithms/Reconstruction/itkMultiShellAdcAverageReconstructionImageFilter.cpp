@@ -99,16 +99,47 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
     IndicesVector allDirectionsIndicies = mitk::gradients::GetAllUniqueDirections(m_BValueMap, m_OriginalGradientDirections);
 
     // [sizeAllDirections] size of GradientContainer cointaining all unique directions
-    const int allDirectionsSize = allDirections.size();
+    const int allDirectionsSize = allDirectionsIndicies.size();
+    std::vector<unsigned int> SHMaxOrderVector(m_BValueMap.size()-1);
+    std::vector<double> WeightsVector(m_BValueMap.size()-1);
+    std::vector<vnl_matrix< double > > ShellInterpolationMatrixVector(m_BValueMap.size()-1);
+    // for Weightings
+    unsigned int maxShellSize = 0;
 
-    /* for each shell
-     * - calculate maxShOrder
-     * - calculate Weights [Weigthing = shell_size / max_shell_size]
-     * - get TragetSHBasis using allDirectionsContainer
-     * - get ShellSHBasis using currentShellDirections
-     * - calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
-     * - save interpolationSHBasis
-     */
+    // for each shell
+    BValueMap::const_iterator it = m_BValueMap.begin();
+    it++; //skip bZeroIndices
+    for(;it != m_BValueMap.end();it++)
+    {
+      //- calculate maxShOrder
+      IndicesVector currentShell = (*it).second;
+      unsigned int SHMaxOrder = 12;
+      while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size())
+        SHMaxOrder -= 2 ;
+
+      //- save shell size
+      WeightsVector.push_back(currentShell.size());
+      if(currentShell.size() > maxShellSize)
+        maxShellSize = currentShell.size();
+
+      //- get TragetSHBasis using allDirectionsContainer
+      vnl_matrix<double> sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(allDirectionsIndicies, m_OriginalGradientDirections);
+      vnl_matrix<double> TargetSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
+      //- get ShellSHBasis using currentShellDirections
+      sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(currentShell, m_OriginalGradientDirections);
+      vnl_matrix<double> ShellSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
+      //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
+      vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
+      vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.inverse();
+      ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
+      //- save interpolationSHBasis
+
+    }
+
+    //- calculate Weights [Weigthing = shell_size / max_shell_size]
+    for(int i = 0 ; i < WeightsVector.size(); i++)
+      WeightsVector.at(i) /= maxShellSize;
+
   }
 
   // calculate average b-Value for target b-Value [bVal_t]

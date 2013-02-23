@@ -30,11 +30,11 @@ namespace mitk{
 class DiffusionCore_EXPORT sh
 {
 public:
-static double factorial(int number);
-static void Cart2Sph(double x, double y, double z, double* cart);
-static double legendre0(int l);
-static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
-static double Yj(int m, int k, double theta, double phi);
+  static double factorial(int number);
+  static void Cart2Sph(double x, double y, double z, double* cart);
+  static double legendre0(int l);
+  static double spherical_harmonic(int m,int l,double theta,double phi, bool complexPart);
+  static double Yj(int m, int k, double theta, double phi);
 
 };
 
@@ -46,9 +46,9 @@ private:
   typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
 
 public:
-  static std::vector<unsigned int> GetAllUniqueDirections( std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer );
+  static std::vector<unsigned int> GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer );
 
-  static bool CheckForDifferingShellDirections(std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer);
+  static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
 
   template<typename type>
   static double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 );

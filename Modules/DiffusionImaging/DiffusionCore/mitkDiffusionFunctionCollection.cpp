@@ -93,11 +93,11 @@ double mitk::sh::Yj(int m, int l, double theta, double phi)
 
 //------------------------- gradients-function ------------------------------------
 
-std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections( std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
+std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
 {
 
   IndiciesVector directioncontainer;
-  BValueMap::iterator mapIterator = refBValueMap.begin();
+  BValueMap::const_iterator mapIterator = refBValueMap.begin();
 
   if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
     mapIterator++; //skip bzero Values
@@ -133,16 +133,16 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections( std::map<doub
 }
 
 
-bool mitk::gradients::CheckForDifferingShellDirections(std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer)
+bool mitk::gradients::CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer)
 {
-  BValueMap::iterator mapIterator = refBValueMap.begin();
+  BValueMap::const_iterator mapIterator = refBValueMap.begin();
 
   if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
     mapIterator++; //skip bzero Values
 
   for( ; mapIterator != refBValueMap.end(); mapIterator++){
 
-    BValueMap::iterator mapIterator_2 = refBValueMap.begin();
+    BValueMap::const_iterator mapIterator_2 = refBValueMap.begin();
     if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
       mapIterator_2++; //skip bzero Values
 

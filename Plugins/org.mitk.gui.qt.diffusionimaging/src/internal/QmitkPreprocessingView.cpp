@@ -139,6 +139,7 @@ void QmitkPreprocessingView::DoAdcAverage()
   filter->SetInput(m_DiffusionImage->GetVectorImage());
   filter->SetOriginalGradientDirections(gradientContainer);
   filter->SetOriginalBValueMap(originalShellMap);
+  filter->SetBValue(m_DiffusionImage->GetB_Value());
   filter->Update();
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();

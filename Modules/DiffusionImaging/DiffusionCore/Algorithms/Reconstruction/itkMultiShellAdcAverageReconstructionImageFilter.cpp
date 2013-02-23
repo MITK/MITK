@@ -40,13 +40,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <time.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>
+#include "mitkDiffusionFunctionCollection.h"
 
 namespace itk
 {
 
 template <class TInputScalarType, class TOutputScalarType>
 MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
-::MultiShellAdcAverageReconstructionImageFilter()
+::MultiShellAdcAverageReconstructionImageFilter():
+  m_Interpolation(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
 }
@@ -55,28 +57,69 @@ template <class TInputScalarType, class TOutputScalarType>
 void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
 ::BeforeThreadedGenerateData()
 {
-  // test whether interpolation is necessary
-  // - Gradeint directions on different shells are different
-  //# if interpolation is neccesary and any #ShellDirection < 15 --> itkException (No interpolation possible)
 
   // test whether BvalueMap contains all necessary information
-  //# BValueMapSize == 0 --> itkWarning (take BValueMap from inputImage)
+  if(m_BValueMap.size() == 0)
+  {
+    itkWarningMacro(<< "No BValueMap given: create one using GradientDirectionContainer");
+
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = m_OriginalGradientDirections->Begin(); gdcit != m_OriginalGradientDirections->End(); ++gdcit)
+    {
+      double bValueKey = int(((m_BValue * gdcit.Value().two_norm() * gdcit.Value().two_norm())+7.5)/10)*10;
+      m_BValueMap[bValueKey].push_back(gdcit.Index());
+    }
+  }
+
   //# BValueMap contains no bZero --> itkException
+  if(m_BValueMap.find(0.0) == m_BValueMap.end())
+  {
+    MITK_INFO << "No ReferenceSignal (BZeroImages) found!";
+    itkExceptionMacro(<< "No ReferenceSignal (BZeroImages) found!");
+  }
+
+  // test whether interpolation is necessary
+  // - Gradeint directions on different shells are different
+  m_Interpolation = mitk::gradients::CheckForDifferingShellDirections(m_BValueMap, m_OriginalGradientDirections.GetPointer());
 
   // if INTERPOLATION necessary
-  // [allDirectionsContainer] Gradient DirectionContainer containing all unique directions
-  // [sizeAllDirections] size of GradientContainer cointaining all unique directions
-  /* for each shell
-   * - calculate maxShOrder
-   * - calculate Weights [Weigthing = shell_size / max_shell_size]
-   * - get TragetSHBasis using allDirectionsContainer
-   * - get ShellSHBasis using currentShellDirections
-   * - calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
-   * - save interpolationSHBasis
-   */
+  if(m_Interpolation)
+  {
+    for(BValueMap::const_iterator it = m_BValueMap.begin();it != m_BValueMap.end(); it++)
+    {
+      if((*it).first == 0.0) continue;
+      // if any #ShellDirection < 15 --> itkException (No interpolation possible)
+      if((*it).second.size() < 15){
+        MITK_INFO << "Abort: No interpolation possible Shell-" << (*it).first << " has less than 15 directions.";
+        itkExceptionMacro(<<"No interpolation possible");
+      }
+    }
+
+    // [allDirectionsContainer] Gradient DirectionContainer containing all unique directions
+    IndicesVector allDirectionsIndicies = mitk::gradients::GetAllUniqueDirections(m_BValueMap, m_OriginalGradientDirections);
+
+    // [sizeAllDirections] size of GradientContainer cointaining all unique directions
+    const int allDirectionsSize = allDirections.size();
+
+    /* for each shell
+     * - calculate maxShOrder
+     * - calculate Weights [Weigthing = shell_size / max_shell_size]
+     * - get TragetSHBasis using allDirectionsContainer
+     * - get ShellSHBasis using currentShellDirections
+     * - calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
+     * - save interpolationSHBasis
+     */
+  }
 
   // calculate average b-Value for target b-Value [bVal_t]
   // calculate target bZero-Value [b0_t]
+
+  MITK_INFO << "Input:" << std::endl
+            << "GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
+            << "Shells: " << (m_BValueMap.size() - 1) << std::endl
+            << "ReferenceImages: " << m_BValueMap.at(0.0).size() << std::endl
+            << "Interpolation: " << m_Interpolation;
+
 
 }
 
@@ -86,7 +129,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 ::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, int /*threadId*/)
 {
 
-  // Get input gradient image pointer
+  /* // Get input gradient image pointer
   typename InputImageType::Pointer inputImage = static_cast< InputImageType * >(ProcessObject::GetInput(0));
   // ImageRegionIterator for the input image
   ImageRegionIterator< InputImageType > iit(inputImage, outputRegionForThread);
@@ -101,7 +144,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   const int numShells = m_BValueMap.size()-1;
   BValueMap::iterator it = m_BValueMap.begin();
   //std::vector<double> adcVec = new Vector<double>(numShells);
-
+*/
 
   // create empty nxm SignalMatrix containing n->signals/directions (in case of interpolation ~ sizeAllDirections otherwise the size of any shell) for m->shells
   // create nx1 targetSignalVector
@@ -125,7 +168,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   // outImageIterator set S_t
 
   // **
-
+  /*
   int vecLength;
 
   // initialize output image
@@ -143,6 +186,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   this->SetNumberOfRequiredOutputs (1);
   this->SetNthOutput (0, outImage);
   MITK_INFO << "...done";
+  */
 }
 
 

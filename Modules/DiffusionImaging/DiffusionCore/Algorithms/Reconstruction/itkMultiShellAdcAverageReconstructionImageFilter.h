@@ -13,22 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-/*=========================================================================
 
-Program:   Tensor ToolKit - TTK
-Module:    $URL: svn://scm.gforge.inria.fr/svn/ttk/trunk/Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h $
-Language:  C++
-Date:      $Date: 2010-06-07 13:39:13 +0200 (Mo, 07 Jun 2010) $
-Version:   $Revision: 68 $
-
-Copyright (c) INRIA 2010. All rights reserved.
-See LICENSE.txt for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
 #ifndef _itk_MultiShellAdcAverageReconstructionImageFilter_h_
 #define _itk_MultiShellAdcAverageReconstructionImageFilter_h_
 
@@ -85,6 +70,8 @@ namespace itk
     itkGetMacro(TargetGradientDirections, GradientDirectionContainerType::Pointer)
     itkGetMacro(TargetBValue, float)
 
+    itkGetMacro(BValue,float)
+    itkSetMacro(BValue,float)
     inline void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
 
   protected:
@@ -98,13 +85,12 @@ namespace itk
     GradientDirectionContainerType::Pointer m_TargetGradientDirections;   ///< container for the subsampled output gradient directions
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions
 
-    IndicesVector m_UsedGradientIndices;
-    IndicesVector m_UnusedGradientIndices;
-    IndicesVector m_BaselineImageIndices;
-
     BValueMap m_BValueMap;
+    float m_BValue;
 
     float m_TargetBValue;
+
+    bool m_Interpolation;
 
     };
 

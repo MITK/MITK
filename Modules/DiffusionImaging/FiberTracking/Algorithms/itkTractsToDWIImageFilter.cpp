@@ -124,16 +124,16 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // save k-space slice of s0 image
                 if (g==0)
-                for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
-                    for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
-                    {
-                        DoubleDwiType::IndexType index3D;
-                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                        SliceType::IndexType index2D;
-                        index2D[0]=x; index2D[1]=y;
-                        double kpix = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
-                        m_KspaceImage->SetPixel(index3D, kpix);
-                    }
+                    for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
+                        for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
+                        {
+                            DoubleDwiType::IndexType index3D;
+                            index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                            SliceType::IndexType index2D;
+                            index2D[0]=x; index2D[1]=y;
+                            double kpix = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
+                            m_KspaceImage->SetPixel(index3D, kpix);
+                        }
 
                 // inverse fourier transform slice
                 SliceType::Pointer newSlice;
@@ -492,7 +492,7 @@ void TractsToDWIImageFilter::GenerateData()
                 for (int i=0; i<m_FiberModels.size(); i++)
                     w += compartments.at(i)->GetPixel(index)[baselineIndex];
 
-                if (w>voxelVolume)  // more fiber than space in voxel?
+                if (w>voxelVolume || w>0 && m_EnforcePureFiberVoxels)  // more fiber than space in voxel?
                 {
                     // adjust fiber signal
                     for (int i=0; i<m_FiberModels.size(); i++)
@@ -500,17 +500,18 @@ void TractsToDWIImageFilter::GenerateData()
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i);
                         doubleDwi->SetPixel(index, doubleDwi->GetPixel(index)*voxelVolume/w);
                     }
-                    w = 0;              // no non-fiber volume left
                 }
                 else
+                {
                     w = voxelVolume-w;  // non-fiber volume
 
-                // adjust non-fiber signal
-                for (int i=0; i<m_NonFiberModels.size(); i++)
-                {
-                    DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
-                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w/m_NonFiberModels.size();
-                    doubleDwi->SetPixel(index, pix);
+                    // adjust non-fiber signal
+                    for (int i=0; i<m_NonFiberModels.size(); i++)
+                    {
+                        DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
+                        DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w/m_NonFiberModels.size();
+                        doubleDwi->SetPixel(index, pix);
+                    }
                 }
             }
             ++it3;

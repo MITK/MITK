@@ -89,6 +89,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_KspaceParamFrame->setVisible(false);
         m_Controls->m_StickModelFrame->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -109,16 +110,23 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
         connect((QObject*) m_Controls->m_FiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
         connect((QObject*) m_Controls->m_NonFiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
-        connect((QObject*) m_Controls->m_AdvancedFiberOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedFiberOptions(int)));
+        connect((QObject*) m_Controls->m_AdvancedOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
+        connect((QObject*) m_Controls->m_AdvancedOptionsBox_2, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
     }
 }
 
-void QmitkFiberfoxView::ShowAdvancedFiberOptions(int state)
+void QmitkFiberfoxView::ShowAdvancedOptions(int state)
 {
     if (state)
+    {
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(true);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(true);
+    }
     else
+    {
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
+    }
 }
 
 void QmitkFiberfoxView::FiberModelFrameVisibility(int index)

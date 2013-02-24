@@ -66,6 +66,7 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( SignalScale, double )
     itkSetMacro( FiberRadius, double )
     itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
@@ -120,6 +121,7 @@ protected:
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;
     double                              m_FiberRadius;
+    double                              m_SignalScale;
 };
 }
 

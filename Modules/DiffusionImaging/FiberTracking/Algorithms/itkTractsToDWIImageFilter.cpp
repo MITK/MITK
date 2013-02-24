@@ -39,9 +39,10 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_VolumeAccuracy(10)
     , m_Upsampling(1)
     , m_NumberOfRepetitions(1)
-    , m_EnforcePureFiberVoxels(true)
-    , m_InterpolationShrink(5)
-    , m_FiberRadius(10)
+    , m_EnforcePureFiberVoxels(false)
+    , m_InterpolationShrink(10)
+    , m_FiberRadius(20)
+    , m_SignalScale(300)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -116,7 +117,8 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)
                 {
-                    m_KspaceArtifacts.at(a)->SetRelaxationT2(signalModel->GetRelaxationT2());
+                    m_KspaceArtifacts.at(a)->SetT1(signalModel->GetT1());
+                    m_KspaceArtifacts.at(a)->SetT2(signalModel->GetT2());
                     fSlice = m_KspaceArtifacts.at(a)->AddArtifact(fSlice);
                 }
 
@@ -475,22 +477,6 @@ void TractsToDWIImageFilter::GenerateData()
         }
 
         MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
-        boost::progress_display disp2(m_NonFiberModels.size()*compartments.at(0)->GetLargestPossibleRegion().GetNumberOfPixels());
-        for (int i=0; i<m_NonFiberModels.size(); i++)
-        {
-            DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
-            ImageRegionIterator<DoubleDwiType> it(doubleDwi, doubleDwi->GetLargestPossibleRegion());
-            while(!it.IsAtEnd())
-            {
-                ++disp2;
-                DoubleDwiType::IndexType index = it.GetIndex();
-                if (m_TissueMask->GetLargestPossibleRegion().IsInside(index) && m_TissueMask->GetPixel(index)>0)
-                    doubleDwi->SetPixel(index, doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement());
-                ++it;
-            }
-        }
-
-        MITK_INFO << "Adjusting compartment signal intensities according to volume fraction";
         ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
         boost::progress_display disp3(m_TissueMask->GetLargestPossibleRegion().GetNumberOfPixels());
         double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
@@ -501,32 +487,29 @@ void TractsToDWIImageFilter::GenerateData()
 
             if (it3.Get()>0)
             {
-                double w = compartments.at(0)->GetPixel(index)[baselineIndex]; // fiber volume
-                double overflowCorrection = 1;
-                if (w>voxelVolume)  // more fiber than space in voxel?
-                    overflowCorrection = voxelVolume/w;
-
-                w = voxelVolume-w;
-                if (w<0)
-                {
-
-                    w = 0;
-                }
-
-                // adjust fiber signal
+                // get fiber volume fraction
+                double w = 0;
                 for (int i=0; i<m_FiberModels.size(); i++)
+                    w += compartments.at(i)->GetPixel(index)[baselineIndex];
+
+                if (w>voxelVolume)  // more fiber than space in voxel?
                 {
-                    DoubleDwiType::Pointer doubleDwi = compartments.at(i);
-                    DoubleDwiType::PixelType pix = overflowCorrection*doubleDwi->GetPixel(index)/m_FiberModels.size();
-                    doubleDwi->SetPixel(index, pix);
+                    // adjust fiber signal
+                    for (int i=0; i<m_FiberModels.size(); i++)
+                    {
+                        DoubleDwiType::Pointer doubleDwi = compartments.at(i);
+                        doubleDwi->SetPixel(index, doubleDwi->GetPixel(index)*voxelVolume/w);
+                    }
+                    w = 0;              // no non-fiber volume left
                 }
+                else
+                    w = voxelVolume-w;  // non-fiber volume
 
                 // adjust non-fiber signal
                 for (int i=0; i<m_NonFiberModels.size(); i++)
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
-                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
-                    pix *= w/m_NonFiberModels.size();
+                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w/m_NonFiberModels.size();
                     doubleDwi->SetPixel(index, pix);
                 }
             }
@@ -542,7 +525,7 @@ void TractsToDWIImageFilter::GenerateData()
     compartments = AddKspaceArtifacts(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
-    double correction = m_Upsampling*m_Upsampling;
+    double correction = m_SignalScale/(m_Upsampling*m_Upsampling);
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -554,17 +537,11 @@ void TractsToDWIImageFilter::GenerateData()
 
         // adjust fiber signal
         for (int i=0; i<m_FiberModels.size(); i++)
-        {
-            double s = m_FiberModels.at(i)->GetSignalScale()/correction;
-            signal += compartments.at(i)->GetPixel(index)*s;
-        }
+            signal += compartments.at(i)->GetPixel(index)*correction;
 
         // adjust non-fiber signal
         for (int i=0; i<m_NonFiberModels.size(); i++)
-        {
-            double s = m_NonFiberModels.at(i)->GetSignalScale()/correction;
-            signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*s;
-        }
+            signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*correction;
 
         DoubleDwiType::PixelType accu = signal; accu.Fill(0.0);
         for (int i=0; i<m_NumberOfRepetitions; i++)

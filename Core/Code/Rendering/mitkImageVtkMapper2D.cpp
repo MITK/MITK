@@ -409,7 +409,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->ApplyLookuptable(renderer, textureClippingBounds);
 
-
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
@@ -580,8 +579,6 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
     this->ApplyColor( renderer );
   }
-
-  localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
 
   // check for texture interpolation property
   bool textureInterpolation = false;

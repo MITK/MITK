@@ -92,6 +92,15 @@ namespace itk
 
     bool m_Interpolation;
 
+    std::vector<double> m_WeightsVector;
+
+    std::vector<vnl_matrix< double > > m_ShellInterpolationMatrixVector;
+    std::vector<IndicesVector> m_bZeroIndicesSplitVectors;
+
+    IndicesVector m_allDirectionsIndicies;
+
+    unsigned int m_allDirectionsSize;
+
     };
 
 

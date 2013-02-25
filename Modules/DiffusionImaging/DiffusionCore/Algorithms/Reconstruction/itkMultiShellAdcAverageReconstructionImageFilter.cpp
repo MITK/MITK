@@ -81,6 +81,10 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   // test whether interpolation is necessary
   // - Gradeint directions on different shells are different
   m_Interpolation = mitk::gradients::CheckForDifferingShellDirections(m_BValueMap, m_OriginalGradientDirections.GetPointer());
+  // [allDirectionsContainer] Gradient DirectionContainer containing all unique directions
+  m_allDirectionsIndicies = mitk::gradients::GetAllUniqueDirections(m_BValueMap, m_OriginalGradientDirections);
+  // [sizeAllDirections] size of GradientContainer cointaining all unique directions
+  m_allDirectionsSize = m_allDirectionsIndicies.size();
 
   // if INTERPOLATION necessary
   if(m_Interpolation)
@@ -95,14 +99,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
       }
     }
 
-    // [allDirectionsContainer] Gradient DirectionContainer containing all unique directions
-    IndicesVector allDirectionsIndicies = mitk::gradients::GetAllUniqueDirections(m_BValueMap, m_OriginalGradientDirections);
-
-    // [sizeAllDirections] size of GradientContainer cointaining all unique directions
-    const int allDirectionsSize = allDirectionsIndicies.size();
-    std::vector<unsigned int> SHMaxOrderVector(m_BValueMap.size()-1);
-    std::vector<double> WeightsVector(m_BValueMap.size()-1);
-    std::vector<vnl_matrix< double > > ShellInterpolationMatrixVector(m_BValueMap.size()-1);
+    m_ShellInterpolationMatrixVector.reserve(m_BValueMap.size()-1);
     // for Weightings
     unsigned int maxShellSize = 0;
 
@@ -112,18 +109,19 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
     for(;it != m_BValueMap.end();it++)
     {
       //- calculate maxShOrder
-      IndicesVector currentShell = (*it).second;
+      const IndicesVector currentShell = (*it).second;
       unsigned int SHMaxOrder = 12;
       while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size())
         SHMaxOrder -= 2 ;
 
       //- save shell size
-      WeightsVector.push_back(currentShell.size());
+
       if(currentShell.size() > maxShellSize)
         maxShellSize = currentShell.size();
 
       //- get TragetSHBasis using allDirectionsContainer
-      vnl_matrix<double> sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(allDirectionsIndicies, m_OriginalGradientDirections);
+      vnl_matrix<double> sphericalCoordinates;
+      sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(m_allDirectionsIndicies, m_OriginalGradientDirections);
       vnl_matrix<double> TargetSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
       //- get ShellSHBasis using currentShellDirections
       sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(currentShell, m_OriginalGradientDirections);
@@ -131,34 +129,53 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
       //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
       vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
       vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.inverse();
-      ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
+      m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
       //- save interpolationSHBasis
 
     }
-
+    m_WeightsVector.reserve(m_BValueMap.size()-1);
+    it = m_BValueMap.begin();
+    it++; // skip ReferenceImages
     //- calculate Weights [Weigthing = shell_size / max_shell_size]
-    for(int i = 0 ; i < WeightsVector.size(); i++)
-      WeightsVector.at(i) /= maxShellSize;
-
+    for(;it != m_BValueMap.end(); it++)
+      m_WeightsVector.push_back(it->second.size() / maxShellSize);
   }
 
-  // calculate average b-Value for target b-Value [bVal_t]
 
-  IndicesVector BZeroIndices = m_BValueMap.at(0.0);
+  // calculate average b-Value for target b-Value [bVal_t]
+  const IndicesVector BZeroIndices = m_BValueMap.at(0.0);
   const unsigned int numberOfBZeroImages = BZeroIndices.size();
   if(numberOfBZeroImages % (m_BValueMap.size()-1)  == 0)
   {
-    for(int i = 0 ; i < numberOfBZeroImages; i++)
+    MITK_INFO << "referenceImage avareg for each shell";
+    m_bZeroIndicesSplitVectors.reserve(m_BValueMap.size()-1);
+    const int stepWidth = BZeroIndices.size() / (m_BValueMap.size()-1);
+    IndicesVector::const_iterator it1 = BZeroIndices.begin();
+    IndicesVector::const_iterator it2 = BZeroIndices.begin() + stepWidth;
+    for(int i = 0 ; i < m_BValueMap.size()-1; i++)
     {
-
+      m_bZeroIndicesSplitVectors.push_back(IndicesVector(it1,it2));
+      it1 += stepWidth;
+      it2 += stepWidth;
     }
+  }else
+  {
+    MITK_INFO << "overall referenceImage avareg";
+    m_bZeroIndicesSplitVectors.reserve(1);
+    m_bZeroIndicesSplitVectors.push_back(BZeroIndices);
   }
 
-  // calculate target bZero-Value [b0_t]
-  double BZeroAverage = 0.0;
-  for(int i = 0 ; i < numberOfBZeroImages; i++)
-    BZeroAverage += m_OriginalGradientDirections->ElementAt(BZeroIndices.at(i));
-  BZeroAverage /= numberOfBZeroImages;
+
+  // initialize output image
+  typename OutputImageType::Pointer outImage = OutputImageType::New();
+  outImage->SetSpacing( this->GetInput()->GetSpacing() );
+  outImage->SetOrigin( this->GetInput()->GetOrigin() );
+  outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction using bZeroDirection+AllDirectionsContainer
+  outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+  outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  outImage->SetVectorLength( m_allDirectionsSize ); // size of 1(bzeroValue) + AllDirectionsContainer
+  outImage->Allocate();
 
 
   MITK_INFO << "Input:" << std::endl
@@ -176,7 +193,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 ::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, int /*threadId*/)
 {
 
-  /* // Get input gradient image pointer
+  // Get input gradient image pointer
   typename InputImageType::Pointer inputImage = static_cast< InputImageType * >(ProcessObject::GetInput(0));
   // ImageRegionIterator for the input image
   ImageRegionIterator< InputImageType > iit(inputImage, outputRegionForThread);
@@ -191,16 +208,42 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   const int numShells = m_BValueMap.size()-1;
   BValueMap::iterator it = m_BValueMap.begin();
   //std::vector<double> adcVec = new Vector<double>(numShells);
-*/
+
+  // calculate target bZero-Value [b0_t]
+  const IndicesVector BZeroIndices = m_BValueMap[0.0];
+  double BZeroAverage = 0.0;
 
   // create empty nxm SignalMatrix containing n->signals/directions (in case of interpolation ~ sizeAllDirections otherwise the size of any shell) for m->shells
   // create nx1 targetSignalVector
+
+  // TO DO
+
   // ** walking over each Voxel
-  /* for each shell in this Voxel
-   * - get the RawSignal
-   * - interpolate the Signal if necessary using corresponding interpolationSHBasis
-   * - save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
-   */
+  while(!iit.IsAtEnd())
+  {
+    InputPixelType b = iit.Get();
+
+    for(int i = 0 ; i < BZeroIndices.size(); i++)
+      BZeroAverage += b[BZeroIndices[i]];
+    BZeroAverage /= BZeroIndices.size();
+
+    OutputPixelType out;
+    out.AllocateElements(m_allDirectionsSize + 1);
+    out.Fill(0.0);
+    out.SetElement(0,BZeroAverage);
+
+    /* for each shell in this Voxel
+     * - get the RawSignal
+     * - interpolate the Signal if necessary using corresponding interpolationSHBasis
+     * - save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
+     */
+
+  }
+
+
+
+
+
 
   // normalize the signals in SignalMatrix [bZeroAverage????] [S/S0 = E]
 
@@ -218,16 +261,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   /*
   int vecLength;
 
-  // initialize output image
-  typename OutputImageType::Pointer outImage = OutputImageType::New();
-  outImage->SetSpacing( this->GetInput()->GetSpacing() );
-  outImage->SetOrigin( this->GetInput()->GetOrigin() );
-  outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction using bZeroDirection+AllDirectionsContainer
-  outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
-  outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetVectorLength( vecLength ); // size of 1(bzeroValue) + AllDirectionsContainer
-  outImage->Allocate();
+
 
 
   this->SetNumberOfRequiredOutputs (1);

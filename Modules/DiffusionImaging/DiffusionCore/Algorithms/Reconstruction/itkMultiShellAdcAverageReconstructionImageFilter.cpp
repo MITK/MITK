@@ -143,7 +143,23 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   }
 
   // calculate average b-Value for target b-Value [bVal_t]
+
+  IndicesVector BZeroIndices = m_BValueMap.at(0.0);
+  const unsigned int numberOfBZeroImages = BZeroIndices.size();
+  if(numberOfBZeroImages % (m_BValueMap.size()-1)  == 0)
+  {
+    for(int i = 0 ; i < numberOfBZeroImages; i++)
+    {
+
+    }
+  }
+
   // calculate target bZero-Value [b0_t]
+  double BZeroAverage = 0.0;
+  for(int i = 0 ; i < numberOfBZeroImages; i++)
+    BZeroAverage += m_OriginalGradientDirections->ElementAt(BZeroIndices.at(i));
+  BZeroAverage /= numberOfBZeroImages;
+
 
   MITK_INFO << "Input:" << std::endl
             << "GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl

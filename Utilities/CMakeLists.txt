@@ -12,14 +12,12 @@ subdirs(
   ipPic
   ipFunc
   ipSegmentation
-  pic2vtk
   tinyxml
   Poco
   qwt
   qxt
   mbilog
   glew
-  vecmath
   qtsingleapplication
   KWStyle
 )

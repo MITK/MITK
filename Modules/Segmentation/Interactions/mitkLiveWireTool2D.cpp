@@ -462,7 +462,7 @@ void mitk::LiveWireTool2D::FinishTool()
 
 
   //TODO visual feedback for completing livewire tool
-  m_ContourModelNode->AddProperty( "color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
   m_ContourModelNode->SetProperty("name", StringProperty::New("contour node"));
 
   //set the livewire interactor to edit control points
@@ -481,16 +481,16 @@ void mitk::LiveWireTool2D::FinishTool()
   m_ContourModelNode->SetData( m_Contour );
   m_ContourModelNode->SetProperty("name", StringProperty::New("working contour node"));
   m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
-  m_ContourModelNode->AddProperty( "color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
-  m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
+  m_ContourModelNode->AddProperty( "points.color", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
 
   m_LiveWireContour = mitk::ContourModel::New();
   m_LiveWireContourNode = mitk::DataNode::New();
   //m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
   m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
-  m_LiveWireContourNode->AddProperty( "color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
-  m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
+  m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_LiveWireContourNode->AddProperty( "points.color", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
   /* END reset contours and datanodes */
 }
 

@@ -55,7 +55,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
-  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(IsActive=true))";
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
 
 

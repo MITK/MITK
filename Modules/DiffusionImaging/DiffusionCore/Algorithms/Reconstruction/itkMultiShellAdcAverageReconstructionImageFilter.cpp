@@ -128,7 +128,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
       vnl_matrix<double> ShellSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
       //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
       vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
-      vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.inverse();
+      vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.pinverse();
       m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
       //- save interpolationSHBasis
 
@@ -214,9 +214,9 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   double BZeroAverage = 0.0;
 
   // create empty nxm SignalMatrix containing n->signals/directions (in case of interpolation ~ sizeAllDirections otherwise the size of any shell) for m->shells
+  vnl_matrix<double> SignalMatrix(m_allDirectionsSize, m_BValueMap.size());
   // create nx1 targetSignalVector
-
-  // TO DO
+  vnl_vector<double> SignalVector(m_allDirectionsSize);
 
   // ** walking over each Voxel
   while(!iit.IsAtEnd())
@@ -227,16 +227,57 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
       BZeroAverage += b[BZeroIndices[i]];
     BZeroAverage /= BZeroIndices.size();
 
-    OutputPixelType out;
-    out.AllocateElements(m_allDirectionsSize + 1);
+    OutputPixelType out = oit.Get();
+    //out.AllocateElements(m_allDirectionsSize + 1);
     out.Fill(0.0);
     out.SetElement(0,BZeroAverage);
 
-    /* for each shell in this Voxel
-     * - get the RawSignal
-     * - interpolate the Signal if necessary using corresponding interpolationSHBasis
-     * - save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
-     */
+    BValueMap::const_iterator it = m_BValueMap.begin();
+    it++; //skip bZeroImages
+    unsigned int shellIndex = 0;
+    bool multipleBValues = m_bZeroIndicesSplitVectors.size() > 1;
+
+
+    while(it != m_BValueMap.end())
+    {
+      // reset Data
+      SignalVector.fill(0.0);
+
+      // - get the RawSignal
+      const IndicesVector currentShell = it->second;
+      for(int i = 0 ; i < currentShell.size(); i++)
+        SignalVector.put(i,b[currentShell[i]]);
+
+      //- interpolate the Signal if necessary using corresponding interpolationSHBasis
+      if(m_Interpolation)
+        SignalVector *= m_ShellInterpolationMatrixVector.at(shellIndex);
+
+      //- normalization of the raw Signal
+      if(multipleBValues)
+        S_S0Normalization(SignalVector, BZeroAverage);
+      else{
+        double shellBZeroAverage = 0;
+        for(unsigned int i = 0 ; i < m_bZeroIndicesSplitVectors.at(shellIndex).size(); i++)
+          shellBZeroAverage += b[m_bZeroIndicesSplitVectors.at(shellIndex).at(i)];
+        S_S0Normalization(SignalVector, shellBZeroAverage/(double)m_bZeroIndicesSplitVectors.at(shellIndex).size());
+      }
+
+      calculateADC(SignalVector, it->first);
+
+      //- weight the signal
+      if(m_Interpolation){
+        const double shellWeight = m_WeightsVector.at(shellIndex);
+        SignalVector *= shellWeight;
+      }
+      //- save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
+      SignalMatrix.set_column(shellIndex, SignalVector);
+
+      it++;
+      shellIndex++;
+    }
+
+
+
 
   }
 
@@ -269,7 +310,21 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   MITK_INFO << "...done";
   */
 }
+template <class TInputScalarType, class TOutputScalarType>
+void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
+::S_S0Normalization( vnl_vector<double> & vec, const double & S0 )
+{
+  for(unsigned int i = 0; i < vec.size(); i++)
+    vec[i] /= S0;
+}
 
+template <class TInputScalarType, class TOutputScalarType>
+void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
+::calculateADC( vnl_vector<double> & vec, const double & bValue)
+{
+  for(unsigned int i = 0; i < vec.size(); i++)
+    vec[i] = log(vec[i])/-bValue;
+}
 
 
 } // end of namespace

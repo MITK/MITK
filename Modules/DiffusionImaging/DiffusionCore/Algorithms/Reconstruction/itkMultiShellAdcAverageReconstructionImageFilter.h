@@ -80,6 +80,9 @@ namespace itk
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
+    void S_S0Normalization( vnl_vector<double> & vec, const double & S0 );
+    void calculateADC( vnl_vector<double> & vec, const double & bValue);
+
 
 
     GradientDirectionContainerType::Pointer m_TargetGradientDirections;   ///< container for the subsampled output gradient directions

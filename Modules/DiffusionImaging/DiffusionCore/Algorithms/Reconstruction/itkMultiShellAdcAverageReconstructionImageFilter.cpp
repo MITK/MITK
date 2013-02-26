@@ -232,19 +232,19 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
     out.Fill(0.0);
     out.SetElement(0,BZeroAverage);
 
-    BValueMap::const_iterator it = m_BValueMap.begin();
-    it++; //skip bZeroImages
+    BValueMap::const_iterator shellIterator = m_BValueMap.begin();
+    shellIterator++; //skip bZeroImages
     unsigned int shellIndex = 0;
     bool multipleBValues = m_bZeroIndicesSplitVectors.size() > 1;
 
 
-    while(it != m_BValueMap.end())
+    while(shellIterator != m_BValueMap.end())
     {
       // reset Data
       SignalVector.fill(0.0);
 
       // - get the RawSignal
-      const IndicesVector currentShell = it->second;
+      const IndicesVector currentShell = shellIterator->second;
       for(int i = 0 ; i < currentShell.size(); i++)
         SignalVector.put(i,b[currentShell[i]]);
 
@@ -262,7 +262,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
         S_S0Normalization(SignalVector, shellBZeroAverage/(double)m_bZeroIndicesSplitVectors.at(shellIndex).size());
       }
 
-      calculateADC(SignalVector, it->first);
+      calculateAdcFromSignal(SignalVector, shellIterator->first);
 
       //- weight the signal
       if(m_Interpolation){
@@ -272,13 +272,24 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
       //- save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
       SignalMatrix.set_column(shellIndex, SignalVector);
 
-      it++;
+      shellIterator++;
       shellIndex++;
     }
 
+    for(int i = 0 ; i < SignalMatrix.rows(); i++)
+      SignalVector.put(i,SignalMatrix.get_row(i).sum());
+
+    SignalVector/= SignalMatrix.cols();
+
+    calculateSignalFromAdc(SignalVector,,BZeroAverage)
+
+    for(int i = 1 ; i < out.Size(); i ++)
+      out.SetElement(i,SignalVector.get(i-1));
 
 
-
+    oit.Set(out);
+    ++oit;
+    ++iit;
   }
 
 
@@ -320,10 +331,18 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
-::calculateADC( vnl_vector<double> & vec, const double & bValue)
+::calculateAdcFromSignal( vnl_vector<double> & vec, const double & bValue)
 {
   for(unsigned int i = 0; i < vec.size(); i++)
     vec[i] = log(vec[i])/-bValue;
+}
+
+template <class TInputScalarType, class TOutputScalarType>
+void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
+::calculateSignalFromAdc( vnl_vector<double> & vec, const double & bValue, const double & bZero)
+{
+  for(unsigned int i = 0 ; i < vec.size(); i++)
+    vec[i] = bZero * exp(-bValue * vec[i])
 }
 
 

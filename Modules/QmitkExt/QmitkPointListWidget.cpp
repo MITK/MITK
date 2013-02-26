@@ -38,10 +38,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
   QWidget(parent), m_PointListView(NULL),  m_MultiWidget(NULL),  m_PointSetNode(NULL), m_Orientation(0),  m_MovePointUpBtn(NULL),
   m_MovePointDownBtn(NULL), m_RemovePointBtn(NULL), m_SavePointsBtn(NULL), m_LoadPointsBtn(NULL), m_ToggleAddPoint(NULL),
-  m_AddPoint(NULL), m_Interactor(NULL), m_TimeStep(0), m_EditAllowed(true), m_NodeObserverTag(0),
+  m_AddPoint(NULL),
   m_Snc1(NULL),
   m_Snc2(NULL),
-  m_Snc3(NULL)
+  m_Snc3(NULL),
+  m_Interactor(NULL),
+  m_TimeStep(0),
+  m_EditAllowed(true),
+  m_NodeObserverTag(0)
 {
   m_PointListView = new QmitkPointListView();
 
@@ -449,20 +453,51 @@ void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
 
 void QmitkPointListWidget::SetSnc1(mitk::SliceNavigationController* snc)
 {
-   m_Snc1 = snc;
-   m_PointListView->SetSnc1(snc);
+  if (snc == NULL)
+  {
+    m_PointListView->RemoveSliceNavigationController(m_Snc1);
+  }
+  else
+  {
+    m_PointListView->AddSliceNavigationController(snc);
+  }
+  m_Snc1 = snc;
 }
 
 void QmitkPointListWidget::SetSnc2(mitk::SliceNavigationController* snc)
 {
-   m_Snc2 = snc;
-   m_PointListView->SetSnc2(snc);
+  if (snc == NULL)
+  {
+    m_PointListView->RemoveSliceNavigationController(m_Snc2);
+  }
+  else
+  {
+    m_PointListView->AddSliceNavigationController(snc);
+  }
+  m_Snc2 = snc;
 }
 
 void QmitkPointListWidget::SetSnc3(mitk::SliceNavigationController* snc)
 {
-   m_Snc3 = snc;
-   m_PointListView->SetSnc3(snc);
+  if (snc == NULL)
+  {
+    m_PointListView->RemoveSliceNavigationController(m_Snc3);
+  }
+  else
+  {
+    m_PointListView->AddSliceNavigationController(snc);
+  }
+  m_Snc3 = snc;
+}
+
+void QmitkPointListWidget::AddSliceNavigationController(mitk::SliceNavigationController* snc)
+{
+  m_PointListView->AddSliceNavigationController(snc);
+}
+
+void QmitkPointListWidget::RemoveSliceNavigationController(mitk::SliceNavigationController* snc)
+{
+  m_PointListView->RemoveSliceNavigationController(snc);
 }
 
 void QmitkPointListWidget::UnselectEditButton()

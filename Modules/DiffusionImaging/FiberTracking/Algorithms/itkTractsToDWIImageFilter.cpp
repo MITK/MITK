@@ -117,7 +117,6 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)
                 {
-                    m_KspaceArtifacts.at(a)->SetT1(signalModel->GetT1());
                     m_KspaceArtifacts.at(a)->SetT2(signalModel->GetT2());
                     fSlice = m_KspaceArtifacts.at(a)->AddArtifact(fSlice);
                 }
@@ -545,7 +544,7 @@ void TractsToDWIImageFilter::GenerateData()
     compartments = AddKspaceArtifacts(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
-    double correction = m_SignalScale/(m_Upsampling*m_Upsampling);
+    double correction = m_SignalScale; ///(m_Upsampling*m_Upsampling);
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());

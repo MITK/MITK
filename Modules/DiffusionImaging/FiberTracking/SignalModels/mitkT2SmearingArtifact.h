@@ -41,10 +41,6 @@ public:
     /** Attenuate signal according to given T2 time. **/
     typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice);
 
-    bool m_UseT1;
-    bool m_UseT2;
-    bool m_UseT2star;
-
 protected:
 
 };

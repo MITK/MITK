@@ -10,12 +10,12 @@ $(license)
 #include "ui_$(view-file-name)Controls.h"
 
 
-/*!
+/**
   \brief $(view-class-name)
 
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-  \sa QmitkFunctionality
+  \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
 class $(view-class-name) : public QmitkAbstractView
@@ -28,14 +28,14 @@ class $(view-class-name) : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent);
-
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
     void DoImageProcessing();
 
   protected:
+
+    virtual void CreateQtPartControl(QWidget *parent);
 
     virtual void SetFocus();
 
@@ -48,4 +48,3 @@ class $(view-class-name) : public QmitkAbstractView
 };
 
 #endif // $(view-file-name)_h
-

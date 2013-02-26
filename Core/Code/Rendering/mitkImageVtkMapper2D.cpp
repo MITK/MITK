@@ -409,7 +409,6 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   this->ApplyLookuptable(renderer, textureClippingBounds);
 
-
   // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
   localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
 
@@ -578,10 +577,9 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
     LevelWindow levelWindow;
     this->GetLevelWindow( levelWindow, renderer );
     usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-    this->ApplyColor( renderer );
   }
 
-  localStorage->m_Texture->SetInput( localStorage->m_ReslicedImage );
+  this->ApplyColor( renderer );
 
   // check for texture interpolation property
   bool textureInterpolation = false;
@@ -1036,13 +1034,13 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_BinaryLookupTable->SetHueRange( 0.0, 0.0 );
   m_BinaryLookupTable->SetValueRange( 0.0, 1.0 );
   m_BinaryLookupTable->SetRange(0.0, 1.0);
+  m_BinaryLookupTable->Build();
   // make first value transparent
   {
     double rgba[4];
     m_BinaryLookupTable->GetTableValue(0, rgba);
     m_BinaryLookupTable->SetTableValue(0, rgba[0], rgba[1], rgba[2], 0); // background to 0
   }
-  m_BinaryLookupTable->Build();
 
   //do not repeat the texture (the image)
   m_Texture->RepeatOff();

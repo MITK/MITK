@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
+#include <vtkColorTransferFunction.h>
 
 //used for acos etc.
 #include <cmath>
@@ -372,6 +373,85 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
 }
 
 
+
+//Internal method which should never be used anywhere else and should not be in th header.
+//----------------------------------------------------------------------------
+// This templated function executes the filter for any type of data.
+template <class T>
+void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
+                                  vtkImageData *inData,
+                                  vtkImageData *outData,
+                                  int outExt[6],
+                                  vtkFloatingPointType* clippingBounds,
+                                  T *)
+{
+  vtkImageIterator<T> inputIt(inData, outExt);
+  vtkImageIterator<unsigned char> outputIt(outData, outExt);
+  vtkColorTransferFunction* lookupTable =  dynamic_cast<vtkColorTransferFunction*>(self->GetLookupTable());
+
+  int y = outExt[2];
+
+  // Loop through ouput pixels
+  while (!outputIt.IsAtEnd())
+  {
+    unsigned char* outputSI = outputIt.BeginSpan();
+    unsigned char* outputSIEnd = outputIt.EndSpan();
+
+    // do we iterate over the inner vertical clipping bounds
+    if( y >= clippingBounds[2] && y < clippingBounds[3] )
+    {
+      T* inputSI = inputIt.BeginSpan();
+
+      int x= outExt[0];
+
+      while (outputSI != outputSIEnd)
+      {
+        // is this pixel within horizontal clipping bounds
+        if ( x >= clippingBounds[0] && x < clippingBounds[1])
+        {
+          // fetching original value
+          double grayValue = static_cast<double>(*inputSI);
+
+          // applying directly colortransferfunction
+          // because vtkColorTransferFunction::MapValue is not threadsafe
+          double rgb[3];
+          lookupTable->GetColor( grayValue, rgb );
+
+          outputSI[0] = static_cast<unsigned char>(255.0*rgb[0] + 0.5);
+          outputSI[1] = static_cast<unsigned char>(255.0*rgb[1] + 0.5);
+          outputSI[2] = static_cast<unsigned char>(255.0*rgb[2] + 0.5);
+          outputSI[3] = 255;
+        }
+        else
+        {
+          // outer horizontal clipping bounds - write a transparent RGBA pixel as a single int
+          *reinterpret_cast<int*>(outputSI) = 0;
+        }
+
+        inputSI++;
+        outputSI+=4;
+        x++;
+      }
+
+    }
+    else
+    {
+      // outer vertical clipping bounds - write a transparent RGBA line as ints
+      while (outputSI != outputSIEnd)
+      {
+        *reinterpret_cast<int*>(outputSI) = 0;
+        outputSI+=4;
+      }
+    }
+
+    inputIt.NextSpan();
+    outputIt.NextSpan();
+    y++;
+  }
+}
+
+
+
 void vtkMitkLevelWindowFilter::ExecuteInformation()
 {
   vtkImageData *input = this->GetInput();
@@ -425,13 +505,34 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
         && extent[0] >= m_ClippingBounds[0]
         && extent[1] <= m_ClippingBounds[1];
 
+    if(this->GetLookupTable())
+      this->GetLookupTable()->Build();
+
     vtkLookupTable *vlt = dynamic_cast<vtkLookupTable*>(this->GetLookupTable());
+    vtkColorTransferFunction *ctf = dynamic_cast<vtkColorTransferFunction*>(this->GetLookupTable());
 
     bool linearLookupTable = vlt && vlt->GetScale() == VTK_SCALE_LINEAR;
 
     bool useFast = dontClip && linearLookupTable;
 
-    if(useFast)
+    if(ctf)
+    {
+      switch (inData->GetScalarType())
+      {
+        vtkTemplateMacro(
+              vtkApplyLookupTableOnScalarsCTF( this,
+                                               inData,
+                                               outData,
+                                               extent,
+                                               m_ClippingBounds,
+                                               static_cast<VTK_TT *>(0)));
+        default:
+          vtkErrorMacro(<< "Execute: Unknown ScalarType");
+          return;
+      }
+    }
+    else if(useFast)
+    {
       switch (inData->GetScalarType())
       {
         vtkTemplateMacro(
@@ -444,7 +545,9 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
           vtkErrorMacro(<< "Execute: Unknown ScalarType");
           return;
       }
+    }
     else
+    {
       switch (inData->GetScalarType())
       {
         vtkTemplateMacro(
@@ -458,6 +561,7 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
           vtkErrorMacro(<< "Execute: Unknown ScalarType");
           return;
       }
+    }
   }
 }
 

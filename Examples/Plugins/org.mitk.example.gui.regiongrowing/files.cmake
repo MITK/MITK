@@ -3,17 +3,17 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  $(activator-file-name).cpp
-  $(view-file-name).cpp
+  org_mitk_example_gui_regiongrowing_Activator.cpp
+  QmitkRegionGrowingView.cpp
 )
 
 set(UI_FILES
-  src/internal/$(view-file-name)Controls.ui
+  src/internal/QmitkRegionGrowingViewControls.ui
 )
 
 set(MOC_H_FILES
-  src/internal/$(activator-file-name).h
-  src/internal/$(view-file-name).h
+  src/internal/org_mitk_example_gui_regiongrowing_Activator.h
+  src/internal/QmitkRegionGrowingView.h
 )
 
 # list of resource files which can be used by the plug-in

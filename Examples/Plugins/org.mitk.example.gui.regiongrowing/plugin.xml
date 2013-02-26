@@ -2,9 +2,9 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="$(view-id)"
-          name="$(view-name)"
-          class="$(view-class-name)"
+    <view id="org.mitk.views.example.regiongrowing"
+          name="Region Growing"
+          class="QmitkRegionGrowingView"
           icon="resources/icon.xpm" />
   </extension>
 

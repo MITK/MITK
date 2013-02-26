@@ -189,4 +189,3 @@ void mitkRenderingTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
     this->m_DataStorage->Add(node);
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
-

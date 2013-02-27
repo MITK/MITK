@@ -13,8 +13,8 @@ Depending on whether you are working with the \link DevelopmentToolkit Toolkit\e
     <li> \ref Architecture </li>
     <li> \ref SettingUpMITK </li>
     <li> \ref GettingToKnowMITK </li>
-	  <li> \ref FirstSteps </li>
-	  <li> \ref AboutTestingPage </li>
+    <li> \ref FirstSteps </li>
+    <li> \ref AboutTestingPage </li>
   </ul>
   <li> \subpage DevelopmentToolkit </li>
   <ul>
@@ -24,10 +24,8 @@ Depending on whether you are working with the \link DevelopmentToolkit Toolkit\e
   <li> \subpage DevelopmentApplication </li>
   <ul>
     <li> \ref mitkExtPointsIndex </li>
-    <li> \ref DeploymentPage </li>
-    <li> \ref BlueBerryExamples </li>
-    <li> \ref BlueBerryIntro </li>
   </ul>
+  <li> \subpage DeploymentPage </li>
 </ul>
 
 */

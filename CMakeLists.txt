@@ -587,6 +587,8 @@ if(MITK_USE_BLUEBERRY)
     set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
   endif()
 
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
+
   add_subdirectory(BlueBerry)
 
   set(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry

@@ -1,9 +1,9 @@
 ##################################################################
 #
-# MITK_CREATE_MODULE 
+# MITK_CREATE_MODULE
 #
 #! Creates a module for the automatic module dependency system within MITK.
-#! Configurations are generated in the moduleConf directory. 
+#! Configurations are generated in the moduleConf directory.
 #!
 #! USAGE:
 #!
@@ -24,15 +24,41 @@
 #! \param HEADERS_ONLY specify this if the modules just contains header files.
 ##################################################################
 macro(MITK_CREATE_MODULE MODULE_NAME_IN)
-  MACRO_PARSE_ARGUMENTS(MODULE
-                        "SUBPROJECTS;VERSION;INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PACKAGE_DEPENDS;TARGET_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP"
-                        "QT_MODULE;FORCE_STATIC;HEADERS_ONLY;GCC_DEFAULT_VISIBILITY;NO_INIT;WARNINGS_AS_ERRORS"
-                        ${ARGN})
-                        
+
+  set(_macro_params
+      SUBPROJECTS            # list of CDash labels
+      VERSION                # module version number, e.g. "1.2.0"
+      INCLUDE_DIRS           # exported include dirs (used in mitkMacroCreateModuleConf.cmake)
+      INTERNAL_INCLUDE_DIRS  # include dirs internal to this module
+      DEPENDS                # list of modules this module depends on
+      DEPENDS_INTERNAL       # list of modules this module internally depends on
+      PACKAGE_DEPENDS        # list of "packages this module depends on (e.g. Qt, VTK, etc.)
+      TARGET_DEPENDS         # list of CMake targets this module should depend on
+      EXPORT_DEFINE          # export macro name for public symbols of this module
+      AUTOLOAD_WITH          # a module target name identifying the module which will trigger the
+                             # automatic loading of this module
+      ADDITIONAL_LIBS        # list of addidtional libraries linked to this module
+      GENERATED_CPP          # not used (?)
+     )
+
+  set(_macro_options
+      QT_MODULE              # the module makes use of Qt features and needs moc and ui generated files
+      FORCE_STATIC           # force building this module as a static library
+      HEADERS_ONLY           # this module is a headers-only library
+      GCC_DEFAULT_VISIBILITY # do not use gcc visibility flags - all symbols will be exported
+      NO_INIT                # do not create CppMicroServices initialization code
+      WARNINGS_AS_ERRORS     # treat all compiler warnings as errors
+     )
+
+  MACRO_PARSE_ARGUMENTS(MODULE "${_macro_params}" "${_macro_options}" ${ARGN})
+
   set(MODULE_NAME ${MODULE_NAME_IN})
 
   if(MODULE_HEADERS_ONLY)
     set(MODULE_PROVIDES )
+    if(MODULE_AUTOLOAD_WITH)
+      message(SEND_ERROR "A headers only module cannot be auto-loaded")
+    endif()
   else()
     set(MODULE_PROVIDES ${MODULE_NAME})
     if(NOT MODULE_NO_INIT AND NOT MODULE_NAME STREQUAL "Mitk")
@@ -46,7 +72,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
       set(MODULE_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
     endif()
   endif()
-  
+
   # check if the subprojects exist as targets
   if(MODULE_SUBPROJECTS)
     foreach(subproject ${MODULE_SUBPROJECTS})
@@ -54,10 +80,20 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         message(SEND_ERROR "The subproject ${subproject} does not have a corresponding target")
       endif()
     endforeach()
-  endif()  
+  endif()
 
-    
-  
+  # check and set-up auto-loading
+  if(MODULE_AUTOLOAD_WITH)
+    if(NOT TARGET "${MODULE_AUTOLOAD_WITH}")
+      message(SEND_ERROR "The module target \"${MODULE_AUTOLOAD_WITH}\" specified as the auto-loading module for \"${MODULE_NAME}\" does not exist")
+    endif()
+    # create a meta-target if it does not already exist
+    set(_module_autoload_meta_target "${MODULE_AUTOLOAD_WITH}-universe")
+    if(NOT TARGET ${_module_autoload_meta_target})
+      add_custom_target(${_module_autoload_meta_target})
+    endif()
+  endif()
+
   # assume worst case
   set(MODULE_IS_ENABLED 0)
   # first we check if we have an explicit module build list
@@ -71,17 +107,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
     # first of all we check for the dependencies
     MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
     if(_MISSING_DEP)
-      message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}") 
+      message("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}")
       set(MODULE_IS_ENABLED 0)
     else(_MISSING_DEP)
       set(MODULE_IS_ENABLED 1)
       # now check for every package if it is enabled. This overlaps a bit with
-      # MITK_CHECK_MODULE ... 
+      # MITK_CHECK_MODULE ...
       foreach(_package ${MODULE_PACKAGE_DEPENDS})
         if((DEFINED MITK_USE_${_package}) AND NOT (MITK_USE_${_package}))
           message("Module ${MODULE_NAME} won't be built. Turn on MITK_USE_${_package} if you want to use it.")
           set(MODULE_IS_ENABLED 0)
-        endif()  
+        endif()
       endforeach()
       if(MODULE_IS_ENABLED)
 
@@ -101,7 +137,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
           if(NOT MODULE_NO_INIT)
             set(MODULE_LIBNAME ${MODULE_PROVIDES})
-                        
+
             set(module_init_src_file)
             usFunctionGenerateModuleInit(module_init_src_file
                                          NAME ${MODULE_NAME}
@@ -111,12 +147,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                                         )
           endif()
 
-          set(DEPENDS "${MODULE_DEPENDS}") 
+          set(DEPENDS "${MODULE_DEPENDS}")
           set(DEPENDS_BEFORE "not initialized")
           set(PACKAGE_DEPENDS "${MODULE_PACKAGE_DEPENDS}")
-          MITK_USE_MODULE("${MODULE_DEPENDS}") 
+          MITK_USE_MODULE("${MODULE_DEPENDS}")
 
-          # ok, now create the module itself 
+          # ok, now create the module itself
           include_directories(. ${ALL_INCLUDE_DIRECTORIES})
           include(files.cmake)
 
@@ -167,7 +203,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
               mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
             else()
               mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
-              
+
               # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
               # versions to "static-member-init", see
               # http://clang-developers.42468.n3.nabble.com/Wc-0x-static-nonintegral-init-gone-td3999651.html
@@ -181,7 +217,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
               # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
               # the compiler and if applicable, prints the specific warning as a real warning and
               # not as an error (although -Werror was given).
-              
+
               mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
               mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
             endif()
@@ -239,7 +275,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             if(NOT MODULE_NO_INIT)
               list(APPEND CPP_FILES ${module_init_src_file})
             endif()
-      
+
             if(UI_FILES)
               QT4_WRAP_UI(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
             endif(UI_FILES)
@@ -254,7 +290,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
             set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
 
-            ORGANIZE_SOURCES(SOURCE ${CPP_FILES} 
+            ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
                              HEADER ${H_FILES}
                              TXX ${TXX_FILES}
                              DOC ${DOX_FILES}
@@ -275,7 +311,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                 link_directories(${ALL_LIBRARY_DIRS})
               endif(ALL_LIBRARY_DIRS)
               add_library(${MODULE_PROVIDES} ${_STATIC} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
-              target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES} QVTK)
+              target_link_libraries(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES})
               if(MODULE_TARGET_DEPENDS)
                 add_dependencies(${MODULE_PROVIDES} ${MODULE_TARGET_DEPENDS})
               endif()
@@ -307,10 +343,48 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif(NOT _STATIC OR MINGW)
 
         endif(NOT MODULE_QT_MODULE OR MITK_USE_QT)
+
+        if(NOT MODULE_HEADERS_ONLY)
+          # add the target name to a global property which is used in the top-level
+          # CMakeLists.txt file to export the target
+          set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_PROVIDES})
+          if(MODULE_AUTOLOAD_WITH)
+            # for auto-loaded modules, adapt the output directory
+            add_dependencies(${_module_autoload_meta_target} ${MODULE_PROVIDES})
+            if(WIN32)
+              set(_module_output_prop RUNTIME_OUTPUT_DIRECTORY)
+            else()
+              set(_module_output_prop LIBRARY_OUTPUT_DIRECTORY)
+            endif()
+            set(_module_output_dir ${CMAKE_${_module_output_prop}}/${MODULE_AUTOLOAD_WITH})
+            get_target_property(_module_is_imported ${MODULE_AUTOLOAD_WITH} IMPORTED)
+            if(NOT _module_is_imported)
+              # if the auto-loading module is not imported, get its location
+              # and put the auto-load module relative to it.
+              get_target_property(_module_output_dir ${MODULE_AUTOLOAD_WITH} ${_module_output_prop})
+              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                    ${_module_output_prop} ${_module_output_dir}/${MODULE_AUTOLOAD_WITH})
+            else()
+              set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                    ${_module_output_prop} ${CMAKE_${_module_output_prop}}/${MODULE_AUTOLOAD_WITH})
+            endif()
+            set_target_properties(${MODULE_PROVIDES} PROPERTIES
+                                  MITK_AUTOLOAD_DIRECTORY ${MODULE_AUTOLOAD_WITH})
+
+            # add the auto-load module name as a property
+            set_property(TARGET ${MODULE_AUTOLOAD_WITH} APPEND PROPERTY MITK_AUTOLOAD_TARGETS ${MODULE_PROVIDES})
+          else()
+            # Add meta dependencies (e.g. on auto-load modules from depending modules)
+            if(ALL_META_DEPENDENCIES)
+              add_dependencies(${MODULE_PROVIDES} ${ALL_META_DEPENDENCIES})
+            endif()
+          endif()
+        endif()
+
       endif(MODULE_IS_ENABLED)
     endif(_MISSING_DEP)
   endif(NOT MODULE_IS_EXCLUDED)
-    
+
   if(NOT MODULE_IS_ENABLED)
     _MITK_CREATE_MODULE_CONF()
   endif(NOT MODULE_IS_ENABLED)

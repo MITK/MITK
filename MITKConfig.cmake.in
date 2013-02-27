@@ -11,6 +11,7 @@ include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallAutoLoadModules)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -45,7 +46,7 @@ set(MITK_DOXYGEN_TAGFILE_NAME "@MITK_DOXYGEN_TAGFILE_NAME@")
 if(MODULES_CONF_DIRS)
   list(APPEND MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
   list(REMOVE_DUPLICATES MODULES_CONF_DIRS)
-else() 
+else()
   set(MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
 endif()
 
@@ -118,7 +119,7 @@ endif()
 if(MITK_USE_BLUEBERRY)
 
   set(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-  
+
   # Don't include the BlueBerry exports file, since the targets are
   # also exported in the MITK exports file
   set(BB_PLUGIN_EXPORTS_FILE_INCLUDED 1)
@@ -141,3 +142,6 @@ if(MITK_USE_BLUEBERRY)
       "${MITK_PLUGIN_PROVISIONING_FILE}")
 
 endif(MITK_USE_BLUEBERRY)
+
+# Set properties on exported targets
+@MITK_EXPORTED_TARGET_PROPERTIES@

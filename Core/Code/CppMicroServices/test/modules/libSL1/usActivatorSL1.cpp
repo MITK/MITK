@@ -36,15 +36,15 @@ class ActivatorSL1 :
     public US_BASECLASS_NAME, public ModuleActivator, public ModulePropsInterface,
     public ServiceTrackerCustomizer<FooService*>
 {
-  
+
 public:
 
   ActivatorSL1()
     : tracker(0), context(0)
   {
-  
+
   }
-  
+
   ~ActivatorSL1()
   {
     delete tracker;
@@ -64,14 +64,6 @@ public:
   void Unload(ModuleContext* /*context*/)
   {
     tracker->Close();
-
-#ifndef US_BUILD_SHARED_LIBS
-    if (sr)
-    {
-      sr.Unregister();
-      sr = 0;
-    }
-#endif
   }
 
   const Properties& GetProperties() const
@@ -103,7 +95,7 @@ private:
   ServiceRegistration sr;
 
   typedef ServiceTracker<FooService*> FooTracker;
-  
+
   FooTracker* tracker;
   ModuleContext* context;
 

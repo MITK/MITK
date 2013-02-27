@@ -34,42 +34,33 @@ US_BEGIN_NAMESPACE
 class ActivatorSL4 :
   public US_BASECLASS_NAME, public ModuleActivator, public FooService
 {
-  
+
 public:
 
   ~ActivatorSL4()
   {
-    
+
   }
 
   void foo()
   {
     US_INFO << "TestModuleSL4: Doing foo";
   }
-  
+
   void Load(ModuleContext* context)
   {
     sr = context->RegisterService<FooService>(this);
     US_INFO << "TestModuleSL4: Registered " << sr;
   }
-  
+
   void Unload(ModuleContext* /*context*/)
   {
-#ifdef US_BUILD_SHARED_LIBS
-    //unregister will be done automagically
-#else
-    if (sr)
-    {
-      sr.Unregister();
-      sr = 0;
-    }
-#endif
   }
 
 private:
 
   ServiceRegistration sr;
-}; 
+};
 
 US_END_NAMESPACE
 

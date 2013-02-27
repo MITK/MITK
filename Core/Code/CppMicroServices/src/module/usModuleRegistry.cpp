@@ -28,12 +28,17 @@
 #include "usModuleContext.h"
 #include "usModuleActivator.h"
 #include "usCoreModuleContext_p.h"
+#include "usGetModuleContext.h"
 #include "usStaticInit_p.h"
 
 #include <cassert>
+#include <map>
 
 
 US_BEGIN_NAMESPACE
+
+typedef Mutex MutexType;
+typedef MutexLock<MutexType> MutexLocker;
 
 typedef US_UNORDERED_MAP_TYPE<long, Module*> ModuleMap;
 
@@ -60,9 +65,6 @@ struct ModuleDeleter
  * Key is the module id.
  */
 US_GLOBAL_STATIC_WITH_DELETER(ModuleMap, modules, ModuleDeleter)
-
-typedef Mutex MutexType;
-typedef MutexLock<MutexType> MutexLocker;
 
 /**
  * Lock for protecting the modules object
@@ -138,9 +140,15 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
   // just pass a null-pointer. Using the module context during
   // static deinitalization time of the core library makes
   // no sense anyway.
-  if (info->id == 1 && info->activatorHook)
+  if (info->id == 1)
   {
-    info->activatorHook()->Unload(0);
+    // Remove listeners from static modules if they have forgotten to do so
+    coreModuleContext()->listeners.RemoveAllListeners(GetModuleContext());
+
+    if (info->activatorHook)
+    {
+      info->activatorHook()->Unload(0);
+    }
     return;
   }
 
@@ -150,7 +158,9 @@ void ModuleRegistry::UnRegister(const ModuleInfo* info)
     curr = modules()->operator[](info->id);
     assert(curr != 0);
   }
+
   curr->Stop();
+
   curr->Uninit();
 }
 
@@ -209,47 +219,6 @@ void ModuleRegistry::GetLoadedModules(std::vector<Module*>& m)
       m.push_back(iter->second);
     }
   }
-}
-
-
-typedef std::list<ModuleActivatorInstanceFunction> StaticInstanceFunctionList;
-
-template<typename T>
-struct StaticModuleDeleter
-{
-  void operator()(GlobalStatic<T>& globalStatic) const
-  {
-    StaticInstanceFunctionList* funcList = globalStatic.pointer;
-    for (StaticInstanceFunctionList::const_reverse_iterator i = funcList->rbegin();
-         i != funcList->rend(); ++i)
-    {
-      (*i)()->Unload(ModuleRegistry::GetModule(1)->GetModuleContext());
-    }
-    DefaultGlobalStaticDeleter<T> defaultDeleter;
-    defaultDeleter(globalStatic);
-  }
-};
-
-/**
- * List of all static modules in this framework.
- */
-US_GLOBAL_STATIC_WITH_DELETER(StaticInstanceFunctionList, staticInstanceFunctionList, StaticModuleDeleter)
-
-/**
- * Lock for protecting the modules object
- */
-US_GLOBAL_STATIC(MutexType, staticInstanceFunctionListLock)
-
-void RegisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func)
-{
-  MutexLocker lock(*staticInstanceFunctionListLock());
-  staticInstanceFunctionList()->push_back(func);
-}
-
-void UnregisterStaticModuleActivatorInstanceFunction(ModuleActivatorInstanceFunction func)
-{
-  MutexLocker lock(*staticInstanceFunctionListLock());
-  staticInstanceFunctionList()->remove(func);
 }
 
 US_END_NAMESPACE

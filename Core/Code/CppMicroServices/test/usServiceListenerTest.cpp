@@ -31,15 +31,9 @@
 
 #include <usModulePropsInterface.h>
 
-#include "usTestUtilSharedLibrary.cpp"
+#include "usTestUtilSharedLibrary.h"
 
 US_USE_NAMESPACE
-
-extern ModuleActivator* _us_module_activator_instance_TestModuleA();
-extern ModuleActivator* _us_module_activator_instance_TestModuleA2();
-extern ModuleActivator* _us_module_activator_instance_TestModuleSL1();
-extern ModuleActivator* _us_module_activator_instance_TestModuleSL3();
-extern ModuleActivator* _us_module_activator_instance_TestModuleSL4();
 
 class TestServiceListener
 {
@@ -290,16 +284,57 @@ bool runLoadUnloadTest(const std::string& name, int cnt, SharedLibraryHandle& ta
   return teststatus;
 }
 
+void frameSL02a()
+{
+  ModuleContext* mc = GetModuleContext();
+
+  TestServiceListener listener1(mc);
+  TestServiceListener listener2(mc);
+
+  try
+  {
+    mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    mc->AddServiceListener(&listener1, &TestServiceListener::serviceChanged);
+    mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+    mc->AddServiceListener(&listener2, &TestServiceListener::serviceChanged);
+  }
+  catch (const std::logic_error& ise)
+  {
+    US_TEST_FAILED_MSG( << "service listener registration failed " << ise.what()
+                        << " : frameSL02a:FAIL" );
+  }
+
+  SharedLibraryHandle target("TestModuleA");
+
+  // Start the test target to get a service published.
+  try
+  {
+    target.Load();
+  }
+  catch (const std::exception& e)
+  {
+    US_TEST_FAILED_MSG( << "Failed to load module, got exception: "
+                        << e.what() << " + in frameSL02a:FAIL" );
+  }
+
+  std::vector<ServiceEvent::Type> events;
+  events.push_back(ServiceEvent::REGISTERED);
+
+  US_TEST_CONDITION(listener1.checkEvents(events), "Check first service listener")
+  US_TEST_CONDITION(listener2.checkEvents(events), "Check second service listener")
+
+  mc->RemoveServiceListener(&listener1, &TestServiceListener::serviceChanged);
+  mc->RemoveServiceListener(&listener2, &TestServiceListener::serviceChanged);
+
+  target.Unload();
+}
+
 void frameSL05a()
 {
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibraryHandle libA("TestModuleA"
-                             #ifndef US_BUILD_SHARED_LIBS
-                               , _us_module_activator_instance_TestModuleA
-                             #endif
-                               );
+  SharedLibraryHandle libA("TestModuleA");
   bool testStatus = runLoadUnloadTest("FrameSL05a", 1, libA, events);
   US_TEST_CONDITION(testStatus, "FrameSL05a")
 }
@@ -309,11 +344,7 @@ void frameSL10a()
   std::vector<ServiceEvent::Type> events;
   events.push_back(ServiceEvent::REGISTERED);
   events.push_back(ServiceEvent::UNREGISTERING);
-  SharedLibraryHandle libA2("TestModuleA2"
-                              #ifndef US_BUILD_SHARED_LIBS
-                                , _us_module_activator_instance_TestModuleA2
-                              #endif
-                                );
+  SharedLibraryHandle libA2("TestModuleA2");
   bool testStatus = runLoadUnloadTest("FrameSL10a", 1, libA2, events);
   US_TEST_CONDITION(testStatus, "FrameSL10a")
 }
@@ -333,21 +364,9 @@ void frameSL25a()
     throw;
   }
 
-  SharedLibraryHandle libSL1("TestModuleSL1"
-                               #ifndef US_BUILD_SHARED_LIBS
-                                 , _us_module_activator_instance_TestModuleSL1
-                               #endif
-                                 );
-  SharedLibraryHandle libSL3("TestModuleSL3"
-                               #ifndef US_BUILD_SHARED_LIBS
-                                 , _us_module_activator_instance_TestModuleSL3
-                               #endif
-                                 );
-  SharedLibraryHandle libSL4("TestModuleSL4"
-                               #ifndef US_BUILD_SHARED_LIBS
-                                 , _us_module_activator_instance_TestModuleSL4
-                               #endif
-                                 );
+  SharedLibraryHandle libSL1("TestModuleSL1");
+  SharedLibraryHandle libSL3("TestModuleSL3");
+  SharedLibraryHandle libSL4("TestModuleSL4");
 
   std::vector<ServiceEvent::Type> expectedServiceEventTypes;
 
@@ -359,10 +378,11 @@ void frameSL25a()
   // Stop libSL4
   expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // FooService at first stop of libSL4
 
+#ifdef US_BUILD_SHARED_LIBS
   // Shutdown
   expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // at stop of libSL1
   expectedServiceEventTypes.push_back(ServiceEvent::UNREGISTERING); // at stop of libSL3
-
+#endif
 
   // Start libModuleTestSL1 to ensure that the Service interface is available.
   try
@@ -531,6 +551,7 @@ int usServiceListenerTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("ServiceListenerTest");
 
+  frameSL02a();
   frameSL05a();
   frameSL10a();
   frameSL25a();

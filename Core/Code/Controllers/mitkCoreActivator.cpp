@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreDataNodeReader.h"
 
 #include <mitkModuleActivator.h>
+#include <mitkModuleSettings.h>
 
 void HandleMicroServicesMessages(mitk::MsgType type, const char* msg)
 {
@@ -39,6 +40,70 @@ void HandleMicroServicesMessages(mitk::MsgType type, const char* msg)
   }
 }
 
+#if defined(_WIN32) || defined(_WIN64)
+std::string GetProgramPath()
+{
+  char path[512];
+  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
+  return std::string(path, index);
+}
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
+std::string GetProgramPath()
+{
+  char path[512];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+  {
+    std::size_t index = std::string(path).find_last_of('/');
+    return std::string(path, index);
+  }
+  return std::string();
+}
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#include <sstream>
+std::string GetProgramPath()
+{
+  std::stringstream ss;
+  ss << "/proc/" << getpid() << "/exe";
+  char proc[512];
+  ssize_t ch = readlink(ss.str().c_str(), proc, 512);
+  if (ch == -1) return std::string();
+  std::size_t index = std::string(proc).find_last_of('/');
+  return std::string(proc, index);
+}
+#endif
+
+void AddMitkAutoLoadPaths(const std::string& programPath)
+{
+  mitk::ModuleSettings::AddAutoLoadPath(programPath);
+#ifdef __APPLE__
+  // Walk up three directories since that is where the .dylib files are located
+  // for build trees.
+  std::string additionalPath = programPath;
+  bool addPath = true;
+  for(int i = 0; i < 3; ++i)
+  {
+    std::size_t index = additionalPath.find_last_of('/');
+    if (index != std::string::npos)
+    {
+      additionalPath = additionalPath.substr(0, index);
+    }
+    else
+    {
+      addPath = false;
+      break;
+    }
+  }
+  if (addPath)
+  {
+    mitk::ModuleSettings::AddAutoLoadPath(additionalPath);
+  }
+#endif
+}
+
 /*
  * This is the module activator for the "Mitk" module. It registers core services
  * like ...
@@ -51,6 +116,18 @@ public:
   {
     // Handle messages from CppMicroServices
     mitk::installMsgHandler(HandleMicroServicesMessages);
+
+    // Add the current application directory to the auto-load paths.
+    // This is useful for third-party executables.
+    std::string programPath = GetProgramPath();
+    if (programPath.empty())
+    {
+      MITK_WARN << "Could not get the program path.";
+    }
+    else
+    {
+      AddMitkAutoLoadPaths(programPath);
+    }
 
     //m_RenderingManager = mitk::RenderingManager::New();
     //context->RegisterService<mitk::RenderingManager>(renderingManager.GetPointer());

@@ -152,7 +152,7 @@ public:
    * be ignored.
    * <li>The service is added to the framework service registry and may now be
    * used by other modules.
-   * <li>A service event of type {@link ServiceEvent#REGISTERED} is fired.
+   * <li>A service event of type ServiceEvent#REGISTERED is fired.
    * <li>A <code>ServiceRegistration</code> object for this registration is
    * returned.
    * </ol>
@@ -535,7 +535,7 @@ public:
    * callback will not be called with a <code>ServiceEvent</code> of type
    * <code>REGISTERED</code>.
    *
-   * @tparam The type of the receiver (containing the member function to be called)
+   * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
    * @param filter The filter criteria.
@@ -550,7 +550,8 @@ public:
   void AddServiceListener(R* receiver, void(R::*callback)(const ServiceEvent),
                           const std::string& filter = std::string())
   {
-    AddServiceListener(ServiceListenerMemberFunctor(receiver, callback), filter);
+    AddServiceListener(ServiceListenerMemberFunctor(receiver, callback),
+                       static_cast<void*>(receiver), filter);
   }
 
   /**
@@ -561,7 +562,7 @@ public:
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be removed)
+   * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
    * @throws std::logic_error If this ModuleContext is no
@@ -571,7 +572,8 @@ public:
   template<class R>
   void RemoveServiceListener(R* receiver, void(R::*callback)(const ServiceEvent))
   {
-    RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback));
+    RemoveServiceListener(ServiceListenerMemberFunctor(receiver, callback),
+                          static_cast<void*>(receiver));
   }
 
   /**
@@ -584,7 +586,7 @@ public:
    * of <code>receiver</code> and <code>callback</code> such that
    * <code>(r == receiver && c == callback)</code>, then this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be called)
+   * @tparam R The type of the receiver (containing the member function to be called)
    * @param receiver The object to connect to.
    * @param callback The member function pointer to call.
    * @throws std::logic_error If this ModuleContext is no
@@ -594,7 +596,8 @@ public:
   template<class R>
   void AddModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
   {
-    AddModuleListener(ModuleListenerMemberFunctor(receiver, callback));
+    AddModuleListener(ModuleListenerMemberFunctor(receiver, callback),
+                      static_cast<void*>(receiver));
   }
 
   /**
@@ -605,7 +608,7 @@ public:
    * If the <code>(receiver,callback)</code> pair is not contained in this
    * context module's list of listeners, this method does nothing.
    *
-   * @tparam The type of the receiver (containing the member function to be removed)
+   * @tparam R The type of the receiver (containing the member function to be removed)
    * @param receiver The object from which to disconnect.
    * @param callback The member function pointer to remove.
    * @throws std::logic_error If this ModuleContext is no
@@ -615,7 +618,8 @@ public:
   template<class R>
   void RemoveModuleListener(R* receiver, void(R::*callback)(const ModuleEvent))
   {
-    RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback));
+    RemoveModuleListener(ModuleListenerMemberFunctor(receiver, callback),
+                         static_cast<void*>(receiver));
   }
 
 
@@ -629,6 +633,13 @@ private:
   // purposely not implemented
   ModuleContext(const ModuleContext&);
   ModuleContext& operator=(const ModuleContext&);
+
+  void AddServiceListener(const ServiceListener& delegate, void* data,
+                          const std::string& filter);
+  void RemoveServiceListener(const ServiceListener& delegate, void* data);
+
+  void AddModuleListener(const ModuleListener& delegate, void* data);
+  void RemoveModuleListener(const ModuleListener& delegate, void* data);
 
   ModuleContextPrivate * const d;
 };

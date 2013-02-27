@@ -9,12 +9,12 @@
 macro(MITK_INSTALL)
 
   set(ARGS ${ARGN})
- 
+
   set(install_directories "")
   list(FIND ARGS DESTINATION _destination_index)
   # set(_install_DESTINATION "")
   if(_destination_index GREATER -1)
-    message(SEND_ERROR "MITK_INSTALL macro must not be called with a DESTINATION parameter.")  
+    message(SEND_ERROR "MITK_INSTALL macro must not be called with a DESTINATION parameter.")
     ### This code was a try to replace a given DESTINATION
     #math(EXPR _destination_index ${_destination_index} + 1)
     #list(GET ARGS ${_destination_index} _install_DESTINATION)
@@ -52,7 +52,7 @@ macro(_fixup_target)
         endif()
         get_filename_component(_item_path \"\${full_path}\" PATH)
       endif()
-      
+
       if(_item_path STREQUAL \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/plugins\"
          OR _item_name MATCHES \"liborg\" # this is for legacy BlueBerry bundle support
         )
@@ -60,13 +60,13 @@ macro(_fixup_target)
         message(\"override: \${item}\")
         message(\"found file: \${_item_path}/\${_item_name}\")
         if(APPLE)
-          string(REPLACE 
-                 \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir} 
+          string(REPLACE
+                 \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}
                  @executable_path \${default_embedded_path_var} \"\${_item_path}\" )
         else()
           set(\${default_embedded_path_var} \"\${_item_path}\")
         endif()
-        message(\"override result: \${\${default_embedded_path_var}}\")        
+        message(\"override result: \${\${default_embedded_path_var}}\")
       endif()
     endmacro(gp_item_default_embedded_path_override)
 
@@ -93,24 +93,30 @@ macro(_fixup_target)
       endmacro()
     endif()
 
-    if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
-      file(GLOB_RECURSE GLOBBED_BLUEBERRY_PLUGINS
-        # glob for all blueberry bundles of this application
-        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\")
+      # When installing multiple applications, this will find *all* already installed
+      # and pulled in libraries (except on MacOS). We don't care...
+      file(GLOB_RECURSE GLOBBED_PLUGINS
+        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/lib*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
     endif()
 
     file(GLOB_RECURSE GLOBBED_QT_PLUGINS
       # glob for Qt plugins
-      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
-    
-    # use custom version of BundleUtilities
-    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
-    set(PLUGIN_DIRS)
-    set(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
+      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+
+    set(PLUGINS )
+    foreach(_plugin ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_PLUGINS})
+      get_filename_component(_plugin_realpath \${_plugin} REALPATH)
+      list(APPEND PLUGINS \${_plugin_realpath})
+    endforeach()
+
     if(PLUGINS)
       list(REMOVE_DUPLICATES PLUGINS)
     endif(PLUGINS)
-    foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS})
+    message(\"globbed plugins: \${PLUGINS}\")
+
+    set(PLUGIN_DIRS)
+    foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND PLUGIN_DIRS \${_pluginpath})
     endforeach(_plugin)
@@ -121,7 +127,7 @@ macro(_fixup_target)
     # use custom version of BundleUtilities
     set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
-    
+
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
   ")
 endmacro()

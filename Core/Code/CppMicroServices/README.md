@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/saschazelzer/CppMicroServices.png)](http://travis-ci.org/saschazelzer/CppMicroServices)
+
 C++ Micro Services
 ==================
 
@@ -25,7 +27,7 @@ The library should compile on many different platforms. Below is a list of teste
   - GCC 4.5 (Ubuntu 11.04 and MacOS X 10.6)
   - Visual Studio 2008 and 2010
   - Clang 3.0 (Ubuntu 11.04 and MacOS X 10.6)
-  
+
 Quick Start
 -----------
 

@@ -48,6 +48,10 @@ set(H_FILES
   Algorithms/mitkExtractSliceFilter.h
   Algorithms/mitkConvert2Dto3DImageFilter.h
 
+  Common/mitkExceptionMacro.h
+  Common/mitkServiceBaseObject.h
+  Common/mitkTestingMacros.h
+
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkITKImageImport.h
@@ -55,15 +59,11 @@ set(H_FILES
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
 
+  Interactions/mitkEventMapperAddOn.h
+
   Interfaces/mitkIDataNodeReader.h
 
   IO/mitkPixelTypeTraits.h
-
-  Interactions/mitkEventMapperAddOn.h
-
-  Common/mitkExceptionMacro.h
-  Common/mitkTestingMacros.h
-
 )
 
 set(CPP_FILES

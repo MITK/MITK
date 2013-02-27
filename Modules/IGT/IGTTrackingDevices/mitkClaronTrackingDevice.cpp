@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClaronTrackingDevice.h"
 #include "mitkClaronTool.h"
 #include "mitkIGTConfig.h"
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 #include <itkMutexLockHolder.h>
@@ -127,7 +127,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
   if (m_Device->StartTracking())
   {
-    mitk::TimeStamp::GetInstance()->Start(this);
+    mitk::IGTTimeStamp::GetInstance()->Start(this);
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }

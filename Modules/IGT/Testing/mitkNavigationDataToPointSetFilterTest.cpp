@@ -16,10 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataToPointSetFilter.h"
 #include "mitkNavigationDataPlayer.h"
-#include "mitkTimeStamp.h"
-#include "mitkStandardFileLocations.h"
-
-#include "mitkTestingMacros.h"
+#include <mitkStandardFileLocations.h>
+#include <mitkTestingMacros.h>
 
 #include <iostream>
 

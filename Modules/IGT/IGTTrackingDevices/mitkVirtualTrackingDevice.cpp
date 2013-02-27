@@ -15,11 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVirtualTrackingDevice.h"
+#include "mitkIGTTimeStamp.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <mitkTimeStamp.h>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 
@@ -83,7 +83,7 @@ bool mitk::VirtualTrackingDevice::StartTracking()
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
-  mitk::TimeStamp::GetInstance()->Start(this);
+  mitk::IGTTimeStamp::GetInstance()->Start(this);
 
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
     m_MultiThreader->TerminateThread(m_ThreadID);
@@ -105,7 +105,7 @@ bool mitk::VirtualTrackingDevice::StopTracking()
     this->SetState(Ready);
   }
 
-  mitk::TimeStamp::GetInstance()->Stop(this);
+  mitk::IGTTimeStamp::GetInstance()->Stop(this);
   m_TrackingFinishedMutex->Lock();
 
   return true;

@@ -14,32 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTimeStamp.h"
+#include "mitkIGTTimeStamp.h"
 #include <map>
 
 #include "mitkRealTimeClock.h"
 
-mitk::TimeStamp::Pointer mitk::TimeStamp::s_Instance = NULL;
+mitk::IGTTimeStamp::Pointer mitk::IGTTimeStamp::s_Instance = NULL;
 
-mitk::TimeStamp::TimeStamp() : itk::Object()
+mitk::IGTTimeStamp::IGTTimeStamp() : itk::Object()
 , m_Time(-1.0), m_ReferenceTime(0.0)
 {
 }
 
-mitk::TimeStamp::~TimeStamp()
+mitk::IGTTimeStamp::~IGTTimeStamp()
 {
 }
 
-mitk::TimeStamp* mitk::TimeStamp::CreateInstance()
+mitk::IGTTimeStamp* mitk::IGTTimeStamp::CreateInstance()
 {
-return mitk::TimeStamp::GetInstance();
+return mitk::IGTTimeStamp::GetInstance();
 }
 
-mitk::TimeStamp* mitk::TimeStamp::GetInstance()
+mitk::IGTTimeStamp* mitk::IGTTimeStamp::GetInstance()
 {
-  if (TimeStamp::s_Instance.IsNull())
+  if (IGTTimeStamp::s_Instance.IsNull())
   {
-    mitk::TimeStamp::Pointer ts = new mitk::TimeStamp;
+    mitk::IGTTimeStamp::Pointer ts = new mitk::IGTTimeStamp;
     s_Instance = ts;
     return s_Instance;
   }
@@ -47,7 +47,7 @@ mitk::TimeStamp* mitk::TimeStamp::GetInstance()
     return s_Instance;
 }
 
-void mitk::TimeStamp::Start(itk::Object::Pointer device)
+void mitk::IGTTimeStamp::Start(itk::Object::Pointer device)
 {
   if (m_RealTimeClock.IsNull())
   {
@@ -71,7 +71,7 @@ void mitk::TimeStamp::Start(itk::Object::Pointer device)
   }
 }
 
-void mitk::TimeStamp::Stop(itk::Object::Pointer device)
+void mitk::IGTTimeStamp::Stop(itk::Object::Pointer device)
 {
   if ( s_Instance.IsNotNull() )
   {
@@ -97,7 +97,7 @@ void mitk::TimeStamp::Stop(itk::Object::Pointer device)
 }
 
 
-double mitk::TimeStamp::GetElapsed()
+double mitk::IGTTimeStamp::GetElapsed()
 {
   if (m_Time > -1)
   {
@@ -108,7 +108,7 @@ double mitk::TimeStamp::GetElapsed()
 }
 
 
-double mitk::TimeStamp::GetElapsed(itk::Object::Pointer device)
+double mitk::IGTTimeStamp::GetElapsed(itk::Object::Pointer device)
 {
   double offset = this->GetOffset( device );
   if ( offset > -1 )
@@ -122,7 +122,7 @@ double mitk::TimeStamp::GetElapsed(itk::Object::Pointer device)
   }
 }
 
-double mitk::TimeStamp::GetCurrentStamp()
+double mitk::IGTTimeStamp::GetCurrentStamp()
 {
   if (m_RealTimeClock.IsNotNull())
   {
@@ -131,12 +131,12 @@ double mitk::TimeStamp::GetCurrentStamp()
   else return 0.0;
 }
 
-void mitk::TimeStamp::SetRealTimeClock(mitk::RealTimeClock::Pointer Clock)
+void mitk::IGTTimeStamp::SetRealTimeClock(mitk::RealTimeClock::Pointer Clock)
 {
   m_RealTimeClock = Clock;
 }
 
-double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
+double mitk::IGTTimeStamp::GetOffset(itk::Object::Pointer Device)
 {
   m_MapIterator =  m_DeviceMap.find(Device);
   if ( m_MapIterator != m_DeviceMap.end() )
@@ -149,9 +149,8 @@ double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
   }
 }
 
-void mitk::TimeStamp::Initialize()
+void mitk::IGTTimeStamp::Initialize()
 {
   if ( m_RealTimeClock.IsNull() )
     m_RealTimeClock = mitk::RealTimeClock::New();
 }
-

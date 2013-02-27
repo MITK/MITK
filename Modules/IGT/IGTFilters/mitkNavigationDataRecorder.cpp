@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataRecorder.h"
 #include <fstream>
-#include <mitkTimeStamp.h>
+#include <mitkIGTTimeStamp.h>
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
 
@@ -41,7 +41,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_StreamMustBeDeleted = false;
 
   //To get a start time
-  mitk::TimeStamp::GetInstance()->Start(this);
+  mitk::IGTTimeStamp::GetInstance()->Start(this);
 }
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
@@ -77,7 +77,7 @@ void mitk::NavigationDataRecorder::Update()
   {
     DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
     mitk::NavigationData::TimeStampType timestamp=0.0; // timestamp for mitk time
-    timestamp = mitk::TimeStamp::GetInstance()->GetElapsed();
+    timestamp = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
 
 
     mitk::NavigationData::TimeStampType sysTimestamp = 0.0; // timestamp for system time

@@ -49,11 +49,11 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT TimeStamp : public itk::Object
+  class MitkIGT_EXPORT IGTTimeStamp : public itk::Object
   {
   public:
 
-    mitkClassMacro(TimeStamp, itk::Object);
+    mitkClassMacro(IGTTimeStamp, itk::Object);
 
    /**
     * \brief creates a new instance of mitkTimeStamp
@@ -63,7 +63,7 @@ namespace mitk {
     *
     * DECREPATED: Use GetInstance instead
     */
-    static TimeStamp* CreateInstance();
+    static IGTTimeStamp* CreateInstance();
 
    /**
     * \brief returns a pointer to the current instance of mitkTimeStamp
@@ -71,7 +71,7 @@ namespace mitk {
     * This method  returns a pointer to the currently existing TimeStamp.
     * If there is no exisiting instance, a new one is created and returned automatically
     */
-    static TimeStamp* GetInstance();
+    static IGTTimeStamp* GetInstance();
 
     /**
     * \brief starts the time-acquisition
@@ -162,9 +162,9 @@ namespace mitk {
 
   protected:
 
-    TimeStamp();
+    IGTTimeStamp();
 
-    virtual ~TimeStamp();
+    virtual ~IGTTimeStamp();
 
     double GetCurrentStamp();
 
@@ -178,7 +178,7 @@ namespace mitk {
     mitk::RealTimeClock::Pointer m_RealTimeClock;
 
     /* pointer to the current instance */
-    static mitk::TimeStamp::Pointer s_Instance;
+    static mitk::IGTTimeStamp::Pointer s_Instance;
 
     /* map, in which pointer to all devices calling Start(), are saved */
     std::map<itk::Object::Pointer, double> m_DeviceMap;

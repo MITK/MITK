@@ -527,7 +527,7 @@ void TractsToDWIImageFilter::GenerateData()
                     for (int i=0; i<m_NonFiberModels.size(); i++)
                     {
                         DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
-                        DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w/m_NonFiberModels.size();
+                        DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w*m_NonFiberModels[i]->GetWeight();
                         doubleDwi->SetPixel(index, pix);
                     }
                 }

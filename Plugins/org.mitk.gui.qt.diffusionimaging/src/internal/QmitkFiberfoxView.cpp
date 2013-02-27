@@ -46,6 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorModel.h>
 #include <mitkBallModel.h>
 #include <mitkStickModel.h>
+#include <mitkAstroStickModel.h>
+#include <mitkDotModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
 #include <mitkT2SmearingArtifact.h>
@@ -87,9 +89,14 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_DiffusionPropsMessage->setVisible(false);
         m_Controls->m_T2bluringParamFrame->setVisible(false);
         m_Controls->m_KspaceParamFrame->setVisible(false);
-        m_Controls->m_StickModelFrame->setVisible(false);
+        m_Controls->m_DiffusivityModelFrameComp1->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
+        m_Controls->m_DiffusivityModelFrameComp3->setVisible(false);
+        m_Controls->m_GeneralFrameComp3->setVisible(false);
+        m_Controls->m_RandomizeAstroComp2->setVisible(false);
+        m_Controls->m_RandomizeAstroComp3->setVisible(false);
+
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -108,8 +115,11 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
         connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(ApplyTransform()));
         connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
-        connect((QObject*) m_Controls->m_FiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
-        connect((QObject*) m_Controls->m_NonFiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
+
+        connect((QObject*) m_Controls->m_Compartment1Box, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(Comp1ModelFrameVisibility(int)));
+        connect((QObject*) m_Controls->m_Compartment2Box, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(Comp2ModelFrameVisibility(int)));
+        connect((QObject*) m_Controls->m_Compartment3Box, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(Comp3ModelFrameVisibility(int)));
+
         connect((QObject*) m_Controls->m_AdvancedOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
         connect((QObject*) m_Controls->m_AdvancedOptionsBox_2, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
     }
@@ -129,26 +139,61 @@ void QmitkFiberfoxView::ShowAdvancedOptions(int state)
     }
 }
 
-void QmitkFiberfoxView::FiberModelFrameVisibility(int index)
+void QmitkFiberfoxView::Comp1ModelFrameVisibility(int index)
 {
     m_Controls->m_TensorModelFrame->setVisible(false);
-    m_Controls->m_StickModelFrame->setVisible(false);
+    m_Controls->m_DiffusivityModelFrameComp1->setVisible(false);
     switch (index)
     {
     case 0:
         m_Controls->m_TensorModelFrame->setVisible(true);
         break;
     case 1:
-        m_Controls->m_StickModelFrame->setVisible(true);
+        m_Controls->m_DiffusivityModelFrameComp1->setVisible(true);
         break;
-    default:
-        m_Controls->m_TensorModelFrame->setVisible(true);
     }
 }
 
-void QmitkFiberfoxView::NonFiberModelFrameVisibility(int index)
+void QmitkFiberfoxView::Comp2ModelFrameVisibility(int index)
 {
+    m_Controls->m_DiffusivityModelFrameComp2->setVisible(false);
+    m_Controls->m_RandomizeAstroComp3->setVisible(false);
+    switch (index)
+    {
+    case 0:
+        m_Controls->m_DiffusivityModelFrameComp2->setVisible(true);
+        break;
+    case 1:
+        m_Controls->m_DiffusivityModelFrameComp2->setVisible(true);
+        m_Controls->m_DiffusivityModelFrameComp3->setVisible(true);
+        break;
+    case 2:
+        break;
+    }
+}
 
+void QmitkFiberfoxView::Comp3ModelFrameVisibility(int index)
+{
+    m_Controls->m_DiffusivityModelFrameComp3->setVisible(false);
+    m_Controls->m_GeneralFrameComp3->setVisible(false);
+    m_Controls->m_RandomizeAstroComp3->setVisible(false);
+    switch (index)
+    {
+    case 0:
+        break;
+    case 1:
+        m_Controls->m_DiffusivityModelFrameComp3->setVisible(true);
+        m_Controls->m_GeneralFrameComp3->setVisible(true);
+        break;
+    case 2:
+        m_Controls->m_RandomizeAstroComp3->setVisible(true);
+        m_Controls->m_DiffusivityModelFrameComp3->setVisible(true);
+        m_Controls->m_GeneralFrameComp3->setVisible(true);
+        break;
+    case 3:
+        m_Controls->m_GeneralFrameComp3->setVisible(true);
+        break;
+    }
 }
 
 void QmitkFiberfoxView::OnConstantRadius(int value)
@@ -673,45 +718,125 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
 
         // signal models
-        QString signalModelString("Ball");
+        double comp3Weight = 0;
+        mitk::BallModel<double> ballModel;
+        mitk::AstroStickModel<double> astrosticksModel;
+        mitk::DotModel<double> dotModel;
+        mitk::BallModel<double> ballModel2;
+        mitk::AstroStickModel<double> astrosticksModel2;
+        mitk::DotModel<double> dotModel2;
+
+        if (m_Controls->m_Compartment3Box->currentIndex()>0)
+        {
+            comp3Weight = m_Controls->m_Comp3Fraction->value();
+            ballModel.SetWeight(1-comp3Weight);
+            astrosticksModel.SetWeight(1-comp3Weight);
+            dotModel.SetWeight(1-comp3Weight);
+            ballModel2.SetWeight(comp3Weight);
+            astrosticksModel2.SetWeight(comp3Weight);
+            dotModel2.SetWeight(comp3Weight);
+        }
+
+        QString signalModelString("");
         itk::TractsToDWIImageFilter::DiffusionModelList fiberModelList, nonFiberModelList;
         mitk::TensorModel<double> tensorModel;
         mitk::StickModel<double> stickModel;
 
-        // free diffusion
-        mitk::BallModel<double> ballModel;
-        ballModel.SetGradientList(gradientList);
-        ballModel.SetBvalue(bVal);
-        ballModel.SetDiffusivity(m_Controls->m_BallD->value());
-        ballModel.SetT2(m_Controls->m_NonFiberT2Box->value());
-        nonFiberModelList.push_back(&ballModel);
-
-        resultNode->AddProperty("Fiberfox.Ball.Diffusivity", DoubleProperty::New(m_Controls->m_BallD->value()));
-        resultNode->AddProperty("Fiberfox.Ball.T2", DoubleProperty::New(m_Controls->m_NonFiberT2Box->value()));
+        // free diffusion compartment
+        switch (m_Controls->m_Compartment2Box->currentIndex())
+        {
+        case 0:
+            MITK_INFO << "Using ball model";
+            ballModel.SetGradientList(gradientList);
+            ballModel.SetBvalue(bVal);
+            ballModel.SetDiffusivity(m_Controls->m_DiffusivityBoxComp2->value());
+            ballModel.SetT2(m_Controls->m_T2BoxComp2->value());
+            nonFiberModelList.push_back(&ballModel);
+            signalModelString += "Ball";
+            resultNode->AddProperty("Fiberfox.Ball.Diffusivity", DoubleProperty::New(m_Controls->m_DiffusivityBoxComp2->value()));
+            resultNode->AddProperty("Fiberfox.Ball.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
+            break;
+        case 1:
+            MITK_INFO << "Using astrosticks model";
+            astrosticksModel.SetGradientList(gradientList);
+            astrosticksModel.SetBvalue(bVal);
+            astrosticksModel.SetDiffusivity(m_Controls->m_DiffusivityBoxComp2->value());
+            astrosticksModel.SetT2(m_Controls->m_T2BoxComp2->value());
+            astrosticksModel.SetRandomizeSticks(m_Controls->m_RandomizeAstroComp2->isChecked());
+            nonFiberModelList.push_back(&astrosticksModel);
+            signalModelString += "Astrosticks";
+            resultNode->AddProperty("Fiberfox.Astrosticks.Diffusivity", DoubleProperty::New(m_Controls->m_DiffusivityBoxComp2->value()));
+            resultNode->AddProperty("Fiberfox.Astrosticks.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
+            break;
+        case 2:
+            MITK_INFO << "Using dot model";
+            dotModel.SetGradientList(gradientList);
+            dotModel.SetT2(m_Controls->m_T2BoxComp2->value());
+            nonFiberModelList.push_back(&dotModel);
+            signalModelString += "Dot";
+            resultNode->AddProperty("Fiberfox.Dot.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
+            break;
+        }
 
         // intra-axonal diffusion
-        switch (m_Controls->m_FiberCompartmentModelBox->currentIndex())
+        switch (m_Controls->m_Compartment1Box->currentIndex())
         {
         case 0:
             MITK_INFO << "Using zeppelin model";
             tensorModel.SetGradientList(gradientList);
             tensorModel.SetBvalue(bVal);
             tensorModel.SetKernelFA(m_Controls->m_TensorFaBox->value());
-            tensorModel.SetT2(m_Controls->m_FiberT2Box->value());
+            tensorModel.SetT2(m_Controls->m_T2BoxComp1->value());
             fiberModelList.push_back(&tensorModel);
-            signalModelString += "-Zeppelin";
+            signalModelString += "Zeppelin";
             resultNode->AddProperty("Fiberfox.Zeppelin.FA", DoubleProperty::New(m_Controls->m_TensorFaBox->value()));
-            resultNode->AddProperty("Fiberfox.Zeppelin.T2", DoubleProperty::New(m_Controls->m_FiberT2Box->value()));
+            resultNode->AddProperty("Fiberfox.Zeppelin.T2", DoubleProperty::New(m_Controls->m_T2BoxComp1->value()));
             break;
         case 1:
             MITK_INFO << "Using stick model";
             stickModel.SetGradientList(gradientList);
-            stickModel.SetDiffusivity(m_Controls->m_StickDiffusivityBox->value());
-            stickModel.SetT2(m_Controls->m_FiberT2Box->value());
+            stickModel.SetDiffusivity(m_Controls->m_DiffusivityBoxComp1->value());
+            stickModel.SetT2(m_Controls->m_T2BoxComp1->value());
             fiberModelList.push_back(&stickModel);
-            signalModelString += "-Stick";
-            resultNode->AddProperty("Fiberfox.Stick.Diffusivity", DoubleProperty::New(m_Controls->m_StickDiffusivityBox->value()));
-            resultNode->AddProperty("Fiberfox.Stick.T2", DoubleProperty::New(m_Controls->m_FiberT2Box->value()));
+            signalModelString += "Stick";
+            resultNode->AddProperty("Fiberfox.Stick.Diffusivity", DoubleProperty::New(m_Controls->m_DiffusivityBoxComp1->value()));
+            resultNode->AddProperty("Fiberfox.Stick.T2", DoubleProperty::New(m_Controls->m_T2BoxComp1->value()));
+            break;
+        }
+
+        // third compartment
+        switch (m_Controls->m_Compartment3Box->currentIndex())
+        {
+        case 1:
+            MITK_INFO << "Using ball model";
+            ballModel2.SetGradientList(gradientList);
+            ballModel2.SetBvalue(bVal);
+            ballModel2.SetDiffusivity(m_Controls->m_DiffusivityBoxComp2->value());
+            ballModel2.SetT2(m_Controls->m_T2BoxComp2->value());
+            nonFiberModelList.push_back(&ballModel2);
+            signalModelString += "Ball";
+            resultNode->AddProperty("Fiberfox.Ball.Diffusivity", DoubleProperty::New(m_Controls->m_DiffusivityBoxComp2->value()));
+            resultNode->AddProperty("Fiberfox.Ball.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
+            break;
+        case 2:
+            MITK_INFO << "Using astrosticks model";
+            astrosticksModel2.SetGradientList(gradientList);
+            astrosticksModel2.SetBvalue(bVal);
+            astrosticksModel2.SetDiffusivity(m_Controls->m_DiffusivityBoxComp2->value());
+            astrosticksModel2.SetT2(m_Controls->m_T2BoxComp2->value());
+            astrosticksModel2.SetRandomizeSticks(m_Controls->m_RandomizeAstroComp3->isChecked());
+            nonFiberModelList.push_back(&astrosticksModel2);
+            signalModelString += "Astrosticks";
+            resultNode->AddProperty("Fiberfox.Astrosticks.Diffusivity", DoubleProperty::New(m_Controls->m_DiffusivityBoxComp2->value()));
+            resultNode->AddProperty("Fiberfox.Astrosticks.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
+            break;
+        case 3:
+            MITK_INFO << "Using dot model";
+            dotModel2.SetGradientList(gradientList);
+            dotModel2.SetT2(m_Controls->m_T2BoxComp2->value());
+            nonFiberModelList.push_back(&dotModel2);
+            signalModelString += "Dot";
+            resultNode->AddProperty("Fiberfox.Dot.T2", DoubleProperty::New(m_Controls->m_T2BoxComp2->value()));
             break;
         }
 

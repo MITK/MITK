@@ -72,8 +72,9 @@ protected slots:
     void CopyBundles();         ///< add copy of the selected bundle to the datamanager
     void ApplyTransform();    ///< rotate and shift selected bundles
     void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
-    void FiberModelFrameVisibility(int index);///< only show parameters of selected fiber model type
-    void NonFiberModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void Comp1ModelFrameVisibility(int index);///< only show parameters of selected fiber model type
+    void Comp2ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void Comp3ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
     void ShowAdvancedOptions(int state);
 
     /** update fibers if any parameter changes */

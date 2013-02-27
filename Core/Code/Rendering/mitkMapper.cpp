@@ -36,6 +36,7 @@ mitk::BaseData* mitk::Mapper::GetData() const
 return m_DataNode->GetData();
 }
 
+
 mitk::DataNode* mitk::Mapper::GetDataNode() const
 {
   return this->m_DataNode.GetPointer();

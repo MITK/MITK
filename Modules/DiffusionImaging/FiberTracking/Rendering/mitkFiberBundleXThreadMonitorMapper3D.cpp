@@ -157,7 +157,6 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::Bas
 
   if (m_lastModifiedMonitorNodeTime < node->GetMTime())
   {
-    this->GenerateData();
     m_lastModifiedMonitorNodeTime = node->GetMTime();
   }
 }

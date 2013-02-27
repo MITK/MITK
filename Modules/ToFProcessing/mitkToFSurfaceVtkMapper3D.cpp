@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const mitk::Surface* mitk::ToFSurfaceVtkMapper3D::GetInput()
 {
   //return static_cast<const mitk::ToFSurface * > ( GetData() );
-  return static_cast<const mitk::Surface * > ( GetData() );
+  return static_cast<const mitk::Surface * > ( GetDataNode->GetData() );
 }
 
 mitk::ToFSurfaceVtkMapper3D::ToFSurfaceVtkMapper3D()
@@ -68,9 +68,10 @@ void mitk::ToFSurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  bool visible = IsVisible(renderer);
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(visible==false)
+  if ( !visible )
   {
     ls->m_Actor->VisibilityOff();
     return;
@@ -264,7 +265,7 @@ void mitk::ToFSurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 
   // Applying shading properties
   {
-    ApplyColorAndOpacityProperties( ls->m_Actor, renderer ) ;
+    ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
     // VTK Properties
     ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
     // Shaders

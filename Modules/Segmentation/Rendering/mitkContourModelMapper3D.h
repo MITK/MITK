@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkVtkMapper2D.h"
+#include "mitkVtkMapper.h"
 
 #include "mitkContourModel.h"
 //#include "mitkContourModelToVtkPolyDataFilter.h"
@@ -37,11 +37,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class Segmentation_EXPORT ContourModelMapper3D : public VtkMapper2D
+  class Segmentation_EXPORT ContourModelMapper3D : public VtkMapper
   {
       public:
     /** Standard class typedefs. */
-    mitkClassMacro( ContourModelMapper3D,VtkMapper2D );
+    mitkClassMacro( ContourModelMapper3D,VtkMapper );
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);
@@ -56,10 +56,6 @@ namespace mitk {
         /*+++ methods of MITK-VTK rendering pipeline +++*/
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer);
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
 

@@ -44,7 +44,7 @@ bool mitk::GLMapper::IsVtkBased() const
   return false;
 }
 
-void mitk::GLMapper::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
+void mitk::GLMapper::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
 {
     float rgba[4]={1.0f,1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists

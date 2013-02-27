@@ -122,7 +122,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     * resources to releases. Must be overwritten in individual subclasses
     * if vtkProps are used.
     */
-    virtual void ReleaseGraphicsResources(vtkWindow *renWin) { };
+    virtual void ReleaseGraphicsResources(vtkWindow* /*renWin*/) { };
 
   protected:
 

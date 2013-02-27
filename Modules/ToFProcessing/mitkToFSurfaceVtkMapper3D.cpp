@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const mitk::Surface* mitk::ToFSurfaceVtkMapper3D::GetInput()
 {
   //return static_cast<const mitk::ToFSurface * > ( GetData() );
-  return static_cast<const mitk::Surface * > ( GetDataNode->GetData() );
+  return static_cast<const mitk::Surface * > ( GetDataNode()->GetData() );
 }
 
 mitk::ToFSurfaceVtkMapper3D::ToFSurfaceVtkMapper3D()

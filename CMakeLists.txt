@@ -429,11 +429,23 @@ set(cflags )
 if(WIN32)
   set(cflags "${cflags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
+if(NOT MSVC_VERSION)
+  foreach(_flag
+    -Wall
+    -Wextra
+    -Wpointer-arith
+    -Winvalid-pch
+    -Wcast-align
+    -Wwrite-strings
+    -Wno-gnu
+    -fdiagnostics-show-option
+    )
+    mitkFunctionCheckCompilerFlags(${_flag} cflags)
+  endforeach()
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
 
-  mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
 

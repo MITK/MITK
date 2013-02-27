@@ -24,12 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK includes
 #include "mitkConnectomicsNetwork.h"
 
-#include "ConnectomicsExports.h"
-
 namespace itk
 {
 
-  class Connectomics_EXPORT ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
+  class ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
   {
 
   public:

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
 
 #include <MitkExports.h>
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkWeakPointer.h"
@@ -81,10 +81,10 @@ class DataStorage;
  *  \image html mitkGeometry2DDataVtkMapper3D.png "Internal filter pipeline"
  *
  */
-class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper3D
+class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper
 {
 public:
-  mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper);
 
   itkNewMacro(Geometry2DDataVtkMapper3D);
 

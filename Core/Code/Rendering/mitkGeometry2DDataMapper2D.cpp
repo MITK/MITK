@@ -46,11 +46,10 @@ mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 
 const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
 {
-  return static_cast<const Geometry2DData * > ( GetData() );
+  return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
 }
 
-
-void mitk::Geometry2DDataMapper2D::GenerateData()
+void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* /* renderer */)
 {
   // collect all Geometry2DDatas accessible from the DataStorage
   m_OtherGeometry2Ds.clear();
@@ -81,10 +80,11 @@ void mitk::Geometry2DDataMapper2D::GenerateData()
 
 void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 {
-  if ( !this->IsVisible(renderer) )
-  {
-    return;
-  }
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible) return;
 
   Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 
@@ -473,9 +473,9 @@ void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoi
 }
 
 
-void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
+void mitk::Geometry2DDataMapper2D::ApplyAllProperties( BaseRenderer *renderer )
 {
-  Superclass::ApplyProperties(renderer);
+  Superclass::ApplyColorAndOpacityProperties(renderer);
 
   PlaneOrientationProperty* decorationProperty;
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
@@ -527,7 +527,7 @@ void mitk::Geometry2DDataMapper2D::DrawLine( BaseRenderer* renderer,
     dynamic_cast< const PlaneGeometry* >( renderer->GetCurrentWorldGeometry2D() );
 
   // Apply color and opacity read from the PropertyList.
-  this->ApplyProperties( renderer );
+  this->ApplyAllProperties( renderer );
 
   ScalarType gapSizeInParamUnits =
     1.0 / lengthInDisplayUnits * gapSizeInPixel;

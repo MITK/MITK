@@ -104,7 +104,7 @@ float mitk::ImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer* renderer)
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 {
-  return static_cast< const mitk::Image * >( this->GetData() );
+  return static_cast< const mitk::Image * >( GetDataNode()->GetData() );
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
@@ -113,45 +113,6 @@ vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
   return m_LSH.GetLocalStorage(renderer)->m_Actors;
 }
 
-void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible( renderer )==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
-{
-  if(IsVisible(renderer)==false)
-    return;
-  if ( GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-  }
-}
 
 
 void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
@@ -471,7 +432,7 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
     }
     else
     {
-      GetColor( rgb, renderer );
+      GetDataNode()->GetColor( rgb, renderer, "color" );
     }
   }
   if(selected)
@@ -483,12 +444,12 @@ void mitk::ImageVtkMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
     }
     else
     {
-      GetColor( rgb, renderer );
+      GetDataNode()->GetColor(rgb, renderer, "color");
     }
   }
   if(!hover && !selected)
   {
-    GetColor( rgb, renderer );
+    GetDataNode()->GetColor( rgb, renderer, "color" );
   }
 
   double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
@@ -514,7 +475,7 @@ void mitk::ImageVtkMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   LocalStorage* localStorage = this->GetLocalStorage( renderer );
   float opacity = 1.0f;
   // check for opacity prop and use it for rendering if it exists
-  GetOpacity( opacity, renderer );
+  GetDataNode()->GetOpacity( opacity, renderer, "opacity" );
   //set the opacity according to the properties
   localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
   if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
@@ -575,7 +536,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   {
     //default lookuptable
     LevelWindow levelWindow;
-    this->GetLevelWindow( levelWindow, renderer );
+    GetDataNode()->GetLevelWindow( levelWindow, renderer, "levelwindow" );
     usedLookupTable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
   }
 
@@ -589,7 +550,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
   mitk::LevelWindow opacLevelWindow;
-  if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+  if( GetDataNode()->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
   {
     //pass the opaque level window to the filter
     localStorage->m_LevelWindowFilter->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
@@ -612,7 +573,11 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer, vtk
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  if ( !this->IsVisible( renderer ) )
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
   {
     return;
   }

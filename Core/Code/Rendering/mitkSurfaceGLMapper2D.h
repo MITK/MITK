@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSURFACEDATAMAPPER2D_H_HEADER_INCLUDED_C10EB2E8
 
 #include <MitkExports.h>
-#include "mitkGLMapper2D.h"
+#include "mitkGLMapper.h"
 #include "mitkSurface.h"
 
 class vtkCutter;
@@ -75,10 +75,10 @@ class DisplayGeometry;
  *   - \b "back normal length (px)": (FloatProperty) Length of the back side normals in pixels.
  *
  */
-class MITK_CORE_EXPORT SurfaceGLMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT SurfaceGLMapper2D : public GLMapper
 {
 public:
-  mitkClassMacro(SurfaceGLMapper2D, GLMapper2D);
+  mitkClassMacro(SurfaceGLMapper2D, GLMapper);
 
   itkNewMacro(Self);
 
@@ -119,7 +119,7 @@ public:
 
   static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
-  virtual void ApplyProperties(BaseRenderer* renderer);
+  virtual void ApplyAllProperties(BaseRenderer* renderer);
 
 protected:
 

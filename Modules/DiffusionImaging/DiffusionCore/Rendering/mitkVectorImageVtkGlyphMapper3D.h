@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "DiffusionCoreExports.h"
 
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkImage.h"
 
 class vtkMaskedGlyph3D;
@@ -31,10 +31,10 @@ class vtkMaskPoints;
 namespace mitk
 {
 
-class DiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper3D
+class DiffusionCore_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper
 {
 public:
-    mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper3D );
+    mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper );
 
     itkNewMacro( Self );
 
@@ -66,10 +66,6 @@ protected:
 
     /**
      * Generate a vtkPolyData by creating vectors as glyphs
-     */
-    virtual void GenerateData();
-
-    /**
      * This method is called, each time a specific renderer is updated.
      */
     virtual void GenerateDataForRenderer( mitk::BaseRenderer* renderer );

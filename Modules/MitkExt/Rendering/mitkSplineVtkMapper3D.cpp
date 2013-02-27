@@ -60,17 +60,16 @@ void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer
   m_SplinesActor->SetUserTransform(vtktransform);
 }
 
-void
-mitk::SplineVtkMapper3D::GenerateData()
+
+void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
-  Superclass::GenerateData();
 
   // only update spline if UpdateSpline has not been called from
   // external, e.g. by the SplineMapper2D. But call it the first time when m_SplineUpdateTime = 0 and m_LastUpdateTime = 0.
   if ( m_SplineUpdateTime < m_LastUpdateTime || m_SplineUpdateTime == 0)
   {
     this->UpdateSpline();
-    this->ApplyProperties(m_SplinesActor, NULL);
+    this->ApplyAllProperties(renderer, m_SplinesActor);
   }
 
   if ( m_SplinesAvailable )
@@ -89,12 +88,11 @@ mitk::SplineVtkMapper3D::GenerateData()
       m_SplinesAddedToAssembly = false;
     }
   }
-}
 
+   bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
-  if ( IsVisible( renderer ) == false )
+  if(!visible)
   {
     m_SplinesActor->VisibilityOff();
     m_SplineAssembly->VisibilityOff();
@@ -111,13 +109,13 @@ void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rende
   //if the properties have been changed, then refresh the properties
   if ( (m_SplineUpdateTime < this->m_DataNode->GetPropertyList()->GetMTime() ) ||
        (m_SplineUpdateTime < this->m_DataNode->GetPropertyList(renderer)->GetMTime() ) )
-    this->ApplyProperties(m_SplinesActor, NULL);
+    this->ApplyAllProperties(renderer, m_SplinesActor);
 }
 
 
-void mitk::SplineVtkMapper3D::ApplyProperties(vtkActor *actor, BaseRenderer *renderer)
+void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  Superclass::ApplyProperties(actor, renderer);
+  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
   vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white

@@ -27,11 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /// Forward declarations.
 
-///
-/// \class QmitkPropertyDelegate
-/// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
-///
-/// \see QmitkPropertiesTableModel
+/**
+ * \ingroup QmitkModule
+ * \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
+ *
+ * \see QmitkPropertiesTableModel
+ */
 class QMITK_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

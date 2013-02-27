@@ -30,12 +30,13 @@ class QmitkPropertiesTableModel;
 class QTableView;
 class QLineEdit;
 
-///
-/// \class QmitkPropertiesTableEditor
-/// \brief Combines a QTableView along with a QmitkPropertiesTableModel to a reusable
-/// Property Editor component.
-///
-/// \see QmitkPropertyDelegate
+/**
+ * \ingroup QmitkModule
+ * \brief Combines a QTableView along with a QmitkPropertiesTableModel to a reusable
+ * Property Editor component.
+ *
+ * \see QmitkPropertyDelegate
+ */
 class QMITK_EXPORT QmitkPropertiesTableEditor : public QWidget
 {
   Q_OBJECT

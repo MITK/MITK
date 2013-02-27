@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKENUMS_H_
 #define QMITKENUMS_H_
 
+/// \ingroup QmitkModule
 enum QmitkItemModelRole
 {
   QmitkDataNodeRole = 64,

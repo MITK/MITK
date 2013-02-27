@@ -28,6 +28,7 @@ class QmitkRenderingManagerInternal;
 class QmitkRenderingManagerFactory;
 
 /**
+ * \ingroup QmitkModule
  * \brief Qt specific implementation of mitk::RenderingManager.
  *
  * This implementation defines a QmitkRenderingRequestEvent to realize the
@@ -38,7 +39,6 @@ class QmitkRenderingManagerFactory;
  * from the system's event processing pipeline during system shutdown to
  * make sure that dangling events do not lead to unexpected behavior.
  *
- * \ingroup Renderer
  */
 class QMITK_EXPORT QmitkRenderingManager : public QObject, public mitk::RenderingManager
 {

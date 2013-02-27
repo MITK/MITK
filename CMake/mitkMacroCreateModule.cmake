@@ -221,6 +221,13 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
             mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
             mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
+
+            # VNL headers throw a lot of these, not fixable for us at least in ITK 3
+            mitkFunctionCheckCompilerFlags("-Wno-error=unused-parameter" module_compile_flags)
+
+            # Some DICOM header file in ITK
+            mitkFunctionCheckCompilerFlags("-Wno-error=cast-align" module_compile_flags)
+
           endif()
         endif(MODULE_WARNINGS_AS_ERRORS)
 

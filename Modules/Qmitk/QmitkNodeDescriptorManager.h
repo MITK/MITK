@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeDescriptor.h"
 
-///
-/// \class QmitkNodeDescriptorManager
-/// \brief QmitkNodeDescriptorManager manages a set of QmitkNodeDescriptors
-///
-/// \sa QmitkNodeDescriptor
-///
+/**
+ * \ingroup QmitkModule
+ * \brief QmitkNodeDescriptorManager manages a set of QmitkNodeDescriptors
+ *
+ * \sa QmitkNodeDescriptor
+ */
 class QMITK_EXPORT QmitkNodeDescriptorManager : public QObject
 {
   Q_OBJECT

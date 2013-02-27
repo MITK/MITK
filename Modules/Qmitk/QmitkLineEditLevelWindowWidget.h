@@ -27,13 +27,11 @@ class QmitkLevelWindowWidgetContextMenu;
 class QLineEdit;
 
 /**
-  \class QmitkLineEditLevelWindowWidget QmitkLineEditLevelWindowWidget.h QmitkLineEditLevelWindowWidget.h
-  \ingroup Widgets
-
-  \brief Provides a widget with two lineedit fields, one to change the window value of the current image and one to change the level value of the current image.
-
-  */
-
+ * \ingroup QmitkModule
+ * \brief Provides a widget with two lineedit fields, one to change the
+ * window value of the current image and one to change the level value of
+ * the current image.
+ */
 class QMITK_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 
   Q_OBJECT

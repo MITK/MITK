@@ -261,7 +261,7 @@ namespace mitk
         interPixelDistance[0],interPixelDistance[1],principalPoint[0],principalPoint[1],calculateDistance);
     }
 
-    /** \addtogroup <KinectReconstruction>
+    /** \ingroup KinectReconstruction
      * @{
      *
      * @brief KinectIndexToCartesianCoordinates Convert a pixel (i,j) with value d to a 3D world point. This conversion is meant for Kinect and slightly different then ToF reconstruction. See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
@@ -293,7 +293,7 @@ namespace mitk
         return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
     }
     /** @}*/
-    /** \addtogroup <KinectReconstructionInverse>
+    /** \ingroup KinectReconstructionInverse
      * @{
      * @brief CartesianCoordinatesToKinectIndexCoordinates Transform a 3D world point back to distance image pixel coordinates.
      * @param cartesianPointX x value of the cartesian point.

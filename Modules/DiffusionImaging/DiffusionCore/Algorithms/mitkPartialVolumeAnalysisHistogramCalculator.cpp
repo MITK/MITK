@@ -949,16 +949,14 @@ namespace mitk
     }
 
     // generate a histogram from the list sample
-    typedef float HistogramMeasurementType;
-    typedef itk::Statistics::ListSampleToHistogramGenerator
-        < ListSampleType, HistogramMeasurementType,
-        itk::Statistics::DenseFrequencyContainer,
-        MeasurementVectorLength > GeneratorType;
+    typedef double HistogramMeasurementType;
+    typedef itk::Statistics::Histogram< HistogramMeasurementType, itk::Statistics::DenseFrequencyContainer2 > HistogramType;
+    typedef itk::Statistics::SampleToHistogramFilter< ListSampleType, HistogramType > GeneratorType;
     typename GeneratorType::Pointer generator = GeneratorType::New();
     typename GeneratorType::HistogramType::SizeType size;
     size.Fill(m_NumberOfBins);
-    generator->SetNumberOfBins( size );
-    generator->SetListSample( listSample );
+    generator->SetHistogramSize( size );
+    generator->SetInput( listSample );
     generator->SetMarginalScale( 10.0 );
     generator->Update();
     *histogram = generator->GetOutput();

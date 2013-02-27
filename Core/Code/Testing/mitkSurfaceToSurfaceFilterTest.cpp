@@ -98,22 +98,22 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[SUCCESS] : Size of PolyDataSeries of input and output are identical." << std::endl;
 
 
-  std::cout << "Testing removeInputs() : " << std::endl;
-  unsigned int numOfInputs = filter->GetNumberOfInputs();
-  filter->RemoveInputs( mitk::Surface::New() );
-  if ( filter->GetNumberOfInputs() != numOfInputs )
-  {
-    std::cout << "[FAILED] : input was removed that was not set." << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : no iput was removed that was not set." << std::endl;
-  filter->RemoveInputs( surface );
-  if ( filter->GetNumberOfInputs() != 0 )
-  {
-    std::cout << "[FAILED] : existing input was not removed correctly." << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
+  //std::cout << "Testing RemoveInputs() : " << std::endl;
+  //unsigned int numOfInputs = filter->GetNumberOfInputs();
+  //filter->RemoveInputs( mitk::Surface::New() );
+  //if ( filter->GetNumberOfInputs() != numOfInputs )
+  //{
+  //  std::cout << "[FAILED] : input was removed that was not set." << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //std::cout << "[SUCCESS] : no input was removed that was not set." << std::endl;
+  //filter->RemoveInputs( surface );
+  //if ( filter->GetNumberOfInputs() != 0 )
+  //{
+  //  std::cout << "[FAILED] : existing input was not removed correctly." << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
 
 
 

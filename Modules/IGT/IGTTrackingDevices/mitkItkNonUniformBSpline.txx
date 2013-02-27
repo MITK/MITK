@@ -31,7 +31,7 @@ This file is based heavily on a corresponding ITK filter.
 #pragma warning ( disable : 4786 )
 #endif
 
-#include "itkNonUniformBSpline.h"
+#include "mitkItkNonUniformBSpline.h"
 
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_matrix.h"

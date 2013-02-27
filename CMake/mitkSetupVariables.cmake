@@ -13,6 +13,10 @@ if(MITK_VERSION_PATCH STREQUAL "99")
   set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
 endif()
 
+# Needed early on for redirecting the BlueBerry documentation output dir
+set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
+    "Output directory for doxygen generated documentation." )
+
 #-----------------------------------
 # Configuration of module system
 #-----------------------------------

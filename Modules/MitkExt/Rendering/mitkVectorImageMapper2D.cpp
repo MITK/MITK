@@ -64,14 +64,18 @@ const mitk::Image * mitk::VectorImageMapper2D::GetInput( void )
   if ( m_Image.IsNotNull() )
     return m_Image;
   else
-    return dynamic_cast<const mitk::Image*>( this->GetData() );
+    return dynamic_cast<const mitk::Image*>( GetDataNode()->GetData() );
 }
 
 
 void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 {
   //std::cout << "2d vector mapping..." << std::endl;
-  if ( IsVisible( renderer ) == false )
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
     return ;
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>( this->GetInput() );

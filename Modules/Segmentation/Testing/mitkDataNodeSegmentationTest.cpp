@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Mapper Test
 #include <mitkMapper.h>
-#include <mitkMapper2D.h>
-#include <mitkVtkMapper2D.h>
+#include <mitkGLMapper.h>
+#include <mitkVtkMapper.h>
 #include <mitkContourMapper2D.h>
 #include <mitkContourSetMapper2D.h>
 

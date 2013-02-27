@@ -67,7 +67,7 @@ mitk::FiberBundleXMapper2D::~FiberBundleXMapper2D()
 
 mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 {
-    return dynamic_cast< mitk::FiberBundleX * > ( GetData() );
+    return dynamic_cast< mitk::FiberBundleX * > ( GetDataNode()->GetData() );
 }
 
 
@@ -75,10 +75,11 @@ mitk::FiberBundleX* mitk::FiberBundleXMapper2D::GetInput()
 void mitk::FiberBundleXMapper2D::Update(mitk::BaseRenderer * renderer)
 {
 
-    if ( !this->IsVisible( renderer ) )
-    {
-        return;
-    }
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
+
 
  MITK_DEBUG << "MapperFBX 2D  update: ";
     // Calculate time step of the input data for the specified renderer (integer value)
@@ -278,55 +279,6 @@ void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-
-
-
-
-// following methods are essential, they actually call the GetVtkProp() method
-// which returns the desired actors
-void mitk::FiberBundleXMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
-{
-    //   MITK_INFO << "FiberBundleMapper2D MitkRenderOVerlay(renderer)";
-    if ( this->IsVisible(renderer)==false )
-        return;
-
-    if ( this->GetVtkProp(renderer)->GetVisibility() )
-    {
-        this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-    }
-}
-
-void mitk::FiberBundleXMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
-{
-    //  MITK_INFO << "FiberBundleMapper2D MitkRenderOpaqueGeometry(renderer)";
-    if ( this->IsVisible( renderer )==false )
-        return;
-
-    if ( this->GetVtkProp(renderer)->GetVisibility() )
-        this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-}
-void mitk::FiberBundleXMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
-{
-    //  MITK_INFO << "FiberBundleMapper2D MitkRenderTranslucentGeometry(renderer)";
-    if ( this->IsVisible(renderer)==false )
-        return;
-
-    //TODO is it possible to have a visible BaseRenderer AND an invisible VtkRenderer???
-    if ( this->GetVtkProp(renderer)->GetVisibility() )
-        this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-
-}
-void mitk::FiberBundleXMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
-{
-    //  MITK_INFO << "FiberBundleMapper2D MitkRenderVolumentricGeometry(renderer)";
-    if(IsVisible(renderer)==false)
-        return;
-
-    //TODO is it possible to have a visible BaseRenderer AND an invisible VtkRenderer???
-    if ( GetVtkProp(renderer)->GetVisibility() )
-        this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-
-}
 
 mitk::FiberBundleXMapper2D::FBXLocalStorage::FBXLocalStorage()
 {

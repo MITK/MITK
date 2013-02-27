@@ -60,12 +60,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
   if( this->GetInput()->GetIsModified( ) || propertiesHaveChanged )
   {
-    GenerateData();
-  }
-}
 
-void mitk::ConnectomicsNetworkMapper3D::GenerateData()
-{
   m_NetworkAssembly->Delete();
   m_NetworkAssembly = vtkPropAssembly::New();
 
@@ -312,6 +307,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateData()
   }
 
   (static_cast<mitk::ConnectomicsNetwork * > ( GetData() ) )->SetIsModified( false );
+  }
 }
 
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()

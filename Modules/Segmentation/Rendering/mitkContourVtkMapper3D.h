@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_CONTOUR_VTK_MAPPER_3D_H
 
 #include "SegmentationExports.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
@@ -37,10 +37,10 @@ class Contour;
  @brief Vtk-based mapper for mitk::Contour
  @ingroup Mapper
  */
-class Segmentation_EXPORT ContourVtkMapper3D : public VtkMapper3D
+class Segmentation_EXPORT ContourVtkMapper3D : public VtkMapper
 {
 public:
-  mitkClassMacro(ContourVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(ContourVtkMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 

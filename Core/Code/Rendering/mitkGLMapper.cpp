@@ -16,46 +16,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkGL.h"
-#include "mitkGLMapper2D.h"
-
-mitk::GLMapper2D::GLMapper2D()
-{
-
-}
+#include "mitkGLMapper.h"
 
 
-mitk::GLMapper2D::~GLMapper2D()
+mitk::GLMapper::GLMapper()
 {
 }
 
-void mitk::GLMapper2D::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
+mitk::GLMapper::~GLMapper()
 {
-  if(IsVisible(renderer)==false)
+}
+
+void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType /* type */)
+{
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
     return;
 
   Paint(renderer);
 }
-void mitk::GLMapper2D::MitkRenderTranslucentGeometry(mitk::BaseRenderer* /*renderer*/)
-{
 
-}
-void mitk::GLMapper2D::MitkRenderOverlay(mitk::BaseRenderer* /*renderer*/)
+bool mitk::GLMapper::IsVtkBased() const
 {
-
+  return false;
 }
 
-void mitk::GLMapper2D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* /*renderer*/)
-{
-
-}
-
-void mitk::GLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::GLMapper::ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
 {
     float rgba[4]={1.0f,1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists
-    GetColor(rgba, renderer);
+    GetDataNode()->GetColor(rgba, renderer, "color");
     // check for opacity prop and use it for rendering if it exists
-    GetOpacity(rgba[3], renderer);
+    GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
     glColor4fv(rgba);
 }

@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::PointSet* mitk::EnhancedPointSetVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
 mitk::EnhancedPointSetVtkMapper3D::EnhancedPointSetVtkMapper3D()
@@ -188,14 +188,11 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData()
-{
-  this->UpdateVtkObjects();
-}
-
-
 void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * renderer )
 {
+
+  this->UpdateVtkObjects();
+
   /* iterate over all points in pointset and apply properties to corresponding vtk objects */
   // get and update the PointSet
   const mitk::PointSet* pointset = this->GetInput();

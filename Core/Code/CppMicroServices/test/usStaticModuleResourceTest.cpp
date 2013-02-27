@@ -112,8 +112,8 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 {
   US_TEST_BEGIN("StaticModuleResourceTest");
 
-  ModuleContext* mc = GetModuleContext();
-  assert(mc);
+  assert(GetModuleContext());
+
 
 #ifdef US_BUILD_SHARED_LIBS
   SharedLibraryHandle libB("TestModuleB");
@@ -132,7 +132,7 @@ int usStaticModuleResourceTest(int /*argc*/, char* /*argv*/[])
 
   US_TEST_CONDITION(module->GetName() == "TestModuleB Module", "Test module name")
 #else
-  Module* module = mc->GetModule();
+  Module* module = GetModuleContext()->GetModule();
 #endif
 
   testResourceOperators(module);

@@ -23,6 +23,7 @@
       <tab type="examples" visible="yes" title="" intro=""/>
       <tab type="usergroup" title="Deprecated">
         <tab type="user" url="@ref deprecated" title="Deprecated List"/>
+        <tab type="user" url="@ref deprecatedSince2013_03" title="Deprecated as of MITK 2013.03"/>
         <tab type="user" url="@ref deprecatedSince2012_12" title="Deprecated as of MITK 2012.12"/>
         <tab type="user" url="@ref deprecatedSince2012_09" title="Deprecated as of MITK 2012.09"/>
       </tab>

@@ -31,12 +31,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //# Forward declarations
 
-///
-/// \class QmitkPropertiesTableModel
-/// \brief A table model for showing and editing mitk::Properties.
-///
-/// \see QmitkPropertyDelegate
-///
+/**
+ * \ingroup QmitkModule
+ * \brief A table model for showing and editing mitk::Properties.
+ *
+ * \see QmitkPropertyDelegate
+ */
 class QMITK_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
 {
 

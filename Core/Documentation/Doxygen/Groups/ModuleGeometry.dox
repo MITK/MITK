@@ -2,7 +2,7 @@ namespace mitk
 {
 /**
 \defgroup Geometry Geometry Classes
-\ingroup DataManagement
+\ingroup Core
 
 \brief This subcategory includes the geometry classes, which describe the geometry of the
 data in space and time.

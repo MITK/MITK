@@ -51,6 +51,7 @@ namespace mitk {
 class RenderingManager;
 }
 
+/// \ingroup QmitkModule
 class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT

@@ -31,8 +31,8 @@ class QDragEnterEvent;
 class QDropEvent;
 
 /**
+ * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
- * \ingroup Renderer
  */
 class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
 {

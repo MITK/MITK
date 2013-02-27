@@ -243,7 +243,7 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
 
 
 
-void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer, vtkActor* actor)
+void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
 {
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 

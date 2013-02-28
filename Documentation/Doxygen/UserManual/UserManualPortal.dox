@@ -1,0 +1,9 @@
+/**
+\page UserManualPortal MITK: User Manual
+
+<ul>
+  <li> \subpage ApplicationsPage </li>
+  <li> \subpage MITKUserManualPage </li>
+  <li> \subpage PluginListPage </li>
+</ul>
+*/

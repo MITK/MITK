@@ -429,11 +429,23 @@ set(cflags )
 if(WIN32)
   set(cflags "${cflags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
+if(NOT MSVC_VERSION)
+  foreach(_flag
+    -Wall
+    -Wextra
+    -Wpointer-arith
+    -Winvalid-pch
+    -Wcast-align
+    -Wwrite-strings
+    -Wno-gnu
+    -fdiagnostics-show-option
+    )
+    mitkFunctionCheckCompilerFlags(${_flag} cflags)
+  endforeach()
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
 
-  mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
 
@@ -586,6 +598,8 @@ if(MITK_USE_BLUEBERRY)
   if(MITK_BUILD_ALL_PLUGINS)
     set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
   endif()
+
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
 
   add_subdirectory(BlueBerry)
 

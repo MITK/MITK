@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_example_gui_regiongrowing org.mitk.example.gui.regiongrowing
+  \ingroup MITKExamplePlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mitk_example_gui_regiongrowing_internal Internal
+  \ingroup org_mitk_example_gui_regiongrowing
+
+  \brief This subcategory includes the internal classes of the org.mitk.example.gui.regiongrowing plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

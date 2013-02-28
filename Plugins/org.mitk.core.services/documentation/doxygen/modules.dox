@@ -3,7 +3,16 @@
   \ingroup MITKPlugins
 
   \brief Provides basic MITK services.
-  
+
+  This plug-in provides service interfaces and service objects for accessing a mitk::DataStorage
+  via the CTK Plugin Framework service registry.
+
+  It also handles the following tasks:
+
+  - Initialize the MITK Logging back-ends.
+  - Register adaptor services in the CTK Plugin Framework service registry for each MITK Micro Service.
+    This allows a seamless access of MITK Micro Service objects from the CTK Plugin Context.
+
 */
 
 /**

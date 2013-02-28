@@ -19,8 +19,11 @@
 #include "mitkInteractor.h"
 #include "mitkDataInteractor.h"
 #include "mitkVtkPropRenderer.h"
+#include "mitkBaseRenderer.h"
 #include "mitkTestingMacros.h"
 #include "mitkGlobalInteraction.h"
+#include "itkLightObject.h"
+#include "mitkDispatcher.h"
 
 int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
 {

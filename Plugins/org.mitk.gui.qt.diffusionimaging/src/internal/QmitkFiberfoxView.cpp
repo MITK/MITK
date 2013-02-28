@@ -89,6 +89,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_KspaceParamFrame->setVisible(false);
         m_Controls->m_StickModelFrame->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -102,7 +103,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_TensionBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnTensionChanged(double)));
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
-        connect((QObject*) m_Controls->m_AddT2Smearing, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddT2Smearing(int)));
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -110,16 +110,23 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AlignOnGrid, SIGNAL(clicked()), (QObject*) this, SLOT(AlignOnGrid()));
         connect((QObject*) m_Controls->m_FiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
         connect((QObject*) m_Controls->m_NonFiberCompartmentModelBox, SIGNAL(currentIndexChanged(int)), (QObject*) this, SLOT(FiberModelFrameVisibility(int)));
-        connect((QObject*) m_Controls->m_AdvancedFiberOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedFiberOptions(int)));
+        connect((QObject*) m_Controls->m_AdvancedOptionsBox, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
+        connect((QObject*) m_Controls->m_AdvancedOptionsBox_2, SIGNAL( stateChanged(int)), (QObject*) this, SLOT(ShowAdvancedOptions(int)));
     }
 }
 
-void QmitkFiberfoxView::ShowAdvancedFiberOptions(int state)
+void QmitkFiberfoxView::ShowAdvancedOptions(int state)
 {
     if (state)
+    {
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(true);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(true);
+    }
     else
+    {
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
+        m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
+    }
 }
 
 void QmitkFiberfoxView::FiberModelFrameVisibility(int index)
@@ -148,14 +155,6 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
 {
     if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
-}
-
-void QmitkFiberfoxView::OnAddT2Smearing(int value)
-{
-    if (value>0)
-        m_Controls->m_T2bluringParamFrame->setVisible(true);
-    else
-        m_Controls->m_T2bluringParamFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnAddGibbsRinging(int value)
@@ -666,97 +665,80 @@ void QmitkFiberfoxView::GenerateImage()
             gradientList.push_back(g);
         }
     }
-    // storage for generated phantom image
-    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
 
-    // signal models
-    QString signalModelString("Ball");
-    itk::TractsToDWIImageFilter::DiffusionModelList fiberModelList, nonFiberModelList;
-    mitk::TensorModel<double> tensorModel;
-    mitk::StickModel<double> stickModel;
-
-    // free diffusion
-    mitk::BallModel<double> ballModel;
-    ballModel.SetGradientList(gradientList);
-    ballModel.SetBvalue(bVal);
-    ballModel.SetDiffusivity(m_Controls->m_BallD->value());
-    ballModel.SetSignalScale(m_Controls->m_NonFiberS0Box->value());
-    ballModel.SetRelaxationT2(m_Controls->m_NonFiberRelaxationT2Box->value());
-    nonFiberModelList.push_back(&ballModel);
-
-    resultNode->AddProperty("Fiberfox.Ball.Diffusivity", DoubleProperty::New(m_Controls->m_BallD->value()));
-    resultNode->AddProperty("Fiberfox.Ball.Scaling", DoubleProperty::New(m_Controls->m_NonFiberS0Box->value()));
-    if (m_Controls->m_AddT2Smearing->isChecked())
-        resultNode->AddProperty("Fiberfox.Ball.T2", DoubleProperty::New(m_Controls->m_NonFiberRelaxationT2Box->value()));
-
-    // intra-axonal diffusion
-    switch (m_Controls->m_FiberCompartmentModelBox->currentIndex())
-    {
-    case 0:
-        MITK_INFO << "Using zeppelin model";
-        tensorModel.SetGradientList(gradientList);
-        tensorModel.SetBvalue(bVal);
-        tensorModel.SetKernelFA(m_Controls->m_TensorFaBox->value());
-        tensorModel.SetSignalScale(m_Controls->m_FiberS0Box->value());
-        tensorModel.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
-        fiberModelList.push_back(&tensorModel);
-        signalModelString += "-Zeppelin";
-        resultNode->AddProperty("Fiberfox.Zeppelin.FA", DoubleProperty::New(m_Controls->m_TensorFaBox->value()));
-        resultNode->AddProperty("Fiberfox.Zeppelin.Scaling", DoubleProperty::New(m_Controls->m_FiberS0Box->value()));
-        if (m_Controls->m_AddT2Smearing->isChecked())
-            resultNode->AddProperty("Fiberfox.Zeppelin.T2", DoubleProperty::New(m_Controls->m_FiberRelaxationT2Box->value()));
-        break;
-    case 1:
-        MITK_INFO << "Using stick model";
-        stickModel.SetGradientList(gradientList);
-        stickModel.SetDiffusivity(m_Controls->m_StickDiffusivityBox->value());
-        stickModel.SetSignalScale(m_Controls->m_FiberS0Box->value());
-        stickModel.SetRelaxationT2(m_Controls->m_FiberRelaxationT2Box->value());
-        fiberModelList.push_back(&stickModel);
-        signalModelString += "-Stick";
-        resultNode->AddProperty("Fiberfox.Stick.Diffusivity", DoubleProperty::New(m_Controls->m_StickDiffusivityBox->value()));
-        resultNode->AddProperty("Fiberfox.Stick.Scaling", DoubleProperty::New(m_Controls->m_FiberS0Box->value()));
-        if (m_Controls->m_AddT2Smearing->isChecked())
-            resultNode->AddProperty("Fiberfox.Stick.T2", DoubleProperty::New(m_Controls->m_FiberRelaxationT2Box->value()));
-        break;
-    }
-
-    itk::TractsToDWIImageFilter::KspaceArtifactList artifactList;
-
-    // noise model
-    double snr = m_Controls->m_NoiseLevel->value();
-    double noiseVariance = 0;
-    if (snr <= 0)
-        snr = 0.0001;
-    if (snr<=99)
-    {
-        noiseVariance = (double)m_Controls->m_FiberS0Box->value()/snr;
-        noiseVariance *= noiseVariance;
-    }
-    mitk::RicianNoiseModel<double> noiseModel;
-    noiseModel.SetNoiseVariance(noiseVariance);
-
-    // artifact models
-    QString artifactModelString("");
-    mitk::GibbsRingingArtifact<double> gibbsModel;
-    if (m_Controls->m_AddGibbsRinging->isChecked())
-    {
-        artifactModelString += "_Gibbs-ringing";
-        resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
-        gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
-        artifactList.push_back(&gibbsModel);
-    }
-
-    mitk::T2SmearingArtifact<double> t2Model;
-    if (m_Controls->m_AddT2Smearing->isChecked())
-    {
-        artifactModelString += "_T2-blurring";
-        t2Model.SetReadoutPulseLength(1);
-        artifactList.push_back(&t2Model);
-    }
 
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
+        // storage for generated phantom image
+        mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+
+        // signal models
+        QString signalModelString("Ball");
+        itk::TractsToDWIImageFilter::DiffusionModelList fiberModelList, nonFiberModelList;
+        mitk::TensorModel<double> tensorModel;
+        mitk::StickModel<double> stickModel;
+
+        // free diffusion
+        mitk::BallModel<double> ballModel;
+        ballModel.SetGradientList(gradientList);
+        ballModel.SetBvalue(bVal);
+        ballModel.SetDiffusivity(m_Controls->m_BallD->value());
+        ballModel.SetT2(m_Controls->m_NonFiberT2Box->value());
+        nonFiberModelList.push_back(&ballModel);
+
+        resultNode->AddProperty("Fiberfox.Ball.Diffusivity", DoubleProperty::New(m_Controls->m_BallD->value()));
+        resultNode->AddProperty("Fiberfox.Ball.T2", DoubleProperty::New(m_Controls->m_NonFiberT2Box->value()));
+
+        // intra-axonal diffusion
+        switch (m_Controls->m_FiberCompartmentModelBox->currentIndex())
+        {
+        case 0:
+            MITK_INFO << "Using zeppelin model";
+            tensorModel.SetGradientList(gradientList);
+            tensorModel.SetBvalue(bVal);
+            tensorModel.SetKernelFA(m_Controls->m_TensorFaBox->value());
+            tensorModel.SetT2(m_Controls->m_FiberT2Box->value());
+            fiberModelList.push_back(&tensorModel);
+            signalModelString += "-Zeppelin";
+            resultNode->AddProperty("Fiberfox.Zeppelin.FA", DoubleProperty::New(m_Controls->m_TensorFaBox->value()));
+            resultNode->AddProperty("Fiberfox.Zeppelin.T2", DoubleProperty::New(m_Controls->m_FiberT2Box->value()));
+            break;
+        case 1:
+            MITK_INFO << "Using stick model";
+            stickModel.SetGradientList(gradientList);
+            stickModel.SetDiffusivity(m_Controls->m_StickDiffusivityBox->value());
+            stickModel.SetT2(m_Controls->m_FiberT2Box->value());
+            fiberModelList.push_back(&stickModel);
+            signalModelString += "-Stick";
+            resultNode->AddProperty("Fiberfox.Stick.Diffusivity", DoubleProperty::New(m_Controls->m_StickDiffusivityBox->value()));
+            resultNode->AddProperty("Fiberfox.Stick.T2", DoubleProperty::New(m_Controls->m_FiberT2Box->value()));
+            break;
+        }
+
+        itk::TractsToDWIImageFilter::KspaceArtifactList artifactList;
+
+        // noise model
+        double noiseVariance = m_Controls->m_NoiseLevel->value();
+        mitk::RicianNoiseModel<double> noiseModel;
+        noiseModel.SetNoiseVariance(noiseVariance);
+
+        // artifact models
+        QString artifactModelString("");
+        mitk::GibbsRingingArtifact<double> gibbsModel;
+        if (m_Controls->m_AddGibbsRinging->isChecked())
+        {
+            artifactModelString += "_Gibbs-ringing";
+            resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
+            gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
+            artifactList.push_back(&gibbsModel);
+        }
+
+        mitk::T2SmearingArtifact<double> contrastModel;
+        contrastModel.SetT2star(this->m_Controls->m_T2starBox->value());
+        contrastModel.SetTE(this->m_Controls->m_TEbox->value());
+        contrastModel.SetTline(m_Controls->m_LineReadoutTimeBox->value());
+        artifactList.push_back(&contrastModel);
+
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
         if (fiberBundle->GetNumFibers()<=0)
             continue;
@@ -774,6 +756,8 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
         filter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
+        filter->SetFiberRadius(m_Controls->m_FiberRadius->value());
+        filter->SetSignalScale(m_Controls->m_SignalScaleBox->value());
 
         if (m_TissueMask.IsNotNull())
         {
@@ -789,7 +773,7 @@ void QmitkFiberfoxView::GenerateImage()
         image->SetDirections(gradientList);
         image->InitializeFromVectorImage();
         resultNode->SetData( image );
-        resultNode->SetName(m_SelectedBundle->GetName()
+        resultNode->SetName(m_SelectedBundles.at(i)->GetName()
                             +"_D"+QString::number(imageRegion.GetSize(0)).toStdString()
                             +"-"+QString::number(imageRegion.GetSize(1)).toStdString()
                             +"-"+QString::number(imageRegion.GetSize(2)).toStdString()
@@ -797,12 +781,12 @@ void QmitkFiberfoxView::GenerateImage()
                             +"-"+QString::number(spacing[1]).toStdString()
                             +"-"+QString::number(spacing[2]).toStdString()
                             +"_b"+QString::number(bVal).toStdString()
-                            +"_SNR"+QString::number(snr).toStdString()
+                            +"_NOISE"+QString::number(noiseVariance).toStdString()
                             +"_"+signalModelString.toStdString()
                             +artifactModelString.toStdString());
-        GetDataStorage()->Add(resultNode, m_SelectedBundle);
+        GetDataStorage()->Add(resultNode, m_SelectedBundles.at(i));
 
-        resultNode->AddProperty("Fiberfox.SNR", DoubleProperty::New(snr));
+        resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
         resultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(m_Controls->m_RepetitionsBox->value()));
         resultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(bVal));
         resultNode->AddProperty("Fiberfox.Model", StringProperty::New(signalModelString.toStdString()));
@@ -816,8 +800,8 @@ void QmitkFiberfoxView::GenerateImage()
 
             mitk::DataNode::Pointer node = mitk::DataNode::New();
             node->SetData( image );
-            node->SetName(m_SelectedBundle->GetName()+"_k-space");
-            GetDataStorage()->Add(node, m_SelectedBundle);
+            node->SetName(m_SelectedBundles.at(i)->GetName()+"_k-space");
+            GetDataStorage()->Add(node, m_SelectedBundles.at(i));
         }
 
         mitk::BaseData::Pointer basedata = resultNode->GetData();

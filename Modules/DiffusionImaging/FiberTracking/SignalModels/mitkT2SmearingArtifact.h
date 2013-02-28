@@ -41,11 +41,7 @@ public:
     /** Attenuate signal according to given T2 time. **/
     typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice);
 
-    void SetReadoutPulseLength(double t){ m_ReadoutPulseLength=t; }
-
 protected:
-
-    unsigned int    m_ReadoutPulseLength;
 
 };
 

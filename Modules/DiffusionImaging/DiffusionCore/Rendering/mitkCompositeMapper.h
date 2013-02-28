@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef COMPOSITEMAPPER_H_HEADER_INCLUDED
 #define COMPOSITEMAPPER_H_HEADER_INCLUDED
 
-#include "mitkGLMapper2D.h"
-#include "mitkVtkMapper2D.h"
+#include "mitkGLMapper.h"
+#include "mitkVtkMapper.h"
 #include "mitkQBallImage.h"
 #include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
@@ -39,12 +39,12 @@ namespace mitk {
   //##Documentation
   //## @brief Composite pattern for combination of different mappers
   //## @ingroup Mapper
-  class CompositeMapper : public VtkMapper2D
+  class CompositeMapper : public VtkMapper
   {
   public:
 
-    mitkClassMacro(CompositeMapper,VtkMapper2D)
-    itkNewMacro(Self)
+    mitkClassMacro(CompositeMapper,VtkMapper);
+    itkNewMacro(Self);
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {
@@ -87,11 +87,6 @@ namespace mitk {
       return retval;
     }
 
-    bool IsVtkBased() const
-    {
-      return m_OdfMapper->IsVtkBased();
-    }
-
     bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer )
     {
       return m_OdfMapper->HasVtkProp(prop, renderer);
@@ -128,19 +123,13 @@ namespace mitk {
       return assembly;
     }
 
-    void SetGeometry3D(const mitk::Geometry3D* aGeometry3D)
-    {
-      m_ImgMapper->SetGeometry3D(aGeometry3D);
-      m_OdfMapper->SetGeometry3D(aGeometry3D);
-    }
+  protected:
 
     virtual void Update(mitk::BaseRenderer* renderer)
     {
       m_OdfMapper->Update(renderer);
       GenerateDataForRenderer(renderer);
     }
-
-  protected:
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer)
     {

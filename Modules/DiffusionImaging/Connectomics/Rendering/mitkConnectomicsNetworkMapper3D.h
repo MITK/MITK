@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 // base class
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 
 // data type
 
@@ -64,11 +64,11 @@ namespace mitk {
     * \ingroup Mapper
     */
 
-  class Connectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper3D
+  class Connectomics_EXPORT ConnectomicsNetworkMapper3D : public VtkMapper
   {
   public:
 
-    mitkClassMacro(ConnectomicsNetworkMapper3D, VtkMapper3D);
+    mitkClassMacro(ConnectomicsNetworkMapper3D, VtkMapper);
     itkNewMacro(Self);
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like deprecated.. should be replaced bz GetViewProp()
@@ -78,7 +78,6 @@ namespace mitk {
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void GenerateData();
 
     virtual const mitk::ConnectomicsNetwork* GetInput();
 

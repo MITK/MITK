@@ -32,6 +32,11 @@ namespace mitk {
 //## 3D world position in mm is calculated via picking (delegated to the
 //## BaseRenderer).
 //## @ingroup Interaction
+
+  /**
+   * \deprecatedSince{2013_03} KeyEvent is deprecated. Use mitk::InteractionKeyEvent instead.
+   * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
+   */
 class MITK_CORE_EXPORT KeyEvent : public Event
 {
   public:

@@ -36,8 +36,8 @@ namespace mitk
   vtkStandardNewMacro(EventConfig);
 }
 
-mitk::EventConfig::EventConfig()
-:m_Errors(false)
+mitk::EventConfig::EventConfig() :
+    m_Errors(false)
 {
   if (m_PropertyList.IsNull())
   {
@@ -55,7 +55,7 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
   {
     if ((*it).interactionEvent->MatchesTemplate(mapping.interactionEvent))
     {
-      MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
+      //MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
       m_EventList.erase(it);
       break;
     }
@@ -93,10 +93,10 @@ void mitk::EventConfig::StartElement(const char* elementName, const char **atts)
     std::string value = ReadXMLStringAttribut(xmlParameterValue, atts);
     m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
-  else if (name == xmlTagInput)
+  else if (name == xmlTagEventVariant)
   {
     std::string eventClass = ReadXMLStringAttribut(xmlParameterEventClass, atts);
-    std::string eventVariant = ReadXMLStringAttribut(xmlParameterEventVariant, atts);
+    std::string eventVariant = ReadXMLStringAttribut(xmlParameterName, atts);
     // New list in which all parameters are stored that are given within the <input/> tag
     m_EventPropertyList = PropertyList::New();
     m_EventPropertyList->SetStringProperty(xmlParameterEventClass.c_str(), eventClass.c_str());
@@ -116,7 +116,7 @@ void mitk::EventConfig::EndElement(const char* elementName)
 {
   std::string name(elementName);
   // At end of input section, all necessary infos are collected to created an interaction event.
-  if (name == xmlTagInput)
+  if (name == xmlTagEventVariant)
   {
     InteractionEvent::Pointer event = EventFactory::CreateEvent(m_EventPropertyList);
     if (event.IsNotNull())
@@ -150,17 +150,17 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
   return std::string();
 }
 
-const mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes()
+mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
 {
   return m_PropertyList;
 }
 
-std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent)
+std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interactionEvent)
 {
   // internal events are excluded from mapping
   if (interactionEvent->GetEventClass() == "InternalEvent")
   {
-    InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent);
+    InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent.GetPointer());
     return internalEvent->GetSignalName();
   }
 
@@ -176,7 +176,7 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent* interactionEvent
   // so "A" will be returned as "StdA"
   if (interactionEvent->GetEventClass() == "KeyEvent")
   {
-    InteractionKeyEvent* keyEvent = dynamic_cast<InteractionKeyEvent*>(interactionEvent);
+    InteractionKeyEvent* keyEvent = dynamic_cast<InteractionKeyEvent*>(interactionEvent.GetPointer());
     return ("Std" + keyEvent->GetKey());
   }
   return "";

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Forward Declartions
 
 ///
+/// \ingroup QmitkModule
 /// \class QmitkDataStorageComboBox
 /// \author Michael Mueller
 /// \version 4.0

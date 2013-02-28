@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //MITK Rendering
 #include "mitkBaseRenderer.h"
-#include "mitkVtkMapper2D.h"
+#include "mitkVtkMapper.h"
 #include "mitkExtractSliceFilter.h"
 
 //VTK
@@ -116,12 +116,12 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper2D
-{
+  class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper
+  {
 
-public:
-  /** Standard class typedefs. */
-  mitkClassMacro( ImageVtkMapper2D,VtkMapper2D );
+  public:
+    /** Standard class typedefs. */
+    mitkClassMacro( ImageVtkMapper2D,VtkMapper );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -133,14 +133,9 @@ public:
    * data. */
   virtual void Update(mitk::BaseRenderer * renderer);
 
-  //### methods of MITK-VTK rendering pipeline
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-
-  virtual void MitkRenderOverlay(BaseRenderer* renderer);
-  virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
-  virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
-  virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
-  //### end of methods of MITK-VTK rendering pipeline
+    //### methods of MITK-VTK rendering pipeline
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    //### end of methods of MITK-VTK rendering pipeline
 
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */

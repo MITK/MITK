@@ -4,6 +4,7 @@
 
   \brief The CoreApp applictaion plug-in.
   
+  Creates the menu and toolbar entries for the main application window.
 */
 
 /**

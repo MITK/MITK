@@ -1,0 +1,24 @@
+/**
+  \defgroup ToolManagerEtAl Classes related to the Segmentation plugin
+
+  \brief A couple of classes related to the Segmentation plugin. See also
+  \ref QmitkSegmentationTechnicalPage
+*/
+
+/**
+  \defgroup MITKModules MITK Modules
+
+  \brief This group includes all MITK Modules.
+*/
+
+/**
+  \defgroup MITKPlugins MITK Plugins
+
+  \brief This group includes all MITK Plugins.
+*/
+
+/**
+  \defgroup MITKExamplePlugins MITK Example Plugins
+
+  \brief This group includes all MITK example plugins demonstrating specific framework features.
+*/

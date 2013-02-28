@@ -28,17 +28,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIcon>
 #include <mitkNodePredicateBase.h>
 
-///
-/// \class QmitkNodeQmitkNodeDescriptor
-/// \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for the mitk::DataNode
-/// which enhances certain mitk::DataNode by additional infos needed by the GUI (Icon, ...)
-///
-/// Moreover, QmitkNodeQmitkNodeDescriptor stores a Menu for actions that can be taken
-/// for a certain DataNode, e.g. for DataNodes containing images this menu
-/// can be filled with Image Filter Actions, etc.
-///
-/// \sa QmitkDataNodeQmitkNodeDescriptorManager
-///
+/**
+ * \ingroup QmitkModule
+ * \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for
+ * the mitk::DataNode which enhances certain mitk::DataNode by additional
+ * infos needed by the GUI (Icon, ...)
+ *
+ * Moreover, QmitkNodeQmitkNodeDescriptor stores a Menu for actions that can be taken
+ * for a certain DataNode, e.g. for DataNodes containing images this menu
+ * can be filled with Image Filter Actions, etc.
+ *
+ * \sa QmitkDataNodeQmitkNodeDescriptorManager
+ */
 class QMITK_EXPORT QmitkNodeDescriptor : public QObject
 {
   Q_OBJECT

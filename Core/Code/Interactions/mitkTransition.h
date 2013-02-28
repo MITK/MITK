@@ -34,7 +34,11 @@ namespace mitk {
   * A transition connects two states.
   * Several actions are stored, that have to be executed after the statechange.
   * @ingroup Interaction
-  **/
+  *
+  * \deprecatedSince{2013_03} mitk::Transition is deprecated. Use mitk::StateMachineTransition instead.
+  * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
+  */
+
   class MITK_CORE_EXPORT Transition
   {
   public:

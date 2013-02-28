@@ -1,0 +1,20 @@
+/**
+  \defgroup Registration RigidRegistration
+  \ingroup MITKModules
+
+  \brief A couple of classes related to registration.
+*/
+
+/**
+  \defgroup RigidRegistration Classes related to rigid registration
+  \ingroup Registration
+
+  \brief A couple of classes related to rigid registration.
+*/
+
+/**
+  \defgroup PointBasedRegistration Classes related to point based registration
+  \ingroup Registration
+
+  \brief A couple of classes related to point based registration.
+*/

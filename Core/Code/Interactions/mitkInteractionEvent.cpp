@@ -30,7 +30,7 @@ void mitk::InteractionEvent::SetSender(mitk::BaseRenderer* sender)
 
 mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
 {
-  return m_Sender.GetPointer();
+  return m_Sender;
 }
 
 bool mitk::InteractionEvent::MatchesTemplate(InteractionEvent::Pointer)
@@ -42,7 +42,12 @@ mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
-std::string mitk::InteractionEvent::GetEventClass()
+bool mitk::InteractionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<InteractionEvent*>(baseClass.GetPointer()) != NULL) ;
+}
+
+std::string mitk::InteractionEvent::GetEventClass() const
 {
   return m_EventClass;
 }

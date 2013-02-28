@@ -28,7 +28,7 @@ mitk::StateMachineTransition::StateMachineTransition(std::string nextStateName, 
   m_TransitionEvent = EventFactory::CreateEvent(propertyList);
 }
 
-bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& transition)
+bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& transition) const
 {
   // Create event based on incoming event type,
   // then try to cast it to the type of event that this transition holds,
@@ -46,7 +46,7 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
     return false;
   }
 
-  if (tmpEvent->IsSubClassOf(m_TransitionEvent.GetPointer()))
+  if (m_TransitionEvent->IsSuperClassOf(tmpEvent.GetPointer()))
   {
     return (this->m_EventVariant == transition.m_EventVariant);
   }
@@ -75,7 +75,7 @@ void mitk::StateMachineTransition::AddAction(StateMachineAction::Pointer action)
   m_Actions.push_back(action);
 }
 
-mitk::StateMachineState::Pointer mitk::StateMachineTransition::GetNextState()
+mitk::StateMachineState::Pointer mitk::StateMachineTransition::GetNextState() const
 {
   return m_NextState;
 }

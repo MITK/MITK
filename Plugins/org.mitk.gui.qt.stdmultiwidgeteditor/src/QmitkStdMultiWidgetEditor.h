@@ -46,14 +46,8 @@ public:
 
   QmitkStdMultiWidget* GetStdMultiWidget();
 
-  /**
-   * Request the QmitkRenderWindowMenus to be either off, or whatever was the last known state, which is
-   * useful when responding to the PartOpened, PartClosed, PartHidden methods.
-   *
-   * \param on If <code>true</code> will request the QmitkStdMultiWidget to set the QmitkRenderWindowMenu to
-   *           whatever was the last known state, and if <code>false</code> will turn the QmitkRenderWindowMenu off.
-   *
-   */
+  /// \brief If on=true will request the QmitkStdMultiWidget set the Menu widget to
+  /// whatever was the last known enabled state, and if on=false will turn the Menu widget off.
   void RequestActivateMenuWidget(bool on);
 
   // -------------------  mitk::IRenderWindowPart  ----------------------

@@ -237,6 +237,7 @@ void
 RenderingManager
 ::RequestUpdate( vtkRenderWindow *renderWindow )
 {
+
   // If the renderWindow is not valid, we do not want to inadvertantly create
   // an entry in the m_RenderWindowList map. It is possible if the user is
   // regularly calling AddRenderer and RemoveRenderer for a rendering update

@@ -1,0 +1,18 @@
+/**
+  \defgroup org_mitk_gui_qt_cmdlinemodules org.mitk.gui.qt.cmdlinemodules
+  \ingroup MITKPlugins
+
+  \brief This plugin, provided by University College London (UCL), written by Matt
+  Clarkson (m.clarkson@ucl.ac.uk) uses the CTK (http://www.commontk.org) Command
+  Line Modules library to run command line programs as an external process.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_cmdlinemodules_internal Internal
+  \ingroup org_mitk_gui_qt_cmdlinemodules
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.cmdlinemodules plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

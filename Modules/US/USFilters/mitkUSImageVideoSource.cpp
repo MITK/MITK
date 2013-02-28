@@ -27,15 +27,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::USImageVideoSource::USImageVideoSource()
-: itk::Object()
+: itk::Object(),
+m_VideoCapture(new cv::VideoCapture()),
+m_IsVideoReady(false),
+m_IsGreyscale(false),
+m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
+m_ResolutionOverrideWidth(0),
+m_ResolutionOverrideHeight(0),
+m_ResolutionOverride(false)
 {
-  m_VideoCapture = new cv::VideoCapture();
-  m_IsVideoReady = false;
-  m_IsGreyscale  = false;
-  this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
-  m_ResolutionOverrideWidth = 0;
-  m_ResolutionOverrideHeight = 0;
-  m_ResolutionOverride = false;
+  m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()

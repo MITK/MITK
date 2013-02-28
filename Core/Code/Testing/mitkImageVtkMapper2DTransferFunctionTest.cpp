@@ -62,6 +62,7 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
         renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
     }
 
+    renderingHelper.PrepareRender();
     //### Usage of vtkRegressionTestImage:
     //vtkRegressionTestImage( vtkRenderWindow )
     //Set a vtkRenderWindow containing the desired scene.
@@ -69,8 +70,10 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
-    renderingHelper.PrepareRender();
-    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
+    //Default tolerance for rendering tests is 10 (set by VTK).
+    //For this case, small artifacts in Windows occur and boundaries of the fonts,
+    //thus we double the default tolerance threshold and set it to 20.
+    int retVal = vtkTesting::Test(argc, argv, renderingHelper.GetVtkRenderWindow(), 20 );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)
     //0 = test failed

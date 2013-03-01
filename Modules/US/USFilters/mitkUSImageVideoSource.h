@@ -101,6 +101,8 @@ namespace mitk {
     itkGetMacro(IsGreyscale,bool);
     itkGetMacro(ResolutionOverrideWidth,int);
     itkGetMacro(ResolutionOverrideHeight,int);
+    int GetImageHeight();
+    int GetImageWidth();
 
 
   protected:

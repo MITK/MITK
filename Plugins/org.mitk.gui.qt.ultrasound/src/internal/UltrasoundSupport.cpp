@@ -53,6 +53,12 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_NewVideoDeviceWidget, SIGNAL(Finished()), this, SLOT(OnNewDeviceWidgetDone()) ); // After NewDeviceWidget finished editing
   connect( m_Controls.m_BtnView, SIGNAL(clicked()), this, SLOT(OnClickedViewDevice()) );
   connect( m_Timer, SIGNAL(timeout()), this, SLOT(DisplayImage()));
+  connect( m_Controls.crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( m_Controls.crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( m_Controls.crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect( m_Controls.crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+
+
   //connect (m_Controls.m_ActiveVideoDevices, SIGNAL())
 
   // Initializations
@@ -88,6 +94,33 @@ void UltrasoundSupport::DisplayImage()
     m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
     m_FrameCounter = 0;
   }
+}
+
+void UltrasoundSupport::OnCropAreaChanged()
+{
+if (m_Device->GetDeviceClass()=="org.mitk.modules.us.USVideoDevice")
+      {
+      mitk::USVideoDevice::Pointer currentVideoDevice = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+
+      if ((m_Controls.crop_left->value() == 0) &&
+          (m_Controls.crop_top->value() == 0) &&
+          (m_Controls.crop_right->value() == 0) &&
+          (m_Controls.crop_bot->value() == 0))
+          currentVideoDevice->GetSource()->RemoveRegionOfInterest();
+
+      int left = m_Controls.crop_left->value();
+      int top = m_Controls.crop_top->value();
+      int right = currentVideoDevice->GetSource()->GetImageWidth() - m_Controls.crop_right->value();
+      int bottom = currentVideoDevice->GetSource()->GetImageHeight() - m_Controls.crop_bot->value();
+      currentVideoDevice->GetSource()->SetRegionOfInterest(left,top,right,bottom);
+      MITK_INFO << "Image  H:" <<  currentVideoDevice->GetSource()->GetImageHeight() << " W:" <<currentVideoDevice->GetSource()->GetImageWidth();
+      MITK_INFO << "Crop  L:"<<left<<" R:"<<right<<" O:"<<top<<" U:"<<bottom;
+      GlobalReinit();
+      }
+else
+      {
+      MITK_WARN << "No USVideoDevice: Cannot Crop!";
+      }
 }
 
 void UltrasoundSupport::OnClickedViewDevice()

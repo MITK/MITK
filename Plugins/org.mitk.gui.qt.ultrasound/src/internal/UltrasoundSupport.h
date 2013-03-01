@@ -63,6 +63,8 @@ class UltrasoundSupport : public QmitkAbstractView
 
     void OnClickedViewDevice();
 
+    void OnCropAreaChanged();
+
     /*
     * \brief This is the main imaging loop that is called regularily during the imaging process
     */

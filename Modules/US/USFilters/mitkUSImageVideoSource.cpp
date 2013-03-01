@@ -78,6 +78,18 @@ void mitk::USImageVideoSource::SetColorOutput(bool isColor){
   m_IsGreyscale = !isColor;
 }
 
+int mitk::USImageVideoSource::GetImageHeight()
+{
+if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+else return 0;
+}
+
+int mitk::USImageVideoSource::GetImageWidth()
+{
+if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
+else return 0;
+}
+
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
   // First, let's do some basic checks to make sure rectangle is inside of actual image
@@ -86,7 +98,7 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
 
   // We can try and correct too large boundaries
   if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH)) bottomRightX = m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+  if (bottomRightY >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
 
   // Nothing to save, throw an exception
   if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";

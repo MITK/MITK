@@ -183,10 +183,10 @@ namespace mitk {
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer) */
     // @deprecated Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
-    DEPRECATED( virtual void GenerateData() { });
+    DEPRECATED( virtual void GenerateData()) { }
 
     /** \brief Generate the data needed for rendering into \a renderer */
-    virtual void GenerateDataForRenderer(BaseRenderer* /* renderer */) { };
+    virtual void GenerateDataForRenderer(BaseRenderer* /* renderer */) { }
 
     /** \brief Updates the time step, which is sometimes needed in subclasses */
     virtual void CalculateTimeStep( BaseRenderer* renderer );

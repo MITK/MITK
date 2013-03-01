@@ -139,4 +139,3 @@ class QmitkDataStorageComboBoxWithSelectNone : public QmitkDataStorageComboBox
 };
 
 #endif // QmitkDataStorageComboBoxWithSelectNone_h
-

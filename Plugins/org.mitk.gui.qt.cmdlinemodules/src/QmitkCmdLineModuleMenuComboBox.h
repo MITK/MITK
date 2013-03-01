@@ -65,4 +65,3 @@ private:
 };
 
 #endif // QMITKCMDLINEMODULEMENUCOMBOBOX_H
-

@@ -12,7 +12,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
- 
+
 #include "QmitkUiLoader.h"
 #include "QmitkDataStorageComboBoxWithSelectNone.h"
 #include "mitkNodePredicateDataType.h"

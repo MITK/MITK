@@ -43,4 +43,3 @@ private:
 };
 
 #endif // CommandLineModulesViewControls_h
-

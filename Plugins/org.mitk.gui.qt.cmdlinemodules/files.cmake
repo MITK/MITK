@@ -14,7 +14,7 @@ set(INTERNAL_CPP_FILES
   CommandLineModulesViewControls.cpp
   CommandLineModulesPreferencesPage.cpp
   CommandLineModulesView.cpp
-  QmitkCmdLineModuleProgressWidget.cpp  
+  QmitkCmdLineModuleProgressWidget.cpp
 )
 
 set(UI_FILES
@@ -63,4 +63,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-

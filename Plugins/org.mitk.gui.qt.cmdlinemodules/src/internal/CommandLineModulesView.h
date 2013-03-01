@@ -44,11 +44,11 @@ namespace berry
  * \sa QmitkAbstractView
  */
 class CommandLineModulesView : public QmitkAbstractView
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
+
 public:
 
   CommandLineModulesView();
@@ -67,7 +67,7 @@ public:
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
 protected Q_SLOTS:
-  
+
   /**
    * \brief Called when the ctkMenuComboBox has the menu selection changed,
    * and causes the corresponding GUI to be displayed.
@@ -223,4 +223,3 @@ private:
 };
 
 #endif // CommandLineModulesView_h
-

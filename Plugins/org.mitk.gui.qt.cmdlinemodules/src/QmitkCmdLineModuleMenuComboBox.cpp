@@ -187,4 +187,3 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
   // Set the constructed menu on the base class combo box.
   this->setMenu(menu);
 }
-

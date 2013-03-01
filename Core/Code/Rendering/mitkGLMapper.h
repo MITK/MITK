@@ -48,7 +48,7 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
     virtual void Paint(mitk::BaseRenderer *renderer) = 0;
 
      /** \brief Apply color and opacity properties read from the PropertyList
-    *  @deprecated Use ApplyColorAndOpacityProperties(...) instead
+    *  \deprecatedSince{2013_03} Use ApplyColorAndOpacityProperties(...) instead
     */
      DEPRECATED(inline virtual void ApplyProperties(mitk::BaseRenderer* renderer)
      {
@@ -70,7 +70,7 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
 
    /** \brief Returns  whether this is a vtk-based mapper
    *  \return false, since all mappers deriving from this class are OpenGL mappers
-   *  @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
+   *  \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
    */
    DEPRECATED( virtual bool IsVtkBased() const );
 

@@ -191,14 +191,12 @@ public:
     mitk::ScalarType* m_mmPerPixel;
 
       /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
-      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
+      vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
-    ~LocalStorage()
-    {
-    }
+    ~LocalStorage();
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */

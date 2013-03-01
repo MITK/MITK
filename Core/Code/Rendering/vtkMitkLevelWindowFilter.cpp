@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageIterator.h>
 #include <vtkLookupTable.h>
 #include <vtkColorTransferFunction.h>
+#include "vtkObjectFactory.h"
 
 //used for acos etc.
 #include <cmath>
@@ -29,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLogMacros.h>
 
 static const double PI = itk::Math::pi;
+
+vtkStandardNewMacro(vtkMitkLevelWindowFilter);
 
 vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter():m_MinOpacity(0.0),m_MaxOpacity(255.0)
 {

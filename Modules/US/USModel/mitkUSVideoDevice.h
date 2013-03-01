@@ -56,6 +56,8 @@ namespace mitk {
 
       itkGetMacro(Source, mitk::USImageVideoSource::Pointer);
       itkGetMacro(Image, mitk::USImage::Pointer);
+      itkGetMacro(DeviceID,int);
+      itkGetMacro(FilePath,std::string);
 
       void GrabImage();
 

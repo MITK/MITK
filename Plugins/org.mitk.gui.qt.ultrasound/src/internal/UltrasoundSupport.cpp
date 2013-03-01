@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 //Mitk
-#include "mitkDataNode.h"
+#include <mitkDataNode.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
 
 // Qmitk
@@ -56,7 +58,7 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
-  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USImageMetadata::PROP_DEV_MODEL ,filter);
+  m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
 
 
   m_Node = mitk::DataNode::New();
@@ -74,9 +76,6 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 
 void UltrasoundSupport::DisplayImage()
 {
- // m_Device->UpdateOutputData(0);
- // mitk::USImage::Pointer image = m_Device->GetOutput();
-
   m_Device->UpdateOutputData(0);
   m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
@@ -85,7 +84,7 @@ void UltrasoundSupport::DisplayImage()
   if (m_FrameCounter == 10)
   {
     int nMilliseconds = m_Clock.restart();
-    float fps = 10000.0f / (nMilliseconds );
+    int fps = 10000.0f / (nMilliseconds );
     m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(fps) +" FPS");
     m_FrameCounter = 0;
   }
@@ -94,28 +93,41 @@ void UltrasoundSupport::DisplayImage()
 void UltrasoundSupport::OnClickedViewDevice()
 {
   m_FrameCounter = 0;
+
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
+    //get device & set data node
     m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
     if (m_Device.IsNull()){
       m_Timer->stop();
       return;
     }
-    //m_Device->UpdateOutputData(0);
     m_Device->Update();
     m_Node->SetData(m_Device->GetOutput());
+
+    //start timer
     int interval = (1000 / m_Controls.m_FrameRate->value());
     m_Timer->setInterval(interval);
     m_Timer->start();
+
+    //reinit view
+    GlobalReinit();
+
+    //change UI elements
     m_Controls.m_BtnView->setText("Stop Viewing");
+    m_Controls.m_FrameRate->setEnabled(false);
   }
-  else
-  { //deactivate imaging
-    m_Controls.m_BtnView->setText("Start Viewing");
+  else //deactivate imaging
+  {
+    //stop timer & release data
     m_Timer->stop();
     m_Node->ReleaseData();
     this->RequestRenderWindowUpdate();
+
+    //change UI elements
+    m_Controls.m_BtnView->setText("Start Viewing");
+    m_Controls.m_FrameRate->setEnabled(true);
   }
 }
 
@@ -125,4 +137,29 @@ void UltrasoundSupport::OnNewDeviceWidgetDone()
   m_Controls.m_DeviceManagerWidget->setVisible(true);
   m_Controls.m_AddDevice->setVisible(true);
   m_Controls.m_Headline->setText("Connected Devices:");
+}
+
+void UltrasoundSupport::GlobalReinit()
+{
+  // get all nodes that have not set "includeInBoundingBox" to false
+  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+
+  // calculate bounding geometry of these nodes
+  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+}
+
+UltrasoundSupport::UltrasoundSupport()
+{
+m_DevicePersistence = mitk::USDevicePersistence::New();
+m_DevicePersistence->RestoreLastDevices();
+}
+
+UltrasoundSupport::~UltrasoundSupport()
+{
+m_DevicePersistence->StoreCurrentDevices();
+m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
 }

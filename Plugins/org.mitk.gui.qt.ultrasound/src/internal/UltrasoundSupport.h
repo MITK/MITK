@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <mitkUSDevicePersistence.h>
 
 #include "ui_UltrasoundSupportControls.h"
 
@@ -47,7 +48,8 @@ class UltrasoundSupport : public QmitkAbstractView
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-   signals:
+    UltrasoundSupport();
+    virtual ~UltrasoundSupport();
 
   public slots:
     /*
@@ -67,6 +69,8 @@ class UltrasoundSupport : public QmitkAbstractView
     void DisplayImage();
 
   protected:
+
+
 
     int m_FrameCounter;
 
@@ -90,6 +94,11 @@ class UltrasoundSupport : public QmitkAbstractView
     mitk::Image::Pointer m_Image;
 
     Ui::UltrasoundSupportControls m_Controls;
+
+    /** @brief reinits the view globally. */
+    void GlobalReinit();
+
+    mitk::USDevicePersistence::Pointer m_DevicePersistence;
 
 };
 

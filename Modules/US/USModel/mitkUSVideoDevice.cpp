@@ -22,6 +22,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufactur
   Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_FilePath = "";
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
@@ -36,6 +37,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata:
   Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_FilePath = "";
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)

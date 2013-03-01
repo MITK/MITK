@@ -1002,9 +1002,16 @@ bool mitk::ImageVtkMapper2D::RenderingGeometryIntersectsImage( const Geometry2D*
   return false;
 }
 
+mitk::ImageVtkMapper2D::LocalStorage::~LocalStorage()
+{
+}
+
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
-  //Do as much actions as possible in here to avoid double executions.
+
+  m_LevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
+
+    //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkNeverTranslucentTexture>::New().GetPointer();
   m_DefaultLookupTable = vtkSmartPointer<vtkLookupTable>::New();
@@ -1054,6 +1061,4 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actors->AddPart( outlineShadowActor );
   m_Actors->AddPart( m_Actor );
 
-  //level window filter
-  m_LevelWindowFilter = new vtkMitkLevelWindowFilter();
 }

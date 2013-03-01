@@ -572,9 +572,10 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
+      unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
       m_Controls->m_JSHistogram->SetImage(this->m_CalculationThread->GetStatisticsImage());
       m_Controls->m_JSHistogram->SetPlanarFigure(m_SelectedPlanarFigure);
-      m_Controls->m_JSHistogram->ComputeIntensityProfile();
+      m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
       std::stringstream message;

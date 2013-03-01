@@ -16,19 +16,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "QmitkHistogramJSWidget.h"
+#include "mitkPixelTypeMultiplex.h"
+#include <mitkImagePixelReadAccessor.h>
+#include "mitkRenderingManager.h"
+#include "mitkBaseRenderer.h"
+#include "mitkImageTimeSelector.h"
+#include "mitkExtractSliceFilter.h"
 
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   QWebView(parent)
 {
-  // set histogram to barchart in first instance
+  // set histogram type to barchart in first instance
   m_UseLineGraph = false;
 
-  // prepare html for use
+  // set html from source
   connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
   QUrl myUrl = QUrl("qrc:/qmitk/Histogram.html");
   setUrl(myUrl);
 
-  // set Scrollbars to always disabled
+  // set Scrollbars to be always disabled
   page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
   page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
@@ -40,14 +46,14 @@ QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 
 }
 
-// adds an Object of Type QmitkHistogramJSWidget to the JavaScript
+// adds an Object of Type QmitkHistogramJSWidget to the JavaScript, using QtWebkitBridge
 void QmitkHistogramJSWidget::AddJSObject()
 {
   page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
 
 
-// reloads WebView, everytime his size has been changed, so the size of the Histogram fits to the size of the widget
+// reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
   QWebView::resizeEvent(resizeEvent);
@@ -64,7 +70,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   ClearData();
   unsigned int i = 0;
   bool firstValue = false;
-  // filter frequencies of 0 to guarantee a better view while using a mask
+  // removes frequencies of 0, which are outside the first and last bin
   for (it = m_Histogram->Begin() ; it != m_Histogram->End(); ++it)
   {
     if (it.GetFrequency() > 0.0)
@@ -78,6 +84,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
     }
   }
   ++endIt;
+  // generating Lists of measurement and frequencies
   for (it = startIt ; it != endIt; ++it, ++i)
   {
     QVariant frequency = it.GetFrequency();
@@ -138,42 +145,73 @@ void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFig
   m_PlanarFigure = planarFigure;
 }
 
-void QmitkHistogramJSWidget::ComputeIntensityProfile()
+template <class PixelType>
+void ReadPixel(mitk::PixelType ptype, mitk::Image::Pointer image, mitk::Index3D indexPoint, double& value)
+{
+  if (image->GetDimension() == 2)
+  {
+    mitk::ImagePixelReadAccessor<PixelType,2> readAccess(image, image->GetSliceData(0));
+    itk::Index<2> idx;
+    idx[0] = indexPoint[0];
+    idx[1] = indexPoint[1];
+    value = readAccess.GetPixelByIndex(idx);
+  }
+  else if (image->GetDimension() == 3)
+  {
+    mitk::ImagePixelReadAccessor<PixelType,3> readAccess(image, image->GetVolumeData(0));
+    itk::Index<3> idx;
+    idx[0] = indexPoint[0];
+    idx[1] = indexPoint[1];
+    idx[2] = indexPoint[2];
+    value = readAccess.GetPixelByIndex(idx);
+  }
+  else
+  {
+    //unhandled
+  }
+}
+
+void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
 {
   this->ClearData();
   m_ParametricPath->Initialize();
 
   if (m_PlanarFigure.IsNull())
   {
-    throw std::invalid_argument("PlanarFigure not set!");
+    mitkThrow() << "PlanarFigure not set!";
   }
 
   if (m_Image.IsNull())
   {
-    throw std::invalid_argument("Image not set!");
+    mitkThrow() << "Image not set!";
   }
 
+  // Get 2D geometry frame of PlanarFigure
   mitk::Geometry2D* planarFigureGeometry2D = dynamic_cast<mitk::Geometry2D*>(m_PlanarFigure->GetGeometry(0));
   if (planarFigureGeometry2D == NULL)
   {
-    throw std::invalid_argument("PlanarFigure has no valid geometry!");
+    mitkThrow() << "PlanarFigure has no valid geometry!";
   }
 
+  // Get 3D geometry from Image (needed for conversion of point to index)
   mitk::Geometry3D* imageGeometry = m_Image->GetGeometry(0);
   if (imageGeometry == NULL)
   {
-    throw std::invalid_argument("Image has no valid geometry!");
+    mitkThrow() << "Image has no valid geometry!";
   }
 
-  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
+  // Get first poly-line of PlanarFigure (other possible poly-lines in PlanarFigure
+  // are not supported)
   const VertexContainerType vertexContainer = m_PlanarFigure->GetPolyLine(0);
 
   VertexContainerType::const_iterator it;
   for (it = vertexContainer.begin(); it != vertexContainer.end(); ++it)
   {
+    // Map PlanarFigure 2D point to 3D point
     mitk::Point3D point3D;
     planarFigureGeometry2D->Map(it->Point, point3D);
 
+    // Convert world to index coordinates
     mitk::Point3D indexPoint3D;
     imageGeometry->WorldToIndex(point3D, indexPoint3D);
 
@@ -182,6 +220,7 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile()
     index[1] = indexPoint3D[1];
     index[2] = indexPoint3D[2];
 
+    // Add index to parametric path
     m_ParametricPath->AddVertex(index);
   }
 
@@ -189,15 +228,15 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile()
 
   if (m_DerivedPath.IsNull())
   {
-    throw std::invalid_argument("No path set!");
+    mitkThrow() << "No path set!";
   }
 
+  // Fill item model with line profile data
   double distance = 0.0;
   mitk::Point3D currentWorldPoint;
 
   double t;
   unsigned int i = 0;
-  int k = 0;
   for (i = 0, t = m_DerivedPath->StartOfInput(); ;++i)
   {
     const PathType::OutputType &continousIndex = m_DerivedPath->Evaluate(t);
@@ -210,14 +249,30 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile()
       currentWorldPoint = worldPoint;
     }
 
+
     distance += currentWorldPoint.EuclideanDistanceTo(worldPoint);
     mitk::Index3D indexPoint;
     imageGeometry->WorldToIndex(worldPoint, indexPoint);
-    double intensity = m_Image->GetPixelValueByIndex(indexPoint);
+    const mitk::PixelType ptype = m_Image->GetPixelType();
+    double intensity = 0.0;
+    if (m_Image->GetDimension() == 4)
+    {
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput(m_Image);
+      timeSelector->SetTimeNr(timeStep);
+      timeSelector->Update();
+      mitk::Image::Pointer image = timeSelector->GetOutput();
+      mitkPixelTypeMultiplex3( ReadPixel, ptype, image, indexPoint, intensity);
+    }
+    else
+    {
+      mitkPixelTypeMultiplex3( ReadPixel, ptype, m_Image, indexPoint, intensity);
+    }
 
     m_Measurement.insert(i, distance);
     m_Frequency.insert(i, intensity);
 
+    // Go to next index; when iteration offset reaches zero, iteration is finished
     PathType::OffsetType offset = m_DerivedPath->IncrementInput(t);
     if (!(offset[0] || offset[1] || offset[2]))
     {

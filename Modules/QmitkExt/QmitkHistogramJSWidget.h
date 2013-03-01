@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \brief Widget which shows a histogram using JavaScript.
 *
 * This class is a QWebView. It shows the histogram for a selected image
-* or segmentation. It also can also display an intesity profile for
-* path elements, which lay over an image.
+* or segmentation. It also can display an intesity profile for
+* path elements, which lais over an image.
 */
 class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
 {
@@ -41,7 +41,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
   /**
   * \brief Measurement property.
   *
-  * This property is used in JavaScript as member of current object.
+  * This property is used in JavaScript as member of the current object.
+  * It holds a QList, containing the measurements of the current histogram.
   * @see GetMeasurement()
   */
   Q_PROPERTY(QList<QVariant> measurement
@@ -50,7 +51,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
   /**
   * \brief Frequency property.
   *
-  * This property is used in JavaScript as member of current object.
+  * This property is used in JavaScript as member of the current object.
+  * It holds a QList, containing the frequencies of the current histogram.
   * @see GetFrequency()
   */
   Q_PROPERTY(QList<QVariant> frequency
@@ -59,7 +61,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
   /**
   * \brief Line graph property.
   *
-  * This property is used in JavaScript as member of current object.
+  * This property is used in JavaScript as member of the current object.
+  * It holds a boolean, which sais wether to use a line or not.
   * @see GetUseLineGraph()
   */
   Q_PROPERTY(bool useLineGraph
@@ -68,7 +71,8 @@ class QmitkExt_EXPORT QmitkHistogramJSWidget : public QWebView
   /**
   * @brief Intesity profile property.
   *
-  * This property is used in JavaScript as member of current object.
+  * This property is used in JavaScript as member of the current object.
+  * It holds a boolean, which sais wether to use an intesity profile or not.
   * @see GetIntensityProfile()
   */
   Q_PROPERTY(bool intensityProfile
@@ -79,6 +83,7 @@ public:
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
   typedef itk::PolyLineParametricPath< 3 > ParametricPathType;
   typedef itk::ParametricPath< 3 >::Superclass PathType;
+  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
 
   explicit QmitkHistogramJSWidget(QWidget *parent = 0);
 
@@ -88,7 +93,7 @@ public:
   /**
   * \brief Event which notifies a change of the widget size.
   *
-  * Reimplemented event from QWebView::resizeEvent(),
+  * Reimplemented from QWebView::resizeEvent(),
   * reloads the webframe
   */
   void resizeEvent(QResizeEvent* resizeEvent);
@@ -96,68 +101,68 @@ public:
   /**
   * \brief Calculates the histogram.
   *
-  * This function filters all frequencies of 0 to the first and after the last bin.
-  * Writes the measurement and frequency, which are given from the HistogramType, into
+  * This function removes all frequencies of 0 until the first bin and behind the last bin.
+  * It writes the measurement and frequency, which are given from the HistogramType, into
   * m_Measurement and m_Frequency.
-  * Calls the signal DataChanged to update the shown information in the webframe.
+  * The SignalDataChanged is called, to update the information, which is displayed in the webframe.
   */
   void ComputeHistogram(HistogramType* histogram);
 
   /**
   * \brief Calculates the intesityprofile.
   *
-  * m_Image and m_PlanarFigure must be set first!
-  * Calculates an intensity profile for a pathelement which lies over an image.
+  * If an image and a pathelement are set, this function
+  * calculates an intensity profile for a pathelement which lies over an image.
   * Sets m_IntensityProfile and m_UseLineGraph to true.
-  * Calls SignalDataChanged to update the shown information in the webframe.
+  * The SignalDataChanged is called, to update the information, which is displayed in the webframe.
   */
-  void ComputeIntensityProfile();
+  void ComputeIntensityProfile(unsigned int timeStep = 0);
 
   /**
   * \brief Clears the Histogram.
   *
-  * This function clears the data and calls the signal DataChanged to update
-  * the shown information in the webframe.
+  * This function clears the data and calls SignalDataChanged to update
+  * the displayed information in the webframe.
   */
   void ClearHistogram();
 
   /**
-  * \brief Get operation for measurement.
+  * \brief Getter for measurement.
   *
   * @return List of measurements.
   */
   QList<QVariant> GetMeasurement();
 
   /**
-  * \brief Get operation for frequency.
+  * \brief Getter for frequency.
   *
   * @return List of frequencies.
   */
   QList<QVariant> GetFrequency();
 
   /**
-  * \brief Get operation for uselineGraph.
+  * \brief Getter for uselineGraph.
   *
   * @return True if a linegraph should be used.
   */
   bool GetUseLineGraph();
 
   /**
-  * \brief Get operation for intensity profile.
+  * \brief Getter for intensity profile.
   *
   * @return True if current histogram is an intesityprofile
   */
   bool GetIntensityProfile();
 
   /**
-  * \brief Set operation for reference image.
+  * \brief Setter for reference image.
   *
   * @param image The corresponding image for an intensity profile.
   */
   void SetImage(mitk::Image* image);
 
   /**
-  * \brief Set operation for  planarFigure.
+  * \brief Setter for planarFigure.
   *
   * @param planarFigure The pathelement for an intensity profile.
   */

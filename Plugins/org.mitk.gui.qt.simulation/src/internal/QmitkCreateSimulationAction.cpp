@@ -15,6 +15,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkCreateSimulationAction.h"
+#include <mitkIOUtil.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkIRenderingManager.h>
+#include <mitkSimulationTemplate.h>
+#include <algorithm>
+
+static std::string CreateFileName(mitk::DataNode::Pointer dataNode)
+{
+  std::string path;
+  dataNode->GetStringProperty("path", path);
+
+  std::string name;
+  dataNode->GetStringProperty("name", name);
+
+  if (name.length() < 5)
+  {
+    name += ".scn";
+  }
+  else
+  {
+    std::string ext = name.substr(name.length() - 4);
+    std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
+
+    if (ext != ".scn" && ext != ".xml")
+      name += ".scn";
+  }
+
+  return path + "/" + name;
+}
+
+static void InitializeViews(mitk::DataStorage::Pointer dataStorage)
+{
+  mitk::NodePredicateNot::Pointer predicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
+  mitk::TimeSlicedGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(subset);
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
+}
 
 QmitkCreateSimulationAction::QmitkCreateSimulationAction()
 {
@@ -30,7 +69,34 @@ void QmitkCreateSimulationAction::Run(const QList<mitk::DataNode::Pointer>& sele
 
   foreach(dataNode, selectedNodes)
   {
-    // TODO
+    if (dynamic_cast<mitk::SimulationTemplate*>(dataNode->GetData()) != NULL)
+    {
+      mitk::SimulationTemplate* simulationTemplate = static_cast<mitk::SimulationTemplate*>(dataNode->GetData());
+      std::string contents = simulationTemplate->Bake();
+
+      if (contents.empty())
+      {
+        MITK_ERROR << "Could not bake template '" << dataNode->GetName() << "'!";
+        continue;
+      }
+
+      std::string fileName = CreateFileName(dataNode);
+
+      std::ofstream file(fileName);
+      file << contents;
+      file.close();
+
+      std::vector<std::string> fileNames;
+      fileNames.push_back(fileName);
+
+      mitk::DataNode::Pointer simulationNode = mitk::IOUtil::LoadDataNode(fileName);
+
+      if (simulationNode.IsNotNull())
+      {
+        m_DataStorage->Add(simulationNode, dataNode);
+        InitializeViews(m_DataStorage);
+      }
+    }
   }
 }
 

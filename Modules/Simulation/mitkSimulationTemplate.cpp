@@ -114,7 +114,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
 
     if (!type.empty())
     {
-      name = "Template." + name;
+      // name = "Simulation Template." + name;
 
       mitk::BaseProperty::Pointer property;
       std::string defaultValue = ParseValue(templ, "default");
@@ -180,6 +180,27 @@ mitk::SimulationTemplate::SimulationTemplate()
 
 mitk::SimulationTemplate::~SimulationTemplate()
 {
+}
+
+std::string mitk::SimulationTemplate::Bake() const
+{
+  if (!m_IsInitialized)
+  {
+    MITK_ERROR << "Simulation template is not initialized!";
+    return "";
+  }
+
+  std::string contents;
+
+  for (VariableContents::size_type i = 0; i < m_VariableContents.size(); ++i)
+  {
+    contents += m_StaticContents[i];
+    contents += m_VariableContents[i].second->GetValueAsString();
+  }
+
+  contents += m_StaticContents.back();
+
+  return contents;
 }
 
 bool mitk::SimulationTemplate::Parse(const std::string& contents)

@@ -21,17 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSimulationModel.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 
-static void InitializeViews(mitk::IRenderWindowPart* renderWindowPart, mitk::Geometry3D* geometry)
-{
-  if (renderWindowPart == NULL || geometry == NULL)
-    return;
-
-  mitk::IRenderingManager* renderingManager = renderWindowPart->GetRenderingManager();
-
-  if (renderingManager != NULL)
-    renderingManager->InitializeViews(geometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-}
-
 QmitkSimulationView::QmitkSimulationView()
   : m_SelectionWasRemovedFromDataStorage(false),
     m_Timer(this)
@@ -123,7 +112,7 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
       dataNode->SetName(m_Record->GetTimeSteps() == 1 ? "Snapshot" : "Record");
 
       this->GetDataStorage()->Add(dataNode, m_Selection);
-      InitializeViews(this->GetRenderWindowPart(), m_Record->GetTimeSlicedGeometry());
+      mitk::RenderingManager::GetInstance()->InitializeViews(m_Record->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
       m_Record = NULL;
     }

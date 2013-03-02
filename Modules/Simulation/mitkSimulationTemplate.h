@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSimulationTemplate_h
 
 #include <mitkBaseData.h>
+#include <mitkBaseProperty.h>
+#include <mitkDataNode.h>
 #include <SimulationExports.h>
 #include <string>
 #include <vector>
@@ -32,6 +34,7 @@ namespace mitk
 
     bool Parse(const std::string& contents);
     bool RequestedRegionIsOutsideOfTheBufferedRegion();
+    void SetProperties(mitk::DataNode::Pointer dataNode) const;
     void SetRequestedRegion(itk::DataObject* data);
     void SetRequestedRegionToLargestPossibleRegion();
     void UpdateOutputInformation();
@@ -46,6 +49,7 @@ namespace mitk
 
     bool m_IsInitialized;
     std::vector<std::string> m_StaticContents;
+    std::vector<std::pair<std::string, BaseProperty::Pointer> > m_VariableContents;
   };
 }
 

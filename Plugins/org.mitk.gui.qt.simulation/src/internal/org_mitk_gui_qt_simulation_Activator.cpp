@@ -15,27 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_gui_qt_simulation_Activator.h"
+#include "QmitkCreateSimulationAction.h"
 #include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
-#include <mitkNodePredicateDataType.h>
-#include <QmitkNodeDescriptorManager.h>
 #include <QtPlugin>
 
 void mitk::org_mitk_gui_qt_simulation_Activator::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateSimulationAction, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationPreferencePage, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSimulationView, context);
-
-  QmitkNodeDescriptorManager* nodeDescriptorManager = QmitkNodeDescriptorManager::GetInstance();
-
-  if (nodeDescriptorManager != NULL)
-  {
-    mitk::NodePredicateDataType::Pointer isSimulation = mitk::NodePredicateDataType::New("Simulation");
-    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/simulationIcon.png", isSimulation, nodeDescriptorManager));
-
-    mitk::NodePredicateDataType::Pointer isSimulationTemplate = mitk::NodePredicateDataType::New("SimulationTemplate");
-    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("SimulationTemplate", ":/Simulation/simulationTemplateIcon.png", isSimulationTemplate, nodeDescriptorManager));
-  }
 }
 
 void mitk::org_mitk_gui_qt_simulation_Activator::stop(ctkPluginContext*)

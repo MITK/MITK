@@ -14,13 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkSimulationPreferencePage.h"
 #include "QmitkSimulationView.h"
 #include <mitkIRenderingManager.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkSimulation.h>
 #include <mitkSimulationModel.h>
-#include <sofa/helper/system/PluginManager.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 
 static void InitializeViews(mitk::IRenderWindowPart* renderWindowPart, mitk::Geometry3D* geometry)
@@ -42,7 +40,6 @@ QmitkSimulationView::QmitkSimulationView()
     mitk::MessageDelegate1<QmitkSimulationView, const mitk::DataNode*>(this, &QmitkSimulationView::OnNodeRemovedFromDataStorage));
 
   connect(&m_Timer, SIGNAL(timeout()), this, SLOT(OnTimerTimeout()));
-  initSOFAPlugins();
 }
 
 QmitkSimulationView::~QmitkSimulationView()

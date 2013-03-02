@@ -50,6 +50,8 @@ namespace mitk
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
   };
+
+  Simulation_EXPORT void RegisterSimulationObjectFactory();
 }
 
 #endif

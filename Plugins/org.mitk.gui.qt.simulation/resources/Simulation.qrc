@@ -1,8 +1,5 @@
 <RCC>
   <qresource prefix="/Simulation">
-    <file>simulationIcon.png</file>
-  </qresource>
-  <qresource prefix="/Simulation">
-    <file>simulationTemplateIcon.png</file>
+    <file>icon.png</file>
   </qresource>
 </RCC>

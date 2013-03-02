@@ -118,30 +118,19 @@ void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     }
     else if (dynamic_cast<SimulationTemplate*>(node->GetData()) != NULL)
     {
-      // TODO
+      SimulationTemplate* simulationTemplate = static_cast<SimulationTemplate*>(node->GetData());
+      simulationTemplate->SetProperties(node);
     }
   }
 }
 
-class RegisterSimulationObjectFactory
+void mitk::RegisterSimulationObjectFactory()
 {
-public:
-  RegisterSimulationObjectFactory()
-    : m_Factory(mitk::SimulationObjectFactory::New())
+  static bool alreadyRegistered = false;
+
+  if (!alreadyRegistered)
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SimulationObjectFactory::New());
+    alreadyRegistered = true;
   }
-
-  ~RegisterSimulationObjectFactory()
-  {
-    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory);
-  }
-
-private:
-  RegisterSimulationObjectFactory(const RegisterSimulationObjectFactory&);
-  RegisterSimulationObjectFactory& operator=(const RegisterSimulationObjectFactory&);
-
-  mitk::SimulationObjectFactory::Pointer m_Factory;
-};
-
-static RegisterSimulationObjectFactory registerSimulationObjectFactory;
+}

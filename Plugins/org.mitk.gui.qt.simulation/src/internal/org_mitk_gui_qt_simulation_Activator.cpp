@@ -31,7 +31,10 @@ void mitk::org_mitk_gui_qt_simulation_Activator::start(ctkPluginContext* context
   if (nodeDescriptorManager != NULL)
   {
     mitk::NodePredicateDataType::Pointer isSimulation = mitk::NodePredicateDataType::New("Simulation");
-    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/icon.png", isSimulation, nodeDescriptorManager));
+    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("Simulation", ":/Simulation/simulationIcon.png", isSimulation, nodeDescriptorManager));
+
+    mitk::NodePredicateDataType::Pointer isSimulationTemplate = mitk::NodePredicateDataType::New("SimulationTemplate");
+    nodeDescriptorManager->AddDescriptor(new QmitkNodeDescriptor("SimulationTemplate", ":/Simulation/simulationTemplateIcon.png", isSimulationTemplate, nodeDescriptorManager));
   }
 }
 

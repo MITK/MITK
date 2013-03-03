@@ -106,10 +106,10 @@ template <typename T> T FromString(const std::string& string)
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseReference(const std::string& ref)
 {
-  std::string name = "{ref}";
+  std::string id = "{ref}";
   mitk::StringProperty::Pointer property = mitk::StringProperty::New(ref.substr(2, ref.length() - 4));
 
-  return std::make_pair(name, property);
+  return std::make_pair(id, property);
 }
 
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const std::string& templ)
@@ -120,9 +120,9 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
   }
   else
   {
-    std::string name = ParseValue(templ, "name");
+    std::string id = ParseValue(templ, "id");
 
-    if (!name.empty())
+    if (!id.empty())
     {
       std::string type = ParseValue(templ, "type");
 
@@ -132,7 +132,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
       mitk::BaseProperty::Pointer property;
       std::string defaultValue = ParseValue(templ, "default");
 
-      if (type == "double" || type == "float")
+      if (type == "float")
       {
         float value = !defaultValue.empty()
           ? FromString<float>(defaultValue)
@@ -140,7 +140,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
 
         property = mitk::FloatProperty::New(value);
       }
-      else if (type == "int" || type == "unsigned int" || type == "short" || type == "unsigned short")
+      else if (type == "int")
       {
         int value = !defaultValue.empty()
           ? FromString<int>(defaultValue)
@@ -158,7 +158,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
       }
 
       if (property.IsNotNull())
-        return std::make_pair(name, property);
+        return std::make_pair(id, property);
     }
   }
 
@@ -234,7 +234,7 @@ std::string mitk::SimulationTemplate::Bake() const
 
       if (it == m_VariableContents.end())
       {
-        MITK_ERROR << "Reference '" << m_VariableContents[i].second << "' not found!";
+        MITK_ERROR << "Template '" << m_VariableContents[i].second << "' not found!";
         return "";
       }
 

@@ -76,7 +76,7 @@ void QmitkCreateSimulationAction::Run(const QList<mitk::DataNode::Pointer>& sele
 
       if (contents.empty())
       {
-        MITK_ERROR << "Could not bake template '" << dataNode->GetName() << "'!";
+        MITK_ERROR << "Could not bake simulation template '" << dataNode->GetName() << "'!";
         continue;
       }
 

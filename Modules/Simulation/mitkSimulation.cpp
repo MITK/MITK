@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
-const float mitk::Simulation::ScaleFactor = 1000.0f;
+const float mitk::Simulation::ScaleFactor = 1.0f; // 1000.0f
 
 static sofa::simulation::Simulation::SPtr CreateSimulation(mitk::Simulation::SimulationType type = mitk::Simulation::Tree)
 {

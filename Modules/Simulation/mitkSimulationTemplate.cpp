@@ -104,17 +104,30 @@ template <typename T> T FromString(const std::string& string)
   return value;
 }
 
+static std::pair<std::string, mitk::BaseProperty::Pointer> ParseReference(const std::string& ref)
+{
+  std::string name = "{ref}";
+  mitk::StringProperty::Pointer property = mitk::StringProperty::New(ref.substr(2, ref.length() - 4));
+
+  return std::make_pair(name, property);
+}
+
 static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const std::string& templ)
 {
-  std::string name = ParseValue(templ, "name");
-
-  if (!name.empty())
+  if (templ.length() > 4 && templ[1] == '\'')
   {
-    std::string type = ParseValue(templ, "type");
+    return ParseReference(templ);
+  }
+  else
+  {
+    std::string name = ParseValue(templ, "name");
 
-    if (!type.empty())
+    if (!name.empty())
     {
-      // name = "Simulation Template." + name;
+      std::string type = ParseValue(templ, "type");
+
+      if (type.empty())
+        type = "string";
 
       mitk::BaseProperty::Pointer property;
       std::string defaultValue = ParseValue(templ, "default");
@@ -127,7 +140,7 @@ static std::pair<std::string, mitk::BaseProperty::Pointer> ParseTemplate(const s
 
         property = mitk::FloatProperty::New(value);
       }
-      else if (type == "int" || type == "unsigned int")
+      else if (type == "int" || type == "unsigned int" || type == "short" || type == "unsigned short")
       {
         int value = !defaultValue.empty()
           ? FromString<int>(defaultValue)
@@ -173,6 +186,24 @@ static VariableContents ParseVariableContents(const std::string& contents, const
   return variableContents;
 }
 
+template <typename T1, typename T2>
+class FirstEqualTo
+{
+public:
+  FirstEqualTo(const T1& value)
+    : m_Value(value)
+  {
+  }
+
+  bool operator()(const std::pair<T1, T2>& pair) const
+  {
+    return pair.first == m_Value;
+  }
+
+private:
+  T1 m_Value;
+};
+
 mitk::SimulationTemplate::SimulationTemplate()
   : m_IsInitialized(false)
 {
@@ -195,7 +226,24 @@ std::string mitk::SimulationTemplate::Bake() const
   for (VariableContents::size_type i = 0; i < m_VariableContents.size(); ++i)
   {
     contents += m_StaticContents[i];
-    contents += m_VariableContents[i].second->GetValueAsString();
+
+    if (m_VariableContents[i].first == "{ref}")
+    {
+      VariableContents::const_iterator it = std::find_if(m_VariableContents.begin(), m_VariableContents.end(),
+        FirstEqualTo<std::string, mitk::BaseProperty::Pointer>(m_VariableContents[i].second->GetValueAsString()));
+
+      if (it == m_VariableContents.end())
+      {
+        MITK_ERROR << "Reference '" << m_VariableContents[i].second << "' not found!";
+        return "";
+      }
+
+      contents += it->second->GetValueAsString();
+    }
+    else
+    {
+      contents += m_VariableContents[i].second->GetValueAsString();
+    }
   }
 
   contents += m_StaticContents.back();
@@ -242,7 +290,10 @@ void mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) c
   }
 
   for(VariableContents::const_iterator it = m_VariableContents.begin(); it != m_VariableContents.end(); ++it)
-    dataNode->SetProperty(it->first.c_str(), it->second.GetPointer());
+  {
+    if (it->first != "{ref}")
+      dataNode->SetProperty(it->first.c_str(), it->second.GetPointer());
+  }
 }
 
 void mitk::SimulationTemplate::SetRequestedRegion(itk::DataObject*)

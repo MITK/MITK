@@ -62,6 +62,13 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageS
   m_IsActive = false;
   m_IsConnected = false;
 
+  USImageCropArea empty;
+  empty.cropBottom = 0;
+  empty.cropTop = 0;
+  empty.cropLeft = 0;
+  empty.cropRight = 0;
+  this->m_CropArea = empty;
+
   //set number of outputs
   this->SetNumberOfOutputs(1);
 

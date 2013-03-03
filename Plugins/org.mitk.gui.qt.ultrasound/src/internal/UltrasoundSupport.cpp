@@ -66,6 +66,12 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice)(" + mitk::USDevice::US_PROPKEY_ISACTIVE + "=true))";
   m_Controls.m_ActiveVideoDevices->Initialize<mitk::USDevice>(mitk::USDevice::US_PROPKEY_LABEL ,filter);
 
+  //UI initializations
+  m_Controls.crop_left->setEnabled(false);
+  m_Controls.crop_right->setEnabled(false);
+  m_Controls.crop_bot->setEnabled(false);
+  m_Controls.crop_top->setEnabled(false);
+
 
   m_Node = mitk::DataNode::New();
   m_Node->SetName("US Image Stream");
@@ -102,19 +108,17 @@ if (m_Device->GetDeviceClass()=="org.mitk.modules.us.USVideoDevice")
       {
       mitk::USVideoDevice::Pointer currentVideoDevice = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
 
-      if ((m_Controls.crop_left->value() == 0) &&
-          (m_Controls.crop_top->value() == 0) &&
-          (m_Controls.crop_right->value() == 0) &&
-          (m_Controls.crop_bot->value() == 0))
-          currentVideoDevice->GetSource()->RemoveRegionOfInterest();
+      mitk::USDevice::USImageCropArea newArea;
+      newArea.cropLeft = m_Controls.crop_left->value();
+      newArea.cropTop = m_Controls.crop_top->value();
+      newArea.cropRight = m_Controls.crop_right->value();
+      newArea.cropBottom = m_Controls.crop_bot->value();
 
-      int left = m_Controls.crop_left->value();
-      int top = m_Controls.crop_top->value();
-      int right = currentVideoDevice->GetSource()->GetImageWidth() - m_Controls.crop_right->value();
-      int bottom = currentVideoDevice->GetSource()->GetImageHeight() - m_Controls.crop_bot->value();
-      currentVideoDevice->GetSource()->SetRegionOfInterest(left,top,right,bottom);
-      MITK_INFO << "Image  H:" <<  currentVideoDevice->GetSource()->GetImageHeight() << " W:" <<currentVideoDevice->GetSource()->GetImageWidth();
-      MITK_INFO << "Crop  L:"<<left<<" R:"<<right<<" O:"<<top<<" U:"<<bottom;
+      //check enabled: if not we are in the initializing step and don't need to do anything
+      //otherwise: update crop area
+      if (m_Controls.crop_right->isEnabled())
+        currentVideoDevice->SetCropArea(newArea);
+
       GlobalReinit();
       }
 else
@@ -150,6 +154,14 @@ void UltrasoundSupport::OnClickedViewDevice()
     //change UI elements
     m_Controls.m_BtnView->setText("Stop Viewing");
     m_Controls.m_FrameRate->setEnabled(false);
+    m_Controls.crop_left->setValue(m_Device->GetCropArea().cropLeft);
+    m_Controls.crop_right->setValue(m_Device->GetCropArea().cropRight);
+    m_Controls.crop_bot->setValue(m_Device->GetCropArea().cropBottom);
+    m_Controls.crop_top->setValue(m_Device->GetCropArea().cropTop);
+    m_Controls.crop_left->setEnabled(true);
+    m_Controls.crop_right->setEnabled(true);
+    m_Controls.crop_bot->setEnabled(true);
+    m_Controls.crop_top->setEnabled(true);
   }
   else //deactivate imaging
   {
@@ -161,6 +173,10 @@ void UltrasoundSupport::OnClickedViewDevice()
     //change UI elements
     m_Controls.m_BtnView->setText("Start Viewing");
     m_Controls.m_FrameRate->setEnabled(true);
+    m_Controls.crop_left->setEnabled(false);
+    m_Controls.crop_right->setEnabled(false);
+    m_Controls.crop_bot->setEnabled(false);
+    m_Controls.crop_top->setEnabled(false);
   }
 }
 

@@ -82,6 +82,10 @@ int greyscale = d->GetSource()->GetIsGreyscale();
 int resOverride = d->GetSource()->GetResolutionOverride();
 int resWidth = d->GetSource()->GetResolutionOverrideWidth();
 int resHight = d->GetSource()->GetResolutionOverrideHeight();
+int cropRight = d->GetCropArea().cropRight;
+int cropLeft = d->GetCropArea().cropLeft;
+int cropBottom = d->GetCropArea().cropBottom;
+int cropTop = d->GetCropArea().cropTop;
 char seperator = '|';
 
 QString returnValue = manufacturer + seperator
@@ -92,19 +96,24 @@ QString returnValue = manufacturer + seperator
                      + QString::number(greyscale) + seperator
                      + QString::number(resOverride) + seperator
                      + QString::number(resWidth) + seperator
-                     + QString::number(resHight);
+                     + QString::number(resHight) + seperator
+                     + QString::number(cropRight) + seperator
+                     + QString::number(cropLeft) + seperator
+                     + QString::number(cropBottom) + seperator
+                     + QString::number(cropTop)
+                     ;
 
-//DEBUG: MITK_INFO << "Output String: " << returnValue.toStdString();
+MITK_INFO << "Output String: " << returnValue.toStdString();
 return returnValue;
 }
 
 mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QString s)
 {
-//DEBUG: MITK_INFO << "Input String: " << s.toStdString();
+MITK_INFO << "Input String: " << s.toStdString();
 std::vector<std::string> data;
 std::string seperators = "|";
 split(s.toStdString(),seperators,data);
-if(data.size() != 9)
+if(data.size() != 13)
   {
   MITK_ERROR << "Cannot parse US device! (Size: " << data.size() << ")";
   return mitk::USVideoDevice::New("INVALID","INVALID","INVALID");
@@ -119,6 +128,11 @@ bool greyscale = (QString(data.at(5).c_str())).toInt();
 bool resOverride = (QString(data.at(6).c_str())).toInt();
 int resWidth = (QString(data.at(7).c_str())).toInt();
 int resHight = (QString(data.at(8).c_str())).toInt();
+mitk::USDevice::USImageCropArea cropArea;
+cropArea.cropRight = (QString(data.at(9).c_str())).toInt();
+cropArea.cropLeft = (QString(data.at(10).c_str())).toInt();
+cropArea.cropBottom = (QString(data.at(11).c_str())).toInt();
+cropArea.cropTop = (QString(data.at(12).c_str())).toInt();
 
 // Assemble Metadata
 mitk::USImageMetadata::Pointer metadata = mitk::USImageMetadata::New();
@@ -148,6 +162,9 @@ if (resOverride)
   returnValue->GetSource()->OverrideResolution(resWidth, resHight);
   returnValue->GetSource()->SetResolutionOverride(true);
   }
+
+// Set Crop Area
+returnValue->SetCropArea(cropArea);
 
 return returnValue;
 }

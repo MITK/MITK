@@ -44,7 +44,7 @@ public:
 
     typedef OutputType::Pointer OutputTypePointer;
 
-      /**
+    /**
      * Allocates a new output object and returns it. Currently the
      * index idx is not evaluated.
      * @param idx the index of the output for which an object should be created
@@ -52,7 +52,13 @@ public:
      */
     virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
 
-    virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
+    /**
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
 //    /**
 //     * Allows to set the output of the point set source.
@@ -62,19 +68,6 @@ public:
 
     virtual void GraftOutput(OutputType *output);
     virtual void GraftNthOutput(DataObjectPointerArraySizeType idx, OutputType *output);
-
-    /**
-     * Returns the output with index 0 of the point set source
-     * @returns the output
-     */
-    virtual OutputType* GetOutput();
-
-    /**
-     * Returns the n'th output of the point set source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    virtual OutputType* GetOutput ( DataObjectPointerArraySizeType idx );
 
 protected:
 

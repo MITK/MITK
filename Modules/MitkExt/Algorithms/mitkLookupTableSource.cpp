@@ -36,61 +36,27 @@ mitk::LookupTableSource::LookupTableSource()
 mitk::LookupTableSource::~LookupTableSource()
 {}
 
-
-
-
-mitk::LookupTableSource::DataObjectPointer
-mitk::LookupTableSource::MakeOutput ( unsigned int )
+itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
-
-
-void
-mitk::LookupTableSource::SetOutput( OutputType* output )
+itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-    itkWarningMacro( << "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-    this->SetNthOutput( 0, output );
-}
-
-
-
-
-mitk::LookupTableSource::OutputType*
-mitk::LookupTableSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-        return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-
-    if ( static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) ) == NULL )
-        itkWarningMacro(<<"Output is NULL!");
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
-
-
-
-
-mitk::LookupTableSource::OutputType*
-mitk::LookupTableSource::GetOutput ( unsigned int idx )
-{
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
-}
-
-
-
 
 void
 mitk::LookupTableSource::GenerateInputRequestedRegion()
 {
     this->ProcessObject::GenerateInputRequestedRegion();
 }
-
-
-
 
 void
 mitk::LookupTableSource::GraftOutput( OutputType* graft )

@@ -53,9 +53,6 @@ public:
   typedef OutputImageType::Pointer OutputImagePointer;
   typedef SlicedData::RegionType OutputImageRegionType;
 
-  /** @brief Get the image output of this process object.  */
-  OutputImageType * GetOutput(void);
-  OutputImageType * GetOutput(unsigned int idx);
 
 //  /** @brief Set the image output of this process object.
 //   *
@@ -127,10 +124,15 @@ public:
    * SmartPointer to a DataObject. If a subclass of ImageSource has
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
-  virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
 
-  virtual DataObjectPointer MakeOutput( const DataObjectIdentifierType & );
-//  virtual void* GetData();
+  /**
+   * This is a default implementation to make sure we have something.
+   * Once all the subclasses of ProcessObject provide an appopriate
+   * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+   * virtual.
+   */
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
   virtual vtkImageData* GetVtkImageData();
 

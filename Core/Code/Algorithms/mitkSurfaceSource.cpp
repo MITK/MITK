@@ -33,38 +33,22 @@ mitk::SurfaceSource::~SurfaceSource()
 {
 }
 
-mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
+itk::DataObject::Pointer mitk::DataNodeSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
+    return OutputType::New().GetPointer();
 }
 
-//mitk::SurfaceSource::DataObjectPointer mitk::SurfaceSource::MakeOutput(const DataObjectIdentifierType &/*idx*/)
-//{
-//    return static_cast<itk::DataObject*>(mitk::Surface::New().GetPointer());
-//}
 
-mitk::Surface* mitk::SurfaceSource::GetOutput()
+DataObject::Pointer mitk::DataNodeSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  if (this->GetNumberOfOutputs() < 1)
-  {
-    return 0;
-  }
-
-  return static_cast<mitk::Surface*>
-    (this->BaseProcess::GetOutput(0));
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
 
-mitk::Surface* mitk::SurfaceSource::GetOutput(unsigned int idx)
-{
-  return static_cast<mitk::Surface*>
-    (this->ProcessObject::GetOutput(idx));
-}
-
-//void mitk::SurfaceSource::SetOutput(mitk::Surface* output)
-//{
-//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-//  BaseProcess::SetNthOutput(0, output);
-//}
 
 void mitk::SurfaceSource::GraftOutput(mitk::Surface* graft)
 {
@@ -93,3 +77,24 @@ void mitk::SurfaceSource::GraftNthOutput(unsigned int idx, mitk::Surface *graft)
   }
 }
 
+
+
+mitk::Surface *mitk::SurfaceSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::Surface*>(Superclass::GetOutput(key));
+}
+
+const mitk::Surface *mitk::SurfaceSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::Surface*>(Superclass::GetOutput(key));
+}
+
+mitk::Surface *mitk::SurfaceSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::Surface*>(Superclass::GetOutput(idx));
+}
+
+const mitk::Surface *mitk::SurfaceSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::Surface*>(Superclass::GetOutput(idx));
+}

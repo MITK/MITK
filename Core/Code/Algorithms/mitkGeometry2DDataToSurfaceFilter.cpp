@@ -92,7 +92,7 @@ mitk::Geometry2DDataToSurfaceFilter::~Geometry2DDataToSurfaceFilter()
 void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 {
   mitk::Geometry2DData::ConstPointer input = this->GetInput();
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   if ( input.IsNull() || (input->GetGeometry2D() == NULL)
     || (input->GetGeometry2D()->IsValid() == false)
@@ -377,7 +377,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
 
 void mitk::Geometry2DDataToSurfaceFilter::GenerateData()
 {
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   if (output.IsNull()) return;
   if (output->GetVtkPolyData()==NULL) return;

@@ -35,42 +35,26 @@ mitk::PlanarFigureSource::PlanarFigureSource()
 mitk::PlanarFigureSource::~PlanarFigureSource()
 {}
 
-
-mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureSource::MakeOutput ( unsigned int )
-{
-  return NULL;
-}
-
-
-void mitk::PlanarFigureSource::SetOutput( OutputType* output )
-{
-    this->SetNthOutput( 0, output );
-}
-
-
-mitk::PlanarFigureSource::OutputType* mitk::PlanarFigureSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
-    {
-        return 0;
-    }
-
-    if ( static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) ) == NULL )
-        itkWarningMacro(<<"Output is NULL!");
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
-}
-
-
-mitk::PlanarFigureSource::OutputType* mitk::PlanarFigureSource::GetOutput ( unsigned int idx )
-{
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
-}
-
 void mitk::PlanarFigureSource::GenerateInputRequestedRegion()
 {
     this->ProcessObject::GenerateInputRequestedRegion();
 }
 
+itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+{
+    return OutputType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
+}
 
 void mitk::PlanarFigureSource::GraftOutput(itk::DataObject *graft)
 {

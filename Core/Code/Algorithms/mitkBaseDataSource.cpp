@@ -27,42 +27,6 @@ mitk::BaseDataSource::BaseDataSource()
     //Superclass::SetNthOutput( 0, output.GetPointer() );
 }
 
-
-
 mitk::BaseDataSource::~BaseDataSource()
 {
 }
-
-
-
-//void mitk::BaseDataSource::SetOutput( OutputType* output )
-//{
-//    this->SetNthOutput( 0, output );
-//}
-
-
-
-//void mitk::BaseDataSource::SetOutput(const DataObjectIdentifierType &key, itk::DataObject *output )
-//{
-//    this->SetOutput(key, output);
-//}
-
-
-
-mitk::BaseDataSource::OutputType* mitk::BaseDataSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
-    {
-        return 0;
-    }
-    return static_cast<OutputType*> ( Superclass::GetOutput( 0 ) );
-}
-
-
-
-mitk::BaseDataSource::OutputType* mitk::BaseDataSource::GetOutput ( unsigned int idx )
-{
-    return static_cast<OutputType*> ( Superclass::GetOutput( idx ) );
-}
-
-

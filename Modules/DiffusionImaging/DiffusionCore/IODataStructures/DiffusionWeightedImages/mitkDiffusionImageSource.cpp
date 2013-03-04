@@ -37,11 +37,20 @@ mitk::DiffusionImageSource<TPixelType>::~DiffusionImageSource()
 {
 }
 
-
-template<typename TPixelType>
-itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::DiffusionImage<TPixelType>::New().GetPointer());
+    return OutputType::New().GetPointer();
+}
+
+
+itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
 
 
@@ -57,19 +66,6 @@ itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( uns
 //    (this->BaseProcess::GetOutput(0));
 //}
 //
-//template<typename TPixelType>
-//mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput(unsigned int idx)
-//{
-//  return static_cast<mitk::DiffusionImage<TPixelType>*>
-//    (this->ProcessObject::GetOutput(idx));
-//}
-//
-//template<typename TPixelType>
-//void mitk::DiffusionImageSource<TPixelType>::SetOutput(mitk::DiffusionImage<TPixelType>* output)
-//{
-//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-//  BaseProcess::SetNthOutput(0, output);
-//}
 //
 //template<typename TPixelType>
 //void mitk::DiffusionImageSource<TPixelType>::GraftOutput(mitk::DiffusionImage<TPixelType>* graft)

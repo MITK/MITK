@@ -56,7 +56,15 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput ( unsigned int idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+    /**
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
     /**
      * Generates the input requested region simply by calling the equivalent
@@ -65,33 +73,12 @@ public:
     void GenerateInputRequestedRegion();
 
     /**
-     * Allows to set the output of the lookup-table source. According to the itk documentation
-     * this method is outdated and should not be used. Instead GraftOutput(...)
-     * should be used.
-     * @param output the intended output of the lookup table source
-     */
-    void SetOutput( OutputType* output );
-
-    /**
      * Replacement of the SetOutput method. I think it is not yet correcly
      * implemented, so you should better not use it.
      * @todo provide a more usefule implementation
      * @param output the intended output of the lookup table source.
      */
     virtual void GraftOutput( OutputType* output );
-
-    /**
-     * Returns the output with index 0 of the lookup table source
-     * @returns the output
-     */
-    OutputType* GetOutput();
-
-    /**
-     * Returns the n'th output of the lookup table source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    OutputType* GetOutput ( unsigned int idx );
 
 protected:
     LookupTableSource();
@@ -104,5 +91,3 @@ protected:
 
 
 #endif
-
-

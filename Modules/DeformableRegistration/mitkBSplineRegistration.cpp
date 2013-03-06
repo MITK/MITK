@@ -208,18 +208,18 @@ namespace mitk {
       // Histogram match the images
       typename HEFilterType::Pointer intensityEqualizeFilter = HEFilterType::New();
 
-      intensityEqualizeFilter->SetReferenceImage( inputRescaleFilter->GetOutput() );
-      intensityEqualizeFilter->SetInput( referenceRescaleFilter->GetOutput() );
+      intensityEqualizeFilter->SetReferenceImage( inputRescaleFilter->GetOutput(0) );
+      intensityEqualizeFilter->SetInput( referenceRescaleFilter->GetOutput(0) );
       intensityEqualizeFilter->SetNumberOfHistogramLevels( 64 );
       intensityEqualizeFilter->SetNumberOfMatchPoints( 12 );
       intensityEqualizeFilter->ThresholdAtMeanIntensityOn();
       intensityEqualizeFilter->Update();
 
-      //fixedImage = referenceRescaleFilter->GetOutput();
-      //movingImage = IntensityEqualizeFilter->GetOutput();
+      //fixedImage = referenceRescaleFilter->GetOutput(0);
+      //movingImage = IntensityEqualizeFilter->GetOutput(0);
 
-      fixedImage = intensityEqualizeFilter->GetOutput();
-      movingImage = inputRescaleFilter->GetOutput();
+      fixedImage = intensityEqualizeFilter->GetOutput(0);
+      movingImage = inputRescaleFilter->GetOutput(0);
     }
 
 
@@ -334,11 +334,11 @@ namespace mitk {
     warper->SetDeformationField( field );
     warper->Update();
 
-    typename InternalImageType::Pointer result = warper->GetOutput();
+    typename InternalImageType::Pointer result = warper->GetOutput(0);
 
     if(m_UpdateInputImage)
     {
-      Image::Pointer outputImage = this->GetOutput();
+      Image::Pointer outputImage = this->GetOutput(0);
       mitk::CastToMitkImage( result, outputImage );
     }
 

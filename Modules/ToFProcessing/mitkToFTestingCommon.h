@@ -42,9 +42,9 @@ inline static mitk::Image::Pointer LoadImage( std::string filename )
   mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   reader->SetFileName ( filename.c_str() );
   reader->Update();
-  if ( reader->GetOutput() == NULL )
+  if ( reader->GetOutput(0) == NULL )
     itkGenericExceptionMacro("File "<<filename <<" could not be read!");
-  mitk::Image::Pointer image = reader->GetOutput();
+  mitk::Image::Pointer image = reader->GetOutput(0);
   return image;
 }
 
@@ -54,9 +54,9 @@ inline static mitk::Surface::Pointer LoadSurface( std::string filename )
   mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
   reader->SetFileName( filename.c_str() );
   reader->Update();
-  if ( reader->GetOutput() == NULL )
+  if ( reader->GetOutput(0) == NULL )
     itkGenericExceptionMacro("File "<< filename <<" could not be read!");
-  mitk::Surface::Pointer surface = reader->GetOutput();
+  mitk::Surface::Pointer surface = reader->GetOutput(0);
   return surface;
 }
 

@@ -75,13 +75,13 @@ class mitkNavigationToolReaderAndWriterTestClass
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
 
-    if ( stlReader->GetOutput() == NULL )
+    if ( stlReader->GetOutput(0) == NULL )
       {
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
     else
       {
-      testSurface = stlReader->GetOutput();
+      testSurface = stlReader->GetOutput(0);
       myNode->SetData(testSurface);
       }
 
@@ -141,13 +141,13 @@ class mitkNavigationToolReaderAndWriterTestClass
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
 
-    if ( stlReader->GetOutput() == NULL )
+    if ( stlReader->GetOutput(0) == NULL )
       {
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
     else
       {
-      testSurface = stlReader->GetOutput();
+      testSurface = stlReader->GetOutput(0);
       myNode->SetData(testSurface);
       }
 

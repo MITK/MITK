@@ -61,7 +61,7 @@ namespace mitk
         reader->SetImageIO(io);
         reader->SetFileName(this->m_FileName);
         reader->Update();
-        ImageType::Pointer img = reader->GetOutput();
+        ImageType::Pointer img = reader->GetOutput(0);
 
         typedef itk::Image<itk::DiffusionTensor3D<float>,3> VecImgType;
         VecImgType::Pointer vecImg = VecImgType::New();
@@ -179,8 +179,8 @@ namespace mitk
           throw itk::ImageFileReaderException(__FILE__, __LINE__, "Image has wrong number of pixel components!");
         }
 
-        this->GetOutput()->InitializeByItk(vecImg.GetPointer());
-        this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+        this->GetOutput(0)->InitializeByItk(vecImg.GetPointer());
+        this->GetOutput(0)->SetVolume(vecImg->GetBufferPointer());
 
         try
         {

@@ -108,7 +108,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
                 fft->SetInput(slice);
                 fft->Update();
-                ComplexSliceType::Pointer fSlice = fft->GetOutput();
+                ComplexSliceType::Pointer fSlice = fft->GetOutput(0);
                 fSlice = RearrangeSlice(fSlice);
 
                 // add artifacts
@@ -136,7 +136,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
                 ifft->SetInput(fSlice);
                 ifft->Update();
-                newSlice = ifft->GetOutput();
+                newSlice = ifft->GetOutput(0);
 
                 // put slice back into channel g
                 for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
@@ -242,12 +242,12 @@ void TractsToDWIImageFilter::GenerateData()
             rescaler->Update();
 
             itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer resampler = itk::ResampleImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-            resampler->SetInput(rescaler->GetOutput());
+            resampler->SetInput(rescaler->GetOutput(0));
             resampler->SetOutputParametersFromImage(m_TissueMask);
             resampler->SetSize(region.GetSize());
             resampler->SetOutputSpacing(spacing);
             resampler->Update();
-            m_TissueMask = resampler->GetOutput();
+            m_TissueMask = resampler->GetOutput(0);
         }
         MITK_INFO << "Using tissue mask";
     }

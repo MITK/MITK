@@ -79,7 +79,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter->SetRigid3DTransform(transform);
 
-  output = myFilter->GetOutput();
+  output = myFilter->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
 
   output->Update(); // execute filter
@@ -125,7 +125,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter2->SetRigid3DTransform(transform2);
 
-  mitk::NavigationData* output2 = myFilter2->GetOutput();
+  mitk::NavigationData* output2 = myFilter2->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput()");
 
   output2->Update(); // execute filter

@@ -101,7 +101,7 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
   m_tubefilter->SetRadius(1);
   m_tubefilter->Update();;
 
-  m_vtkPointList->AddInput(m_tubefilter->GetOutput());
+  m_vtkPointList->AddInput(m_tubefilter->GetOutput(0));
 
 
   // check for color prop and use it for rendering if it exists
@@ -115,7 +115,7 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
     sphere->SetRadius(2);
     sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-    m_vtkPointList->AddInput(sphere->GetOutput());
+    m_vtkPointList->AddInput(sphere->GetOutput(0));
 
     if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label").GetPointer()) == NULL)
     {
@@ -144,16 +144,16 @@ void mitk::LineVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer
       // Move the label to a new position.
       vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
       labelTransform->SetTransform(aLabelTransform);
-      labelTransform->SetInput(label->GetOutput());
+      labelTransform->SetInput(label->GetOutput(0));
 
-      m_vtkPointList->AddInput(labelTransform->GetOutput());
+      m_vtkPointList->AddInput(labelTransform->GetOutput(0));
     }
 
 
   }
 
 
-  m_VtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());
+  m_VtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput(0));
   m_Actor->GetProperty()->SetColor(rgba);
 }
 

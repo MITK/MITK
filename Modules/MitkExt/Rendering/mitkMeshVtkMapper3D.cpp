@@ -136,7 +136,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
 
   if(itkMesh->GetNumberOfPoints()>0)
   {
-    // build m_Spheres->GetOutput() vtkPolyData
+    // build m_Spheres->GetOutput(0) vtkPolyData
     float pointSize = 2.0;
     mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
     if (pointSizeProp.IsNotNull())
@@ -149,12 +149,12 @@ void mitk::MeshVtkMapper3D::GenerateData()
       sphere->SetRadius(pointSize);
       sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-      m_Spheres->AddInput(sphere->GetOutput());
+      m_Spheres->AddInput(sphere->GetOutput(0));
       sphere->Delete();
     }
 
     // setup mapper, actor and add to assembly
-    m_SpheresMapper->SetInput(m_Spheres->GetOutput());
+    m_SpheresMapper->SetInput(m_Spheres->GetOutput(0));
     m_SpheresActor->GetProperty()->SetColor(doubleRgba);
     m_PropAssembly->AddPart(m_SpheresActor);
   }

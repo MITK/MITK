@@ -31,7 +31,7 @@ mitk::Cylinder::Cylinder()
   cylinder->SetResolution(100);
   cylinder->CappingOn();
   cylinder->Update();
-  SetVtkPolyData(cylinder->GetOutput());
+  SetVtkPolyData(cylinder->GetOutput(0));
   cylinder->Delete();
 }
 

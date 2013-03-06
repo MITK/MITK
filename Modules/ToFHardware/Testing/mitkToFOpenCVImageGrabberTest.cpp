@@ -68,7 +68,7 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   mitk::PicFileReader::Pointer mitkFileReader = mitk::PicFileReader::New();
   mitkFileReader->SetFileName(distanceFileName);
   mitkFileReader->Update();
-  mitk::Image::Pointer image = mitkFileReader->GetOutput();
+  mitk::Image::Pointer image = mitkFileReader->GetOutput(0);
 
   mitk::ToFOpenCVImageGrabber::Pointer tofOpenCVImageGrabber = mitk::ToFOpenCVImageGrabber::New();
   tofOpenCVImageGrabber->SetToFImageGrabber(tofImageGrabber);
@@ -79,13 +79,13 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test distance image");
   mitkFileReader->SetFileName(amplitudeFileName);
   mitkFileReader->Update();
-  image = mitkFileReader->GetOutput();
+  image = mitkFileReader->GetOutput(0);
   tofOpenCVImageGrabber->SetImageType(1);
   cvImage = tofOpenCVImageGrabber->GetImage();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test amplitude image");
   mitkFileReader->SetFileName(intensityFileName);
   mitkFileReader->Update();
-  image = mitkFileReader->GetOutput();
+  image = mitkFileReader->GetOutput(0);
   tofOpenCVImageGrabber->SetImageType(2);
   cvImage = tofOpenCVImageGrabber->GetImage();
   MITK_TEST_CONDITION_REQUIRED(CompareImages(image,cvImage),"Test intensity image");

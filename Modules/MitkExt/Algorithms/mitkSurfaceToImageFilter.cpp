@@ -45,7 +45,7 @@ mitk::SurfaceToImageFilter::~SurfaceToImageFilter()
 
 void mitk::SurfaceToImageFilter::GenerateInputRequestedRegion()
 {
-  mitk::Image* output = this->GetOutput();
+  mitk::Image* output = this->GetOutput(0);
   if((output->IsInitialized()==false) )
     return;
 
@@ -55,7 +55,7 @@ void mitk::SurfaceToImageFilter::GenerateInputRequestedRegion()
 void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 {
   mitk::Image *inputImage = (mitk::Image*)this->GetImage();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -74,7 +74,7 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 void mitk::SurfaceToImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer inputImage = this->GetImage();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if(inputImage.IsNull())
     return;
@@ -134,14 +134,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   normalsFilter->SetFlipNormals(0);
   normalsFilter->ReleaseDataFlagOn();
 
-  normalsFilter->SetInput( move->GetOutput() );
+  normalsFilter->SetInput( move->GetOutput(0) );
   move->Delete();
 
   vtkPolyDataToImageStencil * surfaceConverter = vtkPolyDataToImageStencil::New();
   surfaceConverter->SetTolerance( 0.0 );
   surfaceConverter->ReleaseDataFlagOn();
 
-  surfaceConverter->SetInput( normalsFilter->GetOutput() );
+  surfaceConverter->SetInput( normalsFilter->GetOutput(0) );
   normalsFilter->Delete();
 
   mitk::Image::Pointer binaryImage = mitk::Image::New();
@@ -166,14 +166,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   stencil->SetInput(image);
   stencil->ReverseStencilOff();
   stencil->ReleaseDataFlagOn();
-  stencil->SetStencil(surfaceConverter->GetOutput());
+  stencil->SetStencil(surfaceConverter->GetOutput(0));
   surfaceConverter->Delete();
 
   stencil->SetBackgroundValue(m_MakeOutputBinary ? 0 : m_BackgroundValue);
   stencil->Update();
 
-  mitk::Image::Pointer output = this->GetOutput();
-  output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
+  mitk::Image::Pointer output = this->GetOutput(0);
+  output->SetVolume( stencil->GetOutput(0)->GetScalarPointer(), time );
   MITK_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
 
   stencil->Delete();

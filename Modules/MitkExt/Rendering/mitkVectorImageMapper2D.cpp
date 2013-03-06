@@ -187,7 +187,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     m_Cutter->SetInput( vtkImage );
     m_Cutter->GenerateCutScalarsOff();//!
     m_Cutter->Update();
-    cuttedPlane = m_Cutter->GetOutput();
+    cuttedPlane = m_Cutter->GetOutput(0);
   }
   else
   {
@@ -313,7 +313,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     }
 
     vtkMaskedGlyph3D* glyphGenerator = vtkMaskedGlyph3D::New();
-    glyphGenerator->SetSource( glyphSource->GetOutput() );
+    glyphGenerator->SetSource( glyphSource->GetOutput(0) );
     glyphGenerator->SetInputConnection(cuttedPlane->GetProducerPort());
     glyphGenerator->SetInputArrayToProcess (1, 0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
     glyphGenerator->SetVectorModeToUseVector();
@@ -360,7 +360,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     trafo->GetScale(myscale);
     trafo->Scale(1/myscale[0],1/myscale[1],1/myscale[2]);
 
-    this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldGeometry2D(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
+    this->PaintCells( glyphGenerator->GetOutput(0), renderer->GetCurrentWorldGeometry2D(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
 
     vectorMagnitudes->Delete();
     glyphSource->Delete();

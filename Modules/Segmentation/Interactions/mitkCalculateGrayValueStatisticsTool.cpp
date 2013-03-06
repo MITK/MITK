@@ -98,13 +98,13 @@ bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataNode* no
           timeSelector->SetInput( refImage );
           timeSelector->SetTimeNr( timeStep );
           timeSelector->UpdateLargestPossibleRegion();
-          Image::Pointer refImage3D = timeSelector->GetOutput();
+          Image::Pointer refImage3D = timeSelector->GetOutput(0);
 
           ImageTimeSelector::Pointer timeSelector2 = ImageTimeSelector::New();
           timeSelector2->SetInput( image );
           timeSelector2->SetTimeNr( timeStep );
           timeSelector2->UpdateLargestPossibleRegion();
-          Image::Pointer image3D = timeSelector2->GetOutput();
+          Image::Pointer image3D = timeSelector2->GetOutput(0);
 
           if (image3D.IsNotNull() && refImage3D.IsNotNull() )
           {

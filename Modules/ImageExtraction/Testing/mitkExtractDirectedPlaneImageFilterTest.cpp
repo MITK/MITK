@@ -207,7 +207,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //    reader->Update();
 //
-//    mitk::Image::Pointer image = reader->GetOutput();
+//    mitk::Image::Pointer image = reader->GetOutput(0);
 //
 //    return image;
 //  }

@@ -174,7 +174,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   extractor->Modified();
   extractor->Update();
 
-  Image::Pointer slice = extractor->GetOutput();
+  Image::Pointer slice = extractor->GetOutput(0);
 
   /*============= BEGIN undo feature block ========================*/
   //specify the undo operation with the non edited slice
@@ -258,7 +258,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
   contourExtractor->SetInput(slice);
   contourExtractor->Update();
-  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+  mitk::Surface::Pointer contour = contourExtractor->GetOutput(0);
 
   if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
   {

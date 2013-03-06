@@ -549,7 +549,7 @@ void vtkMitkGPUVolumeRayCastMapper::CreateCanonicalView(
   resample->UpdateWholeExtent();
 
   // Copy the pixels over
-  image->DeepCopy(resample->GetOutput());
+  image->DeepCopy(resample->GetOutput(0));
 
   bigImage->Delete();
   resample->Delete();

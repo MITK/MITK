@@ -168,7 +168,7 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
 
   importFilter->Update();
 
-  typename ItkImage::Pointer output = importFilter->GetOutput();
+  typename ItkImage::Pointer output = importFilter->GetOutput(0);
 
   output->DisconnectPipeline();
 

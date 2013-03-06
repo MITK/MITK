@@ -84,7 +84,7 @@ void LabeledImageVolumeCalculator::Calculate()
   m_InputTimeSelector->UpdateLargestPossibleRegion();
 
   AccessByItk_2(
-    m_InputTimeSelector->GetOutput(),
+    m_InputTimeSelector->GetOutput(0),
     _InternalCalculateVolumes,
     this,
     m_Image->GetGeometry( 0 ) );

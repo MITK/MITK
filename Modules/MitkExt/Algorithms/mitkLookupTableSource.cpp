@@ -61,7 +61,7 @@ mitk::LookupTableSource::GenerateInputRequestedRegion()
 void
 mitk::LookupTableSource::GraftOutput( OutputType* graft )
 {
-    OutputType * output = this->GetOutput();
+    OutputType * output = this->GetOutput(0);
 
     if ( output && graft )
     {

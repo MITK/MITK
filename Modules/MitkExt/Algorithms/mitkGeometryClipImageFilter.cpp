@@ -70,7 +70,7 @@ void mitk::GeometryClipImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput();
+  mitk::Image* output = this->GetOutput(0);
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   if((output->IsInitialized()==false) || (m_ClippingGeometry.IsNull()))
     return;
@@ -83,7 +83,7 @@ void mitk::GeometryClipImageFilter::GenerateInputRequestedRegion()
 void mitk::GeometryClipImageFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -120,9 +120,9 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
 
   typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
-  outputimagetoitk->SetInput(geometryClipper->m_OutputTimeSelector->GetOutput());
+  outputimagetoitk->SetInput(geometryClipper->m_OutputTimeSelector->GetOutput(0));
   outputimagetoitk->Update();
-  typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
+  typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput(0);
 
   // create the iterators
   typename ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
@@ -135,7 +135,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
   else
     outsideValue = (typename ItkOutputImageType::PixelType) geometryClipper->m_OutsideValue;
 
-  mitk::Geometry3D* inputGeometry = geometryClipper->m_InputTimeSelector->GetOutput()->GetGeometry();
+  mitk::Geometry3D* inputGeometry = geometryClipper->m_InputTimeSelector->GetOutput(0)->GetGeometry();
   typedef itk::Index<VImageDimension> IndexType;
   Point3D indexPt; indexPt.Fill(0);
   int i, dim=IndexType::GetIndexDimension();
@@ -194,7 +194,7 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
 void mitk::GeometryClipImageFilter::GenerateData()
 {
   Image::ConstPointer input = this->GetInput();
-  Image::Pointer output = this->GetOutput();
+  Image::Pointer output = this->GetOutput(0);
 
   if((output->IsInitialized()==false) || (m_ClippingGeometry.IsNull()))
     return;
@@ -214,7 +214,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
     return;
 
   m_InputTimeSelector->SetInput(input);
-  m_OutputTimeSelector->SetInput(this->GetOutput());
+  m_OutputTimeSelector->SetInput(this->GetOutput(0));
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
@@ -246,7 +246,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
       clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeSlicedClippingGeometry->GetGeometry3D(timestep));
     }
 
-    AccessByItk_2(m_InputTimeSelector->GetOutput(),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);
+    AccessByItk_2(m_InputTimeSelector->GetOutput(0),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);
   }
 
   m_TimeOfHeaderInitialization.Modified();

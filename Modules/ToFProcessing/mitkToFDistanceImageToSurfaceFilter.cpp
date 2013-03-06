@@ -89,7 +89,7 @@ mitk::Image* mitk::ToFDistanceImageToSurfaceFilter::GetInput( unsigned int idx )
 
 void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 {
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
   assert(output);
   mitk::Image::Pointer input = this->GetInput();
   assert(input);
@@ -240,7 +240,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()
 
 void mitk::ToFDistanceImageToSurfaceFilter::GenerateOutputInformation()
 {
-  this->GetOutput();
+  this->GetOutput(0);
   itkDebugMacro(<<"GenerateOutputInformation()");
 }
 

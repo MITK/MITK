@@ -29,7 +29,7 @@ mitk::ObjFileReader::~ObjFileReader()
 
 void mitk::ObjFileReader::GenerateData()
 {
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   if( m_FileName != "")
   {
@@ -39,8 +39,8 @@ void mitk::ObjFileReader::GenerateData()
     reader->SetFileName( m_FileName.c_str() );
     reader->Update();
 
-    if ( reader->GetOutput() != NULL )
-      output->SetVtkPolyData( reader->GetOutput() );
+    if ( reader->GetOutput(0) != NULL )
+      output->SetVtkPolyData( reader->GetOutput(0) );
 
     reader->Delete();
 

@@ -85,7 +85,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         timeSelector->SetInput( m_Image );
         timeSelector->SetTimeNr( m_TimeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        image3D = timeSelector->GetOutput();
+        image3D = timeSelector->GetOutput(0);
       }
 
        // this will do a long long if/else to find out both pixel types
@@ -145,7 +145,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         timeSelector->SetInput( m_Image );
         timeSelector->SetTimeNr( m_TimeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        image3D = timeSelector->GetOutput();
+        image3D = timeSelector->GetOutput(0);
       }
 
       // this will do a long long if/else to find out both pixel types
@@ -216,7 +216,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
     nonConstImage->Update();                                                             \
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
-    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
+    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
 }
 
 

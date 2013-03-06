@@ -248,7 +248,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
     reader->SetFileName( filename.toLatin1() );
     reader->Update();
 
-    mitk::PointSet::Pointer pointSet = reader->GetOutput();
+    mitk::PointSet::Pointer pointSet = reader->GetOutput(0);
     if ( pointSet.IsNull() )
     {
       QMessageBox::warning( this, "Load point set", QString("File reader could not read %1").arg(filename) );

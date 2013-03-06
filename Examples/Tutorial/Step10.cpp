@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
     // Create a node and add the Image (which is read from the file) to it
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(reader->GetOutput());
+    node->SetData(reader->GetOutput(0));
 
     // *******************************************************
     // ****************** START OF NEW PART ******************

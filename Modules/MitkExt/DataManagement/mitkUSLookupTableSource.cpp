@@ -46,7 +46,7 @@ mitk::USLookupTableSource::USLookupTableSource() : mitk::LookupTableSource()
 void mitk::USLookupTableSource::GenerateData()
 {
     std::cout << "USLookupTableSource::generate data!" << std::endl;
-    OutputType::Pointer output = this->GetOutput();
+    OutputType::Pointer output = this->GetOutput(0);
     output->SetVtkLookupTable( this->BuildVtkLookupTable( ) );
 }
 

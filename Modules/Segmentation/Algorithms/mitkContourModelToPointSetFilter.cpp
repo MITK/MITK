@@ -80,7 +80,7 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
 {
 
   mitk::ContourModel::Pointer inputContour =  const_cast<mitk::ContourModel*>(this->GetInput(0));
-  mitk::ContourModelToPointSetFilter::OutputType* outputPointSet = this->GetOutput();
+  mitk::ContourModelToPointSetFilter::OutputType* outputPointSet = this->GetOutput(0);
 
   InputType::VertexIterator it = inputContour->IteratorBegin();
   InputType::VertexIterator end = inputContour->IteratorEnd();

@@ -180,12 +180,12 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<< "Read original distance image using PicFileReader");
   picFileReader->SetFileName(distanceFileName);
   picFileReader->Update();
-  originalImage = picFileReader->GetOutput()->Clone();
+  originalImage = picFileReader->GetOutput(0)->Clone();
 
   MITK_TEST_OUTPUT(<< "Read recorded distance image using ItkImageFileReader");
   nrrdReader->SetFileName(distanceTestFileName);
   nrrdReader->Update();
-  recordedImage = nrrdReader->GetOutput()->Clone();
+  recordedImage = nrrdReader->GetOutput(0)->Clone();
 
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");
@@ -199,12 +199,12 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<< "Read original amplitude image using PicFileReader");
   picFileReader->SetFileName(amplitudeFileName);
   picFileReader->Update();
-  originalImage = picFileReader->GetOutput()->Clone();
+  originalImage = picFileReader->GetOutput(0)->Clone();
 
   MITK_TEST_OUTPUT(<< "Read recorded amplitude image using ItkImageFileReader");
   nrrdReader->SetFileName(amplitudeTestFileName);
   nrrdReader->Update();
-  recordedImage = nrrdReader->GetOutput()->Clone();
+  recordedImage = nrrdReader->GetOutput(0)->Clone();
 
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");
@@ -216,12 +216,12 @@ int mitkToFImageRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_OUTPUT(<< "Read original intensity image using PicFileReader");
   picFileReader->SetFileName(intensityFileName);
   picFileReader->Update();
-  originalImage = picFileReader->GetOutput()->Clone();
+  originalImage = picFileReader->GetOutput(0)->Clone();
 
   MITK_TEST_OUTPUT(<< "Read recorded intensity image using ItkImageFileReader");
   nrrdReader->SetFileName(intensityTestFileName);
   nrrdReader->Update();
-  recordedImage = nrrdReader->GetOutput()->Clone();
+  recordedImage = nrrdReader->GetOutput(0)->Clone();
 
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(0) == tofImageRecorder->GetToFCaptureWidth(), "Testing capture width");
   MITK_TEST_CONDITION_REQUIRED(originalImage->GetDimension(1) == tofImageRecorder->GetToFCaptureHeight(), "Testing capture height");

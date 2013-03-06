@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 
       // Since the DataNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = nodeReader->GetOutput(0);
       ds->Add(node);
     }
     catch(...)

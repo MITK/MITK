@@ -77,7 +77,7 @@ namespace mitk {
       m_Path = pathFinder->GetVectorPath();
 
 
-      m_RoiImg = pathFinder->GetOutput();
+      m_RoiImg = pathFinder->GetOutput(0);
     }
 
 

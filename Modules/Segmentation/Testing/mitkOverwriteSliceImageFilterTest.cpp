@@ -67,7 +67,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       }
     }
 
-    mitk::Image::Pointer slice = extractor->GetOutput()->Clone();
+    mitk::Image::Pointer slice = extractor->GetOutput(0)->Clone();
 
     filter->SetSliceDimension( sliceDimension );
     filter->SetSliceIndex( 1 ); // second slice in that direction
@@ -95,7 +95,7 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       }
     }
 
-    mitk::Image::Pointer output = filter->GetOutput();
+    mitk::Image::Pointer output = filter->GetOutput(0);
 
     if (output.IsNull())
     {

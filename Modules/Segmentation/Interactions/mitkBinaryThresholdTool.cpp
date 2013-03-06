@@ -207,7 +207,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
             timeSelector->SetInput( image );
             timeSelector->SetTimeNr( timeStep );
             timeSelector->UpdateLargestPossibleRegion();
-            Image::Pointer image3D = timeSelector->GetOutput();
+            Image::Pointer image3D = timeSelector->GetOutput(0);
 
             if (image3D->GetDimension() == 2)
             {
@@ -235,7 +235,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
           padFilter->SetLowerThreshold(1);
           padFilter->Update();
 
-          emptySegmentation->SetData(padFilter->GetOutput());
+          emptySegmentation->SetData(padFilter->GetOutput(0));
         }
         if (DataStorage::Pointer storage = m_ToolManager->GetDataStorage())
         {
@@ -255,7 +255,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
   timeSelector->SetInput( segmentation );
   timeSelector->SetTimeNr( timeStep );
   timeSelector->UpdateLargestPossibleRegion();
-  Image::Pointer segmentation3D = timeSelector->GetOutput();
+  Image::Pointer segmentation3D = timeSelector->GetOutput(0);
 
   typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
   SegmentationType::Pointer itkSegmentation;
@@ -301,7 +301,7 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
     roiFilter->Update();
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
-    mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
+    mitk::Image::Pointer tmpImage = roiFilter->GetOutput(0);
 
     tmpNode->SetData(tmpImage);
 

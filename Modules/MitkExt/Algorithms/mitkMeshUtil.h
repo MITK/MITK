@@ -1400,7 +1400,7 @@ public:
     mySphereSource->SetResolution( resolution );
     mySphereSource->Update();
 
-    typename MeshType::Pointer resultMesh = mySphereSource->GetOutput();
+    typename MeshType::Pointer resultMesh = mySphereSource->GetOutput(0);
     resultMesh->Register(); // necessary ????
     return resultMesh;
   }
@@ -1418,9 +1418,9 @@ public:
     mySphereSource->SetSquareness1(1);
     mySphereSource->SetSquareness2(1);
     mySphereSource->Update();
-    mySphereSource->GetOutput();
+    mySphereSource->GetOutput(0);
 
-    typename MeshType::Pointer resultMesh = mySphereSource->GetOutput();
+    typename MeshType::Pointer resultMesh = mySphereSource->GetOutput(0);
     resultMesh->Register();
 
     return resultMesh;
@@ -1517,7 +1517,7 @@ public:
     addTriangle( mySphereSource, scale, pnt3, pnt9, pnt10, resolution );
     addTriangle( mySphereSource, scale, pnt6, pnt0, pnt4, resolution );
 
-    return mySphereSource->GetOutput();
+    return mySphereSource->GetOutput(0);
   }
 
 

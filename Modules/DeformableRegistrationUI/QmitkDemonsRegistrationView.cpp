@@ -103,7 +103,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
         histogramMatching->SetNumberOfMatchPoints(atoi(m_Controls.m_NumberOfMatchPoints->text().toLatin1()));
         histogramMatching->SetThresholdAtMeanIntensity(m_Controls.m_ThresholdAtMeanIntensity->isChecked());
         histogramMatching->Update();
-        mitk::Image::Pointer histimage = histogramMatching->GetOutput();
+        mitk::Image::Pointer histimage = histogramMatching->GetOutput(0);
         if (histimage.IsNotNull())
         {
           registration->SetInput(histimage);
@@ -127,7 +127,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
         mitk::ProgressBar::GetInstance()->Progress(4);
         return;
       }
-      m_ResultImage = registration->GetOutput();
+      m_ResultImage = registration->GetOutput(0);
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
       m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();
@@ -149,7 +149,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
         histogramMatching->SetNumberOfMatchPoints(atoi(m_Controls.m_NumberOfMatchPoints->text().toLatin1()));
         histogramMatching->SetThresholdAtMeanIntensity(m_Controls.m_ThresholdAtMeanIntensity->isChecked());
         histogramMatching->Update();
-        mitk::Image::Pointer histimage = histogramMatching->GetOutput();
+        mitk::Image::Pointer histimage = histogramMatching->GetOutput(0);
         if (histimage.IsNotNull())
         {
           registration->SetInput(histimage);
@@ -173,7 +173,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
         mitk::ProgressBar::GetInstance()->Progress(4);
         return;
       }
-      m_ResultImage = registration->GetOutput();
+      m_ResultImage = registration->GetOutput(0);
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
       m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();

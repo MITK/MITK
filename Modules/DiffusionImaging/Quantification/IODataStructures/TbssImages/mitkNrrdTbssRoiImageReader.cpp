@@ -132,7 +132,7 @@ namespace mitk
       imageIO->SetIORegion( ioRegion );
       void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
       imageIO->Read( buffer );
-      //mitk::Image::Pointer static_cast<OutputType*>(this->GetOutput())image = mitk::Image::New();
+      //mitk::Image::Pointer static_cast<OutputType*>(this->GetOutput(0))image = mitk::Image::New();
       if((ndim==4) && (dimensions[3]<=1))
         ndim = 3;
       if((ndim==3) && (dimensions[2]<=1))
@@ -190,7 +190,7 @@ namespace mitk
         reader->SetImageIO(imageIO);
         reader->Update();
 
-        img = reader->GetOutput();
+        img = reader->GetOutput(0);
 
         static_cast<OutputType*>(this->GetOutput(0))->SetImage(img);
 

@@ -58,7 +58,7 @@ namespace itk{
 
     // generate upsampled image
     mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
-    typename OutputImageType::Pointer outImage = this->GetOutput();
+    typename OutputImageType::Pointer outImage = this->GetOutput(0);
 
     // calculate new image parameters
     mitk::Vector3D newSpacing;

@@ -30,7 +30,7 @@ mitk::PointSetIndexToWorldTransformFilter::~PointSetIndexToWorldTransformFilter(
 void mitk::PointSetIndexToWorldTransformFilter::GenerateData()
 {
   mitk::PointSet::ConstPointer input  = this->GetInput();
-  mitk::PointSet::Pointer output  = this->GetOutput();
+  mitk::PointSet::Pointer output  = this->GetOutput(0);
 
   typedef std::vector<mitk::Point3D> PointContainer;
   PointContainer points;

@@ -237,7 +237,7 @@ void mitk::RegionGrow3DTool::StartRegionGrowing(itk::Image<TPixel, VImageDimensi
 
   m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
 
-  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(0))->Clone();
 
   m_FeedbackNode->SetData( resultImage );
   m_FeedbackNode->SetVisibility(true);
@@ -341,7 +341,7 @@ void mitk::RegionGrow3DTool::ConfirmSegmentation( std::string name, mitk::Color 
   filter->SetLowerThreshold(lowerThresholdLabeledImage);
   filter->Update();
   mitk::Image::Pointer new_image = mitk::Image::New();
-  mitk::CastToMitkImage(filter->GetOutput(), new_image);
+  mitk::CastToMitkImage(filter->GetOutput(0), new_image);
 
 
   //pad to original size
@@ -356,7 +356,7 @@ void mitk::RegionGrow3DTool::ConfirmSegmentation( std::string name, mitk::Color 
     padFilter->SetLowerThreshold(1);
     padFilter->Update();
 
-    new_image = padFilter->GetOutput();
+    new_image = padFilter->GetOutput(0);
   }
 
   new_node->SetData(new_image);
@@ -423,7 +423,7 @@ void mitk::RegionGrow3DTool::UpdatePreview()
   roiFilter->Update();
 
   mitk::DataNode::Pointer new_node = mitk::DataNode::New();
-  mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
+  mitk::Image::Pointer tmpImage = roiFilter->GetOutput(0);
   new_node->SetData(tmpImage);
 
   m_RoiMax = roiFilter->GetMaxValue();

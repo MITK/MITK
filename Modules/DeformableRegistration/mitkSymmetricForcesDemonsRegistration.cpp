@@ -126,10 +126,10 @@ namespace mitk {
 
       typename FixedImageCasterType::Pointer fixedImageCaster = FixedImageCasterType::New();
       fixedImageCaster->SetInput(fixedImage);
-      filter->SetFixedImage( fixedImageCaster->GetOutput() );
+      filter->SetFixedImage( fixedImageCaster->GetOutput(0) );
       typename MovingImageCasterType::Pointer movingImageCaster = MovingImageCasterType::New();
       movingImageCaster->SetInput(movingImage);
-      filter->SetMovingImage(movingImageCaster->GetOutput());
+      filter->SetMovingImage(movingImageCaster->GetOutput(0));
       filter->SetNumberOfIterations( m_Iterations );
       filter->SetStandardDeviations( m_StandardDeviation );
       filter->Update();
@@ -141,28 +141,28 @@ namespace mitk {
       warper->SetInterpolator( interpolator );
       warper->SetOutputSpacing( fixedImage->GetSpacing() );
       warper->SetOutputOrigin( fixedImage->GetOrigin() );
-      warper->SetDeformationField( filter->GetOutput() );
+      warper->SetDeformationField( filter->GetOutput(0) );
       warper->Update();
       typename WriterType::Pointer      writer =  WriterType::New();
       typename CastFilterType::Pointer  caster =  CastFilterType::New();
 
       writer->SetFileName( m_ResultName );
 
-      caster->SetInput( warper->GetOutput() );
-      writer->SetInput( caster->GetOutput()   );
+      caster->SetInput( warper->GetOutput(0) );
+      writer->SetInput( caster->GetOutput(0)   );
       if(m_SaveResult)
       {
         writer->Update();
       }
-      Image::Pointer outputImage = this->GetOutput();
-      mitk::CastToMitkImage( warper->GetOutput(), outputImage );
+      Image::Pointer outputImage = this->GetOutput(0);
+      mitk::CastToMitkImage( warper->GetOutput(0), outputImage );
 
       if (VImageDimension == 2)
       {
         typedef DeformationFieldType  VectorImage2DType;
         typedef typename DeformationFieldType::PixelType Vector2DType;
 
-        typename VectorImage2DType::ConstPointer vectorImage2D = filter->GetOutput();
+        typename VectorImage2DType::ConstPointer vectorImage2D = filter->GetOutput(0);
 
         typename VectorImage2DType::RegionType  region2D = vectorImage2D->GetBufferedRegion();
         typename VectorImage2DType::IndexType   index2D  = region2D.GetIndex();
@@ -251,9 +251,9 @@ namespace mitk {
       {
         typename FieldWriterType::Pointer      fieldwriter =  FieldWriterType::New();
         fieldwriter->SetFileName( m_FieldName );
-        fieldwriter->SetInput( filter->GetOutput() );
-        //m_DeformationField = filter->GetOutput();
-        m_DeformationField = (itk::Image<itk::Vector<float, 3>,3> *)(filter->GetOutput()); //see BUG #3732
+        fieldwriter->SetInput( filter->GetOutput(0) );
+        //m_DeformationField = filter->GetOutput(0);
+        m_DeformationField = (itk::Image<itk::Vector<float, 3>,3> *)(filter->GetOutput(0)); //see BUG #3732
         if(m_SaveField)
         {
           fieldwriter->Update();

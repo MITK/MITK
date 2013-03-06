@@ -315,6 +315,12 @@ protected:
   double m_IgnorePixelValue;
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
+
+  unsigned int m_PlanarFigureAxis;
+  unsigned int m_PlanarFigureSlice;
+  int m_PlanarFigureCoordinate0;
+  int m_PlanarFigureCoordinate1;
+
 };
 
 }

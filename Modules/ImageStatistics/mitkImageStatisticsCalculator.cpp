@@ -629,6 +629,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       {
         throw std::runtime_error( "Non-aligned planar figures not supported!" );
       }
+      m_PlanarFigureAxis = axis;
 
 
       // Find slice number corresponding to PlanarFigure in input image
@@ -636,6 +637,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );
 
       unsigned int slice = index[axis];
+      m_PlanarFigureSlice = slice;
 
 
       // Extract slice with given position and direction from image
@@ -1020,11 +1022,35 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
         statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
-        for (int i=0; i<statistics.MaxIndex.size(); i++)
+
+        typename MinMaxFilterType::IndexType tempMaxIndex;
+        typename MinMaxFilterType::IndexType tempMinIndex;
+
+        tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
+        tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+
+
+// FIX BEGIN
+        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE)
         {
-            statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
-            statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+            statistics.MaxIndex.set_size(m_Image->GetDimension());
+            statistics.MaxIndex[m_PlanarFigureCoordinate0]=tempMaxIndex[0];
+            statistics.MaxIndex[m_PlanarFigureCoordinate1]=tempMaxIndex[1];
+            statistics.MaxIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
+
+            statistics.MinIndex.set_size(m_Image->GetDimension());
+            statistics.MinIndex[m_PlanarFigureCoordinate0]=tempMinIndex[0];
+            statistics.MinIndex[m_PlanarFigureCoordinate1]=tempMinIndex[1];
+            statistics.MinIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
+        } else
+        {
+          for (int i = 0; i<statistics.MaxIndex.size(); i++)
+          {
+            statistics.MaxIndex[i] = tempMaxIndex[i];
+            statistics.MinIndex[i] = tempMinIndex[i];
+          }
         }
+// FIX END
 
       statisticsContainer->push_back( statistics );
     }
@@ -1079,6 +1105,8 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
       i1 = 1;
       break;
   }
+  m_PlanarFigureCoordinate0= i0;
+  m_PlanarFigureCoordinate1= i1;
 
   // store the polyline contour as vtkPoints object
   bool outOfBounds = false;

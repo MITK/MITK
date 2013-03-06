@@ -168,10 +168,10 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     filter->SetInput( itkImage );
 //    filter->UpdateOutputInformation();
 
-    //multiplyImageFilter->SetInput1(filter->GetOutput());
+    //multiplyImageFilter->SetInput1(filter->GetOutput(0));
     //OutputImageType::Pointer constantImage = OutputImageType::New();
-    //constantImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    //constantImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    //constantImage->SetLargestPossibleRegion(filter->GetOutput(0)->GetLargestPossibleRegion());
+    //constantImage->SetBufferedRegion(filter->GetOutput(0)->GetLargestPossibleRegion());
     //constantImage->Allocate();
     //ImageIteratorType it(constantImage, constantImage->GetLargestPossibleRegion());
     //while (!it.IsAtEnd())
@@ -180,8 +180,8 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     //  ++it;
     //}
 
-    ////randomImageSource->SetSize(filter->GetOutput()->GetLargestPossibleRegion().GetSize());
-    ////multiplyImageFilter->SetInput2(randomImageSource->GetOutput());
+    ////randomImageSource->SetSize(filter->GetOutput(0)->GetLargestPossibleRegion().GetSize());
+    ////multiplyImageFilter->SetInput2(randomImageSource->GetOutput(0));
     //multiplyImageFilter->SetInput2(constantImage);
 
     filter->Update();
@@ -218,8 +218,8 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     levWinProp->SetLevelWindow( levelwindow );
     resultNode->SetProperty( "levelwindow", levWinProp );
 
-    //resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
-    resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
+    //resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput(0) ) );
+    resultNode->SetData( mitk::ImportItkImage(filter->GetOutput(0))->Clone());
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);

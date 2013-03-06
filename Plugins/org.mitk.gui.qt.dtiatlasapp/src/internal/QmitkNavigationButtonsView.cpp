@@ -902,7 +902,7 @@ void QmitkNavigationButtonsView::Heatmap()
 
     // get result
     typedef itk::Image<OutPixType2,3> OutType2;
-    OutType2::Pointer outImg = generator->GetOutput();
+    OutType2::Pointer outImg = generator->GetOutput(0);
 
     mitk::Image::Pointer img2 = mitk::Image::New();
     img2->InitializeByItk(outImg.GetPointer());

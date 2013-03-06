@@ -142,7 +142,7 @@ void mitk::WiiMoteActivator::AddSurfaceInteractor()
     {
       nodeReader->SetFileName(fileName.c_str());
       nodeReader->Update();
-      m_Node = nodeReader->GetOutput();
+      m_Node = nodeReader->GetOutput(0);
 
       if(m_Interactor.IsNull())
       {

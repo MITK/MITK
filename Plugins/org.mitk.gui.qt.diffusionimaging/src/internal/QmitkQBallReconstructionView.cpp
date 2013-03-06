@@ -592,9 +592,9 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
       // ODFs TO DATATREE
       mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-      image->InitializeByItk( filter->GetOutput() );
-      //image->SetImportVolume( filter->GetOutput()->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
-      image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+      image->InitializeByItk( filter->GetOutput(0) );
+      //image->SetImportVolume( filter->GetOutput(0)->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
+      image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );
       QString newname;
@@ -792,8 +792,8 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
 
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   QString newname;
@@ -949,8 +949,8 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
 
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   QString newname;

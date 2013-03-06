@@ -162,7 +162,7 @@ void QmitkToFTutorialView::OnStep2()
       // update the filter
       surfaceFilter->Update();
       // get surface from filter
-      mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
+      mitk::Surface::Pointer surface = surfaceFilter->GetOutput(0);
       // add surface to data storage
       mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
       surfaceNode->SetName("ToF surface");

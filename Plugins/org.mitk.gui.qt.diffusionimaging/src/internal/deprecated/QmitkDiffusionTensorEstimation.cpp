@@ -474,8 +474,8 @@ void QmitkDiffusionTensorEstimation::TensorVolumesLoadButton()
 
     // Tensorvolume
     mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( tensorReader->GetOutput() );
-    image->SetVolume( tensorReader->GetOutput()->GetBufferPointer() );
+    image->InitializeByItk( tensorReader->GetOutput(0) );
+    image->SetVolume( tensorReader->GetOutput(0)->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
     mitk::DataStorage::GetInstance()->Add(node);
@@ -582,14 +582,14 @@ void QmitkDiffusionTensorEstimation::QBallVolumesLoadButton()
       MBI_LOG << e;
     }
 
-    //itk::ImageRegionConstIterator<IVType> it (qballReader->GetOutput(), qballReader->GetOutput()->GetLargestPossibleRegion() );
+    //itk::ImageRegionConstIterator<IVType> it (qballReader->GetOutput(0), qballReader->GetOutput(0)->GetLargestPossibleRegion() );
     //it = it.Begin();
     //std::cout << it.Get() << std::endl;
 
     // Tensorvolume
     mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( qballReader->GetOutput() );
-    image->SetVolume( qballReader->GetOutput()->GetBufferPointer() );
+    image->InitializeByItk( qballReader->GetOutput(0) );
+    image->SetVolume( qballReader->GetOutput(0)->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
     mitk::DataStorage::GetInstance()->Add(node);
@@ -731,8 +731,8 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
 
   // VIZ TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   mitk::DataStorage::GetInstance()->Add(node);
@@ -847,8 +847,8 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
 
     // Tensorvolume
     mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( reader->GetOutput() );
-    image->SetVolume( reader->GetOutput()->GetBufferPointer() );
+    image->InitializeByItk( reader->GetOutput(0) );
+    image->SetVolume( reader->GetOutput(0)->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
     mitk::DataStorage::GetInstance()->Add(node);
@@ -939,7 +939,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
 
       // TENSORS TO DATATREE
       //mitk::DataNode::Pointer node=mitk::DataNode::New();
-      //node->SetData( tensorReconstructionFilter->GetOutput() );
+      //node->SetData( tensorReconstructionFilter->GetOutput(0) );
       //mitk::DataStorage::GetInstance()->Add(node);
       //SetDefaultNodeProperties(node, nodename.append(" tensors"));
       //node->SetProperty( "IsConfidenceTensorVolume", mitk::BoolProperty::New( true ) );
@@ -1020,8 +1020,8 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
 
       // TENSORS TO DATATREE
       mitk::Image::Pointer image = mitk::Image::New();
-      image->InitializeByItk( tensorReconstructionFilter->GetOutput() );
-      image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
+      image->InitializeByItk( tensorReconstructionFilter->GetOutput(0) );
+      image->SetVolume( tensorReconstructionFilter->GetOutput(0)->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );
       SetDefaultNodeProperties(node, nodename.append(" tensors"));
@@ -1131,9 +1131,9 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
 
       // ODFs TO DATATREE
       mitk::Image::Pointer image = mitk::Image::New();
-      image->InitializeByItk( filter->GetOutput() );
-      //image->SetImportVolume( filter->GetOutput()->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
-      image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+      image->InitializeByItk( filter->GetOutput(0) );
+      //image->SetImportVolume( filter->GetOutput(0)->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
+      image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );
       QString newname;
@@ -1221,8 +1221,8 @@ void QmitkDiffusionTensorEstimation::ReconstructAnalytically(
 
   // ODFs TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   nodes->push_back(node);
@@ -1384,15 +1384,15 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
     ShiftScaleFilterType::New();
   multi->SetShift(0);
   multi->SetScale(200);//itk::NumericTraits<RealValueType>::max()
-  multi->SetInput(fractionalAnisotropyFilter->GetOutput());
+  multi->SetInput(fractionalAnisotropyFilter->GetOutput(0));
   multi->Update();
   clock.Stop();
   MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
   // FA TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( multi->GetOutput() );
-  image->SetVolume( multi->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( multi->GetOutput(0) );
+  image->SetVolume( multi->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   mitk::DataStorage::GetInstance()->Add(node);
@@ -1438,8 +1438,8 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
 
   // FA TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
-  image->InitializeByItk( relativeAnisotropyFilter->GetOutput() );
-  image->SetVolume( relativeAnisotropyFilter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( relativeAnisotropyFilter->GetOutput(0) );
+  image->SetVolume( relativeAnisotropyFilter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   mitk::DataStorage::GetInstance()->Add(node);
@@ -1485,8 +1485,8 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
   filter->SetNumberOfThreads(4);
   filter->Update();
   itk::ImageRegionIterator<FilterType::OutputImageType>
-    it (filter->GetOutput(),
-    filter->GetOutput()->GetLargestPossibleRegion() );
+    it (filter->GetOutput(0),
+    filter->GetOutput(0)->GetLargestPossibleRegion() );
   it = it.Begin();
 
   // VECTORFIELD
@@ -1705,16 +1705,16 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
 
     typedef itk::Image<TTensorPixelType, 3> ImgType;
     ImgType::Pointer img = ImgType::New();
-    img->SetSpacing( gfaFilter->GetOutput()->GetSpacing() );   // Set the image spacing
-    img->SetOrigin( gfaFilter->GetOutput()->GetOrigin() );     // Set the image origin
-    img->SetDirection( gfaFilter->GetOutput()->GetDirection() );  // Set the image direction
-    img->SetLargestPossibleRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion());
-    img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+    img->SetSpacing( gfaFilter->GetOutput(0)->GetSpacing() );   // Set the image spacing
+    img->SetOrigin( gfaFilter->GetOutput(0)->GetOrigin() );     // Set the image origin
+    img->SetDirection( gfaFilter->GetOutput(0)->GetDirection() );  // Set the image direction
+    img->SetLargestPossibleRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion());
+    img->SetBufferedRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
     img->Allocate();
     itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
     ot = ot.Begin();
     itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
-      (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+      (gfaFilter->GetOutput(0), gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
     it = it.Begin();
 
     for (it = it.Begin(); !it.IsAtEnd(); ++it)
@@ -1779,8 +1779,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   gfaFilter->SetNumberOfThreads(4);
   gfaFilter->Update();
   itk::ImageRegionIterator<GfaFilterType::OutputImageType>
-    itGfa (gfaFilter->GetOutput(),
-    gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+    itGfa (gfaFilter->GetOutput(0),
+    gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
   itGfa = itGfa.Begin();
 
   int numdir = m_Controls->m_QBallStandardAlgorithmsOrderSpinbox->value();
@@ -1797,8 +1797,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   principleDirectionsFilter->Update();
 
   itk::ImageRegionIterator<PrincipleDirectionsFilterType::OutputImageType>
-    it (principleDirectionsFilter->GetOutput(),
-    principleDirectionsFilter->GetOutput()->GetLargestPossibleRegion() );
+    it (principleDirectionsFilter->GetOutput(0),
+    principleDirectionsFilter->GetOutput(0)->GetLargestPossibleRegion() );
 
   if(numdir == 0)
   {
@@ -1970,8 +1970,8 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
   gfaFilter->SetNumberOfThreads(4);
   gfaFilter->Update();
   itk::ImageRegionIterator<GfaFilterType::OutputImageType>
-    itGfa (gfaFilter->GetOutput(),
-    gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+    itGfa (gfaFilter->GetOutput(0),
+    gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
   itGfa = itGfa.Begin();
 
   int numdirs = m_Controls->m_QBallStandardAlgorithmsDeconvolutionSpinbox->value();
@@ -2008,7 +2008,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
   devonvolutionFilter->SetNrDirectionsToExtract(numdirs);
   devonvolutionFilter->SetInput(itkvol);
   devonvolutionFilter->SetNumberOfThreads(m_Controls->m_QBallStandardAlgorithmsDeconvNumberThreadsSpinbox->value());
-  devonvolutionFilter->SetGfaImage(gfaFilter->GetOutput());
+  devonvolutionFilter->SetGfaImage(gfaFilter->GetOutput(0));
   //devonvolutionFilter->SetPresetConvolutionKernels(kernels);
   devonvolutionFilter->Update();
 
@@ -2016,7 +2016,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
   {
     itk::ImageRegionIterator<DeconvolutionFilterType::OutputImageType>
       it (devonvolutionFilter->GetOutput(i),
-      devonvolutionFilter->GetOutput()->GetLargestPossibleRegion() );
+      devonvolutionFilter->GetOutput(0)->GetLargestPossibleRegion() );
     it = it.Begin();
 
     if(i==0)
@@ -2252,8 +2252,8 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
 
     // Angluar Error TO DATATREE
     mitk::Image::Pointer image = mitk::Image::New();
-    image->InitializeByItk( filter->GetOutput() );
-    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    image->InitializeByItk( filter->GetOutput(0) );
+    image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
     mitk::DataNode::Pointer node=mitk::DataNode::New();
     node->SetData( image );
     mitk::DataStorage::GetInstance()->Add(node);
@@ -2342,16 +2342,16 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
 //
 //  typedef itk::Image<TTensorPixelType, 3> ImgType;
 //  ImgType::Pointer img = ImgType::New();
-//  img->SetSpacing( gfaFilter->GetOutput()->GetSpacing() );   // Set the image spacing
-//  img->SetOrigin( gfaFilter->GetOutput()->GetOrigin() );     // Set the image origin
-//  img->SetDirection( gfaFilter->GetOutput()->GetDirection() );  // Set the image direction
-//  img->SetLargestPossibleRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion());
-//  img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+//  img->SetSpacing( gfaFilter->GetOutput(0)->GetSpacing() );   // Set the image spacing
+//  img->SetOrigin( gfaFilter->GetOutput(0)->GetOrigin() );     // Set the image origin
+//  img->SetDirection( gfaFilter->GetOutput(0)->GetDirection() );  // Set the image direction
+//  img->SetLargestPossibleRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion());
+//  img->SetBufferedRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
 //  img->Allocate();
 //  itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
 //  ot = ot.Begin();
 //  itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
-//    (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
+//    (gfaFilter->GetOutput(0), gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
 //  it = it.Begin();
 //
 //  for (it = it.Begin(); !it.IsAtEnd(); ++it)
@@ -2462,7 +2462,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumesLoadButton()
       DiffVolumesType::Pointer diffVolumes = DiffVolumesType::New();
       diffVolumes->SetDirections(nrrdReader->GetDiffusionVectors());
       diffVolumes->SetB_Value(nrrdReader->GetB_Value());
-      diffVolumes->SetImage(nrrdReader->GetOutput());
+      diffVolumes->SetImage(nrrdReader->GetOutput(0));
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( diffVolumes );
       mitk::DataStorage::GetInstance()->Add(node);

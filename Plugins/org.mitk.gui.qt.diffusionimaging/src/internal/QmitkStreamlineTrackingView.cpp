@@ -197,7 +197,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     CastType::Pointer caster = CastType::New();
     caster->SetInput(m_TensorImage);
     caster->Update();
-    TensorImageType::Pointer image = caster->GetOutput();
+    TensorImageType::Pointer image = caster->GetOutput(0);
 
     typedef itk::StreamlineTrackingFilter< float > FilterType;
     FilterType::Pointer filter = FilterType::New();

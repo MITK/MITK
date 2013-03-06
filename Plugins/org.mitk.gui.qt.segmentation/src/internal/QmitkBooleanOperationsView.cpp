@@ -103,7 +103,7 @@ mitk::Image::Pointer QmitkBooleanOperationsView::To3D(const mitk::Image::Pointer
 
     imageTimeSelector->UpdateLargestPossibleRegion();
 
-    return imageTimeSelector->GetOutput();
+    return imageTimeSelector->GetOutput(0);
   }
   else
   {
@@ -172,11 +172,11 @@ void QmitkBooleanOperationsView::OnDifferenceButtonClicked()
 
   itk::AndImageFilter<ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType>::New();
   andFilter->SetInput1(itkImage1);
-  andFilter->SetInput2(notFilter->GetOutput());
+  andFilter->SetInput2(notFilter->GetOutput(0));
   andFilter->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer image3 = mitk::Image::New();
-  mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
+  mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(0), image3);
 
   image3->DisconnectPipeline();
 
@@ -205,7 +205,7 @@ void QmitkBooleanOperationsView::OnUnionButtonClicked()
   orFilter->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer image3 = mitk::Image::New();
-  mitk::CastToMitkImage<ImageType>(orFilter->GetOutput(), image3);
+  mitk::CastToMitkImage<ImageType>(orFilter->GetOutput(0), image3);
 
   image3->DisconnectPipeline();
 
@@ -234,7 +234,7 @@ void QmitkBooleanOperationsView::OnIntersectionButtonClicked()
   andFilter->UpdateLargestPossibleRegion();
 
   mitk::Image::Pointer image3 = mitk::Image::New();
-  mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(), image3);
+  mitk::CastToMitkImage<ImageType>(andFilter->GetOutput(0), image3);
 
   image3->DisconnectPipeline();
 

@@ -248,7 +248,7 @@ void QmitkFiberGenerateRandomWorker::run()
     randomPoints->SetNumberOfPoints(numOfPoints);
     randomPoints->SetRadius(distrRadius);
     randomPoints->Update();
-    vtkPoints* pnts = randomPoints->GetOutput()->GetPoints();
+    vtkPoints* pnts = randomPoints->GetOutput(0)->GetPoints();
 
     /* ASSIGN EACH POINT TO A RANDOM FIBER */
     srand((unsigned)time(0)); // init randomizer

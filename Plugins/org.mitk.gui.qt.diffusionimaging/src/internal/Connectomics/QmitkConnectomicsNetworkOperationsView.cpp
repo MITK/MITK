@@ -477,7 +477,7 @@ void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePush
         filter->SetRescaleConnectivity(m_Controls->rescaleCheckBox->isChecked());
         filter->Update();
 
-        mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput())->Clone();
+        mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput(0))->Clone();
         mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
         connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
         connectivityMatrixImageNode->SetName( "Connectivity matrix" );

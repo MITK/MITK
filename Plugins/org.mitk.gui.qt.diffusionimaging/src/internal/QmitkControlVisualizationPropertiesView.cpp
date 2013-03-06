@@ -1724,7 +1724,7 @@ void QmitkControlVisualizationPropertiesView::GenerateTdi()
     generator->Update();
 
     // get result
-    OutImageType::Pointer outImg = generator->GetOutput();
+    OutImageType::Pointer outImg = generator->GetOutput(0);
 
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());

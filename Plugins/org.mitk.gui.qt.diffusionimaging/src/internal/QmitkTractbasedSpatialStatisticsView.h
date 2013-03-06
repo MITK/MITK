@@ -216,7 +216,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
       {
         nodeReader->SetFileName(f);
         nodeReader->Update();
-        node = nodeReader->GetOutput();
+        node = nodeReader->GetOutput(0);
       }
       catch(...) {
         MITK_ERROR << "Could not read file";

@@ -220,6 +220,8 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             # not as an error (although -Werror was given).
 
             mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
+            mitkFunctionCheckCompilerFlags("-Wno-error=static-member-init" module_compile_flags)
+            mitkFunctionCheckCompilerFlags("-Wno-unknown-warning-option" module_compile_flags)
             mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
 
             # VNL headers throw a lot of these, not fixable for us at least in ITK 3

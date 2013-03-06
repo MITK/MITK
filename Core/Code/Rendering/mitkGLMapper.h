@@ -50,10 +50,10 @@ class MITK_CORE_EXPORT GLMapper : public Mapper
      /** \brief Apply color and opacity properties read from the PropertyList
     *  @deprecated Use ApplyColorAndOpacityProperties(...) instead
     */
-     DEPRECATED(inline virtual void ApplyProperties(mitk::BaseRenderer* renderer)
+     DEPRECATED(inline virtual void ApplyProperties(mitk::BaseRenderer* renderer))
      {
        ApplyColorAndOpacityProperties(renderer);
-     });
+     }
 
     /** \brief Apply color and opacity properties read from the PropertyList.
     * The actor is not used in the GLMappers. Called by mapper subclasses.

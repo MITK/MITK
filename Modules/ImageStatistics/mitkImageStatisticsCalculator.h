@@ -316,10 +316,10 @@ protected:
   bool m_DoIgnorePixelValue;
   bool m_IgnorePixelValueChanged;
 
-  unsigned int m_PlanarFigureAxis;
-  unsigned int m_PlanarFigureSlice;
-  int m_PlanarFigureCoordinate0;
-  int m_PlanarFigureCoordinate1;
+  unsigned int m_PlanarFigureAxis;    // Normal axis for PlanarFigure
+  unsigned int m_PlanarFigureSlice;   // Slice which contains PlanarFigure
+  int m_PlanarFigureCoordinate0;      // First plane-axis for PlanarFigure
+  int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
 
 };
 

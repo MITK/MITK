@@ -1030,8 +1030,11 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         tempMinIndex = minMaxFilter->GetIndexOfMinimum();
 
 
-// FIX BEGIN
-        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE)
+// FIX BUG 14644
+        //If a PlanarFigure is used for segmentation the
+        //adaptedImage is a single slice (2D). Adding the
+        // 3. dimension.
+        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && m_Image->GetDimension()==3)
         {
             statistics.MaxIndex.set_size(m_Image->GetDimension());
             statistics.MaxIndex[m_PlanarFigureCoordinate0]=tempMaxIndex[0];

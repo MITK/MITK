@@ -187,7 +187,7 @@ void VtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, Base
   {
     vtkVectorText *labelText = vtkVectorText::New();
     vtkPolyDataMapper *labelMapper = vtkPolyDataMapper::New();
-    labelMapper->SetInput( labelText->GetOutput() );
+    labelMapper->SetInput( labelText->GetOutput(0) );
 
     vtkFollower *labelFollower = vtkFollower::New();
     labelFollower->SetMapper( labelMapper );

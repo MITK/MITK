@@ -32,7 +32,7 @@ mitk::STLFileReader::~STLFileReader()
 
 void mitk::STLFileReader::GenerateData()
 {
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   if( m_FileName != "")
   {
@@ -41,10 +41,10 @@ void mitk::STLFileReader::GenerateData()
     stlReader->SetFileName( m_FileName.c_str() );
 
     vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
-    normalsGenerator->SetInput( stlReader->GetOutput() );
+    normalsGenerator->SetInput( stlReader->GetOutput(0) );
 
     vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
-    cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+    cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput(0));
     cleanPolyDataFilter->PieceInvariantOff();
     cleanPolyDataFilter->ConvertLinesToPointsOff();
     cleanPolyDataFilter->ConvertPolysToLinesOff();
@@ -52,9 +52,9 @@ void mitk::STLFileReader::GenerateData()
     cleanPolyDataFilter->PointMergingOn();
     cleanPolyDataFilter->Update();
 
-    if ( ( stlReader->GetOutput() != NULL ) && ( cleanPolyDataFilter->GetOutput() != NULL ) )
+    if ( ( stlReader->GetOutput(0) != NULL ) && ( cleanPolyDataFilter->GetOutput(0) != NULL ) )
     {
-      vtkSmartPointer<vtkPolyData> surfaceWithNormals = cleanPolyDataFilter->GetOutput();
+      vtkSmartPointer<vtkPolyData> surfaceWithNormals = cleanPolyDataFilter->GetOutput(0);
       output->SetVtkPolyData( surfaceWithNormals );
     }
   }

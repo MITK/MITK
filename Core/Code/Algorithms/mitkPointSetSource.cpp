@@ -36,14 +36,14 @@ itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( DataObjectPointerArr
     return OutputType::New().GetPointer();
 }
 
-DataObject::Pointer mitk::PointSetSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 void mitk::PointSetSource::GraftOutput(OutputType *graft)

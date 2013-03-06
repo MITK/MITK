@@ -44,3 +44,23 @@ itk::ProcessObject::DataObjectPointer mitk::DataNodeSource::MakeOutput( const Da
     }
   return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
 }
+
+ mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const  mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+ mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const   mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(idx));
+}

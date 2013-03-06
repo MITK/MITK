@@ -218,9 +218,7 @@ bool mitk::Surface::VerifyRequestedRegion()
 
 void mitk::Surface::SetRequestedRegion(const itk::DataObject *data )
 {
-  mitk::Surface *surfaceData;
-
-  surfaceData = dynamic_cast<mitk::Surface*>(data);
+  const mitk::Surface *surfaceData = dynamic_cast<const mitk::Surface*>(data);
 
   if (surfaceData)
   {

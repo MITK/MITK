@@ -29,18 +29,18 @@ mitk::ImageSource::ImageSource()
 
 itk::DataObject::Pointer mitk::ImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return OutputType::New().GetPointer();
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
 
 
-DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
 
 /**
@@ -49,6 +49,26 @@ DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifierTyp
 void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 {
   this->GraftNthOutput(0, graft);
+}
+
+mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(key));
+}
+
+const mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(key));
+}
+
+ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(idx));
 }
 
 /**
@@ -82,7 +102,7 @@ void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion)
 {
   // Get the output pointer
-  OutputImageType * outputPtr = this->GetOutput();
+  OutputImageType * outputPtr = this->GetOutput(0);
   const SlicedData::SizeType& requestedRegionSize
     = outputPtr->GetRequestedRegion().GetSize();
 
@@ -234,5 +254,5 @@ void mitk::ImageSource::PrepareOutputs()
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
     Update();
-    return GetOutput()->GetVtkImageData();
+    return GetOutput(0)->GetVtkImageData();
 }

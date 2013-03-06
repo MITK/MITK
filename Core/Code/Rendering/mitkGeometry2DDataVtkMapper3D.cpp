@@ -82,15 +82,15 @@ namespace mitk
     m_Cleaner->SetInput( emptyPolyData );
     emptyPolyData->Delete();
 
-    m_Edges->SetInput(m_Cleaner->GetOutput());
-    m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
+    m_Edges->SetInput(m_Cleaner->GetOutput(0));
+    m_EdgeTransformer->SetInput( m_Edges->GetOutput(0) );
 
-    m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
+    m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput(0) );
     m_EdgeTuber->SetVaryRadiusToVaryRadiusOff();
     m_EdgeTuber->SetNumberOfSides( 12 );
     m_EdgeTuber->CappingOn();
 
-    m_EdgeMapper->SetInput( m_EdgeTuber->GetOutput() );
+    m_EdgeMapper->SetInput( m_EdgeTuber->GetOutput(0) );
     m_EdgeMapper->ScalarVisibilityOff();
 
     m_BackgroundMapper->SetInput(emptyPolyData);
@@ -111,7 +111,7 @@ namespace mitk
     m_BackHedgeHog  = vtkHedgeHog::New();
 
     m_FrontNormalsMapper = vtkPolyDataMapper::New();
-    m_FrontNormalsMapper->SetInput( m_FrontHedgeHog->GetOutput() );
+    m_FrontNormalsMapper->SetInput( m_FrontHedgeHog->GetOutput(0) );
     m_BackNormalsMapper = vtkPolyDataMapper::New();
 
     m_Prop3DAssembly->AddPart( m_EdgeActor );
@@ -301,7 +301,7 @@ namespace mitk
 
       // Calculate the surface of the Geometry2D
       m_SurfaceCreator->Update();
-      Surface *surface = m_SurfaceCreator->GetOutput();
+      Surface *surface = m_SurfaceCreator->GetOutput(0);
 
       // Check if there's something to display, otherwise return
       if ( (surface->GetVtkPolyData() == 0 )
@@ -334,13 +334,13 @@ namespace mitk
           m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
           m_NormalsTransformer->SetTransform(node->GetVtkTransform(this->GetTimestep()) );
 
-          m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+          m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput(0) );
           m_FrontHedgeHog->SetVectorModeToUseNormal();
           m_FrontHedgeHog->SetScaleFactor( invertNormals ? 1.0 : -1.0 );
 
           m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
 
-          m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
+          m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput(0) );
           m_BackHedgeHog->SetVectorModeToUseNormal();
           m_BackHedgeHog->SetScaleFactor( invertNormals ? -1.0 : 1.0 );
 

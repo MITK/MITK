@@ -191,7 +191,7 @@ template <class T>
 void vtkMitkApplyLevelWindowToRGBFilter::ExecuteInformation()
 {
   vtkImageData *input = this->GetInput();
-  vtkImageData *output = this->GetOutput();
+  vtkImageData *output = this->GetOutput(0);
 
   if (!input)
   {

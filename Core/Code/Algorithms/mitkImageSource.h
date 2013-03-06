@@ -79,14 +79,14 @@ public:
 
    *    // setup the mini-pipeline to calculate the correct regions
    *    // and write to the appropriate bulk data block
-   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput() );
+   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
    *
    *    // execute the mini-pipeline
    *    lastFilterInMiniPipeline->Update();
    *
    *    // graft the mini-pipeline output back onto this filter's output.
    *    // this is needed to get the appropriate regions passed back.
-   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput() );
+   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
    * \endcode
    *
    * For proper pipeline execution, a filter using a mini-pipeline
@@ -133,6 +133,11 @@ public:
    * virtual.
    */
   virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+
+  OutputImageType* GetOutput(const DataObjectIdentifierType & key);
+  const OutputImageType* GetOutput(const DataObjectIdentifierType & key) const;
+  OutputImageType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputImageType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
   virtual vtkImageData* GetVtkImageData();
 

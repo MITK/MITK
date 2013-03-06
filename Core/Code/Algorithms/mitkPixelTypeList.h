@@ -172,7 +172,7 @@ struct AccessItkImageFunctor
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();
     imagetoitk->SetInput(mitkImage);
     imagetoitk->Update();
-    cl->*callBack(imagetoitk->GetOutput(), t1, t2, t3);
+    cl->*callBack(imagetoitk->GetOutput(0), t1, t2, t3);
     return true;
   }
 

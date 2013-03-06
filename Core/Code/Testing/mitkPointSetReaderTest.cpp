@@ -54,7 +54,7 @@ int mitkPointSetReaderTest(int argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED( myPointSetReader->GetSuccess(), "Testing GetSuccess() with valid input file name!");
 
   // evaluate if the read point set is correct
-  mitk::PointSet::Pointer resultPS = myPointSetReader->GetOutput();
+  mitk::PointSet::Pointer resultPS = myPointSetReader->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED( resultPS.IsNotNull(), "Testing output generation!");
   MITK_TEST_CONDITION_REQUIRED( resultPS->GetTimeSteps() == 14, "Testing output time step generation!"); // CAVE: Only valid with the specified test data!
   MITK_TEST_CONDITION_REQUIRED( resultPS->GetPointSet(resultPS->GetTimeSteps()-1)->GetNumberOfPoints() == 0, "Testing output time step generation with empty time step!"); // CAVE: Only valid with the specified test data!

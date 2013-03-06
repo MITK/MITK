@@ -129,7 +129,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
           ApplyProperties( renderer );
 
           // traverse the cut contour
-          vtkPolyData * contour = m_Cutter->GetOutput();
+          vtkPolyData * contour = m_Cutter->GetOutput(0);
 
           vtkPoints *vpoints = contour->GetPoints();
           vtkCellArray *vpolys = contour->GetLines();

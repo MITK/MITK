@@ -37,7 +37,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   sphereSource->SetPhiResolution(10);
   sphereSource->Update();
 
-  vtkPolyData* polys = sphereSource->GetOutput();
+  vtkPolyData* polys = sphereSource->GetOutput(0);
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
 

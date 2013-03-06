@@ -355,7 +355,7 @@ protected:
   //##Documentation
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
-  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
+//  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 
   bool m_Initialized;
 

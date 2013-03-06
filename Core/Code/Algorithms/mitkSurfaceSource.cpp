@@ -33,20 +33,20 @@ mitk::SurfaceSource::~SurfaceSource()
 {
 }
 
-itk::DataObject::Pointer mitk::DataNodeSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return OutputType::New().GetPointer();
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
 
 
-DataObject::Pointer mitk::DataNodeSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
 
 

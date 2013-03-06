@@ -54,7 +54,7 @@ void mitk::PlanesPerpendicularToLinesFilter::CreatePlane(const mitk::Point3D& cu
   right = vnl_cross_3d(down, normal);
   right.normalize();
 
-  itk2vtk(last.Get_vnl_vector()-right*halfWidthInMM-down*halfHeightInMM, origin);
+  itk2vtk(last.GetVnlVector()-right*halfWidthInMM-down*halfHeightInMM, origin);
   right  *= targetSpacing[0];
   down   *= targetSpacing[1];
   normal *= targetSpacing[2];
@@ -142,7 +142,7 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
 
     //set last plane at last point with same normal as the one before the last
     PlaneGeometry::Pointer plane = static_cast<PlaneGeometry*>((*planes.rbegin())->Clone().GetPointer());
-    itk2vtk(last.Get_vnl_vector()-right*halfWidthInMM-down*halfHeightInMM, origin);
+    itk2vtk(last.GetVnlVector()-right*halfWidthInMM-down*halfHeightInMM, origin);
     plane->SetOrigin(origin);
     m_CreatedGeometries->SetGeometry2D(plane, planes.size());
 

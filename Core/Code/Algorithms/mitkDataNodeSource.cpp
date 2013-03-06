@@ -23,7 +23,7 @@ mitk::DataNodeSource::DataNodeSource()
     // Create the output.
     OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
     assert (output.IsNotNull());
-    this->SetNumberOfOutputs( 1 );
+    this->SetNumberOfIndexedOutputs( 1 );
     this->SetOutput(0, output.GetPointer());
 }
 

@@ -57,7 +57,7 @@ class MessageReceiverClass
 
     void OnTimeStampChanged(mitk::NavigationData::TimeStampType v, unsigned int index)
     {
-      m_ReceivedData[index]->SetTimeStamp(v);
+      m_ReceivedData[index]->SetIGTTimeStamp(v);
       ++m_MessagesReceived;
     }
 
@@ -96,7 +96,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd1->SetPosition(initialPos);
     nd1->SetOrientation(initialOri);
     nd1->SetPositionAccuracy(11.111);
-    nd1->SetTimeStamp(64.46);
+    nd1->SetIGTTimeStamp(64.46);
     nd1->SetDataValid(true);
 
     myFilter->SetInput(nd1);
@@ -132,7 +132,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     /* changing two input parameters */
     mitk::FillVector3D(initialPos, 11.0, 21.0, 31.0);
     nd1->SetPosition(initialPos); // change only one parameter
-    nd1->SetTimeStamp(55.55); // change only one parameter
+    nd1->SetIGTTimeStamp(55.55); // change only one parameter
     output->Update(); // re-execute filter
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetPosition(), nd1->GetPosition()), "Testing PositionChanged message");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing TimeStampChanged message");
@@ -159,7 +159,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd0->SetPosition(initialPos);
     nd0->SetOrientation(initialOri);
     nd0->SetPositionAccuracy(11.111);
-    nd0->SetTimeStamp(64.46);
+    nd0->SetIGTTimeStamp(64.46);
     nd0->SetDataValid(true);
 
     mitk::FillVector3D(initialPos, 2.0, 2.0, 2.0);
@@ -168,7 +168,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd1->SetPosition(initialPos);
     nd1->SetOrientation(initialOri2);
     nd1->SetPositionAccuracy(22.222);
-    nd1->SetTimeStamp(222.2);
+    nd1->SetIGTTimeStamp(222.2);
     nd1->SetDataValid(true);
 
     myFilter->SetInput(0, nd0);
@@ -211,7 +211,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     /* remove one listener and check that message is not send */
     myFilter->RemoveTimeStampChangedListener(mitk::MessageDelegate2<MessageReceiverClass, mitk::NavigationData::TimeStampType, unsigned int>(&answers, &MessageReceiverClass::OnTimeStampChanged));
     mitk::NavigationData::TimeStampType oldValue = nd1->GetTimeStamp();
-    nd1->SetTimeStamp(999.9);
+    nd1->SetIGTTimeStamp(999.9);
     myFilter->Update();
     MITK_TEST_CONDITION( ! mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing if TimeStamp message is _not_ send after RemoveListener (!= new value)");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), oldValue), "Testing if TimeStamp message is _not_ send after RemoveListener (== old value)");

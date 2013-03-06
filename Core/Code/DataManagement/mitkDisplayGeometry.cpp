@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDisplayGeometry.h"
 
-mitk::AffineGeometryFrame3D::Pointer mitk::DisplayGeometry::Clone() const
+itk::LightObject::Pointer mitk::DisplayGeometry::InternalClone() const
 {
   itkExceptionMacro(<<"calling mitk::DisplayGeometry::Clone does not make much sense.");
 }

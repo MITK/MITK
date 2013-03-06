@@ -105,7 +105,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData
   else
     hasPosition = true;
 
-  nd->SetTimeStamp(timestamp);
+  nd->SetIGTTimeStamp(timestamp);
   nd->SetPosition(position);
   nd->SetOrientation(orientation);
   nd->SetCovErrorMatrix(matrix);

@@ -94,7 +94,7 @@ void mitk::ThinPlateSplineCurvedGeometry::ComputeGeometry()
   m_ThinPlateSplineTransform->SetTargetLandmarks(m_VtkTargetLandmarks);
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::ThinPlateSplineCurvedGeometry::Clone() const
+itk::LightObject::Pointer mitk::ThinPlateSplineCurvedGeometry::InternalClone() const
 {
  mitk::AffineGeometryFrame3D::Pointer newGeometry = new Self(*this);
  newGeometry->UnRegister();

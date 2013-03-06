@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkUnstructuredGrid.h>
 
-#include <itkSmartPointerForwardReference.txx>
-
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )
 {
   this->Expand(t);

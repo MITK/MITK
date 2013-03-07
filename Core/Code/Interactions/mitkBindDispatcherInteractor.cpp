@@ -22,10 +22,9 @@
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
-//#include "mitkInformer.h"
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
-    m_DataStorage(NULL),m_InformerService(NULL)
+    m_DataStorage(NULL)
 {
   ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
   if (context == NULL)

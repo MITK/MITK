@@ -161,7 +161,7 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
 
     vtkSmartPointer<vtkRenderLargeImage> magnifier = vtkSmartPointer<vtkRenderLargeImage>::New();
     magnifier->SetInput(renderer);
-    magnifier->SetMagnification(1.0);
+    magnifier->SetMagnification(1);
 
     vtkSmartPointer<vtkImageWriter> fileWriter = vtkSmartPointer<vtkPNGWriter>::New();
     fileWriter->SetInput(magnifier->GetOutput());

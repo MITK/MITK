@@ -11,6 +11,7 @@ The distinction between developer and end user use is for convenience only and m
 
   \li \subpage org_blueberry_ui_qt_log
   \li \subpage org_mitk_views_basicimageprocessing
+  \li \subpage org_mitk_views_cmdlinemodules
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_gui_qt_diffusionimaging
   \li \subpage org_mitk_views_imagecropper

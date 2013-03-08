@@ -1,18 +1,18 @@
 /*===================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
- See LICENSE.txt or http://www.mitk.org for details.
+See LICENSE.txt or http://www.mitk.org for details.
 
- ===================================================================*/
+===================================================================*/
 
 #include "mitkStateMachineFactory.h"
 #include "mitkGlobalInteraction.h"
@@ -34,6 +34,7 @@
 //mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
 //mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
 //std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
+
 //XML StateMachine
 const std::string STYLE = "STYLE";
 const std::string NAME = "NAME";
@@ -62,8 +63,10 @@ namespace mitk
   vtkStandardNewMacro(StateMachineFactory);
 }
 
-mitk::StateMachineFactory::StateMachineFactory() :
-    m_AktStateMachineName(""), m_SkipStateMachine(false)
+mitk::StateMachineFactory::StateMachineFactory()
+  : m_AktTransition(NULL)
+  , m_AktStateMachineName("")
+  , m_SkipStateMachine(false)
 {
 }
 
@@ -80,11 +83,8 @@ mitk::StateMachineFactory::~StateMachineFactory()
 
   //should not be necessary due to SmartPointers
   m_StartStates.clear();
-
-  //delete WeakPointer
-  if (m_AktTransition)
-    delete m_AktTransition;
 }
+
 
 /**
  * @brief Returns NULL if no entry with string type is found.
@@ -268,7 +268,7 @@ void mitk::StateMachineFactory::StartElement(const char* elementName, const char
       return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
     }
     if ( ReadXMLBooleanAttribut( START_STATE, atts ) )
-    m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
+      m_StartStates.insert(StartStateMap::value_type(m_AktStateMachineName, m_AktState));
   }
 
   else if ( name == TRANSITION )
@@ -276,12 +276,22 @@ void mitk::StateMachineFactory::StartElement(const char* elementName, const char
     std::string transitionName = ReadXMLStringAttribut( NAME, atts );
     int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
     int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
-    m_AktTransition = new Transition(transitionName, nextStateId, eventId);
     if ( m_AktState )
-    m_AktState->AddTransition( m_AktTransition );
+    {
+      mitk::Transition* transition = new Transition(transitionName, nextStateId, eventId);
+      if (!m_AktState->AddTransition( transition ))
+      {
+        delete transition;
+        m_AktTransition = const_cast<Transition*>(m_AktState->GetTransition(eventId));
+      }
+      else
+      {
+        m_AktTransition = transition;
+      }
+    }
   }
 
-  else if ( name == ACTION )
+  else if ( name == ACTION && m_AktTransition)
   {
     int actionId = ReadXMLIntegerAttribut( ID, atts );
     m_AktAction = Action::New( actionId );

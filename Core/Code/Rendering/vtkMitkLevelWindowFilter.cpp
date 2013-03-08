@@ -205,7 +205,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter* self,
             {
               alpha = 0.0;
             }
-            finalAlpha = static_cast<T>(alpha);
+            finalAlpha = static_cast<unsigned char>(alpha);
 
             for( int c = 4; c < maxC; c++ )
               inputSI++;

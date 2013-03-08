@@ -105,10 +105,10 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     * \brief Apply color and opacity properties read from the PropertyList
     * @deprecated Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) instead
     */
-    DEPRECATED(inline virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+    DEPRECATED(inline virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer))
     {
       ApplyColorAndOpacityProperties(renderer, actor);
-    });
+    }
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.

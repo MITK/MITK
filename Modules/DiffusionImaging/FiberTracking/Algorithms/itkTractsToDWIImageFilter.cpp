@@ -323,7 +323,7 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // resample fiber bundle for sufficient voxel coverage
-    double segmentVolume = 1;
+    double segmentVolume = 0.0001;
     float minSpacing = 1;
     if(m_UpsampledSpacing[0]<m_UpsampledSpacing[1] && m_UpsampledSpacing[0]<m_UpsampledSpacing[2])
         minSpacing = m_UpsampledSpacing[0];
@@ -358,182 +358,166 @@ void TractsToDWIImageFilter::GenerateData()
         compartments.push_back(doubleDwi);
     }
 
-    if (m_CircleDummy)
-    {
-        for (int i=0; i<compartments.size(); i++)
-        {
-            DoubleDwiType::PixelType pix;
-            pix.SetSize(m_FiberModels[0]->GetNumGradients());
-            pix.Fill(1);
+    double interpFact = 2*atan(-0.5*m_InterpolationShrink);
+    double maxVolume = 0;
 
-            DoubleDwiType::Pointer doubleDwi = compartments.at(i);
-            ImageRegion<3> region = doubleDwi->GetLargestPossibleRegion();
-            ImageRegionIterator<DoubleDwiType> it(doubleDwi, region);
-            while(!it.IsAtEnd())
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
+    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
+    vLines->InitTraversal();
+
+    MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
+    boost::progress_display disp(numFibers);
+    for( int i=0; i<numFibers; i++ )
+    {
+        ++disp;
+        vtkIdType   numPoints(0);
+        vtkIdType*  points(NULL);
+        vLines->GetNextCell ( numPoints, points );
+        if (numPoints<2)
+            continue;
+
+        for( int j=0; j<numPoints; j++)
+        {
+            double* temp = fiberPolyData->GetPoint(points[j]);
+            itk::Point<float, 3> vertex = GetItkPoint(temp);
+            itk::Vector<double> v = GetItkVector(temp);
+
+            itk::Vector<double, 3> dir(3);
+            if (j<numPoints-1)
+                dir = GetItkVector(fiberPolyData->GetPoint(points[j+1]))-v;
+            else
+                dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
+
+            itk::Index<3> idx;
+            itk::ContinuousIndex<float, 3> contIndex;
+            m_TissueMask->TransformPhysicalPointToIndex(vertex, idx);
+            m_TissueMask->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
+
+            double frac_x = contIndex[0] - idx[0];
+            double frac_y = contIndex[1] - idx[1];
+            double frac_z = contIndex[2] - idx[2];
+            if (frac_x<0)
             {
-                DoubleDwiType::IndexType index = it.GetIndex();
-                double t = region.GetSize(0)/2;
-                double d1 = index[0]-t+0.5;
-                t = region.GetSize(1)/2;
-                double d2 = index[1]-t+0.5;
-                if (sqrt(d1*d1+d2*d2)<20*m_Upsampling)
-                    it.Set(pix);
-                ++it;
+                idx[0] -= 1;
+                frac_x += 1;
             }
-        }
-    }
-    else
-    {
-        double interpFact = 2*atan(-0.5*m_InterpolationShrink);
-        double maxVolume = 0;
-
-        vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-        vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-        vLines->InitTraversal();
-
-        MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
-        boost::progress_display disp(numFibers);
-        for( int i=0; i<numFibers; i++ )
-        {
-            ++disp;
-            vtkIdType   numPoints(0);
-            vtkIdType*  points(NULL);
-            vLines->GetNextCell ( numPoints, points );
-            if (numPoints<2)
-                continue;
-
-            for( int j=0; j<numPoints; j++)
+            if (frac_y<0)
             {
-                double* temp = fiberPolyData->GetPoint(points[j]);
-                itk::Point<float, 3> vertex = GetItkPoint(temp);
-                itk::Vector<double> v = GetItkVector(temp);
+                idx[1] -= 1;
+                frac_y += 1;
+            }
+            if (frac_z<0)
+            {
+                idx[2] -= 1;
+                frac_z += 1;
+            }
 
-                itk::Vector<double, 3> dir(3);
-                if (j<numPoints-1)
-                    dir = GetItkVector(fiberPolyData->GetPoint(points[j+1]))-v;
-                else
-                    dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
+            frac_x = atan((0.5-frac_x)*m_InterpolationShrink)/interpFact + 0.5;
+            frac_y = atan((0.5-frac_y)*m_InterpolationShrink)/interpFact + 0.5;
+            frac_z = atan((0.5-frac_z)*m_InterpolationShrink)/interpFact + 0.5;
 
-                itk::Index<3> idx;
-                itk::ContinuousIndex<float, 3> contIndex;
-                m_TissueMask->TransformPhysicalPointToIndex(vertex, idx);
-                m_TissueMask->TransformPhysicalPointToContinuousIndex(vertex, contIndex);
-
-                double frac_x = contIndex[0] - idx[0];
-                double frac_y = contIndex[1] - idx[1];
-                double frac_z = contIndex[2] - idx[2];
-                if (frac_x<0)
+            // use trilinear interpolation
+            itk::Index<3> newIdx;
+            for (int x=0; x<2; x++)
+            {
+                frac_x = 1-frac_x;
+                for (int y=0; y<2; y++)
                 {
-                    idx[0] -= 1;
-                    frac_x += 1;
-                }
-                if (frac_y<0)
-                {
-                    idx[1] -= 1;
-                    frac_y += 1;
-                }
-                if (frac_z<0)
-                {
-                    idx[2] -= 1;
-                    frac_z += 1;
-                }
-
-                frac_x = atan((0.5-frac_x)*m_InterpolationShrink)/interpFact + 0.5;
-                frac_y = atan((0.5-frac_y)*m_InterpolationShrink)/interpFact + 0.5;
-                frac_z = atan((0.5-frac_z)*m_InterpolationShrink)/interpFact + 0.5;
-
-                // use trilinear interpolation
-                itk::Index<3> newIdx;
-                for (int x=0; x<2; x++)
-                {
-                    frac_x = 1-frac_x;
-                    for (int y=0; y<2; y++)
+                    frac_y = 1-frac_y;
+                    for (int z=0; z<2; z++)
                     {
-                        frac_y = 1-frac_y;
-                        for (int z=0; z<2; z++)
+                        frac_z = 1-frac_z;
+
+                        newIdx[0] = idx[0]+x;
+                        newIdx[1] = idx[1]+y;
+                        newIdx[2] = idx[2]+z;
+
+                        double frac = frac_x*frac_y*frac_z;
+
+                        // is position valid?
+                        if (!m_TissueMask->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
+                            continue;
+
+                        // generate signal for each fiber compartment
+                        for (int k=0; k<m_FiberModels.size(); k++)
                         {
-                            frac_z = 1-frac_z;
-
-                            newIdx[0] = idx[0]+x;
-                            newIdx[1] = idx[1]+y;
-                            newIdx[2] = idx[2]+z;
-
-                            double frac = frac_x*frac_y*frac_z;
-
-                            // is position valid?
-                            if (!m_TissueMask->GetLargestPossibleRegion().IsInside(newIdx) || m_TissueMask->GetPixel(newIdx)<=0)
-                                continue;
-
-                            // generate signal for each fiber compartment
-                            for (int k=0; k<m_FiberModels.size(); k++)
-                            {
-                                DoubleDwiType::Pointer doubleDwi = compartments.at(k);
-                                m_FiberModels[k]->SetFiberDirection(dir);
-                                DoubleDwiType::PixelType pix = doubleDwi->GetPixel(newIdx);
-                                pix += segmentVolume*frac*m_FiberModels[k]->SimulateMeasurement();
-                                doubleDwi->SetPixel(newIdx, pix );
-                                if (pix[baselineIndex]>maxVolume)
-                                    maxVolume = pix[baselineIndex];
-                            }
+                            DoubleDwiType::Pointer doubleDwi = compartments.at(k);
+                            m_FiberModels[k]->SetFiberDirection(dir);
+                            DoubleDwiType::PixelType pix = doubleDwi->GetPixel(newIdx);
+                            pix += segmentVolume*frac*m_FiberModels[k]->SimulateMeasurement();
+                            doubleDwi->SetPixel(newIdx, pix );
+                            if (pix[baselineIndex]>maxVolume)
+                                maxVolume = pix[baselineIndex];
                         }
                     }
                 }
             }
         }
+    }
 
-        MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
-        ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
-        boost::progress_display disp3(m_TissueMask->GetLargestPossibleRegion().GetNumberOfPixels());
-        double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
+    MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
+    ImageRegionIterator<ItkUcharImgType> it3(m_TissueMask, m_TissueMask->GetLargestPossibleRegion());
+    boost::progress_display disp3(m_TissueMask->GetLargestPossibleRegion().GetNumberOfPixels());
+    double voxelVolume = m_UpsampledSpacing[0]*m_UpsampledSpacing[1]*m_UpsampledSpacing[2];
 
-        double fact = 1;
-        if (m_FiberRadius<0.0001)
-            fact = voxelVolume/maxVolume;
+    double fact = 1;
+    if (m_FiberRadius<0.0001)
+        fact = voxelVolume/maxVolume;
 
-        while(!it3.IsAtEnd())
+    while(!it3.IsAtEnd())
+    {
+        ++disp3;
+        DoubleDwiType::IndexType index = it3.GetIndex();
+
+        if (it3.Get()>0)
         {
-            ++disp3;
-            DoubleDwiType::IndexType index = it3.GetIndex();
-
-            if (it3.Get()>0)
+            // get fiber volume fraction
+            DoubleDwiType::Pointer fiberDwi = compartments.at(0);
+            DoubleDwiType::PixelType fiberPix = fiberDwi->GetPixel(index); // intra axonal compartment
+            if (fact>1) // auto scale intra-axonal if no fiber radius is specified
             {
-                // get fiber volume fraction
-                double w = 0;
-                for (int i=0; i<m_FiberModels.size(); i++)
-                {
-                    DoubleDwiType::PixelType pix = compartments.at(i)->GetPixel(index);
-                    if (fact<1)
-                    {
-                        pix *= fact;
-                        compartments.at(i)->SetPixel(index, pix);
-                    }
-                    w += pix[baselineIndex];
-                }
+                fiberPix *= fact;
+                fiberDwi->SetPixel(index, fiberPix);
+            }
+            double f = fiberPix[baselineIndex];
 
-                if (w>voxelVolume || w>0 && m_EnforcePureFiberVoxels)  // more fiber than space in voxel?
-                {
-                    // adjust fiber signal
-                    for (int i=0; i<m_FiberModels.size(); i++)
-                    {
-                        DoubleDwiType::Pointer doubleDwi = compartments.at(i);
-                        doubleDwi->SetPixel(index, doubleDwi->GetPixel(index)*voxelVolume/w);
-                    }
-                }
-                else
-                {
-                    w = voxelVolume-w;  // non-fiber volume
+            if (f>voxelVolume || f>0 && m_EnforcePureFiberVoxels)  // more fiber than space in voxel?
+            {
+                fiberDwi->SetPixel(index, fiberPix*voxelVolume/f);
 
-                    // adjust non-fiber signal
-                    for (int i=0; i<m_NonFiberModels.size(); i++)
-                    {
-                        DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
-                        DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*w*m_NonFiberModels[i]->GetWeight();
-                        doubleDwi->SetPixel(index, pix);
-                    }
+                for (int i=1; i<m_FiberModels.size(); i++)
+                {
+                    DoubleDwiType::PixelType pix; pix.Fill(0.0);
+                    compartments.at(i)->SetPixel(index, pix);
                 }
             }
-            ++it3;
+            else
+            {
+                double nonf = voxelVolume-f;    // non-fiber volume
+                double inter = 0;
+                if (m_FiberModels.size()>1)
+                    inter = nonf * f;           // intra-axonal fraction of non fiber compartment scales linearly with f
+                double other = nonf - inter;    // rest of compartment
+
+                // adjust non-fiber and intra-axonal signal
+                for (int i=1; i<m_FiberModels.size(); i++)
+                {
+                    DoubleDwiType::Pointer doubleDwi = compartments.at(i);
+                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
+                    if (pix[baselineIndex]>0)
+                        pix /= pix[baselineIndex];
+                    pix *= inter;
+                    doubleDwi->SetPixel(index, pix);
+                }
+                for (int i=0; i<m_NonFiberModels.size(); i++)
+                {
+                    DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
+                    DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*other*m_NonFiberModels[i]->GetWeight();
+                    doubleDwi->SetPixel(index, pix);
+                }
+            }
         }
+        ++it3;
     }
 
     // do k-space stuff
@@ -544,7 +528,6 @@ void TractsToDWIImageFilter::GenerateData()
     compartments = AddKspaceArtifacts(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
-    double correction = m_SignalScale; ///(m_Upsampling*m_Upsampling);
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -556,11 +539,11 @@ void TractsToDWIImageFilter::GenerateData()
 
         // adjust fiber signal
         for (int i=0; i<m_FiberModels.size(); i++)
-            signal += compartments.at(i)->GetPixel(index)*correction;
+            signal += compartments.at(i)->GetPixel(index)*m_SignalScale;
 
         // adjust non-fiber signal
         for (int i=0; i<m_NonFiberModels.size(); i++)
-            signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*correction;
+            signal += compartments.at(m_FiberModels.size()+i)->GetPixel(index)*m_SignalScale;
 
         DoubleDwiType::PixelType accu = signal; accu.Fill(0.0);
         for (int i=0; i<m_NumberOfRepetitions; i++)

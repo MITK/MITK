@@ -75,6 +75,7 @@ protected slots:
     void Comp1ModelFrameVisibility(int index);///< only show parameters of selected fiber model type
     void Comp2ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
     void Comp3ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void Comp4ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
     void ShowAdvancedOptions(int state);
 
     /** update fibers if any parameter changes */

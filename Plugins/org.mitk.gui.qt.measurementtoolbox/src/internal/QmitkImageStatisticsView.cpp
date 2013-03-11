@@ -89,8 +89,9 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*)(this->m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(OnIgnoreZerosCheckboxClicked()) );
     connect( (QObject*) this->m_CalculationThread, SIGNAL(finished()),this, SLOT( OnThreadedStatisticsCalculationEnds()),Qt::QueuedConnection);
     connect( (QObject*) this, SIGNAL(StatisticsUpdate()),this, SLOT( RequestStatisticsUpdate()), Qt::QueuedConnection);
-
     connect( (QObject*) this->m_Controls->m_StatisticsTable, SIGNAL(cellDoubleClicked(int,int)),this, SLOT( JumpToCoordinates(int,int)) );
+    connect( (QObject*) (this->m_Controls->m_barRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnBarRadioButtonSelected()));
+    connect( (QObject*) (this->m_Controls->m_lineRadioButton), SIGNAL(clicked()), (QObject*) (this->m_Controls->m_JSHistogram), SLOT(OnLineRadioButtonSelected()));
   }
 }
 
@@ -208,8 +209,24 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   }
 
   this->ReinitData();
+  if (!selectedNodes.size())
+  {
+    m_Controls->m_JSHistogram->ClearHistogram();
+    m_Controls->m_lineRadioButton->setEnabled(true);
+    m_Controls->m_barRadioButton->setEnabled(true);
+    m_Controls->m_InfoLabel->setText(QString(""));
+  }
   if(selectedNodes.size() == 1 || selectedNodes.size() == 2)
   {
+    bool isBinary = false;
+    selectedNodes.value(0)->GetBoolProperty("binary",isBinary);
+    if(isBinary)
+    {
+      m_Controls->m_JSHistogram->ClearHistogram();
+      m_Controls->m_lineRadioButton->setEnabled(true);
+      m_Controls->m_barRadioButton->setEnabled(true);
+      m_Controls->m_InfoLabel->setText(QString(""));
+    }
     for (int i= 0; i< selectedNodes.size(); ++i)
     {
       this->m_SelectedDataNodes.push_back(selectedNodes.at(i));
@@ -255,8 +272,6 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_ErrorMessageLabel->hide();
   this->InvalidateStatisticsTableView();
   m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-  m_Controls->m_HistogramWidget->ClearItemModel();
-  m_Controls->m_LineProfileWidget->ClearItemModel();
 }
 
 void QmitkImageStatisticsView::OnThreadedStatisticsCalculationEnds()
@@ -384,10 +399,12 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
       this->InvalidateStatisticsTableView();
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-      m_Controls->m_HistogramWidget->ClearItemModel();
-      m_Controls->m_LineProfileWidget->ClearItemModel();
+      m_Controls->m_JSHistogram->ClearHistogram();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
+      m_Controls->m_lineRadioButton->setEnabled(true);
+      m_Controls->m_barRadioButton->setEnabled(true);
+      m_Controls->m_InfoLabel->setText(QString(""));
       return;
     }
 
@@ -495,6 +512,10 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
 
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
+  m_Controls->m_lineRadioButton->setEnabled(true);
+  m_Controls->m_barRadioButton->setEnabled(true);
+  m_Controls->m_InfoLabel->setText(QString(""));
+
   if(m_DataNodeSelectionChanged)
   {
     this->m_StatisticsUpdatePending = false;
@@ -511,11 +532,12 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_CurrentStatisticsValid = true;
     }
 
+    if (m_Controls->m_barRadioButton->isChecked())
+    {
+      m_Controls->m_JSHistogram->OnBarRadioButtonSelected();
+    }
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-    m_Controls->m_HistogramWidget->SetHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
-    m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-    //int timeStep = this->m_CalculationThread->GetTimeStep();
+    m_Controls->m_JSHistogram->ComputeHistogram( this->m_CalculationThread->GetTimeStepHistogram().GetPointer() );
     this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
   }
   else
@@ -526,9 +548,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramWidget->ClearItemModel();
-    m_Controls->m_LineProfileWidget->ClearItemModel();
+    //m_Controls->m_JSHistogram->clearHistogram();
     m_CurrentStatisticsValid = false;
+
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
     if ( m_SelectedPlanarFigure != NULL )
@@ -540,19 +562,25 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-        m_Controls->m_HistogramWidget->ClearItemModel();
-        m_Controls->m_LineProfileWidget->ClearItemModel();
+        m_Controls->m_JSHistogram->ClearHistogram();
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
         m_Controls->m_SelectedMaskLabel->setText( "None" );
         this->m_StatisticsUpdatePending = false;
+        m_Controls->m_lineRadioButton->setEnabled(true);
+        m_Controls->m_barRadioButton->setEnabled(true);
+        m_Controls->m_InfoLabel->setText(QString(""));
         return;
       }
-      // TODO: enable line profile widget
-      m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
-      m_Controls->m_LineProfileWidget->SetImage( this->m_CalculationThread->GetStatisticsImage() );
-      m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
-      m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+      unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+      m_Controls->m_JSHistogram->SetImage(this->m_CalculationThread->GetStatisticsImage());
+      m_Controls->m_JSHistogram->SetPlanarFigure(m_SelectedPlanarFigure);
+      m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
+      m_Controls->m_lineRadioButton->setEnabled(false);
+      m_Controls->m_barRadioButton->setEnabled(false);
+      std::stringstream message;
+      message << "<font color='red'>Only linegraph available for an intesityprofile!</font>";
+      m_Controls->m_InfoLabel->setText(message.str().c_str());
     }
   }
   this->m_StatisticsUpdatePending = false;
@@ -576,9 +604,7 @@ void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
     double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + double(i)/sampling * direction);
     histogram->SetFrequency(i,d);
   }
-  m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-  m_Controls->m_HistogramWidget->SetHistogram( histogram );
-  m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
+  m_Controls->m_JSHistogram->ComputeHistogram( histogram );
 }
 
 void QmitkImageStatisticsView::FillStatisticsTableView(

@@ -14,5 +14,14 @@
         <file>btnRemovePoint.png</file>
         <file>btnSwapSets.png</file>
         <file>ModuleView.png</file>
+        <file>Histogram.html</file>
+        <file>Histogram.js</file>
+        <file>Histogram.css</file>
+        <file>d3.v2.js</file>
+        <file>exporting.js</file>
+        <file>highcharts.js</file>
+        <file>jquery-git.js</file>
+        <file>jquery-ui.js</file>
+        <file>HighChartsHistogram.js</file>
     </qresource>
 </RCC>

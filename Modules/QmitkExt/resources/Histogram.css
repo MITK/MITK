@@ -7,11 +7,6 @@ body {
     shape-rendering: crispEdges;
 }
 
-.area {
-    fill: steelblue;
-    opacity: 0.5;
-}
-
 .line {
     fill: none;
     stroke: black;
@@ -24,5 +19,10 @@ body {
     shape-rendering: crispEdges;
 }
 
-
-
+.infobox {
+    background-color: rgba(255, 255, 255, 0.75);
+    padding: 10px;
+    position: absolute;
+    width: 200px;
+    display: none;
+}

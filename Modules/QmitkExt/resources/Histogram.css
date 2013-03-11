@@ -1,0 +1,29 @@
+body {
+    font: 10px sans-serif;
+}
+
+/**.bar {
+    fill: grey;
+    opacity: 0.5;
+    shape-rendering: crispEdges;
+}
+
+.area {
+    fill: steelblue;
+    opacity: 0.5;
+}
+
+.line {
+    fill: none
+    stroke: black
+    stroke-width: 1
+}**/
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+
+

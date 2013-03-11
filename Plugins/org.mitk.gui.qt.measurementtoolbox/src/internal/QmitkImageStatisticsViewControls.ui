@@ -155,7 +155,7 @@
          <bool>true</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -269,7 +269,22 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget"/>
+        <widget class="QmitkHistogramJSWidget" name="m_JSHistogram">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+        <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
         <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget"/>
        </widget>
       </item>
@@ -308,7 +323,7 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="4" column="0">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -334,6 +349,12 @@
    <class>QmitkVtkLineProfileWidget</class>
    <extends>QWidget</extends>
    <header>QmitkVtkLineProfileWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkHistogramJSWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkHistogramJSWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

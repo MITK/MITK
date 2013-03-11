@@ -26,6 +26,8 @@ var tension = 0.8;
 var connected = false;
 var dur = 1000;
 var binSize = 10;
+var min;
+var max;
 
 /*
  * Connecting signals from qt side with JavaScript methods.
@@ -140,8 +142,8 @@ function updateHistogram()
  */
 function calcBinSize()
 {
-  var min = d3.min(histogramData.measurement);
-  var max = d3.max(histogramData.measurement);
+  min = d3.min(histogramData.measurement);
+  max = d3.max(histogramData.measurement);
   binSize = ((max - min) / (histogramData.measurement.length));
 }
 
@@ -462,10 +464,16 @@ function myMouseOver()
     .range(xScale.domain());
   var y = myBar.data();
   var x = reScale(myBar.attr("x"));
-
   myBar.style("fill", "red");
   d3.select(".infobox").style("display", "block");
-  d3.select(".measurement").text("Greyvalue: " + (Math.round(x)) + " ... " + (Math.round(x+binSize)));
+  if ((min >= 0) && (max <= 2)) //tooltip for float images
+  {
+    d3.select(".measurement").text("Greayvalue: " + (Math.round(x*1000)/1000));
+  }
+  else
+  {
+    d3.select(".measurement").text("Greyvalue: " + (Math.round(x*10)/10) + " ... " + (Math.round((x+binSize)*10)/10));
+  }
   d3.select(".frequency").text("Frequency: " + y);
 }
 

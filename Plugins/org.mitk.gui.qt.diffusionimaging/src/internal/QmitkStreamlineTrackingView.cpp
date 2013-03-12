@@ -210,7 +210,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     filter->SetG((float)m_Controls->m_gSlider->value()/100);
     filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
     filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
-    //filter->SetNumberOfThreads(1);
 
     if (m_SeedRoi.IsNotNull())
     {
@@ -235,11 +234,12 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);
-    QString name(m_TensorImageNode->GetName().c_str());
+    QString name("FiberBundle_");
+    name += m_TensorImageNode->GetName().c_str();
     name += "_Streamline";
     node->SetName(name.toStdString());
     node->SetVisibility(true);
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_TensorImageNode);
 }
 
 

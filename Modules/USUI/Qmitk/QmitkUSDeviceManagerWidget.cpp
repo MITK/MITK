@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#define _USE_MATH_DEFINES
 #include <QmitkUSDeviceManagerWidget.h>
+#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
 
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
@@ -97,5 +99,18 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(mitk::ServiceReference
     m_Controls->m_BtnDisconnect->setEnabled(true);
     m_Controls->m_BtnActivate->setText("Activate");
   }
+}
+
+void QmitkUSDeviceManagerWidget::DisconnectAllDevices()
+{
+//at the moment disconnects ALL devices. Maybe we only want to disconnect the devices handled by this widget?
+mitk::ModuleContext* thisContext = mitk::GetModuleContext();
+std::list<mitk::ServiceReference> services = thisContext->GetServiceReferences<mitk::USDevice>();
+for(std::list<mitk::ServiceReference>::iterator it = services.begin(); it != services.end(); ++it)
+    {
+    mitk::USDevice::Pointer currentDevice = thisContext->GetService<mitk::USDevice>(*it);
+    currentDevice->Disconnect();
+    }
+MITK_INFO << "Disconnected ALL US devises!";
 }
 

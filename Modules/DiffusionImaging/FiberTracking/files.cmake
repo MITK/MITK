@@ -86,5 +86,5 @@ set(H_FILES
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkT2SmearingArtifact.h
+  SignalModels/mitkSignalDecay.h
 )

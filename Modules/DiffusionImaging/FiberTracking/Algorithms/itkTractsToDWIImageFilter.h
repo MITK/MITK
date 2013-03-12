@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkKspaceArtifact.h>
 #include <mitkGibbsRingingArtifact.h>
-#include <mitkT2SmearingArtifact.h>
+#include <mitkSignalDecay.h>
 
 // ITK
 #include <itkImage.h>

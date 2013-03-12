@@ -1253,7 +1253,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>T2* Relaxation:  </string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1314,7 +1314,7 @@
              <item row="4" column="1">
               <widget class="QSpinBox" name="m_T2starBox">
                <property name="toolTip">
-                <string>T2* relaxation time (in milliseconds).</string>
+                <string>Relaxation time due to magnetic field inhomogeneities (T2', in milliseconds).</string>
                </property>
                <property name="minimum">
                 <number>1</number>
@@ -1387,7 +1387,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Echo Time TE:  </string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Time &lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;:  &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>

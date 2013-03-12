@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDotModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
-#include <mitkT2SmearingArtifact.h>
+#include <mitkSignalDecay.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
 
@@ -1005,8 +1005,8 @@ void QmitkFiberfoxView::GenerateImage()
             artifactList.push_back(&gibbsModel);
         }
 
-        mitk::T2SmearingArtifact<double> contrastModel;
-        contrastModel.SetT2star(this->m_Controls->m_T2starBox->value());
+        mitk::SignalDecay<double> contrastModel;
+        contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
         contrastModel.SetTE(this->m_Controls->m_TEbox->value());
         contrastModel.SetTline(m_Controls->m_LineReadoutTimeBox->value());
         artifactList.push_back(&contrastModel);
@@ -1058,10 +1058,15 @@ void QmitkFiberfoxView::GenerateImage()
                             +artifactModelString.toStdString());
         GetDataStorage()->Add(resultNode, m_SelectedBundles.at(i));
 
+        resultNode->AddProperty("Fiberfox.InterpolationShrink", IntProperty::New(m_Controls->m_InterpolationShrink->value()));
+        resultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(m_Controls->m_SignalScaleBox->value()));
+        resultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(m_Controls->m_FiberRadius->value()));
+        resultNode->AddProperty("Fiberfox.Tinhom", IntProperty::New(m_Controls->m_T2starBox->value()));
         resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
         resultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(m_Controls->m_RepetitionsBox->value()));
         resultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(bVal));
         resultNode->AddProperty("Fiberfox.Model", StringProperty::New(signalModelString.toStdString()));
+        resultNode->AddProperty("Fiberfox.PureFiberVoxels", BoolProperty::New(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked()));
         resultNode->AddProperty("binary", BoolProperty::New(false));
         resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(filter->GetLevelWindow()) );
 

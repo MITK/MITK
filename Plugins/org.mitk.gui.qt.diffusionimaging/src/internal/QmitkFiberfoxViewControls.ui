@@ -924,7 +924,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="5" column="0">
-        <widget class="QGroupBox" name="groupBox_9">
+        <widget class="QGroupBox" name="m_IntraAxonalGroupBox">
          <property name="title">
           <string>Intra-axonal Compartment</string>
          </property>
@@ -1479,7 +1479,7 @@
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>2.500000000000000</double>
+                <double>2.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1505,7 +1505,7 @@
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>2.500000000000000</double>
+                <double>2.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1524,7 +1524,7 @@
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>2.500000000000000</double>
+                <double>2.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1550,7 +1550,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>32</number>
+                <number>11</number>
                </property>
               </widget>
              </item>
@@ -1569,7 +1569,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>32</number>
+                <number>11</number>
                </property>
               </widget>
              </item>
@@ -1588,7 +1588,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>5</number>
+                <number>3</number>
                </property>
               </widget>
              </item>

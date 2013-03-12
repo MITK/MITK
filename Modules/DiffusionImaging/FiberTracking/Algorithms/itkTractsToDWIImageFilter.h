@@ -83,6 +83,7 @@ public:
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
+    mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
 
     void GenerateData();
 
@@ -122,6 +123,7 @@ protected:
     double                              m_InterpolationShrink;
     double                              m_FiberRadius;
     double                              m_SignalScale;
+    mitk::LevelWindow                   m_LevelWindow;
 };
 }
 

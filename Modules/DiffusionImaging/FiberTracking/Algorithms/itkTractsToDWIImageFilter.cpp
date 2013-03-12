@@ -528,6 +528,7 @@ void TractsToDWIImageFilter::GenerateData()
     compartments = AddKspaceArtifacts(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
+    unsigned int window = 0;
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -559,10 +560,14 @@ void TractsToDWIImageFilter::GenerateData()
                 signal[i] = floor(signal[i]+0.5);
             else
                 signal[i] = ceil(signal[i]-0.5);
+            if (!m_FiberModels.at(0)->IsBaselineIndex(i) && signal[i]>window)
+                window = signal[i];
         }
         it4.Set(signal);
         ++it4;
     }
+    unsigned int level = window/2;
+    m_LevelWindow = mitk::LevelWindow(level, window);
 
     this->SetNthOutput(0, outImage);
 }

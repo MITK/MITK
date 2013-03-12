@@ -6,12 +6,6 @@ set(SRC_CPP_FILES
   QmitkTbssRoiAnalysisWidget.cpp
   QmitkResidualAnalysisWidget.cpp
   QmitkResidualViewWidget.cpp
-  QmitkTensorModelParametersWidget.cpp
-  QmitkZeppelinModelParametersWidget.cpp
-  QmitkStickModelParametersWidget.cpp
-  QmitkDotModelParametersWidget.cpp
-  QmitkBallModelParametersWidget.cpp
-  QmitkAstrosticksModelParametersWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -42,6 +36,7 @@ set(INTERNAL_CPP_FILES
   QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
+  QmitkFiberExtractionView.cpp
 )
 
 set(UI_FILES
@@ -67,12 +62,7 @@ set(UI_FILES
   src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
-  src/QmitkTensorModelParametersWidgetControls.ui
-  src/QmitkZeppelinModelParametersWidgetControls.ui
-  src/QmitkStickModelParametersWidgetControls.ui
-  src/QmitkDotModelParametersWidgetControls.ui
-  src/QmitkBallModelParametersWidgetControls.ui
-  src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/internal/QmitkFiberExtractionViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -107,12 +97,7 @@ set(MOC_H_FILES
   src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
-  src/QmitkTensorModelParametersWidget.h
-  src/QmitkZeppelinModelParametersWidget.h
-  src/QmitkStickModelParametersWidget.h
-  src/QmitkDotModelParametersWidget.h
-  src/QmitkBallModelParametersWidget.h
-  src/QmitkAstrosticksModelParametersWidget.h
+  src/internal/QmitkFiberExtractionView.h
 )
 
 set(CACHED_RESOURCE_FILES

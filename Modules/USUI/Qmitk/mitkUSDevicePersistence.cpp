@@ -112,7 +112,8 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 MITK_INFO << "Input String: " << s.toStdString();
 std::vector<std::string> data;
 std::string seperators = "|";
-split(s.toStdString(),seperators,data);
+std::string text = s.toStdString();
+split(text,seperators,data);
 if(data.size() != 13)
   {
   MITK_ERROR << "Cannot parse US device! (Size: " << data.size() << ")";

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef _MITK_T2SmearingArtifact_H
-#define _MITK_T2SmearingArtifact_H
+#ifndef _MITK_SignalDecay_H
+#define _MITK_SignalDecay_H
 
 #include <FiberTrackingExports.h>
 #include <mitkKspaceArtifact.h>
@@ -29,23 +29,23 @@ namespace mitk {
   *
   */
 template< class ScalarType >
-class T2SmearingArtifact : public KspaceArtifact< ScalarType >
+class SignalDecay : public KspaceArtifact< ScalarType >
 {
 public:
 
-    T2SmearingArtifact();
-    ~T2SmearingArtifact();
+    SignalDecay();
+    ~SignalDecay();
 
     typedef typename KspaceArtifact< ScalarType >::ComplexSliceType ComplexSliceType;
 
-    /** Attenuate signal according to given T2 time. **/
+    /** Attenuate signal according to given relaxation times. **/
     typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice);
 
 protected:
 
 };
 
-#include "mitkT2SmearingArtifact.cpp"
+#include "mitkSignalDecay.cpp"
 
 }
 

@@ -79,10 +79,12 @@ set(H_FILES
   SignalModels/mitkDiffusionSignalModel.h
   SignalModels/mitkTensorModel.h
   SignalModels/mitkBallModel.h
+  SignalModels/mitkDotModel.h
+  SignalModels/mitkAstroStickModel.h
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkT2SmearingArtifact.h
+  SignalModels/mitkSignalDecay.h
 )

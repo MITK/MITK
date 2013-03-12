@@ -1438,7 +1438,7 @@
              <string notr="true">color: rgb(255, 0, 0);</string>
             </property>
             <property name="text">
-             <string>Using mask image geometry!</string>
+             <string>Using  geometry of selected image!</string>
             </property>
            </widget>
           </item>

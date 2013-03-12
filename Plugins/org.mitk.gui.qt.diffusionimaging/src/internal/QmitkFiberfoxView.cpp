@@ -732,6 +732,18 @@ void QmitkFiberfoxView::GenerateImage()
         return;
     }
 
+    if (m_SelectedImage.IsNotNull())
+    {
+        mitk::Image* img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
+        itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
+        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
+
+        imageRegion = itkImg->GetLargestPossibleRegion();
+        spacing = itkImg->GetSpacing();
+        origin = itkImg->GetOrigin();
+        directionMatrix = itkImg->GetDirection();
+    }
+
     DiffusionSignalModel<double>::GradientListType gradientList;
     double bVal = 1000;
     if (m_SelectedDWI.IsNull())
@@ -1336,7 +1348,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_TissueMask.IsNotNull())
+    if (m_TissueMask.IsNotNull() || m_SelectedImage.IsNotNull())
     {
         m_Controls->m_GeometryMessage->setVisible(true);
         m_Controls->m_GeometryFrame->setEnabled(false);

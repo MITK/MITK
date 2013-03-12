@@ -122,14 +122,9 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mouseReleaseMitkEvent(&myevent);
+    this->mouseMoveMitkEvent(&myevent);
   }
-
-  mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-  this->mouseMoveMitkEvent(&myevent);
-
   QVTKWidget::mouseMoveEvent(me);
-
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)

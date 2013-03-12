@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkFiberProcessingView_h
-#define QmitkFiberProcessingView_h
+#ifndef QmitkFiberExtractionView_h
+#define QmitkFiberExtractionView_h
 
 #include <QmitkFunctionality.h>
-#include "ui_QmitkFiberProcessingViewControls.h"
+#include "ui_QmitkFiberExtractionViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
 #include <mitkFiberBundleX.h>
@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkFiberProcessingView : public QmitkFunctionality
+class QmitkFiberExtractionView : public QmitkFunctionality
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -59,8 +59,8 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkFiberProcessingView();
-  virtual ~QmitkFiberProcessingView();
+  QmitkFiberExtractionView();
+  virtual ~QmitkFiberExtractionView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -70,19 +70,26 @@ public:
 
 protected slots:
 
-  void PruneBundle();               ///< remove too short/too long fibers
-  void MirrorFibers();              ///< mirror bundle on the specified plane
-  void ProcessSelectedBundles();    ///< start selected operation on fiber bundle (e.g. tract density image generation)
-  void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
-  void DoImageColorCoding();        ///< color fibers by selected scalar image
-  void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
+  void OnDrawCircle();          ///< add circle interactors etc.
+  void OnDrawPolygon();         ///< add circle interactors etc.
+  void DoFiberExtraction();     ///< Extract fibers from selected bundle
+  void GenerateAndComposite();
+  void GenerateOrComposite();
+  void GenerateNotComposite();
+  void JoinBundles();               ///< merge selected fiber bundles
+  void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
+  void GenerateRoiImage();          ///< generate binary image of selected planar figures.
+  void ExtractPassingMask();                 ///< extract all fibers passing the selected surface mesh
+  void ExtractEndingInMask();               ///< extract all fibers passing the selected surface mesh
+
+  virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
-  Ui::QmitkFiberProcessingViewControls* m_Controls;
+  Ui::QmitkFiberExtractionViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
   /** Connection from VTK to ITK */
@@ -137,11 +144,22 @@ protected:
   void GenerateStats(); ///< generate statistics of selected fiber bundles
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
+  int m_CircleCounter;                                      ///< used for data node naming
+  int m_PolygonCounter;                                     ///< used for data node naming
   std::vector<mitk::DataNode::Pointer>  m_SelectedFB;       ///< selected fiber bundle nodes
-  mitk::Image::Pointer                  m_SelectedImage;
-  float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
+  std::vector<mitk::DataNode::Pointer>  m_SelectedPF;       ///< selected planar figure nodes
   std::vector<mitk::Surface::Pointer>   m_SelectedSurfaces;
+  mitk::Image::Pointer                  m_SelectedImage;
+  mitk::Image::Pointer                  m_InternalImage;
+  mitk::PlanarFigure::Pointer           m_PlanarFigure;
+  itkUCharImageType::Pointer            m_InternalImageMask3D;
+  itkUCharImageType::Pointer            m_PlanarFigureImage;
+  float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
+  mitk::DataNode::Pointer               m_MaskImageNode;
 
+  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
+  void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
+  void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);

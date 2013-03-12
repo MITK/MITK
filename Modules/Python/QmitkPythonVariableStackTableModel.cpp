@@ -149,9 +149,9 @@ QVariant QmitkPythonVariableStackTableModel::headerData(int section, Qt::Orienta
             if(section == 0)
                 headerData = "Attribute";
             else if(section == 1)
-                headerData = "Value";
-            else if(section == 2)
                 headerData = "Type";
+            else if(section == 2)
+                headerData = "Value";
         }
     }
 
@@ -188,9 +188,9 @@ QVariant QmitkPythonVariableStackTableModel::data(const QModelIndex &index, int 
             if(index.column() == 0)
               return QString::fromStdString(item.m_Name);
             if(index.column() == 1)
-                return QString::fromStdString(item.m_Value);
-            if(index.column() == 2)
                 return QString::fromStdString(item.m_Type);
+            if(index.column() == 2)
+                return QString::fromStdString(item.m_Value);
         }
     }
     return QVariant();

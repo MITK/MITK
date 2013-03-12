@@ -64,10 +64,13 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     }
 
     QString varName = QString::fromStdString( variableStack.at(row).m_Name );
+    QString type = QString::fromStdString( variableStack.at(row).m_Type );
 
     {
-      MITK_DEBUG("QmitkPythonVariableStackTableView") << varName.toStdString();
+      MITK_DEBUG("QmitkPythonVariableStackTableView") << "varName: " << varName.toStdString();
+      MITK_DEBUG("QmitkPythonVariableStackTableView") << "type: " << type.toStdString();
     }
+
     mitk::Image::Pointer mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
 
     if( mitkImage.IsNotNull() )

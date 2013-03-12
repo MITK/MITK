@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const QString mitk::PythonService::m_TmpImageName("temp_mitk_image");
 
 mitk::PythonService::PythonService()
-  : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true )
+  : m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true ), m_ErrorOccured( false )
 {
   {
     MITK_DEBUG << "will init python if necessary";
@@ -149,7 +149,10 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
         commandIssued = false;
 
     if(commandIssued)
+    {
         this->NotifyObserver(pythonCommand.toStdString());
+        m_ErrorOccured = PythonQt::self()->handleError();
+    }
 
     return result.toString().toStdString();
 }
@@ -166,24 +169,28 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
     PyObject* dict = PyImport_GetModuleDict();
     PyObject* object = PyDict_GetItemString(dict, "__main__");
     PyObject* dirMain = PyObject_Dir(object);
-    PyObject* tempObject;
+    PyObject* tempObject = 0;
+    PyObject* strTempObject = 0;
 
     if(dirMain)
     {
-      std::string attr, attrValue, attrType;
+      std::string name, attrValue, attrType;
 
       for(int i = 0; i<PyList_Size(dirMain); i++)
       {
         tempObject = PyList_GetItem(dirMain, i);
-        attr = PyString_AsString(tempObject);
-        tempObject = PyObject_GetAttrString(object, attr.c_str());
+        name = PyString_AsString(tempObject);
+        tempObject = PyObject_GetAttrString( object, name.c_str() );
         attrType = tempObject->ob_type->tp_name;
-        if(PyUnicode_Check(tempObject) || PyString_Check(tempObject))
-          attrValue = PyString_AsString(tempObject);
+
+        strTempObject = PyObject_Repr(tempObject);
+        if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
+          attrValue = PyString_AsString(strTempObject);
         else
           attrValue = "";
+
         mitk::PythonVariable var;
-        var.m_Name = attr;
+        var.m_Name = name;
         var.m_Value = attrValue;
         var.m_Type = attrType;
         list.push_back(var);
@@ -191,6 +198,23 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
     }
 
     return list;
+}
+
+bool mitk::PythonService::DoesVariableExist(const std::string& name) const
+{
+  bool varExists = false;
+
+  std::vector<mitk::PythonVariable> allVars = this->GetVariableStack();
+  for(int i = 0; i< allVars.size(); i++)
+  {
+    if( allVars.at(i).m_Name == name )
+    {
+      varExists = true;
+      break;
+    }
+  }
+
+  return varExists;
 }
 
 void mitk::PythonService::AddPythonCommandObserver(mitk::PythonCommandObserver *observer)
@@ -477,7 +501,8 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
-  this->Execute( "import itk", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
+
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
   return m_ItkWrappingAvailable;
@@ -485,7 +510,7 @@ bool mitk::PythonService::IsItkPythonWrappingAvailable()
 
 bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 {
-  this->Execute( "import cv2", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import cv2\n", IPythonService::SINGLE_LINE_COMMAND );
   m_OpenCVWrappingAvailable = !this->PythonErrorOccured();
 
   return m_OpenCVWrappingAvailable;
@@ -501,6 +526,6 @@ bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 
 bool mitk::PythonService::PythonErrorOccured() const
 {
-  return m_PythonManager.pythonErrorOccured();
+  return m_ErrorOccured;
 }
 

@@ -82,6 +82,9 @@ namespace mitk
         /// \return The list of variables in the __main__ namespace
         virtual std::vector<PythonVariable> GetVariableStack() const = 0;
         ///
+        /// \return true if a variable with this name is defined in the __main__ namespace, false otherwise
+        virtual bool DoesVariableExist(const std::string& name) const = 0;
+        ///
         /// adds a command observer which is informed after a command was issued with "Execute"
         virtual void AddPythonCommandObserver( PythonCommandObserver* observer ) = 0;
         ///

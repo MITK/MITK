@@ -1,0 +1,10 @@
+/**
+\page org_mitk_gui_qt_python The Python Plugin
+
+Available sections:
+  - \ref org_mitk_gui_qt_pythonOverview
+
+\section org_mitk_gui_qt_pythonOverview Overview
+The Python view provides the graphical front end to run Python code through the mitkPython module. Furthermore the ITK/VTK/OpenCV Python wrapping can be used.
+
+*/

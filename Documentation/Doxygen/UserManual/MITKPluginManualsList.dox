@@ -23,6 +23,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_views_volumevisualization
   \li \subpage org_mitk_gui_qt_dicom
   \li \subpage org_mitk_gui_qt_ultrasound
+  \li \subpage org_mitk_gui_qt_python
 
 \section PluginListPageDevPluginList List of Plugins for Developer Use and Examples
 

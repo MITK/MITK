@@ -49,6 +49,9 @@ namespace mitk
       /// \see IPythonService::GetVariableStack()
       std::vector<PythonVariable> GetVariableStack() const;
       ///
+      /// \see IPythonService::DoesVariableExist()
+      bool DoesVariableExist(const std::string& name) const;
+      ///
       /// \see IPythonService::AddPythonCommandObserver()
       void AddPythonCommandObserver( PythonCommandObserver* observer );
       ///
@@ -96,6 +99,7 @@ namespace mitk
       bool m_ItkWrappingAvailable;
       bool m_OpenCVWrappingAvailable;
       bool m_VtkWrappingAvailable;
+      bool m_ErrorOccured;
   };
 }
 #endif

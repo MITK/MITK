@@ -1005,6 +1005,11 @@ void QmitkFiberfoxView::GenerateImage()
             artifactList.push_back(&gibbsModel);
         }
 
+        if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )
+        {
+            this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
+            QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
+        }
         mitk::SignalDecay<double> contrastModel;
         contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
         contrastModel.SetTE(this->m_Controls->m_TEbox->value());

@@ -91,11 +91,11 @@ namespace mitk
       /// \return the ctk abstract python manager instance
       ctkAbstractPythonManager* GetPythonManager();
   protected:
-      QString GetTempImageName(const std::string &ext) const;
+      QString GetTempDataFileName(const std::string &ext) const;
   private:
       QList<PythonCommandObserver*> m_Observer;
       ctkAbstractPythonManager m_PythonManager;
-      static const QString m_TmpImageName;
+      static const QString m_TmpDataFileName;
       bool m_ItkWrappingAvailable;
       bool m_OpenCVWrappingAvailable;
       bool m_VtkWrappingAvailable;

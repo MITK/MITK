@@ -117,7 +117,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
 
               if( j > 0 )
                 varName = QString("%1%2").arg(MITK_SURFACE_VAR_NAME).arg(j);
-              MITK_DEBUG("varName") << "varName" << varName;
+              MITK_DEBUG("varName") << "varName" << varName.toStdString();
 
               if( m_PythonService->IsVtkPythonWrappingAvailable() )
               {

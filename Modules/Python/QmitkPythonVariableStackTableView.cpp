@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <mitkGetModuleContext.h>
 #include <mitkRenderingManager.h>
+#include <mitkSurface.h>
 
 QmitkPythonVariableStackTableView::QmitkPythonVariableStackTableView(QWidget *parent)
     :QTableView(parent)
@@ -65,23 +66,42 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
 
     QString varName = QString::fromStdString( variableStack.at(row).m_Name );
     QString type = QString::fromStdString( variableStack.at(row).m_Type );
+    QString value = QString::fromStdString( variableStack.at(row).m_Value );
 
     {
       MITK_DEBUG("QmitkPythonVariableStackTableView") << "varName: " << varName.toStdString();
       MITK_DEBUG("QmitkPythonVariableStackTableView") << "type: " << type.toStdString();
     }
 
-    mitk::Image::Pointer mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
+    mitk::Image::Pointer mitkImage;
+    mitk::Surface::Pointer mitkSurface;
+
+    if( type.startsWith("itkImage") )
+    {
+      mitkImage = m_PythonService->CopyItkImageFromPython(varName.toStdString());
+    }
+    else if( type.startsWith("numpy.ndarray") )
+    {
+      mitkImage = m_PythonService->CopyCvImageFromPython(varName.toStdString());
+    }
+    else if( value.startsWith("(vtkPolyData)") )
+    {
+      mitkSurface = m_PythonService->CopyVtkPolyDataFromPython(varName.toStdString());
+    }
+
+    std::string nodeName = varName.toStdString();
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetName ( nodeName );
 
     if( mitkImage.IsNotNull() )
     {
-        std::string nodeName = varName.toStdString();
-        mitk::DataNode::Pointer node = mitk::DataNode::New();
-        node->SetName ( nodeName );
-        m_DataStorage->Add(node);
-
-        node->SetData( mitkImage );
-
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      node->SetData( mitkImage );
     }
+    else if( mitkSurface.IsNotNull() )
+    {
+      node->SetData( mitkSurface );
+    }
+
+    m_DataStorage->Add(node);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

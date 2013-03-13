@@ -60,6 +60,11 @@ public:
      */
     virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
+    OutputType* GetOutput(const DataObjectIdentifierType & key);
+    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+
 //    /**
 //     * Allows to set the output of the point set source.
 //     * @param output the intended output of the point set source

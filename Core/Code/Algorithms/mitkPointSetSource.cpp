@@ -46,6 +46,26 @@ itk::DataObject::Pointer mitk::PointSetSource::MakeOutput( const DataObjectIdent
   return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
+mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::PointSetSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::PointSetSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::PointSetSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::PointSetSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
 void mitk::PointSetSource::GraftOutput(OutputType *graft)
 {
   this->GraftNthOutput(0, graft);

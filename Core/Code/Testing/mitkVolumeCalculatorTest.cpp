@@ -37,7 +37,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
       nodeReader->SetFileName(filename);
       nodeReader->Update();
 
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = nodeReader->GetOutput(0);
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
        MITK_TEST_CONDITION_REQUIRED(
          image.IsNotNull()
@@ -63,7 +63,7 @@ int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
       nodeReader->SetFileName(filename3D);
       nodeReader->Update();
 
-      node = nodeReader->GetOutput();
+      node = nodeReader->GetOutput(0);
       image = dynamic_cast<mitk::Image*>(node->GetData());
 
        volumeCalculator->SetImage(image);

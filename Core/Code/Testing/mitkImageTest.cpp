@@ -48,7 +48,7 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
   }
 
   {
-    mitk::Image::Pointer image = imageReader->GetOutput();
+    mitk::Image::Pointer image = imageReader->GetOutput(0);
     vtkImageData* vtk = image->GetVtkImageData();
 
     if(vtk == NULL)

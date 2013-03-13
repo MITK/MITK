@@ -320,7 +320,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
             sliceselector->SetTimeNr(0);
             sliceselector->SetInput(miktTexture);
             sliceselector->Update();
-            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
+            vtkTxture->SetInput(sliceselector->GetOutput(0)->GetVtkImageData());
         }
         else //or just use the 2D image
         {

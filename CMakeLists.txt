@@ -154,6 +154,10 @@ option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
+if(MITK_USE_Python)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  FIND_PACKAGE(PythonInterp REQUIRED)
+endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CTK
@@ -706,6 +710,11 @@ if(MITK_USE_BLUEBERRY)
     set(MITK_PLUGIN_USE_FILE )
   endif()
 
+  # 11.3.13, change, muellerm: activate python bundle if python and blueberry is active
+  if( MITK_USE_Python )
+    set(MITK_BUILD_org.mitk.gui.qt.python ON)
+  endif()
+
 endif()
 
 # Construct a list of paths containing runtime directories
@@ -755,14 +764,11 @@ endif()
 #-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
+option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
 
-set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
-set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
 if(MITK_USE_Python)
-  add_subdirectory(Wrapping)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
 endif()
-
 #-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------

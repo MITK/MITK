@@ -1,0 +1,17 @@
+/**
+
+\page mitkPython_Overview The MITK Python Module
+
+<h1>Brief description</h1>
+The MITK Python Module provides a service class for interactively run python code (passed as C++ strings) and evaluate the results. Furthermore the service class offers means to convert an MITK Image to an ITK/OpenCV image in their wrapped python environment. <strong>Thus, one can process MITK images with Python Code from the OpenCV and ITK wrapping system</strong>. Furthermore one can convert an mitk::Surface to a vtkPolyData in its Python environment.<br />
+Under the hood, the MITK build system takes care that the wrapping build process for ITK/VTK/OpenCV is correctly initiated and all paths are correctly set within MITK code.
+
+<h1>Build Instructions</h1>
+- Install Python <b>2.x</b>
+- Activate MITK_USE_Python in the superbuild process of MITK
+- Provide CMake with the correct Python paths (if not found automatically)
+- Build MITK: All wrapping will be setup by the MITK superbuild routine
+
+<h1>Known problems and workarounds</h1>
+
+ */

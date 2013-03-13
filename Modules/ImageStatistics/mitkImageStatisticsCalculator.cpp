@@ -69,7 +69,11 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_MaskingModeChanged( false ),
   m_IgnorePixelValue(0.0),
   m_DoIgnorePixelValue(false),
-  m_IgnorePixelValueChanged(false)
+  m_IgnorePixelValueChanged(false),
+  m_PlanarFigureAxis (0),
+  m_PlanarFigureSlice (0),
+  m_PlanarFigureCoordinate0 (0),
+  m_PlanarFigureCoordinate1 (0)
 {
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
@@ -1023,12 +1027,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
         statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
 
-        typename MinMaxFilterType::IndexType tempMaxIndex;
-        typename MinMaxFilterType::IndexType tempMinIndex;
-
-        tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
-        tempMinIndex = minMaxFilter->GetIndexOfMinimum();
-
+        typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
+        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
 
 // FIX BUG 14644
         //If a PlanarFigure is used for segmentation the

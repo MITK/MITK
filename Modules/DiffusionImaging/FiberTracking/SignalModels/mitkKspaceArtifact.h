@@ -33,7 +33,13 @@ class KspaceArtifact
 {
 public:
 
-    KspaceArtifact(){ m_T2=90; }
+    KspaceArtifact()
+        : m_T2(2000)
+        , m_TE(100)
+        , m_Tinhom(50)
+        , m_LineReadoutTime(1)
+    {
+    }
     ~KspaceArtifact(){}
 
     typedef typename itk::FFTRealToComplexConjugateImageFilter< ScalarType, 2 >::OutputImageType ComplexSliceType;
@@ -41,12 +47,18 @@ public:
     /** Adds artifact according to model to the input slice. Has to be implemented in subclass. **/
     virtual typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice) = 0;
 
-    void SetRelaxationT2(unsigned int T2){ m_T2=T2; }
+    // all times stored internally in µ seconds, input in milliseconds
+    void SetTline(double LineReadoutTime){ m_LineReadoutTime=LineReadoutTime; }
+    void SetTE(double TE){ m_TE=TE; }
+    void SetT2(double T2){ m_T2=T2; }
+    void SetTinhom(unsigned int Tinhom){ m_Tinhom=Tinhom; }
 
 protected:
 
-    unsigned int  m_T2;
-
+    double    m_Tinhom;
+    double    m_T2;
+    double    m_TE;
+    double    m_LineReadoutTime;
 };
 
 }

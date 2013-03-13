@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimulation.h"
 #include "mitkSimulationDrawTool.h"
-#include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkFloatArray.h>
@@ -38,19 +37,6 @@ mitk::SimulationDrawTool::SimulationDrawTool()
 
 mitk::SimulationDrawTool::~SimulationDrawTool()
 {
-  this->DeleteVtkObjects();
-}
-
-void mitk::SimulationDrawTool::DeleteVtkObjects()
-{
-  for (std::vector<vtkObjectBase*>::const_iterator object = m_VtkObjects.begin(); object != m_VtkObjects.end(); ++object)
-    (*object)->Delete();
-
-  m_VtkObjects.clear();
-
-  for (std::vector<vtkActor*>::const_iterator actor = m_Actors.begin(); actor != m_Actors.end(); ++actor)
-    (*actor)->Delete();
-
   m_Actors.clear();
 }
 
@@ -59,8 +45,7 @@ void mitk::SimulationDrawTool::DisableUpdate()
   m_Update = false;
 }
 
-
-std::vector<vtkActor*> mitk::SimulationDrawTool::GetActors() const
+std::vector<vtkSmartPointer<vtkActor> > mitk::SimulationDrawTool::GetActors() const
 {
   return m_Actors;
 }
@@ -75,7 +60,7 @@ void mitk::SimulationDrawTool::InitProperty(vtkProperty* property) const
 
 void mitk::SimulationDrawTool::Reset()
 {
-  this->DeleteVtkObjects();
+  m_Actors.clear();
   m_Update = true;
 }
 
@@ -86,10 +71,10 @@ void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>& points, fl
 
   unsigned int numPoints = points.size();
 
-  vtkPoints* vtkPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
-  vtkCellArray* cellArray = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> cellArray = vtkSmartPointer<vtkCellArray>::New();
 
   for (unsigned int i = 0; i < numPoints; ++i)
   {
@@ -98,17 +83,14 @@ void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>& points, fl
     cellArray->InsertCellPoint(i);
   }
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(vtkPoints);
   polyData->SetVerts(cellArray);
 
-  vtkPoints->Delete();
-  cellArray->Delete();
-
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
@@ -116,8 +98,6 @@ void mitk::SimulationDrawTool::drawPoints(const std::vector<Vector3>& points, fl
   property->SetColor(color.x(), color.y(), color.z());
   property->SetPointSize(pointSize);
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
@@ -142,18 +122,16 @@ void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, con
 
   unsigned int numPoints = points.size();
 
-  vtkPoints* vtkPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
     vtkPoints->SetPoint(i, points[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(vtkPoints);
 
-  vtkPoints->Delete();
-
-  vtkCellArray* lines = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
   unsigned int numIndices = indices.size();
 
@@ -166,12 +144,10 @@ void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, con
 
   polyData->SetLines(lines);
 
-  lines->Delete();
-
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
@@ -179,8 +155,6 @@ void mitk::SimulationDrawTool::drawLines(const std::vector<Vector3>& points, con
   property->SetLineWidth(lineWidth);
   property->SetColor(color.x(), color.y(), color.z());
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
@@ -191,18 +165,16 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   unsigned int numPoints = points.size();
 
-  vtkPoints* vtkPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
     vtkPoints->SetPoint(i, points[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(vtkPoints);
 
-  vtkPoints->Delete();
-
-  vtkCellArray* triangles = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
 
   for (unsigned int i = 0; i < points.size(); i += 3)
   {
@@ -214,29 +186,22 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   polyData->SetPolys(triangles);
 
-  triangles->Delete();
-
-  vtkPolyDataNormals* polyDataNormals = vtkPolyDataNormals::New();
+  vtkSmartPointer<vtkPolyDataNormals> polyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
   polyDataNormals->ComputeCellNormalsOff();
   polyDataNormals->SetInput(polyData);
   polyDataNormals->SplittingOff();
 
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyDataNormals->GetOutput());
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
   vtkProperty* property = actor->GetProperty();
-
   this->InitProperty(property);
-
   property->SetColor(color.x(), color.y(), color.z());
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
-  m_VtkObjects.push_back(polyDataNormals);
   m_Actors.push_back(actor);
 }
 
@@ -246,19 +211,18 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
     return;
 
   unsigned int numPoints = points.size();
+  unsigned int numNormals = numPoints / 3;
 
-  vtkPoints* vtkPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
     vtkPoints->SetPoint(i, points[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(vtkPoints);
 
-  vtkPoints->Delete();
-
-  vtkCellArray* triangles = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
 
   for (unsigned int i = 0; i < points.size(); i += 3)
   {
@@ -270,34 +234,27 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   polyData->SetPolys(triangles);
 
-  triangles->Delete();
-
-  vtkFloatArray* normals = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> normals = vtkSmartPointer<vtkFloatArray>::New();
   normals->SetNumberOfComponents(3);
+  normals->SetNumberOfTuples(numNormals);
   normals->SetName("Normals");
 
-  for (int i = 0; i < numPoints; i += 3)
-    normals->InsertNextTuple(normal.elems);
+  for (unsigned int i = 0; i < numNormals; ++i)
+    normals->SetTuple(i, normal.elems);
 
   polyData->GetCellData()->SetNormals(normals);
 
-  normals->Delete();
-
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
   vtkProperty* property = actor->GetProperty();
-
   this->InitProperty(property);
-
   property->SetColor(color.x(), color.y(), color.z());
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
@@ -308,18 +265,16 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   unsigned int numPoints = points.size();
 
-  vtkPoints* vtkPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
   vtkPoints->SetNumberOfPoints(numPoints);
 
   for (unsigned int i = 0; i < numPoints; ++i)
     vtkPoints->SetPoint(i, points[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(vtkPoints);
 
-  vtkPoints->Delete();
-
-  vtkCellArray* triangles = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
 
   unsigned int numIndices = indices.size();
 
@@ -333,36 +288,29 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
 
   polyData->SetPolys(triangles);
 
-  triangles->Delete();
-
   unsigned int numNormals = normals.size();
 
-  vtkFloatArray* vtkNormals = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
   vtkNormals->SetNumberOfComponents(3);
+  vtkNormals->SetNumberOfTuples(numNormals);
   vtkNormals->SetName("Normals");
 
-  for (int i = 0; i < numNormals; ++i)
-    vtkNormals->InsertNextTuple(normals[i].elems);
+  for (unsigned int i = 0; i < numNormals; ++i)
+    vtkNormals->SetTuple(i, normals[i].elems);
 
   polyData->GetCellData()->SetNormals(vtkNormals);
 
-  vtkNormals->Delete();
-
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
   vtkProperty* property = actor->GetProperty();
-
   this->InitProperty(property);
-
   property->SetColor(color.x(), color.y(), color.z());
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
@@ -383,34 +331,50 @@ void mitk::SimulationDrawTool::drawFrame(const Vector3& position, const Quaterni
   if (!m_Update)
     return;
 
-  const float radius = 0.05f;
+  float minSize = std::min(std::min(size.x(), size.y()), size.z());
+  float maxSize = std::max(std::max(size.x(), size.y()), size.z());
+
+  if (maxSize > minSize * 2.0f)
+  {
+    if (minSize > 0.0f)
+      maxSize = minSize * 2.0f;
+    else
+      minSize = maxSize * 0.707f;
+  }
+
+  const float radii[] = { minSize * 0.1f, maxSize * 0.2f };
 
   bool wireframeBackup = m_Wireframe;
   m_Wireframe = false;
 
-  std::vector<Vec4f> colors;
-  colors.push_back(Vec4f(0.0f, 0.0f, 1.0f, 1.0f));
-  colors.push_back(Vec4f(0.0f, 1.0f, 0.0f, 1.0f));
-  colors.push_back(Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-
   if (size.x() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(size.x(), 0.0f, 0.0f));
-    this->drawArrow(position, point2, radius, colors.back());
-    colors.pop_back();
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(radii[1], 0.0f, 0.0f));
+    Vec4f red(1.0f, 0.0f, 0.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], red);
+    this->drawCone(point2, point3, radii[1], 0.0f, red);
   }
 
   if (size.y() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(0.0f, size.y(), 0.0f));
-    this->drawArrow(position, point2, radius, colors.back());
-    colors.pop_back();
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(0.0f, radii[1], 0.0f));
+    Vec4f green(0.0f, 1.0f, 0.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], green);
+    this->drawCone(point2, point3, radii[1], 0.0f, green);
   }
 
   if (size.z() != 0.0f)
   {
     Vector3 point2 = position + orientation.rotate(Vec3f(0.0f, 0.0f, size.z()));
-    this->drawArrow(position, point2, radius, colors.back());
+    Vector3 point3 = point2 + orientation.rotate(Vec3f(0.0f, 0.0f, radii[1]));
+    Vec4f blue(0.0f, 0.0f, 1.0f, 1.0f);
+
+    this->drawCylinder(position, point2, radii[0], blue);
+    this->drawCone(point2, point3, radii[1], 0.0f, blue);
   }
 
   m_Wireframe = wireframeBackup;
@@ -425,28 +389,24 @@ void mitk::SimulationDrawTool::drawSpheres(const std::vector<Vector3>& points, c
 
   for (unsigned int i = 0; i < numSpheres; ++i)
   {
-    vtkSphereSource *sphereSource = vtkSphereSource::New();
+    vtkSmartPointer<vtkSphereSource> sphereSource = vtkSmartPointer<vtkSphereSource>::New();
     sphereSource->SetCenter(const_cast<double*>(points[i].elems));
     sphereSource->SetRadius(radii[i]);
     sphereSource->SetPhiResolution(16);
     sphereSource->SetThetaResolution(32);
     sphereSource->LatLongTessellationOn();
 
-    vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
-    polyDataMapper->SetInput(sphereSource->GetOutput());
+    vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    polyDataMapper->SetInputConnection(sphereSource->GetOutputPort());
 
-    vtkActor* actor = vtkActor::New();
+    vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
     actor->SetMapper(polyDataMapper);
     actor->SetScale(Simulation::ScaleFactor);
 
     vtkProperty* property = actor->GetProperty();
-
     this->InitProperty(property);
-
     property->SetColor(color.x(), color.y(), color.z());
 
-    m_VtkObjects.push_back(sphereSource);
-    m_VtkObjects.push_back(polyDataMapper);
     m_Actors.push_back(actor);
   }
 }
@@ -467,26 +427,23 @@ void mitk::SimulationDrawTool::drawCone(const Vector3& point1, const Vector3& po
   if (!m_Update)
     return;
 
-  vtkPoints* points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetNumberOfPoints(2);
   points->SetPoint(0, point1.elems);
   points->SetPoint(1, point2.elems);
 
-  vtkCellArray* line = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> line = vtkSmartPointer<vtkCellArray>::New();
   line->InsertNextCell(2);
   line->InsertCellPoint(0);
   line->InsertCellPoint(1);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
   polyData->SetLines(line);
 
-  points->Delete();
-  line->Delete();
-
   const char* radiiName = "Radii";
 
-  vtkFloatArray* radii = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> radii = vtkSmartPointer<vtkFloatArray>::New();
   radii->SetName(radiiName);
   radii->SetNumberOfTuples(2);
   radii->SetTuple1(0, radius1);
@@ -496,31 +453,24 @@ void mitk::SimulationDrawTool::drawCone(const Vector3& point1, const Vector3& po
   pointData->AddArray(radii);
   pointData->SetActiveScalars(radiiName);
 
-  radii->Delete();
-
-  vtkTubeFilter* tubeFilter = vtkTubeFilter::New();
+  vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
   tubeFilter->SetInput(polyData);
   tubeFilter->CappingOn();
   tubeFilter->SetNumberOfSides(subdivisions);
   tubeFilter->SetVaryRadiusToVaryRadiusByAbsoluteScalar();
 
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
-  polyDataMapper->SetInput(tubeFilter->GetOutput());
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  polyDataMapper->SetInputConnection(tubeFilter->GetOutputPort());
   polyDataMapper->ScalarVisibilityOff();
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
   vtkProperty* property = actor->GetProperty();
-
   this->InitProperty(property);
-
   property->SetColor(color.x(), color.y(), color.z());
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(tubeFilter);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 

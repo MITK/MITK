@@ -54,8 +54,8 @@ void QmitkDIAppFiberTractographyPerspective::CreateInitialLayout(berry::IPageLay
   lo = layout->GetViewLayout("org.mitk.views.streamlinetracking");
   lo->SetCloseable(false);
 
-  bottomleft->AddView("org.mitk.views.fiberprocessing");
-  berry::IViewLayout::Pointer lo2 = layout->GetViewLayout("org.mitk.views.fiberprocessing");
+  bottomleft->AddView("org.mitk.views.fiberextraction");
+  berry::IViewLayout::Pointer lo2 = layout->GetViewLayout("org.mitk.views.fiberextraction");
   lo2->SetCloseable(false);
 
   bottomleft->AddView("org.mitk.views.segmentation");

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageChangeInformation.h>
 #include <mitkAbstractTransformGeometry.h>
 #include <vtkGeneralTransform.h>
-
+#include <mitkPlaneClipping.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
 
@@ -235,7 +235,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
       // Use a combination of the InputGeometry *and* the possible non-rigid
       // AbstractTransformGeometry for reslicing the 3D Image
-      vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkGeneralTransform::New();
+      vtkSmartPointer<vtkGeneralTransform> composedResliceTransform = vtkSmartPointer<vtkGeneralTransform>::New();
       composedResliceTransform->Identity();
       composedResliceTransform->Concatenate(
         inputTimeGeometry->GetGeometry3D( m_TimeStep )->GetVtkTransform()->GetLinearInverse() );
@@ -244,7 +244,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
         );
 
       m_Reslicer->SetResliceTransform( composedResliceTransform );
-      composedResliceTransform->UnRegister( NULL ); // decrease RC
 
       // Set background level to BLACK instead of translucent, to avoid
       // boundary artifacts (see Geometry2DDataVtkMapper3D)
@@ -477,125 +476,7 @@ bool mitk::ExtractSliceFilter::GetClippedPlaneBounds(vtkFloatingPointType bounds
 bool mitk::ExtractSliceFilter::GetClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                                      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
-  bool b =  this->CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);
+  bool b =  mitk::PlaneClipping::CalculateClippedPlaneBounds(boundingGeometry, planeGeometry, bounds);
 
   return b;
-}
-
-
-bool mitk::ExtractSliceFilter
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-                              const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
-{
-  // Clip the plane with the bounding geometry. To do so, the corner points
-  // of the bounding box are transformed by the inverse transformation
-  // matrix, and the transformed bounding box edges derived therefrom are
-  // clipped with the plane z=0. The resulting min/max values are taken as
-  // bounds for the image reslicer.
-  const BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
-
-  BoundingBox::PointType bbMin = boundingBox->GetMinimum();
-  BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-
-  vtkPoints *points = vtkPoints::New();
-  if(boundingGeometry->GetImageGeometry())
-  {
-    points->InsertPoint( 0, bbMin[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 1, bbMin[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 2, bbMin[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 3, bbMin[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 4, bbMax[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
-    points->InsertPoint( 5, bbMax[0]-0.5, bbMin[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 6, bbMax[0]-0.5, bbMax[1]-0.5, bbMax[2]-0.5 );
-    points->InsertPoint( 7, bbMax[0]-0.5, bbMax[1]-0.5, bbMin[2]-0.5 );
-  }
-  else
-  {
-    points->InsertPoint( 0, bbMin[0], bbMin[1], bbMin[2] );
-    points->InsertPoint( 1, bbMin[0], bbMin[1], bbMax[2] );
-    points->InsertPoint( 2, bbMin[0], bbMax[1], bbMax[2] );
-    points->InsertPoint( 3, bbMin[0], bbMax[1], bbMin[2] );
-    points->InsertPoint( 4, bbMax[0], bbMin[1], bbMin[2] );
-    points->InsertPoint( 5, bbMax[0], bbMin[1], bbMax[2] );
-    points->InsertPoint( 6, bbMax[0], bbMax[1], bbMax[2] );
-    points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
-  }
-
-  vtkPoints *newPoints = vtkPoints::New();
-
-  vtkTransform *transform = vtkTransform::New();
-  transform->Identity();
-  transform->Concatenate(
-    planeGeometry->GetVtkTransform()->GetLinearInverse()
-    );
-
-  transform->Concatenate( boundingGeometry->GetVtkTransform() );
-
-  transform->TransformPoints( points, newPoints );
-  transform->Delete();
-
-  bounds[0] = bounds[2] = 10000000.0;
-  bounds[1] = bounds[3] = -10000000.0;
-  bounds[4] = bounds[5] = 0.0;
-
-  this->LineIntersectZero( newPoints, 0, 1, bounds );
-  this->LineIntersectZero( newPoints, 1, 2, bounds );
-  this->LineIntersectZero( newPoints, 2, 3, bounds );
-  this->LineIntersectZero( newPoints, 3, 0, bounds );
-  this->LineIntersectZero( newPoints, 0, 4, bounds );
-  this->LineIntersectZero( newPoints, 1, 5, bounds );
-  this->LineIntersectZero( newPoints, 2, 6, bounds );
-  this->LineIntersectZero( newPoints, 3, 7, bounds );
-  this->LineIntersectZero( newPoints, 4, 5, bounds );
-  this->LineIntersectZero( newPoints, 5, 6, bounds );
-  this->LineIntersectZero( newPoints, 6, 7, bounds );
-  this->LineIntersectZero( newPoints, 7, 4, bounds );
-
-  // clean up vtk data
-  points->Delete();
-  newPoints->Delete();
-
-  if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
-    || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
-  {
-    return false;
-  }
-  else
-  {
-    // The resulting bounds must be adjusted by the plane spacing, since we
-    // we have so far dealt with index coordinates
-    const float *planeSpacing = planeGeometry->GetFloatSpacing();
-    bounds[0] *= planeSpacing[0];
-    bounds[1] *= planeSpacing[0];
-    bounds[2] *= planeSpacing[1];
-    bounds[3] *= planeSpacing[1];
-    bounds[4] *= planeSpacing[2];
-    bounds[5] *= planeSpacing[2];
-    return true;
-  }
-}
-
-bool mitk::ExtractSliceFilter
-::LineIntersectZero( vtkPoints *points, int p1, int p2,
-                    vtkFloatingPointType *bounds )
-{
-  vtkFloatingPointType point1[3];
-  vtkFloatingPointType point2[3];
-  points->GetPoint( p1, point1 );
-  points->GetPoint( p2, point2 );
-
-  if ( (point1[2] * point2[2] <= 0.0) && (point1[2] != point2[2]) )
-  {
-    double x, y;
-    x = ( point1[0] * point2[2] - point1[2] * point2[0] ) / ( point2[2] - point1[2] );
-    y = ( point1[1] * point2[2] - point1[2] * point2[1] ) / ( point2[2] - point1[2] );
-
-    if ( x < bounds[0] ) { bounds[0] = x; }
-    if ( x > bounds[1] ) { bounds[1] = x; }
-    if ( y < bounds[2] ) { bounds[2] = y; }
-    if ( y > bounds[3] ) { bounds[3] = y; }
-    bounds[4] = bounds[5] = 0.0;
-    return true;
-  }
-  return false;
 }

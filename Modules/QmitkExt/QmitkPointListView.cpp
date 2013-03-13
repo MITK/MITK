@@ -29,14 +29,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 QmitkPointListView::QmitkPointListView( QWidget* parent )
-  :QListView( parent ),
-  m_PointListModel( new QmitkPointListModel() ),
-  m_SelfCall( false ),
-  m_showFading(false),
-  m_MultiWidget( NULL),
-  m_Snc1(NULL),
-  m_Snc2(NULL),
-  m_Snc3(NULL)
+  : QListView( parent ),
+    m_Snc1(NULL),
+    m_Snc2(NULL),
+    m_Snc3(NULL),
+    m_PointListModel( new QmitkPointListModel() ),
+    m_SelfCall( false ),
+    m_showFading(false),
+    m_MultiWidget( NULL)
 {
   QListView::setAlternatingRowColors( true );
 
@@ -178,12 +178,27 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
         {
           m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
         }
-        else if ( (m_Snc1 != NULL) && (m_Snc2 != NULL) && (m_Snc3 != NULL) )
+
+        mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
+
+        // remove the three ifs below after the SetSnc* methods have been removed
+        if (m_Snc1 != NULL)
         {
-           mitk::Point3D p = pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep());
            m_Snc1->SelectSliceByPoint(p);
+        }
+        if (m_Snc2 != NULL)
+        {
            m_Snc2->SelectSliceByPoint(p);
+        }
+        if (m_Snc3 != NULL)
+        {
            m_Snc3->SelectSliceByPoint(p);
+        }
+
+        for (std::set<mitk::SliceNavigationController*>::const_iterator i = m_Sncs.begin();
+             i != m_Sncs.end(); ++i)
+        {
+          (*i)->SelectSliceByPoint(p);
         }
       }
       else
@@ -440,4 +455,16 @@ void QmitkPointListView::SetSnc2(mitk::SliceNavigationController* snc)
 void QmitkPointListView::SetSnc3(mitk::SliceNavigationController* snc)
 {
    m_Snc3 = snc;
+}
+
+void QmitkPointListView::AddSliceNavigationController(mitk::SliceNavigationController* snc)
+{
+  if (snc == NULL) return;
+  m_Sncs.insert(snc);
+}
+
+void QmitkPointListView::RemoveSliceNavigationController(mitk::SliceNavigationController* snc)
+{
+  if (snc == NULL) return;
+  m_Sncs.erase(snc);
 }

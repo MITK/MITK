@@ -154,6 +154,10 @@ option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
 option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
 set(MITK_USE_CableSwig ${MITK_USE_Python})
+if(MITK_USE_Python)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  FIND_PACKAGE(PythonInterp REQUIRED)
+endif()
 
 mark_as_advanced(MITK_BUILD_ALL_APPS
                  MITK_USE_CTK
@@ -429,11 +433,23 @@ set(cflags )
 if(WIN32)
   set(cflags "${cflags} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
+if(NOT MSVC_VERSION)
+  foreach(_flag
+    -Wall
+    -Wextra
+    -Wpointer-arith
+    -Winvalid-pch
+    -Wcast-align
+    -Wwrite-strings
+    -Wno-gnu
+    -fdiagnostics-show-option
+    )
+    mitkFunctionCheckCompilerFlags(${_flag} cflags)
+  endforeach()
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "${cflags} -Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
 
-  mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
 
@@ -585,6 +601,8 @@ if(MITK_USE_BLUEBERRY)
     set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
   endif()
 
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
+
   add_subdirectory(BlueBerry)
 
   set(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry
@@ -623,6 +641,8 @@ endforeach()
 link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
+include(${CMAKE_CURRENT_BINARY_DIR}/Core/Code/CppMicroServices/CppMicroServicesConfig.cmake)
+
 add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
@@ -688,6 +708,11 @@ if(MITK_USE_BLUEBERRY)
     set(MITK_PLUGIN_USE_FILE )
   endif()
 
+  # 11.3.13, change, muellerm: activate python bundle if python and blueberry is active
+  if( MITK_USE_Python )
+    set(MITK_BUILD_org.mitk.gui.qt.python ON)
+  endif()
+
 endif()
 
 # Construct a list of paths containing runtime directories
@@ -737,14 +762,11 @@ endif()
 #-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
+option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
 
-set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
-set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
 if(MITK_USE_Python)
-  add_subdirectory(Wrapping)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
 endif()
-
 #-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------

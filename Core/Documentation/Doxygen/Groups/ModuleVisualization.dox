@@ -1,0 +1,45 @@
+
+/**
+
+\defgroup Visualization Visualization and Visualization Organization Classes
+\ingroup Core
+
+\brief This category includes renderwindows (currently one for OpenGL), renderers (currently only one,
+for OpenGL-based renderwindows), mappers  and classes for navigating in the data.
+
+\section overviewVisualization Rationale and overview
+
+Mappers visualize data objects of a specific classes by creating rendering primitives that
+interface to the graphics library (e.g., OpenGL, vtk).
+Renderers organize the rendering process. A Renderer contains a reference to a (sub-) data tree
+and asks the mappers of the data objects to render the data into the renderwindow it is associated to.
+
+More details can be found in the section on \ref Rendering.
+
+\subsection inthisgroupVisualization What belongs into this group
+\section implementVisualization Practical issues
+
+\section futureVisualization Plans for the future
+- Abort mechanism
+- level-of-detail rendering mechanism
+- allow multiple renderers per renderwindow
+- modified detection mechanism:
+  - allow to detect whether a modification of data/property/dislaygeometry
+    /camera requires to re-render. E.g., mark whether a property effects
+    the rendering.
+  - analyze which type of modification requires which kind of action, e.g.:
+    if the displaygeometry or the color has changed, we do not need to
+    resample an image, but we do need to redraw. The first step is to
+    analyze which types of modifications (e.g., displaygeometry changed,
+    properties changed; can we group these?) and actions exist.
+- improved design of navigation controllers, probably more focused on
+  steppers (then on BaseController). Have in mind:
+  - rotatable slices
+  - dependent views: e.g., sequence of renderers showing series of
+    consecutive slices (maybe realized as master stepper and
+    dependent offset steppers)
+  - consider time vs. slice stepping
+- use stepper mechanism for additional purposes, e.g., for animating
+  transfer functions
+
+*/

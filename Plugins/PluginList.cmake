@@ -15,8 +15,10 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.common:ON
   org.mitk.gui.qt.stdmultiwidgeteditor:ON
   org.mitk.gui.qt.common.legacy:OFF
+  org.mitk.gui.qt.cmdlinemodules:OFF
   org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
@@ -32,7 +34,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.meshdecimation:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
-  org.mitk.gui.qt.python.console:OFF
+  org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF

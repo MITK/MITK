@@ -2,6 +2,7 @@
 set(CPP_FILES
   Qmitk/QmitkUSDeviceManagerWidget.cpp
   Qmitk/QmitkUSNewVideoDeviceWidget.cpp
+  Qmitk/mitkUSDevicePersistence.cpp
 )
 set(UI_FILES
   Qmitk/QmitkUSDeviceManagerWidgetControls.ui

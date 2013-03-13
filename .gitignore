@@ -28,6 +28,11 @@ auto-save-list
 tramp
 .\#*
 
+## Eclipse
+.cproject
+.project
+.settings/
+
 # Org-mode
 .org-id-locations
 *_archive

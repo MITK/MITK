@@ -91,11 +91,19 @@ endif()
 # Create the executable and link libraries
 # -----------------------------------------------------------------------
 
+set(_app_compile_flags )
+if(WIN32)
+  set(_app_compile_flags "${_app_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+endif()
+
 if(_APP_SHOW_CONSOLE)
   add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
+
+set_target_properties(${_APP_NAME} PROPERTIES
+                      COMPILE_FLAGS "${_app_compile_flags}")
 
 target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)

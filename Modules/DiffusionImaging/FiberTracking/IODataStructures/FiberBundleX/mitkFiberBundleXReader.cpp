@@ -59,12 +59,12 @@ namespace mitk
       std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
       ext = itksys::SystemTools::LowerCase(ext);
 
-      vtkSmartPointer<vtkDataReader> chooser=vtkDataReader::New();
+      vtkSmartPointer<vtkDataReader> chooser=vtkSmartPointer<vtkDataReader>::New();
       chooser->SetFileName(m_FileName.c_str() );
       if( chooser->IsFilePolyData())
       {
         MITK_INFO << "Reading vtk fiber bundle";
-        vtkSmartPointer<vtkPolyDataReader> reader = vtkPolyDataReader::New();
+        vtkSmartPointer<vtkPolyDataReader> reader = vtkSmartPointer<vtkPolyDataReader>::New();
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 

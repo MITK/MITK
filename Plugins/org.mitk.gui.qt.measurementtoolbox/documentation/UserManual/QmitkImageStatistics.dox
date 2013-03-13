@@ -16,7 +16,7 @@ If you encounter problems using the view, please have a look at the \ref QmitkIm
 
 Manual sections:
 
-- \ref QmitkImageStatisticsUserManualOverview 
+- \ref QmitkImageStatisticsUserManualOverview
 - \ref QmitkImageStatisticsUserManualUsage
 - \ref QmitkImageStatisticsUserManualTrouble
 
@@ -28,11 +28,21 @@ This view provides an easy interface to quickly compute some features of a whole
 
 \section QmitkImageStatisticsUserManualUsage Usage
 
-After selection of an image or a binary mask of an image in the datamanader, the Image Statistics view shows some statistical information. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown at the top.
+After selection of an image or a binary mask of an image in the datamanager, the Image Statistics view shows some statistical information. If a mask is selected, the name of the mask and the name of the image, to which the mask is applied, are shown at the top.
 
-Below it is the statistics window which displays the calculated statistical features (such as mean, standard deviation...) and the histogram.
+Check "Ignore zero-valued voxels" to hide voxels with grayvalue zero.
 
-At the bottom of the view are two buttons. They copy their respective data in csv format to the clipboard.
+Below it is the statistics window which displays the calculated statistical features (such as mean, standard deviation...).
+
+Beneath the statistics window is the histogram window, which shows the histogram of the current selection.
+
+At top of the histogram window are two radiobuttons. Toggle one of them to either show the histogram as a barchart or as a lineplot.
+
+Use mousewheel to zoom in and out the histogram. With the left mouse button the histogram is pannable in zoomed state.
+
+If the histogram is displayed as a barchart a tooltip is available by hovering over one of the bins. A tooltip is also available, if an intesity profile is created for a path element as mask.
+
+At the bottom of each view is one button. They copy their respective data in csv format to the clipboard.
 
 \section QmitkImageStatisticsUserManualTrouble Troubleshooting
 

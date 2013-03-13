@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWeakPointerProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
+#include "vtkNeverTranslucentTexture.h"
+#include "vtkMitkLevelWindowFilter.h"
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>
@@ -34,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
-#include <vtkTexture.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
 
@@ -99,7 +100,7 @@ namespace mitk
 
     m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
     m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
-    m_BackgroundActor->GetProperty()->SetOpacity( 1.0 );
+    m_BackgroundActor->GetProperty()->SetOpacity( 0.0 );
     m_BackgroundActor->SetMapper( m_BackgroundMapper );
 
     vtkProperty * backfaceProperty = m_BackgroundActor->MakeProperty();
@@ -174,7 +175,7 @@ namespace mitk
 
   const Geometry2DData* Geometry2DDataVtkMapper3D::GetInput()
   {
-    return static_cast<const Geometry2DData * > ( GetData() );
+    return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
   }
 
   void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
@@ -209,7 +210,10 @@ namespace mitk
     // edge actor
     m_ImageAssembly->GetParts()->RemoveAllItems();
 
-    if ( !this->IsVisible(renderer) )
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if ( !visible )
     {
       // visibility has explicitly to be set in the single actors
       // due to problems when using cell picking:
@@ -484,12 +488,14 @@ namespace mitk
               //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
-              texture = vtkTexture::New();
+              texture = vtkNeverTranslucentTexture::New();
               texture->RepeatOff();
 
               imageActor = vtkActor::New();
               imageActor->SetMapper( dataSetMapper );
               imageActor->SetTexture( texture );
+              imageActor->GetProperty()->SetOpacity(0.999); // HACK! otherwise VTK wouldn't recognize this as translucent surface (if LUT values map to alpha < 255
+              // improvement: apply "opacity" property onle HERE and also in 2D image mapper. DO NOT change LUT to achieve translucent images (see method ChangeOpacity in image mapper 2D)
 
               // Make imageActor the sole owner of the mapper and texture
               // objects
@@ -523,18 +529,10 @@ namespace mitk
             //See fixed bug #13275
             if(localStorage->m_ReslicedImage != NULL)
             {
-              bool binaryOutline = node->IsOn( "outline binary", renderer );
-              if( binaryOutline )
-              {
-                texture->SetInput( localStorage->m_ReslicedImage );
-              }
-              else
-              {
-                texture->SetInput( localStorage->m_Texture->GetInput() );
-              }
-              // VTK (mis-)interprets unsigned char (binary) images as color images;
-              // So, we must manually turn on their mapping through a (gray scale) lookup table;
-              texture->SetMapColorScalarsThroughLookupTable( localStorage->m_Texture->GetMapColorScalarsThroughLookupTable() );
+              texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+
+              // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
+              texture->MapColorScalarsThroughLookupTableOff();
 
               //re-use properties from the 2D image mapper
               imageActor->SetProperty( localStorage->m_Actor->GetProperty() );
@@ -543,9 +541,6 @@ namespace mitk
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn( "texture interpolation", renderer );
               texture->SetInterpolate( textureInterpolation );
-
-              //get the lookuptable from the 2D image mapper
-              texture->SetLookupTable( localStorage->m_Texture->GetLookupTable() );
 
               // Store this actor to be added to the actor assembly, sort
               // by layer

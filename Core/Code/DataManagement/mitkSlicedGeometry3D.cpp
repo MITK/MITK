@@ -301,9 +301,9 @@ mitk::SlicedGeometry3D::InitializePlanes(
 
 
   ScalarType directedExtent =
-      fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
-    + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
-    + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
+      std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
+    + std::abs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
+    + std::abs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
   if ( directedExtent >= viewSpacing )
   {
@@ -374,9 +374,9 @@ mitk::SlicedGeometry3D
   // distance inside the volume) and the normal, and dividing this value by
   // the directed spacing calculated above.
   ScalarType directedExtent =
-      fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
-    + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
-    + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
+      std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * normal[0] )
+    + std::abs( m_ReferenceGeometry->GetExtentInMM( 1 ) * normal[1] )
+    + std::abs( m_ReferenceGeometry->GetExtentInMM( 2 ) * normal[2] );
 
   if ( directedExtent >= spacing[2] )
   {
@@ -833,7 +833,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
-      if (abs(rotationAngle-180) < mitk::eps )
+      if (std::abs(rotationAngle-180) < mitk::eps )
       {
          // current Normal and desired normal are not linear independent!!(e.g 1,0,0 and -1,0,0).
          // Rotation Axis should be ANY vector that is 90° to current Normal
@@ -892,7 +892,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          // Since both axis vectors lie in the plane, the crossproduct is the planes normal or the negative planes normal
 
          rotationAxis = itk::CrossProduct( VecAxisCurr, vecAxixNew  );
-         if (abs(rotationAngle-180) < mitk::eps )
+         if (std::abs(rotationAngle-180) < mitk::eps )
          {
             // current axisVec and desired axisVec are not linear independent!!(e.g 1,0,0 and -1,0,0).
             // Rotation Axis can be just plane Normal. (have to rotate by 180°)
@@ -973,9 +973,9 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // distance inside the volume) and the normal, and dividing this value by
         // the directed spacing calculated above.*/
         ScalarType directedExtent =
-          fabs( m_ReferenceGeometry->GetExtentInMM( 0 ) * m_DirectionVector[0] )
-          + fabs( m_ReferenceGeometry->GetExtentInMM( 1 ) * m_DirectionVector[1] )
-          + fabs( m_ReferenceGeometry->GetExtentInMM( 2 ) * m_DirectionVector[2] );
+          std::abs( m_ReferenceGeometry->GetExtentInMM( 0 ) * m_DirectionVector[0] )
+          + std::abs( m_ReferenceGeometry->GetExtentInMM( 1 ) * m_DirectionVector[1] )
+          + std::abs( m_ReferenceGeometry->GetExtentInMM( 2 ) * m_DirectionVector[2] );
 
         if ( directedExtent >= spacing[2] )
         {

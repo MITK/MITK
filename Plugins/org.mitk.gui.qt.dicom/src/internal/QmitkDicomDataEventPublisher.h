@@ -20,13 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkPluginContext.h>
 #include <QObject>
 
+/**
+* \brief QmitkDicomDataEventPublisher is a class for publishing ctkEvents.
+*/
 class QmitkDicomDataEventPublisher : public QObject
 {
     Q_OBJECT
     public:
 
+        /**
+        * \brief QmitkDicomDataEventPublisher constructor.
+        */
         QmitkDicomDataEventPublisher();
 
+        /**
+        * \brief QmitkDicomDataEventPublisher destructor.
+        */
         virtual ~QmitkDicomDataEventPublisher();
 
         /// @brief sets the event admin from given plugin context

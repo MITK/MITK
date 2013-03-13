@@ -25,6 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWheelEvent.h>
 #include <mitkDisplayPositionEvent.h>
 
+/**
+ * \ingroup QmitkModule
+ * \deprecatedSince{2013_03} mitk::QmitkEventAdapter is deprecated. It will become
+ * obsolete. Adaption of events is now handeled (for Qt events) in QmitkRenderWindow.
+ * Refer to \see DataInteractionPage  for general information about the concept of
+ * the new implementation
+ */
 class QMITK_EXPORT QmitkEventAdapter
 {
 public:

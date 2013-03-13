@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>569</height>
+    <height>595</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -71,7 +71,7 @@
        <widget class="QLineEdit" name="m_Comment"/>
       </item>
       <item row="4" column="1">
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="probe_label">
         <property name="font">
          <font>
           <underline>true</underline>
@@ -83,7 +83,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="probe_label2">
         <property name="text">
          <string>Probe</string>
         </property>
@@ -93,7 +93,7 @@
        <widget class="QLineEdit" name="m_Probe"/>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="zoom_label">
         <property name="text">
          <string>Zoom</string>
         </property>
@@ -108,7 +108,7 @@
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>GroupBox:</string>
+      <string>Video Source:</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="1" column="1">

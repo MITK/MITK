@@ -32,6 +32,13 @@ QmitkUSNewVideoDeviceWidget::QmitkUSNewVideoDeviceWidget(QWidget* parent, Qt::Wi
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
+
+  //disable a few UI components which are not needed at the moment
+  m_Controls->probe_label->setVisible(false);
+  m_Controls->probe_label2->setVisible(false);
+  m_Controls->zoom_label->setVisible(false);
+  m_Controls->m_Probe->setVisible(false);
+  m_Controls->m_Zoom->setVisible(false);
 }
 
 QmitkUSNewVideoDeviceWidget::~QmitkUSNewVideoDeviceWidget()
@@ -129,7 +136,7 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
   // If no VideoDevice is given, throw an exception
   if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0){
     // TODO Alert if bad path
-    mitkThrow() << "NewVideoDevcieWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
+    mitkThrow() << "NewVideoDeviceWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
   }
   m_TargetDevice = static_cast<mitk::USVideoDevice*> (device.GetPointer());
   m_Active = true;

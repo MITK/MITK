@@ -23,12 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBarImplementation.h>
 #include <QProgressBar>
 
-//##Documentation
-//## @brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
-//##
-//## All mitk-classes will call this class for output:
-//## mitk::ProgressBar::GetInstance();
-
+/**
+ * \ingroup QmitkModule
+ * \brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
+ *
+ * All mitk-classes will call this class for output:
+ * mitk::ProgressBar::GetInstance();
+ */
 class QMITK_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 

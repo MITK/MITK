@@ -41,8 +41,7 @@ GetColor( rgb, BaseRenderer );
 (The BaseRenderer is usually known inside a mapper).
 
 \warning
-This property will not affect images if you set the property "use color" 
-to false. In that case a user-defined lookuptable will be used.
+This property will not affect images if you set the property "LookupTable". In that case a user-defined lookuptable will be used.
 
   <li> in plane resample extent by geometry - Toggles:
 Resampling grid corresponds to the current world geometry. This
@@ -59,8 +58,7 @@ So far it works for images and pointsets. The layer property applies only for si
   <li> LookupTable - This property contains a user defined lookuptable, which can be used to map scalar values to color values. Example: If an image contains a value of 128, in the resulting image the passed lookuptable could map this value to red (255, 0, 0).
 
   \warning
-This property will not effect images if you set the property "use color" 
-to true. In that case color properties and a default lookuptable are used.
+If you set the "LookupTable" property the "color" property will not longer affect your image.
 
 Example for setting up a lookuptable in MITK:
 \code
@@ -81,7 +79,6 @@ mitkLookupTable->SetVtkLookupTable(vtkLUT);
 mitk::LookupTableProperty::Pointer LookupTableProp = mitk::LookupTableProperty::New( mitkLookupTable );
 
 result->SetProperty( "LookupTable", LookupTableProp );
-result->SetBoolProperty("use color", false);
 result->Update();
 \endcode
   <li> opacity - Alpha (or transparency) value of the node/image/surface etc.. The
@@ -99,30 +96,6 @@ GetOpacity( opacity, BaseRenderer );
 
   <li> reslice interpolation - This property takes effect in swivel mode or crosshair rotaiton  only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
   <li> texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
-  <li> use color - This property toggles the use of a user-defined lookuptable 
-for the rendering. True: use the LUT; False: use the color propery.
-Example for setting up a lookuptable in MITK:
-\code
-#include <vtkSmartPointer.h>
-#include <vtkLookupTable.h>
-#include <mitkLookupTable.h>
-#include <mitkLookupTableProperty.h>
-
-[...]
-
-vtkSmartPointer<vtkLookupTable> vtkLUT = vtkSmartPointer<vtkLookupTable>::New();
-vtkLUT->SetRange(100,200); //define your table here
-vtkLUT->Build();
-
-//pass the table to MITK
-mitk::LookupTable::Pointer mitkLookupTable = mitk::LookupTable::New();
-mitkLookupTable->SetVtkLookupTable(vtkLUT);
-mitk::LookupTableProperty::Pointer LookupTableProp = mitk::LookupTableProperty::New( mitkLookupTable );
-
-result->SetProperty( "LookupTable", LookupTableProp );
-result->SetBoolProperty("use color", false);
-result->Update();
-\endcode
   <li> visible - toggle node/image/surface being rendered at all
 </ul>
   

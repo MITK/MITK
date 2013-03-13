@@ -657,9 +657,9 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
         m_Snap.currentFunceiled = m_Snap.currentF;
         IVIM_CEIL( m_Snap.currentF, 0.0, 1.0 );
 
-        oit.Set( myround(m_Snap.currentF * 10000.0) );
-        oit1.Set( myround(m_Snap.currentD * 1000000.0) );
-        oit2.Set( myround(m_Snap.currentDStar * 100000.0) );
+        oit.Set( m_Snap.currentF );
+        oit1.Set( m_Snap.currentD );
+        oit2.Set( m_Snap.currentDStar );
 
         // std::cout << "\tf=" << x[0] << "\tD=" << x[1] << " ; "<<std::endl;
 

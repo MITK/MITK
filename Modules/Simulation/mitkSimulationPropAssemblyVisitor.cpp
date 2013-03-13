@@ -40,9 +40,9 @@ sofa::simulation::Visitor::Result mitk::SimulationPropAssemblyVisitor::processNo
 
     if (simulationModel != NULL)
     {
-      std::vector<vtkActor*> actors = simulationModel->GetActors();
+      std::vector<vtkSmartPointer<vtkActor> > actors = simulationModel->GetActors();
 
-      for (std::vector<vtkActor*>::const_iterator actor = actors.begin(); actor != actors.end(); ++actor)
+      for (std::vector<vtkSmartPointer<vtkActor> >::const_iterator actor = actors.begin(); actor != actors.end(); ++actor)
         m_PropAssembly->AddPart(*actor);
     }
   }

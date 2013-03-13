@@ -426,7 +426,7 @@ void QmitkIVIMView::FittIVIMStart()
 
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
-    mitk::DiffusionImage<short>* img;
+    mitk::DiffusionImage<short>* img = 0;
     for ( int i=0; i<nodes.size(); i++ )
     {
         img = dynamic_cast<mitk::DiffusionImage<short>*>(nodes.at(i)->GetData());
@@ -609,7 +609,6 @@ bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType
     filter->SetInput(vecimg);
     filter->SetGradientDirections(dirs);
     filter->SetBValue(bval);
-    m_Controls->m_Warning->setVisible(false);
 
     switch(m_Controls->m_MethodCombo->currentIndex())
     {

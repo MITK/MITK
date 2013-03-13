@@ -42,6 +42,8 @@ class  FiberTracking_EXPORT FiberBundleX : public BaseData
 {
 public:
 
+    typedef itk::Image<unsigned char, 3> ItkUcharImgType;
+
     // fiber colorcodings
     static const char* COLORCODING_ORIENTATION_BASED;
     static const char* COLORCODING_FA_BASED;
@@ -76,6 +78,7 @@ public:
     void MirrorFibers(unsigned int axis);
     void RotateAroundAxis(double x, double y, double z);
     void TranslateFibers(double x, double y, double z);
+    void ScaleFibers(double x, double y, double z);
 
     // add/subtract fibers
     FiberBundleX::Pointer AddBundle(FiberBundleX* fib);
@@ -84,10 +87,10 @@ public:
     // fiber subset extraction
     FiberBundleX::Pointer           ExtractFiberSubset(PlanarFigure *pf);
     std::vector<long>               ExtractFiberIdSubset(PlanarFigure* pf);
+    FiberBundleX::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint);
+
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected
     void                            GenerateFiberIds(); // TODO: make protected
-
-
 
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);

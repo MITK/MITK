@@ -362,15 +362,10 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     // ask wether camera parameters (intrinsics, ...) should be loaded
     if (QMessageBox::question(this,"Camera parameters","Do you want to specify your own camera intrinsics?",QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
     {
-      MITK_INFO<<"Yes";
       QString fileName = QFileDialog::getOpenFileName(this,"Open camera intrinsics","/","*.xml");
       mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
       cameraIntrinsics->FromXMLFile(fileName.toStdString());
       this->m_ToFImageGrabber->SetProperty("CameraIntrinsics",mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
-    }
-    else
-    {
-      MITK_INFO<<"No";
     }
   }
   else if (m_Controls->m_ConnectCameraButton->text()=="Disconnect")

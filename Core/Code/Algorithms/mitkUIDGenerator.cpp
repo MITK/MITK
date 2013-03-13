@@ -23,17 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdexcept>
 #include <iostream>
 
-#ifdef _MSC_VER
-#include "process.h"
-#else
-#include <unistd.h>
-#endif
 
-namespace mitk {
 
-UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
+
+
+mitk::UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 :m_Prefix(prefix),
- m_LengthOfRandomPart(lengthOfRandomPart)
+ m_LengthOfRandomPart(lengthOfRandomPart),
+ m_RandomGenerator(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
 {
   if (lengthOfRandomPart < 5)
   {
@@ -41,21 +38,11 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
     throw std::invalid_argument("To few digits requested");
   }
 
-  static int instanceID = 0;
-  int processID = 0;
-  #ifdef WIN32
-    processID = _getpid();
-  #else
-    processID = getpid();
-  #endif
-  unsigned int hash = seedhash( time(NULL), clock() );
-  unsigned int seed = (hash + processID) * 10 + instanceID;
-  instanceID++;
+  m_RandomGenerator->Initialize();
 
-  std::srand(seed);
 }
 
-std::string UIDGenerator::GetUID()
+std::string mitk::UIDGenerator::GetUID()
 {
   std::ostringstream s;
   s << m_Prefix;
@@ -84,38 +71,17 @@ std::string UIDGenerator::GetUID()
     s << t->tm_sec;
 
     std::ostringstream rs;
-    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(rand()) );
+    rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(m_RandomGenerator->GetUniformVariate(0, RAND_MAX)) );
 
-    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i)
+    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i) //add zeros for non available digits
     {
-      s << "X";
+      s << "0";
     }
 
     s << rs.str();
   }
 
   return s.str();
-}
-
-unsigned int UIDGenerator::seedhash( time_t t, clock_t c )
-{
-  unsigned int h1 = 0;
-  unsigned char *p = (unsigned char *) &t;
-  for( size_t i = 0; i < sizeof(t); ++i )
-  {
-    h1 *= 255 + 2U;
-    h1 += p[i];
-  }
-  unsigned int h2 = 0;
-  p = (unsigned char *) &c;
-  for( size_t j = 0; j < sizeof(c); ++j )
-  {
-    h2 *= 255 + 2U;
-    h2 += p[j];
-  }
-  return h1 ^ h2;
-}
-
 }
 
 

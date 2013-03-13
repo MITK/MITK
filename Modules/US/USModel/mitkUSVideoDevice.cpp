@@ -22,6 +22,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufactur
   Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_FilePath = "";
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
@@ -36,6 +37,7 @@ mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, mitk::USImageMetadata:
   Init();
   m_SourceIsFile = false;
   m_DeviceID = videoDeviceNumber;
+  m_FilePath = "";
 }
 
 mitk::USVideoDevice::USVideoDevice(std::string videoFilePath, mitk::USImageMetadata::Pointer metadata) : mitk::USDevice(metadata)
@@ -78,6 +80,7 @@ bool mitk::USVideoDevice::OnConnection()
   } else {
      m_Source->SetCameraInput(m_DeviceID);
   }
+  SetSourceCropArea();
   return true;
 }
 
@@ -119,6 +122,38 @@ void mitk::USVideoDevice::GrabImage()
   m_Image = m_Source->GetNextImage();
   //this->SetNthOutput(0, m_Image);
   //this->Modified();
+}
+
+void mitk::USVideoDevice::SetSourceCropArea()
+{
+if (this->m_Source.IsNotNull())
+  {
+    if((m_CropArea.cropBottom==0)&&
+       (m_CropArea.cropTop==0)&&
+       (m_CropArea.cropLeft==0)&&
+       (m_CropArea.cropRight==0))
+      {this->m_Source->RemoveRegionOfInterest();}
+    else
+      {
+      int right = m_Source->GetImageWidth() - m_CropArea.cropRight;
+      int bottom = m_Source->GetImageHeight() - m_CropArea.cropBottom;
+      this->m_Source->SetRegionOfInterest(m_CropArea.cropLeft,
+                                          m_CropArea.cropTop,
+                                          right,
+                                          bottom);
+      }
+
+  }
+else
+  {MITK_WARN << "Cannot set crop are, source is not initialized!";}
+
+}
+
+void mitk::USVideoDevice::SetCropArea(mitk::USDevice::USImageCropArea newArea)
+{
+m_CropArea = newArea;
+MITK_INFO << "Set Crop Area L:" << m_CropArea.cropLeft << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop << " B:" << m_CropArea.cropBottom;
+if (m_IsConnected) SetSourceCropArea();
 }
 
 ITK_THREAD_RETURN_TYPE mitk::USVideoDevice::Acquire(void* pInfoStruct)

@@ -261,7 +261,7 @@ namespace mitk
         interPixelDistance[0],interPixelDistance[1],principalPoint[0],principalPoint[1],calculateDistance);
     }
 
-    /** \addtogroup <KinectReconstruction>
+    /** \ingroup KinectReconstruction
      * @{
      *
      * @brief KinectIndexToCartesianCoordinates Convert a pixel (i,j) with value d to a 3D world point. This conversion is meant for Kinect and slightly different then ToF reconstruction. See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
@@ -293,7 +293,7 @@ namespace mitk
         return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
     }
     /** @}*/
-    /** \addtogroup <KinectReconstructionInverse>
+    /** \ingroup KinectReconstructionInverse
      * @{
      * @brief CartesianCoordinatesToKinectIndexCoordinates Transform a 3D world point back to distance image pixel coordinates.
      * @param cartesianPointX x value of the cartesian point.
@@ -313,9 +313,23 @@ namespace mitk
 
     inline static ToFProcessingCommon::ToFPoint3D CartesianToKinectIndexCoordinates(ToFPoint3D cartesianPoint, ToFPoint2D focalLength, ToFPoint2D  principalPoint, bool calculateDistance=true)
     {
-        return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
+      return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
     }
     /** @}*/
+    /**
+     * @brief ContinuousKinectIndexToCartesianCoordinates This method is escpially meant for reconstructing a Kinect point
+     * with continuous index coordinates (i.e. not exactly a pixel position, but a point interpolated between two pixels).
+     * The only difference to KinectIndexToCartesianCoordinates() is that ContinuousKinectIndexToCartesianCoordinates does not
+     * cast to unsigned int for the index.
+     * @param continuousIndex The continuous coordinates (e.g. 0.5; 0.5).
+     * @param distance Distance value d in mm as obtained from OpenNI.
+     * @param focalLengthX x value of the focal length (from calibration).
+     * @param focalLengthY y value of the focal length (from calibration)
+     * @param principalPointX x value of the principal point (from calibration).
+     * @param principalPointY y value of the principal point (from calibration).
+     * @return a ToFPoint3D. The point in world coordinates (mm).
+     */
+    static ToFProcessingCommon::ToFPoint3D ContinuousKinectIndexToCartesianCoordinates(mitk::Point2D continuousIndex, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY);
   };
 }
 #endif

@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::UnstructuredGrid * > ( GetData() );
+  return static_cast<const mitk::UnstructuredGrid * > ( GetDataNode()->GetData() );
 }
 
 
@@ -119,8 +119,10 @@ vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
   return m_Assembly;
 }
 
-void mitk::UnstructuredGridVtkMapper3D::GenerateData()
+
+void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
+
   m_Assembly->VisibilityOn();
 
   m_ActorWireframe->GetProperty()->SetAmbient(1.0);
@@ -148,12 +150,11 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData()
       colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
     }
   }
-}
 
-void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
-{
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(!IsVisible(renderer))
+  if(!visible)
   {
     m_Assembly->VisibilityOff();
     return;
@@ -180,7 +181,6 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);
 
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
   mitk::DataNode::Pointer bbNode = renderer->GetDataStorage()->GetNamedDerivedNode("Clipping Bounding Object", node);
@@ -211,8 +211,8 @@ void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ 
 void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::DataNode::Pointer node = this->GetDataNode();
-  Superclass::ApplyProperties(m_Actor, renderer);
-  Superclass::ApplyProperties(m_ActorWireframe, renderer);
+  ApplyColorAndOpacityProperties(renderer, m_Actor);
+  ApplyColorAndOpacityProperties(renderer, m_ActorWireframe);
 
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();

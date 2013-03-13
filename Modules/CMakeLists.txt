@@ -35,6 +35,7 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
+    Python
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

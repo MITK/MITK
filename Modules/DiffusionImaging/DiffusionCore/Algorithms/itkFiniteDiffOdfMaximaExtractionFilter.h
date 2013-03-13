@@ -41,6 +41,11 @@ Image< Vector< PixelType, 3 >, 3 > >
 
     public:
 
+    enum Toolkit {  ///< SH coefficient convention (depends on toolkit)
+        FSL,
+        MRTRIX
+    };
+
     enum NormalizationMethods {
         NO_NORM,            ///< no length normalization of the output peaks
         SINGLE_VEC_NORM,    ///< normalize the single peaks to length 1
@@ -87,6 +92,9 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< container for output peaks
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< number of peaks per voxel
 
+    itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
+    itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
+
     protected:
     FiniteDiffOdfMaximaExtractionFilter();
     ~FiniteDiffOdfMaximaExtractionFilter(){}
@@ -122,6 +130,8 @@ Image< Vector< PixelType, 3 >, 3 > >
     ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
     ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
     ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed
+
+    Toolkit                                   m_Toolkit;
 };
 
 }

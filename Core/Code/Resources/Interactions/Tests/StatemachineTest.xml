@@ -1,0 +1,20 @@
+<statemachine>
+    <state name="state1" startstate="true">
+        <transition event_class="MouseMoveEvent" event_variant="no1" target="state2">
+        <action name="doaction1"/>
+        <action name="doaction2"/>
+        </transition>
+    </state>
+    <state name="state2">
+        <transition event_class="MouseMoveEvent" event_variant="no1" target="state3">
+        <action name="doaction7"/>
+        <action name="doaction2"/>
+        </transition>
+    </state>
+    <state name="state3">
+        <transition event_class="MouseReleaseEvent" event_variant="no7" target="state1">
+        <action name="doaction4"/>
+        <action name="doaction5"/>
+        </transition>
+    </state>
+</statemachine>

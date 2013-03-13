@@ -63,7 +63,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Image*> ( GetData() );
+  return static_cast<const mitk::Image*> ( GetDataNode()->GetData() );
 }
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
@@ -211,7 +211,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
   bool volumeRenderingEnabled = true;
 
-  if (this->IsVisible(renderer)==false ||
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ||
       this->GetDataNode() == NULL ||
       dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))==NULL ||
       dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))->GetValue() == false
@@ -439,7 +443,7 @@ void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *r
 
     float rgb[3]={1.0f,1.0f,1.0f};
     // check for color prop and use it for rendering if it exists
-    if(GetColor(rgb, renderer))
+    if(GetDataNode()->GetColor(rgb, renderer, "color"))
     {
       colorTransferFunction->AddRGBPoint( 0.0, 0.0, 0.0, 0.0 );
       colorTransferFunction->AddRGBPoint( 127.5, rgb[0], rgb[1], rgb[2] );
@@ -566,10 +570,6 @@ void mitk::VolumeDataVtkMapper3D::DelClippingPlane()
   m_PlaneSet = false;
 }
 
-void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
-{
-
-}
 
 void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
@@ -588,7 +588,10 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
       levWinProp->SetLevelWindow( levelwindow );
       node->SetProperty( "levelwindow", levWinProp, renderer );
     }
-    if((overwrite) || (node->GetProperty("LookupTable", renderer)==NULL))
+    //This mapper used to set a default lut "LookupTable" for images. However, this will
+    //overwrite the default lut of the 2D image mapper. Thus, this property here is renamed.
+    /*
+    if((overwrite) || (node->GetProperty("Volume.LookupTable", renderer)==NULL))
     {
       // add a default rainbow lookup table for color mapping
       mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
@@ -598,8 +601,8 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
       vtkLut->Build();
       mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
       mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
-    }
+      node->SetProperty( "Volume.LookupTable", mitkLutProp );
+    }*/
     if((overwrite) || (node->GetProperty("TransferFunction", renderer)==NULL))
     {
       // add a default transfer function

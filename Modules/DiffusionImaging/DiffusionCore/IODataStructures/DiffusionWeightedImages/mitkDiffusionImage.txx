@@ -242,6 +242,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     {
       if(AreAlike(gdcitNew.Value(), gdcitOld.Value(), precision))
       {
+        //MITK_INFO << gdcitNew.Value() << "  " << gdcitOld.Value();
         dirIndices[gdcitNew.Index()].push_back(gdcitOld.Index());
       }
     }
@@ -264,17 +265,19 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     for(unsigned int i=0; i<dirIndices.size(); i++)
     {
       // do the averaging
-      int numavg = dirIndices[i].size();
+      const unsigned int numavg = dirIndices[i].size();
+      unsigned int sum = 0;
       for(int j=0; j<numavg; j++)
       {
-        newVec[i] += oldVec[dirIndices[i].at(j)];
+        //MITK_INFO << newVec[i] << " << " << oldVec[dirIndices[i].at(j)];
+        sum += oldVec[dirIndices[i].at(j)];
       }
       if(numavg == 0)
       {
         MITK_ERROR << "mitkDiffusionImage: Error on averaging. Possibly due to corrupted data";
         return;
       }
-      newVec[i] /= numavg;
+      newVec[i] = sum / numavg;
     }
 
     newIt.Set(newVec);

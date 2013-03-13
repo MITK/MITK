@@ -105,13 +105,19 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
   textureCoords->SetNumberOfComponents(2);
+  textureCoords->Allocate(size);
 
   //Make a vtkIdList to save the ID's of the polyData corresponding to the image
   //pixel ID's. See below for more documentation.
-  vtkSmartPointer<vtkIdList> vertexIdList = vtkSmartPointer<vtkIdList>::New();
+  m_VertexIdList = vtkSmartPointer<vtkIdList>::New();
   //Allocate the object once else it would automatically allocate new memory
   //for every vertex and perform a copy which is expensive.
-  vertexIdList->Allocate(size);
+  m_VertexIdList->Allocate(size);
+  m_VertexIdList->SetNumberOfIds(size);
+  for(int i = 0; i < size; ++i)
+  {
+    m_VertexIdList->SetId(i, 0);
+  }
 
   float* scalarFloatData = NULL;
 
@@ -189,7 +195,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         //If we use points->InsertNextPoint(...) instead, the ID's do not
         //correspond to the image pixel ID's. Thus, we have to save them
         //in the vertexIdList.
-        vertexIdList->InsertId(pixelID, points->InsertNextPoint(cartesianCoordinates.GetDataPointer()));
+        m_VertexIdList->SetId(pixelID, points->InsertNextPoint(cartesianCoordinates.GetDataPointer()));
 
         if((i >= 1) && (j >= 1))
         {
@@ -211,37 +217,33 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           vtkIdType x_1y_1 = xy_1-1;
 
           //Find the corresponding vertex ID's in the saved vertexIdList:
-          vtkIdType xyV = vertexIdList->GetId(xy);
-          vtkIdType x_1yV = vertexIdList->GetId(x_1y);
-          vtkIdType xy_1V = vertexIdList->GetId(xy_1);
-          vtkIdType x_1y_1V = vertexIdList->GetId(x_1y_1);
+          vtkIdType xyV = m_VertexIdList->GetId(xy);
+          vtkIdType x_1yV = m_VertexIdList->GetId(x_1y);
+          vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
+          vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
 
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
-              polys->InsertNextCell(3);
-              polys->InsertCellPoint(x_1yV);
-              polys->InsertCellPoint(xyV);
-              polys->InsertCellPoint(x_1y_1V);
+            polys->InsertNextCell(3);
+            polys->InsertCellPoint(x_1yV);
+            polys->InsertCellPoint(xyV);
+            polys->InsertCellPoint(x_1y_1V);
 
-              polys->InsertNextCell(3);
-              polys->InsertCellPoint(x_1y_1V);
-              polys->InsertCellPoint(xyV);
-              polys->InsertCellPoint(xy_1V);
+            polys->InsertNextCell(3);
+            polys->InsertCellPoint(x_1y_1V);
+            polys->InsertCellPoint(xyV);
+            polys->InsertCellPoint(xy_1V);
           }
         }
         //Scalar values are necessary for mapping colors/texture onto the surface
         if (scalarFloatData)
         {
-          scalarArray->InsertTuple1(vertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
+          scalarArray->InsertTuple1(m_VertexIdList->GetId(pixelID), scalarFloatData[pixelID]);
         }
         //These Texture Coordinates will map color pixel and vertices 1:1 (e.g. for Kinect).
-        if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-        {
-
-          float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
-          float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
-          textureCoords->InsertTuple2(vertexIdList->GetId(pixelID), xNorm, yNorm);
-        }
+        float xNorm = (((float)i)/xDimension);// correct video texture scale for kinect
+        float yNorm = ((float)j)/yDimension; //don't flip. we don't need to flip.
+        textureCoords->InsertTuple2(m_VertexIdList->GetId(pixelID), xNorm, yNorm);
       }
     }
   }
@@ -254,11 +256,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   {
     mesh->GetPointData()->SetScalars(scalarArray);
   }
-  //Pass the TextureCoords to the polydata (if they were set).
-  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-  {
-    mesh->GetPointData()->SetTCoords(textureCoords);
-  }
+  //Pass the TextureCoords to the polydata anyway (to save them).
+  mesh->GetPointData()->SetTCoords(textureCoords);
   output->SetVtkPolyData(mesh);
 }
 

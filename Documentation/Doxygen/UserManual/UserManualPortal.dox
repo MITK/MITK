@@ -1,0 +1,14 @@
+/**
+\page UserManualPortal MITK: User Manual
+
+Due to the modular architecture of MITK the user documentation is split in different parts. You can find a short description of the intended purpose and audience of MITK based applications developed by us at \ref ApplicationsPage. To get an introduction into the usage of any MITK based application please read \ref MITKUserManualPage. It will give you an overview of most of the common questions, such as how to load or save data  or navigate within it.
+
+For any more specific documentation of how a plugin operates you can find the plugin documentation in \ref PluginListPage. Depending on the application you are using you might have only some or all of the listed plugins available.
+
+\section UserManualPortalTopics List of topics
+<ul>
+  <li> \subpage ApplicationsPage </li>
+  <li> \subpage MITKUserManualPage </li>
+  <li> \subpage PluginListPage </li>
+</ul>
+*/

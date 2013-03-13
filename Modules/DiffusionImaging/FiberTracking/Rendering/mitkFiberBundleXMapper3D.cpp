@@ -44,7 +44,7 @@ mitk::FiberBundleXMapper3D::~FiberBundleXMapper3D()
 
 const mitk::FiberBundleX* mitk::FiberBundleXMapper3D::GetInput()
 {
-    return static_cast<const mitk::FiberBundleX * > ( GetData() );
+    return static_cast<const mitk::FiberBundleX * > ( GetDataNode()->GetData() );
 }
 
 
@@ -62,7 +62,7 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
     //==========================
 
 
-    mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (this->GetData());
+    mitk::FiberBundleX* FBX = dynamic_cast<mitk::FiberBundleX*> (GetDataNode()->GetData());
     if (FBX == NULL)
         return;
 
@@ -117,8 +117,10 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
 void mitk::FiberBundleXMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-    if ( !this->IsVisible( renderer ) )
-        return;
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if ( !visible ) return;
 
     // Calculate time step of the input data for the specified renderer (integer value)
     // this method is implemented in mitkMapper

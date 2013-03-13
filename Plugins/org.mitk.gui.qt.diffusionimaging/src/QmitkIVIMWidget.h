@@ -47,7 +47,7 @@ class QmitkIVIMWidget : public QmitkPlotWidget
 
 public:
 
-  typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, short> IVIMFilterType;
+  typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, float> IVIMFilterType;
 
   typedef mitk::Image::HistogramType HistogramType;
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;

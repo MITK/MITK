@@ -40,7 +40,6 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
 
     mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
     //Set the opacity for all images
-    renderingHelper.SetImageProperty("use color", mitk::BoolProperty::New(true));
     renderingHelper.SetImageProperty("color", mitk::ColorProperty::New(0.0f, 0.0f, 255.0f));
     //for now this test renders in sagittal view direction
     renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
@@ -60,6 +59,7 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
+    renderingHelper.PrepareRender();
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

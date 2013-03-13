@@ -85,8 +85,6 @@ int mitkSurfaceVtkMapper3DTest(int argc, char* argv[])
     //Perform reinit, because we removed data.
     mitk::RenderingManager::GetInstance()->InitializeViews( renderingHelper.GetDataStorage()->ComputeBoundingGeometry3D(renderingHelper.GetDataStorage()->GetAll()) );
 
-    renderingHelper.Render();
-
     //Find a nice camera position to view the surface from the front.
     //This has to be done after calling renderingHelper.Render(),
     //because it would overwrite the camera position with global reinit.
@@ -98,10 +96,11 @@ int mitkSurfaceVtkMapper3DTest(int argc, char* argv[])
     camera3d->SetViewUp(0,-1,0);
     camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
     camera3d->SetViewAngle(40);
-    camera3d->SetClippingRange(1, 10000);
+   // camera3d->SetClippingRange(1, 10000);
     renderingHelper.GetVtkRenderer()->ResetCamera();
 
 
+    renderingHelper.Render();
     //use this to generate a reference screenshot or save the file:
     bool generateReferenceScreenshot = false;
     if(generateReferenceScreenshot)
@@ -116,6 +115,7 @@ int mitkSurfaceVtkMapper3DTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
+    renderingHelper.PrepareRender();
     int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
     //retVal meanings: (see VTK/Rendering/vtkTesting.h)

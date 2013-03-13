@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSimulationModel.h"
 #include <sofa/core/visual/DisplayFlags.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <vtkActor.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageReader2.h>
@@ -27,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
-#include <vtkTexture.h>
 
 mitk::SimulationModel::SimulationModel()
   : m_LastTime(-1.0),
@@ -39,28 +37,7 @@ mitk::SimulationModel::SimulationModel()
 
 mitk::SimulationModel::~SimulationModel()
 {
-  this->DeleteVtkTextures();
-  this->DeleteVtkObjects();
-}
-
-void mitk::SimulationModel::DeleteVtkObjects()
-{
-  for (std::vector<vtkObjectBase*>::const_iterator object = m_VtkObjects.begin(); object != m_VtkObjects.end(); ++object)
-    (*object)->Delete();
-
-  m_VtkObjects.clear();
-
-  for (std::vector<vtkActor*>::const_iterator actor = m_Actors.begin(); actor != m_Actors.end(); ++actor)
-    (*actor)->Delete();
-
   m_Actors.clear();
-}
-
-void mitk::SimulationModel::DeleteVtkTextures()
-{
-  for (std::map<unsigned int, vtkTexture*>::const_iterator texture = m_Textures.begin(); texture != m_Textures.end(); ++texture)
-    texture->second->Delete();
-
   m_Textures.clear();
 }
 
@@ -86,18 +63,16 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   const sofa::defaulttype::ResizableExtVector<Coord>& vertices = this->getVertices();
   unsigned int numVertices = vertices.size();
 
-  vtkPoints* points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetNumberOfPoints(numVertices);
 
   for (unsigned int i = 0; i < numVertices; ++i)
     points->SetPoint(i, vertices[i].elems);
 
-  vtkPolyData* polyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
 
-  points->Delete();
-
-  vtkCellArray* polys = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
 
   int numTriangles = g.tri0 + g.nbt;
   int numQuads = g.quad0 + g.nbq;
@@ -121,20 +96,17 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
 
   polyData->SetPolys(polys);
 
-  polys->Delete();
-
   const sofa::defaulttype::ResizableExtVector<Coord>& normals = this->getVnormals();
   unsigned int numNormals = normals.size();
 
-  vtkFloatArray* vtkNormals = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
   vtkNormals->SetNumberOfComponents(3);
+  vtkNormals->SetNumberOfTuples(numNormals);
 
   for (unsigned int i = 0; i < numNormals; ++i)
-    vtkNormals->InsertNextTuple(normals[i].elems);
+    vtkNormals->SetTuple(i, normals[i].elems);
 
   polyData->GetPointData()->SetNormals(vtkNormals);
-
-  vtkNormals->Delete();
 
   sofa::core::loader::Material m = g.materialId >= 0
     ? materials.getValue()[g.materialId]
@@ -145,21 +117,20 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     const sofa::defaulttype::ResizableExtVector<TexCoord>& texCoords = this->getVtexcoords();
     unsigned int numTexCoords = texCoords.size();
 
-    vtkFloatArray* vtkTexCoords = vtkFloatArray::New();
+    vtkSmartPointer<vtkFloatArray> vtkTexCoords = vtkSmartPointer<vtkFloatArray>::New();
     vtkTexCoords->SetNumberOfComponents(2);
+    vtkTexCoords->SetNumberOfTuples(numTexCoords);
 
     for (unsigned int i = 0; i < numTexCoords; ++i)
-      vtkTexCoords->InsertNextTuple(texCoords[i].elems);
+      vtkTexCoords->SetTuple(i, texCoords[i].elems);
 
     polyData->GetPointData()->SetTCoords(vtkTexCoords);
-
-    vtkTexCoords->Delete();
   }
 
-  vtkPolyDataMapper* polyDataMapper = vtkPolyDataMapper::New();
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  vtkActor* actor = vtkActor::New();
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
@@ -199,17 +170,15 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
   if (vparams->displayFlags().getShowWireFrame())
     property->SetRepresentationToWireframe();
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 
   if (!m_LastShowNormals)
    return;
 
-  points = vtkPoints::New();
+  points = vtkSmartPointer<vtkPoints>::New();
   points->SetNumberOfPoints(numVertices * 2);
 
-  vtkCellArray* lines = vtkCellArray::New();
+  vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
   for (unsigned int i = 0; i < numVertices; ++i)
   {
@@ -224,26 +193,21 @@ void mitk::SimulationModel::DrawGroup(int ig, const sofa::core::visual::VisualPa
     lines->InsertCellPoint(k);
   }
 
-  polyData = vtkPolyData::New();
+  polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
   polyData->SetLines(lines);
 
-  points->Delete();
-  lines->Delete();
-
-  polyDataMapper = vtkPolyDataMapper::New();
+  polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   polyDataMapper->SetInput(polyData);
 
-  actor = vtkActor::New();
+  actor = vtkSmartPointer<vtkActor>::New();
   actor->SetMapper(polyDataMapper);
   actor->SetScale(Simulation::ScaleFactor);
 
-  m_VtkObjects.push_back(polyData);
-  m_VtkObjects.push_back(polyDataMapper);
   m_Actors.push_back(actor);
 }
 
-std::vector<vtkActor*> mitk::SimulationModel::GetActors() const
+std::vector<vtkSmartPointer<vtkActor> > mitk::SimulationModel::GetActors() const
 {
   return m_Actors;
 }
@@ -268,7 +232,7 @@ void mitk::SimulationModel::internalDraw(const sofa::core::visual::VisualParams*
   if (transparent)
     return;
 
-  this->DeleteVtkObjects();
+  m_Actors.clear();
 
   if (!vparams->displayFlags().getShowVisualModels())
     return;
@@ -293,7 +257,7 @@ bool mitk::SimulationModel::loadTexture(const std::string& filename)
 
 bool mitk::SimulationModel::loadTextures()
 {
-  this->DeleteVtkTextures();
+  m_Textures.clear();
 
   std::vector<unsigned int> activatedTextures;
 
@@ -317,18 +281,17 @@ bool mitk::SimulationModel::loadTextures()
     if (!sofa::helper::system::DataRepository.findFile(textureFilename))
       return false;
 
-    vtkImageReader2* imageReader = vtkImageReader2Factory::CreateImageReader2(textureFilename.c_str());
+    vtkSmartPointer<vtkImageReader2> imageReader;
+    imageReader.TakeReference(vtkImageReader2Factory::CreateImageReader2(textureFilename.c_str()));
 
     if (imageReader == NULL)
       return false;
 
     imageReader->SetFileName(textureFilename.c_str());
 
-    vtkTexture* texture = vtkTexture::New();
+    vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
     texture->SetInput(imageReader->GetOutputDataObject(0));
     texture->InterpolateOn();
-
-    imageReader->Delete();
 
     m_Textures.insert(std::make_pair(activatedTextures[i], texture));
   }

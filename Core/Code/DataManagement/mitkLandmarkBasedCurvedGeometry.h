@@ -42,7 +42,7 @@ public:
 
   virtual void ComputeGeometry() = 0;
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const = 0;
+  virtual itk::LightObject::Pointer InternalClone() const = 0;
 
 protected:
   LandmarkBasedCurvedGeometry();
@@ -57,4 +57,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* MITKLANDMARKBASEDCURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
+#endif

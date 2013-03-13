@@ -21,6 +21,8 @@
 //## @file mitkInteractionEventConst.h
 //## @brief Constants to describe Mouse Events and special Key Events.
 
+#include <string>
+
 namespace mitk
 {
 
@@ -49,10 +51,11 @@ namespace mitk
   {
     return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
   }
-  // TODO: FixME not working!
-  inline MouseButtons operator|=(MouseButtons a, MouseButtons b)
+
+  inline MouseButtons& operator|=(MouseButtons& a, MouseButtons& b)
   {
-    return static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+    a = static_cast<MouseButtons>(static_cast<int>(a) | static_cast<int>(b));
+    return a;
   }
 
   inline ModifierKeys operator|(ModifierKeys a, ModifierKeys b)
@@ -60,10 +63,10 @@ namespace mitk
     return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
   }
 
-// TODO: FixME not working!
-  inline ModifierKeys operator|=(ModifierKeys a, ModifierKeys b)
+  inline ModifierKeys& operator|=(ModifierKeys& a, ModifierKeys& b)
   {
-    return static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
+    a = static_cast<ModifierKeys>(static_cast<int>(a) | static_cast<int>(b));
+    return a;
   }
 
   /**
@@ -102,14 +105,14 @@ namespace mitk
   // XML Tags
   const std::string xmlTagConfigRoot = "config";
   const std::string xmlTagParam = "param";
-  const std::string xmlTagInput = "input";
+  const std::string xmlTagEventVariant = "event_variant";
   const std::string xmlTagAttribute = "attribute";
 
   // XML Param
   const std::string xmlParameterName = "name";
   const std::string xmlParameterValue = "value";
   const std::string xmlParameterEventVariant = "event_variant";
-  const std::string xmlParameterEventClass = "event_class";
+  const std::string xmlParameterEventClass = "class";
 
   // Event Description
   const std::string xmlEventPropertyModifier = "Modifiers";

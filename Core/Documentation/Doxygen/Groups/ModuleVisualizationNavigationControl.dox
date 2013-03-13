@@ -1,0 +1,15 @@
+
+/**
+
+\defgroup NavigationControl Navigation Control Classes
+\ingroup Visualization
+
+\brief The classes in this category tell the render (subclass of mitk::BaseRenderer) which
+slice (subclass mitk::SliceNavigationController) or from which direction (subclass
+mitk::CameraController) it has to render.
+
+Contains two Stepper for stepping through the slices or through different camera views (e.g.,
+for the creation of a movie around the data), respectively, and through time, if
+there is 3D+t data.
+
+*/

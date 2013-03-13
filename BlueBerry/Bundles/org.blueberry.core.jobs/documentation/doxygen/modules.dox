@@ -1,0 +1,16 @@
+/**
+  \defgroup org_blueberry_core_jobs org.blueberry.core.jobs
+  \ingroup BlueBerryPlugins
+
+  \brief A generic jobs API for running background tasks in a BlueBerry application.
+
+*/
+
+/**
+  \defgroup org_blueberry_core_jobs_internal Internal
+  \ingroup org_blueberry_core_jobs
+
+  \brief This subcategory includes the internal classes of the org.blueberry.core.jobs plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

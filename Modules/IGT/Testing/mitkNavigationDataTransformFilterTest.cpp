@@ -121,7 +121,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   rotMatrix[2][2] = 1;
 
   mitk::NavigationDataTransformFilter::TransformType::Pointer transform2 =  mitk::NavigationDataTransformFilter::TransformType::New();
-  transform2->SetRotationMatrix(rotMatrix);
+  transform2->SetMatrix(rotMatrix);
 
   myFilter2->SetRigid3DTransform(transform2);
 

@@ -13,11 +13,7 @@ set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
 
-  set(revision_tag 66dc8282)
-
-  #if(${proj}_REVISION_TAG)
-  #  set(revision_tag ${${proj}_REVISION_TAG})
-  #endif()
+  set(revision_tag 062612b5)
 
   ExternalProject_Add(${proj}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz

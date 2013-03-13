@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactoryBase.h>
 
 
-#define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+// #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 mitk::BaseData::BaseData() :
   m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL),

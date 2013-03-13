@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <SimulationExports.h>
 #include <sofa/component/visualmodel/VisualModelImpl.h>
-
-class vtkActor;
-class vtkObjectBase;
-class vtkTexture;
+#include <vtkActor.h>
+#include <vtkSmartPointer.h>
+#include <vtkTexture.h>
 
 namespace mitk
 {
@@ -31,7 +30,7 @@ namespace mitk
   public:
     SOFA_CLASS(SimulationModel, sofa::component::visualmodel::VisualModelImpl);
 
-    std::vector<vtkActor*> GetActors() const;
+    std::vector<vtkSmartPointer<vtkActor> > GetActors() const;
 
     bool loadTexture(const std::string& filename);
     bool loadTextures();
@@ -46,13 +45,10 @@ namespace mitk
     SimulationModel(const MyType&);
     MyType& operator=(const MyType&);
 
-    void DeleteVtkObjects();
-    void DeleteVtkTextures();
     void DrawGroup(int ig, const sofa::core::visual::VisualParams* vparams, bool transparent);
 
-    std::vector<vtkObjectBase*> m_VtkObjects;
-    std::vector<vtkActor*> m_Actors;
-    std::map<unsigned int, vtkTexture*> m_Textures;
+    std::vector<vtkSmartPointer<vtkActor> > m_Actors;
+    std::map<unsigned int, vtkSmartPointer<vtkTexture> > m_Textures;
 
     double m_LastTime;
     bool m_LastShowNormals;

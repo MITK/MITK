@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 #include <QMessageBox>
 #include <QtSingleApplication>
+#include <QtGlobal>
+#include <QTime>
 
 #include <mitkCommon.h>
 #include <mitkException.h>
@@ -139,5 +141,10 @@ int main(int argc, char** argv)
   // initialization methods and/or missing de-initialization code.
   extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext,libCTKDICOMCore:0.1");
 
+  // Seed the random number generator, once at startup.
+  QTime time = QTime::currentTime();
+  qsrand((uint)time.msec());
+
+  // Run the workbench.
   return berry::Starter::Run(argc, argv, extConfig);
 }

@@ -79,7 +79,7 @@ void mitk::BaseProcess::UnRegister() const
       unsigned int idx;
       for (idx = 0; idx < outputs.size(); ++idx)
       {
-        const_cast<mitk::BaseProcess*>(this)->RemoveOutput(outputs[idx]);
+        const_cast<mitk::BaseProcess*>(this)->RemoveOutput(idx);
       }
       //now the referenceCount should be one!
       int testReferenceCount=GetReferenceCount();

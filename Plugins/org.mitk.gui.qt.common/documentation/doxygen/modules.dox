@@ -3,7 +3,14 @@
   \ingroup MITKPlugins
 
   \brief Provides Qt GUI specific utility classes for MITK View and Editor developers.
-  
+
+  This plug-in provides abstract classes to ease the development of MITK related View and
+  Editor extensions for a BlueBerry based application. The main classes are:
+
+  - QmitkAbstractView
+  - QmitkAbstractRenderEditor
+
+  See also the GUI toolkit independent classes and interfaces in \ref org_mitk_gui_common.
 */
 
 /**

@@ -8,7 +8,7 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
-  mitkEventConfigTest.cpp
+  #mitkEventConfigTest.cpp ## needs to be re-written, test indirect since EventConfig is no longer exported as interface Bug 14529
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -21,8 +21,7 @@ set(MODULE_TESTS
   #mitkImageToItkTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  mitkInteractionEventTest.cpp
-  mitkITKThreadingTest.cpp
+  #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
@@ -40,7 +39,7 @@ set(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  mitkStateMachineContainerTest.cpp
+  ##mitkStateMachineContainerTest.cpp ## rewrite test, indirect since no longer exported Bug 14529
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
@@ -109,6 +108,7 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
+    mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
@@ -125,4 +125,4 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              EXECUTABLE
                             )
 
-set(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
+set(TEST_CPP_FILES ${testdriver_init_file})

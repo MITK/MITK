@@ -1,0 +1,25 @@
+
+/**
+
+\defgroup Mapper Mapper Classes
+\ingroup Visualization
+
+\brief In the MITK rendering concept, Mappers are responsible for actually rendering data onto the screen.
+
+
+\section overviewVisualizationMapper Overview
+
+Mappers differ in the type of data they are capable of rendering (e.g. volume data, polygonal data) and the mode of how data is rendered (e.g. 2D or 3D). For example, the ImageMapperGL2D renders volume data in a 2D view, i.e. it extracts a slice of the volume (as determined by the Geometry of the associated Renderer) and displays it as a 2D plane. All Mapper classes are arranged in a class hierarchy according to these criterions.
+
+
+\section integrationVisualizationMapper Integration into the rendering process
+
+Mapper objects are owned by the DataNode which contains the data they have to render. An overview over this composition is given in the section \ref Renderer. Each DataNode can have (and usually has) multiple Mappers attached, each responsible for different modes of rendering. In most cases this would be one 2D Mapper and one 3D Mapper, but other Mappers are possible, too.
+Which Mapper of a DataNode to use is determined by an ID; the Renderer of a 2D window would for example ask the DataNode to return an appropriate 2D Mapper.
+
+More details can be found in the section on \ref Rendering.
+
+\section todoVisualizationMapper Future plans
+
+The need to Update() a Mapper can be justified by property changes in the associated data items. However, property changes are not uniformly taken into account when deciding on whether to execute Update() or not. The changes are data specific and difficult to generalize. As an effect, many Update() calls are not really necessary and might slow down the rendering process significantly. One solution to this problem might be a mechanism which allows Mappers to register themselves to relevant data properties, so as to be notified whenever a change occurs. If no modification did occur since the last Update(), and the data itself has remained unchanged, no re-initialization (of the rendering pipeline for example) needs to be performed.
+*/

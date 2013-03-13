@@ -39,7 +39,7 @@ mitk::ContourModelMapper2D::~ContourModelMapper2D()
 const mitk::ContourModel* mitk::ContourModelMapper2D::GetInput( void )
 {
   //convient way to get the data from the dataNode
-  return static_cast< const mitk::ContourModel * >( this->GetData() );
+  return static_cast< const mitk::ContourModel * >( GetDataNode()->GetData() );
 }
 
 
@@ -50,61 +50,13 @@ vtkProp* mitk::ContourModelMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 }
 
 
-void mitk::ContourModelMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
-}
-
-
-
-void mitk::ContourModelMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible( renderer )==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
-}
-
-
-
-void mitk::ContourModelMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-
-
-void mitk::ContourModelMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
-{
-  if(IsVisible(renderer)==false)
-    return;
-  if ( GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-
-
 void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   /*++ convert the contour to vtkPolyData and set it as input for our mapper ++*/
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( this->GetData() );
+  mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( GetDataNode()->GetData() );
 
   unsigned int timestep = renderer->GetTimeStep();
 
@@ -124,13 +76,14 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
 void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
+
 
   //check if there is something to be rendered
-  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( this->GetData() );
+  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( GetDataNode()->GetData() );
   if ( data == NULL )
   {
     return;

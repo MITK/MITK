@@ -69,11 +69,31 @@ public:
   /**
   * \brief Sets the SliceNavigationController of the three 2D Renderwindows.
   *  If they are defined, they can be used to automatically set the crosshair to the selected point
+  *
+  * \deprecatedSince{2013_03} Use AddSliceNavigationController and RemoveSliceNavigationController instead.
   */
-  void SetSnc1(mitk::SliceNavigationController* snc);
-  void SetSnc2(mitk::SliceNavigationController* snc);
-  void SetSnc3(mitk::SliceNavigationController* snc);
+  DEPRECATED( void SetSnc1(mitk::SliceNavigationController* snc) );
+  DEPRECATED( void SetSnc2(mitk::SliceNavigationController* snc) );
+  DEPRECATED( void SetSnc3(mitk::SliceNavigationController* snc) );
   ///@}
+
+  /**
+   * @brief Add a mitk::SliceNavigationController instance.
+   * @param snc The mitk::SliceNavigationController instance.
+   *
+   * This method adds \c snc to the set of slice navigation controllers which are
+   * used to navigate to the selected point.
+   */
+  void AddSliceNavigationController(mitk::SliceNavigationController* snc);
+
+  /**
+   * @brief Remove a mitk::SliceNavigationController instance.
+   * @param snc The mitk::SliceNavigationController instance.
+   *
+   * This method removes \c snc from the set of slice navigation controllers which are
+   * used to navigate to the selected point.
+   */
+  void RemoveSliceNavigationController(mitk::SliceNavigationController* snc);
 
 
 signals:
@@ -117,6 +137,8 @@ protected:
   mitk::SliceNavigationController* m_Snc1;
   mitk::SliceNavigationController* m_Snc2;
   mitk::SliceNavigationController* m_Snc3;
+
+  std::set<mitk::SliceNavigationController*> m_Sncs;
 
 
   QmitkPointListModel*    m_PointListModel;

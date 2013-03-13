@@ -32,7 +32,7 @@ mitk::ContourModelMapper3D::~ContourModelMapper3D()
 const mitk::ContourModel* mitk::ContourModelMapper3D::GetInput( void )
 {
   //convient way to get the data from the dataNode
-  return static_cast< const mitk::ContourModel * >( this->GetData() );
+  return static_cast< const mitk::ContourModel * >( GetDataNode()->GetData() );
 }
 
 
@@ -43,54 +43,6 @@ vtkProp* mitk::ContourModelMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
 }
 
 
-void mitk::ContourModelMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
-  }
-}
-
-
-
-void mitk::ContourModelMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible( renderer )==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
-}
-
-
-
-void mitk::ContourModelMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
-{
-  if ( this->IsVisible(renderer)==false )
-    return;
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-
-
-void mitk::ContourModelMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
-{
-  if(IsVisible(renderer)==false)
-    return;
-  if ( GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
-  }
-}
-
-
-
 void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
   /* First convert the contourModel to vtkPolyData, then tube filter it and
@@ -99,7 +51,7 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( this->GetData() );
+  mitk::ContourModel* inputContour  = static_cast< mitk::ContourModel* >( GetDataNode()->GetData() );
 
   localStorage->m_OutlinePolyData = this->CreateVtkPolyDataFromContour(inputContour);
 
@@ -127,12 +79,11 @@ void mitk::ContourModelMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *re
 
 void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
 {
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( this->GetData() );
+
+  mitk::ContourModel* data  = static_cast< mitk::ContourModel*>( GetDataNode()->GetData() );
   if ( data == NULL )
   {
     return;

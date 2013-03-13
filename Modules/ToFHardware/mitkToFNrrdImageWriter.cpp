@@ -201,7 +201,7 @@ namespace mitk
 
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
-    nrrdWriter->SetPixelTypeInfo(imageTemplate->GetPixelType().GetTypeId());
+    nrrdWriter->SetPixelTypeInfo<std::type_info>( &imageTemplate->GetPixelType().GetTypeId());
     if(imageTemplate->GetPixelType().GetNumberOfComponents() > 1)
     {
       nrrdWriter->SetNumberOfComponents(imageTemplate->GetPixelType().GetNumberOfComponents());

@@ -169,7 +169,7 @@ void QmitkSimulationPreferencePage::OnPluginTreeWidgetItemSelectionChanged()
   {
     m_Controls.descriptionPlainTextEdit->clear();
     m_Controls.componentsListWidget->clear();
-    m_Controls.removeButton->setDisabled(true);
+    m_Controls.removeButton->setEnabled(false);
   }
 }
 

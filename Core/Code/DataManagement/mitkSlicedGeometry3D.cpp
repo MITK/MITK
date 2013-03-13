@@ -590,7 +590,7 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
 
     planeGeometry->SetReferenceGeometry( m_ReferenceGeometry );
     planeGeometry->InitializeStandardPlane(
-      rightDV.Get_vnl_vector(), bottomDV.Get_vnl_vector(), &m_Spacing );
+      rightDV.GetVnlVector(), bottomDV.GetVnlVector(), &m_Spacing );
     planeGeometry->SetOrigin(origin);
     planeGeometry->SetBounds(bounds);
 
@@ -670,8 +670,8 @@ mitk::SlicedGeometry3D::SetTimeBounds( const mitk::TimeBounds& timebounds )
 }
 
 
-mitk::AffineGeometryFrame3D::Pointer
-mitk::SlicedGeometry3D::Clone() const
+itk::LightObject::Pointer
+mitk::SlicedGeometry3D::InternalClone() const
 {
   Self::Pointer newGeometry = new SlicedGeometry3D(*this);
   newGeometry->UnRegister();
@@ -829,7 +829,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       // Get Rotation axis und angle
       currentNormal.Normalize();
       newNormal.Normalize();
-      float rotationAngle = angle(currentNormal.Get_vnl_vector(),newNormal.Get_vnl_vector());
+      float rotationAngle = angle(currentNormal.GetVnlVector(),newNormal.GetVnlVector());
 
       rotationAngle *= 180.0 / vnl_math::pi; // from rad to deg
       Vector3D rotationAxis = itk::CrossProduct( currentNormal, newNormal );
@@ -884,7 +884,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
          mitk::Vector3D VecAxisCurr = geometry2D->GetAxisVector(0);
          VecAxisCurr.Normalize();
 
-         float rotationAngle = angle(VecAxisCurr.Get_vnl_vector(),vecAxixNew.Get_vnl_vector());
+         float rotationAngle = angle(VecAxisCurr.GetVnlVector(),vecAxixNew.GetVnlVector());
          rotationAngle = rotationAngle * 180 / PI; // Rad to Deg
 
          // we rotate around the normal of the plane, but we do not know, if we need to rotate clockwise

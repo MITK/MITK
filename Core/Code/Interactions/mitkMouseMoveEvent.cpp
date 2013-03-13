@@ -17,8 +17,7 @@
 #include "mitkException.h"
 #include "mitkMouseMoveEvent.h"
 
-mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition = NULL, mitk::MouseButtons buttonStates =
-    NoButton, mitk::ModifierKeys modifiers = NoKey)
+mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition , mitk::MouseButtons buttonStates, mitk::ModifierKeys modifiers)
 : InteractionPositionEvent(baseRenderer, mousePosition,  "MouseMoveEvent")
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
@@ -57,4 +56,9 @@ bool mitk::MouseMoveEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inter
     return false;
   }
   return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates());
+}
+
+bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  return (dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer()) != NULL) ;
 }

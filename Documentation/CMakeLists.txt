@@ -1,4 +1,4 @@
-# 
+#
 # Variables:
 #  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
 
@@ -31,7 +31,6 @@ if(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
   set(HAVE_DOT "YES")
 endif()
 
-set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 set(MITK_DOXYGEN_TAGFILE_NAME ${MITK_DOXYGEN_OUTPUT_DIR}/MITK.tag CACHE INTERNAL "MITK Doxygen tag file")
 
 # This is relative to the working directory of the doxygen command
@@ -42,7 +41,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${MITK_DOXYGEN_STYLESHEET}
 # Create QCH files for MITK and external projects
 set(MITK_DOXYGEN_GENERATE_QHP "NO")
 if(MITK_DOXYGEN_GENERATE_QCH_FILES)
-  
+
   find_program(QT_HELPGENERATOR_EXECUTABLE
     NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
     PATHS ${QT_BINARY_DIR}
@@ -50,7 +49,7 @@ if(MITK_DOXYGEN_GENERATE_QCH_FILES)
     NO_DEFAULT_PATH
   )
   mark_as_advanced(QT_HELPGENERATOR_EXECUTABLE)
-  
+
   if(NOT QT_HELPGENERATOR_EXECUTABLE)
     message(SEND_ERROR "The Qt help generator could not be found. Disabling qch generation")
   else()
@@ -75,7 +74,7 @@ if(MITK_USE_BLUEBERRY)
   set(BLUEBERRY_DOXYGEN_LINK "<a class=\"el\" href=\"${_blueberry_doxygen_path}/index.html\">BlueBerry Documentation</a>")
   set(MITK_XP_LINK "\\ref mitkExtPointsIndex")
   configure_file(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/html/schema.css)
-  
+
   set(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} BLUEBERRY")
 endif(MITK_USE_BLUEBERRY)
 
@@ -133,7 +132,7 @@ add_custom_target(doc ${_doc_in_all}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   )
 
-if(MITK_USE_BLUEBERRY)  
+if(MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   find_package(Ant)
   if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
@@ -142,16 +141,16 @@ if(MITK_USE_BLUEBERRY)
          ${MITK_SOURCE_DIR}/Plugins/plugin.xml)
 
     file(GLOB_RECURSE _plugin_xmls ${MITK_XP_GLOB_EXPRESSIONS})
-                      
-    MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
+
+    MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls}
                          OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
                          TARGET_NAME mitkXPDoc
                          )
 
-    add_dependencies(doc mitkXPDoc)
-    if(${PROJECT_NAME} STREQUAL "MITK")
-      add_dependencies(doc BlueBerryDoc)
-    endif()
+    add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
+    #if(${PROJECT_NAME} STREQUAL "MITK")
+    #  add_dependencies(doc BlueBerryDoc)
+    #endif()
   endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 endif(MITK_USE_BLUEBERRY)
 
@@ -171,7 +170,7 @@ endif(MITK_USE_BLUEBERRY)
 
 else(DOXYGEN_FOUND)
 
-# copy blank documentation page to prevent QtHelp from being shown 
+# copy blank documentation page to prevent QtHelp from being shown
 # copy the .qhc and .qch files to $MITK_BIN/mitk/bin/ExtBundles/resources/
 
 configure_file(pregenerated/MITKBlankPage.qch

@@ -643,13 +643,13 @@ bool mitk::OdfVtkMapper2D<T,N>
     switch(GetIndex(renderer))
     {
     case 0:
-        retval = this->IsVisible(renderer, "VisibleOdfs_T");
+        GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_T");
         break;
     case 1:
-        retval = this->IsVisible(renderer, "VisibleOdfs_S");
+        GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_S");
         break;
     case 2:
-        retval = this->IsVisible(renderer, "VisibleOdfs_C");
+        GetDataNode()->GetVisibility(retval, renderer, "VisibleOdfs_C");
         break;
     }
 
@@ -698,8 +698,10 @@ template<class T, int N>
 void mitk::OdfVtkMapper2D<T,N>
 ::Update(mitk::BaseRenderer* renderer)
 {
-    if ( !this->IsVisible( renderer ) )
-      return;
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+    if ( !visible ) return;
 
     mitk::Image::Pointer input = const_cast<mitk::Image*>( this->GetInput() );
     if ( input.IsNull() ) return ;

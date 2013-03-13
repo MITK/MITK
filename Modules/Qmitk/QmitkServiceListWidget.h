@@ -34,13 +34,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 /**
-* @brief This widget provides abstraction for the handling of MicroServices . Place one in your Plugin and set it to look for a certain interface.
-* One can also specify a filter and / or a property to use for captioning of the services. It also offers functionality to signal
-* ServiceEvents and to return the actual classes, so only a minimum of interaction with the MicroserviceInterface is required.
-* To get started, just put it in your Plugin or Widget, call the Initialize Method and optionally connect it's signals.
-* As QT limits templating possibilities, events only throw ServiceReferences. You can manually dereference them using TranslateServiceReference()
-*
-* @ingroup QMITK
+ * \ingroup QmitkModule
+ *
+ * \brief This widget provides abstraction for the handling of MicroServices.
+ *
+ * Place one in your Plugin and set it to look for a certain interface.
+ * One can also specify a filter and / or a property to use for captioning of
+ * the services. It also offers functionality to signal
+ * ServiceEvents and to return the actual classes, so only a minimum of
+ * interaction with the MicroserviceInterface is required.
+ * To get started, just put it in your Plugin or Widget, call the Initialize
+ * Method and optionally connect it's signals.
+ * As QT limits templating possibilities, events only throw ServiceReferences.
+ * You can manually dereference them using TranslateServiceReference()
 */
 class QMITK_EXPORT QmitkServiceListWidget :public QWidget
 {

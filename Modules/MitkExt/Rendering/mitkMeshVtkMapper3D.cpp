@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::Mesh * > ( GetData() );
+  return static_cast<const mitk::Mesh * > ( GetDataNode()->GetData() );
 }
 
 vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
@@ -86,8 +86,10 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
   m_Contour->Delete();
 }
 
-void mitk::MeshVtkMapper3D::GenerateData()
+
+void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
+
   m_PropAssembly->VisibilityOn();
 
   if(m_PropAssembly->GetParts()->IsItemPresent(m_SpheresActor))
@@ -182,15 +184,14 @@ void mitk::MeshVtkMapper3D::GenerateData()
       m_PropAssembly->AddPart(m_ContourActor);
     }
   }
-}
 
-
-void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
   SetVtkMapperImmediateModeRendering(m_ContourMapper);
   SetVtkMapperImmediateModeRendering(m_SpheresMapper);
 
-  if(IsVisible(renderer)==false)
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
   {
     m_SpheresActor->VisibilityOff();
     m_ContourActor->VisibilityOff();

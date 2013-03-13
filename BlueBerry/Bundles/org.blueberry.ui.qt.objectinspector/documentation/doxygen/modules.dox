@@ -2,7 +2,8 @@
   \defgroup org_blueberry_ui_qt_objectinspector org.blueberry.ui.qt.objectinspector
   \ingroup BlueBerryPlugins
 
-  \brief Describe your plugin here.
+  \brief A debugging plug-in providing a BlueBerry View for inspecting berry::Object
+  instances and their associated smart-pointers.
   
 */
 

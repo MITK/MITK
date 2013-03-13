@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationData::NavigationData() : itk::DataObject(),
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
-m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0),
+m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
 m_Name()
 {
   m_Position.Fill(0.0);

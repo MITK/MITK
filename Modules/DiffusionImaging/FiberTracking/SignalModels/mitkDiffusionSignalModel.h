@@ -34,7 +34,9 @@ class DiffusionSignalModel
 {
 public:
 
-    DiffusionSignalModel() : m_SignalScale(200){}
+    DiffusionSignalModel()
+        : m_T2(100)
+    {}
     ~DiffusionSignalModel(){}
 
     typedef itk::VariableLengthVector< ScalarType > PixelType;
@@ -45,11 +47,9 @@ public:
     virtual PixelType SimulateMeasurement() = 0;
     void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
-    void SetSignalScale(ScalarType signalScale) { m_SignalScale = signalScale; }
-    void SetRelaxationT2(double T2) { m_RelaxationT2 = T2; }
+    void SetT2(double T2) { m_T2 = T2; }
 
-    double GetRelaxationT2() { return m_RelaxationT2; }
-    ScalarType GetSignalScale() { return m_SignalScale; }
+    double GetT2() { return m_T2; }
     int GetNumGradients(){ return m_GradientList.size(); }
     std::vector< int > GetBaselineIndices()
     {
@@ -71,8 +71,7 @@ protected:
 
     GradientType        m_FiberDirection;   ///< Needed to generate anisotropc signal to determin direction of anisotropy
     GradientListType    m_GradientList;     ///< Diffusion gradient direction container
-    ScalarType          m_SignalScale;      ///< Scaling factor for signal value
-    double              m_RelaxationT2;     ///< Tissue specific relaxation time (used for artificial artifacts)
+    double              m_T2;               ///< Tissue specific relaxation time
 };
 
 }

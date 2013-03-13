@@ -14,6 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifdef _WIN32 // Need version 0x0502 of the windows api to obtain GetThreadId()
+#ifdef _WIN32_WINNT // itk 4.x overwrites _WIN32_WINNT with 0x0400.
+#if _WIN32_WINNT < 0x0502
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif
+#else
+#define _WIN32_WINNT 0x0502
+#endif
+#include "windows.h"
+#endif
+
 #include "mitkImageAccessorBase.h"
 #include "mitkImage.h"
 

@@ -217,12 +217,10 @@ set(CPP_FILES
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventFactory.cpp
-  Interactions/mitkEventHandler.cpp
-  Interactions/mitkEventObserver.cpp
+  Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkEventMapper.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
-  Interactions/mitkInformer.cpp
   Interactions/mitkInteractor.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp
@@ -244,7 +242,6 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
-#  Interactions/mitkStatedEventObserver.cpp
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
@@ -255,6 +252,9 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
+
+  Interfaces/mitkInteractionEventObserver.cpp
+
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
@@ -299,16 +299,13 @@ set(CPP_FILES
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
-  Rendering/mitkVtkMapper2D.cpp
-  Rendering/mitkVtkMapper3D.cpp
+  Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper2D.cpp
+  Rendering/mitkGLMapper.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
-  Rendering/mitkMapper2D.cpp
-  Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
@@ -328,6 +325,7 @@ set(CPP_FILES
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
+  Rendering/mitkRenderingTestHelper.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

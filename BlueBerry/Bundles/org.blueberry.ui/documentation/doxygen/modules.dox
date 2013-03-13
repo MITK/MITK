@@ -3,7 +3,7 @@
   \ingroup BlueBerryPlugins
 
   \brief This is the user interface plugin. It provides a GUI-Toolkit independent framework
-  to build an BlueBerry workbench.
+  to build a BlueBerry workbench.
   
 */
 

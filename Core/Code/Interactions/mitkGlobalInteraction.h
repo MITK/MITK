@@ -65,6 +65,12 @@ namespace mitk {
   //## An iterator is held on one interactor in the map. With the iterator, the map can be looped through so
   //## so that several geometric objects, that lie on top of each other, can be selected.
   //## @ingroup Interaction
+
+  /**
+   * \deprecatedSince{2013_03} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
+   *  Please use the new implementation described in \see DataInteractionPage .
+   */
+
  class MITK_CORE_EXPORT GlobalInteraction : public StateMachine
   {
   public:

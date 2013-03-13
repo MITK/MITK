@@ -43,7 +43,7 @@ Operations:
 
 \section QmitkGibbsTrackingUserManualSignalGeneration Signal Generation
 
-Fiberfox uses a ball-zeppelin model to generate the artificial signal. For details about the signal generation process please refer to TODO.
+Fiberfox uses a flexible multi-compartment model to generate the artificial signal. For details about the signal generation process please refer to TODO.
 A diffusion weighted image is generated from the fibers by selecting the according fiber bundle in the datamanager and clicking "Generate Image". Additionally to the fiber bundle a binary mask can be specified that defines the tissue area. Voxels outside of this mask will contain no signal, only noise. If no tissue mask is selected, the whole image volume is regarded as tissue. Fiberfox allows the addition of artifcats often present in EPI based diffusion weighted datasets like rician noise, Gibbs ringing and blurring introduced by the T2 signal decay.
 
 Image and Compartment Settings:

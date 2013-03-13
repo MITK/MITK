@@ -22,7 +22,7 @@ The input of the algorithm consists of an arbitrary number of binary masks. For 
 \li B-Value: B-Value of the resulting DWI
 \li #Gradient Directions: Number of gradient directions of the resulting DWI.
 \li SNR: Signal to noise ratio. For values > 99, no noise at all is added to the image. The noise values are sampled from a rician distribution.
-\li Grey Matter ADC: Define ADC for isotropic reagions (liquor, air, ...).
+\li Grey Matter ADC: Define ADC for isotropic regions (CSF, air, ...).
 \li Scale of the baseline image values: Usually there is no need to change the dafault value.
 \li Image Dimensions: Size of the resulting DWI (x,y,z)
 \li Image spacing: Spacing of the resulting DWI

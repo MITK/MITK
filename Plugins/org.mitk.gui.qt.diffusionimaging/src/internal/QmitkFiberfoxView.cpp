@@ -438,7 +438,7 @@ QmitkFiberfoxView::GradientListType QmitkFiberfoxView::GenerateHalfShell(int NPo
     NPoints *= 2;
     GradientListType pointshell;
 
-    int numB0 = NPoints/10;
+    int numB0 = NPoints/20;
     if (numB0==0)
         numB0=1;
     GradientType g;

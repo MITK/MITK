@@ -56,7 +56,7 @@ void mitk::ExtractImageFilter::GenerateData()
    }
    else if (input->GetDimension() == 2)
    {
-     Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+     Image::Pointer resultImage = ImageToImageFilter::GetOutput(0);
      resultImage = const_cast<Image*>(input.GetPointer());
      ImageToImageFilter::SetNthOutput( 0, resultImage );
      return;
@@ -97,7 +97,7 @@ void mitk::ExtractImageFilter::GenerateData()
 
   PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex, true, false );
-  Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+  Image::Pointer resultImage = ImageToImageFilter::GetOutput(0);
   planeGeometry->ChangeImageGeometryConsideringOriginOffset(true);
   resultImage->SetGeometry( planeGeometry );
 }
@@ -128,7 +128,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   typename ImageType2D::Pointer slice = sliceExtractor->GetOutput(0);
 
   // re-import to MITK
-  Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+  Image::Pointer resultImage = ImageToImageFilter::GetOutput(0);
   GrabItkImageMemory(slice, resultImage, NULL, false);
 }
 

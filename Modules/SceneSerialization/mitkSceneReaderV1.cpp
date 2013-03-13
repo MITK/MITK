@@ -303,7 +303,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
       deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
       bool success = deserializer->Deserialize();
       error |= !success;
-      PropertyList::Pointer readProperties = deserializer->GetOutput(0);
+      PropertyList::Pointer readProperties = deserializer->GetOutput();
 
       if (readProperties.IsNotNull())
       {
@@ -346,7 +346,7 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
     error = !ioSuccess;
 
     // get the output
-    PropertyList::Pointer inProperties = propertyDeserializer->GetOutput(0);
+    PropertyList::Pointer inProperties = propertyDeserializer->GetOutput();
 
     // store the read-in properties to the given node or throw error otherwise
     if( inProperties.IsNotNull() )

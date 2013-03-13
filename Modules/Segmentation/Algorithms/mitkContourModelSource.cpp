@@ -43,7 +43,7 @@ itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput( const DataObjectI
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 void mitk::ContourModelSource::GraftOutput(OutputType *graft)
@@ -55,4 +55,24 @@ void mitk::ContourModelSource::GraftNthOutput(unsigned int /*idx*/, OutputType* 
 {
   itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
   assert(false);
+}
+
+mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::ContourModelSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::ContourModelSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+ mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::ContourModelSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::ContourModelSource::OutputType*>(Superclass::GetOutput(idx));
 }

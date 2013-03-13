@@ -166,7 +166,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   stencil->SetInput(image);
   stencil->ReverseStencilOff();
   stencil->ReleaseDataFlagOn();
-  stencil->SetStencil(surfaceConverter->GetOutput(0));
+  stencil->SetStencil(surfaceConverter->GetOutput());
   surfaceConverter->Delete();
 
   stencil->SetBackgroundValue(m_MakeOutputBinary ? 0 : m_BackgroundValue);

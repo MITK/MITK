@@ -777,7 +777,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   histogramGenerator->SetHistogramMax( statistics.Max );
   histogramGenerator->Compute();
 
-  histogramContainer->push_back( histogramGenerator->GetOutput(0) );
+  histogramContainer->push_back( histogramGenerator->GetOutput() );
 }
 
 template < typename TPixel, unsigned int VImageDimension >
@@ -1145,7 +1145,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // Apply the generated image stencil to the input image
   vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
   imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-  imageStencilFilter->SetStencil( lassoStencil->GetOutput(0) );
+  imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
   imageStencilFilter->ReverseStencilOff();
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();

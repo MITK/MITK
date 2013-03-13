@@ -637,7 +637,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New();
   wti->SetInput( renderWindow );
   wti->Update();
-  vtkImageData* imageData = wti->GetOutput(0);
+  vtkImageData* imageData = wti->GetOutput();
   int framesize = 5;
   int* windowSize = renderWindow->GetSize();
   int numberOfScalarComponents = imageData->GetNumberOfScalarComponents();

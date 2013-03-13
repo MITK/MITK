@@ -66,7 +66,7 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
   mitk::Image::ConstPointer  maskImage = this->GetInput(1);
   //mitk::Image::Pointer outputImage = this->GetOutput(0);
   //temporary fix for bug #
-  m_outputImage = this->GetOutput(0);
+  m_outputImage = this->GetOutput();
 
   ItkImageType::Pointer itkImage = ItkImageType::New();
   mitk::Image::Pointer tmpImage = mitk::Image::New();

@@ -57,6 +57,11 @@ namespace mitk
     virtual void GraftOutput(OutputType *output);
     virtual void GraftNthOutput(unsigned int idx, OutputType *output);
 
+    OutputType* GetOutput(const DataObjectIdentifierType & key);
+    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+
   protected:
 
     ContourModelSource();

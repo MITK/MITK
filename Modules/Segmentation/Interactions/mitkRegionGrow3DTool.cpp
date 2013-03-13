@@ -423,7 +423,7 @@ void mitk::RegionGrow3DTool::UpdatePreview()
   roiFilter->Update();
 
   mitk::DataNode::Pointer new_node = mitk::DataNode::New();
-  mitk::Image::Pointer tmpImage = roiFilter->GetOutput(0);
+  mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
   new_node->SetData(tmpImage);
 
   m_RoiMax = roiFilter->GetMaxValue();

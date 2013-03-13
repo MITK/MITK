@@ -117,7 +117,7 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   histoFilter->SetHistogramBinMaximum(binMax);
   histoFilter->Update();
 
-  m_UGHistogram = histoFilter->GetOutput(0)->Clone();
+  m_UGHistogram = histoFilter->GetOutput()->Clone();
 
   m_BinSize = (GetMax() - GetMin())/(double)numberOfBins;
 

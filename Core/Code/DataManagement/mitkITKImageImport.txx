@@ -61,7 +61,7 @@ template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::GenerateOutputInformation()
 {
   InputImageConstPointer input  = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -77,7 +77,7 @@ template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::GenerateData()
 {
   InputImageConstPointer input  = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory);
 }
@@ -99,7 +99,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateInputRequestedRegion()
   // input a lower dimension than the output.
   InputImageRegionType inputRegion;
   OutputToInputRegionCopierType regionCopier;
-  regionCopier(inputRegion, this->GetOutput()->GetRequestedRegion());
+  regionCopier(inputRegion, this->GetOutput(0)->GetRequestedRegion());
   input->SetRequestedRegion( inputRegion );
 }
 
@@ -113,7 +113,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
     // cannot guarantee that the input (to which our
     // output is refering) will stay alive.
     InputImageConstPointer input = this->GetInput();
-    mitk::Image::Pointer currentOutput = this->GetOutput();
+    mitk::Image::Pointer currentOutput = this->GetOutput(0);
     if(input.IsNotNull() && currentOutput.IsNotNull())
       currentOutput->SetChannel(input->GetBufferPointer());
   }
@@ -139,7 +139,7 @@ mitk::Image::Pointer mitk::ImportItkImage(const ItkOutputImageType* itkimage, co
   importer->SetGeometry(geometry);
   if(update)
     importer->Update();
-  return importer->GetOutput();
+  return importer->GetOutput(0);
 }
 
 template <typename ItkOutputImageType>

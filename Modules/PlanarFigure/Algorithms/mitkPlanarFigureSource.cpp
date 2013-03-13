@@ -53,7 +53,7 @@ itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput( const DataObjectI
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 void mitk::PlanarFigureSource::GraftOutput(itk::DataObject *graft)

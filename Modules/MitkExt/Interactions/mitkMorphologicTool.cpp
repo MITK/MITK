@@ -97,7 +97,7 @@ void mitk::MorphologicTool::UpdatePreview()
     roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
-    maskedImage = roiFilter->GetOutput(0);
+    maskedImage = roiFilter->GetOutput();
     new_node->SetData(maskedImage);
 
     m_NodeToProceed = new_node;

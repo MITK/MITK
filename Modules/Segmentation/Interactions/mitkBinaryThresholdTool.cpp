@@ -301,7 +301,7 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
     roiFilter->Update();
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
-    mitk::Image::Pointer tmpImage = roiFilter->GetOutput(0);
+    mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
 
     tmpNode->SetData(tmpImage);
 

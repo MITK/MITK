@@ -47,7 +47,7 @@ itk::DataObject::Pointer mitk::GeometryDataSource::MakeOutput( const DataObjectI
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 void mitk::GeometryDataSource::GraftOutput(mitk::GeometryData* graft)

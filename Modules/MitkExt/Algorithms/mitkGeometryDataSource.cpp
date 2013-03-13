@@ -76,3 +76,23 @@ void mitk::GeometryDataSource::GraftNthOutput(unsigned int idx, mitk::GeometryDa
     }
   }
 }
+
+mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
+}

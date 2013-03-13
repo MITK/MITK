@@ -43,6 +43,10 @@ public:
 
   itkNewMacro(Self);
 
+  typedef mitk::Mesh OutputType;
+
+  typedef OutputType::Pointer OutputTypePointer;
+
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /**
@@ -64,6 +68,11 @@ public:
   virtual void GraftOutput(mitk::GeometryData* graft);
 
   virtual void GraftNthOutput(unsigned int idx, mitk::GeometryData *graft);
+
+  OutputType* GetOutput(const DataObjectIdentifierType & key);
+  const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+  OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
   GeometryDataSource();

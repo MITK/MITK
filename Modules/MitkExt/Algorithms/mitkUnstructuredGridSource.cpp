@@ -77,3 +77,22 @@ void mitk::UnstructuredGridSource::GraftNthOutput(unsigned int idx, mitk::Unstru
   }
 }
 
+mitk::UnstructuredGridSource::OutputType* mitk::UnstructuredGridSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::UnstructuredGridSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::UnstructuredGridSource::OutputType* mitk::UnstructuredGridSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::UnstructuredGridSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+mitk::UnstructuredGridSource::OutputType* mitk::UnstructuredGridSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::UnstructuredGridSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const mitk::UnstructuredGridSource::OutputType* mitk::UnstructuredGridSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::UnstructuredGridSource::OutputType*>(Superclass::GetOutput(idx));
+}

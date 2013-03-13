@@ -61,6 +61,11 @@ public:
      */
     virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
+    OutputType* GetOutput(const DataObjectIdentifierType & key);
+    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+
 protected:
 
     MeshSource();

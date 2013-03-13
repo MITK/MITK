@@ -47,3 +47,23 @@ itk::DataObject::Pointer mitk::MeshSource::MakeOutput( const DataObjectIdentifie
     }
   return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
+
+mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::MeshSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::MeshSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::MeshSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::MeshSource::OutputType*>(Superclass::GetOutput(idx));
+}

@@ -40,6 +40,10 @@ public:
 
   itkNewMacro(Self);
 
+  typedef mitk::UnstructuredGrid OutputType;
+
+  typedef OutputType::Pointer OutputTypePointer;
+
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /**
@@ -61,6 +65,11 @@ public:
   virtual void GraftOutput(mitk::UnstructuredGrid* graft);
 
   virtual void GraftNthOutput(unsigned int idx, mitk::UnstructuredGrid *graft);
+
+  OutputType* GetOutput(const DataObjectIdentifierType & key);
+  const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+  OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
   UnstructuredGridSource();

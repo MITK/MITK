@@ -54,33 +54,20 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx ) = 0;
+    virtual itk::DataObject::Pointer MakeOutput (DataObjectPointerArraySizeType idx) = 0;
+
 
     /**
-     * Allows to set the output of the base data source.
-     * @param output the intended output of the base data source
+     * Allocates a new output object and returns it. This function
+     * is pure virtual because mitk::BaseData contains pure virtual functions
+     * and can not directly be instantiated. This must be done by subclasses, which
+     * know which subclasses of mitk::BaseData they want to instantiate. Thus, these
+     * classes have to set their output themselves via this->SetOutput(MakeOutput(0))
+     * in the constructor!
+     * @param idx the index of the output for which an object should be created
+     * @returns the new object
      */
-    virtual void SetOutput( OutputType* output );
-
-    /**
-     * Allows to set the n-th output of the base data source.
-     * @param idx The index of the output
-     * @param output The intended output of the base data source
-     */
-    virtual void SetOutput( unsigned int idx, OutputType* output );
-
-    /**
-     * Returns the output with index 0 of the base data source
-     * @returns the output
-     */
-    virtual OutputType* GetOutput();
-
-    /**
-     * Returns the n'th output of the base data source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    virtual OutputType* GetOutput ( unsigned int idx );
+    virtual itk::DataObject::Pointer MakeOutput (const DataObjectIdentifierType &) = 0;
 
 protected:
 

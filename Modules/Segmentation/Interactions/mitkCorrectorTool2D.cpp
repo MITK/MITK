@@ -143,8 +143,8 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
   }
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
-  resultSlice->Initialize(algorithm->GetOutput());
-  resultSlice->SetVolume(algorithm->GetOutput()->GetData());
+  resultSlice->Initialize(algorithm->GetOutput(0));
+  resultSlice->SetVolume(algorithm->GetOutput(0)->GetData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
 

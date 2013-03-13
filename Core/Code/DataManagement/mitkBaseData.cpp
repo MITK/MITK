@@ -225,20 +225,20 @@ void mitk::BaseData::UnRegister() const
     Superclass::UnRegister(); // now the reference count is zero and this object has been destroyed; thus nothing may be done after this line!!
 }
 
-void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) const
-{
-#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-  itkDebugMacro( "connecting source  " << arg
-    << ", source output index " << idx);
+//void mitk::BaseData::ConnectSource(itk::ProcessObject *arg, unsigned int idx) const
+//{
+//#ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+//  itkDebugMacro( "connecting source  " << arg
+//    << ", source output index " << idx);
 
-  if ( GetSource().GetPointer() != arg || m_SourceOutputIndexDuplicate != idx)
-  {
-    m_SmartSourcePointer = dynamic_cast<mitk::BaseProcess*>(arg);
-    m_SourceOutputIndexDuplicate = idx;
-    Modified();
-  }
-#endif
-}
+//  if ( GetSource().GetPointer() != arg || m_SourceOutputIndexDuplicate != idx)
+//  {
+//    m_SmartSourcePointer = dynamic_cast<mitk::BaseProcess*>(arg);
+//    m_SourceOutputIndexDuplicate = idx;
+//    Modified();
+//  }
+//#endif
+//}
 
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
 {

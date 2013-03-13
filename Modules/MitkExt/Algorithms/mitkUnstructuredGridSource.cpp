@@ -33,34 +33,22 @@ mitk::UnstructuredGridSource::~UnstructuredGridSource()
 {
 }
 
-mitk::UnstructuredGridSource::DataObjectPointer mitk::UnstructuredGridSource::MakeOutput(unsigned int /*idx*/)
+itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::UnstructuredGrid::New().GetPointer());
+    return OutputType::New().GetPointer();
 }
 
 
-mitk::UnstructuredGrid* mitk::UnstructuredGridSource::GetOutput()
+itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  if (this->GetNumberOfOutputs() < 1)
-  {
-    return 0;
-  }
-
-  return static_cast<mitk::UnstructuredGrid*>
-    (this->BaseProcess::GetOutput(0));
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
 
-mitk::UnstructuredGrid* mitk::UnstructuredGridSource::GetOutput(unsigned int idx)
-{
-  return static_cast<mitk::UnstructuredGrid*>
-    (this->ProcessObject::GetOutput(idx));
-}
-
-void mitk::UnstructuredGridSource::SetOutput(mitk::UnstructuredGrid* output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
 
 void mitk::UnstructuredGridSource::GraftOutput(mitk::UnstructuredGrid* graft)
 {

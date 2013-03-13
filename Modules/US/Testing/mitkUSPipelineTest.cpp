@@ -69,7 +69,7 @@ public:
     mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
     TestUSFilter::Pointer filter = TestUSFilter::New();
     videoDevice->Update();
-    filter->SetInput(videoDevice->GetOutput());
+    filter->SetInput(videoDevice->GetOutput(0));
     filter->Update();
     MITK_TEST_CONDITION_REQUIRED(videoDevice.IsNotNull(), "videoDevice should not be null after instantiation");
 

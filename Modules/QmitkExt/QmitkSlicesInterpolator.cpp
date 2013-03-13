@@ -707,7 +707,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    segmentationNode->SetData(s2iFilter->GetOutput());
+    segmentationNode->SetData(s2iFilter->GetOutput(0));
     m_RBtnDisableInterpolation->setChecked(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->Show3DInterpolationResult(false);

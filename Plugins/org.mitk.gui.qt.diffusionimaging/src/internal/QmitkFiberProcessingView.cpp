@@ -370,8 +370,8 @@ void QmitkFiberProcessingView::InternalReorientImagePlane(
     if(additionalIndex < 0)
     {
         this->m_InternalImage = mitk::Image::New();
-        this->m_InternalImage->InitializeByItk( resampler->GetOutput() );
-        this->m_InternalImage->SetVolume( resampler->GetOutput()->GetBufferPointer() );
+        this->m_InternalImage->InitializeByItk( resampler->GetOutput(0) );
+        this->m_InternalImage->SetVolume( resampler->GetOutput(0)->GetBufferPointer() );
     }
 }
 
@@ -513,7 +513,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure(
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
+    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput(0) );
 
 
 
@@ -532,7 +532,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure(
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
     imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput(0) );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();
@@ -548,7 +548,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure(
     itkImporter->Update();
 
     // calculate cropping bounding box
-    m_InternalImageMask3D = itkImporter->GetOutput();
+    m_InternalImageMask3D = itkImporter->GetOutput(0);
     m_InternalImageMask3D->SetDirection(image->GetDirection());
 
     itk::ImageRegionConstIterator<itkUCharImageType>
@@ -606,7 +606,7 @@ void QmitkFiberProcessingView::InternalCalculateMaskFromPlanarFigure(
     roi2->SetRegionOfInterest(cropRegion);
     roi2->SetInput(m_InternalImageMask3D);
     roi2->Update();
-    m_InternalImageMask3D = roi2->GetOutput();
+    m_InternalImageMask3D = roi2->GetOutput(0);
 
     Image::Pointer tmpImage = Image::New();
     tmpImage->InitializeByItk(m_InternalImageMask3D.GetPointer());
@@ -1563,7 +1563,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
     generator->Update();
 
     // get output image
-    OutImageType::Pointer outImg = generator->GetOutput();
+    OutImageType::Pointer outImg = generator->GetOutput(0);
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
@@ -1594,7 +1594,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
 
     // get output image
     typedef itk::Image<OutPixType,3> OutType;
-    OutType::Pointer outImg = generator->GetOutput();
+    OutType::Pointer outImg = generator->GetOutput(0);
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
@@ -1629,7 +1629,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
 
     // get output image
     typedef itk::Image<OutPixType,3> OutType;
-    OutType::Pointer outImg = generator->GetOutput();
+    OutType::Pointer outImg = generator->GetOutput(0);
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());

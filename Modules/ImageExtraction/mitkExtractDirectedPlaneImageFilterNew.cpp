@@ -68,7 +68,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
         timeselector->SetInput( inputImage );
         timeselector->SetTimeNr( m_ActualInputTimestep );
         timeselector->UpdateLargestPossibleRegion();
-        inputImage = timeselector->GetOutput();
+        inputImage = timeselector->GetOutput(0);
     }
     else if ( inputImage->GetDimension() == 2)
     {

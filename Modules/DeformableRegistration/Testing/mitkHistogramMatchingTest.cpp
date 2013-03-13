@@ -82,7 +82,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Get the result image: ";
-  mitk::Image::Pointer histimage = histogramMatching->GetOutput();
+  mitk::Image::Pointer histimage = histogramMatching->GetOutput(0);
   std::cout<<"[PASSED]"<<std::endl;
 
   return EXIT_SUCCESS;

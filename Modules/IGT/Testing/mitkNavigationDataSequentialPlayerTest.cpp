@@ -65,7 +65,7 @@ bool runLoop()
   for(unsigned int i=0; i<player->GetNumberOfSnapshots();++i)
   {
     player->Update();
-    nd0 = player->GetOutput();
+    nd0 = player->GetOutput(0);
     nd1 = player->GetOutput(1);
 
     // test some values

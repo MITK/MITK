@@ -53,7 +53,7 @@ const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::G
     timeSelector->UpdateLargestPossibleRegion();
 
     mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
-    generator->SetImage(timeSelector->GetOutput());
+    generator->SetImage(timeSelector->GetOutput(0));
     generator->ComputeHistogram();
     return static_cast<const mitk::ImageStatisticsHolder::HistogramType*>(generator->GetHistogram());
   }
@@ -217,7 +217,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t)
     {
       timeSelector->SetTimeNr(t);
       timeSelector->UpdateLargestPossibleRegion();
-      mitk::Image* image = timeSelector->GetOutput();
+      mitk::Image* image = timeSelector->GetOutput(0);
       AccessByItk_2( image, _ComputeExtremaInItkImage, this, t );
     }
   }

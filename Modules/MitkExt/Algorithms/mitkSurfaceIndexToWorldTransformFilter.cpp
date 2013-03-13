@@ -30,7 +30,7 @@ mitk::SurfaceIndexToWorldTransformFilter::~SurfaceIndexToWorldTransformFilter()
 void mitk::SurfaceIndexToWorldTransformFilter::GenerateData()
 {
   mitk::Surface* input = const_cast<mitk::Surface*>( this->GetInput());
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   mitk::Point3D current, transformed;
   vtkPoints* surfacePoints = vtkPoints::New();

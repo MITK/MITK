@@ -61,7 +61,7 @@ mitk::Image::Pointer mitk::ClosingTool::ApplyFilter(mitk::Image::Pointer image)
       //m_BallClosingFilter->SetBackgroundValue(0);
       m_BallClosingFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_BallClosingFilter->GetOutput(), new_image);
+      mitk::CastToMitkImage(m_BallClosingFilter->GetOutput(0), new_image);
       break;
 
     case(CROSS):
@@ -77,7 +77,7 @@ mitk::Image::Pointer mitk::ClosingTool::ApplyFilter(mitk::Image::Pointer image)
       m_CrossClosingFilter->SetSafeBorder(true);
       m_CrossClosingFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_CrossClosingFilter->GetOutput(), new_image);
+      mitk::CastToMitkImage(m_CrossClosingFilter->GetOutput(0), new_image);
       break;
 
     default:

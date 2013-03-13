@@ -568,7 +568,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
     idFiberFilter->FieldDataOn();
     idFiberFilter->Update();
 
-    m_FiberIdDataSet = idFiberFilter->GetOutput();
+    m_FiberIdDataSet = idFiberFilter->GetOutput(0);
 
     MITK_DEBUG << "Generating Fiber Ids...[done] | " << m_FiberIdDataSet->GetNumberOfCells();
 
@@ -1004,7 +1004,7 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     cleaner->SetInput(m_FiberPolyData);
     cleaner->PointMergingOff();
     cleaner->Update();
-    m_FiberPolyData = cleaner->GetOutput();
+    m_FiberPolyData = cleaner->GetOutput(0);
 
     m_FiberLengths.clear();
     m_MeanFiberLength = 0;
@@ -1562,7 +1562,7 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, doubl
         functionSource->SetWResolution(sampling);
         functionSource->Update();
 
-        vtkPolyData* outputFunction = functionSource->GetOutput();
+        vtkPolyData* outputFunction = functionSource->GetOutput(0);
         vtkPoints* tmpSmoothPnts = outputFunction->GetPoints(); //smoothPoints of current fiber
 
         vtkSmartPointer<vtkPolyLine> smoothLine = vtkSmartPointer<vtkPolyLine>::New();
@@ -1721,7 +1721,7 @@ bool mitk::FiberBundleX::VerifyRequestedRegion()
 {
     return true;
 }
-void mitk::FiberBundleX::SetRequestedRegion( itk::DataObject *data )
+void mitk::FiberBundleX::SetRequestedRegion(const itk::DataObject *data )
 {
 
 }

@@ -97,7 +97,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     timeSelector->SetInput( input );
     timeSelector->SetTimeNr( m_TimeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    input3D = timeSelector->GetOutput();
+    input3D = timeSelector->GetOutput(0);
   }
 
   if ( m_SliceDifferenceImage.IsNull() ||
@@ -151,7 +151,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     nonConstImage->Update();                                                             \
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
-    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
+    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
 }
 
 #define myMITKOverwriteSliceImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \

@@ -293,7 +293,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
           surfaceFilter->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
 
           mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-          surfaceNode->SetData(surfaceFilter->GetOutput());
+          surfaceNode->SetData(surfaceFilter->GetOutput(0));
           surfaceNode->SetProperty("color", referenceNode->GetProperty("color"));
           surfaceNode->SetOpacity(0.5);
           surfaceNode->SetName(referenceNode->GetName());
@@ -447,7 +447,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   //add the new clipped image node
   mitk::DataNode::Pointer clippedNode = mitk::DataNode::New();
-  mitk::Image::Pointer clippedImage = surfaceClipFilter->GetOutput();
+  mitk::Image::Pointer clippedImage = surfaceClipFilter->GetOutput(0);
   clippedImage->DisconnectPipeline();
   clippedNode->SetData(clippedImage);
   //clippedNode->SetProperty("helper object", mitk::BoolProperty::New(true));

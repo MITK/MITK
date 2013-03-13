@@ -45,7 +45,7 @@ public:
   virtual void SetRequestedRegionToLargestPossibleRegion() {}
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() { return false; }
   virtual bool VerifyRequestedRegion() { return true; }
-  virtual void SetRequestedRegion(itk::DataObject*) {}
+  virtual void SetRequestedRegion( const itk::DataObject*) {}
 
 protected:
   DataType::Pointer m_ItkDataObject;

@@ -14,9 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkDataNodeSource.h"
-
 
 mitk::DataNodeSource::DataNodeSource()
 {
@@ -27,58 +25,42 @@ mitk::DataNodeSource::DataNodeSource()
     this->SetOutput(0, output.GetPointer());
 }
 
-
-
-
 mitk::DataNodeSource::~DataNodeSource()
 {
 }
 
-
-
-
-itk::DataObject::Pointer mitk::DataNodeSource::MakeOutput ( unsigned int /*idx*/ )
+itk::ProcessObject::DataObjectPointer mitk::DataNodeSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
-
-
-void mitk::DataNodeSource::SetOutput( OutputType* output )
+itk::ProcessObject::DataObjectPointer mitk::DataNodeSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-    this->itk::ProcessObject::SetNthOutput( 0, output );
-}
-
-
-
-
-void mitk::DataNodeSource::SetOutput( unsigned int idx, OutputType* output )
-{
-    this->itk::ProcessObject::SetNthOutput(idx, output);
-}
-
-
-
-
-mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-        return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-    else
-    {
-        return dynamic_cast<OutputType*> ( this->GetOutput( 0 ) );
-    }
+  return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
 }
 
-
-
-
-mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput ( unsigned int idx )
+ mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
 {
-    return dynamic_cast<OutputType*> ( this->itk::ProcessObject::GetOutput( idx ) );
+  return static_cast<mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(key));
 }
 
+const  mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(key));
+}
 
+ mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const   mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::DataNodeSource::OutputType*>(Superclass::GetOutput(idx));
+}

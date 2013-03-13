@@ -61,7 +61,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->SetOffset(offset);
   MITK_TEST_CONDITION(myFilter->GetOffset() == offset, "testing Set-/GetOffset()");
 
-  mitk::NavigationData* output = myFilter->GetOutput();
+  mitk::NavigationData* output = myFilter->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
 
   output->Update(); // execute filter

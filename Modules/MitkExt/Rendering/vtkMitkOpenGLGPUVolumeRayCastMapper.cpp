@@ -3694,7 +3694,7 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::ClipBoundingBox(vtkRenderer *ren,
     this->Densify->SetNumberOfSubdivisions(2);
     }
   this->Densify->Update();
-  this->ClippedBoundingBox = this->Densify->GetOutput();
+  this->ClippedBoundingBox = this->Densify->GetOutput(0);
 }
 
 //-----------------------------------------------------------------------------

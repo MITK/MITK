@@ -53,16 +53,13 @@ public:
   typedef OutputImageType::Pointer OutputImagePointer;
   typedef SlicedData::RegionType OutputImageRegionType;
 
-  /** @brief Get the image output of this process object.  */
-  OutputImageType * GetOutput(void);
-  OutputImageType * GetOutput(unsigned int idx);
 
-  /** @brief Set the image output of this process object.
-   *
-   * This call is slated
-   * to be removed from ITK. You should GraftOutput() and possible
-   * DataObject::DisconnectPipeline() to properly change the output. */
-  void SetOutput(OutputImageType *output);
+//  /** @brief Set the image output of this process object.
+//   *
+//   * This call is slated
+//   * to be removed from ITK. You should GraftOutput() and possible
+//   * DataObject::DisconnectPipeline() to properly change the output. */
+//  void SetOutput(OutputImageType *output);
 
   /** @brief Graft the specified DataObject onto this ProcessObject's output.
    *
@@ -82,14 +79,14 @@ public:
 
    *    // setup the mini-pipeline to calculate the correct regions
    *    // and write to the appropriate bulk data block
-   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput() );
+   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
    *
    *    // execute the mini-pipeline
    *    lastFilterInMiniPipeline->Update();
    *
    *    // graft the mini-pipeline output back onto this filter's output.
    *    // this is needed to get the appropriate regions passed back.
-   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput() );
+   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
    * \endcode
    *
    * For proper pipeline execution, a filter using a mini-pipeline
@@ -127,8 +124,20 @@ public:
    * SmartPointer to a DataObject. If a subclass of ImageSource has
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
-//  virtual void* GetData();
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+  /**
+   * This is a default implementation to make sure we have something.
+   * Once all the subclasses of ProcessObject provide an appopriate
+   * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+   * virtual.
+   */
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+
+  OutputImageType* GetOutput(const DataObjectIdentifierType & key);
+  const OutputImageType* GetOutput(const DataObjectIdentifierType & key) const;
+  OutputImageType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputImageType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
   virtual vtkImageData* GetVtkImageData();
 

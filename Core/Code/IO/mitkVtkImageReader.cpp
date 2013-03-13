@@ -47,11 +47,11 @@ void mitk::VtkImageReader::GenerateData()
       reader->SetFileName(m_FileName.c_str());
       reader->Update();
 
-      if ( reader->GetOutput() != NULL )
+      if ( reader->GetOutput(0) != NULL )
       {
-        mitk::Image::Pointer output = this->GetOutput();
-        output->Initialize( reader->GetOutput() );
-        output->SetVolume(  reader->GetOutput()->GetScalarPointer());
+        mitk::Image::Pointer output = this->GetOutput(0);
+        output->Initialize( reader->GetOutput(0) );
+        output->SetVolume(  reader->GetOutput(0)->GetScalarPointer());
       }
       reader->Delete();
     }

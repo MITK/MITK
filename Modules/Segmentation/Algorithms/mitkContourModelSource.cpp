@@ -26,28 +26,25 @@ mitk::ContourModelSource::ContourModelSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-
-
 mitk::ContourModelSource::~ContourModelSource()
 {
 }
 
-
-
-itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput ( unsigned int /*idx */)
+itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
-
-void mitk::ContourModelSource::SetOutput( OutputType* output )
+itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  //itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-    this->ProcessObject::SetNthOutput( 0, output );
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<DataObject *>(OutputType::New().GetPointer());
 }
-
-
 
 void mitk::ContourModelSource::GraftOutput(OutputType *graft)
 {
@@ -58,26 +55,4 @@ void mitk::ContourModelSource::GraftNthOutput(unsigned int /*idx*/, OutputType* 
 {
   itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
   assert(false);
-}
-
-
-
-mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
-    {
-        return 0;
-    }
-    else
-    {
-      return dynamic_cast<OutputType*>
-                         (this->BaseProcess::GetOutput(0));
-    }
-}
-
-
-
-mitk::ContourModelSource::OutputType* mitk::ContourModelSource::GetOutput ( unsigned int idx )
-{
-    return dynamic_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
 }

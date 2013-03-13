@@ -79,6 +79,7 @@ public:
   itkBooleanMacro( CopyMemFlag );
 
 protected:
+  using itk::ProcessObject::SetInput;
   mitk::Image * GetInput(void);
   mitk::Image * GetInput(unsigned int idx);
 

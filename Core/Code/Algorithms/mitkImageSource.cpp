@@ -27,48 +27,21 @@ mitk::ImageSource::ImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-/**
- *
- */
-mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
+itk::DataObject::Pointer mitk::ImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
 
-/**
- *
- */
-mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput()
+
+itk::DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  if (this->GetNumberOfOutputs() < 1)
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-    return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-
-  return static_cast<OutputImageType*>
-                     (this->BaseProcess::GetOutput(0));
+  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
 }
-
-
-/**
- *
- */
-mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(unsigned int idx)
-{
-  return static_cast<OutputImageType*>
-                     (this->ProcessObject::GetOutput(idx));
-}
-
-
-/**
- *
- */
-void mitk::ImageSource::SetOutput(OutputImageType *output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
-
 
 /**
  *
@@ -78,6 +51,25 @@ void mitk::ImageSource::GraftOutput(OutputImageType *graft)
   this->GraftNthOutput(0, graft);
 }
 
+mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(key));
+}
+
+const mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(key));
+}
+
+ mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::ImageSource::OutputImageType*>(Superclass::GetOutput(idx));
+}
 
 /**
  *
@@ -110,7 +102,7 @@ void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion)
 {
   // Get the output pointer
-  OutputImageType * outputPtr = this->GetOutput();
+  OutputImageType * outputPtr = this->GetOutput(0);
   const SlicedData::SizeType& requestedRegionSize
     = outputPtr->GetRequestedRegion().GetSize();
 
@@ -262,5 +254,5 @@ void mitk::ImageSource::PrepareOutputs()
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {
     Update();
-    return GetOutput()->GetVtkImageData();
+    return GetOutput(0)->GetVtkImageData();
 }

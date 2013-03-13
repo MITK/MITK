@@ -127,7 +127,7 @@ void QmitkNavigationToolCreationWidget::OnFinished()
       vtkData->SetRadius(6.0f);
       vtkData->SetCenter(0.0, 0.0, 0.0);
       vtkData->Update();
-      mySphere->SetVtkPolyData(vtkData->GetOutput());
+      mySphere->SetVtkPolyData(vtkData->GetOutput(0));
       vtkData->Delete();
       newNode->SetData(mySphere);
       }
@@ -174,12 +174,12 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
       {
       }
 
-    if ( stlReader->GetOutput() == NULL );
+    if ( stlReader->GetOutput(0) == NULL );
     else
       {
       mitk::DataNode::Pointer newNode = mitk::DataNode::New();
       newNode->SetName(filename);
-      newNode->SetData(stlReader->GetOutput());
+      newNode->SetData(stlReader->GetOutput(0));
       m_DataStorage->Add(newNode);
       }
   }

@@ -49,8 +49,8 @@ void mitk::QBallImage::ConstructRgbImage()
   filter->Update();
 
   m_RgbImage = mitk::Image::New();
-  m_RgbImage->InitializeByItk( filter->GetOutput() );
-  m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  m_RgbImage->InitializeByItk( filter->GetOutput(0) );
+  m_RgbImage->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
 }
 
 mitk::ImageVtkAccessor* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)

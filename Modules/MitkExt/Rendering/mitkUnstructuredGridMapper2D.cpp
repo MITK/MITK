@@ -194,7 +194,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   ApplyColorAndOpacityProperties( renderer );
 
   // traverse the cut contour
-  vtkPolyData * contour = m_Slicer->GetOutput();
+  vtkPolyData * contour = m_Slicer->GetOutput(0);
 
   vtkPoints *vpoints = contour->GetPoints();
   vtkCellArray *vlines = contour->GetLines();

@@ -162,7 +162,7 @@ namespace mitk {
       * data types must overwrite this method so that proper output objects
       * are created.
       */
-      virtual DataObjectPointer MakeOutput(unsigned int idx);
+      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
       //########### GETTER & SETTER ##################//
 

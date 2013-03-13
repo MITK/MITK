@@ -39,7 +39,7 @@ mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 {
-  mitk::Surface *surface = this->GetOutput();
+  mitk::Surface *surface = this->GetOutput(0);
   mitk::Image * image    =  (mitk::Image*)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
@@ -68,7 +68,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
       median->Update();
-      vtkimage = median->GetOutput(); //->Out
+      vtkimage = median->GetOutput(0); //->Out
       median->Delete();
     }
     ProgressBar::GetInstance()->Progress();
@@ -86,7 +86,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       imageresample->SetAxisOutputSpacing(2, m_InterpolationZ);
       imageresample->UpdateInformation();
       imageresample->Update();
-      vtkimage=imageresample->GetOutput();//->Output
+      vtkimage=imageresample->GetOutput(0);//->Output
       imageresample->Delete();
     }
     ProgressBar::GetInstance()->Progress();
@@ -105,7 +105,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->ReleaseDataFlagOn();
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInput(vtkimagethreshold->GetOutput());
+      gaussian->SetInput(vtkimagethreshold->GetOutput(0));
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
@@ -113,14 +113,14 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->UpdateInformation();
       gaussian->Update();
 
-      vtkimage=vtkimagethreshold->GetOutput();
+      vtkimage=vtkimagethreshold->GetOutput(0);
       mitk::Image::Pointer image = mitk::Image::New();
-      image->Initialize(vtkimagethreshold->GetOutput());
+      image->Initialize(vtkimagethreshold->GetOutput(0));
       mitk::ScalarType max = image->GetScalarValueMax();
       MITK_INFO<<max;
       if (max!=0) //too little slices, image smoothing eliminates all segmentation pixels
       {
-        vtkimage = gaussian->GetOutput(); //->Out
+        vtkimage = gaussian->GetOutput(0); //->Out
       }
       else
       {

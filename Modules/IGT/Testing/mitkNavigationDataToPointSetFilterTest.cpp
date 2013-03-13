@@ -137,7 +137,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(0, nd);
   myNavigationDataToPointSetFilter->SetInput(1, nd2);
 
-  mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
@@ -147,7 +147,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(0, nd3);
   myNavigationDataToPointSetFilter->SetInput(1, nd4);
   myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 &&
@@ -160,7 +160,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(1, nd4);
   //nd4->Modified();
   //myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 7.0 && pointSet->GetPoint(0,0)[1] == 8.0 && pointSet->GetPoint(0,0)[2] == 9.0 &&

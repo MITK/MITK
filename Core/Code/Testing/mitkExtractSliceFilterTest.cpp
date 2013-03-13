@@ -116,9 +116,9 @@ public:
     slicer->SetWorldGeometry(TestPlane);
     slicer->Update();
 
-    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "Extractor returned a slice");
+    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput(0) != NULL, "Extractor returned a slice");
 
-    mitk::Image::Pointer reslicedImage = slicer->GetOutput();
+    mitk::Image::Pointer reslicedImage = slicer->GetOutput(0);
 
     AccessFixedDimensionByItk(reslicedImage, TestSphereRadiusByItk, 2);
     AccessFixedDimensionByItk(reslicedImage, TestSphereAreaByItk, 2);
@@ -554,7 +554,7 @@ public:
 
     slicer->Update();
 
-    mitk::Image::Pointer slice = slicer->GetOutput();
+    mitk::Image::Pointer slice = slicer->GetOutput(0);
 
     // Get TestPoiont3D as Index in Slice
     slice->GetGeometry()->WorldToIndex(testPoint3DInWorld,testPoint2DInIndex);
@@ -705,7 +705,7 @@ public:
     reader->SetFileName(filename);
 
     reader->Update();
-    TestVolume = reader->GetOutput();
+    TestVolume = reader->GetOutput(0);
 
   #endif
 
@@ -1025,7 +1025,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
     reader->Update();
 
-    mitk::Image::Pointer pic = reader->GetOutput();
+    mitk::Image::Pointer pic = reader->GetOutput(0);
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
     slicer->SetInput(pic->GetVtkImageData());
@@ -1120,7 +1120,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
 
 
-    texture->SetInput(slicer->GetOutput());
+    texture->SetInput(slicer->GetOutput(0));
 
     texture->SetLookupTable(lookupTable);
 

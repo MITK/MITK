@@ -71,7 +71,7 @@ namespace itk {
       typedef typename itk::MinimumMaximumImageCalculator< typename GfaFilterType::OutputImageType >
         MaxFilterType;
       typename MaxFilterType::Pointer maxFilter = MaxFilterType::New();
-      maxFilter->SetImage(filter->GetOutput());
+      maxFilter->SetImage(filter->GetOutput(0));
       maxFilter->ComputeMaximum();
 
       m_GlobalInputMaximum = maxFilter->GetMaximum();
@@ -90,7 +90,7 @@ namespace itk {
       filter->SetParam1(m_GfaParam1);
       filter->SetParam2(m_GfaParam2);
       filter->Update();
-      m_GfaImage = filter->GetOutput();
+      m_GfaImage = filter->GetOutput(0);
     }
   }
 

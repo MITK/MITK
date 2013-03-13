@@ -74,15 +74,15 @@ void mitk::BilateralFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimensio
   bilateralFilter->SetRangeSigma(m_RangeSigma);
   bilateralFilter->UpdateLargestPossibleRegion();
   //get  Pointer to output image
-  mitk::Image::Pointer resultImage = this->GetOutput();
+  mitk::Image::Pointer resultImage = this->GetOutput(0);
   //write into output image
-  mitk::CastToMitkImage(bilateralFilter->GetOutput(), resultImage);
+  mitk::CastToMitkImage(bilateralFilter->GetOutput(0), resultImage);
 }
 
 void mitk::BilateralFilter::GenerateOutputInformation()
 {
   mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
   itkDebugMacro(<<"GenerateOutputInformation()");
   if(inputImage.IsNull()) return;
 }

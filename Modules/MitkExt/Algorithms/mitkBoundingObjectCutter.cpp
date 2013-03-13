@@ -64,7 +64,7 @@ const mitk::PixelType BoundingObjectCutter::GetOutputPixelType()
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()
 {
-  mitk::Image* output = this->GetOutput();
+  mitk::Image* output = this->GetOutput(0);
   if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
   // we have already calculated the spatial part of the
@@ -77,7 +77,7 @@ void BoundingObjectCutter::GenerateInputRequestedRegion()
 
 void BoundingObjectCutter::GenerateOutputInformation()
 {
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
@@ -180,7 +180,7 @@ void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 void BoundingObjectCutter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if(input.IsNull())
     return;
@@ -189,7 +189,7 @@ void BoundingObjectCutter::GenerateData()
     return;
 
   m_InputTimeSelector->SetInput(input);
-  m_OutputTimeSelector->SetInput(this->GetOutput());
+  m_OutputTimeSelector->SetInput(this->GetOutput(0));
 
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
@@ -215,7 +215,7 @@ void BoundingObjectCutter::GenerateData()
 
     timestep = boundingObjectTimeGeometry->MSToTimeStep( timeInMS );
 
-    ComputeData(m_InputTimeSelector->GetOutput(), timestep);
+    ComputeData(m_InputTimeSelector->GetOutput(0), timestep);
   }
 
   m_InputTimeSelector->SetInput(NULL);

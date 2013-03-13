@@ -73,17 +73,17 @@ int mitkB0ExtractionToSeparateImagesFilterTest(int  argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED( mitkImage.IsNotNull(), "mitkImage not null." );
 
-  mitkImage->InitializeByItk( filter->GetOutput() );
+  mitkImage->InitializeByItk( filter->GetOutput(0) );
 
   MITK_TEST_CONDITION_REQUIRED( mitkImage->GetDimension()==4, "Output image is a 4D image.");
 
-  mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+  mitkImage->SetImportChannel( filter->GetOutput(0)->GetBufferPointer() );
 
   typedef itk::ImageFileWriter< FilterType::OutputImageType > itkImageWriterType;
   typename itkImageWriterType::Pointer itkWriter = itkImageWriterType::New();
 
   itkWriter->SetFileName( argv[2] );
-  itkWriter->SetInput( filter->GetOutput() );
+  itkWriter->SetInput( filter->GetOutput(0) );
 
   try
   {

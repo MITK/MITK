@@ -426,7 +426,7 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateConeRepresentation( const
   vtkData->SetResolution(20);
   vtkData->CappingOn();
   vtkData->Update();
-  activeToolData->SetVtkPolyData(vtkData->GetOutput());
+  activeToolData->SetVtkPolyData(vtkData->GetOutput(0));
   vtkData->Delete();
 
   //new node
@@ -981,7 +981,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(int toolID, bool on)
   else
   {
     for(unsigned int i=0; i < m_FiducialRegistrationFilter->GetNumberOfOutputs(); ++i)
-      m_FiducialRegistrationFilter->SetInput(i,m_Source->GetOutput());
+      m_FiducialRegistrationFilter->SetInput(i,m_Source->GetOutput(0));
   }
 
 }

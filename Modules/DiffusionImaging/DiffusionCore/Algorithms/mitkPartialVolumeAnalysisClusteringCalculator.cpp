@@ -296,12 +296,12 @@ namespace mitk
     castFilter->SetInput( rgbin->r );
     castFilter->Update();
 
-    typename ProbImageType::Pointer r = castFilter->GetOutput();
+    typename ProbImageType::Pointer r = castFilter->GetOutput(0);
 
     castFilter = CastFilterType::New();
     castFilter->SetInput( rgbin->g );
     castFilter->Update();
-    typename ProbImageType::Pointer g = castFilter->GetOutput();
+    typename ProbImageType::Pointer g = castFilter->GetOutput(0);
 
     typename RGBImageType::Pointer rgb = RGBImageType::New();
     rgb->SetSpacing( g->GetSpacing() );   // Set the image spacing
@@ -625,7 +625,7 @@ namespace mitk
     typename CastFilterType::Pointer castFilter = CastFilterType::New();
     castFilter->SetInput( clusteredImage );
     castFilter->Update();
-    typename ProbImageType::Pointer clusterImage = castFilter->GetOutput();
+    typename ProbImageType::Pointer clusterImage = castFilter->GetOutput(0);
 
     typename MaskImageType::Pointer itkmask = 0;
     if(mask.IsNotNull())
@@ -634,7 +634,7 @@ namespace mitk
       typename CastFilterType2::Pointer castFilter2 = CastFilterType2::New();
       castFilter2->SetInput( mask );
       castFilter2->Update();
-      itkmask = castFilter2->GetOutput();
+      itkmask = castFilter2->GetOutput(0);
     }
     else
     {
@@ -699,17 +699,17 @@ namespace mitk
     CastType::Pointer caster = CastType::New();
     caster->SetInput(comp1);
     caster->Update();
-    ImageType::Pointer comp1Image = caster->GetOutput();
+    ImageType::Pointer comp1Image = caster->GetOutput(0);
 
     caster = CastType::New();
     caster->SetInput(comp2);
     caster->Update();
-    ImageType::Pointer comp2Image = caster->GetOutput();
+    ImageType::Pointer comp2Image = caster->GetOutput(0);
 
     caster = CastType::New();
     caster->SetInput(probImg);
     caster->Update();
-    ImageType::Pointer probImage = caster->GetOutput();
+    ImageType::Pointer probImage = caster->GetOutput(0);
 
     // figure out maximum probability for fiber class
     float maxProb = 0;
@@ -783,7 +783,7 @@ namespace mitk
     generator->Update();
 
     // look for frequency mode in the histogram
-    GeneratorType::HistogramType::ConstPointer histogram = generator->GetOutput();
+    GeneratorType::HistogramType::ConstPointer histogram = generator->GetOutput(0);
     GeneratorType::HistogramType::ConstIterator iter = histogram->Begin();
     float maxFreq = 0;
     MeasurementVectorType maxValue;

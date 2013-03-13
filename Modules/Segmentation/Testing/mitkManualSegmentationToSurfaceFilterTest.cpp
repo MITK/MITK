@@ -107,7 +107,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   {
     filter->SetInput(image);
     filter->Update();
-    writer->SetInput(filter->GetOutput());
+    writer->SetInput(filter->GetOutput(0));
     writer->Write();
 
     if( writer->GetNumberOfInputs() < 1 )
@@ -144,7 +144,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
       return EXIT_FAILURE;
     }
 
-    writer->SetInput( filter->GetOutput() );
+    writer->SetInput( filter->GetOutput(0) );
     if( writer->GetNumberOfInputs() < 1 )
     {
       std::cout<<"[FAILED]"<<std::endl;

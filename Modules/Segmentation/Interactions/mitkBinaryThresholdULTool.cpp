@@ -187,7 +187,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
             timeSelector->SetInput( image );
             timeSelector->SetTimeNr( timeStep );
             timeSelector->UpdateLargestPossibleRegion();
-            Image::Pointer image3D = timeSelector->GetOutput();
+            Image::Pointer image3D = timeSelector->GetOutput(0);
 
             AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
           }
@@ -209,7 +209,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
           padFilter->SetLowerThreshold(1);
           padFilter->Update();
 
-          emptySegmentation->SetData(padFilter->GetOutput());
+          emptySegmentation->SetData(padFilter->GetOutput(0));
         }
 
         if (DataStorage* ds = m_ToolManager->GetDataStorage())
@@ -230,7 +230,7 @@ template <typename TPixel, unsigned int VImageDimension>
   timeSelector->SetInput( segmentation );
   timeSelector->SetTimeNr( timeStep );
   timeSelector->UpdateLargestPossibleRegion();
-  Image::Pointer segmentation3D = timeSelector->GetOutput();
+  Image::Pointer segmentation3D = timeSelector->GetOutput(0);
 
   typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
   SegmentationType::Pointer itkSegmentation;
@@ -279,7 +279,7 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
     roiFilter->Update();
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
-    tmpNode->SetData(roiFilter->GetOutput());
+    tmpNode->SetData(roiFilter->GetOutput(0));
 
     m_SensibleMinimumThresholdValue = static_cast<int>( roiFilter->GetMinValue());
     m_SensibleMaximumThresholdValue = static_cast<int>( roiFilter->GetMaxValue());
@@ -312,7 +312,7 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
     filter->Update();
 
     mitk::Image::Pointer new_image = mitk::Image::New();
-    CastToMitkImage(filter->GetOutput(), new_image);
+    CastToMitkImage(filter->GetOutput(0), new_image);
     m_ThresholdFeedbackNode->SetData(new_image);
   }
   RenderingManager::GetInstance()->RequestUpdateAll();

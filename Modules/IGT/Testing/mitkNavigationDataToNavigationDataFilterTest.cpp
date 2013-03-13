@@ -54,7 +54,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   nd0->SetDataValid(initialValid);
   nd0->SetName("testName");
 
-  MITK_TEST_CONDITION(myFilter->GetOutput() == NULL, "testing GetOutput()");
+  MITK_TEST_CONDITION(myFilter->GetOutput(0) == NULL, "testing GetOutput()");
 
   MITK_TEST_CONDITION(myFilter->GetInput() == NULL, "testing GetInput() without SetInput()");
   MITK_TEST_CONDITION(myFilter->GetInput(0) == NULL, "testing GetInput(0) without SetInput()");
@@ -62,7 +62,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   myFilter->SetInput(nd0);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd0, "testing Set-/GetInput()");
   MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0)");
-  MITK_TEST_CONDITION(myFilter->GetOutput() != NULL, "testing GetOutput() after SetInput()");
+  MITK_TEST_CONDITION(myFilter->GetOutput(0) != NULL, "testing GetOutput() after SetInput()");
   MITK_TEST_CONDITION(myFilter->GetOutput(0) != NULL, "testing GetOutput() after SetInput()");
   MITK_TEST_CONDITION(myFilter->GetOutput(0) != nd0, "testing GetOutput() different object than input");
 

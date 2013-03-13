@@ -134,7 +134,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
     }
   }
   filter->Update();
-  mitk::Surface::Pointer resultSurface = filter->GetOutput();
+  mitk::Surface::Pointer resultSurface = filter->GetOutput(0);
   vtkSmartPointer<vtkPoints> result = vtkSmartPointer<vtkPoints>::New();
   result->SetDataTypeToDouble();
   result = resultSurface->GetVtkPolyData()->GetPoints();
@@ -213,7 +213,7 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   }
   filter->Modified();
   filter->Update();
-  resultSurface = filter->GetOutput();
+  resultSurface = filter->GetOutput(0);
   result = vtkSmartPointer<vtkPoints>::New();
   result->SetDataTypeToDouble();
   result = resultSurface->GetVtkPolyData()->GetPoints();

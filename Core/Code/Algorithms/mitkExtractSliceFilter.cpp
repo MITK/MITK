@@ -54,7 +54,7 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation(){
   //TODO try figure out how to set the specs of the slice before it is actually extracted
-  /*Image::Pointer output = this->GetOutput();
+  /*Image::Pointer output = this->GetOutput(0);
   Image::ConstPointer input = this->GetInput();
   if (input.IsNull()) return;
   unsigned int dimensions[2];
@@ -267,7 +267,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
     unitSpacingImageFilter->SetInput( input->GetVtkImageData(m_TimeStep) );
 
-    m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput() );
+    m_Reslicer->SetInput(unitSpacingImageFilter->GetOutput(0) );
   }
   else
   {
@@ -360,8 +360,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   //TODO check the following lines, they are responsible wether vtk error outputs appear or not
   m_Reslicer->UpdateWholeExtent(); //this produces a bad allocation error for 2D images
-  //m_Reslicer->GetOutput()->UpdateInformation();
-  //m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
+  //m_Reslicer->GetOutput(0)->UpdateInformation();
+  //m_Reslicer->GetOutput(0)->SetUpdateExtentToWholeExtent();
 
   //start the pipeline
   m_Reslicer->Update();
@@ -377,7 +377,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   {
     /*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
     vtkImageData* reslicedImage;
-    reslicedImage = m_Reslicer->GetOutput();
+    reslicedImage = m_Reslicer->GetOutput(0);
 
 
     if(!reslicedImage)
@@ -387,7 +387,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     }
 
 
-    mitk::Image::Pointer resultImage = this->GetOutput();
+    mitk::Image::Pointer resultImage = this->GetOutput(0);
 
     //initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
     if (reslicedImage->GetDataDimension() == 1)
@@ -409,8 +409,10 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //set the geometry from current worldgeometry for the reusultimage
     //this is needed that the image has the correct mitk geometry
     //the originalGeometry is the Geometry of the result slice
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
-    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
+
+//    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
+//    Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
+    Geometry2D::Pointer originalGeometry = m_WorldGeometry->Clone();
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 

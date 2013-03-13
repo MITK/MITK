@@ -61,7 +61,7 @@ mitk::Image::Pointer mitk::ErodeTool::ApplyFilter(mitk::Image::Pointer image)
       m_BallErodeFilter->BoundaryToForegroundOn();
       m_BallErodeFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_BallErodeFilter->GetOutput(), new_image);
+      mitk::CastToMitkImage(m_BallErodeFilter->GetOutput(0), new_image);
       break;
 
     case(CROSS):
@@ -76,7 +76,7 @@ mitk::Image::Pointer mitk::ErodeTool::ApplyFilter(mitk::Image::Pointer image)
       m_CrossErodeFilter->BoundaryToForegroundOn();
       m_CrossErodeFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_CrossErodeFilter->GetOutput(), new_image);
+      mitk::CastToMitkImage(m_CrossErodeFilter->GetOutput(0), new_image);
       break;
 
     default:

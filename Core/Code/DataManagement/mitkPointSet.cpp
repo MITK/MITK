@@ -737,7 +737,7 @@ bool mitk::PointSet::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::PointSet::SetRequestedRegion( itk::DataObject * )
+void mitk::PointSet::SetRequestedRegion(const DataObject * )
 {
 }
 

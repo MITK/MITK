@@ -52,7 +52,7 @@ void mitk::ExtractImageFilter::GenerateData()
      timeSelector->SetInput( input );
      timeSelector->SetTimeNr( m_TimeStep );
      timeSelector->UpdateLargestPossibleRegion();
-     input = timeSelector->GetOutput();
+     input = timeSelector->GetOutput(0);
    }
    else if (input->GetDimension() == 2)
    {
@@ -125,7 +125,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   // calculate the output
   sliceExtractor->UpdateLargestPossibleRegion();
 
-  typename ImageType2D::Pointer slice = sliceExtractor->GetOutput();
+  typename ImageType2D::Pointer slice = sliceExtractor->GetOutput(0);
 
   // re-import to MITK
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
@@ -152,7 +152,7 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   ImageToImageFilter::InputImagePointer input = const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
-  Image::Pointer output = this->GetOutput();
+  Image::Pointer output = this->GetOutput(0);
 
   if (input->GetDimension() == 2)
   {
@@ -188,7 +188,7 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
  */
 void mitk::ExtractImageFilter::GenerateOutputInformation()
 {
- Image::Pointer output = this->GetOutput();
+ Image::Pointer output = this->GetOutput(0);
  Image::ConstPointer input = this->GetInput();
  if (input.IsNull()) return;
 

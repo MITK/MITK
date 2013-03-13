@@ -55,7 +55,7 @@ class mitkNavigationDataSourceTestClass
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 0, "testing initial number of outputs");
     myFilter->CreateOutput();
     MITK_TEST_CONDITION(myFilter->GetNumberOfOutputs() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
-    MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput()) != NULL, "test GetOutput() returning valid output object");
+    MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput(0)) != NULL, "test GetOutput() returning valid output object");
     }
 
   static void TestMethodsNormalCases()
@@ -77,7 +77,7 @@ class mitkNavigationDataSourceTestClass
     //test method graft
     MITK_TEST_OUTPUT(<< "testing Graftoutput()");
     myFilter->GraftOutput(nd1);
-    mitk::NavigationData::Pointer out = myFilter->GetOutput();
+    mitk::NavigationData::Pointer out = myFilter->GetOutput(0);
     MITK_TEST_CONDITION(out.GetPointer() != nd1.GetPointer(), "testing if output is same object as source of graft");
     MITK_TEST_CONDITION( mitk::Equal(out->GetPosition(), nd1->GetPosition()) &&
                          mitk::Equal(out->GetOrientation(), nd1->GetOrientation()) &&

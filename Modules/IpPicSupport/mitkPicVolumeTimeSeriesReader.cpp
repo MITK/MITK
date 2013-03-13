@@ -29,7 +29,7 @@ mitkIpPicDescriptor * MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *
 
 void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
 {
-    mitk::Image::Pointer output = this->GetOutput();
+    mitk::Image::Pointer output = this->GetOutput(0);
 
     if ( ( output->IsInitialized() ) && ( this->GetMTime() <= m_ReadHeaderTime.GetMTime() ) )
         return ;
@@ -82,7 +82,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
 
 void mitk::PicVolumeTimeSeriesReader::GenerateData()
 {
-    mitk::Image::Pointer output = this->GetOutput();
+    mitk::Image::Pointer output = this->GetOutput(0);
 
     //
     // Check to see if we can read the file given the name or prefix

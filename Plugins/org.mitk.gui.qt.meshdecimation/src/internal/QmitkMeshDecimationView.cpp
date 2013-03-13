@@ -139,7 +139,7 @@ void QmitkMeshDecimationView::Decimate()
         decimator->SetTargetReduction( targetReduction );
         decimator->SetPreserveTopology( 1 );
         decimator->Update();
-        newPolyData = decimator->GetOutput();
+        newPolyData = decimator->GetOutput(0);
       }
       else
       {
@@ -147,7 +147,7 @@ void QmitkMeshDecimationView::Decimate()
         decimator->SetInput( polyData );
         decimator->SetTargetReduction( targetReduction );
         decimator->Update();
-        newPolyData = decimator->GetOutput();
+        newPolyData = decimator->GetOutput(0);
       }
 
       if( newPolyData != 0 )

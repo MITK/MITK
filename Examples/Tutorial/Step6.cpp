@@ -145,7 +145,7 @@ void Step6::Load(int argc, char* argv[])
 
       // Since the DataNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = nodeReader->GetOutput(0);
       m_DataStorage->Add(node);
 
       mitk::Image::Pointer image =

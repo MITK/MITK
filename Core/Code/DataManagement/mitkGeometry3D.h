@@ -363,8 +363,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
       dim=3;
     }
     for(i=0;i<dim;++i){
-      //index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType >( pt_units[i] );
-      index[i]=itk::Math::RoundHalfIntegerUp<IndexType::IndexValueType>( pt_units[i] );
+      index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType>( pt_units[i] );
     }
   }
 

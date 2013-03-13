@@ -299,7 +299,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
 
     // TENSORS TO DATATREE
     mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
-    image->SetVectorImage( filter->GetOutput() );
+    image->SetVectorImage( filter->GetOutput(0) );
     image->SetB_Value(diffImage->GetB_Value());
     image->SetDirections(gradientList);
     image->InitializeFromVectorImage();
@@ -331,7 +331,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     residualFilter->Update();
 
     itk::Image<float, 3>::Pointer residualImage = itk::Image<float, 3>::New();
-    residualImage = residualFilter->GetOutput();
+    residualImage = residualFilter->GetOutput(0);
 
     mitk::Image::Pointer mitkResImg = mitk::Image::New();
 
@@ -582,7 +582,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
             reconFilter->Update();
 
             typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
-            TensorImageType::Pointer outputTensorImg = reconFilter->GetOutput();
+            TensorImageType::Pointer outputTensorImg = reconFilter->GetOutput(0);
 
             typedef itk::ImageRegionIterator<TensorImageType> TensorImageIteratorType;
             TensorImageIteratorType tensorIt(outputTensorImg, outputTensorImg->GetRequestedRegion());
@@ -704,7 +704,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
 
             typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
             TensorImageType::Pointer tensorImage;
-            tensorImage = tensorReconstructionFilter->GetOutput();
+            tensorImage = tensorReconstructionFilter->GetOutput(0);
 
             // Check the tensor for negative eigenvalues
             if(m_Controls->m_CheckNegativeEigenvalues->isChecked())
@@ -738,7 +738,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
 
             tensorImage->SetDirection( vols->GetVectorImage()->GetDirection() );
             image->InitializeByItk( tensorImage.GetPointer() );
-            image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
+            image->SetVolume( tensorReconstructionFilter->GetOutput(0)->GetBufferPointer() );
             mitk::DataNode::Pointer node=mitk::DataNode::New();
             node->SetData( image );
 
@@ -812,7 +812,7 @@ void QmitkTensorReconstructionView::TensorsToQbi()
         typedef itk::Image<OutputPixelType,3>                OutputImageType;
 
         mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-        OutputImageType::Pointer outimg = filter->GetOutput();
+        OutputImageType::Pointer outimg = filter->GetOutput(0);
         image->InitializeByItk( outimg.GetPointer() );
         image->SetVolume( outimg->GetBufferPointer() );
         mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -990,7 +990,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI(mitk::DataStorage::SetOfObjec
 
             // TENSORS TO DATATREE
             mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
-            image->SetVectorImage( filter->GetOutput() );
+            image->SetVectorImage( filter->GetOutput(0) );
             image->SetB_Value(bVal);
             image->SetDirections(gradientList);
             image->InitializeFromVectorImage();

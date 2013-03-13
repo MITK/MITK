@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::ImageSliceSelector::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input  = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -62,7 +62,7 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
 
   mitk::ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

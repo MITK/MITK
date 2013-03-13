@@ -53,10 +53,10 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 
-        if ( reader->GetOutput() != NULL )
+        if ( reader->GetOutput(0) != NULL )
         {
-          mitk::UnstructuredGrid::Pointer output = this->GetOutput();
-          output->SetVtkUnstructuredGrid( reader->GetOutput() );
+          mitk::UnstructuredGrid::Pointer output = this->GetOutput(0);
+          output->SetVtkUnstructuredGrid( reader->GetOutput(0) );
           success = true;
         }
         reader->Delete();
@@ -72,10 +72,10 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 
-        if ( reader->GetOutput() != NULL )
+        if ( reader->GetOutput(0) != NULL )
         {
-          mitk::UnstructuredGrid::Pointer output = this->GetOutput();
-          output->SetVtkUnstructuredGrid( reader->GetOutput() );
+          mitk::UnstructuredGrid::Pointer output = this->GetOutput(0);
+          output->SetVtkUnstructuredGrid( reader->GetOutput(0) );
           success = true;
         }
         reader->Delete();

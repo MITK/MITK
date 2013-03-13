@@ -71,7 +71,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
       reader->SetFilename( m_Filename );
       bool success = reader->Deserialize();
       error |= !success;
-      m_PropertyList = reader->GetOutput();
+      m_PropertyList = reader->GetOutput(0);
 
       if ( error )
       {

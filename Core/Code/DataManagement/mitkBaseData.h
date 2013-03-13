@@ -224,7 +224,7 @@ public:
   //## region of the data object passed in as a parameter.
   //##
   //## This method is implemented in the concrete subclasses of BaseData.
-  virtual void SetRequestedRegion(itk::DataObject *data)=0;
+  virtual void SetRequestedRegion(const itk::DataObject *data)=0;
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
@@ -355,7 +355,7 @@ protected:
   //##Documentation
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
-  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
+//  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 
   bool m_Initialized;
 

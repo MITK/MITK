@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 
 
-#define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
+//#define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 
 mitk::BaseProcess::BaseProcess() : m_Unregistering(false), m_CalculatingExternalReferenceCount(false), m_ExternalReferenceCount(-1)
 {
@@ -38,7 +38,7 @@ int mitk::BaseProcess::GetExternalReferenceCount() const
 
     m_ExternalReferenceCount = -1;
 
-    DataObjectPointerArray& outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
+    DataObjectPointerArray outputs = const_cast<mitk::BaseProcess*>(this)->GetOutputs();
 
     int realReferenceCount = GetReferenceCount();
 
@@ -108,7 +108,7 @@ void mitk::BaseProcess::UnRegister() const
 * does not do a Register()/UnRegister() because of the
 * desire to break the reference counting loop.
 */
-void mitk::BaseProcess::SetNthOutput(unsigned int idx, itk::DataObject *output)
+void mitk::BaseProcess::SetNthOutput(DataObjectPointerArraySizeType idx, itk::DataObject *output)
 {
 #ifdef MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
   output = dynamic_cast<mitk::BaseData*>(output);

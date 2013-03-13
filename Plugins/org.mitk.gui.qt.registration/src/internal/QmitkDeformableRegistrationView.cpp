@@ -241,7 +241,7 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   reader->SetFileName( m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_DeformationField->text().toStdString() );
   reader->Update();
 
-  DeformationFieldType::Pointer deformationField = reader->GetOutput();
+  DeformationFieldType::Pointer deformationField = reader->GetOutput(0);
 
   mitk::Image * mimage = dynamic_cast<mitk::Image*> (m_MovingNode->GetData());
   mitk::Image * fimage = dynamic_cast<mitk::Image*> (m_FixedNode->GetData());
@@ -273,7 +273,7 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   warper->SetDeformationField( deformationField );
   warper->Update();
 
-  FloatImageType::Pointer outputImage = warper->GetOutput();
+  FloatImageType::Pointer outputImage = warper->GetOutput(0);
   mitk::Image::Pointer result = mitk::Image::New();
 
   mitk::CastToMitkImage(outputImage, result);
@@ -287,8 +287,8 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   this->GetDefaultDataStorage()->Add(newNode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  //Image::Pointer outputImage = this->GetOutput();
-  //mitk::CastToMitkImage( warper->GetOutput(), outputImage );
+  //Image::Pointer outputImage = this->GetOutput(0);
+  //mitk::CastToMitkImage( warper->GetOutput(0), outputImage );
 
 
 }

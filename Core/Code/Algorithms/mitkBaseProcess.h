@@ -79,7 +79,7 @@ protected:
   //## These are only overwritten because of itk::DataObject::ConnectSource being
   //## private and non-virtual: the important stuff is done in
   //## mitk::BaseData::ConnectSource.
-  virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
+  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output);
 
   //##Documentation
   //## @brief Protected methods for setting outputs.

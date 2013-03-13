@@ -556,7 +556,7 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
         timeSelector->SetInput( original );
         timeSelector->SetTimeNr( timeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        mitk::Image::Pointer image3D = timeSelector->GetOutput();
+        mitk::Image::Pointer image3D = timeSelector->GetOutput(0);
 
         AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentationNode->GetData()), timeStep );
       }
@@ -604,7 +604,7 @@ void QmitkThresholdComponent::ITKThresholding( itk::Image<TPixel, VImageDimensio
   timeSelector->SetInput( segmentation );
   timeSelector->SetTimeNr( timeStep );
   timeSelector->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer segmentation3D = timeSelector->GetOutput();
+  mitk::Image::Pointer segmentation3D = timeSelector->GetOutput(0);
 
   typedef itk::Image< DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
   SegmentationType::Pointer itkSegmentation;

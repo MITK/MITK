@@ -91,7 +91,7 @@ inline int vtkResliceRound(double x)
 mitkVtkImageOverwrite::mitkVtkImageOverwrite()
 {
   m_Overwrite_Mode = false;
-  this->GetOutput()->SetScalarTypeToUnsignedInt();
+  this->GetOutput(0)->SetScalarTypeToUnsignedInt();
 }
 
 //----------------------------------------------------------------------------
@@ -453,7 +453,7 @@ static void vtkGetResliceInterpFunc(mitkVtkImageOverwrite *self,
                                                  const void *background,
                                                  mitkVtkImageOverwrite *self))
 {
-  int dataType = self->GetOutput()->GetScalarType();
+  int dataType = self->GetOutput(0)->GetScalarType();
 
   switch (dataType)
   {
@@ -517,8 +517,8 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
                          void (**setpixels)(void *&out, const void *in,
                                             int numscalars, int n))
 {
-  int dataType = self->GetOutput()->GetScalarType();
-  int numscalars = self->GetOutput()->GetNumberOfScalarComponents();
+  int dataType = self->GetOutput(0)->GetScalarType();
+  int numscalars = self->GetOutput(0)->GetNumberOfScalarComponents();
 
   switch (numscalars)
     {
@@ -568,7 +568,7 @@ static void vtkAllocBackgroundPixelT(mitkVtkImageOverwrite *self,
 static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
                              int numComponents)
 {
-  switch (self->GetOutput()->GetScalarType())
+  switch (self->GetOutput(0)->GetScalarType())
     {
     vtkTemplateAliasMacro(vtkAllocBackgroundPixelT(self, (VTK_TT **)rval,
                                               numComponents));
@@ -577,7 +577,7 @@ static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
 
 static void vtkFreeBackgroundPixel(mitkVtkImageOverwrite *self, void **rval)
 {
-  switch (self->GetOutput()->GetScalarType())
+  switch (self->GetOutput(0)->GetScalarType())
     {
     vtkTemplateAliasMacro(delete [] *((VTK_TT **)rval));
     }

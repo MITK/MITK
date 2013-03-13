@@ -90,7 +90,7 @@ public:
   /**
   * intherited from parent
   */
-  virtual void SetRequestedRegion(itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data);
 
 protected:
   ContourSet();

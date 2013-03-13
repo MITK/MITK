@@ -269,7 +269,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
     localStorage->m_TSFilter->Modified();
     localStorage->m_TSFilter->Update();
-    localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput();
+    localStorage->m_ReslicedImage = localStorage->m_TSFilter->GetOutput(0);
   }
   else
   {
@@ -684,7 +684,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     sliceSelector->SetTimeNr(image->GetDimension(3)/2);
     sliceSelector->SetChannelNr(image->GetDimension(4)/2);
     sliceSelector->Update();
-    centralSliceImage = sliceSelector->GetOutput();
+    centralSliceImage = sliceSelector->GetOutput(0);
     if ( centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized() )
     {
       minValue    = centralSliceImage->GetStatistics()->GetScalarValueMin();

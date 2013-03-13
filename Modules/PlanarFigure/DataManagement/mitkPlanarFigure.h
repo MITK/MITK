@@ -243,7 +243,7 @@ public:
   virtual bool VerifyRequestedRegion();
 
   /** \brief Intherited from parent */
-  virtual void SetRequestedRegion(itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data);
 
   /** \brief  Returns the current number of polylines  */
   virtual unsigned short GetPolyLinesSize();

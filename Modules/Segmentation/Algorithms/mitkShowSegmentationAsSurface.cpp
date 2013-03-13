@@ -137,7 +137,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
-  m_Surface = surfaceFilter->GetOutput();
+  m_Surface = surfaceFilter->GetOutput(0);
 
   vtkPolyData* polyData = m_Surface->GetVtkPolyData();
 
@@ -153,7 +153,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     normalsGen->SetInput( polyData );
     normalsGen->Update();
 
-    m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
+    m_Surface->SetVtkPolyData( normalsGen->GetOutput(0) );
 
     normalsGen->Delete();
   }

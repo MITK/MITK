@@ -59,7 +59,7 @@ namespace mitk
         reader->SetImageIO(io);
         reader->SetFileName(this->m_FileName);
         reader->Update();
-        ImageType::Pointer img = reader->GetOutput();
+        ImageType::Pointer img = reader->GetOutput(0);
 
         typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> VecImgType;
         VecImgType::Pointer vecImg = VecImgType::New();
@@ -86,8 +86,8 @@ namespace mitk
           ++ot;
         }
 
-        this->GetOutput()->InitializeByItk(vecImg.GetPointer());
-        this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
+        this->GetOutput(0)->InitializeByItk(vecImg.GetPointer());
+        this->GetOutput(0)->SetVolume(vecImg->GetBufferPointer());
 
         try
         {

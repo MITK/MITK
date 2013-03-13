@@ -287,7 +287,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   unitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
   unitSpacingImageFilter->SetInput( inputData );
 
-  m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
+  m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput(0) );
   unitSpacingImageFilter->Delete();
 
   //m_Reslicer->SetInput( inputData );
@@ -351,7 +351,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   m_Reslicer->Update();
 
   // 1. Check the result
-  vtkImageData* reslicedImage = m_Reslicer->GetOutput();
+  vtkImageData* reslicedImage = m_Reslicer->GetOutput(0);
 
   //mitkIpPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
 
@@ -366,7 +366,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Vector3D spacingVector;
   FillVector3D(spacingVector, mmPerPixel[0], mmPerPixel[1], 1.0);
 
-  mitk::Image::Pointer resultImage = this->GetOutput();
+  mitk::Image::Pointer resultImage = this->GetOutput(0);
   resultImage->Initialize(input->GetPixelType(), 2, dimensions );
   //resultImage->Initialize( pic );
   resultImage->SetSpacing( spacingVector );
@@ -379,11 +379,11 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Vector3D spacingVector;
   FillVector3D(spacingVector, mmPerPixel[0], mmPerPixel[1], 1.0);
 
-  mitk::Image::Pointer resultImage = this->GetOutput();
-  resultImage->Initialize(m_Reslicer->GetOutput());
+  mitk::Image::Pointer resultImage = this->GetOutput(0);
+  resultImage->Initialize(m_Reslicer->GetOutput(0));
   resultImage->Initialize(inputImage->GetPixelType(), 2, dimensions);
   resultImage->SetSpacing(spacingVector);
-  resultImage->SetSlice(m_Reslicer->GetOutput());*/
+  resultImage->SetSlice(m_Reslicer->GetOutput(0));*/
 }
 
 

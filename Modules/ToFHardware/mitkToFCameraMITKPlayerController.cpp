@@ -283,7 +283,7 @@ namespace mitk
       ItkImageFileReader::Pointer nrrdReader = ItkImageFileReader::New();
       nrrdReader->SetFileName(outfileName);
       nrrdReader->Update();
-      image = nrrdReader->GetOutput()->Clone();
+      image = nrrdReader->GetOutput(0)->Clone();
     }
     else
     {
@@ -304,7 +304,7 @@ namespace mitk
       PicFileReader::Pointer picReader = PicFileReader::New();
       picReader->SetFileName(outfileName);
       picReader->Update();
-      image = picReader->GetOutput()->Clone();
+      image = picReader->GetOutput(0)->Clone();
     }
     else
     {

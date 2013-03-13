@@ -115,7 +115,7 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction (itk::Image<TPixel, VIma
   contourSurface->SetPoints( points );
   contourSurface->SetPolys( polygons );
   contourSurface->BuildLinks();
-  Surface::Pointer finalSurface = this->GetOutput();
+  Surface::Pointer finalSurface = this->GetOutput(0);
 
   finalSurface->SetVtkPolyData( contourSurface );
 }

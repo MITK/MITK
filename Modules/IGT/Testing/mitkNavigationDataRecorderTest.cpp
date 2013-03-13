@@ -211,7 +211,7 @@ class mitkNavigationDataRecorderTestClass
 
     //only testing first position at the moment
     myPlayer->Update();
-    mitk::NavigationData::Pointer thisData = myPlayer->GetOutput();
+    mitk::NavigationData::Pointer thisData = myPlayer->GetOutput(0);
     mitk::Point3D reference_pnt;
     reference_pnt[0] = 1;
     reference_pnt[1] = 1/2;

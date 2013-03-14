@@ -1010,10 +1010,20 @@ void QmitkFiberfoxView::GenerateImage()
             this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
             QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
         }
+
+        double lineReadoutTime = m_Controls->m_LineReadoutTimeBox->value();
+
+        // adjusting line readout time to the adapted image size needed for the FFT
+        int y=2;
+        while (y<imageRegion.GetSize(1))
+            y *= 2;
+        if (y>imageRegion.GetSize(1))
+            lineReadoutTime *= (double)imageRegion.GetSize(1)/y;
+
         mitk::SignalDecay<double> contrastModel;
         contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
         contrastModel.SetTE(this->m_Controls->m_TEbox->value());
-        contrastModel.SetTline(m_Controls->m_LineReadoutTimeBox->value());
+        contrastModel.SetTline(lineReadoutTime);
         artifactList.push_back(&contrastModel);
 
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());

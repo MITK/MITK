@@ -431,7 +431,7 @@ include(mitkSetupC++0xVariables)
 
 set(cflags )
 if(WIN32)
-  set(cflags "${cflags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  set(cflags "${cflags} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
 if(NOT MSVC_VERSION)
   foreach(_flag
@@ -467,8 +467,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   if(MINGW)
     # suppress warnings about auto imported symbols
     set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")
-    # we need to define a Windows version
-    set(MITK_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${MITK_CXX_FLAGS}")
   endif()
 
   #set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")

@@ -42,6 +42,11 @@ if(MITK_USE_Boost)
       set(_boost_build_cmd )
     endif()
 
+    set(POST_BUILD "")
+    if(APPLE)
+      set(POST_BUILD install_name_tool -id ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libboost_thread.dylib ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libboost_thread.dylib)
+    endif()
+
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       # Boost needs in-source builds
@@ -53,6 +58,7 @@ if(MITK_USE_Boost)
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"
       INSTALL_COMMAND ""
+      ${POST_BUILD}
       DEPENDS ${proj_DEPENDENCIES}
       )
 

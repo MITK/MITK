@@ -122,7 +122,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                 }
 
                 // save k-space slice of s0 image
-                if (g==0)
+                if (g==m_FiberModels.at(0)->GetFirstBaselineIndex())
                     for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
                         for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
                         {
@@ -131,7 +131,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                             SliceType::IndexType index2D;
                             index2D[0]=x; index2D[1]=y;
                             double kpix = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
-                            m_KspaceImage->SetPixel(index3D, kpix);
+                            m_KspaceImage->SetPixel(index3D, m_KspaceImage->GetPixel(index3D)+kpix);
                         }
 
                 // inverse fourier transform slice
@@ -280,12 +280,12 @@ void TractsToDWIImageFilter::GenerateData()
     // if not, adjust size and dimension (needed for FFT); zero-padding
     if (x!=m_ImageRegion.GetSize(0))
     {
-        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x;
+        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x << " --> " << x*m_Upsampling;
         m_ImageRegion.SetSize(0, x);
     }
     if (y!=m_ImageRegion.GetSize(1))
     {
-        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y;
+        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y << " --> " << y*m_Upsampling;
         m_ImageRegion.SetSize(1, y);
     }
 
@@ -529,6 +529,9 @@ void TractsToDWIImageFilter::GenerateData()
 
     MITK_INFO << "Summing compartments and adding noise";
     unsigned int window = 0;
+    unsigned int window2 = 0;
+    unsigned int min = itk::NumericTraits<unsigned int>::max();
+    unsigned int min2 = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -560,13 +563,24 @@ void TractsToDWIImageFilter::GenerateData()
                 signal[i] = floor(signal[i]+0.5);
             else
                 signal[i] = ceil(signal[i]-0.5);
+
             if (!m_FiberModels.at(0)->IsBaselineIndex(i) && signal[i]>window)
                 window = signal[i];
+            else if (signal[i]>window)
+                window2 = signal[i];
+            if (!m_FiberModels.at(0)->IsBaselineIndex(i) && signal[i]<min)
+                min = signal[i];
+            else if (signal[i]<min)
+                min2 = signal[i];
         }
         it4.Set(signal);
         ++it4;
     }
-    unsigned int level = window/2;
+    window -= min;
+    window2 -= min2;
+    min = (min+min2)/2;
+    window = (window+window2)/2;
+    unsigned int level = window/2 + min;
     m_LevelWindow = mitk::LevelWindow(level, window);
 
     this->SetNthOutput(0, outImage);

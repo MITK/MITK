@@ -41,7 +41,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li <b>Join Bundles</b>: Add new bundle to the datamanager that contains all fibers from the selected bundles.
 \li <b>Include Fiducials</b>: If checked, the specified transformation is also applied to the fiducials belonging to the selected fiber bundle and the fiducials are also copied.
 
-\image html FiberfoxExamples.png Examples of artificial crossing, fanning, highly curved, kissing and twisting fibers as well as of the corresponding tensor images generated with Fiberfox.
+\image html FiberfoxExamples.png Examples of artificial crossing (a,b), fanning (c,d), highly curved (e,f), kissing (g,h) and twisting (i,j) fibers as well as of the corresponding tensor images generated with Fiberfox.
 
 
 \section QmitkFiberfoxViewUserManualSignalGeneration Signal Generation

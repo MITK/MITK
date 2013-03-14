@@ -526,56 +526,61 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));
-  switch(mode->GetRenderingMode())
+  bool binary = false;
+  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  if(binary) // is it a binary image?
   {
-  case mitk::RenderingModeProperty::LEVELWINDOW_COLOR:
-    MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_Color";
-    localStorage->m_LevelWindowFilter->SetLookupTable( localStorage->m_DefaultLookupTable );
-    this->ApplyLevelWindow( renderer );
-    break;
-  case mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR:
-    MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_LookupTable_Color";
-    this->ApplyLookuptable( renderer );
-    this->ApplyLevelWindow( renderer );
-    break;
-  case mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR:
-    MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_ColorTransferFunction_Color";
-    this->ApplyColorTransferFunction( renderer );
-    this->ApplyLevelWindow( renderer );
-    break;
-  case mitk::RenderingModeProperty::LOOKUPTABLE_COLOR:
-    MITK_DEBUG << "'Image Rendering.Mode' = LookupTable_Color";
-    this->ApplyLookuptable( renderer );
-    break;
-  case mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR:
-    MITK_DEBUG << "'Image Rendering.Mode' = ColorTransferFunction_Color";
-    this->ApplyColorTransferFunction( renderer );
-    break;
-  default:
-    MITK_ERROR << "No valid 'Image Rendering.Mode' set";
-    break;
+    //for binary images, we always use our default LuT and map every value to (0,1)
+    //the opacity of 0 will always be 0.0. We never a apply a LuT/TfF nor a level window.
+    localStorage->m_LevelWindowFilter->SetLookupTable(localStorage->m_BinaryLookupTable);
   }
+  else
+  {
+    //all other image types can make use of the rendering mode
+    mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));
+    switch(mode->GetRenderingMode())
+    {
+    case mitk::RenderingModeProperty::LEVELWINDOW_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_Color";
+      localStorage->m_LevelWindowFilter->SetLookupTable( localStorage->m_DefaultLookupTable );
+      this->ApplyLevelWindow( renderer );
+      break;
+    case mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_LookupTable_Color";
+      this->ApplyLookuptable( renderer );
+      this->ApplyLevelWindow( renderer );
+      break;
+    case mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_ColorTransferFunction_Color";
+      this->ApplyColorTransferFunction( renderer );
+      this->ApplyLevelWindow( renderer );
+      break;
+    case mitk::RenderingModeProperty::LOOKUPTABLE_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = LookupTable_Color";
+      this->ApplyLookuptable( renderer );
+      break;
+    case mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR:
+      MITK_DEBUG << "'Image Rendering.Mode' = ColorTransferFunction_Color";
+      this->ApplyColorTransferFunction( renderer );
+      break;
+    default:
+      MITK_ERROR << "No valid 'Image Rendering.Mode' set";
+      break;
+    }
+  }
+  //we apply color for all images (including binaries).
   this->ApplyColor( renderer );
 }
 
 void mitk::ImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
 {
   LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  bool binary = false;
-  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-
   vtkLookupTable* usedLookupTable = localStorage->m_ColorLookupTable;
 
   // If lookup table or transferfunction use is requested...
   mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
 
-  if(binary) // is it a binary image?
-  {
-    //for binary images, we always use our default LuT and map every value to (0,1)
-    usedLookupTable = localStorage->m_BinaryLookupTable;
-  }
-  else if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
+  if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
   {
     usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
   }

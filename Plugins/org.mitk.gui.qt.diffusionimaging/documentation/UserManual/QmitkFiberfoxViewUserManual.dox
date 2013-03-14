@@ -46,7 +46,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 
 \section QmitkFiberfoxViewUserManualSignalGeneration Signal Generation
 
-To generate an artificial signal from the input fibers we follow the concepts recently presented by Panagiotaki et al. in a review and taxonomy of different compartment models: a flexible model combining multiple compartments is used to simulate the anisotropic diffusion inside (intra-axonal compartment) and between axons (inter-axonal compartment), isotropic diffusion outside of the axons (extra-axonal compartment 1) and the restricted diffusion in other cell types (extra-axonal compartment 2) weighted according to their respective volume fraction.
+To generate an artificial signal from the input fibers we follow the concepts recently presented by Panagiotaki et al. in a review and taxonomy of different compartment models[2]: a flexible model combining multiple compartments is used to simulate the anisotropic diffusion inside (intra-axonal compartment) and between axons (inter-axonal compartment), isotropic diffusion outside of the axons (extra-axonal compartment 1) and the restricted diffusion in other cell types (extra-axonal compartment 2) weighted according to their respective volume fraction.
 
 A diffusion weighted image is generated from the fibers by selecting the according fiber bundle in the datamanager and clicking "Generate Image". If some other diffusion weighted image is selected together with the fiber bundle, Fiberfox directly uses the parameters of the selected image (size, spacing, gradient directions, b-values) for the signal generation process. Additionally a binary image can be selected that defines the tissue area. Voxels outside of this mask will contain no signal, only noise.
 
@@ -80,7 +80,7 @@ The group-boxes "Intra-axonal Compartment", "Inter-axonal Compartment" and "Extr
 \li <b>Astrosticks</b>: Consists of multiple stick models pointing in different directions. The single stick orientations can either be distributed equally over the sphere or are sampled randomly. The model represents signal coming from a type of glial cell called astrocytes, or populations of axons with arbitrary orientation. Parameters: randomization of the stick orientations and diffusivity of the sticks <em>d</em>.
 \li <b>Dot</b>: Isotropically restricted compartment. No parameter.
 
-For a detailed description of the single models, please refer to Panagiotaki <em>et al.</em> "Compartment models of the diffusion MR signal in brain white matter: A taxonomy and comparison.". Additionally to the model parameters, each compartment has its own <em>T2</em> signal relaxation constant (in <em>ms</em>).
+For a detailed description of the single models, please refer to Panagiotaki <em>et al.</em> "Compartment models of the diffusion MR signal in brain white matter: A taxonomy and comparison."[2]. Additionally to the model parameters, each compartment has its own <em>T2</em> signal relaxation constant (in <em>ms</em>).
 
 
 <b>Noise and Artifacts:</b>

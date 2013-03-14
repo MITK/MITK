@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_fiberfoxview Fiberfox
 
-This view provides the user interface for Fiberfox, an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images. Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers. From these fibers, a diffusion weighted signal is simulated according to the specified acquisition settings such as gradient direction, b-value, signal-to-noise ratio, image size, and resolution using a flexible combination of various diffusion models.
+This view provides the user interface for Fiberfox, an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images. Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers. From these fibers a diffusion weighted signal is simulated using a flexible combination of various diffusion models. It can be modified using specified acquisition settings such as gradient direction, b-value, signal-to-noise ratio, image size, and resolution.
 
 <b>Available sections:</b>
   - \ref QmitkFiberfoxViewUserManualFiberDefinition

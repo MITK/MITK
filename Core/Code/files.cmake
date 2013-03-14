@@ -199,6 +199,7 @@ set(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
+  DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp

@@ -274,11 +274,11 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
     //return the offset of iterator at one before next-vertex-upwards
     if(itUp != begin)
     {
-      return itUp._Myoff - 1;
+      return std::distance( begin, itUp) - 1;
     }
     else
     {
-      return itUp._Myoff;
+      return std::distance( begin, itUp);
     }
 
   }
@@ -339,11 +339,11 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
     //return the offset of iterator at one after next-vertex-downwards
     if( itDown != end)
     {
-      return itDown._Myoff;// + 1;//index of next vertex
+      return std::distance( begin, itDown);// + 1;//index of next vertex
     }
     else
     {
-      return itDown._Myoff - 1;
+      return std::distance( begin, itDown) - 1;
     }
   }
 }

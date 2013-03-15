@@ -72,7 +72,7 @@ std::string GetProgramPath()
 {
   std::stringstream ss;
   ss << "/proc/" << getpid() << "/exe";
-  char proc[512];
+  char proc[512] = {0};
   ssize_t ch = readlink(ss.str().c_str(), proc, 512);
   if (ch == -1) return std::string();
   std::size_t index = std::string(proc).find_last_of('/');

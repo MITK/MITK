@@ -109,8 +109,8 @@ public:
      at that location.  This probability is interpreted to be the probability
      that a fiber tract passes through that region.
      */
-  itkSetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType, 1);
-  itkGetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType, 1);
+  itkSetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType);
+  itkGetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType);
 
   //overide the built in set input function
   //we need to create a new cache everytime we change the input image

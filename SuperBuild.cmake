@@ -122,9 +122,6 @@ set(sep "^^")
 if(MSVC90 OR MSVC10)
   set(ep_common_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
   set(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
-else()
-  set(ep_common_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX_EXTRA")
-  set(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
 endif()
 
 set(ep_common_args

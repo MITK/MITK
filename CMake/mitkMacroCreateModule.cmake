@@ -252,10 +252,30 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                                       )
 
           if(RESOURCE_FILES)
+            set(res_dir Resources)
+            set(binary_res_files )
+            set(source_res_files )
+            foreach(res_file ${RESOURCE_FILES})
+              if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}/${res_file})
+                list(APPEND binary_res_files "${res_file}")
+              else()
+                list(APPEND source_res_files "${res_file}")
+              endif()
+            endforeach()
+
+            set(res_macro_args )
+            if(binary_res_files)
+              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
+                                         FILES ${binary_res_files})
+            endif()
+            if(source_res_files)
+              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
+                                         FILES ${source_res_files})
+            endif()
+
             usFunctionEmbedResources(CPP_FILES
                                      LIBRARY_NAME ${MODULE_LIBNAME}
-                                     ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
-                                     FILES ${RESOURCE_FILES})
+                                     ${res_macro_args})
           endif()
 
         endif()

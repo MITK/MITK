@@ -41,7 +41,7 @@ void FslPeakImageConverter< PixelType >
     Matrix<double, 4, 4> direction4 = m_InputImages->GetElement(0)->GetDirection();
     ImageRegion<4> imageRegion4 = m_InputImages->GetElement(0)->GetLargestPossibleRegion();
 
-    Vector<float, 3> spacing3;
+    itk::Vector<double,3> spacing3;
     Point<float, 3> origin3;
     Matrix<double, 3, 3> direction3;
     ImageRegion<3> imageRegion3;

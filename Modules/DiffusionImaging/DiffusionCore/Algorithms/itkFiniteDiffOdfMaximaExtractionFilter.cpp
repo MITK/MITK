@@ -160,7 +160,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::BeforeThreadedGenerateData()
 {
     typename CoefficientImageType::Pointer ShCoeffImage = static_cast< CoefficientImageType* >( this->ProcessObject::GetInput(0) );
-    mitk::Vector3D spacing = ShCoeffImage->GetSpacing();
+    itk::Vector<double,3> spacing = ShCoeffImage->GetSpacing();
     double minSpacing = spacing[0];
     if (spacing[1]<minSpacing)
         minSpacing = spacing[1];

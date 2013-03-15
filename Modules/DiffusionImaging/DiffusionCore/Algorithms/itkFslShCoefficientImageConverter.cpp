@@ -33,7 +33,7 @@ void FslShCoefficientImageConverter< PixelType, ShOrder >
     Matrix<double, 4, 4> direction4 = m_InputImage->GetDirection();
     ImageRegion<4> imageRegion4 = m_InputImage->GetLargestPossibleRegion();
 
-    Vector<float, 3> spacing3;
+    Vector<double, 3> spacing3;
     Point<float, 3> origin3;
     Matrix<double, 3, 3> direction3;
     ImageRegion<3> imageRegion3;

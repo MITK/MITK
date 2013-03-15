@@ -470,7 +470,7 @@ void OdfMaximaExtractionFilter< TOdfPixelType >
 
     InputIteratorType git(m_ShCoeffImage, m_ShCoeffImage->GetLargestPossibleRegion() );
 
-    mitk::Vector3D spacing = m_ShCoeffImage->GetSpacing();
+    itk::Vector<double,3> spacing = m_ShCoeffImage->GetSpacing();
     double minSpacing = spacing[0];
     if (spacing[1]<minSpacing)
         minSpacing = spacing[1];

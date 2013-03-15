@@ -26,6 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -34,6 +35,13 @@
 #include "stdint_p.h"
 
 #include "usConfig.h"
+
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+extern "C" {
+const char* us_resource_compressor_error();
+FILE* us_resource_compressor(FILE*, long, int level, long* out_size);
+}
+#endif // US_ENABLE_RESOURCE_COMPRESSION
 
 #ifdef US_PLATFORM_WINDOWS
 static const char DIR_SEP = '\\';
@@ -51,7 +59,8 @@ public:
   enum Flags
   {
     NoFlags = 0x00,
-    Directory = 0x01
+    Directory = 0x01,
+    Compressed = 0x02
   };
 
   Resource(const std::string& name, const std::string& path = std::string(), unsigned int flags = NoFlags);
@@ -81,7 +90,8 @@ class ResourceWriter
 
 public:
 
-  ResourceWriter(const std::string& fileName, const std::string& libName);
+  ResourceWriter(const std::string& fileName, const std::string& libName,
+                 int compressionLevel, int compressionThreshold);
   ~ResourceWriter();
 
   bool AddFiles(const std::vector<std::string>& files, const std::string& basePath);
@@ -110,6 +120,9 @@ private:
 
   std::string libName;
   std::string fileName;
+
+  int compressionLevel;
+  int compressionThreshold;
 
   Resource* root;
 };
@@ -222,12 +235,39 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
   dataOffset = offset;
 
   // open the resource file on the file system
-  std::ifstream file(path.c_str(), std::ifstream::in | std::ifstream::binary);
+  FILE* file = fopen(path.c_str(), "rb");
   if (!file)
   {
     *errorMessage = "File could not be opened: " + path;
     return 0;
   }
+
+  // get the file size
+  fseek(file, 0, SEEK_END);
+  long fileSize = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
+  // try compression
+  if (writer.compressionLevel != 0 && fileSize != 0)
+  {
+    long compressedSize = 0;
+    FILE* compressedFile = us_resource_compressor(file, fileSize, writer.compressionLevel, &compressedSize);
+    if (compressedFile == NULL)
+    {
+      *errorMessage = us_resource_compressor_error();
+      return 0;
+    }
+
+    int compressRatio = static_cast<int>((100.0 * (fileSize - compressedSize)) / fileSize);
+    if (compressRatio >= writer.compressionThreshold)
+    {
+      file = compressedFile;
+      fileSize = compressedSize;
+      flags |= Compressed;
+    }
+  }
+#endif // US_ENABLE_RESOURCE_COMPRESSION
 
   // write the full path of the resource in the file system as a comment
   writer.WriteString("  // ");
@@ -235,17 +275,20 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
   writer.WriteString("\n  ");
 
   // write the length
-  file.seekg(0, std::ifstream::end);
-  std::ifstream::pos_type size = file.tellg();
-  file.seekg(0);
-  writer.WriteNumber4(static_cast<uint32_t>(size));
+  writer.WriteNumber4(static_cast<uint32_t>(fileSize));
   writer.WriteString("\n  ");
   offset += 4;
+
+  if (fseek(file, 0, SEEK_SET) != 0)
+  {
+    *errorMessage = "Could not set stream position.\n";
+    return 0;
+  }
 
   // write the actual payload
   int charsLeft = 16;
   char c = 0;
-  while (file.get(c))
+  while (fread(&c, 1, 1, file))
   {
     --charsLeft;
     writer.WriteHex(static_cast<uint8_t>(c));
@@ -256,16 +299,25 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
     }
   }
 
-  offset += size;
+  if(ferror(file) != 0)
+  {
+    *errorMessage = "Error reading resource file: " + path;
+    return 0;
+  }
+
+  offset += fileSize;
 
   // done
   writer.WriteString("\n  ");
   return offset;
 }
 
-ResourceWriter::ResourceWriter(const std::string& fileName, const std::string& libName)
+ResourceWriter::ResourceWriter(const std::string& fileName, const std::string& libName,
+                               int compressionLevel, int compressionThreshold)
   : libName(libName)
   , fileName(fileName)
+  , compressionLevel(compressionLevel)
+  , compressionThreshold(compressionThreshold)
   , root(NULL)
 {
   out.exceptions(std::ofstream::goodbit);
@@ -617,11 +669,17 @@ std::string GetCurrentDir()
   }
   return std::string(currDir);
 }
+
+bool IsAbsolutePath(const std::string& path)
+{
+  return path.find_first_of('/') == 0;
+}
 #else
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
+#include <Shlwapi.h>
 std::string GetCurrentDir()
 {
   TCHAR currDir[512];
@@ -635,6 +693,11 @@ std::string GetCurrentDir()
   }
   return std::string(currDir);
 }
+
+bool IsAbsolutePath(const std::string& path)
+{
+  return !PathIsRelative(path.c_str());
+}
 #endif
 
 int main(int argc, char** argv)
@@ -643,7 +706,7 @@ int main(int argc, char** argv)
   {
     std::cout << US_RCC_EXECUTABLE_NAME " - A resource compiler for C++ Micro Services modules\n"
                  "\n"
-                 "Usage: " US_RCC_EXECUTABLE_NAME " LIBNAME OUTPUT INPUT [INPUT]...\n"
+                 "Usage: " US_RCC_EXECUTABLE_NAME " LIBNAME OUTPUT INPUT...  [-c COMPRESSION_LEVEL] [-t COMPRESSION_THRESHOLD] [-d ROOT_DIR INPUT [INPUT]]...\n"
                  "Convert all INPUT files into hex code embedded in C funtions written to OUTPUT.\n";
     exit(EXIT_SUCCESS);
   }
@@ -651,17 +714,76 @@ int main(int argc, char** argv)
   std::string libName(argv[1]);
   std::string fileName(argv[2]);
 
-  std::vector<std::string> inputFiles;
+  // default zlib compression level
+  int compressionLevel = -1;
 
+  // use compressed data if 30% reduction or better
+  int compressionThreshold = 30;
+
+  std::map<std::string, std::vector<std::string> > inputFiles;
+  inputFiles.insert(std::make_pair(GetCurrentDir(), std::vector<std::string>()));
+
+  std::vector<std::string>* currFiles = &inputFiles.begin()->second;
+  std::string currRootDir = inputFiles.begin()->first;
   for (int i = 3; i < argc; i++)
   {
-    inputFiles.push_back(argv[i]);
+    if (std::strcmp(argv[i], "-d") == 0)
+    {
+      if (i == argc-1)
+      {
+        std::cerr << "No argument after -d given." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      currRootDir = argv[++i];
+      inputFiles.insert(std::make_pair(currRootDir, std::vector<std::string>()));
+      currFiles = &inputFiles[currRootDir];
+    }
+    else if(std::strcmp(argv[i], "-c") == 0)
+    {
+      if (i == argc-1)
+      {
+        std::cerr << "No argument after -c given." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      compressionLevel = atoi(argv[++i]);
+      if (compressionLevel < -1 || compressionLevel > 10)
+      {
+        compressionLevel = -1;
+      }
+    }
+    else if(std::strcmp(argv[i], "-t") == 0)
+    {
+      if (i == argc-1)
+      {
+        std::cerr << "No argument after -t given." << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      compressionThreshold = atoi(argv[++i]);
+    }
+    else
+    {
+      const std::string inputFile = argv[i];
+      if (IsAbsolutePath(inputFile))
+      {
+        currFiles->push_back(inputFile);
+      }
+      else
+      {
+        currFiles->push_back(currRootDir + DIR_SEP + inputFile);
+      }
+    }
   }
 
-  ResourceWriter writer(fileName, libName);
-  if (!writer.AddFiles(inputFiles, GetCurrentDir()))
+  ResourceWriter writer(fileName, libName, compressionLevel, compressionThreshold);
+  for(std::map<std::string, std::vector<std::string> >::iterator i = inputFiles.begin();
+      i != inputFiles.end(); ++i)
   {
-    return EXIT_FAILURE;
+    if (i->second.empty()) continue;
+
+    if (!writer.AddFiles(i->second, i->first))
+    {
+      return EXIT_FAILURE;
+    }
   }
 
   return writer.Write() ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -13,7 +13,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 
   # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY 
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
@@ -91,7 +91,7 @@ option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
 
 option(${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS "Build all ${MY_PROJECT_NAME} plugins" OFF)
-  
+
 mark_as_advanced(${MY_PROJECT_NAME}_INSTALL_RPATH_RELATIVE
                  ${MY_PROJECT_NAME}_BUILD_ALL_PLUGINS
                  )
@@ -140,7 +140,7 @@ set(CMAKE_MODULE_PATH
   ${MITK_SOURCE_DIR}/CMake
   ${CMAKE_MODULE_PATH}
   )
-  
+
 include(mitkFunctionCheckCompilerFlags)
 include(mitkFunctionGetGccVersion)
 include(mitkFunctionGetVersion)
@@ -210,37 +210,8 @@ endif()
 # Project C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(${PROJECT_NAME}_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(${PROJECT_NAME}_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
-
-  mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
-  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
-  # Enable link dependency optimization to only link libraries which satisfy undefined
-  # symbol references. This aligns the link behavior with the one from the Windows linker.
-  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
-
-  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
-  # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
-  # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
-  # Doing so should allow to build package made for distribution using older linux distro.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    mitkFunctionCheckCompilerFlags("-fstack-protector-all" cflags)
-  endif()
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(${PROJECT_NAME}_CXX_FLAGS "-Wl,--enable-auto-import ${${PROJECT_NAME}_CXX_FLAGS}")
-    # we need to define a Windows version
-    set(${PROJECT_NAME}_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${${PROJECT_NAME}_CXX_FLAGS}")
-  endif()
-
-  set(${PROJECT_NAME}_C_FLAGS "${cflags} ${${PROJECT_NAME}_C_FLAGS}")
-  set(${PROJECT_NAME}_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel -Wsign-promo ${${PROJECT_NAME}_CXX_FLAGS}")
-  # The following line produces a lot of warnings in MITK header files...
-  #set(${PROJECT_NAME}_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${${PROJECT_NAME}_CXX_FLAGS}")
-endif()
+set(${PROJECT_NAME}_C_FLAGS "${MITK_C_FLAGS} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(${PROJECT_NAME}_CXX_FLAGS "${MITK_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # Set C/CXX Flags
@@ -378,7 +349,7 @@ include(mitkInstallRules)
 # set up the environment for the application and for Visual Studio
 if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
-  
+
   set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
   foreach(VS_BUILD_TYPE debug release)
     mitkFunctionCreateWindowsBatchScript("${PROJECT_SOURCE_DIR}/CMake/StartVS.bat.in"

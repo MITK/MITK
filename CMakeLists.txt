@@ -429,9 +429,8 @@ set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_C
 
 include(mitkSetupC++0xVariables)
 
-set(cflags )
 if(WIN32)
-  set(cflags "${cflags} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -D_WIN32_WINNT=0x0501 -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
 endif()
 if(NOT MSVC_VERSION)
   foreach(_flag
@@ -441,17 +440,21 @@ if(NOT MSVC_VERSION)
     -Winvalid-pch
     -Wcast-align
     -Wwrite-strings
-    -Wno-gnu
+    -Wno-error=gnu
+    -Woverloaded-virtual
+    -Wstrict-null-sentinel
+    #-Wold-style-cast
+    #-Wsign-promo
     -fdiagnostics-show-option
     )
-    mitkFunctionCheckCompilerFlags(${_flag} cflags)
+    mitkFunctionCheckCompilerFlags2(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
   endforeach()
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
-  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
-  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" cflags)
+  mitkFunctionCheckCompilerFlags2("-Wl,--no-undefined" MITK_C_FLAGS MITK_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags2("-Wl,--as-needed" MITK_C_FLAGS MITK_CXX_FLAGS)
 
   if(MITK_USE_C++0x)
     mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
@@ -462,21 +465,16 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
   # Doing so should allow to build package made for distribution using older linux distro.
   if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    mitkFunctionCheckCompilerFlags("-fstack-protector-all" cflags)
+    mitkFunctionCheckCompilerFlags2("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
   endif()
   if(MINGW)
     # suppress warnings about auto imported symbols
     set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")
   endif()
 
-  #set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
-  set(MITK_CXX_FLAGS "-Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
   set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 
 endif()
-
-set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
-set(MITK_CXX_FLAGS "${cflags} ${MITK_CXX_FLAGS}")
 
 #-----------------------------------------------------------------------------
 # MITK Packages
@@ -767,6 +765,7 @@ option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)."
 if(MITK_USE_Python)
   set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
 endif()
+
 #-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------

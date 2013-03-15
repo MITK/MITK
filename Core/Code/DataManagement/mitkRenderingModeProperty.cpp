@@ -53,8 +53,8 @@ int mitk::RenderingModeProperty::GetRenderingMode()
 void mitk::RenderingModeProperty::AddRenderingModes()
 {
   AddEnum( "LevelWindow_Color", LEVELWINDOW_COLOR );
-  AddEnum( "LevelWindow_LookupTable_Color", LOOKUPTABLE_LEVELWINDOW_COLOR );
-  AddEnum( "LevelWindow_ColorTransferFunction_Color", COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR );
+  AddEnum( "LookupTable_LevelWindow_Color", LOOKUPTABLE_LEVELWINDOW_COLOR );
+  AddEnum( "ColorTransferFunction_LevelWindow_Color", COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR );
   AddEnum( "LookupTable_Color", LOOKUPTABLE_COLOR );
   AddEnum( "ColorTransferFunction_Color", COLORTRANSFERFUNCTION_COLOR );
 }

@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+#ifdef _MSC_VER
+# pragma warning(push)
+# pragma warning(disable: 4522)
+#endif
+
 /**
  * Encapsulates the enumeration for rendering modes. Valid values are:
  * \li LEVELWINDOW_COLOR: Level window and color will be applied to the image.
@@ -37,9 +42,6 @@ namespace mitk
  * that users who change the mode know that a previously set color will still be applied (on top of the mode).
  */
 
-// use_color(off) -> LevelWindow_LookupTable_Color
-// use_color(on) -> LevelWindow_Color
-
 class MITK_CORE_EXPORT RenderingModeProperty : public EnumerationProperty
 {
 public:
@@ -52,7 +54,6 @@ public:
 
   mitkNewMacro1Param(RenderingModeProperty, const std::string&);
 
-  //todo
   enum ImageRenderingMode
   {
     LEVELWINDOW_COLOR = 0,
@@ -103,6 +104,10 @@ private:
   RenderingModeProperty(const RenderingModeProperty&);
   RenderingModeProperty& operator=(const RenderingModeProperty&);
 };
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
 
 } // end of namespace mitk
 

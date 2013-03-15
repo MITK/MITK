@@ -54,7 +54,7 @@ DwiPhantomGenerationFilter< TOutputScalarType >
     outImage->SetRequestedRegion( m_ImageRegion );
     outImage->SetVectorLength(QBALL_ODFSIZE);
     outImage->Allocate();
-    outImage->FillBuffer(0);
+    outImage->FillBuffer(OutputImageType::PixelType(0.0));
 
     this->SetNthOutput (0, outImage);
 

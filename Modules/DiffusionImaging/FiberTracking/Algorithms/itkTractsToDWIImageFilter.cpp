@@ -105,7 +105,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                     }
 
                 // fourier transform slice
-                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
+                itk::VnlForwardFFTImageFilter< SliceType >::Pointer fft = itk::VnlForwardFFTImageFilter< SliceType >::New();
                 fft->SetInput(slice);
                 fft->Update();
                 ComplexSliceType::Pointer fSlice = fft->GetOutput();
@@ -133,7 +133,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // inverse fourier transform slice
                 SliceType::Pointer newSlice;
-                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
+                itk::VnlInverseFFTImageFilter< ComplexSliceType >::Pointer ifft = itk::VnlInverseFFTImageFilter< ComplexSliceType >::New();
                 ifft->SetInput(fSlice);
                 ifft->Update();
                 newSlice = ifft->GetOutput();
@@ -232,7 +232,7 @@ void TractsToDWIImageFilter::GenerateData()
             ImageRegion<3> region = m_ImageRegion;
             region.SetSize(0, m_ImageRegion.GetSize(0)*m_Upsampling);
             region.SetSize(1, m_ImageRegion.GetSize(1)*m_Upsampling);
-            mitk::Vector3D spacing = m_Spacing;
+            itk::Vector<double> spacing = m_Spacing;
             spacing[0] /= m_Upsampling;
             spacing[1] /= m_Upsampling;
             itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();

@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include <itkImageSource.h>
-#include <itkFFTRealToComplexConjugateImageFilter.h>
-#include <itkFFTComplexConjugateToRealImageFilter.h>
+#include <itkVnlForwardFFTImageFilter.h>
+#include <itkVnlInverseFFTImageFilter.h>
 
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
@@ -58,7 +58,7 @@ public:
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
     typedef itk::Image< double, 2 >                         SliceType;
-    typedef itk::FFTRealToComplexConjugateImageFilter< double, 2 >::OutputImageType ComplexSliceType;
+    typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType ComplexSliceType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -96,8 +96,8 @@ protected:
     /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
     TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    mitk::Vector3D                      m_Spacing;              ///< output image spacing
-    mitk::Vector3D                      m_UpsampledSpacing;
+    itk::Vector<double>                 m_Spacing;              ///< output image spacing
+    itk::Vector<double>                 m_UpsampledSpacing;
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size

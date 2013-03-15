@@ -122,12 +122,12 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
   typedef itk::Image< TPixel, VImageDimension >   InputImageType;
-  typedef InputImageType::IndexType               IndexType;
+  typedef typename InputImageType::IndexType               IndexType;
 
 
   /* compute the requested region for itk filters */
 
-  typename IndexType startPoint, endPoint;
+  IndexType startPoint, endPoint;
 
   startPoint[0] = m_StartPointInIndex[0];
   startPoint[1] = m_StartPointInIndex[1];
@@ -136,7 +136,7 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   endPoint[1] = m_EndPointInIndex[1];
 
   //minimum value in each direction for startRegion
-  typename IndexType startRegion;
+  IndexType startRegion;
   startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
   startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
 
@@ -241,7 +241,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
   * with a gaussing function summation of next two bins right and left
   * to current position x.
   */
-  std::vector<const itk::Index<VImageDimension> > shortestPath;
+  std::vector< itk::Index<VImageDimension> > shortestPath;
 
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
   if(path == NULL)
@@ -280,17 +280,17 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
 
   /*+++ filter image gradient magnitude +++*/
-  typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension>> GradientMagnitudeFilterType;
+  typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension> > GradientMagnitudeFilterType;
   typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
   gradientFilter->SetInput(inputImage);
   gradientFilter->Update();
-  itk::Image<TPixel, VImageDimension>::Pointer gradientMagnImage = gradientFilter->GetOutput();
+  typename itk::Image<TPixel, VImageDimension>::Pointer gradientMagnImage = gradientFilter->GetOutput();
 
   //get the path
 
 
   //iterator of path
-  typename std::vector< const itk::Index<VImageDimension> >::iterator pathIterator = shortestPath.begin();
+  typename std::vector< itk::Index<VImageDimension> >::iterator pathIterator = shortestPath.begin();
 
   std::map< int, int > histogram;
 

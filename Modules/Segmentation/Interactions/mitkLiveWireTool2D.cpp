@@ -571,7 +571,7 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex)
 {
   typedef itk::Image<TPixel, VImageDimension>  InputImageType;
-  typedef InputImageType::IndexType            IndexType;
+  typedef typename InputImageType::IndexType            IndexType;
 
   unsigned long xMAX = inputImage->GetLargestPossibleRegion().GetSize()[0];
   unsigned long yMAX = inputImage->GetLargestPossibleRegion().GetSize()[1];
@@ -595,7 +595,7 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   size[1] = 7;
 
   //minimum value in each direction for startRegion
-  typename IndexType startRegion;
+  IndexType startRegion;
   startRegion[0] = index[0] - 3;
   startRegion[1] = index[1] - 3;
   if(startRegion[0] < 0) startRegion[0] = 0;
@@ -612,13 +612,13 @@ void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, 
   region.SetSize( size );
   region.SetIndex( startRegion );
 
-  typedef  itk::GradientMagnitudeImageFilter< typename InputImageType, typename InputImageType> GradientMagnitudeFilterType;
+  typedef typename  itk::GradientMagnitudeImageFilter< InputImageType, InputImageType> GradientMagnitudeFilterType;
   typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
   gradientFilter->SetInput(inputImage);
   gradientFilter->GetOutput()->SetRequestedRegion(region);
 
   gradientFilter->Update();
-  InputImageType::Pointer gradientMagnImage;
+  typename InputImageType::Pointer gradientMagnImage;
   gradientMagnImage = gradientFilter->GetOutput();
 
 

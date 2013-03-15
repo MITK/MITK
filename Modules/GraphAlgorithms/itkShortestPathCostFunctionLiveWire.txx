@@ -209,7 +209,7 @@ namespace itk
     // f(p) =     0;   if I(p)=0
     //     or     1;   if I(p)!=0
     double laplacianCost;
-    Superclass::PixelType laplaceImageValue;
+    typename Superclass::PixelType laplaceImageValue;
 
 
     laplaceImageValue = m_EdgeImage->GetPixel(p2);

@@ -70,7 +70,7 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
       if(rand() % 2)
       {
          mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
-         while(!iDi->IsComplete());
+         while(!iDi->IsComplete()) {}
 
          //MITK_INFO << "pixeltype: " << im->GetPixelType().GetComponentTypeAsString();
 
@@ -107,7 +107,7 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
       else
       {
          mitk::ImageDataItem* iDi = im->GetSliceData(rand() % nrSlices);
-         while(!iDi->IsComplete());
+         while(!iDi->IsComplete()) {}
 
 
          if ((im->GetPixelType().GetComponentTypeAsString() == "short") && (im->GetDimension() == 3) )

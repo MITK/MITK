@@ -99,22 +99,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnSetupNavigation();
     /**
-    \brief This method changes the name of a specific tool.
-    */
-    void OnChangeToolName(int index, QString name);
-    /**
-    \brief This method creates the surface representation for a tool loaded from file.
-    */
-    void OnToolLoaded(int index, mitk::DataNode::Pointer toolNode);
-    /**
-    \brief This method starts the navigation.
-    */
-    void OnStartNavigation();
-    /**
-    \brief This method stops the navigation.
-    */
-    void OnStopNavigation();
-    /**
     \brief This method performs the visualisation of all NavigationDatas and performs the PointSet recording if activated.
     */
     void RenderScene();

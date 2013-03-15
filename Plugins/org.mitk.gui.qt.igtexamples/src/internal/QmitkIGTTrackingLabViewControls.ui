@@ -37,7 +37,7 @@
         <x>0</x>
         <y>0</y>
         <width>345</width>
-        <height>424</height>
+        <height>455</height>
        </rect>
       </property>
       <attribute name="label">
@@ -165,7 +165,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>445</height>
+        <height>507</height>
        </rect>
       </property>
       <attribute name="label">
@@ -183,7 +183,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>445</height>
+        <height>507</height>
        </rect>
       </property>
       <attribute name="label">
@@ -218,7 +218,7 @@
         <x>0</x>
         <y>0</y>
         <width>342</width>
-        <height>445</height>
+        <height>476</height>
        </rect>
       </property>
       <attribute name="label">
@@ -230,31 +230,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_5">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>342</width>
-        <height>445</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Virtual Camera</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <widget class="QmitkToolSelectionWidget" name="m_VirtualViewToolSelectionWidget" native="true"/>
-       </item>
-      </layout>
-     </widget>
     </widget>
-   </item>
-   <item>
-    <widget class="QmitkToolTrackingStatusWidget" name="m_ToolStatusWidget" native="true"/>
-   </item>
-   <item>
-    <widget class="QmitkUpdateTimerWidget" name="m_RenderingTimerWidget" native="true"/>
    </item>
    <item>
     <spacer name="spacer1">
@@ -280,24 +256,6 @@
    <class>QmitkFiducialRegistrationWidget</class>
    <extends>QWidget</extends>
    <header>QmitkFiducialRegistrationWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkToolSelectionWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkToolSelectionWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkToolTrackingStatusWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkToolTrackingStatusWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkUpdateTimerWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkUpdateTimerWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

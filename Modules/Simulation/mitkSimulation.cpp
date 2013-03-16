@@ -80,22 +80,26 @@ mitk::Simulation::~Simulation()
   }
 }
 
-void mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
+bool mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
 {
-  if (surface.IsNull())
-    return;
-
-  vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
-
-  if (snapshot != NULL)
+  if (surface.IsNotNull())
   {
-    unsigned int timeStep = surface->GetSizeOfPolyDataSeries();
+    vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
 
-    if (timeStep != 0 && surface->GetVtkPolyData(timeStep - 1) == NULL)
-      --timeStep;
+    if (snapshot != NULL)
+    {
+      unsigned int timeStep = surface->GetSizeOfPolyDataSeries();
 
-    surface->SetVtkPolyData(snapshot, timeStep);
+      if (timeStep != 0 && surface->GetVtkPolyData(timeStep - 1) == NULL)
+        --timeStep;
+
+      surface->SetVtkPolyData(snapshot, timeStep);
+
+      return true;
+    }
   }
+
+  return false;
 }
 
 vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const
@@ -112,6 +116,9 @@ vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const
 
   vtkPropCollection* propCollection = propAssembly->GetParts();
   vtkProp* prop = NULL;
+
+  if (propCollection->GetNumberOfItems() == 0)
+    return NULL;
 
   for (propCollection->InitTraversal(); (prop = propCollection->GetNextProp()) != NULL; )
   {

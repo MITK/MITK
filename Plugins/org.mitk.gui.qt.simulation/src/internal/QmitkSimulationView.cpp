@@ -218,12 +218,17 @@ void QmitkSimulationView::OnStepButtonClicked()
     if (m_Record.IsNull())
       m_Record = mitk::Surface::New();
 
-    simulation->AppendSnapshot(m_Record);
+    if (simulation->AppendSnapshot(m_Record))
+    {
+      unsigned int numSteps = m_Record->GetTimeSteps();
+      QString plural = numSteps != 1 ? "s" : "";
 
-    unsigned int numSteps = m_Record->GetTimeSteps();
-    QString plural = numSteps != 1 ? "s" : "";
-
-    m_Controls.stepsRecordedLabel->setText(QString("%1 step%2 recorded").arg(numSteps).arg(plural));
+      m_Controls.stepsRecordedLabel->setText(QString("%1 step%2 recorded").arg(numSteps).arg(plural));
+    }
+    else if (m_Record->GetTimeSteps() == 1)
+    {
+      m_Record = NULL;
+    }
   }
 }
 

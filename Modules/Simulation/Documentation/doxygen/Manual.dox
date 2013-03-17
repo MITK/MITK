@@ -1,12 +1,50 @@
 /**
 \page SimulationManualPage The MITK Simulation Module
 
-The MITK Simulation Module provides medical simulation capabilities by integrating the Simulation Open Framework Architecture (SOFA) into MITK.
+The MITK simulation module provides medical simulation capabilities by integrating the Simulation Open Framework Architecture (SOFA) into MITK.
 
 \section SimulationManualBuildInstructions Build Instructions
 
-Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA as well as the MITK Simulation Module during the superbuild process.
-Afterwards you can activate simulation-enabled plugins during the MITK build configuration, e.g. <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>.
+Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA and the MITK simulation module during the superbuild process.
+You can then activate depending simulation-related plugins during MITK build configuration, i.e. activate <tt>MITK_BUILD_org.mitk.simulation</tt> and <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt> options.
+
+\subsection SimulationManualSOFAPluginBuildInstructions SOFA Plugins
+
+SOFA plugins are built automatically during the MITK superbuild if they are located in the right directory and contain a %CMake script to build them.
+
+SOFA build configuration is originally qmake-based. However, for seamless MITK superbuild integration a %CMake-based build script is used instead.
+After you activated the %CMake option <tt>MITK_USE_SOFA</tt>, SOFA complete with the %CMake-based build script is downloaded during the superbuild.
+Following the MITK superbuild convention for external projects it is located in the <tt>SOFA-src</tt> directory right beneath the top-level MITK build directory.
+Following the SOFA convention for plugins in turn, they should be located in <tt>applications/plugins</tt>.
+Hence, create an <tt>applications/plugins</tt> directory beneath the <tt>SOFA-src</tt> directory and place your plugin here, i.e. <tt>SOFA-src/applications/plugins/myplugin</tt>.
+
+The second and last step is to create a <tt>CMakeLists.txt</tt> file inside your plugin directory.
+Use the %CMake function <tt>add_sofa_library</tt> to easily set up your plugin build script.
+Below is an example of a <tt>CMakeLists.txt</tt> file for a fictional plugin named "myplugin":
+
+<pre>
+set(MYPLUGIN_SOURES
+  Topologies/MyTopology.cpp
+  MyInteraction.cpp
+)
+
+set(MYPLUGIN_LIBS
+  sofa_base_topology
+  sofa_user_interaction
+)
+
+add_sofa_library(myplugin NO_PREFIX)
+</pre>
+
+Note that the naming of <tt>MYPLUGIN_SOURCES</tt> and <tt>MYPLUGIN_LIBS</tt> is crucial for <tt>add_sofa_library(myplugin)</tt> to find the sources and libraries.
+For more information see <tt>SOFA-src/CMake/AddSOFALibrary.cmake</tt>.
+
+Once your plugin is placed in the right directory and provides a <tt>CMakeLists.txt</tt> file it is found and built during the MITK superbuild.
+The binaries of your plugin are generated together with all other SOFA binaries in the <tt>SOFA-build/bin</tt> directory.
+
+SOFA plugins can be loaded at runtime via the simulation preferences by clicking the <tt>Add...</tt> button.
+
+\image html SimulationPreferences.png The simulation preferences dialog box.
 
 \section SimulationManualIntroduction Introduction
 
@@ -20,9 +58,10 @@ SOFA is intended to be used as a framework by itself. It is split into the follo
   <li> Applications
 </ul>
 
-While the former two parts make up the actual framework, the latter part is built on top of them and provides end user applications, e.g. runSofa.
+While the former two parts make up the actual framework, the latter part is built on top of them and provides end user applications, e.g. <tt>runSofa</tt>.
+The MITK simulation module and plugins conceptionally substitute the application layer and make use of the framework and module layer in terms of a toolkit.
 
-To be able to integrate SOFA into MITK, the MITK Simulation Module conceptionally replaces the application layer and solely uses the framework and module layer as a toolkit.
+
 
 \section SimulationManualHowToUpdate How to update SOFA
 

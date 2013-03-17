@@ -74,6 +74,9 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
 
   std::string path = QFileDialog::getOpenFileName(m_Control, "Add SOFA Library", "", filter).toStdString();
 
+  if (path.empty())
+    return;
+
   PluginManager &pluginManager = PluginManager::getInstance();
   std::ostringstream errlog;
 

@@ -46,7 +46,7 @@ int mitkLevelWindowTest(int, char* [])
   mitk::ScalarType defaultWindow = levWin->GetDefaultWindow();
   if (!(defaultWindow == 500))
   {
-    std::cout<<(int)(defaultWindow) + "[FAILED]"<<std::endl;
+    std::cout<<defaultWindow<<" [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
@@ -816,7 +816,7 @@ int mitkLevelWindowTest(int, char* [])
   levWin->ResetDefaultLevelWindow();
   std::cout<<"[PASSED]"<<std::endl;
 
-  // auch für default levelwindow und default range
+  // auch fÃ¼r default levelwindow und default range
 
   //Create Image out of nowhere
   mitk::Image::Pointer image;

@@ -421,7 +421,14 @@ endif()
 #-----------------------------------------------------------------------------
 
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(MITK_C_FLAGS_DEBUG )
+set(MITK_C_FLAGS_RELEASE )
 set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(MITK_CXX_FLAGS_DEBUG )
+set(MITK_CXX_FLAGS_RELEASE )
+
+set(MITK_EXE_LINKER_FLAGS )
+set(MITK_SHARED_LINKER_FLAGS )
 
 include(mitkSetupC++0xVariables)
 
@@ -450,8 +457,8 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 
-  mitkFunctionCheckCompilerFlags2("-Wl,--no-undefined" MITK_C_FLAGS MITK_CXX_FLAGS)
-  mitkFunctionCheckCompilerFlags2("-Wl,--as-needed" MITK_C_FLAGS MITK_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" MITK_SHARED_LINKER_FLAGS)
+  mitkFunctionCheckCompilerFlags("-Wl,--as-needed" MITK_SHARED_LINKER_FLAGS)
 
   if(MITK_USE_C++0x)
     mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX_FLAGS)
@@ -466,7 +473,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
   if(MINGW)
     # suppress warnings about auto imported symbols
-    set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")
+    set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")
     # we need to define a Windows version
     set(MITK_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${MITK_CXX_FLAGS}")
   endif()
@@ -474,6 +481,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 
 endif()
+
+set(MITK_MODULE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
+set(MITK_EXE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
 
 #-----------------------------------------------------------------------------
 # MITK Packages
@@ -610,12 +620,16 @@ if(MITK_USE_BLUEBERRY)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set C/CXX Flags for MITK code
+# Set C/CXX and linker flags for MITK code
 #-----------------------------------------------------------------------------
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${MITK_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MITK_EXE_LINKER_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER_FLAGS}")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
 if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)

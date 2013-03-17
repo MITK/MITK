@@ -370,10 +370,10 @@ int testGeometryAfterCasting()
    mySpacing[2] = 2.9;
    myIndex[0] = -15;
    myIndex[1] = 15;
-   myIndex[2] = 12.1;
+   myIndex[2] = 12;
    mySize[0] = 10;
    mySize[1] = 2;
-   mySize[2] = 555.5;
+   mySize[2] = 555;
    myRegion.SetSize( mySize);
    myRegion.SetIndex( myIndex );
    image3DItk->SetSpacing(mySpacing);

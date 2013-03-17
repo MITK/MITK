@@ -38,6 +38,10 @@ set(MITK_CXX_FLAGS "@MITK_CXX_FLAGS@")
 set(MTTK_CXX_FLAGS_DEBUG "@MITK_CXX_FLAGS_DEBUG@")
 set(MITK_CXX_FLAGS_RELEASE @MITK_CXX_FLAGS_RELEASE@")
 
+set(MITK_EXE_LINKER_FLAGS @MITK_EXE_LINKER_FLAGS@)
+set(MITK_SHARED_LINKER_FLAGS @MITK_SHARED_LINKER_FLAGS@)
+set(MITK_MODULE_LINKER_FLAGS @MITK_MODULE_LINKER_FLAGS@)
+
 # Internal version numbers, used for approximate compatibility checks
 # of a MITK development version (non-release).
 set(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake support

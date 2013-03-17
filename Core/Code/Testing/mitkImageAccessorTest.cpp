@@ -90,8 +90,7 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
                {
                   idx[0] = i;
                   idx[1] = j;
-                  short value = readAccessor.GetPixelByIndexSafe(idx);
-                  value = 0; // this is only done to prevent compiler warning
+                  readAccessor.GetPixelByIndexSafe(idx);
                }
             }
          }

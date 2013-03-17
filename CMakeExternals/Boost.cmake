@@ -42,9 +42,10 @@ if(MITK_USE_Boost)
       set(_boost_build_cmd )
     endif()
 
-    set(POST_BUILD "")
+    set(APPLE_INSTALL_COMMAND "")
     if(APPLE)
-      set(POST_BUILD install_name_tool -id ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libboost_thread.dylib ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install/lib/libboost_thread.dylib)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake @ONLY)
+      set(APPLE_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
     endif()
 
     ExternalProject_Add(${proj}
@@ -57,8 +58,7 @@ if(MITK_USE_Boost)
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"
-      INSTALL_COMMAND ""
-      ${POST_BUILD}
+      INSTALL_COMMAND ${APPLE_INSTALL_COMMAND}
       DEPENDS ${proj_DEPENDENCIES}
       )
 

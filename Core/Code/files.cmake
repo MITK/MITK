@@ -255,6 +255,7 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
+  Interfaces/mitkIShaderRepository.cpp
 
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp

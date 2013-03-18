@@ -45,7 +45,7 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   struct ShaderPrivate;
 
-  class Shader : public itk::LightObject
+  class MITK_CORE_EXPORT Shader : public itk::LightObject
   {
 
   public:

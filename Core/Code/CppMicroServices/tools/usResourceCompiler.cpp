@@ -269,6 +269,10 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
       fileBufferSize = compressedSize;
       flags |= Compressed;
     }
+    else
+    {
+      free(compressedBuffer);
+    }
   }
 
   if (!(flags & Compressed))
@@ -282,17 +286,25 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
     }
     if (fseek(file, 0, SEEK_SET) != 0)
     {
+      free(fileBuffer);
       *errorMessage = "Could not set stream position for resource file " + path;
       return 0;
     }
     if (fread(fileBuffer, 1, fileSize, file) != static_cast<std::size_t>(fileSize))
     {
+      free(fileBuffer);
       *errorMessage = "Error reading resource file " + path;
       return 0;
     }
     fileBufferSize = fileSize;
   }
 
+  if (fclose(file))
+  {
+    *errorMessage = "Error closing resource file " + path;
+    free(fileBuffer);
+    return 0;
+  }
 
   // write the full path of the resource in the file system as a comment
   writer.WriteString("  // ");

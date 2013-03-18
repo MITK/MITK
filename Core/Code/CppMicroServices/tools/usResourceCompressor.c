@@ -78,6 +78,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
   if (deflateInit2(&stream, level, MZ_DEFLATED, -MZ_DEFAULT_WINDOW_BITS, 9, MZ_DEFAULT_STRATEGY) != Z_OK)
   {
     sprintf(us_compress_error, "deflateInit() failed.");
+    free(s_outbuf);
     return NULL;
   }
 
@@ -99,6 +100,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
       if (fread(s_inbuf, 1, n, pInfile) != n)
       {
         sprintf(us_compress_error, "Failed reading from input file.");
+        free(s_outbuf);
         return NULL;
       }
 
@@ -119,6 +121,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
     else if (status != Z_OK)
     {
       sprintf(us_compress_error, "deflate() failed with status %i.", status);
+      free(s_outbuf);
       return NULL;
     }
   }
@@ -126,6 +129,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
   if (deflateEnd(&stream) != Z_OK)
   {
     sprintf(us_compress_error, "deflateEnd() failed.");
+    free(s_outbuf);
     return NULL;
   }
 

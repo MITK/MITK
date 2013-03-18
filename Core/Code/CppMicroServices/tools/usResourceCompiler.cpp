@@ -39,7 +39,7 @@
 #ifdef US_ENABLE_RESOURCE_COMPRESSION
 extern "C" {
 const char* us_resource_compressor_error();
-FILE* us_resource_compressor(FILE*, long, int level, long* out_size);
+unsigned char* us_resource_compressor(FILE*, long, int level, long* out_size);
 }
 #endif // US_ENABLE_RESOURCE_COMPRESSION
 
@@ -244,16 +244,19 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
 
   // get the file size
   fseek(file, 0, SEEK_END);
-  long fileSize = ftell(file);
+  const long fileSize = ftell(file);
   fseek(file, 0, SEEK_SET);
+
+  unsigned char* fileBuffer = NULL;
+  long fileBufferSize = 0;
 
 #ifdef US_ENABLE_RESOURCE_COMPRESSION
   // try compression
   if (writer.compressionLevel != 0 && fileSize != 0)
   {
     long compressedSize = 0;
-    FILE* compressedFile = us_resource_compressor(file, fileSize, writer.compressionLevel, &compressedSize);
-    if (compressedFile == NULL)
+    unsigned char* compressedBuffer = us_resource_compressor(file, fileSize, writer.compressionLevel, &compressedSize);
+    if (compressedBuffer == NULL)
     {
       *errorMessage = us_resource_compressor_error();
       return 0;
@@ -262,12 +265,46 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
     int compressRatio = static_cast<int>((100.0 * (fileSize - compressedSize)) / fileSize);
     if (compressRatio >= writer.compressionThreshold)
     {
-      file = compressedFile;
-      fileSize = compressedSize;
+      fileBuffer = compressedBuffer;
+      fileBufferSize = compressedSize;
       flags |= Compressed;
     }
+    else
+    {
+      free(compressedBuffer);
+    }
   }
+
+  if (!(flags & Compressed))
 #endif // US_ENABLE_RESOURCE_COMPRESSION
+  {
+    fileBuffer = static_cast<unsigned char*>(malloc(sizeof(unsigned char)*fileSize));
+    if (fileBuffer == NULL)
+    {
+      *errorMessage = "Could not allocate memory buffer for resource file " + path;
+      return 0;
+    }
+    if (fseek(file, 0, SEEK_SET) != 0)
+    {
+      free(fileBuffer);
+      *errorMessage = "Could not set stream position for resource file " + path;
+      return 0;
+    }
+    if (fread(fileBuffer, 1, fileSize, file) != static_cast<std::size_t>(fileSize))
+    {
+      free(fileBuffer);
+      *errorMessage = "Error reading resource file " + path;
+      return 0;
+    }
+    fileBufferSize = fileSize;
+  }
+
+  if (fclose(file))
+  {
+    *errorMessage = "Error closing resource file " + path;
+    free(fileBuffer);
+    return 0;
+  }
 
   // write the full path of the resource in the file system as a comment
   writer.WriteString("  // ");
@@ -275,23 +312,16 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
   writer.WriteString("\n  ");
 
   // write the length
-  writer.WriteNumber4(static_cast<uint32_t>(fileSize));
+  writer.WriteNumber4(static_cast<uint32_t>(fileBufferSize));
   writer.WriteString("\n  ");
   offset += 4;
 
-  if (fseek(file, 0, SEEK_SET) != 0)
-  {
-    *errorMessage = "Could not set stream position.\n";
-    return 0;
-  }
-
   // write the actual payload
   int charsLeft = 16;
-  char c = 0;
-  while (fread(&c, 1, 1, file))
+  for (long i = 0; i < fileBufferSize; ++i)
   {
     --charsLeft;
-    writer.WriteHex(static_cast<uint8_t>(c));
+    writer.WriteHex(static_cast<uint8_t>(fileBuffer[i]));
     if (charsLeft == 0)
     {
       writer.WriteString("\n  ");
@@ -299,13 +329,9 @@ int64_t Resource::WritePayload(ResourceWriter& writer, int64_t offset, std::stri
     }
   }
 
-  if(ferror(file) != 0)
-  {
-    *errorMessage = "Error reading resource file: " + path;
-    return 0;
-  }
+  offset += fileBufferSize;
 
-  offset += fileSize;
+  free(fileBuffer);
 
   // done
   writer.WriteString("\n  ");
@@ -497,6 +523,7 @@ bool ResourceWriter::WritePayloads()
         if (offset == 0)
         {
           std::cerr << errorMessage << std::endl;
+          return false;
         }
       }
     }

@@ -136,7 +136,7 @@ function(usFunctionEmbedResources src_var)
     OUTPUT ${us_cpp_resource_file}
     COMMAND ${resource_compiler} "${us_lib_name}" ${us_cpp_resource_file} ${cmd_line_args}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${absolute_res_files}
+    DEPENDS ${absolute_res_files} ${resource_compiler}
     COMMENT "Generating embedded resource file ${us_cpp_resource_name}"
   )
 

@@ -37,7 +37,6 @@ static char us_compress_error[COMPRESS_MSG_BUFFER_SIZE];
 
 #define BUF_SIZE (1024 * 1024)
 static uint8 s_inbuf[BUF_SIZE];
-static uint8 s_outbuf[BUF_SIZE];
 
 
 const char* us_resource_compressor_error()
@@ -45,13 +44,11 @@ const char* us_resource_compressor_error()
   return us_compress_error;
 }
 
-FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_size)
+unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_size)
 {
   const uint infile_size = (uint)file_loc;
-  FILE* pOutfile = NULL;
   z_stream stream;
   uint infile_remaining = infile_size;
-  unsigned char header[4];
   long bytes_written = 0;
 
   memset(us_compress_error, 0, COMPRESS_MSG_BUFFER_SIZE);
@@ -63,10 +60,17 @@ FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_
   }
 
   // Open output file.
-  pOutfile = tmpfile();
-  if (!pOutfile)
+  //pOutfile = tmpfile();
+  //if (!pOutfile)
+  //{
+  //  sprintf(us_compress_error, "Failed opening temporary file.");
+  //  return NULL;
+  //}
+
+  unsigned char* s_outbuf = (unsigned char*)malloc(sizeof(unsigned char)*(infile_size+4));
+  if (s_outbuf == NULL)
   {
-    sprintf(us_compress_error, "Failed opening temporary file.");
+    sprintf(us_compress_error, "Failed to allocate %d bytes for compression buffer.", infile_size);
     return NULL;
   }
 
@@ -74,8 +78,8 @@ FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_
   memset(&stream, 0, sizeof(stream));
   stream.next_in = s_inbuf;
   stream.avail_in = 0;
-  stream.next_out = s_outbuf;
-  stream.avail_out = BUF_SIZE;
+  stream.next_out = s_outbuf+4;
+  stream.avail_out = infile_size;
 
   // Compression.
   if (deflateInit2(&stream, level, MZ_DEFLATED, -MZ_DEFAULT_WINDOW_BITS, 9, MZ_DEFAULT_STRATEGY) != Z_OK)
@@ -85,13 +89,12 @@ FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_
   }
 
   // Write the uncompressed file size in the first four bytes
-  header[0] = (unsigned char)((file_loc & 0xff000000) >> 24);
-  header[1] = (unsigned char)((file_loc & 0x00ff0000) >> 16);
-  header[2] = (unsigned char)((file_loc & 0x0000ff00) >> 8);
-  header[3] = (unsigned char)(file_loc & 0x000000ff);
-  fwrite(header, 1, sizeof(header), pOutfile);
+  s_outbuf[0] = (unsigned char)((file_loc & 0xff000000) >> 24);
+  s_outbuf[1] = (unsigned char)((file_loc & 0x00ff0000) >> 16);
+  s_outbuf[2] = (unsigned char)((file_loc & 0x0000ff00) >> 8);
+  s_outbuf[3] = (unsigned char)(file_loc & 0x000000ff);
 
-  bytes_written = sizeof(header);
+  bytes_written = 4;
   for ( ; ; )
   {
     int status;
@@ -116,20 +119,10 @@ FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_
 
     if ((status == Z_STREAM_END) || (!stream.avail_out))
     {
-      // Output buffer is full, or compression is done, so write buffer to output file.
-      uint n = BUF_SIZE - stream.avail_out;
-      if (fwrite(s_outbuf, 1, n, pOutfile) != n)
-      {
-        sprintf(us_compress_error, "Failed writing to output file.");
-        return NULL;
-      }
-      stream.next_out = s_outbuf;
-      stream.avail_out = BUF_SIZE;
-      bytes_written += n;
-    }
-
-    if (status == Z_STREAM_END)
+      // Output buffer is full, or compression is done.
+      bytes_written += infile_size - stream.avail_out;
       break;
+    }
     else if (status != Z_OK)
     {
       sprintf(us_compress_error, "deflate() failed with status %i.", status);
@@ -147,6 +140,5 @@ FILE* us_resource_compressor(FILE* pInfile, long file_loc, int level, long* out_
   {
     *out_size = bytes_written;
   }
-  fseek(pOutfile, 0, SEEK_SET);
-  return pOutfile;
+  return s_outbuf;
 }

@@ -54,7 +54,6 @@ private:
   };
 
   bool isValid;
-  bool isCompressed;
   const unsigned char *tree, *names, *payloads;
 
   // Returns the offset in the us_resource_tree array for a given node index

@@ -16,7 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkAbstractMapper.h>
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+
+#include "mitkCoreServices.h"
+#include "mitkIShaderRepository.h"
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
@@ -71,14 +73,16 @@ void mitk::ShaderProperty::AddShaderTypes()
 {
   AddEnum( "fixed" );
 
-  std::list<mitk::ShaderRepository::Shader::Pointer> *l
-    = mitk::ShaderRepository::GetGlobalShaderRepository()->GetShaders();
+  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+  if (shaderRepo == NULL) return;
 
-  std::list<mitk::ShaderRepository::Shader::Pointer>::const_iterator i = l->begin();
+  std::list<mitk::IShaderRepository::Shader::Pointer> l = shaderRepo->GetShaders();
 
-  while( i != l->end() )
+  std::list<mitk::IShaderRepository::Shader::Pointer>::const_iterator i = l.begin();
+
+  while( i != l.end() )
   {
-    AddEnum( (*i)->name );
+    AddEnum( (*i)->GetName() );
     i++;
   }
 }

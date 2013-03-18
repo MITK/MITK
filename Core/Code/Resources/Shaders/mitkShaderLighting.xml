@@ -1,26 +1,26 @@
 <?xml version='1.0' encoding='UTF-8'?>
   <Material name='GenericAttributes1'>
-  <Shader 
-    scope='Vertex' 
-    name='VertexShader' 
-    location='Inline' 
-    language='GLSL' 
-    entry='main'> 
-  
+  <Shader
+    scope='Vertex'
+    name='VertexShader'
+    location='Inline'
+    language='GLSL'
+    entry='main'>
+
   <Uniform name="LightPosition" type="vec3" number_of_elements="3" value="0.0 1000.0 0.0"></Uniform>
   <Uniform name="SkyColor" type="vec3" number_of_elements="3" value="0.9 0.8 0.5"></Uniform>
   <Uniform name="GroundColor" type="vec3" number_of_elements="3" value="0.0 0.0 0.0"></Uniform>
-  
-  attribute vec3 scalars; 
-  
+
+  attribute vec3 scalars;
+
   uniform vec3 LightPosition;
   uniform vec3 SkyColor;
   uniform vec3 GroundColor;
-  
-  varying vec3  DiffuseColor;
-  
 
-  void main(void) 
+  varying vec3  DiffuseColor;
+
+
+  void main(void)
   {
     vec3 ecPosition = vec3(gl_ModelViewMatrix * gl_Vertex);
     vec3 tnorm      = normalize(gl_NormalMatrix * gl_Normal);

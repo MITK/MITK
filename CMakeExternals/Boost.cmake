@@ -58,7 +58,7 @@ if(MITK_USE_Boost)
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"
-      INSTALL_COMMAND ${APPLE_INSTALL_COMMAND}
+      INSTALL_COMMAND "${APPLE_INSTALL_COMMAND}"
       DEPENDS ${proj_DEPENDENCIES}
       )
 

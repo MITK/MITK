@@ -333,6 +333,7 @@ set(CPP_FILES
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+  Common/mitkCoreServices.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
@@ -354,4 +355,6 @@ Interactions/Tests/AddAndRemovePoints.xml
 Interactions/Tests/globalConfig.xml
 Interactions/Tests/StatemachineTest.xml
 Interactions/Tests/StatemachineConfigTest.xml
+
+Shaders/mitkShaderLighting.xml
 )

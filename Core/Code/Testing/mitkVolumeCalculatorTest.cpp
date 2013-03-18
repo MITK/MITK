@@ -71,7 +71,6 @@ int mitkVolumeCalculatorTest(int /*argc*/, char* argv[])
        volumeCalculator->ComputeVolume();
        std::vector<float> volumes = volumeCalculator->GetVolumes();
 
-       std::vector<float>::iterator it = volumes.begin();
        for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); it++)
        {
        MITK_TEST_CONDITION_REQUIRED(

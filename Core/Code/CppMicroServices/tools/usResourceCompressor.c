@@ -50,6 +50,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
   z_stream stream;
   uint infile_remaining = infile_size;
   long bytes_written = 0;
+  unsigned char* s_outbuf = NULL;
 
   memset(us_compress_error, 0, COMPRESS_MSG_BUFFER_SIZE);
 
@@ -59,15 +60,7 @@ unsigned char* us_resource_compressor(FILE* pInfile, long file_loc, int level, l
     return NULL;
   }
 
-  // Open output file.
-  //pOutfile = tmpfile();
-  //if (!pOutfile)
-  //{
-  //  sprintf(us_compress_error, "Failed opening temporary file.");
-  //  return NULL;
-  //}
-
-  unsigned char* s_outbuf = (unsigned char*)malloc(sizeof(unsigned char)*(infile_size+4));
+  s_outbuf = (unsigned char*)malloc(sizeof(unsigned char)*(infile_size+4));
   if (s_outbuf == NULL)
   {
     sprintf(us_compress_error, "Failed to allocate %d bytes for compression buffer.", infile_size);

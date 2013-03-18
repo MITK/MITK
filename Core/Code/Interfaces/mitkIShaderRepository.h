@@ -55,6 +55,7 @@ struct MITK_CORE_EXPORT IShaderRepository
 
     ~Shader();
 
+    int GetId() const;
     std::string GetName() const;
     std::string GetMaterialXml() const;
 
@@ -62,6 +63,7 @@ struct MITK_CORE_EXPORT IShaderRepository
 
     Shader();
 
+    void SetId(int id);
     void SetName(const std::string& name);
     void SetMaterialXml(const std::string& xml);
 
@@ -79,7 +81,22 @@ struct MITK_CORE_EXPORT IShaderRepository
 
   virtual std::list<Shader::Pointer> GetShaders() const = 0;
 
+  /**
+   * \brief Return the named shader.
+   *
+   * \param name The shader name.
+   * \return A Shader object.
+   *
+   * Names might not be unique. Use the shader id to uniquely identify a shader.
+   */
   virtual Shader::Pointer GetShader(const std::string& name) const = 0;
+
+  /**
+   * \brief Return the shader identified by the given id.
+   * @param id The shader id.
+   * @return The shader object or null if the id is unknown.
+   */
+  virtual Shader::Pointer GetShader(int id) const = 0;
 
   /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.
@@ -100,9 +117,9 @@ struct MITK_CORE_EXPORT IShaderRepository
   virtual int LoadShader(std::istream& stream, const std::string& name) = 0;
 
   /**
-   * @brief Unload a previously loaded shader.
-   * @param id The unique shader id returned by LoadShader.
-   * @return \c true if the shader id was found and the shader was successfully unloaded,
+   * \brief Unload a previously loaded shader.
+   * \param id The unique shader id returned by LoadShader.
+   * \return \c true if the shader id was found and the shader was successfully unloaded,
    *         \c false otherwise.
    */
   virtual bool UnloadShader(int id) = 0;

@@ -126,8 +126,6 @@ public:
 
     friend class ShaderRepository;
 
-    int id;
-
     void LoadProperties(vtkProperty* prop);
     void LoadProperties(const std::string& path);
     void LoadProperties(std::istream& stream);
@@ -170,6 +168,8 @@ public:
   std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
 
   IShaderRepository::Shader::Pointer GetShader(const std::string& name) const;
+
+  IShaderRepository::Shader::Pointer GetShader(int id) const;
 
   /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.

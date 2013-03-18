@@ -25,6 +25,9 @@ IShaderRepository::~IShaderRepository()
 
 struct IShaderRepository::ShaderPrivate
 {
+  ShaderPrivate() : id(-1) {}
+
+  int id;
   std::string name;
   std::string materialXml;
 };
@@ -34,9 +37,19 @@ IShaderRepository::Shader::Shader()
 {
 }
 
+void IShaderRepository::Shader::SetId(int id)
+{
+  d->id = id;
+}
+
 IShaderRepository::Shader::~Shader()
 {
   delete d;
+}
+
+int IShaderRepository::Shader::GetId() const
+{
+  return d->id;
 }
 
 std::string IShaderRepository::Shader::GetName() const

@@ -113,11 +113,11 @@ int mitk::ShaderRepository::LoadShader(const std::string& filename)
     element->SetName(itksys::SystemTools::GetFilenameWithoutExtension(filename));
     element->name = element->GetName();
     element->path = filename;
-    element->id = shaderId++;
+    element->SetId(shaderId++);
     element->LoadProperties(filename);
     shaders.push_back(element);
     SR_INFO << "found shader '" << element->GetName() << "'";
-    return element->id;
+    return element->GetId();
   }
   else
   {
@@ -131,11 +131,11 @@ int mitk::ShaderRepository::LoadShader(std::istream& stream, const std::string& 
   Shader::Pointer element=Shader::New();
   element->SetName(filename);
   element->name = filename;
-  element->id = shaderId++;
+  element->SetId(shaderId++);
   element->LoadProperties(stream);
   shaders.push_back(element);
   SR_INFO << "found shader '" << element->GetName() << "'";
-  return element->id;
+  return element->GetId();
 }
 
 bool mitk::ShaderRepository::UnloadShader(int id)
@@ -143,7 +143,7 @@ bool mitk::ShaderRepository::UnloadShader(int id)
   for (std::list<Shader::Pointer>::iterator i = shaders.begin();
        i != shaders.end(); ++i)
   {
-    if ((*i)->id == id)
+    if ((*i)->GetId() == id)
     {
       shaders.erase(i);
       return true;
@@ -497,6 +497,16 @@ mitk::IShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShader(const
        i != shaders.end(); ++i)
   {
     if ((*i)->GetName() == name) return i->GetPointer();
+  }
+  return IShaderRepository::Shader::Pointer();
+}
+
+mitk::IShaderRepository::Shader::Pointer mitk::ShaderRepository::GetShader(int id) const
+{
+  for (std::list<Shader::Pointer>::const_iterator i = shaders.begin();
+       i != shaders.end(); ++i)
+  {
+    if ((*i)->GetId() == id) return i->GetPointer();
   }
   return IShaderRepository::Shader::Pointer();
 }

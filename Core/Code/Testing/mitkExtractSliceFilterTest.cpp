@@ -249,7 +249,8 @@ public:
 
 
     //the center of the straight lines
-    typename InputImageType::IndexType centerX, centerY;
+    typename InputImageType::IndexType centerX;
+    //typename InputImageType::IndexType centerY;
 
     centerX[0] = indicesX[0][0];
     centerX[1] = indicesX[0][1] + distanceToCenterX;

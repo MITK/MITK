@@ -18,12 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKSHADERREPOSITORY_H_
 
 #include <MitkExports.h>
-#include "itkObject.h"
-#include "itkObjectFactory.h"
-#include <vtkXMLDataElement.h>
 
-#include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
+#include "mitkIShaderRepository.h"
+
+class vtkXMLDataElement;
+class vtkProperty;
 
 namespace mitk {
 
@@ -35,30 +34,35 @@ namespace mitk {
  *
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
+ *
+ * \deprecatedSince{2013_03} Use the micro service interface IShaderRepository instead.
  */
-class MITK_CORE_EXPORT ShaderRepository : public itk::Object
+class MITK_CORE_EXPORT ShaderRepository : public itk::LightObject, public IShaderRepository
 {
 public:
 
-  mitkClassMacro( ShaderRepository, itk::Object );
+  mitkClassMacro( ShaderRepository, itk::LightObject )
 
-  itkNewMacro( Self );
+  itkFactorylessNewMacro( Self )
 
-  static ShaderRepository *GetGlobalShaderRepository();
+  DEPRECATED(static ShaderRepository *GetGlobalShaderRepository());
 
-  class Shader : public itk::Object
+  /**
+   * \deprecatedSince{2013_03} Use IShaderRepository::Shader instead.
+   */
+  class Shader : public IShaderRepository::Shader
   {
     public:
 
-    mitkClassMacro( Shader, itk::Object );
-    itkNewMacro( Self );
+    mitkClassMacro( Shader, itk::Object )
+    itkFactorylessNewMacro( Self )
 
     class Uniform : public itk::Object
     {
       public:
 
-      mitkClassMacro( Uniform, itk::Object );
-      itkNewMacro( Self );
+      mitkClassMacro( Uniform, itk::Object )
+      itkFactorylessNewMacro( Self )
 
       enum Type
       {
@@ -104,10 +108,12 @@ public:
      */
     ~Shader();
 
+    // DEPRECATED since 2013.03
     std::string name;
+    // DEPRECATED since 2013.03
     std::string path;
 
-    void LoadPropertiesFromPath();
+    DEPRECATED(void LoadPropertiesFromPath());
 
     Uniform *GetUniform(char * /*id*/) { return 0; }
 
@@ -115,6 +121,17 @@ public:
     {
       return &uniforms;
     }
+
+  private:
+
+    friend class ShaderRepository;
+
+    int id;
+
+    void LoadProperties(vtkProperty* prop);
+    void LoadProperties(const std::string& path);
+    void LoadProperties(std::istream& stream);
+
   };
 
 
@@ -124,6 +141,8 @@ protected:
   std::list<Shader::Pointer> shaders;
 
   void LoadShaders();
+
+  Shader::Pointer GetShaderImpl(const std::string& name) const;
 
   /**
    * Constructor
@@ -135,29 +154,40 @@ protected:
    */
   ~ShaderRepository();
 
+private:
+
+  static int shaderId;
+
 public:
 
-  std::list<Shader::Pointer> *GetShaders()
+  DEPRECATED(std::list<Shader::Pointer> *GetShaders())
   {
     return &shaders;
   }
 
-  Shader *GetShader(const char *id);
+  DEPRECATED(Shader *GetShader(const char *id) const);
 
+  std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
+
+  IShaderRepository::Shader::Pointer GetShader(const std::string& name) const;
 
   /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.
    */
-  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);
+  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const;
 
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime);
+  void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime) const;
 
   /** \brief Loads a shader from a given file. Make sure that this file is in the XML shader format.
    */
-  void LoadShader(std::string filename);
+  DEPRECATED(int LoadShader(const std::string& filename));
+
+  int LoadShader(std::istream& stream, const std::string& name);
+
+  bool UnloadShader(int id);
 
 
 };

@@ -13,6 +13,7 @@ set(module_dirs
     Segmentation
     Qmitk
     QmitkExt
+    Properties
     GraphAlgorithms
     DiffusionImaging
     GPGPU

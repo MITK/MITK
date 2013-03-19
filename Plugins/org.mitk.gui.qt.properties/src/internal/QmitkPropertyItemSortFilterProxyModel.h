@@ -14,25 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKPROPERTYTREEFILTERPROXYMODEL_H
-#define QMITKPROPERTYTREEFILTERPROXYMODEL_H
+#ifndef QmitkPropertyItemSortFilterProxyModel_h
+#define QmitkPropertyItemSortFilterProxyModel_h
 
 #include <QSortFilterProxyModel>
 
-class QmitkPropertyTreeFilterProxyModel : public QSortFilterProxyModel
+class QmitkPropertyItemSortFilterProxyModel : public QSortFilterProxyModel
 {
   Q_OBJECT
 
 public:
-  QmitkPropertyTreeFilterProxyModel(QObject *parent = NULL);
-  ~QmitkPropertyTreeFilterProxyModel();
+  explicit QmitkPropertyItemSortFilterProxyModel(QObject* parent = NULL);
+  ~QmitkPropertyItemSortFilterProxyModel();
 
 protected:
-  bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
-  bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+  bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const;
+  bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 
 private:
-  bool filterAcceptsAnyChildRows(const QModelIndex &sourceParent) const;
+  bool FilterAcceptsAnyChildRow(const QModelIndex& sourceParent) const;
 };
 
 #endif

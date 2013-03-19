@@ -33,6 +33,7 @@ set(CPP_FILES
   Algorithms/GibbsTracking/mitkEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkFiberBuilder.cpp
+  Algorithms/GibbsTracking/mitkSphereInterpolator.cpp
 )
 
 set(H_FILES
@@ -87,4 +88,13 @@ set(H_FILES
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
   SignalModels/mitkSignalDecay.h
+)
+
+set(RESOURCE_FILES
+  # Binary directory resources
+  FiberTrackingLUTBaryCoords.bin
+  FiberTrackingLUTIndices.bin
+
+  # Shaders
+  Shaders/mitkShaderFiberClipping.xml
 )

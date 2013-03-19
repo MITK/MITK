@@ -257,7 +257,7 @@ ExternalProject_Add(${proj}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DBUILD_TESTING:BOOL=${ep_build_testing}
-    -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/MITK-build/install
     -DBUILD_SHARED_LIBS:BOOL=ON
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     # --------------- Compile options ----------------

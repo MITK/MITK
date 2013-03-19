@@ -46,12 +46,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneGeometry.h>
 #include <mitkSliceNavigationController.h>
 
-#include <mitkShaderRepository.h>
+#include <mitkIShaderRepository.h>
 #include <mitkShaderProperty.h>
-#include <mitkStandardFileLocations.h>
 
-#include <QCoreApplication>
-#include <QFile>
+#include <mitkGetModuleContext.h>
+#include <mitkModuleContext.h>
+#include <mitkServiceReference.h>
 
 mitk::FiberBundleXMapper2D::FiberBundleXMapper2D()
 {
@@ -168,6 +168,16 @@ void mitk::FiberBundleXMapper2D::UpdateShaderParameter(mitk::BaseRenderer * rend
 
 }
 
+mitk::IShaderRepository *mitk::FiberBundleXMapper2D::GetShaderRepository()
+{
+  ServiceReference serviceRef = GetModuleContext()->GetServiceReference<mitk::IShaderRepository>();
+  if (serviceRef)
+  {
+    return GetModuleContext()->GetService<IShaderRepository>(serviceRef);
+  }
+  return NULL;
+}
+
 // ALL RAW DATA FOR VISUALIZATION IS GENERATED HERE.
 // vtkActors and Mappers are feeded here
 void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
@@ -215,8 +225,9 @@ void mitk::FiberBundleXMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
     localStorage->m_PointActor->GetProperty()->ShadingOn();
 
     // Applying shading properties
+    if (IShaderRepository* shaderRepo = GetShaderRepository())
     {
-        mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
+        shaderRepo->ApplyProperties(this->GetDataNode(),localStorage->m_PointActor,renderer, localStorage->m_LastUpdateTime);
     }
 
 
@@ -243,33 +254,12 @@ vtkProp* mitk::FiberBundleXMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 
 void mitk::FiberBundleXMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {    //add shader to datano
-
-
-    //####### load shader from file #########
-    QString applicationDir = QCoreApplication::applicationDirPath();
-
-    if (applicationDir.endsWith("bin"))
-        applicationDir.append("/");
-    else if (applicationDir.endsWith("MacOS"))
-    {
-        //on osx, check if path for installer or MITK development is needed
-        applicationDir.append("/");
-        QFile f( applicationDir+"FiberTrackingLUTBaryCoords.bin" );
-        if( !f.exists() ) // if file does not exist, then look in MITK development build directory
-            applicationDir.append("../../../");
-    }else
-        applicationDir.append("\\..\\");
-
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( applicationDir.toStdString().c_str(), false );
-    mitk::ShaderRepository::Pointer shaderRepository = mitk::ShaderRepository::GetGlobalShaderRepository();
-    shaderRepository->LoadShader(mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderFiberClipping.xml"));
-
-
-
-    //####################################################################
     node->SetProperty("shader",mitk::ShaderProperty::New("mitkShaderFiberClipping"));
-    mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
 
+    if (IShaderRepository* shaderRepo = GetShaderRepository())
+    {
+      shaderRepo->AddDefaultProperties(node,renderer,overwrite);
+    }
 
     //add other parameters to propertylist
     node->AddProperty( "Fiber2DSliceThickness", mitk::FloatProperty::New(2.0f), renderer, overwrite );

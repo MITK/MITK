@@ -4,7 +4,7 @@
 # (e.g. "libboost_thread.dylib" should be named "<PATH_TO_LIB/libboost_thread.dylib>")
 
 # Get all the shared libraries which are located in the Boost-install/lib directory
-file(GLOB dylibFiles @BOOST_ROOT@/*.dylib)
+file(GLOB dylibFiles @BOOST_ROOT@/lib/*.dylib)
 
 # For each shared library call the install_name_tool in order to change the install name of the according library
 foreach(_dylib ${dylibFiles})

@@ -36,7 +36,11 @@ void mitk::GLMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRende
   if(!visible)
     return;
 
-  Paint(renderer);
+  // the if-condition ensures that Paint(renderer) is only called once, otherwise it will be called four times
+  // it does not mean that OpenGL renders only an opaque scene
+  if(type == mitk::VtkPropRenderer::Opaque)
+    Paint(renderer);
+
 }
 
 bool mitk::GLMapper::IsVtkBased() const

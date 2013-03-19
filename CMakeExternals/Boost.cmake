@@ -16,8 +16,13 @@ if(MITK_USE_Boost)
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
     set(_boost_libs )
+    set(INSTALL_COMMAND "")
 
     if(MITK_USE_Boost_LIBRARIES)
+
+      # Set the boost root to the libraries install directory
+      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
+
       # We need binary boost libraries
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
         set(_boost_libs ${_boost_libs} --with-${_boost_lib})
@@ -35,17 +40,19 @@ if(MITK_USE_Boost)
         set(_shell_extension .sh)
       endif()
 
+      if(APPLE)
+        set(APPLE_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
+        set(INSTALL_COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
+      endif()
+
       set(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
       set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
     else()
+      # If no libraries are specified set the boost root to the boost src directory
+      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
       set(_boost_cfg_cmd )
       set(_boost_build_cmd )
-    endif()
-
-    set(APPLE_INSTALL_COMMAND "")
-    if(APPLE)
-      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake @ONLY)
-      set(APPLE_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
     endif()
 
     ExternalProject_Add(${proj}
@@ -58,15 +65,9 @@ if(MITK_USE_Boost)
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"
-      INSTALL_COMMAND "${APPLE_INSTALL_COMMAND}"
+      INSTALL_COMMAND "${INSTALL_COMMAND}"
       DEPENDS ${proj_DEPENDENCIES}
       )
-
-    if(MITK_USE_Boost_LIBRARIES)
-      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
-    else()
-      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
-    endif()
 
   else()
 

@@ -43,7 +43,7 @@ function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   # the same variable name skip the compilation step.
   # For that same reason, ctkFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
-  string(REGEX REPLACE "[,= \\$\\+\\*\\{\\}\\(\\)\\#-]" "" suffix ${CXX_FLAG_TO_TEST})
+  string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${CXX_FLAG_TO_TEST})
   CHECK_CXX_ACCEPTS_FLAG(${CXX_FLAG_TO_TEST} HAS_FLAG_${suffix})
 
   if(HAS_FLAG_${suffix})
@@ -64,7 +64,7 @@ function(mitkFunctionCheckCompilerFlags2 FLAG_TO_TEST C_RESULT_VAR CXX_RESULT_VA
   # the same variable name skip the compilation step.
   # For that same reason, ctkFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
-  string(REGEX REPLACE "[,= \\$\\+\\*\\{\\}\\(\\)\\#-]" "" suffix ${FLAG_TO_TEST})
+  string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${FLAG_TO_TEST})
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})

@@ -97,15 +97,6 @@ mark_as_advanced(${MY_PROJECT_NAME}_INSTALL_RPATH_RELATIVE
                  )
 
 #-----------------------------------------------------------------------------
-# Additional CXX/C Flags
-#-----------------------------------------------------------------------------
-
-set(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
-mark_as_advanced(ADDITIONAL_C_FLAGS)
-set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
-mark_as_advanced(ADDITIONAL_CXX_FLAGS)
-
-#-----------------------------------------------------------------------------
 # Superbuild script
 #-----------------------------------------------------------------------------
 
@@ -210,10 +201,10 @@ endif()
 # Project C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(${PROJECT_NAME}_C_FLAGS "${MITK_C_FLAGS} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(${PROJECT_NAME}_C_FLAGS "${MITK_C_FLAGS} ${COVERAGE_C_FLAGS}")
 set(${PROJECT_NAME}_C_FLAGS_DEBUG ${MITK_C_FLAGS_DEBUG})
 set(${PROJECT_NAME}_C_FLAGS_RELEASE ${MITK_C_FLAGS_RELEASE})
-set(${PROJECT_NAME}_CXX_FLAGS "${MITK_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(${PROJECT_NAME}_CXX_FLAGS "${MITK_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS}")
 set(${PROJECT_NAME}_CXX_FLAGS_DEBUG ${MITK_CXX_FLAGS_DEBUG})
 set(${PROJECT_NAME}_CXX_FLAGS_RELEASE ${MITK_CXX_FLAGS_RELEASE})
 

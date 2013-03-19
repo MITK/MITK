@@ -31,7 +31,5 @@ MITK_CREATE_MODULE( FiberTracking
 )
 
 if(MODULE_IS_ENABLED)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Rendering/mitkShaderFiberClipping.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mitkShaderFiberClipping.xml)
-  MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mitkShaderFiberClipping.xml)
   add_subdirectory(Testing)
 endif()

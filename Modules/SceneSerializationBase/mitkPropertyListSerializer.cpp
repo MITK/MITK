@@ -61,8 +61,10 @@ std::string mitk::PropertyListSerializer::Serialize()
   fullname = itksys::SystemTools::ConvertToOutputPath(fullname.c_str());
 
   // Trim quotes
-  if (fullname.front() == '"' && fullname.back() == '"' && fullname.length() >= 2)
-    fullname = fullname.substr(1, fullname.length() - 2);
+  std::string::size_type length = fullname.length();
+
+  if (length >= 2 && fullname[0] == '"' && fullname[length - 1] == '"')
+    fullname = fullname.substr(1, length - 2);
 
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....

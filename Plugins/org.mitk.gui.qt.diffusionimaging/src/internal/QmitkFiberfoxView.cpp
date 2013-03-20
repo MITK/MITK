@@ -65,7 +65,6 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     : QmitkAbstractView()
     , m_Controls( 0 )
     , m_SelectedImage( NULL )
-    , m_SelectedBundle( NULL )
 {
 
 }
@@ -105,6 +104,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_VarianceBox->setVisible(false);
+        m_Controls->m_KspaceParamFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -519,7 +519,6 @@ void QmitkFiberfoxView::OnAddBundle()
     node->SetData( bundle );
     QString name = QString("Bundle_%1").arg(children->size());
     node->SetName(name.toStdString());
-    m_SelectedBundle = node;
     m_SelectedBundles.push_back(node);
     UpdateGui();
 
@@ -528,12 +527,12 @@ void QmitkFiberfoxView::OnAddBundle()
 
 void QmitkFiberfoxView::OnDrawROI()
 {
-    if (m_SelectedBundle.IsNull())
+    if (m_SelectedBundles.empty())
         OnAddBundle();
-    if (m_SelectedBundle.IsNull())
+    if (m_SelectedBundles.empty())
         return;
 
-    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundle);
+    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedBundles.at(0));
 
     mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
 
@@ -550,7 +549,7 @@ void QmitkFiberfoxView::OnDrawROI()
     QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
     node->SetSelected(true);
-    GetDataStorage()->Add(node, m_SelectedBundle);
+    GetDataStorage()->Add(node, m_SelectedBundles.at(0));
 
     this->DisableCrosshairNavigation();
 
@@ -639,14 +638,15 @@ void QmitkFiberfoxView::GenerateFibers()
             }
             count++;
         }
-        if (fib.size()>1)
+        if (fib.size()>2)
         {
             fiducials.push_back(fib);
             fliplist.push_back(flip);
         }
+        else if (fib.size()>0)
+            m_SelectedBundles.at(i)->SetData( mitk::FiberBundleX::New() );
+
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        if (fib.size()<3)
-            return;
     }
 
     itk::FibersFromPlanarFiguresFilter::Pointer filter = itk::FibersFromPlanarFiguresFilter::New();
@@ -698,7 +698,7 @@ void QmitkFiberfoxView::GenerateImage()
     origin[2] = spacing[2]/2;
     itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
-    if (m_SelectedBundle.IsNull())
+    if (m_SelectedBundles.empty())
     {
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
                     m_Controls->m_SizeX->value(),
@@ -716,7 +716,8 @@ void QmitkFiberfoxView::GenerateImage()
         node->SetName("Dummy");
         unsigned int window = m_Controls->m_SizeX->value()*m_Controls->m_SizeY->value()*m_Controls->m_SizeZ->value();
         unsigned int level = window/2;
-        node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(level, window) ) );
+        mitk::LevelWindow lw; lw.SetLevelWindow(level, window);
+        node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
         GetDataStorage()->Add(node);
         m_SelectedImage = node;
 
@@ -1360,7 +1361,7 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_SelectedImage.IsNotNull() || m_SelectedBundle.IsNotNull())
+    if (m_SelectedImage.IsNotNull() || !m_SelectedBundles.empty())
     {
         m_Controls->m_TransformBundlesButton->setEnabled(true);
         m_Controls->m_CircleButton->setEnabled(true);
@@ -1383,11 +1384,11 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_GeometryFrame->setEnabled(false);
     }
 
-    if (m_SelectedBundle.IsNotNull())
+    if (!m_SelectedBundles.empty())
     {
         m_Controls->m_CopyBundlesButton->setEnabled(true);
         m_Controls->m_GenerateFibersButton->setEnabled(true);
-        m_Controls->m_FiberBundleLabel->setText(m_SelectedBundle->GetName().c_str());
+        m_Controls->m_FiberBundleLabel->setText(m_SelectedBundles.at(0)->GetName().c_str());
 
         if (m_SelectedBundles.size()>1)
             m_Controls->m_JoinBundlesButton->setEnabled(true);
@@ -1402,7 +1403,6 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedFiducial = NULL;
     m_TissueMask = NULL;
     m_SelectedBundles.clear();
-    m_SelectedBundle = NULL;
     m_SelectedImage = NULL;
     m_SelectedDWI = NULL;
     m_Controls->m_TissueMaskLabel->setText("<font color='grey'>optional</font>");
@@ -1433,19 +1433,15 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
             m_SelectedBundles2.push_back(node);
-            if (m_Controls->m_RealTimeFibers->isChecked() && node!=m_SelectedBundle)
+            if (m_Controls->m_RealTimeFibers->isChecked())
             {
-                m_SelectedBundle = node;
                 m_SelectedBundles.push_back(node);
                 mitk::FiberBundleX::Pointer newFib = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
                 if (newFib->GetNumFibers()!=m_Controls->m_FiberDensityBox->value())
                     GenerateFibers();
             }
             else
-            {
-                m_SelectedBundle = node;
                 m_SelectedBundles.push_back(node);
-            }
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::PlanarEllipse*>(node->GetData()) )
         {
@@ -1457,10 +1453,7 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
             {
                 mitk::DataNode::Pointer pNode = *it;
                 if ( pNode.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(pNode->GetData()) )
-                {
-                    m_SelectedBundle = pNode;
                     m_SelectedBundles.push_back(pNode);
-                }
             }
         }
     }
@@ -1501,11 +1494,6 @@ void QmitkFiberfoxView::DisableCrosshairNavigation()
 
 void QmitkFiberfoxView::NodeRemoved(const mitk::DataNode* node)
 {
-    if (node == m_SelectedImage)
-        m_SelectedImage = NULL;
-    if (node == m_SelectedBundle)
-        m_SelectedBundle = NULL;
-
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(nonConstNode);
 

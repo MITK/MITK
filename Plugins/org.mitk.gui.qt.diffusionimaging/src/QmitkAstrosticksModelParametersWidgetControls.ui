@@ -31,6 +31,9 @@
      <property name="text">
       <string>Randomize Sticks</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">

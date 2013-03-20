@@ -733,7 +733,10 @@ void QmitkFiberExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             bool isBinary = false;
             node->GetPropertyValue<bool>("binary", isBinary);
             if (isBinary)
+            {
                 m_MaskImageNode = node;
+                m_Controls->m_PfLabel->setText(node->GetName().c_str());
+            }
         }
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
         {

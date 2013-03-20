@@ -576,7 +576,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint)
 {
-    vtkSmartPointer<vtkPolyData> polyData = this->GetFiberPolyData();
+    vtkSmartPointer<vtkPolyData> polyData = m_FiberPolyData;
     if (anyPoint)
     {
         float minSpacing = 1;
@@ -588,7 +588,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             minSpacing = mask->GetSpacing()[2];
 
         mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-        fibCopy->ResampleFibers(minSpacing/2);
+        fibCopy->ResampleFibers(minSpacing/10);
         polyData = fibCopy->GetFiberPolyData();
     }
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
@@ -616,14 +616,15 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
                     double* p = polyData->GetPoint(pointIds[j]);
 
                     itk::Point<float, 3> itkP;
-                    itkP[0] = p[0]; itkP[1] = p[1]; p[2] = p[2];
+                    itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
                     itk::Index<3> idx;
                     mask->TransformPhysicalPointToIndex(itkP, idx);
+
                     if ( mask->GetPixel(idx)>0 )
                     {
-                        for (int j=0; j<numPoints; j++)
+                        for (int k=0; k<numPoints; k++)
                         {
-                            double* p = polyData->GetPoint(pointIds[j]);
+                            double* p = polyData->GetPoint(pointIds[k]);
                             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                             container->GetPointIds()->InsertNextId(id);
                         }

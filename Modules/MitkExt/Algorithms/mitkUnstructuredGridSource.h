@@ -42,8 +42,6 @@ public:
 
   typedef mitk::UnstructuredGrid OutputType;
 
-  typedef OutputType::Pointer OutputTypePointer;
-
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /**

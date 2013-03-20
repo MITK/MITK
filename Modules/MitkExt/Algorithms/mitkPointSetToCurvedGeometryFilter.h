@@ -88,8 +88,6 @@ protected:
 
   virtual void GenerateData();
 
-  virtual GeometryDataSource::DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
-
   ProjectionMode m_ProjectionMode;
 
   mitk::PlaneGeometry::Pointer m_XYPlane;

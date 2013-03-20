@@ -80,20 +80,20 @@ mitk::LookupTableSource::GraftOutput( OutputType* graft )
 
 mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
 {
-  return static_cast<mitk::LookupTableSource::OutputType*>(Superclass::GetOutput(key));
+  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
 }
 
 const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
 {
-  return static_cast<const mitk::LookupTableSource::OutputType*>(Superclass::GetOutput(key));
+  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
 }
 
 mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
 {
-  return static_cast<mitk::LookupTableSource::OutputType*>(Superclass::GetOutput(idx));
+  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
 }
 
 const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
 {
-  return static_cast<const mitk::LookupTableSource::OutputType*>(Superclass::GetOutput(idx));
+  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
 }

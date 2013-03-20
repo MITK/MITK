@@ -76,6 +76,11 @@ public:
     */
     virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
 
+    PlanarFigure* GetOutput(const DataObjectIdentifierType & key);
+    const PlanarFigure* GetOutput(const DataObjectIdentifierType & key) const;
+    PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx);
+    const PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx) const;
+
 protected:
     PlanarFigureSource();
     virtual ~PlanarFigureSource();

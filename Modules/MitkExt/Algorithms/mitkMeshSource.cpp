@@ -45,7 +45,7 @@ itk::DataObject::Pointer mitk::MeshSource::MakeOutput( const DataObjectIdentifie
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseProcess.h"
 #include "MitkExtExports.h"
-#include "mitkGeometryDataSource.h"
 
 namespace mitk {
 
@@ -43,9 +42,7 @@ public:
 
   itkNewMacro(Self);
 
-  typedef mitk::Mesh OutputType;
-
-  typedef OutputType::Pointer OutputTypePointer;
+  typedef mitk::GeometryData OutputType;
 
   typedef itk::DataObject::Pointer DataObjectPointer;
 

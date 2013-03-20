@@ -46,7 +46,7 @@ itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput( const DataObj
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 

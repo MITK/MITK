@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactory.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkImageDataItem.h"
-#include "itkSmartPointerForwardReference.txx"
 
 class mitkCompressedImageContainerTestClass
 {

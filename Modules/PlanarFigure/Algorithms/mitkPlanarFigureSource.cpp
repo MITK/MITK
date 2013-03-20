@@ -42,7 +42,7 @@ void mitk::PlanarFigureSource::GenerateInputRequestedRegion()
 
 itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return OutputType::New().GetPointer();
+    return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 
@@ -82,4 +82,24 @@ void mitk::PlanarFigureSource::GraftNthOutput(unsigned int idx, itk::DataObject 
   }
   // Call Graft on NavigationData to copy member data
   output->Graft( graft );
+}
+
+mitk::PlanarFigure* mitk::PlanarFigureSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::PlanarFigure*>(Superclass::GetOutput(key));
+}
+
+const mitk::PlanarFigure* mitk::PlanarFigureSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::PlanarFigure*>(Superclass::GetOutput(key));
+}
+
+ mitk::PlanarFigure* mitk::PlanarFigureSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::PlanarFigure*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::PlanarFigure* mitk::PlanarFigureSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::PlanarFigure*>(Superclass::GetOutput(idx));
 }

@@ -165,11 +165,6 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
 
 }
 
-mitk::GeometryDataSource::DataObjectPointer mitk::PointSetToCurvedGeometryFilter::MakeOutput ( unsigned int )
-{
-  return static_cast<itk::DataObject*> ( mitk::Geometry2DData::New().GetPointer() );
-}
-
 
 void mitk::PointSetToCurvedGeometryFilter::SetDefaultCurvedGeometryProperties ( mitk::DataNode* node )
 {

@@ -201,9 +201,9 @@ bool mitk::UnstructuredGrid::VerifyRequestedRegion()
 
 void mitk::UnstructuredGrid::SetRequestedRegion(const itk::DataObject *data )
 {
-  mitk::UnstructuredGrid *gridData;
+  const mitk::UnstructuredGrid *gridData;
 
-  gridData = dynamic_cast<mitk::UnstructuredGrid*>(data);
+  gridData = dynamic_cast<const mitk::UnstructuredGrid*>(data);
 
   if (gridData)
   {

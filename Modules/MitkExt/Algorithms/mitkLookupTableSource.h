@@ -80,10 +80,10 @@ public:
      */
     virtual void GraftOutput( OutputType* output );
 
-    OutputType* GetOutput(const DataObjectIdentifierType & key);
-    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
-    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
-    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+    virtual OutputType* GetOutput(const DataObjectIdentifierType & key);
+    virtual const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    virtual OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    virtual const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
     LookupTableSource();

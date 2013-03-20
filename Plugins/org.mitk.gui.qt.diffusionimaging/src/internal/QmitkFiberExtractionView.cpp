@@ -117,11 +117,18 @@ void QmitkFiberExtractionView::ExtractEndingInMask()
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, false);
+        if (newFib->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            continue;
+        }
+
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
         name += "_ending-in-mask";
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
+        m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
 
@@ -139,11 +146,17 @@ void QmitkFiberExtractionView::ExtractPassingMask()
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage<itkUCharImageType>(mitkMask, mask);
         mitk::FiberBundleX::Pointer newFib = fib->ExtractFiberSubset(mask, true);
+        if (newFib->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            continue;
+        }
         DataNode::Pointer newNode = DataNode::New();
         newNode->SetData(newFib);
         name += "_passing-mask";
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
+        m_SelectedFB.at(i)->SetVisibility(false);
     }
 }
 void QmitkFiberExtractionView::GenerateRoiImage(){
@@ -733,7 +746,10 @@ void QmitkFiberExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             bool isBinary = false;
             node->GetPropertyValue<bool>("binary", isBinary);
             if (isBinary)
+            {
                 m_MaskImageNode = node;
+                m_Controls->m_PfLabel->setText(node->GetName().c_str());
+            }
         }
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
         {
@@ -904,9 +920,11 @@ void QmitkFiberExtractionView::DoFiberExtraction()
         mitk::PlanarFigure::Pointer roi = dynamic_cast<mitk::PlanarFigure*> (m_SelectedPF.at(0)->GetData());
 
         mitk::FiberBundleX::Pointer extFB = fib->ExtractFiberSubset(roi);
-
         if (extFB->GetNumFibers()<=0)
+        {
+            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
             continue;
+        }
 
         mitk::DataNode::Pointer node;
         node = mitk::DataNode::New();
@@ -1273,15 +1291,15 @@ void QmitkFiberExtractionView::JoinBundles()
         return;
     }
 
-    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedFB.begin();
-    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(0)->GetData());
+    m_SelectedFB.at(0)->SetVisibility(false);
     QString name("");
-    name += QString((*it)->GetName().c_str());
-    ++it;
-    for (it; it!=m_SelectedFB.end(); ++it)
+    name += QString(m_SelectedFB.at(0)->GetName().c_str());
+    for (int i=1; i<m_SelectedFB.size(); i++)
     {
-        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
-        name += "+"+QString((*it)->GetName().c_str());
+        newBundle = newBundle->AddBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData()));
+        name += "+"+QString(m_SelectedFB.at(i)->GetName().c_str());
+        m_SelectedFB.at(i)->SetVisibility(false);
     }
 
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
@@ -1299,17 +1317,17 @@ void QmitkFiberExtractionView::SubstractBundles()
         return;
     }
 
-    std::vector<mitk::DataNode::Pointer>::const_iterator it = m_SelectedFB.begin();
-    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>((*it)->GetData());
+    mitk::FiberBundleX::Pointer newBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(0)->GetData());
+    m_SelectedFB.at(0)->SetVisibility(false);
     QString name("");
-    name += QString((*it)->GetName().c_str());
-    ++it;
-    for (it; it!=m_SelectedFB.end(); ++it)
+    name += QString(m_SelectedFB.at(0)->GetName().c_str());
+    for (int i=1; i<m_SelectedFB.size(); i++)
     {
-        newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>((*it)->GetData()));
+        newBundle = newBundle->SubtractBundle(dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.at(i)->GetData()));
         if (newBundle.IsNull())
             break;
-        name += "-"+QString((*it)->GetName().c_str());
+        name += "-"+QString(m_SelectedFB.at(i)->GetName().c_str());
+        m_SelectedFB.at(i)->SetVisibility(false);
     }
     if (newBundle.IsNull())
     {

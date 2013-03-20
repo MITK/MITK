@@ -166,6 +166,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
         MITK_WARN << "trying to call AddBundle with NULL argument";
         return NULL;
     }
+    MITK_INFO << "Adding fibers";
 
     vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
@@ -176,8 +177,10 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
 
     // add current fiber bundle
     int numFibers = GetNumFibers();
+    boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
@@ -223,6 +226,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::AddBundle(mitk::FiberBundleX* fi
 // subtract two fiber bundles
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundleX* fib)
 {
+    MITK_INFO << "Subtracting fibers";
 
     vtkSmartPointer<vtkPolyData> vNewPolyData = vtkSmartPointer<vtkPolyData>::New();
     vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
@@ -233,8 +237,10 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
 
     // iterate over current fibers
     int numFibers = GetNumFibers();
+    boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
+        ++disp;
         vtkIdType   numPoints(0);
         vtkIdType*  points(NULL);
         vLines->GetNextCell ( numPoints, points );
@@ -576,7 +582,7 @@ void mitk::FiberBundleX::GenerateFiberIds()
 
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint)
 {
-    vtkSmartPointer<vtkPolyData> polyData = this->GetFiberPolyData();
+    vtkSmartPointer<vtkPolyData> polyData = m_FiberPolyData;
     if (anyPoint)
     {
         float minSpacing = 1;
@@ -588,13 +594,15 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             minSpacing = mask->GetSpacing()[2];
 
         mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
-        fibCopy->ResampleFibers(minSpacing/2);
+        fibCopy->ResampleFibers(minSpacing/10);
         polyData = fibCopy->GetFiberPolyData();
     }
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkCellArray> vLines = polyData->GetLines();
+    vtkSmartPointer<vtkCellArray> vLinesOriginal = m_FiberPolyData->GetLines();
     vLines->InitTraversal();
+    vLinesOriginal->InitTraversal();
 
     MITK_INFO << "Extracting fibers";
     boost::progress_display disp(m_NumFibers);
@@ -604,6 +612,10 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
         vtkIdType   numPoints(0);
         vtkIdType*  pointIds(NULL);
         vLines->GetNextCell ( numPoints, pointIds );
+
+        vtkIdType   numPointsOriginal(0);
+        vtkIdType*  pointIdsOriginal(NULL);
+        vLinesOriginal->GetNextCell ( numPointsOriginal, pointIdsOriginal );
 
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
@@ -619,11 +631,12 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
                     itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
                     itk::Index<3> idx;
                     mask->TransformPhysicalPointToIndex(itkP, idx);
+
                     if ( mask->GetPixel(idx)>0 )
                     {
-                        for (int j=0; j<numPoints; j++)
+                        for (int k=0; k<numPointsOriginal; k++)
                         {
-                            double* p = polyData->GetPoint(pointIds[j]);
+                            double* p = m_FiberPolyData->GetPoint(pointIdsOriginal[k]);
                             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                             container->GetPointIds()->InsertNextId(id);
                         }

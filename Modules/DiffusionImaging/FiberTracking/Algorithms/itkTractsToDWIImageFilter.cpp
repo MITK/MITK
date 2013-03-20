@@ -521,17 +521,12 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // do k-space stuff
-    if (!m_KspaceArtifacts.empty())
-        MITK_INFO << "Generating k-space artifacts";
-    else
-        MITK_INFO << "Generating k-space image";
+    MITK_INFO << "Adjusting complex signal";
     compartments = AddKspaceArtifacts(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
     unsigned int window = 0;
-    unsigned int window2 = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
-    unsigned int min2 = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
@@ -566,23 +561,15 @@ void TractsToDWIImageFilter::GenerateData()
 
             if (!m_FiberModels.at(0)->IsBaselineIndex(i) && signal[i]>window)
                 window = signal[i];
-            else if (signal[i]>window)
-                window2 = signal[i];
             if (!m_FiberModels.at(0)->IsBaselineIndex(i) && signal[i]<min)
                 min = signal[i];
-            else if (signal[i]<min)
-                min2 = signal[i];
         }
         it4.Set(signal);
         ++it4;
     }
     window -= min;
-    window2 -= min2;
-    min = (min+min2)/2;
-    window = (window+window2)/2;
     unsigned int level = window/2 + min;
-    m_LevelWindow = mitk::LevelWindow(level, window);
-
+    m_LevelWindow.SetLevelWindow(level, window);
     this->SetNthOutput(0, outImage);
 }
 

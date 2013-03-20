@@ -21,7 +21,8 @@ if(NOT _missing_deps)
   endif()
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/Resources tar xzf ${lut_tarball})
+  file(TO_NATIVE_PATH ${lut_tarball} lut_tarball_native)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/Resources tar xzf ${lut_tarball_native})
 endif()
 
 MITK_CREATE_MODULE( FiberTracking

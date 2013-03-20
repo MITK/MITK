@@ -5,8 +5,6 @@ Development with MITK can happen under several conditions. Depending on whether 
 
 Depending on whether you are working with the \link DevelopmentToolkit Toolkit\endlink or the \link DevelopmentApplication Application\endlink, you can refer to their respective pages. Generated API-Documentation can be found \link DevelopmentAPI here\endlink.
 
-\section DeveloperManualStarting Starting your MITK Development
-
 <ul>
   <li> \subpage StartingDevelopment </li>
   <ul>

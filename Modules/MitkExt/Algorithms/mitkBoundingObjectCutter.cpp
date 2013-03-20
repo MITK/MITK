@@ -83,10 +83,19 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
-
   if(input.IsNull())
+  {
+    MITK_WARN << "Input is not a mitk::Image";
     return;
+  }
+  itkDebugMacro(<<"GenerateOutputInformation()");
+  unsigned int dimension = input->GetDimension();
+
+  if (dimension < 3)
+  {
+    MITK_WARN << "ImageCropper cannot handle 1D or 2D Objects. Operation aborted.";
+    return;
+  }
 
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
@@ -142,7 +151,6 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   // PART II: initialize output image
 
-  unsigned int dimension = input->GetDimension();
   unsigned int *dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)

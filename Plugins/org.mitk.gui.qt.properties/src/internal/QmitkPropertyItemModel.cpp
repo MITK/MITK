@@ -299,10 +299,10 @@ void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences
 
 void QmitkPropertyItemModel::OnPropertyDeleted(const itk::Object* property, const itk::EventObject&)
 {
-  QModelIndex index = this->FindProperty(static_cast<const mitk::BaseProperty*>(property));
+  /*QModelIndex index = this->FindProperty(static_cast<const mitk::BaseProperty*>(property));
 
   if (index != QModelIndex())
-    this->reset();
+    this->reset();*/
 }
 
 void QmitkPropertyItemModel::OnPropertyListDeleted(const itk::Object*)

@@ -32,7 +32,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkGibbsTrackingTest");
 
-  MITK_TEST_CONDITION_REQUIRED(argc>5,"check for input data")
+  MITK_TEST_CONDITION_REQUIRED(argc>4,"check for input data")
 
   QBallImage::Pointer mitkQballImage;
   Image::Pointer mitkMaskImage;
@@ -43,8 +43,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     MITK_INFO << "Q-Ball image: " << argv[1];
     MITK_INFO << "Mask image: " << argv[2];
     MITK_INFO << "Parameter file: " << argv[3];
-    MITK_INFO << "Lut path: " << argv[4];
-    MITK_INFO << "Reference bundle: " << argv[5];
+    MITK_INFO << "Reference bundle: " << argv[4];
 
     RegisterDiffusionCoreObjectFactory();
     RegisterFiberTrackingObjectFactory();
@@ -59,7 +58,7 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(mitkMaskImage.IsNotNull(),"check mask image")
 
-    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[5], s1, s2, false );
+    infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[4], s1, s2, false );
     fib1 = dynamic_cast<mitk::FiberBundleX*>(infile.at(0).GetPointer());
     MITK_TEST_CONDITION_REQUIRED(fib1.IsNotNull(),"check fiber bundle")
 
@@ -80,7 +79,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
     gibbsTracker->SetDuplicateImage(false);
     gibbsTracker->SetRandomSeed(1);
     gibbsTracker->SetLoadParameterFile(argv[3]);
-    gibbsTracker->SetLutPath(argv[4]);
     gibbsTracker->Update();
 
     mitk::FiberBundleX::Pointer fib2 = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());

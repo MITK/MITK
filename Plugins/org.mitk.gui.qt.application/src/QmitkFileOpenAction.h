@@ -47,7 +47,7 @@ public:
   QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
 
   ~QmitkFileOpenAction();
-
+  
 protected slots:
 
   virtual void Run();

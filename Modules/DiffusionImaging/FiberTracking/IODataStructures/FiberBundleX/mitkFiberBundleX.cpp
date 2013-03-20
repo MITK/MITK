@@ -616,7 +616,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
                     double* p = polyData->GetPoint(pointIds[j]);
 
                     itk::Point<float, 3> itkP;
-                    itkP[0] = p[0]; itkP[1] = p[1]; p[2] = p[2];
+                    itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
                     itk::Index<3> idx;
                     mask->TransformPhysicalPointToIndex(itkP, idx);
                     if ( mask->GetPixel(idx)>0 )

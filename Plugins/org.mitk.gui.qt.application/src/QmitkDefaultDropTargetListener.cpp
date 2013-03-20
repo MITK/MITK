@@ -21,8 +21,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QUrl>
 
-#include <mitkWorkbenchUtil.h>
+#include "internal/org_mitk_gui_qt_application_Activator.h"
+
+#include <berryIPreferencesService.h>
 #include <berryPlatformUI.h>
+
+#include <ctkServiceTracker.h>
+
+#include <mitkWorkbenchUtil.h>
+
+class QmitkDefaultDropTargetListenerPrivate
+{
+public:
+
+  QmitkDefaultDropTargetListenerPrivate()
+  : m_PrefServiceTracker(mitk::PluginActivator::GetContext())
+  {
+    m_PrefServiceTracker.open();
+  }
+
+  berry::IPreferences::Pointer GetPreferences() const
+  {
+    berry::IPreferencesService* prefService = m_PrefServiceTracker.getService();
+    if (prefService)
+    {
+      return prefService->GetSystemPreferences()->Node("/General");
+    }
+    return berry::IPreferences::Pointer(0);
+  }
+
+  bool GetOpenEditor() const
+  {
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if(prefs.IsNotNull())
+    {
+      return prefs->GetBool("OpenEditor", true);
+    }
+    return true;
+  }
+
+  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
+};
+
+QmitkDefaultDropTargetListener::QmitkDefaultDropTargetListener()
+  : berry::IDropTargetListener(), d(new QmitkDefaultDropTargetListenerPrivate())
+{
+}
+
+QmitkDefaultDropTargetListener::~QmitkDefaultDropTargetListener()
+{
+}
 
 berry::IDropTargetListener::Events::Types QmitkDefaultDropTargetListener::GetDropTargetEventTypes() const
 {
@@ -47,7 +95,8 @@ void QmitkDefaultDropTargetListener::DropEvent(QDropEvent *event)
   }
 
   mitk::WorkbenchUtil::LoadFiles(fileNames2,
-                                 berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+                                 berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(),
+                                 d->GetOpenEditor());
 
   event->accept();
 }

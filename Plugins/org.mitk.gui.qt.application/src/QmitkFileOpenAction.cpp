@@ -83,6 +83,16 @@ public:
     }
   }
 
+  bool GetOpenEditor() const
+  {
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if(prefs.IsNotNull())
+    {
+      return prefs->GetBool("OpenEditor", true);
+    }
+    return true;
+  }
+
   berry::IWorkbenchWindow::WeakPtr m_Window;
   ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
 };
@@ -116,5 +126,5 @@ void QmitkFileOpenAction::Run()
     return;
 
   d->setLastFileOpenPath(fileNames.front());
-  mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock());
+  mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
 }

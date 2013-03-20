@@ -22,16 +22,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIDropTargetListener.h>
 
+class QmitkDefaultDropTargetListenerPrivate;
+
 /**
  * \ingroup org_mitk_gui_qt_application
  */
 class MITK_QT_APP QmitkDefaultDropTargetListener : public berry::IDropTargetListener
 {
 public:
+  QmitkDefaultDropTargetListener();
+  virtual ~QmitkDefaultDropTargetListener();
 
   Events::Types GetDropTargetEventTypes() const;
 
   void DropEvent(QDropEvent* event);
+
+private:
+
+  const QScopedPointer<QmitkDefaultDropTargetListenerPrivate> d;
 
 };
 

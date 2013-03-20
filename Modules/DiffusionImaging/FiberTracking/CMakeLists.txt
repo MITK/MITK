@@ -21,8 +21,16 @@ if(NOT _missing_deps)
   endif()
 
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources)
-  file(TO_NATIVE_PATH ${lut_tarball} lut_tarball_native)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/Resources tar xzf ${lut_tarball_native})
+  message("Unpacking FiberTracking LUT tarball...")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E  tar xzf ../FibertrackingLUT.tar.gz
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Resources
+                  RESULT_VARIABLE result
+                  ERROR_VARIABLE err_msg)
+  if(result)
+    message(SEND_ERROR "Unpacking FibertrackingLUT.tar.gz failed: ${err_msg}")
+  else()
+    message("done.")
+  endif()
 endif()
 
 MITK_CREATE_MODULE( FiberTracking

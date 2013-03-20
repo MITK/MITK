@@ -374,7 +374,12 @@ void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
 {
   m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
-
+  unsigned int dim = m_ImageToCrop->GetDimension();
+  if (dim < 3)
+  {
+    MITK_WARN << "Image Cropper does not support 1D/2D Objects. Aborting operation";
+    return;
+  }
   if(!this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
   {
     this->GetDefaultDataStorage()->Add(m_CroppingObjectNode, node);

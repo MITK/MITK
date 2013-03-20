@@ -218,7 +218,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {
-  mitk::PointSet* output = GetOutput();
+  mitk::PointSet* output = this->GetOutput(0);
   assert(output);
   for (unsigned int index = 0; index < this->GetNumberOfInputs(); index++)
   {

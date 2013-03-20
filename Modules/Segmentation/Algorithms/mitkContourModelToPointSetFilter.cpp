@@ -31,23 +31,23 @@ mitk::ContourModelToPointSetFilter::~ContourModelToPointSetFilter()
 
 }
 
-void mitk::ContourModelToPointSetFilter::SetInput ( const mitk::ContourModelToPointSetFilter::InputType* input )
-{
-  this->SetInput( 0, input );
-}
+//void mitk::ContourModelToPointSetFilter::SetInput ( const mitk::ContourModelToPointSetFilter::InputType* input )
+//{
+//  this->SetInput( 0, input );
+//}
 
-void mitk::ContourModelToPointSetFilter::SetInput (DataObjectPointerArraySizeType idx, const mitk::ContourModelToPointSetFilter::InputType* input )
-{
-  if ( idx + 1 > this->GetNumberOfInputs() )
-  {
-    this->SetNumberOfRequiredInputs(idx + 1);
-  }
-  if ( input != static_cast<InputType*> ( this->ProcessObject::GetInput ( idx ) ) )
-  {
-    this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
-    this->Modified();
-  }
-}
+//void mitk::ContourModelToPointSetFilter::SetInput (DataObjectPointerArraySizeType idx, const mitk::ContourModelToPointSetFilter::InputType* input )
+//{
+//  if ( idx + 1 > this->GetNumberOfInputs() )
+//  {
+//    this->SetNumberOfRequiredInputs(idx + 1);
+//  }
+//  if ( input != static_cast<InputType*> ( this->ProcessObject::GetInput ( idx ) ) )
+//  {
+//    this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
+//    this->Modified();
+//  }
+//}
 
 void mitk::ContourModelToPointSetFilter::GraftOutput(mitk::ContourModelToPointSetFilter::OutputType* graft)
 {
@@ -79,7 +79,7 @@ void mitk::ContourModelToPointSetFilter::GraftNthOutput(unsigned int idx, mitk::
 void mitk::ContourModelToPointSetFilter::GenerateData()
 {
 
-  mitk::ContourModel::Pointer inputContour =  const_cast<mitk::ContourModel*>(this->GetInput(0));
+  mitk::ContourModel::Pointer inputContour =  static_cast<mitk::ContourModel*>(this->GetInput(0));
   mitk::ContourModelToPointSetFilter::OutputType* outputPointSet = this->GetOutput(0);
 
   InputType::VertexIterator it = inputContour->IteratorBegin();

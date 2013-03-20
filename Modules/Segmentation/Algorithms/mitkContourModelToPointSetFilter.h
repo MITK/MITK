@@ -49,10 +49,10 @@ namespace mitk {
     virtual void GraftOutput(OutputType *output);
     virtual void GraftNthOutput(unsigned int idx, OutputType *output);
 
-    virtual void SetInput( const InputType *input);
-    virtual void SetInput(DataObjectPointerArraySizeType idx, const InputType * input);
-    const InputType * GetInput(void);
-    const InputType * GetInput(unsigned int idx);
+//    virtual void SetInput( const InputType *input);
+//    virtual void SetInput(DataObjectPointerArraySizeType idx, const InputType * input);
+//    const InputType * GetInput(void);
+//    const InputType * GetInput(unsigned int idx);
 
   protected:
     ContourModelToPointSetFilter();

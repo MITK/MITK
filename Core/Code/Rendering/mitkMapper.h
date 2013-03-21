@@ -181,7 +181,8 @@ namespace mitk {
     virtual ~Mapper();
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer)
-    /* \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead. */
+     *  \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
+     */
     DEPRECATED( virtual void GenerateData() { });
 
     /** \brief Generate the data needed for rendering into \a renderer */

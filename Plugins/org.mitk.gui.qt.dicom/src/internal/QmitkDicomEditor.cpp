@@ -132,11 +132,14 @@ void QmitkDicomEditor::SetupProgressDialog(QWidget* parent)
     connect(m_Controls.internalDataWidget, SIGNAL(SignalProcessingFile(QString)),m_ProgressDialogLabel, SLOT(setText(QString)));
     connect(m_Controls.internalDataWidget, SIGNAL(SignalProgress(int)),m_ProgressDialog, SLOT(setValue(int)));
     connect(m_Controls.internalDataWidget, SIGNAL(SignalProgress(int)),this, SLOT(OnImportProgress(int)));
+    connect(m_Controls.internalDataWidget, SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
 
     connect(m_ProgressDialog, SIGNAL(canceled()), m_Controls.externalDataWidget, SIGNAL(SignalCancelImport()));
     connect(m_Controls.externalDataWidget, SIGNAL(SignalProcessingFile(QString)),m_ProgressDialogLabel, SLOT(setText(QString)));
     connect(m_Controls.externalDataWidget, SIGNAL(SignalProgress(int)),m_ProgressDialog, SLOT(setValue(int)));
     connect(m_Controls.externalDataWidget, SIGNAL(SignalProgress(int)),this, SLOT(OnImportProgress(int)));
+    connect(m_Controls.externalDataWidget, SIGNAL(SignalFinishedImport()),this, SLOT(OnDicomImportFinished()));
+
 }
 
 void QmitkDicomEditor::SetupImportDialog()
@@ -235,6 +238,7 @@ void QmitkDicomEditor::OnChangePage(int page)
 
 void QmitkDicomEditor::OnDicomImportFinished()
 {
+  m_ProgressDialog->close();
 }
 
 void QmitkDicomEditor::StartDicomDirectoryListener()

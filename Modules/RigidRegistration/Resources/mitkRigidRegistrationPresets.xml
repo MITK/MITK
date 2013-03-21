@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<mitkRigidRegistrationPresets FILE_VERSION="0.1" >   
+<mitkRigidRegistrationPresets FILE_VERSION="0.1" >
    <preset NAME="TranslationMeanSquares" >
       <transform TRANSFORM="0" USESCALES="0" SCALE1="1" SCALE2="1" SCALE3="1" />
       <metric METRIC="0" COMPUTEGRADIENT="1" />
       <optimizer OPTIMIZER="7" MAXIMIZE="0" GRADIENTMAGNITUDETOLERANCE="0.0001" MINSTEPLENGTH="0.01" MAXSTEPLENGTH="4" RELAXATIONFACTOR="0.5" NUMBERITERATIONS="200" />
       <interpolator INTERPOLATOR="0" />
-   </preset>  
+   </preset>
    <preset NAME="TranslationMI" >
       <transform TRANSFORM="0" USESCALES="0" SCALE1="1" SCALE2="1" SCALE3="1" />
       <metric METRIC="10" COMPUTEGRADIENT="1" SPATIALSAMPLES="1" FIXEDSTANDARDDEVIATION="0.4" MOVINGSTANDARDDEVIATION="0.4" USENORMALIZERANDSMOOTHER="1" FIXEDSMOOTHERVARIANCE="2" MOVINGSMOOTHERVARIANCE="2" />
@@ -41,5 +41,5 @@
       <metric METRIC="8" COMPUTEGRADIENT="1" USESAMPLING="1" SPATIALSAMPLES="90000" HISTOGRAMBINS="32" />
       <optimizer OPTIMIZER="1" MAXIMIZE="0" LEARNINGRATE="0.08" NUMBERITERATIONS="100" />
       <interpolator INTERPOLATOR="1" />
-   </preset>  
+   </preset>
 </mitkRigidRegistrationPresets>

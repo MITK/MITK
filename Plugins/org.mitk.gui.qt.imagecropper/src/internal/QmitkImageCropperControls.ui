@@ -63,7 +63,7 @@
       </palette>
      </property>
      <property name="text">
-      <string>Warning: Image Cropper cannot handle 1D or 2D Objects!</string>
+      <string>The image cropper cannot handle 2D images</string>
      </property>
     </widget>
    </item>

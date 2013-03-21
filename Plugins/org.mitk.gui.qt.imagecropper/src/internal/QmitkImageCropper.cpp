@@ -381,10 +381,11 @@ void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   {
     m_Controls->warningLabel->setVisible(true);
     m_ParentWidget->setEnabled(false);
-
   }
-
-
+  else
+  {
+    m_Controls->warningLabel->setVisible(false);
+  }
 }
 
 void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)

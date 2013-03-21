@@ -70,6 +70,9 @@ namespace mitk {
     */
     const BaseData* GetRepresentationObject(unsigned int idx);
 
+    /** Update method overwrite: hack for ITK 4 compatibility. Executes the GernerateData method directly.*/
+    void Update(){GenerateData();}
+
     virtual void SetTransformPosition(unsigned int index, bool applyTransform); ///< if set to true, the filter will use the position part of the input navigation data at the given index to transform the representation object. If set to false, it will not. If no value is set, it defaults to true.
     virtual bool GetTransformPosition(unsigned int index) const; ///< returns whether position part of the input navigation data at the given index is used for the transformation of the representation object.
     virtual void TransformPositionOn(unsigned int index);  ///< sets the TransformPosition flag to true for the given index

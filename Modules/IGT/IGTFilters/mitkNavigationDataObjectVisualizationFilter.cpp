@@ -59,6 +59,7 @@ void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsi
   //  return false;
 
   m_RepresentationList[idx] = RepresentationPointer(data);
+
   //std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
   //returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements
   //return returnEl.second; // return if insert was successful
@@ -67,9 +68,27 @@ void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsi
 
 void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 {
+  MITK_DEBUG << "Generate data! " << "Number of inputs: " << this->GetNumberOfIndexedInputs();
+  for (unsigned int index=0; index < this->GetNumberOfIndexedInputs(); index++)
+    {
+    MITK_DEBUG << "Test " << index;
+    //get the needed variables
+    const mitk::NavigationData* nd = this->GetInput(index);
+    assert(nd);
+
+    mitk::NavigationData* output = this->GetOutput(index);
+    assert(output);
+    }
+  return;
+  //return;
   /*get each input, lookup the associated BaseData and transfer the data*/
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-  for (unsigned int index=0; index < inputs.size(); index++)
+  //DataObjectPointerArray inputs; //get all inputs
+  //for (int i=0; i<this->GetNumberOfIndexedInputs(); i++)
+   // inputs.push_back(this->GetInput(i));
+
+  //MITK_DEBUG << "Number of inputs: " << inputs.size();
+
+  for (unsigned int index=0; index < this->GetNumberOfIndexedInputs(); index++)
   {
     //get the needed variables
     const mitk::NavigationData* nd = this->GetInput(index);
@@ -88,7 +107,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     const mitk::BaseData* data = this->GetRepresentationObject(index);
     if (data == NULL)
     {
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.");
+      MITK_WARN <<"NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.";
       return;
     }
 
@@ -97,7 +116,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     if (affineTransform.IsNull())
     {
       //replace with mitk standard output
-      itkWarningMacro("NavigationDataObjectVisualizationFilter: AffineTransform IndexToWorldTransform not initialized!");
+      MITK_WARN <<"NavigationDataObjectVisualizationFilter: AffineTransform IndexToWorldTransform not initialized!";
       return;
     }
 

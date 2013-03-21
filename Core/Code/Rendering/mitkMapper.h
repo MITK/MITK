@@ -182,7 +182,8 @@ namespace mitk {
 
 
     /** \brief Generate the data needed for rendering (independent of a specific renderer)
-    /* \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead. */
+     *  \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
+     */
 
     // @deprecated Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
     //DEPRECATED( virtual void GenerateData()) { }

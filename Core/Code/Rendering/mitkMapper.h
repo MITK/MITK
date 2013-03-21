@@ -180,13 +180,8 @@ namespace mitk {
     /** \brief virtual destructor in order to derive from this class */
     virtual ~Mapper();
 
-
     /** \brief Generate the data needed for rendering (independent of a specific renderer)
     /* \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead. */
-
-    // @deprecated Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
-    //DEPRECATED( virtual void GenerateData()) { }
-
     DEPRECATED( virtual void GenerateData() { });
 
     /** \brief Generate the data needed for rendering into \a renderer */

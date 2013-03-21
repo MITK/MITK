@@ -1,9 +1,6 @@
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.ico )
 MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.bmp )
 
-#STATEMACHINE XML
-MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
-
 # Install CTK Qt (designer) plugins
 if(MITK_USE_CTK)
   if(EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})

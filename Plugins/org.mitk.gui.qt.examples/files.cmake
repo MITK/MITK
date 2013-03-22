@@ -12,6 +12,9 @@ set(INTERNAL_CPP_FILES
   viewinitialization/QmitkViewInitializationView.cpp
   volumetry/QmitkVolumetryView.cpp
   surfaceutilities/QmitkSurfaceUtilities.cpp
+  surfaceutilities/mitkSurfaceModifier.cpp
+  surfaceutilities/mitkSurfaceToPointSetFilter.cpp
+  surfaceutilities/mitkTargetPointsCalculator.cpp
 )
 
 set(UI_FILES

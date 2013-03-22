@@ -11,6 +11,7 @@ set(INTERNAL_CPP_FILES
   simplemeasurement/QmitkSimpleMeasurement.cpp
   viewinitialization/QmitkViewInitializationView.cpp
   volumetry/QmitkVolumetryView.cpp
+  surfaceutilities/QmitkSurfaceUtilities.cpp
 )
 
 set(UI_FILES
@@ -20,6 +21,7 @@ set(UI_FILES
   src/internal/simplemeasurement/QmitkSimpleMeasurementControls.ui
   src/internal/viewinitialization/QmitkViewInitializationViewControls.ui
   src/internal/volumetry/QmitkVolumetryViewControls.ui
+  src/internal/surfaceutilities/QmitkSurfaceUtilitiesControls.ui
 )
 
 set(MOC_H_FILES
@@ -30,6 +32,7 @@ set(MOC_H_FILES
   src/internal/simplemeasurement/QmitkSimpleMeasurement.h
   src/internal/viewinitialization/QmitkViewInitializationView.h
   src/internal/volumetry/QmitkVolumetryView.h
+  src/internal/surfaceutilities/QmitkSurfaceUtilities.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -40,6 +43,7 @@ set(CACHED_RESOURCE_FILES
   resources/SimpleMeasurement.png
   resources/viewInitializationIcon.xpm
   resources/volumetryIcon.xpm
+  resources/surfaceUtilities.xpm
 )
 
 set(QRC_FILES

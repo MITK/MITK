@@ -45,13 +45,13 @@ class QmitkSurfaceUtilities : public QmitkAbstractView
 
   protected slots:
 
-    //void OnLoadCurrentTransform();
-    //void OnImportTransform();
-    //void OnExportTransform();
     void OnEulerToMatrixClicked();
     void OnMoveToOriginClicked();
     void OnApplyTransformClicked();
     void OnComputeCoG();
+    void OnGenerateTargetPoints();
+    void OnPerturbeSurface();
+    void OnAddOutliers();
 
 
   protected:

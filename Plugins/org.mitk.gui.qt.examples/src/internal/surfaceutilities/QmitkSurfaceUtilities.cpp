@@ -55,6 +55,9 @@ void QmitkSurfaceUtilities::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_applyTransform, SIGNAL(clicked()), this, SLOT(OnApplyTransformClicked()) );
   connect( m_Controls.m_computeMatrix, SIGNAL(clicked()), this, SLOT(OnEulerToMatrixClicked()) );
   connect( m_Controls.m_ComputeCoG, SIGNAL(clicked()), this, SLOT(OnComputeCoG()) );
+  connect( (QObject*)(m_Controls.m_generateTargetPoints), SIGNAL(clicked()), this, SLOT(OnGenerateTargetPoints()) );
+  connect( m_Controls.m_Perturbe, SIGNAL(clicked()), this, SLOT(OnPerturbeSurface()));
+  connect( m_Controls.m_addOutliers, SIGNAL(clicked()), this, SLOT(OnAddOutliers()));
 
   m_Controls.m_applySurfaceBox->SetDataStorage(this->GetDataStorage());
   m_Controls.m_applySurfaceBox->SetAutoSelectNewItems(true);
@@ -65,6 +68,74 @@ void QmitkSurfaceUtilities::SetFocus()
 {
 
 }
+
+void QmitkSurfaceUtilities::OnPerturbeSurface()
+  {
+  //########## check if everything is ready... ##################
+  mitk::DataNode* node = m_Controls.m_applySurfaceBox->GetSelectedNode();
+  if (!node)
+    {
+    // Nothing selected. Inform the user and return
+    MITK_WARN << "ERROR: Please select a surface before!";
+    return;
+    }
+  //#############################################################
+
+  mitk::SurfaceModifier::Pointer myModifier = mitk::SurfaceModifier::New();
+  myModifier->PerturbeSurface(dynamic_cast<mitk::Surface*>(m_Controls.m_applySurfaceBox->GetSelectedNode()->GetData()),
+                                                             m_Controls.m_varianceX->value(),
+                                                             m_Controls.m_varianceY->value(),
+                                                             m_Controls.m_varianceZ->value());
+  }
+
+void QmitkSurfaceUtilities::OnAddOutliers()
+  {
+  //########## check if everything is ready... ##################
+  mitk::DataNode* node = m_Controls.m_applySurfaceBox->GetSelectedNode();
+  if (!node)
+    {
+    // Nothing selected. Inform the user and return
+    MITK_WARN << "ERROR: Please select a surface before!";
+    return;
+    }
+  //#############################################################
+
+  double outlierChance = (double)m_Controls.m_outlierChance->value() / 100.0;
+  mitk::SurfaceModifier::Pointer myModifier = mitk::SurfaceModifier::New();
+  myModifier->AddOutlierToSurface(dynamic_cast<mitk::Surface*>(m_Controls.m_applySurfaceBox->GetSelectedNode()->GetData()),
+                                                               m_Controls.m_outlierVarianceX->value(),
+                                                               m_Controls.m_outlierVarianceY->value(),
+                                                               m_Controls.m_outlierVarianceZ->value(),
+                                                               outlierChance);
+  }
+
+void QmitkSurfaceUtilities::OnGenerateTargetPoints()
+  {
+  //########## check if everything is ready... ##################
+  mitk::DataNode* node = m_Controls.m_applySurfaceBox->GetSelectedNode();
+  if (!node)
+    {
+    // Nothing selected. Inform the user and return
+    MITK_WARN << "ERROR: Please select a surface before!";
+    return;
+    }
+  //#############################################################
+
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
+
+  mitk::TargetPointsCalculator::Pointer myTargetPointsCalculator = mitk::TargetPointsCalculator::New();
+  myTargetPointsCalculator->SetInterPointDistance(m_Controls.m_InterPointDistance->value());
+  myTargetPointsCalculator->SetInput(surface);
+  MITK_INFO << "Calculating Target Points (this may take a while) ..." << std::endl;
+  myTargetPointsCalculator->DoCalculate();
+  mitk::PointSet::Pointer targetPoints = myTargetPointsCalculator->GetOutput();
+  MITK_INFO << "      ... done." << std::endl;
+
+  mitk::DataNode::Pointer targetPointsImageNode = mitk::DataNode::New();
+  targetPointsImageNode->SetName("Target Points");
+  targetPointsImageNode->SetData(targetPoints);
+  this->GetDataStorage()->Add(targetPointsImageNode);
+  }
 
 void QmitkSurfaceUtilities::OnApplyTransformClicked()
 {

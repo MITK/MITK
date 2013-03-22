@@ -603,7 +603,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QGroupBox" name="groupBox_10">
          <property name="title">
-          <string/>
+          <string>Gaussian Noise</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
@@ -984,7 +984,7 @@ p, li { white-space: pre-wrap; }
             <number>999</number>
            </property>
            <property name="value">
-            <number>20</number>
+            <number>50</number>
            </property>
           </widget>
          </item>

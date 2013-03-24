@@ -733,8 +733,18 @@ int main(int argc, char** argv)
   {
     std::cout << US_RCC_EXECUTABLE_NAME " - A resource compiler for C++ Micro Services modules\n"
                  "\n"
-                 "Usage: " US_RCC_EXECUTABLE_NAME " LIBNAME OUTPUT INPUT...  [-c COMPRESSION_LEVEL] [-t COMPRESSION_THRESHOLD] [-d ROOT_DIR INPUT [INPUT]]...\n"
-                 "Convert all INPUT files into hex code embedded in C funtions written to OUTPUT.\n";
+                 "Usage: " US_RCC_EXECUTABLE_NAME " LIBNAME OUTPUT INPUT...  "
+                 "[-c COMPRESSION_LEVEL] [-t COMPRESSION_THRESHOLD] [-d ROOT_DIR INPUT...]...\n\n"
+                 "Convert all INPUT files into hex code written to OUTPUT.\n"
+                 "\n"
+                 "  LIBNAME The modules library name as it is specified in the US_INITIALIZE_MODULE macro\n"
+                 "  OUTPUT  Absolute path for the generated source file\n"
+                 "  INPUT   Path to the resource file, relative to the current working directory or"
+                 " the preceeding ROOT_DIR argument\n"
+                 "  -c      The Zip compression level (0-9) or -1 [defaults to -1, the default level]\n"
+                 "  -t      Size reduction threshold (0-100) to trigger compression [defaults to 30]\n"
+                 "  -d      Absolute path to a directory containing resource files. All following INPUT"
+                 " files must be relative to this root path\n";
     exit(EXIT_SUCCESS);
   }
 

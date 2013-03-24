@@ -15,10 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRigidRegistrationPreset.h"
-#include "mitkStandardFileLocations.h"
 #include "mitkMetricParameters.h"
 #include "mitkOptimizerParameters.h"
 #include "mitkTransformParameters.h"
+
+#include "mitkGetModuleContext.h"
+#include "mitkModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
 
 namespace mitk {
 
@@ -34,20 +39,7 @@ namespace mitk {
 
   bool RigidRegistrationPreset::LoadPreset()
   {
-    std::string location1 = MITK_ROOT;
-    std::string location2 = "/QFunctionalities/QmitkRigidRegistration";
-    std::string location = location1 + location2;
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(location.c_str(), true);
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch("/bin", true);
-    std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml", "Config");
-
-    if (!xmlFileName.empty())
-    {
-      m_XmlFileName = xmlFileName;
-      return LoadPreset(m_XmlFileName);
-    }
-    else
-      return false;
+    return LoadPreset("mitkRigidRegistrationPresets.xml");
   }
 
   bool RigidRegistrationPreset::LoadPreset(std::string fileName)
@@ -55,8 +47,12 @@ namespace mitk {
     if ( fileName.empty() )
       return false;
 
-    vtkXMLParser::SetFileName( fileName.c_str() );
-    m_XmlFileName = fileName;
+    ModuleResource presetResource = GetModuleContext()->GetModule()->GetResource(fileName);
+    if (!presetResource) return false;
+
+    ModuleResourceStream presetStream(presetResource);
+
+    vtkXMLParser::SetStream(&presetStream);
 
     if ( !vtkXMLParser::Parse() )
     {

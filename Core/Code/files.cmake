@@ -357,4 +357,6 @@ Interactions/Tests/StatemachineTest.xml
 Interactions/Tests/StatemachineConfigTest.xml
 
 Shaders/mitkShaderLighting.xml
+
+mitkLevelWindowPresets.xml
 )

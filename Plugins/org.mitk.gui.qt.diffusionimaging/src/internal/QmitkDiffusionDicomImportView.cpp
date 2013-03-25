@@ -549,11 +549,22 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       unsigned int size2 = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size2 ; ++i )
       {
-        Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
-        headerReader = mitk::DicomDiffusionImageHeaderReader::New();
-        headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
-        headerReader->Update();
-        inHeaders.push_back(headerReader->GetOutput());
+        // Hot Fix for Bug 14459, catching if no valid data in datafile.
+        try
+        {
+          Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
+          headerReader = mitk::DicomDiffusionImageHeaderReader::New();
+          headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
+          headerReader->Update();
+          inHeaders.push_back(headerReader->GetOutput());
+        }
+        catch (mitk::Exception e)
+        {
+          Error("Could not read file header, ABORTING");
+          if(m_OutputFolderNameSet) logfile << e;
+          continue;
+        }
+
         //Status(std::endl;
       }
       mitk::ProgressBar::GetInstance()->Progress();

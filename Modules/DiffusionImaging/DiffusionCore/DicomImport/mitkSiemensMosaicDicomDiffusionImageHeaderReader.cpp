@@ -134,6 +134,13 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     // parse NumberOfImagesInMosaic from 0029,1010 tag
     valueArray.resize(0);
     nItems = ExtractSiemensDiffusionInformation(tag, "NumberOfImagesInMosaic", valueArray);
+
+    // Hot-Fix for Bug 14459, no valid Tag (0029,1010)
+    if (valueArray.size() < 1) // NO data was found
+    {
+        mitkThrow() << "MOSAIC Image has no valid tag (0029,1010). ABORTING";
+        return;
+    }
     if (nItems == 0)  // did not find enough information
     {
       std::cout << "Warning: Cannot find complete information on NumberOfImagesInMosaic in 0029|1010\n";

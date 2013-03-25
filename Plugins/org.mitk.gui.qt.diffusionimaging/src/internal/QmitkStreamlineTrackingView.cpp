@@ -138,7 +138,7 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
     m_SeedRoi = NULL;
     m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
-    m_Controls->m_RoiImageLabel->setText("<font color='grey'>optional</font>");
+    m_Controls->m_RoiImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
 
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )

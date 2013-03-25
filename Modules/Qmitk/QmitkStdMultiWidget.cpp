@@ -1648,10 +1648,10 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
 
   mitk::DataNode::Pointer node;
+  mitk::DataNode::Pointer topSourceNode;
   mitk::Image::Pointer image;
-
-  node = this->GetTopLayerNode(nodes);
   bool isBinary = false;
+  node = this->GetTopLayerNode(nodes);
   if(node.IsNotNull())
   {
     node->GetBoolProperty("binary",isBinary);
@@ -1660,10 +1660,21 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
       if(!sourcenodes->empty())
       {
-        node = this->GetTopLayerNode(sourcenodes);
+        topSourceNode = this->GetTopLayerNode(sourcenodes);
+      }
+      if(topSourceNode.IsNotNull())
+      {
+        image = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+      }
+      else
+      {
+        image = dynamic_cast<mitk::Image*>(node->GetData());
       }
     }
-    image = dynamic_cast<mitk::Image*>(node->GetData());
+    else
+    {
+      image = dynamic_cast<mitk::Image*>(node->GetData());
+    }
   }
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();

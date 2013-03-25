@@ -94,8 +94,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 {
     // check if enough fiducials are available
     for (int i=0; i<m_Fiducials.size(); i++)
-        if (m_Fiducials.at(i).size()<3)
-            itkExceptionMacro("At least 3 fiducials needed per fiber bundle!");
+        if (m_Fiducials.at(i).size()<2)
+            itkExceptionMacro("At least 2 fiducials needed per fiber bundle!");
 
     for (int i=0; i<m_Fiducials.size(); i++)
     {

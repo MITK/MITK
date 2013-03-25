@@ -638,7 +638,7 @@ void QmitkFiberfoxView::GenerateFibers()
             }
             count++;
         }
-        if (fib.size()>2)
+        if (fib.size()>1)
         {
             fiducials.push_back(fib);
             fliplist.push_back(flip);

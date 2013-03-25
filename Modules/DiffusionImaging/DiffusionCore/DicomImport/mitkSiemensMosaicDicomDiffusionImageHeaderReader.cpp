@@ -138,8 +138,9 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     // Hot-Fix for Bug 14459, no valid Tag (0029,1010)
     if (valueArray.size() < 1) // NO data was found
     {
-        mitkThrow() << "MOSAIC Image has no valid tag (0029,1010). ABORTING";
-        return;
+      MITK_ERROR << "MOSAIC Image has no valid tag (0029,1010). ABORTING" << std::endl;
+      mitkThrow() << "MOSAIC Image has no valid tag (0029,1010). ABORTING";
+      return;
     }
     if (nItems == 0)  // did not find enough information
     {

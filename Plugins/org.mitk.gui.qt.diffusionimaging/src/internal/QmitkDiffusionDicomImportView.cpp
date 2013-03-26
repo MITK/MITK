@@ -484,16 +484,23 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
         unsigned int nAcquis = values3.size();
 
-        if(nAcquis != 1)
+        if(nAcquis > 1) // More than one element must have this tag (Not != )
         {
           subsorter.SetSortFunction( SortByAcquisitionNumber );
           it = values3.begin();
         }
-        else
+        else if (values4.size() > 1)
         {
           nAcquis = values4.size();
           subsorter.SetSortFunction( SortBySeqName );
           it = values4.begin();
+        }
+        // Hotfix for Bug 14758, better fix by selecting always availible tags.
+        else
+        {
+          Error("Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING");
+          if(m_OutputFolderNameSet) logfile << "Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING\n";
+          continue;
         }
         nTotalAcquis += nAcquis;
         subsorter.Sort( sub );
@@ -526,6 +533,14 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           seriesUIDs.push_back(identifier.c_str());
         }
         ++it2;
+      }
+
+      // Hot Fix for Bug 14758, checking if no file is acuired.
+      if (nTotalAcquis < 1) // Test if zero, if true than error because no file was selected
+      {
+        Error("Nno files in acquisitions, ABORTING");
+        if(m_OutputFolderNameSet) logfile << "Nno files in acquisitions, ABORTING \n";
+        continue;
       }
 
       if(nfiles % nTotalAcquis != 0)

@@ -236,6 +236,7 @@ void testBinaryResource(Module* module)
   US_TEST_CONDITION(png.eof(), "EOF check");
 }
 
+#ifdef US_ENABLE_RESOURCE_COMPRESSION
 void testCompressedResource(Module* module)
 {
   ModuleResource res = module->GetResource("/icons/compressable.bmp");
@@ -275,6 +276,7 @@ void testCompressedResource(Module* module)
   US_TEST_CONDITION_REQUIRED(isEqual, "Equal binary contents");
   US_TEST_CONDITION(bmp.eof(), "EOF check");
 }
+#endif
 
 struct ResourceComparator {
   bool operator()(const ModuleResource& mr1, const ModuleResource& mr2) const

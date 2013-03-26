@@ -1,7 +1,7 @@
 /**
 \page MITKUserManualPage The MITK User Manual
 
-Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them. 
+Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them.
 
 Available sections:
   - \ref MITKUserManualPageOverview
@@ -31,14 +31,13 @@ The datamanager and the \ref MITKUserManualPagePerspectives have their own help 
   - The \ref MITKUserManualPageMenu
   - The \ref MITKUserManualPageLevelWindow
   - The \ref MITKUserManualPageMemoryUsage
-  - The \ref MITKUserManualPageViews
 
-\section MITKUserManualPageMultiWidget Four Window View  
-  
+\section MITKUserManualPageMultiWidget Four Window View
+
 \subsection MITKUserManualPageMultiWidgetOverview Overview
 
 The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the axial window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
-  
+
 Once you select a point within the picture, informations about it are displayed at the bottom of the screen.
 
 \subsection MITKUserManualPageMultiWidgetNavigation Navigation
@@ -53,7 +52,7 @@ By moving the cursor to the upper right corner of any window you can activate th
 
 \image html Crosshair_Modes.png "Crosshair"
 
-The crosshair button allows you toggle the crosshair, reset the view and change the behaviour of the planes. 
+The crosshair button allows you toggle the crosshair, reset the view and change the behaviour of the planes.
 
 Activating either of the rotation modes allows you to rotate the planes visible in a 2D window by moving the mouse cursor close to them and click and dragging once it changes to indicate that rotation can be done.
 
@@ -65,11 +64,11 @@ The middle button expands the corresponding window to fullscreen within the four
 \image html Views_Choices.png "Layout Choices"
 
 The right button allows you to choose between many different layouts of the four window view to use the one most suited to your task.
-  
+
 \section MITKUserManualPageMenu Menu
 
 \subsection MITKUserManualPageFile File
-This dialog allows you to save, load and clear entire projects, this includes any nodes in the data manager. 
+This dialog allows you to save, load and clear entire projects, this includes any nodes in the data manager.
 
 \subsection MITKUserManualPageEdit Edit
 This dialog supports undo and redo operations as well as the image navigator, which gives you sliders to navigate through the data quickly.
@@ -78,15 +77,10 @@ This dialog supports undo and redo operations as well as the image navigator, wh
 
 This dialog allows you to open a new window, change between perspectives and reset your current one to default settings.
 
-
-If you want to use an operation of a certain perspective within another perspective the "Show View" menu allows to select a specific function that is opened and can be moved within the working areas according to your wishes. Be aware that not every function works with every perspective in a meaningful way.
-
 The Preferences dialog allows you to adjust and save your custom settings.
 
-\image html Window_Dropdown.png "Preferences"
-
 \subsection MITKUserManualPageHelp Help
-This dialog contains this help, the welcome screen and information about MITK.
+This dialog contains this help, the welcome screen and information about MITK Diffusion.
 
 \section MITKUserManualPageLevelWindow Levelwindow
 
@@ -100,18 +94,12 @@ You can pick the levelwindow with the mouse to move it up and down, while moving
 
 The System Load Indicator in the lower right hand corner of the screen gives information about the memory currently required by the MITK application. Keep in mind that image processing is a highly memory intensive task and monitor the indicator to avoid your system freezing while constantly swapping to the hard drive.
 
-\section MITKUserManualPageViews Views
-
-Each solution for a specific problem that is self contained is realized as a single view. Thus you can create a workflow for your problem by combining the capabilities of different views to suit your needs.
-One elegant way to do this is by combining views in \ref MITKUserManualPagePerspectives.
-
-By pressing and holding the left mouse button on a views tab you can move it around to suit your needs, even out of the application window. 
-
 \section MITKUserManualPagePerspectives Perspectives
 
 The different tasks that arise in medical imaging need very different approaches. To acknowledge this circumstance MITK supplies a framework that can be build uppon by very different solutions to those tasks. These solutions are called perspectives, each of them works independently of others although they might be used in sequence to achieve the solution of more difficult problems.
 
-It is possible to switch between the perspectives using the "Window"->"Open Perspective" dialog.
+It is possible to switch between the perspectives using the "Window"->"Open Perspective" dialog, using the Welcome Screen or by using the bar on top of the editor area.
+
 
 
 See \ref MITKUserManualPageMenu for more information about switching perspectives.

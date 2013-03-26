@@ -7,7 +7,6 @@ MITK provides several views for the registration of images.
 
 \section RegistrationModuleOverviewPageList List of Views
 
-  \li \subpage org_mitk_views_deformableregistration
   \li \subpage org_mitk_views_pointbasedregistration
   \li \subpage org_mitk_views_rigidregistration
 

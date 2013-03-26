@@ -72,9 +72,9 @@ namespace itk
 
 }
 
-//#ifndef ITK_MANUAL_INSTANTIATION
-//#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
-//#endif
+#ifndef ITK_MANUAL_INSTANTIATION
+#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
+#endif
 
 
 #endif /* ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H */

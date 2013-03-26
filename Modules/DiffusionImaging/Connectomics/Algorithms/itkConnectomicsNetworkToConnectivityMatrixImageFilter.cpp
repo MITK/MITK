@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
-
 #include <itkImageRegionIterator.h>
 
 #include <vector>

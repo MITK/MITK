@@ -69,6 +69,14 @@ void mitk::PlanarFigureInteractor::SetMinimumPointDistance( ScalarType minimumDi
 float mitk::PlanarFigureInteractor
 ::CanHandleEvent(StateEvent const* stateEvent) const
 {
+  // check if node is visible
+  bool isVisible = false;
+  m_DataNode->GetVisibility( isVisible, NULL );
+  if ( !isVisible ) // if node is not visible -> do not handle event!
+  {
+    return 0.0;
+  }
+
   // If it is a key event that can be handled in the current state,
   // then return 0.5
   mitk::DisplayPositionEvent const *disPosEvent =

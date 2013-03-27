@@ -314,18 +314,19 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
         //be removed in one of the upcomng releases.
         if(readProperties->GetProperty("Image Rendering.Mode") == NULL )
         {
-          mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-          renderingMode->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
           mitk::BaseProperty* useColorProperty = readProperties->GetProperty("use color");
           if(mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(useColorProperty))
           {
             bool useColor = boolProp->GetValue();
             readProperties->DeleteProperty("use color");
-            if(!useColor)
-                renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+            mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+            if(useColor)
+              renderingMode->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
+            else
+              renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+            readProperties->SetProperty("Image Rendering.Mode", renderingMode);
+            MITK_WARN << "The property 'use color' has been found in a scene file and was replaced by 'Image Rendering.Mode'. 'use color' is deprecated since 2013.03 release.";
           }
-          MITK_WARN << "The property 'use color' has been found in a scene file and was replaced by 'Image Rendering.Mode'. 'use color' is deprecated since 2013.03 release.";
-          readProperties->SetProperty("Image Rendering.Mode", renderingMode);
 
         }
         propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace

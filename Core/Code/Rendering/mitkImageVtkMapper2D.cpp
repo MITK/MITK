@@ -537,8 +537,13 @@ void mitk::ImageVtkMapper2D::ApplyRenderingMode( mitk::BaseRenderer* renderer )
   else
   {
     //all other image types can make use of the rendering mode
+    int renderingMode = mitk::RenderingModeProperty::LEVELWINDOW_COLOR;
     mitk::RenderingModeProperty::Pointer mode = dynamic_cast<mitk::RenderingModeProperty*>(this->GetDataNode()->GetProperty( "Image Rendering.Mode", renderer ));
-    switch(mode->GetRenderingMode())
+    if(mode.IsNotNull())
+    {
+      renderingMode = mode->GetRenderingMode();
+    }
+    switch(renderingMode)
     {
     case mitk::RenderingModeProperty::LEVELWINDOW_COLOR:
       MITK_DEBUG << "'Image Rendering.Mode' = LevelWindow_Color";

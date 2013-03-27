@@ -29,7 +29,7 @@ mitk::ImageSource::ImageSource()
 
 itk::DataObject::Pointer mitk::ImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
+  return static_cast<itk::DataObject *>(mitk::Image::New().GetPointer());
 }
 
 
@@ -40,7 +40,7 @@ itk::DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifi
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
+  return static_cast<itk::DataObject *>(mitk::Image::New().GetPointer());
 }
 
 /**

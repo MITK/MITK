@@ -104,8 +104,6 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( m_SelectedFB.empty() )
     {
-        m_Controls->m_InputData->setTitle("Please Select Input Data");
-
         m_Controls->m_ProcessFiberBundleButton->setEnabled(false);
         m_Controls->m_ResampleFibersButton->setEnabled(false);
         m_Controls->m_FaColorFibersButton->setEnabled(false);
@@ -119,8 +117,6 @@ void QmitkFiberProcessingView::UpdateGui()
     }
     else
     {
-        m_Controls->m_InputData->setTitle("Input Data");
-
         m_Controls->m_ProcessFiberBundleButton->setEnabled(true);
         m_Controls->m_ResampleFibersButton->setEnabled(true);
         m_Controls->m_PruneFibersButton->setEnabled(true);
@@ -139,22 +135,17 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
     m_SelectedSurfaces.clear();
     m_SelectedImage = NULL;
 
-    m_Controls->m_FibLabel->setText("<font color='red'>mandatory</font>");
-    m_Controls->m_PfLabel->setText("<font color='grey'>needed for extraction</font>");
-
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
         if ( dynamic_cast<mitk::FiberBundleX*>(node->GetData()) )
         {
-            m_Controls->m_FibLabel->setText(node->GetName().c_str());
             m_SelectedFB.push_back(node);
         }
         else if (dynamic_cast<mitk::Image*>(node->GetData()))
             m_SelectedImage = dynamic_cast<mitk::Image*>(node->GetData());
         else if (dynamic_cast<mitk::Surface*>(node->GetData()))
         {
-            m_Controls->m_PfLabel->setText(node->GetName().c_str());
             m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
         }
     }

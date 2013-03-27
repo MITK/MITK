@@ -23,6 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <list>
 
+#include "mitkInteractionEventObserver.h"
+// MicroServices
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+
+
 mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
@@ -128,7 +135,24 @@ bool mitk::ToolManager::ActivateTool(int id)
 
   //If a tool is deactivated set the event notification policy of the global interaction to multiple again
   if (id == -1)
+  {
     GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
+    // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
+    // in new interaction framework
+    std::list<mitk::ServiceReference> listEventObserver;
+    ServiceTracker<InteractionEventObserver*>* eventObserverTracker= new ServiceTracker<InteractionEventObserver*>(GetModuleContext());
+    eventObserverTracker->Open();
+    eventObserverTracker->GetServiceReferences(listEventObserver); // query all registered interaction event observer
+    for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+    {
+      InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
+      if (interactionEventObserver != NULL) {
+        interactionEventObserver->Enable();  // re-enable the interaction
+      }
+    }
+    eventObserverTracker->Close();
+    delete eventObserverTracker;
+  }
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
@@ -166,6 +190,21 @@ bool mitk::ToolManager::ActivateTool(int id)
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         //If a tool is activated set event notification policy to one
         GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
+        // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
+        // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+        std::list<mitk::ServiceReference> listEventObserver;
+        ServiceTracker<InteractionEventObserver*>* eventObserverTracker= new ServiceTracker<InteractionEventObserver*>(GetModuleContext());
+        eventObserverTracker->Open();
+        eventObserverTracker->GetServiceReferences(listEventObserver);
+        for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+        {
+          InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
+          if (interactionEventObserver != NULL) {
+            interactionEventObserver->Disable();  // disable the interaction
+          }
+        }
+        eventObserverTracker->Close();
+        delete eventObserverTracker;
       }
     }
   }

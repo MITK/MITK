@@ -53,8 +53,9 @@ nmake install
 
 \section BuildInstructions_Get_Source Get a source tree
 
-Since MITK is under active development we recommend to use git to get
-the most recent version. To make sure you get a stable tree, check the
+Since MITK is under active development we recommend to use git to check out
+the latest stable release from the homepage. If you decide to use the most current nightly
+release, make sure to get a stable tree: Check the
 <a href="http://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
 before checking out. If the build tree is not clean, you can specify an
 older revision for the checkout or get a stable tar ball from

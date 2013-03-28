@@ -145,18 +145,19 @@ MergeDiffusionImagesFilter<TScalarType>
         int c=0;
         for (int i=0; i<m_GradientLists.size(); i++)
         {
-            double bValue = m_BValues.at(i);
             GradientListType::Pointer gradients = m_GradientLists.at(i);
             typename DwiImageType::Pointer img = m_ImageVolumes.at(i);
 
             for (int j=0; j<gradients->Size(); j++)
             {
                 GradientType g = gradients->GetElement(j);
+                double mag = g.two_norm();
 
-                if (g.magnitude()>0.0001)
+                if (mag>0.0001)
                 {
+                    double frac = m_BValues.at(i)*mag*mag/m_BValue;
                     g.normalize();
-                    g *= std::sqrt(bValue/m_BValue);
+                    g *= sqrt(frac);
                 }
                 else
                     g = zeroG;

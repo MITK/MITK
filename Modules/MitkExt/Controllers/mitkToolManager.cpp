@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 #include "mitkInteractionEventObserver.h"
+#include "mitkDisplayInteractor.h"
 // MicroServices
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
@@ -147,7 +148,11 @@ bool mitk::ToolManager::ActivateTool(int id)
     {
       InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
       if (interactionEventObserver != NULL) {
-        interactionEventObserver->Enable();  // re-enable the interaction
+        DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(interactionEventObserver);
+        if (displayInteractor != NULL) {
+          // here the regular configuration is loaded again
+          displayInteractor->LoadEventConfig("DisplayConfigMITK.xml","Mitk");
+        }
       }
     }
     eventObserverTracker->Close();
@@ -200,7 +205,11 @@ bool mitk::ToolManager::ActivateTool(int id)
         {
           InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
           if (interactionEventObserver != NULL) {
-            interactionEventObserver->Disable();  // disable the interaction
+            DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(interactionEventObserver);
+            if (displayInteractor != NULL) {
+              // here the regular configuration is loaded again
+              displayInteractor->LoadEventConfig("Legacy/DisplayConfigMITKTools.xml","Mitk");
+            }
           }
         }
         eventObserverTracker->Close();

@@ -96,10 +96,11 @@ namespace mitk
   const std::string KeyF12 = "F12";
 
   const std::string KeyPos1 = "Pos1";
-  const std::string KeyEend = "End";
+  const std::string KeyEnd = "End";
   const std::string KeyInsert = "Insert";
   const std::string KeyPageUp = "PageUp";
   const std::string KeyPageDown = "PageDown";
+  const std::string KeySpace = "Space";
   // End special keys
 
   // XML Tags

@@ -48,6 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLayerController.h"
 
+#include <iomanip>
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager)
 : QWidget(parent, f),
 mitkWidget1(NULL),
@@ -1651,13 +1653,13 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
     mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep);
-    if (fabs(pixelValue)>1000000)
+    if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image->GetPixelValueByIndex(p, timestep)<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< std::scientific<< pixelValue <<"  ";
     }
     else
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image->GetPixelValueByIndex(p, timestep)<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
     }
   }
   else
@@ -1667,8 +1669,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   statusText = stream.str();
   mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-
-
 }
 
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()

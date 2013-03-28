@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkPythonSnippets</class>
+ <widget class="QWidget" name="QmitkPythonSnippets">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>613</width>
+    <height>436</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="Name">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Content:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QTextEdit" name="Content"/>
+   </item>
+  </layout>
+  <action name="PasteSnippet">
+   <property name="icon">
+    <iconset resource="resources/mitkPython.qrc">
+     <normaloff>:/mitkPython/edit-paste.png</normaloff>:/mitkPython/edit-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste snippet!</string>
+   </property>
+   <property name="toolTip">
+    <string>Push button to paste the snippet into the console or the editor. Or double click on the snippet text window.</string>
+   </property>
+  </action>
+  <action name="RemoveSnippet">
+   <property name="icon">
+    <iconset resource="resources/mitkPython.qrc">
+     <normaloff>:/mitkPython/edit-delete.png</normaloff>:/mitkPython/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove snippet</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove the selected snippet.</string>
+   </property>
+  </action>
+  <action name="RenameSnippet">
+   <property name="icon">
+    <iconset resource="resources/mitkPython.qrc">
+     <normaloff>:/mitkPython/edit-find-replace.png</normaloff>:/mitkPython/edit-find-replace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename snippet</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename the selected snippet.</string>
+   </property>
+  </action>
+  <action name="AddSnippet">
+   <property name="icon">
+    <iconset resource="resources/mitkPython.qrc">
+     <normaloff>:/mitkPython/document-new.png</normaloff>:/mitkPython/document-new.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add snippet</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new snippet to the list.</string>
+   </property>
+  </action>
+  <action name="RestoreDefaultSnippets">
+   <property name="icon">
+    <iconset resource="resources/mitkPython.qrc">
+     <normaloff>:/mitkPython/edit-clear.png</normaloff>:/mitkPython/edit-clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Restore default snippets</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear and restore the default snippets.</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resources/mitkPython.qrc"/>
+ </resources>
+ <connections/>
+</ui>

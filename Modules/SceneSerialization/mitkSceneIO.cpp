@@ -157,7 +157,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   SceneReader::Pointer reader = SceneReader::New();
   if ( !reader->LoadScene( document, m_WorkingDirectory, storage ) )
   {
-    MITK_ERROR << "There were errors while loding scene file " << filename << ". Your data may be corrupted";
+    MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
   }
 
   // delete temp directory

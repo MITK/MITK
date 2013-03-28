@@ -199,6 +199,7 @@ set(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
+  DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
@@ -254,6 +255,7 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
+  Interfaces/mitkIShaderRepository.cpp
 
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
@@ -331,6 +333,7 @@ set(CPP_FILES
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+  Common/mitkCoreServices.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
@@ -347,9 +350,14 @@ Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
+Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 Interactions/Tests/AddAndRemovePoints.xml
 Interactions/Tests/globalConfig.xml
 Interactions/Tests/StatemachineTest.xml
 Interactions/Tests/StatemachineConfigTest.xml
+
+Shaders/mitkShaderLighting.xml
+
+mitkLevelWindowPresets.xml
 )

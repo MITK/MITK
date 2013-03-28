@@ -47,11 +47,7 @@ DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
   m_BValue(1.0),
   m_Lambda(0.0),
   m_IsHemisphericalArrangementOfGradientDirections(false),
-  m_IsArithmeticProgession(false),
-  m_UseWeights(false),
-  m_WeightShell1(0.0),
-  m_WeightShell2(0.0),
-  m_WeightShell3(0.0)
+  m_IsArithmeticProgession(false)
 {
   // At least 1 inputs is necessary for a vector image.
   // For images added one at a time we need at least six
@@ -449,19 +445,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
         const int number_coeffs_shell3 = (int)(interp_SHOrder_shell3*interp_SHOrder_shell3 + interp_SHOrder_shell3 + 2.0)/2.0 + interp_SHOrder_shell3;
 
-
-        // find shell with max(dirs)
-        if(m_UseWeights){
-          double maxDirs = size_shell3;
-          if(size_shell2 > maxDirs) maxDirs = size_shell2;
-          if(size_shell1 > maxDirs) maxDirs = size_shell1;
-
-          // calculate weights
-          m_WeightShell1 = size_shell1 / maxDirs;
-          m_WeightShell2 = size_shell2 / maxDirs;
-          m_WeightShell3 = size_shell3 / maxDirs;
-        }
-
         // Create direction container for all directions (no duplicates, different directions from all shells)
         IndiciesVector  all_directions_container = GetAllDirections();
         m_MaxDirections = all_directions_container.size();
@@ -549,19 +532,19 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         MITK_INFO << "  SHOrder: " << interp_SHOrder_shell1;
         MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell1;
         MITK_INFO << "  Number of Gradientdirections: " << size_shell1;
-        if(m_WeightShell1 != 0) MITK_INFO << "  Information content: " << m_WeightShell1;
+
 
         MITK_INFO << "Shell 2";
         MITK_INFO << "  SHOrder: " << interp_SHOrder_shell2;
         MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell2;
         MITK_INFO << "  Number of Gradientdirections: " << size_shell2;
-        if(m_WeightShell2 != 0) MITK_INFO << "  Information content: " << m_WeightShell2;
+
 
         MITK_INFO << "Shell 3";
         MITK_INFO << "  SHOrder: " << interp_SHOrder_shell3;
         MITK_INFO << "  Number of Coeffs: " << number_coeffs_shell3;
         MITK_INFO << "  Number of Gradientdirections: " << size_shell3;
-        if(m_WeightShell3 != 0) MITK_INFO << "  Information content: " << m_WeightShell3;
+
 
         MITK_INFO << "Overall";
         MITK_INFO << "  SHOrder: " << L;
@@ -884,14 +867,6 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
         E1 = (DataShell1);
         E2 = (DataShell2);
         E3 = (DataShell3);
-      }
-
-      //signal weighting according to information content
-      if(m_UseWeights)
-      {
-        E1 *= m_WeightShell1;
-        E2 *= m_WeightShell2;
-        E3 *= m_WeightShell3;
       }
 
       //Implements Eq. [19] and Fig. 4.

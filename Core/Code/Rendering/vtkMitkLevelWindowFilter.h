@@ -36,7 +36,13 @@ class vtkScalarsToColors;
 */
 class MITK_CORE_EXPORT vtkMitkLevelWindowFilter : public vtkImageToImageFilter
 {
+
+
 public:
+  vtkTypeMacro(vtkMitkLevelWindowFilter,vtkImageToImageFilter);
+
+  static vtkMitkLevelWindowFilter *New();
+
   virtual unsigned long int GetMTime();
   /** \brief Get the lookup table for the RGB level window */
   vtkScalarsToColors* GetLookupTable();

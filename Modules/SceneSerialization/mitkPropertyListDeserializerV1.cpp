@@ -79,7 +79,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
         }
         else
         {
-          MITK_ERROR << "There were errors while loding property '" << key << "' of type " << type << ". Your data may be corrupted";
+          MITK_ERROR << "There were errors while loading property '" << key << "' of type " << type << ". Your data may be corrupted";
           error = true;
         }
         break;

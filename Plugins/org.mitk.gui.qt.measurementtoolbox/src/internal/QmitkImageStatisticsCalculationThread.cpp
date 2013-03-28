@@ -154,11 +154,13 @@ void QmitkImageStatisticsCalculationThread::run()
   }
   catch ( const std::runtime_error &e )
   {
+    m_message = "Exception Occurred. See log for details.";
     MITK_ERROR<< "Runtime Exception: " << e.what();
     statisticCalculationSuccessful = false;
   }
   catch ( const std::exception &e )
   {
+    m_message = "Exception Occurred. See log for details.";
     MITK_ERROR<< "Standard Exception: " << e.what();
     statisticCalculationSuccessful = false;
   }

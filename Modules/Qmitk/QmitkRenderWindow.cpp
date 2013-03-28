@@ -122,14 +122,9 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
   { // TODO: INTERACTION_LEGACY
     mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mouseReleaseMitkEvent(&myevent);
+    this->mouseMoveMitkEvent(&myevent);
   }
-
-  mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-  this->mouseMoveMitkEvent(&myevent);
-
   QVTKWidget::mouseMoveEvent(me);
-
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -519,7 +514,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
       break;
 
     case Qt::Key_End:
-          key = mitk::KeyEend;
+          key = mitk::KeyEnd;
           break;
     case Qt::Key_Home:
           key = mitk::KeyPos1;
@@ -532,6 +527,9 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
           break;
     case Qt::Key_PageUp:
           key = mitk::KeyPageUp;
+          break;
+    case Qt::Key_Space:
+          key = mitk::KeySpace;
           break;
     }
   }

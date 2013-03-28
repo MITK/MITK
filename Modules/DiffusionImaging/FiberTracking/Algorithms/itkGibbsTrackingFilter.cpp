@@ -386,7 +386,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         resampler->SetSize( m_QBallImage->GetLargestPossibleRegion().GetSize() );
 
         resampler->SetInput( m_MaskImage );
-        resampler->SetDefaultPixelValue(1.0);
+        resampler->SetDefaultPixelValue(0.0);
         resampler->Update();
         m_MaskImage = resampler->GetOutput();
         MITK_INFO << "GibbsTrackingFilter: resampling finished";

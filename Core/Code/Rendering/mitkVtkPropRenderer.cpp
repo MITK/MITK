@@ -326,6 +326,7 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   // vtk will reenable texturing every time it is needed
   glDisable( GL_TEXTURE_1D );
   glDisable( GL_TEXTURE_2D );
+  glLineWidth(1.0);
 }
 
 /*!

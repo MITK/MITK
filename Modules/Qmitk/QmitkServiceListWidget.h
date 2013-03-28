@@ -97,10 +97,12 @@ class QMITK_EXPORT QmitkServiceListWidget :public QWidget
     *  Make sure you pass the appropriate type, or else this call will fail.
     *  Usually, you will pass the class itself, not the SmartPointer, but the function returns a pointer. Example:
     *  \verbatim mitk::USDevice::Pointer device = GetSelectedService<mitk::USDevice>(); \endverbatim
+    *  @return Returns the current selected device. Returns NULL if no device is selected.
     */
     template <class T>
     T* GetSelectedService()
     {
+      if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
       mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
       return ( m_Context->GetService<T>(ref) );
     }

@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 4e6ac62e)
+    set(revision_tag fef76cef)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -24,6 +24,8 @@ if(MITK_USE_CTK)
     if(MITK_USE_Python)
       list(APPEND ctk_optional_cache_args
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
+           -DCTK_ENABLE_Python_Wrapping:BOOL=ON
+           -DCTK_APP_ctkSimplePythonShell:BOOL=ON
       )
     endif()
 
@@ -49,7 +51,7 @@ if(MITK_USE_CTK)
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 dc553f3da6591d490b4175fb66892276
+      URL_MD5 4d001d855cc3f722827a6cd95bfb7d9c
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

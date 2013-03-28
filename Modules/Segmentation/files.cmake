@@ -56,6 +56,7 @@ Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
 Interactions/mitkContourModelInteractor.cpp
+Interactions/mitkFastMarchingTool.cpp
 IO/mitkContourModelIOFactory.cpp
 IO/mitkContourModelReader.cpp
 IO/mitkContourModelWriter.cpp

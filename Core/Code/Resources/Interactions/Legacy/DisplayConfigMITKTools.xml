@@ -1,13 +1,15 @@
 <!--
 * - MITK : The legacy handling for Tools.
-    Describe which events should trigger an event_variant.
+    Describes which events should trigger an event_variant.
     The corresponding event_variants and their actions are declared in DisplayConfig.xml (in /Resources/Interactions).
     If no event_variant is specified here, this action is disabled during the activation of a tool.
+    So if an action here conflicts with you tool you can comment out this section.
     ! Alternatively you can also just change the event description, so that the actions are triggered by different mouse/key events
     during Tool use. !
+    Refer to 'How to create a Config-File' http://docs.mitk.org/nightly-qt4/Step10Page.html for details.
 
-*   -(deactivated) middle mouse button : panning
-*   -(deactivated) right mouse button  : zooming
+*   - middle mouse button : panning
+*   - right mouse button  : zooming
 *   - wheel               : scrolling
 -->
 <config>
@@ -18,7 +20,6 @@
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
   <param name="alwaysReact" value="false"/>
   <!-- Moving -->
-  <!-- DEACTIVATED
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
@@ -28,9 +29,7 @@
   <event_variant class="MouseMoveEvent" name="Moving">
     <attribute name="ButtonState" value="MiddleMouseButton"/>
   </event_variant>
-  -->
   <!-- Zooming -->
-  <!-- DEACTIVATED
   <event_variant class="MousePressEvent" name="StartZoom">
     <attribute name="EventButton" value="RightMouseButton"/>
   </event_variant>
@@ -40,9 +39,7 @@
   <event_variant class="MouseReleaseEvent" name="EndZooming">
     <attribute name="EventButton" value="RightMouseButton"/>
   </event_variant>
-  -->
-  <!-- PlaneUP and -Down are described twice, this means the transition
-  can be triggered by both events -->
+  <!-- Scrolling trough planes -->
   <event_variant class="MouseWheelEvent" name="PlaneUP">
     <attribute name="ScrollDirection" value="up"/>
   </event_variant>

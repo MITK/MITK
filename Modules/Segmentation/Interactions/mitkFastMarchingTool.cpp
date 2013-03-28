@@ -238,11 +238,14 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   if( m_LastEventSlice != m_LastEventSender->GetSlice() )
   {
     m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
-    m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
 
     CastToItkImage(m_ReferenceSlice, m_SliceInITK);
     smoothing->SetInput( m_SliceInITK );
+
+    this->seeds->clear();
   }
+  m_LastEventSlice = m_LastEventSender->GetSlice();
+
   mitk::Point3D clickInIndex;
 
   m_ReferenceSlice->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
@@ -256,7 +259,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   node.SetValue( seedValue );
   node.SetIndex( seedPosition );
 
-  this->seeds->InsertElement(0, node);
+  this->seeds->InsertElement(this->seeds->Size(), node);
   fastMarching->SetTrialPoints( seeds );
 
   MITK_INFO << this->seeds->size();

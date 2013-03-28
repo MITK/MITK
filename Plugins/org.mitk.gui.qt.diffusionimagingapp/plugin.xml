@@ -63,9 +63,9 @@
       icon="resources/perspectives/connectomics.png"/>
 
     <perspective id="org.mitk.diffusionimagingapp.perspectives.syntheticdata"
-      name="Synthetic Images"
+      name="Synthetic Data"
       class="QmitkDIAppSyntheticDataGenerationPerspective"
-      icon="resources/perspectives/phantomData2.png"/>
+      icon="resources/perspectives/syntheticdata.png"/>
 
     <perspective id="org.mitk.diffusionimagingapp.perspectives.registration"
       name="Registration"

@@ -82,7 +82,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual bool OnAddPoint(Action*, const StateEvent*);
     virtual bool OnDelete(Action*, const StateEvent*);
 
-    void UpdatePreiviewImage();
+    void UpdatePreviewImage();
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;
@@ -94,6 +94,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 
     Point2I m_LastScreenPosition;
     int m_ScreenYDifference;
+    int m_ScreenXDifference;
 
   private:
 

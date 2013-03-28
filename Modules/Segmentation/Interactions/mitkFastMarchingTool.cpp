@@ -36,8 +36,8 @@ mitk::FastMarchingTool::FastMarchingTool()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
 m_LowerThreshold(200),
 m_UpperThreshold(200),
-m_InitialLowerThreshold(200),
-m_InitialUpperThreshold(200),
+m_InitialLowerThreshold(0.0),
+m_InitialUpperThreshold(100.0),
 m_ScreenYDifference(0),
 m_MouseDistanceScaleFactor(0.5),
 sigma(1.0),
@@ -52,15 +52,11 @@ beta(3.0)
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 
 
-  m_ResultImageNode = mitk::DataNode::New();
-  m_ResultImageNode->SetName("FastMarching_Preview");
-
-
   m_SliceInITK = InternalImageType::New();
 
   thresholder = ThresholdingFilterType::New();
-  thresholder->SetLowerThreshold( 0.0 );
-  thresholder->SetUpperThreshold( 100 );
+  thresholder->SetLowerThreshold( m_InitialLowerThreshold );
+  thresholder->SetUpperThreshold( m_InitialUpperThreshold );
   thresholder->SetOutsideValue( 0 );
   thresholder->SetInsideValue( 255 );
 
@@ -127,21 +123,26 @@ const char* mitk::FastMarchingTool::GetName() const
 
 void mitk::FastMarchingTool::Activated()
 {
-MITK_INFO << "Activated";
   Superclass::Activated();
-  //m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode, this->m_ToolManager->GetReferenceData(0) );
+
+  m_ResultImageNode = mitk::DataNode::New();
+  m_ResultImageNode->SetName("FastMarching_Preview");
+  m_ResultImageNode->SetBoolProperty("helper object", true);
+  m_ResultImageNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode);
 }
 
 void mitk::FastMarchingTool::Deactivated()
 {
   Superclass::Deactivated();
-  //m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
+  m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
+  m_ResultImageNode = NULL;
 }
 
 
 bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
+  MITK_INFO << "MousePressed";
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
@@ -193,15 +194,17 @@ bool mitk::FastMarchingTool::OnMouseMoved(Action* action, const StateEvent* stat
       {
         ApplicationCursor* cursor = ApplicationCursor::GetInstance();
         if (!cursor) return false;
+        m_ScreenXDifference += cursor->GetCursorPosition()[0] - m_LastScreenPosition[0];
         m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
         cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
+        m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenXDifference * m_MouseDistanceScaleFactor);
         m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
 
+        //thresholder->SetLowerThreshold( m_LowerThreshold );
+        thresholder->SetUpperThreshold( m_UpperThreshold );
 
-        // 3. Update the contour
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
+        this->UpdatePreviewImage();
       }
     }
   }
@@ -272,7 +275,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   fastMarching->SetTrialPoints( seeds );
 
 
-  this->UpdatePreiviewImage();
+  this->UpdatePreviewImage();
   return true;
 }
 
@@ -286,13 +289,13 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
   {
     this->seeds->pop_back();
     fastMarching->Modified();
-    this->UpdatePreiviewImage();
+    this->UpdatePreviewImage();
   }
   return true;
 }
 
 
-void mitk::FastMarchingTool::UpdatePreiviewImage()
+void mitk::FastMarchingTool::UpdatePreviewImage()
 {
   if(m_ReferenceSlice.IsNotNull())
   {

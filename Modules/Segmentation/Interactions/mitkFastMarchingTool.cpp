@@ -39,7 +39,10 @@ m_UpperThreshold(200),
 m_InitialLowerThreshold(200),
 m_InitialUpperThreshold(200),
 m_ScreenYDifference(0),
-m_MouseDistanceScaleFactor(0.5)
+m_MouseDistanceScaleFactor(0.5),
+sigma(1.0),
+alpha(-0.5),
+beta(3.0)
 {
   CONNECT_ACTION( AcNEWPOINT, OnMousePressed );
   CONNECT_ACTION( AcMOVEPOINT, OnMouseMoved );
@@ -47,10 +50,54 @@ m_MouseDistanceScaleFactor(0.5)
   CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
+
+
+  m_ResultImageNode = mitk::DataNode::New();
+  m_ResultImageNode->SetName("FastMarching_Preview");
+
+
+  m_SliceInITK = InternalImageType::New();
+
+  thresholder = ThresholdingFilterType::New();
+  thresholder->SetLowerThreshold( 0.0 );
+  thresholder->SetUpperThreshold( 100 );
+  thresholder->SetOutsideValue( 0 );
+  thresholder->SetInsideValue( 255 );
+
+  smoothing = SmoothingFilterType::New();
+  smoothing->SetTimeStep( 0.125 );
+  smoothing->SetNumberOfIterations( 5 );
+  smoothing->SetConductanceParameter( 9.0 );
+
+  gradientMagnitude = GradientFilterType::New();
+  gradientMagnitude->SetSigma( sigma );
+
+  sigmoid = SigmoidFilterType::New();
+  sigmoid->SetAlpha( alpha );
+  sigmoid->SetBeta( beta );
+  sigmoid->SetOutputMinimum( 0.0 );
+  sigmoid->SetOutputMaximum( 1.0 );
+
+  fastMarching = FastMarchingFilterType::New();
+  fastMarching->SetStoppingValue( 50 );
+
+  seeds = NodeContainer::New();
+  seeds->Initialize();
+  fastMarching->SetTrialPoints( seeds );
+
+
+  //set up pipeline
+  smoothing->SetInput( m_SliceInITK );
+  gradientMagnitude->SetInput( smoothing->GetOutput() );
+  sigmoid->SetInput( gradientMagnitude->GetOutput() );
+  fastMarching->SetInput( sigmoid->GetOutput() );
+  thresholder->SetInput( fastMarching->GetOutput() );
 }
 
 mitk::FastMarchingTool::~FastMarchingTool()
 {
+  m_ReferenceSlice = NULL; // don't leak
+  m_WorkingSlice = NULL;
 }
 
 const char** mitk::FastMarchingTool::GetXPM() const
@@ -65,12 +112,16 @@ const char* mitk::FastMarchingTool::GetName() const
 
 void mitk::FastMarchingTool::Activated()
 {
+MITK_INFO << "Activated";
   Superclass::Activated();
+  //m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode, this->m_ToolManager->GetReferenceData(0) );
+  m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode);
 }
 
 void mitk::FastMarchingTool::Deactivated()
 {
   Superclass::Deactivated();
+  //m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
 }
 
 
@@ -80,37 +131,37 @@ bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* s
   if (!positionEvent) return false;
 
   m_LastEventSender = positionEvent->GetSender();
+  if( m_LastEventSlice != m_LastEventSender->GetSlice() )
+  {
+    m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+    m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
+
+    CastToItkImage(m_ReferenceSlice, m_SliceInITK);
+  }
+
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  if ( m_WorkingSlice.IsNotNull() )
   {
-    if (positionEvent)
+    // 2. Determine if the user clicked inside or outside of the segmentation
+    const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
+    Point3D mprojectedPointIn2D;
+    workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D);
+    itk::Index<2> projectedPointInWorkingSlice2D;
+    projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+    projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
+
+    if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
     {
-
-
-      m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
-      m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
-
-      if ( m_WorkingSlice.IsNotNull() )
+      if ( m_ReferenceSlice.IsNotNull() )
       {
-        // 2. Determine if the user clicked inside or outside of the segmentation
-        const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
-        Point3D mprojectedPointIn2D;
-        workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D);
-        itk::Index<2> projectedPointInWorkingSlice2D;
-        projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
-        projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
-
-        if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
-        {
-          if ( m_ReferenceSlice.IsNotNull() )
-          {
-            MITK_INFO << "HeyHo";
-          }
-        }
+        MITK_INFO << "HeyHo";
       }
     }
-  }
+
+
+
+  }    else MITK_INFO << "NO SLICE";
 
   return true;
 }
@@ -154,48 +205,24 @@ If the feedback contour should be filled, then it is done here. (Contour is NOT 
 */
 bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (positionEvent)
   {
-    // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
-    if ( m_WorkingSlice.IsNotNull() )
+    // remember parameters for next time
+    m_InitialLowerThreshold = m_LowerThreshold;
+    m_InitialUpperThreshold = m_UpperThreshold;
+
+    if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
     {
-      const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-      if (positionEvent)
-      {
-        // remember parameters for next time
-        m_InitialLowerThreshold = m_LowerThreshold;
-        m_InitialUpperThreshold = m_UpperThreshold;
-
-
-        // 3. use contour to fill a region in our working slice
-        Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-        if (feedbackContour)
-        {
-          Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
-          // false: don't constrain the contour to the image's inside
-          if (projectedContour.IsNotNull())
-          {
-            FeedbackContourTool::FillContourInSlice( projectedContour, m_WorkingSlice, 1 );
-
-            const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-
-            //MITK_DEBUG << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
-
-            // 4. write working slice back into image volume
-            this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
-          }
-        }
-      }
-
-      FeedbackContourTool::SetFeedbackContourVisible(false);
-      mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
+      MITK_INFO << "Write result";
+      //this->WriteBackSegmentationResult(positionEvent, dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()) );
     }
+
   }
 
-  m_ReferenceSlice = NULL; // don't leak
-  m_WorkingSlice = NULL;
-
+  FeedbackContourTool::SetFeedbackContourVisible(false);
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
 }
@@ -204,6 +231,54 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateEvent)
 {
   MITK_INFO << "AddPoint";
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  m_LastEventSender = positionEvent->GetSender();
+  if( m_LastEventSlice != m_LastEventSender->GetSlice() )
+  {
+    m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+    m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
+
+    CastToItkImage(m_ReferenceSlice, m_SliceInITK);
+    smoothing->SetInput( m_SliceInITK );
+  }
+  mitk::Point3D clickInIndex;
+
+  m_ReferenceSlice->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
+
+  itk::Index<2> seedPosition;
+  seedPosition[0] = clickInIndex[0];
+  seedPosition[1] = clickInIndex[1];
+
+  NodeType node;
+  const double seedValue = 0.0;
+  node.SetValue( seedValue );
+  node.SetIndex( seedPosition );
+
+  this->seeds->InsertElement(0, node);
+  fastMarching->SetTrialPoints( seeds );
+
+  MITK_INFO << this->seeds->size();
+  MITK_INFO << clickInIndex;
+
+  try{
+    thresholder->Update();
+  }
+  catch( itk::ExceptionObject & excep )
+  {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return true;
+  }
+
+  mitk::Image::Pointer result = mitk::Image::New();
+  CastToMitkImage( thresholder->GetOutput(), result);
+  result->GetGeometry()->SetOrigin(m_ReferenceSlice->GetGeometry()->GetOrigin() );
+  result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceSlice->GetGeometry()->GetIndexToWorldTransform() );
+  m_ResultImageNode->SetData(result);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return true;
 }
 

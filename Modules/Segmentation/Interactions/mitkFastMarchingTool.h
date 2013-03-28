@@ -20,13 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
+#include "mitkDataNode.h"
 
+#include "itkImage.h"
+
+//itk filter
+#include "itkFastMarchingImageFilter.h"
+#include "itkBinaryThresholdImageFilter.h"
+#include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
+#include "itkSigmoidImageFilter.h"
+#include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
 namespace mitk
 {
 
 /**
-  \brief FastMarching
+  \brief FastMarching semgentation tool.
 */
 class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
 {
@@ -36,6 +45,24 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     itkNewMacro(FastMarchingTool);
 
 
+    /*
+    typedefs for itk pipeline
+    */
+    typedef float                                                                               InternalPixelType;
+    typedef itk::Image< InternalPixelType, 2 >                                                  InternalImageType;
+    typedef unsigned char                                                                       OutputPixelType;
+    typedef itk::Image< OutputPixelType, 2 >                                            OutputImageType;
+
+    typedef itk::BinaryThresholdImageFilter< InternalImageType, OutputImageType >                       ThresholdingFilterType;
+    typedef itk::CurvatureAnisotropicDiffusionImageFilter< InternalImageType, InternalImageType >       SmoothingFilterType;
+    typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< InternalImageType, InternalImageType >  GradientFilterType;
+    typedef itk::SigmoidImageFilter< InternalImageType, InternalImageType >                             SigmoidFilterType;
+    typedef itk::FastMarchingImageFilter< InternalImageType, InternalImageType >                        FastMarchingFilterType;
+    typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
+    typedef FastMarchingFilterType::NodeType                                                            NodeType;
+
+
+    /* icon */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
 
@@ -68,6 +95,22 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
   private:
 
     ScalarType m_MouseDistanceScaleFactor;
+
+    float sigma;
+    float alpha;
+    float beta;
+
+    NodeContainer::Pointer seeds;
+
+    InternalImageType::Pointer m_SliceInITK;
+
+    mitk::DataNode::Pointer m_ResultImageNode;
+
+    ThresholdingFilterType::Pointer thresholder;
+    SmoothingFilterType::Pointer smoothing;
+    GradientFilterType::Pointer gradientMagnitude;
+    SigmoidFilterType::Pointer sigmoid;
+    FastMarchingFilterType::Pointer fastMarching;
 
 };
 

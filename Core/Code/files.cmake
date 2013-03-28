@@ -347,6 +347,7 @@ Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
+Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 Interactions/Tests/AddAndRemovePoints.xml
 Interactions/Tests/globalConfig.xml

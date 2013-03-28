@@ -179,7 +179,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, numberOfThresholds);
+    levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
     levWinProp->SetLevelWindow( levelwindow );
     resultNode->SetProperty( "levelwindow", levWinProp );
 

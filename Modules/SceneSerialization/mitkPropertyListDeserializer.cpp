@@ -75,7 +75,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
 
       if ( error )
       {
-        MITK_ERROR << "There were errors while loding property list file " << m_Filename << ". Your data may be corrupted";
+        MITK_ERROR << "There were errors while loading property list file " << m_Filename << ". Your data may be corrupted";
       }
       break;
     }

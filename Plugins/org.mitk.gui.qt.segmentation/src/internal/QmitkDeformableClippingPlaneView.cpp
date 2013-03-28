@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPlane.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkVtkRepresentationProperty.h"
@@ -490,6 +491,8 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     }
   }
 
+  //set the rendering mode to use the lookup table and level window
+  clippedNode->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by

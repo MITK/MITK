@@ -1,7 +1,8 @@
 /**
 \page GettingToKnowMITK Getting to know MITK
 
-TODO
+This section will show you around MITK and acquaint you with the basic concepts.
+
 <ul>
   <li> \subpage DirectoryStructurePage </li>
   <li> \subpage TutorialPage</li>

@@ -1,7 +1,7 @@
 /**
 \page FirstSteps First steps in Development
 
-TODO
+This section will show you how to extend MITK for your own project.
 
 <ul>
   <li> \subpage NewPluginPage </li>

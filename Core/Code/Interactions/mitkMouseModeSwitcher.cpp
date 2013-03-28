@@ -41,8 +41,11 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
+    ServiceProperties props;
+    props["name"] = std::string("DisplayInteractor");
     m_ServiceRegistration = GetModuleContext()->RegisterService<InteractionEventObserver>(
-        m_CurrentObserver.GetPointer());
+        m_CurrentObserver.GetPointer(),props);
+
   }
 }
 

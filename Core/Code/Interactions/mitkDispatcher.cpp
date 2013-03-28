@@ -154,17 +154,14 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   m_EventObserverTracker->GetServiceReferences(listEventObserver);
   for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
   {
-
-    Any patternName = it->GetProperty("org.mitk.statemachinepattern");
-
-    //if (!patternName.Empty() || patternName.ToString() == "")
-    //{
-      InteractionEventObserver* interactionEventObserver = m_EventObserverTracker->GetService(*it);
-      if (interactionEventObserver != NULL)
+    InteractionEventObserver* interactionEventObserver = m_EventObserverTracker->GetService(*it);
+    if (interactionEventObserver != NULL)
+    {
+      if (interactionEventObserver->IsEnabled())
       {
         interactionEventObserver->Notify(event, eventIsHandled);
       }
-    //}
+    }
   }
 
   // Process event queue

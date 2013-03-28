@@ -514,7 +514,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
       break;
 
     case Qt::Key_End:
-          key = mitk::KeyEend;
+          key = mitk::KeyEnd;
           break;
     case Qt::Key_Home:
           key = mitk::KeyPos1;
@@ -527,6 +527,9 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
           break;
     case Qt::Key_PageUp:
           key = mitk::KeyPageUp;
+          break;
+    case Qt::Key_Space:
+          key = mitk::KeySpace;
           break;
     }
   }

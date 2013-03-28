@@ -33,6 +33,7 @@ namespace mitk
 
   struct MITK_CORE_EXPORT InteractionEventObserver
   {
+    InteractionEventObserver();
     virtual ~InteractionEventObserver();
       /**
      * By this method all registered EventObersers are notified about every InteractionEvent,
@@ -55,6 +56,12 @@ namespace mitk
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
      */
     virtual void Notify(InteractionEvent* interactionEvent,bool isHandled) = 0;
+
+    void Disable();
+    void Enable();
+    bool IsEnabled();
+  private:
+    bool m_IsEnabled;
   };
 
 } /* namespace mitk */

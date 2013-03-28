@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkInteractionConst.h"
 
+#include "itkOrImageFilter.h"
+
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching tool");
@@ -222,8 +224,23 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
     if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
     {
+      OutputImageType::Pointer segmentationSlice = OutputImageType::New();
+
+      CastToItkImage(GetAffectedWorkingSlice( positionEvent ), segmentationSlice);
+
       MITK_INFO << "Write result";
-      this->WriteBackSegmentationResult(positionEvent, dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()) );
+      typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+      orFilter->SetInput(0, thresholder->GetOutput());
+      orFilter->SetInput(1, segmentationSlice);
+      orFilter->Update();
+
+      mitk::Image::Pointer segmentationResult = mitk::Image::New();
+
+      mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+
+      this->WriteBackSegmentationResult(positionEvent, segmentationResult );
       this->m_ResultImageNode->SetVisibility(false);
       this->ClearSeeds();
     }

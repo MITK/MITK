@@ -20,6 +20,7 @@
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
+#include "mitkMessage.h"
 #include "mitkInteractionEventHandler.h"
 
 #include <MitkExports.h>
@@ -36,8 +37,9 @@ namespace mitk
   /**
    * \class TActionFunctor
    * \brief Base class of ActionFunctors, to provide an easy to connect actions with functions.
+   *
+   * \deprecatedSince{2013_03} Use mitk::Message classes instead.
    */
-
   class MITK_CORE_EXPORT TActionFunctor
   {
   public:
@@ -80,7 +82,7 @@ namespace mitk
    *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
    */
 #define CONNECT_FUNCTION(a, f) \
-    EventStateMachine::AddActionFunction(a, new TSpecificActionFunctor<Self>(this, &Self::f));
+    EventStateMachine::AddActionFunction(a, MessageDelegate2<Self, StateMachineAction*, InteractionEvent*, bool>(this, &Self::f));
 
   /**
    * \class EventStateMachine
@@ -99,7 +101,9 @@ namespace mitk
   public:
     mitkClassMacro(EventStateMachine, InteractionEventHandler)
     itkNewMacro(Self)
-    typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
+
+    typedef std::map<std::string, TActionFunctor*> DEPRECATED(ActionFunctionsMapType);
+
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
     /**
@@ -126,10 +130,15 @@ namespace mitk
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();
+
+    typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, bool> ActionFunctionDelegate;
+
     /**
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
      */
-    void AddActionFunction(const std::string action, TActionFunctor* functor);
+    DEPRECATED(void AddActionFunction(const std::string& action, TActionFunctor* functor));
+
+    void AddActionFunction(const std::string& action, const ActionFunctionDelegate& delegate);
 
     StateMachineState* GetCurrentState() const;
 
@@ -167,8 +176,12 @@ namespace mitk
 
 
   private:
+
+    typedef std::map<std::string, ActionFunctionDelegate*> ActionDelegatesMapType;
+
     StateMachineContainer* m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
-    ActionFunctionsMapType m_ActionFunctionsMap; // stores association between action string
+    std::map<std::string, TActionFunctor*> m_ActionFunctionsMap; // stores association between action string
+    ActionDelegatesMapType m_ActionDelegatesMap;
     StateMachineStateType m_CurrentState;
   };
 

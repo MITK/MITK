@@ -88,7 +88,7 @@ public:
   vtkLinearTransform* GetVtkTransform(int t=0) const;
   //##Documentation
   //## @brief Get the Interactor
-  Interactor* GetInteractor() const;
+  DEPRECATED(Interactor* GetInteractor() const);
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataNode
@@ -97,7 +97,7 @@ public:
   virtual void SetData(mitk::BaseData* baseData);
   //##Documentation
   //## @brief Set the Interactor
-  virtual void SetInteractor(Interactor* interactor);
+  DEPRECATED(virtual void SetInteractor(Interactor* interactor));
 
   virtual void SetDataInteractor(const DataInteractor::Pointer& interactor);
   virtual DataInteractor::Pointer GetDataInteractor() const;

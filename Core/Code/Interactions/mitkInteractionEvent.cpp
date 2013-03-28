@@ -33,9 +33,9 @@ mitk::BaseRenderer* mitk::InteractionEvent::GetSender() const
   return m_Sender;
 }
 
-bool mitk::InteractionEvent::MatchesTemplate(InteractionEvent::Pointer)
+bool mitk::InteractionEvent::Equals(const InteractionEvent&) const
 {
-  return false;
+  return true;
 }
 
 mitk::InteractionEvent::~InteractionEvent()
@@ -50,4 +50,14 @@ bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer& bas
 std::string mitk::InteractionEvent::GetEventClass() const
 {
   return m_EventClass;
+}
+
+bool mitk::operator==(const InteractionEvent& a, const InteractionEvent& b)
+{
+  return a.Equals(b);
+}
+
+bool mitk::operator!=(const InteractionEvent& a, const InteractionEvent& b)
+{
+  return !(a == b);
 }

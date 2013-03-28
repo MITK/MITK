@@ -48,14 +48,15 @@ mitk::MouseMoveEvent::~MouseMoveEvent()
 {
 }
 
-bool mitk::MouseMoveEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseMoveEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
 {
-  mitk::MouseMoveEvent* mpe = dynamic_cast<mitk::MouseMoveEvent*>(interactionEvent.GetPointer());
+  const mitk::MouseMoveEvent* mpe = dynamic_cast<const mitk::MouseMoveEvent*>(&interactionEvent);
   if (mpe == NULL)
   {
     return false;
   }
-  return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates());
+  return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates() &&
+          Superclass::Equals(interactionEvent));
 }
 
 bool mitk::MouseMoveEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const

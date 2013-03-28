@@ -62,15 +62,16 @@ mitk::MouseWheelEvent::~MouseWheelEvent()
 {
 }
 
-bool mitk::MouseWheelEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseWheelEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
 {
-  const mitk::MouseWheelEvent* mwe = dynamic_cast<const MouseWheelEvent*>(interactionEvent.GetPointer());
+  const mitk::MouseWheelEvent* mwe = dynamic_cast<const MouseWheelEvent*>(&interactionEvent);
   if (mwe == NULL)
   {
     return false;
   }
   return ((this->GetWheelDelta() * mwe->GetWheelDelta() > 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
-  && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates());
+          && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates() &&
+          Superclass::Equals(interactionEvent));
 }
 
 bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const

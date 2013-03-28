@@ -24,14 +24,14 @@ mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInterac
 {
 }
 
-bool mitk::InternalEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::InternalEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
 {
-  mitk::InternalEvent* internalEvent = dynamic_cast<mitk::InternalEvent*>(interactionEvent.GetPointer());
+  const mitk::InternalEvent* internalEvent = dynamic_cast<const mitk::InternalEvent*>(&interactionEvent);
   if (internalEvent == NULL)
   {
     return false;
   }
-  return (m_SignalName == internalEvent->GetSignalName());
+  return (m_SignalName == internalEvent->GetSignalName() && Superclass::Equals(interactionEvent));
 }
 
 

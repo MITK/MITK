@@ -40,12 +40,13 @@ namespace mitk
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
 
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
     MouseMoveEvent(BaseRenderer*, const Point2D& = Point2D(), MouseButtons buttonStates = NoButton, mitk::ModifierKeys modifiers = NoKey);
     virtual ~MouseMoveEvent();
+
+    virtual bool Equals(const InteractionEvent&) const;
 
   private:
     MouseButtons m_ButtonStates;

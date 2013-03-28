@@ -64,17 +64,16 @@ mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 }
 
-bool mitk::MouseReleaseEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseReleaseEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
 {
-  mitk::MouseReleaseEvent* mre = dynamic_cast<mitk::MouseReleaseEvent*>(interactionEvent.GetPointer());
+  const mitk::MouseReleaseEvent* mre = dynamic_cast<const mitk::MouseReleaseEvent*>(&interactionEvent);
   if (mre == NULL)
   {
     return false;
   }
   return (this->GetEventButton() == mre->GetEventButton() && this->GetModifiers() == mre->GetModifiers()
-      && this->GetButtonStates() == mre->GetButtonStates()
-
-  );
+          && this->GetButtonStates() == mre->GetButtonStates() &&
+          Superclass::Equals(interactionEvent));
 }
 
 bool mitk::MouseReleaseEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const

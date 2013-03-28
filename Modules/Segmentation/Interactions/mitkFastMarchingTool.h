@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLegacyAdaptors.h"
 #include "SegmentationExports.h"
 #include "mitkDataNode.h"
+#include "mitkPointSet.h"
 
 #include "itkImage.h"
 
@@ -111,6 +112,9 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     InternalImageType::Pointer m_SliceInITK;
 
     mitk::DataNode::Pointer m_ResultImageNode;
+
+    mitk::DataNode::Pointer m_SeedsAsPointSetNode;
+    mitk::PointSet::Pointer m_SeedsAsPointSet;
 
     ThresholdingFilterType::Pointer thresholder;
     SmoothingFilterType::Pointer smoothing;

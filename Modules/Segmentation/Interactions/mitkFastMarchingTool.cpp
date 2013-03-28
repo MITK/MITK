@@ -131,12 +131,22 @@ void mitk::FastMarchingTool::Activated()
   m_ResultImageNode->SetColor(0.0, 1.0, 0.0);
   m_ResultImageNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode);
+
+  m_SeedsAsPointSet = mitk::PointSet::New();
+  m_SeedsAsPointSetNode = mitk::DataNode::New();
+  m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
+  m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+  m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
+  m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
+  m_SeedsAsPointSetNode->SetVisibility(true);
+  m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode);
 }
 
 void mitk::FastMarchingTool::Deactivated()
 {
   Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
+  m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   m_ResultImageNode = NULL;
 }
 
@@ -256,6 +266,8 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   this->seeds->InsertElement(this->seeds->Size(), node);
   fastMarching->Modified();
 
+  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
+
 
   this->UpdatePreviewImage();
   return true;
@@ -271,6 +283,10 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
   {
     this->seeds->pop_back();
     fastMarching->Modified();
+
+    //delete last point in pointset - somehow ugly
+    m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
+
     this->UpdatePreviewImage();
   }
   return true;
@@ -308,6 +324,8 @@ void mitk::FastMarchingTool::ClearSeeds()
 {
   this->seeds->clear();
   fastMarching->Modified();
+
+  m_SeedsAsPointSet->Clear();
 }
 
 

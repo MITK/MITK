@@ -83,6 +83,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual bool OnDelete(Action*, const StateEvent*);
 
     void UpdatePreviewImage();
+    void ClearSeeds();
+    void ResetFastMarching(const PositionEvent* positionEvent);
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;

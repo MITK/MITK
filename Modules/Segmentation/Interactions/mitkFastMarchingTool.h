@@ -71,6 +71,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     FastMarchingTool(); // purposely hidden
     virtual ~FastMarchingTool();
 
+    virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+
     virtual void Activated();
     virtual void Deactivated();
 
@@ -80,6 +82,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual bool OnAddPoint(Action*, const StateEvent*);
     virtual bool OnDelete(Action*, const StateEvent*);
 
+    void UpdatePreiviewImage();
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;

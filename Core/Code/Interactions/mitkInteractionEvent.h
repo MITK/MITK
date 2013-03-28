@@ -33,10 +33,10 @@ namespace mitk
 
   public:
     mitkClassMacro(InteractionEvent,itk::LightObject)
-    mitkNewMacro2Param(Self,BaseRenderer*, std::string)
+    mitkNewMacro2Param(Self,BaseRenderer*, const std::string&)
 
     void SetSender(BaseRenderer* sender);
-    BaseRenderer* GetSender();
+    BaseRenderer* GetSender() const;
 
     /**
      * Implementation of equality for each event class.
@@ -59,10 +59,10 @@ namespace mitk
      * This class implements an up cast to check if the provided baseClass object is derived from this class.
      * This function is used to support polymorphism on state machine pattern (XML) level.
      */
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    InteractionEvent(BaseRenderer*, std::string);
+    InteractionEvent(BaseRenderer*, const std::string&);
     virtual ~InteractionEvent();
 
   private:

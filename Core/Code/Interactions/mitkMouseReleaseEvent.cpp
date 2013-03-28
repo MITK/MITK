@@ -18,13 +18,13 @@
 #include "mitkMouseReleaseEvent.h"
 
 mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer,
-    mitk::Point2D mousePosition,
+    const mitk::Point2D& mousePosition,
     mitk::MouseButtons buttonStates,
     mitk::ModifierKeys modifiers,
     mitk::MouseButtons eventButton)
 : InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent")
 , m_EventButton(eventButton)
-,m_ButtonStates(buttonStates)
+, m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
 {
 }
@@ -77,7 +77,7 @@ bool mitk::MouseReleaseEvent::MatchesTemplate(mitk::InteractionEvent::Pointer in
   );
 }
 
-bool mitk::MouseReleaseEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::MouseReleaseEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer()) != NULL) ;
 }

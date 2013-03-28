@@ -17,7 +17,7 @@
 #include "mitkInternalEvent.h"
 #include "mitkDataInteractor.h"
 
-mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, const std::string signalName)
+mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, const std::string& signalName)
 : InteractionEvent(baseRenderer, "InternalEvent")
 , m_DataInteractor(sourceInteractor)
 , m_SignalName(signalName)
@@ -39,17 +39,17 @@ mitk::InternalEvent::~InternalEvent()
 {
 }
 
-const std::string mitk::InternalEvent::GetSignalName()
+std::string mitk::InternalEvent::GetSignalName() const
 {
   return m_SignalName;
 }
 
-mitk::DataInteractor* mitk::InternalEvent::GetTargetInteractor()
+mitk::DataInteractor* mitk::InternalEvent::GetTargetInteractor() const
 {
   return m_DataInteractor.GetPointer();
 }
 
-bool mitk::InternalEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::InternalEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (NULL != dynamic_cast<InternalEvent*>(baseClass.GetPointer()) );
 }

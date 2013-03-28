@@ -17,7 +17,7 @@
 #include "mitkMouseWheelEvent.h"
 
 mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer,
-    Point2D mousePosition,
+    const Point2D& mousePosition,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     int wheelDelta)
@@ -73,7 +73,7 @@ bool mitk::MouseWheelEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inte
   && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates());
 }
 
-bool mitk::MouseWheelEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL) ;
 }

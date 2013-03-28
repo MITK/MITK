@@ -31,7 +31,7 @@ mitk::EventStateMachine::EventStateMachine() :
 {
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(const std::string filename, const std::string moduleName)
+bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const std::string& moduleName)
 {
   if (m_StateMachineContainer != NULL)
   {
@@ -63,7 +63,7 @@ mitk::EventStateMachine::~EventStateMachine()
   }
 }
 
-void mitk::EventStateMachine::AddActionFunction(const std::string action, mitk::TActionFunctor* functor)
+void mitk::EventStateMachine::AddActionFunction(const std::string& action, mitk::TActionFunctor* functor)
 {
   if (!functor)
     return;
@@ -127,7 +127,7 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
   return retVal;
 }
 
-mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
+mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState() const
 {
   return m_CurrentState.GetPointer();
 }

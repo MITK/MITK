@@ -99,7 +99,7 @@ public:
   //## @brief Set the Interactor
   virtual void SetInteractor(Interactor* interactor);
 
-  virtual void SetDataInteractor(DataInteractor::Pointer interactor);
+  virtual void SetDataInteractor(const DataInteractor::Pointer& interactor);
   virtual DataInteractor::Pointer GetDataInteractor() const;
 
   mitk::DataNode& operator=(const DataNode& right);

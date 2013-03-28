@@ -16,7 +16,7 @@
 
 #include "mitkInteractionKeyEvent.h"
 
-mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, const std::string key, mitk::ModifierKeys modifiers = ControlKey) :
+mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, const std::string& key, mitk::ModifierKeys modifiers = ControlKey) :
     InteractionEvent(baseRenderer, "KeyEvent"), m_Key(key), m_Modifiers(modifiers)
 {
 }
@@ -46,7 +46,7 @@ bool mitk::InteractionKeyEvent::MatchesTemplate(mitk::InteractionEvent::Pointer 
   return (this->GetModifiers() == keyEvent->GetModifiers() && this->GetKey() == keyEvent->GetKey());
 }
 
-bool mitk::InteractionKeyEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::InteractionKeyEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<InteractionKeyEvent*>(baseClass.GetPointer()) != NULL) ;
 }

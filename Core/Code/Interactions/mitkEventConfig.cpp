@@ -66,7 +66,7 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-bool mitk::EventConfig::LoadConfig(std::string fileName, std::string moduleName)
+bool mitk::EventConfig::LoadConfig(const std::string& fileName, const std::string& moduleName)
 {
   mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
   mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
@@ -131,7 +131,7 @@ void mitk::EventConfig::EndElement(const char* elementName)
   }
 }
 
-std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const char** atts)
+std::string mitk::EventConfig::ReadXMLStringAttribut(const std::string& name, const char** atts)
 {
   if (atts)
   {
@@ -155,7 +155,7 @@ mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
   return m_PropertyList;
 }
 
-std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interactionEvent)
+std::string mitk::EventConfig::GetMappedEvent(const EventType& interactionEvent) const
 {
   // internal events are excluded from mapping
   if (interactionEvent->GetEventClass() == "InternalEvent")
@@ -164,7 +164,7 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interact
     return internalEvent->GetSignalName();
   }
 
-  for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
+  for (EventListType::const_iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
     if ((*it).interactionEvent->MatchesTemplate(interactionEvent))
     {
@@ -187,7 +187,7 @@ void mitk::EventConfig::ClearConfig()
   m_EventList.clear();
 }
 
-bool mitk::EventConfig::ReadXMLBooleanAttribut(std::string name, const char** atts)
+bool mitk::EventConfig::ReadXMLBooleanAttribut(const std::string& name, const char** atts)
 {
   std::string s = ReadXMLStringAttribut(name, atts);
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);

@@ -63,7 +63,7 @@ namespace mitk
      * Loads a XML resource file in the given module context.
      * The files have to be placed in the Resources/Interaction folder of their respective module.
      **/
-    bool LoadConfig(std::string fileName, std::string moduleName = "Mitk");
+    bool LoadConfig(const std::string& fileName, const std::string& moduleName = "Mitk");
 
     void ClearConfig();
     /**
@@ -80,7 +80,7 @@ namespace mitk
      * \note mitk::InteractionKeys may have a defined event variant, if this is the case, this function returns it. If no
      * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
-    std::string GetMappedEvent(EventType interactionEvent);
+    std::string GetMappedEvent(const EventType& interactionEvent) const;
 
   protected:
 
@@ -100,11 +100,11 @@ namespace mitk
     /**
      * @brief Derived from XMLReader
      **/
-    std::string ReadXMLStringAttribut(std::string name, const char** atts);
+    std::string ReadXMLStringAttribut(const std::string& name, const char** atts);
     /**
      * @brief Derived from XMLReader
      **/
-    bool ReadXMLBooleanAttribut(std::string name, const char** atts);
+    bool ReadXMLBooleanAttribut(const std::string& name, const char** atts);
 
     /**
      * @brief List of all global properties of the config object.

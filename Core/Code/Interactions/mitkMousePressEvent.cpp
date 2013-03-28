@@ -18,7 +18,7 @@
 #include "mitkMousePressEvent.h"
 
 mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer,
-    const mitk::Point2D mousePosition,
+    const mitk::Point2D& mousePosition,
     mitk::MouseButtons buttonStates,
     mitk::ModifierKeys modifiers,
     mitk::MouseButtons eventButton)
@@ -74,7 +74,7 @@ bool mitk::MousePressEvent::MatchesTemplate(mitk::InteractionEvent::Pointer inte
       && this->GetButtonStates() == mpe->GetButtonStates());
 }
 
-bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::MousePressEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<MousePressEvent*>(baseClass.GetPointer()) != NULL) ;
 }

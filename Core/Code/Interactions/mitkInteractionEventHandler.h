@@ -50,13 +50,13 @@ namespace mitk
     * The files have to be placed in the Resources/Interaction folder of their respective module.
     * This method will remove all existing configuration and replaces it with the new one.
     */
-    virtual bool LoadEventConfig(std::string filename, std::string moduleName = "Mitk");
+    virtual bool LoadEventConfig(const std::string& filename, const std::string& moduleName = "Mitk");
     /**
      * This method EXTENDs the configuration.
      * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
      * This way several configuration files can be combined
      */
-    virtual bool AddEventConfig(std::string filename, std::string moduleName = "Mitk");
+    virtual bool AddEventConfig(const std::string& filename, const std::string& moduleName = "Mitk");
 
 
   protected:
@@ -65,7 +65,7 @@ namespace mitk
     /**
      * Returns a PropertyList in which the parameters defined in the config file are listed.
      */
-    PropertyList::Pointer GetAttributes();
+    PropertyList::Pointer GetAttributes() const;
 
     std::string MapToEventVariant(InteractionEvent* interactionEvent);
 

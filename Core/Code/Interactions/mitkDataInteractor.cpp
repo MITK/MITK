@@ -73,7 +73,7 @@ void mitk::DataInteractor::ConnectActionsAndFunctions()
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
-mitk::ProcessEventMode mitk::DataInteractor::GetMode()
+mitk::ProcessEventMode mitk::DataInteractor::GetMode() const
 {
   if (GetCurrentState()->GetMode() == "PREFER_INPUT")
   {

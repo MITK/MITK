@@ -26,7 +26,7 @@ mitk::InteractionEventHandler::~InteractionEventHandler()
 {
 }
 
-bool mitk::InteractionEventHandler::LoadEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::LoadEventConfig(const std::string& filename, const std::string& moduleName)
 {
   m_EventConfig = vtkSmartPointer<EventConfig>::New();
   // notify sub-classes that new config is set
@@ -35,7 +35,7 @@ bool mitk::InteractionEventHandler::LoadEventConfig(std::string filename, std::s
   return success;
 }
 
-bool mitk::InteractionEventHandler::AddEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::AddEventConfig(const std::string& filename, const std::string& moduleName)
 {
   if (m_EventConfig == NULL)
   {
@@ -48,7 +48,7 @@ bool mitk::InteractionEventHandler::AddEventConfig(std::string filename, std::st
   return success;
 }
 
-mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes()
+mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes() const
 {
   if (m_EventConfig != NULL) {
   return m_EventConfig->GetAttributes();

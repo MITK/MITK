@@ -109,7 +109,7 @@ namespace mitk
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string filename, const std::string moduleName="Mitk");
+    bool LoadStateMachine(const std::string& filename, const std::string& moduleName="Mitk");
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for
@@ -131,7 +131,7 @@ namespace mitk
      */
     void AddActionFunction(const std::string action, TActionFunctor* functor);
 
-    StateMachineState* GetCurrentState();
+    StateMachineState* GetCurrentState() const;
 
     /**
      * Is called after loading a statemachine.

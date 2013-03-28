@@ -17,7 +17,7 @@
 #include "mitkException.h"
 #include "mitkInteractionEvent.h"
 
-mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, std::string eventClass)
+mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, const std::string& eventClass)
 : m_Sender(baseRenderer)
 , m_EventClass(eventClass)
 {
@@ -28,7 +28,7 @@ void mitk::InteractionEvent::SetSender(mitk::BaseRenderer* sender)
   m_Sender = sender;
 }
 
-mitk::BaseRenderer* mitk::InteractionEvent::GetSender()
+mitk::BaseRenderer* mitk::InteractionEvent::GetSender() const
 {
   return m_Sender;
 }
@@ -42,7 +42,7 @@ mitk::InteractionEvent::~InteractionEvent()
 {
 }
 
-bool mitk::InteractionEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<InteractionEvent*>(baseClass.GetPointer()) != NULL) ;
 }

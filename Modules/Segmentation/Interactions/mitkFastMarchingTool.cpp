@@ -160,7 +160,7 @@ bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* s
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  if( m_LastEventSender != positionEvent->GetSender() || m_LastEventSlice != positionEvent->GetSender()->GetSlice() )
+  if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
   {
     this->ResetFastMarching(positionEvent);
   }
@@ -259,7 +259,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  if( m_LastEventSender != positionEvent->GetSender() || m_LastEventSlice != positionEvent->GetSender()->GetSlice() )
+  if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
   {
     this->ResetFastMarching(positionEvent);
   }
@@ -314,7 +314,7 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
   {
 
     try{
-      thresholder->Update();
+      thresholder->UpdateLargestPossibleRegion();
     }
     catch( itk::ExceptionObject & excep )
     {
@@ -352,5 +352,6 @@ void mitk::FastMarchingTool::ResetFastMarching(const PositionEvent* positionEven
   smoothing->SetInput( m_SliceInITK );
 
   this->ClearSeeds();
+  this->UpdatePreviewImage();
 }
 

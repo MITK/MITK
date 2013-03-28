@@ -528,6 +528,9 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
     case Qt::Key_PageUp:
           key = mitk::KeyPageUp;
           break;
+    case Qt::Key_Space:
+            key = mitk::KeySpace;
+            break;
     }
   }
   return key;

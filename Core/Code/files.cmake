@@ -352,10 +352,6 @@ Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-Interactions/Tests/AddAndRemovePoints.xml
-Interactions/Tests/globalConfig.xml
-Interactions/Tests/StatemachineTest.xml
-Interactions/Tests/StatemachineConfigTest.xml
 
 Shaders/mitkShaderLighting.xml
 

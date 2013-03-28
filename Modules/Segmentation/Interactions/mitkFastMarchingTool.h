@@ -94,6 +94,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     ScalarType m_UpperThreshold;
     ScalarType m_InitialLowerThreshold;
     ScalarType m_InitialUpperThreshold;
+    ScalarType m_InitialStoppingValue;
+    ScalarType m_StoppingValue;
 
     Point2I m_LastScreenPosition;
     int m_ScreenYDifference;

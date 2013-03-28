@@ -40,6 +40,8 @@ m_LowerThreshold(200),
 m_UpperThreshold(200),
 m_InitialLowerThreshold(0.0),
 m_InitialUpperThreshold(100.0),
+m_InitialStoppingValue(100),
+m_StoppingValue(100),
 m_ScreenYDifference(0),
 m_MouseDistanceScaleFactor(0.5),
 sigma(1.0),
@@ -65,7 +67,7 @@ beta(3.0)
   smoothing = SmoothingFilterType::New();
   smoothing->SetTimeStep( 0.125 );
   smoothing->SetNumberOfIterations( 5 );
-  smoothing->SetConductanceParameter( 9.0 );
+  smoothing->SetConductanceParameter( 3.0 );
 
   gradientMagnitude = GradientFilterType::New();
   gradientMagnitude->SetSigma( sigma );
@@ -155,16 +157,14 @@ void mitk::FastMarchingTool::Deactivated()
 
 bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
-  MITK_INFO << "MousePressed";
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  m_LastEventSender = positionEvent->GetSender();
-  if( m_LastEventSlice != m_LastEventSender->GetSlice() )
+  if( m_LastEventSender != positionEvent->GetSender() || m_LastEventSlice != positionEvent->GetSender()->GetSlice() )
   {
     this->ResetFastMarching(positionEvent);
   }
-
+  m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
@@ -195,10 +195,11 @@ bool mitk::FastMarchingTool::OnMouseMoved(Action* action, const StateEvent* stat
         m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
         cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = std::max<mitk::ScalarType>(0.0, m_InitialLowerThreshold - m_ScreenXDifference * m_MouseDistanceScaleFactor);
+        m_StoppingValue = std::max<mitk::ScalarType>(0.0, m_InitialStoppingValue + m_ScreenXDifference * m_MouseDistanceScaleFactor);
         m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
 
         //thresholder->SetLowerThreshold( m_LowerThreshold );
+        fastMarching->SetStoppingValue( m_StoppingValue );
         thresholder->SetUpperThreshold( m_UpperThreshold );
 
         this->UpdatePreviewImage();
@@ -214,13 +215,13 @@ If the feedback contour should be filled, then it is done here. (Contour is NOT 
 */
 bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
-  MITK_INFO << "Mouse Release";
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (positionEvent)
   {
     // remember parameters for next time
     m_InitialLowerThreshold = m_LowerThreshold;
     m_InitialUpperThreshold = m_UpperThreshold;
+    m_InitialStoppingValue = m_StoppingValue;
 
     if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
     {
@@ -228,7 +229,6 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
       CastToItkImage(GetAffectedWorkingSlice( positionEvent ), segmentationSlice);
 
-      MITK_INFO << "Write result";
       typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
       OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
 
@@ -256,16 +256,16 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
 bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateEvent)
 {
-  MITK_INFO << "AddPoint";
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  m_LastEventSender = positionEvent->GetSender();
-  if( m_LastEventSlice != m_LastEventSender->GetSlice() )
+  if( m_LastEventSender != positionEvent->GetSender() || m_LastEventSlice != positionEvent->GetSender()->GetSlice() )
   {
     this->ResetFastMarching(positionEvent);
   }
+  m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
+
 
   mitk::Point3D clickInIndex;
 
@@ -293,8 +293,6 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
 bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEvent)
 {
-  MITK_INFO << "Delete";
-
   //delete last element of seeds container
   if(!(this->seeds->empty()))
   {

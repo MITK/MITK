@@ -15,18 +15,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FILEREADER_H_HEADER_INCLUDED_C1E7E521
-#define FILEREADER_H_HEADER_INCLUDED_C1E7E521
+#ifndef FileReaderInterface_H_HEADER_INCLUDED_C1E7E521
+#define FileReaderInterface_H_HEADER_INCLUDED_C1E7E521
 
+// Macro
 #include <MitkExports.h>
+#include <mitkCommon.h>
+// MITK
+#include <mitkBaseData.h>
+// ITK
+#include <itkProcessObject.h>
+#include <itkObjectFactory.h>
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+#include <usServiceProperties.h>
+
 
 namespace mitk {
 
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-class MITK_CORE_EXPORT FileReader
+  class MITK_CORE_EXPORT FileReaderInterface : public itk::ProcessObject
 {
+
+  //mitkClassMacro(FileReaderInterface,itk::ProcessObject);
+  //itkNewMacro(Self);
+
   public:
     //##Documentation
     //## @brief Get the specified the file to load.
@@ -73,7 +89,7 @@ class MITK_CORE_EXPORT FileReader
     /**
     @brief Specifies, whether the file reader also can
     read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  ); // TODO Eliminieren, stattdessen abstrakte Klasse welche nach unten StrStream bereitstellt
+    virtual bool CanReadFromMemory(  );
 
     /**
     @brief Set/Get functions to advise the file reader to
@@ -86,10 +102,27 @@ class MITK_CORE_EXPORT FileReader
     the memory buffer and the size from which the reader will read.*/
     virtual void SetMemoryBuffer(const char* dataArray, unsigned int size);
 
+    virtual mitk::BaseData::Pointer Read(std::string path = 0) = 0;
+
+    virtual mitk::BaseData::Pointer Read(std::istream*) = 0;
+
+    virtual int GetPriority() = 0;
+
+    virtual std::list< std::string > GetOptions() = 0;
+
+    virtual void SetOptions(std::list< std::string > Options ) = 0;
+
+    virtual bool CanRead(const std::string& path) = 0; // Todo: nach möglichkeit constref
+
+    virtual float GetProgress() = 0;
+
+    static const std::string US_PRIORITY;
+    static const std::string US_EXTENSION;
+
 
 protected:
-    FileReader();
-    virtual ~FileReader();
+    FileReaderInterface();
+    virtual ~FileReaderInterface();
 
     bool m_CanReadFromMemory;
     bool m_ReadFromMemory;
@@ -101,6 +134,8 @@ public:
 protected:
 };
 } // namespace mitk
-#endif /* FILEREADER_H_HEADER_INCLUDED_C1E7E521 */
 
+// This is the microservice declaration. Do not meddle!
+US_DECLARE_SERVICE_INTERFACE(mitk::FileReaderInterface, "org.mitk.services.FileReader")
 
+#endif /* FileReaderInterface_H_HEADER_INCLUDED_C1E7E521 */

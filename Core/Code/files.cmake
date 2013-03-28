@@ -298,6 +298,10 @@ set(CPP_FILES
   IO/mitkVtkSurfaceReader.cpp
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
+  IO/Interface/mitkFileReaderManager.cpp
+  IO/Interface/mitkFileReaderInterface.cpp
+  IO/Interface/mitkFileWriterManager.cpp
+  IO/Interface/mitkFileWriterInterface.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp

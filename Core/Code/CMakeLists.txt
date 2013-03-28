@@ -34,7 +34,7 @@ set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPI
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS
     ${CppMicroServices_INCLUDE_DIRS} Algorithms Common DataManagement Controllers
-    Interactions Interfaces IO Rendering ${MITK_BINARY_DIR}
+    Interactions Interfaces IO Rendering IO/Interface ${MITK_BINARY_DIR}
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
     ${CppMicroServices_INTERNAL_INCLUDE_DIRS}

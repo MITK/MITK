@@ -1,0 +1,52 @@
+<!--
+* - MITK : The legacy handling for Tools.
+    Describe which events should trigger an event_variant.
+    The corresponding event_variants and their actions are declared in DisplayConfig.xml (in /Resources/Interactions).
+    If no event_variant is specified here, this action is disabled during the activation of a tool.
+    ! Alternatively you can also just change the event description, so that the actions are triggered by different mouse/key events
+    during Tool use. !
+
+*   -(deactivated) middle mouse button : panning
+*   -(deactivated) right mouse button  : zooming
+*   - wheel               : scrolling
+-->
+<config>
+  <!-- Zoom sensitivity -->
+  <param name="zoomFactor" value="5"/>
+  <!-- Zoom either by moving mouse leftright or updown -->
+  <param name="zoomDirection" value="leftright"/>
+  <!-- react to an event, even tough is was already processed by a DataInteractor-->
+  <param name="alwaysReact" value="false"/>
+  <!-- Moving -->
+  <!-- DEACTIVATED
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+  -->
+  <!-- Zooming -->
+  <!-- DEACTIVATED
+  <event_variant class="MousePressEvent" name="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+   <event_variant class="MouseMoveEvent" name="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  -->
+  <!-- PlaneUP and -Down are described twice, this means the transition
+  can be triggered by both events -->
+  <event_variant class="MouseWheelEvent" name="PlaneUP">
+    <attribute name="ScrollDirection" value="up"/>
+  </event_variant>
+  <event_variant class="MouseWheelEvent" name="PlaneDown">
+    <attribute name="ScrollDirection" value="down"/>
+  </event_variant>
+</config>

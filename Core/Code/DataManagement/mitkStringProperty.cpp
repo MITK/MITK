@@ -28,7 +28,12 @@ mitk::StringProperty::StringProperty( const char* string )
 mitk::StringProperty::StringProperty( const std::string& s )
 : m_Value( s )
 {
+}
 
+mitk::StringProperty::StringProperty(const StringProperty& other)
+  : BaseProperty(other)
+  , m_Value(other.m_Value)
+{
 }
 
 bool mitk::StringProperty::IsEqual(const BaseProperty& property ) const
@@ -45,4 +50,16 @@ bool mitk::StringProperty::Assign(const BaseProperty& property )
 std::string mitk::StringProperty::GetValueAsString() const
 {
   return m_Value;
+}
+
+mitk::StringProperty::Pointer mitk::StringProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::StringProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

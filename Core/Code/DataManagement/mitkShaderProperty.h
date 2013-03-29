@@ -48,6 +48,8 @@ public:
 
   mitkNewMacro1Param(ShaderProperty, const std::string&);
 
+  Pointer Clone() const;
+
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.
@@ -67,6 +69,8 @@ protected:
    * Constructor. Sets the representation to a default value of surface(2)
    */
   ShaderProperty( );
+
+  ShaderProperty(const ShaderProperty& other);
 
   /**
    * \brief Sets the scalar mode to the given value. If it is not
@@ -97,8 +101,9 @@ protected:
 private:
 
   // purposely not implemented
-  ShaderProperty(const ShaderProperty&);
   ShaderProperty& operator=(const ShaderProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   virtual bool Assign(const BaseProperty &property);
 

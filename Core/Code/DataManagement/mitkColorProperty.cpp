@@ -24,6 +24,12 @@ mitk::ColorProperty::ColorProperty()
 
 }
 
+mitk::ColorProperty::ColorProperty(const mitk::ColorProperty& other)
+  : BaseProperty(other)
+  , m_Color(other.m_Color)
+{
+}
+
 mitk::ColorProperty::ColorProperty(const float color[3]) : m_Color(color)
 {
 
@@ -84,4 +90,16 @@ std::string mitk::ColorProperty::GetValueAsString() const {
 const mitk::Color & mitk::ColorProperty::GetValue() const
 {
     return GetColor();
+}
+
+mitk::ColorProperty::Pointer mitk::ColorProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

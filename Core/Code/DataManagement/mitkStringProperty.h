@@ -44,6 +44,8 @@ namespace mitk {
       StringProperty( const char* string = 0 );
       StringProperty( const std::string&  s );
 
+      StringProperty(const StringProperty&);
+
     public:
       mitkClassMacro(StringProperty, BaseProperty);
       typedef std::string ValueType;
@@ -51,6 +53,8 @@ namespace mitk {
       itkNewMacro(StringProperty);
       mitkNewMacro1Param(StringProperty, const char*);
       mitkNewMacro1Param(StringProperty, const std::string&)
+
+      Pointer Clone() const;
 
       itkGetStringMacro(Value);
       itkSetStringMacro(Value);
@@ -63,8 +67,9 @@ namespace mitk {
 
     private:
       // purposely not implemented
-      StringProperty(const StringProperty&);
       StringProperty& operator=(const StringProperty&);
+
+      itk::LightObject::Pointer InternalClone() const;
 
       virtual bool IsEqual(const BaseProperty& property ) const;
       virtual bool Assign(const BaseProperty& property );

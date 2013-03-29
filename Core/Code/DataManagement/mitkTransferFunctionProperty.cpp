@@ -42,8 +42,26 @@ TransferFunctionProperty::TransferFunctionProperty()
   : BaseProperty()
 {}
 
+TransferFunctionProperty::TransferFunctionProperty(const TransferFunctionProperty& other)
+  : BaseProperty(other)
+  , m_Value(other.m_Value->Clone())
+{
+}
+
 TransferFunctionProperty::TransferFunctionProperty( mitk::TransferFunction::Pointer value )
   : BaseProperty(), m_Value( value )
 {}
+
+TransferFunctionProperty::Pointer TransferFunctionProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer TransferFunctionProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}
 
 } // namespace mitk

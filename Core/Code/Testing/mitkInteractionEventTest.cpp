@@ -31,9 +31,9 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
   mitk::VtkPropRenderer::Pointer renderer = NULL;
 
-  mitk::MouseButtons buttonStates =  mitk::LeftMouseButton | mitk::RightMouseButton;
-  mitk::MouseButtons eventButton = mitk::LeftMouseButton;
-  mitk::ModifierKeys modifiers = mitk::ControlKey | mitk::AltKey;
+  mitk::InteractionEvent::MouseButtons buttonStates =  mitk::InteractionEvent::LeftMouseButton | mitk::InteractionEvent::RightMouseButton;
+  mitk::InteractionEvent::MouseButtons eventButton = mitk::InteractionEvent::LeftMouseButton;
+  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::ControlKey | mitk::InteractionEvent::AltKey;
 
   mitk::Point2D point;
   point[0] = 17;
@@ -45,7 +45,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  modifiers = mitk::ControlKey;
+  modifiers = mitk::InteractionEvent::ControlKey;
   mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
@@ -62,7 +62,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MouseReleaseEvent::Pointer mr3 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  eventButton = mitk::RightMouseButton;
+  eventButton = mitk::InteractionEvent::RightMouseButton;
   mitk::MouseReleaseEvent::Pointer mr4 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
@@ -79,7 +79,7 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
     point[0] = 178;
   point[1] = 170;
   mitk::MouseMoveEvent::Pointer mm3 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
-  modifiers = mitk::AltKey;
+  modifiers = mitk::InteractionEvent::AltKey;
   mitk::MouseMoveEvent::Pointer mm4 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
 
 

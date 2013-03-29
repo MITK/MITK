@@ -38,12 +38,12 @@ void mitk::MouseWheelEvent::SetWheelDelta(int delta)
   m_WheelDelta = delta;
 }
 
-mitk::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MouseWheelEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MouseWheelEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }

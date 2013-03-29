@@ -16,12 +16,12 @@
 
 #include "mitkInteractionKeyEvent.h"
 
-mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, const std::string& key, mitk::ModifierKeys modifiers = ControlKey) :
-    InteractionEvent(baseRenderer, "KeyEvent"), m_Key(key), m_Modifiers(modifiers)
+mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, const std::string& key, ModifierKeys modifiers = ControlKey) :
+    InteractionEvent(baseRenderer), m_Key(key), m_Modifiers(modifiers)
 {
 }
 
-mitk::ModifierKeys mitk::InteractionKeyEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::InteractionKeyEvent::GetModifiers() const
 {
   return m_Modifiers;
 }

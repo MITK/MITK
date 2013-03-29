@@ -49,9 +49,9 @@ namespace mitk
   protected:
     MouseReleaseEvent(BaseRenderer*,
         const mitk::Point2D& mousePosition = Point2D(),
-        mitk::MouseButtons buttonStates = NoButton,
-        mitk::ModifierKeys modifiers = NoKey,
-        mitk::MouseButtons eventButton = NoButton);
+        MouseButtons buttonStates = NoButton,
+        ModifierKeys modifiers = NoKey,
+        MouseButtons eventButton = NoButton);
     virtual ~MouseReleaseEvent();
 
     virtual bool IsEqual(const InteractionEvent&) const;

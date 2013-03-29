@@ -47,8 +47,8 @@ namespace mitk
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    MousePressEvent(BaseRenderer*, const Point2D& = Point2D(), mitk::MouseButtons buttonStates = NoButton, mitk::ModifierKeys modifiers =
-        NoKey, mitk::MouseButtons eventButton = NoButton);
+    MousePressEvent(BaseRenderer*, const Point2D& = Point2D(), MouseButtons buttonStates = NoButton,
+                    ModifierKeys modifiers = NoKey, MouseButtons eventButton = NoButton);
     virtual ~MousePressEvent();
 
     virtual bool IsEqual(const InteractionEvent&) const;

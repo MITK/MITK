@@ -17,24 +17,18 @@
 #ifndef mitkStateMachineConfig_h
 #define mitkStateMachineConfig_h
 
-#include <vtkXMLParser.h>
-#include <iostream>
-#include "mitkCommon.h"
 #include <MitkExports.h>
-#include <mitkPropertyList.h>
-#include <string>
+
+#include "mitkSharedData.h"
+#include "mitkPropertyList.h"
+
+#include "itkSmartPointer.h"
 
 namespace mitk
 {
 
   class InteractionEvent;
-
-  class EventConfigReader: public vtkXMLParser
-  {
-  public:
-
-  private:
-  };
+  struct EventConfigPrivate;
 
   /**
    * \class EventConfig
@@ -46,16 +40,30 @@ namespace mitk
    *
    * @ingroup Interaction
    **/
-
-  class EventConfig: public vtkXMLParser
+  class MITK_CORE_EXPORT EventConfig
   {
+
   public:
 
-    static EventConfig *New();
-    vtkTypeMacro(EventConfig,vtkXMLParser)
-
-
     typedef itk::SmartPointer<InteractionEvent> EventType;
+
+    /**
+     * @brief Constructs an invalid EventConfig object.
+     *
+     * Call LoadConfig to create a valid configuration object.
+     */
+    EventConfig();
+    EventConfig(const EventConfig& other);
+
+    EventConfig& operator=(const EventConfig& other);
+
+    ~EventConfig();
+
+    /**
+     * @brief Checks wether this EventConfig object is valid.
+     * @return Returns \c true if a configuration was successfully loaded, \c false otherwise.
+     */
+    bool IsValid() const;
 
     /**
      * @brief Loads XML resource
@@ -66,6 +74,7 @@ namespace mitk
     bool LoadConfig(const std::string& fileName, const std::string& moduleName = "Mitk");
 
     void ClearConfig();
+
     /**
      * Returns a PropertyList that contains the properties set in the configuration file.
      * All properties are stored as strings.
@@ -82,61 +91,10 @@ namespace mitk
      */
     std::string GetMappedEvent(const EventType& interactionEvent) const;
 
-  protected:
-
-    EventConfig();
-    virtual ~EventConfig();
-
-    /**
-     * @brief Derived from XMLReader
-     **/
-    void StartElement(const char* elementName, const char **atts);
-    /**
-     * @brief Derived from XMLReader
-     **/
-    void EndElement(const char* elementName);
-
   private:
-    /**
-     * @brief Derived from XMLReader
-     **/
-    std::string ReadXMLStringAttribut(const std::string& name, const char** atts);
-    /**
-     * @brief Derived from XMLReader
-     **/
-    bool ReadXMLBooleanAttribut(const std::string& name, const char** atts);
 
-    /**
-     * @brief List of all global properties of the config object.
-     */
-    PropertyList::Pointer m_PropertyList;
+    SharedDataPointer<EventConfigPrivate> d;
 
-    /**
-     * @brief Temporal list of all properties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
-     * and </event_variant> tags.
-     */
-    PropertyList::Pointer m_EventPropertyList;
-
-    struct EventMapping
-    {
-      std::string variantName;
-      EventType interactionEvent;
-    };
-
-    /**
-     * Checks if mapping with the same parameters already exists, if so, it is replaced,
-     * else the new mapping added
-     */
-    void InsertMapping(EventMapping mapping);
-
-    typedef std::list<EventMapping> EventListType;
-    EventMapping m_CurrEventMapping;
-
-    /**
-     * Stores InteractionEvents and their corresponding VariantName
-     */
-    EventListType m_EventList;
-    bool m_Errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
   };
 
 } // namespace mitk

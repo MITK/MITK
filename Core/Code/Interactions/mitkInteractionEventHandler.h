@@ -19,12 +19,12 @@
 
 #include "itkLightObject.h"
 #include "itkObjectFactory.h"
-#include "mitkEvent.h"
+
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include "mitkEventConfig.h"
 #include "mitkPropertyList.h"
-#include <vtkSmartPointer.h>
+
 #include <string>
 
 
@@ -76,7 +76,7 @@ namespace mitk
     virtual void ConfigurationChanged();
 
   private:
-    vtkSmartPointer<EventConfig> m_EventConfig;
+    EventConfig m_EventConfig;
 
   };
 

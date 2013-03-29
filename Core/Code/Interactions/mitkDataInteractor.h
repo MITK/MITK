@@ -67,6 +67,11 @@ namespace mitk
     NodeType GetDataNode() const;
     int GetLayer() const;
 
+    // Predefined internal events/signals
+    static const std::string IntDeactivateMe; // = "DeactivateMe";
+    static const std::string IntLeaveWidget; // = "LeaveWidget";
+    static const std::string IntEnterWidget; // = "EnterWidget";
+
   protected:
     DataInteractor();
     virtual ~DataInteractor();

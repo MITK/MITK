@@ -145,7 +145,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 {
-  mitk::ModifierKeys modifiers = GetModifiers(ke);
+  mitk::InteractionEvent::ModifierKeys modifiers = GetModifiers(ke);
   std::string key = GetKeyLetter(ke);
 
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
@@ -309,7 +309,7 @@ void QmitkRenderWindow::dropEvent(QDropEvent * event)
   }
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me)
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
 {
 
   mitk::Point2D point;
@@ -318,7 +318,7 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me)
   return point;
 }
 
-mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we)
+mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we) const
 {
   mitk::Point2D point;
   point[0] = we->x();
@@ -326,119 +326,119 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we)
   return point;
 }
 
-mitk::MouseButtons QmitkRenderWindow::GetEventButton(QMouseEvent* me)
+mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetEventButton(QMouseEvent* me) const
 {
-  mitk::MouseButtons eventButton;
+  mitk::InteractionEvent::MouseButtons eventButton;
   switch (me->button())
   {
   case Qt::LeftButton:
-    eventButton = mitk::LeftMouseButton;
+    eventButton = mitk::InteractionEvent::LeftMouseButton;
     break;
   case Qt::RightButton:
-    eventButton = mitk::RightMouseButton;
+    eventButton = mitk::InteractionEvent::RightMouseButton;
     break;
   case Qt::MidButton:
-    eventButton = mitk::MiddleMouseButton;
+    eventButton = mitk::InteractionEvent::MiddleMouseButton;
     break;
   default:
-    eventButton = mitk::NoButton;
+    eventButton = mitk::InteractionEvent::NoButton;
     break;
   }
   return eventButton;
 }
 
-mitk::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEvent* me)
+mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEvent* me) const
 {
-  mitk::MouseButtons buttonState = mitk::NoButton;
+  mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
 
   if (me->buttons() & Qt::LeftButton)
   {
-    buttonState = buttonState | mitk::LeftMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
   }
   if (me->buttons() & Qt::RightButton)
   {
-    buttonState = buttonState | mitk::RightMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
   if (me->buttons() & Qt::MidButton)
   {
-    buttonState = buttonState | mitk::MiddleMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
   return buttonState;
 }
 
-mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QMouseEvent* me)
+mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QMouseEvent* me) const
 {
-  mitk::ModifierKeys modifiers = mitk::NoKey;
+  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
 
   if (me->modifiers() & Qt::ALT)
   {
-    modifiers = modifiers | mitk::AltKey;
+    modifiers = modifiers | mitk::InteractionEvent::AltKey;
   }
   if (me->modifiers() & Qt::CTRL)
   {
-    modifiers = modifiers | mitk::ControlKey;
+    modifiers = modifiers | mitk::InteractionEvent::ControlKey;
   }
   if (me->modifiers() & Qt::SHIFT)
   {
-    modifiers = modifiers | mitk::ShiftKey;
+    modifiers = modifiers | mitk::InteractionEvent::ShiftKey;
   }
   return modifiers;
 }
 
-mitk::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEvent* we)
+mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEvent* we) const
 {
-  mitk::MouseButtons buttonState = mitk::NoButton;
+  mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
 
   if (we->buttons() & Qt::LeftButton)
   {
-    buttonState = buttonState | mitk::RightMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
   if (we->buttons() & Qt::RightButton)
   {
-    buttonState = buttonState | mitk::LeftMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
   }
   if (we->buttons() & Qt::MidButton)
   {
-    buttonState = buttonState | mitk::MiddleMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
   return buttonState;
 }
 
-mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QWheelEvent* we)
+mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QWheelEvent* we) const
 {
-  mitk::ModifierKeys modifiers = mitk::NoKey;
+  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
 
   if (we->modifiers() & Qt::ALT)
   {
-    modifiers = modifiers | mitk::AltKey;
+    modifiers = modifiers | mitk::InteractionEvent::AltKey;
   }
   if (we->modifiers() & Qt::CTRL)
   {
-    modifiers = modifiers | mitk::ControlKey;
+    modifiers = modifiers | mitk::InteractionEvent::ControlKey;
   }
   if (we->modifiers() & Qt::SHIFT)
   {
-    modifiers = modifiers | mitk::ShiftKey;
+    modifiers = modifiers | mitk::InteractionEvent::ShiftKey;
   }
 
   return modifiers;
 }
 
-mitk::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent* ke)
+mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent* ke) const
 {
-  mitk::ModifierKeys modifiers = mitk::NoKey;
+  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
 
   if (ke->modifiers() & Qt::ShiftModifier)
-    modifiers = modifiers | mitk::ShiftKey;
+    modifiers = modifiers | mitk::InteractionEvent::ShiftKey;
   if (ke->modifiers() & Qt::CTRL)
-    modifiers = modifiers | mitk::ControlKey;
+    modifiers = modifiers | mitk::InteractionEvent::ControlKey;
   if (ke->modifiers() & Qt::ALT)
-    modifiers = modifiers | mitk::AltKey;
+    modifiers = modifiers | mitk::InteractionEvent::AltKey;
 
   return modifiers;
 }
 
-std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
+std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
 {
   // Converting Qt Key Event to string element.
   std::string key = "";
@@ -452,91 +452,91 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke)
     switch (tkey)
     {
     case Qt::Key_Return:
-      key = mitk::KeyReturn;
+      key = mitk::InteractionEvent::KeyReturn;
       break;
     case Qt::Key_Enter:
-      key = mitk::KeyEnter;
+      key = mitk::InteractionEvent::KeyEnter;
       break;
     case Qt::Key_Escape:
-      key = mitk::KeyEnter;
+      key = mitk::InteractionEvent::KeyEnter;
       break;
     case Qt::Key_Delete:
-      key = mitk::KeyDelete;
+      key = mitk::InteractionEvent::KeyDelete;
       break;
     case Qt::Key_Up:
-      key = mitk::KeyArrowUp;
+      key = mitk::InteractionEvent::KeyArrowUp;
       break;
     case Qt::Key_Down:
-      key = mitk::KeyArrowDown;
+      key = mitk::InteractionEvent::KeyArrowDown;
       break;
     case Qt::Key_Left:
-      key = mitk::KeyArrowLeft;
+      key = mitk::InteractionEvent::KeyArrowLeft;
       break;
     case Qt::Key_Right:
-      key = mitk::KeyArrowRight;
+      key = mitk::InteractionEvent::KeyArrowRight;
       break;
 
     case Qt::Key_F1:
-      key = mitk::KeyF1;
+      key = mitk::InteractionEvent::KeyF1;
       break;
     case Qt::Key_F2:
-      key = mitk::KeyF2;
+      key = mitk::InteractionEvent::KeyF2;
       break;
     case Qt::Key_F3:
-      key = mitk::KeyF3;
+      key = mitk::InteractionEvent::KeyF3;
       break;
     case Qt::Key_F4:
-      key = mitk::KeyF4;
+      key = mitk::InteractionEvent::KeyF4;
       break;
     case Qt::Key_F5:
-      key = mitk::KeyF5;
+      key = mitk::InteractionEvent::KeyF5;
       break;
     case Qt::Key_F6:
-      key = mitk::KeyF6;
+      key = mitk::InteractionEvent::KeyF6;
       break;
     case Qt::Key_F7:
-      key = mitk::KeyF7;
+      key = mitk::InteractionEvent::KeyF7;
       break;
     case Qt::Key_F8:
-      key = mitk::KeyF8;
+      key = mitk::InteractionEvent::KeyF8;
       break;
     case Qt::Key_F9:
-      key = mitk::KeyF9;
+      key = mitk::InteractionEvent::KeyF9;
       break;
     case Qt::Key_F10:
-      key = mitk::KeyF10;
+      key = mitk::InteractionEvent::KeyF10;
       break;
     case Qt::Key_F11:
-      key = mitk::KeyF11;
+      key = mitk::InteractionEvent::KeyF11;
       break;
     case Qt::Key_F12:
-      key = mitk::KeyF12;
+      key = mitk::InteractionEvent::KeyF12;
       break;
 
     case Qt::Key_End:
-          key = mitk::KeyEnd;
+          key = mitk::InteractionEvent::KeyEnd;
           break;
     case Qt::Key_Home:
-          key = mitk::KeyPos1;
+          key = mitk::InteractionEvent::KeyPos1;
           break;
     case Qt::Key_Insert:
-          key = mitk::KeyInsert;
+          key = mitk::InteractionEvent::KeyInsert;
           break;
     case Qt::Key_PageDown:
-          key = mitk::KeyPageDown;
+          key = mitk::InteractionEvent::KeyPageDown;
           break;
     case Qt::Key_PageUp:
-          key = mitk::KeyPageUp;
+          key = mitk::InteractionEvent::KeyPageUp;
           break;
     case Qt::Key_Space:
-          key = mitk::KeySpace;
+          key = mitk::InteractionEvent::KeySpace;
           break;
     }
   }
   return key;
 }
 
-int QmitkRenderWindow::GetDelta(QWheelEvent* we)
+int QmitkRenderWindow::GetDelta(QWheelEvent* we) const
 {
   return we->delta();
 }

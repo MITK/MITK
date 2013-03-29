@@ -17,8 +17,8 @@
 #include "mitkInteractionEventHandler.h"
 #include "mitkInteractionEvent.h"
 
-mitk::InteractionEventHandler::InteractionEventHandler():
-  m_EventConfig(NULL)
+mitk::InteractionEventHandler::InteractionEventHandler()
+  : m_EventConfig()
 {
 }
 
@@ -28,31 +28,33 @@ mitk::InteractionEventHandler::~InteractionEventHandler()
 
 bool mitk::InteractionEventHandler::LoadEventConfig(const std::string& filename, const std::string& moduleName)
 {
-  m_EventConfig = vtkSmartPointer<EventConfig>::New();
   // notify sub-classes that new config is set
-  bool success = m_EventConfig->LoadConfig(filename, moduleName);
+  bool success = m_EventConfig.LoadConfig(filename, moduleName);
   ConfigurationChanged();
   return success;
 }
 
 bool mitk::InteractionEventHandler::AddEventConfig(const std::string& filename, const std::string& moduleName)
 {
-  if (m_EventConfig == NULL)
+  if (!m_EventConfig.IsValid())
   {
     MITK_ERROR<< "LoadEventConfig has to be called before AddEventConfig can be used.";
     return false;
   }
   // notify sub-classes that new config is set
-  bool success = m_EventConfig->LoadConfig(filename, moduleName);
+  bool success = m_EventConfig.LoadConfig(filename, moduleName);
   ConfigurationChanged();
   return success;
 }
 
 mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes() const
 {
-  if (m_EventConfig != NULL) {
-  return m_EventConfig->GetAttributes();
-  } else {
+  if (m_EventConfig.IsValid())
+  {
+    return m_EventConfig.GetAttributes();
+  }
+  else
+  {
     MITK_ERROR << "InteractionEventHandler::GetAttributes() requested, but not configuration loaded.";
     return NULL;
   }
@@ -60,9 +62,9 @@ mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes() const
 
 std::string mitk::InteractionEventHandler::MapToEventVariant(InteractionEvent* interactionEvent)
 {
-  if (m_EventConfig != NULL)
+  if (m_EventConfig.IsValid())
   {
-    return m_EventConfig->GetMappedEvent(interactionEvent);
+    return m_EventConfig.GetMappedEvent(interactionEvent);
   }
   else
   {

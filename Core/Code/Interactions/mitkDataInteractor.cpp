@@ -20,6 +20,11 @@
 #include "mitkDataNode.h"
 #include "mitkStateMachineState.h"
 
+// Predefined internal events/signals
+const std::string mitk::DataInteractor::IntDeactivateMe = "DeactivateMe";
+const std::string mitk::DataInteractor::IntLeaveWidget = "LeaveWidget";
+const std::string mitk::DataInteractor::IntEnterWidget = "EnterWidget";
+
 mitk::DataInteractor::DataInteractor()
 {
 }

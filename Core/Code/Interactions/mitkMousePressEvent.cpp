@@ -19,9 +19,9 @@
 
 mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer,
     const mitk::Point2D& mousePosition,
-    mitk::MouseButtons buttonStates,
-    mitk::ModifierKeys modifiers,
-    mitk::MouseButtons eventButton)
+    MouseButtons buttonStates,
+    ModifierKeys modifiers,
+    MouseButtons eventButton)
 : InteractionPositionEvent(baseRenderer, mousePosition, "MousePressEvent")
 , m_EventButton(eventButton)
 , m_ButtonStates(buttonStates)
@@ -29,7 +29,7 @@ mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer,
 {
 }
 
-mitk::MouseButtons mitk::MousePressEvent::GetEventButton() const
+mitk::InteractionEvent::MouseButtons mitk::MousePressEvent::GetEventButton() const
 {
   return m_EventButton;
 }
@@ -39,12 +39,12 @@ void mitk::MousePressEvent::SetEventButton(MouseButtons buttons)
   m_EventButton = buttons;
 }
 
-mitk::ModifierKeys mitk::MousePressEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MousePressEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MousePressEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MousePressEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }

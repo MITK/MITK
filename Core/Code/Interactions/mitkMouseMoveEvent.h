@@ -46,7 +46,7 @@ namespace mitk
     MouseMoveEvent(BaseRenderer*, const Point2D& = Point2D(), MouseButtons buttonStates = NoButton, mitk::ModifierKeys modifiers = NoKey);
     virtual ~MouseMoveEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     MouseButtons m_ButtonStates;

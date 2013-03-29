@@ -55,7 +55,7 @@ namespace mitk
     InteractionKeyEvent(BaseRenderer*, const std::string& key, ModifierKeys modifiers);
     virtual ~InteractionKeyEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     std::string m_Key;

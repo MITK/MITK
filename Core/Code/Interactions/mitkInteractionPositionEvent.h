@@ -53,7 +53,7 @@ namespace mitk
     InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition, const std::string& eventClass);
     virtual ~InteractionPositionEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     Point2D m_PointerPosition;

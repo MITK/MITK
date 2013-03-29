@@ -54,8 +54,8 @@ namespace mitk
     InteractionEvent(BaseRenderer*, const std::string&);
     virtual ~InteractionEvent();
 
-    friend bool operator==(const InteractionEvent&, const InteractionEvent&);
-    virtual bool Equals(const InteractionEvent& other) const;
+    friend MITK_CORE_EXPORT bool operator==(const InteractionEvent&, const InteractionEvent&);
+    virtual bool IsEqual(const InteractionEvent& other) const;
 
   private:
     BaseRenderer* m_Sender;

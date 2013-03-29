@@ -54,7 +54,7 @@ namespace mitk
         mitk::MouseButtons eventButton = NoButton);
     virtual ~MouseReleaseEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     MouseButtons m_EventButton;

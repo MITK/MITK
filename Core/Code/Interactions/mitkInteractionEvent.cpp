@@ -33,7 +33,7 @@ mitk::BaseRenderer* mitk::InteractionEvent::GetSender() const
   return m_Sender;
 }
 
-bool mitk::InteractionEvent::Equals(const InteractionEvent&) const
+bool mitk::InteractionEvent::IsEqual(const InteractionEvent&) const
 {
   return true;
 }
@@ -54,7 +54,7 @@ std::string mitk::InteractionEvent::GetEventClass() const
 
 bool mitk::operator==(const InteractionEvent& a, const InteractionEvent& b)
 {
-  return a.Equals(b);
+  return (typeid(a) == typeid(b) && a.IsEqual(b));
 }
 
 bool mitk::operator!=(const InteractionEvent& a, const InteractionEvent& b)

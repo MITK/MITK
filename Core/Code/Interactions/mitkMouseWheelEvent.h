@@ -57,7 +57,7 @@ namespace mitk
         int wheelDelta = 0);
     virtual ~MouseWheelEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     int m_WheelDelta;

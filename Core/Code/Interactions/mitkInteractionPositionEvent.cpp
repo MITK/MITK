@@ -43,9 +43,9 @@ const mitk::Point3D mitk::InteractionPositionEvent::GetPositionInWorld() const
   return m_WorldPosition;
 }
 
-bool mitk::InteractionPositionEvent::Equals(const InteractionEvent& other) const
+bool mitk::InteractionPositionEvent::IsEqual(const InteractionEvent& other) const
 {
-  return Superclass::Equals(other);
+  return Superclass::IsEqual(other);
 }
 
 mitk::InteractionPositionEvent::~InteractionPositionEvent()

@@ -63,16 +63,12 @@ mitk::MousePressEvent::~MousePressEvent()
 {
 }
 
-bool mitk::MousePressEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
+bool mitk::MousePressEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
 {
-  const mitk::MousePressEvent* mpe = dynamic_cast<const mitk::MousePressEvent*>(&interactionEvent);
-  if (mpe == NULL)
-  {
-    return false;
-  }
-  return (this->GetEventButton() == mpe->GetEventButton() && this->GetModifiers() == mpe->GetModifiers()
-          && this->GetButtonStates() == mpe->GetButtonStates() &&
-          Superclass::Equals(interactionEvent));
+  const mitk::MousePressEvent& mpe = static_cast<const mitk::MousePressEvent&>(interactionEvent);
+  return (this->GetEventButton() == mpe.GetEventButton() && this->GetModifiers() == mpe.GetModifiers()
+          && this->GetButtonStates() == mpe.GetButtonStates() &&
+          Superclass::IsEqual(interactionEvent));
 }
 
 bool mitk::MousePressEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const

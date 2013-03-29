@@ -54,7 +54,7 @@ namespace mitk
     InternalEvent(BaseRenderer*, DataInteractor* destInteractor, const std::string& signalName);
     virtual ~InternalEvent();
 
-    virtual bool Equals(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     DataInteractor::Pointer m_DataInteractor;

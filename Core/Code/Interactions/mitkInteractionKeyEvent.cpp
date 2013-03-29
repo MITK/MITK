@@ -36,15 +36,11 @@ mitk::InteractionKeyEvent::~InteractionKeyEvent()
 {
 }
 
-bool mitk::InteractionKeyEvent::Equals(const mitk::InteractionEvent& interactionEvent) const
+bool mitk::InteractionKeyEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
 {
-  const mitk::InteractionKeyEvent* keyEvent = dynamic_cast<const mitk::InteractionKeyEvent*>(&interactionEvent);
-  if (keyEvent == NULL)
-  {
-    return false;
-  }
-  return (this->GetModifiers() == keyEvent->GetModifiers() && this->GetKey() == keyEvent->GetKey() &&
-          Superclass::Equals(interactionEvent));
+  const mitk::InteractionKeyEvent& keyEvent = static_cast<const Self&>(interactionEvent);
+  return (this->GetModifiers() == keyEvent.GetModifiers() && this->GetKey() == keyEvent.GetKey() &&
+          Superclass::IsEqual(interactionEvent));
 }
 
 bool mitk::InteractionKeyEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const

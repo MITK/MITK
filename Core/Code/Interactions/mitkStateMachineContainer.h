@@ -33,12 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  *@brief
-  *
-  * @ingroup Interaction
-  **/
-
-  class MITK_CORE_EXPORT StateMachineContainer : public vtkXMLParser
+   *@brief
+   *
+   * @ingroup Interaction
+   **/
+  class StateMachineContainer : public vtkXMLParser
   {
   public:
 
@@ -56,7 +55,7 @@ namespace mitk {
     /**
     * @brief Returns the StartState of the StateMachine.
     **/
-    StateMachineState::Pointer GetStartState();
+    StateMachineState::Pointer GetStartState() const;
 
     /**
     * @brief Loads XML resource

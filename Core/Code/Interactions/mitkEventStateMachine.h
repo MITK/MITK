@@ -40,7 +40,7 @@ namespace mitk
    *
    * \deprecatedSince{2013_03} Use mitk::Message classes instead.
    */
-  class MITK_CORE_EXPORT TActionFunctor
+  class TActionFunctor
   {
   public:
     virtual bool DoAction(StateMachineAction*, InteractionEvent*)=0;
@@ -55,7 +55,7 @@ namespace mitk
    * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
    */
   template<class T>
-  class TSpecificActionFunctor: public TActionFunctor
+  class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
   {
   public:
 

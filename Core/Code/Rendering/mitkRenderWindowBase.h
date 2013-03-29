@@ -70,18 +70,18 @@ public:
 
   void SetInvertScrollingDirection( bool );
 
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mousePressMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mouseMoveMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void wheelMitkEvent(mitk::WheelEvent *we);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void keyPressMitkEvent(mitk::KeyEvent* mke);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void resizeMitkEvent(int width, int height);
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mousePressMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mouseMoveMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void wheelMitkEvent(mitk::WheelEvent *we));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void keyPressMitkEvent(mitk::KeyEvent* mke));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void resizeMitkEvent(int width, int height));
 
   virtual bool HandleEvent(InteractionEvent* interactionEvent);
 

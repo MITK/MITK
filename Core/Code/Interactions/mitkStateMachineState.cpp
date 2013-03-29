@@ -16,8 +16,9 @@
 
 #include "mitkStateMachineState.h"
 
-mitk::StateMachineState::StateMachineState(std::string stateName, std::string stateMode) :
-    m_Name(stateName),  m_StateMode(stateMode)
+mitk::StateMachineState::StateMachineState(const std::string& stateName, const std::string& stateMode)
+  : m_Name(stateName)
+  , m_StateMode(stateMode)
 {
 }
 
@@ -42,7 +43,8 @@ bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer tran
   return true;
 }
 
-mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(const std::string eventClass, const std::string eventVariant)
+mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(const std::string& eventClass,
+                                                                             const std::string& eventVariant)
 {
   mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)

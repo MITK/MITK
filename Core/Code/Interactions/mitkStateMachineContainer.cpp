@@ -73,7 +73,7 @@ bool mitk::StateMachineContainer::LoadBehavior(std::string fileName, std::string
   return this->Parse() && !m_errors;
 }
 
-mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState()
+mitk::StateMachineState::Pointer mitk::StateMachineContainer::GetStartState() const
 {
   return m_StartState;
 }

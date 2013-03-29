@@ -36,8 +36,6 @@ namespace mitk
    * These events can target a specific DataInteractor, if this DataInteractor is specified in the constructor;
    * else this parameter is set to NULL and the event is treated as a regular event.
    */
-
-  class DataInteracor;
   class MITK_CORE_EXPORT InternalEvent: public InteractionEvent
   {
 

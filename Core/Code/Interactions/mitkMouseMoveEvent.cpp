@@ -24,12 +24,12 @@ mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, const mit
 {
 }
 
-mitk::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MouseMoveEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MouseMoveEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }

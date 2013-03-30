@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define EVENTMAPPER_H_HEADER_INCLUDED
 
 #include <mitkEvent.h>
-#include <mitkCommon.h>
 #include <MitkExports.h>
 #include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
@@ -66,7 +65,7 @@ namespace mitk {
    * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
    */
 
-  class MITK_CORE_EXPORT DEPRECATED() EventMapper : public vtkXMLParser
+  class MITK_CORE_EXPORT EventMapper : public vtkXMLParser
   {
   public:
     static EventMapper *New();

@@ -87,8 +87,9 @@ public:
   //## \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
   vtkLinearTransform* GetVtkTransform(int t=0) const;
   //##Documentation
-  //## @brief Get the Interactor
-  DEPRECATED(Interactor* GetInteractor() const);
+  //## @brief Get the Interactor.
+  //## @deprecatedSince{2013_03} Use DataInteractor and GetDataInteractor instead.
+  Interactor* GetInteractor() const;
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataNode
@@ -96,8 +97,9 @@ public:
   //## data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
   virtual void SetData(mitk::BaseData* baseData);
   //##Documentation
-  //## @brief Set the Interactor
-  DEPRECATED(virtual void SetInteractor(Interactor* interactor));
+  //## @brief Set the Interactor.
+  //## @deprecatedSince{2013_03} Use DataInteractor and SetDataInteractor instead.
+  virtual void SetInteractor(Interactor* interactor);
 
   virtual void SetDataInteractor(const DataInteractor::Pointer& interactor);
   virtual DataInteractor::Pointer GetDataInteractor() const;

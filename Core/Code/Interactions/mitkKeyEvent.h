@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define KeyEvent_H_HEADER_INCLUDED_C184F366
 
 #include <MitkExports.h>
-#include "mitkCommon.h"
 #include "mitkEvent.h"
 #include "mitkVector.h"
 
@@ -38,7 +37,7 @@ namespace mitk {
    * \deprecatedSince{2013_03} KeyEvent is deprecated. Use mitk::InteractionKeyEvent instead.
    * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
    */
-class MITK_CORE_EXPORT DEPRECATED() KeyEvent : public Event
+class MITK_CORE_EXPORT KeyEvent : public Event
 {
   public:
     //##Documentation

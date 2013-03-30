@@ -48,7 +48,7 @@ namespace mitk {
    * Refer to \see DataInteractionPage for general information about the concept of the new implementation.
    */
 
-  class MITK_CORE_EXPORT DEPRECATED() StateMachineFactory : public vtkXMLParser
+  class MITK_CORE_EXPORT StateMachineFactory : public vtkXMLParser
   {
   public:
     static StateMachineFactory *New();

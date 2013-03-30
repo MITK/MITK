@@ -81,7 +81,7 @@ public:
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
   DEPRECATED(virtual void keyPressMitkEvent(mitk::KeyEvent* mke));
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
-  DEPRECATED(virtual void resizeMitkEvent(int width, int height));
+  virtual void resizeMitkEvent(int width, int height);
 
   virtual bool HandleEvent(InteractionEvent* interactionEvent);
 

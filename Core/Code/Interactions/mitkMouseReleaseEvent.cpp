@@ -22,7 +22,7 @@ mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     MouseButtons eventButton)
-: InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent")
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_EventButton(eventButton)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)

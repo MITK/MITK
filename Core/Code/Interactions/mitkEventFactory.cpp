@@ -195,7 +195,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = MouseReleaseEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "KEYEVENT")
+  else if (eventClass == "INTERACTIONKEYEVENT")
   {
     event = InteractionKeyEvent::New(NULL, key, modifiers);
   }
@@ -203,9 +203,9 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
   }
-  else if (eventClass == "POSITIONEVENT")
+  else if (eventClass == "INTERACTIONPOSITIONEVENT")
   {
-    event = InteractionPositionEvent::New(NULL, pos, "PositionEvent");
+    event = InteractionPositionEvent::New(NULL, pos);
   }
   else if (eventClass == "INTERNALEVENT")
   {
@@ -213,7 +213,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "INTERACTIONEVENT")
   {
-    event = InteractionEvent::New(NULL, strSignalName);
+    event = InteractionEvent::New(NULL);
   }
   if (event.IsNull())
   {

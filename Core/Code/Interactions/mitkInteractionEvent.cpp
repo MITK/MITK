@@ -46,9 +46,8 @@ const std::string mitk::InteractionEvent::KeyPageUp = "PageUp";
 const std::string mitk::InteractionEvent::KeyPageDown = "PageDown";
 const std::string mitk::InteractionEvent::KeySpace = "Space";
 
-mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer, const std::string& eventClass)
+mitk::InteractionEvent::InteractionEvent(BaseRenderer* baseRenderer)
 : m_Sender(baseRenderer)
-, m_EventClass(eventClass)
 {
 }
 
@@ -74,11 +73,6 @@ mitk::InteractionEvent::~InteractionEvent()
 bool mitk::InteractionEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<InteractionEvent*>(baseClass.GetPointer()) != NULL) ;
-}
-
-std::string mitk::InteractionEvent::GetEventClass() const
-{
-  return m_EventClass;
 }
 
 bool mitk::operator==(const InteractionEvent& a, const InteractionEvent& b)

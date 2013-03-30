@@ -97,7 +97,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   {
   case CONNECTEDMOUSEACTION:
     // finished connected mouse action
-    if (p->GetEventClass() == "MouseReleaseEvent")
+    if (std::strcmp(p->GetNameOfClass(), "MouseReleaseEvent") == 0)
     {
       m_ProcessingMode = REGULAR;
       eventIsHandled = m_SelectedInteractor->HandleEvent(event, m_SelectedInteractor->GetDataNode());
@@ -138,7 +138,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
       if (dataInteractor->HandleEvent(event, dataInteractor->GetDataNode()))
       { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
         SetEventProcessingMode(dataInteractor);
-        if (p->GetEventClass() == "MousePressEvent" && m_ProcessingMode == REGULAR)
+        if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0 && m_ProcessingMode == REGULAR)
         {
           m_SelectedInteractor = dataInteractor;
           m_ProcessingMode = CONNECTEDMOUSEACTION;

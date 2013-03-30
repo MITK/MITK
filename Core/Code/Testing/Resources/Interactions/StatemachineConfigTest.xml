@@ -13,7 +13,7 @@
         <attribute name="ButtonState" value="LeftMouseButton,RightMouseButton"/>
         <attribute name="Modifiers" value="shift"/>
     </event_variant>
-    <event_variant class="KeyEvent" name="Key1">
+    <event_variant class="InteractionKeyEvent" name="Key1">
         <attribute name="Key" value="l"/>
     </event_variant>
 </config>

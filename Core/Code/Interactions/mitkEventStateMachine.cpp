@@ -110,7 +110,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     return false;
   }
   // check if the current state holds a transition that works with the given event.
-  StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetEventClass(), MapToEventVariant(event));
+  StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetNameOfClass(), MapToEventVariant(event));
 
   if (transition.IsNotNull())
   {

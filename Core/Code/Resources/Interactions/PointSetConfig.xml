@@ -9,7 +9,7 @@
   <event_variant class="InternalEvent" name="NotEnoughPoints">
     <attribute name="SignalName" value="haslessthen3points"/>
   </event_variant>
-  <event_variant class="KeyEvent" name="Abort">
+  <event_variant class="InteractionKeyEvent" name="Abort">
     <attribute name="Key" value="Escape"/>
   </event_variant>
   <event_variant class="MousePressEvent" name="DeletePoint">

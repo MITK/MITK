@@ -18,7 +18,7 @@
 #include "mitkDataInteractor.h"
 
 mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, const std::string& signalName)
-: InteractionEvent(baseRenderer, "InternalEvent")
+: InteractionEvent(baseRenderer)
 , m_DataInteractor(sourceInteractor)
 , m_SignalName(signalName)
 {

@@ -18,9 +18,8 @@
 #include <string>
 
 mitk::InteractionPositionEvent::InteractionPositionEvent(mitk::BaseRenderer* baseRenderer,
-    const mitk::Point2D& mousePosition,
-    const std::string& eventClass)
-: InteractionEvent(baseRenderer, eventClass)
+    const mitk::Point2D& mousePosition)
+: InteractionEvent(baseRenderer)
 , m_PointerPosition(mousePosition)
 {
   if (GetSender() != NULL)

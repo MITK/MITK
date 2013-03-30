@@ -21,7 +21,7 @@ mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     int wheelDelta)
-: InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent")
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_WheelDelta(wheelDelta)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)

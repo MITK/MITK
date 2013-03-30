@@ -22,7 +22,7 @@ mitk::MousePressEvent::MousePressEvent(mitk::BaseRenderer* baseRenderer,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     MouseButtons eventButton)
-: InteractionPositionEvent(baseRenderer, mousePosition, "MousePressEvent")
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_EventButton(eventButton)
 , m_ButtonStates(buttonStates)
 , m_Modifiers( modifiers)

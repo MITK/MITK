@@ -1,6 +1,6 @@
 <statemachine>
     <state name="start" startstate="true">
-        <transition event_class="PositionEvent" event_variant="AddPointClick" target="start">
+        <transition event_class="InteractionPositionEvent" event_variant="AddPointClick" target="start">
             <action name="addpoint"/>
         </transition>
         <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
@@ -10,7 +10,7 @@
         <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="selected">
             <action name="selectpoint"/>
         </transition>
-        <transition event_class="KeyEvent" event_variant="Abort" target="start">
+        <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
             <action name="abort"/>
         </transition>
     </state>

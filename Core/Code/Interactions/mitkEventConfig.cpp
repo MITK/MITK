@@ -271,7 +271,7 @@ mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
 std::string mitk::EventConfig::GetMappedEvent(const EventType& interactionEvent) const
 {
   // internal events are excluded from mapping
-  if (interactionEvent->GetNameOfClass() == "InternalEvent")
+  if (std::strcmp(interactionEvent->GetNameOfClass(), "InternalEvent") == 0)
   {
     InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent.GetPointer());
     return internalEvent->GetSignalName();
@@ -288,7 +288,7 @@ std::string mitk::EventConfig::GetMappedEvent(const EventType& interactionEvent)
   // if this part is reached, no mapping has been found,
   // so here we handle key events and map a key event to the string "Std" + letter/code
   // so "A" will be returned as "StdA"
-  if (interactionEvent->GetNameOfClass() == "InteractionKeyEvent")
+  if (std::strcmp(interactionEvent->GetNameOfClass(), "InteractionKeyEvent") == 0)
   {
     InteractionKeyEvent* keyEvent = dynamic_cast<InteractionKeyEvent*>(interactionEvent.GetPointer());
     return ("Std" + keyEvent->GetKey());

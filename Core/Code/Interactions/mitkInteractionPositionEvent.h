@@ -42,7 +42,7 @@ namespace mitk
   public:
 
     mitkClassMacro(InteractionPositionEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, const Point2D& , const std::string&);
+    mitkNewMacro2Param(Self, BaseRenderer*, const Point2D&);
 
     const Point2D GetPointerPositionOnScreen() const;
     const Point3D GetPositionInWorld() const;
@@ -50,7 +50,7 @@ namespace mitk
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition, const std::string& eventClass);
+    InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition);
     virtual ~InteractionPositionEvent();
 
     virtual bool IsEqual(const InteractionEvent&) const;

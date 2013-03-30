@@ -69,7 +69,7 @@ mitk::DataInteractor::~DataInteractor()
 {
   if (m_DataNode.IsNotNull())
   {
-    m_DataNode->SetInteractor(NULL);
+    m_DataNode->SetDataInteractor(NULL);
   }
 }
 

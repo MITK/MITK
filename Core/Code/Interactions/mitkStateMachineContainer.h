@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+  class Module;
+
   /**
    *@brief
    *
@@ -63,7 +65,7 @@ namespace mitk {
     * Loads a XML resource file in the given module context.
     * The files have to be placed in the Resources/Interaction folder of their respective module.
     **/
-    bool LoadBehavior(std::string fileName , std::string moduleName = "Mitk");
+    bool LoadBehavior(const std::string& fileName , const Module* module);
 
 
     /**

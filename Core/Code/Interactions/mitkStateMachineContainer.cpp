@@ -21,10 +21,10 @@
 #include <algorithm>
 
 // us
+#include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
 
 
 /**
@@ -60,9 +60,12 @@ mitk::StateMachineContainer::~StateMachineContainer()
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-bool mitk::StateMachineContainer::LoadBehavior(std::string fileName, std::string moduleName)
+bool mitk::StateMachineContainer::LoadBehavior(const std::string& fileName, const Module* module)
 {
-  mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
+  if (module == NULL)
+  {
+    module = GetModuleContext()->GetModule();
+  }
   mitk::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
   if (!resource.IsValid() ) {
     mitkThrow() << ("Resource not valid. State machine pattern not found:" + fileName);

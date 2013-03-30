@@ -138,25 +138,24 @@ bool mitk::ToolManager::ActivateTool(int id)
   if (id == -1)
   {
     GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
+
     // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
     // in new interaction framework
-    std::list<mitk::ServiceReference> listEventObserver;
-    ServiceTracker<InteractionEventObserver*>* eventObserverTracker= new ServiceTracker<InteractionEventObserver*>(GetModuleContext());
-    eventObserverTracker->Open();
-    eventObserverTracker->GetServiceReferences(listEventObserver); // query all registered interaction event observer
-    for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+    for (std::map<ServiceReference, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+         it != m_DisplayInteractorConfigs.end(); ++it)
     {
-      InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
-      if (interactionEventObserver != NULL) {
-        DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(interactionEventObserver);
-        if (displayInteractor != NULL) {
+      if (it->first)
+      {
+        DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
+                                                 GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+        if (displayInteractor != NULL)
+        {
           // here the regular configuration is loaded again
-          displayInteractor->LoadEventConfig("DisplayConfigMITK.xml","Mitk");
+          displayInteractor->SetEventConfig(it->second);
         }
       }
     }
-    eventObserverTracker->Close();
-    delete eventObserverTracker;
+    m_DisplayInteractorConfigs.clear();
   }
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
@@ -195,25 +194,23 @@ bool mitk::ToolManager::ActivateTool(int id)
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         //If a tool is activated set event notification policy to one
         GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
+
         // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
         // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
-        std::list<mitk::ServiceReference> listEventObserver;
-        ServiceTracker<InteractionEventObserver*>* eventObserverTracker= new ServiceTracker<InteractionEventObserver*>(GetModuleContext());
-        eventObserverTracker->Open();
-        eventObserverTracker->GetServiceReferences(listEventObserver);
+        m_DisplayInteractorConfigs.clear();
+        std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
         for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
         {
-          InteractionEventObserver* interactionEventObserver = eventObserverTracker->GetService(*it);
-          if (interactionEventObserver != NULL) {
-            DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(interactionEventObserver);
-            if (displayInteractor != NULL) {
-              // here the regular configuration is loaded again
-              displayInteractor->LoadEventConfig("Legacy/DisplayConfigMITKTools.xml","Mitk");
-            }
+          DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
+                                                          GetModuleContext()->GetService<InteractionEventObserver>(*it));
+          if (displayInteractor != NULL)
+          {
+            // remember the original configuration
+            m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+            // here the alternative configuration is loaded
+            displayInteractor->SetEventConfig("Legacy/DisplayConfigMITKTools.xml");
           }
         }
-        eventObserverTracker->Close();
-        delete eventObserverTracker;
       }
     }
   }

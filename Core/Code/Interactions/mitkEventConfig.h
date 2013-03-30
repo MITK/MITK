@@ -28,6 +28,7 @@ namespace mitk
 {
 
   class InteractionEvent;
+  class Module;
   struct EventConfigPrivate;
 
   /**
@@ -55,6 +56,18 @@ namespace mitk
     EventConfig();
     EventConfig(const EventConfig& other);
 
+    /**
+     * @brief Construct an EventConfig object based on a XML configuration file.
+     *
+     * Uses the specified resource file containing an XML event configuration to
+     * construct a EventConfig object. If the resource is invalid, the created
+     * EventConfig object will also be invalid.
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module
+     */
+    EventConfig(const std::string& filename, const Module* module = NULL);
+
     EventConfig& operator=(const EventConfig& other);
 
     ~EventConfig();
@@ -66,13 +79,36 @@ namespace mitk
     bool IsValid() const;
 
     /**
-     * @brief Loads XML resource
+     * @brief This method \e extends this configuration.
      *
-     * Loads a XML resource file in the given module context.
-     * The files have to be placed in the Resources/Interaction folder of their respective module.
-     **/
-    bool LoadConfig(const std::string& fileName, const std::string& moduleName = "Mitk");
+     * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configuration files can be combined.
+     *
+     * @see AddConfig(const EventConfig&)
+     * @see InteractionEventHandler::AddEventConfig(const std::string&, const Module*)
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module The module containing the resource. Defaults to the Mitk module.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddConfig(const std::string& filename, const Module* module = NULL);
 
+    /**
+     * @brief This method \e extends this configuration.
+     * The configuration from the EventConfig object is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configurations can be combined.
+     *
+     * @see AddConfig(const std::string&, const Module*)
+     * @see InteractionEventHandler::AddEventConfig(const EventConfig&)
+     *
+     * @param config The EventConfig object whose configuration should be added.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddConfig(const EventConfig& config);
+
+    /**
+     * @brief Reset this EventConfig object, rendering it invalid.
+     */
     void ClearConfig();
 
     /**
@@ -84,9 +120,9 @@ namespace mitk
     /**
      * Checks if the config object has a definition for the given event. If it has, the corresponding variant name is returned, else
      * an empty string is returned.
-     * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
+     * \note mitk::InternalEvent is handled differently. Their signal name is returned as event variant. So there is no need
      * to configure them in a config file.
-     * \note mitk::InteractionKeys may have a defined event variant, if this is the case, this function returns it. If no
+     * \note mitk::InteractionKeyEvent may have a defined event variant, if this is the case, this function returns it. If no
      * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
     std::string GetMappedEvent(const EventType& interactionEvent) const;

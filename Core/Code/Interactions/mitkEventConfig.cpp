@@ -27,10 +27,10 @@
 #include <vtkXMLDataElement.h>
 
 // us
+#include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
 
 namespace mitk {
 
@@ -113,6 +113,8 @@ mitk::EventConfigPrivate::EventConfigPrivate()
   , m_Errors(false)
   , m_XmlParser(this)
 {
+  // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  m_XmlParser.SetReferenceCount(0);
 }
 
 mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate& other)
@@ -124,6 +126,8 @@ mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate& other)
   , m_Errors(other.m_Errors)
   , m_XmlParser(this)
 {
+  // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  m_XmlParser.SetReferenceCount(0);
 }
 
 void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
@@ -234,6 +238,31 @@ mitk::EventConfig::EventConfig(const EventConfig &other)
 {
 }
 
+mitk::EventConfig::EventConfig(const std::string& filename, const Module* module)
+  : d(new EventConfigPrivate)
+{
+  if (module == NULL)
+  {
+    module = GetModuleContext()->GetModule();
+  }
+  mitk::ModuleResource resource = module->GetResource("Interactions/" + filename);
+  if (!resource.IsValid())
+  {
+    MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
+               << " not found: /Interactions/" << filename;
+    return;
+  }
+
+  EventConfig newConfig;
+  mitk::ModuleResourceStream stream(resource);
+  newConfig.d->m_XmlParser.SetStream(&stream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+}
+
 mitk::EventConfig& mitk::EventConfig::operator =(const mitk::EventConfig& other)
 {
   d = other.d;
@@ -249,18 +278,40 @@ bool mitk::EventConfig::IsValid() const
   return !d->m_EventList.empty();
 }
 
-
-bool mitk::EventConfig::LoadConfig(const std::string& fileName, const std::string& moduleName)
+bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* module)
 {
-  mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
+  if (module == NULL)
+  {
+    module = GetModuleContext()->GetModule();
+  }
   mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
   if (!resource.IsValid())
   {
-    mitkThrow()<< ("Resource not valid. State machine pattern not found:" + fileName);
+    MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
+               << " not found: /Interactions/" << fileName;
+    return false;
   }
+
+  EventConfig newConfig(*this);
   mitk::ModuleResourceStream stream(resource);
-  d->m_XmlParser.SetStream(&stream);
-  return d->m_XmlParser.Parse() && !d->m_Errors;
+  newConfig.d->m_XmlParser.SetStream(&stream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+  return success;
+}
+
+bool mitk::EventConfig::AddConfig(const EventConfig& config)
+{
+  if (!config.IsValid()) return false;
+
+  d->m_PropertyList->ConcatenatePropertyList(config.d->m_PropertyList->Clone(), true);
+  d->m_EventPropertyList = config.d->m_EventPropertyList->Clone();
+  d->m_CurrEventMapping = config.d->m_CurrEventMapping;
+  d->InsertMapping(config.d->m_CurrEventMapping);
+  return true;
 }
 
 mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
@@ -298,5 +349,10 @@ std::string mitk::EventConfig::GetMappedEvent(const EventType& interactionEvent)
 
 void mitk::EventConfig::ClearConfig()
 {
+  d->m_PropertyList->Clear();
+  d->m_EventPropertyList->Clear();
+  d->m_CurrEventMapping.variantName.clear();
+  d->m_CurrEventMapping.interactionEvent = NULL;
   d->m_EventList.clear();
+  d->m_Errors = false;
 }

@@ -33,6 +33,7 @@ namespace mitk
   class InteractionEvent;
   class StateMachineState;
   class DataNode;
+  class Module;
 
   /**
    * \class TActionFunctor
@@ -109,11 +110,11 @@ namespace mitk
     /**
       * @brief Loads XML resource
       *
-      * Loads a XML resource file in the given module context.
+      * Loads a XML resource file from the given module.
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string& filename, const std::string& moduleName="Mitk");
+    bool LoadStateMachine(const std::string& filename, const Module* module = NULL);
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for

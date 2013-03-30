@@ -31,7 +31,7 @@ mitk::EventStateMachine::EventStateMachine() :
 {
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const std::string& moduleName)
+bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const Module* module)
 {
   if (m_StateMachineContainer != NULL)
   {
@@ -39,7 +39,7 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, cons
   }
   m_StateMachineContainer = StateMachineContainer::New();
 
-  if (m_StateMachineContainer->LoadBehavior(filename, moduleName))
+  if (m_StateMachineContainer->LoadBehavior(filename, module))
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 

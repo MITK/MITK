@@ -39,7 +39,7 @@ void mitk::MouseModeSwitcher::InitializeListeners()
   {
     m_CurrentObserver = mitk::DisplayInteractor::New();
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
-    m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
+    m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
     ServiceProperties props;
     props["name"] = std::string("DisplayInteractor");
@@ -55,12 +55,12 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
   {
   case MITK:
   {
-    m_CurrentObserver->LoadEventConfig("DisplayConfigMITK.xml");
+    m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
   }
     break;
   case PACS:
   {
-    m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
+    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
   }
     break;
   }
@@ -77,7 +77,7 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
   {
   case MousePointer:
   {
-    m_CurrentObserver->LoadEventConfig("DisplayConfigPACS.xml");
+    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
     break;
   } // case 0
   case Scroll:

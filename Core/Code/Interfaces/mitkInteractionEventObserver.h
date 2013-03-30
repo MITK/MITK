@@ -59,7 +59,7 @@ namespace mitk
 
     void Disable();
     void Enable();
-    bool IsEnabled();
+    bool IsEnabled() const;
   private:
     bool m_IsEnabled;
   };

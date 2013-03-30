@@ -20,11 +20,14 @@
 #include "mitkEventFactory.h"
 #include "mitkInteractionEventConst.h"
 
-mitk::StateMachineTransition::StateMachineTransition(std::string nextStateName, std::string eventClass, std::string eventVariant) :
-    m_EventClass(eventClass), m_EventVariant(eventVariant), m_NextStateName(nextStateName)
+mitk::StateMachineTransition::StateMachineTransition(const std::string& nextStateName, const std::string& eventClass,
+                                                     const std::string& eventVariant)
+  : m_EventClass(eventClass)
+  , m_EventVariant(eventVariant)
+  , m_NextStateName(nextStateName)
 {
   PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->SetStringProperty(xmlParameterEventClass.c_str(), eventClass.c_str());
+  propertyList->SetStringProperty(InteractionEventConst::xmlParameterEventClass.c_str(), eventClass.c_str());
   m_TransitionEvent = EventFactory::CreateEvent(propertyList);
 }
 
@@ -40,7 +43,7 @@ bool mitk::StateMachineTransition::operator ==(const StateMachineTransition& tra
     return false;
   }
   PropertyList::Pointer propertyList = PropertyList::New();
-  propertyList->SetStringProperty(xmlParameterEventClass.c_str(), transition.m_EventClass.c_str());
+  propertyList->SetStringProperty(InteractionEventConst::xmlParameterEventClass.c_str(), transition.m_EventClass.c_str());
   InteractionEvent::Pointer tmpEvent = EventFactory::CreateEvent(propertyList);
   if (tmpEvent.IsNull()) {
     return false;
@@ -70,7 +73,7 @@ mitk::StateMachineTransition::~StateMachineTransition()
   m_Actions.clear();
 }
 
-void mitk::StateMachineTransition::AddAction(StateMachineAction::Pointer action)
+void mitk::StateMachineTransition::AddAction(const StateMachineAction::Pointer& action)
 {
   m_Actions.push_back(action);
 }
@@ -90,7 +93,7 @@ std::vector<mitk::StateMachineAction::Pointer> mitk::StateMachineTransition::Get
   return m_Actions;
 }
 
-void mitk::StateMachineTransition::SetNextState(SpStateMachineState nextState)
+void mitk::StateMachineTransition::SetNextState(const SpStateMachineState& nextState)
 {
   m_NextState = nextState;
 }

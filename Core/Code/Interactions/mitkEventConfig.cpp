@@ -15,45 +15,126 @@
  ===================================================================*/
 
 #include "mitkEventConfig.h"
-#include <vtkXMLDataElement.h>
-#include <mitkStandardFileLocations.h>
-#include <vtkObjectFactory.h>
-#include <algorithm>
-#include <sstream>
+
 #include "mitkEventFactory.h"
 #include "mitkInteractionEvent.h"
 #include "mitkInternalEvent.h"
 #include "mitkInteractionKeyEvent.h"
 #include "mitkInteractionEventConst.h"
+
+// VTK
+#include <vtkXMLParser.h>
+#include <vtkXMLDataElement.h>
+
 // us
+#include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
 
-namespace mitk
-{
-  vtkStandardNewMacro(EventConfig);
-}
+namespace mitk {
 
-mitk::EventConfig::EventConfig() :
-    m_Errors(false)
+class EventConfigXMLParser : public vtkXMLParser
 {
-  if (m_PropertyList.IsNull())
+
+public:
+
+  EventConfigXMLParser(EventConfigPrivate* d);
+
+protected:
+
+  /**
+   * @brief Derived from XMLReader
+   **/
+  void StartElement(const char* elementName, const char **atts);
+
+  /**
+   * @brief Derived from XMLReader
+   **/
+  void EndElement(const char* elementName);
+
+  std::string ReadXMLStringAttribute(const std::string& name, const char** atts);
+  bool ReadXMLBooleanAttribute(const std::string& name, const char** atts);
+
+private:
+
+  EventConfigPrivate* const d;
+
+};
+
+struct EventConfigPrivate : public SharedData
+{
+
+  EventConfigPrivate();
+  EventConfigPrivate(const EventConfigPrivate& other);
+
+  struct EventMapping
   {
-    m_PropertyList = PropertyList::New();
-  }
+    std::string variantName;
+    InteractionEvent::ConstPointer interactionEvent;
+  };
+
+  /**
+   * Checks if mapping with the same parameters already exists, if so, it is replaced,
+   * else the new mapping added
+   */
+  void InsertMapping(const EventMapping& mapping);
+
+  /**
+   * @brief List of all global properties of the config object.
+   */
+  PropertyList::Pointer m_PropertyList;
+
+  /**
+   * @brief Temporal list of all properties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
+   * and </event_variant> tags.
+   */
+  PropertyList::Pointer m_EventPropertyList;
+
+  EventMapping m_CurrEventMapping;
+
+  typedef std::list<EventMapping> EventListType;
+
+  /**
+   * Stores InteractionEvents and their corresponding VariantName
+   */
+  EventListType m_EventList;
+
+  bool m_Errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
+
+  EventConfigXMLParser m_XmlParser;
+};
+
 }
 
-mitk::EventConfig::~EventConfig()
+
+mitk::EventConfigPrivate::EventConfigPrivate()
+  : m_PropertyList(PropertyList::New())
+  , m_Errors(false)
+  , m_XmlParser(this)
 {
+  // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  m_XmlParser.SetReferenceCount(0);
 }
 
-void mitk::EventConfig::InsertMapping(EventMapping mapping)
+mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate& other)
+  : SharedData(other)
+  , m_PropertyList(other.m_PropertyList->Clone())
+  , m_EventPropertyList(other.m_EventPropertyList->Clone())
+  , m_CurrEventMapping(other.m_CurrEventMapping)
+  , m_EventList(other.m_EventList)
+  , m_Errors(other.m_Errors)
+  , m_XmlParser(this)
+{
+  // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  m_XmlParser.SetReferenceCount(0);
+}
+
+void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
 {
   for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
   {
-    if ((*it).interactionEvent->MatchesTemplate(mapping.interactionEvent))
+    if (*(it->interactionEvent) == *mapping.interactionEvent)
     {
       //MITK_INFO<< "Configuration overwritten:" << (*it).variantName;
       m_EventList.erase(it);
@@ -63,66 +144,55 @@ void mitk::EventConfig::InsertMapping(EventMapping mapping)
   m_EventList.push_back(mapping);
 }
 
-/**
- * @brief Loads the xml file filename and generates the necessary instances.
- **/
-bool mitk::EventConfig::LoadConfig(std::string fileName, std::string moduleName)
+mitk::EventConfigXMLParser::EventConfigXMLParser(EventConfigPrivate *d)
+  : d(d)
 {
-  mitk::Module* module = mitk::ModuleRegistry::GetModule(moduleName);
-  mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
-  if (!resource.IsValid())
-  {
-    mitkThrow()<< ("Resource not valid. State machine pattern not found:" + fileName);
-  }
-  mitk::ModuleResourceStream stream(resource);
-  this->SetStream(&stream);
-  return this->Parse() && !m_Errors;
 }
 
-void mitk::EventConfig::StartElement(const char* elementName, const char **atts)
+void mitk::EventConfigXMLParser::StartElement(const char* elementName, const char **atts)
 {
   std::string name(elementName);
 
-  if (name == xmlTagConfigRoot)
+  if (name == InteractionEventConst::xmlTagConfigRoot)
   {
     //
   }
-  else if (name == xmlTagParam)
+  else if (name == InteractionEventConst::xmlTagParam)
   {
-    std::string name = ReadXMLStringAttribut(xmlParameterName, atts);
-    std::string value = ReadXMLStringAttribut(xmlParameterValue, atts);
-    m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
+    std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName, atts);
+    std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue, atts);
+    d->m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
-  else if (name == xmlTagEventVariant)
+  else if (name == InteractionEventConst::xmlTagEventVariant)
   {
-    std::string eventClass = ReadXMLStringAttribut(xmlParameterEventClass, atts);
-    std::string eventVariant = ReadXMLStringAttribut(xmlParameterName, atts);
+    std::string eventClass = ReadXMLStringAttribute(InteractionEventConst::xmlParameterEventClass, atts);
+    std::string eventVariant = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName, atts);
     // New list in which all parameters are stored that are given within the <input/> tag
-    m_EventPropertyList = PropertyList::New();
-    m_EventPropertyList->SetStringProperty(xmlParameterEventClass.c_str(), eventClass.c_str());
-    m_EventPropertyList->SetStringProperty(xmlParameterEventVariant.c_str(), eventVariant.c_str());
-    m_CurrEventMapping.variantName = eventVariant;
+    d->m_EventPropertyList = PropertyList::New();
+    d->m_EventPropertyList->SetStringProperty(InteractionEventConst::xmlParameterEventClass.c_str(), eventClass.c_str());
+    d->m_EventPropertyList->SetStringProperty(InteractionEventConst::xmlParameterEventVariant.c_str(), eventVariant.c_str());
+    d->m_CurrEventMapping.variantName = eventVariant;
   }
-  else if (name == xmlTagAttribute)
+  else if (name == InteractionEventConst::xmlTagAttribute)
   {
     // Attributes that describe an Input Event, such as which MouseButton triggered the event,or which modifier keys are pressed
-    std::string name = ReadXMLStringAttribut(xmlParameterName, atts);
-    std::string value = ReadXMLStringAttribut(xmlParameterValue, atts);
-    m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
+    std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName, atts);
+    std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue, atts);
+    d->m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
 }
 
-void mitk::EventConfig::EndElement(const char* elementName)
+void mitk::EventConfigXMLParser::EndElement(const char* elementName)
 {
   std::string name(elementName);
   // At end of input section, all necessary infos are collected to created an interaction event.
-  if (name == xmlTagEventVariant)
+  if (name == InteractionEventConst::xmlTagEventVariant)
   {
-    InteractionEvent::Pointer event = EventFactory::CreateEvent(m_EventPropertyList);
+    InteractionEvent::Pointer event = EventFactory::CreateEvent(d->m_EventPropertyList);
     if (event.IsNotNull())
     {
-      m_CurrEventMapping.interactionEvent = event;
-      InsertMapping(m_CurrEventMapping);
+      d->m_CurrEventMapping.interactionEvent = event;
+      d->InsertMapping(d->m_CurrEventMapping);
     }
     else
     {
@@ -131,7 +201,7 @@ void mitk::EventConfig::EndElement(const char* elementName)
   }
 }
 
-std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const char** atts)
+std::string mitk::EventConfigXMLParser::ReadXMLStringAttribute(const std::string& name, const char** atts)
 {
   if (atts)
   {
@@ -150,23 +220,118 @@ std::string mitk::EventConfig::ReadXMLStringAttribut(std::string name, const cha
   return std::string();
 }
 
-mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
+bool mitk::EventConfigXMLParser::ReadXMLBooleanAttribute(const std::string& name, const char** atts)
 {
-  return m_PropertyList;
+  std::string s = ReadXMLStringAttribute(name, atts);
+  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+
+  return s == "TRUE";
 }
 
-std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interactionEvent)
+mitk::EventConfig::EventConfig()
+  : d(new EventConfigPrivate)
+{
+}
+
+mitk::EventConfig::EventConfig(const EventConfig &other)
+  : d(other.d)
+{
+}
+
+mitk::EventConfig::EventConfig(const std::string& filename, const Module* module)
+  : d(new EventConfigPrivate)
+{
+  if (module == NULL)
+  {
+    module = GetModuleContext()->GetModule();
+  }
+  mitk::ModuleResource resource = module->GetResource("Interactions/" + filename);
+  if (!resource.IsValid())
+  {
+    MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
+               << " not found: /Interactions/" << filename;
+    return;
+  }
+
+  EventConfig newConfig;
+  mitk::ModuleResourceStream stream(resource);
+  newConfig.d->m_XmlParser.SetStream(&stream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+}
+
+mitk::EventConfig& mitk::EventConfig::operator =(const mitk::EventConfig& other)
+{
+  d = other.d;
+  return *this;
+}
+
+mitk::EventConfig::~EventConfig()
+{
+}
+
+bool mitk::EventConfig::IsValid() const
+{
+  return !d->m_EventList.empty();
+}
+
+bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* module)
+{
+  if (module == NULL)
+  {
+    module = GetModuleContext()->GetModule();
+  }
+  mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
+  if (!resource.IsValid())
+  {
+    MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
+               << " not found: /Interactions/" << fileName;
+    return false;
+  }
+
+  EventConfig newConfig(*this);
+  mitk::ModuleResourceStream stream(resource);
+  newConfig.d->m_XmlParser.SetStream(&stream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+  return success;
+}
+
+bool mitk::EventConfig::AddConfig(const EventConfig& config)
+{
+  if (!config.IsValid()) return false;
+
+  d->m_PropertyList->ConcatenatePropertyList(config.d->m_PropertyList->Clone(), true);
+  d->m_EventPropertyList = config.d->m_EventPropertyList->Clone();
+  d->m_CurrEventMapping = config.d->m_CurrEventMapping;
+  d->InsertMapping(config.d->m_CurrEventMapping);
+  return true;
+}
+
+mitk::PropertyList::Pointer mitk::EventConfig::GetAttributes() const
+{
+  return d->m_PropertyList;
+}
+
+std::string mitk::EventConfig::GetMappedEvent(const EventType& interactionEvent) const
 {
   // internal events are excluded from mapping
-  if (interactionEvent->GetEventClass() == "InternalEvent")
+  if (std::strcmp(interactionEvent->GetNameOfClass(), "InternalEvent") == 0)
   {
     InternalEvent* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent.GetPointer());
     return internalEvent->GetSignalName();
   }
 
-  for (EventListType::iterator it = m_EventList.begin(); it != m_EventList.end(); ++it)
+  for (EventConfigPrivate::EventListType::const_iterator it = d->m_EventList.begin();
+       it != d->m_EventList.end(); ++it)
   {
-    if ((*it).interactionEvent->MatchesTemplate(interactionEvent))
+    if (*(it->interactionEvent) == *interactionEvent)
     {
       return (*it).variantName;
     }
@@ -174,7 +339,7 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interact
   // if this part is reached, no mapping has been found,
   // so here we handle key events and map a key event to the string "Std" + letter/code
   // so "A" will be returned as "StdA"
-  if (interactionEvent->GetEventClass() == "KeyEvent")
+  if (std::strcmp(interactionEvent->GetNameOfClass(), "InteractionKeyEvent") == 0)
   {
     InteractionKeyEvent* keyEvent = dynamic_cast<InteractionKeyEvent*>(interactionEvent.GetPointer());
     return ("Std" + keyEvent->GetKey());
@@ -184,13 +349,10 @@ std::string mitk::EventConfig::GetMappedEvent(InteractionEvent::Pointer interact
 
 void mitk::EventConfig::ClearConfig()
 {
-  m_EventList.clear();
-}
-
-bool mitk::EventConfig::ReadXMLBooleanAttribut(std::string name, const char** atts)
-{
-  std::string s = ReadXMLStringAttribut(name, atts);
-  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-
-  return s == "TRUE";
+  d->m_PropertyList->Clear();
+  d->m_EventPropertyList->Clear();
+  d->m_CurrEventMapping.variantName.clear();
+  d->m_CurrEventMapping.interactionEvent = NULL;
+  d->m_EventList.clear();
+  d->m_Errors = false;
 }

@@ -86,7 +86,7 @@ void mitk::BindDispatcherInteractor::UnRegisterInteractor(const DataNode* dataNo
   }
 }
 
-const mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher()
+mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher() const
 {
   return m_Dispatcher;
 }

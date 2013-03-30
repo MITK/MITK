@@ -48,6 +48,8 @@ public:
 
   mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const std::string&);
 
+  Pointer Clone() const;
+
   typedef enum
   {
     Square, Circle
@@ -80,6 +82,13 @@ protected:
    * Adds the standard enumeration types with corresponding strings.
    */
   virtual void AddEnumTypes();
+
+private:
+
+  // purposely not implemented
+  PlanarFigureControlPointStyleProperty& operator=(const PlanarFigureControlPointStyleProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // end of namespace mitk

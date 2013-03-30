@@ -41,16 +41,20 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
     mitkClassMacro(GroupTagProperty, BaseProperty);
     itkNewMacro(GroupTagProperty);
 
+    Pointer Clone() const;
+
     using BaseProperty::operator=;
 
   protected:
     GroupTagProperty();
+    GroupTagProperty(const GroupTagProperty&);
 
   private:
 
     // purposely not implemented
-    GroupTagProperty(const GroupTagProperty&);
     GroupTagProperty& operator=(const GroupTagProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty& property) const;
     virtual bool Assign(const BaseProperty& property);

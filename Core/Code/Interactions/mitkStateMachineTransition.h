@@ -19,7 +19,7 @@
 
 #include <MitkExports.h>
 #include "mitkCommon.h"
-#include <itkObject.h>
+#include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
 #include "mitkStateMachineAction.h"
@@ -39,14 +39,14 @@ namespace mitk
    * @ingroup Interaction
    **/
 
-    class MITK_CORE_EXPORT StateMachineTransition: public itk::Object
+    class MITK_CORE_EXPORT StateMachineTransition: public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineTransition, itk::Object);
-    mitkNewMacro3Param(Self, std::string,std::string,std::string);
+    mitkClassMacro(StateMachineTransition, itk::LightObject);
+    mitkNewMacro3Param(Self, const std::string&, const std::string&, const std::string&);
 
 
-    void AddAction(StateMachineAction::Pointer action);
+    void AddAction(const StateMachineAction::Pointer& action);
     SpStateMachineState GetNextState() const;
     std::string GetNextStateName() const;
     /**
@@ -65,10 +65,10 @@ namespace mitk
     /**
      * @brief Set the next state of this object.
      **/
-    void SetNextState(SpStateMachineState nextState);
+    void SetNextState(const SpStateMachineState& nextState);
 
   protected:
-    StateMachineTransition(std::string nextStateName, std::string eventClass, std::string eventVariant);
+    StateMachineTransition(const std::string& nextStateName, const std::string& eventClass, const std::string& eventVariant);
     virtual ~StateMachineTransition();
 
     // Triggering Event

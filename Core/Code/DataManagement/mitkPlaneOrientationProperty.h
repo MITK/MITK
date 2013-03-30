@@ -52,6 +52,8 @@ public:
 
   mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
+  Pointer Clone() const;
+
   enum
   {
     PLANE_DECORATION_NONE,
@@ -115,8 +117,9 @@ protected:
 private:
 
   // purposely not implemented
-  PlaneOrientationProperty(const PlaneOrientationProperty&);
   PlaneOrientationProperty& operator=(const PlaneOrientationProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

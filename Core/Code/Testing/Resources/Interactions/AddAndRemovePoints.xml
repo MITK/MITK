@@ -12,7 +12,7 @@
         <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="pointisselected">
             <action name="selectpoint"/>
         </transition>
-        <transition event_class="KeyEvent" event_variant="Abort" target="start">
+        <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
             <action name="abort"/>
         </transition>
     </state>
@@ -23,7 +23,7 @@
         <transition event_class="MousePressEvent" event_variant="DeletePoint" target="start">
             <action name="deleteselection"/>
         </transition>
-        <transition event_class="KeyEvent" event_variant="Abort" target="start">
+        <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
             <action name="abort"/>
         </transition>
     </state>

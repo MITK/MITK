@@ -72,4 +72,14 @@ void mitk::PlanarFigureControlPointStyleProperty::SetShape(mitk::PlanarFigureCon
   this->SetValue( static_cast<IdType>( shape ) );
 }
 
+mitk::PlanarFigureControlPointStyleProperty::Pointer mitk::PlanarFigureControlPointStyleProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
 
+itk::LightObject::Pointer mitk::PlanarFigureControlPointStyleProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

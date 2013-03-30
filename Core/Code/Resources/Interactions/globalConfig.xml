@@ -60,10 +60,10 @@ Global variant    Event class   Button/Key      Modifiers
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
   <!-- Key Events -->
-  <event_variant class="KeyEvent" name="StdA">
+  <event_variant class="InteractionKeyEvent" name="StdA">
     <attribute name="Key" value="A"/>
   </event_variant>
-  <event_variant class="KeyEvent" name="StdB">
+  <event_variant class="InteractionKeyEvent" name="StdB">
     <attribute name="Key" value="B"/>
   </event_variant>
   <!-- ... -->

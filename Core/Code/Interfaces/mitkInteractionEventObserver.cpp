@@ -35,7 +35,7 @@ void mitk::InteractionEventObserver::Enable()
   m_IsEnabled = true;
 }
 
-bool mitk::InteractionEventObserver::IsEnabled()
+bool mitk::InteractionEventObserver::IsEnabled() const
 {
   return m_IsEnabled;
 }

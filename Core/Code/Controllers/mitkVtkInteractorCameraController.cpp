@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCommand.h>
 #include "mitkAction.h"
 #include "mitkVtkPropRenderer.h"
+#include "mitkKeyEvent.h"
 
 mitk::VtkInteractorCameraController::VtkInteractorCameraController(const char* type) : CameraController(type), m_VtkInteractor(NULL)
 {

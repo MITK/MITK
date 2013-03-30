@@ -30,6 +30,8 @@ mitk::CameraIntrinsics::CameraIntrinsics()
 mitk::CameraIntrinsics::CameraIntrinsics(const CameraIntrinsics& other)
   : itk::Object()
   , mitk::XMLSerializable()
+  , m_Valid(false)
+  , m_Mutex(itk::FastMutexLock::New())
 {
   this->Copy(&other);
 }

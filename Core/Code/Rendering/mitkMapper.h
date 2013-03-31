@@ -165,7 +165,7 @@ namespace mitk {
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
-    int GetTimestep() const { return m_TimeStep; };
+    int GetTimestep() const { return m_TimeStep; }
 
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
      * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
@@ -183,7 +183,7 @@ namespace mitk {
     /** \brief Generate the data needed for rendering (independent of a specific renderer)
      *  \deprecatedSince{2013_03} Use GenerateDataForRenderer(BaseRenderer* renderer) instead.
      */
-    DEPRECATED( virtual void GenerateData() { });
+    DEPRECATED( virtual void GenerateData() ) { }
 
     /** \brief Generate the data needed for rendering into \a renderer */
     virtual void GenerateDataForRenderer(BaseRenderer* /* renderer */) { }
@@ -197,7 +197,7 @@ namespace mitk {
     *
     * To be implemented in sub-classes.
     */
-    virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
+    virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { }
 
     //\brief not thread-safe
     itk::WeakPointer<DataNode> m_DataNode;

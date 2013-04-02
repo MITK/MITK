@@ -218,7 +218,8 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
       //logical or combination of preview and segmentation slice
       OutputImageType::Pointer segmentationSlice = OutputImageType::New();
 
-      CastToItkImage(GetAffectedWorkingSlice( positionEvent ), segmentationSlice);
+      mitk::Image::Pointer workingSlice = GetAffectedWorkingSlice( positionEvent );
+      CastToItkImage( workingSlice, segmentationSlice );
 
       typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
       OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
@@ -230,6 +231,8 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
       mitk::Image::Pointer segmentationResult = mitk::Image::New();
 
       mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+      segmentationResult->GetGeometry()->SetOrigin(workingSlice->GetGeometry()->GetOrigin());
+      segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingSlice->GetGeometry()->GetIndexToWorldTransform());
 
       //write to segmentation volume and hide preview image
       this->WriteBackSegmentationResult(positionEvent, segmentationResult );

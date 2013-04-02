@@ -65,8 +65,8 @@ beta(3.0)
   thresholder->SetInsideValue( 1.0 );
 
   smoothing = SmoothingFilterType::New();
-  smoothing->SetTimeStep( 0.125 );
-  smoothing->SetNumberOfIterations( 5 );
+  smoothing->SetTimeStep( 0.05 );
+  smoothing->SetNumberOfIterations( 2 );
   smoothing->SetConductanceParameter( 9.0 );
 
   gradientMagnitude = GradientFilterType::New();
@@ -144,6 +144,10 @@ void mitk::FastMarchingTool::Activated()
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode);
+
+  m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  CastToItkImage(m_ReferenceSlice, m_SliceInITK);
+  smoothing->SetInput( m_SliceInITK );
 }
 
 void mitk::FastMarchingTool::Deactivated()
@@ -151,6 +155,7 @@ void mitk::FastMarchingTool::Deactivated()
   Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
+  this->ClearSeeds();
   m_ResultImageNode = NULL;
 }
 
@@ -162,12 +167,12 @@ bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* s
   if (!positionEvent) return false;
 
   //if click happpened in another renderwindow or slice then reset pipeline and preview
-  if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
-  {
-    this->ResetFastMarching(positionEvent);
-  }
-  m_LastEventSender = positionEvent->GetSender();
-  m_LastEventSlice = m_LastEventSender->GetSlice();
+  //if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
+  //{
+  //  this->ResetFastMarching(positionEvent);
+  //}
+  //m_LastEventSender = positionEvent->GetSender();
+  //m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
 
@@ -218,7 +223,7 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
       //logical or combination of preview and segmentation slice
       OutputImageType::Pointer segmentationSlice = OutputImageType::New();
 
-      mitk::Image::Pointer workingSlice = GetAffectedWorkingSlice( positionEvent );
+      mitk::Image::Pointer workingSlice = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
       CastToItkImage( workingSlice, segmentationSlice );
 
       typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
@@ -234,15 +239,18 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
       segmentationResult->GetGeometry()->SetOrigin(workingSlice->GetGeometry()->GetOrigin());
       segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingSlice->GetGeometry()->GetIndexToWorldTransform());
 
+      this->m_ResultImageNode->SetData(segmentationResult);
+      this->m_ToolManager->GetWorkingData(0)->SetData(segmentationResult);
       //write to segmentation volume and hide preview image
-      this->WriteBackSegmentationResult(positionEvent, segmentationResult );
+      //this->WriteBackSegmentationResult(positionEvent, segmentationResult );
+
       this->m_ResultImageNode->SetVisibility(false);
       this->ClearSeeds();
     }
 
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   return true;
 }
@@ -255,32 +263,30 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   if (!positionEvent) return false;
 
   //if click happpened in another renderwindow or slice then reset pipeline and preview
-  if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
-  {
-    this->ResetFastMarching(positionEvent);
-  }
-  m_LastEventSender = positionEvent->GetSender();
-  m_LastEventSlice = m_LastEventSender->GetSlice();
+  //if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
+  //{
+  //  this->ResetFastMarching(positionEvent);
+  //}
+  //m_LastEventSender = positionEvent->GetSender();
+  //m_LastEventSlice = m_LastEventSender->GetSlice();
 
 
   mitk::Point3D clickInIndex;
 
   m_ReferenceSlice->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
-
-  itk::Index<2> seedPosition;
+  itk::Index<3> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
+  seedPosition[2] = clickInIndex[2];
 
   NodeType node;
   const double seedValue = 0.0;
   node.SetValue( seedValue );
   node.SetIndex( seedPosition );
-
   this->seeds->InsertElement(this->seeds->Size(), node);
   fastMarching->Modified();
 
   m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
-
 
   //preview result by updating the pipeline - this is not done automatically for changing seeds
   this->UpdatePreviewImage();
@@ -321,7 +327,6 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
       std::cerr << excep << std::endl;
       return;
     }
-
     //make output visible
     mitk::Image::Pointer result = mitk::Image::New();
     CastToMitkImage( thresholder->GetOutput(), result);
@@ -329,7 +334,6 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
     result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceSlice->GetGeometry()->GetIndexToWorldTransform() );
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
-
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -349,7 +353,7 @@ void mitk::FastMarchingTool::ResetFastMarching(const PositionEvent* positionEven
 {
   /*++++++++reset all relevant inputs for FastMarching++++++++*/
   //reset reference slice according to the plane where the click happened
-  m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+  m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
 
   //reset input of FastMarching pipeline
   CastToItkImage(m_ReferenceSlice, m_SliceInITK);

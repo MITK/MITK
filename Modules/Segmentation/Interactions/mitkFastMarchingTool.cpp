@@ -67,7 +67,7 @@ beta(3.0)
   smoothing = SmoothingFilterType::New();
   smoothing->SetTimeStep( 0.125 );
   smoothing->SetNumberOfIterations( 5 );
-  smoothing->SetConductanceParameter( 3.0 );
+  smoothing->SetConductanceParameter( 9.0 );
 
   gradientMagnitude = GradientFilterType::New();
   gradientMagnitude->SetSigma( sigma );
@@ -79,7 +79,7 @@ beta(3.0)
   sigmoid->SetOutputMaximum( 1.0 );
 
   fastMarching = FastMarchingFilterType::New();
-  fastMarching->SetStoppingValue( 100 );
+  fastMarching->SetStoppingValue( m_InitialStoppingValue );
 
   seeds = NodeContainer::New();
   seeds->Initialize();
@@ -157,9 +157,11 @@ void mitk::FastMarchingTool::Deactivated()
 
 bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
 {
+  /*++++++++remenber mouse position to determine movement++++++++*/
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  //if click happpened in another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
   {
     this->ResetFastMarching(positionEvent);
@@ -174,47 +176,35 @@ bool mitk::FastMarchingTool::OnMousePressed (Action* action, const StateEvent* s
 }
 
 
-
-/**
-If in region growing mode (m_ReferenceSlice != NULL), then
-1. Calculate the new thresholds from mouse position (relative to first position)
-2. Perform a new region growing and update the feedback contour
-*/
 bool mitk::FastMarchingTool::OnMouseMoved(Action* action, const StateEvent* stateEvent)
 {
-  if ( FeedbackContourTool::CanHandleEvent(stateEvent) > 0.0 )
+  /*++++++++change parameters according to mouse move++++++++*/
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (positionEvent)
   {
-    if ( m_ReferenceSlice.IsNotNull() )
-    {
-      const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-      if (positionEvent)
-      {
-        ApplicationCursor* cursor = ApplicationCursor::GetInstance();
-        if (!cursor) return false;
-        m_ScreenXDifference += cursor->GetCursorPosition()[0] - m_LastScreenPosition[0];
-        m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
-        cursor->SetCursorPosition( m_LastScreenPosition );
+    //determine movement in x and y direction
+    ApplicationCursor* cursor = ApplicationCursor::GetInstance();
+    if (!cursor) return false;
+    m_ScreenXDifference += cursor->GetCursorPosition()[0] - m_LastScreenPosition[0];
+    m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
+    cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_StoppingValue = std::max<mitk::ScalarType>(0.0, m_InitialStoppingValue + m_ScreenXDifference * m_MouseDistanceScaleFactor);
-        m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
+    m_StoppingValue = std::max<mitk::ScalarType>(0.0, m_InitialStoppingValue + m_ScreenXDifference * m_MouseDistanceScaleFactor);
+    m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
 
-        //thresholder->SetLowerThreshold( m_LowerThreshold );
-        fastMarching->SetStoppingValue( m_StoppingValue );
-        thresholder->SetUpperThreshold( m_UpperThreshold );
+    //thresholder->SetLowerThreshold( m_LowerThreshold );
+    fastMarching->SetStoppingValue( m_StoppingValue );
+    thresholder->SetUpperThreshold( m_UpperThreshold );
 
-        this->UpdatePreviewImage();
-      }
-    }
+    this->UpdatePreviewImage();
   }
-
   return true;
 }
 
-/**
-If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
-*/
+
 bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
 {
+  /*+++++++combine preview image with already performed segmentation++++++*/
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (positionEvent)
   {
@@ -225,6 +215,7 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
     if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
     {
+      //logical or combination of preview and segmentation slice
       OutputImageType::Pointer segmentationSlice = OutputImageType::New();
 
       CastToItkImage(GetAffectedWorkingSlice( positionEvent ), segmentationSlice);
@@ -240,6 +231,7 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
       mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
 
+      //write to segmentation volume and hide preview image
       this->WriteBackSegmentationResult(positionEvent, segmentationResult );
       this->m_ResultImageNode->SetVisibility(false);
       this->ClearSeeds();
@@ -247,7 +239,6 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
   }
 
-  FeedbackContourTool::SetFeedbackContourVisible(false);
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
@@ -256,9 +247,11 @@ bool mitk::FastMarchingTool::OnMouseReleased(Action* action, const StateEvent* s
 
 bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateEvent)
 {
+  /*++++++++++++Add a new seed point for FastMarching algorithm+++++++++++*/
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  //if click happpened in another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
   {
     this->ResetFastMarching(positionEvent);
@@ -286,6 +279,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
 
 
+  //preview result by updating the pipeline - this is not done automatically for changing seeds
   this->UpdatePreviewImage();
   return true;
 }
@@ -293,15 +287,17 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
 bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEvent)
 {
-  //delete last element of seeds container
+  /*++++++++++delete last seed point++++++++*/
   if(!(this->seeds->empty()))
   {
+    //delete last element of seeds container
     this->seeds->pop_back();
     fastMarching->Modified();
 
     //delete last point in pointset - somehow ugly
     m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
 
+    //preview result by updating the pipeline - this is not done automatically for changing seeds
     this->UpdatePreviewImage();
   }
   return true;
@@ -310,9 +306,9 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::UpdatePreviewImage()
 {
+  /*++++++++update FastMarching pipeline and show result++++++++*/
   if(m_ReferenceSlice.IsNotNull())
   {
-
     try{
       thresholder->UpdateLargestPossibleRegion();
     }
@@ -323,6 +319,7 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
       return;
     }
 
+    //make output visible
     mitk::Image::Pointer result = mitk::Image::New();
     CastToMitkImage( thresholder->GetOutput(), result);
     result->GetGeometry()->SetOrigin(m_ReferenceSlice->GetGeometry()->GetOrigin() );
@@ -337,6 +334,7 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
 
 void mitk::FastMarchingTool::ClearSeeds()
 {
+  /*++++++++clear seeds for FastMarching as well as the PointSet for visualization++++++++*/
   this->seeds->clear();
   fastMarching->Modified();
 
@@ -346,11 +344,15 @@ void mitk::FastMarchingTool::ClearSeeds()
 
 void mitk::FastMarchingTool::ResetFastMarching(const PositionEvent* positionEvent)
 {
+  /*++++++++reset all relevant inputs for FastMarching++++++++*/
+  //reset reference slice according to the plane where the click happened
   m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
 
+  //reset input of FastMarching pipeline
   CastToItkImage(m_ReferenceSlice, m_SliceInITK);
   smoothing->SetInput( m_SliceInITK );
 
+  //clear all seeds and preview empty result
   this->ClearSeeds();
   this->UpdatePreviewImage();
 }

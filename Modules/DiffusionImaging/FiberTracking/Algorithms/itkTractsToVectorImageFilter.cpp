@@ -137,8 +137,8 @@ void TractsToVectorImageFilter::GenerateData()
     if (m_UseWorkingCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
 
-    if (m_FiberSampling>0)
-        m_FiberBundle->DoFiberSmoothing(ceil(10.0*m_FiberSampling/minSpacing));
+    // resample fiber bundle for sufficient voxel coverage
+    m_FiberBundle->ResampleFibers(minSpacing/10);
 
     // iterate over all fibers
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();

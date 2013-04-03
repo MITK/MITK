@@ -21,6 +21,12 @@ mitk::LookupTableProperty::LookupTableProperty()
 {
 }
 
+mitk::LookupTableProperty::LookupTableProperty(const LookupTableProperty& other)
+  : mitk::BaseProperty(other)
+  , m_LookupTable(other.m_LookupTable)
+{
+}
+
 mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable::Pointer lut)
 {
     this->SetLookupTable(lut);
@@ -65,4 +71,16 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
 void mitk::LookupTableProperty::SetValue(const ValueType & value)
 {
   SetLookupTable(value);
+}
+
+mitk::LookupTableProperty::Pointer mitk::LookupTableProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

@@ -42,23 +42,19 @@ mitk::PlanarFigureMapper3D::~PlanarFigureMapper3D()
 
 const mitk::PlanarFigure* mitk::PlanarFigureMapper3D::GetInput()
 {
-    return static_cast<const mitk::PlanarFigure * > ( GetData() );
+    return static_cast<const mitk::PlanarFigure * > ( GetDataNode()->GetData() );
 }
 
-/*
- This method is called once the mapper gets new input,
- for UI rotation or changes in colorcoding this method is NOT called
- */
-void mitk::PlanarFigureMapper3D::GenerateData()
+
+void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
     try
     {
-        mitk::PlanarFigure* pf = dynamic_cast< mitk::PlanarFigure* > (this->GetData());
+        mitk::PlanarFigure* pf = dynamic_cast< mitk::PlanarFigure* > (GetDataNode()->GetData());
 
         const mitk::Geometry2D* pfgeometry = pf->GetGeometry2D();
         const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
         mitk::Point3D wp;
-
         mitk::PlanarFigure::PolyLineType line = pf->GetPolyLine(0);
 
         if (line.size() <= 2)
@@ -86,42 +82,6 @@ void mitk::PlanarFigureMapper3D::GenerateData()
         m_VtkPolygonDataMapperGL->SetInput(m_polygonPolyData);
         m_PolygonActor->SetMapper(m_VtkPolygonDataMapperGL);
         m_PolygonAssembly->AddPart(m_PolygonActor);
-
-        m_VtkPolygonDataMapperGL->Modified();
-    }
-    catch(...)
-    {
-
-    }
-}
-
-void mitk::PlanarFigureMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
-{
-    try
-    {
-        mitk::PlanarFigure* pf = dynamic_cast< mitk::PlanarFigure* > (this->GetData());
-
-        const mitk::Geometry2D* pfgeometry = pf->GetGeometry2D();
-        const mitk::PlaneGeometry* planeGeo = dynamic_cast<const mitk::PlaneGeometry*>(pfgeometry);
-        mitk::Point3D wp;
-        mitk::PlanarFigure::PolyLineType line = pf->GetPolyLine(0);
-
-        if (line.size() <= 2)
-            return;
-
-        m_points->SetNumberOfPoints(line.size());
-        m_polygon->GetPointIds()->SetNumberOfIds(line.size());
-
-        int i=0;
-        for (mitk::PlanarFigure::PolyLineType::iterator it = line.begin(); it!=line.end(); ++it)
-        {
-            mitk::PlanarFigure::PolyLineElement elem = *it;
-            planeGeo->Map(elem.Point, wp);
-
-            m_points->InsertPoint(i,(double)wp[0], (double)wp[1], (double)wp[2] );
-            m_polygon->GetPointIds()->SetId(i, i);
-            i++;
-        }
 
         //updates all polygon pipeline
         m_VtkPolygonDataMapperGL->Modified();

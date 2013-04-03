@@ -199,6 +199,7 @@ set(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
+  DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
@@ -224,6 +225,7 @@ set(CPP_FILES
   Interactions/mitkInteractor.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp
+  Interactions/mitkInteractionEventConst.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionKeyEvent.cpp
   Interactions/mitkMousePressEvent.cpp
@@ -254,6 +256,7 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
+  Interfaces/mitkIShaderRepository.cpp
 
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
@@ -299,16 +302,13 @@ set(CPP_FILES
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
-  Rendering/mitkVtkMapper2D.cpp
-  Rendering/mitkVtkMapper3D.cpp
+  Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper2D.cpp
+  Rendering/mitkGLMapper.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
-  Rendering/mitkMapper2D.cpp
-  Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
@@ -328,11 +328,13 @@ set(CPP_FILES
   Rendering/vtkMitkThickSlicesFilter.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp
   Rendering/vtkNeverTranslucentTexture.cpp
+  Rendering/mitkRenderingTestHelper.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+  Common/mitkCoreServices.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
@@ -349,9 +351,10 @@ Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
+Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-Interactions/Tests/AddAndRemovePoints.xml
-Interactions/Tests/globalConfig.xml
-Interactions/Tests/StatemachineTest.xml
-Interactions/Tests/StatemachineConfigTest.xml
+
+Shaders/mitkShaderLighting.xml
+
+mitkLevelWindowPresets.xml
 )

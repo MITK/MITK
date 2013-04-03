@@ -50,7 +50,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
     {
       if ( !reader->LoadScene( document, workingDirectory, storage ) )
       {
-        MITK_ERROR << "There were errors while loding scene file " << workingDirectory + "/index.xml. Your data may be corrupted";
+        MITK_ERROR << "There were errors while loading scene file " << workingDirectory + "/index.xml. Your data may be corrupted";
         return false;
       }
       else

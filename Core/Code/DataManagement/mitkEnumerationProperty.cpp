@@ -27,6 +27,11 @@ mitk::EnumerationProperty::EnumerationProperty()
   m_CurrentValue = 0;
 }
 
+mitk::EnumerationProperty::EnumerationProperty(const EnumerationProperty& other)
+  : BaseProperty(other)
+  , m_CurrentValue(other.m_CurrentValue)
+{
+}
 
 bool mitk::EnumerationProperty::AddEnum( const std::string& name, const IdType& id )
 {
@@ -193,3 +198,14 @@ const mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProp
   return s_StringMapForClassName[ className ];
 }
 
+mitk::EnumerationProperty::Pointer mitk::EnumerationProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::EnumerationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

@@ -39,23 +39,29 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())
   {
-    AccessByItk(m_FixedImage, GetTransform2);
+    AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 3);
     return m_TransformObject;
   }
   return NULL;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
 {
   if (VImageDimension == 3)
   {
     typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
     typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
-    typename FixedImage3DType::Pointer fixedImage3D;
-    mitk::CastToItkImage(m_FixedImage, fixedImage3D);
-    typename MovingImage3DType::Pointer movingImage3D;
-    mitk::CastToItkImage(m_MovingImage, movingImage3D);
+
+    // the fixedImage is the input parameter (fix for Bug #14626)
+    typename FixedImage3DType::Pointer fixedImage = itkImage1;
+
+    // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+    typename mitk::ImageToItk<MovingImage3DType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImage3DType>::New();
+    movingImageToItk->SetInput(m_MovingImage);
+    movingImageToItk->Update();
+    typename MovingImage3DType::Pointer movingImage = movingImageToItk->GetOutput();
+
     typename itk::VersorRigid3DTransform< double >::Pointer transformPointer = itk::VersorRigid3DTransform< double >::New();
     transformPointer->SetIdentity();
     typedef typename itk::VersorRigid3DTransform< double >    VersorRigid3DTransformType;
@@ -63,8 +69,8 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<T
     {
       typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage3D );
-      transformInitializer->SetMovingImage( movingImage3D );
+      transformInitializer->SetFixedImage( fixedImage );
+      transformInitializer->SetMovingImage( movingImage );
       transformInitializer->SetTransform( transformPointer );
       if (m_Controls.m_MomentsVersorRigid3D->isChecked())
       {

@@ -31,8 +31,8 @@ class QDragEnterEvent;
 class QDropEvent;
 
 /**
+ * \ingroup QmitkModule
  * \brief MITK implementation of the QVTKWidget
- * \ingroup Renderer
  */
 class QMITK_EXPORT QmitkRenderWindow: public QVTKWidget, public mitk::RenderWindowBase
 {
@@ -156,16 +156,16 @@ private:
 
   // Helper Functions to Convert Qt-Events to Mitk-Events
 
-  mitk::Point2D GetMousePosition(QMouseEvent* me);
-  mitk::Point2D GetMousePosition(QWheelEvent* we);
-  mitk::MouseButtons GetEventButton(QMouseEvent* me);
-  mitk::MouseButtons GetButtonState(QMouseEvent* me);
-  mitk::ModifierKeys GetModifiers(QMouseEvent* me);
-  mitk::MouseButtons GetButtonState(QWheelEvent* we);
-  mitk::ModifierKeys GetModifiers(QWheelEvent* we);
-  mitk::ModifierKeys GetModifiers(QKeyEvent* ke);
-  std::string GetKeyLetter(QKeyEvent* ke);
-  int GetDelta(QWheelEvent* we);
+  mitk::Point2D GetMousePosition(QMouseEvent* me) const;
+  mitk::Point2D GetMousePosition(QWheelEvent* we) const;
+  mitk::InteractionEvent::MouseButtons GetEventButton(QMouseEvent* me) const;
+  mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent* me) const;
+  mitk::InteractionEvent::ModifierKeys GetModifiers(QMouseEvent* me) const;
+  mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent* we) const;
+  mitk::InteractionEvent::ModifierKeys GetModifiers(QWheelEvent* we) const;
+  mitk::InteractionEvent::ModifierKeys GetModifiers(QKeyEvent* ke) const;
+  std::string GetKeyLetter(QKeyEvent* ke) const;
+  int GetDelta(QWheelEvent* we) const;
 
   bool m_ResendQtEvents;
 

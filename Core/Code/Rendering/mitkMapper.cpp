@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Mapper::Mapper()
   :m_TimeStep( 0 )
 {
-
 }
 
 
@@ -31,14 +30,15 @@ mitk::Mapper::~Mapper()
 {
 }
 
+
 mitk::BaseData* mitk::Mapper::GetData() const
 {
-  return m_DataNode->GetData();
+return m_DataNode->GetData();
 }
+
 
 mitk::DataNode* mitk::Mapper::GetDataNode() const
 {
-  itkDebugMacro("returning DataNode address " << this->m_DataNode );
   return this->m_DataNode.GetPointer();
 }
 
@@ -79,20 +79,14 @@ bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRend
     return node->GetLevelWindow(levelWindow, renderer, name);
 }
 
+
 bool mitk::Mapper::IsVisible(mitk::BaseRenderer* renderer, const char* name) const
 {
-    bool visible=true;
-    GetVisibility(visible, renderer, name);
+    bool visible = true;
+    GetDataNode()->GetVisibility(visible, renderer, name);
     return visible;
 }
 
-void mitk::Mapper::GenerateData()
-{
-}
-
-void mitk::Mapper::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
-{
-}
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
@@ -142,7 +136,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
       (renderer && (m_LastUpdateTime < renderer->GetTimeStepUpdateTime()))
     )
   {
-    this->GenerateData();
     m_LastUpdateTime.Modified();
   }
 

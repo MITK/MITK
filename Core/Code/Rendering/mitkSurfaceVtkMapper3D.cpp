@@ -27,9 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSmartPointerProperty.h"
 
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+#include "mitkIShaderRepository.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
+#include <mitkCoreServices.h>
 
 //VTK
 #include <vtkActor.h>
@@ -43,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 {
-    return static_cast<const mitk::Surface * > ( GetData() );
+  return static_cast<const mitk::Surface * > ( GetDataNode()->GetData() );
 }
 
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
@@ -61,42 +62,43 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
 {
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-    bool visible = IsVisible(renderer);
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-    if(visible==false)
-    {
-        ls->m_Actor->VisibilityOff();
-        return;
-    }
+  if(!visible)
+  {
+    ls->m_Actor->VisibilityOff();
+    return;
+  }
 
-    //
-    // set the input-object at time t for the mapper
-    //
-    mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-    vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
-    if(polydata == NULL)
-    {
-        ls->m_Actor->VisibilityOff();
-        return;
-    }
+  //
+  // set the input-object at time t for the mapper
+  //
+  mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
+  vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
+  if(polydata == NULL)
+  {
+    ls->m_Actor->VisibilityOff();
+    return;
+  }
 
-    if ( m_GenerateNormals )
-    {
-        ls->m_VtkPolyDataNormals->SetInput( polydata );
-        ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
-    }
-    else
-    {
-        ls->m_VtkPolyDataMapper->SetInput( polydata );
-    }
+  if ( m_GenerateNormals )
+  {
+    ls->m_VtkPolyDataNormals->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+  }
+  else
+  {
+    ls->m_VtkPolyDataMapper->SetInput( polydata );
+  }
 
-    //
-    // apply properties read from the PropertyList
-    //
-    ApplyProperties(ls->m_Actor, renderer);
+  //
+  // apply properties read from the PropertyList
+  //
+  ApplyAllProperties(renderer, ls->m_Actor);
 
-    if(visible)
-        ls->m_Actor->VisibilityOn();
+  if(visible)
+    ls->m_Actor->VisibilityOn();
 }
 
 
@@ -242,17 +244,21 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
 
 
 
-void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
+void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer, vtkActor* /*actor*/)
 {
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
     // Applying shading properties
     {
-        Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
+        Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
         // VTK Properties
         ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
         // Shaders
-        mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+        if (shaderRepo != NULL)
+        {
+            shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+        }
     }
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
@@ -461,8 +467,10 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 
     // Shaders
+    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+    if (shaderRepo)
     {
-        mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+        shaderRepo->AddDefaultProperties(node,renderer,overwrite);
     }
 }
 

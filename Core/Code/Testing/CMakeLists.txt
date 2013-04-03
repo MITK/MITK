@@ -1,3 +1,13 @@
+# The core tests need relaxed compiler flags...
+# TODO fix core tests to compile without these additional no-error flags
+if(MSVC_VERSION)
+  # disable deprecated warnings (they would lead to errors)
+  mitkFunctionCheckCompilerFlags2("/wd4996" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+else()
+  mitkFunctionCheckCompilerFlags2("-Wno-error=deprecated" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags2("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
+
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 
@@ -71,13 +81,18 @@ mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVt
                         ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedLiver640x480REF.png #corresponding reference screenshot
 )
 
+mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2DTransferFunctionTest
+                        ${MITK_DATA_DIR}/Png2D-bw.png
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
+)
+
 #mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTexturedSphereTest_Football mitkSurfaceVtkMapper3DTexturedSphereTest
 #                        ${MITK_DATA_DIR}/RenderingTestData/texture.jpg #input texture
 #                        -V
 #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedSphere640x480REF.png corresponding reference screenshot
 #)
 
-SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 #mitkSurfaceVtkMapper3DTest_TextureProperty #mitkSurfaceVtkMapper3DTexturedSphereTest_Football #mitkImageVtkMapper2D_pic3dOpacity640x480
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw #mitkSurfaceVtkMapper3DTest_TextureProperty #mitkSurfaceVtkMapper3DTexturedSphereTest_Football #mitkImageVtkMapper2D_pic3dOpacity640x480
 PROPERTY RUN_SERIAL TRUE)
 
 endif()

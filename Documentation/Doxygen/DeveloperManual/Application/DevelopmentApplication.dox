@@ -8,9 +8,10 @@ Working with the application, you will have to learn about extension points and 
 <ul>  
   <li> \subpage BlueBerryIntro </li>
   <li> \subpage BlueBerryExamples </li>
-  <li> \subpage mitkExtPointsIndex </li>
-  <li> \subpage DeploymentPage </li>
 </ul>
 
+The MITK application extension-point reference is available here:
+
+ - \subpage mitkExtPointsIndex
 
 */

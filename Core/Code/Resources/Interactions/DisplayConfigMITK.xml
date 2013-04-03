@@ -1,6 +1,5 @@
 <!--
 * - MITK : The original interaction scheme
-*   - left mouse button   : setting the cross position in the MPR view
 *   - middle mouse button : panning
 *   - right mouse button  : zooming
 *   - wheel               : scrolling
@@ -32,8 +31,7 @@
   <event_variant class="MouseReleaseEvent" name="EndZooming">
     <attribute name="EventButton" value="RightMouseButton"/>
   </event_variant>
-  <!-- PlaneUP and -Down are described twice, this means the transition
-  can be triggered by both events -->
+  <!-- Scrolling through planes -->
   <event_variant class="MouseWheelEvent" name="PlaneUP">
     <attribute name="ScrollDirection" value="up"/>
   </event_variant>

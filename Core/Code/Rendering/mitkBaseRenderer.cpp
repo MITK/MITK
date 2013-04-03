@@ -17,6 +17,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"
 #include "mitkResliceMethodProperty.h"
+#include "mitkKeyEvent.h"
 
 // Geometries
 #include "mitkPlaneGeometry.h"
@@ -253,7 +254,7 @@ void mitk::BaseRenderer::RegisterLocalStorageHandler(mitk::BaseLocalStorageHandl
 
 }
 
-mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher()
+mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
 {
   return m_BindDispatcherInteractor->GetDispatcher();
 }

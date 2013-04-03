@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkExports.h>
 
+/// \ingroup QmitkModule
 QMITK_EXPORT void QmitkRegisterClasses();
 
 #endif

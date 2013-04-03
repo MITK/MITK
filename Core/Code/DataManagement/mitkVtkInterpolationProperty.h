@@ -45,6 +45,8 @@ public:
 
   mitkNewMacro1Param(VtkInterpolationProperty, const std::string&);
 
+  Pointer Clone() const;
+
   /**
    * Returns the current interpolation value as defined by VTK constants.
    * @returns the current interpolation as VTK constant.
@@ -104,8 +106,9 @@ protected:
 private:
 
   // purposely not implemented
-  VtkInterpolationProperty(const VtkInterpolationProperty&);
   VtkInterpolationProperty& operator=(const VtkInterpolationProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

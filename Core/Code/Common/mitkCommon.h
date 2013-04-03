@@ -134,7 +134,7 @@ calling object*/
 #ifdef MITK_NO_DEPRECATED_WARNINGS
   #define DEPRECATED(func) func
 #elif defined(__GNUC__)
-  #define DEPRECATED(...) __VA_ARGS__ __attribute__ ((deprecated))
+  #define DEPRECATED(...) __VA_ARGS__ __attribute__((deprecated))
 #elif defined(_MSC_VER)
   #define DEPRECATED(...) __declspec(deprecated) ##__VA_ARGS__
 #else

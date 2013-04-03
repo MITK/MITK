@@ -22,10 +22,9 @@
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
-//#include "mitkInformer.h"
 
 mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
-    m_DataStorage(NULL),m_InformerService(NULL)
+    m_DataStorage(NULL)
 {
   ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
   if (context == NULL)
@@ -87,7 +86,7 @@ void mitk::BindDispatcherInteractor::UnRegisterInteractor(const DataNode* dataNo
   }
 }
 
-const mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher()
+mitk::Dispatcher::Pointer mitk::BindDispatcherInteractor::GetDispatcher() const
 {
   return m_Dispatcher;
 }

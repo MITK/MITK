@@ -157,10 +157,12 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         include_directories(. ${ALL_INCLUDE_DIRECTORIES})
         include(files.cmake)
 
-        set(module_compile_flags )
-        if(WIN32)
-          set(module_compile_flags "${module_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
-        endif()
+        set(module_c_flags )
+        set(module_c_flags_debug )
+        set(module_c_flags_release )
+        set(module_cxx_flags )
+        set(module_cxx_flags_debug )
+        set(module_cxx_flags_release )
 
         if(MODULE_GCC_DEFAULT_VISIBILITY)
           set(use_visibility_flags 0)
@@ -193,17 +195,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif()
 
         if(use_visibility_flags)
-          mitkFunctionCheckCompilerFlags("-fvisibility=hidden" module_compile_flags)
-          mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_compile_flags)
+          mitkFunctionCheckCompilerFlags2("-fvisibility=hidden" module_c_flags module_cxx_flags)
+          mitkFunctionCheckCompilerFlags2("-fvisibility-inlines-hidden" module_c_flags module_cxx_flags)
         endif()
 
         configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
 
         if(MODULE_WARNINGS_AS_ERRORS)
           if(MSVC_VERSION)
-            mitkFunctionCheckCompilerFlags("/WX" module_compile_flags)
+            mitkFunctionCheckCompilerFlags2("/WX" module_c_flags module_cxx_flags)
           else()
-            mitkFunctionCheckCompilerFlags("-Werror" module_compile_flags)
+            mitkFunctionCheckCompilerFlags2("-Werror" module_c_flags module_cxx_flags)
 
             # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
             # versions to "static-member-init", see
@@ -212,15 +214,24 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             # Also, older Clang and seemingly all gcc versions do not warn if unknown
             # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the
             # command line. This may get confusing if unrelated compiler errors happen and
-            # the error output then additinally contains errors about unknown flags (which
+            # the error output then additionally contains errors about unknown flags (which
             # is not the case if there were no compile errors).
             #
             # So instead of using -Wno-* we use -Wno-error=*, which will be properly rejected by
             # the compiler and if applicable, prints the specific warning as a real warning and
             # not as an error (although -Werror was given).
 
-            mitkFunctionCheckCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_compile_flags)
-            mitkFunctionCheckCompilerFlags("-Wno-error=gnu" module_compile_flags)
+            mitkFunctionCheckCompilerFlags2("-Wno-error=c++0x-static-nonintegral-init" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCompilerFlags2("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCompilerFlags2("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCompilerFlags2("-Wno-error=gnu" module_c_flags module_cxx_flags)
+
+            # VNL headers throw a lot of these, not fixable for us at least in ITK 3
+            mitkFunctionCheckCompilerFlags2("-Wno-error=unused-parameter" module_c_flags module_cxx_flags)
+
+            # Some DICOM header file in ITK
+            mitkFunctionCheckCompilerFlags2("-Wno-error=cast-align" module_c_flags module_cxx_flags)
+
           endif()
         endif(MODULE_WARNINGS_AS_ERRORS)
 
@@ -241,10 +252,30 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
                                       )
 
           if(RESOURCE_FILES)
+            set(res_dir Resources)
+            set(binary_res_files )
+            set(source_res_files )
+            foreach(res_file ${RESOURCE_FILES})
+              if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}/${res_file})
+                list(APPEND binary_res_files "${res_file}")
+              else()
+                list(APPEND source_res_files "${res_file}")
+              endif()
+            endforeach()
+
+            set(res_macro_args )
+            if(binary_res_files)
+              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${res_dir}
+                                         FILES ${binary_res_files})
+            endif()
+            if(source_res_files)
+              list(APPEND res_macro_args ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${res_dir}
+                                         FILES ${source_res_files})
+            endif()
+
             usFunctionEmbedResources(CPP_FILES
                                      LIBRARY_NAME ${MODULE_LIBNAME}
-                                     ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
-                                     FILES ${RESOURCE_FILES})
+                                     ${res_macro_args})
           endif()
 
         endif()
@@ -317,8 +348,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           endif()
 
           # Apply properties to the module target.
-          set_target_properties(${MODULE_PROVIDES} PROPERTIES
-                                COMPILE_FLAGS "${module_compile_flags}")
+          # We cannot use set_target_properties like below since there is no way to
+          # differentiate C/C++ and Releas/Debug flags using target properties.
+          # See http://www.cmake.org/Bug/view.php?id=6493
+          #set_target_properties(${MODULE_PROVIDES} PROPERTIES
+          #                      COMPILE_FLAGS "${module_compile_flags}")
+          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${module_c_flags}")
+          set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${module_c_flags_debug}")
+          set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${module_c_flags_release}")
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${module_cxx_flags}")
+          set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${module_cxx_flags_debug}")
+          set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}")
 
           # add the target name to a global property which is used in the top-level
           # CMakeLists.txt file to export the target

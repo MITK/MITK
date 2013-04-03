@@ -7,8 +7,14 @@ BlueBerry is an application framework used in MITK for creating modular and exte
 More high-level documentation can be found below:
 
 - \subpage BlueBerryWorkbench
+- \ref BlueBerryExamples
 
-Please see the \ref BlueBerryExamples for code examples demonstrating different features of the appication framework.
+Please see the \ref BlueBerryExamples for code examples demonstrating different features of the application framework.
+
+The BlueBerry developer reference is available here:
+
+- \ref BlueBerryPlugins
+- \subpage BlueBerryExtPointsIndex
 
 
 \page BlueBerryWorkbench The Workbench: What are Views, Editors, Perspectives?

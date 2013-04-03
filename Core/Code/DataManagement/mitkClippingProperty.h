@@ -42,13 +42,15 @@ namespace mitk {
 class MITK_CORE_EXPORT ClippingProperty : public BaseProperty
 {
 public:
-  mitkClassMacro(ClippingProperty, BaseProperty);
+  mitkClassMacro(ClippingProperty, BaseProperty)
 
   typedef std::string ValueType;
 
   itkNewMacro( ClippingProperty );
   mitkNewMacro2Param( ClippingProperty,
     const Point3D &, const Vector3D & );
+
+  Pointer Clone() const;
 
   bool GetClippingEnabled() const;
   void SetClippingEnabled( bool enabled );
@@ -71,16 +73,18 @@ protected:
   Vector3D m_Normal;
 
   ClippingProperty();
+  ClippingProperty(const ClippingProperty& other);
   ClippingProperty( const Point3D &origin, const Vector3D &normal );
 
 private:
 
   // purposely not implemented
-  ClippingProperty(const ClippingProperty&);
   ClippingProperty& operator=(const ClippingProperty&);
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty& property);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
 };
 

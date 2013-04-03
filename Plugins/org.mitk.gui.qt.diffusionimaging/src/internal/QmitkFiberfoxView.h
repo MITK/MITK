@@ -72,9 +72,11 @@ protected slots:
     void CopyBundles();         ///< add copy of the selected bundle to the datamanager
     void ApplyTransform();    ///< rotate and shift selected bundles
     void AlignOnGrid();         ///< shift selected fiducials to nearest voxel center
-    void FiberModelFrameVisibility(int index);///< only show parameters of selected fiber model type
-    void NonFiberModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
-    void ShowAdvancedFiberOptions(int state);
+    void Comp1ModelFrameVisibility(int index);///< only show parameters of selected fiber model type
+    void Comp2ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void Comp3ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void Comp4ModelFrameVisibility(int index);///< only show parameters of selected non-fiber model type
+    void ShowAdvancedOptions(int state);
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
@@ -84,7 +86,6 @@ protected slots:
     void OnBiasChanged(double value);
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
-    void OnAddT2Smearing(int value);
     void OnAddGibbsRinging(int value);
     void OnConstantRadius(int value);
 
@@ -128,7 +129,6 @@ protected:
     mitk::Image::Pointer                                m_TissueMask;                   ///< mask defining which regions of the image should contain signal and which are containing only noise
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
     mitk::DataNode::Pointer                             m_SelectedImage;
-    mitk::DataNode::Pointer                             m_SelectedBundle;
     mitk::DataNode::Pointer                             m_SelectedDWI;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;

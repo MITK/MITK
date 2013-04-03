@@ -1,6 +1,6 @@
 macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;MODULE_DEPENDENCIES;SUBPROJECTS" "TEST_PLUGIN" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;MODULE_DEPENDENCIES;SUBPROJECTS" "TEST_PLUGIN;NO_INSTALL" ${ARGN})
 
   MITK_CHECK_MODULE(_MODULE_CHECK_RESULT Mitk ${_PLUGIN_MODULE_DEPENDENCIES})
   if(NOT _MODULE_CHECK_RESULT)
@@ -11,14 +11,21 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
     if(_PLUGIN_TEST_PLUGIN)
       set(is_test_plugin "TEST_PLUGIN")
+      set(_PLUGIN_NO_INSTALL 1)
     else()
       set(is_test_plugin)
+    endif()
+
+    if(_PLUGIN_NO_INSTALL)
+      set(plugin_no_install "NO_INSTALL")
+    else()
+      set(plugin_no_install)
     endif()
 
     MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
                             EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
                             DOXYGEN_TAGFILES ${_PLUGIN_DOXYGEN_TAGFILES}
-                            ${is_test_plugin})
+                            ${is_test_plugin} ${plugin_no_install})
 
     target_link_libraries(${PLUGIN_TARGET} ${ALL_LIBRARIES})
 
@@ -39,7 +46,7 @@ macro(MACRO_CREATE_MITK_CTK_PLUGIN)
 
     #------------------------------------------------------------#
     #------------------ Installer support -----------------------#
-    if(NOT _PLUGIN_TEST_PLUGIN)
+    if(NOT _PLUGIN_NO_INSTALL)
 
       set(_autoload_targets )
       foreach(_dependency ${ALL_DEPENDENCIES})

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplicationCursor.h"
 
 /*!
+  \ingroup QmitkModule
   \brief Qt specific implementation of ApplicationCursorImplementation
 
   This class very simply calls the QApplication's methods setOverrideCursor() and

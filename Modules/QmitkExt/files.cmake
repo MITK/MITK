@@ -118,6 +118,8 @@ set(CPP_FILES
 
  QmitkModuleTableModel.cpp
  QmitkModulesDialog.cpp
+
+ QmitkHistogramJSWidget.cpp
 )
 
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -222,6 +224,8 @@ set(MOC_H_FILES
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
  QmitkAdaptiveRegionGrowingWidget.h
+
+ QmitkHistogramJSWidget.h
 )
 
 if( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )

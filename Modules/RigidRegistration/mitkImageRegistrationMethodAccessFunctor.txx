@@ -60,7 +60,7 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<TPixel, VIm
   typedef typename itk::LinearInterpolateImageFunction<MovingImageType, double> InterpolatorType;
   typedef itk::NearestNeighborInterpolateImageFunction<MovingImageType, double> InterpolatorType2;
   typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
-  typedef typename itk::Transform< double, VImageDimension, VImageDimension >    TransformType;
+  typedef typename itk::MatrixOffsetTransformBase< double, VImageDimension, VImageDimension > TransformType;
   typedef typename TransformType::Pointer                TransformPointer;
   typedef typename itk::ImageToImageMetric<FixedImageType, MovingImageType>    MetricType;
   typedef typename MetricType::Pointer                MetricPointer;
@@ -97,30 +97,15 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<TPixel, VIm
   registration->SetFixedImage(fixedImage);
   registration->SetMovingImage(movingImage);
   registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
-//     if(transFac->GetTransformParameters()->GetInitialParameters().size())
-//     {
-//       registration->SetInitialTransformParameters( transFac->GetTransformParameters()->GetInitialParameters() );
-//     }
-//     else
-//     {
-    itk::Array<double> zeroInitial;
-    zeroInitial.set_size(transform->GetNumberOfParameters());
-    zeroInitial.fill(0.0);
-    if (zeroInitial.size() >= 1)
-    {
-      zeroInitial[0] = 1.0;
-    }
-    if (zeroInitial.size() >= 5)
-    {
-      zeroInitial[4] = 1.0;
-    }
-    if (zeroInitial.size() >= 9)
-    {
-      zeroInitial[8] = 1.0;
-    }
-    registration->SetInitialTransformParameters( zeroInitial );
-    optimizer->SetInitialPosition( zeroInitial );
-//    }
+
+  // set initial position to identity by first setting the transformation to identity
+  // and then using its parameters
+  transform->SetIdentity();
+  typename TransformType::ParametersType identityParameters = transform->GetParameters();
+
+  registration->SetInitialTransformParameters( identityParameters );
+  optimizer->SetInitialPosition( identityParameters );
+
   if (method->m_Interpolator == ImageRegistrationMethod::LINEARINTERPOLATOR)
   {
     typename InterpolatorType::Pointer interpolator = InterpolatorType::New();

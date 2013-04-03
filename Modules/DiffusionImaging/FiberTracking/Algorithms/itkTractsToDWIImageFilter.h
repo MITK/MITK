@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkKspaceArtifact.h>
 #include <mitkGibbsRingingArtifact.h>
-#include <mitkT2SmearingArtifact.h>
+#include <mitkSignalDecay.h>
 
 // ITK
 #include <itkImage.h>
@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageSource.h>
 #include <itkFFTRealToComplexConjugateImageFilter.h>
 #include <itkFFTComplexConjugateToRealImageFilter.h>
+
+#include <cmath>
 
 typedef itk::VectorImage< short, 3 > DWIImageType;
 
@@ -64,6 +66,8 @@ public:
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
 
     // input
+    itkSetMacro( SignalScale, double )
+    itkSetMacro( FiberRadius, double )
     itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
@@ -79,6 +83,7 @@ public:
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
+    mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
 
     void GenerateData();
 
@@ -116,6 +121,9 @@ protected:
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;
+    double                              m_FiberRadius;
+    double                              m_SignalScale;
+    mitk::LevelWindow                   m_LevelWindow;
 };
 }
 

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManagerFactory.h"
 
 /**
+ * \ingroup QmitkModule
  * \brief Qt specific implementation of mitk::RenderingManagerFactory.
  *
  * This class create QmitkRenderingManager instances via
@@ -31,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  * A static instance of QmitkRenderingManagerFactory is created in
  * QmitkRenderWindow, forcing the usage of QmitkRenderingManager for the Qt
  * platform.
- * \ingroup Renderer
  */
 class QMITK_EXPORT QmitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {

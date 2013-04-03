@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKVOLUMEDATAVTKMAPPER3D_H_HEADER_INCLUDED
 
 #include <MitkExports.h>
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
 #include <vtkVolumeProperty.h>
@@ -61,16 +61,14 @@ namespace mitk {
 //## @brief Vtk-based mapper for VolumeData
 //##
 //## @ingroup Mapper
-class MITK_CORE_EXPORT VolumeDataVtkMapper3D : public VtkMapper3D
+class MITK_CORE_EXPORT VolumeDataVtkMapper3D : public VtkMapper
 {
 public:
-  mitkClassMacro(VolumeDataVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(VolumeDataVtkMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 
   virtual const mitk::Image* GetInput();
-
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
   virtual void EnableMask();
   virtual void DisableMask();

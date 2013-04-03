@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFile>
 #include <tinyxml.h>
 #include <math.h>
+#include <boost/progress.hpp>
 
 namespace itk{
 
@@ -287,6 +288,8 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     TimeProbe clock; clock.Start();
     m_NumAcceptedFibers = 0;
     unsigned long counter = 1;
+
+    boost::progress_display disp(m_Steps*singleIts);
     if (!m_AbortTracking)
     for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
     {
@@ -296,6 +299,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 
         for (unsigned long i=0; i<singleIts; i++)
         {
+            ++disp;
             if (m_AbortTracking)
                 break;
 
@@ -318,13 +322,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/counter;
         m_NumParticles = particleGrid->m_NumParticles;
         m_NumConnections = particleGrid->m_NumConnections;
-
-        MITK_INFO << "GibbsTrackingFilter: proposal acceptance: " << 100*m_ProposalAcceptance << "%";
-        MITK_INFO << "GibbsTrackingFilter: particles: " << m_NumParticles;
-        MITK_INFO << "GibbsTrackingFilter: connections: " << m_NumConnections;
-        MITK_INFO << "GibbsTrackingFilter: progress: " << 100*(float)m_CurrentStep/m_Steps << "%";
-        MITK_INFO << "GibbsTrackingFilter: cell overflows: " << particleGrid->m_NumCellOverflows;
-        MITK_INFO << "----------------------------------------";
 
         if (m_AbortTracking)
             break;
@@ -386,7 +383,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         resampler->SetSize( m_QBallImage->GetLargestPossibleRegion().GetSize() );
 
         resampler->SetInput( m_MaskImage );
-        resampler->SetDefaultPixelValue(1.0);
+        resampler->SetDefaultPixelValue(0.0);
         resampler->Update();
         m_MaskImage = resampler->GetOutput();
         MITK_INFO << "GibbsTrackingFilter: resampling finished";

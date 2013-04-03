@@ -2,7 +2,7 @@
   \defgroup org_blueberry_test org.blueberry.test
   \ingroup BlueBerryPlugins
 
-  \brief Describe your plugin here.
+  \brief Testing infrastructure for running unit tests defined in BlueBerry plug-ins.
   
 */
 

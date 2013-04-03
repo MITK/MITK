@@ -269,7 +269,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        // directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         node->SetName("_VectorField");
@@ -323,7 +323,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        //directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -435,7 +435,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_TensorImageNodes.at(0)->GetName().c_str());
@@ -556,7 +556,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -695,7 +695,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());

@@ -44,14 +44,15 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
+
+  bool visible = true;
+
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible ) return;
 
   // Get PlanarFigure from input
   mitk::PlanarFigure *planarFigure = const_cast< mitk::PlanarFigure * >(
-    static_cast< const mitk::PlanarFigure * >( this->GetData() ) );
+    static_cast< const mitk::PlanarFigure * >( GetDataNode()->GetData() ) );
 
   // Check if PlanarFigure has already been placed; otherwise, do nothing
   if ( !planarFigure->IsPlaced() )
@@ -104,7 +105,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
   // Apply visual appearance properties from the PropertyList
-  this->ApplyProperties( renderer );
+  ApplyColorAndOpacityProperties( renderer );
 
   // Enable line antialiasing
   glEnable( GL_LINE_SMOOTH );
@@ -352,7 +353,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     glVertex3f( displayPoint[0], displayPoint[1], PLANAR_OFFSET );
   }
 
-  if(closed)
+  if(closed && (vertices.begin() != vertices.end()))
   { // complete line loop to the first point again
     mitk::Point2D displayPoint;
     this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,

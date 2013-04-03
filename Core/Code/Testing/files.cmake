@@ -66,6 +66,7 @@ set(MODULE_TESTS
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkUIDGeneratorTest.cpp
+  mitkShaderRepositoryTest.cpp
 )
 
 # test with image filename as an extra command line parameter
@@ -109,11 +110,19 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DOpacityTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
+    mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
+)
+
+set(MODULE_RESOURCE_FILES
+  Interactions/AddAndRemovePoints.xml
+  Interactions/globalConfig.xml
+  Interactions/StatemachineTest.xml
+  Interactions/StatemachineConfigTest.xml
 )
 
 # Create an artificial module initializing class for
@@ -125,4 +134,12 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              EXECUTABLE
                             )
 
-set(TEST_CPP_FILES ${testdriver_init_file} mitkRenderingTestHelper.cpp)
+# Embed the resources
+set(testdriver_resources )
+usFunctionEmbedResources(testdriver_resources
+                         EXECUTABLE_NAME ${MODULE_NAME}TestDriver
+                         ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+                         FILES ${MODULE_RESOURCE_FILES}
+                        )
+
+set(TEST_CPP_FILES ${testdriver_init_file} ${testdriver_resources})

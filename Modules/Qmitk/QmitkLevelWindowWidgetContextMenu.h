@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 
 /**
-  \class QmitkLevelWindowWidgetContextMenu QmitkLevelWindowWidgetContextMenu.h QmitkLevelWindowWidgetContextMenu.h
-  \ingroup Widgets
-
-  \brief Provides a contextmenu for Level/Window functionality. Either creates a new contextmenu with standard functions or adds Level/Window standard functions to an predefined contextmenu.
-
-  */
-
+ * \ingroup QmitkModule
+ * \brief Provides a contextmenu for Level/Window functionality.
+ *
+ * Either creates
+ * a new contextmenu with standard functions or adds Level/Window standard
+ * functions to an predefined contextmenu.
+ */
 class QMITK_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget {
 
   Q_OBJECT

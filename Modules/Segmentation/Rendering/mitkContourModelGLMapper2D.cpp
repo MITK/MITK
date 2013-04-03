@@ -37,7 +37,10 @@ mitk::ContourModelGLMapper2D::~ContourModelGLMapper2D()
 
 void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
 
   bool updateNeccesary=true;
 
@@ -259,7 +262,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::ContourModel * > ( GetData() );
+  return static_cast<const mitk::ContourModel * > ( GetDataNode()->GetData() );
 }
 
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

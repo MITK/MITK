@@ -32,13 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  /**
-  *@brief
-  *
-  * @ingroup Interaction
-  **/
+  class Module;
 
-  class MITK_CORE_EXPORT StateMachineContainer : public vtkXMLParser
+  /**
+   *@brief
+   *
+   * @ingroup Interaction
+   **/
+  class StateMachineContainer : public vtkXMLParser
   {
   public:
 
@@ -56,7 +57,7 @@ namespace mitk {
     /**
     * @brief Returns the StartState of the StateMachine.
     **/
-    StateMachineState::Pointer GetStartState();
+    StateMachineState::Pointer GetStartState() const;
 
     /**
     * @brief Loads XML resource
@@ -64,7 +65,7 @@ namespace mitk {
     * Loads a XML resource file in the given module context.
     * The files have to be placed in the Resources/Interaction folder of their respective module.
     **/
-    bool LoadBehavior(std::string fileName , std::string moduleName = "Mitk");
+    bool LoadBehavior(const std::string& fileName , const Module* module);
 
 
     /**

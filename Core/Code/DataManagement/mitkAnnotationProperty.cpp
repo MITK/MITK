@@ -66,6 +66,12 @@ mitk::AnnotationProperty::AnnotationProperty(
   m_Position[2] = z;
 }
 
+mitk::AnnotationProperty::AnnotationProperty(const mitk::AnnotationProperty& other)
+  : BaseProperty(other)
+  , m_Label(other.m_Label)
+  , m_Position(other.m_Position)
+{
+}
 
 const mitk::Point3D &mitk::AnnotationProperty::GetPosition() const
 {
@@ -103,4 +109,16 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
 
   myStr << this->GetLabel() << this->GetPosition();
   return myStr.str();
+}
+
+mitk::AnnotationProperty::Pointer mitk::AnnotationProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::AnnotationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

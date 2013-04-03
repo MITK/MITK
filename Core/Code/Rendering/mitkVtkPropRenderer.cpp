@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MAPPERS
 #include "mitkMapper.h"
 #include "mitkImageVtkMapper2D.h"
-#include "mitkVtkMapper2D.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
+#include "mitkGLMapper.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "mitkPointSetGLMapper2D.h"
 
@@ -64,7 +64,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm),
   m_VtkMapperPresent(false),
-  m_NewRenderer(true),
   m_CameraInitializedForMapperID(0)
 {
   didCount=false;
@@ -187,35 +186,27 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
-    if((mapper->IsVtkBased() == true) )
+
+    VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
+
+    if(vtkmapper)
     {
       //sthVtkBased = true;
-      mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
-      if(vtkMapper)
-      {
-        vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
-        //vtkMapper->GetVtkProp(this)->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
-      }
-      if(lastVtkBased == false)
+      if(!lastVtkBased)
       {
         Disable2DOpenGL();
         lastVtkBased = true;
       }
     }
     else
-      if((mapper->IsVtkBased() == false) && (lastVtkBased == true))
+      if(lastVtkBased)
       {
       Enable2DOpenGL();
       lastVtkBased = false;
     }
 
-    switch(type)
-    {
-    case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
-    case mitk::VtkPropRenderer::Translucent: mapper->MitkRenderTranslucentGeometry(this); break;
-    case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
-    case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
-    }
+  mapper->MitkRender(this, type);
+
   }
 
   if (lastVtkBased == false)
@@ -281,8 +272,11 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     if ( mapper.IsNull() )
       continue;
 
+    bool visible = true;
+    node->GetVisibility(visible, this, "visible");
+
     // The information about LOD-enabled mappers is required by RenderingManager
-    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+    if ( mapper->IsLODEnabled( this ) && visible )
     {
       ++m_NumberOfVisibleLODEnabledMappers;
     }
@@ -332,6 +326,7 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   // vtk will reenable texturing every time it is needed
   glDisable( GL_TEXTURE_1D );
   glDisable( GL_TEXTURE_2D );
+  glLineWidth(1.0);
 }
 
 /*!
@@ -348,6 +343,7 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix();
 }
 
+
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
 {
   if(datatreenode!=NULL)
@@ -355,29 +351,24 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
     mitk::Mapper::Pointer mapper = datatreenode->GetMapper(m_MapperID);
     if(mapper.IsNotNull())
     {
-      Mapper2D* mapper2d=dynamic_cast<Mapper2D*>(mapper.GetPointer());
-      if(mapper2d != NULL)
+      GLMapper* glmapper=dynamic_cast<GLMapper*>(mapper.GetPointer());
+
+      if(GetDisplayGeometry()->IsValid())
       {
-        if(GetDisplayGeometry()->IsValid())
+        if(glmapper != NULL)
         {
-          VtkMapper2D* vtkmapper2d=dynamic_cast<VtkMapper2D*>(mapper.GetPointer());
-          if(vtkmapper2d != NULL)
+          glmapper->Update(this);
+          m_VtkMapperPresent=false;
+        }
+        else
+        {
+          VtkMapper* vtkmapper=dynamic_cast<VtkMapper*>(mapper.GetPointer());
+          if(vtkmapper != NULL)
           {
-            vtkmapper2d->Update(this);
+            vtkmapper->Update(this);
+            vtkmapper->UpdateVtkTransform(this);
             m_VtkMapperPresent=true;
           }
-          else
-            mapper2d->Update(this);
-        }
-      }
-      else
-      {
-        VtkMapper3D* vtkmapper3d=dynamic_cast<VtkMapper3D*>(mapper.GetPointer());
-        if(vtkmapper3d != NULL)
-        {
-          vtkmapper3d->Update(this);
-          vtkmapper3d->UpdateVtkTransform(this);
-          m_VtkMapperPresent=true;
         }
       }
     }
@@ -554,8 +545,7 @@ mitk::DataNode *
       if ( !pickable )
         continue;
 
-      VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
-                            ( node->GetMapper( m_MapperID ) );
+      VtkMapper *mapper = dynamic_cast < VtkMapper * >  ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
 
@@ -590,13 +580,18 @@ mitk::DataNode *
       if ( node.IsNull() )
         continue;
 
-      mitk::Mapper::Pointer mapper = node->GetMapper( m_MapperID );
-      if ( mapper.IsNull() )
+      mitk::Mapper * mapper = node->GetMapper( m_MapperID );
+      if ( mapper == NULL)
         continue;
 
-      if ( mapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
-      {
-        return node;
+      mitk::VtkMapper * vtkmapper = dynamic_cast< VtkMapper * >(mapper);
+
+      if(vtkmapper){
+        //if vtk-based, then ...
+       if ( vtkmapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
+       {
+          return node;
+       }
       }
     }
 
@@ -677,7 +672,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
       Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
       if (mapper)
       {
-        VtkMapper3D* vtkmapper = dynamic_cast<VtkMapper3D*>( mapper );
+        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
         if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);
@@ -719,10 +714,16 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
     if ( node.IsNull() )
       continue;
 
-    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if(mapper.IsNotNull())
-      mapper->ReleaseGraphicsResources(renWin);
-  }
+      Mapper * mapper = node->GetMapper(m_MapperID);
+
+      if (mapper)
+      {
+        VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>( mapper );
+
+       if(vtkmapper)
+         vtkmapper->ReleaseGraphicsResources(renWin);
+      }
+   }
 }
 
 

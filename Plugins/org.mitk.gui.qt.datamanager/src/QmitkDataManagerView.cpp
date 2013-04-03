@@ -716,7 +716,7 @@ void QmitkDataManagerView::MakeAllNodesInvisible( bool )
   {
     node->SetVisibility(false);
   }
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
@@ -728,7 +728,7 @@ void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
   {
     node->SetVisibility(selectedNodes.contains(node));
   }
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )

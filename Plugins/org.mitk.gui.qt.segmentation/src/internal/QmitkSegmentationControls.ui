@@ -220,7 +220,7 @@
       </property>
       <attribute name="icon">
        <iconset resource="../../resources/segmentation.qrc">
-        <normaloff>:/segmentation/QmitkSegmentation.png</normaloff>:/segmentation/QmitkSegmentation.png</iconset>
+        <normaloff>:/segmentation/segmentation.png</normaloff>:/segmentation/segmentation.png</iconset>
       </attribute>
       <attribute name="label">
        <string>Contouring</string>

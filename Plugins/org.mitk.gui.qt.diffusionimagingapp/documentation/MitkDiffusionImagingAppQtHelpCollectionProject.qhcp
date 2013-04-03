@@ -4,7 +4,7 @@
          <title>MITK Diffusion Help</title>
          <applicationIcon>assistant-logo.png</applicationIcon>
          <startPage>qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html</startPage>
-         <applicationIcon>QmitkDiffusionimagingAppAssistantIcon.png</applicationIcon>
+         <applicationIcon>assistant-icon.png</applicationIcon>
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
@@ -13,7 +13,7 @@
              <text>About MITK Diffusion Help</text>
          </aboutMenuText>
          <aboutDialog>
-             <icon>QmitkDiffusionimagingAppAboutLogo.png</icon>
+             <icon>about-logo.png</icon>
         </aboutDialog>
      </assistant>
      <docFiles>

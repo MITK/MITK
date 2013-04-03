@@ -3,7 +3,7 @@
     <file>btnReinit.xpm</file>
     <file>btnDelete.png</file>
     <file>btnNew.png</file>
-    <file>QmitkSegmentation.png</file>
+    <file>segmentation.png</file>
     <file>btnLoad.png</file>
     <file>btnSave.png</file>
   </qresource>

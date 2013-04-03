@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pointsetinteraction"
+          name="PointSet Interaction"
+          class="QmitkPointSetInteractionView"
+          icon="resources/pointset_interaction.png" />
+  </extension>
+
+</plugin>

@@ -72,9 +72,6 @@ class MITK_CORE_EXPORT Image : public SlicedData
   friend class ImageReadAccessor;
   friend class ImageWriteAccessor;
 
-  template <class TPixel, unsigned int VDimension>
-  friend class ImagePixelAccessor;
-
 public:
   mitkClassMacro(Image, SlicedData);
 

@@ -8,7 +8,7 @@ Available sections:
   - \ref StrTrackUserManualParameters
   - \ref StrTrackUserManualReferences
 
-\image html streamlinetrackingview.png Streamline Tracking View
+\image html QmitkDiffusionimagingStreamlineTrackingQmitkDiffusionimagingSWPhantomRois.png Streamline Tracking View
 
 \section StrTrackUserManualInputData Input Data
 

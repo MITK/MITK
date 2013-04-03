@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/QmitkRigidRegistrationView">
-     <file>RigidRegistration.xpm</file>
+     <file>QmitkRegistrationRigidRegistration.xpm</file>
  </qresource>
  </RCC>

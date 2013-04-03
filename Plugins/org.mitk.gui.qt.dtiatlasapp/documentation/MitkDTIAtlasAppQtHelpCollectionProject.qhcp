@@ -2,9 +2,9 @@
 <QHelpCollectionProject version="1.0">
      <assistant>
          <title>MITK 3M3 Help</title>
-		 <applicationIcon>assistant-logo.png</applicationIcon>
+         <applicationIcon>assistant-logo.png</applicationIcon>
          <startPage>qthelp://org.mitk.gui.qt.dtiatlasapp/bundle/index.html</startPage>
-		 <applicationIcon>assistant-icon.png</applicationIcon>
+         <applicationIcon>QmitkDTIAtlasAppAssistantIcon.png</applicationIcon>
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
@@ -12,11 +12,11 @@
          <aboutMenuText>
              <text>About MITK 3M3 Help</text>
          </aboutMenuText>
-         <aboutDialog>		 
-		     <icon>about-logo.png</icon>
-		</aboutDialog>
+         <aboutDialog>
+             <icon>QmitkDTIAtlasAppAboutLogo.png</icon>
+        </aboutDialog>
      </assistant>
      <docFiles>
-         
+
      </docFiles>
 </QHelpCollectionProject>

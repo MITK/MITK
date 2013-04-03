@@ -14,30 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKPROPERTYTREEITEM_H
-#define QMITKPROPERTYTREEITEM_H
+#ifndef QmitkPropertyItem_h
+#define QmitkPropertyItem_h
 
 #include <QList>
 #include <QVariant>
 
-class QmitkPropertyTreeItem
+class QmitkPropertyItem
 {
 public:
-  explicit QmitkPropertyTreeItem(const QList<QVariant> &data);
-  ~QmitkPropertyTreeItem();
+  explicit QmitkPropertyItem(const QList<QVariant>& data);
+  ~QmitkPropertyItem();
 
-  void AppendChild(QmitkPropertyTreeItem *child);
-  QmitkPropertyTreeItem * GetChild(int row);
+  void AppendChild(QmitkPropertyItem* child);
+  QmitkPropertyItem* GetChild(int row) const;
   int GetChildCount() const;
   int GetColumnCount() const;
   QVariant GetData(int column) const;
-  QmitkPropertyTreeItem * GetParent();
-  int GetRow() const;
+  QmitkPropertyItem* GetParent() const;
+  int GetRow();
 
 private:
-  QList<QmitkPropertyTreeItem *> m_Children;
+  QmitkPropertyItem(const QmitkPropertyItem&);
+  QmitkPropertyItem& operator=(const QmitkPropertyItem&);
+
   QList<QVariant> m_Data;
-  QmitkPropertyTreeItem *m_Parent;
+  QList<QmitkPropertyItem*> m_Children;
+  QmitkPropertyItem* m_Parent;
 };
 
 #endif

@@ -7,12 +7,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkLineEdit.cpp
   QmitkPropertyListView.cpp
-  QmitkPropertyTreeItem.cpp
-  QmitkPropertyTreeFilterProxyModel.cpp
-  QmitkPropertyTreeModel.cpp
-  QmitkPropertyTreeView.cpp
   QmitkNodeTableViewKeyFilter.cpp
   QmitkInfoDialog.cpp
 )
@@ -21,12 +16,8 @@ set(MOC_H_FILES
   src/QmitkDataManagerView.h
   src/QmitkDataManagerPreferencePage.h
   src/QmitkDataManagerHotkeysPrefPage.h
-  src/internal/QmitkLineEdit.h
   src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkPropertyListView.h
-  src/internal/QmitkPropertyTreeFilterProxyModel.h
-  src/internal/QmitkPropertyTreeModel.h
-  src/internal/QmitkPropertyTreeView.h
   src/internal/QmitkInfoDialog.h
   src/internal/mitkPluginActivator.h
 )

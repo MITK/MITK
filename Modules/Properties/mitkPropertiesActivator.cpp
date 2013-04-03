@@ -22,6 +22,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
+class AliasEquals
+{
+public:
+  AliasEquals(const std::string& alias)
+    : m_Alias(alias)
+  {
+  }
+
+  bool operator()(std::pair<std::string, std::string> element)
+  {
+    return element.second == m_Alias;
+  }
+
+private:
+  std::string m_Alias;
+};
+
 namespace mitk
 {
   class PropertiesActivator : public ModuleActivator
@@ -132,26 +149,9 @@ namespace mitk
 
   std::string PropertiesActivator::PropertyAliasesImpl::GetPropertyName(const std::string& alias) const
   {
-    class AliasEquals
-    {
-    public:
-      AliasEquals(const std::string& alias)
-        : m_Alias(alias)
-      {
-      }
-
-      bool operator()(std::pair<std::string, std::string> element)
-      {
-        return element.second == m_Alias;
-      }
-
-    private:
-      std::string m_Alias;
-    };
-
     if (!alias.empty())
     {
-      std::map<std::string, std::string>::iterator iter = std::find_if(m_Aliases.begin(), m_Aliases.end(), AliasEquals(alias));
+      std::map<std::string, std::string>::const_iterator iter = std::find_if(m_Aliases.begin(), m_Aliases.end(), AliasEquals(alias));
 
       if (iter != m_Aliases.end())
         return iter->first;

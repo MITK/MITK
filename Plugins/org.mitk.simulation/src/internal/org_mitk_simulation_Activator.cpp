@@ -16,11 +16,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_simulation_Activator.h"
 #include <mitkGetSimulationPreferences.h>
+#include <mitkLoadPropertiesModule.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkPropertyFilters.h>
 #include <mitkSimulationObjectFactory.h>
 #include <QmitkNodeDescriptorManager.h>
 #include <QtPlugin>
 #include <sofa/helper/system/PluginManager.h>
+
+template <class T>
+T* GetPropertyService(ctkPluginContext* context)
+{
+  if (context == NULL)
+    return NULL;
+
+  mitk::LoadPropertiesModule();
+
+  ctkServiceReference serviceRef = context->getServiceReference<T>();
+
+  return serviceRef
+    ? context->getService<T>(serviceRef)
+    : NULL;
+}
 
 static void InitSOFAPlugins()
 {
@@ -52,10 +69,30 @@ static void InitSOFAPlugins()
   }
 }
 
-void mitk::org_mitk_simulation_Activator::start(ctkPluginContext*)
+static void SetPropertyFilters(ctkPluginContext* context)
+{
+  mitk::PropertyFilters* propertyFilters = GetPropertyService<mitk::PropertyFilters>(context);
+
+  if (propertyFilters == NULL)
+    return;
+
+  mitk::PropertyFilter simulationFilter;
+
+  simulationFilter.AddEntry("layer", mitk::PropertyFilter::Blacklist);
+  simulationFilter.AddEntry("name", mitk::PropertyFilter::Blacklist);
+  simulationFilter.AddEntry("path", mitk::PropertyFilter::Blacklist);
+  simulationFilter.AddEntry("selected", mitk::PropertyFilter::Blacklist);
+  simulationFilter.AddEntry("visible", mitk::PropertyFilter::Blacklist);
+
+  propertyFilters->AddFilter("Simulation", simulationFilter);
+  propertyFilters->AddFilter("SimulationTemplate", simulationFilter);
+}
+
+void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)
 {
   RegisterSimulationObjectFactory();
   InitSOFAPlugins();
+  SetPropertyFilters(context);
 
   QmitkNodeDescriptorManager* nodeDescriptorManager = QmitkNodeDescriptorManager::GetInstance();
 
@@ -69,7 +106,7 @@ void mitk::org_mitk_simulation_Activator::start(ctkPluginContext*)
   }
 }
 
-void mitk::org_mitk_simulation_Activator::stop(ctkPluginContext* context)
+void mitk::org_mitk_simulation_Activator::stop(ctkPluginContext*)
 {
 }
 

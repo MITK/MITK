@@ -27,7 +27,6 @@ namespace mitk
     Q_OBJECT
     Q_INTERFACES(ctkPluginActivator)
 
-  public:
     void start(ctkPluginContext* context);
     void stop(ctkPluginContext* context);
   };

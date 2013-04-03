@@ -35,7 +35,7 @@ mitk::SurfaceSource::~SurfaceSource()
 
 itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
+  return static_cast<itk::DataObject *>(mitk::Surface::New().GetPointer());
 }
 
 
@@ -46,7 +46,7 @@ itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput( const DataObjectIdenti
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<itk::DataObject *>(itk::DataObject::New().GetPointer());
+  return static_cast<itk::DataObject *>(mitk::Surface::New().GetPointer());
 }
 
 

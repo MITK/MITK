@@ -4,7 +4,7 @@
          <title>MITK 3M3 Help</title>
          <applicationIcon>assistant-logo.png</applicationIcon>
          <startPage>qthelp://org.mitk.gui.qt.dtiatlasapp/bundle/index.html</startPage>
-         <applicationIcon>QmitkDTIAtlasAppAssistantIcon.png</applicationIcon>
+         <applicationIcon>assistant-icon.png</applicationIcon>
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
@@ -13,7 +13,7 @@
              <text>About MITK 3M3 Help</text>
          </aboutMenuText>
          <aboutDialog>
-             <icon>QmitkDTIAtlasAppAboutLogo.png</icon>
+             <icon>about-logo.png</icon>
         </aboutDialog>
      </assistant>
      <docFiles>

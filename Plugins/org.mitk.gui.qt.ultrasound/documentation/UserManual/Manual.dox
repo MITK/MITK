@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_ultrasound Ultrasound
 
-\image html QmitkUltrasound.xpm "Icon of Ultrasound"
+\image html icon.xpm "Icon of Ultrasound"
 
 Available sections:
   - \ref org_mitk_gui_qt_ultrasoundOverview

@@ -2,7 +2,7 @@
     <qresource prefix="/QmitkMovieMakerView" >
         <file>QmitkMovieMakerClasses.png</file>
         <file>QmitkMovieMakerGUI.png</file>
-        <file>QmitkMovieMakerIcon.xpm</file>
+        <file>icon.xpm</file>
         <file>pause.xpm</file>
         <file>play.xpm</file>
         <file>stop.xpm</file>

@@ -2,7 +2,7 @@
 
 \page org_mitk_views_moviemaker The Movie Maker View
 
-\image html QmitkMovieMakerIcon.png "Icon of the View"
+\image html icon.png "Icon of the View"
 
 Available sections:
   - \ref QmitkMovieMakerUserManualOverview 

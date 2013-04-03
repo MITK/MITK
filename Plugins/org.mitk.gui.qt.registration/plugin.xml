@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.deformableregistration"
+          name="DeformableRegistration"
+          class="QmitkDeformableRegistrationView"
+          icon="resources/DeformableRegistration.xpm" />
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pointbasedregistration"
+          name="PointBasedRegistration"
+          class="QmitkPointBasedRegistrationView" 
+          icon="resources/PointBasedRegistration.xpm"/>
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.rigidregistration"
+          name="RigidRegistration"
+          class="QmitkRigidRegistrationView"
+          icon="resources/RigidRegistration.xpm" />
+  </extension>
+
+</plugin>

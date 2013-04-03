@@ -1,5 +1,5 @@
 <RCC>
   <qresource prefix="/QmitkPointBasedRegistrationView" >
-    <file>QmitkRegistrationPointBasedRegistration.xpm</file>
+    <file>PointBasedRegistration.xpm</file>
   </qresource>
 </RCC>

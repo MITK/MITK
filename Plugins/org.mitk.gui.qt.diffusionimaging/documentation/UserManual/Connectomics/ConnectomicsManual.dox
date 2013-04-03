@@ -1,7 +1,7 @@
 /**
 \page org_mitk_diffusionimagingapp_perspectives_connectomics The Connectomics Perspective
 
-\image html QmitkDiffusionimagingConnectomicsPerspective.png "Icon of the Perspective"
+\image html connectomics_perspective.png "Icon of the Perspective"
 
 The connectomics perspective is a collection of views which provide functionality for the work with brain connectivity networks. Currently there exist the following views:
 

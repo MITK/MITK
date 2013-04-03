@@ -454,7 +454,7 @@
         </property>
         <property name="icon">
          <iconset resource="../../resources/QmitkPointBasedRegistrationView.qrc">
-          <normaloff>:/QmitkPointBasedRegistrationView/QmitkRegistrationPointBasedRegistration.xpm</normaloff>:/QmitkPointBasedRegistrationView/QmitkRegistrationPointBasedRegistration.xpm</iconset>
+          <normaloff>:/QmitkPointBasedRegistrationView/PointBasedRegistration.xpm</normaloff>:/QmitkPointBasedRegistrationView/PointBasedRegistration.xpm</iconset>
         </property>
        </widget>
       </item>

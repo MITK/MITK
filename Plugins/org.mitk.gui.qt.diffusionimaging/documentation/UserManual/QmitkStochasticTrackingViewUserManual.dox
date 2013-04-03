@@ -8,7 +8,7 @@ Available sections:
   - \ref QmitkStochasticTrackingUserManualParameters
   - \ref QmitkStochasticTrackingUserManualReferences
 
-\image html QmitkDiffusionimagingStochasticTrackingQmitkDiffusionimagingSWPhantomRois.png Stochastic Tracking View
+\image html stochastictrackingview.png Stochastic Tracking View
 
 \section QmitkStochasticTrackingUserManualInputData Input Data
 

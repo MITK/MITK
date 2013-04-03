@@ -91,6 +91,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
+    : m_GlobalReinitOnNodeDelete(true)
 {
 }
 
@@ -420,6 +421,8 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
     m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
 
+  m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
+
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
@@ -703,7 +706,8 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
     {
       node = *it;
       this->GetDataStorage()->Remove(node);
-      this->GlobalReinit(false);
+      if (m_GlobalReinitOnNodeDelete)
+          this->GlobalReinit(false);
     }
   }
 }

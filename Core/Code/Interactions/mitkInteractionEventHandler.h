@@ -19,17 +19,19 @@
 
 #include "itkLightObject.h"
 #include "itkObjectFactory.h"
-#include "mitkEvent.h"
+
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include "mitkEventConfig.h"
 #include "mitkPropertyList.h"
-#include <vtkSmartPointer.h>
+
 #include <string>
 
 
 namespace mitk
 {
+  class Module;
+
   /**
    * \class EventHandler
    *  Serves as a base class for all objects and classes that handle mitk::InteractionEvents.
@@ -42,30 +44,77 @@ namespace mitk
   public:
     mitkClassMacro(InteractionEventHandler, itk::LightObject)
     itkNewMacro(Self)
+
     /**
-    * @brief Loads XML resource
-    *
-    * Loads a XML resource file in the given module context.
-    * Default is the Mitk module (core).
-    * The files have to be placed in the Resources/Interaction folder of their respective module.
-    * This method will remove all existing configuration and replaces it with the new one.
-    */
-    virtual bool LoadEventConfig(std::string filename, std::string moduleName = "Mitk");
-    /**
-     * This method EXTENDs the configuration.
-     * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
-     * This way several configuration files can be combined
+     * @brief Loads a configuration from an XML resource.
+     *
+     * Loads an event configuration from an XML resource file contained in the given module.
+     * Default is the Mitk module (core).
+     * The files have to be placed in the Resources/Interactions folder of their respective module.
+     * This method will remove all existing configuration and replaces it with the new one.
+     *
+     * @see SetEventConfig(const EventConfig&)
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module The module containing the resource. Defaults to the Mitk module.
+     * @return \c true if the resource was successfully loaded, \c false otherwise.
      */
-    virtual bool AddEventConfig(std::string filename, std::string moduleName = "Mitk");
+    bool SetEventConfig(const std::string& filename, const Module* module = NULL);
+
+    /**
+     * @brief Loads a configuration from an EventConfig object.
+     *
+     * Loads an event configuration from the given EventConfig object. This method will remove
+     * all existing configuration and replaces it with the new one.
+     *
+     * @see SetEventConfig(const std::string&, const Module*)
+     *
+     * @param config The EventConfig object containing the new configuration.
+     * @return \c true if the configuration was successfully loaded, \c false otherwise.
+     */
+    bool SetEventConfig(const EventConfig& config);
+
+    /**
+     * @brief Returns the current configuration.
+     * @return A EventConfig object representing the current event configuration.
+     */
+    EventConfig GetEventConfig() const;
+
+    /**
+     * @brief This method \e extends the configuration.
+     *
+     * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configuration files can be combined.
+     *
+     * @see AddEventConfig(const EventConfig&)
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module The module containing the resource. Defaults to the Mitk module.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddEventConfig(const std::string& filename, const Module* module = NULL);
+
+    /**
+     * @brief This method \e extends the configuration.
+     * The configuration from the EventConfig object is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configurations can be combined.
+     *
+     * @see AddEventConfig(const std::string&, const Module*)
+     *
+     * @param config The EventConfig object whose configuration should be added.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddEventConfig(const EventConfig& config);
 
 
   protected:
     InteractionEventHandler();
     virtual ~InteractionEventHandler();
+
     /**
      * Returns a PropertyList in which the parameters defined in the config file are listed.
      */
-    PropertyList::Pointer GetAttributes();
+    PropertyList::Pointer GetAttributes() const;
 
     std::string MapToEventVariant(InteractionEvent* interactionEvent);
 
@@ -76,7 +125,7 @@ namespace mitk
     virtual void ConfigurationChanged();
 
   private:
-    vtkSmartPointer<EventConfig> m_EventConfig;
+    EventConfig m_EventConfig;
 
   };
 

@@ -34,7 +34,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.meshdecimation:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
-  org.mitk.gui.qt.python.console:OFF
+  org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF

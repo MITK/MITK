@@ -25,12 +25,28 @@ if(NOT DEFINED ITK_DIR)
   endif()
 
   if(MITK_USE_Python)
+
     list(APPEND additional_cmake_args
          -DUSE_WRAP_ITK:BOOL=ON
          -DITK_USE_REVIEW:BOOL=ON
+         -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+         -DPYTHON_DEBUG_LIBRARY=${PYTHON_DEBUG_LIBRARY}
+         -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_DIR}
+         -DPYTHON_LIBRARY=${PYTHON_LIBRARY}
+         #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
+         #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
          -DCableSwig_DIR:PATH=${CableSwig_DIR}
          -DWRAP_ITK_JAVA:BOOL=OFF
          -DWRAP_ITK_TCL:BOOL=OFF
+         -DWRAP_unsigned_char:BOOL=ON
+         #-DWRAP_double:BOOL=ON
+         -DWRAP_rgb_unsigned_char:BOOL=ON
+         #-DWRAP_rgba_unsigned_char:BOOL=ON
+         -DWRAP_signed_char:BOOL=ON
+         #-DWRAP_signed_long:BOOL=ON
+         -DWRAP_signed_short:BOOL=ON
+         -DWRAP_short:BOOL=ON
+         -DWRAP_unsigned_long:BOOL=ON
         )
   endif()
 

@@ -31,9 +31,9 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
   mitk::VtkPropRenderer::Pointer renderer = NULL;
 
-  mitk::MouseButtons buttonStates =  mitk::LeftMouseButton | mitk::RightMouseButton;
-  mitk::MouseButtons eventButton = mitk::LeftMouseButton;
-  mitk::ModifierKeys modifiers = mitk::ControlKey | mitk::AltKey;
+  mitk::InteractionEvent::MouseButtons buttonStates =  mitk::InteractionEvent::LeftMouseButton | mitk::InteractionEvent::RightMouseButton;
+  mitk::InteractionEvent::MouseButtons eventButton = mitk::InteractionEvent::LeftMouseButton;
+  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::ControlKey | mitk::InteractionEvent::AltKey;
 
   mitk::Point2D point;
   point[0] = 17;
@@ -45,15 +45,15 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  modifiers = mitk::ControlKey;
+  modifiers = mitk::InteractionEvent::ControlKey;
   mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      me1->MatchesTemplate(me2.GetPointer()) &&
-      me1->MatchesTemplate(me3.GetPointer()) &&
-      (me2->MatchesTemplate(me3.GetPointer())) &&
-      !(me3->MatchesTemplate(me4.GetPointer()))
+      *me1 == *me2 &&
+      *me1 == *me3 &&
+      *me2 == *me3 &&
+      *me3 != *me4
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MousePressEvent");
 
   // MouseReleaseEvents
@@ -62,15 +62,15 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   point[0] = 178;
   point[1] = 170;
   mitk::MouseReleaseEvent::Pointer mr3 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
-  eventButton = mitk::RightMouseButton;
+  eventButton = mitk::InteractionEvent::RightMouseButton;
   mitk::MouseReleaseEvent::Pointer mr4 = mitk::MouseReleaseEvent::New(renderer,point, buttonStates, modifiers, eventButton);
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      mr1->MatchesTemplate(mr2.GetPointer()) &&
-      mr1->MatchesTemplate(mr3.GetPointer()) &&
-      (mr2->MatchesTemplate(mr3.GetPointer())) &&
-      !(mr3->MatchesTemplate(mr4.GetPointer()))
+      *mr1 == *mr2 &&
+      *mr1 == *mr3 &&
+      *mr2 == *mr3 &&
+      *mr3 != *mr4
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MouseReleaseEvent");
 
 
@@ -79,14 +79,14 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
     point[0] = 178;
   point[1] = 170;
   mitk::MouseMoveEvent::Pointer mm3 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
-  modifiers = mitk::AltKey;
+  modifiers = mitk::InteractionEvent::AltKey;
   mitk::MouseMoveEvent::Pointer mm4 = mitk::MouseMoveEvent::New(renderer,point, buttonStates, modifiers);
 
 
 
   MITK_TEST_CONDITION_REQUIRED(
-      mm1->MatchesTemplate(mm3.GetPointer()) &&
-      !(mm3->MatchesTemplate(mm4.GetPointer()))
+      *mm1 == *mm3 &&
+      *mm3 != *mm4
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MouseMoveEvent");
 
 

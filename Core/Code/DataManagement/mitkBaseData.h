@@ -41,7 +41,7 @@ namespace mitk {
 class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
-  mitkClassMacro(BaseData,itk::DataObject);
+  mitkClassMacro(BaseData,itk::DataObject)
 
   //##Documentation
   //## @brief Return the TimeSlicedGeometry of the data as const pointer.
@@ -315,7 +315,7 @@ public:
   unsigned int GetTimeSteps() const
   {
     return m_TimeSlicedGeometry->GetTimeSteps();
-  };
+  }
 
 
   //##Documentation
@@ -342,7 +342,7 @@ protected:
   //## @brief Pure virtual; Must be used in subclasses to get a data object to a
   //## valid state. Should at least create one empty object and call
   //## Superclass::InitializeTimeSlicedGeometry() to ensure an existing valid geometry
-  virtual void InitializeEmpty(){};
+  virtual void InitializeEmpty(){}
 
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;

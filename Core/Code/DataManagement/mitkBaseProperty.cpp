@@ -22,6 +22,11 @@ mitk::BaseProperty::BaseProperty()
 {
 }
 
+mitk::BaseProperty::BaseProperty(const mitk::BaseProperty&)
+  : itk::Object()
+{
+}
+
 mitk::BaseProperty::~BaseProperty()
 {
 }
@@ -41,18 +46,18 @@ bool mitk::BaseProperty::AssignProperty(const BaseProperty& rhs)
 {
   if (this == &rhs) return true; // no self assignment
 
-  const char* t1 = typeid(this).name();
-  const char* t2 = typeid(&rhs).name();
-
-  std::string s1(t1);
-  std::string s2(t2);
-
   if (typeid(*this) == typeid(rhs) && Assign(rhs))
   {
     this->Modified();
     return true;
   }
   return false;
+}
+
+mitk::BaseProperty::Pointer mitk::BaseProperty::Clone() const
+{
+  Pointer result = dynamic_cast<BaseProperty*>(this->InternalClone().GetPointer());
+  return result;
 }
 
 bool mitk::BaseProperty::operator==(const BaseProperty& property) const

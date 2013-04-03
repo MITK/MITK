@@ -81,6 +81,10 @@ public:
 
   MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost");
 
+  // It is not clear what the following code is supposed to test. The expression in
+  // the catch(...) block does have no effect, so success is always true.
+  // Related bugs are 13894 and 13889
+  /*
   bool success = true;
   try
   {
@@ -92,6 +96,7 @@ public:
     success == false;
   }
   MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager GetLevelWindow() and SetLevelWindow()");
+  */
 
   manager->SetAutoTopMostImage(true);
   MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost()");
@@ -115,14 +120,14 @@ public:
   ds->Add(node2);
 
   MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Test if nodes have been added");
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
+  MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
 
   mitk::Image::Pointer image3 = mitk::IOUtil::LoadImage(testImageFile);
   mitk::DataNode::Pointer node3 = mitk::DataNode::New();
   node3->SetData(image3);
   ds->Add(node3);
   MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 3, "Test if another node have been added");
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
+  MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
 
   ds->Remove(node1);
   MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Deleted node 1 (test GetRelevantNodes())");

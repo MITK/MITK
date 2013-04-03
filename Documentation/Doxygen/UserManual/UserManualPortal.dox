@@ -1,9 +1,15 @@
 /**
 \page UserManualPortal MITK: User Manual
 
+To get an introduction into the usage of any MITK based application please read \ref MITKUserManualPage. It will give you an overview of most of the common questions, such as how to load or save data or navigate within it. You can find a short description of the intended purpose and audience of MITK based applications developed by us at \ref ApplicationsPage.
+For more specific questions regarding the usage of a certain plugin (like e.g. the segmentation view) you can refer to a list of \ref PluginListPage
+
+For more specific information on how a plugin operates you can find the plugin documentation in \ref PluginListPage. Depending on the application you are using you might have only some or all of the listed plugins available.
+
+\section UserManualPortalTopics List of topics
 <ul>
-  <li> \subpage ApplicationsPage </li>
   <li> \subpage MITKUserManualPage </li>
+  <li> \subpage ApplicationsPage </li>  
   <li> \subpage PluginListPage </li>
 </ul>
 */

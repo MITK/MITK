@@ -315,7 +315,7 @@ int main(int argc, char* argv[])
   {
     m_DisplayInteractor = mitk::DisplayInteractor::New();
     m_DisplayInteractor->LoadStateMachine("DisplayInteraction.xml");
-    m_DisplayInteractor->LoadEventConfig("DisplayConfigMITK.xml");
+    m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
 
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();

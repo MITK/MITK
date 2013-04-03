@@ -22,9 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include "mitkBaseController.h"
 #include "mitkDisplayPositionEvent.h"
-#include "mitkKeyEvent.h"
 
 namespace mitk {
+
+class KeyEvent;
 
 //##Documentation
 //## @brief controls the camera used by the associated BaseRenderer

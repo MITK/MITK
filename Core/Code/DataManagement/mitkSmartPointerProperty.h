@@ -46,6 +46,8 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
 
     typedef itk::Object::Pointer ValueType;
 
+    Pointer Clone() const;
+
     itk::Object::Pointer GetSmartPointer() const;
     ValueType GetValue() const;
 
@@ -67,14 +69,16 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
   protected:
 
     SmartPointerProperty(itk::Object* = NULL);
+    SmartPointerProperty(const SmartPointerProperty&);
 
     itk::Object::Pointer m_SmartPointer;
 
   private:
 
     // purposely not implemented
-    SmartPointerProperty(const SmartPointerProperty&);
     SmartPointerProperty& operator=(const SmartPointerProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty&) const;
     virtual bool Assign(const BaseProperty&);

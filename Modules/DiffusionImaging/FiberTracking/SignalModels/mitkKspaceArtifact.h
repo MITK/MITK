@@ -35,8 +35,8 @@ public:
 
     KspaceArtifact()
         : m_T2(2000)
-        , m_TE(20)
-        , m_T2star(50)
+        , m_TE(100)
+        , m_Tinhom(50)
         , m_LineReadoutTime(1)
     {
     }
@@ -47,17 +47,18 @@ public:
     /** Adds artifact according to model to the input slice. Has to be implemented in subclass. **/
     virtual typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice) = 0;
 
-    void SetTline(unsigned int LineReadoutTime){ m_LineReadoutTime=LineReadoutTime; }
-    void SetT2(unsigned int T2){ m_T2=T2; }
-    void SetTE(unsigned int TE){ m_TE=TE; }
-    void SetT2star(unsigned int T2star){ m_T2star=T2star; }
+    // all times stored internally in µ seconds, input in milliseconds
+    void SetTline(double LineReadoutTime){ m_LineReadoutTime=LineReadoutTime; }
+    void SetTE(double TE){ m_TE=TE; }
+    void SetT2(double T2){ m_T2=T2; }
+    void SetTinhom(unsigned int Tinhom){ m_Tinhom=Tinhom; }
 
 protected:
 
-    unsigned int    m_T2star;
-    unsigned int    m_T2;
-    unsigned int    m_TE;
-    double          m_LineReadoutTime;
+    double    m_Tinhom;
+    double    m_T2;
+    double    m_TE;
+    double    m_LineReadoutTime;
 };
 
 }

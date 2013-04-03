@@ -14,5 +14,9 @@
         <file>btnRemovePoint.png</file>
         <file>btnSwapSets.png</file>
         <file>ModuleView.png</file>
+        <file>Histogram.html</file>
+        <file>Histogram.js</file>
+        <file>Histogram.css</file>
+        <file>d3.v2.js</file>
     </qresource>
 </RCC>

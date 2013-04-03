@@ -39,9 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/Connectomics/QmitkConnectomicsDataView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h"
 #include "src/internal/Connectomics/QmitkConnectomicsStatisticsView.h"
-#include "src/internal/QmitkDwiSoftwarePhantomView.h"
 #include "src/internal/QmitkOdfMaximaExtractionView.h"
 #include "src/internal/QmitkFiberfoxView.h"
+#include "src/internal/QmitkFiberExtractionView.h"
 
 namespace mitk {
 
@@ -69,8 +69,8 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsStatisticsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkOdfMaximaExtractionView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDwiSoftwarePhantomView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberfoxView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberExtractionView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

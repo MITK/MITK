@@ -260,7 +260,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   contourExtractor->Update();
   mitk::Surface::Pointer contour = contourExtractor->GetOutput(0);
 
-  if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
+  if (m_3DInterpolationEnabled)
   {
     unsigned int pos = this->AddContourmarker(positionEvent);
     mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();

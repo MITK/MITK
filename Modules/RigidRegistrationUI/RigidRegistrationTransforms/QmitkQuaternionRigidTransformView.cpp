@@ -39,32 +39,38 @@ itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())
   {
-    AccessByItk(m_FixedImage, GetTransform2);
+    AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 3);
     return m_TransformObject;
   }
   return NULL;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
-    typename FixedImage3DType::Pointer fixedImage3D;
-    mitk::CastToItkImage(m_FixedImage, fixedImage3D);
-    typename MovingImage3DType::Pointer movingImage3D;
-    mitk::CastToItkImage(m_MovingImage, movingImage3D);
+    typedef typename itk::Image< TPixelType, 3 >  FixedImageType;
+    typedef typename itk::Image< TPixelType, 3 >  MovingImageType;
+
+    // the fixedImage is the input parameter (fix for Bug #14626)
+    typename FixedImageType::Pointer fixedImage = itkImage1;
+
+    // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+    typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
+    movingImageToItk->SetInput(m_MovingImage);
+    movingImageToItk->Update();
+    typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
+
     typename itk::QuaternionRigidTransform< double >::Pointer transformPointer = itk::QuaternionRigidTransform< double >::New();
     transformPointer->SetIdentity();
     typedef typename itk::QuaternionRigidTransform< double >    QuaternionRigidTransformType;
     if (m_Controls.m_CenterForInitializerQuaternionRigid->isChecked())
     {
-      typedef typename itk::CenteredTransformInitializer<QuaternionRigidTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
+      typedef typename itk::CenteredTransformInitializer<QuaternionRigidTransformType, FixedImageType, MovingImageType> TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage3D );
-      transformInitializer->SetMovingImage( movingImage3D );
+      transformInitializer->SetFixedImage( fixedImage );
+      transformInitializer->SetMovingImage( movingImage );
       transformInitializer->SetTransform( transformPointer );
       if (m_Controls.m_MomentsQuaternionRigid->isChecked())
       {

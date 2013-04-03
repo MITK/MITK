@@ -23,6 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <list>
 
+#include "mitkInteractionEventObserver.h"
+#include "mitkDisplayInteractor.h"
+// MicroServices
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+
+
 mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
@@ -128,7 +136,27 @@ bool mitk::ToolManager::ActivateTool(int id)
 
   //If a tool is deactivated set the event notification policy of the global interaction to multiple again
   if (id == -1)
+  {
     GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
+
+    // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
+    // in new interaction framework
+    for (std::map<ServiceReference, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+         it != m_DisplayInteractorConfigs.end(); ++it)
+    {
+      if (it->first)
+      {
+        DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
+                                                 GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+        if (displayInteractor != NULL)
+        {
+          // here the regular configuration is loaded again
+          displayInteractor->SetEventConfig(it->second);
+        }
+      }
+    }
+    m_DisplayInteractorConfigs.clear();
+  }
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
@@ -166,6 +194,23 @@ bool mitk::ToolManager::ActivateTool(int id)
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         //If a tool is activated set event notification policy to one
         GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
+
+        // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
+        // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+        m_DisplayInteractorConfigs.clear();
+        std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+        for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+        {
+          DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
+                                                          GetModuleContext()->GetService<InteractionEventObserver>(*it));
+          if (displayInteractor != NULL)
+          {
+            // remember the original configuration
+            m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+            // here the alternative configuration is loaded
+            displayInteractor->SetEventConfig("Legacy/DisplayConfigMITKTools.xml");
+          }
+        }
       }
     }
   }

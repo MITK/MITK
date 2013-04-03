@@ -29,10 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessorBase.h"
 #include "mitkImage.h"
 
-itk::ThreadProcessIDType mitk::CurrentThreadHandle()
+mitk::ImageAccessorBase::ThreadIDType mitk::ImageAccessorBase::CurrentThreadHandle()
 {
   #ifdef ITK_USE_SPROC
-    return GetCurrentThread();
+    return GetCurrentThreadId();
   #endif
 
   #ifdef ITK_USE_PTHREADS
@@ -40,23 +40,13 @@ itk::ThreadProcessIDType mitk::CurrentThreadHandle()
   #endif
 
   #ifdef ITK_USE_WIN32_THREADS
-    return GetCurrentThread();
+    return GetCurrentThreadId();
   #endif
 }
 
-bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadProcessIDType handle2)
+bool mitk::ImageAccessorBase::CompareThreadHandles(mitk::ImageAccessorBase::ThreadIDType handle1, mitk::ImageAccessorBase::ThreadIDType handle2)
 {
-  #ifdef ITK_USE_SPROC
-    return GetThreadId(handle1) == GetThreadId(handle2);
-  #endif
-
-  #ifdef ITK_USE_WIN32_THREADS
-    return GetThreadId(handle1) == GetThreadId(handle2);
-  #endif
-
-  #ifdef ITK_USE_PTHREADS
-    return handle1 == handle2;
-  #endif
+  return handle1 == handle2;
 }
 
   mitk::ImageAccessorBase::ImageAccessorBase(
@@ -70,7 +60,7 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
     m_Options(OptionFlags),
     m_CoherentMemory(false)
     {
-      m_Thread = mitk::CurrentThreadHandle();
+      m_Thread = CurrentThreadHandle();
 
       // Initialize WaitLock
       m_WaitLock = new ImageAccessorWaitLock();
@@ -190,8 +180,8 @@ bool mitk::CompareThreadHandles(itk::ThreadProcessIDType handle1, itk::ThreadPro
   {
     #ifdef MITK_USE_RECURSIVE_MUTEX_PREVENTION
     // Prevent deadlock
-    itk::ThreadProcessIDType id = mitk::CurrentThreadHandle();
-    if(mitk::CompareThreadHandles(id,iAB->m_Thread)) {
+    ThreadIDType id = CurrentThreadHandle();
+    if(CompareThreadHandles(id,iAB->m_Thread)) {
       m_Image->m_ReadWriteLock.Unlock();
       mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
     }

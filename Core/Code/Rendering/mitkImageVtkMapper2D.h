@@ -80,10 +80,9 @@ namespace mitk {
  *   - \b "LookupTable": (mitkLookupTableProperty) If this property is set,
  *          the default lookuptable will be ignored and the "LookupTable" value
  *          will be used instead.
+ *   - \b "Image Rendering.Mode": This property decides which mode is used to render images. (E.g. if a lookup table or a transferfunction is applied). Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink
  *   - \b "Image Rendering.Transfer Function": (mitkTransferFunctionProperty) If this
  *          property is set, a color transferfunction will be used to color the image.
- *     \warning This property will not have any effect if, the "LookupTable" property
- *                   is set.
  *   - \b "binary": (BoolProperty) is the image a binary image or not
  *   - \b "outline binary": (BoolProperty) show outline of the image or not
  *   - \b "texture interpolation": (BoolProperty) texture interpolation of the image
@@ -107,19 +106,19 @@ namespace mitk {
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
  *   - \b "Image Rendering.Transfer Function":  Default color transfer function for CTs
- *   - \b "LookupTable":  Undefined. Must be set by the user.
+ *   - \b "LookupTable": Rainbow color.
 
  * If the modality-property is set for an image, the mapper uses modality-specific default properties,
  * e.g. color maps, if they are defined.
 
  * \ingroup Mapper
  */
-  class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper
-  {
+class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper
+{
 
-  public:
-    /** Standard class typedefs. */
-    mitkClassMacro( ImageVtkMapper2D,VtkMapper );
+public:
+  /** Standard class typedefs. */
+  mitkClassMacro( ImageVtkMapper2D,VtkMapper );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -131,9 +130,9 @@ namespace mitk {
    * data. */
   virtual void Update(mitk::BaseRenderer * renderer);
 
-    //### methods of MITK-VTK rendering pipeline
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-    //### end of methods of MITK-VTK rendering pipeline
+  //### methods of MITK-VTK rendering pipeline
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  //### end of methods of MITK-VTK rendering pipeline
 
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -161,15 +160,16 @@ namespace mitk {
       *   of the respective render window. Any user of this
       *   slice has to check whether it is set to NULL!
       */
-      vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
-      /** \brief Plane on which the slice is rendered as texture. */
-      vtkSmartPointer<vtkPlaneSource> m_Plane;
-      /** \brief The texture which is used to render the current slice. */
-      vtkSmartPointer<vtkTexture> m_Texture;
-      /** \brief The lookuptable for colors and level window */
-      vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
-      vtkSmartPointer<vtkLookupTable> m_BinaryLookupTable;
-      /** \brief The actual reslicer (one per renderer) */
+    vtkSmartPointer<vtkPolyData> m_EmptyPolyData;
+    /** \brief Plane on which the slice is rendered as texture. */
+    vtkSmartPointer<vtkPlaneSource> m_Plane;
+    /** \brief The texture which is used to render the current slice. */
+    vtkSmartPointer<vtkTexture> m_Texture;
+    /** \brief The lookuptables for colors and level window */
+    vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
+    vtkSmartPointer<vtkLookupTable> m_BinaryLookupTable;
+    vtkSmartPointer<vtkLookupTable> m_ColorLookupTable;
+    /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
     vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
@@ -178,22 +178,19 @@ namespace mitk {
           For instance, if you zoom or pann, there is no need to recompute the contour. */
     vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
-
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
 
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
-      /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
-      vtkMitkLevelWindowFilter* m_LevelWindowFilter;
+    /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
+    vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
-    ~LocalStorage()
-    {
-    }
+    ~LocalStorage();
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -204,6 +201,11 @@ namespace mitk {
 
   /** \brief Set the default properties for general image rendering. */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+  /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
+   * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink
+   */
+  void ApplyRenderingMode(mitk::BaseRenderer *renderer);
 
 protected:
   /** \brief Transforms the actor to the actual position in 3D.
@@ -258,13 +260,25 @@ protected:
     * to keep the correct order for the final VTK rendering.*/
   float CalculateLayerDepth(mitk::BaseRenderer* renderer);
 
-    /** \brief This method applies (or modifies) the lookuptable for all types of images. */
-    void ApplyLookuptable( mitk::BaseRenderer* renderer, vtkFloatingPointType* bounds );
+  /** \brief This method applies (or modifies) the lookuptable for all types of images.
+   * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
+   * which uses the lookup table must be set.
+*/
+  void ApplyLookuptable(mitk::BaseRenderer* renderer);
 
-  /** \brief This method applies a color transfer function, if no LookuptableProperty is set.
-    Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
-    images (e.g. float) */
+  /** \brief This method applies a color transfer function.
+   * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
+   * images (e.g. float)
+   * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a 'Image Rendering.Mode' which uses the color transfer function must be set.
+*/
   void ApplyColorTransferFunction(mitk::BaseRenderer* renderer);
+
+  /**
+   * @brief ApplyLevelWindow Apply the level window for the given renderer.
+   * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
+   * @param renderer Level window for which renderer?
+   */
+  void ApplyLevelWindow(mitk::BaseRenderer* renderer);
 
   /** \brief Set the color of the image/polydata */
   void ApplyColor( mitk::BaseRenderer* renderer );

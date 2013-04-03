@@ -47,6 +47,8 @@ protected:
 
   ColorProperty();
 
+  ColorProperty(const ColorProperty& other);
+
   ColorProperty(const float red, const float green, const float blue);
 
   ColorProperty(const float color[3]);
@@ -55,12 +57,14 @@ protected:
 
 public:
 
-  mitkClassMacro(ColorProperty, BaseProperty);
+  mitkClassMacro(ColorProperty, BaseProperty)
 
   itkNewMacro(ColorProperty);
   mitkNewMacro1Param(ColorProperty, const float*);
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);
+
+  Pointer Clone() const;
 
   typedef mitk::Color ValueType;
 
@@ -76,8 +80,9 @@ public:
 private:
 
   // purposely not implemented
-  ColorProperty(const ColorProperty&);
   ColorProperty& operator=(const ColorProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty & property);

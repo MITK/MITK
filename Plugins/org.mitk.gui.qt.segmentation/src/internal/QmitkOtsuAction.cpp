@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkRenderingModeProperty.h>
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
@@ -92,18 +93,10 @@ void QmitkOtsuAction::Run(const QList<DataNode::Pointer> &selectedNodes)
 
 void QmitkOtsuAction::OtsuSegmentationDone()
 {
-
-  /*
-  if (result == QDialog::Rejected)
-  m_ThresholdingToolManager->ActivateTool(-1);*/
-
   this->PerformOtsuSegmentation();
 
   m_OtsuSegmentationDialog->deleteLater();
   m_OtsuSegmentationDialog = NULL;
-
-  //m_ThresholdingToolManager->SetReferenceData(NULL);
-  //m_ThresholdingToolManager->SetWorkingData(NULL);
 
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -145,60 +138,31 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     typedef itk::Image< InputPixelType, dim > InputImageType;
     typedef itk::Image< OutputPixelType, dim > OutputImageType;
 
-    //typedef itk::OtsuThresholdImageFilter< InputImageType, OutputImageType > FilterType;
     typedef itk::OtsuMultipleThresholdsImageFilter< InputImageType, OutputImageType > FilterType;
-    //typedef itk::MultiplyImageFilter< OutputImageType, OutputImageType, OutputImageType> MultiplyFilterType;
-    //typedef itk::RandomImageSource< OutputImageType> RandomImageSourceType;
-    //typedef itk::ImageRegionIterator< OutputImageType > ImageIteratorType;
-
 
     FilterType::Pointer filter = FilterType::New();
-    //MultiplyFilterType::Pointer multiplyImageFilter = MultiplyFilterType::New();
-    //RandomImageSourceType::Pointer randomImageSource = RandomImageSourceType::New();
 
     filter->SetNumberOfThresholds(numberOfThresholds);
-    //filter->SetLabelOffset(0);
-    /*
-    filter->SetOutsideValue( 1 );
-    filter->SetInsideValue( 0 );*/
 
     InputImageType::Pointer itkImage;
     mitk::CastToItkImage(mitkImage, itkImage);
 
     filter->SetInput( itkImage );
-//    filter->UpdateOutputInformation();
-
-    //multiplyImageFilter->SetInput1(filter->GetOutput(0));
-    //OutputImageType::Pointer constantImage = OutputImageType::New();
-    //constantImage->SetLargestPossibleRegion(filter->GetOutput(0)->GetLargestPossibleRegion());
-    //constantImage->SetBufferedRegion(filter->GetOutput(0)->GetLargestPossibleRegion());
-    //constantImage->Allocate();
-    //ImageIteratorType it(constantImage, constantImage->GetLargestPossibleRegion());
-    //while (!it.IsAtEnd())
-    //{
-    //  it.Set(1);
-    //  ++it;
-    //}
-
-    ////randomImageSource->SetSize(filter->GetOutput(0)->GetLargestPossibleRegion().GetSize());
-    ////multiplyImageFilter->SetInput2(randomImageSource->GetOutput(0));
-    //multiplyImageFilter->SetInput2(constantImage);
 
     filter->Update();
-    //multiplyImageFilter->Update();
 
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
     std::string nameOfResultImage = this->m_DataNode->GetName();
     nameOfResultImage.append("Otsu");
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
     resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
-    resultNode->SetProperty("use color", mitk::BoolProperty::New(false) );
+    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+    resultNode->SetProperty("Image Rendering.Mode", renderingMode);
 
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
 
     mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-
-    //resultNode->GetProperty(prop, "LookupTable");
 
     vtkLookupTable *lookupTable = vtkLookupTable::New();
     lookupTable->SetHueRange(1.0, 0.0);
@@ -218,8 +182,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     levWinProp->SetLevelWindow( levelwindow );
     resultNode->SetProperty( "levelwindow", levWinProp );
 
-    //resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput(0) ) );
-    resultNode->SetData( mitk::ImportItkImage(filter->GetOutput(0))->Clone());
+    resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput(0) ) );
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);

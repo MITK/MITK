@@ -277,11 +277,12 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);
-    QString name(m_DiffusionImageNode->GetName().c_str());
-    name += "_FiberBundle";
+    QString name("FiberBundle_");
+    name += m_DiffusionImageNode->GetName().c_str();
+    name += "_Probabilistic";
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
-    GetDataStorage()->Add(fbNode);
+    GetDataStorage()->Add(fbNode, m_DiffusionImageNode);
 }
 
 

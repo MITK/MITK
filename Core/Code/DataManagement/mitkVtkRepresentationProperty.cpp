@@ -88,3 +88,15 @@ bool mitk::VtkRepresentationProperty::AddEnum( const std::string& name, const Id
 {
   return Superclass::AddEnum( name, id );
 }
+
+mitk::VtkRepresentationProperty::Pointer mitk::VtkRepresentationProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::VtkRepresentationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

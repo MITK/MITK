@@ -76,3 +76,15 @@ bool mitk::VtkVolumeRenderingProperty::AddEnum( const std::string& name, const I
 {
   return Superclass::AddEnum( name, id );
 }
+
+mitk::VtkVolumeRenderingProperty::Pointer mitk::VtkVolumeRenderingProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::VtkVolumeRenderingProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

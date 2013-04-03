@@ -47,6 +47,8 @@ public:
 
     itkNewMacro( Self );
 
+    Pointer Clone() const;
+
     /**
      * @returns the associated vtkLookupTable
      */
@@ -121,10 +123,13 @@ protected:
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
+    LookupTable(const LookupTable& other);
+
     vtkLookupTable* m_LookupTable;
 
 private:
 
+    virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // namespace mitk

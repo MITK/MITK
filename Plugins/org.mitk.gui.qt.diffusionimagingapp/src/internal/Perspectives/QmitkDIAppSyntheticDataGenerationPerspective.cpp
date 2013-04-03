@@ -46,8 +46,8 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.fiberfoxview");
   lo->SetCloseable(false);
 
-  left->AddView("org.mitk.views.dwisoftwarephantomview");
-  lo = layout->GetViewLayout("org.mitk.views.dwisoftwarephantomview");
+  left->AddView("org.mitk.views.fiberprocessing");
+  lo = layout->GetViewLayout("org.mitk.views.fiberprocessing");
   lo->SetCloseable(false);
 
   left->AddView("org.mitk.views.segmentation");

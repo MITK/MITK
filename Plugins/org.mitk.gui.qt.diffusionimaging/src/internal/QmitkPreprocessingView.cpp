@@ -441,6 +441,7 @@ void QmitkPreprocessingView::MergeDwis()
     GradientListContainerType   gradientListContainer;
     std::vector< double >       bValueContainer;
 
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
     for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
     {
         DiffusionImageType::Pointer dwi = dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >( m_SelectedDiffusionNodes.at(i)->GetData() );
@@ -449,6 +450,11 @@ void QmitkPreprocessingView::MergeDwis()
             imageContainer.push_back(dwi->GetVectorImage());
             gradientListContainer.push_back(dwi->GetDirections());
             bValueContainer.push_back(dwi->GetB_Value());
+            if (i>0)
+            {
+                name += "+";
+                name += m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+            }
         }
     }
 
@@ -469,14 +475,6 @@ void QmitkPreprocessingView::MergeDwis()
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-
-    for (int i=0; i<bValueContainer.size(); i++)
-    {
-        name += "_";
-        name += QString::number(bValueContainer.at(i));
-    }
-
     imageNode->SetName(name.toStdString().c_str());
     GetDefaultDataStorage()->Add(imageNode);
 }

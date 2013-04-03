@@ -120,7 +120,7 @@ void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
     m_Controls->m_SurroundingSlider->hide();
     m_Controls->m_SurroundingSpin->hide();
     m_Controls->m_BoxButton->setEnabled(true);
-
+    m_Controls->warningLabel->setVisible(false);
     // create ui element connections
     this->CreateConnections();
   }
@@ -364,17 +364,39 @@ void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   if (nodes.size() != 1 || dynamic_cast<mitk::Image*>(nodes[0]->GetData()) == 0)
   {
     m_ParentWidget->setEnabled(false);
+    m_Controls->warningLabel->setVisible(false);
     return;
   }
 
   m_ImageNode = nodes[0];
   m_ParentWidget->setEnabled(true);
+  // do not accept datanodes with dimension of less than three
+  mitk::Image* m_ImageToCrop = dynamic_cast<mitk::Image*>(nodes[0]->GetData());
+  if (m_ImageToCrop == NULL)
+  {
+    return;
+  }
+  unsigned int dim = m_ImageToCrop->GetDimension();
+  if (dim < 3)
+  {
+    m_Controls->warningLabel->setVisible(true);
+    m_ParentWidget->setEnabled(false);
+  }
+  else
+  {
+    m_Controls->warningLabel->setVisible(false);
+  }
 }
 
 void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
 {
   m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
-
+  unsigned int dim = m_ImageToCrop->GetDimension();
+  if (dim < 3)
+  {
+    MITK_WARN << "Image Cropper does not support 1D/2D Objects. Aborting operation";
+    return;
+  }
   if(!this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
   {
     this->GetDefaultDataStorage()->Add(m_CroppingObjectNode, node);

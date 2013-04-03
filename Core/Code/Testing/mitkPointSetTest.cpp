@@ -621,7 +621,7 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   mitk::PointSet::Pointer clonePS = pointSet->Clone();
   MITK_INFO << "... clone pointset ts: " << clonePS->GetTimeSteps();
 
-  for (int t=0; t< pointSet->GetTimeSteps(); t++)
+  for (unsigned int t=0; t< pointSet->GetTimeSteps(); t++)
   {
      MITK_INFO << "testing timestep: " << t;
      for (int i=0; i<pointSet->GetSize(t); i++)

@@ -38,7 +38,7 @@ namespace mitk
 
   public:
     mitkClassMacro(MouseWheelEvent,InteractionPositionEvent)
-    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D , MouseButtons , ModifierKeys, int)
+    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D&, MouseButtons , ModifierKeys, int)
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
@@ -47,16 +47,17 @@ namespace mitk
     int GetWheelDelta() const;
     void SetWheelDelta(int delta);
 
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
-    virtual bool IsSuperClassOf(InteractionEvent::Pointer baseClass);
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
     MouseWheelEvent(BaseRenderer* = NULL,
-        const Point2D mousePosition = Point2D(),
+        const Point2D& mousePosition = Point2D(),
         MouseButtons buttonStates = NoButton,
         ModifierKeys modifiers = NoKey,
         int wheelDelta = 0);
     virtual ~MouseWheelEvent();
+
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     int m_WheelDelta;

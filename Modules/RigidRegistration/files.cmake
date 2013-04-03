@@ -9,5 +9,10 @@ set(CPP_FILES
   mitkPyramidalRegistrationMethod.cpp
 )
 
+set(RESOURCE_FILES
+  mitkRigidRegistrationPresets.xml
+  mitkRigidRegistrationTestPresets.xml
+)
+
 MITK_MULTIPLEX_PICTYPE( mitkImageRegistrationMethod-TYPE.cpp )
 MITK_MULTIPLEX_PICTYPE( mitkPyramidalRegistrationMethod-TYPE.cpp )

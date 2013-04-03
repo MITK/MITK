@@ -22,6 +22,12 @@ mitk::LevelWindowProperty::LevelWindowProperty()
 {
 }
 
+mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindowProperty& other)
+  : BaseProperty(other)
+  , m_LevWin(other.m_LevWin)
+{
+}
+
 mitk::LevelWindowProperty::LevelWindowProperty(const mitk::LevelWindow &levWin)
 {
     SetLevelWindow(levWin);
@@ -71,4 +77,16 @@ std::string mitk::LevelWindowProperty::GetValueAsString() const
   std::stringstream myStr;
   myStr << "L:" << m_LevWin.GetLevel() << " W:" << m_LevWin.GetWindow();
   return myStr.str();
+}
+
+mitk::LevelWindowProperty::Pointer mitk::LevelWindowProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::LevelWindowProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

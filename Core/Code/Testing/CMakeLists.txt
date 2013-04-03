@@ -1,3 +1,13 @@
+# The core tests need relaxed compiler flags...
+# TODO fix core tests to compile without these additional no-error flags
+if(MSVC_VERSION)
+  # disable deprecated warnings (they would lead to errors)
+  mitkFunctionCheckCompilerFlags2("/wd4996" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+else()
+  mitkFunctionCheckCompilerFlags2("-Wno-error=deprecated" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags2("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
+
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 

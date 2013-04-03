@@ -56,6 +56,12 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 
     typedef T ValueType;
 
+    Pointer Clone() const
+    {
+      Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+      return result;
+    }
+
     itkSetMacro(Value,T);
     itkGetConstMacro(Value,T);
 
@@ -72,13 +78,23 @@ class MITK_EXPORT GenericProperty : public BaseProperty
     GenericProperty() {}
     GenericProperty(T x)
        : m_Value(x) {}
+    GenericProperty(const GenericProperty& other)
+      : BaseProperty(other)
+      , m_Value(other.m_Value)
+    {}
+
     T m_Value;
 
   private:
 
     // purposely not implemented
-    GenericProperty(const GenericProperty&);
     GenericProperty& operator=(const GenericProperty&);
+
+    virtual itk::LightObject::Pointer InternalClone() const
+    {
+      itk::LightObject::Pointer result(new Self(*this));
+      return result;
+    }
 
     virtual bool IsEqual(const BaseProperty& other) const
     {
@@ -113,15 +129,28 @@ public:                                                       \
   mitkClassMacro(PropertyName, GenericProperty< Type >);      \
   itkNewMacro(PropertyName);                                  \
   mitkNewMacro1Param(PropertyName, Type);                     \
+  Pointer Clone() const;                                      \
   using BaseProperty::operator=;                              \
 protected:                                                    \
   PropertyName();                                             \
+  PropertyName(const PropertyName&);                          \
   PropertyName(Type x);                                       \
+private:                                                      \
+  itk::LightObject::Pointer InternalClone() const;            \
 };
 
-#define mitkDefineGenericProperty(PropertyName,Type,DefaultValue)    \
-  mitk::PropertyName::PropertyName()  : Superclass(DefaultValue) { } \
-  mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}
+#define mitkDefineGenericProperty(PropertyName,Type,DefaultValue)            \
+  mitk::PropertyName::PropertyName()  : Superclass(DefaultValue) { }         \
+  mitk::PropertyName::PropertyName(const PropertyName& other) : GenericProperty< Type >(other) {} \
+  mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                \
+  mitk::PropertyName::Pointer mitk::PropertyName::Clone() const {            \
+    Pointer result = static_cast<Self*>(this->InternalClone().GetPointer()); \
+    return result;                                                           \
+  }                                                                          \
+  itk::LightObject::Pointer mitk::PropertyName::InternalClone() const {      \
+    itk::LightObject::Pointer result(new Self(*this));                       \
+    return result;                                                           \
+  }                                                                          \
 
 
 #endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */

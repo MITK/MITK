@@ -64,7 +64,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
   : BaseRenderer(name,renWin, rm),
   m_VtkMapperPresent(false),
-  m_NewRenderer(true),
   m_CameraInitializedForMapperID(0)
 {
   didCount=false;
@@ -327,6 +326,7 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   // vtk will reenable texturing every time it is needed
   glDisable( GL_TEXTURE_1D );
   glDisable( GL_TEXTURE_2D );
+  glLineWidth(1.0);
 }
 
 /*!

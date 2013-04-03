@@ -48,6 +48,8 @@ public:
 
   mitkNewMacro1Param(VtkScalarModeProperty, const std::string&);
 
+  Pointer Clone() const;
+
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.
@@ -102,8 +104,9 @@ protected:
 private:
 
   // purposely not implemented
-  VtkScalarModeProperty(const VtkScalarModeProperty&);
   VtkScalarModeProperty& operator=(const VtkScalarModeProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

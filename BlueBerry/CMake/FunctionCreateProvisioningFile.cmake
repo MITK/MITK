@@ -92,6 +92,10 @@ function(FunctionCreateProvisioningFile)
     ctkFunctionGetAllPluginTargets(_plugin_list)
   endif()
 
+  if(_plugin_list)
+    list(REMOVE_DUPLICATES _plugin_list)
+  endif()
+
   set(_exclude_targets )
   if(_PROV_EXCLUDE_PLUGINS)
     # Convert the plug-in symbolic names to valid target names

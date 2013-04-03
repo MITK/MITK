@@ -81,6 +81,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
   connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
   m_RBtnEnable3DInterpolation->setChecked(true);
+  m_RBtnEnable3DInterpolation->setToolTip("Interpolate a binary volume from a set of arbitrarily arranged contours.");
   grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
 
   m_BtnAccept3DInterpolation = new QPushButton("Accept", this);
@@ -96,6 +97,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
   connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
+  m_RBtnEnable2DInterpolation ->setToolTip("Interpolate contours in left-out slices from a set of slice-by-slice arranged contours.");
   grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
 
   m_BtnAcceptInterpolation = new QPushButton("Accept", this);
@@ -110,6 +112,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   m_RBtnDisableInterpolation = new QRadioButton("Disable", this);
   connect(m_RBtnDisableInterpolation, SIGNAL(toggled(bool)), this, SLOT(OnInterpolationDisabled(bool)));
+  m_RBtnDisableInterpolation->setToolTip("Disable interpolation.");
   grid->addWidget(m_RBtnDisableInterpolation, 2,0);
 
   layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);

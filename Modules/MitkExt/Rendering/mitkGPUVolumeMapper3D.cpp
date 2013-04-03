@@ -236,7 +236,7 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer* renderer)
   if(!visible) return false;
 
   bool value = false;
-  if(!node->GetBoolProperty("volumerendering",value,renderer));
+  if(!node->GetBoolProperty("volumerendering",value,renderer))
     return false;
 
   if(!value)

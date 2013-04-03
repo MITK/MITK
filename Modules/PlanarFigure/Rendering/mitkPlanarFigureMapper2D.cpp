@@ -353,7 +353,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     glVertex3f( displayPoint[0], displayPoint[1], PLANAR_OFFSET );
   }
 
-  if(closed)
+  if(closed && (vertices.begin() != vertices.end()))
   { // complete line loop to the first point again
     mitk::Point2D displayPoint;
     this->TransformObjectToDisplay( vertices.begin()->Point, displayPoint,

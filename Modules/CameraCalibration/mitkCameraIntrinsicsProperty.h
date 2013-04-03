@@ -39,6 +39,8 @@ public:
   itkNewMacro(CameraIntrinsicsProperty);
   mitkNewMacro1Param(CameraIntrinsicsProperty, mitk::CameraIntrinsics::Pointer);
 
+  Pointer Clone() const;
+
   itkSetMacro(Value, mitk::CameraIntrinsics::Pointer );
   itkGetConstMacro(Value, mitk::CameraIntrinsics::Pointer );
 
@@ -51,13 +53,16 @@ protected:
 
   CameraIntrinsicsProperty();
 
+  CameraIntrinsicsProperty(const CameraIntrinsicsProperty&);
+
   CameraIntrinsicsProperty( mitk::CameraIntrinsics::Pointer value );
 
 private:
 
   // purposely not implemented
-  CameraIntrinsicsProperty(const CameraIntrinsicsProperty&);
   CameraIntrinsicsProperty& operator=(const CameraIntrinsicsProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty& property);

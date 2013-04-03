@@ -27,6 +27,12 @@ mitk::LookupTable::LookupTable()
   this->SetRequestedRegionToLargestPossibleRegion();
 }
 
+mitk::LookupTable::LookupTable(const LookupTable& other)
+  : itk::DataObject()
+  , m_LookupTable(vtkLookupTable::New())
+{
+  m_LookupTable->DeepCopy(other.m_LookupTable);
+}
 
 mitk::LookupTable::~LookupTable()
 {
@@ -294,4 +300,16 @@ void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent;
   m_LookupTable->PrintHeader(os, vtkIndent());
+}
+
+mitk::LookupTable::Pointer mitk::LookupTable::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::LookupTable::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

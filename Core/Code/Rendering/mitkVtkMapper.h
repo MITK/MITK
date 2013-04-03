@@ -62,7 +62,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
      /**
      * \brief Returns whether this is an vtk-based mapper
-     * @deprecated All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
+     * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
      */
     DEPRECATED( virtual bool IsVtkBased() const );
 
@@ -103,12 +103,12 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList
-    * @deprecated Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) instead
+    * \deprecatedSince{2013_03} Use ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) instead
     */
-    DEPRECATED(inline virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+    DEPRECATED(inline virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer))
     {
       ApplyColorAndOpacityProperties(renderer, actor);
-    });
+    }
 
     /**
     * \brief Apply color and opacity properties read from the PropertyList.

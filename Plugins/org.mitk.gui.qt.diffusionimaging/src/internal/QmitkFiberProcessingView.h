@@ -70,25 +70,12 @@ public:
 
 protected slots:
 
-  void OnDrawCircle();          ///< add circle interactors etc.
-  void OnDrawPolygon();         ///< add circle interactors etc.
-  void DoFiberExtraction();     ///< Extract fibers from selected bundle
-  void GenerateAndComposite();
-  void GenerateOrComposite();
-  void GenerateNotComposite();
   void PruneBundle();               ///< remove too short/too long fibers
   void MirrorFibers();              ///< mirror bundle on the specified plane
-  void JoinBundles();               ///< merge selected fiber bundles
-  void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
-  void GenerateRoiImage();          ///< generate binary image of selected planar figures.
   void ProcessSelectedBundles();    ///< start selected operation on fiber bundle (e.g. tract density image generation)
   void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
   void DoImageColorCoding();        ///< color fibers by selected scalar image
-  void Extract3d();                 ///< extract all fibers passing the selected surface mesh
   void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
-  void ExtractMask();                 ///< extract all fibers passing the selected surface mesh
-
-  virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
 protected:
 
@@ -150,22 +137,11 @@ protected:
   void GenerateStats(); ///< generate statistics of selected fiber bundles
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
 
-  int m_CircleCounter;                                      ///< used for data node naming
-  int m_PolygonCounter;                                     ///< used for data node naming
   std::vector<mitk::DataNode::Pointer>  m_SelectedFB;       ///< selected fiber bundle nodes
-  std::vector<mitk::DataNode::Pointer>  m_SelectedPF;       ///< selected planar figure nodes
-  std::vector<mitk::Surface::Pointer>   m_SelectedSurfaces;
   mitk::Image::Pointer                  m_SelectedImage;
-  mitk::Image::Pointer                  m_InternalImage;
-  mitk::PlanarFigure::Pointer           m_PlanarFigure;
-  itkUCharImageType::Pointer            m_InternalImageMask3D;
-  itkUCharImageType::Pointer            m_PlanarFigureImage;
   float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
-  mitk::DataNode::Pointer               m_MaskImageNode;
+  std::vector<mitk::Surface::Pointer>   m_SelectedSurfaces;
 
-  void AddCompositeToDatastorage(mitk::PlanarFigureComposite::Pointer, mitk::DataNode::Pointer);
-  void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
-  void CompositeExtraction(mitk::DataNode::Pointer node, mitk::Image* image);
   mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
   mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);

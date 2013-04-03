@@ -43,7 +43,7 @@ namespace mitk
 
     static const float ScaleFactor;
 
-    void AppendSnapshot(Surface::Pointer surface) const;
+    bool AppendSnapshot(Surface::Pointer surface) const;
     double GetDefaultDT() const;
     SimulationDrawTool* GetDrawTool();
     sofa::simulation::Node::SPtr GetRootNode() const;

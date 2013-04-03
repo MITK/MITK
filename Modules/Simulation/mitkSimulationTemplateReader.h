@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkSimulationReader_h
-#define mitkSimulationReader_h
+#ifndef mitkSimulationTemplateReader_h
+#define mitkSimulationTemplateReader_h
 
 #include <mitkBaseProcess.h>
 #include <mitkFileReader.h>
@@ -23,12 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class Simulation_EXPORT SimulationReader : public BaseProcess, FileReader
+  class Simulation_EXPORT SimulationTemplateReader : public BaseProcess, FileReader
   {
   public:
     static bool CanReadFile(const std::string& filename, const std::string& filePrefix, const std::string& filePattern);
 
-    mitkClassMacro(SimulationReader, BaseProcess);
+    mitkClassMacro(SimulationTemplateReader, BaseProcess);
     itkNewMacro(Self);
 
     const char* GetFileName() const;
@@ -45,10 +45,10 @@ namespace mitk
     void GenerateOutputInformation();
 
   private:
-    SimulationReader();
-    ~SimulationReader();
+    SimulationTemplateReader();
+    ~SimulationTemplateReader();
 
-    SimulationReader(const Self &);
+    SimulationTemplateReader(const Self &);
     Self & operator=(const Self &);
 
     std::string m_FileName;

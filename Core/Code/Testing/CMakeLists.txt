@@ -76,12 +76,12 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapp
 
 # Testing of the rendering of binary images
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
-                        ${MITK_DATA_DIR}/binaryTestImage.nrrd #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryTestImage640x480REF.png #corresponding reference screenshot
+                        ${MITK_DATA_DIR}/RenderingTestData/binaryImage.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryImage640x480REF.png #corresponding reference screenshot
 )
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImageWithRef640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
-                        ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/binaryTestImage.nrrd #input image to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryTestImageWithRef640x480REF.png #corresponding reference screenshot
+                        ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/RenderingTestData/binaryImage.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryImageWithRef640x480REF.png #corresponding reference screenshot
 )
 # End of binary image tests
 

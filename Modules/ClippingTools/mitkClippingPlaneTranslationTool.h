@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ClippingToolsExports.h"
 
-#include "mitkAffineInteractor3D.h"
+#include "mitkAffineDataInteractor3D.h"
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkTool.h"
@@ -52,11 +52,8 @@ namespace mitk
     virtual void Deactivated();
 
     mitk::DataNode::Pointer           m_ClippingPlaneNode;
-    mitk::AffineInteractor3D::Pointer m_AffineInteractor;
+    mitk::AffineDataInteractor3D::Pointer m_AffineDataInteractor;
 
-  private:
-
-    void ClippingPlaneChanged();
   };
 
 } //end namespace mitk

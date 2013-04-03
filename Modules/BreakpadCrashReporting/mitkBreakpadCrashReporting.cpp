@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLogMacros.h"
 
 
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
+
 #include <windows.h>
 #include <tchar.h>
 #include "client/windows/crash_generation/client_info.h"
@@ -27,14 +28,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "client/windows/handler/exception_handler.h"
 #include "client/windows/common/ipc_protocol.h"
 
-#elif defined(Q_OS_MAC)
+#elif Q_OS_MAC
+
 #include <client/mac/handler/exception_handler.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#elif defined(Q_OS_LINUX)
+
+#elif __gnu_linux__
+
+#include <client/linux/crash_generation/crash_generation_server.h>
+#include <client/linux/crash_generation/client_info.h>
 #include <client/linux/handler/exception_handler.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+
 #endif
 
 #include <QApplication>
@@ -49,18 +56,25 @@ static int  breakpadNumberOfConnections = 0;          // current number of conne
 static int  numberOfConnectionAttemptsPerformed = 1;  // number of performed re-connect attempts of a crash client
 
 mitk::BreakpadCrashReporting::BreakpadCrashReporting()
+:server_fd(-1)
+,client_fd(-1)
 {
   m_CrashServer         = NULL;
   m_ExceptionHandler    = NULL;
 
   m_NamedPipeString       = "\\\\.\\pipe\\MitkCrashServices\\MitkBasedApplication";
   m_CrashDumpPath         = QDir(QApplication::instance()->applicationDirPath()).absolutePath();
-  m_CrashDumpPath.append("/CrashDumps/");
+  m_CrashDumpPath.append("/CrashDumps/"); // is created if it does not exist
 
   m_NumberOfConnectionAttempts = 3;
   m_ReconnectDelay             = 300;
 
+  // TODO platform specific
+#ifdef WIN32
   m_CrashReportingServerExecutable = QDir(QApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer.exe");
+#else
+  m_CrashReportingServerExecutable = QDir(QApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer");
+#endif
 }
 
 mitk::BreakpadCrashReporting::~BreakpadCrashReporting()
@@ -74,8 +88,11 @@ mitk::BreakpadCrashReporting::~BreakpadCrashReporting()
     delete m_CrashServer;
   }
 }
+
+#ifdef WIN32
+// TODO platform specific
 //This function gets called in the event of a crash.
-bool ShowDumpResults(const wchar_t* dump_path,
+bool BreakpadCrashReportingDumpCallbackWindows(const wchar_t* dump_path,
                      const wchar_t* minidump_id,
                      void* context,
                      EXCEPTION_POINTERS* exinfo,
@@ -91,11 +108,30 @@ bool ShowDumpResults(const wchar_t* dump_path,
   return succeeded;
 }
 
+#elif __gnu_linux__
+bool BreakpadCrashReportingDumpCallbackLinux(const google_breakpad::MinidumpDescriptor& descriptor,
+                             void* context,
+                             bool succeeded)
+{
+  return succeeded;
+}
+#endif
+
+bool mitk::BreakpadCrashReporting::DumpCallbackPlatformIndependent()
+{
+}
 
 void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGenerationServer)
 {
-  google_breakpad::CustomClientInfo custom_info;
+#ifdef WIN32  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
+  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
+#else
+  std::string dump_path = m_CrashDumpPath.toStdString();
+#endif
 
+
+
+#ifdef WIN32
   /* This is needed for CRT to not show dialog for invalid param
    failures and instead let the code handle it.*/
   _CrtSetReportMode(_CRT_ASSERT, 0);
@@ -112,27 +148,16 @@ void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGe
      MITK_INFO << "Initializing Breakpad Crash Handler, connecting to named pipe: ";
   }
 
-#ifdef _MSC_VER  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
-  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
-#else
-  std::wstring dump_path = m_CrashDumpPath.toStdWString();
-#endif
-
-
-
   m_ExceptionHandler = new google_breakpad::ExceptionHandler(
-#if defined(Q_OS_WIN)
-                                dump_path,
-#else
-                                m_CrashDumpPath.toStdString(),
-#endif
+                                 dump_path,
+                                 m_CrashDumpPath.toStdString(),
                                  NULL,
-                                 ShowDumpResults,
+                                 BreakpadCrashReportingDumpCallbackWindows,
                                  NULL,
                                  google_breakpad::ExceptionHandler::HANDLER_ALL,
                                  MiniDumpNormal, //see DbgHelp.h
                                  pipe,
-                                 &custom_info);
+                                 NULL); // custom client info (unused)
 
   if(connectToCrashGenerationServer)
   {
@@ -153,32 +178,74 @@ void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGe
       }
     }
   }
+
+#elif __gnu_linux__
+
+  google_breakpad::MinidumpDescriptor dumpDescriptor( dump_path );
+
+  if (client_fd == -1)
+  {
+    MITK_WARN << "In-process crash dump handling, the unsafer method";
+  }
+
+  m_ExceptionHandler = new google_breakpad::ExceptionHandler(
+                                 dumpDescriptor, // descriptor (where to dump)
+                                 NULL, // filter (we don't filter)
+                                 BreakpadCrashReportingDumpCallbackLinux, // our callback in cases of crashes
+                                 NULL, // callback_context (no idea.. custom data probably)
+                                 true, // install_handler (yes, write dumps with each crash, not only on request)
+                                 client_fd ); // should be initialized in StopCrashServer() by ealier call
+
+
+#endif
 }
 
-static void _cdecl ShowClientConnected(void* context,
+static void
+#ifdef WIN32
+  _cdecl
+#endif
+ShowClientConnected(void* context,
                                        const google_breakpad::ClientInfo* client_info)
 { // callback of the crash generation server on client connect
+#ifdef WIN32
   MITK_INFO << "Breakpad Client connected: " << client_info->pid();
+#else
+  MITK_INFO << "Breakpad Client connected: TODO proc-info";
+#endif
 
   breakpadOnceConnected = true; // static variables indicate server shutdown after usage
   breakpadNumberOfConnections++;
 }
 
-static void _cdecl ShowClientCrashed(void* context,
-                                     const google_breakpad::ClientInfo* client_info,
-                                     const std::wstring* dump_path)
+#ifdef WIN32
+static void _cdecl ShowClientCrashed(void* context, const google_breakpad::ClientInfo* client_info, const std::wstring* dump_path)
+#elif __gnu_linux__
+static void ShowClientCrashed(void* context, const google_breakpad::ClientInfo* client_info, const std::string* dump_path)
+#endif
 { // callback of the crash generation server on client crash
 
+#ifdef WIN32
   MITK_INFO << "Breakpad Client request dump: " << client_info->pid();
-
   // we may add some log info here along the dump file
   google_breakpad::CustomClientInfo custom_info = client_info->GetCustomInfo();
+#else
+  MITK_INFO << "Breakpad Client request dump: TODO proc-info";
+#endif
+
 }
 
-static void _cdecl ShowClientExited(void* context,
+static void
+#ifdef WIN32
+  _cdecl
+#endif
+ShowClientExited(void* context,
                                     const google_breakpad::ClientInfo* client_info)
 { // callback of the crash generation server on client exit
+#ifdef WIN32
   MITK_INFO << "Breakpad Client exited :" << client_info->pid();
+#else
+  MITK_INFO << "Breakpad Client exited : TODO proc-info";
+#endif
 
   // we'd like to shut down server if there is no further client connected,
   // but no access to private server members in this callback
@@ -199,6 +266,51 @@ bool mitk::BreakpadCrashReporting::StartCrashServer(bool lauchOutOfProcessExecut
     return true;
   }
 
+  /*
+     Idea here:
+      - application-under-observation starts out-of-process dump generation executable
+      - dump generation executable creates google CrashGenerationServer
+        - requires fd to listen to
+
+     DONC
+      - CreateReportChannel
+        - fork
+          - in parent: InitializeServer, exit with return value of qtapplication.exec(), i.e. run forever. TODO stop with crashed child
+          - in parent: continue
+  */
+
+#ifdef __gnu_linux__
+  google_breakpad::CrashGenerationServer::CreateReportChannel(&server_fd, &client_fd); // both OUT parameters
+
+  pid_t child_pid = fork();
+
+  if ( child_pid != 0)
+  {
+    // server process
+    InitializeServer(server_fd);
+
+    if (qApp)
+    {
+      MITK_INFO << "Wait for observed breakpad child to finish/crash...";
+      int status;
+      waitpid( child_pid, &status, WEXITED );
+      MITK_INFO << "Breakpad child terminated, so I also terminate...";
+      exit(EXIT_SUCCESS);
+    }
+    else
+    {
+      MITK_ERROR << "You MUST initialize the qApp instance before calling StartCrashServer. You did not. Exiting...";
+      exit(EXIT_FAILURE);
+    }
+  }
+  else
+  {
+    // child process
+    return true; // assume we are fine since we got here..
+  }
+
+#endif
+
   if(lauchOutOfProcessExecutable)
   { // spawn process and launch CrashReportingServer executable
     QString tmpPipeString           = m_NamedPipeString;
@@ -216,42 +328,59 @@ bool mitk::BreakpadCrashReporting::StartCrashServer(bool lauchOutOfProcessExecut
   }
 }
 
-bool mitk::BreakpadCrashReporting::InitializeServer()
+bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
 {
   QDir myDir;
   myDir.mkpath(m_CrashDumpPath); // Assure directory is created.
 
-#ifdef _MSC_VER  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
-  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
-#else
-  std::wstring dump_path = m_CrashDumpPath.toStdWString();
-#endif
+  google_breakpad::CrashGenerationServer::OnClientDumpRequestCallback dump_callback = &ShowClientCrashed;
+  google_breakpad::CrashGenerationServer::OnClientExitingCallback exit_callback = &ShowClientExited;
+  void* dump_context = NULL;
+  void* exit_context = NULL;
 
-  m_CrashServer = new google_breakpad::CrashGenerationServer((const wchar_t*)m_NamedPipeString.utf16(),
+#ifdef WIN32  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
+  std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
+  m_CrashServer = new google_breakpad::CrashGenerationServer(dump_path,
                                            NULL,
                                            ShowClientConnected, // connect callback
                                            NULL,
-                                           ShowClientCrashed, // dump callback
-                                           NULL,
-                                           ShowClientExited, // exit callback
-                                           NULL,
+                                           dump_callback,
+                                           dump_context,
+                                           exit_callback, // exit callback
+                                           exit_context,
                                            NULL,
                                            NULL,
                                            true,
                                            &dump_path);
+#elif __gnu_linux__
+  std::string dump_path = m_CrashDumpPath.toStdString();
+
+  MITK_INFO << "Start Breakpad crash dump generation server with file descriptor " << listen_fd;
+
+  m_CrashServer = new google_breakpad::CrashGenerationServer(listen_fd,
+                                           dump_callback,
+                                           dump_context,
+                                           exit_callback,
+                                           exit_context,
+                                           true, // generate_dumps
+                                           &dump_path);
+#endif
 
   if (!m_CrashServer->Start())
   {
-    MITK_ERROR << "Unable to start google breakpad server.";
+    MITK_ERROR << "Unable to start Breakpad crash dump generation server.";
     delete m_CrashServer;
     m_CrashServer = NULL;
     return false;
   }
   else
   {
-    MITK_INFO << "Google breakpad server started.";
+    MITK_INFO << "Breakpad crash dump generation server started.";
     return true;
   }
+
+  return false;
+
 }
 
 bool mitk::BreakpadCrashReporting::RequestDump()
@@ -280,10 +409,6 @@ void mitk::BreakpadCrashReporting::StopCrashServer()
 
 void mitk::BreakpadCrashReporting::CrashAppForTestPurpose()
 {
-  //printf(NULL);
-
-  //derived derived;
-
   int* x = 0;
   *x = 1;
 }

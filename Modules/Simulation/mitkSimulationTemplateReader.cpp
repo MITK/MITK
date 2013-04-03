@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static std::string ReadFile(const std::string& fileName)
 {
-  std::ifstream file(fileName);
+  std::ifstream file(fileName.c_str());
 
   if (!file.is_open())
     mitkThrow() << "Could not load '" << fileName << "'!";

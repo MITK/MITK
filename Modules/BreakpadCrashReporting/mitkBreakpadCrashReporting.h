@@ -31,6 +31,17 @@ namespace google_breakpad {
 namespace mitk {
 
   /**
+
+    TODO
+      oop server Linux
+      help on how to USE dumps
+      test dump existence
+      CMake:
+       check buildtype (O2/-g/..)
+       build integration
+    TODO long-term: Apple
+
+
   * \brief Integration of Google's Breakpad Project in MITK.
   *
   * Breakpad is a library and tool suite that allows you to distribute an application to users with compiler-provided
@@ -70,7 +81,7 @@ namespace mitk {
   class MITK_BREAKPAD_EXPORT BreakpadCrashReporting
   {
     public:
-      BreakpadCrashReporting();
+      BreakpadCrashReporting(/*TODO add path here*/);
       ~BreakpadCrashReporting();
 
       /** Initializes an event handler for 'unhandled exceptions' that will dump a so-called 'minidump' to a defined folder.
@@ -142,8 +153,14 @@ namespace mitk {
 
 
   protected:
-      bool InitializeServer();
+      bool InitializeServer(int listen_fd = -1);
       void StopCrashServer();
+
+      bool DumpCallbackPlatformIndependent();
+
+      int server_fd;
+      int client_fd;
+
   };
 } // namespace mitk
 

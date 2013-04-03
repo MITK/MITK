@@ -168,7 +168,7 @@ void QmitkSimulationView::OnSimulationComboBoxSelectionChanged(const mitk::DataN
     m_Selection = m_Controls.simulationComboBox->GetSelectedNode();
     m_Controls.sceneGroupBox->setEnabled(true);
     m_Controls.snapshotButton->setEnabled(true);
-    static_cast<mitk::Simulation*>(node->GetData())->SetAsActiveSimulation();
+    static_cast<mitk::Simulation*>(m_Selection->GetData())->SetAsActiveSimulation();
   }
   else
   {
@@ -203,7 +203,7 @@ void QmitkSimulationView::OnStepButtonClicked()
   if (!this->SetSelectionAsCurrentSimulation())
     return;
 
-  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Controls.simulationComboBox->GetSelectedNode()->GetData());
+  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
   sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
 

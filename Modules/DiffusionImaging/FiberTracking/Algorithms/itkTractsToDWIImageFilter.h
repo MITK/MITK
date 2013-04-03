@@ -84,6 +84,7 @@ public:
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
+    itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
 
     void GenerateData();
 
@@ -109,6 +110,7 @@ protected:
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
+    ItkDoubleImgType::Pointer           m_FrequencyMap;         ///< map of the B0 inhomogeneities
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments

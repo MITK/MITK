@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
 #include <itkResampleDwiImageFilter.h>
+#include <itkKspaceImageFilter.h>
 
 namespace itk
 {
@@ -108,11 +109,20 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                     }
 
                 // fourier transform slice
-                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
-                fft->SetInput(slice);
-                fft->Update();
-                ComplexSliceType::Pointer fSlice = fft->GetOutput();
+                ComplexSliceType::Pointer fSlice;
+
+//                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
+//                fft->SetInput(slice);
+//                fft->Update();
+//                fSlice = fft->GetOutput();
+
+                itk::KspaceImageFilter< double >::Pointer dft = itk::KspaceImageFilter< double >::New();
+                dft->SetInput(slice);
+                dft->Update();
+
+                fSlice = dft->GetOutput();
                 fSlice = RearrangeSlice(fSlice);
+
 
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)

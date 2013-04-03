@@ -771,7 +771,7 @@ namespace mitk
     generator->Update();
 
     // look for frequency mode in the histogram
-    GeneratorType::HistogramType::ConstPointer histogram = generator->GetOutput(0);
+    GeneratorType::HistogramType::ConstPointer histogram = generator->GetOutput();
     GeneratorType::HistogramType::ConstIterator iter = histogram->Begin();
     float maxFreq = 0;
     MeasurementVectorType maxValue;

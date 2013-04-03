@@ -900,7 +900,7 @@ namespace mitk
     histogramGenerator->SetHistogramMin(  statistics.Min );
     histogramGenerator->SetHistogramMax(  statistics.Max );
     histogramGenerator->Compute();
-    *histogram = histogramGenerator->GetOutput(0);
+    *histogram = histogramGenerator->GetOutput();
   }
 
 
@@ -959,7 +959,7 @@ namespace mitk
     generator->SetInput( listSample );
     generator->SetMarginalScale( 10.0 );
     generator->Update();
-    *histogram = generator->GetOutput(0);
+    *histogram = generator->GetOutput();
 
   }
 
@@ -1111,7 +1111,7 @@ namespace mitk
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
     imageStencilFilter->SetInput( vtkImporter->GetOutput(0) );
-    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput(0) );
+    imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
     imageStencilFilter->Update();

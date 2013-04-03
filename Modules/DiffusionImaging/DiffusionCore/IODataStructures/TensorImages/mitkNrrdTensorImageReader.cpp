@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
-#include "itkDiffusionTensor3D.h"
+
 
 #include "mitkITKImageImport.h"
 #include "mitkImageDataItem.h"
@@ -139,8 +139,8 @@ namespace mitk
               tensor.SetElement(4, vec.GetElement(4));
               tensor.SetElement(5, vec.GetElement(5));
 
-              tensor = tensor.PreMultiply(measFrame);
-              tensor = tensor.PostMultiply(measFrameTransp);
+              tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
+              tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
               fixVec = tensor;
             }
 
@@ -164,8 +164,8 @@ namespace mitk
 
             if(readFrame)
             {
-              tensor = tensor.PreMultiply(measFrame);
-              tensor = tensor.PostMultiply(measFrameTransp);
+              tensor = ConvertMatrixTypeToFixedArrayType(tensor.PreMultiply(measFrame));
+              tensor = ConvertMatrixTypeToFixedArrayType(tensor.PostMultiply(measFrameTransp));
             }
 
             FixPixType fixVec(tensor);
@@ -269,6 +269,23 @@ namespace mitk
     }
 
     return false;
+  }
+
+  itk::DiffusionTensor3D<float> NrrdTensorImageReader
+    ::ConvertMatrixTypeToFixedArrayType(const itk::DiffusionTensor3D<float>::Superclass::MatrixType & matrix)
+  {
+     /*       | 0  1  2  |
+      *       | X  3  4  |
+      *       | X  X  5  |
+      */
+    itk::DiffusionTensor3D<float> arr;
+    arr.SetElement(0,matrix(0,0));
+    arr.SetElement(1,matrix(0,1));
+    arr.SetElement(2,matrix(0,2));
+    arr.SetElement(3,matrix(1,3));
+    arr.SetElement(4,matrix(1,4));
+    arr.SetElement(5,matrix(2,5));
+    return arr;
   }
 
 } //namespace MITK

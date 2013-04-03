@@ -60,7 +60,7 @@ TPDPixelType>
 ::BeforeThreadedGenerateData()
 {
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
-    mitk::Vector3D spacing = inputImagePointer->GetSpacing();
+    Vector<double,3> spacing = inputImagePointer->GetSpacing();
     mitk::Point3D origin = inputImagePointer->GetOrigin();
     itk::Matrix<double, 3, 3> direction = inputImagePointer->GetDirection();
     ImageRegion<3> imageRegion = inputImagePointer->GetLargestPossibleRegion();

@@ -38,7 +38,6 @@ set(CPP_FILES
   Algorithms/mitkConnectomicsSimulatedAnnealingManager.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionBase.cpp
   Algorithms/mitkConnectomicsSimulatedAnnealingCostFunctionModularity.cpp
-  Algorithms/itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp
 
 )
 

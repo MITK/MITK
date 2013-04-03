@@ -90,7 +90,7 @@ public:
 private:
 
     // image variables
-    mitk::Vector3D                                  m_Spacing;
+    itk::Vector<double>                             m_Spacing;
     mitk::Point3D                                   m_Origin;
     itk::Matrix<double, 3, 3>                       m_DirectionMatrix;
     ImageRegion<3>                                  m_ImageRegion;

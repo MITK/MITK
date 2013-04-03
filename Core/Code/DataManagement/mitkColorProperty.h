@@ -64,8 +64,6 @@ public:
   mitkNewMacro1Param(ColorProperty, const mitk::Color&);
   mitkNewMacro3Param(ColorProperty, const float, const float, const float);
 
-  Pointer Clone() const;
-
   typedef mitk::Color ValueType;
 
   const mitk::Color & GetColor() const;

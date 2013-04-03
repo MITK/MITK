@@ -53,14 +53,9 @@ class MITK_EXPORT GenericProperty : public BaseProperty
 
     mitkClassMacro(GenericProperty, BaseProperty);
     mitkNewMacro1Param(GenericProperty<T>, T);
+    itkCloneMacro(Self)
 
     typedef T ValueType;
-
-    Pointer Clone() const
-    {
-      Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-      return result;
-    }
 
     itkSetMacro(Value,T);
     itkGetConstMacro(Value,T);
@@ -129,7 +124,6 @@ public:                                                       \
   mitkClassMacro(PropertyName, GenericProperty< Type >);      \
   itkNewMacro(PropertyName);                                  \
   mitkNewMacro1Param(PropertyName, Type);                     \
-  Pointer Clone() const;                                      \
   using BaseProperty::operator=;                              \
 protected:                                                    \
   PropertyName();                                             \
@@ -143,10 +137,6 @@ private:                                                      \
   mitk::PropertyName::PropertyName()  : Superclass(DefaultValue) { }         \
   mitk::PropertyName::PropertyName(const PropertyName& other) : GenericProperty< Type >(other) {} \
   mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                \
-  mitk::PropertyName::Pointer mitk::PropertyName::Clone() const {            \
-    Pointer result = static_cast<Self*>(this->InternalClone().GetPointer()); \
-    return result;                                                           \
-  }                                                                          \
   itk::LightObject::Pointer mitk::PropertyName::InternalClone() const {      \
     itk::LightObject::Pointer result(new Self(*this));                       \
     return result;                                                           \

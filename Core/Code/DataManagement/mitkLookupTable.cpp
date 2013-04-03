@@ -302,12 +302,6 @@ void mitk::LookupTable::PrintSelf(std::ostream &os, itk::Indent indent) const
   m_LookupTable->PrintHeader(os, vtkIndent());
 }
 
-mitk::LookupTable::Pointer mitk::LookupTable::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::LookupTable::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

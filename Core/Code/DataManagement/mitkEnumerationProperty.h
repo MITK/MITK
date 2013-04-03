@@ -80,9 +80,6 @@ public:
    */
   typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
-  Pointer Clone() const;
-
-
   /**
    * Adds an enumeration value into the enumeration. The name and id provided
    * must be unique. This is checked while adding the new enumeration value.

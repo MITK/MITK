@@ -135,12 +135,6 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
     return std::string("NULL");
 }
 
-mitk::SmartPointerProperty::Pointer mitk::SmartPointerProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

@@ -93,12 +93,6 @@ bool mitk::VtkScalarModeProperty::AddEnum( const std::string& name, const IdType
   return Superclass::AddEnum( name, id );
 }
 
-mitk::VtkScalarModeProperty::Pointer mitk::VtkScalarModeProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::VtkScalarModeProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

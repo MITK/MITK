@@ -114,12 +114,6 @@ std::string ClippingProperty::GetValueAsString() const
   return myStr.str();
 }
 
-ClippingProperty::Pointer ClippingProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer ClippingProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

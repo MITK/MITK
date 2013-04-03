@@ -92,12 +92,6 @@ const mitk::Color & mitk::ColorProperty::GetValue() const
     return GetColor();
 }
 
-mitk::ColorProperty::Pointer mitk::ColorProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::ColorProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

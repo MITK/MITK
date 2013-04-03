@@ -47,8 +47,6 @@ public:
 
     itkNewMacro( Self );
 
-    Pointer Clone() const;
-
     /**
      * @returns the associated vtkLookupTable
      */

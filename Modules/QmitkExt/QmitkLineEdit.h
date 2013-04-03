@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkLineEdit_h
 
 #include <QmitkExtExports.h>
-#include <QLineEdit.h>
+#include <QLineEdit>
 
 class QmitkExt_EXPORT QmitkLineEdit : public QLineEdit
 {

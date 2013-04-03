@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyAliases.h"
 #include "mitkPropertyDescriptions.h"
 #include "mitkPropertyFilters.h"
-#include <algorithm>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 #include <usModuleActivator.h>
@@ -152,7 +151,7 @@ namespace mitk
 
     if (!alias.empty())
     {
-      std::map<std::string, std::string>::const_iterator iter = std::find_if(m_Aliases.begin(), m_Aliases.end(), AliasEquals(alias));
+      std::map<std::string, std::string>::iterator iter = std::find_if(m_Aliases.begin(), m_Aliases.end(), AliasEquals(alias));
 
       if (iter != m_Aliases.end())
         return iter->first;

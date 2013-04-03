@@ -7,7 +7,7 @@ set(MODULE_TESTS
   mitkMeshTest.cpp
   mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp
-  mitkPipelineSmartPointerCorrectnessTest.cpp
+  # mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneFitTest.cpp
   mitkPointLocatorTest.cpp
   # mitkSegmentationInterpolationTest.cpp

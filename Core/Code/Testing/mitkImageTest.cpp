@@ -54,7 +54,7 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
     if(vtk == NULL)
       return false;
 
-    if(image->GetExternalReferenceCount() != 1)
+    if(image->GetReferenceCount() != 1)
       return false;
   }
 

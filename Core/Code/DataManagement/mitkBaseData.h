@@ -113,15 +113,6 @@ public:
   }
 
   //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  virtual void UnRegister() const;
-
-  //##Documentation
-  //## @brief for internal use only. Helps to deal with the
-  //## weak-pointer-problem.
-  virtual int GetExternalReferenceCount() const;
-
-  //##Documentation
   //## @brief Update the information for this BaseData (the geometry in particular)
   //## so that it can be used as an output of a BaseProcess.
   //##
@@ -350,7 +341,6 @@ protected:
   bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 
-  mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;
   mutable unsigned int m_SourceOutputIndexDuplicate;
   //##Documentation
   //## @brief for internal use only. Helps to deal with the
@@ -360,15 +350,6 @@ protected:
   bool m_Initialized;
 
 private:
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_Unregistering;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_CalculatingExternalReferenceCount;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable int m_ExternalReferenceCount;
 
   //##Documentation
   //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
@@ -377,9 +358,6 @@ private:
 
   TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  friend class mitk::BaseProcess;
 };
 
 } // namespace mitk

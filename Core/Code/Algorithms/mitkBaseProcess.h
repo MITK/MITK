@@ -58,51 +58,12 @@ public:
     return m_Updating;
   }
 
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  virtual void UnRegister() const;
-
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  virtual int GetExternalReferenceCount() const;
-
 protected:
 
   BaseProcess();
 
   virtual ~BaseProcess();
 
-  //##Documentation
-  //## @brief Protected methods for setting outputs.
-  //##
-  //## Subclasses make use of them for getting output.
-  //## These are only overwritten because of itk::DataObject::ConnectSource being
-  //## private and non-virtual: the important stuff is done in
-  //## mitk::BaseData::ConnectSource.
-  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output);
-
-  //##Documentation
-  //## @brief Protected methods for setting outputs.
-  //##
-  //## Subclasses make use of them for getting output.
-  //## These are only overwritten because of itk::DataObject::ConnectSource being
-  //## private and non-virtual: the important stuff is done in
-  //## mitk::BaseData::ConnectSource.
-  virtual void AddOutput(itk::DataObject *output);
-
-private:
-
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_Unregistering;
-
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_CalculatingExternalReferenceCount;
-
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable int m_ExternalReferenceCount;
 };
 
 } // namespace mitk

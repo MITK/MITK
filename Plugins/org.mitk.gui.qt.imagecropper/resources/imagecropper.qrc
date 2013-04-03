@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/imagecropper" >
-        <file>icon.xpm</file>
+        <file>QmitkImageCropperIcon.xpm</file>
         <file>btn_ctrl.xpm</file>
         <file>mouse_left.xpm</file>
         <file>mouse_middle.xpm</file>

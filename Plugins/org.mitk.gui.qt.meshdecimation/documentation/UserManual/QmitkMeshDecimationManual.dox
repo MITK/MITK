@@ -2,7 +2,7 @@
 
 \page org_mitk_views_meshdecimation The Mesh Decimation Plugin
 
-\image html meshdecimation.png "Icon of the Plugin"
+\image html QmitkMeshDecimation.png "Icon of the Plugin"
 
 Available sections:
   - \ref meshdecimationOverview 
@@ -19,7 +19,7 @@ The view offers two basic procedures to decimate surfaces: One that reduces a su
  
 \section meshdecimationUsage Usage
 
-\image html meshdecimation-ui.png "The user interface of the Mesh Decimation View"
+\image html QmitkMeshDecimationUI.png "The user interface of the Mesh Decimation View"
 
 The usage of the view should be straightforward, as shown in the screenshot. To decimate a MITK surface do the following:
 - Select a surface in the datamanager

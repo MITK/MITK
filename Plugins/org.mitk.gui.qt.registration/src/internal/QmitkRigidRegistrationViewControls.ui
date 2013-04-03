@@ -396,7 +396,7 @@
               </property>
               <property name="icon">
                <iconset resource="../../resources/QmitkRigidRegistrationView.qrc">
-                <normaloff>:/QmitkRigidRegistrationView/RigidRegistration.xpm</normaloff>:/QmitkRigidRegistrationView/RigidRegistration.xpm</iconset>
+                <normaloff>:/QmitkRigidRegistrationView/QmitkRegistrationRigidRegistration.xpm</normaloff>:/QmitkRigidRegistrationView/QmitkRegistrationRigidRegistration.xpm</iconset>
               </property>
               <property name="default">
                <bool>false</bool>

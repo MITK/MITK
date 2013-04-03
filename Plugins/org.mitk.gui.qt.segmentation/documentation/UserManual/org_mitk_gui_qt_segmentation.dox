@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_segmentation The Segmentation Plugin
 
-\image html segmentation.png "Icon of the Plugin"
+\image html QmitkSegmentation.png "Icon of the Plugin"
 
 <i>Some of the features described below are closed source additions to the open source toolkit MITK and are not  available in every application.</i>
 
@@ -276,11 +276,11 @@ These %actions are accessible through the context-menu of segmentations in Data 
 You can use the surface masking tool to create binary images from a surface which
 is used used as a mask on an image. This task is demonstrated below:
 
-\image html segmentationFromSurfaceBefore.png Load an image and a surface. 
+\image html QmitkSegmentationFromSurfaceBefore.png Load an image and a surface. 
 
 Select the image and the surface in the corresponding drop-down boxes (both are selected automatically if there is just one image and one surface)
 
-\image html segmentationFromSurfaceAfter.png Create segmentation from surface
+\image html QmitkSegmentationFromSurfaceAfter.png Create segmentation from surface
 
 After clicking "Create segmentation from surface" the newly created binary image is inserted in the DataManager and can be used for further processing
 

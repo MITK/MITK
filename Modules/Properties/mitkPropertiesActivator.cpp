@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPropertyAliases.h"
 #include "mitkPropertyDescriptions.h"
 #include "mitkPropertyFilters.h"
+#include <algorithm>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 #include <usModuleActivator.h>

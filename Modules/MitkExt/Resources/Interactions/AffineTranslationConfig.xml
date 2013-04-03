@@ -1,5 +1,5 @@
 <config>
-  <event_variant class="PositionEvent" name="MovePointer">
+  <event_variant class="MouseMoveEvent" name="MovePointer">
   </event_variant>
   <event_variant class="MousePressEvent" name="InitTranslatation">
       <attribute name="EventButton" value="LeftMouseButton"/>

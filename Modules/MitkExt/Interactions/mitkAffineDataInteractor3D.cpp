@@ -94,7 +94,6 @@ bool mitk::AffineDataInteractor3D::CheckOverObject(StateMachineAction*, Interact
   ////Re-enable VTK interactor (may have been disabled previously)
   //if ( renderWindowInteractor != NULL )
   //  renderWindowInteractor->Enable();
-
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
     return false;
@@ -102,13 +101,18 @@ bool mitk::AffineDataInteractor3D::CheckOverObject(StateMachineAction*, Interact
   m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
   m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
 
+  InternalEvent::Pointer event;
   if(interactionEvent->GetSender()->PickObject( m_CurrentPickedDisplayPoint, m_CurrentPickedPoint ) == this->GetDataNode().GetPointer())
   {
     //Object will be selected
-    InternalEvent::Pointer event = InternalEvent::New(NULL, this, "OverObject");
-    positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
+    event = InternalEvent::New(NULL, this, "OverObject");
   }
-
+  else
+  {
+    //Object will be de-selected
+    event = InternalEvent::New(NULL, this, "NotOverObject");
+  }
+  positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
   return true;
 }
 

@@ -63,8 +63,8 @@ namespace mitk
     virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
     virtual bool InitTranslate (StateMachineAction*, InteractionEvent*);
     virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
-   // virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
-   // virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
+    virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
+    virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
    // virtual bool EndTranslate (StateMachineAction*, InteractionEvent*);
    // virtual bool EndRotate (StateMachineAction*, InteractionEvent*);*/
 

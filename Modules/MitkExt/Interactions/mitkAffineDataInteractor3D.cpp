@@ -52,8 +52,8 @@ void mitk::AffineDataInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("deselectObject",DeselectObject);
   CONNECT_FUNCTION("initTranslate",InitTranslate);
   CONNECT_FUNCTION("initRotate",InitRotate);
-  //CONNECT_FUNCTION("translateObject",TranslateObject);
-  //CONNECT_FUNCTION("rotateObject",RotateObject);
+  CONNECT_FUNCTION("translateObject",TranslateObject);
+  CONNECT_FUNCTION("rotateObject",RotateObject);
   //CONNECT_FUNCTION("endTranslate",EndTranslate);
   //CONNECT_FUNCTION("endRotate",EndRotate);
 }
@@ -155,13 +155,20 @@ bool mitk::AffineDataInteractor3D::InitTranslate(StateMachineAction*, Interactio
   //    if ( renderWindowInteractor != NULL )
   //      renderWindowInteractor->Disable();
 
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
+
+  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
+  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
   m_InitialPickedPoint = m_CurrentPickedPoint;
   m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
-  if ((this->GetSender()).IsNotNull())
-    timeStep = this->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  if ((interactionEvent->GetSender()) != NULL)
+    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
@@ -177,13 +184,20 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   //    if ( renderWindowInteractor != NULL )
   //      renderWindowInteractor->Disable();
 
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
+
+  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
+  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
   m_InitialPickedPoint = m_CurrentPickedPoint;
   m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
-  if ((this->GetSender()).IsNotNull())
-    timeStep = this->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  if ((interactionEvent->GetSender()) != NULL)
+    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
@@ -192,6 +206,61 @@ bool mitk::AffineDataInteractor3D::InitRotate(StateMachineAction*, InteractionEv
   return true;
 }
 
+bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
+
+  m_CurrentPickedPoint = positionEvent->GetPositionInWorld();
+  m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
+  Vector3D interactionMove;
+  interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
+  interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
+  interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
+
+  Point3D origin = m_OriginalGeometry->GetOrigin();
+
+  // Get the timestep to also support 3D+t
+  int timeStep = 0;
+  if ((interactionEvent->GetSender()) != NULL)
+    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+    // If data is an mitk::Surface, extract it
+  Surface::Pointer surface = dynamic_cast< Surface* >(this->GetDataNode()->GetData());
+  vtkPolyData* polyData = NULL;
+  if (surface.IsNotNull())
+  {
+    polyData = surface->GetVtkPolyData( timeStep );
+
+    // Extract surface normal from surface (if existent, otherwise use default)
+    vtkPointData* pointData = polyData->GetPointData();
+    if (pointData != NULL)
+    {
+      vtkDataArray* normal = polyData->GetPointData()->GetVectors( "planeNormal" );
+      if (normal != NULL)
+      {
+        m_ObjectNormal[0] = normal->GetComponent( 0, 0 );
+        m_ObjectNormal[1] = normal->GetComponent( 0, 1 );
+        m_ObjectNormal[2] = normal->GetComponent( 0, 2 );
+      }
+    }
+  }
+
+  Vector3D transformedObjectNormal;
+  this->GetDataNode()->GetData()->GetGeometry( timeStep )->IndexToWorld(
+    m_ObjectNormal, transformedObjectNormal );
+
+  this->GetDataNode()->GetData()->GetGeometry( timeStep )->SetOrigin(
+    origin + transformedObjectNormal * (interactionMove * transformedObjectNormal) );
+
+  return true;
+}
+bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent*)
+{
+  return true;
+}
 
 
 bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer renderer, double scalar)
@@ -210,10 +279,10 @@ bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer rendere
 
 
   // If data is an mitk::Surface, extract it
-  Surface* surface = dynamic_cast< Surface * >(data.GetPointer());
+  Surface::Pointer surface = dynamic_cast< Surface* >(data.GetPointer());
   vtkPolyData* polyData = NULL;
-  if ( surface != NULL )
-    polyData = surface->GetVtkPolyData( timeStep );
+  if (surface.IsNotNull())
+    polyData = surface->GetVtkPolyData(timeStep);
 
   if (polyData == NULL)
   {
@@ -222,22 +291,22 @@ bool mitk::AffineDataInteractor3D::ColorizeSurface(BaseRenderer::Pointer rendere
   }
 
   vtkPointData *pointData = polyData->GetPointData();
-  if ( pointData == NULL )
+  if (pointData == NULL)
   {
     MITK_ERROR << "AffineInteractor3D: No point data present!";
     return false;
   }
 
   vtkDataArray *scalars = pointData->GetScalars();
-  if ( scalars == NULL )
+  if (scalars == NULL)
   {
     MITK_ERROR << "AffineInteractor3D: No scalars for point data present!";
     return false;
   }
 
-  for ( unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i )
+  for (unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i)
   {
-    scalars->SetComponent( i, 0, scalar );
+    scalars->SetComponent(i, 0, scalar);
   }
 
   polyData->Modified();

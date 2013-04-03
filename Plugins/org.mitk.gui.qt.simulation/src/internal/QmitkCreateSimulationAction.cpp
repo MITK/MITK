@@ -82,7 +82,7 @@ void QmitkCreateSimulationAction::Run(const QList<mitk::DataNode::Pointer>& sele
 
       std::string fileName = CreateFileName(dataNode);
 
-      std::ofstream file(fileName);
+      std::ofstream file(fileName.c_str());
       file << contents;
       file.close();
 

@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <string>
-#include <itkObject.h>
-#include <itkWeakPointer.h>
+#include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
 
@@ -32,11 +31,11 @@ namespace mitk {
    * m_StateMode .
    */
 
-  class MITK_CORE_EXPORT StateMachineState : public itk::Object
+  class MITK_CORE_EXPORT StateMachineState : public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineState, itk::Object);
-    mitkNewMacro2Param(Self, std::string, std::string);
+    mitkClassMacro(StateMachineState, itk::LightObject);
+    mitkNewMacro2Param(Self, const std::string&, const std::string&);
 
 
 
@@ -48,7 +47,7 @@ namespace mitk {
     /**
     * @brief Return Transition which matches given event description.
     **/
-    StateMachineTransition::Pointer GetTransition(const std::string eventClass,const std::string eventVariant);
+    StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant);
 
     /**
     * @brief Returns the name.
@@ -65,7 +64,7 @@ namespace mitk {
 
   protected:
 
-    StateMachineState(std::string name, std::string stateMode);
+    StateMachineState(const std::string& name, const std::string& stateMode);
     ~StateMachineState();
 
   private:

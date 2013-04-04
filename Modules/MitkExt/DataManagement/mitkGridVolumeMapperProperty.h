@@ -48,6 +48,8 @@ public:
 
   mitkNewMacro1Param(GridVolumeMapperProperty, const std::string&);
 
+  Pointer Clone() const;
+
   /**
    * Sets the mapper to projected tetrahedra.
    */
@@ -96,6 +98,10 @@ protected:
    * enumeration values.
    */
   virtual void AddRepresentationTypes();
+
+private:
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 } // end of namespace mitk
 #endif // _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_

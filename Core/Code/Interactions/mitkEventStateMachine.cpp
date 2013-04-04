@@ -31,7 +31,7 @@ mitk::EventStateMachine::EventStateMachine() :
 {
 }
 
-bool mitk::EventStateMachine::LoadStateMachine(const std::string filename, const std::string moduleName)
+bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, const Module* module)
 {
   if (m_StateMachineContainer != NULL)
   {
@@ -39,12 +39,24 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string filename, const
   }
   m_StateMachineContainer = StateMachineContainer::New();
 
-  if (m_StateMachineContainer->LoadBehavior(filename, moduleName))
+  if (m_StateMachineContainer->LoadBehavior(filename, module))
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
 
     // clear actions map ,and connect all actions as declared in sub-class
+    for(std::map<std::string, TActionFunctor*>::iterator i = m_ActionFunctionsMap.begin();
+        i != m_ActionFunctionsMap.end(); ++i)
+    {
+      delete i->second;
+    }
     m_ActionFunctionsMap.clear();
+    for(ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.begin();
+        i != m_ActionDelegatesMap.end(); ++i)
+    {
+      delete i->second;
+    }
+    m_ActionDelegatesMap.clear();
+
     ConnectActionsAndFunctions();
     return true;
   }
@@ -63,13 +75,32 @@ mitk::EventStateMachine::~EventStateMachine()
   }
 }
 
-void mitk::EventStateMachine::AddActionFunction(const std::string action, mitk::TActionFunctor* functor)
+void mitk::EventStateMachine::AddActionFunction(const std::string& action, mitk::TActionFunctor* functor)
 {
   if (!functor)
     return;
 // make sure double calls for same action won't cause memory leaks
   delete m_ActionFunctionsMap[action];
+  ActionDelegatesMapType::iterator i = m_ActionDelegatesMap.find(action);
+  if (i != m_ActionDelegatesMap.end())
+  {
+    delete i->second;
+    m_ActionDelegatesMap.erase(i);
+  }
   m_ActionFunctionsMap[action] = functor;
+}
+
+void mitk::EventStateMachine::AddActionFunction(const std::string& action, const ActionFunctionDelegate& delegate)
+{
+  std::map<std::string, TActionFunctor*>::iterator i = m_ActionFunctionsMap.find(action);
+  if (i != m_ActionFunctionsMap.end())
+  {
+    delete i->second;
+    m_ActionFunctionsMap.erase(i);
+  }
+
+  delete m_ActionDelegatesMap[action];
+  m_ActionDelegatesMap[action] = delegate.Clone();
 }
 
 bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dataNode)
@@ -79,7 +110,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     return false;
   }
   // check if the current state holds a transition that works with the given event.
-  StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetEventClass(), MapToEventVariant(event));
+  StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetNameOfClass(), MapToEventVariant(event));
 
   if (transition.IsNotNull())
   {
@@ -117,17 +148,27 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
   {
     return false;
   }
-  // Maps Action-Name to Functor and executes DoAction on Functor.
-  TActionFunctor* actionFunction = m_ActionFunctionsMap[action->GetActionName()];
-  if (actionFunction == NULL)
+
+  bool retVal = false;
+  // Maps Action-Name to Functor and executes the Functor.
+  ActionDelegatesMapType::iterator delegateIter = m_ActionDelegatesMap.find(action->GetActionName());
+  if (delegateIter != m_ActionDelegatesMap.end())
   {
-    return false;
+    retVal = delegateIter->second->Execute(action, event);
   }
-  bool retVal = actionFunction->DoAction(action, event);
+  else
+  {
+    // try the legacy system
+    std::map<std::string, TActionFunctor*>::iterator functionIter = m_ActionFunctionsMap.find(action->GetActionName());
+    if (functionIter != m_ActionFunctionsMap.end())
+    {
+      retVal = functionIter->second->DoAction(action, event);
+    }
+  }
   return retVal;
 }
 
-mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState()
+mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState() const
 {
   return m_CurrentState.GetPointer();
 }

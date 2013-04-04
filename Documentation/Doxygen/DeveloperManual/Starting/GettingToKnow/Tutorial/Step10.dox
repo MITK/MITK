@@ -130,11 +130,11 @@ Examples for key events:
 \code
 <config>
   <!-- Event of key 'a' pressed -->
-  <event_variant class="KeyEvent" name="StdA">
+  <event_variant class="InteractionKeyEvent" name="StdA">
     <attribute name="Key" value="A"/>
   </event_variant>
   <!-- Event of key 'b' pressed  while modifiers ctrl and shift are pressed-->
-  <event_variant class="KeyEvent" name="StdA">
+  <event_variant class="InteractionKeyEvent" name="StdA">
     <attribute name="Key" value="A"/>
     <attribute name="Modifiers" value="shift,ctrl"/>
   </event_variant>

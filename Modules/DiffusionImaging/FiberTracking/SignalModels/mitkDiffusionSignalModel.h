@@ -73,6 +73,7 @@ public:
     {
         if (m_GradientList.size()>idx && m_GradientList.at(idx).GetNorm()<0.0001)
             return true;
+        return false;
     }
 
 protected:

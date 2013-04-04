@@ -26,6 +26,12 @@ mitk::GridRepresentationProperty::GridRepresentationProperty( )
 }
 
 
+mitk::GridRepresentationProperty::GridRepresentationProperty(const mitk::GridRepresentationProperty& other)
+  : mitk::EnumerationProperty(other)
+{
+}
+
+
 mitk::GridRepresentationProperty::GridRepresentationProperty( const IdType& value )
 {
   AddRepresentationTypes();
@@ -88,4 +94,16 @@ void mitk::GridRepresentationProperty::AddRepresentationTypes()
 bool mitk::GridRepresentationProperty::AddEnum( const std::string& name, const IdType& id )
 {
   return Superclass::AddEnum( name, id );
+}
+
+mitk::GridRepresentationProperty::Pointer mitk::GridRepresentationProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
+
+itk::LightObject::Pointer mitk::GridRepresentationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

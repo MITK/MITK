@@ -29,6 +29,12 @@ mitk::ShaderProperty::ShaderProperty( )
   SetShader( (IdType)0 );
 }
 
+mitk::ShaderProperty::ShaderProperty(const ShaderProperty& other)
+  : mitk::EnumerationProperty(other)
+  , shaderList(other.shaderList)
+{
+}
+
 mitk::ShaderProperty::ShaderProperty( const IdType& value )
 {
   AddShaderTypes();
@@ -107,4 +113,14 @@ bool mitk::ShaderProperty::Assign(const BaseProperty &property)
   return true;
 }
 
+mitk::ShaderProperty::Pointer mitk::ShaderProperty::Clone() const
+{
+  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
+  return result;
+}
 
+itk::LightObject::Pointer mitk::ShaderProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

@@ -17,24 +17,19 @@
 #ifndef mitkStateMachineConfig_h
 #define mitkStateMachineConfig_h
 
-#include <vtkXMLParser.h>
-#include <iostream>
-#include "mitkCommon.h"
 #include <MitkExports.h>
-#include <mitkPropertyList.h>
-#include <string>
+
+#include "mitkSharedData.h"
+#include "mitkPropertyList.h"
+
+#include "itkSmartPointer.h"
 
 namespace mitk
 {
 
   class InteractionEvent;
-
-  class EventConfigReader: public vtkXMLParser
-  {
-  public:
-
-  private:
-  };
+  class Module;
+  struct EventConfigPrivate;
 
   /**
    * \class EventConfig
@@ -46,26 +41,76 @@ namespace mitk
    *
    * @ingroup Interaction
    **/
-
-  class EventConfig: public vtkXMLParser
+  class MITK_CORE_EXPORT EventConfig
   {
+
   public:
-
-    static EventConfig *New();
-    vtkTypeMacro(EventConfig,vtkXMLParser)
-
 
     typedef itk::SmartPointer<InteractionEvent> EventType;
 
     /**
-     * @brief Loads XML resource
+     * @brief Constructs an invalid EventConfig object.
      *
-     * Loads a XML resource file in the given module context.
-     * The files have to be placed in the Resources/Interaction folder of their respective module.
-     **/
-    bool LoadConfig(std::string fileName, std::string moduleName = "Mitk");
+     * Call LoadConfig to create a valid configuration object.
+     */
+    EventConfig();
+    EventConfig(const EventConfig& other);
 
+    /**
+     * @brief Construct an EventConfig object based on a XML configuration file.
+     *
+     * Uses the specified resource file containing an XML event configuration to
+     * construct a EventConfig object. If the resource is invalid, the created
+     * EventConfig object will also be invalid.
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module
+     */
+    EventConfig(const std::string& filename, const Module* module = NULL);
+
+    EventConfig& operator=(const EventConfig& other);
+
+    ~EventConfig();
+
+    /**
+     * @brief Checks wether this EventConfig object is valid.
+     * @return Returns \c true if a configuration was successfully loaded, \c false otherwise.
+     */
+    bool IsValid() const;
+
+    /**
+     * @brief This method \e extends this configuration.
+     *
+     * The configuration from the resource provided is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configuration files can be combined.
+     *
+     * @see AddConfig(const EventConfig&)
+     * @see InteractionEventHandler::AddEventConfig(const std::string&, const Module*)
+     *
+     * @param filename The resource name relative to the Interactions resource folder.
+     * @param module The module containing the resource. Defaults to the Mitk module.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddConfig(const std::string& filename, const Module* module = NULL);
+
+    /**
+     * @brief This method \e extends this configuration.
+     * The configuration from the EventConfig object is loaded and only the ones conflicting are replaced by the new one.
+     * This way several configurations can be combined.
+     *
+     * @see AddConfig(const std::string&, const Module*)
+     * @see InteractionEventHandler::AddEventConfig(const EventConfig&)
+     *
+     * @param config The EventConfig object whose configuration should be added.
+     * @return \c true if the configuration was successfully added, \c false otherwise.
+     */
+    bool AddConfig(const EventConfig& config);
+
+    /**
+     * @brief Reset this EventConfig object, rendering it invalid.
+     */
     void ClearConfig();
+
     /**
      * Returns a PropertyList that contains the properties set in the configuration file.
      * All properties are stored as strings.
@@ -75,68 +120,17 @@ namespace mitk
     /**
      * Checks if the config object has a definition for the given event. If it has, the corresponding variant name is returned, else
      * an empty string is returned.
-     * \note mitk::InternalEvents are handled differently. Their signal name is returned as event variant. So there is no need
+     * \note mitk::InternalEvent is handled differently. Their signal name is returned as event variant. So there is no need
      * to configure them in a config file.
-     * \note mitk::InteractionKeys may have a defined event variant, if this is the case, this function returns it. If no
+     * \note mitk::InteractionKeyEvent may have a defined event variant, if this is the case, this function returns it. If no
      * such definition is found key events are mapped to Std + Key , so an 'A' will be return as 'StdA' .
      */
-    std::string GetMappedEvent(EventType interactionEvent);
-
-  protected:
-
-    EventConfig();
-    virtual ~EventConfig();
-
-    /**
-     * @brief Derived from XMLReader
-     **/
-    void StartElement(const char* elementName, const char **atts);
-    /**
-     * @brief Derived from XMLReader
-     **/
-    void EndElement(const char* elementName);
+    std::string GetMappedEvent(const EventType& interactionEvent) const;
 
   private:
-    /**
-     * @brief Derived from XMLReader
-     **/
-    std::string ReadXMLStringAttribut(std::string name, const char** atts);
-    /**
-     * @brief Derived from XMLReader
-     **/
-    bool ReadXMLBooleanAttribut(std::string name, const char** atts);
 
-    /**
-     * @brief List of all global properties of the config object.
-     */
-    PropertyList::Pointer m_PropertyList;
+    SharedDataPointer<EventConfigPrivate> d;
 
-    /**
-     * @brief Temporal list of all properties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
-     * and </event_variant> tags.
-     */
-    PropertyList::Pointer m_EventPropertyList;
-
-    struct EventMapping
-    {
-      std::string variantName;
-      EventType interactionEvent;
-    };
-
-    /**
-     * Checks if mapping with the same parameters already exists, if so, it is replaced,
-     * else the new mapping added
-     */
-    void InsertMapping(EventMapping mapping);
-
-    typedef std::list<EventMapping> EventListType;
-    EventMapping m_CurrEventMapping;
-
-    /**
-     * Stores InteractionEvents and their corresponding VariantName
-     */
-    EventListType m_EventList;
-    bool m_Errors; // use member, because of inheritance from vtkXMLParser we can't return a success value for parsing the file.
   };
 
 } // namespace mitk

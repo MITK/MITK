@@ -20,6 +20,11 @@
 #include "mitkDataNode.h"
 #include "mitkStateMachineState.h"
 
+// Predefined internal events/signals
+const std::string mitk::DataInteractor::IntDeactivateMe = "DeactivateMe";
+const std::string mitk::DataInteractor::IntLeaveWidget = "LeaveWidget";
+const std::string mitk::DataInteractor::IntEnterWidget = "EnterWidget";
+
 mitk::DataInteractor::DataInteractor()
 {
 }
@@ -64,7 +69,7 @@ mitk::DataInteractor::~DataInteractor()
 {
   if (m_DataNode.IsNotNull())
   {
-    m_DataNode->SetInteractor(NULL);
+    m_DataNode->SetDataInteractor(NULL);
   }
 }
 
@@ -73,7 +78,7 @@ void mitk::DataInteractor::ConnectActionsAndFunctions()
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
-mitk::ProcessEventMode mitk::DataInteractor::GetMode()
+mitk::ProcessEventMode mitk::DataInteractor::GetMode() const
 {
   if (GetCurrentState()->GetMode() == "PREFER_INPUT")
   {

@@ -39,6 +39,8 @@ public:
   mitkNewMacro1Param(ResliceMethodProperty, const IdType&);
   mitkNewMacro1Param(ResliceMethodProperty, const std::string&);
 
+  Pointer Clone() const;
+
   using BaseProperty::operator=;
 
 protected:
@@ -52,8 +54,9 @@ protected:
 private:
 
   // purposely not implemented
-  ResliceMethodProperty(const ResliceMethodProperty&);
   ResliceMethodProperty& operator=(const ResliceMethodProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

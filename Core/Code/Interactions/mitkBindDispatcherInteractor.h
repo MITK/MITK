@@ -58,7 +58,7 @@ namespace mitk
     /**
      * Return currently active Dispatcher.
      */
-    const Dispatcher::Pointer GetDispatcher();
+    Dispatcher::Pointer GetDispatcher() const;
 
 
   private:

@@ -17,8 +17,8 @@
 #include "mitkInteractionEventHandler.h"
 #include "mitkInteractionEvent.h"
 
-mitk::InteractionEventHandler::InteractionEventHandler():
-  m_EventConfig(NULL)
+mitk::InteractionEventHandler::InteractionEventHandler()
+  : m_EventConfig()
 {
 }
 
@@ -26,33 +26,76 @@ mitk::InteractionEventHandler::~InteractionEventHandler()
 {
 }
 
-bool mitk::InteractionEventHandler::LoadEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::SetEventConfig(const std::string& filename, const Module* module)
 {
-  m_EventConfig = vtkSmartPointer<EventConfig>::New();
-  // notify sub-classes that new config is set
-  bool success = m_EventConfig->LoadConfig(filename, moduleName);
-  ConfigurationChanged();
-  return success;
+  EventConfig newConfig(filename, module);
+  if (newConfig.IsValid())
+  {
+    m_EventConfig = newConfig;
+    // notify sub-classes that new config is set
+    ConfigurationChanged();
+    return true;
+  }
+  return false;
 }
 
-bool mitk::InteractionEventHandler::AddEventConfig(std::string filename, std::string moduleName)
+bool mitk::InteractionEventHandler::SetEventConfig(const EventConfig& config)
 {
-  if (m_EventConfig == NULL)
+  if (config.IsValid())
   {
-    MITK_ERROR<< "LoadEventConfig has to be called before AddEventConfig can be used.";
+    m_EventConfig = config;
+    // notify sub-classes that new config is set
+    ConfigurationChanged();
+    return true;
+  }
+  return false;
+}
+
+mitk::EventConfig mitk::InteractionEventHandler::GetEventConfig() const
+{
+  return m_EventConfig;
+}
+
+bool mitk::InteractionEventHandler::AddEventConfig(const std::string& filename, const Module* module)
+{
+  if (!m_EventConfig.IsValid())
+  {
+    MITK_ERROR<< "SetEventConfig has to be called before AddEventConfig can be used.";
     return false;
   }
   // notify sub-classes that new config is set
-  bool success = m_EventConfig->LoadConfig(filename, moduleName);
-  ConfigurationChanged();
+  bool success = m_EventConfig.AddConfig(filename, module);
+  if (success)
+  {
+    ConfigurationChanged();
+  }
   return success;
 }
 
-mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes()
+bool mitk::InteractionEventHandler::AddEventConfig(const EventConfig& config)
 {
-  if (m_EventConfig != NULL) {
-  return m_EventConfig->GetAttributes();
-  } else {
+  if (!m_EventConfig.IsValid())
+  {
+    MITK_ERROR<< "SetEventConfig has to be called before AddEventConfig can be used.";
+    return false;
+  }
+  // notify sub-classes that new config is set
+  bool success = m_EventConfig.AddConfig(config);
+  if (success)
+  {
+    ConfigurationChanged();
+  }
+  return success;
+}
+
+mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes() const
+{
+  if (m_EventConfig.IsValid())
+  {
+    return m_EventConfig.GetAttributes();
+  }
+  else
+  {
     MITK_ERROR << "InteractionEventHandler::GetAttributes() requested, but not configuration loaded.";
     return NULL;
   }
@@ -60,9 +103,9 @@ mitk::PropertyList::Pointer mitk::InteractionEventHandler::GetAttributes()
 
 std::string mitk::InteractionEventHandler::MapToEventVariant(InteractionEvent* interactionEvent)
 {
-  if (m_EventConfig != NULL)
+  if (m_EventConfig.IsValid())
   {
-    return m_EventConfig->GetMappedEvent(interactionEvent);
+    return m_EventConfig.GetMappedEvent(interactionEvent);
   }
   else
   {

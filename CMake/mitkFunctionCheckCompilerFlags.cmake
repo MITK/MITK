@@ -41,7 +41,7 @@ function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   # the cost of compiling the test each time the project is configured, the variable set by
   # the macro is added to the cache so that following invocation of the macro with
   # the same variable name skip the compilation step.
-  # For that same reason, ctkFunctionCheckCompilerFlags function appends a unique suffix to
+  # For that same reason, the mitkFunctionCheckCompilerFlags function appends a unique suffix to
   # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
   string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${CXX_FLAG_TO_TEST})
   CHECK_CXX_ACCEPTS_FLAG(${CXX_FLAG_TO_TEST} HAS_FLAG_${suffix})
@@ -58,13 +58,31 @@ function(mitkFunctionCheckCompilerFlags2 FLAG_TO_TEST C_RESULT_VAR CXX_RESULT_VA
     message(FATAL_ERROR "FLAG_TO_TEST shouldn't be empty")
   endif()
 
-  # Internally, the macro CMAKE_CXX_ACCEPTS_FLAG calls TRY_COMPILE. To avoid
+  # Clear all flags. If not, existing flags triggering warnings might lead to
+  # false-negatives when checking for certain compiler flags.
+  set(CMAKE_C_FLAGS )
+  set(CMAKE_C_FLAGS_DEBUG )
+  set(CMAKE_C_FLAGS_MINSIZEREL )
+  set(CMAKE_C_FLAGS_RELEASE )
+  set(CMAKE_C_FLAGS_RELWITHDEBINFO )
+  set(CMAKE_CXX_FLAGS )
+  set(CMAKE_CXX_FLAGS_DEBUG )
+  set(CMAKE_CXX_FLAGS_MINSIZEREL )
+  set(CMAKE_CXX_FLAGS_RELEASE )
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO )
+
+  # Internally, the macro CMAKE_CXX_COMPILER_FLAG calls TRY_COMPILE. To avoid
   # the cost of compiling the test each time the project is configured, the variable set by
   # the macro is added to the cache so that following invocation of the macro with
   # the same variable name skip the compilation step.
-  # For that same reason, ctkFunctionCheckCompilerFlags function appends a unique suffix to
-  # the HAS_FLAG variable. This suffix is created using a 'clean version' of the flag to test.
-  string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${FLAG_TO_TEST})
+  # For that same reason, the mitkFunctionCheckCompilerFlags2 function appends a unique suffix to
+  # the HAS_CXX_FLAG and HAS_C_FLAG variable. This suffix is created using a 'clean version' of the
+  # flag to test. The value of HAS_C(XX)_FLAG_${suffix} additonally needs to be a valid
+  # pre-processor token because CHECK_CXX_COMPILER_FLAG adds it as a definition to the compiler
+  # arguments. An invalid token triggers compiler warnings, which in case of the "-Werror" flag
+  # leads to false-negative checks.
+  string(REGEX REPLACE "[/-]" "_" suffix ${FLAG_TO_TEST})
+  string(REGEX REPLACE "[, \\$\\+\\*\\{\\}\\(\\)\\#]" "" suffix ${suffix})
   CHECK_CXX_COMPILER_FLAG(${FLAG_TO_TEST} HAS_CXX_FLAG_${suffix})
 
   if(HAS_CXX_FLAG_${suffix})

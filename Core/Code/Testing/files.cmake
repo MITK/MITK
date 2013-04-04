@@ -118,6 +118,13 @@ set(MODULE_CUSTOM_TESTS
     mitkLevelWindowManagerTest.cpp
 )
 
+set(MODULE_RESOURCE_FILES
+  Interactions/AddAndRemovePoints.xml
+  Interactions/globalConfig.xml
+  Interactions/StatemachineTest.xml
+  Interactions/StatemachineConfigTest.xml
+)
+
 # Create an artificial module initializing class for
 # the usServiceListenerTest.cpp
 usFunctionGenerateModuleInit(testdriver_init_file
@@ -127,4 +134,12 @@ usFunctionGenerateModuleInit(testdriver_init_file
                              EXECUTABLE
                             )
 
-set(TEST_CPP_FILES ${testdriver_init_file})
+# Embed the resources
+set(testdriver_resources )
+usFunctionEmbedResources(testdriver_resources
+                         EXECUTABLE_NAME ${MODULE_NAME}TestDriver
+                         ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+                         FILES ${MODULE_RESOURCE_FILES}
+                        )
+
+set(TEST_CPP_FILES ${testdriver_init_file} ${testdriver_resources})

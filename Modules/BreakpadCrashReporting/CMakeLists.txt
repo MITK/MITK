@@ -1,28 +1,30 @@
-option(MITK_USE_BREAKPAD_CRASH_REPORTING "Enable support for Google Breakpad Crash Reporting" OFF)
 
+if(MITK_USE_BREAKPAD)
 
-if(MITK_USE_BREAKPAD_CRASH_REPORTING)
-
+  message(STATUS "Get directory hint for Breakpad:")
+  message(STATUS ${Breakpad_DIR})
+  message(STATUS ${Breakpad_SRC})
+  # TODO this should be properly moved to some BreakpadConfig.cmake
+  find_path(MITK_BREAKPAD_SRC_DIR breakpad_googletest_includes.h DOC  "Directory breakpad/src/" PATHS ${Breakpad_SRC}/src ${Breakpad_DIR})
+  message(STATUS "Found Breakpad at:")
+  message(STATUS ${MITK_BREAKPAD_SRC_DIR})
   if(CMAKE_SYSTEM MATCHES "Windows")
-
-    find_path(MITK_BREAKPAD_SRC_DIR breakpad_googletest_includes.h ${MITK_BREAKPAD_SRC_DIR} DOC  "Directory breakpad/src/")
 
     set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR})
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-      ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/common.lib # ??
-      ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/crash_generation_client.lib # ???
-      ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/crash_generation_server.lib # out-of-process dump generator
-      ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/exception_handler.lib # dump creator (ExceptionHandler)
-      ${MITK_BREAKPAD_SRC_DIR}/client/windows/Release/lib/crash_report_sender.lib
+      ${Breakpad_DIR}/Release/common.lib # ??
+      ${Breakpad_DIR}/Release/crash_generation_client.lib # ???
+      ${Breakpad_DIR}/Release/crash_generation_server.lib # out-of-process dump generator
+      ${Breakpad_DIR}/Release/exception_handler.lib # dump creator (ExceptionHandler)
+      ${Breakpad_DIR}/Release/crash_report_sender.lib
       ) # ??? unused, I guess
 
     set(EXECUTABLE_PROPERTY WIN32)
   elseif(CMAKE_SYSTEM MATCHES "Linux")
-    find_path(MITK_BREAKPAD_SRC_DIR breakpad_googletest_includes.h ${MITK_BREAKPAD_SRC_DIR} DOC  "Directory breakpad/src/")
 
     set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR}) # TODO why the repetition, is INCLUDE_DIRS_INTERNAL not empty before??
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-      ${MITK_BREAKPAD_SRC_DIR}/client/linux/libbreakpad_client.a
+      ${Breakpad_DIR}/libbreakpad_client.a
       )
   else()
     message(FATAL_ERROR "Unsupported platform for Breakpad crash reporting: ${CMAKE_SYSTEM}")
@@ -49,4 +51,4 @@ if(MITK_USE_BREAKPAD_CRASH_REPORTING)
 
 add_subdirectory(Testing)
 
-endif(MITK_USE_BREAKPAD_CRASH_REPORTING)
+endif(MITK_USE_BREAKPAD)

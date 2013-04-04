@@ -66,6 +66,7 @@ set(external_projects
   Poco
   ITK
   Boost
+  Breakpad
   DCMTK
   CTK
   SOFA
@@ -252,6 +253,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_CppUnit
   MITK_USE_GLEW
   MITK_USE_Boost
+  MITK_USE_Breakpad
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
@@ -300,6 +302,7 @@ ExternalProject_Add(${proj}
     ${GLUT_DEPENDS}
     ${GLEW_DEPENDS}
     ${Boost_DEPENDS}
+    ${Breakpad_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
@@ -431,6 +434,8 @@ ExternalProject_Add(${proj}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
+    -DBreakpad_DIR:PATH=${Breakpad_DIR}
+    -DBreakpad_SRC:PATH=${Breakpad_SRC}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DQwt_DIR:PATH=${Qwt_DIR}

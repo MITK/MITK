@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSignalDecay.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
+#include <mitkNodePredicateProperty.h>
 
 #include <QMessageBox>
 
@@ -108,6 +109,10 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_NoiseFrame->setVisible(true);
         m_Controls->m_GhostFrame->setVisible(false);
         m_Controls->m_DistortionsFrame->setVisible(false);
+
+        m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
+        mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+        m_Controls->m_FrequencyMapBox->SetPredicate(isMitkImage);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -805,6 +810,8 @@ void QmitkFiberfoxView::GenerateImage()
 
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
+        itk::TractsToDWIImageFilter::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter::New();
+
         // storage for generated phantom image
         mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
         QString signalModelString("");
@@ -1058,12 +1065,14 @@ void QmitkFiberfoxView::GenerateImage()
         if ( y>imageRegion.GetSize(1) )
             lineReadoutTime *= (double)imageRegion.GetSize(1)/y;
 
+        // add signal contrast model
         mitk::SignalDecay<double> contrastModel;
         contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
         contrastModel.SetTE(this->m_Controls->m_TEbox->value());
         contrastModel.SetTline(lineReadoutTime);
         artifactList.push_back(&contrastModel);
 
+        // add N/2 ghosting
         double kOffset = 0;
         if (m_Controls->m_AddGhosts->isChecked())
         {
@@ -1072,38 +1081,51 @@ void QmitkFiberfoxView::GenerateImage()
             resultNode->AddProperty("Fiberfox.Line-Offset", DoubleProperty::New(kOffset));
         }
 
+        // add distortions
+        if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
+        {
+            mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(fMapNode->GetData());
+            ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+            CastToItkImage< ItkDoubleImgType >(img, itkImg);
+
+            if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+                tractsToDwiFilter->SetFrequencyMap(itkImg);
+        }
+
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
         if (fiberBundle->GetNumFibers()<=0)
             continue;
 
-        itk::TractsToDWIImageFilter::Pointer filter = itk::TractsToDWIImageFilter::New();
-        filter->SetImageRegion(imageRegion);
-        filter->SetSpacing(spacing);
-        filter->SetOrigin(origin);
-        filter->SetDirectionMatrix(directionMatrix);
-        filter->SetFiberBundle(fiberBundle);
-        filter->SetFiberModels(fiberModelList);
-        filter->SetNonFiberModels(nonFiberModelList);
-        filter->SetNoiseModel(&noiseModel);
-        filter->SetKspaceArtifacts(artifactList);
-        filter->SetkOffset(kOffset);
-        filter->SettLine(m_Controls->m_LineReadoutTimeBox->value());
-        filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
-        filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
-        filter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
-        filter->SetFiberRadius(m_Controls->m_FiberRadius->value());
-        filter->SetSignalScale(m_Controls->m_SignalScaleBox->value());
+        tractsToDwiFilter->SetImageRegion(imageRegion);
+        tractsToDwiFilter->SetSpacing(spacing);
+        tractsToDwiFilter->SetOrigin(origin);
+        tractsToDwiFilter->SetDirectionMatrix(directionMatrix);
+        tractsToDwiFilter->SetFiberBundle(fiberBundle);
+        tractsToDwiFilter->SetFiberModels(fiberModelList);
+        tractsToDwiFilter->SetNonFiberModels(nonFiberModelList);
+        tractsToDwiFilter->SetNoiseModel(&noiseModel);
+        tractsToDwiFilter->SetKspaceArtifacts(artifactList);
+        tractsToDwiFilter->SetkOffset(kOffset);
+        tractsToDwiFilter->SettLine(m_Controls->m_LineReadoutTimeBox->value());
+        tractsToDwiFilter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
+        tractsToDwiFilter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
+        tractsToDwiFilter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
+        tractsToDwiFilter->SetFiberRadius(m_Controls->m_FiberRadius->value());
+        tractsToDwiFilter->SetSignalScale(m_Controls->m_SignalScaleBox->value());
 
         if (m_TissueMask.IsNotNull())
         {
             ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
             mitk::CastToItkImage<ItkUcharImgType>(m_TissueMask, mask);
-            filter->SetTissueMask(mask);
+            tractsToDwiFilter->SetTissueMask(mask);
         }
-        filter->Update();
+        tractsToDwiFilter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-        image->SetVectorImage( filter->GetOutput() );
+        image->SetVectorImage( tractsToDwiFilter->GetOutput() );
         image->SetB_Value(bVal);
         image->SetDirections(gradientList);
         image->InitializeFromVectorImage();
@@ -1129,11 +1151,11 @@ void QmitkFiberfoxView::GenerateImage()
         resultNode->AddProperty("Fiberfox.Model", StringProperty::New(signalModelString.toStdString()));
         resultNode->AddProperty("Fiberfox.PureFiberVoxels", BoolProperty::New(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked()));
         resultNode->AddProperty("binary", BoolProperty::New(false));
-        resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(filter->GetLevelWindow()) );
+        resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(tractsToDwiFilter->GetLevelWindow()) );
 
         if (m_Controls->m_KspaceImageBox->isChecked())
         {
-            itk::Image<double, 3>::Pointer kspace = filter->GetKspaceImage();
+            itk::Image<double, 3>::Pointer kspace = tractsToDwiFilter->GetKspaceImage();
             mitk::Image::Pointer image = mitk::Image::New();
             image->InitializeByItk(kspace.GetPointer());
             image->SetVolume(kspace->GetBufferPointer());

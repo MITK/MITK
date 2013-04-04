@@ -55,17 +55,17 @@ void KspaceImageFilter< TPixelType >
     m_SpectrumImage->Allocate();
     m_SpectrumImage->FillBuffer(0);
 
-    if (m_FrequencyImage.IsNull())
+    if (m_FrequencyMap.IsNull())
     {
-        m_FrequencyImage = InputImageType::New();
-        m_FrequencyImage->SetSpacing( inputImage->GetSpacing() );
-        m_FrequencyImage->SetOrigin( inputImage->GetOrigin() );
-        m_FrequencyImage->SetDirection( inputImage->GetDirection() );
-        m_FrequencyImage->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
-        m_FrequencyImage->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
-        m_FrequencyImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
-        m_FrequencyImage->Allocate();
-        m_FrequencyImage->FillBuffer(0);
+        m_FrequencyMap = InputImageType::New();
+        m_FrequencyMap->SetSpacing( inputImage->GetSpacing() );
+        m_FrequencyMap->SetOrigin( inputImage->GetOrigin() );
+        m_FrequencyMap->SetDirection( inputImage->GetDirection() );
+        m_FrequencyMap->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->Allocate();
+        m_FrequencyMap->FillBuffer(0);
     }
 
     m_tLine /= 1000;
@@ -113,7 +113,7 @@ void KspaceImageFilter< TPixelType >
             double y = it.GetIndex()[1];
 
             vcl_complex<double> f(it.Get(), 0);
-            s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy) + m_FrequencyImage->GetPixel(it.GetIndex())*10*t ) );
+            s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy) + m_FrequencyMap->GetPixel(it.GetIndex())*10*t ) );
 
             ++it;
         }

@@ -55,6 +55,7 @@ public:
     virtual void CreateQtPartControl(QWidget *parent);
     void SetFocus();
 
+    typedef itk::Image<double, 3>           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;

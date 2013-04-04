@@ -56,7 +56,7 @@ namespace itk{
 
     itkGetMacro( SpectrumImage, typename InputImageType::Pointer )
 
-    itkSetMacro( FrequencyImage, typename InputImageType::Pointer )
+    itkSetMacro( FrequencyMap, typename InputImageType::Pointer )
     itkSetMacro( tLine, double )
     itkSetMacro( kOffset, double )
 
@@ -69,7 +69,7 @@ namespace itk{
     void AfterThreadedGenerateData();
 
     typename InputImageType::Pointer    m_SpectrumImage;
-    typename InputImageType::Pointer    m_FrequencyImage;
+    typename InputImageType::Pointer    m_FrequencyMap;
     double                              m_tLine;
     double                              m_kOffset;
 

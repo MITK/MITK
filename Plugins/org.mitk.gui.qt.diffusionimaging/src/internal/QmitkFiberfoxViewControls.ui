@@ -1965,7 +1965,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="m_FrequencyMapBox"/>
+              <widget class="QmitkDataStorageComboBox" name="m_FrequencyMapBox"/>
              </item>
             </layout>
            </widget>
@@ -2060,6 +2060,11 @@
    <extends>QWidget</extends>
    <header>QmitkDotModelParametersWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

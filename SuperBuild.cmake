@@ -43,6 +43,7 @@ set(external_projects
   CableSwig
   ITK
   Boost
+  Breakpad
   DCMTK
   CTK
   OpenCV
@@ -169,6 +170,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_EXAMPLES
   MITK_USE_ACVD
   MITK_USE_Boost
+  MITK_USE_Breakpad
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
@@ -210,6 +212,7 @@ ExternalProject_Add(${proj}
     # Optionnal dependencies
     ${ACVD_DEPENDS}
     ${Boost_DEPENDS}
+    ${Breakpad_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
     ${OpenCV_DEPENDS}
@@ -319,6 +322,8 @@ ExternalProject_Add(${proj}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
+    -DBreakpad_DIR:PATH=${Breakpad_DIR}
+    -DBreakpad_SRC:PATH=${Breakpad_SRC}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
   CMAKE_ARGS

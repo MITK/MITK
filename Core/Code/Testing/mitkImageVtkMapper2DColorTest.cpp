@@ -45,12 +45,14 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
     renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
     renderingHelper.Render();
 
-    //use this to generate a reference screenshot or save the file:
-    bool generateReferenceScreenshot = false;
-    if(generateReferenceScreenshot)
+    //####################
+    //Use this to generate a reference screenshot or save the file.
+    //(Only in your local version of the test!)
+    if(false)
     {
-        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+        renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
     }
+    //####################
 
     //### Usage of vtkRegressionTestImage:
     //vtkRegressionTestImage( vtkRenderWindow )
@@ -59,15 +61,15 @@ int mitkImageVtkMapper2DColorTest(int argc, char* argv[])
     //for a path a valid image with -V. If the test failed with the
     //first image (foo.png) check if there are images of the form
     //foo_N.png (where N=1,2,3...) and compare against them.
-    renderingHelper.PrepareRender();
-    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
+//    renderingHelper.PrepareRender();
+//    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
 
-    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
-    //0 = test failed
-    //1 = test passed
-    //2 = test not run
-    //3 = something with vtkInteraction
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
+//    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
+//    //0 = test failed
+//    //1 = test passed
+//    //2 = test not run
+//    //3 = something with vtkInteraction
+    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive" );
 
     MITK_TEST_END();
 }

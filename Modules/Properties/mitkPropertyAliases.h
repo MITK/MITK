@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPropertyAliases_h
 
 #include <itkLightObject.h>
+#include <PropertiesExports.h>
 #include <usServiceInterface.h>
 
 namespace mitk
 {
-  class PropertyAliases
+  class Properties_EXPORT PropertyAliases
   {
   public:
     virtual ~PropertyAliases();

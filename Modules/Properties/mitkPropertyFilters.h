@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyFilter.h"
 #include <mitkBaseProperty.h>
+#include <PropertiesExports.h>
 #include <usServiceInterface.h>
 
 namespace mitk
 {
-  class PropertyFilters
+  class Properties_EXPORT PropertyFilters
   {
   public:
     virtual ~PropertyFilters();

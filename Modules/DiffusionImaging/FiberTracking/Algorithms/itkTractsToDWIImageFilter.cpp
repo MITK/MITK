@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkWindowedSincInterpolateImageFunction.h>
 #include <itkResampleDwiImageFilter.h>
 #include <itkKspaceImageFilter.h>
+#include <itkDftImageFilter.h>
 
 namespace itk
 {
@@ -44,6 +45,8 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_InterpolationShrink(10)
     , m_FiberRadius(20)
     , m_SignalScale(300)
+    , m_kOffset(0)
+    , m_tLine(1)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -116,13 +119,14 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 //                fft->Update();
 //                fSlice = fft->GetOutput();
 
-                itk::KspaceImageFilter< double >::Pointer dft = itk::KspaceImageFilter< double >::New();
-                dft->SetInput(slice);
-                dft->Update();
+                itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
+                idft->SetInput(slice);
+                idft->SetkOffset(m_kOffset);
+                idft->SettLine(m_tLine);
+                idft->Update();
 
-                fSlice = dft->GetOutput();
+                fSlice = idft->GetOutput();
                 fSlice = RearrangeSlice(fSlice);
-
 
                 // add artifacts
                 for (int a=0; a<m_KspaceArtifacts.size(); a++)
@@ -146,10 +150,16 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // inverse fourier transform slice
                 SliceType::Pointer newSlice;
-                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
-                ifft->SetInput(fSlice);
-                ifft->Update();
-                newSlice = ifft->GetOutput();
+
+                itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
+                dft->SetInput(fSlice);
+                dft->Update();
+                newSlice = dft->GetOutput();
+
+//                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
+//                ifft->SetInput(fSlice);
+//                ifft->Update();
+//                newSlice = ifft->GetOutput();
 
                 // put slice back into channel g
                 for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
@@ -281,11 +291,11 @@ void TractsToDWIImageFilter::GenerateData()
     outImage->FillBuffer(temp);
 
     // is input slize size a power of two?
-    int x=2; int y=2;
-    while (x<m_ImageRegion.GetSize(0))
-        x *= 2;
-    while (y<m_ImageRegion.GetSize(1))
-        y *= 2;
+    int x=m_ImageRegion.GetSize(0); int y=m_ImageRegion.GetSize(1);
+    if ( x%2 == 1 )
+        x += 1;
+    if ( y%2 == 1 )
+        y += 1;
 
     // if not, adjust size and dimension (needed for FFT); zero-padding
     if (x!=m_ImageRegion.GetSize(0))

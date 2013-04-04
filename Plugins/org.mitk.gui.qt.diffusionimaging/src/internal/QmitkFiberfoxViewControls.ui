@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>493</width>
-    <height>1438</height>
+    <height>1482</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1694,8 +1694,8 @@
           <string>Noise and Artifacts</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="4" column="0">
-           <widget class="QFrame" name="m_KspaceParamFrame">
+          <item row="8" column="0">
+           <widget class="QFrame" name="m_GibbsRingingFrame">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1784,35 +1784,38 @@
             </layout>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QFrame" name="m_T2bluringParamFrame">
-            <property name="enabled">
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="m_AddDistortions">
+            <property name="text">
+             <string>Add Distortions</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="m_AddGibbsRinging">
+            <property name="text">
+             <string>Add Gibbs Ringing</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="m_AddNoise">
+            <property name="text">
+             <string>Add Rician Noise</string>
+            </property>
+            <property name="checked">
              <bool>true</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QFormLayout" name="formLayout">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
-             <property name="horizontalSpacing">
-              <number>0</number>
-             </property>
-             <property name="verticalSpacing">
-              <number>0</number>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
-            </layout>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QFrame" name="frame_7">
+           <widget class="QFrame" name="m_NoiseFrame">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -1856,13 +1859,115 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QCheckBox" name="m_AddGibbsRinging">
+           <widget class="QCheckBox" name="m_AddGhosts">
             <property name="text">
-             <string>Add Gibbs Ringing</string>
+             <string>Add N/Ghosts</string>
             </property>
             <property name="checked">
              <bool>false</bool>
             </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QFrame" name="m_GhostFrame">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_6">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_23">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>K-Space Line Offset:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="m_kOffsetBox">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QFrame" name="m_DistortionsFrame">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_7">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_25">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Frequency Map:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_FrequencyMapBox"/>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>

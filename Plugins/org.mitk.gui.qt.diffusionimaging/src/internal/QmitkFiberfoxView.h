@@ -87,6 +87,9 @@ protected slots:
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
     void OnAddGibbsRinging(int value);
+    void OnAddNoise(int value);
+    void OnAddGhosts(int value);
+    void OnAddDistortions(int value);
     void OnConstantRadius(int value);
 
 protected:

@@ -85,6 +85,8 @@ public:
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
     itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
+    itkSetMacro( kOffset, double )
+    itkSetMacro( tLine, double )
 
     void GenerateData();
 
@@ -111,6 +113,8 @@ protected:
     ImageRegion<3>                      m_UpsampledImageRegion;
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
     ItkDoubleImgType::Pointer           m_FrequencyMap;         ///< map of the B0 inhomogeneities
+    double                              m_kOffset;
+    double                              m_tLine;
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments

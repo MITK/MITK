@@ -104,7 +104,10 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_AdvancedSignalOptionsFrame->setVisible(false);
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_VarianceBox->setVisible(false);
-        m_Controls->m_KspaceParamFrame->setVisible(false);
+        m_Controls->m_GibbsRingingFrame->setVisible(false);
+        m_Controls->m_NoiseFrame->setVisible(true);
+        m_Controls->m_GhostFrame->setVisible(false);
+        m_Controls->m_DistortionsFrame->setVisible(false);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));
@@ -119,6 +122,10 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_ContinuityBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnContinuityChanged(double)));
         connect((QObject*) m_Controls->m_BiasBox, SIGNAL(valueChanged(double)), (QObject*) this, SLOT(OnBiasChanged(double)));
         connect((QObject*) m_Controls->m_AddGibbsRinging, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGibbsRinging(int)));
+        connect((QObject*) m_Controls->m_AddNoise, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddNoise(int)));
+        connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
+        connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
+
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
         connect((QObject*) m_Controls->m_TransformBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(ApplyTransform()));
@@ -246,12 +253,36 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
         GenerateFibers();
 }
 
+void QmitkFiberfoxView::OnAddDistortions(int value)
+{
+    if (value>0)
+        m_Controls->m_DistortionsFrame->setVisible(true);
+    else
+        m_Controls->m_DistortionsFrame->setVisible(false);
+}
+
+void QmitkFiberfoxView::OnAddGhosts(int value)
+{
+    if (value>0)
+        m_Controls->m_GhostFrame->setVisible(true);
+    else
+        m_Controls->m_GhostFrame->setVisible(false);
+}
+
+void QmitkFiberfoxView::OnAddNoise(int value)
+{
+    if (value>0)
+        m_Controls->m_NoiseFrame->setVisible(true);
+    else
+        m_Controls->m_NoiseFrame->setVisible(false);
+}
+
 void QmitkFiberfoxView::OnAddGibbsRinging(int value)
 {
     if (value>0)
-        m_Controls->m_KspaceParamFrame->setVisible(true);
+        m_Controls->m_GibbsRingingFrame->setVisible(true);
     else
-        m_Controls->m_KspaceParamFrame->setVisible(false);
+        m_Controls->m_GibbsRingingFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnDistributionChanged(int value)
@@ -990,17 +1021,23 @@ void QmitkFiberfoxView::GenerateImage()
 
         itk::TractsToDWIImageFilter::KspaceArtifactList artifactList;
 
-        // noise model
-        double noiseVariance = m_Controls->m_NoiseLevel->value();
+        // artifact models
+        QString artifactModelString("");
+        double noiseVariance = 0;
+        if (m_Controls->m_AddNoise->isChecked())
+        {
+            noiseVariance = m_Controls->m_NoiseLevel->value();
+            artifactModelString += "_NOISE";
+            artifactModelString += QString::number(noiseVariance);
+            resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
+        }
         mitk::RicianNoiseModel<double> noiseModel;
         noiseModel.SetNoiseVariance(noiseVariance);
 
-        // artifact models
-        QString artifactModelString("");
         mitk::GibbsRingingArtifact<double> gibbsModel;
         if (m_Controls->m_AddGibbsRinging->isChecked())
         {
-            artifactModelString += "_Gibbs-ringing";
+            artifactModelString += "_RINGING";
             resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
             gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
             artifactList.push_back(&gibbsModel);
@@ -1014,11 +1051,11 @@ void QmitkFiberfoxView::GenerateImage()
 
         double lineReadoutTime = m_Controls->m_LineReadoutTimeBox->value();
 
-        // adjusting line readout time to the adapted image size needed for the FFT
-        int y=2;
-        while (y<imageRegion.GetSize(1))
-            y *= 2;
-        if (y>imageRegion.GetSize(1))
+        // adjusting line readout time to the adapted image size needed for the DFT
+        int y = imageRegion.GetSize(1);
+        if ( y%2 == 1 )
+            y += 1;
+        if ( y>imageRegion.GetSize(1) )
             lineReadoutTime *= (double)imageRegion.GetSize(1)/y;
 
         mitk::SignalDecay<double> contrastModel;
@@ -1026,6 +1063,14 @@ void QmitkFiberfoxView::GenerateImage()
         contrastModel.SetTE(this->m_Controls->m_TEbox->value());
         contrastModel.SetTline(lineReadoutTime);
         artifactList.push_back(&contrastModel);
+
+        double kOffset = 0;
+        if (m_Controls->m_AddGhosts->isChecked())
+        {
+            artifactModelString += "_GHOST";
+            kOffset = m_Controls->m_kOffsetBox->value();
+            resultNode->AddProperty("Fiberfox.Line-Offset", DoubleProperty::New(kOffset));
+        }
 
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
         if (fiberBundle->GetNumFibers()<=0)
@@ -1041,6 +1086,8 @@ void QmitkFiberfoxView::GenerateImage()
         filter->SetNonFiberModels(nonFiberModelList);
         filter->SetNoiseModel(&noiseModel);
         filter->SetKspaceArtifacts(artifactList);
+        filter->SetkOffset(kOffset);
+        filter->SettLine(m_Controls->m_LineReadoutTimeBox->value());
         filter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         filter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
         filter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
@@ -1069,7 +1116,6 @@ void QmitkFiberfoxView::GenerateImage()
                             +"-"+QString::number(spacing[1]).toStdString()
                             +"-"+QString::number(spacing[2]).toStdString()
                             +"_b"+QString::number(bVal).toStdString()
-                            +"_NOISE"+QString::number(noiseVariance).toStdString()
                             +"_"+signalModelString.toStdString()
                             +artifactModelString.toStdString());
         GetDataStorage()->Add(resultNode, m_SelectedBundles.at(i));
@@ -1078,7 +1124,6 @@ void QmitkFiberfoxView::GenerateImage()
         resultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(m_Controls->m_SignalScaleBox->value()));
         resultNode->AddProperty("Fiberfox.FiberRadius", IntProperty::New(m_Controls->m_FiberRadius->value()));
         resultNode->AddProperty("Fiberfox.Tinhom", IntProperty::New(m_Controls->m_T2starBox->value()));
-        resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
         resultNode->AddProperty("Fiberfox.Repetitions", IntProperty::New(m_Controls->m_RepetitionsBox->value()));
         resultNode->AddProperty("Fiberfox.b-value", DoubleProperty::New(bVal));
         resultNode->AddProperty("Fiberfox.Model", StringProperty::New(signalModelString.toStdString()));

@@ -18,11 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPropertyDescriptions_h
 
 #include <itkLightObject.h>
+#include <PropertiesExports.h>
 #include <usServiceInterface.h>
 
 namespace mitk
 {
-  class PropertyDescriptions
+  class Properties_EXPORT PropertyDescriptions
   {
   public:
     virtual ~PropertyDescriptions();

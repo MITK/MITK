@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
 #include <itkResampleDwiImageFilter.h>
+#include <itkKspaceImageFilter.h>
+#include <itkDftImageFilter.h>
 
 namespace itk
 {
@@ -43,6 +45,8 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_InterpolationShrink(10)
     , m_FiberRadius(20)
     , m_SignalScale(300)
+    , m_kOffset(0)
+    , m_tLine(1)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -56,7 +60,7 @@ TractsToDWIImageFilter::~TractsToDWIImageFilter()
 
 }
 
-std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFilter::AddKspaceArtifacts( std::vector< DoubleDwiType::Pointer >& images )
+std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFilter::DoKspaceStuff( std::vector< DoubleDwiType::Pointer >& images )
 {
     // create slice object
     SliceType::Pointer slice = SliceType::New();
@@ -67,6 +71,20 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
     slice->SetBufferedRegion( region );
     slice->SetRequestedRegion( region );
     slice->Allocate();
+
+    // frequency map slice
+    SliceType::Pointer fMap = NULL;
+    if (m_FrequencyMap.IsNotNull())
+    {
+        fMap = SliceType::New();
+        ImageRegion<2> region;
+        region.SetSize(0, m_UpsampledImageRegion.GetSize()[0]);
+        region.SetSize(1, m_UpsampledImageRegion.GetSize()[1]);
+        fMap->SetLargestPossibleRegion( region );
+        fMap->SetBufferedRegion( region );
+        fMap->SetRequestedRegion( region );
+        fMap->Allocate();
+    }
 
     boost::progress_display disp(images.size()*images[0]->GetVectorLength()*images[0]->GetLargestPossibleRegion().GetSize(2));
     std::vector< DoubleDwiType::Pointer > outImages;
@@ -105,13 +123,21 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                         SliceType::PixelType pix2D = image->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
+
+                        if (fMap.IsNotNull())
+                            fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
                     }
 
                 // fourier transform slice
-                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
-                fft->SetInput(slice);
-                fft->Update();
-                ComplexSliceType::Pointer fSlice = fft->GetOutput();
+                ComplexSliceType::Pointer fSlice;
+                itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
+                idft->SetInput(slice);
+                idft->SetkOffset(m_kOffset);
+                idft->SettLine(m_tLine);
+                idft->SetFrequencyMap(fMap);
+                idft->Update();
+
+                fSlice = idft->GetOutput();
                 fSlice = RearrangeSlice(fSlice);
 
                 // add artifacts
@@ -136,10 +162,10 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // inverse fourier transform slice
                 SliceType::Pointer newSlice;
-                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
-                ifft->SetInput(fSlice);
-                ifft->Update();
-                newSlice = ifft->GetOutput();
+                itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
+                dft->SetInput(fSlice);
+                dft->Update();
+                newSlice = dft->GetOutput();
 
                 // put slice back into channel g
                 for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
@@ -271,11 +297,11 @@ void TractsToDWIImageFilter::GenerateData()
     outImage->FillBuffer(temp);
 
     // is input slize size a power of two?
-    int x=2; int y=2;
-    while (x<m_ImageRegion.GetSize(0))
-        x *= 2;
-    while (y<m_ImageRegion.GetSize(1))
-        y *= 2;
+    int x=m_ImageRegion.GetSize(0); int y=m_ImageRegion.GetSize(1);
+    if ( x%2 == 1 )
+        x += 1;
+    if ( y%2 == 1 )
+        y += 1;
 
     // if not, adjust size and dimension (needed for FFT); zero-padding
     if (x!=m_ImageRegion.GetSize(0))
@@ -320,6 +346,18 @@ void TractsToDWIImageFilter::GenerateData()
         m_TissueMask->SetRequestedRegion( m_UpsampledImageRegion );
         m_TissueMask->Allocate();
         m_TissueMask->FillBuffer(1);
+    }
+
+    // resample frequency map
+    if (m_FrequencyMap.IsNotNull())
+    {
+        itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer resampler = itk::ResampleImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+        resampler->SetInput(m_FrequencyMap);
+        resampler->SetOutputParametersFromImage(m_FrequencyMap);
+        resampler->SetSize(m_UpsampledImageRegion.GetSize());
+        resampler->SetOutputSpacing(m_UpsampledSpacing);
+        resampler->Update();
+        m_FrequencyMap = resampler->GetOutput();
     }
 
     // resample fiber bundle for sufficient voxel coverage
@@ -522,7 +560,7 @@ void TractsToDWIImageFilter::GenerateData()
 
     // do k-space stuff
     MITK_INFO << "Adjusting complex signal";
-    compartments = AddKspaceArtifacts(compartments);
+    compartments = DoKspaceStuff(compartments);
 
     MITK_INFO << "Summing compartments and adding noise";
     unsigned int window = 0;

@@ -18,121 +18,121 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define mitkPixelTypeMultiplex0( function, ptype )    \
 {                                                 \
-    if ( ptype.GetTypeId() == typeid(char) )\
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
       function<char>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(unsigned char))\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
       function<unsigned char>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
       function<short>( ptype,  );      \
-    else if ( ptype.GetTypeId() == typeid(unsigned short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
       function<unsigned short>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
       function<int>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(unsigned int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
       function<unsigned int>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
       function<long int>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
       function<unsigned long int>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(float)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,  );\
-    else if ( ptype.GetTypeId() == typeid(double)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
       function<double>( ptype,  );\
 }\
 
 #define mitkPixelTypeMultiplex1( function, ptype, param1 )    \
 {                                                 \
-    if ( ptype.GetTypeId() == typeid(char) )\
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
       function<char>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned char))\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
       function<unsigned char>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
       function<short>( ptype,  param1 );      \
-    else if ( ptype.GetTypeId() == typeid(unsigned short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
       function<unsigned short>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
       function<int>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
       function<unsigned int>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
       function<long int>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
       function<unsigned long int>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(float)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,  param1 );\
-    else if ( ptype.GetTypeId() == typeid(double)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
       function<double>( ptype,  param1 );\
 }\
 
 #define mitkPixelTypeMultiplex2( function, ptype, param1, param2 )    \
 {                                                 \
-    if ( ptype.GetTypeId() == typeid(char) )\
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
       function<char>( ptype,   param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned char))\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
       function<unsigned char>( ptype,   param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
       function<short>( ptype,   param1, param2 );      \
-    else if ( ptype.GetTypeId() == typeid(unsigned short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
       function<unsigned short>( ptype,  param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
       function<int>( ptype,   param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
       function<unsigned int>( ptype,  param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
       function<long int>( ptype,  param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
       function<unsigned long int>( ptype,   param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(float)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,   param1, param2 );\
-    else if ( ptype.GetTypeId() == typeid(double)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
       function<double>( ptype,  param1, param2 );\
 }\
 
 #define mitkPixelTypeMultiplex3( function, ptype, param1, param2, param3 )    \
 {                                                 \
-    if ( ptype.GetTypeId() == typeid(char) )\
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
       function<char>( ptype,   param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned char))\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
       function<unsigned char>( ptype,   param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
       function<short>( ptype,   param1, param2, param3 );      \
-    else if ( ptype.GetTypeId() == typeid(unsigned short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
       function<unsigned short>( ptype,  param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
       function<int>( ptype,   param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
       function<unsigned int>( ptype,  param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
       function<long int>( ptype,  param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
       function<unsigned long int>( ptype,   param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(float)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,   param1, param2, param3 );\
-    else if ( ptype.GetTypeId() == typeid(double)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
       function<double>( ptype,  param1, param2, param3 );\
 }\
 
 #define mitkPixelTypeMultiplex4( function, ptype, param1, param2, param3, param4 )    \
 {                                                 \
-    if ( ptype.GetTypeId() == typeid(char) )\
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
       function<char>( ptype,  param1, param2, param3, param4 );\
-    else if ( ptype.GetTypeId() == typeid(unsigned char))\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
       function<unsigned char>( ptype,   param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
       function<short>( ptype,   param1, param2, param3, param4  );      \
-    else if ( ptype.GetTypeId() == typeid(unsigned short) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
       function<unsigned short>( ptype,  param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
       function<int>( ptype,   param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(unsigned int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
       function<unsigned int>( ptype,  param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
       function<long int>( ptype,  param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(unsigned long int) )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
       function<unsigned long int>( ptype,   param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(float)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,   param1, param2, param3, param4  );\
-    else if ( ptype.GetTypeId() == typeid(double)  )\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
       function<double>( ptype,  param1, param2, param3, param4 );\
 }\
 

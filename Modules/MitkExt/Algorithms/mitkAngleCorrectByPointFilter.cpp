@@ -155,7 +155,8 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
       typedef unsigned char InputImagePixelType;
       typedef ScalarType OutputImagePixelType;
 
-      if(input->GetPixelType().GetTypeId()!=typeid(InputImagePixelType))
+      if(input->GetPixelType().GetPixelType() != itk::ImageIOBase::SCALAR ||
+         input->GetPixelType().GetComponentType()!= MapPixelComponentType<InputImagePixelType>::value)
       {
         itkExceptionMacro("only implemented for " << typeid(PixelType).name() );
       }

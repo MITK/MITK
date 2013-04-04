@@ -46,11 +46,11 @@ bool mitk::RGBToRGBACastImageFilter::IsRGBImage( const mitk::Image *image )
 {
   const mitk::PixelType &inputPixelType = image->GetPixelType();
 
-  if ( (inputPixelType.GetPixelTypeId() == itk::ImageIOBase::RGB )
-    && ( (inputPixelType.GetTypeId() == typeid( unsigned char) )
-      || (inputPixelType.GetTypeId() == typeid( unsigned short) )
-      || (inputPixelType.GetTypeId() == typeid( float) )
-      || (inputPixelType.GetTypeId() == typeid( double) )
+  if ( (inputPixelType.GetPixelType() == itk::ImageIOBase::RGB )
+    && ( (inputPixelType.GetComponentType() == itk::ImageIOBase::UCHAR )
+      || (inputPixelType.GetComponentType() == itk::ImageIOBase::USHORT )
+      || (inputPixelType.GetComponentType() == itk::ImageIOBase::FLOAT )
+      || (inputPixelType.GetComponentType() == itk::ImageIOBase::DOUBLE )
        )
      )
   {

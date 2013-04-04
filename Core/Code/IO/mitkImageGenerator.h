@@ -42,11 +42,12 @@ public:
                                                       float spacingY = 1,
                                                       float spacingZ = 1)
     {
-        itk::ImageRegion<3> imageRegion;
+        typedef itk::Image< TPixelType, 3 > ImageType;
+        typename ImageType::RegionType imageRegion;
         imageRegion.SetSize(0, dimX);
         imageRegion.SetSize(1, dimY);
         imageRegion.SetSize(2, dimZ);
-        mitk::Vector3D spacing;
+        typename ImageType::SpacingType spacing;
         spacing[0] = spacingX;
         spacing[1] = spacingY;
         spacing[2] = spacingZ;
@@ -54,7 +55,6 @@ public:
         mitk::Point3D                       origin; origin.Fill(0.0);
         itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
-        typedef itk::Image< TPixelType, 3 > ImageType;
         typename ImageType::Pointer image = ImageType::New();
         image->SetSpacing( spacing );
         image->SetOrigin( origin );

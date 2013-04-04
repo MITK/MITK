@@ -130,12 +130,6 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // fourier transform slice
                 ComplexSliceType::Pointer fSlice;
-
-//                itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::Pointer fft = itk::FFTRealToComplexConjugateImageFilter< SliceType::PixelType, 2 >::New();
-//                fft->SetInput(slice);
-//                fft->Update();
-//                fSlice = fft->GetOutput();
-
                 itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetInput(slice);
                 idft->SetkOffset(m_kOffset);
@@ -168,16 +162,10 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
 
                 // inverse fourier transform slice
                 SliceType::Pointer newSlice;
-
                 itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
                 dft->SetInput(fSlice);
                 dft->Update();
                 newSlice = dft->GetOutput();
-
-//                itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::Pointer ifft = itk::FFTComplexConjugateToRealImageFilter< SliceType::PixelType, 2 >::New();
-//                ifft->SetInput(fSlice);
-//                ifft->Update();
-//                newSlice = ifft->GetOutput();
 
                 // put slice back into channel g
                 for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)

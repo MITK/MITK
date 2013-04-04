@@ -53,7 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSignalDecay.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
 
 #include <QMessageBox>
 
@@ -112,7 +114,14 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-        m_Controls->m_FrequencyMapBox->SetPredicate(isMitkImage);
+        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+        mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
+        mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
+        mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
+        isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+        mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
+        mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
+        m_Controls->m_FrequencyMapBox->SetPredicate(finalPredicate);
 
         connect((QObject*) m_Controls->m_GenerateImageButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateImage()));
         connect((QObject*) m_Controls->m_GenerateFibersButton, SIGNAL(clicked()), (QObject*) this, SLOT(GenerateFibers()));

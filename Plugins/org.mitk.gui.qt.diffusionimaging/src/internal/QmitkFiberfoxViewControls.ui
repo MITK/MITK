@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1861,7 +1861,7 @@
           <item row="3" column="0">
            <widget class="QCheckBox" name="m_AddGhosts">
             <property name="text">
-             <string>Add N/Ghosts</string>
+             <string>Add N/2 Ghosts</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -1908,7 +1908,7 @@
              <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="m_kOffsetBox">
                <property name="toolTip">
-                <string/>
+                <string>A larger offset increases the inensity of the ghost image.</string>
                </property>
                <property name="decimals">
                 <number>3</number>
@@ -1965,7 +1965,11 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QmitkDataStorageComboBox" name="m_FrequencyMapBox"/>
+              <widget class="QmitkDataStorageComboBox" name="m_FrequencyMapBox">
+               <property name="toolTip">
+                <string>Select image specifying the frequency inhomogeneities (in Hz).</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -2068,12 +2072,11 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>m_CircleButton</tabstop>
   <tabstop>m_FlipButton</tabstop>
   <tabstop>m_RealTimeFibers</tabstop>
-  <tabstop>m_DistributionBox</tabstop>
   <tabstop>m_AdvancedOptionsBox</tabstop>
+  <tabstop>m_DistributionBox</tabstop>
   <tabstop>m_VarianceBox</tabstop>
   <tabstop>m_FiberDensityBox</tabstop>
   <tabstop>m_FiberSamplingBox</tabstop>
@@ -2107,6 +2110,7 @@
   <tabstop>m_BvalueBox</tabstop>
   <tabstop>m_AdvancedOptionsBox_2</tabstop>
   <tabstop>m_RepetitionsBox</tabstop>
+  <tabstop>m_SignalScaleBox</tabstop>
   <tabstop>m_TEbox</tabstop>
   <tabstop>m_LineReadoutTimeBox</tabstop>
   <tabstop>m_T2starBox</tabstop>
@@ -2119,9 +2123,15 @@
   <tabstop>m_Compartment3Box</tabstop>
   <tabstop>m_Compartment4Box</tabstop>
   <tabstop>m_Comp4FractionBox</tabstop>
+  <tabstop>m_AddNoise</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
+  <tabstop>m_AddGhosts</tabstop>
+  <tabstop>m_kOffsetBox</tabstop>
+  <tabstop>m_AddDistortions</tabstop>
+  <tabstop>m_FrequencyMapBox</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
   <tabstop>m_KspaceUndersamplingBox</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>

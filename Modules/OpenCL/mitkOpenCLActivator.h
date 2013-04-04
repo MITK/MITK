@@ -40,17 +40,12 @@ private:
 
   std::auto_ptr<OclResourceServiceImpl> m_ResourceService;
 
-  /** Static variable for fast internal access to the ResourceService */
-  static OclResourceServiceImpl* m_InternalResourceReference;
-
 public:
   /** @brief Load module context */
   void Load(mitk::ModuleContext *context);
 
   /** @brief Unload module context */
   void Unload(mitk::ModuleContext* );
-
-  static OclResourceService* GetResourceServiceRef();
 
 };
 

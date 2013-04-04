@@ -23,20 +23,11 @@ void OpenCLActivator::Load(mitk::ModuleContext *context)
   mitk::ServiceProperties props;
 
   context->RegisterService<OclResourceService>(m_ResourceService.get(), props);
-  m_InternalResourceReference = m_ResourceService.get();
 }
 
 void OpenCLActivator::Unload(mitk::ModuleContext *)
 {
-  m_InternalResourceReference = NULL;
   m_ResourceService.release();
 }
-
-OclResourceService* OpenCLActivator::GetResourceServiceRef()
-{
-  return m_InternalResourceReference;
-}
-
-OclResourceServiceImpl* OpenCLActivator::m_InternalResourceReference = NULL;
 
 US_EXPORT_MODULE_ACTIVATOR(MitkOcl, OpenCLActivator )

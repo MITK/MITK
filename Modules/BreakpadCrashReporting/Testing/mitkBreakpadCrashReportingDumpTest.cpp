@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QCoreApplication>
 
-int mitkBreakpadCrashReportingDumpTest(int argc, char** argv)
+int mitkBreakpadCrashReportingDumpTest(int argc, char** const argv)
 {
   // always start with this!
   MITK_TEST_BEGIN("mitkBreakpadCrashReportingDumpTest")

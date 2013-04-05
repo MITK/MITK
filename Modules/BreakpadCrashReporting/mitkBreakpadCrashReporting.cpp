@@ -119,6 +119,7 @@ bool BreakpadCrashReportingDumpCallbackLinux(const google_breakpad::MinidumpDesc
 
 bool mitk::BreakpadCrashReporting::DumpCallbackPlatformIndependent()
 {
+  return true;
 }
 
 void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGenerationServer)
@@ -150,7 +151,6 @@ void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGe
 
   m_ExceptionHandler = new google_breakpad::ExceptionHandler(
                                  dump_path,
-                                 m_CrashDumpPath.toStdString(),
                                  NULL,
                                  BreakpadCrashReportingDumpCallbackWindows,
                                  NULL,
@@ -334,13 +334,14 @@ bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
   myDir.mkpath(m_CrashDumpPath); // Assure directory is created.
 
   google_breakpad::CrashGenerationServer::OnClientDumpRequestCallback dump_callback = &ShowClientCrashed;
-  google_breakpad::CrashGenerationServer::OnClientExitingCallback exit_callback = &ShowClientExited;
+  google_breakpad::CrashGenerationServer::OnClientExitedCallback exit_callback = &ShowClientExited;
   void* dump_context = NULL;
   void* exit_context = NULL;
 
 #ifdef WIN32  // http://stackoverflow.com/questions/5625884/conversion-of-stdwstring-to-qstring-throws-linker-error
   std::wstring dump_path = std::wstring((const wchar_t *)m_CrashDumpPath.utf16());
-  m_CrashServer = new google_breakpad::CrashGenerationServer(dump_path,
+  std::wstring pipe_name = std::wstring((const wchar_t *)m_NamedPipeString.utf16());
+  m_CrashServer = new google_breakpad::CrashGenerationServer(pipe_name,
                                            NULL,
                                            ShowClientConnected, // connect callback
                                            NULL,

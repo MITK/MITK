@@ -87,8 +87,15 @@ double mitk::TimeGeometry::GetDiagonalLengthinWorldSpace() const
   return sqrt(GetDiagonalLength2InWorldSpace());
 }
 
-bool mitk::TimeGeometry::IsInside(const mitk::Point3D& p) const
+bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D& p) const
 {
-  return m_BoundingBox->IsInside(index);
+  return m_BoundingBox->IsInside(p);
 }
 
+void mitk::TimeGeometry::ApplyTransformMatrixToAllTimeSteps (mitk::Transform3D& transformation)
+{
+  for (TimeStepType step = 0; step <GetNumberOfTimeSteps(); ++step)
+  {
+    GetGeometryForTimeStep(step)->Transform(transformation);
+  }
+}

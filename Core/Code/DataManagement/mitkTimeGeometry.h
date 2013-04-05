@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define TimeGeometry_h
 
 //MITK
-#include <MitkExports.h>
+#include <mitkBaseGeometry.h>
 #include <mitkCommon.h>
+#include <MitkExports.h>
 #include "mitkOperationActor.h"
+#include "mitkVector.h"
 
 // To be replaced
 #include <mitkSlicedGeometry3D.h>
@@ -29,8 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 
 //ITK
-#include <itkObject.h>
 #include <itkBoundingBox.h>
+#include <itkFixedArray.h>
+#include <itkObject.h>
 
 namespace mitk {
 
@@ -39,17 +42,18 @@ namespace mitk {
 
   class MITK_CORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
   {
+
+  public:
     typedef unsigned long TimePointType;
     typedef std::size_t   TimeStepType;
 
-  public:
     virtual TimeStepType GetNumberOfTimeSteps() = 0;
     virtual TimePointType    GetMinimumTimePoint () = 0;
     virtual TimePointType    GetMaximumTimePoint () = 0;
 
     //##Documentation
     //## @brief Get the time bounds (in ms)
-    virtual TimeBounds GetTimeBounds( );
+    virtual TimeBounds GetTimeBounds( ) = 0;
 
     virtual bool IsValidTimePoint (TimePointType& timePoint) = 0;
     virtual bool IsValidTimeStep  (TimeStepType& timeStep) = 0;
@@ -57,10 +61,13 @@ namespace mitk {
     virtual TimePointType  TimeStepToTimePoint (TimeStepType& timeStep) = 0;
     virtual TimeStepType   TimePointToTimeStep (TimePointType& timePoint) = 0;
 
-    // To be implemented by this class
-    virtual void ApplyTransformMatrixToAllTimeSteps (Transform3D& transformation) = 0;
+    virtual BaseGeometry* GetGeometryForTimePoint ( TimePointType& timePoint) = 0;
+    virtual BaseGeometry* GetGeometryForTimeStep  ( TimeStepType& timeStep) = 0;
 
-    virtual bool IsValid ()
+    // To be implemented by this class
+    void ApplyTransformMatrixToAllTimeSteps (Transform3D& transformation);
+
+    virtual bool IsValid () = 0;
     //##Documentation
     //## @brief Get the position of the corner number \a id (in world coordinates)
     //##
@@ -91,7 +98,7 @@ namespace mitk {
     //##Documentation
     //## @brief Test whether the point \a p (world coordinates in mm) is
     //## inside the bounding box
-    bool IsWordlPointInside(const mitk::Point3D& p) const;
+    bool IsWorldPointInside(const mitk::Point3D& p) const;
 
     //##Documentation
     //## @brief Updates the bounding box to cover the area used in all time steps
@@ -99,7 +106,7 @@ namespace mitk {
     //## The bounding box is updated by this method. The new bounding box
     //## covers an area which includes all bounding boxes during
     //## all times steps.
-    virtual void UpdateBoundingBox();
+    virtual void UpdateBoundingBox() = 0;
 
     virtual void Initialize();
   protected:

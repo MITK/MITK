@@ -53,6 +53,7 @@ set(H_FILES
   Common/mitkServiceBaseObject.h
   Common/mitkTestingMacros.h
 
+  DataManagement/mitkTimeGeometry.h
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkImagePixelAccessor.h
@@ -116,6 +117,7 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkInteractorCameraController.cpp
   Controllers/mitkVtkLayerController.cpp
+  DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp

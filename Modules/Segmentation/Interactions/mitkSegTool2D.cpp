@@ -295,20 +295,6 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeo
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
 
-  slice->DisconnectPipeline();
-  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-  contourExtractor->SetInput(slice);
-  contourExtractor->Update();
-  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-  if (m_3DInterpolationEnabled)
-  {
-    unsigned int pos = this->AddContourmarker(positionEvent);
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
-    contour->DisconnectPipeline();
-  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 

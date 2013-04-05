@@ -12,11 +12,12 @@ if(MITK_USE_BREAKPAD)
 
     set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR})
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-      ${Breakpad_DIR}/Release/common.lib # ??
-      ${Breakpad_DIR}/Release/crash_generation_client.lib # ???
-      ${Breakpad_DIR}/Release/crash_generation_server.lib # out-of-process dump generator
-      ${Breakpad_DIR}/Release/exception_handler.lib # dump creator (ExceptionHandler)
-      ${Breakpad_DIR}/Release/crash_report_sender.lib
+      ${Breakpad_DIR}/Debug/breakpad_client.lib
+#      ${Breakpad_DIR}/Release/common.lib # ??
+#      ${Breakpad_DIR}/Release/crash_generation_client.lib # ???
+#      ${Breakpad_DIR}/Release/crash_generation_server.lib # out-of-process dump generator
+#      ${Breakpad_DIR}/Release/exception_handler.lib # dump creator (ExceptionHandler)
+#      ${Breakpad_DIR}/Release/crash_report_sender.lib
       ) # ??? unused, I guess
 
     set(EXECUTABLE_PROPERTY WIN32)

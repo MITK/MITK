@@ -34,12 +34,12 @@ namespace mitk
  * for mitk::DataNodeSource.
  * @ingroup Process
  */
-  class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
+class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( DataNodeSource, itk::ProcessObject );
+    mitkClassMacro( DataNodeSource, itk::ProcessObject )
 
-    itkNewMacro( Self );
+    itkNewMacro( Self )
 
     typedef mitk::DataNode OutputType;
 
@@ -61,8 +61,8 @@ public:
      */
     virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
 
-    OutputType* GetOutput(const DataObjectIdentifierType & key);
-    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    OutputType* GetOutput();
+    const OutputType* GetOutput() const;
     OutputType* GetOutput(DataObjectPointerArraySizeType idx);
     const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 

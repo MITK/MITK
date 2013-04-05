@@ -24,29 +24,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-//##Documentation
-//## @brief Superclass of all classes generating Images (instances of class
-//## Image) as output.
-//##
-//## In itk and vtk the generated result of a ProcessObject is only guaranteed
-//## to be up-to-date, when Update() of the ProcessObject or the generated
-//## DataObject is called immediately before access of the data stored in the
-//## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
-//## for mitk::ImageSource. But there are also three access methods provided
-//## that guarantee an up-to-date result (by first calling Update and then
-//## returning the result of GetOutput()): GetData(), GetPic() and
-//## GetVtkImageData().
-//## @ingroup Process
+/**
+ * @brief Superclass of all classes generating Images (instances of class
+ * Image) as output.
+ *
+ * In itk and vtk the generated result of a ProcessObject is only guaranteed
+ * to be up-to-date, when Update() of the ProcessObject or the generated
+ * DataObject is called immediately before access of the data stored in the
+ * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
+ * for mitk::ImageSource. But there are also three access methods provided
+ * that guarantee an up-to-date result (by first calling Update and then
+ * returning the result of GetOutput()): GetData(), GetPic() and
+ * GetVtkImageData().
+ * @ingroup Process
+ */
 class MITK_CORE_EXPORT ImageSource : public BaseProcess
 {
 public:
-  mitkClassMacro(ImageSource,BaseProcess);
+  mitkClassMacro(ImageSource,BaseProcess)
 
   /** @brief Smart Pointer type to a DataObject. */
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /** @brief Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkNewMacro(Self)
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;

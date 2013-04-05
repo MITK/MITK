@@ -128,7 +128,7 @@ mitk::Image::Pointer mitk::ImportItkImage(const itk::SmartPointer<ItkOutputImage
   importer->SetGeometry(geometry);
   if(update)
     importer->Update();
-  return importer->GetOutput();
+  return importer->GetOutput(0);
 }
 
 template <typename ItkOutputImageType>

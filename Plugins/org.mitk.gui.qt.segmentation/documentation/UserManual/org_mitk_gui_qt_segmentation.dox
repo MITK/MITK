@@ -162,6 +162,23 @@ Left-click inside a segmentation with holes to completely fill all holes.
 
 This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (hold CTRL while clicking).
 
+\image html org_mitk_gui_qt_segmentationIMGiconLiveWire.png LiveWire Tool
+
+The LiveWire Tool acts as a magnetic lasso with a contour snapping to edges of objects.
+
+\image html org_mitk_gui_qt_segmentationIMGLiveWireUsage.png Steps for using LiveWire Tool
+
+<ul>
+<li>(1) To start the Tool you have to double click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
+<li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
+<li>(3) To fix a segment you can set anchor points by single left mouse button click.
+<li>(4) Go on with moving the mouse and setting anchor points.
+<li>(5) To close the contour double click on the initial anchor point.
+<li>(6) After closing the contour can be edited by moving, inserting and deleting anchor points.
+</ul>
+
+The contour will be transfered to its binary image representation by deactivating the tool.
+
 \subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
 
 Creating segmentations for modern CT volumes is very time-consuming, because structures of interest can easily cover a range of 50 or more slices.

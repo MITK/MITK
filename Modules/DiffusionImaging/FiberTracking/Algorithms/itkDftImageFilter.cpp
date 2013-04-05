@@ -64,7 +64,7 @@ void DftImageFilter< TPixelType >
             int x = it.GetIndex()[0];
             int y = it.GetIndex()[1];
 
-            vcl_complex<double> f = it.Get();
+            vcl_complex<double> f(it.Get().real(), it.Get().imag());
             s += f * exp( std::complex<double>(0, -2 * M_PI * (kx*(double)x/szx + ky*(double)y/szy) ) );
 
             ++it;

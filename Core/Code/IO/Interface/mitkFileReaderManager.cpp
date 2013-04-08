@@ -74,7 +74,7 @@ std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(std::
   mitk::ModuleContext * context = mitk::GetModuleContext();
   // filter for class and extension
   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::FileReaderInterface::US_EXTENSION + "=" + extension + "))";
-  std::list <mitk::ServiceReference> result = context->GetServiceReferences(filter);
+  std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileReader", filter);
   // the comparator sorts by priority
   result.sort(mitk::FileReaderManager::CompareServiceRef);
   return result;

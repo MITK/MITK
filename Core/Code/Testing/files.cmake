@@ -8,7 +8,7 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
-  #mitkEventConfigTest.cpp ## needs to be re-written, test indirect since EventConfig is no longer exported as interface Bug 14529
+  mitkEventConfigTest.cpp ## needs to be re-written, test indirect since EventConfig is no longer exported as interface Bug 14529
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp

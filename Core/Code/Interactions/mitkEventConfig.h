@@ -60,13 +60,27 @@ namespace mitk
      * @brief Construct an EventConfig object based on a XML configuration file.
      *
      * Uses the specified resource file containing an XML event configuration to
-     * construct a EventConfig object. If the resource is invalid, the created
+     * construct an EventConfig object. If the resource is invalid, the created
      * EventConfig object will also be invalid.
      *
      * @param filename The resource name relative to the Interactions resource folder.
      * @param module
      */
     EventConfig(const std::string& filename, const Module* module = NULL);
+
+    /**
+     * @brief Construct an EventConfig object based on a XML configuration file.
+     *
+     * Uses the specified istream refering to a file containing an XML event configuration to
+     * construct an EventConfig object. If the resource is invalid, the created
+     * EventConfig object will also be invalid.
+     *
+     * @param
+     */
+    EventConfig(std::ifstream* inputStream);
+
+
+    EventConfig(std::vector<PropertyList::Pointer> *configDescription );
 
     EventConfig& operator=(const EventConfig& other);
 

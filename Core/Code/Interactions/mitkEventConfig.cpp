@@ -263,6 +263,35 @@ mitk::EventConfig::EventConfig(const std::string& filename, const Module* module
   }
 }
 
+mitk::EventConfig::EventConfig(std::ifstream *inputStream)
+ : d(new EventConfigPrivate)
+{
+  EventConfig newConfig;
+  newConfig.d->m_XmlParser.SetStream(inputStream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+}
+
+mitk::EventConfig::EventConfig(std::vector<PropertyList::Pointer> *configDescription)
+{
+  for (std::vector<PropertyList::Pointer>::iterator it = configDescription->begin(); it != configDescription->end(); ++it) {
+
+    InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
+    if (event.IsNotNull())
+    {
+      d->m_CurrEventMapping.interactionEvent = event;
+      d->InsertMapping(d->m_CurrEventMapping);
+    }
+    else
+    {
+      MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+    }
+  }
+}
+
 mitk::EventConfig& mitk::EventConfig::operator =(const mitk::EventConfig& other)
 {
   d = other.d;

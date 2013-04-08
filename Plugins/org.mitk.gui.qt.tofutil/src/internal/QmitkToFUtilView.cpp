@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkCommand.h>
+#include <mitkRenderingModeProperty.h>
 
 const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 
@@ -302,73 +303,106 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
-        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
-        this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
-        this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+    this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+    this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+    this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
 
-        // initial update of composite filter
-        this->m_ToFCompositeFilter->Update();
-        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
-        this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
+    // initial update of composite filter
+    this->m_ToFCompositeFilter->Update();
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+    this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
 
-        std::string rgbFileName;
-        m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
+    std::string rgbFileName;
+    m_ToFImageGrabber->GetCameraDevice()->GetStringProperty("RGBImageFileName",rgbFileName);
 
-        if ((m_SelectedCamera.contains("Kinect"))||(rgbFileName!=""))
-        {
-            //set the reconstruction mode for kinect
-            this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
-            if (rgbFileName!="" || m_ToFImageGrabber->GetBoolProperty("RGB") )
-            {
-                this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
-            }
-            else if (m_ToFImageGrabber->GetBoolProperty("IR"))
-            {
-                this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-            }
-        }
-        else
-        {
-            this->m_RGBImageNode = NULL;
-            this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
-            this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-            this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
-            this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
-        }
-        this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
-        this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+    bool hasRGBImage = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasRGBImage",hasRGBImage);
 
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
-        this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
-        this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+    bool hasIntensityImage = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasIntensityImage",hasIntensityImage);
 
-        this->UseToFVisibilitySettings(true);
+    bool hasAmplitudeImage = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("HasAmplitudeImage",hasAmplitudeImage);
 
-        m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
-        // initialize visualization widget
-        m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
-        // set distance image to measurement widget
-        m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
-
-        this->m_Frametimer->start(0);
-
-        m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
-        m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
-        m_Controls->tofMeasurementWidget->setEnabled(true);
-        m_Controls->SurfacePropertiesBox->setEnabled(true);
-
-        if (m_Controls->m_TextureCheckBox->isChecked())
-        {
-            OnTextureCheckBoxChecked(true);
-        }
-        if (m_Controls->m_KinectTextureCheckBox->isChecked())
-        {
-            OnKinectRGBTextureCheckBoxChecked(true);
-        }
+    bool KinectReconstructionMode = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("KinectReconstructionMode",KinectReconstructionMode);
+    if(KinectReconstructionMode)
+    {
+      //set the reconstruction mode for kinect
+      this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
     }
-    m_Controls->m_TextureCheckBox->setEnabled(true);
+
+    if(hasRGBImage || (rgbFileName!=""))
+    {
+      if(m_ToFImageGrabber->GetBoolProperty("IR"))
+      {
+         this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+      }
+      else
+      {
+         this->m_RGBImageNode = ReplaceNodeData("RGB image",this->m_ToFImageGrabber->GetOutput(3));
+      }
+    }
+    else
+    {
+      this->m_RGBImageNode = NULL;
+    }
+
+    if(hasAmplitudeImage)
+    {
+      this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+      this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+    }
+
+    if(hasIntensityImage)
+    {
+      this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+      this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+    }
+
+//    if ((rgbFileName!="") || hasRGBImage)
+//    {
+
+//    }
+//    else
+//    {
+
+
+//    }
+//    this->m_AmplitudeImageNode = ReplaceNodeData("Amplitude image",m_MitkAmplitudeImage);
+//    this->m_IntensityImageNode = ReplaceNodeData("Intensity image",m_MitkIntensityImage);
+
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
+    this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
+    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+    this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
+
+    this->UseToFVisibilitySettings(true);
+
+    m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
+    // initialize visualization widget
+    m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode, this->m_AmplitudeImageNode, this->m_IntensityImageNode);
+    // set distance image to measurement widget
+    m_Controls->tofMeasurementWidget->SetDistanceImage(m_MitkDistanceImage);
+
+    this->m_Frametimer->start(0);
+
+    m_Controls->m_ToFVisualisationSettingsWidget->setEnabled(true);
+    m_Controls->m_ToFCompositeFilterWidget->setEnabled(true);
+    m_Controls->tofMeasurementWidget->setEnabled(true);
+    m_Controls->SurfacePropertiesBox->setEnabled(true);
+
+    if (m_Controls->m_TextureCheckBox->isChecked())
+    {
+      OnTextureCheckBoxChecked(true);
+    }
+    if (m_Controls->m_KinectTextureCheckBox->isChecked())
+    {
+      OnKinectRGBTextureCheckBoxChecked(true);
+    }
+  }
+  m_Controls->m_TextureCheckBox->setEnabled(true);
 }
 
 void QmitkToFUtilView::OnToFCameraStopped()
@@ -541,78 +575,89 @@ mitk::DataNode::Pointer QmitkToFUtilView::ReplaceNodeData( std::string nodeName,
 
 void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
 {
-    // set node properties
-    if (m_DistanceImageNode.IsNotNull())
+  //We need this property for every node.
+  mitk::RenderingModeProperty::Pointer renderingModePropertyForTransferFunction = mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+
+  // set node properties
+  if (m_DistanceImageNode.IsNotNull())
+  {
+    this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
+  }
+  if (m_AmplitudeImageNode.IsNotNull())
+  {
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
     {
-        this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
-        this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
+      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
-    if (m_AmplitudeImageNode.IsNotNull())
+    else
     {
-        if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("RGB")))
-        {
-            this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-        }
-        else
-        {
-            this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-        }
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
-        this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-        this->m_AmplitudeImageNode->SetBoolProperty("use color",!useToF);
-        this->m_AmplitudeImageNode->GetPropertyList()->DeleteProperty("LookupTable");
+      this->m_AmplitudeImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
     }
-    if (m_IntensityImageNode.IsNotNull())
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
+  }
+  if (m_IntensityImageNode.IsNotNull())
+  {
+    if (m_SelectedCamera.contains("Kinect"))
     {
-        if (m_SelectedCamera.contains("Kinect"))
-        {
-            this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-        }
-        else
-        {
-            this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-            this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-            this->m_IntensityImageNode->SetBoolProperty("use color",!useToF);
-            this->m_IntensityImageNode->GetPropertyList()->DeleteProperty("LookupTable");
-        }
+      this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
-    if ((m_RGBImageNode.IsNotNull()))
+    else
     {
-        if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
-        {
-            this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
-        }
-        else
-        {
-            this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-            this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-        }
+      this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_IntensityImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
     }
-    // initialize images
-    if (m_MitkDistanceImage.IsNotNull())
+  }
+  if ((m_RGBImageNode.IsNotNull()))
+  {
+    if ((m_SelectedCamera.contains("Kinect"))&&(m_ToFImageGrabber->GetBoolProperty("IR")))
     {
-        this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-                    this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( false ));
     }
-    if(this->m_SurfaceNode.IsNotNull())
+    else
     {
-        QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetQmitkRenderWindows();
-        QHashIterator<QString, QmitkRenderWindow*> i(renderWindowHashMap);
-        while (i.hasNext()){
-            i.next();
-            this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->GetRenderWindow()) );
-        }
-        this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
     }
-    //disable/enable gradient background
-    this->GetRenderWindowPart()->EnableDecorations(!useToF, QStringList(QString("background")));
+  }
+  // initialize images
+  if (m_MitkDistanceImage.IsNotNull())
+  {
+    this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
+          this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+  }
+  if(this->m_SurfaceNode.IsNotNull())
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindowHashMap = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+    QHashIterator<QString, QmitkRenderWindow*> i(renderWindowHashMap);
+    while (i.hasNext()){
+      i.next();
+      this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->GetRenderWindow()) );
+    }
+    this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+  }
+  //disable/enable gradient background
+  this->GetRenderWindowPart()->EnableDecorations(!useToF, QStringList(QString("background")));
+
+  if((this->m_RGBImageNode.IsNotNull()))
+  {
+    bool RGBImageHasDifferentResolution = false;
+    m_ToFImageGrabber->GetCameraDevice()->GetBoolProperty("RGBImageHasDifferentResolution",RGBImageHasDifferentResolution);
+    if(RGBImageHasDifferentResolution)
+    {
+      //update the display geometry by using the RBG image node. Only for renderwindow coronal
+      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
+    }
+  }
 }

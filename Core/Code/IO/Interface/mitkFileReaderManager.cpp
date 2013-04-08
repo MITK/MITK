@@ -82,5 +82,5 @@ std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(std::
 
 bool mitk::FileReaderManager::CompareServiceRef(mitk::ServiceReference first, mitk::ServiceReference second)
 {
-  return (any_cast<int>(first.GetProperty(mitk::FileReaderInterface::US_PRIORITY)) <= any_cast<int> (second.GetProperty(mitk::FileReaderInterface::US_PRIORITY)));
+  return (any_cast<int>(first.GetProperty(mitk::FileReaderInterface::US_PRIORITY)) > any_cast<int> (second.GetProperty(mitk::FileReaderInterface::US_PRIORITY)));
 }

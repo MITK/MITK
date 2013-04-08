@@ -76,12 +76,12 @@ public:
   virtual void DummyReader::SetFilePattern(const char* aFilePattern)
   { }
 
-  virtual void DummyReader::Init(std::string extension)
+  virtual void DummyReader::Init(std::string extension, int priority)
   {
     mitk::ModuleContext* context = mitk::GetModuleContext();
     mitk::ServiceProperties props;
-    props[mitk::FileReaderInterface::US_EXTENSION] =extension;
-
+    props[mitk::FileReaderInterface::US_EXTENSION] = extension;
+    props[mitk::FileReaderInterface::US_PRIORITY]  = priority;
 
     m_ServiceRegistration = context->RegisterService<mitk::FileReaderInterface>(this, props);
   }
@@ -100,8 +100,12 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
 
   DummyReader* testDR = new DummyReader();
   DummyReader* otherDR = new DummyReader();
-  testDR->Init("test");
-  otherDR->Init("other");
+  DummyReader* mediocreTestDR = new DummyReader();
+  DummyReader* prettyFlyTestDR = new DummyReader();
+  DummyReader* awesomeTestDR = new DummyReader();
+
+  testDR->Init("test",1);
+  otherDR->Init("other",1);
 
   mitk::FileReaderInterface* returned = mitk::FileReaderManager::GetReader("test");
 
@@ -110,6 +114,14 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   returned = mitk::FileReaderManager::GetReader("other");
 
   MITK_TEST_CONDITION_REQUIRED(otherDR == returned,"Testing correct retrieval of FileReader 2/2");
+
+  mediocreTestDR->Init("test",20);
+  prettyFlyTestDR->Init("test",50);
+  awesomeTestDR->Init("test",100);
+
+  returned = mitk::FileReaderManager::GetReader("test");
+  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct priorized retrieval of FileReader: Best Reader");
+
   // always end with this!
   MITK_TEST_END();
 }

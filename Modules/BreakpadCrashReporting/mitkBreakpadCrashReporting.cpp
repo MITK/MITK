@@ -334,7 +334,12 @@ bool mitk::BreakpadCrashReporting::InitializeServer( int listen_fd )
   myDir.mkpath(m_CrashDumpPath); // Assure directory is created.
 
   google_breakpad::CrashGenerationServer::OnClientDumpRequestCallback dump_callback = &ShowClientCrashed;
-  google_breakpad::CrashGenerationServer::OnClientExitedCallback exit_callback = &ShowClientExited;
+#ifdef WIN32
+  google_breakpad::CrashGenerationServer::OnClientExitedCallback exit_callback = &ShowClientExited;   // this...
+#elif __gnu_linux__
+  google_breakpad::CrashGenerationServer::OnClientExitingCallback exit_callback = &ShowClientExited;  // and that.. tell much about cross-platform..
+#endif
+
   void* dump_context = NULL;
   void* exit_context = NULL;
 

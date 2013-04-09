@@ -67,7 +67,7 @@ class MITK_CORE_EXPORT FileReaderManager
 
     static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension);
 
-    //static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension, std::list<std::string> options );
+    static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension, std::list<std::string> options );
 
     static bool CompareServiceRef(mitk::ServiceReference first, mitk::ServiceReference second);
 

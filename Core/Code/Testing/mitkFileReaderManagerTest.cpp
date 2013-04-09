@@ -123,7 +123,7 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   awesomeTestDR->Init("test",100);
 
   returned = mitk::FileReaderManager::GetReader("test");
-  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct priorized retrieval of FileReader: Best Reader");
+  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct priorized retrieval of FileReader: Best reader");
 
   // Now to give those readers some options, then we will try again
 
@@ -140,13 +140,37 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   options.clear();
   options.push_front("canFly");
   returned = mitk::FileReaderManager::GetReader("test", options);
-  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct retrieval of FileReader with Options: Best Reader with options");
+  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct retrieval of FileReader with Options: Best reader with options");
+
+  options.push_front("isAwesome");
+  returned = mitk::FileReaderManager::GetReader("test", options);
+  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct retrieval of FileReader with multiple Options: Best reader with options");
 
   options.clear();
   options.push_front("isANiceGuy");
   returned = mitk::FileReaderManager::GetReader("test", options);
-  MITK_TEST_CONDITION_REQUIRED(mediocreTestDR == returned, "Testing correct retrieval of specific FileReader with Options: low Priority Reader with specific option");
+  MITK_TEST_CONDITION_REQUIRED(mediocreTestDR == returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
 
+  options.push_front("canFly");
+  returned = mitk::FileReaderManager::GetReader("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returned == 0, "Testing correct return of 0 value when no matching reader was found");
+
+  std::list< mitk::FileReaderInterface* > returnedList;
+  returnedList = mitk::FileReaderManager::GetReaders("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 0, "Testing correct return of zero readers when no matching reader was found, asking for all compatibles");
+
+  options.clear();
+  options.push_back("canFly");
+  returnedList = mitk::FileReaderManager::GetReaders("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two readers when two matching reader was found, asking for all compatibles");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correct priorization of returned Readers with options 1/2");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.back() == prettyFlyTestDR, "Testing correct priorization of returned Readers with options 2/2");
+
+  options.clear();
+  options.push_back("isAwesome");
+  returnedList = mitk::FileReaderManager::GetReaders("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one readers when one matching reader was found, asking for all compatibles");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correctness of result from former query");
 
   // always end with this!
   MITK_TEST_END();

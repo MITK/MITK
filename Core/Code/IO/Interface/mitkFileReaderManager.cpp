@@ -67,6 +67,13 @@ std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::
 
 mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(std::string extension, std::list<std::string> options )
 {
+  std::list <mitk::FileReaderInterface*> matching = mitk::FileReaderManager::GetReaders(extension, options);
+  if (matching.size() == 0) return 0;
+  return matching.front();
+}
+
+std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::string extension, std::list<std::string> options )
+{
   std::list <mitk::FileReaderInterface*> allReaders = mitk::FileReaderManager::GetReaders(extension);
   std::list <mitk::FileReaderInterface*> result;
   // the list is already sorted by priority. Now find reader that supports all options
@@ -75,15 +82,14 @@ mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(std::string extens
   {
     mitk::FileReaderInterface * currentReader = allReaders.front();
     allReaders.pop_front();
-
-    // Now see if this reader supports all options
-
+    // Now see if this reader supports all options. If yes, push to results
     if ( mitk::FileReaderManager::ReaderSupportsOptions(currentReader, options) ) result.push_back(currentReader);
-
   }
-
-  return result.front();
+  return result;
 }
+
+
+//////////////////// INTERNAL CODE ////////////////////
 
 bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options )
 {
@@ -99,10 +105,10 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* r
       // Iterate over each available option from reader to check if one of them matches the current option
       for(std::list<std::string>::iterator options_j = readerOptions.begin(); options_j != readerOptions.end(); options_j++)
         if ( *options_i == *options_j ) optionFound = true;
-      if (optionFound == false) return false;
+      if (optionFound == false) return false; // If one option was not found, leave method and return false
     }
   }
-  return true;
+  return true; // if all options have been found, return true
 }
 
 

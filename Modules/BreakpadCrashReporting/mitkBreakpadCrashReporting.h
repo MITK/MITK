@@ -135,7 +135,6 @@ namespace mitk {
   protected:
 
       bool InitializeServer(int listen_fd = -1);
-      void StopCrashServer();
 
       // External out-of-process (OOP) Crash Reporting Server file path - if OOP is used.
       void SetCrashReportingServerExecutable(QString exe);
@@ -143,17 +142,20 @@ namespace mitk {
 
       bool DumpCallbackPlatformIndependent();
 
-      QString m_NamedPipeString;
+      google_breakpad::CrashGenerationServer*  m_CrashServer;
+      google_breakpad::ExceptionHandler*       m_ExceptionHandler;
+
       QString m_CrashDumpPath;
+
+  // Linux connection parameters
+      int server_fd;
+      int client_fd;
+
+  // Windows connection parameters
+      QString m_NamedPipeString;
       QString m_CrashReportingServerExecutable;
       int     m_NumberOfConnectionAttempts;
       int     m_ReconnectDelay;
-      google_breakpad::ExceptionHandler*       m_ExceptionHandler;
-      google_breakpad::CrashGenerationServer*  m_CrashServer;
-
-
-      int server_fd;
-      int client_fd;
 
   };
 } // namespace mitk

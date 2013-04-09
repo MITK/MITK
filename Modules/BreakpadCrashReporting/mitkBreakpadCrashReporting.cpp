@@ -59,25 +59,19 @@ static int  numberOfConnectionAttemptsPerformed = 1;  // number of performed re-
 #endif
 
 mitk::BreakpadCrashReporting::BreakpadCrashReporting()
-:server_fd(-1)
-,client_fd(-1)
+: m_CrashServer(NULL)
+, m_ExceptionHandler(NULL)
+, m_CrashDumpPath( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath() + "/CrashDumps" )
+  // Linux connection parameters
+, server_fd(-1)
+, client_fd(-1)
+  // Windows connection parameters
+, m_NamedPipeString("\\\\.\\pipe\\MitkCrashServices\\MitkBasedApplication")
+,  m_CrashReportingServerExecutable( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer.exe") )
+, m_NumberOfConnectionAttempts(3)
+, m_ReconnectDelay(300)
 {
-  m_CrashServer         = NULL;
-  m_ExceptionHandler    = NULL;
-
-  m_NamedPipeString       = "\\\\.\\pipe\\MitkCrashServices\\MitkBasedApplication";
-  m_CrashDumpPath         = QDir(QApplication::instance()->applicationDirPath()).absolutePath();
-  m_CrashDumpPath.append("/CrashDumps/"); // is created if it does not exist
-
-  m_NumberOfConnectionAttempts = 3;
-  m_ReconnectDelay             = 300;
-
   // TODO platform specific
-#ifdef WIN32
-  m_CrashReportingServerExecutable = QDir(QApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer.exe");
-#else
-  m_CrashReportingServerExecutable = QDir(QApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer");
-#endif
 }
 
 mitk::BreakpadCrashReporting::~BreakpadCrashReporting()
@@ -405,12 +399,6 @@ bool mitk::BreakpadCrashReporting::RequestDump()
     }
   }
   return false;
-}
-
-void mitk::BreakpadCrashReporting::StopCrashServer()
-{
-  delete m_CrashServer;
-  m_CrashServer = NULL;
 }
 
 void mitk::BreakpadCrashReporting::CrashAppForTestPurpose()

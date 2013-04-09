@@ -1,3 +1,11 @@
+# TODOs
+#  - nicer separation of Linux/Window/.. code
+#  - test should check existence of dump file
+#  - find nice script to use linux symbol writer tool dump_.. on all relevant libraries
+#  - update documentation
+#  - use the same library structure in "our" cmake script as google uses in their build
+#    - otherwise we cannot switch between custom-built versions of breakpad and our superbuild version
+
 
 if(MITK_USE_BREAKPAD)
 

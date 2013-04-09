@@ -19,7 +19,7 @@ Image processing in MITK draws heavily from the pipelining concept, and a clear 
 In the real world, a pipeline connects a source of some kind with a consumer of another. So we identify three key concepts:
 
 1. The source, which generates data of some kind.
-2. The pipeline, which transports the data. Many different pipeline segements can be switched in line to achieve this.
+2. The pipeline, which transports the data. Many different pipeline segments can be switched in line to achieve this.
 3. The consumer, which uses the data to do something of interest.
 
 The analogy to real pipelines falls a little short in one point: A physical pipeline would never process it's contents, while in software development a pipeline usually does (this is why they are often dubbed filters as well). One might ask why one shouldn't just implement the processing logic in the consumer onject itself, since it onviously knows best what to do with it's data. The two main reasons for this are reusability and flexibility. Say, one wants to display a bone segmentation from a CT-image. Let's also assume for the sake of this introduction, that this is a simple task. One could build a monolithic class that solves the problem. Or one builds a pipeline between the displaying class and the source. We know that bones are very bright in a CT Scan, so we use a treshold filter, and then a segmentation Filter to solve the problem.

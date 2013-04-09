@@ -38,7 +38,6 @@ namespace mitk {
   * produce C and C++ stack traces from these minidumps. Breakpad can also write minidumps on request for programs that
   * have not crashed (from http://code.google.com/p/google-breakpad/wiki/GettingStartedWithBreakpad).
   *
-  *
   * Usage:
   *
   * In-process usage:
@@ -71,7 +70,7 @@ namespace mitk {
   {
     public:
 
-      BreakpadCrashReporting(/*TODO add path here*/);
+      BreakpadCrashReporting( const QString& dumpPath = QString::null );
       ~BreakpadCrashReporting();
 
       /** Initializes an event handler for 'unhandled exceptions' that will dump a so-called 'minidump' to a defined folder.

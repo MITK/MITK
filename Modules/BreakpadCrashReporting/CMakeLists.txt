@@ -104,6 +104,8 @@ endfunction()
 
 if(MITK_USE_BREAKPAD)
 
+  find_package(Breakpad)
+
   message(STATUS "Get directory hint for Breakpad:")
   message(STATUS ${Breakpad_DIR})
   message(STATUS ${Breakpad_SRC})
@@ -115,7 +117,6 @@ if(MITK_USE_BREAKPAD)
   if(CMAKE_SYSTEM MATCHES "Windows")
     checkWindowsCompilerFlags()
 
-    set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR})
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
       ${Breakpad_DIR}/Debug/breakpad_client.lib
 #      ${Breakpad_DIR}/Release/common.lib # ??
@@ -129,7 +130,6 @@ if(MITK_USE_BREAKPAD)
   elseif(CMAKE_SYSTEM MATCHES "Linux")
     checkLinuxCompilerFlags()
 
-    set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR}) # TODO why the repetition, is INCLUDE_DIRS_INTERNAL not empty before??
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
       ${Breakpad_DIR}/libbreakpad_client.a
       )
@@ -138,16 +138,13 @@ if(MITK_USE_BREAKPAD)
   endif()
 
   message(STATUS "Building BreakpadCrashReporting module.")
-  message(STATUS "  Including ${INCLUDE_DIRS_INTERNAL}")
   message(STATUS "  Linking ${ADDITIONAL_LIBS}")
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
-    INCLUDE_DIRS ${MITK_BIN_DIR}
-    INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-    DEPENDS Mitk Qmitk
+    INTERNAL_INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     EXPORT_DEFINE MITK_BREAKPAD_EXPORT
     ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
-    QT_MODULE
+    PACKAGE_DEPENDS QT
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")

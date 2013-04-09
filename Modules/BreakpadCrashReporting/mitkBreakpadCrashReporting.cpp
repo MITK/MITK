@@ -71,7 +71,6 @@ mitk::BreakpadCrashReporting::BreakpadCrashReporting()
 , m_NumberOfConnectionAttempts(3)
 , m_ReconnectDelay(300)
 {
-  // TODO platform specific
 }
 
 mitk::BreakpadCrashReporting::~BreakpadCrashReporting()
@@ -87,7 +86,6 @@ mitk::BreakpadCrashReporting::~BreakpadCrashReporting()
 }
 
 #ifdef WIN32
-// TODO platform specific
 //This function gets called in the event of a crash.
 bool BreakpadCrashReportingDumpCallbackWindows(const wchar_t* dump_path,
                      const wchar_t* minidump_id,
@@ -259,19 +257,6 @@ bool mitk::BreakpadCrashReporting::StartCrashServer(bool lauchOutOfProcessExecut
     MITK_INFO << "Crash Server object already generated.";
     return true;
   }
-
-  /*
-     Idea here:
-      - application-under-observation starts out-of-process dump generation executable
-      - dump generation executable creates google CrashGenerationServer
-        - requires fd to listen to
-
-     DONC
-      - CreateReportChannel
-        - fork
-          - in parent: InitializeServer, exit with return value of qtapplication.exec(), i.e. run forever. TODO stop with crashed child
-          - in parent: continue
-  */
 
 #ifdef __gnu_linux__
   google_breakpad::CrashGenerationServer::CreateReportChannel(&server_fd, &client_fd); // both OUT parameters

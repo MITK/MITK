@@ -104,8 +104,8 @@ int main(int argc, char* argv[])
       myBreakpad->SetCrashDumpPath(folderForCrashDumps);
     }
 
-    MITK_INFO << "NamedPipeName: " << myBreakpad->m_NamedPipeString.toStdString().c_str() << "\n";
-    MITK_INFO << "FolderForCrashDumps: " << myBreakpad->m_CrashDumpPath.toStdString().c_str() << "\n";
+    MITK_INFO << "NamedPipeName: " << myBreakpad->GetNamedPipeName().toStdString().c_str() << "\n";
+    MITK_INFO << "FolderForCrashDumps: " << myBreakpad->GetCrashDumpPath().toStdString().c_str() << "\n";
 
     if(myBreakpad->StartCrashServer(false)) // false = we are already in a separate process.
     {

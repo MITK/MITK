@@ -423,3 +423,8 @@ int mitk::BreakpadCrashReporting::GetNumberOfConnections()
 {
   return breakpadNumberOfConnections;
 }
+
+void mitk::BreakpadCrashReporting::SetNamedPipeName(QString name)
+{
+  m_NamedPipeString = name;
+}

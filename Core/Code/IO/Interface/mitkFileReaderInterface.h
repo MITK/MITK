@@ -108,9 +108,11 @@ namespace mitk {
 
     virtual int GetPriority() = 0;
 
+    virtual std::list< std::string > GetSupportedOptions() = 0;
+
     virtual std::list< std::string > GetOptions() = 0;
 
-    virtual void SetOptions(std::list< std::string > Options ) = 0;
+    virtual void SetOptions(std::list< std::string > options ) = 0;
 
     virtual bool CanRead(const std::string& path) = 0; // Todo: nach möglichkeit constref
 

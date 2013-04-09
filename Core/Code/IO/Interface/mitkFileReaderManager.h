@@ -63,11 +63,11 @@ class MITK_CORE_EXPORT FileReaderManager
     **/
     static mitk::FileReaderInterface* GetReader(std::string extension);
 
-    //static mitk::FileReaderInterface* GetReader(std::string extension, std::list<std::string> properties );
+    static mitk::FileReaderInterface* GetReader(std::string extension, std::list<std::string> options );
 
     static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension);
 
-    //static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension, std::list<std::string> properties );
+    //static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension, std::list<std::string> options );
 
     static bool CompareServiceRef(mitk::ServiceReference first, mitk::ServiceReference second);
 
@@ -76,6 +76,8 @@ protected:
     //virtual ~FileReaderManager();
 
     static std::list< mitk::ServiceReference > GetReaderList(std::string extension);
+
+    static bool ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options );
 
 };
 } // namespace mitk

@@ -35,6 +35,7 @@ public:
   itkNewMacro(Self);
 
   mitk::ServiceRegistration m_ServiceRegistration;
+  std::list< std::string > m_Options; // this list can be set and will be returned via getOptions and via getSupportedOptions (it's a dummy!)
 
   virtual mitk::BaseData::Pointer DummyReader::Read(std::string path = 0)
   { return 0; }
@@ -45,12 +46,14 @@ public:
   virtual int DummyReader::GetPriority()
   { return 0; }
 
-  virtual std::list< std::string > DummyReader::GetOptions()
-  { std::list< std::string > result;
-    return result; }
+  virtual std::list< std::string > GetSupportedOptions()
+  { return m_Options; }
 
-  virtual void DummyReader::SetOptions(std::list< std::string > Options )
-  { }
+  virtual std::list< std::string > DummyReader::GetOptions()
+  { return m_Options; }
+
+  virtual void DummyReader::SetOptions(std::list< std::string > options )
+  { m_Options = options; }
 
   virtual bool DummyReader::CanRead(const std::string& path)
   { return true; }
@@ -121,6 +124,29 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
 
   returned = mitk::FileReaderManager::GetReader("test");
   MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct priorized retrieval of FileReader: Best Reader");
+
+  // Now to give those readers some options, then we will try again
+
+  std::list<std::string> options;
+  options.push_front("isANiceGuy");
+  mediocreTestDR->SetOptions(options);
+  options.clear();
+  options.push_front("canFly");
+  prettyFlyTestDR->SetOptions(options);
+  options.push_front("isAwesome");
+  awesomeTestDR->SetOptions(options); //note: awesomeReader canFly and isAwesome
+
+  // Reset Options, use to define what we want the reader to do
+  options.clear();
+  options.push_front("canFly");
+  returned = mitk::FileReaderManager::GetReader("test", options);
+  MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct retrieval of FileReader with Options: Best Reader with options");
+
+  options.clear();
+  options.push_front("isANiceGuy");
+  returned = mitk::FileReaderManager::GetReader("test", options);
+  MITK_TEST_CONDITION_REQUIRED(mediocreTestDR == returned, "Testing correct retrieval of specific FileReader with Options: low Priority Reader with specific option");
+
 
   // always end with this!
   MITK_TEST_END();

@@ -65,6 +65,46 @@ std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::
   return result;
 }
 
+mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(std::string extension, std::list<std::string> options )
+{
+  std::list <mitk::FileReaderInterface*> allReaders = mitk::FileReaderManager::GetReaders(extension);
+  std::list <mitk::FileReaderInterface*> result;
+  // the list is already sorted by priority. Now find reader that supports all options
+
+  while (allReaders.size() > 0)
+  {
+    mitk::FileReaderInterface * currentReader = allReaders.front();
+    allReaders.pop_front();
+
+    // Now see if this reader supports all options
+
+    if ( mitk::FileReaderManager::ReaderSupportsOptions(currentReader, options) ) result.push_back(currentReader);
+
+  }
+
+  return result.front();
+}
+
+bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options )
+{
+  std::list<std::string> readerOptions = reader->GetSupportedOptions();
+  if (options.size() == 0) return true;         // if no options were requested, return true unconditionally
+  if (readerOptions.size() == 0) return false;  // if options were requested and reader supports no options, return false
+
+  // For each of the strings in requuested options, check if option is available in reader
+  for(std::list<std::string>::iterator options_i = options.begin(); options_i != options.end(); options_i++)
+  {
+    {
+      bool optionFound = false;
+      // Iterate over each available option from reader to check if one of them matches the current option
+      for(std::list<std::string>::iterator options_j = readerOptions.begin(); options_j != readerOptions.end(); options_j++)
+        if ( *options_i == *options_j ) optionFound = true;
+      if (optionFound == false) return false;
+    }
+  }
+  return true;
+}
+
 
 
 //////////////////// uS-INTERACTION ////////////////////

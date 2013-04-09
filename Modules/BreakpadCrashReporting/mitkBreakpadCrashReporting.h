@@ -110,19 +110,19 @@ namespace mitk {
 
       // Named pipe string to communicate with OutOfProcessCrashReporter.
       QString m_NamedPipeString;
-      void    SetNamedPipeName(QString name){m_NamedPipeString = name;}
+      void    SetNamedPipeName(QString name);
 
       // Directory path to save crash dumps.
       QString m_CrashDumpPath;
-      void    SetCrashDumpPath(QString path){m_CrashDumpPath = path;}
+      void    SetCrashDumpPath(QString path);
 
       // External out-of-process (OOP) Crash Reporting Server file path - if OOP is used.
       QString m_CrashReportingServerExecutable;
-      void    SetCrashReportingServerExecutable(QString exe){m_CrashReportingServerExecutable = exe;}
+      void    SetCrashReportingServerExecutable(QString exe);
 
       // Re-connect handling in case a crash server cannot be reached.
-      void    SetNumberOfConnectionAttempts(int no){m_NumberOfConnectionAttempts = no;}
-      void    SetReconnectDelayInMilliSeconds(int ms) {m_ReconnectDelay = ms;}
+      void    SetNumberOfConnectionAttempts(int no);
+      void    SetReconnectDelayInMilliSeconds(int ms);
       int     m_NumberOfConnectionAttempts;
       int     m_ReconnectDelay;
 

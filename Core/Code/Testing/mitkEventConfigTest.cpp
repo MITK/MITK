@@ -42,7 +42,6 @@ int mitkEventConfigTest(int argc, char* argv[])
    * each one is tested here.
    */
 
-
   // Construction using compiled-in resrouces:
    mitk::Module *module = mitk::GetModuleContext()->GetModule();
    mitk::EventConfig newConfig("StatemachineConfigTest.xml",module);
@@ -74,7 +73,6 @@ int mitkEventConfigTest(int argc, char* argv[])
   mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(NULL,pos,mitk::InteractionEvent::RightMouseButton,mitk::InteractionEvent::ShiftKey,-2 );
   mitk::InteractionKeyEvent::Pointer ke = mitk::InteractionKeyEvent::New(NULL,"l",mitk::InteractionEvent::NoKey );
 
-
   MITK_TEST_CONDITION_REQUIRED(
         newConfig.GetMappedEvent(mpe1.GetPointer()) == "Variant1" &&
         newConfig.GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
@@ -83,22 +81,20 @@ int mitkEventConfigTest(int argc, char* argv[])
         newConfig.GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file
         , "03 Check Mouse- and Key-Events "  );
 
-
   // Construction providing a input stream
-
   std::ifstream* configStream = new std::ifstream("/MITK/MITK/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml");
   // if (myfile.is_open())
-  newConfig(configStream);
+  mitk::EventConfig newConfig2(configStream);
 
   delete configStream;
   MITK_TEST_CONDITION_REQUIRED(
-         newConfig.IsValid() == true
+         newConfig2.IsValid() == true
           , "01 Check if file can be loaded and is valid" );
   /*
    * Test the global properties:
    * Test if stored values match the ones in the test config file.
    */
-  properties = newConfig.GetAttributes();
+  properties = newConfig2.GetAttributes();
     MITK_TEST_CONDITION_REQUIRED(
         properties->GetStringProperty("property1",prop1) &&
         prop1 == "yes" &&
@@ -109,17 +105,14 @@ int mitkEventConfigTest(int argc, char* argv[])
   /*
    * Check if Events get mapped to the proper Variants
    */
-
   MITK_TEST_CONDITION_REQUIRED(
-        newConfig.GetMappedEvent(mpe1.GetPointer()) == "Variant1" &&
-        newConfig.GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
-        newConfig.GetMappedEvent(mme1.GetPointer()) == "Move2" &&
-        newConfig.GetMappedEvent(ke.GetPointer()) == "Key1" &&
-        newConfig.GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file
+        newConfig2.GetMappedEvent(mpe1.GetPointer()) == "Variant1" &&
+        newConfig2.GetMappedEvent(standard1.GetPointer()) == "Standard1" &&
+        newConfig2.GetMappedEvent(mme1.GetPointer()) == "Move2" &&
+        newConfig2.GetMappedEvent(ke.GetPointer()) == "Key1" &&
+        newConfig2.GetMappedEvent(mme2.GetPointer()) == "" // does not exist in file
         , "03 Check Mouse- and Key-Events "  );
-
 
   // always end with this!
   MITK_TEST_END()
-
 }

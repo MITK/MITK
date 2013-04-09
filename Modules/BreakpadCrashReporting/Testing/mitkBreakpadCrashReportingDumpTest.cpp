@@ -19,7 +19,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBreakpadCrashReporting.h"
 
 #include <QCoreApplication>
+#include <QDir>
+#include <QDateTime>
 
+QString CreateEmptyTestFolder()
+{
+  QString dirname = QString("mitkBreakpadCrashReportingDumpTest-%1").arg(
+    QDateTime::currentDateTime().toString( Qt::ISODate ).remove(':').remove('-').remove('+') );
+
+  if ( QDir::temp().mkdir( dirname ) )
+  {
+    return QDir::tempPath() + QDir::separator() + dirname;
+  }
+  else
+  {
+    return QString::null;
+  }
+}
+
+/**
+  \brief Start crash reporting and crash (expectedly).
+
+  This method is excpected to setup BreakpadCrashReporting,
+  then provoke a crash, thus creating a crash dump in a configured
+  folder.
+
+  CMake is configured to expect failure of this test.
+  In addition we check the actual existence of a crash dump
+  in mitkBreakpadCrashReportingDumpCheckTest.
+*/
 int mitkBreakpadCrashReportingDumpTest(int argc, char** const argv)
 {
   // always start with this!
@@ -27,7 +55,10 @@ int mitkBreakpadCrashReportingDumpTest(int argc, char** const argv)
 
   QCoreApplication qtApplication(argc,argv);
 
-  mitk::BreakpadCrashReporting crashReporting;
+  QString emptyTempFolder = CreateEmptyTestFolder();
+
+  MITK_TEST_OUTPUT( << "Dumping files to " << qPrintable( emptyTempFolder ) );
+  mitk::BreakpadCrashReporting crashReporting(emptyTempFolder);
 
   // start out-of-process crash dump server
   MITK_TEST_CONDITION_REQUIRED( crashReporting.StartCrashServer(true) == true, "Start out-of-process crash reporting server");
@@ -39,8 +70,6 @@ int mitkBreakpadCrashReportingDumpTest(int argc, char** const argv)
 
   // provoke a seg-fault to make test crash
   crashReporting.CrashAppForTestPurpose();
-
-  MITK_TEST_CONDITION_REQUIRED( false, "Test failed, did not crash...)");
 
   // always end with this!
   MITK_TEST_END()

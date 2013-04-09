@@ -1,6 +1,6 @@
 # TODOs
 #  LATER nicer separation of Linux/Window/.. code
-#  - test should check existence of dump file
+#  OK test should check existence of dump file
 #  - find nice script to use linux symbol writer tool dump_.. on all relevant libraries
 #  - update documentation
 #  OK check buildtype (O2/-g/..) in cmake

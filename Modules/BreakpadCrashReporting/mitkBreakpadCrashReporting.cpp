@@ -58,10 +58,10 @@ static int  breakpadNumberOfConnections = 0;          // current number of conne
 static int  numberOfConnectionAttemptsPerformed = 1;  // number of performed re-connect attempts of a crash client
 #endif
 
-mitk::BreakpadCrashReporting::BreakpadCrashReporting()
+mitk::BreakpadCrashReporting::BreakpadCrashReporting( const QString& dumpPath )
 : m_CrashServer(NULL)
 , m_ExceptionHandler(NULL)
-, m_CrashDumpPath( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath() + "/CrashDumps" )
+, m_CrashDumpPath( dumpPath )
   // Linux connection parameters
 , server_fd(-1)
 , client_fd(-1)
@@ -71,6 +71,10 @@ mitk::BreakpadCrashReporting::BreakpadCrashReporting()
 , m_NumberOfConnectionAttempts(3)
 , m_ReconnectDelay(300)
 {
+  if ( m_CrashDumpPath.isEmpty() )
+  {
+    m_CrashDumpPath = QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath() + "/CrashDumps";
+  }
 }
 
 mitk::BreakpadCrashReporting::~BreakpadCrashReporting()

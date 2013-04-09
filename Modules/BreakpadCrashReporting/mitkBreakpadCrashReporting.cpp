@@ -53,7 +53,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static bool breakpadOnceConnected = false;            // indicates a server having had at least one client connection
 static int  breakpadNumberOfConnections = 0;          // current number of connected clients
+
+#ifdef WIN32
 static int  numberOfConnectionAttemptsPerformed = 1;  // number of performed re-connect attempts of a crash client
+#endif
 
 mitk::BreakpadCrashReporting::BreakpadCrashReporting()
 :server_fd(-1)
@@ -109,8 +112,9 @@ bool BreakpadCrashReportingDumpCallbackWindows(const wchar_t* dump_path,
 }
 
 #elif __gnu_linux__
-bool BreakpadCrashReportingDumpCallbackLinux(const google_breakpad::MinidumpDescriptor& descriptor,
-                             void* context,
+bool BreakpadCrashReportingDumpCallbackLinux(
+                             const google_breakpad::MinidumpDescriptor& /*descriptor*/,
+                             void* /*context*/,
                              bool succeeded)
 {
   return succeeded;
@@ -200,27 +204,23 @@ void mitk::BreakpadCrashReporting::InitializeClientHandler(bool connectToCrashGe
 #endif
 }
 
+#ifdef WIN32
 static void
-#ifdef WIN32
   _cdecl
-#endif
-ShowClientConnected(void* context,
-                                       const google_breakpad::ClientInfo* client_info)
+ShowClientConnected(void* /*context*/,
+                    const google_breakpad::ClientInfo* client_info)
 { // callback of the crash generation server on client connect
-#ifdef WIN32
   MITK_INFO << "Breakpad Client connected: " << client_info->pid();
-#else
-  MITK_INFO << "Breakpad Client connected: TODO proc-info";
-#endif
 
   breakpadOnceConnected = true; // static variables indicate server shutdown after usage
   breakpadNumberOfConnections++;
 }
+#endif
 
 #ifdef WIN32
-static void _cdecl ShowClientCrashed(void* context, const google_breakpad::ClientInfo* client_info, const std::wstring* dump_path)
+static void _cdecl ShowClientCrashed(void* /*context*/, const google_breakpad::ClientInfo* client_info, const std::wstring* /*dump_path*/)
 #elif __gnu_linux__
-static void ShowClientCrashed(void* context, const google_breakpad::ClientInfo* client_info, const std::string* dump_path)
+static void ShowClientCrashed(void* context, const google_breakpad::ClientInfo* /*client_info*/, const std::string* /*dump_path*/)
 #endif
 { // callback of the crash generation server on client crash
 
@@ -238,8 +238,8 @@ static void
 #ifdef WIN32
   _cdecl
 #endif
-ShowClientExited(void* context,
-                                    const google_breakpad::ClientInfo* client_info)
+ShowClientExited(void* /*context*/,
+                 const google_breakpad::ClientInfo* client_info)
 { // callback of the crash generation server on client exit
 #ifdef WIN32
   MITK_INFO << "Breakpad Client exited :" << client_info->pid();
@@ -419,12 +419,43 @@ void mitk::BreakpadCrashReporting::CrashAppForTestPurpose()
   *x = 1;
 }
 
-int mitk::BreakpadCrashReporting::GetNumberOfConnections()
+int mitk::BreakpadCrashReporting::GetNumberOfConnections() const
 {
   return breakpadNumberOfConnections;
 }
 
-void mitk::BreakpadCrashReporting::SetNamedPipeName(QString name)
+void mitk::BreakpadCrashReporting::SetNamedPipeName(const QString& name)
 {
   m_NamedPipeString = name;
+}
+
+QString mitk::BreakpadCrashReporting::GetNamedPipeName() const
+{
+  return m_NamedPipeString;
+}
+
+void mitk::BreakpadCrashReporting::SetCrashDumpPath(const QString& path)
+{
+  m_CrashDumpPath = path;
+}
+
+QString mitk::BreakpadCrashReporting::GetCrashDumpPath() const
+{
+  return m_CrashDumpPath;
+}
+
+
+void mitk::BreakpadCrashReporting::SetCrashReportingServerExecutable(QString exe)
+{
+  m_CrashReportingServerExecutable = exe;
+}
+
+void mitk::BreakpadCrashReporting::SetNumberOfConnectionAttempts(int no)
+{
+  m_NumberOfConnectionAttempts = no;
+}
+
+void mitk::BreakpadCrashReporting::SetReconnectDelayInMilliSeconds(int ms)
+{
+  m_ReconnectDelay = ms;
 }

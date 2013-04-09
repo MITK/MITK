@@ -70,6 +70,7 @@ namespace mitk {
   class MITK_BREAKPAD_EXPORT BreakpadCrashReporting
   {
     public:
+
       BreakpadCrashReporting(/*TODO add path here*/);
       ~BreakpadCrashReporting();
 
@@ -109,26 +110,16 @@ namespace mitk {
       bool StartCrashServer(bool launchOutOfProcessExecutable);
 
       // Named pipe string to communicate with OutOfProcessCrashReporter.
-      QString m_NamedPipeString;
-      void    SetNamedPipeName(QString name);
+      void    SetNamedPipeName(const QString& name);
+      QString GetNamedPipeName() const;
 
       // Directory path to save crash dumps.
-      QString m_CrashDumpPath;
-      void    SetCrashDumpPath(QString path);
-
-      // External out-of-process (OOP) Crash Reporting Server file path - if OOP is used.
-      QString m_CrashReportingServerExecutable;
-      void    SetCrashReportingServerExecutable(QString exe);
+      void    SetCrashDumpPath(const QString& path);
+      QString GetCrashDumpPath() const;
 
       // Re-connect handling in case a crash server cannot be reached.
       void    SetNumberOfConnectionAttempts(int no);
       void    SetReconnectDelayInMilliSeconds(int ms);
-      int     m_NumberOfConnectionAttempts;
-      int     m_ReconnectDelay;
-
-      // This may be a security issue.
-      google_breakpad::ExceptionHandler*       m_ExceptionHandler;
-      google_breakpad::CrashGenerationServer*  m_CrashServer;
 
       // Do not call this without purpose :-)
       void CrashAppForTestPurpose();
@@ -138,14 +129,28 @@ namespace mitk {
       bool RequestDump();
 
       // returns the number of currently connected clients
-      int GetNumberOfConnections();
+      int GetNumberOfConnections() const;
 
 
   protected:
+
       bool InitializeServer(int listen_fd = -1);
       void StopCrashServer();
 
+      // External out-of-process (OOP) Crash Reporting Server file path - if OOP is used.
+      void SetCrashReportingServerExecutable(QString exe);
+
+
       bool DumpCallbackPlatformIndependent();
+
+      QString m_NamedPipeString;
+      QString m_CrashDumpPath;
+      QString m_CrashReportingServerExecutable;
+      int     m_NumberOfConnectionAttempts;
+      int     m_ReconnectDelay;
+      google_breakpad::ExceptionHandler*       m_ExceptionHandler;
+      google_breakpad::CrashGenerationServer*  m_CrashServer;
+
 
       int server_fd;
       int client_fd;

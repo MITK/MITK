@@ -1,12 +1,106 @@
 # TODOs
-#  - nicer separation of Linux/Window/.. code
+#  LATER nicer separation of Linux/Window/.. code
 #  - test should check existence of dump file
 #  - find nice script to use linux symbol writer tool dump_.. on all relevant libraries
 #  - update documentation
-#  - check buildtype (O2/-g/..) in cmake
+#  OK check buildtype (O2/-g/..) in cmake
 #  - use the same library structure in "our" cmake script as google uses in their build
 #    - otherwise we cannot switch between custom-built versions of breakpad and our superbuild version
 
+function(checkWindowsCompilerFlags)
+  # TODO simplify this with foreach and some string functions
+  set (WINDOWS_CXX_FLAGS_OK_ZI 0)
+  if ( CMAKE_CXX_FLAGS_DEBUG MATCHES .*/Zi.* )
+    set(WINDOWS_CXX_FLAGS_OK_ZI 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS_RELEASE MATCHES .*/Zi.* )
+    set(WINDOWS_CXX_FLAGS_OK_ZI 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS MATCHES .*/Zi.* )
+    set(WINDOWS_CXX_FLAGS_OK_ZI 1)
+  endif()
+
+  set (WINDOWS_C_FLAGS_OK_ZI 0)
+  if ( CMAKE_C_FLAGS_DEBUG MATCHES .*/Zi.* )
+    set(WINDOWS_C_FLAGS_OK_ZI 1)
+  endif()
+  if ( CMAKE_C_FLAGS_RELEASE MATCHES .*/Zi.* )
+    set(WINDOWS_C_FLAGS_OK_ZI 1)
+  endif()
+  if ( CMAKE_C_FLAGS MATCHES .*/Zi.* )
+    set(WINDOWS_C_FLAGS_OK_ZI 1)
+  endif()
+
+  set (WINDOWS_CXX_FLAGS_OK_DEBUG 0)
+  if ( CMAKE_CXX_FLAGS_DEBUG MATCHES .*/debug.* )
+    set(WINDOWS_CXX_FLAGS_OK_DEBUG 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS_RELEASE MATCHES .*/debug.* )
+    set(WINDOWS_CXX_FLAGS_OK_DEBUG 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS MATCHES .*/debug.* )
+    set(WINDOWS_CXX_FLAGS_OK_DEBUG 1)
+  endif()
+
+  set (WINDOWS_C_FLAGS_OK_DEBUG 0)
+  if ( CMAKE_C_FLAGS_DEBUG MATCHES .*/debug.* )
+    set(WINDOWS_C_FLAGS_OK_DEBUG 1)
+  endif()
+  if ( CMAKE_C_FLAGS_RELEASE MATCHES .*/debug.* )
+    set(WINDOWS_C_FLAGS_OK_DEBUG 1)
+  endif()
+  if ( CMAKE_C_FLAGS MATCHES .*/debug.* )
+    set(WINDOWS_C_FLAGS_OK_DEBUG 1)
+  endif()
+
+  if (NOT WINDOWS_CXX_FLAGS_OK_ZI)
+    message(WARNING "When using the breakpad crash reporting module, you should use the /Zi flag in CMAKE_CXX_FLAGS (_RELEASE)")
+  endif()
+  if (NOT WINDOWS_C_FLAGS_OK_ZI)
+    message(WARNING "When using the breakpad crash reporting module, you should use the /Zi flag in CMAKE_C_FLAGS (_RELEASE)")
+  endif()
+
+  if (NOT WINDOWS_CXX_FLAGS_OK_DEBUG)
+    message(WARNING "When using the breakpad crash reporting module, you should use the /debug flag in CMAKE_CXX_FLAGS (_RELEASE)")
+  endif()
+  if (NOT WINDOWS_C_FLAGS_OK_DEBUG)
+    message(WARNING "When using the breakpad crash reporting module, you should use the /debug flag in CMAKE_C_FLAGS (_RELEASE)")
+  endif()
+endfunction()
+
+function(checkLinuxCompilerFlags)
+  # TODO simplify this with foreach and some string functions
+  set (LINUX_CXX_FLAGS_OK_G 0)
+  if ( CMAKE_CXX_FLAGS_DEBUG MATCHES .*-g.* )
+    set(LINUX_CXX_FLAGS_OK_G 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS_RELEASE MATCHES .*-g.* )
+    set(LINUX_CXX_FLAGS_OK_G 1)
+  endif()
+  if ( CMAKE_CXX_FLAGS MATCHES .*-g.* )
+    set(LINUX_CXX_FLAGS_OK_G 1)
+  endif()
+
+  set (LINUX_C_FLAGS_OK_G 0)
+  if ( CMAKE_C_FLAGS_DEBUG MATCHES .*-g.* )
+    set(LINUX_C_FLAGS_OK_G 1)
+  endif()
+  if ( CMAKE_C_FLAGS_RELEASE MATCHES .*-g.* )
+    set(LINUX_C_FLAGS_OK_G 1)
+  endif()
+  if ( CMAKE_C_FLAGS MATCHES .*-g.* )
+    set(LINUX_C_FLAGS_OK_G 1)
+  endif()
+
+  if (NOT LINUX_CXX_FLAGS_OK_G)
+    message(WARNING "When using the breakpad crash reporting module, you should use the -g flag in CMAKE_CXX_FLAGS (_RELEASE)")
+  endif()
+  if (NOT LINUX_C_FLAGS_OK_G)
+    message(WARNING "When using the breakpad crash reporting module, you should use the -g flag in CMAKE_C_FLAGS (_RELEASE)")
+  endif()
+
+
+endfunction()
 
 if(MITK_USE_BREAKPAD)
 
@@ -17,7 +111,9 @@ if(MITK_USE_BREAKPAD)
   find_path(MITK_BREAKPAD_SRC_DIR breakpad_googletest_includes.h DOC  "Directory breakpad/src/" PATHS ${Breakpad_SRC}/src ${Breakpad_DIR})
   message(STATUS "Found Breakpad at:")
   message(STATUS ${MITK_BREAKPAD_SRC_DIR})
+
   if(CMAKE_SYSTEM MATCHES "Windows")
+    checkWindowsCompilerFlags()
 
     set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR})
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
@@ -31,6 +127,7 @@ if(MITK_USE_BREAKPAD)
 
     set(EXECUTABLE_PROPERTY WIN32)
   elseif(CMAKE_SYSTEM MATCHES "Linux")
+    checkLinuxCompilerFlags()
 
     set(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_BREAKPAD_SRC_DIR}) # TODO why the repetition, is INCLUDE_DIRS_INTERNAL not empty before??
     set(ADDITIONAL_LIBS ${ADDITIONAL_LIBS}

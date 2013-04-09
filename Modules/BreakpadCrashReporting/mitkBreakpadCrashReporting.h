@@ -31,17 +31,6 @@ namespace google_breakpad {
 namespace mitk {
 
   /**
-
-    TODO
-      oop server Linux
-      help on how to USE dumps
-      test dump existence
-      CMake:
-       check buildtype (O2/-g/..)
-       build integration
-    TODO long-term: Apple
-
-
   * \brief Integration of Google's Breakpad Project in MITK.
   *
   * Breakpad is a library and tool suite that allows you to distribute an application to users with compiler-provided

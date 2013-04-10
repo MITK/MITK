@@ -83,25 +83,11 @@ int mitkPlayerLoadAndRenderRGBDataTest(int argc, char* argv[])
     bool generateReferenceScreenshot = false;
     if(generateReferenceScreenshot)
     {
-      renderingHelper.SaveAsPNG("/home/kilgus/Pictures/output.png");
+      renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/output.png");
     }
 
-    //### Usage of vtkRegressionTestImage:
-    //vtkRegressionTestImage( vtkRenderWindow )
-    //Set a vtkRenderWindow containing the desired scene.
-    //vtkRegressionTestImage automatically searches in argc and argv[]
-    //for a path a valid image with -V. If the test failed with the
-    //first image (foo.png) check if there are images of the form
-    //foo_N.png (where N=1,2,3...) and compare against them.
-    renderingHelper.PrepareRender();
-    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
-
-    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
-    //0 = test failed
-    //1 = test passed
-    //2 = test not run
-    //3 = something with vtkInteraction
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
+    //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
     //Wait some time to avoid threading issues.
     itksys::SystemTools::Delay(1000);

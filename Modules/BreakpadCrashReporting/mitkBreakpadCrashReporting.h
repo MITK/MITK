@@ -66,7 +66,7 @@ namespace mitk {
   * one server instance running.
   *
   */
-  class MITK_BREAKPAD_EXPORT BreakpadCrashReporting
+  class BreakpadCrashReporting_EXPORT BreakpadCrashReporting
   {
     public:
 

@@ -257,7 +257,7 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 }
 
 
-itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /*idx */)
+itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( DataObjectPointerArraySizeType /*idx */)
 {
   mitk::USImage::Pointer p = mitk::USImage::New();
   return static_cast<itk::DataObject*>(p.GetPointer());

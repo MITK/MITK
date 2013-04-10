@@ -104,13 +104,13 @@ void mitkRenderingTestHelper::Render()
   //if the datastorage is initialized and at least 1 image is loaded render it
   if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
   {
-    //perform global reinit:
+    //Prepare the VTK camera before rendering.
     m_RenderWindow->GetRenderer()->PrepareRender();
 
-    //use this to actually show the iamge in a renderwindow
     this->GetVtkRenderWindow()->Render();
     if(m_AutomaticallyCloseRenderWindow == false)
     {
+      //Use interaction to stop the test
       this->GetVtkRenderWindow()->GetInteractor()->Start();
     }
   }
@@ -121,12 +121,6 @@ void mitkRenderingTestHelper::Render()
 
 }
 
-void mitkRenderingTestHelper::PrepareRender()
-{
-  //perform global reinit:
-  m_RenderWindow->GetRenderer()->PrepareRender();
-}
-
 mitk::DataStorage::Pointer mitkRenderingTestHelper::GetDataStorage()
 {
   return m_DataStorage;
@@ -134,7 +128,8 @@ mitk::DataStorage::Pointer mitkRenderingTestHelper::GetDataStorage()
 
 void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
 {
-  // parse parameters
+  //i is set 1, because 0 is the testname as string
+  //parse parameters
   for (int i = 1; i < argc; ++i)
   {
     //add everything to a list but -T and -V
@@ -180,7 +175,7 @@ vtkRenderWindow* mitkRenderingTestHelper::GetVtkRenderWindow()
 
 bool mitkRenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
 {
-  this->PrepareRender();
+  this->Render();
 
   //retVal meanings: (see VTK/Rendering/vtkTesting.h)
   //0 = test failed
@@ -210,6 +205,11 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
 
   fileWriter->Write();
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
+}
+
+void mitkRenderingTestHelper::SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow)
+{
+  m_AutomaticallyCloseRenderWindow = automaticallyCloseRenderWindow;
 }
 
 void mitkRenderingTestHelper::SaveReferenceScreenShot(std::string fileName)

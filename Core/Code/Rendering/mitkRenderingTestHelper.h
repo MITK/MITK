@@ -34,7 +34,8 @@ public:
   /** @brief Generate a rendering test helper object including a render window of the size width * height (in pixel).
       @param argc Number of parameters. (here: Images) "Usage: [filename1 filenam2 -V referenceScreenshot
         (optional -T /directory/to/save/differenceImage)]
-      @param argv Given parameters.
+      @param argv Given parameters. If no data is inserted via commandline, you can add data
+      later via AddNodeToDataStorage().
     **/
   mitkRenderingTestHelper(int width, int height, int argc, char *argv[]);
 
@@ -64,7 +65,9 @@ public:
   void SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow);
 
   /** @brief This method set the property of the member datastorage
-        @param property Set a property for each image in the datastorage m_DataStorage.
+        @param property Set a property for each image in the datastorage m_DataStorage. If you want
+        to set the property for a single data node, use GetDataStorage() and set the property
+        yourself for the destinct node.
     **/
   void SetImageProperty(const char *propertyKey, mitk::BaseProperty *property);
 
@@ -79,9 +82,6 @@ public:
   /** @brief Render everything into an mitkRenderWindow. Call SetViewDirection() and SetProperty() before this method.
     **/
   void Render();
-  /** @brief Calls PrepareRender function of mitkRenderWindow
-    **/
-  void PrepareRender();
 
   /** @brief Returns the datastorage, in order to modify the data inside a rendering test.
     **/
@@ -117,7 +117,16 @@ public:
   void SaveReferenceScreenShot(std::string fileName);
 
   /**
-   * @brief CompareRenderWindowAgainstReference Convenience method to compare the image rendered in the internal renderwindow against a reference screen shot
+   * @brief CompareRenderWindowAgainstReference Convenience method to compare the image rendered in the internal renderwindow against a reference screen shot.
+   *
+    Usage of vtkTesting::Test:
+    vtkTesting::Test( argc, argv, vtkRenderWindow, threshold )
+    Set a vtkRenderWindow containing the desired scene. This is automatically rendered.
+    vtkTesting::Test() automatically searches in argc and argv[]
+    for a path a valid image with -V. If the test failed with the
+    first image (foo.png) it checks if there are images of the form
+    foo_N.png (where N=1,2,3...) and compare against them. This allows for multiple
+    valid images.
    * @param argc Number of arguments.
    * @param argv Arguments must(!) contain the term "-V Path/To/Valid/Image.png"
    * @param threshold Allowed difference between two images. Default = 10.0 and was taken from VTK.

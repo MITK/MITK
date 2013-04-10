@@ -8,11 +8,11 @@
 #    OK otherwise we cannot switch between custom-built versions of breakpad and our superbuild version
 #  [optional] add install step to our Breakpad build
 
-if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
+if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
 
   find_package(Breakpad)
   if (NOT Breakpad_FOUND)
-    message(FATAL_ERROR "MITK_USE_BREAKPAD was set but Breakpad build cannot be found. Plaese check CMake cache variables regarding Breakpad")
+    message(FATAL_ERROR "MITK_USE_Breakpad was set but Breakpad build cannot be found. Plaese check CMake cache variables regarding Breakpad")
   endif()
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
@@ -28,4 +28,4 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
 
 add_subdirectory(Testing)
 
-endif(MITK_USE_BREAKPAD)
+endif(MITK_USE_Breakpad)

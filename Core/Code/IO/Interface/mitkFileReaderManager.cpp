@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //////////////////// READING DIRECTLY ////////////////////
 
-mitk::BaseData::Pointer mitk::FileReaderManager::Read(std::string path)
+mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
 {
   mitk::ModuleContext * context = mitk::GetModuleContext();
   // Find extension
@@ -43,13 +43,13 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(std::string path)
 
 //////////////////// GETTING READERS ////////////////////
 
-mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(std::string extension)
+mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension)
 {
   mitk::ModuleContext * context = mitk::GetModuleContext();
   return context->GetService<mitk::FileReaderInterface>(GetReaderList(extension).front());
 }
 
-std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::string extension)
+std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(const std::string& extension)
 {
   mitk::ModuleContext * context = mitk::GetModuleContext();
   std::list <mitk::FileReaderInterface*> result;
@@ -65,14 +65,14 @@ std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::
   return result;
 }
 
-mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(std::string extension, std::list<std::string> options )
+mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension, const std::list<std::string>& options )
 {
   std::list <mitk::FileReaderInterface*> matching = mitk::FileReaderManager::GetReaders(extension, options);
   if (matching.size() == 0) return 0;
   return matching.front();
 }
 
-std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(std::string extension, std::list<std::string> options )
+std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(const std::string& extension, const std::list<std::string>& options )
 {
   std::list <mitk::FileReaderInterface*> allReaders = mitk::FileReaderManager::GetReaders(extension);
   std::list <mitk::FileReaderInterface*> result;
@@ -115,7 +115,7 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* r
 
 //////////////////// uS-INTERACTION ////////////////////
 
-std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(std::string extension)
+std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const std::string& extension)
 {
   mitk::ModuleContext * context = mitk::GetModuleContext();
   // filter for class and extension
@@ -126,7 +126,7 @@ std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(std::
   return result;
 }
 
-bool mitk::FileReaderManager::CompareServiceRef(mitk::ServiceReference first, mitk::ServiceReference second)
+bool mitk::FileReaderManager::CompareServiceRef(const mitk::ServiceReference& first, const mitk::ServiceReference& second)
 {
   return (any_cast<int>(first.GetProperty(mitk::FileReaderInterface::US_PRIORITY)) > any_cast<int> (second.GetProperty(mitk::FileReaderInterface::US_PRIORITY)));
 }

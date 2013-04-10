@@ -48,10 +48,10 @@ class MITK_CORE_EXPORT FileReaderManager
     * FileReadException: If the selected reader failed to read the file
     **/
 
-    static mitk::BaseData::Pointer Read(std::string path);
+    static mitk::BaseData::Pointer Read(const std::string& path);
 
     template <class T>
-    static T* Read(std::string path);
+    static T* Read(const std::string& path);
    // {
    //   if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
    //   mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
@@ -61,21 +61,21 @@ class MITK_CORE_EXPORT FileReaderManager
     /**
     * Returns a compatible Reader to the given file extension
     **/
-    static mitk::FileReaderInterface* GetReader(std::string extension);
+    static mitk::FileReaderInterface* GetReader(const std::string& extension);
 
-    static mitk::FileReaderInterface* GetReader(std::string extension, std::list<std::string> options );
+    static mitk::FileReaderInterface* GetReader(const std::string& extension, const std::list<std::string>& options );
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension);
+    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension);
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(std::string extension, std::list<std::string> options );
+    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, const std::list<std::string>& options );
 
-    static bool CompareServiceRef(mitk::ServiceReference first, mitk::ServiceReference second);
+    static bool CompareServiceRef(const mitk::ServiceReference& first, const mitk::ServiceReference& second);
 
 protected:
     //FileReaderManager();
     //virtual ~FileReaderManager();
 
-    static std::list< mitk::ServiceReference > GetReaderList(std::string extension);
+    static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension);
 
     static bool ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options );
 

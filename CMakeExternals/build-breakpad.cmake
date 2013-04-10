@@ -1,6 +1,8 @@
 # CMakeLists.txt for Breakpad
 # - supports builds on Windows and Linux only
 # - needs to keep updated when updating the SVN revision in Breakpad.cmake
+# - imitates the library structure of google's build system
+# - does not build libraries which are not required by the MITK breakpad module
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -11,28 +13,28 @@ if (WIN32)
   include_directories(src)
 
  # Windows...
- set(client_CPPs
-   src/client/windows/sender/crash_report_sender.cc
+ set(exceptionhandler_CPPs
    src/client/windows/handler/exception_handler.cc
-   src/client/windows/crash_generation/crash_generation_server.cc
-   src/client/windows/crash_generation/crash_generation_client.cc
-   src/client/windows/crash_generation/minidump_generator.cc
+   )
+
+ set(server_CPPs
    src/client/windows/crash_generation/client_info.cc
+   src/client/windows/crash_generation/crash_generation_server.cc
+   src/client/windows/crash_generation/minidump_generator.cc
+   )
+
+ set(client_CPPs
+   src/client/windows/crash_generation/crash_generation_client.cc
    )
 
  set(common_CPPs
    src/common/convert_UTF.c
-   #src/common/md5.cc
    src/common/language.cc
-   #src/common/dwarf_cfi_to_module.cc
-   #src/common/dwarf_line_to_module.cc
    src/common/string_conversion.cc
    src/common/module.cc
-   #src/common/dwarf_cu_to_module.cc # requires stdint.h
    src/common/windows/http_upload.cc
    src/common/windows/string_utils.cc
    src/common/windows/guid_string.cc
-   #src/common/windows/pdb_source_line_writer.cc # requires MS Debug Interface Access SDK dia
    )
 
   # this was copied from http://svn.code.sf.net/p/safir/svn/safir_sdk_core/trunk/src/lluf/lluf_crash_reporter.ss/src/google-breakpad/build-breakpad-windows.cmake
@@ -48,10 +50,10 @@ if (WIN32)
 
   include_directories(src)
 
-  add_library(breakpad_client STATIC
-    ${client_CPPs}
-    ${common_CPPs}
-    )
+  add_library(common STATIC ${common_CPPs})
+  add_library(crash_generation_client STATIC ${client_CPPs})
+  add_library(crash_generation_server STATIC ${server_CPPs})
+  add_library(exception_handler STATIC ${exceptionhandler_CPPs})
 
 else()
 
@@ -59,7 +61,6 @@ else()
  # commented code is not required right now and depends on other libraries (e.g. glog)
  set(client_CPPs
    src/client/minidump_file_writer.cc
-   #src/client/linux/sender/google_crash_report_sender.cc
    src/client/linux/handler/minidump_descriptor.cc
    src/client/linux/handler/exception_handler.cc
    src/client/linux/log/log.cc
@@ -78,7 +79,6 @@ else()
    src/common/dwarf_cfi_to_module.cc
    src/common/dwarf_line_to_module.cc
    src/common/string_conversion.cc
-   #src/common/stabs_reader.cc
    src/common/module.cc
    src/common/dwarf_cu_to_module.cc
    src/common/stabs_to_module.cc

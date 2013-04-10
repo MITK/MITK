@@ -74,15 +74,25 @@ find_path(Breakpad_INCLUDE_DIR breakpad_googletest_includes.h DOC  "Directory br
 
 if(CMAKE_SYSTEM MATCHES "Windows")
 
+  message(STATUS "Checking Windows build requirements for breakpad")
+
   checkWindowsCompilerFlags() # without debug information, Breakpad makes not much sense, so inform developer
 
-  find_library(Breakpad_CLIENT_LIB breakpad_client PATHS ${Breakpad_SRC}/src ${Breakpad_DIR} PATH_SUFFIXES Release Debug)
+  find_library(Breakpad_CLIENT_LIB crash_generation_client PATHS ${Breakpad_SRC}/src ${Breakpad_DIR} PATH_SUFFIXES Release Debug)
+  find_library(Breakpad_SERVER_LIB crash_generation_server PATHS ${Breakpad_SRC}/src ${Breakpad_DIR} PATH_SUFFIXES Release Debug)
+  find_library(Breakpad_EXCEPTIONHANDLER_LIB exception_handler PATHS ${Breakpad_SRC}/src ${Breakpad_DIR} PATH_SUFFIXES Release Debug)
+  find_library(Breakpad_COMMON_LIB common PATHS ${Breakpad_SRC}/src ${Breakpad_DIR} PATH_SUFFIXES Release Debug)
 
   set(Breakpad_LIBRARIES
       ${Breakpad_CLIENT_LIB}
+      ${Breakpad_SERVER_LIB}
+      ${Breakpad_EXCEPTIONHANDLER_LIB}
+      ${Breakpad_COMMON_LIB}
      )
 
 elseif(CMAKE_SYSTEM MATCHES "Linux")
+
+  message(STATUS "Checking Linux build requirements for breakpad")
 
   checkLinuxCompilerFlags() # without debug information, Breakpad makes not much sense, so inform developer
 

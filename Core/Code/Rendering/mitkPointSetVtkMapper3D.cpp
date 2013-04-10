@@ -345,25 +345,6 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
 void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  // create new vtk render objects (e.g. sphere for a point)
-  this->CreateVTKRenderObjects();
-
-  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
-  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
-
-  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
-  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
-  // only create new vtk render objects if property values were changed
-  if ( pointSizeProp.IsNotNull() &&  contourSizeProp.IsNotNull() )
-  {
-    if (m_PointSize!=pointSizeProp->GetValue() || m_ContourRadius!= contourSizeProp->GetValue())
-    {
-      this->CreateVTKRenderObjects();
-    }
-  }
-
-  this->ApplyAllProperties(renderer, m_ContourActor);
-
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if(!visible)
@@ -373,6 +354,34 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     m_ContourActor->VisibilityOff();
     return;
   }
+
+  // create new vtk render objects (e.g. sphere for a point)
+
+  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
+  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(!needGenerateData)
+  {
+    mitk::FloatProperty * pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
+    mitk::FloatProperty * contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
+
+    // only create new vtk render objects if property values were changed
+    if(pointSizeProp && m_PointSize!=pointSizeProp->GetValue() )
+      needGenerateData = true;
+    if(contourSizeProp && m_ContourRadius!=contourSizeProp->GetValue() )
+      needGenerateData = true;
+  }
+
+  if(needGenerateData)
+  {
+    this->CreateVTKRenderObjects();
+    ls->UpdateGenerateDataTime();
+  }
+
+  this->ApplyAllProperties(renderer, m_ContourActor);
 
   bool showPoints = true;
   this->GetDataNode()->GetBoolProperty("show points", showPoints);

@@ -1,3 +1,10 @@
+# Attempts to find a build directory of the Breakpad project (as provided by the MITK superbuild)
+#
+# Fills the following variables:
+#  Breakpad_FOUND
+#  Breakpad_INCLUDE_DIR
+#  Breakpad_LIBRARIES
+#
 
 function(checkWindowsCompilerFlags)
   # TODO simplify this with foreach and some string functions
@@ -106,6 +113,14 @@ else()
   message(FATAL_ERROR "Unsupported platform for Breakpad crash reporting: ${CMAKE_SYSTEM}")
 endif()
 
-message(STATUS "FindBreakpad...")
-message(STATUS " .. include at ${Breakpad_INCLUDE_DIR}")
-message(STATUS " .. link libraries ${Breakpad_LIBRARIES}")
+if (Breakpad_LIBRARIES MATCHES "NOTFOUND")
+  set(Breakpad_FOUND FALSE)
+elseif(Breakpad_INCLUDE_DIR MATCHES "NOTFOUND")
+  set(Breakpad_FOUND FALSE)
+else()
+  set(Breakpad_FOUND TRUE)
+endif()
+
+#message(STATUS "FindBreakpad... found it: ${Breakpad_FOUND}")
+#message(STATUS " .. include at ${Breakpad_INCLUDE_DIR}")
+#message(STATUS " .. link libraries ${Breakpad_LIBRARIES}")

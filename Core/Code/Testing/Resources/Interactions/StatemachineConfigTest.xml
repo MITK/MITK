@@ -1,0 +1,19 @@
+<config>
+ <param name="property1" value="yes"/>
+ <param name="scrollModus" value="leftright"/>
+    <event_variant class="MousePressEvent" name="Variant1">
+        <attribute name="EventButton" value="LeftMouseButton"/>
+        <attribute name="ButtonState" value="MiddleMouseButton"/>
+        <attribute name="Modifiers" value="ctrl,alt"/>
+    </event_variant>
+    <event_variant class="MousePressEvent" name="Standard1">
+        <attribute name="EventButton" value="LeftMouseButton"/>
+    </event_variant>
+    <event_variant class="MouseMoveEvent" name="Move2">
+        <attribute name="ButtonState" value="LeftMouseButton,RightMouseButton"/>
+        <attribute name="Modifiers" value="shift"/>
+    </event_variant>
+    <event_variant class="InteractionKeyEvent" name="Key1">
+        <attribute name="Key" value="l"/>
+    </event_variant>
+</config>

@@ -54,9 +54,9 @@ int mitkSTLFileReaderTest(int argc, char* argv[])
   reader->SetFileName(argv[1]);
   reader->Update();
 
-  MITK_TEST_CONDITION_REQUIRED((reader->GetOutput() != NULL),"Reader output not NULL")
+  MITK_TEST_CONDITION_REQUIRED((reader->GetOutput(0) != NULL),"Reader output not NULL")
 
-  mitk::Surface::Pointer surface = reader->GetOutput();
+  mitk::Surface::Pointer surface = reader->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(surface->IsInitialized(),"IsInitialized()")
 
   MITK_TEST_CONDITION_REQUIRED((surface->GetVtkPolyData()!=NULL),"mitk::Surface::SetVtkPolyData()")
@@ -66,7 +66,7 @@ int mitkSTLFileReaderTest(int argc, char* argv[])
   vtkSmartPointer<vtkSTLReader> myVtkSTLReader = vtkSmartPointer<vtkSTLReader>::New();
   myVtkSTLReader->SetFileName( argv[1] );
   myVtkSTLReader->Update();
-  vtkSmartPointer<vtkPolyData> myVtkPolyData = myVtkSTLReader->GetOutput();
+  vtkSmartPointer<vtkPolyData> myVtkPolyData = myVtkSTLReader->GetOutput(0);
   // vtkPolyData from vtkSTLReader directly
   int n = myVtkPolyData->GetNumberOfPoints();
   // vtkPolyData from mitkSTLFileReader

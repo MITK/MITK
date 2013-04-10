@@ -21,71 +21,86 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PointSetSource::PointSetSource()
 {
   // Create the output.
-  OutputType::Pointer output = dynamic_cast<OutputType*>(this->MakeOutput(0).GetPointer());
+  OutputType::Pointer output = static_cast<OutputType*>(this->MakeOutput(0).GetPointer());
   Superclass::SetNumberOfRequiredInputs(0);
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-
-
-
 mitk::PointSetSource::~PointSetSource()
 {
 }
 
-
-
-
-itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( unsigned int /*idx */)
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
-
-
-
-void mitk::PointSetSource::SetOutput( OutputType* output )
+itk::DataObject::Pointer mitk::PointSetSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-    this->ProcessObject::SetNthOutput( 0, output );
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
+mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput()
+{
+  return itkDynamicCastInDebugMode< OutputType * >( this->GetPrimaryOutput() );
+}
 
+const mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput() const
+{
+  return itkDynamicCastInDebugMode< const OutputType * >( this->GetPrimaryOutput() );
+}
 
+mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(DataObjectPointerArraySizeType idx)
+{
+  return static_cast<OutputType*>(Superclass::GetOutput(idx));
+}
+
+const  mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput(DataObjectPointerArraySizeType idx) const
+{
+  const OutputType *out = dynamic_cast< const OutputType * >
+                      ( this->ProcessObject::GetOutput(idx) );
+
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+    {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
+    }
+  return out;
+}
 
 void mitk::PointSetSource::GraftOutput(OutputType *graft)
 {
   this->GraftNthOutput(0, graft);
 }
 
-void mitk::PointSetSource::GraftNthOutput(unsigned int /*idx*/, OutputType* /*graft*/)
+void mitk::PointSetSource::GraftOutput(const itk::ProcessObject::DataObjectIdentifierType& key, OutputType* graft)
 {
-  itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
-  assert(false);
-}
-
-
-
-mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
+  if ( !graft )
     {
-        return 0;
+    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
     }
-    else
-    {
-      return dynamic_cast<OutputType*>
-                         (this->BaseProcess::GetOutput(0));
-    }
+
+  itkExceptionMacro(<< "GraftOutput(): This method is not yet functional in MITK. Implement mitk::PointSet::Graft() before using!!" );
+
+  // we use the process object method since all out output may not be
+  // of the same type
+  itk::DataObject *output = this->ProcessObject::GetOutput(key);
+
+  // Call GraftImage to copy meta-information, regions, and the pixel container
+  output->Graft(graft);
 }
 
-
-
-
-mitk::PointSetSource::OutputType* mitk::PointSetSource::GetOutput ( unsigned int idx )
+void mitk::PointSetSource::GraftNthOutput(DataObjectPointerArraySizeType idx, OutputType* graft)
 {
-    return dynamic_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
+  if ( idx >= this->GetNumberOfIndexedOutputs() )
+    {
+    itkExceptionMacro(<< "Requested to graft output " << idx
+                      << " but this filter only has " << this->GetNumberOfIndexedOutputs() << " indexed Outputs.");
+    }
+  this->GraftOutput( this->MakeNameFromOutputIndex(idx), graft );
 }
-
-

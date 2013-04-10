@@ -52,7 +52,7 @@ void mitk::ItkImageFileReader::GenerateData()
     }
   }
 
-  mitk::Image::Pointer image = this->GetOutput();
+  mitk::Image::Pointer image = this->GetOutput(0);
 
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
@@ -131,11 +131,7 @@ void mitk::ItkImageFileReader::GenerateData()
   void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
 
-  mitk::PixelType pixelType = mitk::PixelType(imageIO->GetComponentTypeInfo(), imageIO->GetPixelType(),
-                                              imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
-                                              imageIO->GetComponentTypeAsString( imageIO->GetComponentType() ).c_str(),
-                                              imageIO->GetPixelTypeAsString( imageIO->GetPixelType() ).c_str() );
-  image->Initialize( pixelType, ndim, dimensions );
+  image->Initialize( MakePixelType(imageIO), ndim, dimensions );
   image->SetImportChannel( buffer, 0, Image::ManageMemory );
 
   // access direction of itk::Image and include spacing
@@ -161,7 +157,7 @@ void mitk::ItkImageFileReader::GenerateData()
 
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
-//  mitk::DataNode::Pointer node = this->GetOutput();
+//  mitk::DataNode::Pointer node = this->GetOutput(0);
 //  node->SetData( image );
 
   // add level-window property

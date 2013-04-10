@@ -49,7 +49,7 @@ void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterest(mitk::BaseData* roi)
     filter->SetInput(this->GetInput(0));
     filter->Update();
 
-    this->SetInput(1, filter->GetOutput());
+    this->SetInput(1, filter->GetOutput(0));
     return;
   }
 }
@@ -64,7 +64,7 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
 
   mitk::Image::ConstPointer  inputImage = this->GetInput(0);
   mitk::Image::ConstPointer  maskImage = this->GetInput(1);
-  //mitk::Image::Pointer outputImage = this->GetOutput();
+  //mitk::Image::Pointer outputImage = this->GetOutput(0);
   //temporary fix for bug #
   m_outputImage = this->GetOutput();
 
@@ -82,11 +82,11 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
   m_RoiFilter->SetRegionOfInterest(region);
   m_RoiFilter->Update();
 
-  mitk::CastToMitkImage(m_RoiFilter->GetOutput(), tmpImage);
+  mitk::CastToMitkImage(m_RoiFilter->GetOutput(0), tmpImage);
 
 
   m_MaskFilter->SetInput(0,tmpImage);
-  m_MaskFilter->SetMask(m_CropFilter->GetOutput());
+  m_MaskFilter->SetMask(m_CropFilter->GetOutput(0));
 
   m_MaskFilter->SetOutsideValue(-32765);
   m_MaskFilter->Update();
@@ -94,6 +94,6 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
   m_MinValue = m_MaskFilter->GetMinValue();
 
   //temporary fix for bug #
-  m_outputImage = m_MaskFilter->GetOutput();
+  m_outputImage = m_MaskFilter->GetOutput(0);
   m_outputImage->DisconnectPipeline();
 }

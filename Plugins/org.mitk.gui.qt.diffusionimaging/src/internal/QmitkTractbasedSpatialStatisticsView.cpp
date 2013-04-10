@@ -1297,12 +1297,12 @@ void QmitkTractbasedSpatialStatisticsView::Clustering()
   DirectionReader::Pointer directionReader = DirectionReader::New();
   directionReader->SetFileName(m_TbssWorkspaceManager.GetInputDir().toStdString() + "/tbss/" + m_TbssWorkspaceManager.GetGradient().toStdString());
   directionReader->Update();
-  VectorImageType::Pointer directions = directionReader->GetOutput();
+  VectorImageType::Pointer directions = directionReader->GetOutput(0);
 
   FloatReaderType::Pointer distMapReader = FloatReaderType::New();
   distMapReader->SetFileName(m_TbssWorkspaceManager.GetInputDir().toStdString() + "/stats/" + m_TbssWorkspaceManager.GetDistanceMap().toStdString());
   distMapReader->Update();
-  FloatImageType::Pointer distanceMap = distMapReader->GetOutput();
+  FloatImageType::Pointer distanceMap = distMapReader->GetOutput(0);
 
 
   std::string line;
@@ -1511,7 +1511,7 @@ void QmitkTractbasedSpatialStatisticsView::Clustering()
     UCharReaderType::Pointer cReader = UCharReaderType::New();
     cReader->SetFileName("/mnt/E130-Projekte/NeuroDiffusion/BRAM DTI/ClusteringFornix/fornix_central_maxFA_path_Dilated_by_3.nrrd");
     cReader->Update();
-    newMask = cReader->GetOutput();
+    newMask = cReader->GetOutput(0);
 
 
     // mitk::DataNode::Pointer maskNode = readNode("itk image/mnt/E130-Projekte/NeuroDiffusion/BRAM DTI/TBSS/clusterMasks/area2.nii");
@@ -1900,24 +1900,24 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
 
     floatReader->SetFileName(*faIt);
     //floatReader->Update();
-    //FloatImageType::Pointer faImage = floatReader->GetOutput();
+    //FloatImageType::Pointer faImage = floatReader->GetOutput(0);
 
     charReader->SetFileName(*maskIt);
     //charReader->Update();
-    // CharImageType::Pointer maskImage = charReader->GetOutput();
+    // CharImageType::Pointer maskImage = charReader->GetOutput(0);
 
     MultiplicationFilterType::Pointer multiplicationFilter = MultiplicationFilterType::New();
-    multiplicationFilter->SetInput1(floatReader->GetOutput());
-    multiplicationFilter->SetInput2(charReader->GetOutput());
+    multiplicationFilter->SetInput1(floatReader->GetOutput(0));
+    multiplicationFilter->SetInput2(charReader->GetOutput(0));
     multiplicationFilter->Update();
 
     //FloatImageType::Pointer maskedImage = FloatImageType::New();
-    //maskedImage = MultiplicationFilter->GetOutput();
+    //maskedImage = MultiplicationFilter->GetOutput(0);
 
     FloatWriterType::Pointer floatWriter = FloatWriterType::New();
     std::string s = faFiles.toStdString().append("/"+*outputIt);
     floatWriter->SetFileName(s.c_str());
-    floatWriter->SetInput(multiplicationFilter->GetOutput());
+    floatWriter->SetInput(multiplicationFilter->GetOutput(0));
     floatWriter->Update();
 
     ++faIt;
@@ -1995,14 +1995,14 @@ void QmitkTractbasedSpatialStatisticsView::InitializeGridByVectorImage()
   VectorReaderType::Pointer vectorReader = VectorReaderType::New();
   vectorReader->SetFileName("E:\\tbss\\testing\\Gradient.mhd");
   vectorReader->Update();
-  FloatVectorImageType::Pointer directions = vectorReader->GetOutput();
+  FloatVectorImageType::Pointer directions = vectorReader->GetOutput(0);
 
 
   // Read roi from file.
   CharReaderType::Pointer roiReader = CharReaderType::New();
   roiReader->SetFileName("E:\\tbss\\testing\\debugging skeletonization\\segment2.mhd");
   roiReader->Update();
-  CharImageType::Pointer roi = roiReader->GetOutput();
+  CharImageType::Pointer roi = roiReader->GetOutput(0);
 
   DoInitializeGridByVectorImage(directions, roi, std::string("directions"));
 
@@ -2109,12 +2109,12 @@ void QmitkTractbasedSpatialStatisticsView::DoInitializeGridByVectorImage(FloatVe
   arrow->SetShaftRadius(0.03/meanlength);
   //arrow->SetTipRadius(0.05/meanlength);
 
-  glyph->SetSource(arrow->GetOutput());
+  glyph->SetSource(arrow->GetOutput(0));
   glyph->Update();
 
   mitk::Surface::Pointer glyph_surface = mitk::Surface::New();
 
-  glyph_surface->SetVtkPolyData(glyph->GetOutput());
+  glyph_surface->SetVtkPolyData(glyph->GetOutput(0));
   glyph_surface->UpdateOutputInformation();
 
   mitk::DataNode::Pointer gridNode = mitk::DataNode::New();

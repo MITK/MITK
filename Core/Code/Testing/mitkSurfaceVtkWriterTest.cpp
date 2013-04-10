@@ -48,10 +48,10 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
   vtkPolyDataReader* reader = vtkPolyDataReader::New();
   reader->SetFileName(argv[1]);
   reader->Update();
-  if (reader->GetOutput())
+  if (reader->GetOutput(0))
   {
     mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData(reader->GetOutput());
+    surface->SetVtkPolyData(reader->GetOutput(0));
     surface->Update();
 
     MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Surface creation")

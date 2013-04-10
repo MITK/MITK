@@ -87,7 +87,7 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
   f->SetThickSliceMode( 0 ); // MIP
   f->SetInput( i );
   f->Update();
-  o = f->GetOutput();
+  o = f->GetOutput(0);
 
   CheckResultImageForTSFilter(o);
 

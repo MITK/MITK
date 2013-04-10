@@ -83,3 +83,9 @@ bool mitk::GridVolumeMapperProperty::AddEnum( const std::string& name, const IdT
 {
   return Superclass::AddEnum( name, id );
 }
+
+itk::LightObject::Pointer mitk::GridVolumeMapperProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

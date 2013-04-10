@@ -36,52 +36,21 @@ mitk::LookupTableSource::LookupTableSource()
 mitk::LookupTableSource::~LookupTableSource()
 {}
 
-
-
-
-mitk::LookupTableSource::DataObjectPointer
-mitk::LookupTableSource::MakeOutput ( unsigned int )
+itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
-
-
-void
-mitk::LookupTableSource::SetOutput( OutputType* output )
+itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-    itkWarningMacro( << "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-    this->SetNthOutput( 0, output );
-}
-
-
-
-
-mitk::LookupTableSource::OutputType*
-mitk::LookupTableSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-        return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-
-    if ( static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) ) == NULL )
-        itkWarningMacro(<<"Output is NULL!");
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
-
-
-
-
-mitk::LookupTableSource::OutputType*
-mitk::LookupTableSource::GetOutput ( unsigned int idx )
-{
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
-}
-
-
-
 
 void
 mitk::LookupTableSource::GenerateInputRequestedRegion()
@@ -89,13 +58,10 @@ mitk::LookupTableSource::GenerateInputRequestedRegion()
     this->ProcessObject::GenerateInputRequestedRegion();
 }
 
-
-
-
 void
 mitk::LookupTableSource::GraftOutput( OutputType* graft )
 {
-    OutputType * output = this->GetOutput();
+    OutputType * output = this->GetOutput(0);
 
     if ( output && graft )
     {
@@ -110,4 +76,24 @@ mitk::LookupTableSource::GraftOutput( OutputType* graft )
         // copy the meta-information
         output->CopyInformation( graft );
     }
+}
+
+mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
+}
+
+const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
+}
+
+mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
+}
+
+const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
 }

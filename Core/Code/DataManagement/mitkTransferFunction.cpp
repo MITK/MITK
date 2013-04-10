@@ -43,6 +43,23 @@ TransferFunction::TransferFunction()
   m_ColorTransferFunction->AddRGBPoint(0,1,1,1);
 }
 
+TransferFunction::TransferFunction(const TransferFunction& other)
+  : itk::Object()
+  , m_ScalarOpacityFunction(other.m_ScalarOpacityFunction.New())
+  , m_GradientOpacityFunction(other.m_GradientOpacityFunction.New())
+  , m_ColorTransferFunction(other.m_ColorTransferFunction.New())
+  , m_Min(other.m_Min)
+  , m_Max(other.m_Max)
+  , m_Histogram(other.m_Histogram)
+  , m_ScalarOpacityPoints(other.m_ScalarOpacityPoints)
+  , m_GradientOpacityPoints(other.m_GradientOpacityPoints)
+  , m_RGBPoints(other.m_RGBPoints)
+{
+  m_ScalarOpacityFunction->DeepCopy(other.m_ScalarOpacityFunction);
+  m_GradientOpacityFunction->DeepCopy(other.m_GradientOpacityFunction);
+  m_ColorTransferFunction->DeepCopy(other.m_ColorTransferFunction);
+}
+
 TransferFunction::~TransferFunction()
 {
 }
@@ -304,6 +321,12 @@ void TransferFunction::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << indent << "ColorTransfer: ";
   m_ColorTransferFunction->PrintHeader(os, vtkIndent());
   os << indent << "Min: " << m_Min << ", Max: " << m_Max << std::endl;
+}
+
+itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }
 
 }// namespace

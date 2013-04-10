@@ -402,7 +402,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     filter->Update();
 
     DiffusionImageType::Pointer image = DiffusionImageType::New();
-    image->SetVectorImage( filter->GetOutput() );
+    image->SetVectorImage( filter->GetOutput(0) );
     image->SetB_Value(m_DiffusionImage->GetB_Value());
     image->SetDirections(filter->GetGradientDirections());
     image->SetMeasurementFrame(m_DiffusionImage->GetMeasurementFrame());
@@ -441,6 +441,7 @@ void QmitkPreprocessingView::MergeDwis()
     GradientListContainerType   gradientListContainer;
     std::vector< double >       bValueContainer;
 
+    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
     for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
     {
         DiffusionImageType::Pointer dwi = dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >( m_SelectedDiffusionNodes.at(i)->GetData() );
@@ -449,6 +450,11 @@ void QmitkPreprocessingView::MergeDwis()
             imageContainer.push_back(dwi->GetVectorImage());
             gradientListContainer.push_back(dwi->GetDirections());
             bValueContainer.push_back(dwi->GetB_Value());
+            if (i>0)
+            {
+                name += "+";
+                name += m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+            }
         }
     }
 
@@ -461,7 +467,7 @@ void QmitkPreprocessingView::MergeDwis()
 
     vnl_matrix_fixed< double, 3, 3 > mf; mf.set_identity();
     DiffusionImageType::Pointer image = DiffusionImageType::New();
-    image->SetVectorImage( filter->GetOutput() );
+    image->SetVectorImage( filter->GetOutput(0) );
     image->SetB_Value(filter->GetB_Value());
     image->SetDirections(filter->GetOutputGradients());
     image->SetMeasurementFrame(mf);
@@ -469,14 +475,6 @@ void QmitkPreprocessingView::MergeDwis()
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
     imageNode->SetData( image );
-    QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
-
-    for (int i=0; i<bValueContainer.size(); i++)
-    {
-        name += "_";
-        name += QString::number(bValueContainer.at(i));
-    }
-
     imageNode->SetName(name.toStdString().c_str());
     GetDefaultDataStorage()->Add(imageNode);
 }
@@ -518,8 +516,8 @@ void QmitkPreprocessingView::ExtractB0()
         filter->Update();
 
         mitk::Image::Pointer mitkImage = mitk::Image::New();
-        mitkImage->InitializeByItk( filter->GetOutput() );
-        mitkImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        mitkImage->InitializeByItk( filter->GetOutput(0) );
+        mitkImage->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
         mitk::DataNode::Pointer node=mitk::DataNode::New();
         node->SetData( mitkImage );
         node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0"));
@@ -561,8 +559,8 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
         filter->Update();
 
         mitk::Image::Pointer mitkImage = mitk::Image::New();
-        mitkImage->InitializeByItk( filter->GetOutput() );
-        mitkImage->SetImportChannel( filter->GetOutput()->GetBufferPointer() );
+        mitkImage->InitializeByItk( filter->GetOutput(0) );
+        mitkImage->SetImportChannel( filter->GetOutput(0)->GetBufferPointer() );
         mitk::DataNode::Pointer node=mitk::DataNode::New();
         node->SetData( mitkImage );
         node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0_ALL"));

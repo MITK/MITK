@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 
 #include <fstream>
-#include <itkSmartPointerForwardReference.txx>
 #include <mitkDataNodeFactory.h>
 
 #include <vtkImageData.h>
@@ -78,7 +77,7 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char* /*argv*/[])
   //boCutter->UpdateLargestPossibleRegion();
   //std::cout<<"[PASSED]"<<std::endl;
 
-  //mitk::Image::Pointer cuttedImage = boCutter->GetOutput();
+  //mitk::Image::Pointer cuttedImage = boCutter->GetOutput(0);
 
   //MITK_TEST_OUTPUT(<< " Testing whether origin of cutted image is identical to origin of original image: ");
   //MITK_TEST_CONDITION_REQUIRED( mitk::Equal(image->GetGeometry()->GetOrigin(),cuttedImage->GetGeometry()->GetOrigin()), "");

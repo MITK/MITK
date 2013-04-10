@@ -47,7 +47,7 @@ int mitkImageToSurfaceFilterTest(int argc, char* argv[])
   mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
   reader->SetFileName(argv[1]);
   reader->Update();
-  mitk::Image::Pointer tImage = reader->GetOutput();
+  mitk::Image::Pointer tImage = reader->GetOutput(0);
 
   // testing initialization of member variables!
   MITK_TEST_CONDITION_REQUIRED(testObject->GetThreshold() == 1.0f, "Testing initialization of threshold member variable");
@@ -71,29 +71,29 @@ int mitkImageToSurfaceFilterTest(int argc, char* argv[])
 
   testObject->Update();
   mitk::Surface::Pointer resultSurface = NULL;
-  resultSurface = testObject->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetOutput() != NULL, "Testing surface generation!");
+  resultSurface = testObject->GetOutput(0);
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetOutput(0) != NULL, "Testing surface generation!");
 
-  mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
+  mitk::Surface::Pointer testSurface1 = testObject->GetOutput(0)->Clone();
 
   testObject->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
   testObject->SetTargetReduction(0.5f);
   testObject->Update();
-  mitk::Surface::Pointer testSurface2 = testObject->GetOutput()->Clone();
+  mitk::Surface::Pointer testSurface2 = testObject->GetOutput(0)->Clone();
 
   MITK_TEST_CONDITION_REQUIRED(testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface2->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() , "Testing DecimatePro mesh decimation!");
 
   testObject->SetDecimate(mitk::ImageToSurfaceFilter::QuadricDecimation);
   testObject->SetTargetReduction(0.5f);
   testObject->Update();
-  mitk::Surface::Pointer testSurface3 = testObject->GetOutput()->Clone();
+  mitk::Surface::Pointer testSurface3 = testObject->GetOutput(0)->Clone();
 
   MITK_TEST_CONDITION_REQUIRED(testSurface1->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() > testSurface3->GetVtkPolyData()->GetPoints()->GetNumberOfPoints() , "Testing QuadricDecimation mesh decimation!");
 
   testObject->SetSmooth(true);
   testObject->SetDecimate(mitk::ImageToSurfaceFilter::NoDecimation);
   testObject->Update();
-  mitk::Surface::Pointer testSurface4 = testObject->GetOutput()->Clone();
+  mitk::Surface::Pointer testSurface4 = testObject->GetOutput(0)->Clone();
   MITK_TEST_CONDITION_REQUIRED( CompareSurfacePointPositions(testSurface1, testSurface4), "Testing smoothing of surface changes point data!");
 
   // thats it folks

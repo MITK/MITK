@@ -107,6 +107,16 @@ mitk::PropertyList::PropertyList()
 {
 }
 
+mitk::PropertyList::PropertyList(const mitk::PropertyList& other)
+  : itk::Object()
+{
+  for (PropertyMap::const_iterator i = other.m_Properties.begin();
+       i != other.m_Properties.end(); ++i)
+  {
+    m_Properties.insert(std::make_pair(i->first, i->second->Clone()));
+  }
+}
+
 
 mitk::PropertyList::~PropertyList()
 {
@@ -155,17 +165,6 @@ bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 }
 
 
-mitk::PropertyList::Pointer mitk::PropertyList::Clone()
-{
-  mitk::PropertyList::Pointer newPropertyList = PropertyList::New();
-
-  // copy the map
-  newPropertyList->m_Properties = m_Properties;
-
-  return newPropertyList.GetPointer();
-}
-
-
 void mitk::PropertyList::Clear()
 {
   PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();
@@ -177,6 +176,11 @@ void mitk::PropertyList::Clear()
   m_Properties.clear();
 }
 
+itk::LightObject::Pointer mitk::PropertyList::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}
 
 void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool replace)
 {

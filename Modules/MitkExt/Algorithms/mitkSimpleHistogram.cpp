@@ -44,11 +44,11 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
    {
     int typInt=0;
     {
-      const std::type_info& typ=source->GetPixelType().GetTypeId();
-      if     (typ == typeid(unsigned char )) typInt=0;
-      else if(typ == typeid(signed char   )) typInt=1;
-      else if(typ == typeid(unsigned short)) typInt=2;
-      else if(typ == typeid(signed short  )) typInt=3;
+      const int typ=source->GetPixelType().GetComponentType();
+      if     (typ == itk::ImageIOBase::UCHAR) typInt=0;
+      else if(typ == itk::ImageIOBase::CHAR) typInt=1;
+      else if(typ == itk::ImageIOBase::USHORT) typInt=2;
+      else if(typ == itk::ImageIOBase::SHORT) typInt=3;
       else
       {
         MITK_WARN << "SimpleImageHistogram currently only supports un/signed char/short";

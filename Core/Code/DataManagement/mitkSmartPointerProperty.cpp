@@ -84,6 +84,12 @@ mitk::SmartPointerProperty::SmartPointerProperty(itk::Object* pointer)
   SetSmartPointer( pointer );
 }
 
+mitk::SmartPointerProperty::SmartPointerProperty(const SmartPointerProperty& other)
+  : BaseProperty(other)
+  , m_SmartPointer(other.m_SmartPointer)
+{
+}
+
 itk::Object::Pointer mitk::SmartPointerProperty::GetSmartPointer() const
 {
     return m_SmartPointer;
@@ -127,4 +133,10 @@ std::string mitk::SmartPointerProperty::GetValueAsString() const
     return m_ReferencesUID[ m_SmartPointer.GetPointer() ];
   else
     return std::string("NULL");
+}
+
+itk::LightObject::Pointer mitk::SmartPointerProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

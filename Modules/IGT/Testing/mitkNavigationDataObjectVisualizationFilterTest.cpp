@@ -73,7 +73,7 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 0, "Testing GetNumberOfToolRepresentations()");
 
   //testing getting the output
-  mitk::NavigationData* output = myFilter->GetOutput();
+  mitk::NavigationData* output = myFilter->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
   MITK_TEST_CONDITION_REQUIRED(output == myFilter->GetOutput(0), "Testing GetOutput() == GetOutput(0)");
   MITK_TEST_CONDITION_REQUIRED(output != myFilter->GetOutput(1), "Testing GetOutput() != GetOutput(1)");

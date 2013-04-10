@@ -75,7 +75,7 @@ const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput
 
 itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigationDataFilter::GetInputIndex( std::string navDataName )
 {
-  DataObjectPointerArray& outputs = this->GetInputs();
+  DataObjectPointerArray outputs = this->GetInputs();
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
     if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
       return i;

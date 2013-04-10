@@ -54,7 +54,7 @@ namespace mitk
     ///
     /// make a clone of this intrinsics
     ///
-    Pointer Clone() const;
+    itkCloneMacro(Self)
 
     ///
     /// copy information from other to this
@@ -124,10 +124,16 @@ namespace mitk
 
   protected:
     CameraIntrinsics();
+    CameraIntrinsics(const CameraIntrinsics& other);
+
     cv::Mat m_CameraMatrix;
     cv::Mat m_DistorsionCoeffs;
     bool m_Valid;
     itk::FastMutexLock::Pointer m_Mutex;
+
+  private:
+
+    virtual itk::LightObject::Pointer InternalClone() const;
   };
 
 } // namespace mitk

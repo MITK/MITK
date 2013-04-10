@@ -408,7 +408,6 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 
   m_Controls->m_QBallSelectionBox->setHidden(true);
   m_Controls->m_OutputCoeffsImage->setHidden(true);
-  m_Controls->m_UseWeights->setHidden(true);
 
   if (method==0)
     m_Controls->m_ShFrame->setVisible(false);
@@ -441,7 +440,6 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     m_Controls->m_Description->setText("SH recon. of the multi shell diffusion signal (Aganj 2010)");
     m_Controls->m_QBallSelectionBox->setHidden(false);
     m_Controls->m_OutputCoeffsImage->setHidden(false);
-    m_Controls->m_UseWeights->setHidden(false);
     break;
   }
 }
@@ -592,9 +590,9 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
       // ODFs TO DATATREE
       mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-      image->InitializeByItk( filter->GetOutput() );
-      //image->SetImportVolume( filter->GetOutput()->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
-      image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+      image->InitializeByItk( filter->GetOutput(0) );
+      //image->SetImportVolume( filter->GetOutput(0)->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::ManageMemory );
+      image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );
       QString newname;
@@ -792,8 +790,8 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
 
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   QString newname;
@@ -937,10 +935,6 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
 
   filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
   filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage(), vols->GetB_Value() );
-
-  //filter->SetBValue(vols->GetB_Value());
-  filter->SetUseWeights( m_Controls->m_UseWeights->isChecked());
-
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
@@ -949,8 +943,8 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(
 
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  image->InitializeByItk( filter->GetOutput(0) );
+  image->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
   mitk::DataNode::Pointer node=mitk::DataNode::New();
   node->SetData( image );
   QString newname;

@@ -97,7 +97,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     timeSelector->SetInput( input );
     timeSelector->SetTimeNr( m_TimeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    input3D = timeSelector->GetOutput();
+    input3D = timeSelector->GetOutput(0);
   }
 
   if ( m_SliceDifferenceImage.IsNull() ||
@@ -141,7 +141,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
 
 // basically copied from mitk/Core/Algorithms/mitkImageAccessByItk.h
 #define myMITKOverwriteSliceImageFilterAccessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension, itkimage2)            \
-  if ( typeId == typeid(pixeltype) )                                                    \
+  if ( typeId == MapPixelComponentType<pixeltype>::value )                                                    \
 {                                                                                        \
     typedef itk::Image<pixeltype, dimension> ImageType;                                   \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                    \
@@ -151,7 +151,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     nonConstImage->Update();                                                             \
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
-    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
+    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
 }
 
 #define myMITKOverwriteSliceImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \
@@ -170,7 +170,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::OverwriteSliceImageFilter::ItkImageSwitch( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=m_SliceImage->GetPixelType().GetTypeId();
+  const int typeId=m_SliceImage->GetPixelType().GetComponentType();
 
   myMITKOverwriteSliceImageFilterAccessAllTypesByItk( m_SliceImage, ItkImageProcessing, 2, itkImage );
 }

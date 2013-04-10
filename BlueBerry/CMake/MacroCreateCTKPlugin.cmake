@@ -17,9 +17,10 @@
 #!        will be available in the set of include directories of depending plug-ins.
 #! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
 #! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
+#! \param NO_INSTALL (option) Don't install this plug-in.
 macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES" "TEST_PLUGIN;NO_QHP_TRANSFORM" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 
@@ -167,7 +168,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
 
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
-  if(NOT _PLUGIN_TEST_PLUGIN)
+  if(NOT _PLUGIN_NO_INSTALL)
     set(install_directories "")
     if(NOT MACOSX_BUNDLE_NAMES)
       set(install_directories bin/plugins)

@@ -105,13 +105,11 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo<std::type_info>( &pixelType.GetTypeId() );
-  // Set also the PixelTypeIO information since it is available after
-  // the changes in PixelType for Bug #12838
-  imageIO->SetPixelType( pixelType.GetPixelTypeId() );
-
-  if(pixelType.GetNumberOfComponents() > 1)
-    imageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
+  imageIO->SetPixelType( pixelType.GetPixelType() );
+  imageIO->SetComponentType( pixelType.GetComponentType() < PixelComponentUserType ?
+                             static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
+                             itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+  imageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
 
   itk::ImageIORegion ioRegion( dimension );
 
@@ -213,7 +211,7 @@ void mitk::ImageWriter::GenerateData()
       timesteps = input->GetDimension(3);
       ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
       timeSelector->SetInput(input);
-      mitk::Image::Pointer image = timeSelector->GetOutput();
+      mitk::Image::Pointer image = timeSelector->GetOutput(0);
       for(t = 0; t < timesteps; ++t)
       {
         std::ostringstream filename;

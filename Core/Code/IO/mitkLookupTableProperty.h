@@ -41,6 +41,8 @@ namespace mitk {
 
     LookupTableProperty();
 
+    LookupTableProperty(const LookupTableProperty&);
+
     LookupTableProperty(const mitk::LookupTable::Pointer lut);
 
   public:
@@ -65,8 +67,9 @@ namespace mitk {
   private:
 
     // purposely not implemented
-    LookupTableProperty(const LookupTableProperty&);
     LookupTableProperty& operator=(const LookupTableProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty& property) const;
     virtual bool Assign(const BaseProperty& property);

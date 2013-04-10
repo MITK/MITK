@@ -1,0 +1,31 @@
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="start">
+            <action name="addpoint"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="EnoughPoints" target="final">
+            <action name="colourme"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="NotEnoughPoints" target="start">
+          <action name="standardcolour"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="pointisselected">
+            <action name="selectpoint"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
+            <action name="abort"/>
+        </transition>
+    </state>
+    <state name="pointisselected">
+        <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="start">
+            <action name="unselect"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="DeletePoint" target="start">
+            <action name="deleteselection"/>
+        </transition>
+        <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
+            <action name="abort"/>
+        </transition>
+    </state>
+    <state name="final"/>
+</statemachine>

@@ -45,7 +45,7 @@ const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = GetModuleContext();
+    ModuleContext* context = mitk::GetModuleContext();
     const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());
@@ -235,7 +235,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
                 vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
                 triangleFilter->SetInput(polys);
                 triangleFilter->Update();
-                polys = triangleFilter->GetOutput();
+                polys = triangleFilter->GetOutput(0);
                 polys->Register(NULL);
                 surface->SetVtkPolyData(polys);
             }

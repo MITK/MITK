@@ -27,87 +27,91 @@ mitk::ImageSource::ImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-/**
- *
- */
-mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
+itk::DataObject::Pointer mitk::ImageSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+  return static_cast<itk::DataObject *>(mitk::Image::New().GetPointer());
 }
 
-/**
- *
- */
-mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput()
+
+itk::DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  if (this->GetNumberOfOutputs() < 1)
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-    return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-
-  return static_cast<OutputImageType*>
-                     (this->BaseProcess::GetOutput(0));
+  return static_cast<itk::DataObject *>(mitk::Image::New().GetPointer());
 }
 
-
-/**
- *
- */
-mitk::ImageSource::OutputImageType* mitk::ImageSource::GetOutput(unsigned int idx)
-{
-  return static_cast<OutputImageType*>
-                     (this->ProcessObject::GetOutput(idx));
-}
-
-
-/**
- *
- */
-void mitk::ImageSource::SetOutput(OutputImageType *output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
-
-
-/**
- *
- */
 void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 {
   this->GraftNthOutput(0, graft);
 }
 
-
-/**
- *
- */
-void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
+void mitk::ImageSource::GraftOutput(const DataObjectIdentifierType& key, OutputImageType* graft)
 {
-  itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
-  assert(false);
-  if (idx < this->GetNumberOfOutputs())
+  if ( !graft )
     {
-    OutputImageType * output = this->GetOutput(idx);
-
-    if (output && graft)
-      {
-      // grab a handle to the bulk data of the specified data object
-//      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-
-      // copy the region ivars of the specified data object
-      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-//      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
-//      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-
-      // copy the meta-information
-      output->CopyInformation( graft );
-      }
+    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
     }
+
+  itkExceptionMacro(<< "GraftOutput(): This method is not yet functional in MITK. Implement mitk::Image::Graft() before using!!" );
+
+  // we use the process object method since all out output may not be
+  // of the same type
+  itk::DataObject *output = this->ProcessObject::GetOutput(key);
+
+  // Call GraftImage to copy meta-information, regions, and the pixel container
+  output->Graft(graft);
 }
 
+void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
+{
+  if ( idx >= this->GetNumberOfIndexedOutputs() )
+    {
+    itkExceptionMacro(<< "Requested to graft output " << idx
+                      << " but this filter only has " << this->GetNumberOfIndexedOutputs() << " indexed Outputs.");
+    }
+  this->GraftOutput( this->MakeNameFromOutputIndex(idx), graft );
+}
+
+mitk::ImageSource::OutputImageType *  mitk::ImageSource::GetOutput(void)
+{
+  return itkDynamicCastInDebugMode< OutputImageType * >( this->GetPrimaryOutput() );
+}
+
+const  mitk::ImageSource::OutputImageType *  mitk::ImageSource::GetOutput(void) const
+{
+  return itkDynamicCastInDebugMode< const OutputImageType * >( this->GetPrimaryOutput() );
+}
+
+mitk::ImageSource::OutputImageType*  mitk::ImageSource::GetOutput(DataObjectPointerArraySizeType idx)
+{
+  OutputImageType *out = dynamic_cast< OutputImageType * >
+                      ( this->ProcessObject::GetOutput(idx) );
+
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+    {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputImageType ).name () );
+    }
+  return out;
+}
+
+const  mitk::ImageSource::OutputImageType*  mitk::ImageSource::GetOutput(DataObjectPointerArraySizeType idx) const
+{
+  const OutputImageType *out = dynamic_cast< const OutputImageType * >
+                      ( this->ProcessObject::GetOutput(idx) );
+
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+    {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputImageType ).name () );
+    }
+  return out;
+}
+
+
 //----------------------------------------------------------------------------
-int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion)
+unsigned int mitk::ImageSource::SplitRequestedRegion(unsigned int i, unsigned int num, OutputImageRegionType& splitRegion)
 {
   // Get the output pointer
   OutputImageType * outputPtr = this->GetOutput();
@@ -137,8 +141,8 @@ int mitk::ImageSource::SplitRequestedRegion(int i, int num, OutputImageRegionTyp
 
   // determine the actual number of pieces that will be generated
   SlicedData::SizeType::SizeValueType range = requestedRegionSize[splitAxis];
-  int valuesPerThread = (int)ceil(range/(double)num);
-  int maxThreadIdUsed = (int)ceil(range/(double)valuesPerThread) - 1;
+  unsigned int valuesPerThread = itk::Math::Ceil< unsigned int>(range / (double)num);
+  unsigned int maxThreadIdUsed = itk::Math::Ceil< unsigned int>(range / (double)valuesPerThread) - 1;
 
   // Split the region
   if (i < maxThreadIdUsed)
@@ -209,7 +213,7 @@ void mitk::ImageSource::GenerateData()
 //----------------------------------------------------------------------------
 // The execute method created by the subclass.
 
-void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, int)
+void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, itk::ThreadIdType)
 {
   itkExceptionMacro("subclass should override this method!!!");
 }
@@ -221,7 +225,7 @@ void mitk::ImageSource::ThreadedGenerateData(const OutputImageRegionType&, int)
 ITK_THREAD_RETURN_TYPE mitk::ImageSource::ThreaderCallback( void *arg )
 {
   ThreadStruct *str;
-  int total, threadId, threadCount;
+  itk::ThreadIdType total, threadId, threadCount;
 
   threadId = ((itk::MultiThreader::ThreadInfoStruct *)(arg))->ThreadID;
   threadCount = ((itk::MultiThreader::ThreadInfoStruct *)(arg))->NumberOfThreads;
@@ -252,12 +256,6 @@ void mitk::ImageSource::PrepareOutputs()
 {
   Superclass::PrepareOutputs();
 }
-
-/*void* mitk::ImageSource::GetData()
-{
-    Update();
-    return GetOutput()->GetData();
-}*/
 
 vtkImageData* mitk::ImageSource::GetVtkImageData()
 {

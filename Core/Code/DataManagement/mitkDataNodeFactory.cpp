@@ -179,7 +179,7 @@ void mitk::DataNodeFactory::GenerateData()
         node->SetData(baseData);
         this->SetDefaultCommonProperties( node );
 
-        this->SetOutput(i, node);
+        this->SetOutput(this->MakeNameFromOutputIndex(i), node);
       }
     }
     if(!usedNewDTNF && ( m_FileName != "" ) && !(m_Serie == false))

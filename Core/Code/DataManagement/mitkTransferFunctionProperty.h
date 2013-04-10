@@ -51,14 +51,16 @@ protected:
   mitk::TransferFunction::Pointer m_Value;
 
   TransferFunctionProperty();
+  TransferFunctionProperty(const TransferFunctionProperty& other);
 
   TransferFunctionProperty( mitk::TransferFunction::Pointer value );
 
 private:
 
   // purposely not implemented
-  TransferFunctionProperty(const TransferFunctionProperty&);
   TransferFunctionProperty& operator=(const TransferFunctionProperty&);
+
+  itk::LightObject::Pointer InternalClone() const;
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty& property);

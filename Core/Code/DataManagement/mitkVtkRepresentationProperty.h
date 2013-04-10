@@ -104,8 +104,9 @@ protected:
 private:
 
   // purposely not implemented
-  VtkRepresentationProperty(const VtkRepresentationProperty&);
   VtkRepresentationProperty& operator=(const VtkRepresentationProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

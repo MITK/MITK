@@ -214,7 +214,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
 
-    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
+    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(0), binaryImageToItk1->GetOutput(0)->GetRequestedRegion());
     it.Begin();
     mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
 
@@ -277,11 +277,12 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberPolyData);
     mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
     fbNode->SetData(fib);
-    QString name(m_DiffusionImageNode->GetName().c_str());
-    name += "_FiberBundle";
+    QString name("FiberBundle_");
+    name += m_DiffusionImageNode->GetName().c_str();
+    name += "_Probabilistic";
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
-    GetDataStorage()->Add(fbNode);
+    GetDataStorage()->Add(fbNode, m_DiffusionImageNode);
 }
 
 

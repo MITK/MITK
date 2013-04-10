@@ -868,7 +868,7 @@ mitk::Surface::Pointer QmitkNDIConfigurationWidget::LoadSurfaceFromSTLFile(QStri
     try{
       stlReader->SetFileName(surfaceFilename.toStdString().c_str());
       stlReader->Update();//load surface
-      toolSurface = stlReader->GetOutput();
+      toolSurface = stlReader->GetOutput(0);
     }
     catch(std::exception& e )
     {

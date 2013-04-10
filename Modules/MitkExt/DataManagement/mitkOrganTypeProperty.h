@@ -61,8 +61,9 @@ class MitkExt_EXPORT OrganTypeProperty : public EnumerationProperty
   private:
 
     // purposely not implemented
-    OrganTypeProperty(const OrganTypeProperty&);
     OrganTypeProperty& operator=(const OrganTypeProperty&);
+
+    virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

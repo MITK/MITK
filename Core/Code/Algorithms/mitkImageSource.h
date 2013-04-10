@@ -22,47 +22,96 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseProcess.h"
 #include "mitkImage.h"
 
+//#include "itkIntTypes.h"
+
 namespace mitk {
 
-//##Documentation
-//## @brief Superclass of all classes generating Images (instances of class
-//## Image) as output.
-//##
-//## In itk and vtk the generated result of a ProcessObject is only guaranteed
-//## to be up-to-date, when Update() of the ProcessObject or the generated
-//## DataObject is called immediately before access of the data stored in the
-//## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
-//## for mitk::ImageSource. But there are also three access methods provided
-//## that guarantee an up-to-date result (by first calling Update and then
-//## returning the result of GetOutput()): GetData(), GetPic() and
-//## GetVtkImageData().
-//## @ingroup Process
+/**
+ * @brief Superclass of all classes generating Images (instances of class
+ * Image) as output.
+ *
+ * In itk and vtk the generated result of a ProcessObject is only guaranteed
+ * to be up-to-date, when Update() of the ProcessObject or the generated
+ * DataObject is called immediately before access of the data stored in the
+ * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
+ * for mitk::ImageSource. But there are also three access methods provided
+ * that guarantee an up-to-date result (by first calling Update and then
+ * returning the result of GetOutput()): GetData(), GetPic() and
+ * GetVtkImageData().
+ * @ingroup Process
+ */
 class MITK_CORE_EXPORT ImageSource : public BaseProcess
 {
 public:
-  mitkClassMacro(ImageSource,BaseProcess);
+  mitkClassMacro(ImageSource,BaseProcess)
 
   /** @brief Smart Pointer type to a DataObject. */
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   /** @brief Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkNewMacro(Self)
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;
   typedef OutputImageType::Pointer OutputImagePointer;
   typedef SlicedData::RegionType OutputImageRegionType;
 
-  /** @brief Get the image output of this process object.  */
-  OutputImageType * GetOutput(void);
-  OutputImageType * GetOutput(unsigned int idx);
-
-  /** @brief Set the image output of this process object.
+  /**
+   * @brief Get the output data of this image source object.
    *
-   * This call is slated
-   * to be removed from ITK. You should GraftOutput() and possible
-   * DataObject::DisconnectPipeline() to properly change the output. */
-  void SetOutput(OutputImageType *output);
+   * The output of this
+   * function is not valid until an appropriate Update() method has
+   * been called, either explicitly or implicitly.  Both the filter
+   * itself and the data object have Update() methods, and both
+   * methods update the data.  Here are three ways to use
+   * GetOutput() and make sure the data is valid.  In these
+   * examples, \a image is a pointer to some Image object, and the
+   * particular ProcessObjects involved are filters.  The same
+   * examples apply to non-image (e.g. Mesh) data as well.
+   *
+   * \code
+   *   anotherFilter->SetInput( someFilter->GetOutput() );
+   *   anotherFilter->Update();
+   * \endcode
+   *
+   * In this situation, \a someFilter and \a anotherFilter are said
+   * to constitute a \b pipeline.
+   *
+   * \code
+   *   image = someFilter->GetOutput();
+   *   image->Update();
+   * \endcode
+   *
+   * \code
+   *   someFilter->Update();
+   *   image = someFilter->GetOutput();
+   * \endcode
+   * (In the above example, the two lines of code can be in
+   * either order.)
+   *
+   * Note that Update() is not called automatically except within a
+   * pipeline as in the first example.  When \b streaming (using a
+   * StreamingImageFilter) is activated, it may be more efficient to
+   * use a pipeline than to call Update() once for each filter in
+   * turn.
+   *
+   * For an image, the data generated is for the requested
+   * Region, which can be set using ImageBase::SetRequestedRegion().
+   * By default, the largest possible region is requested.
+   *
+   * For Filters which have multiple outputs of different types, the
+   * GetOutput() method assumes the output is of OutputImageType. For
+   * the GetOutput(DataObjectPointerArraySizeType) method, a dynamic_cast is performed
+   * incase the filter has outputs of different types or image
+   * types. Derived classes should have named get methods for these
+   * outputs.
+   */
+  OutputImageType * GetOutput(void);
+  const OutputImageType * GetOutput(void) const;
+
+  OutputImageType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputImageType* GetOutput(DataObjectPointerArraySizeType idx) const;
+
 
   /** @brief Graft the specified DataObject onto this ProcessObject's output.
    *
@@ -82,14 +131,14 @@ public:
 
    *    // setup the mini-pipeline to calculate the correct regions
    *    // and write to the appropriate bulk data block
-   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput() );
+   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
    *
    *    // execute the mini-pipeline
    *    lastFilterInMiniPipeline->Update();
    *
    *    // graft the mini-pipeline output back onto this filter's output.
    *    // this is needed to get the appropriate regions passed back.
-   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput() );
+   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
    * \endcode
    *
    * For proper pipeline execution, a filter using a mini-pipeline
@@ -101,6 +150,13 @@ public:
    * mini-pipeline will do).
    *  */
   virtual void GraftOutput(OutputImageType *output);
+
+  /** Graft the specified data object onto this ProcessObject's named
+   * output. This is similar to the GraftOutput method except it
+   * allows you to specify which output is affected.
+   * See the GraftOutput for general usage information.
+   */
+  virtual void GraftOutput(const DataObjectIdentifierType & key, OutputImageType *output);
 
   /** @brief Graft the specified data object onto this ProcessObject's idx'th
    * output.
@@ -127,8 +183,15 @@ public:
    * SmartPointer to a DataObject. If a subclass of ImageSource has
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
-//  virtual void* GetData();
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+  /**
+   * This is a default implementation to make sure we have something.
+   * Once all the subclasses of ProcessObject provide an appopriate
+   * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+   * virtual.
+   */
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
   virtual vtkImageData* GetVtkImageData();
 
@@ -181,7 +244,7 @@ protected:
    * \sa GenerateData(), SplitRequestedRegion() */
   virtual
   void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                            int threadId );
+                            itk::ThreadIdType threadId );
 
 
   /** @brief This method is intentionally left blank.
@@ -213,7 +276,7 @@ protected:
    *      4) Call AfterThreadedGenerateData()
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
-  virtual void BeforeThreadedGenerateData() {};
+  virtual void BeforeThreadedGenerateData() {}
 
   /** @brief If an imaging filter needs to perform processing after all
    * processing threads have completed, the filter can can provide an
@@ -227,7 +290,7 @@ protected:
    *      4) Call AfterThreadedGenerateData()
    * Note that this flow of control is only available if a filter provides
    * a ThreadedGenerateData() method and NOT a GenerateData() method. */
-  virtual void AfterThreadedGenerateData() {};
+  virtual void AfterThreadedGenerateData() {}
 
   /** @brief Split the output's RequestedRegion into "num" pieces, returning
    * region "i" as "splitRegion".
@@ -237,7 +300,7 @@ protected:
    * the routine is capable of splitting the output RequestedRegion,
    * i.e. return value is less than or equal to "num". */
   virtual
-  int SplitRequestedRegion(int i, int num, OutputImageRegionType& splitRegion);
+  unsigned int SplitRequestedRegion(unsigned int i, unsigned int num, OutputImageRegionType& splitRegion);
 
   /** @brief Static function used as a "callback" by the MultiThreader.
    *
@@ -252,6 +315,7 @@ protected:
   };
 
 private:
+  ImageSource(const Self &);   //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
 

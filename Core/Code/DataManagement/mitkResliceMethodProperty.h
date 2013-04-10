@@ -52,8 +52,9 @@ protected:
 private:
 
   // purposely not implemented
-  ResliceMethodProperty(const ResliceMethodProperty&);
   ResliceMethodProperty& operator=(const ResliceMethodProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

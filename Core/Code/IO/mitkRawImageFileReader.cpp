@@ -62,9 +62,9 @@ bool mitk::RawImageFileReader::CanReadFile(const std::string filename, const std
 
 void mitk::RawImageFileReader::GenerateData()
 {
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
-  if (this->GetOutput()==NULL)
+  if (this->GetOutput(0)==NULL)
   {
     MITK_INFO << "Error" << std::endl;
   }
@@ -122,9 +122,9 @@ void mitk::RawImageFileReader::GenerateData()
 template < typename TPixel, unsigned int VImageDimensions >
 void mitk::RawImageFileReader::TypedGenerateData()
 {
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
-  if (this->GetOutput()==NULL)
+  if (this->GetOutput(0)==NULL)
   {
     MITK_INFO << "Error" << std::endl;
   }
@@ -179,8 +179,8 @@ void mitk::RawImageFileReader::TypedGenerateData()
   }
 
   mitk::Image::Pointer image = mitk::Image::New();
-  mitk::CastToMitkImage(reader->GetOutput(), image);
+  mitk::CastToMitkImage(reader->GetOutput(0), image);
   output->Initialize( image );
-  output->SetVolume(  reader->GetOutput()->GetBufferPointer());
+  output->SetVolume(  reader->GetOutput(0)->GetBufferPointer());
 }
 

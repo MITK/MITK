@@ -27,6 +27,15 @@ mitk::CameraIntrinsics::CameraIntrinsics()
   m_DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
 }
 
+mitk::CameraIntrinsics::CameraIntrinsics(const CameraIntrinsics& other)
+  : itk::Object()
+  , mitk::XMLSerializable()
+  , m_Valid(false)
+  , m_Mutex(itk::FastMutexLock::New())
+{
+  this->Copy(&other);
+}
+
 mitk::CameraIntrinsics::~CameraIntrinsics()
 {
 
@@ -53,14 +62,6 @@ bool mitk::CameraIntrinsics::IsValid() const
 {
   itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
   return m_Valid;
-}
-
-mitk::CameraIntrinsics::Pointer mitk::CameraIntrinsics::Clone() const
-{
-  mitk::CameraIntrinsics::Pointer copy = mitk::CameraIntrinsics::New();
-  copy->SetIntrinsics( this->GetCameraMatrix(), this->GetDistorsionCoeffs() );
-  copy->SetValid(this->IsValid());
-  return copy;
 }
 
 vnl_matrix_fixed<mitk::ScalarType, 3, 3>
@@ -500,4 +501,10 @@ void mitk::CameraIntrinsics::SetValid( bool valid )
 {
   itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
   m_Valid = valid;
+}
+
+itk::LightObject::Pointer mitk::CameraIntrinsics::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

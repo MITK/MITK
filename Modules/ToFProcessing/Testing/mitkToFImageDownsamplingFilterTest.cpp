@@ -54,7 +54,7 @@ int mitkToFImageDownsamplingFilterTest(int argc , char* argv[])
   filename.append(argv[1]);
   reader->SetFileName(filename);
   reader->Update();
-  mitk::Image::Pointer image = reader->GetOutput();
+  mitk::Image::Pointer image = reader->GetOutput(0);
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Testing image reading");
   MITK_INFO << "Original image dimensions " << image->GetDimension (0)<<" " << image->GetDimension(1)<< " " << image->GetDimension(2) ;
@@ -69,7 +69,7 @@ int mitkToFImageDownsamplingFilterTest(int argc , char* argv[])
     (image->GetDimension()==2 || image->GetDimension()==3))
   {
     testDownSampler->Update();
-    mitk::Image::Pointer resultImage = testDownSampler->GetOutput();
+    mitk::Image::Pointer resultImage = testDownSampler->GetOutput(0);
     MITK_TEST_CONDITION_REQUIRED(resultImage->GetDimension(0) == XDIM && resultImage->GetDimension(1)==YDIM &&resultImage->GetDimension(2)==ZDIM, "Test result image dimensions with 3D image");
     MITK_INFO << "new image dimensions " << resultImage->GetDimension (0)<<" " << resultImage->GetDimension(1)<<" " << resultImage->GetDimension(2) ;
   }

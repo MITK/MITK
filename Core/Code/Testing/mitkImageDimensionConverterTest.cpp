@@ -117,7 +117,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
 
   imageReader->SetFileName(sstream.str().c_str());
   imageReader->Update();
-  mitk::Image::Pointer imageLoaded2D = imageReader->GetOutput();
+  mitk::Image::Pointer imageLoaded2D = imageReader->GetOutput(0);
 
   // check if image can be loaded
   MITK_TEST_CONDITION_REQUIRED( imageLoaded2D.IsNotNull() , "Loading saved 2D Image");
@@ -173,7 +173,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
   // Convert it with filter to a 3D image and check if everything went well
   convertFilter->SetInput(mitkImage2D);
   convertFilter->Update();
-  mitk::Image::Pointer mitkImage3D = convertFilter->GetOutput();
+  mitk::Image::Pointer mitkImage3D = convertFilter->GetOutput(0);
 
   MITK_TEST_CONDITION_REQUIRED( mitkImage3D->GetDimension() == 3   , "Converted Image is Dimension 3");
 
@@ -236,7 +236,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      sstream2 << ".nrrd";
      imageReader->SetFileName(sstream2.str().c_str());
      imageReader->Update();
-     mitk::Image::Pointer imageLoaded = imageReader->GetOutput();
+     mitk::Image::Pointer imageLoaded = imageReader->GetOutput(0);
 
      // check if image can be loaded
      MITK_TEST_CONDITION_REQUIRED( imageLoaded.IsNotNull() , "Loading saved Image");
@@ -286,7 +286,7 @@ int mitkImageDimensionConverterTest(int argc, char* argv[])
      MITK_TEST_CONDITION_REQUIRED( matrixIsEqual , "Compare Geometry: Matrix");
 
 
-
+return 0;
 
    MITK_TEST_END();
 }

@@ -16,7 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkAbstractMapper.h>
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+
+#include "mitkCoreServices.h"
+#include "mitkIShaderRepository.h"
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
@@ -25,6 +27,12 @@ mitk::ShaderProperty::ShaderProperty( )
 {
   AddShaderTypes();
   SetShader( (IdType)0 );
+}
+
+mitk::ShaderProperty::ShaderProperty(const ShaderProperty& other)
+  : mitk::EnumerationProperty(other)
+  , shaderList(other.shaderList)
+{
 }
 
 mitk::ShaderProperty::ShaderProperty( const IdType& value )
@@ -71,14 +79,16 @@ void mitk::ShaderProperty::AddShaderTypes()
 {
   AddEnum( "fixed" );
 
-  std::list<mitk::ShaderRepository::Shader::Pointer> *l
-    = mitk::ShaderRepository::GetGlobalShaderRepository()->GetShaders();
+  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+  if (shaderRepo == NULL) return;
 
-  std::list<mitk::ShaderRepository::Shader::Pointer>::const_iterator i = l->begin();
+  std::list<mitk::IShaderRepository::Shader::Pointer> l = shaderRepo->GetShaders();
 
-  while( i != l->end() )
+  std::list<mitk::IShaderRepository::Shader::Pointer>::const_iterator i = l.begin();
+
+  while( i != l.end() )
   {
-    AddEnum( (*i)->name );
+    AddEnum( (*i)->GetName() );
     i++;
   }
 }
@@ -103,4 +113,8 @@ bool mitk::ShaderProperty::Assign(const BaseProperty &property)
   return true;
 }
 
-
+itk::LightObject::Pointer mitk::ShaderProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

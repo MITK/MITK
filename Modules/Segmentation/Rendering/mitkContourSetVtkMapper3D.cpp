@@ -149,7 +149,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
     m_TubeFilter->SetInput(m_ContourSet);
     m_TubeFilter->SetRadius(1);
     m_TubeFilter->Update();
-    m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput());
+    m_VtkPolyDataMapper->SetInput(m_TubeFilter->GetOutput(0));
 
     vtkFloatingPointType rgba[4]={0.0f,1.0f,0.0f,0.6f};
 

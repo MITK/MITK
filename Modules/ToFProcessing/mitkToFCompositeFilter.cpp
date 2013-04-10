@@ -157,7 +157,7 @@ void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 void mitk::ToFCompositeFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if (output->IsInitialized())
     return;
@@ -214,7 +214,7 @@ ItkImageType2D::Pointer mitk::ToFCompositeFilter::ProcessItkBilateralFilter(ItkI
   bilateralFilter->SetDomainSigma(m_BilateralFilterDomainSigma);
   bilateralFilter->SetRangeSigma(m_BilateralFilterRangeSigma);
   //bilateralFilter->SetRadius(m_BilateralFilterKernelRadius);
-  outputItkImage = bilateralFilter->GetOutput();
+  outputItkImage = bilateralFilter->GetOutput(0);
   outputItkImage->Update();
   return outputItkImage;
 }

@@ -111,7 +111,7 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeGPU->SetProperty( ls->m_VolumePropertyGPU );
   ls->m_VolumeGPU->VisibilityOn();
 
-  ls->m_MapperGPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperGPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput(0) );
 
   ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(renderer->GetVtkRenderer(),ls->m_VolumePropertyGPU);
 
@@ -153,7 +153,7 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeCPU->SetProperty( ls->m_VolumePropertyCPU );
   ls->m_VolumeCPU->VisibilityOn();
 
-  ls->m_MapperCPU->SetInput( m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
+  ls->m_MapperCPU->SetInput( m_UnitSpacingImageFilter->GetOutput(0) );//m_Resampler->GetOutput(0));
 
   ls->m_cpuInitialized=true;
 }
@@ -236,7 +236,7 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer* renderer)
   if(!visible) return false;
 
   bool value = false;
-  if(!node->GetBoolProperty("volumerendering",value,renderer));
+  if(!node->GetBoolProperty("volumerendering",value,renderer))
     return false;
 
   if(!value)
@@ -639,7 +639,7 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   ls->m_VolumeRAY->SetProperty( ls->m_VolumePropertyRAY );
   ls->m_VolumeRAY->VisibilityOn();
 
-  ls->m_MapperRAY->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  ls->m_MapperRAY->SetInput( this->m_UnitSpacingImageFilter->GetOutput(0) );
 
   ls->m_raySupported = ls->m_MapperRAY->IsRenderSupported(renderer->GetRenderWindow(),ls->m_VolumePropertyRAY);
 

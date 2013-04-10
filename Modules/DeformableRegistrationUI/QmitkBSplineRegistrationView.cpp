@@ -116,7 +116,7 @@ void QmitkBSplineRegistrationView::PrintDeformationField()
   reader->SetFileName(  m_Controls.m_DeformationField->text().toStdString()  );
   reader->Update();
 
-  DeformationFieldType::Pointer deformationField = reader->GetOutput();
+  DeformationFieldType::Pointer deformationField = reader->GetOutput(0);
 
 
   typedef itk::ImageRegionIterator<DeformationFieldType> IteratorType;
@@ -167,7 +167,7 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
       QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
     }
 
-    mitk::Image::Pointer image = registration->GetOutput();
+    mitk::Image::Pointer image = registration->GetOutput(0);
 
     if (image.IsNotNull())
     {

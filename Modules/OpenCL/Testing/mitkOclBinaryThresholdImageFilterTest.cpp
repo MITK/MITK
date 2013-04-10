@@ -72,7 +72,7 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   oclFilter->Update();
 
   mitk::Image::Pointer outputImage = mitk::Image::New();
-  outputImage = oclFilter->GetOutput();
+  outputImage = oclFilter->GetOutput(0);
 
   MITK_TEST_CONDITION_REQUIRED( outputImage.IsNotNull(), "Filter returned an not-NULL image. ");
 
@@ -94,14 +94,14 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   SubtractFilterType::Pointer subFilt = SubtractFilterType::New();
 
   ImageType::Pointer gpuReferenceImage = ImageType::New();
-  CastToItkImage( oclFilter->GetOutput() ,gpuReferenceImage );
+  CastToItkImage( oclFilter->GetOutput(0) ,gpuReferenceImage );
 
-  subFilt->SetInput1( refThrFilter->GetOutput() );
+  subFilt->SetInput1( refThrFilter->GetOutput(0) );
   subFilt->SetInput2( gpuReferenceImage );
 
   typedef itk::StatisticsImageFilter< ImageType > StatFilterType;
   StatFilterType::Pointer stats = StatFilterType::New();
-  stats->SetInput( subFilt->GetOutput() );
+  stats->SetInput( subFilt->GetOutput(0) );
   stats->Update();
 
   MITK_TEST_CONDITION( stats->GetMaximum() == 0, "Maximal value in the difference image is 0.");

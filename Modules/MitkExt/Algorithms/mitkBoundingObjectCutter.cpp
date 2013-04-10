@@ -64,7 +64,7 @@ const mitk::PixelType BoundingObjectCutter::GetOutputPixelType()
 
 void BoundingObjectCutter::GenerateInputRequestedRegion()
 {
-  mitk::Image* output = this->GetOutput();
+  mitk::Image* output = this->GetOutput(0);
   if((output->IsInitialized()==false) || (m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
   // we have already calculated the spatial part of the
@@ -77,16 +77,25 @@ void BoundingObjectCutter::GenerateInputRequestedRegion()
 
 void BoundingObjectCutter::GenerateOutputInformation()
 {
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
   mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
-
   if(input.IsNull())
+  {
+    MITK_WARN << "Input is not a mitk::Image";
     return;
+  }
+  itkDebugMacro(<<"GenerateOutputInformation()");
+  unsigned int dimension = input->GetDimension();
+
+  if (dimension < 3)
+  {
+    MITK_WARN << "ImageCropper cannot handle 1D or 2D Objects. Operation aborted.";
+    return;
+  }
 
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
@@ -110,15 +119,15 @@ void BoundingObjectCutter::GenerateOutputInformation()
   // build region out of bounding-box of bounding-object
   mitk::SlicedData::IndexType  index=m_InputRequestedRegion.GetIndex(); //init times and channels
   mitk::BoundingBox::PointType min = boBoxRelativeToImage->GetMinimum();
-  index[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0]+0.5);
-  index[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1]+0.5);
-  index[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2]+0.5);
+  index[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0]);
+  index[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1]);
+  index[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2]);
 
   mitk::SlicedData::SizeType   size = m_InputRequestedRegion.GetSize(); //init times and channels
   mitk::BoundingBox::PointType max = boBoxRelativeToImage->GetMaximum();
-  size[0] = (mitk::SlicedData::SizeType::SizeValueType)(max[0]+0.5)-index[0];
-  size[1] = (mitk::SlicedData::SizeType::SizeValueType)(max[1]+0.5)-index[1];
-  size[2] = (mitk::SlicedData::SizeType::SizeValueType)(max[2]+0.5)-index[2];
+  size[0] = (mitk::SlicedData::SizeType::SizeValueType)(max[0])-index[0];
+  size[1] = (mitk::SlicedData::SizeType::SizeValueType)(max[1])-index[1];
+  size[2] = (mitk::SlicedData::SizeType::SizeValueType)(max[2])-index[2];
 
   mitk::SlicedData::RegionType boRegion(index, size);
 
@@ -142,7 +151,6 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   // PART II: initialize output image
 
-  unsigned int dimension = input->GetDimension();
   unsigned int *dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
@@ -180,7 +188,7 @@ void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 void BoundingObjectCutter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if(input.IsNull())
     return;
@@ -189,7 +197,7 @@ void BoundingObjectCutter::GenerateData()
     return;
 
   m_InputTimeSelector->SetInput(input);
-  m_OutputTimeSelector->SetInput(this->GetOutput());
+  m_OutputTimeSelector->SetInput(this->GetOutput(0));
 
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
@@ -215,7 +223,7 @@ void BoundingObjectCutter::GenerateData()
 
     timestep = boundingObjectTimeGeometry->MSToTimeStep( timeInMS );
 
-    ComputeData(m_InputTimeSelector->GetOutput(), timestep);
+    ComputeData(m_InputTimeSelector->GetOutput(0), timestep);
   }
 
   m_InputTimeSelector->SetInput(NULL);

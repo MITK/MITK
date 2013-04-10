@@ -73,7 +73,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
 
   mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput(0));
 
-  mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput();
+  mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput(0);
 
   mitk::ContourModel::Pointer contour(input);
 
@@ -212,6 +212,6 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
   //somehow the isClosed property is not set via copy constructor
   contour->SetIsClosed(input->IsClosed());
 
-  this->SetOutput(contour);
+  this->SetOutput(0, contour);
 
 }

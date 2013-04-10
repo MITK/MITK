@@ -53,8 +53,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   if (inputImage->GetTimeSlicedGeometry() )
   {
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
-    originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+    originalGeometry = inputImage->GetTimeSlicedGeometry()->Clone();
     m_WorkingImage->SetGeometry( originalGeometry );
   }
   else
@@ -78,7 +77,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
     imageDirection.SetIdentity();
     //correctPixelTypeImage->SetDirection(imageDirection);
 
-    temporarySlice = this->GetOutput();
+    temporarySlice = this->GetOutput(0);
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
     CastToMitkImage( correctPixelTypeImage, temporarySlice );
   }

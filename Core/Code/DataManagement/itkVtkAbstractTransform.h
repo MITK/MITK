@@ -43,6 +43,8 @@ public:
   typedef typename Superclass::InputVectorType InputVectorType;
   typedef typename Superclass::InputVnlVectorType InputVnlVectorType;
   typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
+  typedef typename Superclass::ParametersType ParametersType;
+  typedef typename Superclass::JacobianType JacobianType;
 
 
   itkNewMacro(Self);
@@ -57,6 +59,9 @@ public:
   //##Documentation
   //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
+
+  using Superclass::TransformVector;
+  using Superclass::TransformCovariantVector;
 
   virtual OutputPointType TransformPoint(const InputPointType  & ) const;
   virtual OutputVectorType TransformVector(const InputVectorType &) const;

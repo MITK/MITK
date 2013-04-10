@@ -125,7 +125,7 @@ stop:
   slicer2->Update();
 
 
-  mitk::Image::Pointer sliceInMitk = slicer2->GetOutput();
+  mitk::Image::Pointer sliceInMitk = slicer2->GetOutput(0);
   vtkSmartPointer<vtkImageData> slice2 = vtkSmartPointer<vtkImageData>::New();
   slice2 = sliceInMitk->GetVtkImageData();
 

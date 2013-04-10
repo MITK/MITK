@@ -129,7 +129,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_BoundingBox->SetZLength( 0.0 );
 
   m_BoundingBoxMapper = vtkPolyDataMapper::New();
-  m_BoundingBoxMapper->SetInput( m_BoundingBox->GetOutput() );
+  m_BoundingBoxMapper->SetInput( m_BoundingBox->GetOutput(0) );
 
   m_BoundingBoxActor = vtkActor::New();
   m_BoundingBoxActor->SetMapper( m_BoundingBoxMapper );
@@ -151,16 +151,16 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_ImageCast->ClampOverflowOn();
 
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
-  m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput());
+  m_UnitSpacingImageFilter->SetInput(m_ImageCast->GetOutput(0));
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   m_ImageMaskFilter = vtkImageMask::New();
   m_ImageMaskFilter->SetMaskedOutputValue(0xffff);
 
-  this->m_Resampler->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
-  this->m_HiResMapper->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
+  this->m_Resampler->SetInput( this->m_UnitSpacingImageFilter->GetOutput(0) );
+  this->m_HiResMapper->SetInput( this->m_UnitSpacingImageFilter->GetOutput(0) );
 
-//  m_T2DMapper->SetInput(m_Resampler->GetOutput());
+//  m_T2DMapper->SetInput(m_Resampler->GetOutput(0));
 
 
   this->CreateDefaultTransferFunctions();
@@ -335,14 +335,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
   //If mask exists, process mask before resampling.
   if (this->m_Mask)
   {
-    this->m_ImageMaskFilter->SetImageInput(this->m_UnitSpacingImageFilter->GetOutput());
-    this->m_Resampler->SetInput(this->m_ImageMaskFilter->GetOutput());
-    this->m_HiResMapper->SetInput(this->m_ImageMaskFilter->GetOutput());
+    this->m_ImageMaskFilter->SetImageInput(this->m_UnitSpacingImageFilter->GetOutput(0));
+    this->m_Resampler->SetInput(this->m_ImageMaskFilter->GetOutput(0));
+    this->m_HiResMapper->SetInput(this->m_ImageMaskFilter->GetOutput(0));
   }
   else
   {
-    this->m_Resampler->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
-    this->m_HiResMapper->SetInput(this->m_UnitSpacingImageFilter->GetOutput());
+    this->m_Resampler->SetInput(this->m_UnitSpacingImageFilter->GetOutput(0));
+    this->m_HiResMapper->SetInput(this->m_UnitSpacingImageFilter->GetOutput(0));
   }
 
   this->UpdateTransferFunctions( renderer );
@@ -534,7 +534,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     {
     m_PlaneWidget->SetInteractor(interactor);
     m_PlaneWidget->SetPlaceFactor(1.0);
-    m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput());
+    m_PlaneWidget->SetInput(m_UnitSpacingImageFilter->GetOutput(0));
     m_PlaneWidget->OutlineTranslationOff(); //disables scaling of the bounding box
     m_PlaneWidget->ScaleEnabledOff(); //disables scaling of the bounding box
     m_PlaneWidget->DrawPlaneOff(); //clipping plane is transparent
@@ -692,8 +692,8 @@ bool mitk::VolumeDataVtkMapper3D::SetMask(const mitk::Image* mask)
 {
   if (this->m_Mask)
   {
-    if ( (mask->GetPixelType().GetTypeId() == typeid(unsigned char))
-         &&(mask->GetPixelType().GetPixelTypeId() == itk::ImageIOBase::SCALAR ))
+    if ( (mask->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
+         &&(mask->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR ))
     {
       Image *img = const_cast<Image*>(mask);
 

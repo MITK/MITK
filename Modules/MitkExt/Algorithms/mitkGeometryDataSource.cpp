@@ -34,32 +34,20 @@ mitk::GeometryDataSource::~GeometryDataSource()
 {
 }
 
-mitk::GeometryDataSource::DataObjectPointer mitk::GeometryDataSource::MakeOutput(unsigned int /*idx*/)
+itk::DataObject::Pointer mitk::GeometryDataSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::GeometryData::New().GetPointer());
+    return OutputType::New().GetPointer();
 }
 
-mitk::GeometryData* mitk::GeometryDataSource::GetOutput()
-{
-  if (this->GetNumberOfOutputs() < 1)
-  {
-    return 0;
-  }
 
-  return static_cast<mitk::GeometryData*>
-    (this->BaseProcess::GetOutput(0));
-}
-
-mitk::GeometryData* mitk::GeometryDataSource::GetOutput(unsigned int idx)
+itk::DataObject::Pointer mitk::GeometryDataSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  return static_cast<mitk::GeometryData*>
-    (this->itk::ProcessObject::GetOutput(idx));
-}
-
-void mitk::GeometryDataSource::SetOutput(mitk::GeometryData* output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 void mitk::GeometryDataSource::GraftOutput(mitk::GeometryData* graft)
@@ -87,4 +75,24 @@ void mitk::GeometryDataSource::GraftNthOutput(unsigned int idx, mitk::GeometryDa
       output->CopyInformation( graft );
     }
   }
+}
+
+mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+{
+  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
+}
+
+mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
 }

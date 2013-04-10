@@ -102,6 +102,14 @@ void TestPropPolymorphicAssignment(T prop, T prop2, const std::string& strProp)
 }
 
 template<class T>
+void TestPropCloning(T prop)
+{
+  T prop2 = prop->Clone();
+  MITK_TEST_CONDITION_REQUIRED(prop.GetPointer() != prop2.GetPointer(), "Test clone pointer")
+  MITK_TEST_CONDITION_REQUIRED(*prop == *prop2, "Test equality of the clone")
+}
+
+template<class T>
 void TestProperty(const typename T::ValueType& v1, const typename T::ValueType& v2,
                   const std::string& strV1, const std::string& strV2)
 {
@@ -113,6 +121,8 @@ void TestProperty(const typename T::ValueType& v1, const typename T::ValueType& 
   MITK_TEST_CONDITION_REQUIRED(prop->GetValue() == v1, "Test constructor");
   std::string msg = std::string("Test GetValueAsString() [") + prop->GetValueAsString() + " == " + strV1 + "]";
   MITK_TEST_CONDITION_REQUIRED(prop->GetValueAsString() == strV1, msg);
+
+  TestPropCloning(prop);
 
   typename T::Pointer prop2 = T::New();
   prop2->AddObserver(itk::ModifiedEvent(), l.m_Cmd.GetPointer());

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkPlane.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkRotationOperation.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkVtkRepresentationProperty.h"
@@ -293,7 +294,7 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
           surfaceFilter->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
 
           mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-          surfaceNode->SetData(surfaceFilter->GetOutput());
+          surfaceNode->SetData(surfaceFilter->GetOutput(0));
           surfaceNode->SetProperty("color", referenceNode->GetProperty("color"));
           surfaceNode->SetOpacity(0.5);
           surfaceNode->SetName(referenceNode->GetName());
@@ -447,7 +448,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
   //add the new clipped image node
   mitk::DataNode::Pointer clippedNode = mitk::DataNode::New();
-  mitk::Image::Pointer clippedImage = surfaceClipFilter->GetOutput();
+  mitk::Image::Pointer clippedImage = surfaceClipFilter->GetOutput(0);
   clippedImage->DisconnectPipeline();
   clippedNode->SetData(clippedImage);
   //clippedNode->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -490,6 +491,8 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
     }
   }
 
+  //set the rendering mode to use the lookup table and level window
+  clippedNode->SetProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR));
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New(lut.GetPointer());
   clippedNode->SetProperty("LookupTable", lutProp);
   // it is absolutely important, to use the LevelWindow settings provided by

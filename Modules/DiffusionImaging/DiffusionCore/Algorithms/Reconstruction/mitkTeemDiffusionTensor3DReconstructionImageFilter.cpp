@@ -172,7 +172,7 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   typename FileReaderType::Pointer reader = FileReaderType::New();
   reader->SetFileName(filename);
   reader->Update();
-  typename VectorImageType::Pointer vecImage = reader->GetOutput();
+  typename VectorImageType::Pointer vecImage = reader->GetOutput(0);
 
   remove(filename);
   sprintf( filename, "tensors_%d.raw", random_integer);

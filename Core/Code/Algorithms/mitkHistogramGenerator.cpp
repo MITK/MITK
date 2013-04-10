@@ -77,7 +77,7 @@ void mitk::HistogramGenerator::ComputeHistogram()
     timeSelector->SetInput(m_Image);
     timeSelector->SetTimeNr( 0 );
     timeSelector->UpdateLargestPossibleRegion();
-    AccessByItk_n( timeSelector->GetOutput() , InternalCompute, (this, m_Histogram));
+    AccessByItk_n( timeSelector->GetOutput(0) , InternalCompute, (this, m_Histogram));
   }
 
 // debug code

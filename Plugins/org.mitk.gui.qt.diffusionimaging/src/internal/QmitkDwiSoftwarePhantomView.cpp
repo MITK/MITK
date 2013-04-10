@@ -250,7 +250,7 @@ void QmitkDwiSoftwarePhantomView::GeneratePhantom()
     filter->Update();
 
     mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-    image->SetVectorImage( filter->GetOutput() );
+    image->SetVectorImage( filter->GetOutput(0) );
     image->SetB_Value(bVal);
     image->SetDirections(gradientList);
     image->InitializeFromVectorImage();

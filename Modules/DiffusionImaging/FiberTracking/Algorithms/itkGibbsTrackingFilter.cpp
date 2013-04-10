@@ -171,7 +171,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         TensorImageToQBallImageFilter<float,float>::Pointer filter = TensorImageToQBallImageFilter<float,float>::New();
         filter->SetInput( m_TensorImage );
         filter->Update();
-        m_QBallImage = filter->GetOutput();
+        m_QBallImage = filter->GetOutput(0);
     }
     else if (m_DuplicateImage) // generate local working copy of QBall image (if not disabled)
     {
@@ -179,7 +179,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
         duplicator->SetInputImage( m_QBallImage );
         duplicator->Update();
-        m_QBallImage = duplicator->GetOutput();
+        m_QBallImage = duplicator->GetOutput(0);
     }
 
     // perform mean subtraction on odfs
@@ -386,9 +386,9 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         resampler->SetSize( m_QBallImage->GetLargestPossibleRegion().GetSize() );
 
         resampler->SetInput( m_MaskImage );
-        resampler->SetDefaultPixelValue(1.0);
+        resampler->SetDefaultPixelValue(0.0);
         resampler->Update();
-        m_MaskImage = resampler->GetOutput();
+        m_MaskImage = resampler->GetOutput(0);
         MITK_INFO << "GibbsTrackingFilter: resampling finished";
     }
 }

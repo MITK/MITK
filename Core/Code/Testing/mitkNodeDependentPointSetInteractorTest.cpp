@@ -63,14 +63,14 @@ int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
     const std::string filename1 = argv[1];
     nodeReader->SetFileName(filename1);
     nodeReader->Update();
-    node1 = nodeReader->GetOutput();
+    node1 = nodeReader->GetOutput(0);
     ds->Add(node1);
 
     //file 2
     const std::string filename2 = argv[2];
     nodeReader->SetFileName(filename2);
     nodeReader->Update();
-    node2 = nodeReader->GetOutput();
+    node2 = nodeReader->GetOutput(0);
     ds->Add(node2);
   }
   catch(...) {

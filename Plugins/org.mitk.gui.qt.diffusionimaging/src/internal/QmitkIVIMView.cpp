@@ -401,10 +401,10 @@ void QmitkIVIMView::AutoThreshold()
     histogramGenerator->SetHistogramMax(  dimg->GetScalarValueMax() * .5 );
     histogramGenerator->Compute();
 
-    HistogramType::ConstIterator iter = histogramGenerator->GetOutput()->Begin();
+    HistogramType::ConstIterator iter = histogramGenerator->GetOutput(0)->Begin();
     float maxFreq = 0;
     float maxValue = 0;
-    while ( iter != histogramGenerator->GetOutput()->End() )
+    while ( iter != histogramGenerator->GetOutput(0)->End() )
     {
         if(iter.GetFrequency() > maxFreq)
         {
@@ -426,7 +426,7 @@ void QmitkIVIMView::FittIVIMStart()
 
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
-    mitk::DiffusionImage<short>* img;
+    mitk::DiffusionImage<short>* img = 0;
     for ( int i=0; i<nodes.size(); i++ )
     {
         img = dynamic_cast<mitk::DiffusionImage<short>*>(nodes.at(i)->GetData());

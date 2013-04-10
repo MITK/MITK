@@ -63,12 +63,12 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
 
   //Take a slice
   mitk::ImageSliceSelector::Pointer slice = mitk::ImageSliceSelector::New();
-    slice->SetInput(cyl2cart->GetOutput());
+    slice->SetInput(cyl2cart->GetOutput(0));
     slice->SetSliceNr(1);
     slice->Update();
 
   std::cout << "Testing IsInitialized(): ";
-  if(slice->GetOutput()->IsInitialized()==false)
+  if(slice->GetOutput(0)->IsInitialized()==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -76,7 +76,7 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing IsSliceSet(): ";
-  if(slice->GetOutput()->IsSliceSet(0)==false)
+  if(slice->GetOutput(0)->IsSliceSet(0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -98,7 +98,7 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
 
     std::cout << "Testing 3D+t: Updating slice: ";
     slice->Update();
-    if(slice->GetOutput()->IsInitialized()==false)
+    if(slice->GetOutput(0)->IsInitialized()==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -106,7 +106,7 @@ int mitkCylindricToCartesianFilterTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
 
     std::cout << "Testing 3D+t: IsSliceSet(): ";
-    if(slice->GetOutput()->IsSliceSet(0)==false)
+    if(slice->GetOutput(0)->IsSliceSet(0)==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

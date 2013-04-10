@@ -154,7 +154,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
         filter->SetToolkit(FilterType::FSL);
     }
 
-    filter->SetInputImage(caster->GetOutput());
+    filter->SetInputImage(caster->GetOutput(0));
     filter->GenerateData();
     typename FilterType::QballImageType::Pointer itkQbi = filter->GetQballImage();
     typename FilterType::CoefficientImageType::Pointer itkCi = filter->GetCoefficientImage();
@@ -269,7 +269,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        // directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         node->SetName("_VectorField");
@@ -323,7 +323,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        //directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -397,7 +397,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
 
     if (m_Controls->m_OutputDirectionImagesBox->isChecked())
     {
-        MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput();
+        MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput(0);
         mitk::Image::Pointer img = mitk::Image::New();
         img->InitializeByItk( itkImg.GetPointer() );
         img->SetVolume( itkImg->GetBufferPointer() );
@@ -435,7 +435,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_TensorImageNodes.at(0)->GetName().c_str());
@@ -472,7 +472,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
         typename CasterType::Pointer caster = CasterType::New();
         caster->SetInput(img);
         caster->Update();
-        filter->SetInput(caster->GetOutput());
+        filter->SetInput(caster->GetOutput(0));
         geometry = img->GetGeometry();
     }
     catch(itk::ExceptionObject &e)
@@ -556,7 +556,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -610,7 +610,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
             CasterType::Pointer caster = CasterType::New();
             caster->SetInput(img);
             caster->Update();
-            filter->SetShCoeffImage(caster->GetOutput());
+            filter->SetShCoeffImage(caster->GetOutput(0));
             geometry = img->GetGeometry();
         }
         catch(itk::ExceptionObject &e)
@@ -695,7 +695,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());

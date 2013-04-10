@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
       // Since the DataNodeFactory directly creates a node,
       // use the datastorage to add the read node
-      storage->Add(nodeReader->GetOutput());
+      storage->Add(nodeReader->GetOutput(0));
     }
     catch(...)
     {

@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
 
       // Since the DataNodeFactory directly creates a node,
       // use the datastorage to add the read node
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = nodeReader->GetOutput(0);
       m_DataStorage->Add(node);
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -315,7 +315,7 @@ int main(int argc, char* argv[])
   {
     m_DisplayInteractor = mitk::DisplayInteractor::New();
     m_DisplayInteractor->LoadStateMachine("DisplayInteraction.xml");
-    m_DisplayInteractor->LoadEventConfig("DisplayConfigMITK.xml");
+    m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
 
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();

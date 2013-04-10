@@ -109,7 +109,7 @@ int testGeometryDataToSurfaceFilter(mitk::Geometry2DDataToSurfaceFilter* geometr
   int result;
 
   std::cout << "Testing SetRequestedRegionToLargestPossibleRegion(): ";
-  geometryToSurfaceFilter->GetOutput()->SetRequestedRegionToLargestPossibleRegion();
+  geometryToSurfaceFilter->GetOutput(0)->SetRequestedRegionToLargestPossibleRegion();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing UpdateOutputInformation(): ";
@@ -117,12 +117,12 @@ int testGeometryDataToSurfaceFilter(mitk::Geometry2DDataToSurfaceFilter* geometr
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing correctness of bounding-box after UpdateOutputInformation(): ";
-  if((result=testExpectedIndexBoundingBox(geometryToSurfaceFilter->GetOutput()->GetGeometry(), expectedIndexBounds)) != EXIT_SUCCESS) {
+  if((result=testExpectedIndexBoundingBox(geometryToSurfaceFilter->GetOutput(0)->GetGeometry(), expectedIndexBounds)) != EXIT_SUCCESS) {
     return result;
   }
 
   std::cout << "Testing correctness of axis-parallel bounding-box after UpdateOutputInformation(): ";
-  if((result=testExpectedAxisParallelBoundingBox(geometryToSurfaceFilter->GetOutput()->GetGeometry(), expectedAxisParallelBounds)) != EXIT_SUCCESS) {
+  if((result=testExpectedAxisParallelBoundingBox(geometryToSurfaceFilter->GetOutput(0)->GetGeometry(), expectedAxisParallelBounds)) != EXIT_SUCCESS) {
     return result;
   }
 
@@ -132,17 +132,17 @@ int testGeometryDataToSurfaceFilter(mitk::Geometry2DDataToSurfaceFilter* geometr
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing correctness of bounding-box after Update(): ";
-  if((result=testExpectedIndexBoundingBox(geometryToSurfaceFilter->GetOutput()->GetGeometry(), expectedIndexBounds)) != EXIT_SUCCESS) {
+  if((result=testExpectedIndexBoundingBox(geometryToSurfaceFilter->GetOutput(0)->GetGeometry(), expectedIndexBounds)) != EXIT_SUCCESS) {
     return result;
   }
 
   std::cout << "Testing correctness of axis-parallel bounding-box after UpdateOutputInformation(): ";
-  if((result=testExpectedAxisParallelBoundingBox(geometryToSurfaceFilter->GetOutput()->GetGeometry(), expectedAxisParallelBounds)) != EXIT_SUCCESS) {
+  if((result=testExpectedAxisParallelBoundingBox(geometryToSurfaceFilter->GetOutput(0)->GetGeometry(), expectedAxisParallelBounds)) != EXIT_SUCCESS) {
     return result;
   }
 
   std::cout << "Testing bounding-box consistency: "<<std::endl;
-  if((result=testSurfaceBoundingBoxConsistency(geometryToSurfaceFilter->GetOutput(), expectIdentityTransform)) != EXIT_SUCCESS) {
+  if((result=testSurfaceBoundingBoxConsistency(geometryToSurfaceFilter->GetOutput(0), expectIdentityTransform)) != EXIT_SUCCESS) {
     std::cout<<"[FAILED]"<<std::endl;
     return result;
   }

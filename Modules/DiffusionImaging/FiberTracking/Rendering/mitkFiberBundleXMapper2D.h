@@ -39,6 +39,7 @@ class vtkPolyData;
 
 namespace mitk {
 
+  struct IShaderRepository;
 
   class FiberBundleXMapper2D : public VtkMapper
   {
@@ -95,6 +96,8 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer*);
 
     void UpdateShaderParameter(mitk::BaseRenderer*);
+
+    static IShaderRepository* GetShaderRepository();
 
   private:
     vtkSmartPointer<vtkLookupTable> m_lut;

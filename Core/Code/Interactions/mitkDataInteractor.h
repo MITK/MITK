@@ -62,10 +62,15 @@ namespace mitk
     /**
      * @brief Returns the mode the DataInteractor currently is in. See in mitkDispatcher the description of m_ProcessingMode for further details.
      */
-    ProcessEventMode GetMode();
+    ProcessEventMode GetMode() const;
 
     NodeType GetDataNode() const;
     int GetLayer() const;
+
+    // Predefined internal events/signals
+    static const std::string IntDeactivateMe; // = "DeactivateMe";
+    static const std::string IntLeaveWidget; // = "LeaveWidget";
+    static const std::string IntEnterWidget; // = "EnterWidget";
 
   protected:
     DataInteractor();

@@ -58,12 +58,15 @@ namespace mitk {
   protected:
     itk::WeakPointer<itk::Object> m_WeakPointer;
 
+    WeakPointerProperty(const WeakPointerProperty&);
+
     WeakPointerProperty(itk::Object* pointer = 0);
 
   private:
     // purposely not implemented
-    WeakPointerProperty(const WeakPointerProperty&);
     WeakPointerProperty& operator=(const WeakPointerProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty& property) const;
     virtual bool Assign(const BaseProperty& property);

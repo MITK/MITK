@@ -116,19 +116,20 @@ public:
     slicer->SetWorldGeometry(TestPlane);
     slicer->Update();
 
-    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput() != NULL, "Extractor returned a slice");
+    MITK_TEST_CONDITION_REQUIRED(slicer->GetOutput(0) != NULL, "Extractor returned a slice");
 
-    mitk::Image::Pointer reslicedImage = slicer->GetOutput();
+    mitk::Image::Pointer reslicedImage = slicer->GetOutput(0);
 
     AccessFixedDimensionByItk(reslicedImage, TestSphereRadiusByItk, 2);
     AccessFixedDimensionByItk(reslicedImage, TestSphereAreaByItk, 2);
 
+    /*
     double devArea, devDiameter;
     if(TestvolumeSize == 128.0){ devArea = Testfailure_Deviation_Volume_128; devDiameter = Testfailure_Deviation_Diameter_128; }
     else if(TestvolumeSize == 256.0){devArea = Testfailure_Deviation_Volume_256; devDiameter = Testfailure_Deviation_Diameter_256;}
     else if (TestvolumeSize == 512.0){devArea = Testfailure_Deviation_Volume_512; devDiameter = Testfailure_Deviation_Diameter_512;}
     else{devArea = Testfailure_Deviation_Volume_128; devDiameter = Testfailure_Deviation_Diameter_128;}
-
+    */
 
     std::string areatestName = TestName.append(" area");
     std::string diametertestName = TestName.append(" testing diameter");
@@ -244,11 +245,12 @@ public:
 
     //each distance from the first mark of each direction to the center of the straight line between the marks
     double distanceToCenterX = std::abs(indicesX[0][1] - indicesX[1][1]) / 2.0;
-    double distanceToCenterY = std::abs(indicesY[0][0] - indicesY[1][0]) / 2.0;
+    //double distanceToCenterY = std::abs(indicesY[0][0] - indicesY[1][0]) / 2.0;
 
 
     //the center of the straight lines
-    typename InputImageType::IndexType centerX, centerY;
+    typename InputImageType::IndexType centerX;
+    //typename InputImageType::IndexType centerY;
 
     centerX[0] = indicesX[0][0];
     centerX[1] = indicesX[0][1] + distanceToCenterX;
@@ -554,7 +556,7 @@ public:
 
     slicer->Update();
 
-    mitk::Image::Pointer slice = slicer->GetOutput();
+    mitk::Image::Pointer slice = slicer->GetOutput(0);
 
     // Get TestPoiont3D as Index in Slice
     slice->GetGeometry()->WorldToIndex(testPoint3DInWorld,testPoint2DInIndex);
@@ -575,7 +577,7 @@ public:
 
     //compare the pixelvalues of the defined point in the 3D volume with the value of the resliced image
     unsigned short valueAt3DVolume = imageInMitk->GetPixelValueByIndex(testPoint3DInIndex);//image->GetPixel(testPoint3DInIndex);
-    unsigned short valueAt3DVolumeByWorld = imageInMitk->GetPixelValueByWorldCoordinate(testPoint3DInWorld);
+    //unsigned short valueAt3DVolumeByWorld = imageInMitk->GetPixelValueByWorldCoordinate(testPoint3DInWorld);
     unsigned short valueAtSlice = slice->GetPixelValueByIndex(testPoint2DInIndex);
 
     //valueAt3DVolume == valueAtSlice is not always working. because of rounding errors
@@ -589,7 +591,7 @@ public:
     sliceInVtk = slice->GetVtkImageData();
 
     double PixelvalueByMitkOutput = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
-    double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
+    //double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
 
 
     /* Test that everything is working equally if vtkoutput is used instead of the default output
@@ -705,7 +707,7 @@ public:
     reader->SetFileName(filename);
 
     reader->Update();
-    TestVolume = reader->GetOutput();
+    TestVolume = reader->GetOutput(0);
 
   #endif
 
@@ -1025,7 +1027,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
 
     reader->Update();
 
-    mitk::Image::Pointer pic = reader->GetOutput();
+    mitk::Image::Pointer pic = reader->GetOutput(0);
     vtkSmartPointer<vtkImageReslice> slicer = vtkSmartPointer<vtkImageReslice>::New();
 
     slicer->SetInput(pic->GetVtkImageData());
@@ -1120,7 +1122,7 @@ int mitkExtractSliceFilterTest(int argc, char* argv[])
     vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
 
 
-    texture->SetInput(slicer->GetOutput());
+    texture->SetInput(slicer->GetOutput(0));
 
     texture->SetLookupTable(lookupTable);
 

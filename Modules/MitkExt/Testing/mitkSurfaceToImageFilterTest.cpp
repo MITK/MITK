@@ -59,7 +59,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 
   mitk::Surface::Pointer surface = NULL;
 
-  surface = reader->GetOutput();
+  surface = reader->GetOutput(0);
 
   if(surface.IsNull())
   {
@@ -100,8 +100,8 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 #ifdef WIN32     // Unix based systems do not seem to resolve pixel type correctly
 
   std::cout << "Testing if result image is of type unsigned char: " << std::flush;
-  //std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetItkTypeAsString();
-  std::string typeId = s2iFilter->GetOutput()->GetPixelType().GetComponentTypeAsString();
+  //std::string typeId = s2iFilter->GetOutput(0)->GetPixelType().GetItkTypeAsString();
+  std::string typeId = s2iFilter->GetOutput(0)->GetPixelType().GetComponentTypeAsString();
   std::cout << std::endl << "XXX: " << typeId << std::endl;
   if( typeId != "unsigned char" )
   {
@@ -114,7 +114,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 #endif
 
   //mitk::PicFileWriter::Pointer picWriter = mitk::PicFileWriter::New();
-  //picWriter->SetInput(s2iFilter->GetOutput());
+  //picWriter->SetInput(s2iFilter->GetOutput(0));
   //picWriter->SetFileName("SurfaceToImageFilterTestOutput.pic");
   //picWriter->Write();
 

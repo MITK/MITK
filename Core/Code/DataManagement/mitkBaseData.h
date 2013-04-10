@@ -41,7 +41,7 @@ namespace mitk {
 class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
-  mitkClassMacro(BaseData,itk::DataObject);
+  mitkClassMacro(BaseData,itk::DataObject)
 
   //##Documentation
   //## @brief Return the TimeSlicedGeometry of the data as const pointer.
@@ -111,15 +111,6 @@ public:
       return NULL;
     return m_TimeSlicedGeometry->GetGeometry3D(t);
   }
-
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  virtual void UnRegister() const;
-
-  //##Documentation
-  //## @brief for internal use only. Helps to deal with the
-  //## weak-pointer-problem.
-  virtual int GetExternalReferenceCount() const;
 
   //##Documentation
   //## @brief Update the information for this BaseData (the geometry in particular)
@@ -224,7 +215,7 @@ public:
   //## region of the data object passed in as a parameter.
   //##
   //## This method is implemented in the concrete subclasses of BaseData.
-  virtual void SetRequestedRegion(itk::DataObject *data)=0;
+  virtual void SetRequestedRegion(const itk::DataObject *data)=0;
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
@@ -315,7 +306,7 @@ public:
   unsigned int GetTimeSteps() const
   {
     return m_TimeSlicedGeometry->GetTimeSteps();
-  };
+  }
 
 
   //##Documentation
@@ -342,7 +333,7 @@ protected:
   //## @brief Pure virtual; Must be used in subclasses to get a data object to a
   //## valid state. Should at least create one empty object and call
   //## Superclass::InitializeTimeSlicedGeometry() to ensure an existing valid geometry
-  virtual void InitializeEmpty(){};
+  virtual void InitializeEmpty(){}
 
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
@@ -350,25 +341,11 @@ protected:
   bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 
-  mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;
   mutable unsigned int m_SourceOutputIndexDuplicate;
-  //##Documentation
-  //## @brief for internal use only. Helps to deal with the
-  //## weak-pointer-problem.
-  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 
   bool m_Initialized;
 
 private:
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_Unregistering;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_CalculatingExternalReferenceCount;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable int m_ExternalReferenceCount;
 
   //##Documentation
   //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
@@ -377,9 +354,6 @@ private:
 
   TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  friend class mitk::BaseProcess;
 };
 
 } // namespace mitk

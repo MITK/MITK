@@ -347,7 +347,7 @@ void QmitkSegmentationPostProcessing::AutocropSelected(bool)
       {
         cropFilter->Update();
 
-        image = cropFilter->GetOutput();
+        image = cropFilter->GetOutput(0);
 
         if (image.IsNotNull())
         {
@@ -404,7 +404,7 @@ mitk::Image::Pointer QmitkSegmentationPostProcessing::IncreaseCroppedImageSize( 
 
 
   mitk::Image::Pointer paddedImage = mitk::Image::New();
-  mitk::CastToMitkImage(padFilter->GetOutput(), paddedImage);
+  mitk::CastToMitkImage(padFilter->GetOutput(0), paddedImage);
 
   paddedImage->SetGeometry(image->GetGeometry());
 

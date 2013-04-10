@@ -117,7 +117,7 @@ namespace mitk
     * SetVtkOutputRequest(true) has to be called at least once before
     * GetVtkOutput(). Otherwise the output is empty for the first update step.
     */
-    vtkImageData* GetVtkOutput(){ m_VtkOutputRequested = true; return m_Reslicer->GetOutput(); }
+    vtkImageData* GetVtkOutput(){ m_VtkOutputRequested = true; return m_Reslicer->GetOutput(0); }
 
     /** Set VtkOutPutRequest to suppress the convertion of the image.
     * It is suggested to use this with GetVtkOutput().

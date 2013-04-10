@@ -232,17 +232,17 @@ mitk::MousePressEvent::Pointer mitk::VtkEventAdapter::AdaptMousePressEvent(mitk:
   switch (vtkCommandEventId)
   {
   case vtkCommand::LeftButtonPressEvent:
-    button = mitk::LeftMouseButton;
+    button = InteractionEvent::LeftMouseButton;
     buttonState |= button;
     buttonStateMap[sender] = buttonState;
     break;
   case vtkCommand::MiddleButtonPressEvent:
-    button = mitk::MiddleMouseButton;
+    button = InteractionEvent::MiddleMouseButton;
     buttonState |= button;
     buttonStateMap[sender] = buttonState;
     break;
   case vtkCommand::RightButtonPressEvent:
-    button = mitk::RightMouseButton;
+    button = InteractionEvent::RightMouseButton;
     buttonState |= button;
     buttonStateMap[sender] = buttonState;
     break;
@@ -250,19 +250,21 @@ mitk::MousePressEvent::Pointer mitk::VtkEventAdapter::AdaptMousePressEvent(mitk:
 
   if (rwi->GetShiftKey())
   {
-    modifiers |= mitk::ShiftKey;
+    modifiers |= InteractionEvent::ShiftKey;
   }
   if (rwi->GetControlKey())
   {
-    modifiers |= mitk::ControlKey;
+    modifiers |= InteractionEvent::ControlKey;
   }
   if (rwi->GetAltKey())
   {
-    modifiers |= mitk::AltKey;
+    modifiers |= InteractionEvent::AltKey;
   }
 
-  MousePressEvent::Pointer mpe = MousePressEvent::New(sender, point, (MouseButtons) buttonState, (ModifierKeys) modifiers,
-      (MouseButtons) button);
+  MousePressEvent::Pointer mpe = MousePressEvent::New(sender, point,
+                                                      static_cast<InteractionEvent::MouseButtons>(buttonState),
+                                                      static_cast<InteractionEvent::ModifierKeys>(modifiers),
+                                                      static_cast<InteractionEvent::MouseButtons>(button));
   return mpe;
 }
 
@@ -303,18 +305,20 @@ mitk::MouseMoveEvent::Pointer mitk::VtkEventAdapter::AdaptMouseMoveEvent(mitk::B
 
   if (rwi->GetShiftKey())
   {
-    modifiers |= mitk::ShiftKey;
+    modifiers |= InteractionEvent::ShiftKey;
   }
   if (rwi->GetControlKey())
   {
-    modifiers |= mitk::ControlKey;
+    modifiers |= InteractionEvent::ControlKey;
   }
   if (rwi->GetAltKey())
   {
-    modifiers |= mitk::AltKey;
+    modifiers |= InteractionEvent::AltKey;
   }
 
-  MouseMoveEvent::Pointer mme = MouseMoveEvent::New(sender, point, (MouseButtons) buttonState, (ModifierKeys) modifiers);
+  MouseMoveEvent::Pointer mme = MouseMoveEvent::New(sender, point,
+                                                    static_cast<InteractionEvent::MouseButtons>(buttonState),
+                                                    static_cast<InteractionEvent::ModifierKeys>(modifiers));
   return mme;
 }
 
@@ -344,17 +348,17 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
   switch (vtkCommandEventId)
   {
   case vtkCommand::LeftButtonReleaseEvent:
-    button = mitk::LeftMouseButton;
+    button = InteractionEvent::LeftMouseButton;
     // remove left mouse button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
   case vtkCommand::MiddleButtonReleaseEvent:
-    button = mitk::MiddleMouseButton;
+    button = InteractionEvent::MiddleMouseButton;
     // remove middle button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
   case vtkCommand::RightButtonReleaseEvent:
-    button = mitk::RightMouseButton;
+    button = InteractionEvent::RightMouseButton;
     // remove right mouse button from button state
     buttonStateMap[sender] = (buttonState - button);
     break;
@@ -362,15 +366,15 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
 
   if (rwi->GetShiftKey())
   {
-    modifiers |= mitk::ShiftKey;
+    modifiers |= InteractionEvent::ShiftKey;
   }
   if (rwi->GetControlKey())
   {
-    modifiers |= mitk::ControlKey;
+    modifiers |= InteractionEvent::ControlKey;
   }
   if (rwi->GetAltKey())
   {
-    modifiers |= mitk::AltKey;
+    modifiers |= InteractionEvent::AltKey;
   }
 
   // after releasing button is no longer pressed, to update it
@@ -378,8 +382,10 @@ mitk::MouseReleaseEvent::Pointer mitk::VtkEventAdapter::AdaptMouseReleaseEvent(m
     buttonState = buttonStateMap.find(sender)->second;
   }
 
-  MouseReleaseEvent::Pointer mre = MouseReleaseEvent::New(sender, point, (MouseButtons) buttonState, (ModifierKeys) modifiers,
-      (MouseButtons) button);
+  MouseReleaseEvent::Pointer mre = MouseReleaseEvent::New(sender, point,
+                                                          static_cast<InteractionEvent::MouseButtons>(buttonState),
+                                                          static_cast<InteractionEvent::ModifierKeys>(modifiers),
+                                                          static_cast<InteractionEvent::MouseButtons>(button));
   return mre;
 }
 
@@ -423,7 +429,10 @@ mitk::MouseWheelEvent::Pointer mitk::VtkEventAdapter::AdaptMouseWheelEvent(mitk:
 
   // vtkWheelEvent does not have a buttonState or event button
   int buttonState = 0;
-  MouseWheelEvent::Pointer mpe = MouseWheelEvent::New(sender, point, (MouseButtons) buttonState, (ModifierKeys) modifiers, delta);
+  MouseWheelEvent::Pointer mpe = MouseWheelEvent::New(sender, point,
+                                                      static_cast<InteractionEvent::MouseButtons>(buttonState),
+                                                      static_cast<InteractionEvent::ModifierKeys>(modifiers),
+                                                      delta);
   return mpe;
 }
 
@@ -447,7 +456,8 @@ mitk::InteractionKeyEvent::Pointer mitk::VtkEventAdapter::AdaptInteractionKeyEve
   {
     modifiers |= mitk::BS_AltButton;
   }
-  InteractionKeyEvent::Pointer ike = InteractionKeyEvent::New(sender, std::string(rwi->GetKeySym()), (ModifierKeys)modifiers );
+  InteractionKeyEvent::Pointer ike = InteractionKeyEvent::New(sender, std::string(rwi->GetKeySym()),
+                                                              static_cast<InteractionEvent::ModifierKeys>(modifiers));
   return ike;
 
 }

@@ -68,11 +68,11 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
         timeselector->SetInput( inputImage );
         timeselector->SetTimeNr( m_ActualInputTimestep );
         timeselector->UpdateLargestPossibleRegion();
-        inputImage = timeselector->GetOutput();
+        inputImage = timeselector->GetOutput(0);
     }
     else if ( inputImage->GetDimension() == 2)
     {
-        mitk::Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+        mitk::Image::Pointer resultImage = ImageToImageFilter::GetOutput(0);
         resultImage = const_cast<mitk::Image*>( inputImage.GetPointer() );
         ImageToImageFilter::SetNthOutput( 0, resultImage);
         return;
@@ -234,7 +234,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
         ++sliceIterator;
     }
 
-    Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+    Image::Pointer resultImage = ImageToImageFilter::GetOutput(0);
     GrabItkImageMemory(resultSlice, resultImage, NULL, false);
     resultImage->SetClonedGeometry(newSliceGeometryTest);
     //Workaround because of BUG (#6505)

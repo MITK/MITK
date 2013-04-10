@@ -75,6 +75,8 @@ protected:
    */
   GridRepresentationProperty( );
 
+  GridRepresentationProperty(const GridRepresentationProperty& other);
+
   /**
    * Constructor. Sets the representation to the given value. If it is not
    * valid, the representation is set to Wireframe(1)
@@ -101,6 +103,10 @@ protected:
    * enumeration values.
    */
   virtual void AddRepresentationTypes();
+
+private:
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 } // end of namespace mitk
 #endif // _MITK_GRID_REPRESENTATION_PROPERTY__H_

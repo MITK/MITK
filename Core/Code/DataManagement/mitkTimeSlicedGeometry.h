@@ -152,7 +152,8 @@ public:
   //##Documentation
   //## @brief duplicates the geometry
   virtual itk::LightObject::Pointer InternalClone() const;
-  TimeSlicedGeometry::Pointer CloneCopy() const;
+  // muellerm, 18.1.13, method not implemented
+  //TimeSlicedGeometry::Pointer CloneCopy() const;
   virtual void ExecuteOperation(Operation* operation);
 protected:
   TimeSlicedGeometry();

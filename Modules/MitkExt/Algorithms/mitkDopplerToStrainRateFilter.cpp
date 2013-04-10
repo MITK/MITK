@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -66,7 +66,7 @@ void mitk::DopplerToStrainRateFilter::GenerateOutputInformation()
 void mitk::DopplerToStrainRateFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
 
   mitk::Point3iProperty::Pointer pointProp;
@@ -146,7 +146,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
       // Cast to pic descriptor for the timeSelector image
       mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
-      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+      CastToIpPicDescriptor( timeSelector->GetOutput(0), timeSelectorPic );
 
       _mitkIpPicFreeTags(picStrainRate->info->tags_head);
       picStrainRate->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
@@ -365,7 +365,7 @@ void mitk::DopplerToStrainRateFilter::GenerateInputRequestedRegion()
 
   mitk::ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::Pointer output = this->GetOutput(0);
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

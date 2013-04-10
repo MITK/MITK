@@ -53,12 +53,12 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ComputeScalarsOff();
-  skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput());//RC++
+  skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput(0));//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
 
   vtkPolyData *polydata;
-  polydata = skinExtractor->GetOutput();
+  polydata = skinExtractor->GetOutput(0);
   polydata->Register(NULL);//RC++
   skinExtractor->Delete();
 
@@ -75,7 +75,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     smoother->SetConvergence( 0 );
 
     polydata->Delete();//RC--
-    polydata = smoother->GetOutput();
+    polydata = smoother->GetOutput(0);
     polydata->Register(NULL);//RC++
     smoother->Delete();
   }
@@ -97,7 +97,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->SetMaximumError(0.002);
 
     polydata->Delete();//RC--
-    polydata = decimate->GetOutput();
+    polydata = decimate->GetOutput(0);
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }
@@ -108,7 +108,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
     decimate->SetInput(polydata);
     polydata->Delete();
-    polydata = decimate->GetOutput();
+    polydata = decimate->GetOutput(0);
     polydata->Register(NULL);
     decimate->Delete();
   }
@@ -165,7 +165,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
 void mitk::ImageToSurfaceFilter::GenerateData()
 {
-  mitk::Surface *surface = this->GetOutput();
+  mitk::Surface *surface = this->GetOutput(0);
   mitk::Image * image        =  (mitk::Image*)GetInput();
   if(image == NULL || !image->IsInitialized())
     mitkThrow() << "No input image set, please set an valid input image!";
@@ -224,7 +224,7 @@ void mitk::ImageToSurfaceFilter::GenerateOutputInformation()
   mitk::Image::ConstPointer inputImage  =(mitk::Image*) this->GetInput();
 
   //mitk::Image *inputImage = (mitk::Image*)this->GetImage();
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 

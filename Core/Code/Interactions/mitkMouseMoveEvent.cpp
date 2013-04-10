@@ -17,19 +17,19 @@
 #include "mitkException.h"
 #include "mitkMouseMoveEvent.h"
 
-mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, mitk::Point2D mousePosition , mitk::MouseButtons buttonStates, mitk::ModifierKeys modifiers)
-: InteractionPositionEvent(baseRenderer, mousePosition,  "MouseMoveEvent")
+mitk::MouseMoveEvent::MouseMoveEvent(mitk::BaseRenderer* baseRenderer, const mitk::Point2D& mousePosition , MouseButtons buttonStates, ModifierKeys modifiers)
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
 {
 }
 
-mitk::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MouseMoveEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MouseMoveEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MouseMoveEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }
@@ -48,17 +48,14 @@ mitk::MouseMoveEvent::~MouseMoveEvent()
 {
 }
 
-bool mitk::MouseMoveEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseMoveEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
 {
-  mitk::MouseMoveEvent* mpe = dynamic_cast<mitk::MouseMoveEvent*>(interactionEvent.GetPointer());
-  if (mpe == NULL)
-  {
-    return false;
-  }
-  return (this->GetModifiers() == mpe->GetModifiers() && this->GetButtonStates() == mpe->GetButtonStates());
+  const mitk::MouseMoveEvent& mpe = static_cast<const mitk::MouseMoveEvent&>(interactionEvent);
+  return (this->GetModifiers() == mpe.GetModifiers() && this->GetButtonStates() == mpe.GetButtonStates() &&
+          Superclass::IsEqual(interactionEvent));
 }
 
-bool mitk::MouseMoveEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+bool mitk::MouseMoveEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
 {
   return (dynamic_cast<MouseMoveEvent*>(baseClass.GetPointer()) != NULL) ;
 }

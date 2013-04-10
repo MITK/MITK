@@ -691,13 +691,13 @@ SliceNavigationController
                   stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
                   stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
                   mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep());
-                  if (fabs(pixelValue)>1000000)
+                  if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
                   {
-                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific<< pixelValue <<"  ";
                   }
                   else
                   {
-                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
+                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
                   }
                 }
                 else

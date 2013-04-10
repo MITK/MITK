@@ -144,7 +144,7 @@ void mitk::DicomDiffusionImageHeaderReader::Update()
         reader->SetVolumeReader(this->m_VolumeReader);
         reader->SetOutputPointer(this->m_Output);
         reader->Update();
-        this->m_Output = reader->GetOutput();
+        this->m_Output = reader->GetOutput(0);
         break;
       }
     case(SV_SIEMENS):
@@ -156,7 +156,7 @@ void mitk::DicomDiffusionImageHeaderReader::Update()
         reader->SetVolumeReader(this->m_VolumeReader);
         reader->SetOutputPointer(this->m_Output);
         reader->Update();
-        this->m_Output = reader->GetOutput();
+        this->m_Output = reader->GetOutput(0);
         break;
       }
     case(SV_SIEMENS_MOSAIC):
@@ -169,7 +169,7 @@ void mitk::DicomDiffusionImageHeaderReader::Update()
         reader->SetVolumeReader(this->m_VolumeReader);
         reader->SetOutputPointer(this->m_Output);
         reader->Update();
-        this->m_Output = reader->GetOutput();
+        this->m_Output = reader->GetOutput(0);
         break;
       }
     case(SV_PHILIPS):
@@ -182,7 +182,7 @@ void mitk::DicomDiffusionImageHeaderReader::Update()
         reader->SetVolumeReader(this->m_VolumeReader);
         reader->SetOutputPointer(this->m_Output);
         reader->Update();
-        this->m_Output = reader->GetOutput();
+        this->m_Output = reader->GetOutput(0);
         break;
       }
     case(SV_UNKNOWN_VENDOR):

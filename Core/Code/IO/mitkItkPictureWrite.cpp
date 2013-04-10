@@ -100,7 +100,7 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   {
     UCharWriterType::Pointer writer = UCharWriterType::New();
     SetOutputNames<UCharWriterType>( writer, fileName, numberOfImages );
-    writer->SetInput( rescaler->GetOutput() );
+    writer->SetInput( rescaler->GetOutput(0) );
     writer->Update();
   }
   // 16bit  16bit possible
@@ -108,7 +108,7 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   {
     ShortWriterType::Pointer writer = ShortWriterType::New();
     SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
-    writer->SetInput( sh_rescaler->GetOutput() );
+    writer->SetInput( sh_rescaler->GetOutput(0) );
     writer->Update();
   }
   // rescaling to maximum of supported format
@@ -118,14 +118,14 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
     {
       typename ShortWriterType::Pointer writer = ShortWriterType::New();
       SetOutputNames<ShortWriterType>( writer, fileName, numberOfImages );
-      writer->SetInput(sh_rescaler->GetOutput() );
+      writer->SetInput(sh_rescaler->GetOutput(0) );
       writer->Update();
     }
     else
     {
       typename UCharWriterType::Pointer writer = UCharWriterType::New();
       SetOutputNames<UCharWriterType>( writer, fileName, numberOfImages );
-      writer->SetInput( rescaler->GetOutput() );
+      writer->SetInput( rescaler->GetOutput(0) );
       writer->Update();
     }
   }

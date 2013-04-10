@@ -40,20 +40,34 @@ public:
 
   itkNewMacro(Self);
 
+  typedef mitk::UnstructuredGrid OutputType;
+
   typedef itk::DataObject::Pointer DataObjectPointer;
 
-  virtual DataObjectPointer MakeOutput(unsigned int idx);
+  /**
+   * Allocates a new output object and returns it. Currently the
+   * index idx is not evaluated.
+   * @param idx the index of the output for which an object should be created
+   * @returns the new object
+   */
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
 
-
-  void SetOutput(mitk::UnstructuredGrid* output);
-
-  mitk::UnstructuredGrid* GetOutput();
-
-  mitk::UnstructuredGrid* GetOutput(unsigned int idx);
+  /**
+   * This is a default implementation to make sure we have something.
+   * Once all the subclasses of ProcessObject provide an appopriate
+   * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+   * virtual.
+   */
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
   virtual void GraftOutput(mitk::UnstructuredGrid* graft);
 
   virtual void GraftNthOutput(unsigned int idx, mitk::UnstructuredGrid *graft);
+
+  OutputType* GetOutput(const DataObjectIdentifierType & key);
+  const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+  OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+  const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
   UnstructuredGridSource();

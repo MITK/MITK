@@ -69,7 +69,11 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_MaskingModeChanged( false ),
   m_IgnorePixelValue(0.0),
   m_DoIgnorePixelValue(false),
-  m_IgnorePixelValueChanged(false)
+  m_IgnorePixelValueChanged(false),
+  m_PlanarFigureAxis (0),
+  m_PlanarFigureSlice (0),
+  m_PlanarFigureCoordinate0 (0),
+  m_PlanarFigureCoordinate1 (0)
 {
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
@@ -536,7 +540,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
   imageTimeSelector->SetInput( m_Image );
   imageTimeSelector->SetTimeNr( timeStep );
   imageTimeSelector->UpdateLargestPossibleRegion();
-  mitk::Image *timeSliceImage = imageTimeSelector->GetOutput();
+  mitk::Image *timeSliceImage = imageTimeSelector->GetOutput(0);
 
 
   switch ( m_MaskingMode )
@@ -573,7 +577,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
           maskedImageTimeSelector->SetInput( m_ImageMask );
           maskedImageTimeSelector->SetTimeNr( timeStep );
           maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
+          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput(0);
 
           m_InternalImage = timeSliceImage;
           CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
@@ -629,6 +633,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       {
         throw std::runtime_error( "Non-aligned planar figures not supported!" );
       }
+      m_PlanarFigureAxis = axis;
 
 
       // Find slice number corresponding to PlanarFigure in input image
@@ -636,6 +641,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );
 
       unsigned int slice = index[axis];
+      m_PlanarFigureSlice = slice;
 
 
       // Extract slice with given position and direction from image
@@ -644,7 +650,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
-      m_InternalImage = imageExtractor->GetOutput();
+      m_InternalImage = imageExtractor->GetOutput(0);
 
 
       // Compute mask from PlanarFigure
@@ -896,7 +902,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
   adaptMaskFilter->SetOutputOffset( offset );
   adaptMaskFilter->Update();
-  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
+  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput(0);
 
 
   // Make sure that mask region is contained within image region
@@ -926,7 +932,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     extractImageFilter->SetInput( image );
     extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
     extractImageFilter->Update();
-    adaptedImage = extractImageFilter->GetOutput();
+    adaptedImage = extractImageFilter->GetOutput(0);
   }
   else
   {
@@ -963,7 +969,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
-  labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+  labelStatisticsFilter->GetOutput(0)->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+
 
   // Execute the filter
   labelStatisticsFilter->Update();
@@ -1020,11 +1027,34 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
         statistics.MinIndex.set_size(adaptedImage->GetImageDimension());
         statistics.MaxIndex.set_size(adaptedImage->GetImageDimension());
-        for (int i=0; i<statistics.MaxIndex.size(); i++)
+
+        typename MinMaxFilterType::IndexType tempMaxIndex = minMaxFilter->GetIndexOfMaximum();
+        typename MinMaxFilterType::IndexType tempMinIndex = minMaxFilter->GetIndexOfMinimum();
+
+// FIX BUG 14644
+        //If a PlanarFigure is used for segmentation the
+        //adaptedImage is a single slice (2D). Adding the
+        // 3. dimension.
+        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && m_Image->GetDimension()==3)
         {
-            statistics.MaxIndex[i] = minMaxFilter->GetIndexOfMaximum()[i];
-            statistics.MinIndex[i] = minMaxFilter->GetIndexOfMinimum()[i];
+            statistics.MaxIndex.set_size(m_Image->GetDimension());
+            statistics.MaxIndex[m_PlanarFigureCoordinate0]=tempMaxIndex[0];
+            statistics.MaxIndex[m_PlanarFigureCoordinate1]=tempMaxIndex[1];
+            statistics.MaxIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
+
+            statistics.MinIndex.set_size(m_Image->GetDimension());
+            statistics.MinIndex[m_PlanarFigureCoordinate0]=tempMinIndex[0];
+            statistics.MinIndex[m_PlanarFigureCoordinate1]=tempMinIndex[1];
+            statistics.MinIndex[m_PlanarFigureAxis]=m_PlanarFigureSlice;
+        } else
+        {
+          for (int i = 0; i<statistics.MaxIndex.size(); i++)
+          {
+            statistics.MaxIndex[i] = tempMaxIndex[i];
+            statistics.MinIndex[i] = tempMinIndex[i];
+          }
         }
+// FIX END
 
       statisticsContainer->push_back( statistics );
     }
@@ -1050,7 +1080,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
   castFilter->SetInput( image );
   castFilter->Update();
-  castFilter->GetOutput()->FillBuffer( 1 );
+  castFilter->GetOutput(0)->FillBuffer( 1 );
 
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
@@ -1079,6 +1109,8 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
       i1 = 1;
       break;
   }
+  m_PlanarFigureCoordinate0= i0;
+  m_PlanarFigureCoordinate1= i1;
 
   // store the polyline contour as vtkPoints object
   bool outOfBounds = false;
@@ -1136,7 +1168,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
 
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
-  itkExporter->SetInput( castFilter->GetOutput() );
+  itkExporter->SetInput( castFilter->GetOutput(0) );
 
   vtkSmartPointer<vtkImageImport> vtkImporter = vtkSmartPointer<vtkImageImport>::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
@@ -1159,7 +1191,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   itkImporter->Update();
 
   // Store mask
-  m_InternalImageMask2D = itkImporter->GetOutput();
+  m_InternalImageMask2D = itkImporter->GetOutput(0);
 }
 
 

@@ -82,8 +82,8 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
     return NULL;
   }
 
-  m_DeformationField = m_Deformer->GetOutput();
-  m_InverseDeformationField = m_LandmarkDeformer->GetOutput();
+  m_DeformationField = m_Deformer->GetOutput(0);
+  m_InverseDeformationField = m_LandmarkDeformer->GetOutput(0);
 
   m_Warper = FilterType::New();
 
@@ -106,7 +106,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
   m_Warper->UpdateLargestPossibleRegion();
   m_Warper->RemoveObserver(obs3);
 
-  return m_Warper->GetOutput();
+  return m_Warper->GetOutput(0);
 }
 
 mitk::LandmarkWarping::LandmarkContainerType::Pointer mitk::LandmarkWarping::GetTransformedTargetLandmarks()

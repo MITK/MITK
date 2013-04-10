@@ -279,7 +279,7 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   magnifier->SetInput(renderer);
   magnifier->SetMagnification(magnificationFactor);
   //magnifier->Update();
-  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetInput(magnifier->GetOutput(0));
   fileWriter->SetFileName(fileName.toLatin1());
 
   // vtkRenderLargeImage has problems with different layers, therefore we have to

@@ -52,6 +52,8 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     virtual void CreateQtPartControl(QWidget *parent);
     /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
     virtual void CreateConnections();
+    /* @brief Disconnects all devices immediately. */
+    virtual void DisconnectAllDevices();
 
   public slots:
 

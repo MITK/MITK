@@ -27,9 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSmartPointerProperty.h"
 
 #include "mitkShaderProperty.h"
-#include "mitkShaderRepository.h"
+#include "mitkIShaderRepository.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
+#include <mitkCoreServices.h>
 
 //VTK
 #include <vtkActor.h>
@@ -84,7 +85,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput(0) );
   }
   else
   {
@@ -253,7 +254,11 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
         // VTK Properties
         ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
         // Shaders
-        mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+        if (shaderRepo != NULL)
+        {
+            shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
+        }
     }
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
@@ -320,7 +325,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
             sliceselector->SetTimeNr(0);
             sliceselector->SetInput(miktTexture);
             sliceselector->Update();
-            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
+            vtkTxture->SetInput(sliceselector->GetOutput(0)->GetVtkImageData());
         }
         else //or just use the 2D image
         {
@@ -462,8 +467,10 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 
     // Shaders
+    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+    if (shaderRepo)
     {
-        mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+        shaderRepo->AddDefaultProperties(node,renderer,overwrite);
     }
 }
 

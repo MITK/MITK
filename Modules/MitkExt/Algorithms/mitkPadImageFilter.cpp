@@ -84,7 +84,7 @@ void mitk::PadImageFilter::GenerateData()
   padFilter->SetPadLowerBound( padLowerBound );
   padFilter->SetPadUpperBound( padUpperBound );
 
-  mitk::Image::Pointer outputImage = this->GetOutput();
+  mitk::Image::Pointer outputImage = this->GetOutput(0);
 
 
   // If the Binary flag is set, use an additional binary threshold filter after
@@ -96,19 +96,19 @@ void mitk::PadImageFilter::GenerateData()
       BinaryFilterType;
     BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
 
-    binaryFilter->SetInput( padFilter->GetOutput() );
+    binaryFilter->SetInput( padFilter->GetOutput(0) );
     binaryFilter->SetLowerThreshold( m_LowerThreshold );
     binaryFilter->SetUpperThreshold( m_UpperThreshold );
     binaryFilter->SetInsideValue( 1 );
     binaryFilter->SetOutsideValue( 0 );
     binaryFilter->Update();
 
-    mitk::CastToMitkImage( binaryFilter->GetOutput(), outputImage );
+    mitk::CastToMitkImage( binaryFilter->GetOutput(0), outputImage );
   }
   else
   {
     padFilter->Update();
-    mitk::CastToMitkImage( padFilter->GetOutput(), outputImage );
+    mitk::CastToMitkImage( padFilter->GetOutput(0), outputImage );
   }
 
   outputImage->SetRequestedRegionToLargestPossibleRegion();

@@ -56,8 +56,9 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
   private:
 
     // purposely not implemented
-    ModalityProperty(const ModalityProperty&);
     const ModalityProperty& operator=(const ModalityProperty&);
+
+    virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

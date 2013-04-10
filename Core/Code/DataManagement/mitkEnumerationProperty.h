@@ -80,7 +80,6 @@ public:
    */
   typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
-
   /**
    * Adds an enumeration value into the enumeration. The name and id provided
    * must be unique. This is checked while adding the new enumeration value.
@@ -195,14 +194,17 @@ protected:
    */
   EnumerationProperty();
 
+  EnumerationProperty(const EnumerationProperty&);
+
   virtual bool IsEqual( const BaseProperty& property ) const;
   virtual bool Assign( const BaseProperty& property );
 
 private:
 
   // purposely not implemented
-  EnumerationProperty(const EnumerationProperty&);
   EnumerationProperty& operator=(const EnumerationProperty&);
+
+  itk::LightObject::Pointer InternalClone() const;
 
   IdType m_CurrentValue;
 

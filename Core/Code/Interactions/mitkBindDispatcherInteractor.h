@@ -27,7 +27,6 @@
 
 namespace mitk
 {
-  class InformerService;
 /**
  * \class BindDispatcherInteractor
  * \brief This Class is used to connect a DataStorage with the Dispatcher.
@@ -59,7 +58,7 @@ namespace mitk
     /**
      * Return currently active Dispatcher.
      */
-    const Dispatcher::Pointer GetDispatcher();
+    Dispatcher::Pointer GetDispatcher() const;
 
 
   private:
@@ -75,7 +74,6 @@ namespace mitk
 
     Dispatcher::Pointer m_Dispatcher;
     DataStorage::Pointer m_DataStorage;
-    InformerService* m_InformerService; // holds reference to MicroService that notifies listeners
   };
 
 }

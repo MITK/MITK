@@ -294,12 +294,12 @@ void QmitkNavigationToolManagementWidget::OnLoadSurface()
       {
       }
 
-    if ( stlReader->GetOutput() == NULL );
+    if ( stlReader->GetOutput(0) == NULL );
     else
       {
       mitk::DataNode::Pointer newNode = mitk::DataNode::New();
       newNode->SetName(filename);
-      newNode->SetData(stlReader->GetOutput());
+      newNode->SetData(stlReader->GetOutput(0));
       m_DataStorage->Add(newNode);
       }
   }

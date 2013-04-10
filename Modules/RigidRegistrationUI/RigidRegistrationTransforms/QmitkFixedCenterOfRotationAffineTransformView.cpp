@@ -46,14 +46,20 @@ itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename FixedImageType::Pointer fixedImage;
-  mitk::CastToItkImage(m_FixedImage, fixedImage);
-  typename MovingImageType::Pointer movingImage;
-  mitk::CastToItkImage(m_MovingImage, movingImage);
+
+  // the fixedImage is the input parameter (fix for Bug #14626)
+  typename FixedImageType::Pointer fixedImage = itkImage1;
+
+  // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+  typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
+  movingImageToItk->SetInput(m_MovingImage);
+  movingImageToItk->Update();
+  typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
+
   typedef typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension >    CenteredAffineTransformType;
   typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::Pointer transformPointer = itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::New();
   transformPointer->SetIdentity();

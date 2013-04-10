@@ -85,7 +85,7 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->IsCameraActive(),"IsCameraActive() after StartCamera()");
   picFileReader->SetFileName(distanceFileName);
   picFileReader->Update();
-  expectedResultImage = picFileReader->GetOutput();
+  expectedResultImage = picFileReader->GetOutput(0);
   int captureWidth = expectedResultImage->GetDimension(0);
   int captureHeight = expectedResultImage->GetDimension(1);
   MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->GetCaptureWidth()==captureWidth,"Test GetCaptureWidth()");

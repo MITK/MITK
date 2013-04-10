@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     //*************************************************************************
 
     // Add the node to the DataStorage
-    ds->Add(reader->GetOutput());
+    ds->Add(reader->GetOutput(0));
   }
   catch(...)
   {

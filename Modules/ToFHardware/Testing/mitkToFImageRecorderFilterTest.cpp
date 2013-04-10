@@ -135,17 +135,17 @@ int mitkToFImageRecorderFilterTest(int /* argc */, char* /*argv*/[])
   std::string testDistanceImageName = dirName + "test_DistanceImage.nrrd";
   imageReader->SetFileName(testDistanceImageName);
   imageReader->Update();
-  mitk::Image::Pointer loadedDistanceImage = imageReader->GetOutput();
+  mitk::Image::Pointer loadedDistanceImage = imageReader->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testDistanceImage,loadedDistanceImage),"Test loaded image 0 (distance image)");
   std::string testAmplitudeImageName = dirName + "test_AmplitudeImage.nrrd";
   imageReader->SetFileName(testAmplitudeImageName);
   imageReader->Update();
-  mitk::Image::Pointer loadedAmplitudeImage = imageReader->GetOutput();
+  mitk::Image::Pointer loadedAmplitudeImage = imageReader->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testAmplitudeImage,loadedAmplitudeImage),"Test loaded image 1 (amplitude image)");
   std::string testIntensityImageName = dirName + "test_IntensityImage.nrrd";
   imageReader->SetFileName(testIntensityImageName);
   imageReader->Update();
-  mitk::Image::Pointer loadedIntensityImage = imageReader->GetOutput();
+  mitk::Image::Pointer loadedIntensityImage = imageReader->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(CompareImages(testIntensityImage,loadedIntensityImage),"Test loaded image 2 (intensity image)");
 
   //clean up and delete saved image files

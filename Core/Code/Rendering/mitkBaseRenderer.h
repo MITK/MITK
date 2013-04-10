@@ -124,7 +124,7 @@ namespace mitk
 
     //##Documentation
     //## @brief Returns the Dispatcher which handles Events for this BaseRenderer
-    Dispatcher::Pointer GetDispatcher();
+    Dispatcher::Pointer GetDispatcher() const;
 
     //##Documentation
     //## @brief Default mapper id to use.

@@ -187,7 +187,7 @@ bool mitk::DataNode::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::DataNode::SetRequestedRegion(itk::DataObject * /*data*/)
+void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 {
 }
 
@@ -546,7 +546,7 @@ bool mitk::DataNode::IsInteractorEnabled() const
   return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
 }
 
-void mitk::DataNode::SetDataInteractor(DataInteractor::Pointer interactor)
+void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer& interactor)
 {
   m_DataInteractor = interactor;
   Modified();

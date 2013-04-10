@@ -67,7 +67,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   reader->Update();
   std::cout<<"[PASSED]"<<std::endl;
 
-  mitk::Image::Pointer image = reader->GetOutput();
+  mitk::Image::Pointer image = reader->GetOutput(0);
 
   std::cout << "Creating node: ";
   mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -97,7 +97,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   sphere->SetPhiResolution(18);
 
   vtkPolyDataMapper *map = vtkPolyDataMapper::New();
-  map->SetInput(sphere->GetOutput());
+  map->SetInput(sphere->GetOutput(0));
   sphere->Delete();
 
   vtkActor *aSphere = vtkActor::New();

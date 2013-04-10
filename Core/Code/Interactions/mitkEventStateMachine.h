@@ -20,6 +20,7 @@
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
+#include "mitkMessage.h"
 #include "mitkInteractionEventHandler.h"
 
 #include <MitkExports.h>
@@ -32,13 +33,15 @@ namespace mitk
   class InteractionEvent;
   class StateMachineState;
   class DataNode;
+  class Module;
 
   /**
    * \class TActionFunctor
    * \brief Base class of ActionFunctors, to provide an easy to connect actions with functions.
+   *
+   * \deprecatedSince{2013_03} Use mitk::Message classes instead.
    */
-
-  class MITK_CORE_EXPORT TActionFunctor
+  class TActionFunctor
   {
   public:
     virtual bool DoAction(StateMachineAction*, InteractionEvent*)=0;
@@ -53,7 +56,7 @@ namespace mitk
    * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
    */
   template<class T>
-  class TSpecificActionFunctor: public TActionFunctor
+  class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
   {
   public:
 
@@ -80,7 +83,7 @@ namespace mitk
    *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
    */
 #define CONNECT_FUNCTION(a, f) \
-    EventStateMachine::AddActionFunction(a, new TSpecificActionFunctor<Self>(this, &Self::f));
+    EventStateMachine::AddActionFunction(a, MessageDelegate2<Self, StateMachineAction*, InteractionEvent*, bool>(this, &Self::f));
 
   /**
    * \class EventStateMachine
@@ -99,17 +102,19 @@ namespace mitk
   public:
     mitkClassMacro(EventStateMachine, InteractionEventHandler)
     itkNewMacro(Self)
-    typedef std::map<std::string, TActionFunctor*> ActionFunctionsMapType;
+
+    typedef std::map<std::string, TActionFunctor*> DEPRECATED(ActionFunctionsMapType);
+
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
     /**
       * @brief Loads XML resource
       *
-      * Loads a XML resource file in the given module context.
+      * Loads a XML resource file from the given module.
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string filename, const std::string moduleName="Mitk");
+    bool LoadStateMachine(const std::string& filename, const Module* module = NULL);
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for
@@ -126,12 +131,17 @@ namespace mitk
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();
+
+    typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, bool> ActionFunctionDelegate;
+
     /**
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
      */
-    void AddActionFunction(const std::string action, TActionFunctor* functor);
+    DEPRECATED(void AddActionFunction(const std::string& action, TActionFunctor* functor));
 
-    StateMachineState* GetCurrentState();
+    void AddActionFunction(const std::string& action, const ActionFunctionDelegate& delegate);
+
+    StateMachineState* GetCurrentState() const;
 
     /**
      * Is called after loading a statemachine.
@@ -167,8 +177,12 @@ namespace mitk
 
 
   private:
+
+    typedef std::map<std::string, ActionFunctionDelegate*> ActionDelegatesMapType;
+
     StateMachineContainer* m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
-    ActionFunctionsMapType m_ActionFunctionsMap; // stores association between action string
+    std::map<std::string, TActionFunctor*> m_ActionFunctionsMap; // stores association between action string
+    ActionDelegatesMapType m_ActionDelegatesMap;
     StateMachineStateType m_CurrentState;
   };
 

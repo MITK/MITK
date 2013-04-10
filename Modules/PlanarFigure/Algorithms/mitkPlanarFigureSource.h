@@ -46,25 +46,26 @@ public:
     typedef itk::DataObject::Pointer DataObjectPointer;
 
     /**
-     * Allocates a new output object and returns it.
+     * Allocates a new output object and returns it. Currently the
+     * index idx is not evaluated.
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput ( unsigned int idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+    /**
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
     /**
      * Generates the input requested region simply by calling the equivalent
      * method of the superclass.
      */
     void GenerateInputRequestedRegion();
-
-    /**
-     * Allows to set the output of the planar figure source. According to the itk documentation
-     * this method is outdated and should not be used. Instead GraftOutput(...)
-     * should be used.
-     * @param output the intended output of the planar figure source
-     */
-    void SetOutput( OutputType* output );
 
     /**
      * Graft output 0 to the parameter graft
@@ -75,18 +76,10 @@ public:
     */
     virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
 
-    /**
-     * Returns the output with index 0 of the planar figure source
-     * @returns the output
-     */
-    OutputType* GetOutput();
-
-    /**
-     * Returns the nth output of the planar figure source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    OutputType* GetOutput ( unsigned int idx );
+    PlanarFigure* GetOutput(const DataObjectIdentifierType & key);
+    const PlanarFigure* GetOutput(const DataObjectIdentifierType & key) const;
+    PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx);
+    const PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
     PlanarFigureSource();

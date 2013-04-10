@@ -44,7 +44,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->SetPhiResolution(10);
   sphereSource->Update();
 
-  vtkPolyData* polys = sphereSource->GetOutput();
+  vtkPolyData* polys = sphereSource->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData() == NULL, "Testing initial state of vtkPolyData");
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
@@ -88,9 +88,9 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
     sphereSource->SetThetaResolution(10);
     sphereSource->SetPhiResolution(10);
     sphereSource->Update();
-    sphereSource->GetOutput()->ComputeBounds();
-    sphereSource->GetOutput()->GetBounds( boundsMat[i] );
-    surface->SetVtkPolyData( sphereSource->GetOutput(),i );
+    sphereSource->GetOutput(0)->ComputeBounds();
+    sphereSource->GetOutput(0)->GetBounds( boundsMat[i] );
+    surface->SetVtkPolyData( sphereSource->GetOutput(0),i );
     sphereSource->Delete();
   }
 
@@ -128,7 +128,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->SetThetaResolution(10);
   sphereSource->SetPhiResolution(10);
   sphereSource->Update();
-  surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
+  surface->SetVtkPolyData( sphereSource->GetOutput(0), 3 );
   sphereSource->Delete();
 
   inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();

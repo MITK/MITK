@@ -47,7 +47,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
 
   if ( m_EvenlySpaced )
   {
-    AffineGeometryFrame3D::Pointer geometry = other.m_Geometry2Ds[0]->Clone();
+    Geometry2D::Pointer geometry = other.m_Geometry2Ds[0]->Clone();
     Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
     assert(geometry2D!=NULL);
     SetGeometry2D(geometry2D, 0);
@@ -64,8 +64,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
       }
       else
       {
-        AffineGeometryFrame3D::Pointer geometry = other.m_Geometry2Ds[s]->Clone();
-        Geometry2D* geometry2D = dynamic_cast<Geometry2D*>(geometry.GetPointer());
+        Geometry2D* geometry2D = other.m_Geometry2Ds[0]->Clone();
         assert(geometry2D!=NULL);
         SetGeometry2D(geometry2D, s);
       }

@@ -85,7 +85,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         timeSelector->SetInput( m_Image );
         timeSelector->SetTimeNr( m_TimeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        image3D = timeSelector->GetOutput();
+        image3D = timeSelector->GetOutput(0);
       }
 
        // this will do a long long if/else to find out both pixel types
@@ -145,7 +145,7 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
         timeSelector->SetInput( m_Image );
         timeSelector->SetTimeNr( m_TimeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        image3D = timeSelector->GetOutput();
+        image3D = timeSelector->GetOutput(0);
       }
 
       // this will do a long long if/else to find out both pixel types
@@ -206,7 +206,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
 
 // basically copied from mitk/Core/Algorithms/mitkImageAccessByItk.h
 #define myMITKDiffImageApplierFilterAccessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension, itkimage2)            \
-  if ( typeId == typeid(pixeltype) )                                                    \
+  if ( typeId == MapPixelComponentType<pixeltype>::value )                                                    \
 {                                                                                        \
     typedef itk::Image<pixeltype, dimension> ImageType;                                   \
     typedef mitk::ImageToItk<ImageType> ImageToItkType;                                    \
@@ -216,7 +216,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
     nonConstImage->Update();                                                             \
     imagetoitk->SetInput(nonConstImage);                                                     \
     imagetoitk->Update();                                                               \
-    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
+    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
 }
 
 
@@ -235,7 +235,7 @@ mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::DiffImageApplier::ItkImageSwitch2DDiff( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=m_SliceDifferenceImage->GetPixelType().GetTypeId();
+  const int typeId=m_SliceDifferenceImage->GetPixelType().GetComponentType();
 
   myMITKDiffImageApplierFilterAccessAllTypesByItk( m_SliceDifferenceImage, ItkImageProcessing2DDiff, 2, itkImage );
 }
@@ -244,7 +244,7 @@ void mitk::DiffImageApplier::ItkImageSwitch2DDiff( itk::Image<TPixel,VImageDimen
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::DiffImageApplier::ItkImageSwitch3DDiff( itk::Image<TPixel,VImageDimension>* itkImage )
 {
-  const std::type_info& typeId=m_SliceDifferenceImage->GetPixelType().GetTypeId();
+  const int typeId=m_SliceDifferenceImage->GetPixelType().GetComponentType();
 
   myMITKDiffImageApplierFilterAccessAllTypesByItk( m_SliceDifferenceImage, ItkImageProcessing3DDiff, 3, itkImage );
 }

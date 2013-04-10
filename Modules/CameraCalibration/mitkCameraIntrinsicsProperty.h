@@ -51,13 +51,16 @@ protected:
 
   CameraIntrinsicsProperty();
 
+  CameraIntrinsicsProperty(const CameraIntrinsicsProperty&);
+
   CameraIntrinsicsProperty( mitk::CameraIntrinsics::Pointer value );
 
 private:
 
   // purposely not implemented
-  CameraIntrinsicsProperty(const CameraIntrinsicsProperty&);
   CameraIntrinsicsProperty& operator=(const CameraIntrinsicsProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty& property);

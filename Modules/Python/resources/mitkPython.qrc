@@ -1,0 +1,13 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/mitkPython">
+     <file>document-new.png</file>
+     <file>document-open.png</file>
+     <file>document-save.png</file>
+     <file>edit-delete.png</file>
+     <file>edit-paste.png</file>
+     <file>edit-find-replace.png</file>
+     <file>edit-clear.png</file>
+     <file>media-playback-start.png</file>
+     <file>PythonSnippets.xml</file>
+ </qresource>
+ </RCC>

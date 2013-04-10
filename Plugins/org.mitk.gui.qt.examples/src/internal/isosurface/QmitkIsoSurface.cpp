@@ -156,7 +156,7 @@ void QmitkIsoSurface::CreateSurface()
     filter->SetTargetReduction( targetReduction );
 
 
-    int numOfPolys = filter->GetOutput()->GetVtkPolyData()->GetNumberOfPolys();
+    int numOfPolys = filter->GetOutput(0)->GetVtkPolyData()->GetNumberOfPolys();
     if(numOfPolys>2000000)
     {
       QApplication::restoreOverrideCursor();
@@ -168,7 +168,7 @@ void QmitkIsoSurface::CreateSurface()
           QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
     }
     mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-    surfaceNode->SetData( filter->GetOutput() );
+    surfaceNode->SetData( filter->GetOutput(0) );
 
     int layer = 0;
 
@@ -201,7 +201,7 @@ void QmitkIsoSurface::CreateSurface()
     */
     this->GetDefaultDataStorage()->Add(surfaceNode, node);
 
-    mitk::Surface::Pointer surface = filter->GetOutput();
+    mitk::Surface::Pointer surface = filter->GetOutput(0);
 
     //to show surfaceContur
     surfaceNode->SetColor( m_RainbowColor.GetNextColor() );

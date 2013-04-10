@@ -30,7 +30,7 @@ mitk::Convert2Dto3DImageFilter::~Convert2Dto3DImageFilter()
 void mitk::Convert2Dto3DImageFilter::GenerateData()
 {
    mitk::Image::ConstPointer inputImage = this->GetInput();
-   mitk::Image::Pointer resultImage = this->GetOutput();
+   mitk::Image::Pointer resultImage = this->GetOutput(0);
 
   AccessFixedDimensionByItk_1(inputImage,ItkConvert2DTo3D, 2, resultImage);
 

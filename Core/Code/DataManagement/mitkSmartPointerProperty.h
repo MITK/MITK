@@ -67,14 +67,16 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
   protected:
 
     SmartPointerProperty(itk::Object* = NULL);
+    SmartPointerProperty(const SmartPointerProperty&);
 
     itk::Object::Pointer m_SmartPointer;
 
   private:
 
     // purposely not implemented
-    SmartPointerProperty(const SmartPointerProperty&);
     SmartPointerProperty& operator=(const SmartPointerProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty&) const;
     virtual bool Assign(const BaseProperty&);

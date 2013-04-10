@@ -122,7 +122,7 @@ namespace mitk
           reader->SetImageIO(io);
 
           reader->Update();
-          img = reader->GetOutput();
+          img = reader->GetOutput(0);
 
 
           MITK_INFO << "NrrdTbssImageReader READING HEADER INFORMATION";
@@ -382,7 +382,7 @@ namespace mitk
 
 
 /*
-      typename ImageType::Pointer img = reader->GetOutput();
+      typename ImageType::Pointer img = reader->GetOutput(0);
       itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
       std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
       std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();

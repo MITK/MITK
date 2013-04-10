@@ -706,7 +706,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
         filter->SetNumberOfThreads(1);
         filter->SetLambda(m_Lambda);
         filter->Update();
-        typename RegFitType::OutputImageType::Pointer outimg = filter->GetOutput();
+        typename RegFitType::OutputImageType::Pointer outimg = filter->GetOutput(0);
 
         ImageRegionConstIterator< RegFitType::OutputImageType > iit(outimg, outimg->GetLargestPossibleRegion());
         iit.GoToBegin();

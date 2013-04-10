@@ -86,17 +86,17 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   mitk::ItkImageFileReader::Pointer fileReader = mitk::ItkImageFileReader::New();
   fileReader->SetFileName(distanceImageFileName);
   fileReader->Update();
-  mitk::Image::Pointer distanceImageRead = fileReader->GetOutput();
+  mitk::Image::Pointer distanceImageRead = fileReader->GetOutput(0);
 
   fileReader = mitk::ItkImageFileReader::New();
   fileReader->SetFileName(amplitudeImageFileName);
   fileReader->Update();
-  mitk::Image::Pointer amplitudeImageRead = fileReader->GetOutput();
+  mitk::Image::Pointer amplitudeImageRead = fileReader->GetOutput(0);
 
   fileReader = mitk::ItkImageFileReader::New();
   fileReader->SetFileName(intensityImageFileName);
   fileReader->Update();
-  mitk::Image::Pointer intensityImageRead = fileReader->GetOutput();
+  mitk::Image::Pointer intensityImageRead = fileReader->GetOutput(0);
 
   bool readingCorrect = true;
   //  for all frames...

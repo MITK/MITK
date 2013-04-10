@@ -161,7 +161,7 @@ void mitk::ManufacturerLogo::Enable()
     if(itksys::SystemTools::FileExists(m_FileName.c_str()) && !m_ForceShowMBIDepartmentLogo)
     {
       m_PngReader->Update();
-      m_Actor->SetInput(m_PngReader->GetOutput());
+      m_Actor->SetInput(m_PngReader->GetOutput(0));
     }
     else // either logo file not found or logo renderer is forced to show the MBI logo
     {
@@ -195,7 +195,7 @@ void mitk::ManufacturerLogo::Enable()
       m_VtkImageImport->Modified();
       m_VtkImageImport->Update();
 
-      m_Actor->SetInput(m_VtkImageImport->GetOutput());
+      m_Actor->SetInput(m_VtkImageImport->GetOutput(0));
     }
 
     m_Actor->SetOpacity(m_Opacity);
@@ -373,7 +373,7 @@ bool mitk::ManufacturerLogo::VerifyRequestedRegion()
     return true;
 }
 
-void mitk::ManufacturerLogo::SetRequestedRegion(itk::DataObject*)
+void mitk::ManufacturerLogo::SetRequestedRegion( const itk::DataObject*)
 {
     //nothing to do
 }

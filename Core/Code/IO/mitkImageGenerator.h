@@ -42,11 +42,12 @@ public:
                                                       float spacingY = 1,
                                                       float spacingZ = 1)
     {
-        itk::ImageRegion<3> imageRegion;
+        typedef itk::Image< TPixelType, 3 > ImageType;
+        typename ImageType::RegionType imageRegion;
         imageRegion.SetSize(0, dimX);
         imageRegion.SetSize(1, dimY);
         imageRegion.SetSize(2, dimZ);
-        mitk::Vector3D spacing;
+        typename ImageType::SpacingType spacing;
         spacing[0] = spacingX;
         spacing[1] = spacingY;
         spacing[2] = spacingZ;
@@ -54,7 +55,6 @@ public:
         mitk::Point3D                       origin; origin.Fill(0.0);
         itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
-        typedef itk::Image< TPixelType, 3 > ImageType;
         typename ImageType::Pointer image = ImageType::New();
         image->SetSpacing( spacing );
         image->SetOrigin( origin );
@@ -153,19 +153,24 @@ public:
         {
             // the comparison of the component type is sufficient enough since the mitk::PixelType type object is
             // created as SCALAR and hence does not need the comparison against type.GetPixelTypeId() == itk::ImageIOBase::SCALAR
-            if(type.GetTypeId() == typeid(int)) //call integer function
+            if(type.GetComponentType() == itk::ImageIOBase::INT) //call integer function
             {
                 imageBuffer[i] = (TPixelType)randomGenerator->GetIntegerVariate((int)randomMax);
                 //TODO random generator does not support integer values in a given range (e.g. from 5-10)
                 //range is always [0, (int)randomMax]
-            }else if((type.GetTypeId() == typeid(double)) || (type.GetTypeId() == typeid(float))) //call integer function
+            }
+            else if((type.GetComponentType() == itk::ImageIOBase::DOUBLE) ||
+                    (type.GetComponentType() == itk::ImageIOBase::FLOAT)) //call floating point function
             {
                 imageBuffer[i] = (TPixelType)randomGenerator->GetUniformVariate(randMin,randomMax);
-            }else if(type.GetTypeId() == typeid(unsigned char))
+            }
+            else if(type.GetComponentType() == itk::ImageIOBase::UCHAR)
             {
                 //use the integer randomGenerator with mod 256 to generate unsigned char values
                 imageBuffer[i] = (unsigned char) ((int)randomGenerator->GetIntegerVariate((int)randomMax)) % 256;
-            }else{
+            }
+            else
+            {
                 MITK_ERROR << "Datatype not supported yet.";
                 //TODO call different methods for other datatypes
             }

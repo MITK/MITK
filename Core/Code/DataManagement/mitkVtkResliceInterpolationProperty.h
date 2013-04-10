@@ -100,8 +100,9 @@ protected:
 private:
 
   // purposely not implemented
-  VtkResliceInterpolationProperty(const VtkResliceInterpolationProperty&);
   VtkResliceInterpolationProperty& operator=(const VtkResliceInterpolationProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

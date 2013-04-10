@@ -113,3 +113,9 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
   AddEnum( "Vertebra", newId++ );
   AddEnum( "Wrist", newId++ );
 }
+
+itk::LightObject::Pointer mitk::OrganTypeProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

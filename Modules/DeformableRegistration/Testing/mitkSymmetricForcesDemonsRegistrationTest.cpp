@@ -94,7 +94,7 @@ int mitkSymmetricForcesDemonsRegistrationTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Get the result image: ";
-  mitk::Image::Pointer resultImage = symmetricForcesDemonsRegistration->GetOutput();
+  mitk::Image::Pointer resultImage = symmetricForcesDemonsRegistration->GetOutput(0);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Get the deformation field: ";

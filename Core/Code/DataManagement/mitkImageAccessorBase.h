@@ -44,12 +44,6 @@ struct ImageAccessorWaitLock {
   itk::SimpleFastMutexLock m_Mutex;
 };
 
-
-/** \brief System dependend thread method, to prevent recursive mutex access */
-itk::ThreadProcessIDType MITK_CORE_EXPORT CurrentThreadHandle();
-/** \brief System dependend thread method, to prevent recursive mutex access */
-bool MITK_CORE_EXPORT CompareThreadHandles(itk::ThreadProcessIDType, itk::ThreadProcessIDType);
-
 // Defs to assure dead lock prevention only in case of possible thread handling.
 #if defined(ITK_USE_SPROC) || defined(ITK_USE_PTHREADS) || defined(ITK_USE_WIN32_THREADS)
   #define MITK_USE_RECURSIVE_MUTEX_PREVENTION
@@ -87,12 +81,18 @@ public:
 
 protected:
 
-//  ImageAccessorBase() :
-//    m_CoherentMemory(false)
-//  {
-//    m_waitLock = new ImageAccessorWaitLock();
-//    m_waitLock->m_WaiterCount = 0;
-//  }
+  // Define type of thread id
+#ifdef ITK_USE_SPROC
+typedef int ThreadIDType;
+#endif
+
+#ifdef ITK_USE_WIN32_THREADS
+typedef DWORD ThreadIDType;
+#endif
+
+#ifdef ITK_USE_PTHREADS
+typedef pthread_t ThreadIDType;
+#endif
 
   /** \brief Checks validity of given parameters from inheriting classes and stores those parameters in member variables. */
   ImageAccessorBase(
@@ -138,10 +138,18 @@ protected:
   /** \brief Uses the WaitLock to wait for another ImageAccessor*/
   void WaitForReleaseOf(ImageAccessorWaitLock* wL);
 
-  itk::ThreadProcessIDType m_Thread;
+  ThreadIDType m_Thread;
 
   /** \brief Prevents a recursive mutex lock by comparing thread ids of competing image accessors */
   void PreventRecursiveMutexLock(ImageAccessorBase* iAB);
+
+
+private:
+
+  /** \brief System dependend thread method, to prevent recursive mutex access */
+  ThreadIDType CurrentThreadHandle();
+  /** \brief System dependend thread method, to prevent recursive mutex access */
+  inline bool CompareThreadHandles(ThreadIDType, ThreadIDType);
 
 };
 

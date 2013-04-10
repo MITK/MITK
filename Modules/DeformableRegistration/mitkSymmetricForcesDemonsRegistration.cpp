@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageFileWriter.h"
 #include "itkWarpImageFilter.h"
-#include "itkInverseDeformationFieldImageFilter.h"
+//#include <..\ITKV3Compatibility\itkInverseDeformationFieldImageFilter.h>
 
 #include "mitkSymmetricForcesDemonsRegistration.h"
 
@@ -108,7 +108,7 @@ namespace mitk {
                           OutputImageType > CastFilterType;
     typedef typename itk::ImageFileWriter< OutputImageType >  WriterType;
     typedef typename itk::ImageFileWriter< DeformationFieldType >  FieldWriterType;
-    typedef  typename itk::InverseDeformationFieldImageFilter<DeformationFieldType, DeformationFieldType>  InverseFilterType;
+    //typedef  typename itk::InverseDeformationFieldImageFilter<DeformationFieldType, DeformationFieldType>  InverseFilterType;
 
 
     typename FixedImageType::Pointer fixedImage = FixedImageType::New();
@@ -141,7 +141,7 @@ namespace mitk {
       warper->SetInterpolator( interpolator );
       warper->SetOutputSpacing( fixedImage->GetSpacing() );
       warper->SetOutputOrigin( fixedImage->GetOrigin() );
-      warper->SetDeformationField( filter->GetOutput(0) );
+      warper->SetDisplacementField( filter->GetOutput(0) );
       warper->Update();
       typename WriterType::Pointer      writer =  WriterType::New();
       typename CastFilterType::Pointer  caster =  CastFilterType::New();

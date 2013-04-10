@@ -272,19 +272,27 @@ bool mitk::BreakpadCrashReporting::StartCrashServer(bool lauchOutOfProcessExecut
     // server process
     InitializeServer(server_fd);
 
-    if (qApp)
-    {
-      MITK_INFO << "Wait for observed breakpad child to finish/crash...";
-      int status;
-      waitpid( child_pid, &status, WEXITED );
-      MITK_INFO << "Breakpad child terminated, so I also terminate...";
-      exit(EXIT_SUCCESS);
-    }
-    else
-    {
-      MITK_ERROR << "You MUST initialize the qApp instance before calling StartCrashServer. You did not. Exiting...";
-      exit(EXIT_FAILURE);
-    }
+    MITK_INFO << "Wait for observed breakpad child to finish/crash...";
+    int status;
+    do {
+      pid_t w = waitpid(child_pid, &status, WUNTRACED | WCONTINUED);
+      if (w == -1) {
+        perror("waitpid");
+        exit(EXIT_FAILURE);
+      }
+
+      if (WIFEXITED(status)) {
+        printf("exited, status=%d\n", WEXITSTATUS(status));
+      } else if (WIFSIGNALED(status)) {
+        printf("killed by signal %d\n", WTERMSIG(status));
+      } else if (WIFSTOPPED(status)) {
+        printf("stopped by signal %d\n", WSTOPSIG(status));
+      } else if (WIFCONTINUED(status)) {
+        printf("continued\n");
+      }
+    } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    MITK_INFO << "Breakpad child terminated, so I also terminate...";
+    exit(EXIT_SUCCESS);
   }
   else
   {

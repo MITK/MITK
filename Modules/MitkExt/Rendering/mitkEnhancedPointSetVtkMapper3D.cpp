@@ -364,7 +364,10 @@ void mitk::EnhancedPointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRende
   bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
   if(needGenerateData)
+  {
+    ls->UpdateGenerateDataTime();
     this->UpdateVtkObjects();
+  }
 
   ApplyProperties(renderer);
 }

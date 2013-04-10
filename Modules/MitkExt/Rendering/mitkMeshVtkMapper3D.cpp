@@ -95,6 +95,7 @@ void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* rendere
 
   if(needGenerateData)
   {
+    ls->UpdateGenerateDataTime();
 
     m_PropAssembly->VisibilityOn();
 

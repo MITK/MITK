@@ -65,6 +65,32 @@ mitk::VectorImageVtkGlyphMapper3D::~VectorImageVtkGlyphMapper3D()
 */
 void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
+  {
+    if ( m_Glyph3DActor != NULL )
+      m_Glyph3DActor->VisibilityOff();
+    return ;
+  }
+  else
+  {
+    if ( m_Glyph3DActor != NULL )
+      m_Glyph3DActor->VisibilityOn();
+  }
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(!needGenerateData)
+  {
+    return;
+  }
+
+  ls->UpdateGenerateDataTime();
+
   //
   // get the input image...
   //
@@ -72,7 +98,7 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
   if ( mitkImage.GetPointer() == NULL )
   {
     itkWarningMacro( << "VectorImage is null !" );
-    return ;
+    return;
   }
 
   //
@@ -179,20 +205,6 @@ m_MaximumNumberOfPoints = 80*80*80;
     //writer->Update();
   }
 
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
-
-  if ( !visible )
-  {
-    if ( m_Glyph3DActor != NULL )
-      m_Glyph3DActor->VisibilityOff();
-    return ;
-  }
-  else
-  {
-    if ( m_Glyph3DActor != NULL )
-      m_Glyph3DActor->VisibilityOn();
-  }
 }
 
 

@@ -172,10 +172,10 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
     // remove observer tags from lists
     m_NodesModifiedObserverTags.erase(m_NodesModifiedObserverTags.begin()+index);
     m_NodesDeleteObserverTags.erase(m_NodesDeleteObserverTags.begin()+index);
-    // remove node name from combobox
-    this->removeItem(index);
     // remove node from node vector
     m_Nodes.erase(m_Nodes.begin()+index);
+    // remove node name from combobox
+    this->removeItem(index);
   }
 }
 

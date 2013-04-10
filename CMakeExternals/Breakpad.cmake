@@ -2,7 +2,7 @@
 # Breakpad
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_BREAKPAD)
+if(MITK_USE_Breakpad)
 
   # Sanity checks
   if(DEFINED Breakpad_DIR AND NOT EXISTS ${Breakpad_DIR})

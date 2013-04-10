@@ -141,7 +141,7 @@ namespace mitk {
       warper->SetOutputSpacing( fixedImage->GetSpacing() );
       warper->SetOutputOrigin( fixedImage->GetOrigin() );
       warper->SetOutputDirection( fixedImage->GetDirection());
-      warper->SetDeformationField( filter->GetOutput(0) );
+      warper->SetDisplacementField( filter->GetOutput(0) );
       warper->Update();
       Image::Pointer outputImage = this->GetOutput(0);
       mitk::CastToMitkImage( warper->GetOutput(0), outputImage );

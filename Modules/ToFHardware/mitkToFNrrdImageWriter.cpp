@@ -202,6 +202,7 @@ namespace mitk
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
     nrrdWriter->SetPixelType( imageTemplate->GetPixelType().GetPixelType());
+    nrrdWriter->SetComponentType( (itk::ImageIOBase::IOComponentType) imageTemplate->GetPixelType().GetComponentType());
     if(imageTemplate->GetPixelType().GetNumberOfComponents() > 1)
     {
       nrrdWriter->SetNumberOfComponents(imageTemplate->GetPixelType().GetNumberOfComponents());
@@ -252,7 +253,16 @@ namespace mitk
       unsigned int sizeInBytes = size * sizeof(float);
       float* data = new float[size];
       stream.read((char*)data, sizeInBytes);
-      nrrdWriter->Write(data);
+      try
+      {
+        nrrdWriter->Write(data);
+      }
+      catch (itk::ExceptionObject* e)
+      {
+        MITK_ERROR<< e->what();
+        return;
+      }
+
       stream.close();
       delete[] data;
     }

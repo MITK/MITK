@@ -548,7 +548,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
         this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
         this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
         this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
-        this->m_DistanceImageNode->SetBoolProperty("use color",!useToF);
+        this->m_DistanceImageNode->SetBoolProperty("use color",useToF);
         this->m_DistanceImageNode->GetPropertyList()->DeleteProperty("LookupTable");
     }
     if (m_AmplitudeImageNode.IsNotNull())

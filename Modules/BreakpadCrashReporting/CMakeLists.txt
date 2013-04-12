@@ -22,7 +22,8 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")
-    add_executable(CrashReportingServer WIN32 mitkCrashReportingServer.cpp ${SERVER_MOC_CPP})
+    add_executable(CrashReportingServer WIN32 mitkCrashReportingServer.cpp)
+    # TODO MITK_INSTALL(CrashReportingServer ..)
     target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} ${QT_QTMAIN_LIBRARY} BreakpadCrashReporting)
   endif()
 

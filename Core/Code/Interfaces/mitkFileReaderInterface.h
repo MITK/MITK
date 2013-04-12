@@ -108,6 +108,8 @@ namespace mitk {
 
     virtual int GetPriority() = 0;
 
+    virtual std::string GetExtension() = 0;
+
     virtual std::list< std::string > GetSupportedOptions() = 0;
 
     virtual std::list< std::string > GetOptions() = 0;

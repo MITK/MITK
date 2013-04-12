@@ -87,3 +87,9 @@ int mitk::FileReaderAbstract::GetPriority()
 {
   return m_Priority;
 }
+
+
+std::string mitk::FileReaderAbstract::GetExtension()
+{
+  return m_Extension;
+}

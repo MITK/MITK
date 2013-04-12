@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
+#include "mitkFileReaderAbstract.h"
 #include "mitkFileReaderInterface.h"
 #include "mitkFileReaderManager.h"
 #include "mitkGetModuleContext.h"
@@ -31,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 
 
-class DummyReader : public mitk::FileReaderInterface, public itk::ProcessObject{
+class DummyReader : public mitk::FileReaderAbstract, public itk::ProcessObject{
 
 public:
   mitkClassMacro(DummyReader, itk::ProcessObject);
@@ -44,9 +45,6 @@ public:
   { return 0; }
 
   virtual mitk::BaseData::Pointer DummyReader::Read(std::istream*)
-  { return 0; }
-
-  virtual int DummyReader::GetPriority()
   { return 0; }
 
   virtual std::list< std::string > GetSupportedOptions()
@@ -64,24 +62,6 @@ public:
   virtual float DummyReader::GetProgress()
   { return 1; }
 
-  virtual const std::string DummyReader::GetFileName() const
-  { return ""; }
-
-  virtual void DummyReader::SetFileName(const std::string aFileName)
-  {}
-
-  virtual const std::string DummyReader::GetFilePrefix() const
-  { return ""; }
-
-  virtual void DummyReader::SetFilePrefix(const std::string aFilePrefix)
-  { }
-
-  virtual const std::string DummyReader::GetFilePattern() const
-  { return ""; }
-
-  virtual void DummyReader::SetFilePattern(const std::string aFilePattern)
-  { }
-
   virtual void DummyReader::Init(std::string extension, int priority)
   {
     mitk::ModuleContext* context = mitk::GetModuleContext();
@@ -91,19 +71,6 @@ public:
 
     m_ServiceRegistration = context->RegisterService<mitk::FileReaderInterface>(this, props);
   }
-
-  bool DummyReader::CanReadFromMemory(  )
-  { return false; }
-
-  void DummyReader::SetReadFromMemory( bool read )
-  {  }
-
-  bool DummyReader::GetReadFromMemory(  )
-  { return false; }
-
-  void DummyReader::SetMemoryBuffer(const std::string dataArray, unsigned int size)
-  {   }
-
 
 }; // End of internal dummy reader
 

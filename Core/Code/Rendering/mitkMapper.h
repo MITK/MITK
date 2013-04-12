@@ -222,7 +222,7 @@ namespace mitk {
 
     /** \brief Base class for mapper specific rendering ressources.
      */
-    class BaseLocalStorage
+    class MITK_CORE_EXPORT BaseLocalStorage
     {
       public:
 

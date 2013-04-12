@@ -77,9 +77,9 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               varName = QString("%1%2").arg(MITK_IMAGE_VAR_NAME).arg(i);
             MITK_DEBUG("QmitkPythonVariableStackTableModel") << "varName" << varName.toStdString();
 
-            bool exportAsCvImage = m_PythonService->IsOpenCvPythonWrappingAvailable();
+            bool exportAsCvImage = mitkImage->GetDimension() == 2 && m_PythonService->IsOpenCvPythonWrappingAvailable();
 
-            if( mitkImage->GetDimension() == 2 && exportAsCvImage )
+            if( exportAsCvImage )
             {
               int ret = QMessageBox::question(NULL, "Export option",
                 "2D image detected. Export as OpenCV image to Python instead of an ITK image?",

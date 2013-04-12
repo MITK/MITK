@@ -65,6 +65,7 @@ public:
   /** Applies properties specific to this mapper */
   virtual void ApplyAllProperties( BaseRenderer *renderer );
 
+  LocalStorageHandler<BaseLocalStorage> m_LSH;
 
 protected:
   Geometry2DDataMapper2D();

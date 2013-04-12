@@ -59,6 +59,8 @@ public:
 
   void ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer);
 
+  LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
 
   UnstructuredGridVtkMapper3D();

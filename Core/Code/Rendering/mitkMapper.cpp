@@ -103,16 +103,13 @@ void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
   const DataNode* node = GetDataNode();
+
   assert(node!=NULL);
 
-  //safety cause there are datatreenodes that have no defined data (video-nodes and root)
-  unsigned int dataMTime = 0;
-  mitk::BaseData::Pointer data = static_cast<mitk::BaseData *>(node->GetData());
+  mitk::BaseData * data = static_cast<mitk::BaseData *>(node->GetData());
 
-  if (data.IsNotNull())
-  {
-    dataMTime = data->GetMTime();
-  }
+  if (!data)
+    return;
 
   // Calculate time step of the input data for the specified renderer (integer value)
   this->CalculateTimeStep( renderer );
@@ -129,17 +126,33 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
     return;
   }
 
-  if(
-      (m_LastUpdateTime < GetMTime()) ||
-      (m_LastUpdateTime < node->GetDataReferenceChangedTime()) ||
-      (m_LastUpdateTime < dataMTime) ||
-      (renderer && (m_LastUpdateTime < renderer->GetTimeStepUpdateTime()))
-    )
+  this->GenerateDataForRenderer(renderer);
+}
+
+
+bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(
+    mitk::BaseRenderer *renderer,
+    mitk::Mapper *mapper,
+    mitk::DataNode *dataNode)
+{
+  if( mapper && m_LastGenerateDataTime < mapper -> GetMTime () )
+    return true;
+
+  if( dataNode )
   {
-    m_LastUpdateTime.Modified();
+    if( m_LastGenerateDataTime < dataNode -> GetDataReferenceChangedTime () )
+      return true;
+
+    mitk::BaseData * data = dataNode -> GetData ( ) ;
+
+    if( data && m_LastGenerateDataTime < data -> GetMTime ( ) )
+      return true;
   }
 
-  this->GenerateDataForRenderer(renderer);
+  if( renderer && m_LastGenerateDataTime < renderer -> GetTimeStepUpdateTime ( ) )
+    return true;
+
+  return false;
 }
 
 void mitk::Mapper::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

@@ -314,6 +314,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
       break;
     case RESLICE_CUBIC:
       m_Reslicer->SetInterpolationModeToCubic();
+      break;
     default:
       //the default interpolation used by mitk
       m_Reslicer->SetInterpolationModeToNearestNeighbor();

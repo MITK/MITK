@@ -30,32 +30,32 @@ mitk::FileReaderAbstract::~FileReaderAbstract()
 
 ////////////////// Filenames etc. //////////////////
 
-const char* mitk::FileReaderAbstract::GetFileName() const
+const std::string mitk::FileReaderAbstract::GetFileName() const
 {
   return m_FileName;
 }
 
-void mitk::FileReaderAbstract::SetFileName(const char* aFileName)
+void mitk::FileReaderAbstract::SetFileName(const std::string aFileName)
 {
  m_FileName = aFileName;
 }
 
-const char* mitk::FileReaderAbstract::GetFilePrefix() const
+const std::string mitk::FileReaderAbstract::GetFilePrefix() const
 {
   return m_FilePrefix;
 }
 
-void mitk::FileReaderAbstract::SetFilePrefix(const char* aFilePrefix)
+void mitk::FileReaderAbstract::SetFilePrefix(const std::string aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
 }
 
-const char* mitk::FileReaderAbstract::GetFilePattern() const
+const std::string mitk::FileReaderAbstract::GetFilePattern() const
 {
   return m_FilePattern;
 }
 
-void mitk::FileReaderAbstract::SetFilePattern(const char* aFilePattern)
+void mitk::FileReaderAbstract::SetFilePattern(const std::string aFilePattern)
 {
   m_FilePattern = aFilePattern;
 }
@@ -75,8 +75,15 @@ bool mitk::FileReaderAbstract::GetReadFromMemory(  )
 {
   return m_ReadFromMemory;
 }
-void mitk::FileReaderAbstract::SetMemoryBuffer(const char* dataArray, unsigned int size)
+void mitk::FileReaderAbstract::SetMemoryBuffer(const std::string dataArray, unsigned int size)
 {
   m_MemoryBuffer = dataArray;
   m_MemorySize   = size;
+}
+
+////////////////// µS related Getters //////////////////
+
+int mitk::FileReaderAbstract::GetPriority()
+{
+  return m_Priority;
 }

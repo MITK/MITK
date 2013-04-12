@@ -64,22 +64,22 @@ public:
   virtual float DummyReader::GetProgress()
   { return 1; }
 
-  virtual const char* DummyReader::GetFileName() const
+  virtual const std::string DummyReader::GetFileName() const
   { return ""; }
 
-  virtual void DummyReader::SetFileName(const char* aFileName)
+  virtual void DummyReader::SetFileName(const std::string aFileName)
   {}
 
-  virtual const char* DummyReader::GetFilePrefix() const
+  virtual const std::string DummyReader::GetFilePrefix() const
   { return ""; }
 
-  virtual void DummyReader::SetFilePrefix(const char* aFilePrefix)
+  virtual void DummyReader::SetFilePrefix(const std::string aFilePrefix)
   { }
 
-  virtual const char* DummyReader::GetFilePattern() const
+  virtual const std::string DummyReader::GetFilePattern() const
   { return ""; }
 
-  virtual void DummyReader::SetFilePattern(const char* aFilePattern)
+  virtual void DummyReader::SetFilePattern(const std::string aFilePattern)
   { }
 
   virtual void DummyReader::Init(std::string extension, int priority)
@@ -101,7 +101,7 @@ public:
   bool DummyReader::GetReadFromMemory(  )
   { return false; }
 
-  void DummyReader::SetMemoryBuffer(const char* dataArray, unsigned int size)
+  void DummyReader::SetMemoryBuffer(const std::string dataArray, unsigned int size)
   {   }
 
 

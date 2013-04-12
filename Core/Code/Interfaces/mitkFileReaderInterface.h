@@ -48,27 +48,27 @@ namespace mitk {
     //## @brief Get the specified the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual const char* GetFileName() const = 0;
+    virtual const std::string GetFileName() const = 0;
 
     //##Documentation
     //## @brief Specify the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual void SetFileName(const char* aFileName) = 0;
+    virtual void SetFileName(const std::string aFileName) = 0;
 
     //##Documentation
     //## @brief Get the specified file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const char* GetFilePrefix() const = 0;
+    virtual const std::string GetFilePrefix() const = 0;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const char* aFilePrefix) = 0;
+    virtual void SetFilePrefix(const std::string aFilePrefix) = 0;
 
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
@@ -76,7 +76,7 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const char* GetFilePattern() const = 0;
+    virtual const std::string GetFilePattern() const = 0;
 
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
@@ -84,7 +84,7 @@ namespace mitk {
 
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
-    virtual void SetFilePattern(const char* aFilePattern) = 0;
+    virtual void SetFilePattern(const std::string aFilePattern) = 0;
 
     /**
     @brief Specifies, whether the file reader also can
@@ -100,7 +100,7 @@ namespace mitk {
     /**
     @brief To be used along with a call of SetReadFromMemory(true). This sets
     the memory buffer and the size from which the reader will read.*/
-    virtual void SetMemoryBuffer(const char* dataArray, unsigned int size) = 0;
+    virtual void SetMemoryBuffer(const std::string dataArray, unsigned int size) = 0;
 
     virtual mitk::BaseData::Pointer Read(std::string path = 0) = 0;
 
@@ -123,12 +123,6 @@ namespace mitk {
 protected:
     //FileReaderInterface();
     //virtual ~FileReaderInterface();
-
-    bool m_CanReadFromMemory;
-    bool m_ReadFromMemory;
-
-    const    char* m_MemoryBuffer;
-    unsigned int   m_MemorySize;
 public:
 
 protected:

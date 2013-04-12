@@ -38,12 +38,8 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderAbstract : public itk::ProcessObject,  mitk::FileReaderInterface
+  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface
 {
-
-  //mitkClassMacro(FileReaderAbstract,itk::ProcessObject);
-  //itkNewMacro(Self);
-
   public:
     //##Documentation
     //## @brief Get the specified the file to load.

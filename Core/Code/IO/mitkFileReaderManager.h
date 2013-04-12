@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <mitkServiceReference.h>
-
+#include <mitkGetModuleContext.h>
 
 
 namespace mitk {
@@ -61,15 +61,13 @@ class MITK_CORE_EXPORT FileReaderManager
     /**
     * Returns a compatible Reader to the given file extension
     **/
-    static mitk::FileReaderInterface* GetReader(const std::string& extension);
+    static mitk::FileReaderInterface* GetReader(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
     static mitk::FileReaderInterface* GetReader(const std::string& extension, const std::list<std::string>& options );
 
     static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension);
 
     static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, const std::list<std::string>& options );
-
-    static bool CompareServiceRef(const mitk::ServiceReference& first, const mitk::ServiceReference& second);
 
 protected:
     //FileReaderManager();

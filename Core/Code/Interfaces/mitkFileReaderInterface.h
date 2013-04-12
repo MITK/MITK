@@ -114,11 +114,9 @@ namespace mitk {
 
     virtual void SetOptions(std::list< std::string > options ) = 0;
 
-    virtual bool CanRead(const std::string& path) = 0; // Todo: nach möglichkeit constref
-
+    virtual bool CanRead(const std::string& path) = 0;
     virtual float GetProgress() = 0;
 
-    static const std::string US_PRIORITY;
     static const std::string US_EXTENSION;
 
 

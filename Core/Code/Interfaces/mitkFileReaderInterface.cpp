@@ -17,5 +17,4 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFileReaderInterface.h"
 
-const std::string mitk::FileReaderInterface::US_PRIORITY = "org.mitk.services.FileReader.Priority";
 const std::string mitk::FileReaderInterface::US_EXTENSION = "org.mitk.services.FileReader.Extension";

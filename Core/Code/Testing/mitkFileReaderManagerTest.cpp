@@ -87,7 +87,7 @@ public:
     mitk::ModuleContext* context = mitk::GetModuleContext();
     mitk::ServiceProperties props;
     props[mitk::FileReaderInterface::US_EXTENSION] = extension;
-    props[mitk::FileReaderInterface::US_PRIORITY]  = priority;
+    props[mitk::ServiceConstants::SERVICE_RANKING()]  = priority;
 
     m_ServiceRegistration = context->RegisterService<mitk::FileReaderInterface>(this, props);
   }
@@ -105,7 +105,7 @@ public:
   {   }
 
 
-};
+}; // End of internal dummy reader
 
 /**
  *  TODO
@@ -116,6 +116,8 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   MITK_TEST_BEGIN("FileReaderManager");
  // mitk::FileReaderManager::Pointer frm = mitk::FileReaderManager::New();
  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderManager instantiation");
+
+MITK_INFO << mitk::ServiceConstants::SERVICE_RANKING();
 
   DummyReader* testDR = new DummyReader();
   DummyReader* otherDR = new DummyReader();

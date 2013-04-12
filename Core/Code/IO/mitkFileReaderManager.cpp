@@ -43,9 +43,8 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
 
 //////////////////// GETTING READERS ////////////////////
 
-mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension)
+mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension, mitk::ModuleContext* context)
 {
-  mitk::ModuleContext * context = mitk::GetModuleContext();
   return context->GetService<mitk::FileReaderInterface>(GetReaderList(extension).front());
 }
 
@@ -121,12 +120,7 @@ std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const
   // filter for class and extension
   std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::FileReaderInterface::US_EXTENSION + "=" + extension + "))";
   std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileReader", filter);
-  // the comparator sorts by priority
-  result.sort(mitk::FileReaderManager::CompareServiceRef);
+  result.sort();
+  std::reverse(result.begin(), result.end());
   return result;
-}
-
-bool mitk::FileReaderManager::CompareServiceRef(const mitk::ServiceReference& first, const mitk::ServiceReference& second)
-{
-  return (any_cast<int>(first.GetProperty(mitk::FileReaderInterface::US_PRIORITY)) > any_cast<int> (second.GetProperty(mitk::FileReaderInterface::US_PRIORITY)));
 }

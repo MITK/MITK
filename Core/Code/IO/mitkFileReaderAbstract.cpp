@@ -27,6 +27,23 @@ m_ReadFromMemory (false)
 mitk::FileReaderAbstract::~FileReaderAbstract()
 {
 }
+
+////////////////// µS related Reading //////////////////
+
+//virtual const char* GetFileName() const = 0;
+
+//    virtual void SetFileName(const char* aFileName) = 0;
+
+//    virtual const char* GetFilePrefix() const = 0;
+
+//    virtual void SetFilePrefix(const char* aFilePrefix) = 0;
+
+//    virtual const char* GetFilePattern() const = 0;
+
+//    virtual void SetFilePattern(const char* aFilePattern) = 0;
+
+////////////////// Memory Reading //////////////////
+
 bool mitk::FileReaderAbstract::CanReadFromMemory(  )
 {
   return m_CanReadFromMemory;

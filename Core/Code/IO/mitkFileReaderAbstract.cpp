@@ -28,19 +28,37 @@ mitk::FileReaderAbstract::~FileReaderAbstract()
 {
 }
 
-////////////////// µS related Reading //////////////////
+////////////////// Filenames etc. //////////////////
 
-//virtual const char* GetFileName() const = 0;
+const char* mitk::FileReaderAbstract::GetFileName() const
+{
+  return m_FileName;
+}
 
-//    virtual void SetFileName(const char* aFileName) = 0;
+void mitk::FileReaderAbstract::SetFileName(const char* aFileName)
+{
+ m_FileName = aFileName;
+}
 
-//    virtual const char* GetFilePrefix() const = 0;
+const char* mitk::FileReaderAbstract::GetFilePrefix() const
+{
+  return m_FilePrefix;
+}
 
-//    virtual void SetFilePrefix(const char* aFilePrefix) = 0;
+void mitk::FileReaderAbstract::SetFilePrefix(const char* aFilePrefix)
+{
+  m_FilePrefix = aFilePrefix;
+}
 
-//    virtual const char* GetFilePattern() const = 0;
+const char* mitk::FileReaderAbstract::GetFilePattern() const
+{
+  return m_FilePattern;
+}
 
-//    virtual void SetFilePattern(const char* aFilePattern) = 0;
+void mitk::FileReaderAbstract::SetFilePattern(const char* aFilePattern)
+{
+  m_FilePattern = aFilePattern;
+}
 
 ////////////////// Memory Reading //////////////////
 

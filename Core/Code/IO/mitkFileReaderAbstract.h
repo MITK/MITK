@@ -41,31 +41,32 @@ namespace mitk {
   class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface
 {
   public:
+
     //##Documentation
     //## @brief Get the specified the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual const char* GetFileName() const = 0;
+    virtual const char* GetFileName() const;
 
     //##Documentation
     //## @brief Specify the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual void SetFileName(const char* aFileName) = 0;
+    virtual void SetFileName(const char* aFileName);
 
     //##Documentation
     //## @brief Get the specified file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const char* GetFilePrefix() const = 0;
+    virtual const char* GetFilePrefix() const;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const char* aFilePrefix) = 0;
+    virtual void SetFilePrefix(const char* aFilePrefix);
 
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
@@ -73,7 +74,7 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const char* GetFilePattern() const = 0;
+    virtual const char* GetFilePattern() const;
 
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
@@ -81,7 +82,7 @@ namespace mitk {
 
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
-    virtual void SetFilePattern(const char* aFilePattern) = 0;
+    virtual void SetFilePattern(const char* aFilePattern);
 
     /**
     @brief Specifies, whether the file reader also can
@@ -122,6 +123,10 @@ protected:
 
     bool m_CanReadFromMemory;
     bool m_ReadFromMemory;
+
+    const    char* m_FileName;
+    const    char* m_FilePrefix;
+    const    char* m_FilePattern;
 
     const    char* m_MemoryBuffer;
     unsigned int   m_MemorySize;

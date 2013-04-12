@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileReaderManager.h"
 #include "mitkGetModuleContext.h"
 #include "mitkModuleContext.h"
+
+#include <itkProcessObject.h>
+
 #include <usServiceProperties.h>
 #include <MitkExports.h>
 #include <mitkCommon.h>
@@ -28,10 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 
 
-class DummyReader : public mitk::FileReaderInterface {
+class DummyReader : public mitk::FileReaderInterface, public itk::ProcessObject{
 
 public:
-  mitkClassMacro(DummyReader, mitk::FileReaderInterface);
+  mitkClassMacro(DummyReader, itk::ProcessObject);
   itkNewMacro(Self);
 
   mitk::ServiceRegistration m_ServiceRegistration;
@@ -88,6 +91,19 @@ public:
 
     m_ServiceRegistration = context->RegisterService<mitk::FileReaderInterface>(this, props);
   }
+
+  bool DummyReader::CanReadFromMemory(  )
+  { return false; }
+
+  void DummyReader::SetReadFromMemory( bool read )
+  {  }
+
+  bool DummyReader::GetReadFromMemory(  )
+  { return false; }
+
+  void DummyReader::SetMemoryBuffer(const char* dataArray, unsigned int size)
+  {   }
+
 
 };
 
@@ -154,6 +170,8 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   options.push_front("canFly");
   returned = mitk::FileReaderManager::GetReader("test", options);
   MITK_TEST_CONDITION_REQUIRED(returned == 0, "Testing correct return of 0 value when no matching reader was found");
+
+  // Onward to test the retrieval of multiple readers
 
   std::list< mitk::FileReaderInterface* > returnedList;
   returnedList = mitk::FileReaderManager::GetReaders("test", options);

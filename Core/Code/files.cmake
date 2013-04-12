@@ -68,6 +68,8 @@ set(H_FILES
   Interactions/mitkEventMapperAddOn.h
 
   Interfaces/mitkIDataNodeReader.h
+  Interfaces/mitkFileWriterInterface.cpp
+  Interfaces/mitkFileReaderInterface.cpp
 
   IO/mitkPixelTypeTraits.h
 )
@@ -259,8 +261,11 @@ set(CPP_FILES
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
+  IO/mitkFileReaderAbstract.cpp
+  IO/mitkFileReaderManager.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
+  IO/mitkFileWriterManager.cpp
   #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkImageWriter.cpp
@@ -298,10 +303,6 @@ set(CPP_FILES
   IO/mitkVtkSurfaceReader.cpp
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
-  IO/Interface/mitkFileReaderManager.cpp
-  IO/Interface/mitkFileReaderInterface.cpp
-  IO/Interface/mitkFileWriterManager.cpp
-  IO/Interface/mitkFileWriterInterface.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp

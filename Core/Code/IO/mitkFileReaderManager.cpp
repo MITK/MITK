@@ -33,7 +33,7 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
   extension.erase(0, path.find_last_of('.'));
 
   // Get best Reader
-  mitk::FileReaderInterface::Pointer reader = GetReader(extension);
+  mitk::FileReaderInterface* reader = GetReader(extension);
 
   //Read
   //return reader->Read(path);

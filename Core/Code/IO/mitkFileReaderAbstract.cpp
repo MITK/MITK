@@ -15,35 +15,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkFileReaderInterface.h"
-
-const std::string mitk::FileReaderInterface::US_PRIORITY = "org.mitk.services.FileReader.Priority";
-const std::string mitk::FileReaderInterface::US_EXTENSION = "org.mitk.services.FileReader.Extension";
+#include "mitkFileReaderAbstract.h"
 
 
-mitk::FileReaderInterface::FileReaderInterface() :
+mitk::FileReaderAbstract::FileReaderAbstract() :
 m_CanReadFromMemory (false),
 m_ReadFromMemory (false)
 {
 }
 
-mitk::FileReaderInterface::~FileReaderInterface()
+mitk::FileReaderAbstract::~FileReaderAbstract()
 {
 }
-bool mitk::FileReaderInterface::CanReadFromMemory(  )
+bool mitk::FileReaderAbstract::CanReadFromMemory(  )
 {
   return m_CanReadFromMemory;
 }
 
-void mitk::FileReaderInterface::SetReadFromMemory( bool read )
+void mitk::FileReaderAbstract::SetReadFromMemory( bool read )
 {
   m_ReadFromMemory = read;
 }
-bool mitk::FileReaderInterface::GetReadFromMemory(  )
+bool mitk::FileReaderAbstract::GetReadFromMemory(  )
 {
   return m_ReadFromMemory;
 }
-void mitk::FileReaderInterface::SetMemoryBuffer(const char* dataArray, unsigned int size)
+void mitk::FileReaderAbstract::SetMemoryBuffer(const char* dataArray, unsigned int size)
 {
   m_MemoryBuffer = dataArray;
   m_MemorySize   = size;

@@ -37,7 +37,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderInterface : public itk::ProcessObject
+  class MITK_CORE_EXPORT FileReaderInterface
 {
 
   //mitkClassMacro(FileReaderInterface,itk::ProcessObject);
@@ -89,18 +89,18 @@ namespace mitk {
     /**
     @brief Specifies, whether the file reader also can
     read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  );
+    virtual bool CanReadFromMemory(  ) = 0;
 
     /**
     @brief Set/Get functions to advise the file reader to
     use a memory array for reading a file*/
-    virtual void SetReadFromMemory( bool read );
-    virtual bool GetReadFromMemory(  );
+    virtual void SetReadFromMemory( bool read ) = 0;
+    virtual bool GetReadFromMemory(  ) = 0;
 
     /**
     @brief To be used along with a call of SetReadFromMemory(true). This sets
     the memory buffer and the size from which the reader will read.*/
-    virtual void SetMemoryBuffer(const char* dataArray, unsigned int size);
+    virtual void SetMemoryBuffer(const char* dataArray, unsigned int size) = 0;
 
     virtual mitk::BaseData::Pointer Read(std::string path = 0) = 0;
 
@@ -123,8 +123,8 @@ namespace mitk {
 
 
 protected:
-    FileReaderInterface();
-    virtual ~FileReaderInterface();
+    //FileReaderInterface();
+    //virtual ~FileReaderInterface();
 
     bool m_CanReadFromMemory;
     bool m_ReadFromMemory;
@@ -135,7 +135,10 @@ public:
 
 protected:
 };
+
 } // namespace mitk
+
+
 
 // This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::FileReaderInterface, "org.mitk.services.FileReader")

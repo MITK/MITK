@@ -27,10 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkProcessObject.h>
 #include <itkObjectFactory.h>
+#include <itkLightObject.h>
 // Microservices
 #include <usServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
+#include <usServiceRegistration.h>
+#include <usModuleContext.h>
+
 
 
 namespace mitk {
@@ -38,9 +42,11 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface
+  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface, public itk::LightObject
 {
   public:
+
+    mitkClassMacro(FileReaderAbstract, itk::LightObject);
 
     //##Documentation
     //## @brief Get the specified the file to load.
@@ -138,9 +144,13 @@ protected:
     std::string m_Extension;
     int m_Priority;
 
-public:
+    // Registration
+    mitk::ServiceRegistration m_Registration;
 
-protected:
+    virtual void RegisterMicroservice(mitk::ModuleContext* context);
+
+    virtual mitk::ServiceProperties ConstructServiceProperties();
+
 };
 } // namespace mitk
 

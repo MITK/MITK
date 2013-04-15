@@ -70,6 +70,7 @@ bool mitk::FileReaderAbstract::CanReadFromMemory(  )
 void mitk::FileReaderAbstract::SetReadFromMemory( bool read )
 {
   m_ReadFromMemory = read;
+  m_Registration.SetProperties(ConstructServiceProperties());
 }
 bool mitk::FileReaderAbstract::GetReadFromMemory(  )
 {
@@ -80,6 +81,26 @@ void mitk::FileReaderAbstract::SetMemoryBuffer(const std::string dataArray, unsi
   m_MemoryBuffer = dataArray;
   m_MemorySize   = size;
 }
+
+
+//////////// µS Registration & Properties //////////////
+
+void mitk::FileReaderAbstract::RegisterMicroservice(mitk::ModuleContext* context)
+{
+  ServiceProperties props = this->ConstructServiceProperties();
+  m_Registration = context->RegisterService<mitk::FileReaderInterface>(this, props);
+}
+
+mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
+{
+  mitk::ServiceProperties result;
+  result[mitk::FileReaderInterface::US_EXTENSION]    = m_Extension;
+  result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
+  result[mitk::FileReaderInterface::US_CAN_READ_FROM_MEMORY]  = m_CanReadFromMemory;
+  return result;
+}
+
+
 
 ////////////////// µS related Getters //////////////////
 

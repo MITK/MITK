@@ -120,6 +120,8 @@ namespace mitk {
     virtual float GetProgress() = 0;
 
     static const std::string US_EXTENSION;
+    static const std::string US_CAN_READ_FROM_MEMORY;
+
 
 
 protected:

@@ -29,16 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceProperties.h>
-#include <usServiceRegistration.h>
 
 
-class DummyReader : public mitk::FileReaderAbstract, public itk::ProcessObject{
+
+class DummyReader : public mitk::FileReaderAbstract {
 
 public:
-  mitkClassMacro(DummyReader, itk::ProcessObject);
+
+  mitkClassMacro(DummyReader, mitk::FileReaderAbstract);
   itkNewMacro(Self);
 
-  mitk::ServiceRegistration m_ServiceRegistration;
   std::list< std::string > m_Options; // this list can be set and will be returned via getOptions and via getSupportedOptions (it's a dummy!)
 
   virtual mitk::BaseData::Pointer DummyReader::Read(std::string path = 0)
@@ -64,12 +64,9 @@ public:
 
   virtual void DummyReader::Init(std::string extension, int priority)
   {
-    mitk::ModuleContext* context = mitk::GetModuleContext();
-    mitk::ServiceProperties props;
-    props[mitk::FileReaderInterface::US_EXTENSION] = extension;
-    props[mitk::ServiceConstants::SERVICE_RANKING()]  = priority;
-
-    m_ServiceRegistration = context->RegisterService<mitk::FileReaderInterface>(this, props);
+   m_Extension = extension;
+   m_Priority = priority;
+   this->RegisterMicroservice(mitk::GetModuleContext());
   }
 
 }; // End of internal dummy reader

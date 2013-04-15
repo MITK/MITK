@@ -53,8 +53,8 @@ namespace mitk
       ok = m_Controller->OpenCameraConnection();
       if (ok)
       {
-        this->m_CaptureWidth = m_Controller->GetCaptureWidth();
-        this->m_CaptureHeight = m_Controller->GetCaptureHeight();
+        this->m_CaptureWidth = m_Controller->GetInternalCaptureWidth();
+        this->m_CaptureHeight = m_Controller->GetInternalCaptureHeight();
         this->m_OriginControllerHeight = m_CaptureHeight;
         this->m_OriginControllerWidth = m_CaptureWidth;
         this->m_SourceDataSize = m_Controller->GetSourceDataStructSize();

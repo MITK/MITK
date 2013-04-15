@@ -28,15 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 extern PMDHandle m_PMDHandle; //TODO
 extern PMDDataDescription m_DataDescription; //TODO
 
-struct SourceDataStruct {
-  PMDDataDescription dataDescription;
-  char sourceData;
-};
-
 namespace mitk
 {
-  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController(): m_InternalCaptureWidth(0),
-    m_InternalCaptureHeight(0), m_InternalPixelNumber(0)
+  ToFCameraPMDCamBoardController::ToFCameraPMDCamBoardController()
   {
     m_SourcePlugin = MITK_TOF_PMDCAMBOARD_SOURCE_PLUGIN;
     m_SourceParam = SOURCE_PARAM;
@@ -62,14 +56,13 @@ namespace mitk
       this->UpdateCamera();
       this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
       ErrorText(m_PMDRes);
-      this->m_InternalCaptureWidth = m_DataDescription.img.numColumns;
-      this->m_CaptureWidth = 200;
-      this->m_InternalCaptureHeight = m_DataDescription.img.numRows;
-      this->m_CaptureHeight = 200;
-      this->m_InternalPixelNumber = m_InternalCaptureWidth*m_InternalCaptureHeight;
+      this->m_CaptureWidth = m_DataDescription.img.numColumns;
+      this->m_InternalCaptureWidth = 200;
+      this->m_CaptureHeight = m_DataDescription.img.numRows;
+      this->m_InternalCaptureHeight = 200;
       this->m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
 
-      this->m_NumberOfBytes = m_InternalPixelNumber * sizeof(float);
+      this->m_NumberOfBytes = m_PixelNumber * sizeof(float);
       this->m_SourceDataSize = m_DataDescription.size;
       this->m_SourceDataStructSize = m_DataDescription.size + sizeof(PMDDataDescription);
       MITK_INFO << "Datasource size: " << this->m_SourceDataSize <<std::endl;
@@ -150,150 +143,22 @@ namespace mitk
     return NULL;
   }
 
-  bool mitk::ToFCameraPMDCamBoardController::SetExposureMode( int mode )
-  {
-    if (mode==0) // normal mode
-    {
-      this->m_PMDRes = pmdSourceCommand(m_PMDHandle, 0, 0, "SetExposureMode Normal");
-      return ErrorText(this->m_PMDRes);
-    }
-    else if (mode==1) // SMB mode
-    {
-      this->m_PMDRes = pmdSourceCommand(m_PMDHandle, 0, 0, "SetExposureMode SMB");
-      return ErrorText(this->m_PMDRes);
-    }
-    else
-    {
-      MITK_ERROR<<"Specified exposure mode not supported. Exposure mode must be 0 (Normal) or 1 (SMB)";
-      return false;
-    }
-  }
-
   bool mitk::ToFCameraPMDCamBoardController::SetFieldOfView( float fov )
   {
+    //return true;
     std::stringstream commandStream;
     commandStream<<"SetFOV "<<fov;
     this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, commandStream.str().c_str());
     return ErrorText(this->m_PMDRes);
   }
 
-  bool mitk::ToFCameraPMDCamBoardController::SetFPNCalibration( bool on )
+  void ToFCameraPMDCamBoardController::TransformCameraOutput( float* in, float* out, bool isDist)
   {
-    if(on)
-    {
-      this->m_PMDRes=pmdSourceCommand(m_PMDHandle,0,0,"SetFPNCalibration On");
-      return this->ErrorText(this->m_PMDRes);
-    }
-    else
-    {
-      this->m_PMDRes=pmdSourceCommand(m_PMDHandle,0,0,"SetFPNCalibration Off");
-      return this->ErrorText(this->m_PMDRes);
-    }
-  }
-
-  bool mitk::ToFCameraPMDCamBoardController::SetFPPNCalibration( bool on )
-  {
-    if(on)
-    {
-      this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetFPPNCalibration On");
-      return this->ErrorText(this->m_PMDRes);
-    }
-    else
-    {
-      this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetFPPNCalibration Off");
-      return this->ErrorText(this->m_PMDRes);
-    }
-  }
-
-  bool mitk::ToFCameraPMDCamBoardController::SetLinearityCalibration( bool on )
-  {
-    if(on)
-    {
-      this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetLinearityCalibration On");
-      return this->ErrorText(this->m_PMDRes);
-    }
-    else
-    {
-      this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetLinearityCalibration Off");
-      return this->ErrorText(this->m_PMDRes);
-    }
-  }
-
-  bool mitk::ToFCameraPMDCamBoardController::SetLensCalibration( bool on )
-  {
-    if (on)
-    {
-      this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, "SetLensCalibration On");
-      return ErrorText(this->m_PMDRes);
-    }
-    else
-    {
-      this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, "SetLensCalibration Off");
-      return ErrorText(this->m_PMDRes);
-    }
-  }
-
-  bool ToFCameraPMDCamBoardController::GetAmplitudes(float* amplitudeArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdGetAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes);
-    this->TransformCameraOutput(tempArray, amplitudeArray, false);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDCamBoardController::GetAmplitudes(char* sourceData, float* amplitudeArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdCalcAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    this->TransformCameraOutput(tempArray, amplitudeArray, false);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDCamBoardController::GetIntensities(float* intensityArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdGetIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes);
-    this->TransformCameraOutput(tempArray, intensityArray, false);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDCamBoardController::GetIntensities(char* sourceData, float* intensityArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdCalcIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    this->TransformCameraOutput(tempArray, intensityArray, false);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDCamBoardController::GetDistances(float* distanceArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdGetDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes);
-    this->TransformCameraOutput(tempArray, distanceArray, true);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  bool ToFCameraPMDCamBoardController::GetDistances(char* sourceData, float* distanceArray)
-  {
-    float* tempArray = new float[m_InternalCaptureWidth*m_InternalCaptureHeight];
-    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    this->TransformCameraOutput(tempArray, distanceArray, true);
-    delete[] tempArray;
-    return ErrorText(this->m_PMDRes);
-  }
-
-  void ToFCameraPMDCamBoardController::TransformCameraOutput( float* in, float* out, bool isDist )
-  {
-    vnl_matrix<float> inMat = vnl_matrix<float>(m_InternalCaptureHeight,m_InternalCaptureWidth);
+    vnl_matrix<float> inMat = vnl_matrix<float>(m_CaptureHeight,m_CaptureWidth);
     inMat.copy_in(in);
-    vnl_matrix<float> outMat = vnl_matrix<float>(m_CaptureHeight, m_CaptureWidth);
-    vnl_matrix<float> temp = vnl_matrix<float>(m_CaptureHeight, m_CaptureWidth);
-    temp = inMat.extract(m_CaptureHeight, m_CaptureWidth, 0,1);
+    vnl_matrix<float> outMat = vnl_matrix<float>(m_InternalCaptureHeight, m_InternalCaptureWidth);
+    vnl_matrix<float> temp = vnl_matrix<float>(m_InternalCaptureHeight, m_InternalCaptureWidth);
+    temp = inMat.extract(m_InternalCaptureHeight, m_InternalCaptureWidth, 0,1);
     outMat = temp.transpose();
     if(isDist)
     {

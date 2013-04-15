@@ -115,6 +115,8 @@ namespace mitk
 
   protected:
 
+    virtual void TransformCameraOutput(float* in, float* out, bool isDist);
+
     ToFCameraPMDCamCubeController();
 
     ~ToFCameraPMDCamCubeController();

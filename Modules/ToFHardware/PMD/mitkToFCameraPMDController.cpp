@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <pmdsdk2.h>
 #include <string.h>
 
+// vnl includes
+#include "vnl/vnl_matrix.h"
+
 PMDHandle m_PMDHandle; //TODO
 PMDDataDescription m_DataDescription; //TODO
 
@@ -28,7 +31,7 @@ struct SourceDataStruct {
 namespace mitk
 {
   ToFCameraPMDController::ToFCameraPMDController(): m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0),
-    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false),
+    m_CaptureWidth(200), m_CaptureHeight(200),m_InternalCaptureWidth(m_CaptureWidth),m_InternalCaptureHeight(m_CaptureHeight), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false),
     m_InputFileName("")
   {
   }
@@ -50,8 +53,8 @@ namespace mitk
     if(error != PMD_OK)
     {
       pmdGetLastError (m_PMDHandle, m_PMDError, 128);
-      MITK_ERROR << "PMD CamCube Error " << m_PMDError;
-      mitkThrow() << "PMD CamCube Error " << m_PMDError;
+      MITK_ERROR << "PMD Error " << m_PMDError;
+      mitkThrow() << "PMD Error " << m_PMDError;
       return false;
     }
     else return true;
@@ -65,37 +68,55 @@ namespace mitk
 
   bool ToFCameraPMDController::GetAmplitudes(float* amplitudeArray)
   {
-    this->m_PMDRes = pmdGetAmplitudes(m_PMDHandle, amplitudeArray, this->m_NumberOfBytes);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdGetAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    TransformCameraOutput(tempArray, amplitudeArray, false);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 
   bool ToFCameraPMDController::GetAmplitudes(char* sourceData, float* amplitudeArray)
   {
-    this->m_PMDRes = pmdCalcAmplitudes(m_PMDHandle, amplitudeArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdCalcAmplitudes(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    TransformCameraOutput(tempArray, amplitudeArray, false);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 
   bool ToFCameraPMDController::GetIntensities(float* intensityArray)
   {
-    this->m_PMDRes = pmdGetIntensities(m_PMDHandle, intensityArray, this->m_NumberOfBytes);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdGetIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    TransformCameraOutput(tempArray, intensityArray, false);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 
   bool ToFCameraPMDController::GetIntensities(char* sourceData, float* intensityArray)
   {
-    this->m_PMDRes = pmdCalcIntensities(m_PMDHandle, intensityArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdCalcIntensities(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    TransformCameraOutput(tempArray, intensityArray, false);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 
   bool ToFCameraPMDController::GetDistances(float* distanceArray)
   {
-    this->m_PMDRes = pmdGetDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdGetDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes);
+    TransformCameraOutput(tempArray, distanceArray, true);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 
   bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
   {
-    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    float* tempArray = new float[m_CaptureWidth*m_CaptureHeight];
+    this->m_PMDRes = pmdCalcDistances(m_PMDHandle, tempArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
+    TransformCameraOutput(tempArray, distanceArray, true);
+    delete[] tempArray;
     return ErrorText(this->m_PMDRes);
   }
 

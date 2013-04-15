@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFPMDConfig.h"
 #include <pmdsdk2.h>
 
+#include "vnl/vnl_matrix.h"
+
 //Plugin defines for CamCube
 #define SOURCE_PARAM ""
 #define PROC_PARAM ""
@@ -58,6 +60,8 @@ namespace mitk
       ErrorText(m_PMDRes);
       m_CaptureWidth = m_DataDescription.img.numColumns;
       m_CaptureHeight = m_DataDescription.img.numRows;
+      m_InternalCaptureWidth = m_CaptureWidth;
+      m_InternalCaptureHeight = m_CaptureHeight;
       m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
       m_NumberOfBytes = m_PixelNumber * sizeof(float);
       m_SourceDataSize = m_DataDescription.size;
@@ -227,5 +231,21 @@ namespace mitk
       this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, "SetLensCalibration Off");
       return ErrorText(this->m_PMDRes);
     }
+  }
+
+  void ToFCameraPMDCamCubeController::TransformCameraOutput( float* in, float* out, bool isDist )
+  {
+    vnl_matrix<float> inMat = vnl_matrix<float>(m_CaptureHeight,m_CaptureWidth);
+    inMat.copy_in(in);
+    vnl_matrix<float> outMat = vnl_matrix<float>(m_InternalCaptureHeight, m_InternalCaptureWidth);
+    outMat = inMat.extract(m_InternalCaptureHeight, m_InternalCaptureWidth, 0,0);
+    outMat.fliplr();
+    if(isDist)
+    {
+      outMat*=1000;
+    }
+    outMat.copy_out(out);
+    inMat.clear();
+    outMat.clear();
   }
 }

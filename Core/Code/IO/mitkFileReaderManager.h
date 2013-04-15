@@ -63,19 +63,19 @@ class MITK_CORE_EXPORT FileReaderManager
     **/
     static mitk::FileReaderInterface* GetReader(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    static mitk::FileReaderInterface* GetReader(const std::string& extension, const std::list<std::string>& options );
+    static mitk::FileReaderInterface* GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension);
+    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, const std::list<std::string>& options );
+    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
 protected:
     //FileReaderManager();
     //virtual ~FileReaderManager();
 
-    static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension);
+    static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension, mitk::ModuleContext* context);
 
-    static bool ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options );
+    static bool ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options);
 
 };
 } // namespace mitk

@@ -70,7 +70,6 @@ bool mitk::FileReaderAbstract::CanReadFromMemory(  )
 void mitk::FileReaderAbstract::SetReadFromMemory( bool read )
 {
   m_ReadFromMemory = read;
-  m_Registration.SetProperties(ConstructServiceProperties());
 }
 bool mitk::FileReaderAbstract::GetReadFromMemory(  )
 {

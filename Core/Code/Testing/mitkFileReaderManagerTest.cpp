@@ -39,28 +39,14 @@ public:
   mitkClassMacro(DummyReader, mitk::FileReaderAbstract);
   itkNewMacro(Self);
 
-  std::list< std::string > m_Options; // this list can be set and will be returned via getOptions and via getSupportedOptions (it's a dummy!)
-
   virtual mitk::BaseData::Pointer DummyReader::Read(std::string path = 0)
   { return 0; }
 
   virtual mitk::BaseData::Pointer DummyReader::Read(std::istream*)
   { return 0; }
 
-  virtual std::list< std::string > GetSupportedOptions()
-  { return m_Options; }
-
-  virtual std::list< std::string > DummyReader::GetOptions()
-  { return m_Options; }
-
   virtual void DummyReader::SetOptions(std::list< std::string > options )
-  { m_Options = options; }
-
-  virtual bool DummyReader::CanRead(const std::string& path)
-  { return true; }
-
-  virtual float DummyReader::GetProgress()
-  { return 1; }
+  { m_Options = options; m_Registration.SetProperties(ConstructServiceProperties());}
 
   virtual void DummyReader::Init(std::string extension, int priority)
   {
@@ -91,6 +77,9 @@ MITK_INFO << mitk::ServiceConstants::SERVICE_RANKING();
 
   testDR->Init("test",1);
   otherDR->Init("other",1);
+
+  MITK_TEST_CONDITION_REQUIRED(testDR->CanRead("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
+  MITK_TEST_CONDITION_REQUIRED(!testDR->CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
   mitk::FileReaderInterface* returned = mitk::FileReaderManager::GetReader("test");
 

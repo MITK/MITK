@@ -19,3 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string mitk::FileReaderInterface::US_EXTENSION = "org.mitk.services.FileReader.Extension";
 const std::string mitk::FileReaderInterface::US_CAN_READ_FROM_MEMORY = "org.mitk.services.FileReader.CanReadFromMemory";
+
+/**
+* @brief Used to indicate that an image should be read as an binary image.
+*/
+const std::string mitk::FileReaderInterface::OPTION_READ_AS_BINARY = "org.mitk.services.FileReader.Option.ReadAsBinary";

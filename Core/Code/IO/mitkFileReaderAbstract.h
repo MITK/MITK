@@ -114,15 +114,15 @@ namespace mitk {
 
     std::string GetExtension();
 
-    virtual std::list< std::string > GetSupportedOptions() = 0;
+    virtual std::list< std::string > GetSupportedOptions();
 
-    virtual std::list< std::string > GetOptions() = 0;
+    // virtual std::list< std::string > GetOptions() = 0;
 
-    virtual void SetOptions(std::list< std::string > options ) = 0;
+    // virtual void SetOptions(std::list< std::string > options ) = 0;
 
-    virtual bool CanRead(const std::string& path) = 0; // Todo: nach möglichkeit constref
+    virtual bool CanRead(const std::string& path);
 
-    virtual float GetProgress() = 0;
+    virtual float GetProgress();
 
 
 protected:
@@ -143,6 +143,7 @@ protected:
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;
     int m_Priority;
+    std::list< std::string > m_Options; // Options supported by this reader. Can be left emtpy if no special options are required
 
     // Registration
     mitk::ServiceRegistration m_Registration;

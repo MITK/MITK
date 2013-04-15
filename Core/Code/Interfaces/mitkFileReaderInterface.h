@@ -112,17 +112,20 @@ namespace mitk {
 
     virtual std::list< std::string > GetSupportedOptions() = 0;
 
-    virtual std::list< std::string > GetOptions() = 0;
+    //virtual std::list< std::string > GetOptions() = 0;
 
-    virtual void SetOptions(std::list< std::string > options ) = 0;
+    //virtual void SetOptions(std::list< std::string > options ) = 0;
 
     virtual bool CanRead(const std::string& path) = 0;
+
     virtual float GetProgress() = 0;
 
+    // Microservice Properties
     static const std::string US_EXTENSION;
     static const std::string US_CAN_READ_FROM_MEMORY;
 
-
+    // Microservice Names for defined Properties
+    static const std::string OPTION_READ_AS_BINARY;
 
 protected:
     //FileReaderInterface();

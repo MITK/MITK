@@ -96,10 +96,34 @@ mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
   result[mitk::FileReaderInterface::US_EXTENSION]    = m_Extension;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
   result[mitk::FileReaderInterface::US_CAN_READ_FROM_MEMORY]  = m_CanReadFromMemory;
+
+  for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
+    result[*it] = std::string("true");
+  }
   return result;
 }
 
+//////////////////////// Options ///////////////////////
 
+std::list< std::string > mitk::FileReaderAbstract::GetSupportedOptions()
+{
+  return m_Options;
+}
+
+////////////////// MISC //////////////////
+
+bool mitk::FileReaderAbstract::CanRead(const std::string& path)
+{
+  // Default implementation only checks if extension is correct
+  std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
+  return (m_Extension == pathEnd);
+}
+
+float mitk::FileReaderAbstract::GetProgress()
+{
+  // Default implementation always returns 1 (finished)
+  return 1;
+}
 
 ////////////////// µS related Getters //////////////////
 

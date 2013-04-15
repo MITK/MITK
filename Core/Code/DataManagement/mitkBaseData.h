@@ -21,10 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 
 #include "mitkBaseProcess.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
+
+//To be replaced
+#include "mitkTimeSlicedGeometry.h"
 
 
 namespace mitk {
@@ -55,6 +58,11 @@ public:
     return m_TimeSlicedGeometry.GetPointer();
   }
 
+  const mitk::TimeGeometry* GetTimeGeometry() const
+  {
+    return m_TimeGeometry.GetPointer();
+  }
+
   //##Documentation
   //## @brief Return the TimeSlicedGeometry of the data as pointer.
   //##
@@ -67,6 +75,11 @@ public:
     return m_TimeSlicedGeometry.GetPointer();
   }
 
+  mitk::TimeGeometry* GetTimeGeometry()
+  {
+    return m_TimeGeometry.GetPointer();
+  }
+
   //##Documentation
   //## @brief Return the Geometry3D of the data.
   //##
@@ -75,6 +88,7 @@ public:
   //## is up-to-date (by setting the update extent to largest possible and
   //## calling UpdateOutputInformation).
   const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
+  const mitk::TimeGeometry* GetUpdatedTimeGeometry();
 
   //##Documentation
   //## @brief Expands the TimeSlicedGeometry to a number of TimeSteps.
@@ -376,6 +390,7 @@ private:
   PropertyList::Pointer m_PropertyList;
 
   TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
+  TimeGeometry::Pointer m_TimeGeometry;
 
   //##Documentation
   //## @brief Helps to deal with the weak-pointer-problem.

@@ -41,8 +41,17 @@ namespace mitk {
   {
 
   public:
+    mitkClassMacro(BaseGeometry, itk::Object);
+
     virtual void Transform( Transform3D& transformation )
     {};
+    //##Documentation
+    //## @brief Get the position of a corner (in world coordinates)
+    //##
+    //## See SetImageGeometry for how a corner is defined on images.
+    Point3D GetCornerPointInWorldSpace(bool xFront=true, bool yFront=true, bool zFront=true) const
+    {return m_Geo->GetCornerPoint(xFront,yFront,zFront);}
+
 
     mitk::Geometry3D::Pointer m_Geo;
 

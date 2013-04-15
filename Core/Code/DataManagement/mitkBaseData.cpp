@@ -86,6 +86,15 @@ const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
   return GetTimeSlicedGeometry();
 }
 
+const mitk::TimeGeometry* mitk::BaseData::GetUpdatedTimeGeometry()
+{
+  SetRequestedRegionToLargestPossibleRegion();
+
+  UpdateOutputInformation();
+
+  return GetTimeGeometry();
+}
+
 void mitk::BaseData::Expand( unsigned int timeSteps )
 {
   if( m_TimeSlicedGeometry.IsNotNull() )

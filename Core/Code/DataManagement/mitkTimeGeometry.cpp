@@ -27,6 +27,11 @@ void mitk::TimeGeometry::Initialize()
 {
 }
 
+
+/* \brief short description
+ * parameters
+ *
+ */
 mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorldSpace(int id) const
 {
   assert(id >= 0);
@@ -98,4 +103,20 @@ void mitk::TimeGeometry::ApplyTransformMatrixToAllTimeSteps (mitk::Transform3D& 
   {
     GetGeometryForTimeStep(step)->Transform(transformation);
   }
+}
+
+void mitk::TimeGeometry::UpdateBoundingBox ()
+{
+  assert(m_BoundingBox.IsNotNull());
+  typedef BoundingBox::PointsContainer ContainerType;
+
+  ContainerType::Pointer points = ContainerType::New();
+  points->reserve(2*GetNumberOfTimeSteps());
+  for (TimeStepType step = 0; step <GetNumberOfTimeSteps(); ++step)
+  {
+    points->push_back(GetGeometryForTimeStep(step)->GetCornerPointInWorldSpace(false,false,false));
+    points->push_back(GetGeometryForTimeStep(step)->GetCornerPointInWorldSpace(true,true,true));
+  }
+  m_BoundingBox->SetPoints(points);
+  m_BoundingBox->ComputeBoundingBox();
 }

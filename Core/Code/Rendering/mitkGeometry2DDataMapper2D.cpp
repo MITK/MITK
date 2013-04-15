@@ -49,8 +49,15 @@ const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
   return static_cast<const Geometry2DData * > ( GetDataNode()->GetData() );
 }
 
-void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* /* renderer */)
+void mitk::Geometry2DDataMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
+  if(!ls->IsGenerateDataRequired(renderer,this,GetDataNode()))
+    return;
+
+  ls->UpdateGenerateDataTime();
+
   // collect all Geometry2DDatas accessible from the DataStorage
   m_OtherGeometry2Ds.clear();
   if (m_DataStorage.IsNull())

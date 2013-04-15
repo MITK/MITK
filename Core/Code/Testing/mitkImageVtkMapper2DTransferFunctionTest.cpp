@@ -27,63 +27,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
 {
-    // load all arguments into a datastorage, take last argument as reference rendering
-    // setup a renderwindow of fixed size X*Y
-    // render the datastorage
-    // compare rendering to reference image
-    MITK_TEST_BEGIN("mitkImageVtkMapper2DTransferFunctionTest")
+  // load all arguments into a datastorage, take last argument as reference rendering
+  // setup a renderwindow of fixed size X*Y
+  // render the datastorage
+  // compare rendering to reference image
+  MITK_TEST_BEGIN("mitkImageVtkMapper2DTransferFunctionTest")
 
-    // enough parameters?
-    if ( argc < 2 )
-    {
-        MITK_TEST_OUTPUT( << "Usage: " << std::string(*argv) << " [file1 file2 ...] outputfile" )
-                MITK_TEST_OUTPUT( << "Will render a central axial slice of all given files into outputfile" )
-                exit( EXIT_SUCCESS );
-    }
-    mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-    //define an arbitrary colortransferfunction
-    vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-    colorTransferFunction->SetColorSpaceToRGB();
-    colorTransferFunction->AddRGBPoint(0.0, 1, 0, 0); //black = red
-    colorTransferFunction->AddRGBPoint(127.5, 0, 1, 0); //grey = green
-    colorTransferFunction->AddRGBPoint(255.0, 0, 0, 1); //white = blue
-    mitk::TransferFunction::Pointer transferFucntion = mitk::TransferFunction::New();
-    transferFucntion->SetColorTransferFunction( colorTransferFunction );
+  //define an arbitrary colortransferfunction
+  vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  colorTransferFunction->SetColorSpaceToRGB();
+  colorTransferFunction->AddRGBPoint(0.0, 1, 0, 0); //black = red
+  colorTransferFunction->AddRGBPoint(127.5, 0, 1, 0); //grey = green
+  colorTransferFunction->AddRGBPoint(255.0, 0, 0, 1); //white = blue
+  mitk::TransferFunction::Pointer transferFucntion = mitk::TransferFunction::New();
+  transferFucntion->SetColorTransferFunction( colorTransferFunction );
 
-    //set the rendering mode to use the transfer function
-    renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
-    //set the property for the image
-    renderingHelper.SetImageProperty("Image Rendering.Transfer Function", mitk::TransferFunctionProperty::New(transferFucntion));
+  //set the rendering mode to use the transfer function
+  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
+  //set the property for the image
+  renderingHelper.SetImageProperty("Image Rendering.Transfer Function", mitk::TransferFunctionProperty::New(transferFucntion));
 
-    renderingHelper.Render();
+  //use this to generate a reference screenshot or save the file:
+  bool generateReferenceScreenshot = false;
+  if(generateReferenceScreenshot)
+  {
+    renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
+  }
 
-    //use this to generate a reference screenshot or save the file:
-    bool generateReferenceScreenshot = false;
-    if(generateReferenceScreenshot)
-    {
-        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
-    }
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
-    renderingHelper.PrepareRender();
-    //### Usage of vtkRegressionTestImage:
-    //vtkRegressionTestImage( vtkRenderWindow )
-    //Set a vtkRenderWindow containing the desired scene.
-    //vtkRegressionTestImage automatically searches in argc and argv[]
-    //for a path a valid image with -V. If the test failed with the
-    //first image (foo.png) check if there are images of the form
-    //foo_N.png (where N=1,2,3...) and compare against them.
-    //Default tolerance for rendering tests is 10 (set by VTK).
-    //For this case, small artifacts in Windows occur and boundaries of the fonts,
-    //thus we double the default tolerance threshold and set it to 20.
-    int retVal = vtkTesting::Test(argc, argv, renderingHelper.GetVtkRenderWindow(), 20 );
-
-    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
-    //0 = test failed
-    //1 = test passed
-    //2 = test not run
-    //3 = something with vtkInteraction
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
-
-    MITK_TEST_END();
+  MITK_TEST_END();
 }

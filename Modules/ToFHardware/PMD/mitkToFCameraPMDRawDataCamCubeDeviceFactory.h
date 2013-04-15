@@ -78,6 +78,10 @@ private:
       cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
       device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
+      device->SetBoolProperty("HasRGBImage", false);
+      device->SetBoolProperty("HasAmplitudeImage", true);
+      device->SetBoolProperty("HasIntensityImage", true);
+
      return device.GetPointer();
    }
    int m_DeviceNumber;

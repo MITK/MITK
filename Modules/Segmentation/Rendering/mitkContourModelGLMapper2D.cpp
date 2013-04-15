@@ -143,19 +143,21 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       displayGeometry->WorldToDisplay(pt2d, pt2d);
 
       Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetSquaredNorm();
+      ScalarType scalardiff = diff.GetNorm();
 
       //draw lines
       bool projectmode=false;
-      GetDataNode()->GetVisibility(projectmode, renderer, "project");
+      GetDataNode()->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
 
       if(projectmode)
-        drawit=true;
-      else
       {
-        if(diff.GetSquaredNorm()<0.5)
-          drawit=true;
+        drawit=true;
       }
+      else if(scalardiff<0.25)
+      {
+        drawit=true;
+      }
+
       if(drawit)
       {
         //lastPt2d is not valid in first step
@@ -175,8 +177,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           Point2D  tmp;
 
           Vector2D horz,vert;
-          horz[0]=pointsize-scalardiff*2; horz[1]=0;
-          vert[0]=0;                vert[1]=pointsize-scalardiff*2;
+          horz[1]=0;
+          vert[0]=0;
           horz[0]=pointsize;
           vert[1]=pointsize;
           glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
@@ -187,7 +189,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
           tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
           tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-          glEnd ();
+          glEnd();
           glLineWidth(1);
           //the actual point in the specified color to see the usual color of the point
           glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
@@ -235,11 +237,11 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       displayGeometry->WorldToDisplay(pt2d, pt2d);
 
       Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetSquaredNorm();
+      ScalarType scalardiff = diff.GetNorm();
       //----------------------------------
 
       //draw point if close to plane
-      if(scalardiff<0.5)
+      if(scalardiff<0.25)
       {
 
         float pointsize = 3.2;
@@ -272,6 +274,7 @@ void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mi
   node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

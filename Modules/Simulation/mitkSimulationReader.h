@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseProcess.h>
 #include <mitkFileReader.h>
+#include <SimulationExports.h>
 
 namespace mitk
 {

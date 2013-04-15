@@ -1,10 +1,13 @@
 set(CPP_FILES
   mitkSimulation.cpp
   mitkSimulationDrawTool.cpp
-  mitkSimulationPropAssemblyVisitor.cpp
   mitkSimulationIOFactory.cpp
   mitkSimulationMapper3D.cpp
-  mitkSimulationReader.cpp
-  mitkSimulationObjectFactory.cpp
   mitkSimulationModel.cpp
+  mitkSimulationObjectFactory.cpp
+  mitkSimulationPropAssemblyVisitor.cpp
+  mitkSimulationReader.cpp
+  mitkSimulationTemplate.cpp
+  mitkSimulationTemplateIOFactory.cpp
+  mitkSimulationTemplateReader.cpp
 )

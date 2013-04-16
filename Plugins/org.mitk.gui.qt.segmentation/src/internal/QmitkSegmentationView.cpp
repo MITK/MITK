@@ -688,7 +688,7 @@ void QmitkSegmentationView::OnSurfaceSelectionChanged()
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if (m_AutoSelectionEnabled)
+  if (m_AutoSelectionEnabled && this->IsActivated())
   {
     if (nodes.size() == 0 && m_Controls->patImageSelector->GetSelectedNode().IsNull())
     {
@@ -711,7 +711,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
         return;
       }
 
-      MITK_INFO<<"NodeNAme: "<<nodeName<<"IsSelected: "<<selectedNode->IsSelected()<<" IsVisible: "<<selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
       mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
       if (selectedImage.IsNull())
       {

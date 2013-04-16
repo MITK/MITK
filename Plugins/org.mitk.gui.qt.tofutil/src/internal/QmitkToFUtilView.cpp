@@ -417,7 +417,7 @@ void QmitkToFUtilView::OnToFCameraStopped()
 void QmitkToFUtilView::OnToFCameraSelected(const QString selected)
 {
   m_SelectedCamera = selected;
-  if ((selected.contains("CamBoard"))||(selected.contains("O3D")))
+  if (selected.contains("O3D"))
   {
     MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
     this->m_Controls->m_SurfaceCheckBox->setEnabled(false);

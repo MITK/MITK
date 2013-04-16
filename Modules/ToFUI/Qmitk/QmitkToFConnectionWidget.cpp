@@ -141,10 +141,6 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
       emit ToFCameraSelected(selectedCamera);
 
-      //Creating a new  instance of m_ToFImageGrabber
-      this->m_ToFImageGrabber = NULL;
-      this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
-
       //Feeding it with the Info from ServiceListWidget
       this->m_ToFImageGrabber->SetCameraDevice(device);
 

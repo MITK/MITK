@@ -145,8 +145,9 @@ void QmitkPreprocessingView::DoAdcAverage()
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( filter->GetOutput() );
   image->SetB_Value( filter->GetTargetBValue() );
+  //image->SetOriginalDirections( filter->GetTargetGradientDirections() );
   image->SetDirections( filter->GetTargetGradientDirections() );
-  image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
+  //image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
   image->InitializeFromVectorImage();
 
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();

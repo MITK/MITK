@@ -711,7 +711,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
         return;
       }
 
-      MITK_INFO<<"NodeNAme: "<<nodeName;
+      MITK_INFO<<"NodeNAme: "<<nodeName<<"IsSelected: "<<selectedNode->IsSelected()<<" IsVisible: "<<selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
       mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
       if (selectedImage.IsNull())
       {
@@ -801,6 +801,9 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
           if (m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) != selectedNode)
           {
             SetToolManagerSelection(selectedNode, NULL);
+            //May be a bug in the selection services. A node which is deselected will be passed as selected node to the OnSelectionChanged function
+            if (!selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
+                selectedNode->SetVisibility(true);
             this->UpdateWarningLabel("The selected patient image does not\nmatchwith the selected segmentation!");
           }
         }

@@ -51,6 +51,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   m_Interpolation(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
+  //this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -86,6 +87,12 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   // [sizeAllDirections] size of GradientContainer cointaining all unique directions
   m_allDirectionsSize = m_allDirectionsIndicies.size();
 
+  //MITK_INFO << m_allDirectionsSize;
+  //exit(0);
+
+  m_TargetGradientDirections = mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(m_BValueMap,m_OriginalGradientDirections);
+  //MITK_INFO << m_allDirectionsSize;
+
   // if INTERPOLATION necessary
   if(m_Interpolation)
   {
@@ -101,7 +108,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
 
     m_ShellInterpolationMatrixVector.reserve(m_BValueMap.size()-1);
     // for Weightings
-    unsigned int maxShellSize = 0;
+
 
     // for each shell
     BValueMap::const_iterator it = m_BValueMap.begin();
@@ -114,76 +121,83 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
       while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size())
         SHMaxOrder -= 2 ;
 
-      //- save shell size
-
-      if(currentShell.size() > maxShellSize)
-        maxShellSize = currentShell.size();
-
       //- get TragetSHBasis using allDirectionsContainer
       vnl_matrix<double> sphericalCoordinates;
       sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(m_allDirectionsIndicies, m_OriginalGradientDirections);
       vnl_matrix<double> TargetSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
+      MITK_INFO << "TargetSHBasis " << TargetSHBasis.rows() << " x " << TargetSHBasis.cols();
       //- get ShellSHBasis using currentShellDirections
       sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(currentShell, m_OriginalGradientDirections);
       vnl_matrix<double> ShellSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
+      MITK_INFO << "ShellSHBasis " << ShellSHBasis.rows() << " x " << ShellSHBasis.cols();
       //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
       vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
       vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.pinverse();
+      MITK_INFO << "shellInterpolationMatrix " << shellInterpolationMatrix.rows() << " x " << shellInterpolationMatrix.cols();
       m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
+
+
+
       //- save interpolationSHBasis
 
     }
-    m_WeightsVector.reserve(m_BValueMap.size()-1);
-    it = m_BValueMap.begin();
-    it++; // skip ReferenceImages
-    //- calculate Weights [Weigthing = shell_size / max_shell_size]
-    for(;it != m_BValueMap.end(); it++)
-      m_WeightsVector.push_back(it->second.size() / maxShellSize);
+
+  }
+  m_WeightsVector.reserve(m_BValueMap.size()-1);
+  BValueMap::const_iterator itt = m_BValueMap.begin();
+  itt++; // skip ReferenceImages
+  //- calculate Weights [Weigthing = shell_size / max_shell_size]
+  unsigned int maxShellSize = 0;
+  for(;itt != m_BValueMap.end(); itt++){
+    if(itt->second.size() > maxShellSize)
+      maxShellSize = itt->second.size();
+  }
+  itt = m_BValueMap.begin();
+  itt++; // skip ReferenceImages
+  for(;itt != m_BValueMap.end(); itt++){
+    m_WeightsVector.push_back(itt->second.size() / (double)maxShellSize);
   }
 
 
   // calculate average b-Value for target b-Value [bVal_t]
-  const IndicesVector BZeroIndices = m_BValueMap.at(0.0);
-  const unsigned int numberOfBZeroImages = BZeroIndices.size();
-  if(numberOfBZeroImages % (m_BValueMap.size()-1)  == 0)
-  {
-    MITK_INFO << "referenceImage avareg for each shell";
-    m_bZeroIndicesSplitVectors.reserve(m_BValueMap.size()-1);
-    const int stepWidth = BZeroIndices.size() / (m_BValueMap.size()-1);
-    IndicesVector::const_iterator it1 = BZeroIndices.begin();
-    IndicesVector::const_iterator it2 = BZeroIndices.begin() + stepWidth;
-    for(int i = 0 ; i < m_BValueMap.size()-1; i++)
-    {
-      m_bZeroIndicesSplitVectors.push_back(IndicesVector(it1,it2));
-      it1 += stepWidth;
-      it2 += stepWidth;
-    }
-  }else
-  {
-    MITK_INFO << "overall referenceImage avareg";
-    m_bZeroIndicesSplitVectors.reserve(1);
-    m_bZeroIndicesSplitVectors.push_back(BZeroIndices);
-  }
+  // MITK_INFO << "overall referenceImage avareg";
+
 
 
   // initialize output image
-  typename OutputImageType::Pointer outImage = OutputImageType::New();
+  typename OutputImageType::Pointer outImage = static_cast<OutputImageType * >(ProcessObject::GetOutput(0));
+  //outImage = OutputImageType::New();
   outImage->SetSpacing( this->GetInput()->GetSpacing() );
   outImage->SetOrigin( this->GetInput()->GetOrigin() );
   outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction using bZeroDirection+AllDirectionsContainer
   outImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
   outImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
   outImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
-  outImage->SetVectorLength( m_allDirectionsSize ); // size of 1(bzeroValue) + AllDirectionsContainer
+  outImage->SetVectorLength( 1+m_allDirectionsSize ); // size of 1(bzeroValue) + AllDirectionsContainer
   outImage->Allocate();
 
+  BValueMap::iterator it = m_BValueMap.begin();
+  it++; // skip bZeroImages corresponding to 0-bValue
+  m_TargetBValue = 0;
+  while(it!=m_BValueMap.end())
+  {
+    m_TargetBValue += it->first;
+    it++;
+  }
+  m_TargetBValue /= (double)(m_BValueMap.size()-1);
 
-  MITK_INFO << "Input:" << std::endl
-            << "GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
-            << "Shells: " << (m_BValueMap.size() - 1) << std::endl
-            << "ReferenceImages: " << m_BValueMap.at(0.0).size() << std::endl
-            << "Interpolation: " << m_Interpolation;
 
+  MITK_INFO << "Input:" << std::endl << std::endl
+            << "    GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
+            << "    Shells: " << (m_BValueMap.size() - 1) << std::endl
+            << "    ReferenceImages: " << m_BValueMap.at(0.0).size() << std::endl
+            << "    Interpolation: " << m_Interpolation << std::endl;
+
+  MITK_INFO << "Output:" << std::endl << std::endl
+            << "    OutImageVectorLength: " << outImage->GetVectorLength() << std::endl
+            << "    TargetDirections: " << m_allDirectionsSize << std::endl
+            << "    TargetBValue: " << m_TargetBValue << std::endl
+            << std::endl;
 
 }
 
@@ -205,16 +219,12 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
 
-  const int numShells = m_BValueMap.size()-1;
-  BValueMap::iterator it = m_BValueMap.begin();
-  //std::vector<double> adcVec = new Vector<double>(numShells);
-
   // calculate target bZero-Value [b0_t]
   const IndicesVector BZeroIndices = m_BValueMap[0.0];
   double BZeroAverage = 0.0;
 
   // create empty nxm SignalMatrix containing n->signals/directions (in case of interpolation ~ sizeAllDirections otherwise the size of any shell) for m->shells
-  vnl_matrix<double> SignalMatrix(m_allDirectionsSize, m_BValueMap.size());
+  vnl_matrix<double> SignalMatrix(m_allDirectionsSize, m_BValueMap.size()-1);
   // create nx1 targetSignalVector
   vnl_vector<double> SignalVector(m_allDirectionsSize);
 
@@ -223,20 +233,17 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   {
     InputPixelType b = iit.Get();
 
-    for(int i = 0 ; i < BZeroIndices.size(); i++)
+    for(unsigned int i = 0 ; i < BZeroIndices.size(); i++)
       BZeroAverage += b[BZeroIndices[i]];
-    BZeroAverage /= BZeroIndices.size();
+    BZeroAverage /= (double)BZeroIndices.size();
 
     OutputPixelType out = oit.Get();
-    //out.AllocateElements(m_allDirectionsSize + 1);
     out.Fill(0.0);
     out.SetElement(0,BZeroAverage);
 
     BValueMap::const_iterator shellIterator = m_BValueMap.begin();
     shellIterator++; //skip bZeroImages
     unsigned int shellIndex = 0;
-    bool multipleBValues = m_bZeroIndicesSplitVectors.size() > 1;
-
 
     while(shellIterator != m_BValueMap.end())
     {
@@ -245,25 +252,21 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
       // - get the RawSignal
       const IndicesVector currentShell = shellIterator->second;
-      for(int i = 0 ; i < currentShell.size(); i++)
+      for(unsigned int i = 0 ; i < currentShell.size(); i++)
         SignalVector.put(i,b[currentShell[i]]);
 
+      //MITK_INFO <<"RawSignal: "<< SignalVector;
+      MITK_INFO << "möp" <<currentShell.size();
       //- interpolate the Signal if necessary using corresponding interpolationSHBasis
-      if(m_Interpolation)
-        SignalVector *= m_ShellInterpolationMatrixVector.at(shellIndex);
+      if(m_Interpolation) SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * SignalVector;
 
       //- normalization of the raw Signal
-      if(multipleBValues)
-        S_S0Normalization(SignalVector, BZeroAverage);
-      else{
-        double shellBZeroAverage = 0;
-        for(unsigned int i = 0 ; i < m_bZeroIndicesSplitVectors.at(shellIndex).size(); i++)
-          shellBZeroAverage += b[m_bZeroIndicesSplitVectors.at(shellIndex).at(i)];
-        S_S0Normalization(SignalVector, shellBZeroAverage/(double)m_bZeroIndicesSplitVectors.at(shellIndex).size());
-      }
+      S_S0Normalization(SignalVector, BZeroAverage);
 
+      //MITK_INFO <<"Normalized: "<< SignalVector;
       calculateAdcFromSignal(SignalVector, shellIterator->first);
 
+      //MITK_INFO <<"ADC: "<< SignalVector;
       //- weight the signal
       if(m_Interpolation){
         const double shellWeight = m_WeightsVector.at(shellIndex);
@@ -274,38 +277,27 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
       shellIterator++;
       shellIndex++;
+      //MITK_INFO << SignalMatrix;
     }
-
-    for(int i = 0 ; i < SignalMatrix.rows(); i++)
+    // MITK_INFO <<"finalSignalMatrix: " << SignalMatrix;
+    // ADC averaging Sum(ADC)/n
+    for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)
       SignalVector.put(i,SignalMatrix.get_row(i).sum());
+    SignalVector/= (double)(m_BValueMap.size()-1);
+    // MITK_INFO << "AveragedADC: " << SignalVector;
+    // recalculate signal from ADC
+    calculateSignalFromAdc(SignalVector, m_TargetBValue, BZeroAverage);
 
-    SignalVector/= SignalMatrix.cols();
-
-    calculateSignalFromAdc(SignalVector,,BZeroAverage)
-
-    for(int i = 1 ; i < out.Size(); i ++)
+    for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));
 
-
+    //MITK_INFO << "ADCAveragedSignal: " << out;
+    //MITK_INFO << "-------------";
     oit.Set(out);
     ++oit;
     ++iit;
   }
 
-
-
-
-
-
-  // normalize the signals in SignalMatrix [bZeroAverage????] [S/S0 = E]
-
-  /* for each row in the SignalMatrix
-   * - calculate for each rowentry the ADC [ln(E)/-b = ADC]
-   * - weight the ith ADC entry with the corresponding shellWeighting
-   * - average the Signal over the row [ADC_t]
-   * - calculate target Signal using target b-Value [S_t = b0_t * e^(-bVal_t * ADC_t)
-   * - Save S_t in targetSignalVector
-   */
 
   // outImageIterator set S_t
 
@@ -339,11 +331,14 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
-::calculateSignalFromAdc( vnl_vector<double> & vec, const double & bValue, const double & bZero)
+::calculateSignalFromAdc(vnl_vector<double> & vec, const double & bValue, const double & referenceSignal)
 {
-  for(unsigned int i = 0 ; i < vec.size(); i++)
-    vec[i] = bZero * exp(-bValue * vec[i])
+  for(unsigned int i = 0 ; i < vec.size(); i++){
+    //MITK_INFO << vec[i];
+    //MITK_INFO << bValue;
+    //MITK_INFO << referenceSignal;
+    vec[i] = referenceSignal * exp((-bValue) * vec[i]);
+  }
 }
-
 
 } // end of namespace

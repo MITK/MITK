@@ -82,7 +82,7 @@ namespace itk
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
     void S_S0Normalization( vnl_vector<double> & vec, const double & S0 );
     void calculateAdcFromSignal( vnl_vector<double> & vec, const double & bValue);
-    void calculateSignalFromAdc( vnl_vector<double> & vec, const double & bValue);
+    void calculateSignalFromAdc( vnl_vector<double> & vec, const double & bValue, const double & referenceSignal);
 
 
 
@@ -90,9 +90,9 @@ namespace itk
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions
 
     BValueMap m_BValueMap;
-    float m_BValue;
+    double m_BValue;
 
-    float m_TargetBValue;
+    double m_TargetBValue;
 
     bool m_Interpolation;
 

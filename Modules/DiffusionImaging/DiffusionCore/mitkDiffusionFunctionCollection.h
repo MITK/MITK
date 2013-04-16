@@ -50,6 +50,8 @@ public:
   static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
   static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
   static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, GradientDirectionContainerType::Pointer refGradientsContainer);
+  static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, mitk::gradients::GradientDirectionContainerType::Pointer origninalGradentcontainer);
+
 
   template<typename type>
   static double dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fixed< type ,3 > const& v2 );

@@ -203,3 +203,47 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_mat
       }
   return SHBasisOutput;
 }
+
+mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(
+    const mitk::gradients::BValueMap & bValueMap,
+    mitk::gradients::GradientDirectionContainerType::Pointer origninalGradentcontainer)
+{
+  mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
+  BValueMap::const_iterator mapIterator = bValueMap.begin();
+
+  if(bValueMap.find(0) != bValueMap.end() && bValueMap.size() > 1){
+    mapIterator++; //skip bzero Values
+    vnl_vector_fixed<double, 3> vec;
+    vec.fill(0.0);
+    directioncontainer->push_back(vec);
+  }
+
+  for( ; mapIterator != bValueMap.end(); mapIterator++){
+
+    IndiciesVector currentShell = mapIterator->second;
+
+    while(currentShell.size()>0)
+    {
+      unsigned int wntIndex = currentShell.back();
+      currentShell.pop_back();
+
+      mitk::gradients::GradientDirectionContainerType::Iterator containerIt = directioncontainer->Begin();
+      bool directionExist = false;
+      while(containerIt != directioncontainer->End())
+      {
+        if (fabs(dot(containerIt.Value(), origninalGradentcontainer->ElementAt(wntIndex)))  > 0.9998)
+        {
+          directionExist = true;
+          break;
+        }
+        containerIt++;
+      }
+      if(!directionExist)
+      {
+        directioncontainer->push_back(origninalGradentcontainer->ElementAt(wntIndex).normalize());
+      }
+    }
+  }
+
+  return directioncontainer;
+}

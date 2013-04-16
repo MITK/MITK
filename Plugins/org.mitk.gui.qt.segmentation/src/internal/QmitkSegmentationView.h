@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 class QmitkRenderWindow;
-// class QmitkSegmentationPostProcessing;
 
 /**
  * \ingroup ToolManagerEtAl
@@ -65,7 +64,7 @@ public:
   virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 
   // BlueBerry's notification about preference changes (e.g. from a dialog)
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences*);
+  virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
   // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
   void RenderingManagerReinitialized(const itk::EventObject&);
@@ -77,7 +76,8 @@ public:
 
 protected slots:
 
-  void OnComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
+  void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
 
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();
@@ -90,9 +90,10 @@ protected slots:
 
   void OnSurfaceSelectionChanged();
 
-  //called when the checkbox Remember Contour Positions is selected/deselected
-
   void OnWorkingNodeVisibilityChanged();
+
+  // called if a node's binary property has changed
+  void OnBinaryPropertyChanged();
 
   void OnShowMarkerNodes(bool);
 
@@ -114,9 +115,6 @@ protected:
 
   // propagate BlueBerry selection to ToolManager for manual segmentation
   void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
-
-  // checks if selected reference image is aligned with the slices stack orientation of the StdMultiWidget
-  void CheckImageAlignment();
 
   // checks if given render window aligns with the slices of given image
   bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
@@ -141,6 +139,12 @@ protected:
 
   void NodeRemoved(const mitk::DataNode* node);
 
+  void NodeAdded(const mitk::DataNode *node);
+
+  bool CheckForSameGeometry(const mitk::DataNode*, const mitk::DataNode*) const;
+
+  void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
+
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 
@@ -150,16 +154,21 @@ protected:
   // THE currently existing QmitkStdMultiWidget
   QmitkStdMultiWidget * m_MultiWidget;
 
-  // QmitkSegmentationPostProcessing* m_PostProcessing;
-
-  unsigned long m_RenderingManagerObserverTag;
-  unsigned long m_SlicesRotationObserverTag1;
-  unsigned long m_SlicesRotationObserverTag2;
   unsigned long m_VisibilityChangedObserverTag;
 
   bool m_DataSelectionChanged;
 
   NodeTagMapType  m_WorkingDataObserverTags;
+
+  NodeTagMapType  m_BinaryPropertyObserverTags;
+
+  bool m_AutoSelectionEnabled;
+
+  mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
+  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
+  mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
+  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

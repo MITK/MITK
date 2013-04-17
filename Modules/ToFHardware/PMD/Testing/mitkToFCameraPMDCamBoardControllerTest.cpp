@@ -36,12 +36,7 @@ int mitkToFCameraPMDCamBoardControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(testObject->SetRegionOfInterest(3,5,200,201),"Testing SetRegionOfInterest()");
   MITK_TEST_OUTPUT(<<"Call GetRegionOfInterest()");
   MITK_INFO<<testObject->GetRegionOfInterest();
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetExposureMode(0),"Testing SetExposureMode()");
   MITK_TEST_CONDITION_REQUIRED(testObject->SetFieldOfView(35.7f),"Testing SetFieldOfView()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetFPNCalibration(true),"Testing SetFPNCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetFPPNCalibration(true),"Testing SetFPPNCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetLinearityCalibration(true),"Testing SetLinearityCalibration()");
-  MITK_TEST_CONDITION_REQUIRED(testObject->SetLensCalibration(true),"Testing SetLensCalibration()");
   MITK_TEST_CONDITION_REQUIRED(testObject->CloseCameraConnection(),"Testing closing of camera connection!");
 
   MITK_TEST_END();

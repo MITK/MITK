@@ -26,6 +26,15 @@ if(MITK_USE_CTK)
            -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
            -DCTK_ENABLE_Python_Wrapping:BOOL=ON
            -DCTK_APP_ctkSimplePythonShell:BOOL=ON
+           -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+           -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+           -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+      )
+    else()
+      list(APPEND ctk_optional_cache_args
+           -DCTK_LIB_Scripting/Python/Widgets:BOOL=OFF
+           -DCTK_ENABLE_Python_Wrapping:BOOL=OFF
+           -DCTK_APP_ctkSimplePythonShell:BOOL=OFF
       )
     endif()
 

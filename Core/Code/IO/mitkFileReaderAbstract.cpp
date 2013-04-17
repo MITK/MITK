@@ -30,7 +30,7 @@ mitk::FileReaderAbstract::~FileReaderAbstract()
 
 ////////////////// Filenames etc. //////////////////
 
-const std::string mitk::FileReaderAbstract::GetFileName() const
+std::string mitk::FileReaderAbstract::GetFileName() const
 {
   return m_FileName;
 }
@@ -40,22 +40,22 @@ void mitk::FileReaderAbstract::SetFileName(const std::string aFileName)
  m_FileName = aFileName;
 }
 
-const std::string mitk::FileReaderAbstract::GetFilePrefix() const
+std::string mitk::FileReaderAbstract::GetFilePrefix() const
 {
   return m_FilePrefix;
 }
 
-void mitk::FileReaderAbstract::SetFilePrefix(const std::string aFilePrefix)
+void mitk::FileReaderAbstract::SetFilePrefix(const std::string& aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
 }
 
-const std::string mitk::FileReaderAbstract::GetFilePattern() const
+std::string mitk::FileReaderAbstract::GetFilePattern() const
 {
   return m_FilePattern;
 }
 
-void mitk::FileReaderAbstract::SetFilePattern(const std::string aFilePattern)
+void mitk::FileReaderAbstract::SetFilePattern(const std::string& aFilePattern)
 {
   m_FilePattern = aFilePattern;
 }
@@ -87,7 +87,9 @@ void mitk::FileReaderAbstract::SetMemoryBuffer(const std::string dataArray, unsi
 void mitk::FileReaderAbstract::RegisterMicroservice(mitk::ModuleContext* context)
 {
   ServiceProperties props = this->ConstructServiceProperties();
-  m_Registration = context->RegisterService<mitk::FileReaderInterface>(this, props);
+  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
+  //TODO Check for null
+  m_Registration = context->RegisterService<mitk::FileReaderInterface>(lightObject, props);
 }
 
 mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
@@ -105,21 +107,21 @@ mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
 
 //////////////////////// Options ///////////////////////
 
-std::list< std::string > mitk::FileReaderAbstract::GetSupportedOptions()
+std::list< std::string > mitk::FileReaderAbstract::GetSupportedOptions() const
 {
   return m_Options;
 }
 
 ////////////////// MISC //////////////////
 
-bool mitk::FileReaderAbstract::CanRead(const std::string& path)
+bool mitk::FileReaderAbstract::CanRead(const std::string& path) const
 {
   // Default implementation only checks if extension is correct
   std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
   return (m_Extension == pathEnd);
 }
 
-float mitk::FileReaderAbstract::GetProgress()
+float mitk::FileReaderAbstract::GetProgress() const
 {
   // Default implementation always returns 1 (finished)
   return 1;
@@ -127,13 +129,12 @@ float mitk::FileReaderAbstract::GetProgress()
 
 ////////////////// µS related Getters //////////////////
 
-int mitk::FileReaderAbstract::GetPriority()
+int mitk::FileReaderAbstract::GetPriority() const
 {
   return m_Priority;
 }
 
-
-std::string mitk::FileReaderAbstract::GetExtension()
+std::string mitk::FileReaderAbstract::GetExtension() const
 {
   return m_Extension;
 }

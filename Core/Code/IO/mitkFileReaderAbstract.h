@@ -52,7 +52,7 @@ namespace mitk {
     //## @brief Get the specified the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual const std::string GetFileName() const;
+    virtual std::string GetFileName() const;
 
     //##Documentation
     //## @brief Specify the file to load.
@@ -65,14 +65,14 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const std::string GetFilePrefix() const;
+    virtual std::string GetFilePrefix() const;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const std::string aFilePrefix);
+    virtual void SetFilePrefix(const std::string& aFilePrefix);
 
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
@@ -80,7 +80,7 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const std::string GetFilePattern() const;
+    virtual std::string GetFilePattern() const;
 
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
@@ -88,7 +88,7 @@ namespace mitk {
 
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
-    virtual void SetFilePattern(const std::string aFilePattern);
+    virtual void SetFilePattern(const std::string& aFilePattern);
 
     /**
     @brief Specifies, whether the file reader also can
@@ -106,23 +106,23 @@ namespace mitk {
     the memory buffer and the size from which the reader will read.*/
     virtual void SetMemoryBuffer(const std::string dataArray, unsigned int size);
 
-    virtual mitk::BaseData::Pointer Read(std::string path = 0) = 0;
+    virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
 
-    virtual mitk::BaseData::Pointer Read(std::istream*) = 0;
+    virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
 
-    int GetPriority();
+    virtual int GetPriority() const;
 
-    std::string GetExtension();
+    virtual std::string GetExtension() const;
 
-    virtual std::list< std::string > GetSupportedOptions();
+    virtual std::list< std::string > GetSupportedOptions() const;
 
     // virtual std::list< std::string > GetOptions() = 0;
 
     // virtual void SetOptions(std::list< std::string > options ) = 0;
 
-    virtual bool CanRead(const std::string& path);
+    virtual bool CanRead(const std::string& path) const;
 
-    virtual float GetProgress();
+    virtual float GetProgress() const;
 
 
 protected:

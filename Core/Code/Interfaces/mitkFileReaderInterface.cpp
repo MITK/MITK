@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFileReaderInterface.h"
 
+mitk::FileReaderInterface::~FileReaderInterface()
+{
+
+}
+
 const std::string mitk::FileReaderInterface::US_EXTENSION = "org.mitk.services.FileReader.Extension";
 const std::string mitk::FileReaderInterface::US_CAN_READ_FROM_MEMORY = "org.mitk.services.FileReader.CanReadFromMemory";
 

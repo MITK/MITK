@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileReaderManager.h"
 #include "mitkGetModuleContext.h"
 #include "mitkModuleContext.h"
+#include <mitkBaseData.h>
 
 #include <itkProcessObject.h>
 
@@ -39,16 +40,16 @@ public:
   mitkClassMacro(DummyReader, mitk::FileReaderAbstract);
   itkNewMacro(Self);
 
-  virtual mitk::BaseData::Pointer DummyReader::Read(std::string path = 0)
+  virtual itk::SmartPointer<mitk::BaseData> Read(const std::string& path = 0)
   { return 0; }
 
-  virtual mitk::BaseData::Pointer DummyReader::Read(std::istream*)
+  virtual itk::SmartPointer<mitk::BaseData> Read(const std::istream& stream )
   { return 0; }
 
-  virtual void DummyReader::SetOptions(std::list< std::string > options )
+  virtual void SetOptions(std::list< std::string > options )
   { m_Options = options; m_Registration.SetProperties(ConstructServiceProperties());}
 
-  virtual void DummyReader::Init(std::string extension, int priority)
+  virtual void Init(std::string extension, int priority)
   {
    m_Extension = extension;
    m_Priority = priority;

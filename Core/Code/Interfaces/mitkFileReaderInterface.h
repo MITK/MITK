@@ -22,33 +22,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 // MITK
-#include <mitkBaseData.h>
+//#include <mitkBaseData.h>
 // ITK
-#include <itkProcessObject.h>
-#include <itkObjectFactory.h>
+//#include <itkProcessObject.h>
+//#include <itkObjectFactory.h>
 // Microservices
 #include <usServiceInterface.h>
-#include <usServiceRegistration.h>
-#include <usServiceProperties.h>
+//#include <usServiceRegistration.h>
+//#include <usServiceProperties.h>
 
 
 namespace mitk {
 
+  class BaseData;
+}
+
+namespace itk {
+
+  template<class T> class SmartPointer;
+}
+
+namespace mitk {
+
+
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderInterface
+  struct MITK_CORE_EXPORT FileReaderInterface
 {
 
   //mitkClassMacro(FileReaderInterface,itk::ProcessObject);
   //itkNewMacro(Self);
 
-  public:
+    virtual ~FileReaderInterface();
+
     //##Documentation
     //## @brief Get the specified the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual const std::string GetFileName() const = 0;
+    virtual std::string GetFileName() const = 0;
 
     //##Documentation
     //## @brief Specify the file to load.
@@ -61,14 +73,14 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const std::string GetFilePrefix() const = 0;
+    virtual std::string GetFilePrefix() const = 0;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const std::string aFilePrefix) = 0;
+    virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
 
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
@@ -76,7 +88,7 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual const std::string GetFilePattern() const = 0;
+    virtual std::string GetFilePattern() const = 0;
 
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
@@ -84,7 +96,7 @@ namespace mitk {
 
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
-    virtual void SetFilePattern(const std::string aFilePattern) = 0;
+    virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
     /**
     @brief Specifies, whether the file reader also can
@@ -95,6 +107,7 @@ namespace mitk {
     @brief Set/Get functions to advise the file reader to
     use a memory array for reading a file*/
     virtual void SetReadFromMemory( bool read ) = 0;
+
     virtual bool GetReadFromMemory(  ) = 0;
 
     /**
@@ -102,23 +115,23 @@ namespace mitk {
     the memory buffer and the size from which the reader will read.*/
     virtual void SetMemoryBuffer(const std::string dataArray, unsigned int size) = 0;
 
-    virtual mitk::BaseData::Pointer Read(std::string path = 0) = 0;
+    virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
 
-    virtual mitk::BaseData::Pointer Read(std::istream*) = 0;
+    virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
 
-    virtual int GetPriority() = 0;
+    virtual int GetPriority() const = 0 ;
 
-    virtual std::string GetExtension() = 0;
+    virtual std::string GetExtension() const = 0;
 
-    virtual std::list< std::string > GetSupportedOptions() = 0;
+    virtual std::list< std::string > GetSupportedOptions() const = 0;
 
     //virtual std::list< std::string > GetOptions() = 0;
 
     //virtual void SetOptions(std::list< std::string > options ) = 0;
 
-    virtual bool CanRead(const std::string& path) = 0;
+    virtual bool CanRead(const std::string& path) const = 0;
 
-    virtual float GetProgress() = 0;
+    virtual float GetProgress() const = 0;
 
     // Microservice Properties
     static const std::string US_EXTENSION;
@@ -129,7 +142,7 @@ namespace mitk {
 
 protected:
     //FileReaderInterface();
-    //virtual ~FileReaderInterface();
+
 public:
 
 protected:

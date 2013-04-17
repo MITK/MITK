@@ -90,7 +90,6 @@ int mitkEventConfigTest(int argc, char* argv[])
 
   // Construction providing a input stream
   std::ifstream* configStream = new std::ifstream(argv[1]);
-
   mitk::EventConfig newConfig2(configStream);
 
   //delete configStream;
@@ -144,16 +143,9 @@ int mitkEventConfigTest(int argc, char* argv[])
 
 
   MITK_TEST_CONDITION_REQUIRED(
-        newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant"
+        newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant" &&
+         newConfig3.GetMappedEvent(mousePress2.GetPointer()) == "MouseReleaseEventVariant"
         , "04 Check Mouseevents from PropertyLists"  );
-
-  MITK_TEST_CONDITION_REQUIRED(
-        newConfig3.GetMappedEvent(mousePress2.GetPointer()) == "MouseReleaseEventVariant"
-        , "05 Check Mouseevents from PropertyLists"  );
-
-
-
-
 
   MITK_TEST_END()
 

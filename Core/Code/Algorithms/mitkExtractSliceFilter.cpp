@@ -53,6 +53,7 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 }
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation(){
+  Superclass::GenerateOutputInformation();
   //TODO try figure out how to set the specs of the slice before it is actually extracted
   /*Image::Pointer output = this->GetOutput(0);
   Image::ConstPointer input = this->GetInput();

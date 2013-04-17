@@ -257,11 +257,11 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 }
 
 
-itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /*idx */)
-{
-  mitk::USImage::Pointer p = mitk::USImage::New();
-  return static_cast<itk::DataObject*>(p.GetPointer());
-}
+//itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /*idx */)
+//{
+//  mitk::USImage::Pointer p = mitk::USImage::New();
+//  return static_cast<itk::DataObject*>(p.GetPointer());
+//}
 
 bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){
   if ( m_Calibration.IsNull() ) return false;

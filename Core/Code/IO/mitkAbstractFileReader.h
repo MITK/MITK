@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FileReaderAbstract_H_HEADER_INCLUDED_C1E7E521
-#define FileReaderAbstract_H_HEADER_INCLUDED_C1E7E521
+#ifndef AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
+#define AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
 
 // Macro
 #include <MitkExports.h>
@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkBaseData.h>
-#include <mitkFileReaderInterface.h>
+#include <mitkIFileReader.h>
 
 // ITK
 #include <itkObjectFactory.h>
@@ -39,7 +39,7 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface
+  class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 {
   public:
 
@@ -101,8 +101,8 @@ namespace mitk {
 
 
 protected:
-    FileReaderAbstract();
-    virtual ~FileReaderAbstract();
+    AbstractFileReader();
+    virtual ~AbstractFileReader();
 
     // Filenames etc..
     std::string m_FileName;
@@ -125,6 +125,6 @@ protected:
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::FileReaderAbstract, "org.mitk.services.FileReader")
+US_DECLARE_SERVICE_INTERFACE(mitk::AbstractFileReader, "org.mitk.services.FileReader")
 
-#endif /* FileReaderAbstract_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* AbstractFileReader_H_HEADER_INCLUDED_C1E7E521 */

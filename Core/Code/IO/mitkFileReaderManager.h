@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <mitkBaseData.h>
-#include <mitkFileReaderInterface.h>
+#include <mitkIFileReader.h>
 
 // Microservices
 #include <mitkServiceReference.h>
@@ -61,13 +61,13 @@ class MITK_CORE_EXPORT FileReaderManager
     /**
     * Returns a compatible Reader to the given file extension
     **/
-    static mitk::FileReaderInterface* GetReader(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileReader* GetReader(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    static mitk::FileReaderInterface* GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static std::list <mitk::IFileReader*> GetReaders(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    static std::list <mitk::FileReaderInterface*> GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static std::list <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
 protected:
     //FileReaderManager();
@@ -75,7 +75,7 @@ protected:
 
     static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension, mitk::ModuleContext* context);
 
-    static bool ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options);
+    static bool ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options);
 
 };
 } // namespace mitk

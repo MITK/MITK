@@ -14,33 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkFileWriterInterface.h"
+#include "mitkIFileWriter.h"
 
-bool mitk::FileWriterInterface::CanWriteDataType( DataNode* )
+bool mitk::IFileWriter::CanWriteDataType( DataNode* )
 {
   //TODO #345 check for writing permission
   return false;
 }
 
 
-void mitk::FileWriterInterface::SetInput( DataNode* )
+void mitk::IFileWriter::SetInput( DataNode* )
 {
 }
 
 
-std::string mitk::FileWriterInterface::GetFileExtension()
+std::string mitk::IFileWriter::GetFileExtension()
 {
   return "";
 }
 
 
 
-mitk::FileWriterInterface::FileWriterInterface() :
+mitk::IFileWriter::IFileWriter() :
 m_CanWriteToMemory(false),
 m_WriteToMemory(false)
 {
 }
 
-mitk::FileWriterInterface::~FileWriterInterface()
+mitk::IFileWriter::~IFileWriter()
 {
 }

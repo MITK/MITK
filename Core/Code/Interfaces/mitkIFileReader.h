@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FileReaderInterface_H_HEADER_INCLUDED_C1E7E521
-#define FileReaderInterface_H_HEADER_INCLUDED_C1E7E521
+#ifndef IFileReader_H_HEADER_INCLUDED_C1E7E521
+#define IFileReader_H_HEADER_INCLUDED_C1E7E521
 
 // Macro
 #include <MitkExports.h>
@@ -43,10 +43,10 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  struct MITK_CORE_EXPORT FileReaderInterface
+  struct MITK_CORE_EXPORT IFileReader
 {
 
-    virtual ~FileReaderInterface();
+    virtual ~IFileReader();
 
     //##Documentation
     //## @brief Get the specified the file to load.
@@ -123,6 +123,6 @@ protected:
 
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::FileReaderInterface, "org.mitk.services.FileReader")
+US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.services.FileReader")
 
-#endif /* FileReaderInterface_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */

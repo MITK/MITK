@@ -15,47 +15,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkFileReaderAbstract.h"
+#include "mitkAbstractFileReader.h"
 
 
-mitk::FileReaderAbstract::FileReaderAbstract() :
-m_CanReadFromMemory (false),
-m_ReadFromMemory (false)
+mitk::AbstractFileReader::AbstractFileReader() :
+m_Priority (1),
+m_Extension ("")
 {
 }
 
-mitk::FileReaderAbstract::~FileReaderAbstract()
+mitk::AbstractFileReader::~AbstractFileReader()
 {
 }
 
 ////////////////// Filenames etc. //////////////////
 
-std::string mitk::FileReaderAbstract::GetFileName() const
+std::string mitk::AbstractFileReader::GetFileName() const
 {
   return m_FileName;
 }
 
-void mitk::FileReaderAbstract::SetFileName(const std::string aFileName)
+void mitk::AbstractFileReader::SetFileName(const std::string aFileName)
 {
  m_FileName = aFileName;
 }
 
-std::string mitk::FileReaderAbstract::GetFilePrefix() const
+std::string mitk::AbstractFileReader::GetFilePrefix() const
 {
   return m_FilePrefix;
 }
 
-void mitk::FileReaderAbstract::SetFilePrefix(const std::string& aFilePrefix)
+void mitk::AbstractFileReader::SetFilePrefix(const std::string& aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
 }
 
-std::string mitk::FileReaderAbstract::GetFilePattern() const
+std::string mitk::AbstractFileReader::GetFilePattern() const
 {
   return m_FilePattern;
 }
 
-void mitk::FileReaderAbstract::SetFilePattern(const std::string& aFilePattern)
+void mitk::AbstractFileReader::SetFilePattern(const std::string& aFilePattern)
 {
   m_FilePattern = aFilePattern;
 }
@@ -63,21 +63,21 @@ void mitk::FileReaderAbstract::SetFilePattern(const std::string& aFilePattern)
 
 //////////// µS Registration & Properties //////////////
 
-void mitk::FileReaderAbstract::RegisterMicroservice(mitk::ModuleContext* context)
+void mitk::AbstractFileReader::RegisterMicroservice(mitk::ModuleContext* context)
 {
   ServiceProperties props = this->ConstructServiceProperties();
   itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
   if (lightObject == 0)
      mitkThrow() << "Tried to register reader that is not a lightObject. All readers must inherit from itk::LightObject when used as a Microservice.";
-  m_Registration = context->RegisterService<mitk::FileReaderInterface>(lightObject, props);
+  m_Registration = context->RegisterService<mitk::IFileReader>(lightObject, props);
 }
 
-mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
+mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   mitk::ServiceProperties result;
-  result[mitk::FileReaderInterface::US_EXTENSION]    = m_Extension;
+  result[mitk::IFileReader::US_EXTENSION]    = m_Extension;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
@@ -88,21 +88,21 @@ mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
 
 //////////////////////// Options ///////////////////////
 
-std::list< std::string > mitk::FileReaderAbstract::GetSupportedOptions() const
+std::list< std::string > mitk::AbstractFileReader::GetSupportedOptions() const
 {
   return m_Options;
 }
 
 ////////////////// MISC //////////////////
 
-bool mitk::FileReaderAbstract::CanRead(const std::string& path) const
+bool mitk::AbstractFileReader::CanRead(const std::string& path) const
 {
   // Default implementation only checks if extension is correct
   std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
   return (m_Extension == pathEnd);
 }
 
-float mitk::FileReaderAbstract::GetProgress() const
+float mitk::AbstractFileReader::GetProgress() const
 {
   // Default implementation always returns 1 (finished)
   return 1;
@@ -110,12 +110,12 @@ float mitk::FileReaderAbstract::GetProgress() const
 
 ////////////////// µS related Getters //////////////////
 
-int mitk::FileReaderAbstract::GetPriority() const
+int mitk::AbstractFileReader::GetPriority() const
 {
   return m_Priority;
 }
 
-std::string mitk::FileReaderAbstract::GetExtension() const
+std::string mitk::AbstractFileReader::GetExtension() const
 {
   return m_Extension;
 }

@@ -33,7 +33,7 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
   extension.erase(0, path.find_last_of('.'));
 
   // Get best Reader
-  mitk::FileReaderInterface* reader = GetReader(extension);
+  mitk::IFileReader* reader = GetReader(extension);
 
   //Read
   //return reader->Read(path);
@@ -43,42 +43,42 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
 
 //////////////////// GETTING READERS ////////////////////
 
-mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension, mitk::ModuleContext* context )
+mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, mitk::ModuleContext* context )
 {
-  return context->GetService<mitk::FileReaderInterface>(GetReaderList(extension, context).front());
+  return context->GetService<mitk::IFileReader>(GetReaderList(extension, context).front());
 }
 
-std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(const std::string& extension, mitk::ModuleContext* context )
+std::list <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, mitk::ModuleContext* context )
 {
-  std::list <mitk::FileReaderInterface*> result;
+  std::list <mitk::IFileReader*> result;
   std::list <mitk::ServiceReference > refs = GetReaderList(extension, context);
 
   // Translate List of ServiceRefs to List of Pointers
   while ( !refs.empty() )
   {
-    result.push_back( context->GetService<mitk::FileReaderInterface>(refs.front()));
+    result.push_back( context->GetService<mitk::IFileReader>(refs.front()));
     refs.pop_front();
   }
 
   return result;
 }
 
-mitk::FileReaderInterface* mitk::FileReaderManager::GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context )
+mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context )
 {
-  std::list <mitk::FileReaderInterface*> matching = mitk::FileReaderManager::GetReaders(extension, options, context);
+  std::list <mitk::IFileReader*> matching = mitk::FileReaderManager::GetReaders(extension, options, context);
   if (matching.size() == 0) return 0;
   return matching.front();
 }
 
-std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context )
+std::list <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context )
 {
-  std::list <mitk::FileReaderInterface*> allReaders = mitk::FileReaderManager::GetReaders(extension, context);
-  std::list <mitk::FileReaderInterface*> result;
+  std::list <mitk::IFileReader*> allReaders = mitk::FileReaderManager::GetReaders(extension, context);
+  std::list <mitk::IFileReader*> result;
   // the list is already sorted by priority. Now find reader that supports all options
 
   while (allReaders.size() > 0)
   {
-    mitk::FileReaderInterface * currentReader = allReaders.front();
+    mitk::IFileReader * currentReader = allReaders.front();
     allReaders.pop_front();
     // Now see if this reader supports all options. If yes, push to results
     if ( mitk::FileReaderManager::ReaderSupportsOptions(currentReader, options) ) result.push_back(currentReader);
@@ -89,7 +89,7 @@ std::list <mitk::FileReaderInterface*> mitk::FileReaderManager::GetReaders(const
 
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* reader, std::list<std::string> options )
+bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options )
 {
   std::list<std::string> readerOptions = reader->GetSupportedOptions();
   if (options.size() == 0) return true;         // if no options were requested, return true unconditionally
@@ -116,7 +116,7 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::FileReaderInterface* r
 std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const std::string& extension, mitk::ModuleContext* context )
 {
   // filter for class and extension
-  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::FileReaderInterface::US_EXTENSION + "=" + extension + "))";
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::IFileReader::US_EXTENSION + "=" + extension + "))";
   std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileReader", filter);
   result.sort();
   std::reverse(result.begin(), result.end());

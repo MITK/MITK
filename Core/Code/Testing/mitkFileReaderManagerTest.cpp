@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include "mitkFileReaderAbstract.h"
-#include "mitkFileReaderInterface.h"
+#include "mitkAbstractFileReader.h"
+#include "mitkIFileReader.h"
 #include "mitkFileReaderManager.h"
 #include "mitkGetModuleContext.h"
 #include "mitkModuleContext.h"
@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-class DummyReader : public mitk::FileReaderAbstract, public itk::LightObject {
+class DummyReader : public mitk::AbstractFileReader, public itk::LightObject {
 
 public:
 
@@ -81,7 +81,7 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED(testDR->CanRead("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
   MITK_TEST_CONDITION_REQUIRED(!testDR->CanRead("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
-  mitk::FileReaderInterface* returned = mitk::FileReaderManager::GetReader("test");
+  mitk::IFileReader* returned = mitk::FileReaderManager::GetReader("test");
 
   MITK_TEST_CONDITION_REQUIRED(testDR == returned,"Testing correct retrieval of FileReader 1/2");
 
@@ -128,7 +128,7 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
 
   // Onward to test the retrieval of multiple readers
 
-  std::list< mitk::FileReaderInterface* > returnedList;
+  std::list< mitk::IFileReader* > returnedList;
   returnedList = mitk::FileReaderManager::GetReaders("test", options);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 0, "Testing correct return of zero readers when no matching reader was found, asking for all compatibles");
 

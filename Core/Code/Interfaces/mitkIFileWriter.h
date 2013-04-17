@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FileWriterInterface_H_HEADER_INCLUDED
-#define FileWriterInterface_H_HEADER_INCLUDED
+#ifndef IFileWriter_H_HEADER_INCLUDED
+#define IFileWriter_H_HEADER_INCLUDED
 
 #include <MitkExports.h>
 #include <itkProcessObject.h>
@@ -40,10 +40,10 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of writers that write data to files
 //## @ingroup Process
-class MITK_CORE_EXPORT FileWriterInterface : public itk::ProcessObject
+class MITK_CORE_EXPORT IFileWriter : public itk::ProcessObject
 {
   public:
-    mitkClassMacro(FileWriterInterface,itk::ProcessObject);
+    mitkClassMacro(IFileWriter,itk::ProcessObject);
     //##Documentation
     //## @brief Get the specified the file to write
     //##
@@ -109,8 +109,8 @@ class MITK_CORE_EXPORT FileWriterInterface : public itk::ProcessObject
     virtual void Write() = 0;
 
 protected:
-  FileWriterInterface();
-  virtual ~FileWriterInterface();
+  IFileWriter();
+  virtual ~IFileWriter();
 
   bool   m_CanWriteToMemory;
   bool   m_WriteToMemory;
@@ -141,6 +141,6 @@ virtual void Update()                                                         \
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::FileWriterInterface, "org.mitk.services.FileWriter")
+US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.services.FileWriter")
 
-#endif /* FileWriterInterface_H_HEADER_INCLUDED */
+#endif /* IFileWriter_H_HEADER_INCLUDED */

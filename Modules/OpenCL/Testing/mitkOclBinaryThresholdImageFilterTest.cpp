@@ -72,7 +72,7 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   oclFilter->Update();
 
   mitk::Image::Pointer outputImage = mitk::Image::New();
-  outputImage = oclFilter->GetOutput(0);
+  outputImage = oclFilter->GetOutput();
 
   MITK_TEST_CONDITION_REQUIRED( outputImage.IsNotNull(), "Filter returned an not-NULL image. ");
 
@@ -94,7 +94,7 @@ int mitkOclBinaryThresholdImageFilterTest( int argc, char* argv[] )
   SubtractFilterType::Pointer subFilt = SubtractFilterType::New();
 
   ImageType::Pointer gpuReferenceImage = ImageType::New();
-  CastToItkImage( oclFilter->GetOutput(0) ,gpuReferenceImage );
+  CastToItkImage( oclFilter->GetOutput() ,gpuReferenceImage );
 
   subFilt->SetInput1( refThrFilter->GetOutput(0) );
   subFilt->SetInput2( gpuReferenceImage );

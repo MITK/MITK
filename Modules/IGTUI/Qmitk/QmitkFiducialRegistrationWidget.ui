@@ -67,7 +67,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Find fiducial correspondences (needs 6+ fiducial pairs)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>    Find fiducial 
+      <string>    Find fiducial
  correspondences</string>
      </property>
     </widget>
@@ -87,8 +87,7 @@
       </size>
      </property>
      <property name="text">
-      <string>  Register
- Fiducials</string>
+      <string>  Register</string>
      </property>
     </widget>
    </item>
@@ -256,7 +255,7 @@
               </size>
              </property>
              <property name="text">
-              <string>&amp;Add current 
+              <string>&amp;Add current
 instrument position</string>
              </property>
             </widget>
@@ -303,11 +302,6 @@ instrument position</string>
   <zorder>m_RegisterFiducialsBtn</zorder>
   <zorder>m_UseICPRegistration</zorder>
   <zorder>m_gbFiducialRegistration</zorder>
-  <zorder>sourceLandmarksGroupBox</zorder>
-  <zorder>targetLandmarksGroupBox</zorder>
-  <zorder>statusLabel</zorder>
-  <zorder>m_RegistrationQualityDisplay</zorder>
-  <zorder>statusLabel</zorder>
  </widget>
  <customwidgets>
   <customwidget>

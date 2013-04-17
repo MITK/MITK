@@ -109,12 +109,6 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
   if( item == NULL  || item->GetData() == NULL )
     return;
 
-  if( item->GetData()->GetSource().IsNull() )
-  {
-    m_SelectedDataNode = 0;
-    return;
-  }
-
   m_SelectedDataNode = const_cast<mitk::DataNode*>(item);
 
   std::cout << "Selected mitk::Image at address " << m_SelectedDataNode->GetData() << std::endl;

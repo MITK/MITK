@@ -460,11 +460,14 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
   }
   mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-  node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
-  m_WorkingDataObserverTags.erase(tempNode);
-
-  node->GetProperty("binary")->RemoveObserver( m_BinaryPropertyObserverTags[tempNode] );
-  m_BinaryPropertyObserverTags.erase(tempNode);
+  //Since the binary property could be changed during runtime by the user
+  if (image && !isHelperObject)
+  {
+      node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
+      m_WorkingDataObserverTags.erase(tempNode);
+      node->GetProperty("binary")->RemoveObserver( m_BinaryPropertyObserverTags[tempNode] );
+      m_BinaryPropertyObserverTags.erase(tempNode);
+  }
 
   if((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) == node))
   {

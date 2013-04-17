@@ -28,10 +28,17 @@
 #include "mitkGetModuleContext.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 
 int mitkEventConfigTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("EventConfig")
+
+  if (argc != 2) {
+    MITK_ERROR << "Test needs configuration test file as parameter.";
+    return -1;
+  }
+
 
   /*
    * Loads a test a Config file and test if Config is build up correctly,
@@ -82,11 +89,11 @@ int mitkEventConfigTest(int argc, char* argv[])
         , "03 Check Mouse- and Key-Events "  );
 
   // Construction providing a input stream
-  std::ifstream* configStream = new std::ifstream("/MITK/MITK/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml");
-  // if (myfile.is_open())
+  std::ifstream* configStream = new std::ifstream(argv[1]);
+
   mitk::EventConfig newConfig2(configStream);
 
-  delete configStream;
+  //delete configStream;
   MITK_TEST_CONDITION_REQUIRED(
          newConfig2.IsValid() == true
           , "01 Check if file can be loaded and is valid" );
@@ -114,5 +121,40 @@ int mitkEventConfigTest(int argc, char* argv[])
         , "03 Check Mouse- and Key-Events "  );
 
   // always end with this!
+
+  // Construction providing a property list
+  mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
+  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MousePressEvent");
+  propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MousePressEventVariant");
+  propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
+
+  mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
+  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MOUSERELEASEEVENT");
+  propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MouseReleaseEventVariant");
+  propertyList2->SetStringProperty("Modifiers","SHIFT");
+
+  std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();
+  configDescription->push_back(propertyList1);
+  configDescription->push_back(propertyList2);
+
+  mitk::EventConfig newConfig3(configDescription);
+
+  mitk::MousePressEvent::Pointer mousePress1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey | mitk::InteractionEvent::ControlKey ,mitk::InteractionEvent::NoButton );
+  mitk::MouseReleaseEvent::Pointer mousePress2 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );
+
+
+  MITK_TEST_CONDITION_REQUIRED(
+        newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant"
+        , "04 Check Mouseevents from PropertyLists"  );
+
+  MITK_TEST_CONDITION_REQUIRED(
+        newConfig3.GetMappedEvent(mousePress2.GetPointer()) == "MouseReleaseEventVariant"
+        , "05 Check Mouseevents from PropertyLists"  );
+
+
+
+
+
   MITK_TEST_END()
+
 }

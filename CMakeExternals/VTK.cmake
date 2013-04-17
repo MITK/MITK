@@ -39,6 +39,11 @@ if(NOT DEFINED VTK_DIR)
          #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
          #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
         )
+  else()
+    list(APPEND additional_cmake_args
+         -DVTK_WRAP_PYTHON:BOOL=OFF
+         -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
+        )
   endif()
 
   if(MITK_USE_QT)

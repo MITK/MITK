@@ -25,7 +25,6 @@ if(NOT DEFINED ITK_DIR)
   endif()
 
   if(MITK_USE_Python)
-
     list(APPEND additional_cmake_args
          -DUSE_WRAP_ITK:BOOL=ON
          -DITK_USE_REVIEW:BOOL=ON
@@ -46,6 +45,10 @@ if(NOT DEFINED ITK_DIR)
          -DWRAP_signed_short:BOOL=ON
          -DWRAP_short:BOOL=ON
          -DWRAP_unsigned_long:BOOL=ON
+        )
+  else()
+    list(APPEND additional_cmake_args
+         -DUSE_WRAP_ITK:BOOL=OFF
         )
   endif()
 

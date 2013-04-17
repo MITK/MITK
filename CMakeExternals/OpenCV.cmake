@@ -32,6 +32,11 @@ if(MITK_USE_OpenCV)
          #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
          #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
           )
+    else()
+      list(APPEND additional_cmake_args
+         -DBUILD_opencv_python:BOOL=OFF
+         -DBUILD_NEW_PYTHON_SUPPORT:BOOL=OFF
+          )
     endif()
 
     # 12-05-02, muellerm, added QT usage by OpenCV if QT is used in MITK

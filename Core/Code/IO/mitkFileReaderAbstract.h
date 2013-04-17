@@ -21,19 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Macro
 #include <MitkExports.h>
 #include <mitkCommon.h>
+
 // MITK
 #include <mitkBaseData.h>
 #include <mitkFileReaderInterface.h>
+
 // ITK
-//#include <itkProcessObject.h>
 #include <itkObjectFactory.h>
+
 // Microservices
-//#include <usServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
 #include <usModuleContext.h>
-
-
 
 namespace mitk {
 
@@ -86,22 +85,6 @@ namespace mitk {
     the data is stored in multiple files. */
     virtual void SetFilePattern(const std::string& aFilePattern);
 
-    /**
-    @brief Specifies, whether the file reader also can
-    read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  );
-
-    /**
-    @brief Set/Get functions to advise the file reader to
-    use a memory array for reading a file*/
-    virtual void SetReadFromMemory( bool read );
-    virtual bool GetReadFromMemory(  );
-
-    /**
-    @brief To be used along with a call of SetReadFromMemory(true). This sets
-    the memory buffer and the size from which the reader will read.*/
-    virtual void SetMemoryBuffer(const std::string dataArray, unsigned int size);
-
     virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
 
     virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
@@ -125,12 +108,6 @@ protected:
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;
-
-    // Reading from Memory
-    bool m_CanReadFromMemory;
-    bool m_ReadFromMemory;
-    std::string m_MemoryBuffer;
-    unsigned int   m_MemorySize;
 
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;

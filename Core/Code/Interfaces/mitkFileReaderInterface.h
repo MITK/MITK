@@ -90,23 +90,6 @@ namespace mitk {
     the data is stored in multiple files. */
     virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
-    /**
-    @brief Specifies, whether the file reader also can
-    read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  ) = 0;
-
-    /**
-    @brief Set/Get functions to advise the file reader to
-    use a memory array for reading a file*/
-    virtual void SetReadFromMemory( bool read ) = 0;
-
-    virtual bool GetReadFromMemory(  ) = 0;
-
-    /**
-    @brief To be used along with a call of SetReadFromMemory(true). This sets
-    the memory buffer and the size from which the reader will read.*/
-    virtual void SetMemoryBuffer(const std::string dataArray, unsigned int size) = 0;
-
     virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
 
     virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
@@ -123,7 +106,6 @@ namespace mitk {
 
     // Microservice Properties
     static const std::string US_EXTENSION;
-    static const std::string US_CAN_READ_FROM_MEMORY;
 
     // Microservice Names for defined Properties
     static const std::string OPTION_READ_AS_BINARY;

@@ -60,27 +60,6 @@ void mitk::FileReaderAbstract::SetFilePattern(const std::string& aFilePattern)
   m_FilePattern = aFilePattern;
 }
 
-////////////////// Memory Reading //////////////////
-
-bool mitk::FileReaderAbstract::CanReadFromMemory(  )
-{
-  return m_CanReadFromMemory;
-}
-
-void mitk::FileReaderAbstract::SetReadFromMemory( bool read )
-{
-  m_ReadFromMemory = read;
-}
-bool mitk::FileReaderAbstract::GetReadFromMemory(  )
-{
-  return m_ReadFromMemory;
-}
-void mitk::FileReaderAbstract::SetMemoryBuffer(const std::string dataArray, unsigned int size)
-{
-  m_MemoryBuffer = dataArray;
-  m_MemorySize   = size;
-}
-
 
 //////////// µS Registration & Properties //////////////
 
@@ -100,7 +79,6 @@ mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
   mitk::ServiceProperties result;
   result[mitk::FileReaderInterface::US_EXTENSION]    = m_Extension;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
-  result[mitk::FileReaderInterface::US_CAN_READ_FROM_MEMORY]  = m_CanReadFromMemory;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
     result[*it] = std::string("true");

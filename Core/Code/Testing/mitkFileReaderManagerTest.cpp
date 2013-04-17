@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 
 #include <itkProcessObject.h>
+#include <itkLightObject.h>
 
 #include <usServiceProperties.h>
 #include <MitkExports.h>
@@ -33,11 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-class DummyReader : public mitk::FileReaderAbstract {
+class DummyReader : public mitk::FileReaderAbstract, public itk::LightObject {
 
 public:
 
-  mitkClassMacro(DummyReader, mitk::FileReaderAbstract);
+  mitkClassMacro(DummyReader, itk::LightObject);
   itkNewMacro(Self);
 
   virtual itk::SmartPointer<mitk::BaseData> Read(const std::string& path = 0)
@@ -67,8 +68,6 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   MITK_TEST_BEGIN("FileReaderManager");
  // mitk::FileReaderManager::Pointer frm = mitk::FileReaderManager::New();
  // MITK_TEST_CONDITION_REQUIRED(argc == 2,"Testing FileReaderManager instantiation");
-
-MITK_INFO << mitk::ServiceConstants::SERVICE_RANKING();
 
   DummyReader* testDR = new DummyReader();
   DummyReader* otherDR = new DummyReader();

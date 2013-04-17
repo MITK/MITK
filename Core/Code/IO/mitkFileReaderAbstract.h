@@ -25,14 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkFileReaderInterface.h>
 // ITK
-#include <itkProcessObject.h>
+//#include <itkProcessObject.h>
 #include <itkObjectFactory.h>
-#include <itkLightObject.h>
 // Microservices
-#include <usServiceInterface.h>
+//#include <usServiceInterface.h>
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
-#include <usServiceRegistration.h>
 #include <usModuleContext.h>
 
 
@@ -42,11 +40,9 @@ namespace mitk {
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface, public itk::LightObject
+  class MITK_CORE_EXPORT FileReaderAbstract : public mitk::FileReaderInterface
 {
   public:
-
-    mitkClassMacro(FileReaderAbstract, itk::LightObject);
 
     //##Documentation
     //## @brief Get the specified the file to load.
@@ -115,10 +111,6 @@ namespace mitk {
     virtual std::string GetExtension() const;
 
     virtual std::list< std::string > GetSupportedOptions() const;
-
-    // virtual std::list< std::string > GetOptions() = 0;
-
-    // virtual void SetOptions(std::list< std::string > options ) = 0;
 
     virtual bool CanRead(const std::string& path) const;
 

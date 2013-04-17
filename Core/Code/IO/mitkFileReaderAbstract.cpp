@@ -88,12 +88,15 @@ void mitk::FileReaderAbstract::RegisterMicroservice(mitk::ModuleContext* context
 {
   ServiceProperties props = this->ConstructServiceProperties();
   itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
-  //TODO Check for null
+  if (lightObject == 0)
+     mitkThrow() << "Tried to register reader that is not a lightObject. All readers must inherit from itk::LightObject when used as a Microservice.";
   m_Registration = context->RegisterService<mitk::FileReaderInterface>(lightObject, props);
 }
 
 mitk::ServiceProperties mitk::FileReaderAbstract::ConstructServiceProperties()
 {
+  if ( m_Extension == "" )
+    MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   mitk::ServiceProperties result;
   result[mitk::FileReaderInterface::US_EXTENSION]    = m_Extension;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;

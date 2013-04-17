@@ -21,15 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Macro
 #include <MitkExports.h>
 #include <mitkCommon.h>
-// MITK
-//#include <mitkBaseData.h>
-// ITK
-//#include <itkProcessObject.h>
-//#include <itkObjectFactory.h>
+
 // Microservices
 #include <usServiceInterface.h>
-//#include <usServiceRegistration.h>
-//#include <usServiceProperties.h>
+
 
 
 namespace mitk {
@@ -50,9 +45,6 @@ namespace mitk {
 //## @ingroup Process
   struct MITK_CORE_EXPORT FileReaderInterface
 {
-
-  //mitkClassMacro(FileReaderInterface,itk::ProcessObject);
-  //itkNewMacro(Self);
 
     virtual ~FileReaderInterface();
 
@@ -125,10 +117,6 @@ namespace mitk {
 
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
-    //virtual std::list< std::string > GetOptions() = 0;
-
-    //virtual void SetOptions(std::list< std::string > options ) = 0;
-
     virtual bool CanRead(const std::string& path) const = 0;
 
     virtual float GetProgress() const = 0;
@@ -141,7 +129,7 @@ namespace mitk {
     static const std::string OPTION_READ_AS_BINARY;
 
 protected:
-    //FileReaderInterface();
+
 
 public:
 

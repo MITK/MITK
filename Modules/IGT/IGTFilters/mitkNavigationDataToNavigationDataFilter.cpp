@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataToNavigationDataFilter::NavigationDataToNavigationDataFilter()
 : mitk::NavigationDataSource()
 {
+mitk::NavigationData::Pointer output = mitk::NavigationData::New();
+this->SetNumberOfRequiredOutputs(1);
+this->SetNthOutput(0, output.GetPointer());
 }
 
 

@@ -497,7 +497,6 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
-  m_TrackingDeviceSource->Update();
   m_ToolVisualizationFilter->Update();
   MITK_DEBUG << "Number of outputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedOutputs();
   MITK_DEBUG << "Number of inputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedInputs();

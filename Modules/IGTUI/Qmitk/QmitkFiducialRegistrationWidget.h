@@ -64,6 +64,18 @@ public:
   mitk::DataNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
 
   void SetQualityDisplayText(QString text); ///< sets specific text on the UI (useful to display FRE/TRE...)
+  /*!
+  \brief Specify the name of the source landmarks. Will be used for label and button.
+
+  Example: sourceLandmarkName="CT" will result in group box title "CT landmarks" and button text "Add CT landmark".
+  */
+  void SetSourceLandmarkName(QString sourceLandmarkName);
+  /*!
+  \brief Specify the name of the source landmarks. Will be used for label and button.
+
+  Example: targetLandmarkName="CT" will result in group box title "CT landmarks" and button text "Add CT landmark".
+  */
+  void SetTargetLandmarkName(QString targetLandmarkName);
   bool UseICPIsChecked(); ///< returns true if automatic correspondences search is activated else false
   void HideStaticRegistrationRadioButton(bool on); ///< show or hide  "static Fiducial Registration" radio button in the UI
   void HideContinousRegistrationRadioButton(bool on); ///< show or hide  "hybrid continuous Fiducial Registration" radio button in the UI

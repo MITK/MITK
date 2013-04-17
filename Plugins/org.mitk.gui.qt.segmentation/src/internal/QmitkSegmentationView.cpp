@@ -730,8 +730,8 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
           {
             refNode = sources->ElementAt(0);
 
-            refNode->SetVisibility(/*refNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))*/true);
-            selectedNode->SetVisibility(/*selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))*/true);
+            refNode->SetVisibility(true);
+            selectedNode->SetVisibility(true);
             SetToolManagerSelection(refNode,selectedNode);
 
             mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
@@ -760,8 +760,8 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 
               if (this->CheckForSameGeometry(selectedNode, it->Value()))
               {
-                refNode->SetVisibility(/*refNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))*/true);
-                selectedNode->SetVisibility(/*selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))*/true);
+                refNode->SetVisibility(true);
+                selectedNode->SetVisibility(true);
 
                 mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
                 for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)

@@ -48,8 +48,6 @@ public:
 
     itkSetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
     itkGetMacro( AngularThreshold, float)                               ///< cluster directions that are closer together than the specified threshold
-    itkSetMacro( FiberSampling, int)                                    ///< Sampling points per voxel
-    itkGetMacro( FiberSampling, int)                                    ///< Sampling points per voxel
     itkSetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
     itkGetMacro( NormalizeVectors, bool)                                ///< Normalize vectors to length 1
     itkSetMacro( UseWorkingCopy, bool)                                  ///< Do not modify input fiber bundle. Use a copy.
@@ -90,7 +88,6 @@ protected:
     bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
     bool                                m_UseTrilinearInterpolation;        ///< trilinearly interpolate between neighbouring voxels
     int                                 m_MaxNumDirections;                 ///< if more directions per voxel are extracted, only the largest are kept
-    int                                 m_FiberSampling;                    ///< fiber points per voxel
     float                               m_Thres;                            ///< distance threshold for trilinear interpolation
 
     // output datastructures

@@ -30,8 +30,7 @@ TractsToVectorImageFilter::TractsToVectorImageFilter():
     m_Epsilon(0.999),
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
-    m_FiberSampling(5),
-    m_UseTrilinearInterpolation(true),
+    m_UseTrilinearInterpolation(false),
     m_Thres(0.5)
 {
     this->SetNumberOfRequiredOutputs(1);
@@ -148,7 +147,11 @@ void TractsToVectorImageFilter::GenerateData()
     itk::TimeProbe clock;
     m_DirectionsContainer = ContainerType::New();
 
-    MITK_INFO << "Generating fODFs (trilinear interpolation)";
+    if (m_UseTrilinearInterpolation)
+        MITK_INFO << "Generating directions from tractogram (trilinear interpolation)";
+    else
+        MITK_INFO << "Generating directions from tractogram";
+
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
@@ -561,9 +564,6 @@ void TractsToVectorImageFilter::GenerateData()
     directionsPolyData->SetPoints(m_VtkPoints);
     directionsPolyData->SetLines(m_VtkCellArray);
     m_OutputFiberBundle = mitk::FiberBundleX::New(directionsPolyData);
-
-    MITK_INFO << "mean time per fiber: " << clock.GetMean() << "s";
-    MITK_INFO << "absolute time: " << clock.GetTotal()/60 << "min";
 }
 
 

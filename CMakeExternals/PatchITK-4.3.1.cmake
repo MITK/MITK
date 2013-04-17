@@ -8,6 +8,6 @@ configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 set(path "Modules/ThirdParty/GDCM/src/CMakeLists.txt")
 file(STRINGS ${path} contents NEWLINE_CONSUME)
-string(REPLACE "SFF)" "SFF gdcmDSED)" contents ${contents})
+string(REPLACE "SFF)" "SFF gdcmDSED gdcmCommon)" contents ${contents})
 set(CONTENTS ${contents})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)

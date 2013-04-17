@@ -37,12 +37,14 @@ mitk::DiffusionImageSource<TPixelType>::~DiffusionImageSource()
 {
 }
 
+template<typename TPixelType>
 itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
+template<typename TPixelType>
 itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
@@ -50,7 +52,7 @@ itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( con
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
 

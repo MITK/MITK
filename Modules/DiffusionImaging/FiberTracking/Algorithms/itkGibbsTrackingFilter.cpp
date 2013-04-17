@@ -179,7 +179,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         typename DuplicateFilterType::Pointer duplicator = DuplicateFilterType::New();
         duplicator->SetInputImage( m_QBallImage );
         duplicator->Update();
-        m_QBallImage = duplicator->GetOutput(0);
+        m_QBallImage = duplicator->GetOutput();
     }
 
     // perform mean subtraction on odfs

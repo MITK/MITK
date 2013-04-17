@@ -201,7 +201,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     trackingFilter->SetbValues(vecCont);
     trackingFilter->SetGradients(Pdir);
     trackingFilter->SetMeasurementFrame(measurement_frame);
-    trackingFilter->SetWhiteMatterProbabilityImageInput(wmImage);
+    trackingFilter->SetWhiteMatterProbabilityImage(wmImage);
     trackingFilter->SetTotalTracts(m_Controls->m_SeedsPerVoxelSlider->value());
     trackingFilter->SetMaxLikelihoodCacheSize(m_Controls->m_MaxCacheSizeSlider->value()*1000);
     trackingFilter->SetMaxTractLength(m_Controls->m_MaxTractLengthSlider->value());

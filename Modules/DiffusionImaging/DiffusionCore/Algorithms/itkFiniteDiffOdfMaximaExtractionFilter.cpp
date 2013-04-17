@@ -1,4 +1,18 @@
+/*===================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __itkFiniteDiffOdfMaximaExtractionFilter_cpp
 #define __itkFiniteDiffOdfMaximaExtractionFilter_cpp
 
@@ -161,7 +175,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 ::BeforeThreadedGenerateData()
 {
     typename CoefficientImageType::Pointer ShCoeffImage = static_cast< CoefficientImageType* >( this->ProcessObject::GetInput(0) );
-    mitk::Vector3D spacing = ShCoeffImage->GetSpacing();
+    itk::Vector<double,3> spacing = ShCoeffImage->GetSpacing();
     double minSpacing = spacing[0];
     if (spacing[1]<minSpacing)
         minSpacing = spacing[1];

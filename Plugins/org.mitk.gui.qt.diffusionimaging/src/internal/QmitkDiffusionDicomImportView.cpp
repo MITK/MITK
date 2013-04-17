@@ -570,7 +570,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           headerReader = mitk::DicomDiffusionImageHeaderReader::New();
           headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
           headerReader->Update();
-          inHeaders.push_back(headerReader->GetOutput(0));
+          inHeaders.push_back(headerReader->GetOutput());
         }
         catch (mitk::Exception e)
         {

@@ -42,19 +42,19 @@ namespace itk
     typedef mitk::ConnectomicsNetwork  InputType;
 
     itkNewMacro(Self)
-      itkTypeMacro( ConnectomicsNetworkToConnectivityMatrixImageFilter, ImageSource )
+    itkTypeMacro( ConnectomicsNetworkToConnectivityMatrixImageFilter, ImageSource )
 
-      /** Get/Set m_BinaryConnectivity **/
-      itkSetMacro( BinaryConnectivity, bool)
-      itkGetMacro( BinaryConnectivity, bool)
+    /** Get/Set m_BinaryConnectivity **/
+    itkSetMacro( BinaryConnectivity, bool)
+    itkGetMacro( BinaryConnectivity, bool)
 
-      /** Get/Set m_RescaleConnectivity **/
-      itkSetMacro( RescaleConnectivity, bool)
-      itkGetMacro( RescaleConnectivity, bool)
+    /** Get/Set m_RescaleConnectivity **/
+    itkSetMacro( RescaleConnectivity, bool)
+    itkGetMacro( RescaleConnectivity, bool)
 
-      itkSetMacro( InputNetwork, InputType::Pointer)
+    itkSetMacro( InputNetwork, InputType::Pointer)
 
-      void GenerateData();
+    void GenerateData();
 
   protected:
 

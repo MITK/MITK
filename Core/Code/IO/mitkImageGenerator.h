@@ -48,7 +48,6 @@ public:
         imageRegion.SetSize(1, dimY);
         imageRegion.SetSize(2, dimZ);
         typename ImageType::SpacingType spacing;
-        itk::Vector<double> spacing;
         spacing[0] = spacingX;
         spacing[1] = spacingY;
         spacing[2] = spacingZ;

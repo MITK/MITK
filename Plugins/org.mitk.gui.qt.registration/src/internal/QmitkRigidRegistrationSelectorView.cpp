@@ -242,7 +242,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     for (unsigned long i = 0; i < size; ++i)
     {
       m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
-      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
+      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
     }
 
     m_GeometryWorldToItkPhysicalTransform = mitk::Geometry3D::TransformType::New();

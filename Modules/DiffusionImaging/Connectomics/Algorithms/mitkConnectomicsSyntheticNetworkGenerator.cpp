@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 
 //for random number generation
-#include "vxl/core/vnl/vnl_random.h"
-#include "vxl/core/vnl/vnl_math.h"
+#include "vnl/vnl_random.h"
+#include "vnl/vnl_math.h"
 
 mitk::ConnectomicsSyntheticNetworkGenerator::ConnectomicsSyntheticNetworkGenerator()
 : m_LastGenerationWasSuccess( false )

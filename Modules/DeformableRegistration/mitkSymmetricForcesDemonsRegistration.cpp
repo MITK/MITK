@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageFileWriter.h"
 #include "itkWarpImageFilter.h"
+#include "itkInverseDisplacementFieldImageFilter.h"
 
 #include "mitkSymmetricForcesDemonsRegistration.h"
 

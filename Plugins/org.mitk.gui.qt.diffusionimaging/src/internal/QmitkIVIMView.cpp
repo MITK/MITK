@@ -401,10 +401,10 @@ void QmitkIVIMView::AutoThreshold()
     histogramGenerator->SetHistogramMax(  dimg->GetScalarValueMax() * .5 );
     histogramGenerator->Compute();
 
-    HistogramType::ConstIterator iter = histogramGenerator->GetOutput(0)->Begin();
+    HistogramType::ConstIterator iter = histogramGenerator->GetOutput()->Begin();
     float maxFreq = 0;
     float maxValue = 0;
-    while ( iter != histogramGenerator->GetOutput(0)->End() )
+    while ( iter != histogramGenerator->GetOutput()->End() )
     {
         if(iter.GetFrequency() > maxFreq)
         {

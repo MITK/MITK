@@ -15,8 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkSimulation.h>
+#include <mitkSimulationModel.h>
 #include <mitkTestingMacros.h>
+#include <sofa/component/init.h>
+#include <sofa/core/visual/VisualParams.h>
+#include <sofa/core/ObjectFactory.h>
 #include <sofa/helper/system/SetDirectory.h>
+#include <sofa/simulation/common/UpdateContextVisitor.h>
+#include <sofa/simulation/common/xml/initXml.h>
 
 using namespace mitk;
 using namespace std;
@@ -26,6 +32,14 @@ int mitkSimulationTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkSimulationTest")
 
   MITK_TEST_CONDITION_REQUIRED(argc == 2, "Test if command line has argument.")
+
+  MITK_TEST_OUTPUT(<< "Initialize SOFA.")
+  sofa::component::init();
+  sofa::simulation::xml::initXml();
+
+  MITK_TEST_OUTPUT(<< "Register SimulationModel and add alias for VisualModel.")
+  int SimulationModelClass = sofa::core::RegisterObject("").add<mitk::SimulationModel>();
+  sofa::core::ObjectFactory::AddAlias("VisualModel", "SimulationModel", true);
 
   MITK_TEST_CONDITION(Simulation::ScaleFactor > 0.0f, "Check if simulation scale factor is greater than zero.")
 
@@ -91,6 +105,10 @@ int mitkSimulationTest(int argc, char* argv[])
   simulation->SetAsActiveSimulation();
   activeSimulation = sofa::simulation::getSimulation();
   MITK_TEST_CONDITION_REQUIRED(sofaSimulation.get() == activeSimulation, "Set simulation as active simulation.")
+
+  rootNode->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
+  sofaSimulation->updateVisual(rootNode.get());
+  sofaSimulation->draw(sofa::core::visual::VisualParams::defaultInstance(), rootNode.get());
 
   record = simulation->TakeSnapshot();
   MITK_TEST_CONDITION(record.IsNotNull() && record->GetSizeOfPolyDataSeries() == 1 && record->IsEmptyTimeStep(0) == false, "Take snapshot.")

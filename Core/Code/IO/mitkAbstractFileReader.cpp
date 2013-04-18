@@ -15,8 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#include "mitkAbstractFileReader.h"
-#include "usGetModuleContext.h"
+#include <mitkAbstractFileReader.h>
+#include <usGetModuleContext.h>
+#include <itksys/SystemTools.hxx>
+//#include <mitkBaseData.h>
+
 
 
 mitk::AbstractFileReader::AbstractFileReader() :
@@ -62,6 +65,16 @@ void mitk::AbstractFileReader::SetFilePattern(const std::string& aFilePattern)
   m_FilePattern = aFilePattern;
 }
 
+////////////////////// Reading /////////////////////////
+
+itk::SmartPointer<mitk::BaseData> mitk::AbstractFileReader::Read(const std::string& path)
+{
+  if (! itksys::SystemTools::FileExists(path.c_str()))
+    mitkThrow() << "File '" + path + "' not found.";
+  std::ifstream stream;
+  stream.open(path.c_str());
+  return this->Read(stream);
+}
 
 //////////// µS Registration & Properties //////////////
 

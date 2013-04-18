@@ -85,7 +85,7 @@ namespace mitk {
     the data is stored in multiple files. */
     virtual void SetFilePattern(const std::string& aFilePattern);
 
-    virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
+    virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0);
 
     virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
 

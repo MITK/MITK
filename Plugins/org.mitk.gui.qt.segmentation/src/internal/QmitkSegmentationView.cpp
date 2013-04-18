@@ -395,10 +395,10 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
 {
   bool isBinary (false);
   bool isHelperObject (false);
+  node->GetBoolProperty("binary", isBinary);
+  node->GetBoolProperty("helper object", isHelperObject);
   if (m_AutoSelectionEnabled)
   {
-    node->GetBoolProperty("binary", isBinary);
-    node->GetBoolProperty("helper object", isHelperObject);
     if (!isBinary && dynamic_cast<mitk::Image*>(node->GetData()))
     {
       FireNodeSelected(const_cast<mitk::DataNode*>(node));

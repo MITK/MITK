@@ -116,7 +116,7 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, s
 std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const std::string& extension, mitk::ModuleContext* context )
 {
   // filter for class and extension
-  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::IFileReader::US_EXTENSION + "=" + extension + "))";
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::IFileReader::PROP_EXTENSION + "=" + extension + "))";
   std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileReader", filter);
   result.sort();
   std::reverse(result.begin(), result.end());

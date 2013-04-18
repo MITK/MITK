@@ -119,6 +119,8 @@ protected:
 
     virtual void RegisterMicroservice(mitk::ModuleContext* context);
 
+    virtual void UnregisterMicroservice(mitk::ModuleContext* context);
+
     virtual mitk::ServiceProperties ConstructServiceProperties();
 
 };

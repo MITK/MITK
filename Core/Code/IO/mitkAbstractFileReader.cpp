@@ -16,16 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkAbstractFileReader.h"
+#include "usGetModuleContext.h"
 
 
 mitk::AbstractFileReader::AbstractFileReader() :
-m_Priority (1),
+m_Priority (0),
 m_Extension ("")
 {
 }
 
 mitk::AbstractFileReader::~AbstractFileReader()
 {
+  UnregisterMicroservice(mitk::GetModuleContext());
 }
 
 ////////////////// Filenames etc. //////////////////
@@ -72,12 +74,26 @@ void mitk::AbstractFileReader::RegisterMicroservice(mitk::ModuleContext* context
   m_Registration = context->RegisterService<mitk::IFileReader>(lightObject, props);
 }
 
+void mitk::AbstractFileReader::UnregisterMicroservice(mitk::ModuleContext* context)
+{
+  if (! m_Registration )
+  {
+    MITK_WARN << "Someone tried to unregister a FileReader, but it was either not registered or the registration has expired.";
+    return;
+  }
+
+  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
+  if (lightObject == 0)
+     mitkThrow() << "Tried to unregister reader that is not a lightObject. All readers must inherit from itk::LightObject when used as a Microservice. However, you somehow registered the object. If you read this error message, something is very wrong.";
+  m_Registration.Unregister();
+}
+
 mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   mitk::ServiceProperties result;
-  result[mitk::IFileReader::US_EXTENSION]    = m_Extension;
+  result[mitk::IFileReader::PROP_EXTENSION]    = m_Extension;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {

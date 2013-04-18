@@ -98,7 +98,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
   m_Warper->SetOutputSpacing( m_DeformationField->GetSpacing() );
   m_Warper->SetOutputOrigin(  m_DeformationField->GetOrigin() );
 
-  m_Warper->SetDeformationField( m_DeformationField );
+  m_Warper->SetDisplacementField( m_DeformationField );
 
   m_Warper->SetInput( m_MovingImage );
 

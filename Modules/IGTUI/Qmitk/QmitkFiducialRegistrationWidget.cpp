@@ -232,7 +232,7 @@ void QmitkFiducialRegistrationWidget::SetSourceLandmarkName(QString sourceLandma
   QString buttonText = "Add ";
   buttonText.append(sourceLandmarkName);
   buttonText.append(" Landmark");
-  m_Controls->m_AddTrackingFiducialBtn->setText(buttonText);
+  m_Controls->m_AddImageFiducialBtn->setText(buttonText);
 }
 
 void QmitkFiducialRegistrationWidget::SetTargetLandmarkName(QString targetLandmarkName)
@@ -243,5 +243,5 @@ void QmitkFiducialRegistrationWidget::SetTargetLandmarkName(QString targetLandma
   QString buttonText = "Add ";
   buttonText.append(targetLandmarkName);
   buttonText.append(" Landmark");
-  m_Controls->m_AddImageFiducialBtn->setText(buttonText);
+  m_Controls->m_AddTrackingFiducialBtn->setText(buttonText);
 }

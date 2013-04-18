@@ -105,7 +105,7 @@ namespace mitk {
     virtual float GetProgress() const = 0;
 
     // Microservice Properties
-    static const std::string US_EXTENSION;
+    static const std::string PROP_EXTENSION;
 
     // Microservice Names for defined Properties
     static const std::string OPTION_READ_AS_BINARY;

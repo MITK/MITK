@@ -1104,11 +1104,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
   {
     mitk::Geometry3D::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
     mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
-    m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
+    m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
-    m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(originalDataGeometry.GetPointer()));
+    m_UndoGeometryList.push_back(originalDataGeometry.GetPointer());
 
     vtkIdType pointId;
     vtkPoints* vPointsSource=vtkPoints::New();

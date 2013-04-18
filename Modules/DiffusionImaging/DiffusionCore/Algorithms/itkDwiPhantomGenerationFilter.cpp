@@ -68,7 +68,10 @@ DwiPhantomGenerationFilter< TOutputScalarType >
     outImage->SetRequestedRegion( m_ImageRegion );
     outImage->SetVectorLength(QBALL_ODFSIZE);
     outImage->Allocate();
-    outImage->FillBuffer(OutputImageType::PixelType(0.0));
+    // ITKv4 migration fix : removing OutputImageType::PixelType(0.0)
+    // the conversion is handled internally by the itk::Image
+    typename OutputImageType::PixelType fillValue(0.0);
+    outImage->FillBuffer( fillValue );
 
     this->SetNthOutput (0, outImage);
 

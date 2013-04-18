@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_CPP
+#define ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_CPP
+
 #include <itkImageRegionIterator.h>
 
 #include <vector>
@@ -179,3 +182,5 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
   }
 
 }
+
+#endif

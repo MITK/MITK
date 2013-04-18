@@ -17,9 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ProportialTimeGeometry_h
 #define ProportialTimeGeometry_h
 
+//ITK
+#include <itkBoundingBox.h>
+#include <itkFixedArray.h>
+#include <itkObject.h>
 //MITK
 #include <mitkTimeGeometry.h>
-#include <mitkBaseGeometry.h>
 #include <mitkCommon.h>
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
@@ -31,11 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // STL
 #include <vector>
 
-//ITK
-#include <itkBoundingBox.h>
-#include <itkFixedArray.h>
-#include <itkObject.h>
-
 namespace mitk {
 
 //  typedef itk::BoundingBox<unsigned long, 3, double>   BoundingBox;
@@ -44,33 +42,42 @@ namespace mitk {
   class MITK_CORE_EXPORT ProportionalTimeGeometry : public TimeGeometry
   {
   public:
+    mitkClassMacro(ProportionalTimeGeometry, TimeGeometry);
 
     ProportionalTimeGeometry();
-//    mitkClassMacro(ProportionalTimeGeometry, TimeGeometry);
     typedef ProportionalTimeGeometry self;
     itkNewMacro(self);
 
-    virtual TimeStepType     GetNumberOfTimeSteps();
-    virtual TimePointType    GetMinimumTimePoint ();
-    virtual TimePointType    GetMaximumTimePoint ();
+    virtual TimeStepType     GetNumberOfTimeSteps() const;
+    virtual TimePointType    GetMinimumTimePoint () const;
+    virtual TimePointType    GetMaximumTimePoint () const;
 
     //##Documentation
     //## @brief Get the time bounds (in ms)
-    virtual TimeBounds GetTimeBounds( );
+    virtual TimeBounds GetTimeBounds( ) const;
 
-    virtual bool IsValidTimePoint (TimePointType& timePoint);
-    virtual bool IsValidTimeStep  (TimeStepType& timeStep);
-    virtual TimePointType  TimeStepToTimePoint (TimeStepType& timeStep);
-    virtual TimeStepType   TimePointToTimeStep (TimePointType& timePoint);
+    virtual bool IsValidTimePoint (TimePointType timePoint) const;
+    virtual bool IsValidTimeStep  (TimeStepType timeStep) const;
+    virtual TimePointType  TimeStepToTimePoint (TimeStepType timeStep) const;
+    virtual TimeStepType   TimePointToTimeStep (TimePointType timePoint) const;
+    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const;
 
-    virtual BaseGeometry* GetGeometryForTimePoint ( TimePointType timePoint);
-    virtual BaseGeometry* GetGeometryForTimeStep  ( TimeStepType timeStep);
+    virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const;
+    virtual Geometry3D* GetGeometryForTimeStep  ( TimeStepType timeStep) const;
 
     virtual bool IsValid ();
 
     virtual void Initialize();
 
     virtual void ExecuteOperation(Operation *);
+
+    virtual void Expand(TimeStepType size);
+    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep);
+
+    /**
+    * \brief Makes a deep copy of the current object
+    */
+    virtual TimeGeometry::Pointer Clone () const;
 
     itkGetMacro(FirstTimePoint, TimePointType);
     itkSetMacro(FirstTimePoint, TimePointType);
@@ -86,7 +93,7 @@ namespace mitk {
     virtual ~ProportionalTimeGeometry();
 
     BoundingBox::Pointer m_BoundingBox;
-    std::vector<BaseGeometry::Pointer> m_GeometryVector;
+    std::vector<Geometry3D::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
 

@@ -392,8 +392,8 @@ namespace mitk
     m_OutputTimeSelector->SetInput( outputImage );
 
     Image::RegionType outputRegion = outputImage->GetRequestedRegion();
-    const TimeSlicedGeometry *outputTimeGeometry = outputImage->GetTimeSlicedGeometry();
-    const TimeSlicedGeometry *inputTimeGeometry = inputImage->GetTimeSlicedGeometry();
+    const TimeGeometry *outputTimeGeometry = outputImage->GetTimeGeometry();
+    const TimeGeometry *inputTimeGeometry = inputImage->GetTimeGeometry();
     ScalarType timeInMS;
 
     int timestep = 0;
@@ -416,8 +416,8 @@ namespace mitk
       int t;
       for( t = tstart; t < tmax; ++t )
       {
-        timeInMS = outputTimeGeometry->TimeStepToMS( t );
-        timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+        timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+        timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
         m_InputTimeSelector->SetTimeNr( timestep );
         m_InputTimeSelector->UpdateLargestPossibleRegion();
@@ -435,7 +435,7 @@ namespace mitk
         imageToPlaneTransform->SetIdentity();
 
         imageToPlaneTransform->Compose(
-          inputTimeGeometry->GetGeometry3D( t )->GetIndexToWorldTransform() );
+          inputTimeGeometry->GetGeometryForTimeStep( t )->GetIndexToWorldTransform() );
         imageToPlaneTransform->Compose( planeWorldToIndexTransform );
 
         MITK_INFO << "Accessing ITK function...\n";

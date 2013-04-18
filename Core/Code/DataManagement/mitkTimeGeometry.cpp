@@ -32,7 +32,7 @@ void mitk::TimeGeometry::Initialize()
  * parameters
  *
  */
-mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorldSpace(int id) const
+mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
 {
   assert(id >= 0);
   assert(m_BoundingBox.IsNotNull());
@@ -62,7 +62,7 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorldSpace(int id) const
   return cornerpoint;
 }
 
-mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorldSpace(bool xFront, bool yFront, bool zFront) const
+mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(bool xFront, bool yFront, bool zFront) const
 {
   assert(m_BoundingBox.IsNotNull());
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
@@ -75,21 +75,21 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorldSpace(bool xFront, bool y
   return cornerpoint;
 }
 
-mitk::Point3D mitk::TimeGeometry::GetCenterInWorldSpace() const
+mitk::Point3D mitk::TimeGeometry::GetCenterInWorld() const
 {
   assert(m_BoundingBox.IsNotNull());
   return m_BoundingBox->GetCenter();
 }
 
-double mitk::TimeGeometry::GetDiagonalLength2InWorldSpace() const
+double mitk::TimeGeometry::GetDiagonalLength2InWorld() const
 {
-  Vector3D diagonalvector = GetCornerPointInWorldSpace()-GetCornerPointInWorldSpace(false, false, false);
+  Vector3D diagonalvector = GetCornerPointInWorld()-GetCornerPointInWorld(false, false, false);
   return diagonalvector.GetSquaredNorm();
 }
 
-double mitk::TimeGeometry::GetDiagonalLengthinWorldSpace() const
+double mitk::TimeGeometry::GetDiagonalLengthinWorld() const
 {
-  return sqrt(GetDiagonalLength2InWorldSpace());
+  return sqrt(GetDiagonalLength2InWorld());
 }
 
 bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D& p) const
@@ -97,26 +97,47 @@ bool mitk::TimeGeometry::IsWorldPointInside(const mitk::Point3D& p) const
   return m_BoundingBox->IsInside(p);
 }
 
-void mitk::TimeGeometry::ApplyTransformMatrixToAllTimeSteps (mitk::Transform3D& transformation)
-{
-  for (TimeStepType step = 0; step <GetNumberOfTimeSteps(); ++step)
-  {
-    GetGeometryForTimeStep(step)->Transform(transformation);
-  }
-}
-
 void mitk::TimeGeometry::UpdateBoundingBox ()
 {
   assert(m_BoundingBox.IsNotNull());
   typedef BoundingBox::PointsContainer ContainerType;
 
+  unsigned long lastModifiedTime = 0;
+  unsigned long currentModifiedTime = 0;
+
   ContainerType::Pointer points = ContainerType::New();
   points->reserve(2*GetNumberOfTimeSteps());
   for (TimeStepType step = 0; step <GetNumberOfTimeSteps(); ++step)
   {
-    points->push_back(GetGeometryForTimeStep(step)->GetCornerPointInWorldSpace(false,false,false));
-    points->push_back(GetGeometryForTimeStep(step)->GetCornerPointInWorldSpace(true,true,true));
+    currentModifiedTime = GetGeometryForTimeStep(step)->GetMTime();
+    if (currentModifiedTime > lastModifiedTime)
+      lastModifiedTime = currentModifiedTime;
+
+
+    Point3D minimum = GetGeometryForTimeStep(step)->GetCornerPoint(false,false,false);
+    Point3D maximum = GetGeometryForTimeStep(step)->GetCornerPoint(true,true,true);
+
+    Point3D minimumWorld;
+    GetGeometryForTimeStep(step)->IndexToWorld(minimum, minimumWorld);
+    Point3D maximumWorld;
+    GetGeometryForTimeStep(step)->IndexToWorld(maximum, maximumWorld);
+
+    points->push_back(minimumWorld);
+    points->push_back(maximumWorld);
   }
-  m_BoundingBox->SetPoints(points);
-  m_BoundingBox->ComputeBoundingBox();
+
+  if (lastModifiedTime >= this->GetMTime())
+  {
+    m_BoundingBox->SetPoints(points);
+    m_BoundingBox->ComputeBoundingBox();
+    this->Modified();
+  }
+}
+
+mitk::ScalarType mitk::TimeGeometry::GetExtendInWorld (unsigned int direction) const
+{
+  assert(direction < 3);
+  assert(m_BoundingBox.IsNotNull());
+  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  return bounds[direction * 2 + 1] - bounds[direction * 2];
 }

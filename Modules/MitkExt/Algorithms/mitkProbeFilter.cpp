@@ -75,15 +75,15 @@ void mitk::ProbeFilter::GenerateOutputInformation()
   if(input->GetGeometry()==NULL) return;
   if(source->GetGeometry()==NULL) return;
 
-  if( (input->GetTimeSlicedGeometry()->GetTimeSteps()==1) && (source->GetTimeSlicedGeometry()->GetTimeSteps()>1) )
+  if( (input->GetTimeGeometry()->GetNumberOfTimeSteps()==1) && (source->GetTimeGeometry()->GetNumberOfTimeSteps()>1) )
   {
     Geometry3D::Pointer geometry3D = Geometry3D::New();
     geometry3D->Initialize();
-    geometry3D->SetBounds(source->GetTimeSlicedGeometry()->GetBounds());
-    geometry3D->SetTimeBounds(source->GetTimeSlicedGeometry()->GetGeometry3D(0)->GetTimeBounds());
+    geometry3D->SetBounds(source->GetTimeGeometry()->GetBoundsInWorld());
+    geometry3D->SetTimeBounds(source->GetTimeGeometry()->GetGeometryForTimeStep(0)->GetTimeBounds());
 
     TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();
-    outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeSlicedGeometry()->GetTimeSteps());
+    outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeGeometry()->GetNumberOfTimeSteps());
 
     output->Expand(outputTimeSlicedGeometry->GetTimeSteps());
     output->SetGeometry( outputTimeSlicedGeometry );

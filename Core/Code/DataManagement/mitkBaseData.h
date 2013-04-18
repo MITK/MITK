@@ -53,7 +53,7 @@ public:
   //## be sure that the geometry is up-to-date.
   //##
   //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
+  const mitk::TimeSlicedGeometry* OldGetTimeSlicedGeometry() const
   {
     return m_TimeSlicedGeometry.GetPointer();
   }
@@ -258,6 +258,7 @@ public:
   //## during initialization.
   //## \sa SetClonedGeometry
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetTimeGeometry (TimeGeometry* geometry);
 
   //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of the data.
@@ -265,6 +266,7 @@ public:
   //##
   //## \sa SetGeometry
   virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
+  virtual void SetClonedTimeGeometry (const TimeGeometry* geometry);
 
   //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of a given time step.
@@ -328,6 +330,8 @@ public:
   //## a better implementation could be over the length of the data vector.
   unsigned int GetTimeSteps() const
   {
+
+    return m_TimeGeometry->GetNumberOfTimeSteps();
     return m_TimeSlicedGeometry->GetTimeSteps();
   }
 

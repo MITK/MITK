@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageStatisticsHolder.h"
 #include "mitkPixelTypeMultiplex.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include <vtkImageData.h>
 
@@ -47,7 +48,7 @@ m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStati
 
   //Since the above called "Initialize" method doesn't take the geometry into account we need to set it
   //here manually
-  this->SetGeometry(dynamic_cast<mitk::TimeSlicedGeometry*>(other.GetTimeSlicedGeometry()->Clone().GetPointer()));
+  this->SetTimeGeometry(other.GetTimeGeometry()->Clone().GetPointer());
 
   if (this->GetDimension() > 3)
   {
@@ -792,6 +793,51 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
+
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels, int tDim )
+{
+  unsigned int dimensions[5];
+  dimensions[0] = (unsigned int)(geometry.GetExtendInWorld(0)+0.5);
+  dimensions[1] = (unsigned int)(geometry.GetExtendInWorld(1)+0.5);
+  dimensions[2] = (unsigned int)(geometry.GetExtendInWorld(2)+0.5);
+  dimensions[3] = (tDim > 0) ? tDim : geometry.GetNumberOfTimeSteps();
+  dimensions[4] = 0;
+
+  unsigned int dimension = 2;
+  if ( dimensions[2] > 1 )
+    dimension = 3;
+  if ( dimensions[3] > 1 )
+    dimension = 4;
+
+  Initialize( type, dimension, dimensions, channels );
+  SetTimeGeometry(geometry.Clone().GetPointer());
+
+  //Old
+  // Checks if the bounding box is inverted. Makes no sense for
+  // a TimeGeometry, since bounding box is always in World Coordinate
+  // and they are calculated from the Geometrie3D Points.
+  // Check
+  /*
+  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBox()->GetBounds();
+  if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )
+  {
+    SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+
+    mitk::Point3D origin; origin.Fill(0.0);
+    slicedGeometry->IndexToWorld(origin, origin);
+
+    bounds[1]-=bounds[0]; bounds[3]-=bounds[2]; bounds[5]-=bounds[4];
+    bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;
+this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
+    slicedGeometry->SetBounds(bounds);
+    slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.Get_vnl_vector().data_block());
+
+    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+  }
+  */
+}
+
+
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
 {
   unsigned int dimensions[5];
@@ -852,7 +898,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::
 
 void mitk::Image::Initialize(const mitk::Image* image)
 {
-  Initialize(image->GetPixelType(), *image->GetTimeSlicedGeometry());
+  Initialize(image->GetPixelType(), *image->GetTimeGeometry());
 }
 
 void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim, int pDim)

@@ -217,8 +217,8 @@ void mitk::GeometryClipImageFilter::GenerateData()
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
   ScalarType timeInMS;
 
   int timestep=0;
@@ -228,9 +228,8 @@ void mitk::GeometryClipImageFilter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
-
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();

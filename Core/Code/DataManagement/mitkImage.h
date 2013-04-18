@@ -237,6 +237,13 @@ public:
   //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
   virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1);
 
+  /**
+  * \brief Initialize new (or re-initialize) image information by a TimeGeometry
+  *
+  * \param tDim override time dimension if the value is bigger than 0 (Default -1)
+  */
+  virtual void Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels = 1, int tDim=-1 );
+
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry2D and number of slices
   //##

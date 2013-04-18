@@ -233,9 +233,9 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 //
 mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
 {
-  if(GetTimeSlicedGeometry() == NULL)
+  if (GetTimeGeometry() == NULL)
     return NULL;
-  return dynamic_cast<SlicedGeometry3D*>(GetTimeSlicedGeometry()->GetGeometry3D(t));
+  return dynamic_cast<SlicedGeometry3D*>(GetTimeGeometry()->GetGeometryForTimeStep(t));
 }
 
 const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)

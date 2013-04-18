@@ -200,10 +200,10 @@ void BoundingObjectCutter::GenerateData()
   m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *boundingObjectTimeGeometry = m_BoundingObject->GetTimeSlicedGeometry();
-  ScalarType timeInMS;
+  const mitk::TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+  const mitk::TimeGeometry *boundingObjectTimeGeometry = m_BoundingObject->GetTimeGeometry();
+  TimePointType timeInMS;
 
   int timestep=0;
   int tstart=outputRegion.GetIndex(3);
@@ -212,16 +212,15 @@ void BoundingObjectCutter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
-
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    timestep = boundingObjectTimeGeometry->MSToTimeStep( timeInMS );
+    timestep = boundingObjectTimeGeometry->TimePointToTimeStep( timeInMS );
 
     ComputeData(m_InputTimeSelector->GetOutput(), timestep);
   }

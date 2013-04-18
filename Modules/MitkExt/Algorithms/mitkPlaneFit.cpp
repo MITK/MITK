@@ -51,7 +51,7 @@ void mitk::PlaneFit::GenerateOutputInformation()
   bool update = false;
   if ( output->GetGeometry() == NULL || output->GetTimeSlicedGeometry() == NULL )
     update = true;
-  if ( ( ! update ) && ( output->GetTimeSlicedGeometry()->GetTimeSteps() != input->GetTimeSlicedGeometry()->GetTimeSteps() ) )
+  if ( ( ! update ) && ( output->GetTimeGeometry()->GetNumberOfTimeSteps() != input->GetTimeGeometry()->GetNumberOfTimeSteps() ) )
     update = true;
   if ( update )
   {

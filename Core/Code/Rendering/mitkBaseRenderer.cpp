@@ -397,7 +397,7 @@ int mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const
   {
     return -1;
   }
-  return data->GetTimeSlicedGeometry()->MSToTimeStep(GetTime());
+  return data->GetTimeGeometry()->TimePointToTimeStep(GetTime());
 }
 
 mitk::ScalarType mitk::BaseRenderer::GetTime() const

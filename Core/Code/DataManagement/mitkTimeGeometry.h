@@ -22,14 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkFixedArray.h>
 #include <itkObject.h>
 //MITK
-#include <mitkBaseGeometry.h>
 #include <mitkCommon.h>
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
 #include "mitkVector.h"
 
 // To be replaced
-#include <mitkSlicedGeometry3D.h>
+#include <mitkGeometry3D.h>
 
 // STL
 #include <vector>
@@ -40,6 +39,11 @@ namespace mitk {
 //  typedef itk::BoundingBox<unsigned long, 3, double>   BoundingBox;
 //  typedef itk::FixedArray<ScalarType,2>                TimeBounds;
 
+
+//  typedef unsigned long TimePointType;
+  typedef float         TimePointType;
+  typedef std::size_t   TimeStepType;
+
   /**
   * \brief Manages the geometries of a data object for each time step
   *
@@ -48,61 +52,81 @@ namespace mitk {
   */
   class MITK_CORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
   {
+  protected:
+    TimeGeometry();
+    virtual ~TimeGeometry();
+
+    /**
+    * \brief Contains a bounding box which includes all time steps
+    */
+    BoundingBox::Pointer m_BoundingBox;
+
 
   public:
     mitkClassMacro(TimeGeometry, itk::Object);
 
-    typedef unsigned long TimePointType;
-    typedef std::size_t   TimeStepType;
 
     /**
     * \brief Returns the number of time steps.
     */
-    virtual TimeStepType     GetNumberOfTimeSteps() = 0;
+    virtual TimeStepType     GetNumberOfTimeSteps() const = 0;
     /**
     * \brief Returns the first time point for which the object is valid.
     */
-    virtual TimePointType    GetMinimumTimePoint () = 0;
+    virtual TimePointType    GetMinimumTimePoint () const = 0;
     /**
     * \brief Returns the last time point for which the object is valid
     */
-    virtual TimePointType    GetMaximumTimePoint () = 0;
+    virtual TimePointType    GetMaximumTimePoint () const = 0;
 
     /**
     * \brief Get the time bounds (in ms)
     */
-    virtual TimeBounds GetTimeBounds( ) = 0;
+    virtual TimeBounds GetTimeBounds( ) const = 0;
     /**
     * \brief Tests if a given time point is covered by this object
     */
-    virtual bool IsValidTimePoint (TimePointType& timePoint) = 0;
+    virtual bool IsValidTimePoint (TimePointType timePoint) const = 0;
     /**
     * \brief Test for the given time step if a geometry is availible
     */
-    virtual bool IsValidTimeStep  (TimeStepType& timeStep) = 0;
+    virtual bool IsValidTimeStep  (TimeStepType timeStep) const = 0;
 
     /**
     * \brief Converts a time step to a time point
     */
-    virtual TimePointType  TimeStepToTimePoint (TimeStepType& timeStep) = 0;
+    virtual TimePointType  TimeStepToTimePoint (TimeStepType timeStep) const = 0;
     /**
     * \brief Converts a time point to the corresponding time step
     */
-    virtual TimeStepType   TimePointToTimeStep (TimePointType& timePoint) = 0;
+    virtual TimeStepType   TimePointToTimeStep (TimePointType timePoint) const = 0;
 
     /**
     * \brief Returns the geometry of a specific time point
     */
-    virtual BaseGeometry* GetGeometryForTimePoint ( TimePointType timePoint) = 0;
+    virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     */
-    virtual BaseGeometry* GetGeometryForTimeStep  ( TimeStepType timeStep) = 0;
+    virtual Geometry3D* GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
 
     /**
-    * \brief Applies the given transformation to all time
+    * \brief Returns a clone of the geometry of a specific time point
     */
-    void ApplyTransformMatrixToAllTimeSteps (Transform3D& transformation);
+    virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
+    /**
+    * \brief Sets the geometry for a given time step
+    */
+    virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep) = 0;
+
+    /**
+    * \brief Expands to the given number of time steps
+    *
+    * Expands to the given number of time steps. Each new created time
+    * step is filled with an empty geometry.
+    * Shrinking is not supported!
+    */
+    virtual void Expand(TimeStepType size) = 0;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid
@@ -113,29 +137,29 @@ namespace mitk {
     *
     * See SetImageGeometry for how a corner is defined on images.
     */
-    Point3D GetCornerPointInWorldSpace(int id) const;
+    Point3D GetCornerPointInWorld(int id) const;
 
     /**
     * \brief Get the position of a corner (in world coordinates)
     *
     * See SetImageGeometry for how a corner is defined on images.
     */
-    Point3D GetCornerPointInWorldSpace(bool xFront=true, bool yFront=true, bool zFront=true) const;
+    Point3D GetCornerPointInWorld(bool xFront=true, bool yFront=true, bool zFront=true) const;
 
     /**
     * \brief Get the center of the bounding-box in mm
     */
-    Point3D GetCenterInWorldSpace() const;
+    Point3D GetCenterInWorld() const;
 
     /**
     * \brief Get the squared length of the diagonal of the bounding-box in mm
     */
-    double GetDiagonalLength2InWorldSpace() const;
+    double GetDiagonalLength2InWorld() const;
 
     /**
     * \brief Get the length of the diagonal of the bounding-box in mm
     */
-    double GetDiagonalLengthinWorldSpace() const;
+    double GetDiagonalLengthinWorld() const;
 
     /**
     * \brief Test whether the point \a p (world coordinates in mm) is inside the bounding box
@@ -152,17 +176,36 @@ namespace mitk {
     void UpdateBoundingBox();
 
     /**
+    * \brief Returns a bounding box that covers all time steps
+    */
+    BoundingBox* GetBoundingBoxInWorld()
+    {
+      return m_BoundingBox;
+    }
+
+    /**
+    * \brief Returns the world bounds of the object that cover all time steps
+    */
+    BoundingBox::BoundsArrayType GetBoundsInWorld() const
+    {
+      return m_BoundingBox->GetBounds();
+    }
+
+    /**
+    * \brief Returns the Extend of the bounding in the given direction
+    */
+    ScalarType GetExtendInWorld (unsigned int direction) const;
+
+    /**
+    * \brief Makes a deep copy of the current object
+    */
+    virtual TimeGeometry::Pointer Clone () const = 0 ;
+
+    /**
     * \brief Initializes the TimeGeometry
     */
     virtual void Initialize();
-  protected:
-    TimeGeometry();
-    virtual ~TimeGeometry();
 
-    /**
-    * \brief Contains a bounding box which includes all time steps
-    */
-    BoundingBox::Pointer m_BoundingBox;
 
   }; // end class TimeGeometry
 

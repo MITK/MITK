@@ -41,9 +41,6 @@ public:
   mitkClassMacro(DummyReader, itk::LightObject);
   itkNewMacro(Self);
 
-  virtual itk::SmartPointer<mitk::BaseData> Read(const std::string& path = 0)
-  { return 0; }
-
   virtual itk::SmartPointer<mitk::BaseData> Read(const std::istream& stream )
   { return 0; }
 

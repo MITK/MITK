@@ -1,7 +1,10 @@
 set(MODULE_TESTS
   mitkSimulationDrawToolTest.cpp
-  mitkSimulationMapper3DTest.cpp
   mitkSimulationPropAssemblyVisitorTest.cpp
   mitkSimulationTemplateTest.cpp
+)
+
+set(MODULE_CUSTOM_TESTS
+  mitkSimulationMapper3DTest.cpp
   mitkSimulationTest.cpp
 )

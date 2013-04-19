@@ -51,7 +51,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   m_Interpolation(false)
 {
   this->SetNumberOfRequiredInputs( 1 );
-  //this->SetNumberOfThreads(1);
+  this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -228,6 +228,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   // create nx1 targetSignalVector
   vnl_vector<double> SignalVector(m_allDirectionsSize);
 
+
   // ** walking over each Voxel
   while(!iit.IsAtEnd())
   {
@@ -247,31 +248,41 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
     while(shellIterator != m_BValueMap.end())
     {
+
       // reset Data
       SignalVector.fill(0.0);
 
       // - get the RawSignal
       const IndicesVector currentShell = shellIterator->second;
-      for(unsigned int i = 0 ; i < currentShell.size(); i++)
-        SignalVector.put(i,b[currentShell[i]]);
+      vnl_vector<double> InterpVector(currentShell.size());
 
-      //MITK_INFO <<"RawSignal: "<< SignalVector;
-      MITK_INFO << "möp" <<currentShell.size();
-      //- interpolate the Signal if necessary using corresponding interpolationSHBasis
-      if(m_Interpolation) SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * SignalVector;
+      // - get raw Signal for currente shell
+      for(unsigned int i = 0 ; i < currentShell.size(); i++)
+        InterpVector.put(i,b[currentShell[i]]);
+      MITK_INFO <<"RawSignal: "<< InterpVector;
 
       //- normalization of the raw Signal
-      S_S0Normalization(SignalVector, BZeroAverage);
+      S_S0Normalization(InterpVector, BZeroAverage);
+      MITK_INFO <<"Normalized: "<< InterpVector;
 
-      //MITK_INFO <<"Normalized: "<< SignalVector;
+      //- interpolate the Signal if necessary using corresponding interpolationSHBasis
+      if(m_Interpolation)
+        SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * InterpVector;
+      else
+        SignalVector = InterpVector;
+      MITK_INFO <<"Interpolated: "<< SignalVector;
+
+      // - ADC calculation for the signalVector
       calculateAdcFromSignal(SignalVector, shellIterator->first);
+      MITK_INFO << "ADCVector: " << SignalVector;
 
-      //MITK_INFO <<"ADC: "<< SignalVector;
+
       //- weight the signal
-      if(m_Interpolation){
-        const double shellWeight = m_WeightsVector.at(shellIndex);
-        SignalVector *= shellWeight;
-      }
+      //if(m_Interpolation){
+      //  const double shellWeight = m_WeightsVector.at(shellIndex);
+      //  SignalVector *= shellWeight;
+      //}
+
       //- save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
       SignalMatrix.set_column(shellIndex, SignalVector);
 
@@ -279,6 +290,7 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
       shellIndex++;
       //MITK_INFO << SignalMatrix;
     }
+    exit(0);
     // MITK_INFO <<"finalSignalMatrix: " << SignalMatrix;
     // ADC averaging Sum(ADC)/n
     for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)

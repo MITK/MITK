@@ -531,11 +531,9 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
   }
   memset( segmentation->GetData(), 0, byteSize );
 
-  if (original->GetTimeSlicedGeometry() )
+  if (original->GetTimeGeometry() )
   {
-    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = original->GetTimeSlicedGeometry()->Clone();
-    mitk::TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
-    segmentation->SetGeometry( originalGeometry );
+    segmentation->SetTimeGeometry( original->GetTimeGeometry()->Clone().GetPointer() );
   }
   else
   {

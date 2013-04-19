@@ -75,7 +75,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   vtkPolyData * polyData;
   Geometry3D* geometry;
 
-  unsigned int t, timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
+  unsigned int t, timesteps = input->GetTimeGeometry()->GetNumberOfTimeSteps();
 
   for(t = 0; t < timesteps; ++t)
   {
@@ -87,7 +87,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     geometry = input->GetGeometry(t);
     if ( timesteps > 1 )
     {
-      if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+      if(input->GetTimeGeometry()->IsValidTimeStep(t))
       {
         const TimeBounds& timebounds = geometry->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;

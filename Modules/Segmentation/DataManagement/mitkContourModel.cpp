@@ -540,7 +540,7 @@ void mitk::ContourModel::UpdateOutputInformation()
       }
     }
   }
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }
 
 

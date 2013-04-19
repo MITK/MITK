@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
+#include <mitkProportionalTimeGeometry.h>
 #include "mitkImageDataItem.h"
 #include "mitkImageDescriptor.h"
 #include "mitkImageAccessorBase.h"
@@ -417,7 +418,9 @@ public:
     slicedGeometry->SetSpacing(spacing);
 
     // re-initialize TimeSlicedGeometry
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+    SetTimeGeometry(timeGeometry);
 
     // clean-up
     delete [] tmpDimensions;

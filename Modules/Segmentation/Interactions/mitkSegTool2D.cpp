@@ -230,7 +230,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   extractor->SetTimeStep( timeStep );
   extractor->SetWorldGeometry( planeGeometry );
   extractor->SetVtkOutputRequest(true);
-  extractor->SetResliceTransformByGeometry( image->GetTimeSlicedGeometry()->GetGeometry3D( timeStep ) );
+  extractor->SetResliceTransformByGeometry( image->GetGeometry( timeStep ) );
 
   extractor->Modified();
   extractor->Update();

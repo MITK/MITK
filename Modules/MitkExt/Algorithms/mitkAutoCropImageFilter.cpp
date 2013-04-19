@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageRegionConstIterator.h>
 #include <itkRegionOfInterestImageFilter.h>
+#include <mitkProportionalTimeGeometry.h>
 
 
 mitk::AutoCropImageFilter::AutoCropImageFilter()
@@ -184,11 +185,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // re-initialize the slicedGeometry with the correct planeGeometry
   // in order to get a fully initialized SlicedGeometry3D
   slicedGeometry->InitializeEvenlySpaced( plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices() );
-
-
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = output->GetTimeSlicedGeometry();
-  timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, output->GetDimension(3));
-  timeSlicedGeometry->CopyTimes(input->GetTimeSlicedGeometry());
 
   m_TimeOfHeaderInitialization.Modified();
 

@@ -70,7 +70,7 @@ public:
   //## be sure that the geometry is up-to-date.
   //##
   //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
+  mitk::TimeSlicedGeometry* OldGetTimeSlicedGeometry()
   {
     return m_TimeSlicedGeometry.GetPointer();
   }
@@ -87,7 +87,7 @@ public:
   //## member. Before doing this, it makes sure that the TimeSlicedGeometry
   //## is up-to-date (by setting the update extent to largest possible and
   //## calling UpdateOutputInformation).
-  const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
+  const mitk::TimeSlicedGeometry* OldGetUpdatedTimeSlicedGeometry();
   const mitk::TimeGeometry* GetUpdatedTimeGeometry();
 
   //##Documentation

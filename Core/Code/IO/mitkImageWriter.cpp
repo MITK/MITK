@@ -219,9 +219,9 @@ void mitk::ImageWriter::GenerateData()
         ::itk::OStringStream filename;
         timeSelector->SetTimeNr(t);
         timeSelector->Update();
-        if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+        if(input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
+          const mitk::TimeBounds& timebounds = input->GetTimeGeometry()->GetGeometryForTimeStep(t)->GetTimeBounds();
           filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }
         else

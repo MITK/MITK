@@ -885,7 +885,9 @@ this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
     slicedGeometry->SetBounds(bounds);
     slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.Get_vnl_vector().data_block());
 
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+    SetTimeGeometry(timeGeometry);
   }
 }
 
@@ -1015,7 +1017,10 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   // re-initialize SlicedGeometry3D
   slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  SetTimeGeometry(timeGeometry);
 
   delete [] tmpDimensions;
 }
@@ -1199,7 +1204,8 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
     MITK_INFO << "WARNING: Applied a non-image geometry onto an image. Please be SURE that this geometry is pixel-center-based! If it is not, you need to call Geometry3D->ChangeImageGeometryConsideringOriginOffset(true) before calling image->setGeometry(..)\n";
   }
   Superclass::SetGeometry(aGeometry3D);
-  GetTimeSlicedGeometry()->ImageGeometryOn();
+  for (TimeStepType step = 0; step < GetTimeGeometry()->GetNumberOfTimeSteps(); ++step)
+    GetTimeGeometry()->GetGeometryForTimeStep(step)->ImageGeometryOn();
 }
 
 void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const

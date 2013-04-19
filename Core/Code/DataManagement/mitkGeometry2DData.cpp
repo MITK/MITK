@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGeometry2DData.h"
 #include "mitkBaseProcess.h"
+#include <mitkProportionalTimeGeometry.h>
 
 mitk::Geometry2DData::Geometry2DData()
 {
@@ -43,13 +44,9 @@ void mitk::Geometry2DData::SetGeometry2D(mitk::Geometry2D *geometry2d)
 {
   if(geometry2d != NULL)
   {
-    TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
-    if(timeSlicedGeometry == NULL)
-    {
-      Superclass::SetGeometry(geometry2d);
-      return;
-    }
-    timeSlicedGeometry->InitializeEvenlyTimed(geometry2d, 1);
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(geometry2d, 1);
+    SetTimeGeometry(timeGeometry);
     Modified();
   }
   else

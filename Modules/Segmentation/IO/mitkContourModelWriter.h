@@ -195,12 +195,12 @@ protected:
     void WriteXML( mitk::ContourModel* contourModel, std::ofstream& out );
 
     /**
-    * Writes the geometry information of the TimeSlicedGeometry to an outstream.
+    * Writes the geometry information of the TimeGeometry to an outstream.
     * The root tag is not included.
-    * @param geometry the TimeSlicedGeometry of the contour.
+    * @param geometry the TimeGeometry of the contour.
     * @param the stream to write to.
     */
-    void WriteGeometryInformation( mitk::TimeSlicedGeometry* geometry, std::ofstream& out );
+    void WriteGeometryInformation( mitk::TimeGeometry* geometry, std::ofstream& out );
 
     /**
      * Writes an standard xml header to the given stream.

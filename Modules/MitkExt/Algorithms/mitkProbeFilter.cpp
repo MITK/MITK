@@ -109,10 +109,10 @@ void mitk::ProbeFilter::GenerateData()
   }
 
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  const mitk::TimeSlicedGeometry *sourceTimeGeometry = source->GetTimeSlicedGeometry();
-  ScalarType timeInMS;
+  const TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
+  const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+  const TimeGeometry *sourceTimeGeometry = source->GetTimeGeometry();
+  TimePointType timeInMS;
   int timestep=0;
 
   int tstart, tmax;
@@ -123,14 +123,14 @@ void mitk::ProbeFilter::GenerateData()
   int t;
   for(t=tstart;t<tmax;++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToMS( t );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
 
     vtkProbeFilter* probe = vtkProbeFilter::New();
 
-    timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
+    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
     probe->SetInput( input->GetVtkPolyData(timestep) );
 
-    timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
+    timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
     probe->SetSource( source->GetVtkImageData(timestep) );
 
     output->SetVtkPolyData( probe->GetPolyDataOutput(), t );
@@ -152,7 +152,7 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
 
   mitk::Surface::Pointer output = this->GetOutput();
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
-  const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
+  const TimeGeometry *outputTimeGeometry = output->GetTimeGeometry();
 
   mitk::Surface::RegionType inputSurfaceRegion = outputRegion;
   Image::RegionType sourceImageRegion = source->GetLargestPossibleRegion();
@@ -171,22 +171,22 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
   }
 
   //create and set input requested region for the input surface
-  const mitk::TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
 
   ScalarType timeInMS;
   int timestep=0;
 
   // convert the start-index-time of output in start-index-time of input via millisecond-time
-  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
-  timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTime( timestep ) ) )
+  timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
+  timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( inputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputSurfaceRegion.SetIndex( 3, timestep );
   else
     inputSurfaceRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of input via millisecond-time
-  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
-  timestep = inputTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+  timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
+  timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     inputSurfaceRegion.SetSize( 3, timestep - inputSurfaceRegion.GetIndex(3) + 1 );
   else
     inputSurfaceRegion.SetSize( 3, 1 );
@@ -194,19 +194,19 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
   input->SetRequestedRegion( &inputSurfaceRegion  );
 
   //create and set input requested region for the source image
-  const mitk::TimeSlicedGeometry *sourceTimeGeometry = source->GetTimeSlicedGeometry();
+  const TimeGeometry *sourceTimeGeometry = source->GetTimeGeometry();
 
   // convert the start-index-time of output in start-index-time of source via millisecond-time
-  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3));
-  timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( sourceTimeGeometry->IsValidTime( timestep ) ) )
+  timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
+  timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( sourceTimeGeometry->IsValidTimeStep( timestep ) ) )
     sourceImageRegion.SetIndex( 3, timestep );
   else
     sourceImageRegion.SetIndex( 3, 0 );
   // convert the end-index-time of output in end-index-time of source via millisecond-time
-  timeInMS = outputTimeGeometry->TimeStepToMS(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
-  timestep = sourceTimeGeometry->MSToTimeStep( timeInMS );
-  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTime( timestep ) ) )
+  timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3)+outputRegion.GetSize(3)-1);
+  timestep = sourceTimeGeometry->TimePointToTimeStep( timeInMS );
+  if( ( timeInMS > ScalarTypeNumericTraits::NonpositiveMin() ) && ( outputTimeGeometry->IsValidTimeStep( timestep ) ) )
     sourceImageRegion.SetSize( 3, timestep - sourceImageRegion.GetIndex(3) + 1 );
   else
     sourceImageRegion.SetSize( 3, 1 );

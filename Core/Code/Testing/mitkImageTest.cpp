@@ -163,7 +163,7 @@ int mitkImageTest(int argc, char* argv[])
   //-----------------
   // testing origin information and methods
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ");
+  //Old MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetTimeSlicedGeometry()->GetOrigin(): ");
 
   // Setting origin via SetOrigin(origin): ";
   mitk::FillVector3D(origin, 37.0, 17.92, 27.83);
@@ -171,18 +171,18 @@ int mitkImageTest(int argc, char* argv[])
 
   // Test origin
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ");
+  //Old MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetTimeSlicedGeometry()->GetOrigin(): ");
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
 
   //-----------------
   // testing spacing information and methods
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correct spacing from Geometry3D!");
-   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctspacing from TimeSlicedGeometry!");
+  //Odl MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctspacing from TimeSlicedGeometry!");
 
   mitk::FillVector3D(spacing, 7.0, 0.92, 1.83);
   imgMem->SetSpacing(spacing);
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetGeometry()->GetSpacing(): ");
-  MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ");
+  //Old MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctness of changed spacing via GetTimeSlicedGeometry()->GetSpacing(): ");
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(), spacing), "Testing correctness of changed spacing via GetSlicedGeometry()->GetGeometry2D(0)->GetSpacing(): ");
 
   mitk::Image::Pointer vecImg = mitk::Image::New();
@@ -234,9 +234,9 @@ int mitkImageTest(int argc, char* argv[])
   origin2 = mitkByVtkImage->GetGeometry()->GetOrigin();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
 
-  MITK_TEST_OUTPUT(<< " Testing whether GetTimeSlicedGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
-  origin2 = mitkByVtkImage->GetTimeSlicedGeometry()->GetOrigin();
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+  //Old MITK_TEST_OUTPUT(<< " Testing whether GetTimeSlicedGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
+  //Old origin2 = mitkByVtkImage->GetTimeSlicedGeometry()->GetOrigin();
+  //Old MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
 
   // TODO test the following initializers on channel-incorporation
   //  void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
@@ -313,8 +313,8 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetSpacing() == image->GetGeometry()->GetSpacing(), "Clone (testing spacing)");
   MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()),
                                "Clone (testing transformation matrix)");
-  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),
-    cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeGeometry()->GetGeometryForTimeStep(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),
+    cloneImage->GetTimeGeometry()->GetGeometryForTimeStep(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
 
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {

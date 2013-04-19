@@ -120,11 +120,9 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       mitk::AffineGeometryFrame3D::TransformType *affineTransform =
         planeGeometry->GetIndexToWorldTransform();
 
-      mitk::TimeSlicedGeometry *timeGeometry = output->GetTimeSlicedGeometry();
-      timeGeometry->SetIndexToWorldTransform( affineTransform );
-
-      mitk::Geometry3D *g3d = timeGeometry->GetGeometry3D( 0 );
-      g3d->SetIndexToWorldTransform( affineTransform );
+      TimeGeometry *timeGeometry = output->GetTimeGeometry();
+      Geometry3D *geometrie3d = timeGeometry->GetGeometryForTimeStep( 0 );
+      geometrie3d->SetIndexToWorldTransform( affineTransform );
     }
 
     if ( !m_UseBoundingBox)
@@ -307,10 +305,8 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
       mitk::AffineGeometryFrame3D::TransformType *affineTransform =
         abstractGeometry->GetIndexToWorldTransform();
 
-      mitk::TimeSlicedGeometry *timeGeometry = output->GetTimeSlicedGeometry();
-      timeGeometry->SetIndexToWorldTransform( affineTransform );
-
-      mitk::Geometry3D *g3d = timeGeometry->GetGeometry3D( 0 );
+      TimeGeometry *timeGeometry = output->GetTimeGeometry();
+      Geometry3D *g3d = timeGeometry->GetGeometryForTimeStep( 0 );
       g3d->SetIndexToWorldTransform( affineTransform );
 
       vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();

@@ -100,7 +100,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   passed = true;
   for (int i=0;i<5;i++)
   {
-    mitk::BoundingBox::BoundsArrayType surfBounds = (const_cast<mitk::BoundingBox*>(surface->GetTimeSlicedGeometry()->GetGeometry3D(i)->GetBoundingBox()))->GetBounds();
+    mitk::BoundingBox::BoundsArrayType surfBounds = (const_cast<mitk::BoundingBox*>(surface->GetTimeGeometry()->GetGeometryForTimeStep(i)->GetBoundingBox()))->GetBounds();
 
     if ( boundsMat[i][0] != surfBounds[0]
     || boundsMat[i][1] != surfBounds[1]
@@ -115,11 +115,11 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   }
   MITK_TEST_CONDITION_REQUIRED(passed, "Testing mitk::Surface::Testing 4D surface data creation!" );
 
-  const mitk::TimeSlicedGeometry* inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
+  const mitk::TimeGeometry* inputTimeGeometry = surface->GetUpdatedTimeGeometry();
 
   int time = 3;
   int timestep=0;
-  timestep = inputTimeGeometry->MSToTimeStep( time );
+  timestep = inputTimeGeometry->TimePointToTimeStep( time );
   MITK_TEST_CONDITION_REQUIRED(time == timestep, "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry()!");
 
   sphereSource = vtkSphereSource::New();
@@ -131,11 +131,11 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   surface->SetVtkPolyData( sphereSource->GetOutput(), 3 );
   sphereSource->Delete();
 
-  inputTimeGeometry = surface->GetUpdatedTimeSlicedGeometry();
+  inputTimeGeometry = surface->GetUpdatedTimeGeometry();
   time = 3;
   timestep=0;
 
-  timestep = inputTimeGeometry->MSToTimeStep( time );
+  timestep = inputTimeGeometry->TimePointToTimeStep( time );
   MITK_TEST_CONDITION_REQUIRED(time == timestep, "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again!");
 
   unsigned int numberoftimesteps = surface->GetTimeSteps();

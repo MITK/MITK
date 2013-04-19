@@ -654,10 +654,10 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
   {
     mitk::BaseData::Pointer basedata = node->GetData();
     if ( basedata.IsNotNull() &&
-         basedata->GetTimeSlicedGeometry()->IsValid() )
+      basedata->GetTimeGeometry()->IsValid() )
     {
       renderWindow->GetRenderingManager()->InitializeViews(
-            basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       renderWindow->GetRenderingManager()->RequestUpdateAll();
     }
   }
@@ -782,7 +782,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
         this->GetDataStorage()->Add(node, parentNode);
         mitk::BaseData::Pointer basedata = node->GetData();
         mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }

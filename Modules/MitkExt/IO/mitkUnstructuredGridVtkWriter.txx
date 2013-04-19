@@ -68,17 +68,17 @@ void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   vtkUnstructuredGrid * unstructuredGrid;
   Geometry3D* geometry;
 
-  if(input->GetTimeSlicedGeometry()->GetTimeSteps()>1)
+  if(input->GetTimeGeometry()->GetNumberOfTimeSteps()>1)
   {
 
     int t, timesteps;
 
-    timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
+    timesteps = input->GetTimeGeometry()->GetNumberOfTimeSteps();
     for(t = 0; t < timesteps; ++t)
     {
       ::itk::OStringStream filename;
       geometry = input->GetGeometry(t);
-      if(input->GetTimeSlicedGeometry()->IsValidTime(t))
+      if(input->GetTimeGeometry()->IsValidTimeStep(t))
       {
         const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << GetDefaultExtension();

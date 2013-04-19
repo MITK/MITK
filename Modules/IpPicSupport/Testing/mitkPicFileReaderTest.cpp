@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSlicedGeometry3D.h"
 #include <itksys/SystemTools.hxx>
 #include <itkImageFileReader.h>
+#include <mitkTimeGeometry.h>
 
 #include <fstream>
 int mitkPicFileReaderTest(int argc, char* argv[])
@@ -86,9 +87,9 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing type of geometry (TimeSlicedGeometry expected): ";
-      mitk::TimeSlicedGeometry* timegeometry;
-      timegeometry = reader->GetOutput()->GetTimeSlicedGeometry();
-      if(timegeometry==NULL)
+      mitk::TimeGeometry* timeGeometry;
+      timeGeometry = reader->GetOutput()->GetTimeGeometry();
+      if(timeGeometry==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -96,7 +97,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing availability of first geometry contained in the TimeSlicedGeometry: ";
-      if(timegeometry->GetGeometry3D(0)==NULL)
+      if(timeGeometry->GetGeometryForTimeStep(0)==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -105,7 +106,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
 
       std::cout << "Testing type of first geometry contained in the TimeSlicedGeometry (SlicedGeometry3D expected): ";
       mitk::SlicedGeometry3D* slicedgeometry;
-      slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timegeometry->GetGeometry3D(0));
+      slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(0));
       if(slicedgeometry==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
@@ -141,9 +142,9 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing extent in units of image of TimeSlicedGeometry: ";
-      if((fabs(timegeometry->GetExtent(0)-picheader->n[0])>mitk::eps) || (fabs(timegeometry->GetExtent(1)-picheader->n[1])>mitk::eps)
-        || (picheader->dim>2 && (fabs(timegeometry->GetExtent(2)-picheader->n[2])>mitk::eps))
-        || (picheader->dim>3 && (abs((mitkIpInt4_t) timegeometry->GetTimeSteps()- (mitkIpInt4_t) picheader->n[3])>0))
+      if((fabs(timeGeometry->GetExtendInWorld(0)-picheader->n[0])>mitk::eps) || (fabs(timeGeometry->GetExtendInWorld(1)-picheader->n[1])>mitk::eps)
+        || (picheader->dim>2 && (fabs(timeGeometry->GetExtendInWorld(2)-picheader->n[2])>mitk::eps))
+        || (picheader->dim>3 && (abs((mitkIpInt4_t) timeGeometry->GetNumberOfTimeSteps()- (mitkIpInt4_t) picheader->n[3])>0))
         )
       {
         std::cout<<"[FAILED]"<<std::endl;

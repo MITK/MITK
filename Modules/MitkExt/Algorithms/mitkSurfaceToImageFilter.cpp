@@ -61,12 +61,12 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 
   if((inputImage == NULL) ||
      (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeSlicedGeometry() == NULL)) return;
+     (inputImage->GetTimeGeometry() == NULL)) return;
 
   if (m_MakeOutputBinary)
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeSlicedGeometry());
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
   else
-    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
+    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
 
   output->SetPropertyList(inputImage->GetPropertyList()->Clone());
 }

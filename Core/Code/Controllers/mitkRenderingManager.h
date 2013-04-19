@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
+#include "mitkTimeGeometry.h"
 
 class vtkRenderWindow;
 class vtkObject;
@@ -154,6 +155,8 @@ public:
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
   virtual bool InitializeViews( const Geometry3D *geometry,
+    RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
+  virtual bool InitializeViews( const TimeGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
 

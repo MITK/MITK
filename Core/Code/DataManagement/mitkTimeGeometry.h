@@ -178,7 +178,7 @@ namespace mitk {
     /**
     * \brief Returns a bounding box that covers all time steps
     */
-    BoundingBox* GetBoundingBoxInWorld()
+    BoundingBox* GetBoundingBoxInWorld() const
     {
       return m_BoundingBox;
     }
@@ -205,6 +205,20 @@ namespace mitk {
     * \brief Initializes the TimeGeometry
     */
     virtual void Initialize();
+
+    /**
+    * \brief Updates the geometry
+    */
+    void Update();
+
+    /**
+    * \brief Updates everything except the Bounding box
+    *
+    * This class should be overwritten by child classes.
+    * The method is called when Update() is required.
+    */
+    virtual void UpdateWithoutBoundingBox()
+    {};
 
 
   }; // end class TimeGeometry

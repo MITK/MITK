@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include "algorithm"
 
@@ -423,7 +424,7 @@ void mitk::PlanarFigure::UpdateOutputInformation()
   // Bounds are NOT calculated here, since the Geometry2D defines a fixed
   // frame (= bounds) for the planar figure.
   Superclass::UpdateOutputInformation();
-  this->GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeGeometry()->Update();
 }
 
 
@@ -538,8 +539,6 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
 
 void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
 {
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-
   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
   geometry2D->Initialize();
 
@@ -551,7 +550,9 @@ void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
 
   // The geometry is propagated automatically to all time steps,
   // if EvenlyTimed is true...
-  timeGeometry->InitializeEvenlyTimed( geometry2D, timeSteps );
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(geometry2D, timeSteps);
+  SetTimeGeometry(timeGeometry);
 }
 
 

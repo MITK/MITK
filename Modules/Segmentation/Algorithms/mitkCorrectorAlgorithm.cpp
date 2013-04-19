@@ -51,11 +51,9 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   TimeSlicedGeometry::Pointer originalGeometry;
 
-  if (inputImage->GetTimeSlicedGeometry() )
+  if (inputImage->GetTimeGeometry() )
   {
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
-    originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
-    m_WorkingImage->SetGeometry( originalGeometry );
+    m_WorkingImage->SetTimeGeometry(inputImage->GetTimeGeometry()->Clone().GetPointer());
   }
   else
   {

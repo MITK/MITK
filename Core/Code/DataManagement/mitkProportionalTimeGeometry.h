@@ -89,6 +89,15 @@ namespace mitk {
 //    void AddGeometry(BaseGeometry geometry);
     void ReserveSpaceForGeometries (TimeStepType numberOfGeometries);
 
+    /**
+    * \brief Initializes the TimeGeometry with equally time Step geometries
+    */
+    void Initialize (Geometry3D * geometry, TimeStepType timeSteps);
+    /**
+    * \brief Initialize the TimeGeometry with empty Geometry3D
+    */
+    void Initialize (TimeStepType timeSteps);
+
   protected:
     virtual ~ProportionalTimeGeometry();
 

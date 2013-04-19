@@ -141,3 +141,9 @@ mitk::ScalarType mitk::TimeGeometry::GetExtendInWorld (unsigned int direction) c
   BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
   return bounds[direction * 2 + 1] - bounds[direction * 2];
 }
+
+void mitk::TimeGeometry::Update()
+{
+  this->UpdateBoundingBox();
+  this->UpdateWithoutBoundingBox();
+}

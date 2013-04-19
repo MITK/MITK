@@ -157,7 +157,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
 
   //set the transformation of the image to adapt reslice axis
-  localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() ) );
+  localStorage->m_Reslicer->SetResliceTransformByGeometry( input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() ) );
 
 
   //is the geometry of the slice based on the input image or the worldgeometry?
@@ -250,7 +250,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
     }
     normal.Normalize();
 
-    input->GetTimeSlicedGeometry()->GetGeometry3D( this->GetTimestep() )->WorldToIndex( normal, normInIndex );
+    input->GetTimeGeometry()->GetGeometryForTimeStep( this->GetTimestep() )->WorldToIndex( normal, normInIndex );
 
     dataZSpacing = 1.0 / normInIndex.GetNorm();
 
@@ -631,10 +631,10 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   this->CalculateTimeStep( renderer );
 
   // Check if time step is valid
-  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
   if ( ( dataTimeGeometry == NULL )
-       || ( dataTimeGeometry->GetTimeSteps() == 0 )
-       || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+    || ( dataTimeGeometry->GetNumberOfTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
     return;
   }

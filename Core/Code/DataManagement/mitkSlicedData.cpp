@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSlicedData.h"
 #include "mitkBaseProcess.h"
+#include <mitkProportionalTimeGeometry.h>
 
 
 mitk::SlicedData::SlicedData() : m_UseLargestPossibleRegion(false)
@@ -138,7 +139,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
-  if(GetTimeSlicedGeometry() == NULL) return false;
+  if(GetTimeGeometry() == NULL) return false;
 
   unsigned int i;
 
@@ -295,13 +296,13 @@ void mitk::SlicedData::SetSpacing(const float aSpacing[3])
 
 void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 {
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  TimeGeometry* timeSlicedGeometry = GetTimeGeometry();
 
   assert(timeSlicedGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeSlicedGeometry->GetTimeSteps();
+  unsigned int steps = timeSlicedGeometry->GetNumberOfTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
@@ -316,9 +317,10 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
         slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
       }
     }
-    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
+    ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
+    if(timeGeometry != NULL)
     {
-      GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, steps);
+      timeGeometry->Initialize(slicedGeometry, steps);
       break;
     }
   }
@@ -326,13 +328,13 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 
 void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 {
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = GetTimeSlicedGeometry();
+  TimeGeometry* timeSlicedGeometry = GetTimeGeometry();
 
   assert(timeSlicedGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeSlicedGeometry->GetTimeSteps();
+  unsigned int steps = timeSlicedGeometry->GetNumberOfTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
@@ -341,9 +343,10 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
     {
       slicedGeometry->SetSpacing(aSpacing);
     }
-    if(GetTimeSlicedGeometry()->GetEvenlyTimed())
+    ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
+    if(timeGeometry != NULL)
     {
-      GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, steps);
+      timeGeometry->Initialize(slicedGeometry, steps);
       break;
     }
   }

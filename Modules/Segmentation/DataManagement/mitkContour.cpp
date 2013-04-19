@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkContour.h"
+#include <mitkProportionalTimeGeometry.h>
 
 mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
@@ -81,7 +82,7 @@ void mitk::Contour::UpdateOutputInformation()
   }
   Geometry3D* geometry3d = GetGeometry(0);
   geometry3d->SetBounds(mitkBounds);
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }
 
 void mitk::Contour::SetRequestedRegionToLargestPossibleRegion()
@@ -123,7 +124,9 @@ void mitk::Contour::Initialize()
   m_ContourPath->Initialize();
   m_BoundingBox = BoundingBoxType::New();
   m_Vertices = BoundingBoxType::PointsContainer::New();
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(1);
+  SetTimeGeometry(timeGeometry);
 }
 
 unsigned int mitk::Contour::GetNumberOfPoints() const

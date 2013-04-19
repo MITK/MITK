@@ -63,7 +63,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
   mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   mitk::Image* mask  = m_Mask ;
-  if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeGeometry()->GetNumberOfTimeSteps() == 0))
     return;
 
   input->SetRequestedRegionToLargestPossibleRegion();
@@ -145,7 +145,7 @@ void mitk::MaskImageFilter::GenerateData()
   mitk::Image::Pointer mask  = m_Mask;
   mitk::Image::Pointer output = this->GetOutput();
 
-  if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeGeometry()->GetNumberOfTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);

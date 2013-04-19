@@ -131,7 +131,7 @@ void mitk::UnstructuredGrid::UpdateOutputInformation()
   if ( ( m_CalculateBoundingBox ) && ( m_GridSeries.size() > 0 ) )
     CalculateBoundingBox();
   else
-    GetTimeSlicedGeometry()->UpdateInformation();
+    GetTimeGeometry()->Update();
 }
 
 void mitk::UnstructuredGrid::CalculateBoundingBox()
@@ -140,10 +140,10 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
   // first make sure, that the associated time sliced geometry has
   // the same number of geometry 3d's as vtkUnstructuredGrids are present
   //
-  mitk::TimeSlicedGeometry* timeGeometry = GetTimeSlicedGeometry();
-  if ( timeGeometry->GetTimeSteps() != m_GridSeries.size() )
+  TimeGeometry* timeGeometry = GetTimeGeometry();
+  if ( timeGeometry->GetNumberOfTimeSteps() != m_GridSeries.size() )
   {
-    itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
+    itkExceptionMacro(<<"timeGeometry->GetNumberOfTimeSteps() != m_GridSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
   }
 
   //
@@ -160,13 +160,13 @@ void mitk::UnstructuredGrid::CalculateBoundingBox()
       grid->ComputeBounds();
       grid->GetBounds( bounds );
     }
-    mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( i );
+    mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometryForTimeStep( i );
     assert( g3d.IsNotNull() );
     g3d->SetFloatBounds( bounds );
   }
-  timeGeometry->UpdateInformation();
+  timeGeometry->Update();
 
-  mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox*>( timeGeometry->GetBoundingBox() );
+  mitk::BoundingBox::Pointer bb = const_cast<mitk::BoundingBox*>( timeGeometry->GetBoundingBoxInWorld() );
   itkDebugMacro( << "boundingbox min: "<< bb->GetMinimum());
   itkDebugMacro( << "boundingbox max: "<< bb->GetMaximum());
   m_CalculateBoundingBox = false;

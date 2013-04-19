@@ -93,7 +93,7 @@ void mitk::BaseData::UpdateOutputInformation()
   }
 }
 
-const mitk::TimeSlicedGeometry* mitk::BaseData::GetUpdatedTimeSlicedGeometry()
+const mitk::TimeSlicedGeometry* mitk::BaseData::OldGetUpdatedTimeSlicedGeometry()
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -187,10 +187,10 @@ bool mitk::BaseData::IsEmpty() const
 {
   if(IsInitialized() == false)
     return true;
-  const TimeSlicedGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeSlicedGeometry();
+  const TimeGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeGeometry();
   if(timeGeometry == NULL)
     return true;
-  unsigned int timeSteps = timeGeometry->GetTimeSteps();
+  unsigned int timeSteps = timeGeometry->GetNumberOfTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
   {
     if(IsEmptyTimeStep(t) == false)

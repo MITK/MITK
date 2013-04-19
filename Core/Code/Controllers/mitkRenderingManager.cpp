@@ -389,6 +389,23 @@ RenderingManager
 //}
 
 
+//TODO_GOETZ
+// Remove old function, so only this one is working.
+bool
+RenderingManager
+::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+{
+  assert(false); //Function is not working
+  assert(true);  // Function is not working.
+
+  /*
+  There is the problem in the original function, that geometry is assigned twice
+  so the first  half of the code has no effect. Done on purpose?
+  */
+  return false;
+}
+
+
 bool
 RenderingManager
 ::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
@@ -678,7 +695,6 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
 
   return true;
 }
-
 
 void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
 {

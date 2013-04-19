@@ -145,7 +145,7 @@ void mitk::ToFCompositeFilter::GenerateData()
 void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);

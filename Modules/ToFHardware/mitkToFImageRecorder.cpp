@@ -135,7 +135,7 @@ namespace mitk
     this->m_ToFImageWriter->SetRGBImageFileName(this->m_RGBImageFileName);
     this->m_ToFImageWriter->SetRGBCaptureWidth(this->m_RGBCaptureWidth);
     this->m_ToFImageWriter->SetRGBCaptureHeight(this->m_RGBCaptureHeight);
-    this->m_ToFImageWriter->SetToFCaptureHeight(this->m_ToFCaptureHeight);
+    //this->m_ToFImageWriter->SetToFCaptureHeight(this->m_ToFCaptureHeight);
     this->m_ToFImageWriter->SetToFCaptureWidth(this->m_ToFCaptureWidth);
     this->m_ToFImageWriter->SetToFCaptureHeight(this->m_ToFCaptureHeight);
     this->m_ToFImageWriter->SetToFImageType(this->m_ToFImageType);

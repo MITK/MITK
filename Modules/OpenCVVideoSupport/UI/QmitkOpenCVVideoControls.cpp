@@ -126,7 +126,7 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
       else
       {
         int hertz = m_Controls->UpdateRate->text().toInt();
-        int updateTime = itk::Math::Round<int,float>( 1000.0/hertz );
+        int updateTime = itk::Math::Round<int, double>( 1000.0/hertz );
 
         // resets the whole background
         m_VideoBackground->SetTimerDelay( updateTime );

@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageFileWriter.h"
 #include "itkWarpImageFilter.h"
+
 #include "itkInverseDisplacementFieldImageFilter.h"
+
 
 #include "mitkSymmetricForcesDemonsRegistration.h"
 
@@ -108,7 +110,6 @@ namespace mitk {
                           OutputImageType > CastFilterType;
     typedef typename itk::ImageFileWriter< OutputImageType >  WriterType;
     typedef typename itk::ImageFileWriter< DeformationFieldType >  FieldWriterType;
-
 
     typename FixedImageType::Pointer fixedImage = FixedImageType::New();
     mitk::CastToItkImage(m_ReferenceImage, fixedImage);

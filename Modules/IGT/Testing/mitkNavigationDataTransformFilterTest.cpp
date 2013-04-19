@@ -27,9 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**Documentation
 *  test for the class "NavigationDataTransformFilter".
 */
-typedef itk::Rigid3DTransform<mitk::ScalarType > TransformType;
+typedef itk::VersorRigid3DTransform<mitk::ScalarType > TransformType;
 
-typedef itk::Vector<mitk::ScalarType,3> VectorType;
+typedef itk::Vector<double,3> VectorType;
 
 int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 {
@@ -75,7 +75,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
 
   /* test translation */
-  transform->Translate(translationVector);
+  transform->TransformVector(translationVector);
 
   myFilter->SetRigid3DTransform(transform);
 

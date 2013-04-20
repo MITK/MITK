@@ -440,13 +440,18 @@ if(NOT MSVC_VERSION)
     -Wcast-align
     -Wwrite-strings
     -Wno-error=gnu
-    -Woverloaded-virtual
-    -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCompilerFlags2(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
+  endforeach()
+  # C++ only flags
+  foreach(_flag
+    -Woverloaded-virtual
+    -Wstrict-null-sentinel
+    )
+    mitkFunctionCheckCompilerFlags(${_flag} MITK_CXX_FLAGS)
   endforeach()
 endif()
 

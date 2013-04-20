@@ -196,7 +196,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
 
         if(use_visibility_flags)
           mitkFunctionCheckCompilerFlags2("-fvisibility=hidden" module_c_flags module_cxx_flags)
-          mitkFunctionCheckCompilerFlags2("-fvisibility-inlines-hidden" module_c_flags module_cxx_flags)
+          mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_cxx_flags)
         endif()
 
         configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)

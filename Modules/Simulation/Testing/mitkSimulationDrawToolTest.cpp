@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 
-using namespace mitk;
-
 int mitkSimulationDrawToolTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkSimulationDrawToolTest")
@@ -30,17 +28,17 @@ int mitkSimulationDrawToolTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(argc == 4, "Check if command line has correct number of arguments.")
 
   MITK_TEST_OUTPUT(<< "Register SimulationObjectFactory.")
-  RegisterSimulationObjectFactory();
+  mitk::RegisterSimulationObjectFactory();
 
   MITK_TEST_OUTPUT(<< "Create RenderingTestHelper.")
   mitkRenderingTestHelper renderingTestHelper(1024, 768, argc, argv);
   renderingTestHelper.SetMapperIDToRender3D();
 
-  DataNode* simulationNode = renderingTestHelper.GetDataStorage()->GetNode(NodePredicateDataType::New("Simulation"));
+  mitk::DataNode* simulationNode = renderingTestHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Simulation"));
   MITK_TEST_CONDITION_REQUIRED(simulationNode != NULL, "Check if simulation scene was loaded correctly.");
 
   MITK_TEST_OUTPUT(<< "Initialize simulation.")
-  Simulation::Pointer simulation = dynamic_cast<Simulation*>(simulationNode->GetData());
+  mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(simulationNode->GetData());
   simulation->SetAsActiveSimulation();
   simulation->GetRootNode()->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
 

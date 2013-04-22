@@ -72,11 +72,11 @@ void QmitkCreateSimulationAction::Run(const QList<mitk::DataNode::Pointer>& sele
     if (dynamic_cast<mitk::SimulationTemplate*>(dataNode->GetData()) != NULL)
     {
       mitk::SimulationTemplate* simulationTemplate = static_cast<mitk::SimulationTemplate*>(dataNode->GetData());
-      std::string contents = simulationTemplate->Bake();
+      std::string contents = simulationTemplate->CreateSimulation();
 
       if (contents.empty())
       {
-        MITK_ERROR << "Could not bake simulation template '" << dataNode->GetName() << "'!";
+        MITK_ERROR << "Could not create simulation from template '" << dataNode->GetName() << "'!";
         continue;
       }
 

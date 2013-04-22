@@ -14,15 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <mitkIOUtil.h>
 #include <mitkSimulation.h>
+#include <mitkSimulationObjectFactory.h>
 #include <mitkSimulationModel.h>
 #include <mitkTestingMacros.h>
-#include <sofa/component/init.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/core/ObjectFactory.h>
-#include <sofa/helper/system/SetDirectory.h>
 #include <sofa/simulation/common/UpdateContextVisitor.h>
-#include <sofa/simulation/common/xml/initXml.h>
 
 using namespace mitk;
 using namespace std;
@@ -33,13 +31,8 @@ int mitkSimulationTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(argc == 2, "Test if command line has argument.")
 
-  MITK_TEST_OUTPUT(<< "Initialize SOFA.")
-  sofa::component::init();
-  sofa::simulation::xml::initXml();
-
-  MITK_TEST_OUTPUT(<< "Register SimulationModel and add alias for VisualModel.")
-  int SimulationModelClass = sofa::core::RegisterObject("").add<mitk::SimulationModel>();
-  sofa::core::ObjectFactory::AddAlias("VisualModel", "SimulationModel", true);
+  MITK_TEST_OUTPUT(<< "Register SimulationObjectFactory.")
+  RegisterSimulationObjectFactory();
 
   MITK_TEST_CONDITION(Simulation::ScaleFactor > 0.0f, "Check if simulation scale factor is greater than zero.")
 
@@ -86,34 +79,25 @@ int mitkSimulationTest(int argc, char* argv[])
   boolResult = simulation->AppendSnapshot(record);
   MITK_TEST_CONDITION(boolResult == false && record->GetSizeOfPolyDataSeries() == 1 && record->IsEmptyTimeStep(0), "Try to append snapshot to empty surface.")
 
-  string path = sofa::helper::system::SetDirectory::GetParentDir(argv[1]);
-  sofa::helper::system::DataRepository.addFirstPath(path);
-  rootNode = sofa::core::objectmodel::SPtr_dynamic_cast<sofa::simulation::Node>(sofaSimulation->load(argv[1]));
-  MITK_TEST_CONDITION_REQUIRED(rootNode.get() != NULL, "Load simulation scene.");
+  DataNode::Pointer dataNode = IOUtil::LoadDataNode(argv[1]);
+  Simulation* simulation2 = dynamic_cast<Simulation*>(dataNode->GetData());
+  sofa::simulation::Simulation::SPtr sofaSimulation2 = simulation2->GetSimulation();
+  sofa::simulation::Node::SPtr rootNode2 = simulation2->GetRootNode();
+  MITK_TEST_CONDITION_REQUIRED(rootNode2.get() != NULL, "Load simulation scene.");
 
-  simulation->SetRootNode(rootNode.get());
-  sofa::simulation::Node::SPtr rootNode2 = simulation->GetRootNode();
-  MITK_TEST_CONDITION_REQUIRED(rootNode.get() == rootNode2.get(), "Set root node.")
-
-  defaultDT = rootNode->getDt();
-  simulation->SetDefaultDT(defaultDT);
-  MITK_TEST_CONDITION(defaultDT == simulation->GetDefaultDT(), "Set default time step.")
-
-  sofaSimulation->init(rootNode.get());
-  sofa::helper::system::DataRepository.removePath(path);
-
-  simulation->SetAsActiveSimulation();
+  simulation2->SetAsActiveSimulation();
   activeSimulation = sofa::simulation::getSimulation();
-  MITK_TEST_CONDITION_REQUIRED(sofaSimulation.get() == activeSimulation, "Set simulation as active simulation.")
+  MITK_TEST_CONDITION_REQUIRED(sofaSimulation2.get() == activeSimulation, "Set simulation as active simulation.")
 
-  rootNode->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
-  sofaSimulation->updateVisual(rootNode.get());
-  sofaSimulation->draw(sofa::core::visual::VisualParams::defaultInstance(), rootNode.get());
+  MITK_TEST_OUTPUT(<< "Draw simulation scene.")
+  rootNode2->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
+  sofaSimulation2->updateVisual(rootNode2.get());
+  sofaSimulation2->draw(sofa::core::visual::VisualParams::defaultInstance(), rootNode2.get());
 
-  record = simulation->TakeSnapshot();
+  record = simulation2->TakeSnapshot();
   MITK_TEST_CONDITION(record.IsNotNull() && record->GetSizeOfPolyDataSeries() == 1 && record->IsEmptyTimeStep(0) == false, "Take snapshot.")
 
-  boolResult = simulation->AppendSnapshot(record);
+  boolResult = simulation2->AppendSnapshot(record);
   MITK_TEST_CONDITION(boolResult == true && record->GetSizeOfPolyDataSeries() == 2 && record->IsEmptyTimeStep(1) == false, "Append snapshot.")
 
   MITK_TEST_END()

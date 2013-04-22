@@ -49,7 +49,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   m_WorkingImage->Initialize( inputImage );
   m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
 
-  TimeSlicedGeometry::Pointer originalGeometry;
+  TimeGeometry::Pointer originalGeometry = NULL;
 
   if (inputImage->GetTimeGeometry() )
   {
@@ -86,14 +86,14 @@ void mitk::CorrectorAlgorithm::GenerateData()
   CastToIpPicDescriptor( temporarySlice, temporarySlicePic );
   TobiasHeimannCorrectionAlgorithm( temporarySlicePic );
 
-  temporarySlice->SetGeometry(originalGeometry);
+  temporarySlice->SetTimeGeometry(originalGeometry);
 
   // temporarySlice is our return value (user  can get it by calling GetOutput() )
 
 //  CalculateDifferenceImage( temporarySlice, inputImage );
-//  if ( m_DifferenceImage.IsNotNull() && inputImage->GetTimeSlicedGeometry() )
+//  if ( m_DifferenceImage.IsNotNull() && inputImage->GetTimeGeometry() )
 //  {
-//    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeSlicedGeometry()->Clone();
+//    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeGeometry()->Clone();
 //    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
 //    m_DifferenceImage->SetGeometry( originalGeometry );
 //  }

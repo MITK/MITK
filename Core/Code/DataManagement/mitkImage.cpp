@@ -795,6 +795,12 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   m_Initialized = true;
 }
 
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
+{
+  mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(dynamic_cast<Geometry3D*>(geometry.Clone().GetPointer()), tDim);
+  this->Initialize(type, *timeGeometry, channels, tDim);
+}
 
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels, int tDim )
 {
@@ -812,68 +818,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
     dimension = 4;
 
   Initialize( type, dimension, dimensions, channels );
+
   SetTimeGeometry(geometry.Clone().GetPointer());
-
-  //Old
-  // Checks if the bounding box is inverted. Makes no sense for
-  // a TimeGeometry, since bounding box is always in World Coordinate
-  // and they are calculated from the Geometrie3D Points.
-  // Check
-  /*
-  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBox()->GetBounds();
-  if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )
-  {
-    SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
-
-    mitk::Point3D origin; origin.Fill(0.0);
-    slicedGeometry->IndexToWorld(origin, origin);
-
-    bounds[1]-=bounds[0]; bounds[3]-=bounds[2]; bounds[5]-=bounds[4];
-    bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;
-this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
-    slicedGeometry->SetBounds(bounds);
-    slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.Get_vnl_vector().data_block());
-
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
-  }
-  */
-}
-
-
-void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
-{
-  unsigned int dimensions[5];
-  dimensions[0] = (unsigned int)(geometry.GetExtent(0)+0.5);
-  dimensions[1] = (unsigned int)(geometry.GetExtent(1)+0.5);
-  dimensions[2] = (unsigned int)(geometry.GetExtent(2)+0.5);
-  dimensions[3] = 0;
-  dimensions[4] = 0;
-
-  unsigned int dimension = 2;
-  if ( dimensions[2] > 1 )
-    dimension = 3;
-
-  if ( tDim > 0)
-  {
-    dimensions[3] = tDim;
-  }
-  else
-  {
-    const mitk::TimeSlicedGeometry* timeGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>(&geometry);
-    if ( timeGeometry != NULL )
-    {
-      dimensions[3] = timeGeometry->GetTimeSteps();
-    }
-  }
-
-  if ( dimensions[3] > 1 )
-    dimension = 4;
-
-  Initialize( type, dimension, dimensions, channels );
-
-  SetGeometry(static_cast<Geometry3D*>(geometry.Clone().GetPointer()));
-
-  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBox()->GetBounds();
+/* //Old //TODO_GOETZ Really necessary?
+  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBoxInWorld()->GetBounds();
   if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )
   {
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
@@ -890,7 +838,7 @@ this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
     ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
     timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
     SetTimeGeometry(timeGeometry);
-  }
+  }*/
 }
 
 void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )

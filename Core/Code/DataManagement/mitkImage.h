@@ -235,8 +235,8 @@ public:
   //##Documentation
   //## initialize new (or re-initialize) image information by a Geometry3D
   //##
-  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
-  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=-1);
+  //## @param tDim defines the number of time steps for which the Image should be initialized
+  virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
 
   /**
   * \brief Initialize new (or re-initialize) image information by a TimeGeometry
@@ -251,9 +251,8 @@ public:
   //## Initializes the bounding box according to the width/height of the
   //## Geometry2D and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
   //## The spacing is calculated from the Geometry2D.
-  //## @param tDim override time dimension (@a n[3]) if @a geometry is a TimeSlicedGeometry (if >0)
   //## \sa SlicedGeometry3D::InitializeEvenlySpaced
-  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=-1);
+  virtual void Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped = false, unsigned int channels = 1, int tDim=1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by another

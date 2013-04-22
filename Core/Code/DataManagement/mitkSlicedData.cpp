@@ -252,34 +252,30 @@ void mitk::SlicedData::SetGeometry(Geometry3D* aGeometry3D)
 {
   if(aGeometry3D!=NULL)
   {
-    TimeSlicedGeometry::Pointer timeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(aGeometry3D);
-    if(timeSlicedGeometry.IsNull())
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
+    if(slicedGeometry.IsNull())
     {
-      SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
-      if(slicedGeometry.IsNull())
+      Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
+      if(geometry2d!=NULL)
       {
-        Geometry2D* geometry2d = dynamic_cast<Geometry2D*>(aGeometry3D);
-        if(geometry2d!=NULL)
-        {
-          if((GetSlicedGeometry()->GetGeometry2D(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
-            return;
-          slicedGeometry = SlicedGeometry3D::New();
-          slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
-        }
-        else
-        {
-          slicedGeometry = SlicedGeometry3D::New();
-          PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
-          planeGeometry->InitializeStandardPlane(aGeometry3D);
-          slicedGeometry->InitializeEvenlySpaced(planeGeometry, (unsigned int)(aGeometry3D->GetExtent(2)));
-        }
+        if((GetSlicedGeometry()->GetGeometry2D(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
+          return;
+        slicedGeometry = SlicedGeometry3D::New();
+        slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
       }
-      assert(slicedGeometry.IsNotNull());
-
-      timeSlicedGeometry = TimeSlicedGeometry::New();
-      timeSlicedGeometry->InitializeEvenlyTimed(slicedGeometry, 1);
+      else
+      {
+        slicedGeometry = SlicedGeometry3D::New();
+        PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
+        planeGeometry->InitializeStandardPlane(aGeometry3D);
+        slicedGeometry->InitializeEvenlySpaced(planeGeometry, (unsigned int)(aGeometry3D->GetExtent(2)));
+      }
     }
-    Superclass::SetGeometry(timeSlicedGeometry);
+    assert(slicedGeometry.IsNotNull());
+
+    timeGeometry->Initialize(slicedGeometry, 1);
+    Superclass::SetTimeGeometry(timeGeometry);
   }
   else
   {
@@ -296,13 +292,13 @@ void mitk::SlicedData::SetSpacing(const float aSpacing[3])
 
 void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 {
-  TimeGeometry* timeSlicedGeometry = GetTimeGeometry();
+  TimeGeometry* timeGeometry = GetTimeGeometry();
 
-  assert(timeSlicedGeometry!=NULL);
+  assert(timeGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeSlicedGeometry->GetNumberOfTimeSteps();
+  unsigned int steps = timeGeometry->GetNumberOfTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
@@ -328,13 +324,13 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 
 void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 {
-  TimeGeometry* timeSlicedGeometry = GetTimeGeometry();
+  TimeGeometry* timeGeometry = GetTimeGeometry();
 
-  assert(timeSlicedGeometry!=NULL);
+  assert(timeGeometry!=NULL);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
-  unsigned int steps = timeSlicedGeometry->GetNumberOfTimeSteps();
+  unsigned int steps = timeGeometry->GetNumberOfTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {

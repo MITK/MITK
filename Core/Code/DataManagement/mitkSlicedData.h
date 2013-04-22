@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include "mitkBaseData.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include "itkIndex.h"
 #include "itkOffset.h"

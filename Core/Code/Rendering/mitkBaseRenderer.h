@@ -181,7 +181,8 @@ namespace mitk
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
 
 
-    itkGetConstObjectMacro(WorldGeometry, Geometry3D)
+    itkGetConstObjectMacro(WorldGeometry, Geometry3D);
+    itkGetConstObjectMacro(TimeWorldGeometry, TimeGeometry);
 
     //##Documentation
     //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering

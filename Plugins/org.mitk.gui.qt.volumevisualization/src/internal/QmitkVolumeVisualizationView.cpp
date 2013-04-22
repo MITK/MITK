@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkVolumeRenderingProperty.h"
 
+#include <mitkIRenderingManager.h>
+
 #include <QToolTip>
 #include <qxtspanslider.h>
 
@@ -55,7 +57,7 @@ enum RenderMode
 };
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
-: QmitkFunctionality(),
+: QmitkAbstractView(),
   m_Controls(NULL)
 {
 }
@@ -126,24 +128,20 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset( int mode )
     // -- Creat new TransferFunction
     mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(transferFuncProp->GetValue());
     tfInit->SetTransferFunctionMode(mode);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
     m_Controls->m_TransferFunctionWidget->OnUpdateCanvas();
   }
 }
 
 
-void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
 
   mitk::DataNode::Pointer node;
 
-  for (std::vector<mitk::DataNode*>::iterator iter = nodes.begin();
-       iter != nodes.end();
-       ++iter)
+  foreach (mitk::DataNode::Pointer currentNode, nodes)
   {
-    mitk::DataNode::Pointer currentNode = *iter;
-
     if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {
       if( dynamic_cast<mitk::Image*>(currentNode->GetData())->GetDimension()>=3 )
@@ -302,7 +300,7 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
 
   m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
   UpdateInterface();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
 }
 
 void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
@@ -311,7 +309,7 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
     return;
 
   m_SelectedNode->SetProperty("volumerendering.uselod",mitk::BoolProperty::New(state));
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
 }
 
 void QmitkVolumeVisualizationView::OnRenderMode(int mode)
@@ -333,7 +331,7 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
 #endif
   m_SelectedNode->SetProperty("volumerendering.usemip",mitk::BoolProperty::New(usemip));
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

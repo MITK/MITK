@@ -332,61 +332,11 @@ RenderingManager
       // Immediately repaint this window (implementation platform specific)
       // If the size is 0, it crashes
       this->ForceImmediateUpdate(it->first);
-
-  //    int *size = it->first->GetSize();
-  //    if ( 0 != size[0] && 0 != size[1] )
-  //    {
-  //      //prepare the camera before rendering
-  //      //Note: this is a very important step which should be called before the VTK render!
-  //      //If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-  //      mitk::VtkPropRenderer *vPR =
-  //          dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance( it->first ));
-      //      if(vPR)
-      //         vPR->PrepareRender();
-      //      // Execute rendering
-      //      it->first->Render();
-      //    }
-
-      //    it->second = RENDERING_INACTIVE;
     }
   }
 
-  //m_UpdatePending = false;
 }
 
-
-//bool RenderingManager::InitializeViews( const mitk::DataStorage * storage, const DataNode* node = NULL, RequestType type, bool preserveRoughOrientationInWorldSpace )
-//{
-//  mitk::Geometry3D::Pointer geometry;
-//  if ( storage != NULL )
-//  {
-//    geometry = storage->ComputeVisibleBoundingGeometry3D(node, "visible", NULL, "includeInBoundingBox" );
-//
-//    if ( geometry.IsNotNull() )
-//    {
-//      // let's see if we have data with a limited live-span ...
-//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-//      {
-//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-//
-//        mitk::TimeSlicedGeometry::Pointer timegeometry =
-//          mitk::TimeSlicedGeometry::New();
-//        timegeometry->InitializeEvenlyTimed(
-//          geometry, (unsigned int) duration );
-//        timegeometry->SetTimeBounds( timebounds );
-//
-//        timebounds[1] = timebounds[0] + 1.0;
-//        geometry->SetTimeBounds( timebounds );
-//
-//        geometry = timegeometry;
-//      }
-//    }
-//  }
-//
-//  // Use geometry for initialization
-//  return this->InitializeViews( geometry.GetPointer(), type );
-//}
 
 
 //TODO_GOETZ
@@ -607,41 +557,6 @@ RenderingManager
 
   return true;
 }
-
-//bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const DataStorage* ds, const DataNode node = NULL,  bool initializeGlobalTimeSNC )
-//{
-//  mitk::Geometry3D::Pointer geometry;
-//  if ( ds != NULL )
-//  {
-//    geometry = ds->ComputeVisibleBoundingGeometry3D(node, NULL, "includeInBoundingBox" );
-//
-//    if ( geometry.IsNotNull() )
-//    {
-//      // let's see if we have data with a limited live-span ...
-//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-//      {
-//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-//
-//        mitk::TimeSlicedGeometry::Pointer timegeometry =
-//          mitk::TimeSlicedGeometry::New();
-//        timegeometry->InitializeEvenlyTimed(
-//          geometry, (unsigned int) duration );
-//        timegeometry->SetTimeBounds( timebounds );
-//
-//        timebounds[1] = timebounds[0] + 1.0;
-//        geometry->SetTimeBounds( timebounds );
-//
-//        geometry = timegeometry;
-//      }
-//    }
-//  }
-//
-//  // Use geometry for initialization
-//  return this->InitializeView( renderWindow,
-//    geometry.GetPointer(), initializeGlobalTimeSNC );
-//}
-
 
 bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geometry3D * geometry, bool initializeGlobalTimeSNC )
 {

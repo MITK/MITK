@@ -63,7 +63,7 @@ int compareGeometry(const mitk::TimeGeometry & geometry,
                  const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM,
                  const mitk::Point3D& cornerpoint0, const mitk::Vector3D& right, const mitk::Vector3D& bottom, const mitk::Vector3D& normal)
 {
-  //Probleme durch umstellung von TimeSlicedGeometry auf  TimeGeometry?
+  //Probleme durch umstellung von Time-SlicedGeometry auf  TimeGeometry?
   //Eventuell gibt es keine Entsprechung mehr.
   std::cout << "Testing width, height and thickness (in units): ";
   if((mitk::Equal(geometry.GetExtendInWorld(0),width)==false) ||

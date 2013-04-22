@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkVector.h"
 #include "mitkTestingMacros.h"
-#include "mitkTimeSlicedGeometry.h"
 
 #include "vtkPolyData.h"
 #include "vtkSphereSource.h"
@@ -120,7 +119,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   int time = 3;
   int timestep=0;
   timestep = inputTimeGeometry->TimePointToTimeStep( time );
-  MITK_TEST_CONDITION_REQUIRED(time == timestep, "Testing correctness of geometry for surface->GetUpdatedTimeSlicedGeometry()!");
+  MITK_TEST_CONDITION_REQUIRED(time == timestep, "Testing correctness of geometry for surface->GetUpdatedTimeGeometry()!");
 
   sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);

@@ -48,7 +48,7 @@ namespace mitk
   - interpolation mode either Nearestneighbor, Linear or Cubic.
   - a transform this is a convinient way to adapt the reslice axis for the case
   that the image is transformed e.g. rotated.
-  - time step the time step in a timesliced volume.
+  - time step the time step in a times volume.
   - resample by geometry wether the resampling grid corresponds to the specs of the
   worldgeometry or is directly derived from the input image
 

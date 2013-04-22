@@ -70,7 +70,7 @@ void mitk::UnstructuredGrid::InitializeEmpty()
 {
   vtkUnstructuredGrid* pdnull = 0;
   m_GridSeries.resize( 1, pdnull );
-  Superclass::InitializeTimeSlicedGeometry(1);
+  Superclass::InitializeTimeGeometry(1);
 
   m_Initialized = true;
 }

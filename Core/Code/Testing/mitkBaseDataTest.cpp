@@ -46,8 +46,8 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   //test method GetTimeSlicedGeometry()
   MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry(), "Testing creation of TimeSlicedGeometry");
 
-  mitk::TimeSlicedGeometry* geo = NULL;
-  baseDataImpl->SetGeometry(geo);
+  mitk::TimeGeometry* geo = NULL;
+  baseDataImpl->SetTimeGeometry(geo);
 
   MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == NULL, "Reset Geometry");
 

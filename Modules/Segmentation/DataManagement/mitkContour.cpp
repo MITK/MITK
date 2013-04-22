@@ -27,7 +27,7 @@ m_Closed ( true ),
 m_Selected ( false ),
 m_Width (3.0)
 {
-  Superclass::InitializeTimeSlicedGeometry();
+  Superclass::InitializeTimeGeometry();
 }
 
 mitk::Contour::Contour( const Contour & other ): BaseData(other),

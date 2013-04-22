@@ -69,7 +69,7 @@ void mitk::PointSet::InitializeEmpty()
   m_PointSetSeries[0]->SetPointData( pointData );
   m_CalculateBoundingBox = false;
 
-  Superclass::InitializeTimeSlicedGeometry(1);
+  Superclass::InitializeTimeGeometry(1);
   m_Initialized = true;
 }
 

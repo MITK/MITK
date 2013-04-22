@@ -114,7 +114,7 @@ void mitk::Surface::InitializeEmpty()
   if (!m_PolyDatas.empty())
     this->ClearData();
 
-  Superclass::InitializeTimeSlicedGeometry();
+  Superclass::InitializeTimeGeometry();
 
   m_PolyDatas.push_back(NULL);
   m_Initialized = true;

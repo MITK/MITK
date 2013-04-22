@@ -123,7 +123,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
     || ( dataTimeGeometry->GetNumberOfTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTimeStep( m_TimeStep ) ) )
   {
-    // TimeSlicedGeometry or time step is not valid for this data:
+    // TimeGeometry or time step is not valid for this data:
     // reset mapper so that nothing is displayed
     this->ResetMapper( renderer );
     return;

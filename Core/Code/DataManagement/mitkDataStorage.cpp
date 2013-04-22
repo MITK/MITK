@@ -250,7 +250,7 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
   }
 }
 
-mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   if (input == NULL)
     throw std::invalid_argument("DataStorage: input is invalid");
@@ -362,7 +362,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
     numberOfTimeSteps = static_cast<unsigned int>((maximalTime-minimalTime)/minimalIntervallSize);
   }
 
-  TimeSlicedGeometry::Pointer timeSlicedGeometry = NULL;
+  TimeGeometry::Pointer timeGeometry = NULL;
   if ( result->GetPoints()->Size()>0 )
   {
     // Initialize a geometry of a single time step
@@ -380,18 +380,18 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
     geometry->SetSpacing(minSpacing);
     geometry->SetTimeBounds(minTimeBounds);
     // Initialize the time sliced geometry
-    timeSlicedGeometry = TimeSlicedGeometry::New();
-    timeSlicedGeometry->InitializeEvenlyTimed(geometry,numberOfTimeSteps);
+    timeGeometry = ProportionalTimeGeometry::New();
+    dynamic_cast<ProportionalTimeGeometry*>(timeGeometry.GetPointer())->Initialize(geometry,numberOfTimeSteps);
   }
-  return timeSlicedGeometry;
+  return timeGeometry;
 }
 
-mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   return this->ComputeBoundingGeometry3D(this->GetAll(), boolPropertyKey, renderer, boolPropertyKey2);
 }
 
-mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
+mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
 {
   return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
 }

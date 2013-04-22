@@ -772,11 +772,13 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     slicedGeometry->SetTimeBounds(timebounds);
   }
 
-  TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-  timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
-  timeSliceGeometry->ImageGeometryOn();
-
-  SetGeometry(timeSliceGeometry);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  for (TimeStepType step = 0; step < timeGeometry->GetNumberOfTimeSteps(); ++step)
+  {
+    timeGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
+  }
+  SetTimeGeometry(timeGeometry);
 
   ImageDataItemPointer dnull=NULL;
 

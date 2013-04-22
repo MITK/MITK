@@ -167,13 +167,14 @@ public:
 
   /** Initializes the specified window to the geometry of the given
    * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
-   * geometry as global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+   * geometry as global TimeGeometry. PLATFORM SPECIFIC. */
   //virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = NULL, bool initializeGlobalTimeSNC = false );
 
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
-   * global TimeSlicedGeometry. PLATFORM SPECIFIC. */
+   * global TimeGeometry. PLATFORM SPECIFIC. */
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const TimeGeometry *geometry, bool initializeGlobalTimeSNC = false);
 
   /** Initializes the specified window to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
@@ -378,7 +379,7 @@ protected:
 private:
 
   void InternalViewInitialization(
-      mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
+      mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry,
       bool boundingBoxInitialized, int mapperID );
 
 };

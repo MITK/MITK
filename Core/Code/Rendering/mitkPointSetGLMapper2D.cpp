@@ -116,7 +116,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     // ok, das ist aus GenerateData kopiert
     mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
-    // Get the TimeSlicedGeometry of the input object
+    // Get the TimeGeometry of the input object
     const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
     if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
     {

@@ -102,7 +102,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   if ( ( inputTimeGeometry == NULL )
     || ( inputTimeGeometry->GetNumberOfTimeSteps() <= 0 ) )
   {
-    itkWarningMacro(<<"Error reading input image TimeSlicedGeometry.");
+    itkWarningMacro(<<"Error reading input image TimeGeometry.");
     return;
   }
 

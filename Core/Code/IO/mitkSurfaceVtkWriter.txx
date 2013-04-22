@@ -94,7 +94,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
       }
       else
       {
-        itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of surface " << filename << ".");
+        itkWarningMacro(<<"Error on write: TimeGeometry invalid of surface " << filename << ".");
         filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
       }
       m_VtkWriter->SetFileName(filename.str().c_str());

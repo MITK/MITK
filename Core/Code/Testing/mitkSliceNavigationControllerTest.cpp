@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkRotationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkPlanePositionManager.h"
@@ -59,15 +58,17 @@ bool operator==(const mitk::Geometry3D & left, const mitk::Geometry3D & right)
   return true;
 }
 
-int compareGeometry(const mitk::Geometry3D & geometry,
+int compareGeometry(const mitk::TimeGeometry & geometry,
                  const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& numSlices,
                  const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::ScalarType& thicknessInMM,
                  const mitk::Point3D& cornerpoint0, const mitk::Vector3D& right, const mitk::Vector3D& bottom, const mitk::Vector3D& normal)
 {
+  //Probleme durch umstellung von TimeSlicedGeometry auf  TimeGeometry?
+  //Eventuell gibt es keine Entsprechung mehr.
   std::cout << "Testing width, height and thickness (in units): ";
-  if((mitk::Equal(geometry.GetExtent(0),width)==false) ||
-     (mitk::Equal(geometry.GetExtent(1),height)==false) ||
-     (mitk::Equal(geometry.GetExtent(2),numSlices)==false)
+  if((mitk::Equal(geometry.GetExtendInWorld(0),width)==false) ||
+     (mitk::Equal(geometry.GetExtendInWorld(1),height)==false) ||
+     (mitk::Equal(geometry.GetExtendInWorld(2),numSlices)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -76,9 +77,9 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm): ";
-  if((mitk::Equal(geometry.GetExtentInMM(0),widthInMM)==false) ||
-     (mitk::Equal(geometry.GetExtentInMM(1),heightInMM)==false) ||
-     (mitk::Equal(geometry.GetExtentInMM(2),thicknessInMM)==false)
+  if((mitk::Equal(geometry.GetExtendInWorld(0),widthInMM)==false) ||
+     (mitk::Equal(geometry.GetExtendInWorld(1),heightInMM)==false) ||
+     (mitk::Equal(geometry.GetExtendInWorld(2),thicknessInMM)==false)
     )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -90,7 +91,7 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout << "dir=0 ";
   mitk::Vector3D dv;
   dv=right; dv.Normalize(); dv*=widthInMM;
-  if((mitk::Equal(geometry.GetAxisVector(0), dv)==false))
+  if((mitk::Equal(geometry.GetGeometryForTimeStep(0)->GetAxisVector(0), dv)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -98,7 +99,7 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]";
   std::cout << ", dir=1 ";
   dv=bottom; dv.Normalize(); dv*=heightInMM;
-  if((mitk::Equal(geometry.GetAxisVector(1), dv)==false))
+  if((mitk::Equal(geometry.GetGeometryForTimeStep(0)->GetAxisVector(1), dv)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -106,7 +107,7 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]";
   std::cout << ", dir=2 ";
   dv=normal; dv.Normalize(); dv*=thicknessInMM;
-  if((mitk::Equal(geometry.GetAxisVector(2), dv)==false))
+  if((mitk::Equal(geometry.GetGeometryForTimeStep(0)->GetAxisVector(2), dv)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -114,7 +115,7 @@ int compareGeometry(const mitk::Geometry3D & geometry,
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing offset: ";
-  if((mitk::Equal(geometry.GetCornerPoint(0),cornerpoint0)==false))
+  if((mitk::Equal(geometry.GetGeometryForTimeStep(0)->GetCornerPoint(0),cornerpoint0)==false))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -140,7 +141,7 @@ int testGeometry(const mitk::Geometry3D * geometry,
 
   std::cout << "Creating and initializing a SliceNavigationController with the Geometry3D: ";
   mitk::SliceNavigationController::Pointer sliceCtrl = mitk::SliceNavigationController::New();
-  sliceCtrl->SetInputWorldGeometry(geometry);
+  sliceCtrl->SetInputWorldGeometry3D(geometry);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing SetViewDirection(mitk::SliceNavigationController::Axial): ";
@@ -270,11 +271,11 @@ int testReorientPlanes ()
 
    //Create SNC
    mitk::SliceNavigationController::Pointer sliceCtrl1 = mitk::SliceNavigationController::New();
-   sliceCtrl1->SetInputWorldGeometry(slicedgeometry1);
+   sliceCtrl1->SetInputWorldGeometry3D(slicedgeometry1);
    sliceCtrl1->Update();
 
    mitk::SliceNavigationController::Pointer sliceCtrl2 = mitk::SliceNavigationController::New();
-   sliceCtrl2->SetInputWorldGeometry(slicedgeometry2);
+   sliceCtrl2->SetInputWorldGeometry3D(slicedgeometry2);
    sliceCtrl2->Update();
 
    slicedgeometry1->SetSliceNavigationController(sliceCtrl1);
@@ -432,11 +433,11 @@ int testRestorePlanePostionOperation ()
 
     //Create SNC
     mitk::SliceNavigationController::Pointer sliceCtrl1 = mitk::SliceNavigationController::New();
-    sliceCtrl1->SetInputWorldGeometry(slicedgeometry1);
+    sliceCtrl1->SetInputWorldGeometry3D(slicedgeometry1);
     sliceCtrl1->Update();
 
     mitk::SliceNavigationController::Pointer sliceCtrl2 = mitk::SliceNavigationController::New();
-    sliceCtrl2->SetInputWorldGeometry(slicedgeometry2);
+    sliceCtrl2->SetInputWorldGeometry3D(slicedgeometry2);
     sliceCtrl2->Update();
 
     slicedgeometry1->SetSliceNavigationController(sliceCtrl1);

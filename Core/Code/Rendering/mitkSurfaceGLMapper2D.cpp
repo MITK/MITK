@@ -153,7 +153,7 @@ void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     return;
 
   //
-  // get the TimeSlicedGeometry of the input object
+  // get the TimeGeometry of the input object
   //
   const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )

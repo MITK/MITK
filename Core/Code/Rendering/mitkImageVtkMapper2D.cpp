@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>
-#include <mitkTimeSlicedGeometry.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkPixelType.h>
 //#include <mitkTransferFunction.h>

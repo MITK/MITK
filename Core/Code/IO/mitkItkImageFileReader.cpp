@@ -157,7 +157,7 @@ void mitk::ItkImageFileReader::GenerateData()
   slicedGeometry->InitializeEvenlySpaced(planeGeometry, image->GetDimension(2));
   slicedGeometry->SetSpacing(spacing);
 
-  // re-initialize TimeSlicedGeometry
+  // re-initialize TimeGeometry
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
   image->SetTimeGeometry(timeGeometry);

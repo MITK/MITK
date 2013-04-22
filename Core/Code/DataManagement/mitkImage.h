@@ -417,7 +417,7 @@ public:
     slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
     slicedGeometry->SetSpacing(spacing);
 
-    // re-initialize TimeSlicedGeometry
+    // re-initialize TimeGeometry
     ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
     timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
     SetTimeGeometry(timeGeometry);

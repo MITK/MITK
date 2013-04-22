@@ -393,41 +393,41 @@ RenderingManager
 // Remove old function, so only this one is working.
 bool
 RenderingManager
-::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
-  assert(false); //Function is not working
-  assert(true);  // Function is not working.
-
-  /*
-  There is the problem in the original function, that geometry is assigned twice
-  so the first  half of the code has no effect. Done on purpose?
-  */
-  return false;
+  ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
+  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(dataGeometry->Clone().GetPointer()), 1);
+  return InitializeViews(propTimeGeometry,type, preserveRoughOrientationInWorldSpace);
 }
 
 
 bool
 RenderingManager
-::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
+::InitializeViews( const TimeGeometry * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
   MITK_DEBUG << "initializing views";
 
   bool boundingBoxInitialized = false;
 
-  Geometry3D::ConstPointer geometry = dataGeometry;
+  TimeGeometry::ConstPointer timeGeometry = dataGeometry;
+  TimeGeometry::Pointer modifiedGeometry = dataGeometry->Clone().GetPointer();
 
+
+  // //TODO_GOETZ previously this code section has been disabled by
+  // a later asignment to geometry (e.g. timeGeometry)
+  // This has been fixed during Geometry-1-Plattform Project
+  // Propably this code is not working anymore, test!!
+  /*
   if (dataGeometry && preserveRoughOrientationInWorldSpace)
   {
-
     // clone the input geometry
-    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
     assert(modifiedGeometry.IsNotNull());
 
     // construct an affine transform from it
     AffineGeometryFrame3D::TransformType::Pointer transform = AffineGeometryFrame3D::TransformType::New();
-    assert( modifiedGeometry->GetIndexToWorldTransform() );
-    transform->SetMatrix( modifiedGeometry->GetIndexToWorldTransform()->GetMatrix() );
-    transform->SetOffset( modifiedGeometry->GetIndexToWorldTransform()->GetOffset() );
+    assert( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform() );
+    transform->SetMatrix( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetMatrix() );
+    transform->SetOffset( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetOffset() );
 
     // get transform matrix
     AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
@@ -507,38 +507,38 @@ RenderingManager
     modifiedGeometry->SetIndexToWorldTransform( transform );
     geometry = modifiedGeometry;
 
-  }
+  }*/
 
   int warningLevel = vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
 
-  if ( (geometry.IsNotNull() ) && (const_cast< mitk::BoundingBox * >(
-    geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+  if ( (timeGeometry.IsNotNull() ) && (const_cast< mitk::BoundingBox * >(
+    timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps) )
   {
     boundingBoxInitialized = true;
   }
 
-  if (geometry.IsNotNull() )
+  if (timeGeometry.IsNotNull() )
   {// make sure bounding box has an extent bigger than zero in any direction
     // clone the input geometry
-    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
+    //Old Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
     assert(modifiedGeometry.IsNotNull());
-    Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetBounds();
-    for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
+    for (TimeStepType step = 0; step < modifiedGeometry->GetNumberOfTimeSteps(); ++step)
     {
-      //check for equality but for an epsilon
-      if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
+      Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
+      for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
       {
-        newBounds[ 2 * dimension + 1 ] += 1;
+        //check for equality but for an epsilon
+        if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
+        {
+          newBounds[ 2 * dimension + 1 ] += 1;
+        }
       }
+      modifiedGeometry->GetGeometryForTimeStep(step)->SetBounds(newBounds);
     }
-
-    // set the newly calculated bounds array
-    modifiedGeometry->SetBounds(newBounds);
-
-    geometry = modifiedGeometry;
   }
 
+  timeGeometry = modifiedGeometry;
   RenderWindowList::iterator it;
   for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
   {
@@ -553,14 +553,14 @@ RenderingManager
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
       )
     {
-      this->InternalViewInitialization( baseRenderer, geometry,
+      this->InternalViewInitialization( baseRenderer, timeGeometry,
         boundingBoxInitialized, id );
     }
   }
 
   if ( boundingBoxInitialized )
   {
-    m_TimeNavigationController->SetInputWorldGeometry( geometry );
+    m_TimeNavigationController->SetInputWorldTimeGeometry( timeGeometry );
   }
   m_TimeNavigationController->Update();
 
@@ -642,7 +642,15 @@ RenderingManager
 //    geometry.GetPointer(), initializeGlobalTimeSNC );
 //}
 
+
 bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geometry3D * geometry, bool initializeGlobalTimeSNC )
+{
+  ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
+  propTimeGeometry->Initialize(dynamic_cast<Geometry3D *>(geometry->Clone().GetPointer()), 1);
+  return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC );
+}
+
+bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const TimeGeometry * geometry, bool initializeGlobalTimeSNC )
 {
   bool boundingBoxInitialized = false;
 
@@ -650,7 +658,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geo
   vtkObject::GlobalWarningDisplayOff();
 
   if ( (geometry != NULL ) && (const_cast< mitk::BoundingBox * >(
-   geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
+   geometry->GetBoundingBoxInWorld())->GetDiagonalLength2() > mitk::eps) )
   {
    boundingBoxInitialized = true;
   }
@@ -665,7 +673,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geo
 
   if ( boundingBoxInitialized && initializeGlobalTimeSNC )
   {
-    m_TimeNavigationController->SetInputWorldGeometry( geometry );
+    m_TimeNavigationController->SetInputWorldTimeGeometry( geometry );
   }
   m_TimeNavigationController->Update();
 
@@ -696,7 +704,7 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
   return true;
 }
 
-void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
+void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::TimeGeometry *geometry, bool boundingBoxInitialized, int mapperID )
 {
   mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
@@ -706,7 +714,7 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
   if ( boundingBoxInitialized )
   {
     // Set geometry for NC
-    nc->SetInputWorldGeometry( geometry );
+    nc->SetInputWorldTimeGeometry( geometry );
     nc->Update();
 
     if ( mapperID == 1 )

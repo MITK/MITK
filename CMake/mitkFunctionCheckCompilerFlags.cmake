@@ -28,8 +28,8 @@
 #    3-myflags: -fprofile-arcs -Wall
 
 include(TestCXXAcceptsFlag)
-include(CheckCXXCompilerFlag)
-include(CheckCCompilerFlag)
+include(mitkCheckCXXCompilerFlag)
+include(mitkCheckCCompilerFlag)
 
 function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
 

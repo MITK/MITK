@@ -126,5 +126,5 @@ void mitk::ToFImageDownsamplingFilter::ItkImageResampling( itk::Image<TPixel,VIm
   mitk::Image::Pointer resultImage = ImageToImageFilter::GetOutput();
 
   // Cast itk image to mitk image
-  mitk::CastToMitkImage(resampler->GetOutput(0), resultImage);
+  mitk::CastToMitkImage(resampler->GetOutput(), resultImage);
 }

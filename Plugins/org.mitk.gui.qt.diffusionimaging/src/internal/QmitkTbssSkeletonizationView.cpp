@@ -261,7 +261,7 @@ void QmitkTbssSkeletonizationView::Skeletonize()
     skeletonizer->Update();
 
 
-    FloatImageType::Pointer output = skeletonizer->GetOutput(0);
+    FloatImageType::Pointer output = skeletonizer->GetOutput();
     mitk::Image::Pointer mitkOutput = mitk::Image::New();
     mitk::CastToMitkImage(output, mitkOutput);
     AddToDataStorage(mitkOutput, "all_FA_skeletonised");
@@ -329,7 +329,7 @@ void QmitkTbssSkeletonizationView::Project()
     skeletonizer->Update();
 
 
-    FloatImageType::Pointer output = skeletonizer->GetOutput(0);
+    FloatImageType::Pointer output = skeletonizer->GetOutput();
     mitk::Image::Pointer mitkOutput = mitk::Image::New();
     mitk::CastToMitkImage(output, mitkOutput);
     AddToDataStorage(mitkOutput, "mean_FA_skeletonised");
@@ -345,7 +345,7 @@ void QmitkTbssSkeletonizationView::Project()
     DistanceMapFilterType::Pointer distanceMapFilter = DistanceMapFilterType::New();
     distanceMapFilter->SetInput(output);
     distanceMapFilter->Update();
-    FloatImageType::Pointer distanceMap = distanceMapFilter->GetOutput(0);
+    FloatImageType::Pointer distanceMap = distanceMapFilter->GetOutput();
 
     if(m_Controls->m_OutputDistanceMap->isChecked())
     {
@@ -383,7 +383,7 @@ void QmitkTbssSkeletonizationView::Project()
     thresholder->Update();
 
 
-    CharImageType::Pointer thresholdedImg = thresholder->GetOutput(0);
+    CharImageType::Pointer thresholdedImg = thresholder->GetOutput();
 
 
     if(m_Controls->m_OutputMask->isChecked())
@@ -400,7 +400,7 @@ void QmitkTbssSkeletonizationView::Project()
     CharReaderType::Pointer reader = CharReaderType::New();
     reader->SetFileName("/local/testing/LowerCingulum_1mm.nii.gz");
     reader->Update();
-    CharImageType::Pointer cingulum = reader->GetOutput(0);
+    CharImageType::Pointer cingulum = reader->GetOutput();
 
 
 

@@ -101,7 +101,7 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
   sphereSource->SetPhiResolution(25);
   sphereSource->Update();
 
-  vtkPolyData* sphere = sphereSource->GetOutput(0);
+  vtkPolyData* sphere = sphereSource->GetOutput();
 
   m_Surface = mitk::Surface::New();
   m_Surface->SetVtkPolyData( sphere );

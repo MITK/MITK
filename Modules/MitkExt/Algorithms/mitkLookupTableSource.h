@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTable.h"
 #include "MitkExtExports.h"
 #include "mitkCommon.h"
-#include "mitkBaseProcess.h"
+
+#include "itkProcessObject.h"
 
 namespace mitk
 {
@@ -40,9 +41,8 @@ class MitkExt_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 
-    mitkClassMacro( LookupTableSource, BaseProcess );
-
-    itkNewMacro( Self );
+    mitkClassMacro( LookupTableSource, itk::ProcessObject )
+    itkNewMacro( Self )
 
     typedef mitk::LookupTable OutputType;
 
@@ -80,8 +80,8 @@ public:
      */
     virtual void GraftOutput( OutputType* output );
 
-    virtual OutputType* GetOutput(const DataObjectIdentifierType & key);
-    virtual const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
+    virtual OutputType* GetOutput();
+    virtual const OutputType* GetOutput() const;
     virtual OutputType* GetOutput(DataObjectPointerArraySizeType idx);
     virtual const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 

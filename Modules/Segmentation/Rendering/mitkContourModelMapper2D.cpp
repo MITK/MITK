@@ -178,7 +178,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
       subdivFilter->SetInput(inputContour);
       subdivFilter->Update();
 
-      subdivContour = subdivFilter->GetOutput(0);
+      subdivContour = subdivFilter->GetOutput();
 
       if(subdivContour->GetNumberOfVertices() == 0 )
       {
@@ -225,7 +225,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
             sphere->SetRadius(1.2);
             sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
             sphere->Update();
-            appendPoly->AddInput(sphere->GetOutput(0));
+            appendPoly->AddInput(sphere->GetOutput());
           }
         }
 
@@ -250,7 +250,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
           sphere->SetRadius(1.2);
           sphere->SetCenter(coordinates[0], coordinates[1], coordinates[2]);
           sphere->Update();
-          appendPoly->AddInput(sphere->GetOutput(0));
+          appendPoly->AddInput(sphere->GetOutput());
         }
       }
 
@@ -307,7 +307,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
 
 
         //set to 2D representation of the contour
-        resultingPolyData= cutter->GetOutput(0);
+        resultingPolyData= cutter->GetOutput();
 
       }//end if(project contour)
       else
@@ -322,7 +322,7 @@ vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromCo
     appendPoly->Update();
 
     //return contour with control points
-    return appendPoly->GetOutput(0);
+    return appendPoly->GetOutput();
   }else
   {
     //return empty polyData

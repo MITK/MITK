@@ -46,7 +46,7 @@ mitk::PointSetToCurvedGeometryFilter::~PointSetToCurvedGeometryFilter()
 void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
 {
   mitk::PointSet::ConstPointer input  = this->GetInput();
-  mitk::Geometry2DData::Pointer output  = dynamic_cast<mitk::Geometry2DData*> ( this->GetOutput(0) );
+  mitk::Geometry2DData::Pointer output  = dynamic_cast<mitk::Geometry2DData*> ( this->GetOutput() );
 
   if ( input.IsNull() )
     itkGenericExceptionMacro ( "Input point set is NULL!" );
@@ -90,7 +90,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
 void mitk::PointSetToCurvedGeometryFilter::GenerateData()
 {
   mitk::PointSet::ConstPointer input  = this->GetInput();
-  mitk::GeometryData::Pointer output  = this->GetOutput(0);
+  mitk::GeometryData::Pointer output  = this->GetOutput();
 
   //
   // check preconditions
@@ -150,7 +150,7 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
       itkExceptionMacro ( "PCAPlane not yet implemented!" );
       m_PCAPlaneCalculator->SetInput ( input );
       m_PCAPlaneCalculator->Update();
-      m_PlaneLandmarkProjector->SetProjectionPlane ( dynamic_cast<mitk::PlaneGeometry*> ( m_PCAPlaneCalculator->GetOutput(0) ) );
+      m_PlaneLandmarkProjector->SetProjectionPlane ( dynamic_cast<mitk::PlaneGeometry*> ( m_PCAPlaneCalculator->GetOutput() ) );
     }
     else
       itkExceptionMacro ( "Unknown projection mode" );

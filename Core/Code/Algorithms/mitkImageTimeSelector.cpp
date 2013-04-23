@@ -30,7 +30,7 @@ mitk::ImageTimeSelector::~ImageTimeSelector()
 void mitk::ImageTimeSelector::GenerateOutputInformation()
 {
   Image::ConstPointer input  = this->GetInput();
-  Image::Pointer output = this->GetOutput(0);
+  Image::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -49,7 +49,7 @@ void mitk::ImageTimeSelector::GenerateOutputInformation()
 
 void mitk::ImageTimeSelector::GenerateData()
 {
-  const Image::RegionType& requestedRegion = this->GetOutput(0)->GetRequestedRegion();
+  const Image::RegionType& requestedRegion = this->GetOutput()->GetRequestedRegion();
 
   //do we really need a complete volume at a time?
   if(requestedRegion.GetSize(2)>1)
@@ -65,7 +65,7 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
 
   ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  Image::Pointer output = this->GetOutput(0);
+  Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

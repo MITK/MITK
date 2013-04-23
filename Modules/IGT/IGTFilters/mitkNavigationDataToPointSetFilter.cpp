@@ -150,7 +150,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   std::vector<mitk::NavigationData::TimeStampType> vectorOldTime(this->GetNumberOfOutputs());
 
   //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
-  mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize();
+  mitk::PointSet::PointIdentifier newPointId = this->GetOutput()->GetSize();
 
   bool numberForMean_is_reached = false;
   while (!numberForMean_is_reached)
@@ -218,7 +218,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {
-  mitk::PointSet* output = this->GetOutput(0);
+  mitk::PointSet* output = this->GetOutput();
   assert(output);
   for (unsigned int index = 0; index < this->GetNumberOfInputs(); index++)
   {

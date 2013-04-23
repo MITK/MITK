@@ -297,7 +297,7 @@ void QmitkImageCropper::CropImage()
   }
 
   // cutting successful
-  mitk::Image::Pointer resultImage = cutter->GetOutput(0);
+  mitk::Image::Pointer resultImage = cutter->GetOutput();
   resultImage->DisconnectPipeline();
 
   RemoveBoundingObjectFromNode();

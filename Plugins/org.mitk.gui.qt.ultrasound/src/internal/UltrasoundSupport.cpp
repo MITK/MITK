@@ -87,7 +87,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 void UltrasoundSupport::DisplayImage()
 {
   m_Device->UpdateOutputData(0);
-  m_Node->SetData(m_Device->GetOutput(0));
+  m_Node->SetData(m_Device->GetOutput());
   this->RequestRenderWindowUpdate();
 
   m_FrameCounter ++;
@@ -138,7 +138,7 @@ void UltrasoundSupport::OnClickedViewDevice()
       return;
     }
     m_Device->Update();
-    m_Node->SetData(m_Device->GetOutput(0));
+    m_Node->SetData(m_Device->GetOutput());
 
     //start timer
     int interval = (1000 / m_Controls.m_FrameRate->value());

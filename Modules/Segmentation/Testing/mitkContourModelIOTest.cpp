@@ -45,7 +45,7 @@ static void TestContourModel(mitk::ContourModel* contour, std::string fileName)
 
   MITK_TEST_CONDITION(reader->GetSuccess(), "read file");
 
-  mitk::ContourModel::Pointer contour2 = reader->GetOutput(0);
+  mitk::ContourModel::Pointer contour2 = reader->GetOutput();
 
   MITK_TEST_CONDITION_REQUIRED(contour2.IsNotNull(),"contour is not null");
 

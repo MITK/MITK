@@ -95,17 +95,17 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   { //write values to file/stream
     distanceSelector->SetSliceNr(i);
     distanceSelector->Update();
-    tmpDistance = distanceSelector->GetOutput(0);
+    tmpDistance = distanceSelector->GetOutput();
     distanceArray = (float*)tmpDistance->GetData();
 
     amplitudeSelector->SetSliceNr(i);
     amplitudeSelector->Update();
-    tmpAmplitude = amplitudeSelector->GetOutput(0);
+    tmpAmplitude = amplitudeSelector->GetOutput();
     amplitudeArray = (float*)tmpAmplitude->GetData();
 
     intensitySelector->SetSliceNr(i);
     intensitySelector->Update();
-    tmpIntensity = intensitySelector->GetOutput(0);
+    tmpIntensity = intensitySelector->GetOutput();
     intensityArray = (float*)tmpIntensity->GetData();
 
     csvWriter->Add(distanceArray, amplitudeArray, intensityArray);
@@ -130,17 +130,17 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   {
     distanceSelector->SetSliceNr(j);
     distanceSelector->Update();
-    tmpDistance = distanceSelector->GetOutput(0);
+    tmpDistance = distanceSelector->GetOutput();
     distanceArray = (float*)tmpDistance->GetData();
 
     amplitudeSelector->SetSliceNr(j);
     amplitudeSelector->Update();
-    tmpAmplitude = amplitudeSelector->GetOutput(0);
+    tmpAmplitude = amplitudeSelector->GetOutput();
     amplitudeArray = (float*)tmpAmplitude->GetData();
 
     intensitySelector->SetSliceNr(j);
     intensitySelector->Update();
-    tmpIntensity = intensitySelector->GetOutput(0);
+    tmpIntensity = intensitySelector->GetOutput();
     intensityArray = (float*)tmpIntensity->GetData();
 
     //for all pixels

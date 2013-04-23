@@ -302,13 +302,13 @@ void QmitkToFUtilView::OnToFCameraStarted()
     // initial update of image grabber
     this->m_ToFImageGrabber->Update();
 
-        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+        this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput());
         this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
         this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
 
         // initial update of composite filter
         this->m_ToFCompositeFilter->Update();
-        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+        this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
         this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
 
         std::string rgbFileName;
@@ -341,7 +341,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
         this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,m_MitkDistanceImage);
         this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,m_MitkAmplitudeImage);
         this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,m_MitkIntensityImage);
-        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
+        this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput();
         this->m_SurfaceNode = ReplaceNodeData("Surface",m_Surface);
 
         this->UseToFVisibilitySettings(true);

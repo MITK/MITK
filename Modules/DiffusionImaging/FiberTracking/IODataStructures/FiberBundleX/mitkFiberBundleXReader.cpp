@@ -68,14 +68,14 @@ namespace mitk
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 
-        if ( reader->GetOutput(0) != NULL )
+        if ( reader->GetOutput() != NULL )
         {
-          vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput(0);
+          vtkSmartPointer<vtkPolyData> fiberPolyData = reader->GetOutput();
 
 //          vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
 //          cleaner->SetInput(fiberPolyData);
 //          cleaner->Update();
-//          fiberPolyData = cleaner->GetOutput(0);
+//          fiberPolyData = cleaner->GetOutput();
 
           m_OutputCache = OutputType::New(fiberPolyData);
         }
@@ -193,7 +193,7 @@ namespace mitk
           vtkSmartPointer<vtkCleanPolyData> cleaner = vtkSmartPointer<vtkCleanPolyData>::New();
           cleaner->SetInput(fiberPolyData);
           cleaner->Update();
-          fiberPolyData = cleaner->GetOutput(0);
+          fiberPolyData = cleaner->GetOutput();
 
           m_OutputCache = OutputType::New(fiberPolyData);
         }

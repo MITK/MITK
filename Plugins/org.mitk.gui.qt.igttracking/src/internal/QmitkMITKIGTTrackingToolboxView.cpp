@@ -375,7 +375,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
     volumeGenerator->SetTrackingDeviceData(data);
     volumeGenerator->Update();
 
-    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput(0);
+    mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 
     m_TrackingVolumeNode->SetData(volumeSurface);
 
@@ -421,7 +421,7 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
       vtkData->SetRadius(3.0f);
       vtkData->SetCenter(0.0, 0.0, 0.0);
       vtkData->Update();
-      mySphere->SetVtkPolyData(vtkData->GetOutput(0));
+      mySphere->SetVtkPolyData(vtkData->GetOutput());
       vtkData->Delete();
       newNode->SetData(mySphere);
       newNode->SetName(toolname.str());

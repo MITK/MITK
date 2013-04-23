@@ -150,7 +150,7 @@ int mitkPicFileIOTest(int, char*[])
         imageReader->SetFileName("test_image.pic");
         imageReader->Update();
 
-        secondImage = imageReader->GetOutput(0);
+        secondImage = imageReader->GetOutput();
       }
       catch ( std::exception& e )
       {

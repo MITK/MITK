@@ -69,7 +69,7 @@ void CutImageWithOutputTypeSelect
 
   // PART 2: get access to the MITK output image via an ITK image
   typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
-  outputimagetoitk->SetInput(cutter->m_OutputTimeSelector->GetOutput(0));
+  outputimagetoitk->SetInput(cutter->m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
   typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 

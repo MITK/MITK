@@ -207,7 +207,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
             timeSelector->SetInput( image );
             timeSelector->SetTimeNr( timeStep );
             timeSelector->UpdateLargestPossibleRegion();
-            Image::Pointer image3D = timeSelector->GetOutput(0);
+            Image::Pointer image3D = timeSelector->GetOutput();
 
             if (image3D->GetDimension() == 2)
             {
@@ -235,7 +235,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
           padFilter->SetLowerThreshold(1);
           padFilter->Update();
 
-          emptySegmentation->SetData(padFilter->GetOutput(0));
+          emptySegmentation->SetData(padFilter->GetOutput());
         }
         if (DataStorage::Pointer storage = m_ToolManager->GetDataStorage())
         {
@@ -255,7 +255,7 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
   timeSelector->SetInput( segmentation );
   timeSelector->SetTimeNr( timeStep );
   timeSelector->UpdateLargestPossibleRegion();
-  Image::Pointer segmentation3D = timeSelector->GetOutput(0);
+  Image::Pointer segmentation3D = timeSelector->GetOutput();
 
   typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
   SegmentationType::Pointer itkSegmentation;

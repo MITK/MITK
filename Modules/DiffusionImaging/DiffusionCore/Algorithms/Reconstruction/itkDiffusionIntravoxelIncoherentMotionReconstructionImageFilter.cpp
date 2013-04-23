@@ -205,7 +205,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
 {
 
     typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
 
@@ -682,7 +682,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
     if(m_Method == IVIM_REGULARIZED)
     {
         typename OutputImageType::Pointer outputImage =
-                static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+                static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
         ImageRegionIterator< OutputImageType > oit0(outputImage, outputImage->GetLargestPossibleRegion());
         oit0.GoToBegin();
 
@@ -706,7 +706,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
         filter->SetNumberOfThreads(1);
         filter->SetLambda(m_Lambda);
         filter->Update();
-        typename RegFitType::OutputImageType::Pointer outimg = filter->GetOutput(0);
+        typename RegFitType::OutputImageType::Pointer outimg = filter->GetOutput();
 
         ImageRegionConstIterator< RegFitType::OutputImageType > iit(outimg, outimg->GetLargestPossibleRegion());
         iit.GoToBegin();

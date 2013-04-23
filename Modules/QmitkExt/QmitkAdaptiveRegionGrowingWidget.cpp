@@ -349,7 +349,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
           timeSelector->SetInput(orgImage);
           timeSelector->SetTimeNr( timeStep );
           timeSelector->UpdateLargestPossibleRegion();
-          mitk::Image* timedImage = timeSelector->GetOutput(0);
+          mitk::Image* timedImage = timeSelector->GetOutput();
           AccessByItk_2( timedImage , StartRegionGrowing, timedImage->GetGeometry(), seedPoint);
       }
       else if (orgImage->GetDimension() == 3)
@@ -444,7 +444,7 @@ void QmitkAdaptiveRegionGrowingWidget::StartRegionGrowing(itk::Image<TPixel, VIm
   this->m_SliderInitialized = true;
   this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
 
-  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(0))->Clone();
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
 
   //create new node and then delete the old one if there is one
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();

@@ -58,15 +58,15 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ExtrusionFilter->SetVector(vtkvector);
 
   m_TriangleFilter = vtkTriangleFilter::New();
-  m_TriangleFilter->SetInput(m_ExtrusionFilter->GetOutput(0));
+  m_TriangleFilter->SetInput(m_ExtrusionFilter->GetOutput());
 
   m_SubdivisionFilter = vtkLinearSubdivisionFilter::New();
-  m_SubdivisionFilter->SetInput(m_TriangleFilter->GetOutput(0));
+  m_SubdivisionFilter->SetInput(m_TriangleFilter->GetOutput());
   m_SubdivisionFilter->SetNumberOfSubdivisions(4);
 
   m_ClippingBox = vtkPlanes::New();
   m_ClipPolyDataFilter = vtkClipPolyData::New();
-  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput(0));
+  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput());
   m_ClipPolyDataFilter->SetClipFunction(m_ClippingBox);
   m_ClipPolyDataFilter->InsideOutOn();
 
@@ -177,21 +177,21 @@ void mitk::ExtrudedContour::BuildSurface()
 
   // set extrusion scale factor
   m_ExtrusionFilter->SetScaleFactor(GetGeometry()->GetExtentInMM(2));
-  SetVtkPolyData(m_SubdivisionFilter->GetOutput(0));
+  SetVtkPolyData(m_SubdivisionFilter->GetOutput());
   //if(m_ClippingGeometry.IsNull())
   //{
-  //  SetVtkPolyData(m_SubdivisionFilter->GetOutput(0));
+  //  SetVtkPolyData(m_SubdivisionFilter->GetOutput());
   //}
   //else
   //{
-  //  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput(0));
+  //  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput());
   //  mitk::BoundingBox::BoundsArrayType bounds=m_ClippingGeometry->GetBounds();
 
   //  m_ClippingBox->SetBounds(bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]);
   //  m_ClippingBox->SetTransform(GetGeometry()->GetVtkTransform());
   //  m_ClipPolyDataFilter->SetClipFunction(m_ClippingBox);
   //  m_ClipPolyDataFilter->SetValue(0);
-  //  SetVtkPolyData(m_ClipPolyDataFilter->GetOutput(0));
+  //  SetVtkPolyData(m_ClipPolyDataFilter->GetOutput());
   //}
 
   m_LastCalculateExtrusionTime.Modified();

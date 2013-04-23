@@ -27,7 +27,7 @@ extern "C"
 
 void mitk::PicFileReader::GenerateOutputInformation()
 {
-    Image::Pointer output = this->GetOutput(0);
+    Image::Pointer output = this->GetOutput();
 
     if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
         return;
@@ -208,7 +208,7 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor* pic)
 
 void mitk::PicFileReader::GenerateData()
 {
-    Image::Pointer output = this->GetOutput(0);
+    Image::Pointer output = this->GetOutput();
 
     // Check to see if we can read the file given the name or prefix
     //

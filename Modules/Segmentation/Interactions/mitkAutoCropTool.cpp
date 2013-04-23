@@ -67,7 +67,7 @@ bool mitk::AutoCropTool::ProcessOneWorkingData( DataNode* node )
     {
       cropFilter->Update();
 
-      image = cropFilter->GetOutput(0);
+      image = cropFilter->GetOutput();
       if (image.IsNotNull())
       {
         node->SetData( image );

@@ -46,8 +46,8 @@ m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 
 
   //this->Modified();
-  //this->GetOutput(0)->Modified();
-  //this->GetOutput(0)->ReleaseData();
+  //this->GetOutput()->Modified();
+  //this->GetOutput()->ReleaseData();
 }
 
 

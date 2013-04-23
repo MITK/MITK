@@ -37,7 +37,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   sphereSource->SetPhiResolution(10);
   sphereSource->Update();
 
-  vtkPolyData* polys = sphereSource->GetOutput(0);
+  vtkPolyData* polys = sphereSource->GetOutput();
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
 
@@ -78,7 +78,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[SUCCESS] : number of inputs == number of outputs." << std::endl;
 
 
-  mitk::Surface::Pointer outputSurface = filter->GetOutput(0);
+  mitk::Surface::Pointer outputSurface = filter->GetOutput();
   if ( outputSurface->GetVtkPolyData()->GetNumberOfPolys() != surface->GetVtkPolyData()->GetNumberOfPolys() )
   {
     std::cout << "[FAILED] : number of Polys in PolyData of output != number of Polys in PolyData of input" << std::endl;
@@ -89,7 +89,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 
 
   filter->Update();
-  outputSurface = filter->GetOutput(0);
+  outputSurface = filter->GetOutput();
   if ( outputSurface->GetSizeOfPolyDataSeries() != surface->GetSizeOfPolyDataSeries() )
   {
     std::cout << "[FAILED] : number of PolyDatas in PolyDataSeries of output != number of PolyDatas of input" << std::endl;

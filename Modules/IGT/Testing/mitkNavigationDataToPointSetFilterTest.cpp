@@ -79,7 +79,7 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(3, nd3);
 
   //Process
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
   mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
   mitk::PointSet::Pointer pointSet2 = myNavigationDataToPointSetFilter->GetOutput(2);
   mitk::PointSet::Pointer pointSet3 = myNavigationDataToPointSetFilter->GetOutput(3);
@@ -137,7 +137,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(0, nd);
   myNavigationDataToPointSetFilter->SetInput(1, nd2);
 
-  mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
@@ -147,7 +147,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(0, nd3);
   myNavigationDataToPointSetFilter->SetInput(1, nd4);
   myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
+  pointSet = myNavigationDataToPointSetFilter->GetOutput();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 &&
@@ -160,7 +160,7 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(1, nd4);
   //nd4->Modified();
   //myNavigationDataToPointSetFilter->Update();
-  pointSet = myNavigationDataToPointSetFilter->GetOutput(0);
+  pointSet = myNavigationDataToPointSetFilter->GetOutput();
   pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 7.0 && pointSet->GetPoint(0,0)[1] == 8.0 && pointSet->GetPoint(0,0)[2] == 9.0 &&
@@ -190,7 +190,7 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
     myNavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
   }
 
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
   mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
 
   myNavigationDataToPointSetFilter->Update();

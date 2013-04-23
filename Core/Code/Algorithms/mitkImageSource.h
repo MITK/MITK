@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
 
 #include <MitkExports.h>
-#include "mitkBaseProcess.h"
+#include "mitkBaseDataSource.h"
 #include "mitkImage.h"
 
-//#include "itkIntTypes.h"
 
 namespace mitk {
 
@@ -40,19 +39,17 @@ namespace mitk {
  * GetVtkImageData().
  * @ingroup Process
  */
-class MITK_CORE_EXPORT ImageSource : public BaseProcess
+class MITK_CORE_EXPORT ImageSource : public BaseDataSource
 {
 public:
-  mitkClassMacro(ImageSource,BaseProcess)
-
-  /** @brief Smart Pointer type to a DataObject. */
-  typedef itk::DataObject::Pointer DataObjectPointer;
+  mitkClassMacro(ImageSource,BaseDataSource)
 
   /** @brief Method for creation through the object factory. */
   itkNewMacro(Self)
 
   /** @brief Some convenient typedefs. */
   typedef mitk::Image OutputImageType;
+  typedef OutputImageType OutputType;
   typedef OutputImageType::Pointer OutputImagePointer;
   typedef SlicedData::RegionType OutputImageRegionType;
 
@@ -106,67 +103,7 @@ public:
    * types. Derived classes should have named get methods for these
    * outputs.
    */
-  OutputImageType * GetOutput(void);
-  const OutputImageType * GetOutput(void) const;
-
-  OutputImageType* GetOutput(DataObjectPointerArraySizeType idx);
-  const OutputImageType* GetOutput(DataObjectPointerArraySizeType idx) const;
-
-
-  /** @brief Graft the specified DataObject onto this ProcessObject's output.
-   *
-   * This method grabs a handle to the specified DataObject's bulk
-   * data to used as its output's own bulk data. It also copies the
-   * region ivars (RequestedRegion, BufferedRegion,
-   * LargestPossibleRegion) and meta-data (Spacing, Origin) from the
-   * specified data object into this filter's output data object. Most
-   * importantly, however, it leaves the Source ivar untouched so the
-   * original pipeline routing is intact. This method is used when a
-   * process object is implemented using a mini-pipeline which is
-   * defined in its GenerateData() method.  The usage is:
-   *
-   * \code
-   *    // setup the mini-pipeline to process the input to this filter
-   *    firstFilterInMiniPipeline->SetInput( this->GetInput() );
-
-   *    // setup the mini-pipeline to calculate the correct regions
-   *    // and write to the appropriate bulk data block
-   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
-   *
-   *    // execute the mini-pipeline
-   *    lastFilterInMiniPipeline->Update();
-   *
-   *    // graft the mini-pipeline output back onto this filter's output.
-   *    // this is needed to get the appropriate regions passed back.
-   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
-   * \endcode
-   *
-   * For proper pipeline execution, a filter using a mini-pipeline
-   * must implement the GenerateInputRequestedRegion(),
-   * GenerateOutputRequestedRegion(), GenerateOutputInformation() and
-   * EnlargeOutputRequestedRegion() methods as necessary to reflect
-   * how the mini-pipeline will execute (in other words, the outer
-   * filter's pipeline mechanism must be consistent with what the
-   * mini-pipeline will do).
-   *  */
-  virtual void GraftOutput(OutputImageType *output);
-
-  /** Graft the specified data object onto this ProcessObject's named
-   * output. This is similar to the GraftOutput method except it
-   * allows you to specify which output is affected.
-   * See the GraftOutput for general usage information.
-   */
-  virtual void GraftOutput(const DataObjectIdentifierType & key, OutputImageType *output);
-
-  /** @brief Graft the specified data object onto this ProcessObject's idx'th
-   * output.
-   *
-   * This is the similar to GraftOutput method except is
-   * allows you specify which output is affected. The specified index
-   * must be a valid output number (less than
-   * ProcessObject::GetNumberOfOutputs()). See the GraftOutput for
-   * general usage information. */
-  virtual void GraftNthOutput(unsigned int idx, OutputImageType *output);
+  mitkBaseDataSourceGetOutputDeclarations
 
   /** @brief Make a DataObject of the correct type to used as the specified
    * output.

@@ -37,7 +37,7 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
   typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
   castImageFilter->SetInput( itkInputImage );
   castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput(0);
+  itkOutputImage = castImageFilter->GetOutput();
 }
 #endif //DOXYGEN_SKIP
 

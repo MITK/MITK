@@ -48,7 +48,7 @@ bool ImageVtkDataReferenceCheck(const char* fname) {
   }
 
   {
-    mitk::Image::Pointer image = imageReader->GetOutput(0);
+    mitk::Image::Pointer image = imageReader->GetOutput();
     vtkImageData* vtk = image->GetVtkImageData();
 
     if(vtk == NULL)
@@ -260,7 +260,7 @@ int mitkImageTest(int argc, char* argv[])
     return 0;
   }
 
-  mitk::Image::Pointer image = imageReader->GetOutput(0);
+  mitk::Image::Pointer image = imageReader->GetOutput();
 
   // generate a random point in world coordinates
   mitk::Point3D xMax, yMax, zMax, xMaxIndex, yMaxIndex, zMaxIndex;
@@ -325,7 +325,7 @@ int mitkImageTest(int argc, char* argv[])
     selector->SetTimeNr(0);
     selector->SetInput(image);
     selector->Update();
-    image = selector->GetOutput(0);
+    image = selector->GetOutput();
   }
 
   if(image->GetDimension()==3)

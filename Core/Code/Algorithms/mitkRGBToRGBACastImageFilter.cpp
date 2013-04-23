@@ -65,7 +65,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput(0);
+  mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   if ( !output->IsInitialized() )
   {
@@ -80,7 +80,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateInputRequestedRegion()
 void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -126,7 +126,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateOutputInformation()
 void mitk::RGBToRGBACastImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if( !output->IsInitialized() )
   {
@@ -134,7 +134,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
   }
 
   m_InputTimeSelector->SetInput(input);
-  m_OutputTimeSelector->SetInput(this->GetOutput(0));
+  m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
@@ -157,7 +157,7 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    mitk::Image *image = m_InputTimeSelector->GetOutput(0);
+    mitk::Image *image = m_InputTimeSelector->GetOutput();
 
     const mitk::PixelType &pixelType = image->GetPixelType();
 
@@ -207,9 +207,9 @@ void mitk::RGBToRGBACastImageFilter::InternalCast(
 
   typename mitk::ImageToItk< OutputImageType >::Pointer outputimagetoitk =
     mitk::ImageToItk< OutputImageType >::New();
-  outputimagetoitk->SetInput(addComponentFilter->m_OutputTimeSelector->GetOutput(0));
+  outputimagetoitk->SetInput(addComponentFilter->m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
-  typename OutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput(0);
+  typename OutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
   // create the iterators
   typename InputImageType::RegionType inputRegionOfInterest =

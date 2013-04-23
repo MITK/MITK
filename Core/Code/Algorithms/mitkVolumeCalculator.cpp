@@ -72,7 +72,7 @@ void mitk::VolumeCalculator::ComputeVolume()
     {
       m_TimeSelector->SetTimeNr(timeStep);
       m_TimeSelector->Update();
-      AccessFixedDimensionByItk(m_TimeSelector->GetOutput(0),InternalCompute,3);
+      AccessFixedDimensionByItk(m_TimeSelector->GetOutput(),InternalCompute,3);
       m_Volumes[timeStep] = m_Volume;
     }
   }

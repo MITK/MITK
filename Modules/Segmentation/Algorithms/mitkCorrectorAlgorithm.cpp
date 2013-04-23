@@ -77,7 +77,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
     imageDirection.SetIdentity();
     //correctPixelTypeImage->SetDirection(imageDirection);
 
-    temporarySlice = this->GetOutput(0);
+    temporarySlice = this->GetOutput();
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
     CastToMitkImage( correctPixelTypeImage, temporarySlice );
   }

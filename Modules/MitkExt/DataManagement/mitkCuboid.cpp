@@ -30,7 +30,7 @@ mitk::Cuboid::Cuboid()
   cube->SetYLength(2.0);
   cube->SetZLength(2.0);
   cube->Update();
-  SetVtkPolyData(cube->GetOutput(0));
+  SetVtkPolyData(cube->GetOutput());
   cube->Delete();
 }
 

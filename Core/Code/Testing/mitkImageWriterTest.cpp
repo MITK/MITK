@@ -184,7 +184,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
     extractFilter->SetWorldGeometry( image->GetSlicedGeometry()->GetGeometry2D(0) );
 
     extractFilter->Update();
-    singleSliceImage = extractFilter->GetOutput(0);
+    singleSliceImage = extractFilter->GetOutput();
 
     // test 3D writing in format supporting only 2D
     myImageWriter->SetExtension(".png");

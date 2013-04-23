@@ -28,7 +28,7 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
     return ;
   }
 
-  mitk::Surface::Pointer output = this->GetOutput(0);
+  mitk::Surface::Pointer output = this->GetOutput();
   MITK_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
   output->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
@@ -40,9 +40,9 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
     vtkReader->SetFileName( fileName.c_str() );
     vtkReader->Update();
 
-    if ( vtkReader->GetOutput(0) != NULL )
+    if ( vtkReader->GetOutput() != NULL )
     {
-      output->SetVtkPolyData( vtkReader->GetOutput(0)->GetVtkPolyData(), i );
+      output->SetVtkPolyData( vtkReader->GetOutput()->GetVtkPolyData(), i );
     }
     else
     {

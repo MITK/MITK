@@ -44,7 +44,7 @@ void mitk::BoundingObjectToSegmentationFilter::SetBoundingObject(mitk::BoundingO
 void mitk::BoundingObjectToSegmentationFilter::GenerateData()
 {
   typedef itk::Image<unsigned char, 3> itkImageType;
-  mitk::Image::Pointer outputImage = this->GetOutput(0);
+  mitk::Image::Pointer outputImage = this->GetOutput();
   mitk::Image::ConstPointer inputImage = this->GetInput();
   outputImage->Initialize(inputImage);
 

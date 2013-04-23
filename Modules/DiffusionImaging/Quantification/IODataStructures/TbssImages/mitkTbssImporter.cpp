@@ -174,7 +174,7 @@ namespace mitk
         fileReader->SetImageIO(io);
         fileReader->Update();
 
-        VectorImageType::Pointer img = fileReader->GetOutput(0);
+        VectorImageType::Pointer img = fileReader->GetOutput();
 
         VectorImageType::SizeType size = img->GetLargestPossibleRegion().GetSize();
 
@@ -232,7 +232,7 @@ namespace mitk
         fileReader->SetFileName(file);
         fileReader->Update();
 
-        FloatImage3DType::Pointer img = fileReader->GetOutput(0);
+        FloatImage3DType::Pointer img = fileReader->GetOutput();
 
         FloatImage3DType::SizeType size = img->GetLargestPossibleRegion().GetSize();
 

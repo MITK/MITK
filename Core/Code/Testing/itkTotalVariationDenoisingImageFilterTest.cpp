@@ -152,7 +152,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     filter->SetInput(image);
     filter->SetNumberOfThreads(1);
     filter->Update();
-    ImageType::Pointer outImage = filter->GetOutput(0);
+    ImageType::Pointer outImage = filter->GetOutput();
 
     PrintImage(outImage);
     if(fabs(outImage->GetPixel(index) - 4.472) > precision)
@@ -176,7 +176,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     sFilter->SetLambda(0.5);
     sFilter->SetNumberOfThreads(1);
     sFilter->Update();
-    ImageType::Pointer outImageS = sFilter->GetOutput(0);
+    ImageType::Pointer outImageS = sFilter->GetOutput();
 
     PrintImage(outImageS);
     if(fabs(outImageS->GetPixel(index) - 4.0) > precision)
@@ -200,7 +200,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     tvFilter->SetNumberOfThreads(1);
     tvFilter->SetLambda(0.1);
     tvFilter->Update();
-    ImageType::Pointer outImageTV = tvFilter->GetOutput(0);
+    ImageType::Pointer outImageTV = tvFilter->GetOutput();
 
     PrintImage(outImageTV);
     if(fabs(outImageTV->GetPixel(index) - 4.0) > precision)
@@ -225,7 +225,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     vecFilter->SetInput(vecImage);
     vecFilter->SetNumberOfThreads(1);
     vecFilter->Update();
-    ImageType::Pointer outVecImage = vecFilter->GetOutput(0);
+    ImageType::Pointer outVecImage = vecFilter->GetOutput();
 
     PrintImage(outVecImage);
     if(fabs(outVecImage->GetPixel(index) - 6.324) > precision)
@@ -250,7 +250,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     sVecFilter->SetLambda(0.5);
     sVecFilter->SetNumberOfThreads(1);
     sVecFilter->UpdateLargestPossibleRegion();
-    VectorImageType::Pointer outVecImageS = sVecFilter->GetOutput(0);
+    VectorImageType::Pointer outVecImageS = sVecFilter->GetOutput();
 
     PrintVectorImage(outVecImageS);
     if(fabs(outVecImageS->GetPixel(vecIndex)[1] - 4.0) > precision)
@@ -273,7 +273,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char* /*argv*/[])
     tvVecFilter->SetNumberOfThreads(1);
     tvVecFilter->SetLambda(0.1);
     tvVecFilter->Update();
-    VectorImageType::Pointer outVecImageTV = tvVecFilter->GetOutput(0);
+    VectorImageType::Pointer outVecImageTV = tvVecFilter->GetOutput();
 
     PrintVectorImage(outVecImageTV);
     if(fabs(outVecImageTV->GetPixel(vecIndex)[1] - 4.0) > precision)

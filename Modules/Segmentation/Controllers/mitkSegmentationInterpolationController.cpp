@@ -130,7 +130,7 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Ima
     timeSelector->SetInput( m_Segmentation );
     timeSelector->SetTimeNr( timeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    Image::Pointer segmentation3D = timeSelector->GetOutput(0);
+    Image::Pointer segmentation3D = timeSelector->GetOutput();
     AccessFixedDimensionByItk_2( segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep );
   }
 
@@ -445,19 +445,19 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     extractor->SetVtkOutputRequest(false);
     extractor->Modified();
     extractor->Update();
-    lowerMITKSlice = extractor->GetOutput(0);
+    lowerMITKSlice = extractor->GetOutput();
     lowerMITKSlice->DisconnectPipeline();
 
     extractor->SetWorldGeometry(m_Segmentation->GetSlicedGeometry(timeStep)->GetGeometry2D(sliceIndex));
     extractor->Modified();
     extractor->Update();
-    resultImage = extractor->GetOutput(0);
+    resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
 
     extractor->SetWorldGeometry(m_Segmentation->GetSlicedGeometry(timeStep)->GetGeometry2D(upperBound));
     extractor->Modified();
     extractor->Update();
-    upperMITKSlice = extractor->GetOutput(0);
+    upperMITKSlice = extractor->GetOutput();
     upperMITKSlice->DisconnectPipeline();
 
     if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;

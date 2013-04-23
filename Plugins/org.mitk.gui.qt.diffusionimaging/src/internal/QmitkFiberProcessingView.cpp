@@ -331,7 +331,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateFiberEndingsImage(mitk
     generator->Update();
 
     // get output image
-    OutImageType::Pointer outImg = generator->GetOutput(0);
+    OutImageType::Pointer outImg = generator->GetOutput();
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
@@ -362,7 +362,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateColorHeatmap(mitk::Fib
 
     // get output image
     typedef itk::Image<OutPixType,3> OutType;
-    OutType::Pointer outImg = generator->GetOutput(0);
+    OutType::Pointer outImg = generator->GetOutput();
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
@@ -396,7 +396,7 @@ mitk::DataNode::Pointer QmitkFiberProcessingView::GenerateTractDensityImage(mitk
 
     // get output image
     typedef itk::Image<OutPixType,3> OutType;
-    OutType::Pointer outImg = generator->GetOutput(0);
+    OutType::Pointer outImg = generator->GetOutput();
     mitk::Image::Pointer img = mitk::Image::New();
     img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());

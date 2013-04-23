@@ -61,7 +61,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->SetInput(nd1);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput()");
 
-  mitk::NavigationData* output = myFilter->GetOutput(0);
+  mitk::NavigationData* output = myFilter->GetOutput();
 
   /*test case no transform set*/
   MITK_TEST_FOR_EXCEPTION(std::exception, output->Update(););
@@ -79,7 +79,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter->SetRigid3DTransform(transform);
 
-  output = myFilter->GetOutput(0);
+  output = myFilter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
 
   output->Update(); // execute filter
@@ -125,7 +125,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter2->SetRigid3DTransform(transform2);
 
-  mitk::NavigationData* output2 = myFilter2->GetOutput(0);
+  mitk::NavigationData* output2 = myFilter2->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(output2 != NULL, "Testing GetOutput()");
 
   output2->Update(); // execute filter
@@ -189,7 +189,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
     && (myFilter->GetInput(1) == nd2)), "Testing Set-/GetInput(index, data)");
   output = NULL;
   output2 = NULL;
-  output = myFilter->GetOutput(0);
+  output = myFilter->GetOutput();
   output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!
   MITK_TEST_CONDITION_REQUIRED(((output != NULL) && (output2 != NULL)), "Testing GetOutput(index)");

@@ -37,7 +37,7 @@ mitk::PlaneFit::~PlaneFit()
 void mitk::PlaneFit::GenerateOutputInformation()
 {
   mitk::PointSet::ConstPointer input  = this->GetInput();
-  mitk::GeometryData::Pointer output  = this->GetOutput(0);
+  mitk::GeometryData::Pointer output  = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 

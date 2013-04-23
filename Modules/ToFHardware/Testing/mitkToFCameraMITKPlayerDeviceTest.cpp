@@ -93,15 +93,15 @@ int mitkToFCameraMITKPlayerDeviceTest(int /* argc */, char* /*argv*/[])
   mitk::PicFileReader::Pointer distanceFileReader = mitk::PicFileReader::New();
   distanceFileReader->SetFileName(distanceFileName);
   distanceFileReader->Update();
-  mitk::Image::Pointer distanceImage = distanceFileReader->GetOutput(0);
+  mitk::Image::Pointer distanceImage = distanceFileReader->GetOutput();
   mitk::PicFileReader::Pointer amplitudeFileReader = mitk::PicFileReader::New();
   amplitudeFileReader->SetFileName(amplitudeFileName);
   amplitudeFileReader->Update();
-  mitk::Image::Pointer amplitudeImage = amplitudeFileReader->GetOutput(0);
+  mitk::Image::Pointer amplitudeImage = amplitudeFileReader->GetOutput();
   mitk::PicFileReader::Pointer intensityFileReader = mitk::PicFileReader::New();
   intensityFileReader->SetFileName(intensityFileName);
   intensityFileReader->Update();
-  mitk::Image::Pointer intensityImage = intensityFileReader->GetOutput(0);
+  mitk::Image::Pointer intensityImage = intensityFileReader->GetOutput();
   unsigned int numberOfFrames = distanceImage->GetDimension(2);
   for (int i=0; i<numberOfFrames; i++)
   {

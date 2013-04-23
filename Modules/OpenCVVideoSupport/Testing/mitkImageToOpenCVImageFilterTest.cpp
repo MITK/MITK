@@ -29,9 +29,9 @@ mitk::Image::Pointer LoadImage( std::string filename )
   mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
   reader->SetFileName ( filename.c_str() );
   reader->Update();
-  if ( reader->GetOutput(0) == NULL )
+  if ( reader->GetOutput() == NULL )
     itkGenericExceptionMacro("File "<<filename <<" could not be read!");
-  mitk::Image::Pointer image = reader->GetOutput(0);
+  mitk::Image::Pointer image = reader->GetOutput();
   return image;
 }
 

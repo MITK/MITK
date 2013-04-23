@@ -261,7 +261,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     sliceSelector->SetTimeNr(image->GetDimension(3)/2);
     sliceSelector->SetChannelNr(image->GetDimension(4)/2);
     sliceSelector->Update();
-    image = sliceSelector->GetOutput(0);
+    image = sliceSelector->GetOutput();
     if ( image == NULL || !image->IsInitialized() ) return;
 
     minValue    = image->GetStatistics()->GetScalarValueMin();

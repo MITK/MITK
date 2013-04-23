@@ -588,7 +588,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       //        mitk::GroupDiffusionHeadersFilter::OutputType outHeaders;
       //        grouper->SetInput(inHeaders);
       //        grouper->Update();
-      //        outHeaders = grouper->GetOutput(0);
+      //        outHeaders = grouper->GetOutput();
 
       // READ VOLUMES
       PrintMemoryUsage();
@@ -606,7 +606,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         vReader->SetHeaders(hc);
         vReader->Update();
         VolumesReader::OutputImageType::Pointer vecImage;
-        vecImage = vReader->GetOutput(0);
+        vecImage = vReader->GetOutput();
         Status(QString("Volumes Loaded (%1)").arg(folderName));
 
         // CONSTRUCT CONTAINER WITH DIRECTIONS

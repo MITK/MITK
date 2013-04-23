@@ -58,8 +58,8 @@ void mitk::TensorImage::ConstructRgbImage()
     filter->Update();
 
     m_RgbImage = mitk::Image::New();
-    m_RgbImage->InitializeByItk( filter->GetOutput(0) );
-    m_RgbImage->SetVolume( filter->GetOutput(0)->GetBufferPointer() );
+    m_RgbImage->InitializeByItk( filter->GetOutput() );
+    m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
 mitk::ImageVtkAccessor* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)

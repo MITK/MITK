@@ -54,7 +54,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
       {
         cropFilter->Update();
 
-        image = cropFilter->GetOutput(0);
+        image = cropFilter->GetOutput();
 
         if (image.IsNotNull())
         {
@@ -73,7 +73,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
               imageTimeSelector->UpdateLargestPossibleRegion();
 
               // We split a long nested code line into separate calls for debugging:
-              mitk::ImageSource::OutputImageType *_3dSlice = imageTimeSelector->GetOutput(0);
+              mitk::ImageSource::OutputImageType *_3dSlice = imageTimeSelector->GetOutput();
               mitk::Image::Pointer _cropped3dSlice = this->IncreaseCroppedImageSize(_3dSlice);
 
               // +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++ BUG +++
@@ -160,8 +160,8 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
 
 
   mitk::Image::Pointer paddedImage = mitk::Image::New();
-  paddedImage->InitializeByItk(padFilter->GetOutput(0));
-  mitk::CastToMitkImage(padFilter->GetOutput(0), paddedImage);
+  paddedImage->InitializeByItk(padFilter->GetOutput());
+  mitk::CastToMitkImage(padFilter->GetOutput(), paddedImage);
 
   //calculate translation according to padding to get the new origin
   mitk::Point3D paddedOrigin = image->GetGeometry()->GetOrigin();

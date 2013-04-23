@@ -715,7 +715,7 @@ void QmitkRigidRegistrationView::ShowContour()
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->Update();
 
-  ShortImageType::Pointer binaryImage = thresholdFilter->GetOutput(0);
+  ShortImageType::Pointer binaryImage = thresholdFilter->GetOutput();
   mitk::Image::Pointer mitkBinaryImage = mitk::Image::New();
   mitk::CastToMitkImage(binaryImage, mitkBinaryImage);
 
@@ -733,7 +733,7 @@ void QmitkRigidRegistrationView::ShowContour()
   surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
-  mitk::Surface::Pointer surface = surfaceFilter->GetOutput(0);
+  mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
 
 
   if(m_ContourHelperNode.IsNull())

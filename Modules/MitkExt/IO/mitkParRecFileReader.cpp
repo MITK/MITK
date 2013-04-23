@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::ParRecFileReader::GenerateOutputInformation()
 {
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_ReadHeaderTime.GetMTime()))
     return;
@@ -186,7 +186,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
 void mitk::ParRecFileReader::GenerateData()
 {
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   // Check to see if we can read the file given the name or prefix
   //

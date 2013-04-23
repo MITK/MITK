@@ -20,14 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GeometryDataSource::GeometryDataSource()
 {
-  // Create the output. We use static_cast<> here because we know the default
-  // output must be of type TOutputImage
-  mitk::GeometryData::Pointer output
-    = static_cast<mitk::GeometryData*>(this->MakeOutput(0).GetPointer());
-  output->Initialize();
-
+  // Create the output.
+  itk::DataObject::Pointer output = this->MakeOutput(0);
   Superclass::SetNumberOfRequiredOutputs(1);
-  Superclass::SetNthOutput(0, output.GetPointer());
+  Superclass::SetNthOutput(0, output);
 }
 
 mitk::GeometryDataSource::~GeometryDataSource()
@@ -36,63 +32,17 @@ mitk::GeometryDataSource::~GeometryDataSource()
 
 itk::DataObject::Pointer mitk::GeometryDataSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return OutputType::New().GetPointer();
+  return OutputType::New().GetPointer();
 }
-
 
 itk::DataObject::Pointer mitk::GeometryDataSource::MakeOutput( const DataObjectIdentifierType & name )
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
-    {
-    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
-    }
-  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
-}
-
-void mitk::GeometryDataSource::GraftOutput(mitk::GeometryData* graft)
-{
-  this->GraftNthOutput(0, graft);
-}
-
-void mitk::GeometryDataSource::GraftNthOutput(unsigned int idx, mitk::GeometryData *graft)
-{
-  if (idx < this->GetNumberOfOutputs())
   {
-    mitk::GeometryData * output = this->GetOutput(idx);
-
-    if (output && graft)
-    {
-      // grab a handle to the bulk data of the specified data object
-      //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-
-      // copy the region ivars of the specified data object
-      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-      //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
-      //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-
-      // copy the meta-information
-      output->CopyInformation( graft );
-    }
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
   }
+  return OutputType::New().GetPointer();
 }
 
-mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
-{
-  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
-}
-
-const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
-{
-  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(key));
-}
-
-mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
-{
-  return static_cast<mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
-}
-
-const mitk::GeometryDataSource::OutputType* mitk::GeometryDataSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
-{
-  return static_cast<const mitk::GeometryDataSource::OutputType*>(Superclass::GetOutput(idx));
-}
+mitkBaseDataSourceGetOutputDefinitions(mitk::GeometryDataSource)

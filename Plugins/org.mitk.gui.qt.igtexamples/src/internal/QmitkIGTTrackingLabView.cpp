@@ -184,7 +184,7 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
     return;
   }
 
-  mitk::NavigationData::Pointer nd = m_Source->GetOutput(0);
+  mitk::NavigationData::Pointer nd = m_Source->GetOutput();
 
   if( nd.IsNull() || !nd->IsDataValid())
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
@@ -426,7 +426,7 @@ mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateConeRepresentation( const
   vtkData->SetResolution(20);
   vtkData->CappingOn();
   vtkData->Update();
-  activeToolData->SetVtkPolyData(vtkData->GetOutput(0));
+  activeToolData->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
 
   //new node
@@ -981,7 +981,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(int toolID, bool on)
   else
   {
     for(unsigned int i=0; i < m_FiducialRegistrationFilter->GetNumberOfOutputs(); ++i)
-      m_FiducialRegistrationFilter->SetInput(i,m_Source->GetOutput(0));
+      m_FiducialRegistrationFilter->SetInput(i,m_Source->GetOutput());
   }
 
 }

@@ -43,72 +43,6 @@ itk::DataObject::Pointer mitk::ImageSource::MakeOutput( const DataObjectIdentifi
   return static_cast<itk::DataObject *>(mitk::Image::New().GetPointer());
 }
 
-void mitk::ImageSource::GraftOutput(OutputImageType *graft)
-{
-  this->GraftNthOutput(0, graft);
-}
-
-void mitk::ImageSource::GraftOutput(const DataObjectIdentifierType& key, OutputImageType* graft)
-{
-  if ( !graft )
-    {
-    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
-    }
-
-  itkExceptionMacro(<< "GraftOutput(): This method is not yet functional in MITK. Implement mitk::Image::Graft() before using!!" );
-
-  // we use the process object method since all out output may not be
-  // of the same type
-  itk::DataObject *output = this->ProcessObject::GetOutput(key);
-
-  // Call GraftImage to copy meta-information, regions, and the pixel container
-  output->Graft(graft);
-}
-
-void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
-{
-  if ( idx >= this->GetNumberOfIndexedOutputs() )
-    {
-    itkExceptionMacro(<< "Requested to graft output " << idx
-                      << " but this filter only has " << this->GetNumberOfIndexedOutputs() << " indexed Outputs.");
-    }
-  this->GraftOutput( this->MakeNameFromOutputIndex(idx), graft );
-}
-
-mitk::ImageSource::OutputImageType *  mitk::ImageSource::GetOutput(void)
-{
-  return itkDynamicCastInDebugMode< OutputImageType * >( this->GetPrimaryOutput() );
-}
-
-const  mitk::ImageSource::OutputImageType *  mitk::ImageSource::GetOutput(void) const
-{
-  return itkDynamicCastInDebugMode< const OutputImageType * >( this->GetPrimaryOutput() );
-}
-
-mitk::ImageSource::OutputImageType*  mitk::ImageSource::GetOutput(DataObjectPointerArraySizeType idx)
-{
-  OutputImageType *out = dynamic_cast< OutputImageType * >
-                      ( this->ProcessObject::GetOutput(idx) );
-
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
-    {
-    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputImageType ).name () );
-    }
-  return out;
-}
-
-const  mitk::ImageSource::OutputImageType*  mitk::ImageSource::GetOutput(DataObjectPointerArraySizeType idx) const
-{
-  const OutputImageType *out = dynamic_cast< const OutputImageType * >
-                      ( this->ProcessObject::GetOutput(idx) );
-
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
-    {
-    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputImageType ).name () );
-    }
-  return out;
-}
-
 
 //----------------------------------------------------------------------------
 unsigned int mitk::ImageSource::SplitRequestedRegion(unsigned int i, unsigned int num, OutputImageRegionType& splitRegion)
@@ -262,3 +196,5 @@ vtkImageData* mitk::ImageSource::GetVtkImageData()
     Update();
     return GetOutput()->GetVtkImageData();
 }
+
+mitkBaseDataSourceGetOutputDefinitions(mitk::ImageSource)

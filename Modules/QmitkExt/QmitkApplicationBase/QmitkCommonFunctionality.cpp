@@ -436,7 +436,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       vtkTriangleFilter* triangleFilter = vtkTriangleFilter::New();
       triangleFilter->SetInput(polys);
       triangleFilter->Update();
-      polys = triangleFilter->GetOutput(0);
+      polys = triangleFilter->GetOutput();
       polys->Register(NULL);
       triangleFilter->Delete();
       surface->SetVtkPolyData(polys);
@@ -569,7 +569,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
              mitk::Convert2Dto3DImageFilter::Pointer convertFilter = mitk::Convert2Dto3DImageFilter::New();
              convertFilter->SetInput(image);
              convertFilter->Update();
-             image = convertFilter->GetOutput(0);
+             image = convertFilter->GetOutput();
           }
           else if (ret == QMessageBox::NoRole)
           {
@@ -706,7 +706,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   //
 
   pngWriter->SetInput(processedImageData);
-  //pngWriter->SetInput( wti->GetOutput(0) );
+  //pngWriter->SetInput( wti->GetOutput() );
   pngWriter->SetFileName( concreteFilename.c_str() );
 
   pngWriter->Write();

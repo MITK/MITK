@@ -85,7 +85,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
   if ( m_GenerateNormals )
   {
     ls->m_VtkPolyDataNormals->SetInput( polydata );
-    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput(0) );
+    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
   }
   else
   {
@@ -325,7 +325,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
             sliceselector->SetTimeNr(0);
             sliceselector->SetInput(miktTexture);
             sliceselector->Update();
-            vtkTxture->SetInput(sliceselector->GetOutput(0)->GetVtkImageData());
+            vtkTxture->SetInput(sliceselector->GetOutput()->GetVtkImageData());
         }
         else //or just use the 2D image
         {

@@ -22,11 +22,10 @@ mitk::SurfaceSource::SurfaceSource()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type TOutputImage
-  mitk::Surface::Pointer output
-    = static_cast<mitk::Surface*>(this->MakeOutput(0).GetPointer());
+  itk::DataObject::Pointer output = this->MakeOutput(0);
 
   Superclass::SetNumberOfRequiredOutputs(1);
-  Superclass::SetNthOutput(0, output.GetPointer());
+  Superclass::SetNthOutput(0, output);
 }
 
 mitk::SurfaceSource::~SurfaceSource()
@@ -35,7 +34,7 @@ mitk::SurfaceSource::~SurfaceSource()
 
 itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  return static_cast<itk::DataObject *>(mitk::Surface::New().GetPointer());
+  return OutputType::New().GetPointer();
 }
 
 
@@ -49,52 +48,4 @@ itk::DataObject::Pointer mitk::SurfaceSource::MakeOutput( const DataObjectIdenti
   return static_cast<itk::DataObject *>(mitk::Surface::New().GetPointer());
 }
 
-
-void mitk::SurfaceSource::GraftOutput(mitk::Surface* graft)
-{
-  this->GraftNthOutput(0, graft);
-}
-
-void mitk::SurfaceSource::GraftNthOutput(unsigned int idx, mitk::Surface *graft)
-{
-  if (idx < this->GetNumberOfOutputs())
-  {
-    mitk::Surface * output = this->GetOutput(idx);
-
-    if (output && graft)
-    {
-      // grab a handle to the bulk data of the specified data object
-      //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-
-      // copy the region ivars of the specified data object
-      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-      //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
-      //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-
-      // copy the meta-information
-      output->CopyInformation( graft );
-    }
-  }
-}
-
-
-
-mitk::Surface *mitk::SurfaceSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
-{
-  return static_cast<mitk::Surface*>(Superclass::GetOutput(key));
-}
-
-const mitk::Surface *mitk::SurfaceSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
-{
-  return static_cast<const mitk::Surface*>(Superclass::GetOutput(key));
-}
-
-mitk::Surface *mitk::SurfaceSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
-{
-  return static_cast<mitk::Surface*>(Superclass::GetOutput(idx));
-}
-
-const mitk::Surface *mitk::SurfaceSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
-{
-  return static_cast<const mitk::Surface*>(Superclass::GetOutput(idx));
-}
+mitkBaseDataSourceGetOutputDefinitions(mitk::SurfaceSource)

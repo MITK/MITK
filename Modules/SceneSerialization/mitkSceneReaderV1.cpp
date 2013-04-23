@@ -252,7 +252,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
       try
       {
         factory->Update();
-        node = factory->GetOutput(0);
+        node = factory->GetOutput();
       }
       catch (std::exception& e)
       {

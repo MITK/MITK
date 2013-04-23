@@ -93,7 +93,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     myFilter->SetInput(0,nd1);
     MITK_TEST_CONDITION(myFilter->GetInput(0) == nd1, "Testing Set-/GetInput() ND1");
 
-    mitk::NavigationData* output1 = myFilter->GetOutput(0);
+    mitk::NavigationData* output1 = myFilter->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput() ND1");
 
     MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() before setting source points");
@@ -246,7 +246,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       nd1->SetDataValid(initialValid);
 
       myFilter->SetInput(0, nd1);
-      mitk::NavigationData::Pointer output = myFilter->GetOutput(0);
+      mitk::NavigationData::Pointer output = myFilter->GetOutput();
 
       output->Update();
 
@@ -305,7 +305,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
 
     myFilter->SetInput(0,nd1);
 
-    output1 = myFilter->GetOutput(0);
+    output1 = myFilter->GetOutput();
     output1->Update();
 
     MITK_TEST_CONDITION(

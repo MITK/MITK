@@ -391,7 +391,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   }
 
-  Image::Pointer resultImage = this->GetOutput(0);
+  Image::Pointer resultImage = this->GetOutput();
 
   Point3D origin;
   origin[0] = xmin;

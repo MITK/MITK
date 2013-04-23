@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     virtual void GenerateOutputInformation()
       {
       mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput(0);
-      mitk::Image::Pointer output      = (mitk::Image*) this->GetOutput(0);
+      mitk::Image::Pointer output      = (mitk::Image*) this->GetOutput();
      if(inputImage.IsNull()) return;
      };
 
@@ -69,12 +69,12 @@ public:
     mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
     TestUSFilter::Pointer filter = TestUSFilter::New();
     videoDevice->Update();
-    filter->SetInput(videoDevice->GetOutput(0));
+    filter->SetInput(videoDevice->GetOutput());
     filter->Update();
     MITK_TEST_CONDITION_REQUIRED(videoDevice.IsNotNull(), "videoDevice should not be null after instantiation");
 
-    //mitk::USImage::Pointer result = dynamic_cast<mitk::USImage *> (filter->GetOutput(0));
-    mitk::USImage::Pointer result = filter->GetOutput(0);
+    //mitk::USImage::Pointer result = dynamic_cast<mitk::USImage *> (filter->GetOutput());
+    mitk::USImage::Pointer result = filter->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(result.IsNotNull(), "resulting images should not be null");
     std::string model = result->GetMetadata()->GetDeviceModel();
     MITK_TEST_CONDITION_REQUIRED(model.compare("Model") == 0   , "Resulting images should have their metadata set correctly");

@@ -426,7 +426,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     {
       m_SurfaceMapper=SurfaceGLMapper2D::New();
     }
-    m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput(0));
+    m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
     m_SurfaceMapper->SetDataNode(GetDataNode());
 
     m_SurfaceMapper->Paint(renderer);

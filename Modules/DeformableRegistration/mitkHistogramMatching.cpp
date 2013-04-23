@@ -72,14 +72,14 @@ namespace mitk {
       typename MovingImageCasterType::Pointer movingImageCaster = MovingImageCasterType::New();
       movingImageCaster->SetInput(movingImage);
       typename MatchingFilterType::Pointer matcher = MatchingFilterType::New();
-      matcher->SetInput( movingImageCaster->GetOutput(0) );
-      matcher->SetReferenceImage( fixedImageCaster->GetOutput(0) );
+      matcher->SetInput( movingImageCaster->GetOutput() );
+      matcher->SetReferenceImage( fixedImageCaster->GetOutput() );
       matcher->SetNumberOfHistogramLevels( m_NumberOfHistogramLevels );
       matcher->SetNumberOfMatchPoints( m_NumberOfMatchPoints );
       matcher->SetThresholdAtMeanIntensity(m_ThresholdAtMeanIntensity);
       matcher->Update();
-      Image::Pointer outputImage = this->GetOutput(0);
-      mitk::CastToMitkImage( matcher->GetOutput(0), outputImage );
+      Image::Pointer outputImage = this->GetOutput();
+      mitk::CastToMitkImage( matcher->GetOutput(), outputImage );
     }
   }
 } // end namespace

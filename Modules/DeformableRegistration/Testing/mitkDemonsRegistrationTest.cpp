@@ -94,7 +94,7 @@ int mitkDemonsRegistrationTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Get the result image: ";
-  mitk::Image::Pointer resultImage = demonsRegistration->GetOutput(0);
+  mitk::Image::Pointer resultImage = demonsRegistration->GetOutput();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Get the deformation field: ";

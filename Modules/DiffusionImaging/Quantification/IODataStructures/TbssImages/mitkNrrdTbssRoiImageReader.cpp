@@ -132,14 +132,14 @@ namespace mitk
       imageIO->SetIORegion( ioRegion );
       void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
       imageIO->Read( buffer );
-      //mitk::Image::Pointer static_cast<OutputType*>(this->GetOutput(0))image = mitk::Image::New();
+      //mitk::Image::Pointer static_cast<OutputType*>(this->GetOutput())image = mitk::Image::New();
       if((ndim==4) && (dimensions[3]<=1))
         ndim = 3;
       if((ndim==3) && (dimensions[2]<=1))
         ndim = 2;
 
-      static_cast<OutputType*>(this->GetOutput(0))->Initialize( MakePixelType(imageIO), ndim, dimensions );
-      static_cast<OutputType*>(this->GetOutput(0))->SetImportChannel( buffer, 0, Image::ManageMemory );
+      static_cast<OutputType*>(this->GetOutput())->Initialize( MakePixelType(imageIO), ndim, dimensions );
+      static_cast<OutputType*>(this->GetOutput())->SetImportChannel( buffer, 0, Image::ManageMemory );
 
       // access direction of itk::Image and include spacing
       mitk::Matrix3D matrix;
@@ -152,20 +152,20 @@ namespace mitk
       // re-initialize PlaneGeometry with origin and direction
       PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>
                                      (static_cast<OutputType*>
-                                      (this->GetOutput(0))->GetSlicedGeometry(0)->GetGeometry2D(0));
+                                      (this->GetOutput())->GetSlicedGeometry(0)->GetGeometry2D(0));
       planeGeometry->SetOrigin(origin);
       planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 
       // re-initialize SlicedGeometry3D
-      SlicedGeometry3D* slicedGeometry = static_cast<OutputType*>(this->GetOutput(0))->GetSlicedGeometry(0);
-      slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(2));
+      SlicedGeometry3D* slicedGeometry = static_cast<OutputType*>(this->GetOutput())->GetSlicedGeometry(0);
+      slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetOutput())->GetDimension(2));
       slicedGeometry->SetSpacing(spacing);
 
       // re-initialize TimeSlicedGeometry
-      static_cast<OutputType*>(this->GetOutput(0))->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
+      static_cast<OutputType*>(this->GetOutput())->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetOutput())->GetDimension(3));
 
       buffer = NULL;
-      MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput(0))->GetPixelType().GetNumberOfComponents() << std::endl;
+      MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
 
 
 
@@ -183,9 +183,9 @@ namespace mitk
         reader->SetImageIO(imageIO);
         reader->Update();
 
-        img = reader->GetOutput(0);
+        img = reader->GetOutput();
 
-        static_cast<OutputType*>(this->GetOutput(0))->SetImage(img);
+        static_cast<OutputType*>(this->GetOutput())->SetImage(img);
 
         itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
         ReadRoiInfo(imgMetaDictionary);
@@ -250,18 +250,18 @@ namespace mitk
       else if(itKey->find("preprocessed FA") != std::string::npos)
       {
         MITK_INFO << *itKey << " ---> " << metaString;
-        static_cast<OutputType*>(this->GetOutput(0))->SetPreprocessedFA(true);
-        static_cast<OutputType*>(this->GetOutput(0))->SetPreprocessedFAFile(metaString);
+        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFA(true);
+        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFAFile(metaString);
       }
 
       // Name of structure
       if (itKey->find("structure") != std::string::npos)
       {
         MITK_INFO << *itKey << " ---> " << metaString;
-        static_cast<OutputType*>(this->GetOutput(0))->SetStructure(metaString);
+        static_cast<OutputType*>(this->GetOutput())->SetStructure(metaString);
       }
     }
-    static_cast<OutputType*>(this->GetOutput(0))->SetRoi(roi);
+    static_cast<OutputType*>(this->GetOutput())->SetRoi(roi);
 
   }
 

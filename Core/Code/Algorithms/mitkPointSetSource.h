@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_POINT_SET_SOURCE_H
 #define _MITK_POINT_SET_SOURCE_H
 
-#include "mitkBaseProcess.h"
+#include "mitkBaseDataSource.h"
 #include "mitkPointSet.h"
 
 namespace mitk
@@ -33,16 +33,18 @@ namespace mitk
  * DataObject.
  * @ingroup Process
  */
-class MITK_CORE_EXPORT PointSetSource : public BaseProcess
+class MITK_CORE_EXPORT PointSetSource : public BaseDataSource
 {
 public:
-    mitkClassMacro( PointSetSource, BaseProcess )
+    mitkClassMacro( PointSetSource, BaseDataSource )
 
     itkNewMacro( Self )
 
     typedef PointSet OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
+
+    mitkBaseDataSourceGetOutputDeclarations
 
     /**
      * Allocates a new output object and returns it. Currently the
@@ -59,15 +61,6 @@ public:
      * virtual.
      */
     virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
-
-    OutputType* GetOutput();
-    const OutputType* GetOutput() const;
-    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
-    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
-
-    virtual void GraftOutput(OutputType *output);
-    virtual void GraftOutput(const itk::ProcessObject::DataObjectIdentifierType& key, OutputType* graft);
-    virtual void GraftNthOutput(DataObjectPointerArraySizeType idx, OutputType *output);
 
 protected:
 

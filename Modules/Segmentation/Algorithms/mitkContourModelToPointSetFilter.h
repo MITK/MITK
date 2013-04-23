@@ -39,27 +39,20 @@ namespace mitk {
 
   public:
 
-    mitkClassMacro(ContourModelToPointSetFilter, PointSetSource);
-    itkNewMacro(Self);
+    mitkClassMacro(ContourModelToPointSetFilter, PointSetSource)
+    itkNewMacro(Self)
 
     typedef PointSet OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::ContourModel InputType;
 
-    virtual void GraftOutput(OutputType *output);
-    virtual void GraftNthOutput(unsigned int idx, OutputType *output);
-
-//    virtual void SetInput( const InputType *input);
-//    virtual void SetInput(DataObjectPointerArraySizeType idx, const InputType * input);
-//    const InputType * GetInput(void);
-//    const InputType * GetInput(unsigned int idx);
-
   protected:
+
     ContourModelToPointSetFilter();
 
     virtual ~ContourModelToPointSetFilter();
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() {}
 
     void GenerateData();
   };

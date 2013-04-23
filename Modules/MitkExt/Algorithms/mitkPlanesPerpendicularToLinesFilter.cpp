@@ -33,7 +33,7 @@ mitk::PlanesPerpendicularToLinesFilter::~PlanesPerpendicularToLinesFilter()
 void mitk::PlanesPerpendicularToLinesFilter::GenerateOutputInformation()
 {
   mitk::Mesh::ConstPointer input  = this->GetInput();
-  mitk::GeometryData::Pointer output = this->GetOutput(0);
+  mitk::GeometryData::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -77,7 +77,7 @@ void mitk::PlanesPerpendicularToLinesFilter::CreatePlane(const mitk::Point3D& cu
 void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
 {
   mitk::Mesh::ConstPointer input  = this->GetInput();
-  mitk::GeometryData::Pointer output = this->GetOutput(0);
+  mitk::GeometryData::Pointer output = this->GetOutput();
 
   if(m_Plane.IsNotNull())
   {

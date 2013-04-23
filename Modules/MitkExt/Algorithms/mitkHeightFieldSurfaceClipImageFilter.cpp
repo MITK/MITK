@@ -114,7 +114,7 @@ namespace mitk
 
   void HeightFieldSurfaceClipImageFilter::GenerateInputRequestedRegion()
   {
-    Image *outputImage = this->GetOutput(0);
+    Image *outputImage = this->GetOutput();
     Image *inputImage = const_cast< Image * >( this->GetInput( 0 ) );
     const Surface *inputSurface = dynamic_cast< const Surface * >( this->GetInput( 1 ) );
 
@@ -132,7 +132,7 @@ namespace mitk
   void HeightFieldSurfaceClipImageFilter::GenerateOutputInformation()
   {
     const Image *inputImage = this->GetInput( 0 );
-    Image *outputImage = this->GetOutput(0);
+    Image *outputImage = this->GetOutput();
 
     if ( outputImage->IsInitialized()
       && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()) )
@@ -181,10 +181,10 @@ namespace mitk
 
     typename ImageToItk<ItkOutputImageType >::Pointer outputimagetoitk =
       ImageToItk<ItkOutputImageType>::New();
-    outputimagetoitk->SetInput( clipImageFilter->m_OutputTimeSelector->GetOutput(0) );
+    outputimagetoitk->SetInput( clipImageFilter->m_OutputTimeSelector->GetOutput() );
     outputimagetoitk->Update();
 
-    typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput(0);
+    typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
                     std::vector< double > test;
 
 
@@ -386,7 +386,7 @@ namespace mitk
   {
     const Image *inputImage = this->GetInput( 0 );
 
-    const Image *outputImage = this->GetOutput(0);
+    const Image *outputImage = this->GetOutput();
 
     m_InputTimeSelector->SetInput( inputImage );
     m_OutputTimeSelector->SetInput( outputImage );
@@ -442,7 +442,7 @@ namespace mitk
         if(i==1)
         {
           AccessByItk_3(
-            m_InputTimeSelector->GetOutput(0),
+            m_InputTimeSelector->GetOutput(),
             _InternalComputeClippedImage,
             this,
             inputSurface->GetVtkPolyData( t ),
@@ -450,7 +450,7 @@ namespace mitk
         }
         else
         {
-          mitk::Image::Pointer extensionImage = m_OutputTimeSelector->GetOutput(0)->Clone();
+          mitk::Image::Pointer extensionImage = m_OutputTimeSelector->GetOutput()->Clone();
           AccessByItk_3(
             extensionImage,
             _InternalComputeClippedImage,

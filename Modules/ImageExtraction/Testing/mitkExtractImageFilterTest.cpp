@@ -85,7 +85,7 @@ static void Test3D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
         continue;
       }
 
-      mitk::Image::Pointer output = filter->GetOutput(0);
+      mitk::Image::Pointer output = filter->GetOutput();
 
       if (output.GetPointer() == filter->GetInput())
       {
@@ -181,7 +181,7 @@ static void Test2D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
       continue;
     }
 
-    mitk::Image::Pointer output = filter->GetOutput(0);
+    mitk::Image::Pointer output = filter->GetOutput();
 
     if (output.GetPointer() != filter->GetInput())
     {
@@ -219,7 +219,7 @@ static void Test4D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
     timeSelector->SetInput( image );
     timeSelector->SetTimeNr( timeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    mitk::Image::Pointer image3D = timeSelector->GetOutput(0);
+    mitk::Image::Pointer image3D = timeSelector->GetOutput();
 
     for ( unsigned int sliceDimension = 0; sliceDimension < 6; ++sliceDimension )
     {
@@ -266,7 +266,7 @@ static void Test4D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
           continue;
         }
 
-        mitk::Image::Pointer output = filter->GetOutput(0);
+        mitk::Image::Pointer output = filter->GetOutput();
 
         if (output.GetPointer() == filter->GetInput())
         {

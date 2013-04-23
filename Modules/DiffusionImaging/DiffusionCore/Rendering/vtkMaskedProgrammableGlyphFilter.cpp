@@ -43,7 +43,7 @@ vtkMaskedProgrammableGlyphFilter::~vtkMaskedProgrammableGlyphFilter()
 void vtkMaskedProgrammableGlyphFilter::SetInput(vtkDataSet *input)
 {
   this->MaskPoints->SetInput(input);
-  this->Superclass::SetInput(this->MaskPoints->GetOutput(0));
+  this->Superclass::SetInput(this->MaskPoints->GetOutput());
 }
 
 void vtkMaskedProgrammableGlyphFilter::SetRandomMode(int mode)
@@ -60,7 +60,7 @@ void vtkMaskedProgrammableGlyphFilter::Execute()
 {
   if (this->UseMaskPoints)
     {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput(0));
+    this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     double onRatio = MaximumNumberOfPoints != 0.0 ? numPts / MaximumNumberOfPoints : 1.0;
@@ -82,7 +82,7 @@ int vtkMaskedProgrammableGlyphFilter::RequestData(
 {
   if (this->UseMaskPoints)
   {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput(0));
+    this->Superclass::SetInput(this->MaskPoints->GetOutput());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
     this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
     this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);

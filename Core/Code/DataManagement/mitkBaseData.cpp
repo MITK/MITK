@@ -151,9 +151,9 @@ bool mitk::BaseData::IsEmpty() const
   return true;
 }
 
-itk::SmartPointer<mitk::BaseProcess> mitk::BaseData::GetSource() const
+itk::SmartPointer<mitk::BaseDataSource> mitk::BaseData::GetSource() const
 {
-  return static_cast<mitk::BaseProcess*>(Superclass::GetSource().GetPointer());
+  return static_cast<mitk::BaseDataSource*>(Superclass::GetSource().GetPointer());
 }
 
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
@@ -220,6 +220,11 @@ unsigned long mitk::BaseData::GetMTime() const
     //}
   }
   return time;
+}
+
+void mitk::BaseData::Graft(const itk::DataObject*)
+{
+  itkExceptionMacro(<< "Graft not implemented for mitk::BaseData subclass " << this->GetNameOfClass())
 }
 
 void mitk::BaseData::CopyInformation( const itk::DataObject* data )

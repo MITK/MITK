@@ -58,11 +58,11 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
     myImageToItkFilter ->SetInput(mitksource);                                                  \
     \
     ImageFilterTypePointer itkpipeline =                                                     \
-    itkpipelinefunction(myImageToItkFilter->GetOutput(0)).GetPointer();                             \
+    itkpipelinefunction(myImageToItkFilter->GetOutput()).GetPointer();                             \
     itkpipeline->Update();                                                                 \
     \
-    result->InitializeByItk(itkpipeline->GetOutput(0));                                              \
-    result->SetVolume(itkpipeline->GetOutput(0)->GetBufferPointer());                           \
+    result->InitializeByItk(itkpipeline->GetOutput());                                              \
+    result->SetVolume(itkpipeline->GetOutput()->GetBufferPointer());                           \
 }
 //    _calculateItkPipelineFunction(result, mitkimage, itkpipeline<type, dimension>::New());
 
@@ -125,10 +125,10 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
     myImageToItkFilter->SetInput(mitksource);                                                  \
     \
     ImageFilterTypePointer itkpipeline =                                                     \
-    itkpipelinefunction<ImageType,resultItkImageType>(myImageToItkFilter->GetOutput(0)).GetPointer();                             \
+    itkpipelinefunction<ImageType,resultItkImageType>(myImageToItkFilter->GetOutput()).GetPointer();                             \
     itkpipeline->Update();                                                                 \
     \
-    resultItkImage = itkpipeline->GetOutput(0);                                              \
+    resultItkImage = itkpipeline->GetOutput();                                              \
 }
 
 //##Documentation

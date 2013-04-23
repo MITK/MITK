@@ -171,7 +171,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         TensorImageToQBallImageFilter<float,float>::Pointer filter = TensorImageToQBallImageFilter<float,float>::New();
         filter->SetInput( m_TensorImage );
         filter->Update();
-        m_QBallImage = filter->GetOutput(0);
+        m_QBallImage = filter->GetOutput();
     }
     else if (m_DuplicateImage) // generate local working copy of QBall image (if not disabled)
     {
@@ -388,7 +388,7 @@ void GibbsTrackingFilter< ItkQBallImageType >::PrepareMaskImage()
         resampler->SetInput( m_MaskImage );
         resampler->SetDefaultPixelValue(0.0);
         resampler->Update();
-        m_MaskImage = resampler->GetOutput(0);
+        m_MaskImage = resampler->GetOutput();
         MITK_INFO << "GibbsTrackingFilter: resampling finished";
     }
 }

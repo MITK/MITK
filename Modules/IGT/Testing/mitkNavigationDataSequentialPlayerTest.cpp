@@ -65,7 +65,7 @@ bool runLoop()
   for(unsigned int i=0; i<player->GetNumberOfSnapshots();++i)
   {
     player->Update();
-    nd0 = player->GetOutput(0);
+    nd0 = player->GetOutput();
     nd1 = player->GetOutput(1);
 
     // test some values
@@ -126,7 +126,7 @@ void TestStandardWorkflow()
                       "Testing GoToSnapshot() [1]");
 
   player->GoToSnapshot(1);
-  mitk::NavigationData::Pointer nd0 = player->GetOutput(0);
+  mitk::NavigationData::Pointer nd0 = player->GetOutput();
   MITK_TEST_CONDITION(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector(),
                       "Testing GoToSnapshot() [2]");
 

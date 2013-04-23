@@ -209,7 +209,7 @@ mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateRepresentationObjec
   vtkData->CappingOn();
   vtkData->Update();
 
-  cone->SetVtkPolyData(vtkData->GetOutput(0));
+  cone->SetVtkPolyData(vtkData->GetOutput());
 
   vtkData->Delete();
 

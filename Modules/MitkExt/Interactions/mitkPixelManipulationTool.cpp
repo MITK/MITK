@@ -96,7 +96,7 @@ void mitk::PixelManipulationTool::CalculateImage()
         filter->SetBoundingObject( boundingObject);
         filter->SetInput(image);
         filter->Update();
-        roi = filter->GetOutput(0);
+        roi = filter->GetOutput();
       }
       else
         roi =  dynamic_cast<mitk::Image*> (maskNode->GetData());

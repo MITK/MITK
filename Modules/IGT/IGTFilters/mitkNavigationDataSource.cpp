@@ -45,19 +45,22 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput()
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
 
-  return static_cast<NavigationData*>(this->ProcessObject::GetOutput(0));
+  return static_cast<NavigationData*>(this->ProcessObject::GetPrimaryOutput());
 }
 
 
-mitk::NavigationData* mitk::NavigationDataSource::GetOutput(unsigned int idx)
+mitk::NavigationData* mitk::NavigationDataSource::GetOutput(DataObjectPointerArraySizeType idx)
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-  return static_cast<NavigationData*>(this->ProcessObject::GetOutput(idx));
+  NavigationData* out = dynamic_cast<NavigationData*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( NavigationData ).name () );
+  }
+  return out;
 }
 
 
-mitk::NavigationData* mitk::NavigationDataSource::GetOutput(std::string navDataName)
+mitk::NavigationData* mitk::NavigationDataSource::GetOutput(const std::string& navDataName)
 {
   DataObjectPointerArray outputs = this->GetOutputs();
   for (DataObjectPointerArray::iterator it = outputs.begin(); it != outputs.end(); ++it)

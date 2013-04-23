@@ -64,7 +64,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
 {
   mitk::Surface::ConstPointer input  = this->GetInput();
   mitk::Image::ConstPointer source = this->GetSource();
-  mitk::Surface::Pointer output = this->GetOutput(0);
+  mitk::Surface::Pointer output = this->GetOutput();
 
   if(input.IsNull()) return;
   if(source.IsNull()) return;
@@ -95,7 +95,7 @@ void mitk::ProbeFilter::GenerateData()
 {
   mitk::Surface *input  = const_cast< mitk::Surface * >(this->GetInput());
   mitk::Image *source = const_cast< mitk::Image * >(this->GetSource());
-  mitk::Surface::Pointer output = this->GetOutput(0);
+  mitk::Surface::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"Generating Data");
 
@@ -147,7 +147,7 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
   if(input==NULL) return;
   if(source==NULL) return;
 
-  mitk::Surface::Pointer output = this->GetOutput(0);
+  mitk::Surface::Pointer output = this->GetOutput();
   mitk::Surface::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
 

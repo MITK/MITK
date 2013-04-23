@@ -255,7 +255,7 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   CreateRandomDistanceImage(100,100,itkInputImage,mitkInputImage);
   ItkImageType_2D::Pointer itkOutputImage;
   compositeFilter->SetInput(mitkInputImage);
-  mitk::Image::Pointer mitkOutputImage = compositeFilter->GetOutput(0);
+  mitk::Image::Pointer mitkOutputImage = compositeFilter->GetOutput();
 
 
   //-------------------------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
 
   //standard variant
   thresholdFilter->SetInput(itkInputImage);
-  itkOutputImage = thresholdFilter->GetOutput(0);
+  itkOutputImage = thresholdFilter->GetOutput();
   itkOutputImage->Update();
 
   //variant with composite filter
@@ -286,8 +286,8 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //Apply first and second filter
 
   //standard variant
-  medianFilter->SetInput(thresholdFilter->GetOutput(0));
-  itkOutputImage = medianFilter->GetOutput(0);
+  medianFilter->SetInput(thresholdFilter->GetOutput());
+  itkOutputImage = medianFilter->GetOutput();
   itkOutputImage->Update();
 
   //variant with composite filter
@@ -306,8 +306,8 @@ int mitkToFCompositeFilterTest(int /* argc */, char* /*argv*/[])
   //Apply first three filters
 
   //standard variant
-  bilateralFilter->SetInput(medianFilter->GetOutput(0));
-  itkOutputImage = bilateralFilter->GetOutput(0);
+  bilateralFilter->SetInput(medianFilter->GetOutput());
+  itkOutputImage = bilateralFilter->GetOutput();
   itkOutputImage->Update();
 
   //variant with composite filter

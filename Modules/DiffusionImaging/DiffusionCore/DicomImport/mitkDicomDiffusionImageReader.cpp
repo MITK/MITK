@@ -37,7 +37,7 @@ template <class TPixelType, const int TDimension>
 void DicomDiffusionImageReader<TPixelType, TDimension>
 ::GenerateOutputInformation(void)
 {
-  typename OutputImageType::Pointer output = this->GetOutput(0);
+  typename OutputImageType::Pointer output = this->GetOutput();
   typedef itk::ImageSeriesReader<InputImageType> ReaderType;
 
   // Read the first (or last) volume and use its size.
@@ -51,10 +51,10 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
       reader->SetFileNames (m_Headers[0]->m_DicomFilenames);
       reader->UpdateOutputInformation();
 
-      output->SetSpacing( reader->GetOutput(0)->GetSpacing() );   // Set the image spacing
-      output->SetOrigin( reader->GetOutput(0)->GetOrigin() );     // Set the image origin
-      output->SetDirection( reader->GetOutput(0)->GetDirection() );  // Set the image direction
-      output->SetLargestPossibleRegion( reader->GetOutput(0)->GetLargestPossibleRegion() );
+      output->SetSpacing( reader->GetOutput()->GetSpacing() );   // Set the image spacing
+      output->SetOrigin( reader->GetOutput()->GetOrigin() );     // Set the image origin
+      output->SetDirection( reader->GetOutput()->GetDirection() );  // Set the image direction
+      output->SetLargestPossibleRegion( reader->GetOutput()->GetLargestPossibleRegion() );
       output->SetVectorLength( m_Headers.size() );
     }
     catch (itk::ExceptionObject &e)
@@ -85,7 +85,7 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
 {
   typedef itk::ImageSeriesReader<InputImageType> ReaderType;
 
-  typename OutputImageType::Pointer output = this->GetOutput(0);
+  typename OutputImageType::Pointer output = this->GetOutput();
 
   typedef typename OutputImageType::RegionType   RegionType;
   RegionType requestedRegion = output->GetRequestedRegion();
@@ -115,13 +115,13 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
     reader->SetFileNames(m_Headers[i]->m_DicomFilenames);
     reader->UpdateLargestPossibleRegion();
 
-    if (reader->GetOutput(0)->GetRequestedRegion().GetSize() != validSize)
+    if (reader->GetOutput()->GetRequestedRegion().GetSize() != validSize)
       {
       itkExceptionMacro(<< "Size mismatch!");
       }
 
-    itk::ImageRegionConstIterator<InputImageType> it (reader->GetOutput(0),
-                                               reader->GetOutput(0)->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<InputImageType> it (reader->GetOutput(),
+                                               reader->GetOutput()->GetLargestPossibleRegion());
 
     while (!it.IsAtEnd())
       {

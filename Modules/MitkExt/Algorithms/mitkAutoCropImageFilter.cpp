@@ -66,25 +66,25 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   roiFilter->SetInput(0,inputItkImage);
   roiFilter->SetRegionOfInterest(this->GetCroppingRegion());
   roiFilter->Update();
-  outputItk = roiFilter->GetOutput(0);
+  outputItk = roiFilter->GetOutput();
   outputItk->DisconnectPipeline();
 
   mitk::Image::Pointer newMitkImage = mitk::Image::New();
   mitk::CastToMitkImage( outputItk, newMitkImage );
-  MITK_INFO << "Crop-Output dimension: " << (newMitkImage->GetDimension() == 3) << " Filter-Output dimension: "<<this->GetOutput(0)->GetDimension()<< " Timestep: " << timestep;
+  MITK_INFO << "Crop-Output dimension: " << (newMitkImage->GetDimension() == 3) << " Filter-Output dimension: "<<this->GetOutput()->GetDimension()<< " Timestep: " << timestep;
 
 //  const mitk::ChannelDescriptor desc = newMitkImage->GetChannelDescriptor(0);
 //  unsigned char* image3D = desc.GetData();
-//  this->GetOutput(0)->SetVolume( (void*) &image3D , timestep );
+//  this->GetOutput()->SetVolume( (void*) &image3D , timestep );
 
-  this->GetOutput(0)->SetVolume( newMitkImage->GetData(), timestep);
+  this->GetOutput()->SetVolume( newMitkImage->GetData(), timestep);
 //  this->SetOutput(newMitkImage);
 }
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
 {
   mitk::Image::Pointer input = const_cast<mitk::Image*> (this->GetInput());
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if(input->GetDimension() <= 2)
   {
@@ -198,7 +198,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
 void mitk::AutoCropImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if(input.IsNull())
     return;
@@ -226,10 +226,10 @@ void mitk::AutoCropImageFilter::GenerateData()
     m_TimeSelector->SetTimeNr(timestep);
     m_TimeSelector->UpdateLargestPossibleRegion();
 
-    AccessFixedDimensionByItk_1( m_TimeSelector->GetOutput(0), ITKCrop3DImage, 3, timestep );
+    AccessFixedDimensionByItk_1( m_TimeSelector->GetOutput(), ITKCrop3DImage, 3, timestep );
   }
 
-  // this->GetOutput(0)->Update(); // Not sure if this is necessary...
+  // this->GetOutput()->Update(); // Not sure if this is necessary...
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -283,7 +283,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_TimeSelector->SetInput( inputMitk );
       m_TimeSelector->SetTimeNr( 0 );
       m_TimeSelector->UpdateLargestPossibleRegion();
-      inputMitk = m_TimeSelector->GetOutput(0);
+      inputMitk = m_TimeSelector->GetOutput();
     }
 
     ImagePointer inputItk = ImageType::New();
@@ -307,7 +307,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       {
         m_TimeSelector->SetTimeNr( idx );
         m_TimeSelector->UpdateLargestPossibleRegion();
-        inputMitk = m_TimeSelector->GetOutput(0);
+        inputMitk = m_TimeSelector->GetOutput();
         mitk::CastToItkImage( inputMitk , inputItk );
       }
 

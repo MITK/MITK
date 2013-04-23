@@ -50,7 +50,7 @@ mitk::SimulationReader::~SimulationReader()
 
 void mitk::SimulationReader::GenerateData()
 {
-  Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(this->GetOutput(0));
+  Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(this->GetOutput());
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
 
   sofa::simulation::Simulation::SPtr currentSofaSimulation = sofa::simulation::getSimulation();

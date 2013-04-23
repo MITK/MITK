@@ -184,7 +184,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     }
   }
   filter->Update();
-  mitk::PointSet::Pointer result = filter->GetOutput(0);
+  mitk::PointSet::Pointer result = filter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter without subset");
 
@@ -196,7 +196,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
   surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance);
   MITK_TEST_CONDITION_REQUIRED(filter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithOutInterPixelDistance,"Testing Set/GetReconstructionMode()");
-  mitk::Surface::Pointer surface = surfaceFilter->GetOutput(0);
+  mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface
   mitk::PointSet::Pointer pointSet = mitk::ToFTestingCommon::VtkPolyDataToMitkPointSet(surface->GetVtkPolyData());
@@ -225,7 +225,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     }
   }
   filter->Update();
-  result = filter->GetOutput(0);
+  result = filter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter without subset");
 
@@ -237,7 +237,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
   surfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance);
   MITK_TEST_CONDITION_REQUIRED(surfaceFilter->GetReconstructionMode() == mitk::ToFDistanceImageToSurfaceFilter::WithInterPixelDistance,"Testing Set/GetReconstructionMode()");
-  surface = surfaceFilter->GetOutput(0);
+  surface = surfaceFilter->GetOutput();
   surface->Update();
   // create point set from surface
   pointSet = mitk::ToFTestingCommon::VtkPolyDataToMitkPointSet(surface->GetVtkPolyData());
@@ -271,7 +271,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetSubset(subSet);
   filter->Modified();
   filter->Update();
-  result = filter->GetOutput(0);
+  result = filter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter with subset");
 
@@ -301,7 +301,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   filter->SetSubset(subSet);
   filter->Modified();
   filter->Update();
-  result = filter->GetOutput(0);
+  result = filter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED((expectedResult->GetSize()==result->GetSize()),"Test if point set size is equal");
   MITK_TEST_CONDITION_REQUIRED(mitk::ToFTestingCommon::PointSetsEqual(expectedResult,result),"Testing filter with subset");
 

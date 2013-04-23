@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                 \
     imagetoitk->SetInput(mitkImage);                                                     \
     imagetoitk->Update();                                                               \
-    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
+    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
 }
 
 #define myMITKOverwriteSliceImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \

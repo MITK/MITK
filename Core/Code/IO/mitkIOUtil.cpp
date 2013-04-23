@@ -114,7 +114,7 @@ DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
             mitkThrow() << "An exception occured during loading the file " << path << ". Exception says could not find data.";
         }
 
-        mitk::DataNode::Pointer node = reader->GetOutput(0);
+        mitk::DataNode::Pointer node = reader->GetOutput();
 
         if(node.IsNull())
         {
@@ -235,7 +235,7 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
                 vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
                 triangleFilter->SetInput(polys);
                 triangleFilter->Update();
-                polys = triangleFilter->GetOutput(0);
+                polys = triangleFilter->GetOutput();
                 polys->Register(NULL);
                 surface->SetVtkPolyData(polys);
             }

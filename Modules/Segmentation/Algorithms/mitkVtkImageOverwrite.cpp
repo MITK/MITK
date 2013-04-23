@@ -1,3 +1,19 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -91,7 +107,7 @@ inline int vtkResliceRound(double x)
 mitkVtkImageOverwrite::mitkVtkImageOverwrite()
 {
   m_Overwrite_Mode = false;
-  this->GetOutput(0)->SetScalarTypeToUnsignedInt();
+  this->GetOutput()->SetScalarTypeToUnsignedInt();
 }
 
 //----------------------------------------------------------------------------
@@ -453,7 +469,7 @@ static void vtkGetResliceInterpFunc(mitkVtkImageOverwrite *self,
                                                  const void *background,
                                                  mitkVtkImageOverwrite *self))
 {
-  int dataType = self->GetOutput(0)->GetScalarType();
+  int dataType = self->GetOutput()->GetScalarType();
 
   switch (dataType)
   {
@@ -517,8 +533,8 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
                          void (**setpixels)(void *&out, const void *in,
                                             int numscalars, int n))
 {
-  int dataType = self->GetOutput(0)->GetScalarType();
-  int numscalars = self->GetOutput(0)->GetNumberOfScalarComponents();
+  int dataType = self->GetOutput()->GetScalarType();
+  int numscalars = self->GetOutput()->GetNumberOfScalarComponents();
 
   switch (numscalars)
     {
@@ -568,7 +584,7 @@ static void vtkAllocBackgroundPixelT(mitkVtkImageOverwrite *self,
 static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
                              int numComponents)
 {
-  switch (self->GetOutput(0)->GetScalarType())
+  switch (self->GetOutput()->GetScalarType())
     {
     vtkTemplateAliasMacro(vtkAllocBackgroundPixelT(self, (VTK_TT **)rval,
                                               numComponents));
@@ -577,7 +593,7 @@ static void vtkAllocBackgroundPixel(mitkVtkImageOverwrite *self, void **rval,
 
 static void vtkFreeBackgroundPixel(mitkVtkImageOverwrite *self, void **rval)
 {
-  switch (self->GetOutput(0)->GetScalarType())
+  switch (self->GetOutput()->GetScalarType())
     {
     vtkTemplateAliasMacro(delete [] *((VTK_TT **)rval));
     }

@@ -239,7 +239,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   {
     MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
     this->ResizeOutputs(1);
-    DataNode::Pointer node = this->GetOutput(0);
+    DataNode::Pointer node = this->GetOutput();
     mitk::DicomSeriesReader::StringContainer stringvec;
     stringvec.push_back(this->GetFileName());
     if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))

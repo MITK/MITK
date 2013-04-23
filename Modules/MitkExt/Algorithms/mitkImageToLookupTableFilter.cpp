@@ -120,7 +120,7 @@ void mitk::ImageToLookupTableFilter::GenerateData()
             //determine the range of the vector magnitudes in the image
             ImageConverterType::Pointer imageConverter = ImageConverterType::New();
             imageConverter->SetInput(image);
-            VectorFieldType::Pointer itkImage = imageConverter->GetOutput(0);
+            VectorFieldType::Pointer itkImage = imageConverter->GetOutput();
             VectorFieldIteratorType it( itkImage, itkImage->GetRequestedRegion() );
             it.GoToBegin();
             while ( !it.IsAtEnd() )

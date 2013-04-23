@@ -388,16 +388,16 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
 
         typedef itk::Image<TOdfPixelType, 3> ImgType;
         ImgType::Pointer img = ImgType::New();
-        img->SetSpacing( gfaFilter->GetOutput(0)->GetSpacing() );   // Set the image spacing
-        img->SetOrigin( gfaFilter->GetOutput(0)->GetOrigin() );     // Set the image origin
-        img->SetDirection( gfaFilter->GetOutput(0)->GetDirection() );  // Set the image direction
-        img->SetLargestPossibleRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion());
-        img->SetBufferedRegion( gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
+        img->SetSpacing( gfaFilter->GetOutput()->GetSpacing() );   // Set the image spacing
+        img->SetOrigin( gfaFilter->GetOutput()->GetOrigin() );     // Set the image origin
+        img->SetDirection( gfaFilter->GetOutput()->GetDirection() );  // Set the image direction
+        img->SetLargestPossibleRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion());
+        img->SetBufferedRegion( gfaFilter->GetOutput()->GetLargestPossibleRegion() );
         img->Allocate();
         itk::ImageRegionIterator<ImgType> ot (img, img->GetLargestPossibleRegion() );
         ot = ot.Begin();
         itk::ImageRegionConstIterator<GfaFilterType::OutputImageType> it
-                (gfaFilter->GetOutput(0), gfaFilter->GetOutput(0)->GetLargestPossibleRegion() );
+                (gfaFilter->GetOutput(), gfaFilter->GetOutput()->GetLargestPossibleRegion() );
         it = it.Begin();
 
         for (it = it.Begin(); !it.IsAtEnd(); ++it)
@@ -481,7 +481,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
-      multi->SetInput(anisotropyFilter->GetOutput(0));
+      multi->SetInput(anisotropyFilter->GetOutput());
       nodename = QString(nodename.c_str()).append("_FA").toStdString();*/
 
 
@@ -489,7 +489,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::FA);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_FA").toStdString();
 
         }
@@ -500,14 +500,14 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
-      multi->SetInput(anisotropyFilter->GetOutput(0));
+      multi->SetInput(anisotropyFilter->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();*/
 
             MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::RA);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_RA").toStdString();
 
         }
@@ -517,7 +517,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::AD);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_AD").toStdString();
         }
         else if(method == 3) // RD (Radial diffusivity, (Lambda2+Lambda3)/2
@@ -526,7 +526,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::RD);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_RD").toStdString();
         }
         else if(method == 4) // 1-(Lambda2+Lambda3)/(2*Lambda1)
@@ -535,7 +535,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::CA);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_CA").toStdString();
         }
         else if(method == 5) // MD (Mean Diffusivity, (Lambda1+Lambda2+Lambda3)/3 )
@@ -544,7 +544,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
             measurementsCalculator->SetInput(itkvol.GetPointer() );
             measurementsCalculator->SetMeasure(MeasurementsType::MD);
             measurementsCalculator->Update();
-            multi->SetInput(measurementsCalculator->GetOutput(0));
+            multi->SetInput(measurementsCalculator->GetOutput());
             nodename = QString(nodename.c_str()).append("_MD").toStdString();
         }
 
@@ -554,8 +554,8 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
 
         // FA TO DATATREE
         mitk::Image::Pointer image = mitk::Image::New();
-        image->InitializeByItk( multi->GetOutput(0) );
-        image->SetVolume( multi->GetOutput(0)->GetBufferPointer() );
+        image->InitializeByItk( multi->GetOutput() );
+        image->SetVolume( multi->GetOutput()->GetBufferPointer() );
         mitk::DataNode::Pointer node=mitk::DataNode::New();
         node->SetData( image );
         node->SetProperty( "name", mitk::StringProperty::New(nodename) );

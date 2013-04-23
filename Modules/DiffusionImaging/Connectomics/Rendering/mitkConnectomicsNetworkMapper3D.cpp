@@ -131,7 +131,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
       vtkSmartPointer<vtkPolyDataMapper> mapper =
         vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInput(sphereSource->GetOutput(0));
+      mapper->SetInput(sphereSource->GetOutput());
 
       vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();
@@ -188,7 +188,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
 
       vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
-      tubes->SetInput( lineSource->GetOutput(0) );
+      tubes->SetInput( lineSource->GetOutput() );
       tubes->SetNumberOfSides( 12 );
 
       // determine radius
@@ -203,7 +203,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
       vtkSmartPointer<vtkPolyDataMapper> mapper2 =
         vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper2->SetInput( tubes->GetOutput(0) );
+      mapper2->SetInput( tubes->GetOutput() );
 
       vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();

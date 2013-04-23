@@ -59,7 +59,7 @@ mitk::Image::Pointer mitk::DilateTool::ApplyFilter(mitk::Image::Pointer image)
       m_BallDilateFilter->BoundaryToForegroundOn();
       m_BallDilateFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_BallDilateFilter->GetOutput(0), new_image);
+      mitk::CastToMitkImage(m_BallDilateFilter->GetOutput(), new_image);
       break;
 
     case(CROSS):
@@ -74,7 +74,7 @@ mitk::Image::Pointer mitk::DilateTool::ApplyFilter(mitk::Image::Pointer image)
       m_CrossDilateFilter->BoundaryToForegroundOn();
       m_CrossDilateFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_CrossDilateFilter->GetOutput(0), new_image);
+      mitk::CastToMitkImage(m_CrossDilateFilter->GetOutput(), new_image);
       break;
 
     default:

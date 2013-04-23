@@ -540,7 +540,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
   imageTimeSelector->SetInput( m_Image );
   imageTimeSelector->SetTimeNr( timeStep );
   imageTimeSelector->UpdateLargestPossibleRegion();
-  mitk::Image *timeSliceImage = imageTimeSelector->GetOutput(0);
+  mitk::Image *timeSliceImage = imageTimeSelector->GetOutput();
 
 
   switch ( m_MaskingMode )
@@ -577,7 +577,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
           maskedImageTimeSelector->SetInput( m_ImageMask );
           maskedImageTimeSelector->SetTimeNr( timeStep );
           maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput(0);
+          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
 
           m_InternalImage = timeSliceImage;
           CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
@@ -650,7 +650,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
-      m_InternalImage = imageExtractor->GetOutput(0);
+      m_InternalImage = imageExtractor->GetOutput();
 
 
       // Compute mask from PlanarFigure
@@ -902,7 +902,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
   adaptMaskFilter->SetOutputOffset( offset );
   adaptMaskFilter->Update();
-  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput(0);
+  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
 
 
   // Make sure that mask region is contained within image region
@@ -932,7 +932,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     extractImageFilter->SetInput( image );
     extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
     extractImageFilter->Update();
-    adaptedImage = extractImageFilter->GetOutput(0);
+    adaptedImage = extractImageFilter->GetOutput();
   }
   else
   {
@@ -969,7 +969,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
-  labelStatisticsFilter->GetOutput(0)->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+  labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
 
   // Execute the filter
@@ -1080,7 +1080,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
   castFilter->SetInput( image );
   castFilter->Update();
-  castFilter->GetOutput(0)->FillBuffer( 1 );
+  castFilter->GetOutput()->FillBuffer( 1 );
 
   // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
   // These points are used by the vtkLassoStencilSource to create
@@ -1168,7 +1168,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
 
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
-  itkExporter->SetInput( castFilter->GetOutput(0) );
+  itkExporter->SetInput( castFilter->GetOutput() );
 
   vtkSmartPointer<vtkImageImport> vtkImporter = vtkSmartPointer<vtkImageImport>::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
@@ -1191,7 +1191,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   itkImporter->Update();
 
   // Store mask
-  m_InternalImageMask2D = itkImporter->GetOutput(0);
+  m_InternalImageMask2D = itkImporter->GetOutput();
 }
 
 

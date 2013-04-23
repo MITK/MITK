@@ -180,7 +180,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       }
       vtkPolyDataMapper* m = dynamic_cast<vtkPolyDataMapper*>(a->GetMapper());
       assert(m != NULL);
-      m->SetInput(source->GetOutput(0));
+      m->SetInput(source->GetOutput());
       aIt->second.second = data.pointSpec; // update point spec in actormap
     }
   } // for each point

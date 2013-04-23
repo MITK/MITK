@@ -69,7 +69,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   slice->Update();
 
   std::cout << "Testing IsInitialized(): ";
-  if(slice->GetOutput(0)->IsInitialized()==false)
+  if(slice->GetOutput()->IsInitialized()==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -77,7 +77,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing IsSliceSet(): ";
-  if(slice->GetOutput(0)->IsSliceSet(0)==false)
+  if(slice->GetOutput()->IsSliceSet(0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -117,7 +117,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 
     //Use the same slice-selector again, this time to take a slice of the filtered image
     //which is smaller than the one of the old input!!
-    slice->SetInput(cyl2cart->GetOutput(0));
+    slice->SetInput(cyl2cart->GetOutput());
     slice->SetSliceNr(1);
 
     //The requested region is still the old one,
@@ -127,7 +127,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 
     //If no exception occured, check that the requested region is now
     //the one of the smaller image
-    if(cyl2cart->GetOutput(0)->GetLargestPossibleRegion().GetSize()[0]!=64)
+    if(cyl2cart->GetOutput()->GetLargestPossibleRegion().GetSize()[0]!=64)
     {
       std::cout<<"Part 1 [FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -135,7 +135,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"Part 1 (without exception) [PASSED] ";
 
     //Check that the size of the output is now the one of the smaller image
-    if((cyl2cart->GetOutput(0)->GetDimensions()[0]!=64) || (cyl2cart->GetOutput(0)->GetDimensions()[1]!=64))
+    if((cyl2cart->GetOutput()->GetDimensions()[0]!=64) || (cyl2cart->GetOutput()->GetDimensions()[1]!=64))
     {
       std::cout<<"Part 1b [FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -162,7 +162,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   std::cout<<"Part 2 [PASSED]"<<std::endl;
 
   std::cout << "Testing IsInitialized(): ";
-  if(slice->GetOutput(0)->IsInitialized()==false)
+  if(slice->GetOutput()->IsInitialized()==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -170,7 +170,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing IsSliceSet(): ";
-  if(slice->GetOutput(0)->IsSliceSet(0)==false)
+  if(slice->GetOutput()->IsSliceSet(0)==false)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -192,7 +192,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 
     std::cout << "Testing 3D+t: Updating slice: ";
     slice->Update();
-    if(slice->GetOutput(0)->IsInitialized()==false)
+    if(slice->GetOutput()->IsInitialized()==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;
@@ -200,7 +200,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
 
     std::cout << "Testing 3D+t: IsSliceSet(): ";
-    if(slice->GetOutput(0)->IsSliceSet(0)==false)
+    if(slice->GetOutput()->IsSliceSet(0)==false)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

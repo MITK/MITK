@@ -139,7 +139,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   m_InterpolateSurfaceFilter->Update();
 
-  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput(0);
+  Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
   vtkSmartPointer<vtkMarchingCubes> mcFilter = vtkSmartPointer<vtkMarchingCubes>::New();
   mcFilter->SetInput(distanceImage->GetVtkImageData());
@@ -148,7 +148,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   m_InterpolationResult = 0;
   m_InterpolationResult = mitk::Surface::New();
-  m_InterpolationResult->SetVtkPolyData(mcFilter->GetOutput(0));
+  m_InterpolationResult->SetVtkPolyData(mcFilter->GetOutput());
   m_InterpolationResult->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
@@ -157,7 +157,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
     polyDataAppender->AddInput(m_ReduceFilter->GetOutput(i)->GetVtkPolyData());
   }
   polyDataAppender->Update();
-  m_Contours->SetVtkPolyData(polyDataAppender->GetOutput(0));
+  m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
   //Last progress step
   /*
@@ -206,7 +206,7 @@ void mitk::SurfaceInterpolationController::SetSegmentationImage(Image* workingIm
 
 mitk::Image* mitk::SurfaceInterpolationController::GetImage()
 {
-  return m_InterpolateSurfaceFilter->GetOutput(0);
+  return m_InterpolateSurfaceFilter->GetOutput();
 }
 
 double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()

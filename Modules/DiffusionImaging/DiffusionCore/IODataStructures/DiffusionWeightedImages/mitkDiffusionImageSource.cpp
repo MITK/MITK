@@ -65,7 +65,7 @@ itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( con
 //  }
 //
 //  return static_cast<mitk::DiffusionImage<TPixelType>*>
-//    (this->BaseProcess::GetOutput(0));
+//    (this->BaseProcess::GetOutput());
 //}
 //
 //

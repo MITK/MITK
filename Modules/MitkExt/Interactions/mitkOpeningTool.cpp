@@ -61,7 +61,7 @@ mitk::Image::Pointer mitk::OpeningTool::ApplyFilter(mitk::Image::Pointer image)
       //m_BallOpeningFilter->SetBackgroundValue(0);
       m_BallOpeningFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_BallOpeningFilter->GetOutput(0), new_image);
+      mitk::CastToMitkImage(m_BallOpeningFilter->GetOutput(), new_image);
       break;
 
     case(CROSS):
@@ -76,7 +76,7 @@ mitk::Image::Pointer mitk::OpeningTool::ApplyFilter(mitk::Image::Pointer image)
       //m_CrossOpeningFilter->SetBackgroundValue(0);
       m_CrossOpeningFilter->UpdateLargestPossibleRegion();
 
-      mitk::CastToMitkImage(m_CrossOpeningFilter->GetOutput(0), new_image);
+      mitk::CastToMitkImage(m_CrossOpeningFilter->GetOutput(), new_image);
       break;
 
     default:

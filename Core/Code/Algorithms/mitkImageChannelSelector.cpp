@@ -29,7 +29,7 @@ mitk::ImageChannelSelector::~ImageChannelSelector()
 void mitk::ImageChannelSelector::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input  = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -42,7 +42,7 @@ void mitk::ImageChannelSelector::GenerateOutputInformation()
 
 void mitk::ImageChannelSelector::GenerateData()
 {
-  const Image::RegionType& requestedRegion = GetOutput(0)->GetRequestedRegion();
+  const Image::RegionType& requestedRegion = GetOutput()->GetRequestedRegion();
 
   //do we really need the complete channel?
   if(requestedRegion.GetSize(3)>1)
@@ -62,7 +62,7 @@ void mitk::ImageChannelSelector::GenerateInputRequestedRegion()
 
   mitk::ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

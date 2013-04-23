@@ -863,7 +863,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
       nameOfResultImage.append("Otsu");
       resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
       resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput(0))->Clone());
+      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
 
       this->GetDataStorage()->Add(resultNode, node);
 

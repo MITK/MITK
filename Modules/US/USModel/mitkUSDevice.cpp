@@ -216,7 +216,7 @@ mitk::USImage* mitk::USDevice::GetOutput()
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
 
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(0));
+  return static_cast<USImage*>(this->ProcessObject::GetOutput());
 }
 
 

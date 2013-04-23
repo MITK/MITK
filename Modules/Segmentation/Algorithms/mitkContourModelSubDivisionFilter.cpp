@@ -73,7 +73,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
 
   mitk::ContourModel::Pointer input =  const_cast<mitk::ContourModel*>(this->GetInput(0));
 
-  mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput(0);
+  mitk::ContourModelSubDivisionFilter::OutputType::Pointer outputContour = this->GetOutput();
 
   mitk::ContourModel::Pointer contour(input);
 

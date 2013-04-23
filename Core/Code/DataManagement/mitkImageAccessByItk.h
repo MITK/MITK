@@ -88,7 +88,7 @@ public:
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \
     imagetoitk->Update();                                                              \
-    itkImageTypeFunction(imagetoitk->GetOutput(0));                                     \
+    itkImageTypeFunction(imagetoitk->GetOutput());                                     \
   } else
 
 #define _accessByItkArgs(itkImageTypeFunction, type)                                   \
@@ -116,7 +116,7 @@ public:
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(nonConstImage);                                               \
     imagetoitk->Update();                                                              \
-    itkImageTypeFunction(imagetoitk->GetOutput(0), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \
+    itkImageTypeFunction(imagetoitk->GetOutput(), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \
   } else
 
 #define _accessByItkArgs_n(itkImageTypeFunction, type, args)                           \
@@ -532,7 +532,7 @@ public:
     itk::SmartPointer<ImageToItkType2> imagetoitk2 = ImageToItkType2::New();            \
     imagetoitk2->SetInput(nonConstImage2);                                              \
     imagetoitk2->Update();                                                              \
-    itkImageTypeFunction(imagetoitk1->GetOutput(0), imagetoitk2->GetOutput(0));           \
+    itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());           \
   } else
 
 #define _accessTwoImagesByItkArgs2(itkImageTypeFunction, type1, type2)                  \

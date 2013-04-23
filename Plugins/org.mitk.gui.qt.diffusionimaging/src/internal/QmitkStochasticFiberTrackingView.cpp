@@ -214,7 +214,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
 
-    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(0), binaryImageToItk1->GetOutput(0)->GetRequestedRegion());
+    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
     it.Begin();
     mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
 

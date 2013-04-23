@@ -102,7 +102,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     myFilter->SetInput(nd1);
     MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "testing Set-/GetInput()");
 
-    mitk::NavigationData* output = myFilter->GetOutput(0);
+    mitk::NavigationData* output = myFilter->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
 
 
@@ -176,9 +176,9 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0)");
     MITK_TEST_CONDITION(myFilter->GetInput(1) == nd1, "testing Set-/GetInput(1)");
 
-    mitk::NavigationData* output0 = myFilter->GetOutput(0);
+    mitk::NavigationData* output0 = myFilter->GetOutput();
     mitk::NavigationData* output1 = myFilter->GetOutput(1);
-    MITK_TEST_CONDITION_REQUIRED(output0 != NULL, "Testing GetOutput(0)");
+    MITK_TEST_CONDITION_REQUIRED(output0 != NULL, "Testing GetOutput()");
     MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput(1)");
 
     /* register message receiver */

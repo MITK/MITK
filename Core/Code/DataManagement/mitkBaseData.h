@@ -296,7 +296,7 @@ public:
    * GetSource() returns a SmartPointer and not a WeakPointer
    * because it is assumed the code calling GetSource() wants to hold a
    * long term reference to the source. */
-  itk::SmartPointer<mitk::BaseProcess> GetSource() const;
+  itk::SmartPointer<mitk::BaseDataSource> GetSource() const;
 
   //##Documentation
   //## @brief Get the number of time steps from the Timeslicedgeometry
@@ -313,6 +313,11 @@ public:
   //## @brief Get the modified time of the last change of the contents
   //## this data object or its geometry.
   virtual unsigned long GetMTime() const;
+
+  /**
+   * \sa itk::ProcessObject::Graft
+   */
+  virtual void Graft(const DataObject*);
 
 protected:
   BaseData();

@@ -154,7 +154,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
         filter->SetToolkit(FilterType::FSL);
     }
 
-    filter->SetInputImage(caster->GetOutput(0));
+    filter->SetInputImage(caster->GetOutput());
     filter->GenerateData();
     typename FilterType::QballImageType::Pointer itkQbi = filter->GetQballImage();
     typename FilterType::CoefficientImageType::Pointer itkCi = filter->GetCoefficientImage();
@@ -397,7 +397,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
 
     if (m_Controls->m_OutputDirectionImagesBox->isChecked())
     {
-        MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput(0);
+        MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput();
         mitk::Image::Pointer img = mitk::Image::New();
         img->InitializeByItk( itkImg.GetPointer() );
         img->SetVolume( itkImg->GetBufferPointer() );
@@ -472,7 +472,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
         typename CasterType::Pointer caster = CasterType::New();
         caster->SetInput(img);
         caster->Update();
-        filter->SetInput(caster->GetOutput(0));
+        filter->SetInput(caster->GetOutput());
         geometry = img->GetGeometry();
     }
     catch(itk::ExceptionObject &e)
@@ -610,7 +610,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
             CasterType::Pointer caster = CasterType::New();
             caster->SetInput(img);
             caster->Update();
-            filter->SetShCoeffImage(caster->GetOutput(0));
+            filter->SetShCoeffImage(caster->GetOutput());
             geometry = img->GetGeometry();
         }
         catch(itk::ExceptionObject &e)

@@ -187,7 +187,7 @@ void TestDataStorage( mitk::DataStorage* ds, std::string filename )
   mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
   reader -> SetFileName(filename.c_str());
   reader -> Update();
-  mitk::Image::Pointer image = reader->GetOutput(0);
+  mitk::Image::Pointer image = reader->GetOutput();
 
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New();   // node with image and name property

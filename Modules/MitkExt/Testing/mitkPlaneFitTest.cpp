@@ -80,7 +80,7 @@ int mitkPlaneFitTest(int, char*[] )
 
   //Test PlaneGeometry
   std::cout << "  Test PlaneGeometry: ";
-  mitk::Geometry2D* Geometry2D = dynamic_cast<mitk::Geometry2D*>( PlaneFit->GetOutput(0)->GetGeometry());
+  mitk::Geometry2D* Geometry2D = dynamic_cast<mitk::Geometry2D*>( PlaneFit->GetOutput()->GetGeometry());
   if( Geometry2D )
   {
     std::cout<<"[PASSED]"<<std::endl;

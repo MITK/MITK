@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CONTOURMODEL_SOURCE_H
 
 #include "SegmentationExports.h"
-#include "mitkBaseProcess.h"
+#include "mitkBaseDataSource.h"
 #include "mitkContourModel.h"
 
 namespace mitk
@@ -27,16 +27,18 @@ namespace mitk
   * @brief Superclass of all classes generating ContourModels.
   * @ingroup Process
   */
-  class Segmentation_EXPORT ContourModelSource : public BaseProcess
+  class Segmentation_EXPORT ContourModelSource : public BaseDataSource
   {
   public:
-    mitkClassMacro( ContourModelSource, BaseProcess );
 
-    itkNewMacro( Self );
+    mitkClassMacro( ContourModelSource, BaseDataSource )
+    itkNewMacro( Self )
 
     typedef ContourModel OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
+
+    mitkBaseDataSourceGetOutputDeclarations
 
     /**
      * Allocates a new output object and returns it. Currently the
@@ -53,14 +55,6 @@ namespace mitk
      * virtual.
      */
     virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
-
-    virtual void GraftOutput(OutputType *output);
-    virtual void GraftNthOutput(unsigned int idx, OutputType *output);
-
-    OutputType* GetOutput(const DataObjectIdentifierType & key);
-    const OutputType* GetOutput(const DataObjectIdentifierType & key) const;
-    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
-    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
   protected:
 

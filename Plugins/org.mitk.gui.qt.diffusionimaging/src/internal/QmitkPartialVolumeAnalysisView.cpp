@@ -364,7 +364,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput(mitkInImage);
     caster->Update();
-    ItkRgbaImageType::Pointer itkInImage = caster->GetOutput(0);
+    ItkRgbaImageType::Pointer itkInImage = caster->GetOutput();
 
     typedef itk::ExtractChannelFromRgbaImageFilter< itk::Image< short, 3>, OutType > ExtractionFilterType;
     ExtractionFilterType::Pointer filter = ExtractionFilterType::New();
@@ -372,7 +372,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
     filter->SetChannel(ExtractionFilterType::ALPHA);
     filter->SetReferenceImage(referenceImage);
     filter->Update();
-    OutType::Pointer outImg = filter->GetOutput(0);
+    OutType::Pointer outImg = filter->GetOutput();
 
     mitk::Image::Pointer img = mitk::Image::New();  img->InitializeByItk(outImg.GetPointer());
     img->SetVolume(outImg->GetBufferPointer());
@@ -396,7 +396,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
 
     typedef itk::ImageMomentsCalculator< SegImageType > MomentsType;
     MomentsType::Pointer momentsCalc = MomentsType::New();
-    momentsCalc->SetImage(caster->GetOutput(0));
+    momentsCalc->SetImage(caster->GetOutput());
     momentsCalc->Compute();
     MomentsType::VectorType cog = momentsCalc->GetCenterOfGravity();
     MomentsType::MatrixType axes = momentsCalc->GetPrincipalAxes();
@@ -410,7 +410,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
     MomentsType::AffineTransformPointer trafo = momentsCalc->GetPhysicalAxesToPrincipalAxesTransform();
 
     itk::ImageRegionIterator<SegImageType>
-            itimage(caster->GetOutput(0), caster->GetOutput(0)->GetLargestPossibleRegion());
+            itimage(caster->GetOutput(), caster->GetOutput()->GetLargestPossibleRegion());
     itimage = itimage.Begin();
 
     double max = -9999999999.0;
@@ -423,7 +423,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
             ImageType::IndexType index = itimage.GetIndex();
 
             itk::Point<float,3> point;
-            caster->GetOutput(0)->TransformIndexToPhysicalPoint(index,point);
+            caster->GetOutput()->TransformIndexToPhysicalPoint(index,point);
 
             itk::Point<float,3> newPoint;
             newPoint = trafo->TransformPoint(point);
@@ -967,9 +967,9 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
         ThreshType::Pointer thresh = ThreshType::New();
         thresh->SetUpperThreshold((90-m_Controls->m_SimilarAnglesSlider->value())*(PVA_PI/180.0));
         thresh->SetInsideValue(1.0);
-        thresh->SetInput(caster->GetOutput(0));
+        thresh->SetInput(caster->GetOutput());
         thresh->Update();
-        itkmask = thresh->GetOutput(0);
+        itkmask = thresh->GetOutput();
 
         mask = mitk::Image::New();
         mask->InitializeByItk(itkmask.GetPointer());
@@ -1211,17 +1211,17 @@ void QmitkPartialVolumeAnalysisView::ShowClusteringResults()
         ClusterCasterType::Pointer clCaster = ClusterCasterType::New();
         clCaster->SetInput(clusteredImage);
         clCaster->Update();
-        clCaster->GetOutput(0);
+        clCaster->GetOutput();
 
         typedef itk::MaskImageFilter< RGBImageType, MaskImageType, RGBImageType > MaskType;
         MaskType::Pointer masker = MaskType::New();
-        masker->SetInput1(clCaster->GetOutput(0));
+        masker->SetInput1(clCaster->GetOutput());
         masker->SetInput2(itkmask);
         masker->Update();
 
         clusteredImage = mitk::Image::New();
-        clusteredImage->InitializeByItk(masker->GetOutput(0));
-        clusteredImage->SetVolume(masker->GetOutput(0)->GetBufferPointer());
+        clusteredImage->InitializeByItk(masker->GetOutput());
+        clusteredImage->SetVolume(masker->GetOutput()->GetBufferPointer());
     }
 
     if(m_ClusteringResult.IsNotNull())
@@ -1341,7 +1341,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
                 ImageCasterType::Pointer caster = ImageCasterType::New();
                 caster->SetInput( shortImage );
                 caster->Update();
-                charImage = caster->GetOutput(0);
+                charImage = caster->GetOutput();
 
 
                 mitk::CastToMitkImage(charImage, m_SelectedImageMask);
@@ -1666,14 +1666,14 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     CastType::Pointer caster = CastType::New();
     caster->SetInput(tensorimage);
     caster->Update();
-    TensorImageType::Pointer image = caster->GetOutput(0);
+    TensorImageType::Pointer image = caster->GetOutput();
 
     typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
     MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
     measurementsCalculator->SetInput(image );
     measurementsCalculator->SetMeasure(MeasurementsType::FA);
     measurementsCalculator->Update();
-    MeasurementsType::OutputImageType::Pointer fa = measurementsCalculator->GetOutput(0);
+    MeasurementsType::OutputImageType::Pointer fa = measurementsCalculator->GetOutput();
 
     m_FAImage = mitk::Image::New();
     m_FAImage->InitializeByItk(fa.GetPointer());
@@ -1687,7 +1687,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     measurementsCalculator->SetInput(image );
     measurementsCalculator->SetMeasure(MeasurementsType::CA);
     measurementsCalculator->Update();
-    MeasurementsType::OutputImageType::Pointer ca = measurementsCalculator->GetOutput(0);
+    MeasurementsType::OutputImageType::Pointer ca = measurementsCalculator->GetOutput();
 
     m_CAImage = mitk::Image::New();
     m_CAImage->InitializeByItk(ca.GetPointer());
@@ -1701,7 +1701,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     measurementsCalculator->SetInput(image );
     measurementsCalculator->SetMeasure(MeasurementsType::RD);
     measurementsCalculator->Update();
-    MeasurementsType::OutputImageType::Pointer rd = measurementsCalculator->GetOutput(0);
+    MeasurementsType::OutputImageType::Pointer rd = measurementsCalculator->GetOutput();
 
     m_RDImage = mitk::Image::New();
     m_RDImage->InitializeByItk(rd.GetPointer());
@@ -1715,7 +1715,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     measurementsCalculator->SetInput(image );
     measurementsCalculator->SetMeasure(MeasurementsType::AD);
     measurementsCalculator->Update();
-    MeasurementsType::OutputImageType::Pointer ad = measurementsCalculator->GetOutput(0);
+    MeasurementsType::OutputImageType::Pointer ad = measurementsCalculator->GetOutput();
 
     m_ADImage = mitk::Image::New();
     m_ADImage->InitializeByItk(ad.GetPointer());
@@ -1729,7 +1729,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     measurementsCalculator->SetInput(image );
     measurementsCalculator->SetMeasure(MeasurementsType::RA);
     measurementsCalculator->Update();
-    MeasurementsType::OutputImageType::Pointer md = measurementsCalculator->GetOutput(0);
+    MeasurementsType::OutputImageType::Pointer md = measurementsCalculator->GetOutput();
 
     m_MDImage = mitk::Image::New();
     m_MDImage->InitializeByItk(md.GetPointer());
@@ -1745,7 +1745,7 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     dirFilter->Update();
 
     itk::ImageRegionIterator<DirImageType>
-            itd(dirFilter->GetOutput(0), dirFilter->GetOutput(0)->GetLargestPossibleRegion());
+            itd(dirFilter->GetOutput(), dirFilter->GetOutput()->GetLargestPossibleRegion());
     itd = itd.Begin();
     while( !itd.IsAtEnd() )
     {
@@ -1760,9 +1760,9 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     typedef itk::CartesianToPolarVectorImageFilter<
             DirImageType, DirImageType, true> C2PFilterType;
     C2PFilterType::Pointer cpFilter = C2PFilterType::New();
-    cpFilter->SetInput(dirFilter->GetOutput(0));
+    cpFilter->SetInput(dirFilter->GetOutput());
     cpFilter->Update();
-    DirImageType::Pointer dir = cpFilter->GetOutput(0);
+    DirImageType::Pointer dir = cpFilter->GetOutput();
 
     typedef itk::Image<float, 3> CompImageType;
     CompImageType::Pointer comp1 = CompImageType::New();

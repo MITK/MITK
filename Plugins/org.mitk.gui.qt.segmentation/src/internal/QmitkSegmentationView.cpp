@@ -584,7 +584,7 @@ void QmitkSegmentationView::CreateSegmentationFromSurface()
   nameOfResultImage.append(surfaceNode->GetName());
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
   resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-  resultNode->SetData( s2iFilter->GetOutput(0) );
+  resultNode->SetData( s2iFilter->GetOutput() );
 
   this->GetDataStorage()->Add(resultNode, imageNode);
 

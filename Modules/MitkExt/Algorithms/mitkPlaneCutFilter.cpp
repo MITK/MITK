@@ -36,7 +36,7 @@ void mitk::PlaneCutFilter::GenerateData()
   }
 
   //Allocate output.
-  OutputImageType *output = this->GetOutput(0);
+  OutputImageType *output = this->GetOutput();
 
   output->Initialize(input);
   output->SetImportVolume(input->GetData());

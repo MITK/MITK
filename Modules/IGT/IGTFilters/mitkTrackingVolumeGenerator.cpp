@@ -50,7 +50,7 @@ void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Poi
 
 void mitk::TrackingVolumeGenerator::GenerateData()
 {
-    mitk::Surface::Pointer output = this->GetOutput(0);  //the surface wich represents the tracking volume
+    mitk::Surface::Pointer output = this->GetOutput();  //the surface wich represents the tracking volume
 
     std::string filepath = ""; // Full path to file (wil be resolved later)
   std::string filename = this->m_Data.VolumeModelLocation; // Name of the file or possibly a magic String, e.g. "cube"
@@ -63,9 +63,9 @@ void mitk::TrackingVolumeGenerator::GenerateData()
             bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case,
                                                          // the tracking volume polydata has to be updated manually
             cubeSource->SetBounds(bounds);
-            cubeSource->GetOutput(0)->Update();
+            cubeSource->GetOutput()->Update();
 
-            output->SetVtkPolyData(cubeSource->GetOutput(0)); //set the vtkCubeSource as polyData of the surface
+            output->SetVtkPolyData(cubeSource->GetOutput()); //set the vtkCubeSource as polyData of the surface
             return;
   }
   if (filename.compare("") == 0) // empty String means no model, return empty output
@@ -88,12 +88,12 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     stlReader->SetFileName( filepath.c_str() );
     stlReader->Update();
 
-    if ( stlReader->GetOutput(0) == NULL)
+    if ( stlReader->GetOutput() == NULL)
     {
         MITK_ERROR << "Error while reading file";
         return ;
     }
-    output->SetVtkPolyData( stlReader->GetOutput(0)->GetVtkPolyData());//set the visible trackingvolume
+    output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)

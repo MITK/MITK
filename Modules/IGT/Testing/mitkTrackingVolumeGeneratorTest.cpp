@@ -40,7 +40,7 @@ public:
         mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemNotSpecified), "Tracking System not specified:");
         myTVGenerator->Update();
-        mitk::Surface::Pointer volume = myTVGenerator->GetOutput(0);
+        mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
         MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
@@ -51,7 +51,7 @@ public:
         myTVGenerator->SetTrackingDeviceType(mitk::ClaronMicron);
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::ClaronMicron),"loading MicronTracker Volume data:");
         myTVGenerator->Update();
-        mitk::Surface::Pointer volume = myTVGenerator->GetOutput(0);
+        mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
         MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
@@ -62,7 +62,7 @@ public:
         myTVGenerator->SetTrackingDeviceType(mitk::NDIAurora);
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIAurora),"loading Aurora Volume data:");
         myTVGenerator->Update();
-        mitk::Surface::Pointer volume = myTVGenerator->GetOutput(0);
+        mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
         MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
@@ -73,7 +73,7 @@ public:
         myTVGenerator->SetTrackingDeviceType(mitk::NDIPolaris);
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIPolaris),"loading Polaris Volume data:");
         myTVGenerator->Update();
-        mitk::Surface::Pointer volume = myTVGenerator->GetOutput(0);
+        mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
         MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
@@ -84,7 +84,7 @@ public:
         myTVGenerator->SetTrackingDeviceType(mitk::IntuitiveDaVinci);
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:");
         myTVGenerator->Update();
-        mitk::Surface::Pointer volume = myTVGenerator->GetOutput(0);
+        mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
         MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
     }
 
@@ -95,7 +95,7 @@ public:
         myTVGenerator->SetTrackingDeviceType(mitk::TrackingSystemInvalid); //MicroBird not implemented yet, so using as test dummy
         MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemInvalid),"testing device type");
         myTVGenerator->Update();
-        MITK_TEST_CONDITION(myTVGenerator->GetOutput(0)->GetVtkPolyData()->GetNumberOfVerts()==0,"testing (invalid) output");
+        MITK_TEST_CONDITION(myTVGenerator->GetOutput()->GetVtkPolyData()->GetNumberOfVerts()==0,"testing (invalid) output");
     }
 
     static void TestSetTrackingDevice()

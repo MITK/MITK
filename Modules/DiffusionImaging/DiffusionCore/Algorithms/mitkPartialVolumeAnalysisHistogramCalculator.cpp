@@ -406,7 +406,7 @@ namespace mitk
       throw std::runtime_error( "Error: image empty!" );
     }
 
-    mitk::Image *timeSliceImage = const_cast<mitk::Image*>(m_Image.GetPointer());//imageTimeSelector->GetOutput(0);
+    mitk::Image *timeSliceImage = const_cast<mitk::Image*>(m_Image.GetPointer());//imageTimeSelector->GetOutput();
 
     switch ( m_MaskingMode )
     {
@@ -432,7 +432,7 @@ namespace mitk
           maskedImageTimeSelector->SetInput( m_ImageMask );
           maskedImageTimeSelector->SetTimeNr( 0 );
           maskedImageTimeSelector->UpdateLargestPossibleRegion();
-          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput(0);
+          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
 
           InternalMaskImage(timeSliceMaskedImage);
 
@@ -561,7 +561,7 @@ namespace mitk
     caster->Update();
 
     ImageMaskSpatialObject::Pointer maskSO = ImageMaskSpatialObject::New();
-    maskSO->SetImage ( caster->GetOutput(0) );
+    maskSO->SetImage ( caster->GetOutput() );
     m_InternalMask3D  =
         maskSO->GetAxisAlignedBoundingBoxRegion();
 
@@ -570,10 +570,10 @@ namespace mitk
     typedef itk::RegionOfInterestImageFilter< ImageType, MaskImage3DType > ROIFilterType;
     ROIFilterType::Pointer roi = ROIFilterType::New();
     roi->SetRegionOfInterest(m_InternalMask3D);
-    roi->SetInput(caster->GetOutput(0));
+    roi->SetInput(caster->GetOutput());
     roi->Update();
 
-    m_InternalImageMask3D = roi->GetOutput(0);
+    m_InternalImageMask3D = roi->GetOutput();
 
     MITK_DEBUG << "Created m_InternalImageMask3D";
 
@@ -697,15 +697,15 @@ namespace mitk
     if(additionalIndex < 0)
     {
       this->m_InternalImage = mitk::Image::New();
-      this->m_InternalImage->InitializeByItk( resampler->GetOutput(0) );
-      this->m_InternalImage->SetVolume( resampler->GetOutput(0)->GetBufferPointer() );
+      this->m_InternalImage->InitializeByItk( resampler->GetOutput() );
+      this->m_InternalImage->SetVolume( resampler->GetOutput()->GetBufferPointer() );
     }
     else
     {
       unsigned int myIndex = additionalIndex;
       this->m_InternalAdditionalResamplingImages.push_back(mitk::Image::New());
-      this->m_InternalAdditionalResamplingImages[myIndex]->InitializeByItk( resampler->GetOutput(0) );
-      this->m_InternalAdditionalResamplingImages[myIndex]->SetVolume( resampler->GetOutput(0)->GetBufferPointer() );
+      this->m_InternalAdditionalResamplingImages[myIndex]->InitializeByItk( resampler->GetOutput() );
+      this->m_InternalAdditionalResamplingImages[myIndex]->SetVolume( resampler->GetOutput()->GetBufferPointer() );
     }
 
   }
@@ -832,7 +832,7 @@ namespace mitk
     resampler->SetDefaultPixelValue(0);
     resampler->Update();
 
-    m_InternalImageMask3D = resampler->GetOutput(0);
+    m_InternalImageMask3D = resampler->GetOutput();
 
   }
 
@@ -976,8 +976,8 @@ namespace mitk
     roi->Update();
 
     m_InternalAdditionalResamplingImages[additionalIndex] = mitk::Image::New();
-    m_InternalAdditionalResamplingImages[additionalIndex]->InitializeByItk(roi->GetOutput(0));
-    m_InternalAdditionalResamplingImages[additionalIndex]->SetVolume(roi->GetOutput(0)->GetBufferPointer());
+    m_InternalAdditionalResamplingImages[additionalIndex]->InitializeByItk(roi->GetOutput());
+    m_InternalAdditionalResamplingImages[additionalIndex]->SetVolume(roi->GetOutput()->GetBufferPointer());
   }
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -1092,7 +1092,7 @@ namespace mitk
 
     // Make a stencil from the extruded polygon
     vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput(0) );
+    polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
 
 
 
@@ -1110,7 +1110,7 @@ namespace mitk
 
     // Apply the generated image stencil to the input image
     vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
-    imageStencilFilter->SetInput( vtkImporter->GetOutput(0) );
+    imageStencilFilter->SetInput( vtkImporter->GetOutput() );
     imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
     imageStencilFilter->ReverseStencilOff();
     imageStencilFilter->SetBackgroundValue( 0 );
@@ -1119,7 +1119,7 @@ namespace mitk
 
     // Export from VTK back to ITK
     vtkImageExport *vtkExporter = vtkImageExport::New();
-    vtkExporter->SetInput( imageStencilFilter->GetOutput(0) );
+    vtkExporter->SetInput( imageStencilFilter->GetOutput() );
     vtkExporter->Update();
 
     typename ImageImportType::Pointer itkImporter = ImageImportType::New();
@@ -1127,7 +1127,7 @@ namespace mitk
     itkImporter->Update();
 
     // calculate cropping bounding box
-    m_InternalImageMask3D = itkImporter->GetOutput(0);
+    m_InternalImageMask3D = itkImporter->GetOutput();
     m_InternalImageMask3D->SetDirection(image->GetDirection());
 
     itk::ImageRegionIterator<MaskImage3DType>
@@ -1201,8 +1201,8 @@ namespace mitk
     roi->Update();
 
     m_InternalImage = mitk::Image::New();
-    m_InternalImage->InitializeByItk(roi->GetOutput(0));
-    m_InternalImage->SetVolume(roi->GetOutput(0)->GetBufferPointer());
+    m_InternalImage->InitializeByItk(roi->GetOutput());
+    m_InternalImage->SetVolume(roi->GetOutput()->GetBufferPointer());
 
     // crop internal mask
     typedef itk::RegionOfInterestImageFilter< MaskImage3DType, MaskImage3DType > ROIMaskFilterType;
@@ -1210,7 +1210,7 @@ namespace mitk
     roi2->SetRegionOfInterest(m_CropRegion);
     roi2->SetInput(m_InternalImageMask3D);
     roi2->Update();
-    m_InternalImageMask3D = roi2->GetOutput(0);
+    m_InternalImageMask3D = roi2->GetOutput();
 
     // Clean up VTK objects
     polyline->Delete();

@@ -61,7 +61,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     subdivFilter->SetInput(input);
     subdivFilter->Update();
 
-    subdivContour = subdivFilter->GetOutput(0);
+    subdivContour = subdivFilter->GetOutput();
 
     if(subdivContour->GetNumberOfVertices() == 0 )
     {

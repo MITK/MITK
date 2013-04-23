@@ -117,13 +117,13 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
     {
       vtkLineSource * lineSource = vtkLineSource::New();
       lineSource->Update();
-      glyph = lineSource->GetOutput(0);
+      glyph = lineSource->GetOutput();
     }
     else if ( m_GlyphType == ArrowGlyph )
     {
       vtkArrowSource * arrowSource = vtkArrowSource::New();
       arrowSource->Update();
-      glyph = arrowSource->GetOutput(0);
+      glyph = arrowSource->GetOutput();
     }
     else
     {
@@ -132,7 +132,7 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
       itkWarningMacro( << "unknown glyph type!" );
       vtkLineSource * lineSource = vtkLineSource::New();
       lineSource->Update();
-      glyph = lineSource->GetOutput(0);
+      glyph = lineSource->GetOutput();
     }
 m_RandomMode = false;
 m_UseMaskPoints = false;
@@ -154,7 +154,7 @@ m_MaximumNumberOfPoints = 80*80*80;
     m_Glyph3DGenerator->SetRandomMode( m_RandomMode );
     m_Glyph3DGenerator->SetMaximumNumberOfPoints( m_MaximumNumberOfPoints );
     m_Glyph3DGenerator->Update();
-    m_Glyph3DMapper->SetInput( m_Glyph3DGenerator->GetOutput(0) );
+    m_Glyph3DMapper->SetInput( m_Glyph3DGenerator->GetOutput() );
     m_Glyph3DActor->SetMapper( m_Glyph3DMapper );
 
     if (GetDataNode()->GetProperty("LookupTable"))

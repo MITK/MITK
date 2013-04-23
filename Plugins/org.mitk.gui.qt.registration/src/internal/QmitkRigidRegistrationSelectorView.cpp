@@ -202,7 +202,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       its->SetInput(fimage);
       its->SetTimeNr(timestep);
       its->Update();
-      fimage = its->GetOutput(0);
+      fimage = its->GetOutput();
     }
 
     if(mimage->GetDimension()>3)
@@ -210,7 +210,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       its->SetInput(mimage);
       its->SetTimeNr(timestep);
       its->Update();
-      mimage = its->GetOutput(0);
+      mimage = its->GetOutput();
     }
 
     // Initial moving image geometry

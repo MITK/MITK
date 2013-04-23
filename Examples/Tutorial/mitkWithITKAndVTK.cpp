@@ -45,7 +45,7 @@ int main( int /*argc*/, char ** argv )
     fprintf( stderr, "Could not open file %s \n\n", filename );
     return EXIT_FAILURE;
   }
-  mitk::Image::Pointer mitkImage = reader->GetOutput(0);
+  mitk::Image::Pointer mitkImage = reader->GetOutput();
 
   // ITK: Image smoothing
   // Create ITK image, cast from MITK image
@@ -62,7 +62,7 @@ int main( int /*argc*/, char ** argv )
   filter->Update(); // run filter
 
   // reimport filtered image data
-  mitk::CastToMitkImage( filter->GetOutput(0), mitkImage );
+  mitk::CastToMitkImage( filter->GetOutput(), mitkImage );
 
   // VTK: Show result in renderwindow
   vtkImageViewer *viewer=vtkImageViewer::New();

@@ -60,7 +60,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput(0);
+  mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   mitk::Image* mask  = m_Mask ;
   if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
@@ -76,7 +76,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
 void mitk::MaskImageFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -102,14 +102,14 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
 
   typename mitk::ImageToItk<ItkMaskImageType>::Pointer maskimagetoitk = mitk::ImageToItk<ItkMaskImageType>::New();
-  maskimagetoitk->SetInput(m_MaskTimeSelector->GetOutput(0));
+  maskimagetoitk->SetInput(m_MaskTimeSelector->GetOutput());
   maskimagetoitk->Update();
-  typename ItkMaskImageType::Pointer maskItkImage = maskimagetoitk->GetOutput(0);
+  typename ItkMaskImageType::Pointer maskItkImage = maskimagetoitk->GetOutput();
 
   typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
-  outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput(0));
+  outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
-  typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput(0);
+  typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
   // create the iterators
   typename ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
@@ -143,14 +143,14 @@ void mitk::MaskImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer mask  = m_Mask;
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeSlicedGeometry()->GetTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);
   m_MaskTimeSelector->SetInput(mask);
-  m_OutputTimeSelector->SetInput(this->GetOutput(0));
+  m_OutputTimeSelector->SetInput(this->GetOutput());
 
   mitk::Image::RegionType outputRegion = output->GetRequestedRegion();
   const mitk::TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
@@ -178,7 +178,7 @@ void mitk::MaskImageFilter::GenerateData()
     m_MaskTimeSelector->SetTimeNr(timestep);
     m_MaskTimeSelector->UpdateLargestPossibleRegion();
 
-    AccessByItk(m_InputTimeSelector->GetOutput(0),InternalComputeMask);
+    AccessByItk(m_InputTimeSelector->GetOutput(),InternalComputeMask);
   }
 
   m_TimeOfHeaderInitialization.Modified();

@@ -34,7 +34,7 @@ mitk::AngleCorrectByPointFilter::~AngleCorrectByPointFilter()
 void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
@@ -75,7 +75,7 @@ void mitk::AngleCorrectByPointFilter::GenerateOutputInformation()
 void mitk::AngleCorrectByPointFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
 
   if(m_PreferTransducerPositionFromProperty)
@@ -164,7 +164,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
       InputImagePixelType *in;
       OutputImagePixelType *out;
 
-      in  = (InputImagePixelType *)timeSelector->GetOutput(0)->GetData();
+      in  = (InputImagePixelType *)timeSelector->GetOutput()->GetData();
       out = (OutputImagePixelType*)pic_out->data;
 
       for (z=0 ; z<zDim ; ++z)
@@ -204,7 +204,7 @@ void mitk::AngleCorrectByPointFilter::GenerateInputRequestedRegion()
 
   mitk::ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

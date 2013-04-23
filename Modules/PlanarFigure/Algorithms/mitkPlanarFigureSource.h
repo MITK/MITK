@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "PlanarFigureExports.h"
 #include "mitkCommon.h"
-#include "mitkBaseProcess.h"
+#include "mitkBaseDataSource.h"
 
 namespace mitk
 {
@@ -35,15 +35,17 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-class PlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseProcess
+class PlanarFigure_EXPORT PlanarFigureSource : public mitk::BaseDataSource
 {
 public:
-    mitkClassMacro( PlanarFigureSource, BaseProcess );
-    itkNewMacro( Self );
+    mitkClassMacro( PlanarFigureSource, BaseDataSource )
+    itkNewMacro( Self )
 
     typedef mitk::PlanarFigure OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef itk::DataObject::Pointer DataObjectPointer;
+
+    mitkBaseDataSourceGetOutputDeclarations
 
     /**
      * Allocates a new output object and returns it. Currently the
@@ -66,20 +68,6 @@ public:
      * method of the superclass.
      */
     void GenerateInputRequestedRegion();
-
-    /**
-     * Graft output 0 to the parameter graft
-     */
-    virtual void GraftOutput(itk::DataObject *graft);
-    /**
-    * Graft output idx to the parameter graft
-    */
-    virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
-
-    PlanarFigure* GetOutput(const DataObjectIdentifierType & key);
-    const PlanarFigure* GetOutput(const DataObjectIdentifierType & key) const;
-    PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx);
-    const PlanarFigure* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
     PlanarFigureSource();

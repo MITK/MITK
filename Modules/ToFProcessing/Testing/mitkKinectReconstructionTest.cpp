@@ -59,7 +59,7 @@ int mitkKinectReconstructionTest(int  argc , char* argv[])
     mitk::Surface::Pointer groundTruth = mitk::IOUtil::LoadSurface(groundTruthSurfacePath);
     MITK_TEST_CONDITION_REQUIRED(groundTruth.IsNotNull(), "Testing if ground truth could be loaded.");
 
-    mitk::Surface::Pointer resultOfFilter = distToSurf->GetOutput(0);
+    mitk::Surface::Pointer resultOfFilter = distToSurf->GetOutput();
     MITK_TEST_CONDITION_REQUIRED(resultOfFilter.IsNotNull(), "Testing if any output was generated.");
 
     MITK_TEST_CONDITION_REQUIRED( mitk::ToFTestingCommon::VtkPolyDatasEqual(resultOfFilter->GetVtkPolyData(),

@@ -76,13 +76,13 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   std::cout << "Initializing mitk::ReferenceCountWatcher: ";
   mitk::ReferenceCountWatcher::Pointer filterWatcher, filterOutputWatcher;
   filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter1");
-  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(0), "filter1Output");
+  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(), "filter1Output");
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part1: "<<std::endl;
   try
   {
-    mitk::Image::Pointer output = filter->GetOutput(0);
+    mitk::Image::Pointer output = filter->GetOutput();
     std::cout << "Testing to set filter to NULL, keeping reference to output:";
     filter = NULL;
     std::cout<<"[PASSED]"<<std::endl;
@@ -136,7 +136,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
   std::cout << "Testing MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED part2: "<<std::endl;
   filter = FilterType::New();
   filterWatcher = new mitk::ReferenceCountWatcher(filter, "filter2");
-  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(0), "filter2Output");
+  filterOutputWatcher = new mitk::ReferenceCountWatcher(filter->GetOutput(), "filter2Output");
   try
   {
     std::cout << "Testing to set filter to NULL, keeping NO reference to output:";
@@ -174,8 +174,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
     {
       typename FilterType::Pointer localFilter = FilterType::New();
       filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter3");
-      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(0), "filter3Output");
-      output = localFilter->GetOutput(0);
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter3Output");
+      output = localFilter->GetOutput();
       std::cout << "Testing running out of scope of filter, keeping reference to output:";
     }
     std::cout<<"[PASSED]"<<std::endl;
@@ -231,8 +231,8 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
     {
       typename FilterType::Pointer localFilter = FilterType::New();
       filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter4");
-      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(0), "filter4Output");
-      output = localFilter->GetOutput(0);
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter4Output");
+      output = localFilter->GetOutput();
       std::cout << "Testing running out of scope of filter, keeping reference to output (as in part 3):";
     }
     std::cout<<"[PASSED]"<<std::endl;
@@ -292,7 +292,7 @@ int runPipelineSmartPointerCorrectnessTestForFilterType(typename InputType::Poin
     {
       typename FilterType::Pointer localFilter = FilterType::New();
       filterWatcher = new mitk::ReferenceCountWatcher(localFilter, "filter5");
-      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(0), "filter5Output");
+      filterOutputWatcher = new mitk::ReferenceCountWatcher(localFilter->GetOutput(), "filter5Output");
       std::cout << "Testing running out of scope of filter, keeping NO reference to output:";
     }
     std::cout<<"[PASSED]"<<std::endl;

@@ -99,7 +99,7 @@ void QmitkToFTutorialView::OnStep1()
     // update image grabber which itself represents the source of a MITK filter pipeline
     tofImageGrabber->Update();
     // grab distance image
-    mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput(0);
+    mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput();
     // grab amplitude image
     mitk::Image::Pointer amplitudeImage = tofImageGrabber->GetOutput(1);
     // grab intensity image
@@ -162,7 +162,7 @@ void QmitkToFTutorialView::OnStep2()
       // update the filter
       surfaceFilter->Update();
       // get surface from filter
-      mitk::Surface::Pointer surface = surfaceFilter->GetOutput(0);
+      mitk::Surface::Pointer surface = surfaceFilter->GetOutput();
       // add surface to data storage
       mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
       surfaceNode->SetName("ToF surface");

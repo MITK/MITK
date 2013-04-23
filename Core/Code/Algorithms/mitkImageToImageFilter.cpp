@@ -99,9 +99,9 @@ void mitk::ImageToImageFilter::GenerateInputRequestedRegion()
       // dimension, the input a higher dimension than the output, and the
       // input a lower dimension than the output.
       InputImageRegionType inputRegion;
-      //      this->CallCopyRegion(inputRegion, this->GetOutput(0)->GetRequestedRegion()); @FIXME  ??
+      //      this->CallCopyRegion(inputRegion, this->GetOutput()->GetRequestedRegion()); @FIXME  ??
       //      input->SetRequestedRegion( inputRegion ); @FIXME ??
-      input->SetRequestedRegion( this->GetOutput(0) ); // ersatz. @FIXME ??
+      input->SetRequestedRegion( this->GetOutput() ); // ersatz. @FIXME ??
     }
   }
 }

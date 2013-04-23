@@ -1056,7 +1056,7 @@ void QmitkFiberfoxView::GenerateImage()
         filter->Update();
 
         mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
-        image->SetVectorImage( filter->GetOutput(0) );
+        image->SetVectorImage( filter->GetOutput() );
         image->SetB_Value(bVal);
         image->SetDirections(gradientList);
         image->InitializeFromVectorImage();

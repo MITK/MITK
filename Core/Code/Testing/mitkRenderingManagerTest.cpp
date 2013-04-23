@@ -71,7 +71,7 @@ static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager
   plane->SetBounds( planeBounds );
   plane->SetCenter( 0.0, 0.0, 0.0 );
 
-  vtkPolyData* polys = plane->GetOutput(0);
+  vtkPolyData* polys = plane->GetOutput();
   mitk::Surface::Pointer mitkPlane = mitk::Surface::New();
   mitkPlane->SetVtkPolyData( polys );
   plane->Delete();
@@ -96,7 +96,7 @@ static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager
   cube->SetBounds( cubeBounds );
   cube->SetCenter( 0.0, 0.0, 0.0 );
 
-  vtkPolyData* polyCube = cube->GetOutput(0);
+  vtkPolyData* polyCube = cube->GetOutput();
   mitk::Surface::Pointer mitkCube = mitk::Surface::New();
   mitkCube->SetVtkPolyData( polyCube );
   cube->Delete();

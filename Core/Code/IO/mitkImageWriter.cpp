@@ -211,7 +211,7 @@ void mitk::ImageWriter::GenerateData()
       timesteps = input->GetDimension(3);
       ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
       timeSelector->SetInput(input);
-      mitk::Image::Pointer image = timeSelector->GetOutput(0);
+      mitk::Image::Pointer image = timeSelector->GetOutput();
       for(t = 0; t < timesteps; ++t)
       {
         std::ostringstream filename;

@@ -40,7 +40,7 @@ void mitk::ContourSetToPointSetFilter::GenerateOutputInformation()
 void mitk::ContourSetToPointSetFilter::GenerateData()
 {
   mitk::ContourSet* input =  (mitk::ContourSet*) (this->GetInput());
-  mitk::PointSet::Pointer output = this->GetOutput(0);
+  mitk::PointSet::Pointer output = this->GetOutput();
 
   mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
   mitk::ContourSet::ContourIterator contourIt = contourVec.begin();

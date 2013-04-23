@@ -38,7 +38,7 @@ void itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::GenerateData()
 
   this->AllocateOutputs();
 
-  OutputImageType::Pointer output = this->GetOutput(0);
+  OutputImageType::Pointer output = this->GetOutput();
 
   if(m_InputNetwork.IsNull())
   {

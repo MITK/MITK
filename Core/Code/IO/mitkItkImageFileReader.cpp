@@ -52,7 +52,7 @@ void mitk::ItkImageFileReader::GenerateData()
     }
   }
 
-  mitk::Image::Pointer image = this->GetOutput(0);
+  mitk::Image::Pointer image = this->GetOutput();
 
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
@@ -157,7 +157,7 @@ void mitk::ItkImageFileReader::GenerateData()
 
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
-//  mitk::DataNode::Pointer node = this->GetOutput(0);
+//  mitk::DataNode::Pointer node = this->GetOutput();
 //  node->SetData( image );
 
   // add level-window property

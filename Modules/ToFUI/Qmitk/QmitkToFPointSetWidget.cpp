@@ -356,7 +356,7 @@ void QmitkToFPointSetWidget::MeasurementPointSetChanged()
       toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
       toFDistanceImageToPointSetFilter->SetSubset(m_MeasurementPointSet2D);
       toFDistanceImageToPointSetFilter->Update();
-      mitk::PointSet::Pointer measurementPointSet3D = toFDistanceImageToPointSetFilter->GetOutput(0);
+      mitk::PointSet::Pointer measurementPointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
       m_MeasurementPointSet3DNode->SetData(measurementPointSet3D);
 
       // calculate distance between points
@@ -419,7 +419,7 @@ void QmitkToFPointSetWidget::PointSetChanged()
       toFDistanceImageToPointSetFilter->SetInput(m_DistanceImage);
       toFDistanceImageToPointSetFilter->SetSubset(m_PointSet2D);
       toFDistanceImageToPointSetFilter->Update();
-      mitk::PointSet::Pointer pointSet3D = toFDistanceImageToPointSetFilter->GetOutput(0);
+      mitk::PointSet::Pointer pointSet3D = toFDistanceImageToPointSetFilter->GetOutput();
       m_PointSet3DNode->SetData(pointSet3D);
       this->m_VtkTextActor->SetInput("Choose points with SHIFT+Click");    }
     else

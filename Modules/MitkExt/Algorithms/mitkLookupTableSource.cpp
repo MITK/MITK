@@ -19,17 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::LookupTableSource::LookupTableSource()
 {
-    // Create the output. We use static_cast<> here because we know the default
-    // output must be of type TOutputImage
-    OutputType::Pointer output = static_cast<OutputType*>( this->MakeOutput( 0 ).GetPointer() );
-
-    if ( output.GetPointer() == NULL )
-    {
-        itkWarningMacro(<<"Output could not be created!");
-    }
-
-    this->ProcessObject::SetNumberOfRequiredOutputs( 1 );
-    this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
+  // Create the output.
+  itk::DataObject::Pointer output = this->MakeOutput(0);
+  Superclass::SetNumberOfRequiredOutputs(1);
+  Superclass::SetNthOutput(0, output);
 }
 
 
@@ -38,7 +31,7 @@ mitk::LookupTableSource::~LookupTableSource()
 
 itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return OutputType::New().GetPointer();
+  return OutputType::New().GetPointer();
 }
 
 
@@ -46,10 +39,10 @@ itk::DataObject::Pointer mitk::LookupTableSource::MakeOutput( const DataObjectId
 {
   itkDebugMacro("MakeOutput(" << name << ")");
   if( this->IsIndexedOutputName(name) )
-    {
+  {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
-    }
-  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
+  }
+  return OutputType::New().GetPointer();
 }
 
 void
@@ -61,7 +54,7 @@ mitk::LookupTableSource::GenerateInputRequestedRegion()
 void
 mitk::LookupTableSource::GraftOutput( OutputType* graft )
 {
-    OutputType * output = this->GetOutput(0);
+    OutputType * output = this->GetOutput();
 
     if ( output && graft )
     {
@@ -78,22 +71,32 @@ mitk::LookupTableSource::GraftOutput( OutputType* graft )
     }
 }
 
-mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
+mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput()
 {
-  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
+  return itkDynamicCastInDebugMode<OutputType*>( this->GetPrimaryOutput() );
 }
 
-const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput() const
 {
-  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(key));
+  return itkDynamicCastInDebugMode<const OutputType*>( this->GetPrimaryOutput() );
 }
 
 mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
 {
-  return static_cast<mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
+  OutputType* out = dynamic_cast<OutputType*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
+  }
+  return out;
 }
 
 const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
 {
-  return static_cast<const mitk::LookupTableSource::OutputType*>(itk::ProcessObject::GetOutput(idx));
+  const OutputType* out = dynamic_cast<const OutputType*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
+  }
+  return out;
 }

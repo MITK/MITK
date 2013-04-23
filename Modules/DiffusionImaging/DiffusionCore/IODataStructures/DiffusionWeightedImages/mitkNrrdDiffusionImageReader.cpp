@@ -54,15 +54,15 @@ namespace mitk
       itkWarningMacro("cache is empty!");
     }
 
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetVectorImage(m_OutputCache->GetVectorImage());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetB_Value(m_OutputCache->GetB_Value());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetDirections(m_OutputCache->GetDirections());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetMeasurementFrame(m_OutputCache->GetMeasurementFrame());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->InitializeFromVectorImage();
   }
 
@@ -107,7 +107,7 @@ namespace mitk
           itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
           reader->SetImageIO(io);
           reader->Update();
-          img = reader->GetOutput(0);
+          img = reader->GetOutput();
 
           int vecsize = img->GetVectorLength();
           std::cout << vecsize << std::endl;
@@ -129,7 +129,7 @@ namespace mitk
           reader->SetFileName(fname3);
           reader->SetImageIO(io2);
           reader->Update();
-          typename ImageType4D::Pointer img4 = reader->GetOutput(0);
+          typename ImageType4D::Pointer img4 = reader->GetOutput();
 
           // delete temporary file
           itksys::SystemTools::RemoveFile(fname3.c_str());
@@ -470,7 +470,7 @@ namespace mitk
         MITK_INFO << e.GetDescription();
       }
 
-      typename ImageType::Pointer img = reader->GetOutput(0);
+      typename ImageType::Pointer img = reader->GetOutput();
       itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
       std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
       std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();

@@ -32,7 +32,7 @@ mitk::Cone::Cone()
   cone->SetResolution(20);
   cone->CappingOn();
   cone->Update();
-  SetVtkPolyData(cone->GetOutput(0));
+  SetVtkPolyData(cone->GetOutput());
   cone->Delete();
 }
 

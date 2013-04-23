@@ -170,7 +170,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
     vtkImageThreshold* threshold = vtkImageThreshold::New();
-    threshold->SetInput( indexCoordinatesImageFilter->GetOutput(0) );
+    threshold->SetInput( indexCoordinatesImageFilter->GetOutput() );
     //indexCoordinatesImageFilter->Delete();
     threshold->SetInValue( 100 );
     threshold->SetOutValue( 0 );
@@ -179,7 +179,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     threshold->ReleaseDataFlagOn();
 
     vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-    gaussian->SetInput( threshold->GetOutput(0) );
+    gaussian->SetInput( threshold->GetOutput() );
     //threshold->Delete();
     gaussian->SetDimensionality( 3  );
     gaussian->SetRadiusFactor( 0.49 );
@@ -191,12 +191,12 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ReleaseDataFlagOn();
-  skinExtractor->SetInput(gaussian->GetOutput(0));//RC++
+  skinExtractor->SetInput(gaussian->GetOutput());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, 50);
 
   vtkPolyData *polydata;
-  polydata = skinExtractor->GetOutput(0);
+  polydata = skinExtractor->GetOutput();
   polydata->Register(NULL);//RC++
   skinExtractor->Delete();
 
@@ -213,7 +213,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     smoother->SetConvergence( 0 );
 
     polydata->Delete();//RC--
-    polydata = smoother->GetOutput(0);
+    polydata = smoother->GetOutput();
     polydata->Register(NULL);//RC++
     smoother->Delete();
   }
@@ -234,7 +234,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     decimate->SetMaximumError(0.002);
 
     polydata->Delete();//RC--
-    polydata = decimate->GetOutput(0);
+    polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
     decimate->Delete();
   }

@@ -70,7 +70,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::GenerateData()
         timeSelector->SetInput( input3D );
         timeSelector->SetTimeNr( m_TimeStep );
         timeSelector->UpdateLargestPossibleRegion();
-        input3D = timeSelector->GetOutput(0);
+        input3D = timeSelector->GetOutput();
     }
 
     m_ImageGeometry3D = input3D->GetGeometry();
@@ -231,7 +231,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //    itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();                 \
 //    imagetoitk->SetInput(mitkImage);                                                     \
 //    imagetoitk->Update();                                                               \
-//    itkImageTypeFunction(imagetoitk->GetOutput(0), itkimage2);                          \
+//    itkImageTypeFunction(imagetoitk->GetOutput(), itkimage2);                          \
 //}
 //
 //#define myMITKOverwriteDirectedPlaneImageFilterAccessAllTypesByItk(mitkImage, itkImageTypeFunction,       dimension, itkimage2)    \

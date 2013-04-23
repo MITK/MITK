@@ -62,7 +62,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
         reader->Update();
 
       std::cout << "Testing IsInitialized(): ";
-      if(reader->GetOutput(0)->IsInitialized()==false)
+      if(reader->GetOutput()->IsInitialized()==false)
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -70,7 +70,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing IsSliceSet(): ";
-      if(reader->GetOutput(0)->IsSliceSet(0)==false)
+      if(reader->GetOutput()->IsSliceSet(0)==false)
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -78,7 +78,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing availability of geometry: ";
-      if(reader->GetOutput(0)->GetGeometry()==NULL)
+      if(reader->GetOutput()->GetGeometry()==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -87,7 +87,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
 
       std::cout << "Testing type of geometry (TimeSlicedGeometry expected): ";
       mitk::TimeSlicedGeometry* timegeometry;
-      timegeometry = reader->GetOutput(0)->GetTimeSlicedGeometry();
+      timegeometry = reader->GetOutput()->GetTimeSlicedGeometry();
       if(timegeometry==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;

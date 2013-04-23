@@ -29,7 +29,7 @@ mitk::Ellipsoid::Ellipsoid()
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);
   sphere->Update();
-  SetVtkPolyData(sphere->GetOutput(0));
+  SetVtkPolyData(sphere->GetOutput());
   sphere->Delete();
 }
 

@@ -57,7 +57,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
   try {
     reader->SetFileName(argv[1]);
     reader->Update();
-    unstructuredGrid = reader->GetOutput(0);
+    unstructuredGrid = reader->GetOutput();
   }
   catch (itk::ExceptionObject e)
   {

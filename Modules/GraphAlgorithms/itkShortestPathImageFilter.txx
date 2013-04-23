@@ -726,7 +726,7 @@ namespace itk
 
       if (m_MakeOutputImage)
       {
-       OutputImagePointer output0 = this->GetOutput(0);
+       OutputImagePointer output0 = this->GetOutput();
        output0->SetRegions(  this->GetInput()->GetLargestPossibleRegion() );
          output0->Allocate();
          OutputImageIteratorType shortestPathImageIt (output0, output0->GetRequestedRegion());

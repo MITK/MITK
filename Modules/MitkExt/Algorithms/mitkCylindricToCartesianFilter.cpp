@@ -304,7 +304,7 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
 
 void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 {
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
@@ -368,7 +368,7 @@ void mitk::CylindricToCartesianFilter::GenerateOutputInformation()
 void mitk::CylindricToCartesianFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
   timeSelector->SetInput(input);
@@ -428,7 +428,7 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       // Cast to pic descriptor for the timeSelector image
       mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
-      CastToIpPicDescriptor( timeSelector->GetOutput(0), timeSelectorPic );
+      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
 
       _mitkIpPicFreeTags(pic_transformed->info->tags_head);
       pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
@@ -482,7 +482,7 @@ void mitk::CylindricToCartesianFilter::GenerateInputRequestedRegion()
 
   mitk::ImageToImageFilter::InputImagePointer input =
     const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
-  mitk::Image::Pointer output = this->GetOutput(0);
+  mitk::Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;
   requestedRegion = output->GetRequestedRegion();

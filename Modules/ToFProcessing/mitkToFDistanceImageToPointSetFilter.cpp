@@ -123,7 +123,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
   principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
-  mitk::PointSet::Pointer output = this->GetOutput(0);
+  mitk::PointSet::Pointer output = this->GetOutput();
   assert(output);
   mitk::Image::Pointer input = this->GetInput();
   assert(input);
@@ -191,7 +191,7 @@ void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 
 void mitk::ToFDistanceImageToPointSetFilter::GenerateOutputInformation()
 {
-  this->GetOutput(0);
+  this->GetOutput();
   itkDebugMacro(<<"GenerateOutputInformation()");
 }
 

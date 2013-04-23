@@ -195,17 +195,17 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
         endif()
 
         if(use_visibility_flags)
-          mitkFunctionCheckCompilerFlags2("-fvisibility=hidden" module_c_flags module_cxx_flags)
-          mitkFunctionCheckCompilerFlags("-fvisibility-inlines-hidden" module_cxx_flags)
+          mitkFunctionCheckCAndCXXCompilerFlags("-fvisibility=hidden" module_c_flags module_cxx_flags)
+          mitkFunctionCheckCAndCXXCompilerFlags("-fvisibility-inlines-hidden" module_c_flags module_cxx_flags)
         endif()
 
         configure_file(${MITK_SOURCE_DIR}/CMake/moduleExports.h.in ${CMAKE_BINARY_DIR}/${MODULES_CONF_DIRNAME}/${MODULE_NAME}Exports.h @ONLY)
 
         if(MODULE_WARNINGS_AS_ERRORS)
           if(MSVC_VERSION)
-            mitkFunctionCheckCompilerFlags2("/WX" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
           else()
-            mitkFunctionCheckCompilerFlags2("-Werror" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Werror" module_c_flags module_cxx_flags)
 
             # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
             # versions to "static-member-init", see
@@ -221,16 +221,16 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
             # the compiler and if applicable, prints the specific warning as a real warning and
             # not as an error (although -Werror was given).
 
-            mitkFunctionCheckCompilerFlags2("-Wno-error=c++0x-static-nonintegral-init" module_c_flags module_cxx_flags)
-            mitkFunctionCheckCompilerFlags2("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
-            mitkFunctionCheckCompilerFlags2("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
-            mitkFunctionCheckCompilerFlags2("-Wno-error=gnu" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=c++0x-static-nonintegral-init" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
 
             # VNL headers throw a lot of these, not fixable for us at least in ITK 3
-            mitkFunctionCheckCompilerFlags2("-Wno-error=unused-parameter" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unused-parameter" module_c_flags module_cxx_flags)
 
             # Some DICOM header file in ITK
-            mitkFunctionCheckCompilerFlags2("-Wno-error=cast-align" module_c_flags module_cxx_flags)
+            mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=cast-align" module_c_flags module_cxx_flags)
 
           endif()
         endif(MODULE_WARNINGS_AS_ERRORS)

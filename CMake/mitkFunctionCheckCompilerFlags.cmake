@@ -52,7 +52,7 @@ function(mitkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
 
 endfunction()
 
-function(mitkFunctionCheckCompilerFlags2 FLAG_TO_TEST C_RESULT_VAR CXX_RESULT_VAR)
+function(mitkFunctionCheckCAndCXXCompilerFlags FLAG_TO_TEST C_RESULT_VAR CXX_RESULT_VAR)
 
   if(FLAG_TO_TEST STREQUAL "")
     message(FATAL_ERROR "FLAG_TO_TEST shouldn't be empty")

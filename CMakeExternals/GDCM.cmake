@@ -27,7 +27,7 @@ if(NOT DEFINED GDCM_DIR)
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL http://dl.dropbox.com/u/5822501/gdcm-2.2.1.tar.gz
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.2.1.tar.gz
      URL_MD5 67c6808a6f62796954f4131e24aaab2c
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}

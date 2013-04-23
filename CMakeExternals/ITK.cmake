@@ -27,8 +27,8 @@ if(NOT DEFINED ITK_DIR)
   if(MITK_USE_Python)
 
     list(APPEND additional_cmake_args
-         -DUSE_WRAP_ITK:BOOL=ON
-         -DITK_USE_REVIEW:BOOL=ON
+         -DITK_WRAPPING:BOOL=ON
+         #-DITK_USE_REVIEW:BOOL=ON
          -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
          -DPYTHON_DEBUG_LIBRARY=${PYTHON_DEBUG_LIBRARY}
          -DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_DIR}
@@ -36,17 +36,16 @@ if(NOT DEFINED ITK_DIR)
          #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
          #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
          -DCableSwig_DIR:PATH=${CableSwig_DIR}
-         -DWRAP_ITK_JAVA:BOOL=OFF
-         -DWRAP_ITK_TCL:BOOL=OFF
-         -DWRAP_unsigned_char:BOOL=ON
-         #-DWRAP_double:BOOL=ON
-         -DWRAP_rgb_unsigned_char:BOOL=ON
-         #-DWRAP_rgba_unsigned_char:BOOL=ON
-         -DWRAP_signed_char:BOOL=ON
+         #-DITK_WRAP_JAVA:BOOL=OFF
+         -DITK_WRAP_unsigned_char:BOOL=ON
+         #-DITK_WRAP_double:BOOL=ON
+         -DITK_WRAP_rgb_unsigned_char:BOOL=ON
+         #-DITK_WRAP_rgba_unsigned_char:BOOL=ON
+         -DITK_WRAP_signed_char:BOOL=ON
          #-DWRAP_signed_long:BOOL=ON
-         -DWRAP_signed_short:BOOL=ON
-         -DWRAP_short:BOOL=ON
-         -DWRAP_unsigned_long:BOOL=ON
+         -DITK_WRAP_signed_short:BOOL=ON
+         -DITK_WRAP_short:BOOL=ON
+         -DITK_WRAP_unsigned_long:BOOL=ON
         )
   endif()
 
@@ -56,8 +55,8 @@ if(NOT DEFINED ITK_DIR)
      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
      BINARY_DIR ${proj}-build
      PREFIX ${proj}-cmake
-     URL http://dl.dropbox.com/u/5822501/InsightToolkit-4.3.1.tar.gz
-     URL_MD5 31869cdc83d05802e040e7f909001e1d
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.3.2.tar.gz
+     URL_MD5 f25bb1561887be621d3954689f3944a6
      INSTALL_COMMAND ""
      PATCH_COMMAND ${ITK_PATCH_COMMAND}
      CMAKE_GENERATOR ${gen}

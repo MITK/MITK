@@ -32,10 +32,10 @@ namespace mitk
     mitkClassMacro(SimulationTemplate, BaseData);
     itkNewMacro(Self);
 
-    std::string Bake() const;
+    std::string CreateSimulation() const;
     bool Parse(const std::string& contents);
     bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    void SetProperties(DataNode::Pointer dataNode) const;
+    bool SetProperties(DataNode::Pointer dataNode) const;
     void SetRequestedRegion(itk::DataObject* data);
     void SetRequestedRegionToLargestPossibleRegion();
     void UpdateOutputInformation();

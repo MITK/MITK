@@ -40,9 +40,6 @@ static TemplateIndex CreateTemplateIndex(const std::string& contents)
     begin = contents.find_first_of('{', end);
   }
 
-  if (templateIndex.empty())
-    mitkThrow() << "No templates found!";
-
   return templateIndex;
 }
 
@@ -213,7 +210,7 @@ mitk::SimulationTemplate::~SimulationTemplate()
 {
 }
 
-std::string mitk::SimulationTemplate::Bake() const
+std::string mitk::SimulationTemplate::CreateSimulation() const
 {
   if (!m_IsInitialized)
   {
@@ -254,7 +251,10 @@ std::string mitk::SimulationTemplate::Bake() const
 bool mitk::SimulationTemplate::Parse(const std::string& contents)
 {
   if (m_IsInitialized)
+  {
+    MITK_ERROR << "Simulation template is already initialized!";
     return false;
+  }
 
   TemplateIndex templateIndex = CreateTemplateIndex(contents);
   std::vector<std::string> staticContents = ParseStaticContents(contents, templateIndex);
@@ -272,21 +272,24 @@ bool mitk::SimulationTemplate::RequestedRegionIsOutsideOfTheBufferedRegion()
   return false;
 }
 
-void mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) const
+bool mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) const
 {
   if (dataNode.IsNull())
-    return;
+  {
+    MITK_ERROR << "Data node does not exist!";
+    return false;
+  }
 
   if (!m_IsInitialized)
   {
     MITK_ERROR << "Simulation template is not initialized!";
-    return;
+    return false;
   }
 
   if (dynamic_cast<SimulationTemplate*>(dataNode->GetData()) != this)
   {
     MITK_ERROR << "Data node does not own this simulation template!";
-    return;
+    return false;
   }
 
   for(VariableContents::const_iterator it = m_VariableContents.begin(); it != m_VariableContents.end(); ++it)
@@ -294,6 +297,8 @@ void mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) c
     if (it->first != "{ref}")
       dataNode->SetProperty(it->first.c_str(), it->second.GetPointer());
   }
+
+  return true;
 }
 
 void mitk::SimulationTemplate::SetRequestedRegion(itk::DataObject*)

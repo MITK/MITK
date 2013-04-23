@@ -36,8 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define _USE_MATH_DEFINES
 
 #include "itkMultiShellAdcAverageReconstructionImageFilter.h"
-#include <math.h>
-#include <time.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>
 #include "mitkDiffusionFunctionCollection.h"
@@ -47,11 +45,10 @@ namespace itk
 
 template <class TInputScalarType, class TOutputScalarType>
 MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
-::MultiShellAdcAverageReconstructionImageFilter():
-  m_Interpolation(false)
+::MultiShellAdcAverageReconstructionImageFilter()
 {
   this->SetNumberOfRequiredInputs( 1 );
-  this->SetNumberOfThreads(1);
+ // this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -79,23 +76,14 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
     itkExceptionMacro(<< "No ReferenceSignal (BZeroImages) found!");
   }
 
-  // test whether interpolation is necessary
-  // - Gradeint directions on different shells are different
-  m_Interpolation = mitk::gradients::CheckForDifferingShellDirections(m_BValueMap, m_OriginalGradientDirections.GetPointer());
   // [allDirectionsContainer] Gradient DirectionContainer containing all unique directions
   m_allDirectionsIndicies = mitk::gradients::GetAllUniqueDirections(m_BValueMap, m_OriginalGradientDirections);
   // [sizeAllDirections] size of GradientContainer cointaining all unique directions
   m_allDirectionsSize = m_allDirectionsIndicies.size();
 
-  //MITK_INFO << m_allDirectionsSize;
-  //exit(0);
-
   m_TargetGradientDirections = mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(m_BValueMap,m_OriginalGradientDirections);
-  //MITK_INFO << m_allDirectionsSize;
 
-  // if INTERPOLATION necessary
-  if(m_Interpolation)
-  {
+
     for(BValueMap::const_iterator it = m_BValueMap.begin();it != m_BValueMap.end(); it++)
     {
       if((*it).first == 0.0) continue;
@@ -105,44 +93,40 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
         itkExceptionMacro(<<"No interpolation possible");
       }
     }
-
     m_ShellInterpolationMatrixVector.reserve(m_BValueMap.size()-1);
-    // for Weightings
-
 
     // for each shell
     BValueMap::const_iterator it = m_BValueMap.begin();
+
     it++; //skip bZeroIndices
+
     for(;it != m_BValueMap.end();it++)
     {
       //- calculate maxShOrder
-      const IndicesVector currentShell = (*it).second;
+      const IndicesVector currentShell = it->second;
       unsigned int SHMaxOrder = 12;
       while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size())
+      {
         SHMaxOrder -= 2 ;
-
+      }
       //- get TragetSHBasis using allDirectionsContainer
       vnl_matrix<double> sphericalCoordinates;
       sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(m_allDirectionsIndicies, m_OriginalGradientDirections);
       vnl_matrix<double> TargetSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
-      MITK_INFO << "TargetSHBasis " << TargetSHBasis.rows() << " x " << TargetSHBasis.cols();
+      //MITK_INFO << "TargetSHBasis " << TargetSHBasis.rows() << " x " << TargetSHBasis.cols();
       //- get ShellSHBasis using currentShellDirections
       sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(currentShell, m_OriginalGradientDirections);
       vnl_matrix<double> ShellSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
-      MITK_INFO << "ShellSHBasis " << ShellSHBasis.rows() << " x " << ShellSHBasis.cols();
+      //MITK_INFO << "ShellSHBasis " << ShellSHBasis.rows() << " x " << ShellSHBasis.cols();
       //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
       vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
       vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.pinverse();
-      MITK_INFO << "shellInterpolationMatrix " << shellInterpolationMatrix.rows() << " x " << shellInterpolationMatrix.cols();
-      m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
-
-
-
+      //MITK_INFO << "shellInterpolationMatrix " << shellInterpolationMatrix.rows() << " x " << shellInterpolationMatrix.cols();
       //- save interpolationSHBasis
+      m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
 
     }
 
-  }
   m_WeightsVector.reserve(m_BValueMap.size()-1);
   BValueMap::const_iterator itt = m_BValueMap.begin();
   itt++; // skip ReferenceImages
@@ -156,12 +140,8 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   itt++; // skip ReferenceImages
   for(;itt != m_BValueMap.end(); itt++){
     m_WeightsVector.push_back(itt->second.size() / (double)maxShellSize);
+    MITK_INFO << m_WeightsVector.back();
   }
-
-
-  // calculate average b-Value for target b-Value [bVal_t]
-  // MITK_INFO << "overall referenceImage avareg";
-
 
 
   // initialize output image
@@ -176,13 +156,13 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   outImage->SetVectorLength( 1+m_allDirectionsSize ); // size of 1(bzeroValue) + AllDirectionsContainer
   outImage->Allocate();
 
-  BValueMap::iterator it = m_BValueMap.begin();
-  it++; // skip bZeroImages corresponding to 0-bValue
+  BValueMap::iterator ittt = m_BValueMap.begin();
+  ittt++; // skip bZeroImages corresponding to 0-bValue
   m_TargetBValue = 0;
-  while(it!=m_BValueMap.end())
+  while(ittt!=m_BValueMap.end())
   {
-    m_TargetBValue += it->first;
-    it++;
+    m_TargetBValue += ittt->first;
+    ittt++;
   }
   m_TargetBValue /= (double)(m_BValueMap.size()-1);
 
@@ -190,8 +170,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   MITK_INFO << "Input:" << std::endl << std::endl
             << "    GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
             << "    Shells: " << (m_BValueMap.size() - 1) << std::endl
-            << "    ReferenceImages: " << m_BValueMap.at(0.0).size() << std::endl
-            << "    Interpolation: " << m_Interpolation << std::endl;
+            << "    ReferenceImages: " << m_BValueMap.at(0.0).size() << std::endl;
 
   MITK_INFO << "Output:" << std::endl << std::endl
             << "    OutImageVectorLength: " << outImage->GetVectorLength() << std::endl
@@ -233,10 +212,13 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
   while(!iit.IsAtEnd())
   {
     InputPixelType b = iit.Get();
-
-    for(unsigned int i = 0 ; i < BZeroIndices.size(); i++)
+    BZeroAverage=0.0;
+    for(unsigned int i = 0 ; i < BZeroIndices.size(); i++){
+      //MITK_INFO << "BValues("<<i<<")"<< b[BZeroIndices[i]];
       BZeroAverage += b[BZeroIndices[i]];
+    }
     BZeroAverage /= (double)BZeroIndices.size();
+    //MITK_INFO << "BValues(average)"<< BZeroAverage ;
 
     OutputPixelType out = oit.Get();
     out.Fill(0.0);
@@ -248,7 +230,6 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
 
     while(shellIterator != m_BValueMap.end())
     {
-
       // reset Data
       SignalVector.fill(0.0);
 
@@ -259,78 +240,65 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
       // - get raw Signal for currente shell
       for(unsigned int i = 0 ; i < currentShell.size(); i++)
         InterpVector.put(i,b[currentShell[i]]);
-      MITK_INFO <<"RawSignal: "<< InterpVector;
-
+      //MITK_INFO << "InputVector(RAWSIGNAL:"<< shellIndex <<")";
+      //MITK_INFO << InterpVector ;
       //- normalization of the raw Signal
       S_S0Normalization(InterpVector, BZeroAverage);
-      MITK_INFO <<"Normalized: "<< InterpVector;
-
+      //MITK_INFO << "InputVector(NORMALIZED:"<< shellIndex <<")";
+      //MITK_INFO << InterpVector ;
       //- interpolate the Signal if necessary using corresponding interpolationSHBasis
-      if(m_Interpolation)
-        SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * InterpVector;
-      else
-        SignalVector = InterpVector;
-      MITK_INFO <<"Interpolated: "<< SignalVector;
+
+      SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * InterpVector;
+
+      //MITK_INFO << "SignalVector(NORMALIZED:"<< shellIndex <<")";
+      //MITK_INFO << SignalVector ;
 
       // - ADC calculation for the signalVector
       calculateAdcFromSignal(SignalVector, shellIterator->first);
-      MITK_INFO << "ADCVector: " << SignalVector;
-
+      //MITK_INFO << "SignalVector(SIGNaL->ADC:"<< shellIndex <<")";
+      //MITK_INFO << SignalVector ;
 
       //- weight the signal
-      //if(m_Interpolation){
-      //  const double shellWeight = m_WeightsVector.at(shellIndex);
-      //  SignalVector *= shellWeight;
-      //}
+      SignalVector *= m_WeightsVector.at(shellIndex);
 
       //- save the (interpolated) ShellSignalVector as the ith column in the SignalMatrix
       SignalMatrix.set_column(shellIndex, SignalVector);
 
       shellIterator++;
       shellIndex++;
-      //MITK_INFO << SignalMatrix;
+
     }
-    exit(0);
-    // MITK_INFO <<"finalSignalMatrix: " << SignalMatrix;
     // ADC averaging Sum(ADC)/n
     for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)
       SignalVector.put(i,SignalMatrix.get_row(i).sum());
     SignalVector/= (double)(m_BValueMap.size()-1);
-    // MITK_INFO << "AveragedADC: " << SignalVector;
+    //MITK_INFO << "SignalVector(AVERAGEDADC)";
+    //MITK_INFO << SignalVector ;
+
     // recalculate signal from ADC
     calculateSignalFromAdc(SignalVector, m_TargetBValue, BZeroAverage);
+    //MITK_INFO << "SignalVector(ADC->SIGNAL)";
+    //MITK_INFO << SignalVector ;
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));
 
-    //MITK_INFO << "ADCAveragedSignal: " << out;
+    //MITK_INFO << "NewSignal: " << out;
     //MITK_INFO << "-------------";
     oit.Set(out);
     ++oit;
     ++iit;
   }
-
-
-  // outImageIterator set S_t
-
-  // **
-  /*
-  int vecLength;
-
-
-
-
-  this->SetNumberOfRequiredOutputs (1);
-  this->SetNthOutput (0, outImage);
-  MITK_INFO << "...done";
-  */
 }
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
 ::S_S0Normalization( vnl_vector<double> & vec, const double & S0 )
 {
-  for(unsigned int i = 0; i < vec.size(); i++)
+  for(unsigned int i = 0; i < vec.size(); i++){
     vec[i] /= S0;
+    if(vec[i]>1.0) vec[i] = 1;
+    if(vec[i]<0.0) vec[i] = 0;
+  }
 }
 
 template <class TInputScalarType, class TOutputScalarType>

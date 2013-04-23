@@ -94,8 +94,6 @@ namespace itk
 
     double m_TargetBValue;
 
-    bool m_Interpolation;
-
     std::vector<double> m_WeightsVector;
 
     std::vector<vnl_matrix< double > > m_ShellInterpolationMatrixVector;

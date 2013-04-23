@@ -35,6 +35,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataTestImplementation is initialized and empty");
   MITK_TEST_CONDITION(baseDataImpl->GetExternalReferenceCount()== baseDataImpl->GetReferenceCount(), "Checks external reference count!");
 
+
   mitk::BaseDataTestImplementation::Pointer cloneBaseData = baseDataImpl->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneBaseData.IsNotNull(),"Testing instantiation of base data clone");
   MITK_TEST_CONDITION(cloneBaseData->IsInitialized(), "Clone of BaseDataTestImplementation is initialized");

@@ -15,8 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkTimeGeometry.h>
 
-mitk::TimeGeometry::TimeGeometry()
+mitk::TimeGeometry::TimeGeometry() :
+  m_BoundingBox(BoundingBox::New())
 {
+  typedef BoundingBox::PointsContainer ContainerType;
+  ContainerType::Pointer points = ContainerType::New();
+  m_BoundingBox->SetPoints(points.GetPointer());
 }
 
 mitk::TimeGeometry::~TimeGeometry()

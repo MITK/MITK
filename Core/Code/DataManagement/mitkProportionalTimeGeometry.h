@@ -101,7 +101,6 @@ namespace mitk {
   protected:
     virtual ~ProportionalTimeGeometry();
 
-    BoundingBox::Pointer m_BoundingBox;
     std::vector<Geometry3D::Pointer> m_GeometryVector;
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;

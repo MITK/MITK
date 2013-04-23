@@ -133,14 +133,15 @@ void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(Geometry3D *geometry, T
 mitk::TimeGeometry::Pointer mitk::ProportionalTimeGeometry::Clone() const
 {
   ProportionalTimeGeometry::Pointer newTimeGeometry = ProportionalTimeGeometry::New();
-  newTimeGeometry->m_BoundingBox = this->m_BoundingBox->DeepCopy();
+  newTimeGeometry->m_BoundingBox = m_BoundingBox->DeepCopy();
   newTimeGeometry->m_FirstTimePoint = this->m_FirstTimePoint;
   newTimeGeometry->m_StepDuration = this->m_StepDuration;
   newTimeGeometry->m_GeometryVector.clear();
   newTimeGeometry->Expand(this->GetNumberOfTimeSteps());
   for (TimeStepType i =0; i < GetNumberOfTimeSteps(); ++i)
   {
-    Geometry3D* tempGeometry = dynamic_cast<Geometry3D*> (GetGeometryCloneForTimeStep(i)->Clone().GetPointer());
+    AffineGeometryFrame3D::Pointer pointer = GetGeometryForTimeStep(i)->Clone();
+    Geometry3D* tempGeometry = dynamic_cast<Geometry3D*> (pointer.GetPointer());
     newTimeGeometry->SetTimeStepGeometry(tempGeometry,i);
   }
   TimeGeometry::Pointer finalPointer = dynamic_cast<TimeGeometry*>(newTimeGeometry.GetPointer());

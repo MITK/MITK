@@ -55,11 +55,6 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 {}
 
 
-mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureReader::MakeOutput ( unsigned int )
-{
-  return static_cast<itk::DataObject*>(PlanarFigure::New().GetPointer()); // just as a stand in for the pipeline update mechanism. This will be overwritten in GenerateData()
-}
-
 void mitk::PlanarFigureReader::GenerateData()
 {
   m_Success = false;

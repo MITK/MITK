@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigureSource.h"
 
+#include "mitkPlanarCircle.h"
+
 mitk::PlanarFigureSource::PlanarFigureSource()
 {
     // Create the output. We use static_cast<> here because we know the default
@@ -42,7 +44,7 @@ void mitk::PlanarFigureSource::GenerateInputRequestedRegion()
 
 itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-    return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
+    return static_cast<itk::DataObject *>(PlanarCircle::New().GetPointer());
 }
 
 
@@ -53,7 +55,7 @@ itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput( const DataObjectI
     {
     return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
+  return static_cast<itk::DataObject *>(PlanarCircle::New().GetPointer());
 }
 
 void mitk::PlanarFigureSource::GraftOutput(itk::DataObject *graft)

@@ -57,7 +57,7 @@ class Geometry2D;
 class PlanarFigure_EXPORT PlanarFigure : public BaseData
 {
 public:
-  mitkClassMacro( PlanarFigure, BaseData );
+  mitkClassMacro( PlanarFigure, BaseData )
 
   struct PolyLineElement
   {
@@ -367,12 +367,15 @@ protected:
 
 private:
 
+  // not implemented to prevent PlanarFigure::New() calls which would create an itk::Object.
+  static Pointer New();
+
   struct Feature
   {
     Feature( const char *name, const char *unit )
     : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true ), Visible( true )
     {
-    };
+    }
 
     std::string Name;
     std::string Unit;

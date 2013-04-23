@@ -190,11 +190,16 @@ SliceNavigationController::Update(
 
   m_BlockUpdate = true;
 
-  if ( m_LastUpdateTime < m_InputWorldTimeGeometry->GetMTime() )
+  if ( m_InputWorldTimeGeometry.IsNotNull() &&
+    m_LastUpdateTime < m_InputWorldTimeGeometry->GetMTime() )
   {
     Modified();
   }
-
+  if ( m_InputWorldGeometry3D.IsNotNull() &&
+    m_LastUpdateTime < m_InputWorldGeometry3D->GetMTime() )
+  {
+    Modified();
+  }
   this->SetViewDirection( viewDirection );
   this->SetTop( top );
   this->SetFrontSide( frontside );

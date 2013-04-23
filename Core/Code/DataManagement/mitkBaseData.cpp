@@ -323,6 +323,9 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   if (bd != NULL)
   {
     m_PropertyList = bd->GetPropertyList()->Clone();
+    if (bd->GetTimeGeometry()!=NULL)
+      m_TimeGeometry = bd->GetTimeGeometry()->Clone();
+
   }
   else
   {

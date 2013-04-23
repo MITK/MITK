@@ -165,8 +165,7 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of origin via GetGeometry()->GetOrigin(): ");
 
   // Setting origin via SetOrigin(origin): ";
-  mitk::FillVector3D(origin, 37.0, 17.92, 27.83);
-  imgMem->SetOrigin(origin);
+  mitk::FillVector3D(origin, 37.0, 17.92, 27.83);  imgMem->SetOrigin(origin);
 
   // Test origin
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetGeometry()->GetOrigin(), origin), "Testing correctness of changed origin via GetGeometry()->GetOrigin(): ");

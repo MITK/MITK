@@ -69,8 +69,6 @@ namespace mitk {
 
     virtual void Initialize();
 
-    virtual void ExecuteOperation(Operation *);
-
     virtual void Expand(TimeStepType size);
     virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep);
 

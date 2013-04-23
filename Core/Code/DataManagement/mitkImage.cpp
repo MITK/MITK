@@ -798,16 +798,18 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(dynamic_cast<Geometry3D*>(geometry.Clone().GetPointer()), tDim);
+  AffineGeometryFrame3D::Pointer geometry3D = geometry.Clone();
+  timeGeometry->Initialize(dynamic_cast<Geometry3D*>(geometry3D.GetPointer()), tDim);
   this->Initialize(type, *timeGeometry, channels, tDim);
 }
 
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels, int tDim )
 {
+  const ProportionalTimeGeometry& ptG = dynamic_cast<const ProportionalTimeGeometry&>(geometry);
   unsigned int dimensions[5];
-  dimensions[0] = (unsigned int)(geometry.GetExtendInWorld(0)+0.5);
-  dimensions[1] = (unsigned int)(geometry.GetExtendInWorld(1)+0.5);
-  dimensions[2] = (unsigned int)(geometry.GetExtendInWorld(2)+0.5);
+  dimensions[0] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(0)+0.5);
+  dimensions[1] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(1)+0.5);
+  dimensions[2] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(2)+0.5);
   dimensions[3] = (tDim > 0) ? tDim : geometry.GetNumberOfTimeSteps();
   dimensions[4] = 0;
 

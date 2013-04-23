@@ -220,6 +220,10 @@ namespace mitk {
     virtual void UpdateWithoutBoundingBox()
     {};
 
+    /**
+    * \brief Executes the given operation on all time steps
+    */
+    virtual void ExecuteOperation(Operation *op);
 
   }; // end class TimeGeometry
 

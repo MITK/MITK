@@ -313,12 +313,12 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
         slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
       }
     }
-    ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
-    if(timeGeometry != NULL)
-    {
-      timeGeometry->Initialize(slicedGeometry, steps);
-      break;
-    }
+    //ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
+    //if(timeGeometry != NULL)
+    //{
+    //  timeGeometry->Initialize(slicedGeometry, steps);
+    //  break;
+    //}
   }
 }
 
@@ -338,12 +338,6 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
     if(slicedGeometry != NULL)
     {
       slicedGeometry->SetSpacing(aSpacing);
-    }
-    ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
-    if(timeGeometry != NULL)
-    {
-      timeGeometry->Initialize(slicedGeometry, steps);
-      break;
     }
   }
 }

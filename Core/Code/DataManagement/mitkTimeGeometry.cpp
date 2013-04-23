@@ -151,3 +151,11 @@ void mitk::TimeGeometry::Update()
   this->UpdateBoundingBox();
   this->UpdateWithoutBoundingBox();
 }
+
+void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
+{
+  for (TimeStepType step = 0; step < GetNumberOfTimeSteps(); ++step)
+  {
+    GetGeometryForTimeStep(step)->ExecuteOperation(op);
+  }
+}

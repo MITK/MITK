@@ -10,12 +10,12 @@ set(MODULE_TESTS
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
-   mitkNavigationDataSequentialPlayerTest.cpp
+   # mitkNavigationDataSequentialPlayerTest.cpp commented out because of bug 15020
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
-   mitkNavigationDataToPointSetFilterTest.cpp
-   mitkNavigationDataTransformFilterTest.cpp
+   # mitkNavigationDataToPointSetFilterTest.cpp commented out because of bug 15022
+   # mitkNavigationDataTransformFilterTest.cpp commented out because of bug 15023
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp

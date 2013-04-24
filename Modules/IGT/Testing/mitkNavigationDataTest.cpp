@@ -112,7 +112,7 @@ class NavigationDataTestClass
     bool graftIsEqual = (nd->GetPosition() == graftedCopy->GetPosition())
                      && (nd->GetOrientation() == graftedCopy->GetOrientation())
                      && (nd->IsDataValid() == graftedCopy->IsDataValid())
-                     && mitk::Equal(nd->GetTimeStamp(), graftedCopy->GetTimeStamp())
+                     && mitk::Equal(nd->GetIGTTimeStamp(), graftedCopy->GetIGTTimeStamp())
                      && (nd->GetHasPosition() == graftedCopy->GetHasPosition())
                      && (nd->GetHasOrientation() == graftedCopy->GetHasOrientation())
                      && (nd->GetCovErrorMatrix() == graftedCopy->GetCovErrorMatrix())

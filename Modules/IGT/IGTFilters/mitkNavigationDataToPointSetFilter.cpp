@@ -164,7 +164,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
         mitk::PointSet::PointType pos;
         if (counterVec[i] == 0) //first Element must be inserted
         {
-          vectorOldTime[i] = input->GetTimeStamp();
+          vectorOldTime[i] = input->GetIGTTimeStamp();
 
           //no need to call an update
           pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
@@ -176,7 +176,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
           //manually call an update to track new positions
           this->ProcessObject::GetInput(i)->Update();
           input = this->GetInput(i);
-          mitk::NavigationData::TimeStampType newTime = input->GetTimeStamp();
+          mitk::NavigationData::TimeStampType newTime = input->GetIGTTimeStamp();
           if (vectorOldTime[i]<newTime)
           {
             pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!

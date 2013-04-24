@@ -10,7 +10,7 @@ set(MODULE_TESTS
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataReferenceTransformFilterTest.cpp
-   mitkNavigationDataSequentialPlayerTest.cpp
+   # mitkNavigationDataSequentialPlayerTest.cpp commented out because of bug 15020
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp

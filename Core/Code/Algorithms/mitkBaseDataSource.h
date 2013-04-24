@@ -81,6 +81,7 @@ public:
   mitkClassMacro(BaseDataSource, itk::ProcessObject)
 
   typedef BaseData OutputType;
+  typedef itk::ProcessObject::DataObjectIdentifierType DataObjectIdentifierType;
 
   mitkBaseDataSourceGetOutputDeclarations
 

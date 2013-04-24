@@ -2,7 +2,7 @@ set(CPP_FILES
 
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
-  DicomImport/mitkGroupDiffusionHeadersFilter.cpp
+  # DicomImport/mitkGroupDiffusionHeadersFilter.cpp
   DicomImport/mitkDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkGEDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkPhilipsDicomDiffusionImageHeaderReader.cpp

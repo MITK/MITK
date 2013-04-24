@@ -575,7 +575,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int /*NumberOfThreads*/)
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType /*NumberOfThreads*/)
 {
 
   itk::TimeProbe clock;

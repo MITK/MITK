@@ -136,7 +136,7 @@ namespace itk
   template <class TInputScalarType, class TOutputScalarType>
   void
     TensorImageToDiffusionImageFilter<TInputScalarType, TOutputScalarType>
-    ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
+    ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
   {
 
     typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;

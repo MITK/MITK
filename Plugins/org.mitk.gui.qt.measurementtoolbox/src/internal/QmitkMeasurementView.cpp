@@ -338,12 +338,12 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     data.m_Figure->RemoveObserver( data.m_EndInteractionObserverTag );
 
     MEASUREMENT_DEBUG << "removing from the list of tracked planar figures";
-    d->m_DataNodeToPlanarFigureData.erase( it );
 
     isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
     if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
       PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
     }
+    d->m_DataNodeToPlanarFigureData.erase( it );
   }
 
   mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();

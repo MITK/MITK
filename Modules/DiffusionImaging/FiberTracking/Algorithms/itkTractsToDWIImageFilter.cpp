@@ -261,7 +261,7 @@ void TractsToDWIImageFilter::GenerateData()
             ImageRegion<3> region = m_ImageRegion;
             region.SetSize(0, m_ImageRegion.GetSize(0)*m_Upsampling);
             region.SetSize(1, m_ImageRegion.GetSize(1)*m_Upsampling);
-            mitk::Vector3D spacing = m_Spacing;
+            itk::Vector<double> spacing = m_Spacing;
             spacing[0] /= m_Upsampling;
             spacing[1] /= m_Upsampling;
             itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkUcharImgType,ItkUcharImgType>::New();

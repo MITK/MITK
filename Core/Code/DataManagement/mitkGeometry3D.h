@@ -187,7 +187,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   Vector3D GetAxisVector(unsigned int direction) const
   {
     Vector3D frontToBack;
-    frontToBack.Set_vnl_vector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
+    frontToBack.SetVnlVector(m_IndexToWorldTransform->GetMatrix().GetVnlMatrix().get_column(direction));
     frontToBack *= GetExtent(direction);
     return frontToBack;
   }
@@ -305,7 +305,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## \sa GetOrigin
   VnlVector GetOriginVnl() const
   {
-    return const_cast<Self*>(this)->m_Origin.Get_vnl_vector();
+    return const_cast<Self*>(this)->m_Origin.GetVnlVector();
   }
 
   //##Documentation
@@ -363,8 +363,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
       dim=3;
     }
     for(i=0;i<dim;++i){
-      //index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType >( pt_units[i] );
-      index[i]=itk::Math::RoundHalfIntegerUp( pt_units[i] );
+      index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType>( pt_units[i] );
     }
   }
 
@@ -457,9 +456,9 @@ virtual void SetBounds(const BoundsArrayType& bounds);
     if (m_ImageGeometry)
     {
       mitk::Point3D discretIndex;
-      discretIndex[0]=itk::Math::RoundHalfIntegerUp( index[0] );
-      discretIndex[1]=itk::Math::RoundHalfIntegerUp( index[1] );
-      discretIndex[2]=itk::Math::RoundHalfIntegerUp( index[2] );
+      discretIndex[0]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[0] );
+      discretIndex[1]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[1] );
+      discretIndex[2]=itk::Math::RoundHalfIntegerUp<mitk::ScalarType>( index[2] );
 
       inside = m_BoundingBox->IsInside(discretIndex);
       //we have to check if the index is at the upper border of each dimension,
@@ -591,7 +590,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##  newGeometry->UnRegister();
   //##  return newGeometry.GetPointer();
   //## \endcode
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)

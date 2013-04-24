@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVector.h"
 #include "mitkBaseProcess.h"
 
-#include <itkSmartPointerForwardReference.txx>
-
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
@@ -271,8 +269,8 @@ void mitk::ExtrudedContour::BuildGeometry()
   }
 
   // calculate down-vector
-  VnlVector rightDV = m_RightVector.Get_vnl_vector(); rightDV.normalize(); vnl2vtk(rightDV, m_Right);
-  VnlVector downDV  = vnl_cross_3d( m_Vector.Get_vnl_vector(), rightDV ); downDV.normalize();  vnl2vtk(downDV,  m_Down);
+  VnlVector rightDV = m_RightVector.GetVnlVector(); rightDV.normalize(); vnl2vtk(rightDV, m_Right);
+  VnlVector downDV  = vnl_cross_3d( m_Vector.GetVnlVector(), rightDV ); downDV.normalize();  vnl2vtk(downDV,  m_Down);
 
   // Part II: calculate plane as base for extrusion, project the contour
   // on this plane and store as polygon for IsInside test and BoundingBox calculation

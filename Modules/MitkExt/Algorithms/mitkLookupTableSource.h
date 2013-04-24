@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTable.h"
 #include "MitkExtExports.h"
 #include "mitkCommon.h"
-#include "mitkBaseProcess.h"
+
+#include "itkProcessObject.h"
 
 namespace mitk
 {
@@ -40,9 +41,8 @@ class MitkExt_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 
-    mitkClassMacro( LookupTableSource, BaseProcess );
-
-    itkNewMacro( Self );
+    mitkClassMacro( LookupTableSource, itk::ProcessObject )
+    itkNewMacro( Self )
 
     typedef mitk::LookupTable OutputType;
 
@@ -56,21 +56,21 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput ( unsigned int idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+    /**
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
     /**
      * Generates the input requested region simply by calling the equivalent
      * method of the superclass.
      */
     void GenerateInputRequestedRegion();
-
-    /**
-     * Allows to set the output of the lookup-table source. According to the itk documentation
-     * this method is outdated and should not be used. Instead GraftOutput(...)
-     * should be used.
-     * @param output the intended output of the lookup table source
-     */
-    void SetOutput( OutputType* output );
 
     /**
      * Replacement of the SetOutput method. I think it is not yet correcly
@@ -80,18 +80,10 @@ public:
      */
     virtual void GraftOutput( OutputType* output );
 
-    /**
-     * Returns the output with index 0 of the lookup table source
-     * @returns the output
-     */
-    OutputType* GetOutput();
-
-    /**
-     * Returns the n'th output of the lookup table source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    OutputType* GetOutput ( unsigned int idx );
+    virtual OutputType* GetOutput();
+    virtual const OutputType* GetOutput() const;
+    virtual OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    virtual const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
     LookupTableSource();
@@ -104,5 +96,3 @@ protected:
 
 
 #endif
-
-

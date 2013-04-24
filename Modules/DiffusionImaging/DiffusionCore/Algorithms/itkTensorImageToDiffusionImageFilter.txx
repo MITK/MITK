@@ -147,7 +147,7 @@ namespace itk
     unsigned long step = numPixels/100;
     unsigned long progress = 0;
 
-    IteratorOutputType itOut (this->GetOutput(0), outputRegionForThread);
+    IteratorOutputType itOut (this->GetOutput(), outputRegionForThread);
     IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
     IteratorBaselineType itB0 (m_BaselineImage, outputRegionForThread);
 

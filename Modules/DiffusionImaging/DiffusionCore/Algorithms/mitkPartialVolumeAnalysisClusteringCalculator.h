@@ -74,9 +74,8 @@ namespace mitk
         hVals.set_size(histogram->GetSize()[0]);
         double sum = histogram->GetTotalFrequency();
         MitkHistType::ConstIterator endIt = histogram->End();
-        MitkHistType::ConstIterator it;
+        MitkHistType::ConstIterator it = histogram->Begin();
         bool firstNonEmptyBinFound = false;
-        it = histogram->Begin();
         //++it;
         int i=0;
         while (it != endIt)

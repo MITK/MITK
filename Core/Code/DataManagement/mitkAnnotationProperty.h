@@ -50,8 +50,6 @@ public:
   mitkNewMacro4Param( AnnotationProperty,
     const std::string &, ScalarType, ScalarType, ScalarType );
 
-  Pointer Clone() const;
-
   itkGetStringMacro( Label );
   itkSetStringMacro( Label );
 

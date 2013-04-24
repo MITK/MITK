@@ -72,6 +72,7 @@ public:
 
   const mitk::Surface *GetInput(void);
 
+  using itk::ProcessObject::SetInput;
   virtual void SetInput(const mitk::Surface *surface);
 
   void SetImage(const mitk::Image *source);

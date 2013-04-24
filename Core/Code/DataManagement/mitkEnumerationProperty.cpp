@@ -198,12 +198,6 @@ const mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProp
   return s_StringMapForClassName[ className ];
 }
 
-mitk::EnumerationProperty::Pointer mitk::EnumerationProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::EnumerationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

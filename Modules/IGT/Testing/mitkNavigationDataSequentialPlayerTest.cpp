@@ -126,7 +126,7 @@ void TestStandardWorkflow()
                       "Testing GoToSnapshot() [1]");
 
   player->GoToSnapshot(1);
-  mitk::NavigationData::Pointer nd0 = player->GetOutput(0);
+  mitk::NavigationData::Pointer nd0 = player->GetOutput();
   MITK_TEST_CONDITION(qTool0Snapshot0.as_vector() == nd0->GetOrientation().as_vector(),
                       "Testing GoToSnapshot() [2]");
 

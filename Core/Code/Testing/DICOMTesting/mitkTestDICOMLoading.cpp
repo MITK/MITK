@@ -94,27 +94,27 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
 }
 
 std::string
-mitk::TestDICOMLoading::TypeIDToString(const std::type_info& ti)
+mitk::TestDICOMLoading::ComponentTypeToString(int type)
 {
-  if (ti == typeid(unsigned char))
+  if (type == itk::ImageIOBase::UCHAR)
     return "UCHAR";
-  else if (ti == typeid(char))
+  else if (type == itk::ImageIOBase::CHAR)
     return "CHAR";
-  else if (ti == typeid(unsigned short))
+  else if (type == itk::ImageIOBase::USHORT)
     return "USHORT";
-  else if (ti == typeid(short))
+  else if (type == itk::ImageIOBase::SHORT)
     return "SHORT";
-  else if (ti == typeid(unsigned int))
+  else if (type == itk::ImageIOBase::UINT)
     return "UINT";
-  else if (ti == typeid(int))
+  else if (type == itk::ImageIOBase::INT)
     return "INT";
-  else if (ti == typeid(long unsigned int))
+  else if (type == itk::ImageIOBase::ULONG)
     return "ULONG";
-  else if (ti == typeid(long int))
+  else if (type == itk::ImageIOBase::LONG)
     return "LONG";
-  else if (ti == typeid(float))
+  else if (type == itk::ImageIOBase::FLOAT)
     return "FLOAT";
-  else if (ti == typeid(double))
+  else if (type == itk::ImageIOBase::DOUBLE)
     return "DOUBLE";
   else
     return "UNKNOWN";
@@ -141,7 +141,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   SetDefaultLocale();
 
   // basic image data
-  DumpLine( "Pixeltype",    TypeIDToString( (image->GetPixelType().GetTypeId()) ));
+  DumpLine( "Pixeltype",    ComponentTypeToString(image->GetPixelType().GetComponentType()) );
   DumpLine( "BitsPerPixel", image->GetPixelType().GetBpe() );
   DumpLine( "Dimension",    image->GetDimension() );
 

@@ -54,8 +54,6 @@ namespace mitk {
     itkNewMacro(LookupTableProperty);
     mitkNewMacro1Param(LookupTableProperty, const mitk::LookupTable::Pointer);
 
-    Pointer Clone() const;
-
     itkGetObjectMacro(LookupTable, LookupTable );
     ValueType GetValue() const;
 

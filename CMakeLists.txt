@@ -334,9 +334,8 @@ include(mitkMacroGetLinuxDistribution)
 find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
 
-if(ITK_USE_SYSTEM_GDCM)
-  find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
-endif()
+find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
+include(${GDCM_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -725,7 +724,7 @@ endif()
 # Construct a list of paths containing runtime directories
 # for MITK applications on Windows
 set(MITK_RUNTIME_PATH
-    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
+    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_DIR}/bin/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
     )
 
 if(QT4_FOUND)

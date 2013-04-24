@@ -225,7 +225,7 @@ namespace itk {
   {
     // init output and b-zero iterators
     typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+      static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
     ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);

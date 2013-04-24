@@ -43,6 +43,8 @@ public:
   typedef typename Superclass::InputVectorType InputVectorType;
   typedef typename Superclass::InputVnlVectorType InputVnlVectorType;
   typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
+  typedef typename Superclass::ParametersType ParametersType;
+  typedef typename Superclass::JacobianType JacobianType;
 
 
   itkNewMacro(Self);
@@ -58,15 +60,23 @@ public:
   //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
   virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
 
+  using Superclass::TransformVector;
+  using Superclass::TransformCovariantVector;
+
   virtual OutputPointType TransformPoint(const InputPointType  & ) const;
-  virtual OutputVectorType    TransformVector(const InputVectorType &) const;
+  virtual OutputVectorType TransformVector(const InputVectorType &) const;
   virtual OutputVnlVectorType TransformVector(const InputVnlVectorType &) const;
   virtual OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &) const;
 
-  virtual InputPointType   BackTransform(const OutputPointType  &point ) const;
-  virtual InputVectorType  BackTransform(const OutputVectorType &vector) const;
+  virtual InputPointType BackTransform(const OutputPointType  &point ) const;
+  virtual InputVectorType BackTransform(const OutputVectorType &vector) const;
   virtual InputVnlVectorType BackTransform(const OutputVnlVectorType &vector) const;
   virtual InputCovariantVectorType BackTransform(const OutputCovariantVectorType &vector) const;
+
+  virtual void SetParameters(const ParametersType&);
+  virtual void SetFixedParameters(const ParametersType&);
+  virtual void ComputeJacobianWithRespectToParameters(const InputPointType&, JacobianType&) const;
+  virtual void ComputeJacobianWithRespectToPosition(const InputPointType&, JacobianType&) const;
 
   virtual unsigned long GetMTime() const;
 

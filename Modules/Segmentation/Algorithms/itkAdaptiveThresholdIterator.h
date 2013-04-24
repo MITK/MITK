@@ -146,7 +146,7 @@ namespace itk
     const IndexType GetIndex()
     { return (* m_QueueMap.find(m_RegionGrowingState)).second.front();}// [!] is never called?!
 
-    const PixelType & Get(void) const
+    const PixelType Get(void) const
     { return const_cast<ImageType *>(this->m_Image.GetPointer())->GetPixel((* m_QueueMap.find(m_RegionGrowingState)).second.front() ); }
     //[!] is never called?!
 

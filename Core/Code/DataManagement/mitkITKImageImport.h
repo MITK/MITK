@@ -40,9 +40,9 @@ template <class TInputImage>
 class MITK_EXPORT ITKImageImport : public ImageSource
 {
 public:
-  mitkClassMacro(ITKImageImport,ImageSource);
 
-  itkNewMacro(Self);
+  mitkClassMacro(ITKImageImport,ImageSource)
+  itkNewMacro(Self)
 
   //##Documentation
   //## \brief The type of the input image.
@@ -65,6 +65,7 @@ public:
   //##Documentation
   //## \brief Set the input itk::Image of this image importer.
   void SetInput(const InputImageType*);
+  using itk::ProcessObject::SetInput;
 
   //##Documentation
   //## \brief Set the Geometry of the result image (optional)
@@ -89,7 +90,7 @@ protected:
 
   virtual void GenerateData();
 
-  virtual void SetNthOutput(unsigned int num, itk::DataObject *output);
+  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output);
 
   /** Typedef for the region copier function object that converts an
    * output region to an input region. */

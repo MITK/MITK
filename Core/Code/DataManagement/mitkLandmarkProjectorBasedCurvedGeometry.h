@@ -42,7 +42,7 @@ public:
 
   itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform*);
 
-  mitk::AffineGeometryFrame3D::Pointer Clone() const;
+  itk::LightObject::Pointer InternalClone() const;
 
 protected:
   LandmarkProjectorBasedCurvedGeometry();

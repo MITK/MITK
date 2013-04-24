@@ -61,12 +61,12 @@ namespace mitk {
     /**
     *\brief return the output with id idx of the filter
     */
-    NavigationData* GetOutput(unsigned int idx);
+    NavigationData* GetOutput(DataObjectPointerArraySizeType idx);
 
     /**
     *\brief return the output with name navDataName of the filter
     */
-    NavigationData* GetOutput(std::string navDataName);
+    NavigationData* GetOutput(const std::string& navDataName);
 
     /**
     *\brief return the index of the output with name navDataName, -1 if no output with that name was found
@@ -115,18 +115,20 @@ namespace mitk {
     virtual void GraftOutput(itk::DataObject *graft);
 
     /**
-    * \brief Make a DataObject of the correct type to used as the specified output.
-    *
-    * This method is automatically called when DataObject::DisconnectPipeline()
-    * is called.  DataObject::DisconnectPipeline, disconnects a data object
-    * from being an output of its current source.  When the data object
-    * is disconnected, the ProcessObject needs to construct a replacement
-    * output data object so that the ProcessObject is in a valid state.
-    * Subclasses of NavigationDataSource that have outputs of different
-    * data types must overwrite this method so that proper output objects
-    * are created.
-    */
-    virtual DataObjectPointer MakeOutput(unsigned int idx);
+     * Allocates a new output object and returns it. Currently the
+     * index idx is not evaluated.
+     * @param idx the index of the output for which an object should be created
+     * @returns the new object
+     */
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+
+    /**
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
+     */
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
 
     /**
     * \brief Set all filter parameters as the PropertyList p

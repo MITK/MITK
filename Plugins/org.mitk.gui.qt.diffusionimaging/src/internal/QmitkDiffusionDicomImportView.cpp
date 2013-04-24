@@ -542,7 +542,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(m_OutputFolderNameSet) logfile << "Nno files in acquisitions, ABORTING \n";
         continue;
       }
-
       if(nfiles % nTotalAcquis != 0)
       {
         Error("Number of files per acquisition differs between series, ABORTING");
@@ -579,7 +578,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           if(m_OutputFolderNameSet) logfile << e;
           continue;
         }
-
         //Status(std::endl;
       }
       mitk::ProgressBar::GetInstance()->Progress();

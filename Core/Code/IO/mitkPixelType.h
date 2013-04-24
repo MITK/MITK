@@ -30,16 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-template< typename ComponentT>
-const char* ComponentTypeToString()
+template<typename T>
+std::string PixelComponentTypeToString()
 {
-  return typeid(ComponentT).name();
+  return itk::ImageIOBase::GetComponentTypeAsString(itk::ImageIOBase::MapPixelType<T>::CType);
 }
 
 template<typename PixelT>
-const char* PixelTypeToString()
+std::string PixelTypeToString()
 {
-  return typeid(PixelT).name();
+  return std::string();
 }
 
 
@@ -57,102 +57,74 @@ class MITK_CORE_EXPORT PixelType
 public:
 
   typedef itk::ImageIOBase::IOPixelType ItkIOPixelType;
+  typedef itk::ImageIOBase::IOComponentType ItkIOComponentType;
 
   PixelType(const mitk::PixelType & aPixelType);
 
-  /** \brief Get the \a type_info of the scalar (!) type. Each element
-  * may contain m_NumberOfComponents (more than one) of these scalars.
-  *
-  */
-  inline const std::type_info& GetTypeId() const
-  {
-    return m_ComponentType;
-  }
+  itk::ImageIOBase::IOPixelType GetPixelType() const;
 
-  /** \brief Get the \a type_info of the whole pixel type.
-  *
-  * If you want the type information for the component of a compound type use the
-  * GetTypeId() method
-  */
-  /*inline const std::type_info& GetPixelTypeId() const
-  {
-    return m_PixelType;
-  }
-*/
-  inline itk::ImageIOBase::IOPixelType GetPixelTypeId() const
-  {
-    return m_PixelType;
-  }
+  /**
+   * \brief Get the \a component type (the scalar (!) type). Each element
+   * may contain m_NumberOfComponents (more than one) of these scalars.
+   *
+   */
+  int GetComponentType() const;
 
-  /** \brief Returns a string containing the ItkTypeName,
-    *
-    * The string provides the same information as GetPixelTypeId.name()
-    */
-  std::string GetItkTypeAsString() const
-  {
-    return m_PixelTypeName;
-  }
+  /**
+   * \brief Returns a string containing the ITK pixel type name.
+   */
+  std::string GetPixelTypeAsString() const;
 
-  /** \brief Returns a string containing the type name of the component,
-    *
-    * The string provides the same information as GetTypeId.name()
-    */
-  std::string GetComponentTypeAsString() const
-  {
-      return m_ComponentTypeName;
-  }
+  /**
+   * \brief Returns a string containing the name of the component.
+   */
+  std::string GetComponentTypeAsString() const;
 
-  /** \brief Get size of the PixelType in bytes
-    *
-    * A RGBA PixelType of floats will return 4 * sizeof(float)
-  */
-  size_t GetSize() const
-  {
-    return (m_NumberOfComponents * m_BytesPerComponent);
-  }
+  /**
+   * \brief Returns a string representing the pixel type and pixel components.
+   */
+  std::string GetTypeAsString() const;
 
-  /** \brief Get the number of bits per element (of an
-  * element)
-  *
-  * A vector of double with three components will return
-  * 8*sizeof(double)*3.
-  * \sa GetBitsPerComponent
-  * \sa GetItkTypeId
-  * \sa GetTypeId
-  */
-  size_t GetBpe() const
-  {
-    return this->GetSize() * 8;
-  }
+  /**
+   * \brief Get size of the PixelType in bytes
+   *
+   * A RGBA PixelType of floats will return 4 * sizeof(float)
+   */
+  size_t GetSize() const;
 
-  /** \brief Get the number of components of which each element consists
-  *
-  * Each pixel can consist of multiple components, e.g. RGB.
-  */
-  inline size_t GetNumberOfComponents() const
-  {
-    return m_NumberOfComponents;
-  }
+  /**
+   * \brief Get the number of bits per element (of an
+   * element)
+   *
+   * A vector of double with three components will return
+   * 8*sizeof(double)*3.
+   * \sa GetBitsPerComponent
+   * \sa GetItkTypeId
+   * \sa GetTypeId
+   */
+  size_t GetBpe() const;
 
-  /** \brief Get the number of bits per components
-  * \sa GetBitsPerComponent
-  */
-  inline size_t GetBitsPerComponent() const
-  {
-    return m_BytesPerComponent * 8;
-  }
+  /**
+   * \brief Get the number of components of which each element consists
+   *
+   * Each pixel can consist of multiple components, e.g. RGB.
+   */
+  size_t GetNumberOfComponents() const;
+
+  /**
+   * \brief Get the number of bits per components
+   * \sa GetBitsPerComponent
+   */
+  size_t GetBitsPerComponent() const;
 
   bool operator==(const PixelType& rhs) const;
   bool operator!=(const PixelType& rhs) const;
 
-  ~PixelType() {}
+  ~PixelType();
 
 private:
 
-  friend class ItkImageFileReader;
-
-  friend class NrrdTbssImageReader;
-  friend class NrrdTbssRoiImageReader;
+  friend PixelType MakePixelType(const itk::ImageIOBase* imageIO);
 
   template< typename ComponentT, typename PixelT, std::size_t numberOfComponents >
     friend PixelType MakePixelType();
@@ -160,27 +132,12 @@ private:
   template< typename ItkImageType >
     friend PixelType MakePixelType();
 
-  PixelType( const std::type_info& componentType,
-             //const std::type_info& pixelType,
+  PixelType( const int componentType,
              const ItkIOPixelType pixelType,
              std::size_t bytesPerComponent,
              std::size_t numberOfComponents,
-             const char* componentTypeName = 0,
-             const char* pixelTypeName = 0 )
-    : m_ComponentType( componentType ),
-      m_PixelType( pixelType ),
-      m_NumberOfComponents( numberOfComponents ),
-      m_BytesPerComponent( bytesPerComponent )
-  {
-    if(componentTypeName) m_ComponentTypeName = componentTypeName;
-    else m_ComponentTypeName = componentType.name();
-
-    if(pixelTypeName) m_PixelTypeName = pixelTypeName;
-    //else m_PixelTypeName = pixelType.name();
-    else m_PixelTypeName = this->PixelNameFromItkIOType( pixelType );
-  }
-
-  std::string PixelNameFromItkIOType( ItkIOPixelType ptype);
+             const std::string& componentTypeName,
+             const std::string& pixelTypeName);
 
   // default constructor is disabled on purpose
   PixelType(void);
@@ -191,13 +148,13 @@ private:
   /** \brief the \a type_info of the scalar (!) component type. Each element
     may contain m_NumberOfComponents (more than one) of these scalars.
   */
-  const std::type_info& m_ComponentType;
+  const int m_ComponentType;
 
   const ItkIOPixelType m_PixelType;
 
-  std::string m_ComponentTypeName;
+  const std::string m_ComponentTypeName;
 
-  std::string m_PixelTypeName;
+  const std::string m_PixelTypeName;
 
   std::size_t m_NumberOfComponents;
 
@@ -212,11 +169,11 @@ PixelType MakePixelType()
 {
   typedef itk::Image< PixelT, numOfComponents> ItkImageType;
 
-  return PixelType( typeid(ComponentT), //typeid(ItkImageType),
-                    MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOType,
+  return PixelType( MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
+                    MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
                     sizeof(ComponentT), numOfComponents,
-                    ComponentTypeToString<ComponentT>(),
-                    0//PixelTypeToString<ItkImageType>()
+                    PixelComponentTypeToString<ComponentT>(),
+                    PixelTypeToString<PixelT>()
                    );
 }
 
@@ -243,13 +200,20 @@ PixelType MakePixelType()
 
   // call the constructor
   return PixelType(
-            typeid(ComponentT),
-            MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOType,
-            //MapCompositePixelType< PixelT >::IOType,
+            MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOComponentType,
+            MapPixelType<PixelT, isPrimitiveType<PixelT>::value >::IOPixelType,
             sizeof(ComponentT), numComp,
-            ComponentTypeToString<ComponentT>(),
-            0
+            PixelComponentTypeToString<ComponentT>(),
+            PixelTypeToString<PixelT>()
          );
+}
+
+inline PixelType MakePixelType(const itk::ImageIOBase* imageIO)
+{
+  return mitk::PixelType(imageIO->GetComponentType(), imageIO->GetPixelType(),
+                         imageIO->GetComponentSize(), imageIO->GetNumberOfComponents(),
+                         imageIO->GetComponentTypeAsString(imageIO->GetComponentType()),
+                         imageIO->GetPixelTypeAsString(imageIO->GetPixelType()));
 }
 
 /** \brief An interface to the MakePixelType method for creating scalar pixel types.
@@ -261,16 +225,6 @@ PixelType MakeScalarPixelType()
 {
     return MakePixelType<T,T,1>();
 }
-
-/**
- * @brief Translate the itk::ImageIOBase::IOType to a std::type_info
- *
- * The functionality is similar to the itk::ImageIOBase::GetComponentTypeInfo but this one can also handle composite pixel types.
- *
- * @param imageIO the ImageIO associated with an image to be read-in
- * @return the typeid() of the given type for composite types, calls internal GetComponentTypeInfo for simple types
- */
-const std::type_info& GetPixelTypeFromITKImageIO( const itk::ImageIOBase::Pointer imageIO);
 
 } // namespace mitk
 

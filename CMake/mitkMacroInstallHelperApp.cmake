@@ -15,7 +15,7 @@ macro(MITK_INSTALL_HELPER_APP)
 
   set(DIRS
     ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
-    ${ITK_LIBRARY_DIRS}/${intermediate_dir}
+    ${ITK_DIR}/bin/${intermediate_dir}
     ${QT_LIBRARY_DIR}
   ${QT_LIBRARY_DIR}/../bin
     ${MITK_BINARY_DIR}/bin/${intermediate_dir}

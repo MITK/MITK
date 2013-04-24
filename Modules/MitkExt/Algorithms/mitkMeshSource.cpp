@@ -24,62 +24,46 @@ mitk::MeshSource::MeshSource()
     OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
     assert (output.IsNotNull());
     this->SetNumberOfRequiredInputs(0);
-    this->SetNumberOfOutputs( 1 );
+    this->SetNumberOfIndexedOutputs( 1 );
     this->SetOutput(0, output.GetPointer());
 }
-
-
-
 
 mitk::MeshSource::~MeshSource()
 {
 }
 
-
-
-
-itk::DataObject::Pointer mitk::MeshSource::MakeOutput ( unsigned int /*idx */)
+itk::DataObject::Pointer mitk::MeshSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
 
 
-
-
-void mitk::MeshSource::SetOutput( OutputType* output )
+itk::DataObject::Pointer mitk::MeshSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-    this->ProcessObject::SetNthOutput( 0, output );
-}
-
-
-
-
-void mitk::MeshSource::SetOutput( unsigned int idx, OutputType* output )
-{
-    this->ProcessObject::SetNthOutput(idx, output);
-}
-
-
-
-
-mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
     {
-        return 0;
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
     }
-    else
-    {
-        return dynamic_cast<OutputType*> ( this->GetOutput( 0 ) );
-    }
+  return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }
 
-
-
-
-mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput ( unsigned int idx )
+mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key)
 {
-    return dynamic_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
+  return static_cast<mitk::MeshSource::OutputType*>(Superclass::GetOutput(key));
 }
 
+const mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(const itk::ProcessObject::DataObjectIdentifierType &key) const
+{
+  return static_cast<const mitk::MeshSource::OutputType*>(Superclass::GetOutput(key));
+}
 
+mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
+{
+  return static_cast<mitk::MeshSource::OutputType*>(Superclass::GetOutput(idx));
+}
+
+const mitk::MeshSource::OutputType* mitk::MeshSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
+{
+  return static_cast<const mitk::MeshSource::OutputType*>(Superclass::GetOutput(idx));
+}

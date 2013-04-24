@@ -126,7 +126,7 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
       else
       {
         int hertz = m_Controls->UpdateRate->text().toInt();
-        int updateTime = itk::Math::Round( static_cast<double>(1000.0/hertz) );
+        int updateTime = itk::Math::Round<int, double>( 1000.0/hertz );
 
         // resets the whole background
         m_VideoBackground->SetTimerDelay( updateTime );
@@ -225,7 +225,7 @@ void QmitkOpenCVVideoControls::NewFrameAvailable( mitk::VideoSource* /*videoSour
 {
   emit NewOpenCVFrameAvailable( m_VideoSource->GetCurrentFrame() );
   if(!m_SliderCurrentlyMoved)
-    m_Controls->VideoProgressSlider->setValue( itk::Math::Round( m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO)
+    m_Controls->VideoProgressSlider->setValue( itk::Math::Round<int,double>( m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO)
       *m_Controls->VideoProgressSlider->maximum() ) );
 }
 

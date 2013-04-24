@@ -422,7 +422,7 @@ mitk::Geometry3D* mitk::ContourModel::GetGeometry (int t)const
 
 
 
-void mitk::ContourModel::SetRequestedRegion (itk::DataObject *data)
+void mitk::ContourModel::SetRequestedRegion( const itk::DataObject *data)
 {
   //no support for regions
 }

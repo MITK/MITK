@@ -44,12 +44,12 @@ public:
   typedef InputImageType::ConstPointer   InputImageConstPointer;
   typedef SlicedData::RegionType         InputImageRegionType;
 
+  using itk::ProcessObject::SetInput;
   /** Set/Get the image input of this process object.  */
   virtual void SetInput( const InputImageType *image);
   virtual void SetInput( unsigned int, const InputImageType * image);
   const InputImageType * GetInput(void);
   const InputImageType * GetInput(unsigned int idx);
-
 
 protected:
   ImageToImageFilter();

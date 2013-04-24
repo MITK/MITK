@@ -21,8 +21,7 @@ set(MODULE_TESTS
   #mitkImageToItkTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  mitkInteractionEventTest.cpp
-  mitkITKThreadingTest.cpp
+  #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp

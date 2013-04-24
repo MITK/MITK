@@ -336,7 +336,7 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
     it_rgbaImage.Value() = lookupTable[ int ( it_inputImage.Value() ) - offset ];
   }
 
-  mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage );
+  mitk::Image::Pointer mitkRGBAImage = mitk::ImportItkImage( rgbaImage )->Clone();
 
   mitk::DataNode::Pointer rgbaImageNode = mitk::DataNode::New();
   rgbaImageNode->SetData(mitkRGBAImage);
@@ -477,7 +477,7 @@ void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePush
         filter->SetRescaleConnectivity(m_Controls->rescaleCheckBox->isChecked());
         filter->Update();
 
-        mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput());
+        mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput())->Clone();
         mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
         connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
         connectivityMatrixImageNode->SetName( "Connectivity matrix" );

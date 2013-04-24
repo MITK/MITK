@@ -503,12 +503,6 @@ void mitk::CameraIntrinsics::SetValid( bool valid )
   m_Valid = valid;
 }
 
-mitk::CameraIntrinsics::Pointer mitk::CameraIntrinsics::Clone() const
-{
-  Pointer result = dynamic_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::CameraIntrinsics::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

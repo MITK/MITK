@@ -146,7 +146,7 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
-  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
+  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
   // Clean up
   buffer.release();

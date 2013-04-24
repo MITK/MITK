@@ -52,11 +52,6 @@ namespace mitk
     }
   }
 
-  mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
-  {
-    return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
-  }
-
   void ToFImageGrabber::GenerateData()
   {
     int requiredImageSequence = 0;
@@ -70,7 +65,7 @@ namespace mitk
     this->m_ToFCameraDevice->GetAllImages(this->m_DistanceArray, this->m_AmplitudeArray, this->m_IntensityArray, this->m_SourceDataArray,
       requiredImageSequence, this->m_ImageSequence, this->m_RgbDataArray );
 
-    mitk::Image::Pointer distanceImage = this->GetOutput(0);
+    mitk::Image::Pointer distanceImage = this->GetOutput();
     //if (!distanceImage->IsInitialized())
     if (!m_DistanceImageInitialized)
     {

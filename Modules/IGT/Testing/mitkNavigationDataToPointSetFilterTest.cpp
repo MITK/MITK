@@ -79,7 +79,7 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(3, nd3);
 
   //Process
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
   mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
   mitk::PointSet::Pointer pointSet2 = myNavigationDataToPointSetFilter->GetOutput(2);
   mitk::PointSet::Pointer pointSet3 = myNavigationDataToPointSetFilter->GetOutput(3);
@@ -190,7 +190,7 @@ static void TestMode3DMean(mitk::NavigationDataToPointSetFilter::Pointer myNavig
     myNavigationDataToPointSetFilter->SetInput(i, player->GetOutput(i));
   }
 
-  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput(0);
+  mitk::PointSet::Pointer pointSet0 = myNavigationDataToPointSetFilter->GetOutput();
   mitk::PointSet::Pointer pointSet1 = myNavigationDataToPointSetFilter->GetOutput(1);
 
   myNavigationDataToPointSetFilter->Update();

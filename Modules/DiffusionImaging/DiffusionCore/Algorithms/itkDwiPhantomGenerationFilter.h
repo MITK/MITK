@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
@@ -90,7 +105,7 @@ public:
 private:
 
     // image variables
-    mitk::Vector3D                                  m_Spacing;
+    itk::Vector<double>                             m_Spacing;
     mitk::Point3D                                   m_Origin;
     itk::Matrix<double, 3, 3>                       m_DirectionMatrix;
     ImageRegion<3>                                  m_ImageRegion;

@@ -57,23 +57,23 @@ namespace mitk
 
     int vecsize = m_OutputCache->GetImage()->GetVectorLength();
 
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetImage(m_OutputCache->GetImage());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetGroupInfo(m_OutputCache->GetGroupInfo());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetMetaInfo(m_OutputCache->GetMetaInfo());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetIsMeta(m_OutputCache->GetIsMeta());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetContainsDistanceMap(m_OutputCache->GetContainsDistanceMap());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetContainsMeanSkeleton(m_OutputCache->GetContainsMeanSkeleton());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetContainsSkeletonMask(m_OutputCache->GetContainsSkeletonMask());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->SetContainsGradient(m_OutputCache->GetContainsGradient());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetOutput())
         ->InitializeFromVectorImage();
 
   }

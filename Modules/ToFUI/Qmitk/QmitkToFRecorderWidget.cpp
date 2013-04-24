@@ -170,7 +170,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     bool distanceImageSelected = true;
     bool amplitudeImageSelected = true;
     bool intensityImageSelected = true;
-    bool rgbImageSelected = true;
+    bool rgbImageSelected = false;
     bool rawDataSelected = false;
 
     QString tmpFileName("");
@@ -307,7 +307,7 @@ QString QmitkToFRecorderWidget::getSaveFileName(mitk::ToFImageWriter::ToFImageTy
   intensityImageCheckBox->setChecked(true);
   QCheckBox* rgbImageCheckBox = new QCheckBox;
   rgbImageCheckBox->setText("RGB image");
-  rgbImageCheckBox->setChecked(true);
+  rgbImageCheckBox->setChecked(false);
   QCheckBox* rawDataCheckBox = new QCheckBox;
   rawDataCheckBox->setText("Raw data");
   rawDataCheckBox->setChecked(false);

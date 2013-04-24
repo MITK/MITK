@@ -277,6 +277,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateOutputInformation()
 {
   this->GetOutput();
   itkDebugMacro(<<"GenerateOutputInformation()");
+
 }
 
 void mitk::ToFDistanceImageToSurfaceFilter::SetScalarImage(IplImage* iplScalarImage)

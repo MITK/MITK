@@ -54,8 +54,6 @@ public:
 
   mitkNewMacro1Param(RenderingModeProperty, const std::string&);
 
-  Pointer Clone() const;
-
   enum ImageRenderingMode
   {
     LEVELWINDOW_COLOR = 0,

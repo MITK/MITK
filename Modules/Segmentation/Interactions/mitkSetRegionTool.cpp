@@ -201,7 +201,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint - 0.5 );
+      contourInImageIndexCoordinates->AddVertex(newPoint - mitk::Point3D::VectorType(0.5));
     }
 
     m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N

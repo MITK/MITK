@@ -72,6 +72,7 @@ class MITK_CORE_EXPORT Geometry2DDataToSurfaceFilter : public SurfaceSource
     const Geometry2DData *GetInput(unsigned int idx);
 
     virtual void SetInput(const Geometry2DData *image);
+    using itk::ProcessObject::SetInput;
     virtual void SetInput(unsigned int index, const Geometry2DData *image);
 
     /** \brief If \a true (default), use Geometry3D::GetParametricBounds() to define the resolution in parameter space,

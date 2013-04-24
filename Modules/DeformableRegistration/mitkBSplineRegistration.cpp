@@ -261,7 +261,7 @@ namespace mitk {
     try
     {
       double tstart(clock());
-      registration->StartRegistration();
+      registration->Update();
       double time = clock() - tstart;
       time = time / CLOCKS_PER_SEC;
       MITK_INFO << "Registration time: " << time;
@@ -331,7 +331,7 @@ namespace mitk {
     warper->SetOutputSpacing( movingImage->GetSpacing() );
     warper->SetOutputOrigin( movingImage->GetOrigin() );
     warper->SetOutputDirection( movingImage->GetDirection() );
-    warper->SetDeformationField( field );
+    warper->SetDisplacementField( field );
     warper->Update();
 
     typename InternalImageType::Pointer result = warper->GetOutput();

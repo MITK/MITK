@@ -309,7 +309,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     // initial update of composite filter
     this->m_ToFCompositeFilter->Update();
-    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+    this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput();
     this->m_DistanceImageNode = ReplaceNodeData("Distance image",m_MitkDistanceImage);
 
     std::string rgbFileName;

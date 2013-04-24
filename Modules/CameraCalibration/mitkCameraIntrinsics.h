@@ -54,7 +54,7 @@ namespace mitk
     ///
     /// make a clone of this intrinsics
     ///
-    Pointer Clone() const;
+    itkCloneMacro(Self)
 
     ///
     /// copy information from other to this

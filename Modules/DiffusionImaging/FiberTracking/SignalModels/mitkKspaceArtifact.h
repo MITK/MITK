@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <FiberTrackingExports.h>
 #include <itkImage.h>
-#include <itkFFTRealToComplexConjugateImageFilter.h>
+#include <itkVnlForwardFFTImageFilter.h>
 
 namespace mitk {
 
@@ -42,7 +42,8 @@ public:
     }
     ~KspaceArtifact(){}
 
-    typedef typename itk::FFTRealToComplexConjugateImageFilter< ScalarType, 2 >::OutputImageType ComplexSliceType;
+    typedef itk::Image< ScalarType, 2 > WorkImageType;
+    typedef typename itk::VnlForwardFFTImageFilter< WorkImageType >::OutputImageType ComplexSliceType;
 
     /** Adds artifact according to model to the input slice. Has to be implemented in subclass. **/
     virtual typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice) = 0;

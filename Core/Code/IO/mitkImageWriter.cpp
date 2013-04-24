@@ -105,13 +105,11 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo( pixelType.GetTypeId() );
-  // Set also the PixelTypeIO information since it is available after
-  // the changes in PixelType for Bug #12838
-  imageIO->SetPixelType( pixelType.GetPixelTypeId() );
-
-  if(pixelType.GetNumberOfComponents() > 1)
-    imageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
+  imageIO->SetPixelType( pixelType.GetPixelType() );
+  imageIO->SetComponentType( pixelType.GetComponentType() < PixelComponentUserType ?
+                             static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
+                             itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+  imageIO->SetNumberOfComponents( pixelType.GetNumberOfComponents() );
 
   itk::ImageIORegion ioRegion( dimension );
 
@@ -122,7 +120,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
     imageIO->SetOrigin(i,origin[i]);
 
     mitk::Vector3D direction;
-    direction.Set_vnl_vector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+    direction.SetVnlVector(image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
     vnl_vector< double > axisDirection(dimension);
     for(unsigned int j=0; j<dimension; j++)
     {
@@ -216,7 +214,7 @@ void mitk::ImageWriter::GenerateData()
       mitk::Image::Pointer image = timeSelector->GetOutput();
       for(t = 0; t < timesteps; ++t)
       {
-        ::itk::OStringStream filename;
+        std::ostringstream filename;
         timeSelector->SetTimeNr(t);
         timeSelector->Update();
         if(input->GetTimeSlicedGeometry()->IsValidTime(t))
@@ -241,13 +239,13 @@ void mitk::ImageWriter::GenerateData()
     }
     else if ( vti )
     {
-      ::itk::OStringStream filename;
+      std::ostringstream filename;
       filename <<  m_FileName.c_str() << m_Extension;
       writeVti(filename.str().c_str(), input);
     }
     else
     {
-      ::itk::OStringStream filename;
+      std::ostringstream filename;
       filename <<  m_FileName.c_str() << m_Extension;
       WriteByITK(input, filename.str());
     }
@@ -263,7 +261,7 @@ void mitk::ImageWriter::GenerateData()
     if( m_FileName.length() > 3 && found != m_FileName.length() - 4 )
     {
       //if Extension not in Filename
-      ::itk::OStringStream filename;
+      std::ostringstream filename;
       filename <<  m_FileName.c_str() << m_Extension;
       picWriter->SetFileName( filename.str().c_str() );
     }
@@ -281,7 +279,7 @@ void mitk::ImageWriter::GenerateData()
         || m_Extension.find(".nii.gz") != std::string::npos
         )
     {
-        ::itk::OStringStream filename;
+        std::ostringstream filename;
         filename <<  this->m_FileName.c_str() << this->m_Extension;
         WriteByITK(input, filename.str());
     }

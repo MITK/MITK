@@ -799,8 +799,8 @@ void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
   itk::ImageRegionConstIterator<ImageType>
       itimage(image, image->GetLargestPossibleRegion());
 
-  itmask = itmask.Begin();
-  itimage = itimage.Begin();
+  itmask.GoToBegin();
+  itimage.GoToBegin();
 
   while( !itmask.IsAtEnd() )
   {
@@ -970,6 +970,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
   // than the image region, the Update() would result in an exception).
   labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+
 
   // Execute the filter
   labelStatisticsFilter->Update();

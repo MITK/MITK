@@ -54,8 +54,6 @@ namespace mitk {
       mitkNewMacro1Param(StringProperty, const char*);
       mitkNewMacro1Param(StringProperty, const std::string&)
 
-      Pointer Clone() const;
-
       itkGetStringMacro(Value);
       itkSetStringMacro(Value);
 

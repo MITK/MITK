@@ -40,8 +40,6 @@ public:
   itkNewMacro(TransferFunctionProperty);
   mitkNewMacro1Param(TransferFunctionProperty, mitk::TransferFunction::Pointer);
 
-  Pointer Clone() const;
-
   itkSetMacro(Value, mitk::TransferFunction::Pointer );
   itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
 

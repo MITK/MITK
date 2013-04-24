@@ -95,7 +95,7 @@ class mitkNavigationDataSourceTestClass
     //test invalid call of methods
     MyNavigationDataSourceTest::Pointer myFilter = MyNavigationDataSourceTest::New();
 
-    mitk::NavigationData::Pointer testOutput = myFilter->GetOutput(0);
+    mitk::NavigationData::Pointer testOutput = myFilter->GetOutput();
     MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(int) before initialization");
 
     testOutput = myFilter->GetOutput("test");

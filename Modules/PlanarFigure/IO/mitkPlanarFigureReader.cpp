@@ -39,7 +39,7 @@ mitk::PlanarFigureReader::PlanarFigureReader() : PlanarFigureSource(), FileReade
 m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
   this->SetNumberOfRequiredOutputs(1);
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedOutputs(1);
   this->SetNthOutput(0, this->MakeOutput(0));
 
   m_CanReadFromMemory = true;
@@ -55,16 +55,10 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 {}
 
 
-mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureReader::MakeOutput ( unsigned int )
-{
-  return static_cast<itk::DataObject*>(PlanarCircle::New().GetPointer()); // just as a stand in for the pipeline update mechanism. This will be overwritten in GenerateData()
-}
-
-
 void mitk::PlanarFigureReader::GenerateData()
 {
   m_Success = false;
-  this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
+  this->SetNumberOfIndexedOutputs(0); // reset all outputs, we add new ones depending on the file content
 
   TiXmlDocument document;
 
@@ -427,7 +421,7 @@ bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std
 void mitk::PlanarFigureReader::ResizeOutputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs( num );
+  this->SetNumberOfIndexedOutputs( num );
   for ( unsigned int i = prevNum; i < num; ++i )
   {
     this->SetNthOutput( i, this->MakeOutput( i ).GetPointer() );

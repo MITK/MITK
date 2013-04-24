@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkScaleLogarithmicTransformView.h"
 #include "QmitkAffineTransformView.h"
 #include "QmitkFixedCenterOfRotationAffineTransformView.h"
-#include "QmitkRigid3DTransformView.h"
 #include "QmitkEuler3DTransformView.h"
 #include "QmitkCenteredEuler3DTransformView.h"
 #include "QmitkQuaternionRigidTransformView.h"

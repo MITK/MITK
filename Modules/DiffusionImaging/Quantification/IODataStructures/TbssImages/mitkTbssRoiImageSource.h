@@ -48,18 +48,7 @@ public:
 
   virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
-  OutputType * GetOutput(unsigned int idx);
-
-  //void SetOutput(OutputType* output);
-
-  OutputType* GetOutput();
-  //{return Superclass::GetOutput();}
-
-  //OutputType* GetOutput(unsigned int idx);
-
-  //virtual void GraftOutput(OutputType* graft);
-
-  //virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
+  OutputType* GetOutput(unsigned int idx);
 
 protected:
   TbssRoiImageSource();
@@ -68,8 +57,6 @@ protected:
 };
 
 } // namespace mitk
-
-//#include "mitkTbssRoiImageSource.cpp"
 
 
 #endif /* _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_ */

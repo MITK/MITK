@@ -138,8 +138,8 @@ namespace mitk
       if((ndim==3) && (dimensions[2]<=1))
         ndim = 2;
 
-      static_cast<OutputType*>(this->GetOutput())->Initialize( MakePixelType(imageIO), ndim, dimensions );
-      static_cast<OutputType*>(this->GetOutput())->SetImportChannel( buffer, 0, Image::ManageMemory );
+      static_cast<OutputType*>(this->GetPrimaryOutput())->Initialize( MakePixelType(imageIO), ndim, dimensions );
+      static_cast<OutputType*>(this->GetPrimaryOutput())->SetImportChannel( buffer, 0, Image::ManageMemory );
 
       // access direction of itk::Image and include spacing
       mitk::Matrix3D matrix;
@@ -152,20 +152,20 @@ namespace mitk
       // re-initialize PlaneGeometry with origin and direction
       PlaneGeometry* planeGeometry = static_cast<PlaneGeometry*>
                                      (static_cast<OutputType*>
-                                      (this->GetOutput())->GetSlicedGeometry(0)->GetGeometry2D(0));
+                                      (this->GetPrimaryOutput())->GetSlicedGeometry(0)->GetGeometry2D(0));
       planeGeometry->SetOrigin(origin);
       planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 
       // re-initialize SlicedGeometry3D
-      SlicedGeometry3D* slicedGeometry = static_cast<OutputType*>(this->GetOutput())->GetSlicedGeometry(0);
-      slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetOutput())->GetDimension(2));
+      SlicedGeometry3D* slicedGeometry = static_cast<OutputType*>(this->GetPrimaryOutput())->GetSlicedGeometry(0);
+      slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetPrimaryOutput())->GetDimension(2));
       slicedGeometry->SetSpacing(spacing);
 
       // re-initialize TimeSlicedGeometry
-      static_cast<OutputType*>(this->GetOutput())->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetOutput())->GetDimension(3));
+      static_cast<OutputType*>(this->GetPrimaryOutput())->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetPrimaryOutput())->GetDimension(3));
 
       buffer = NULL;
-      MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
+      MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetPrimaryOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
 
 
 
@@ -185,7 +185,7 @@ namespace mitk
 
         img = reader->GetOutput();
 
-        static_cast<OutputType*>(this->GetOutput())->SetImage(img);
+        static_cast<OutputType*>(this->GetPrimaryOutput())->SetImage(img);
 
         itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
         ReadRoiInfo(imgMetaDictionary);
@@ -250,18 +250,18 @@ namespace mitk
       else if(itKey->find("preprocessed FA") != std::string::npos)
       {
         MITK_INFO << *itKey << " ---> " << metaString;
-        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFA(true);
-        static_cast<OutputType*>(this->GetOutput())->SetPreprocessedFAFile(metaString);
+        static_cast<OutputType*>(this->GetPrimaryOutput())->SetPreprocessedFA(true);
+        static_cast<OutputType*>(this->GetPrimaryOutput())->SetPreprocessedFAFile(metaString);
       }
 
       // Name of structure
       if (itKey->find("structure") != std::string::npos)
       {
         MITK_INFO << *itKey << " ---> " << metaString;
-        static_cast<OutputType*>(this->GetOutput())->SetStructure(metaString);
+        static_cast<OutputType*>(this->GetPrimaryOutput())->SetStructure(metaString);
       }
     }
-    static_cast<OutputType*>(this->GetOutput())->SetRoi(roi);
+    static_cast<OutputType*>(this->GetPrimaryOutput())->SetRoi(roi);
 
   }
 

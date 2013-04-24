@@ -682,7 +682,7 @@ void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
     if(m_Method == IVIM_REGULARIZED)
     {
         typename OutputImageType::Pointer outputImage =
-                static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
+                static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
         ImageRegionIterator< OutputImageType > oit0(outputImage, outputImage->GetLargestPossibleRegion());
         oit0.GoToBegin();
 

@@ -103,7 +103,7 @@ TPDPixelType>
     vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-    typename OutputImageType::Pointer directionImage = static_cast< OutputImageType* >( this->ProcessObject::GetOutput() );
+    typename OutputImageType::Pointer directionImage = static_cast< OutputImageType* >( this->ProcessObject::GetPrimaryOutput() );
     ImageRegionConstIterator< OutputImageType > it(directionImage, directionImage->GetLargestPossibleRegion() );
 
     mitk::Vector3D spacing = directionImage->GetSpacing();

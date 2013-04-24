@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
-#include "mitkGroupDiffusionHeadersFilter.h"
 #include "mitkDicomDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
@@ -559,7 +558,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(m_OutputFolderNameSet) logfile << "Reading Headers "<< folderName.toStdString() << "\n";
 
       mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
-      mitk::GroupDiffusionHeadersFilter::InputType inHeaders;
+      typedef short PixelValueType;
+      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+      VolumesReader::HeaderContainer inHeaders;
       unsigned int size2 = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size2 ; ++i )
       {
@@ -594,8 +595,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       PrintMemoryUsage();
       if(m_OutputFolderNameSet) logfile << "Loading volumes\n";
       Status(QString("Loading Volumes %1").arg(folderName));
-      typedef short PixelValueType;
-      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+
       VolumesReader::Pointer vReader = VolumesReader::New();
       VolumesReader::HeaderContainer hc = inHeaders;
 

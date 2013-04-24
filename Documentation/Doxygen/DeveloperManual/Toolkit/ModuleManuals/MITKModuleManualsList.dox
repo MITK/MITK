@@ -19,4 +19,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage DiffusionImagingPropertiesPage
   \li \subpage ConnectomicsRenderingPropertiesPage
 
+\section MITKMigrationGuides Migration Guides
+
+  \li \ref InteractionMigration
 */

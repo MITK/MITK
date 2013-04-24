@@ -1,0 +1,178 @@
+/**
+
+\page InteractionMigration Migration Guide to new Interaction Concept
+
+\tableofcontents
+
+
+\section GeneralChanges General Changes
+
+\subsection StatemachineDefinitions
+
+Previously the statemachine pattern along with the event description has been stored in a single file (StateMachine.xml).
+Now the pattern and the events are separated from each other. The statemachine pattern describes the workflow and the configuration
+file describes which specific event triggers an action in the workflow. Every pattern is now put into a single file (for inclusion refer to \ref IncludeFiles ).
+
+The pattern description has to be completely rewritten, but is pretty straight forward based on the old one, how to do this is explained here \ref HowToStateMachine .
+Here an example is shown for a simple state containing a transition and a parameter.
+
+\code
+<state NAME="neutral" ID="1" START_STATE="TRUE">
+    <transition NAME="Shift+press" NEXT_STATE_ID="1" EVENT_ID="3">
+        <action ID="10" />
+        <intParameter NAME="DIRECTION_X" VALUE="0" />
+    </transition>
+</state>
+\endcode
+<b> Example snippet (old) </b>
+
+
+
+\code
+<state name="neutral" startstate="true">
+    <transition event_class="MousePressEvent" event_variant="MouseLeftButtonPressed" target="neutral">
+        <action name="addPoint"/>
+    </transition>
+</state>
+\endcode
+<b> Example snippet (new) </b>
+
+Changes:
+<ul>
+ <li> ID is dropped, states are referenced now by their name
+ <li> transition now longer have names
+ <li> NEXT_STATE_ID becomes target
+ <li> action ids become names, these names are used in the interactor to connect an action with a function
+ <li> parameters are stored in the configuration file
+ <li> EVENT_ID is replaced by event_class and event_variant (see below)
+</ul>
+
+Event_class describes the class of the event (see \ref EventClassSection ) - the event_variant provides a name that is used in the configuration file
+to give an explicit description of the event (or the globalConfig.xml is loaded as configuration file and standard values are used).
+
+Configuration files for state machines are described here: \ref ConfigFileDescriptionSection .
+
+\subsection InteractorStruture Structure of an Interactor
+
+Actions are now directly connected to functions in the DataInteractors, so the classic switch statement becomes obsolete:
+
+\code
+bool mitk::SomeInteractor::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
+{
+  switch (action->GetActionId())
+  {
+  case Action1:
+  ...
+  case Action2:
+  ...
+  }
+}
+\endcode
+
+changes to
+
+\code
+void mitk::ExampleInteractor::ConnectActionsAndFunctions()
+{
+CONNECT_FUNCTION("stringOfActionFromXmlFile", Action1);
+CONNECT_FUNCTION("stringOfActionFromXmlFile2", Action2);
+...
+}
+
+bool Action1(StateMachineAction* , InteractionEvent*)
+{
+...
+}
+...
+\endcode
+
+where each action is implemented as a function. See \ref HowToDataInteractor .
+
+
+\subsection GuardStates Guard States
+
+Formerly there where so called guard states, which cause a transition only if certain conditions are met. These states have been removed,
+as a replacement serve the InternalEvents which can be triggered from within a data interactor. An example showing how to use them is given in \ref ExampleInternalEvent .
+
+\subsection IncludeFiles Register statemachine patterns and configuration w/o the build system
+
+There are different ways to load a statemachine pattern or configuration objects from files.
+If you are working in a module you can use the resources to easily load patterns and configurations.
+To use this place your XML file in the 'Resources/Interactions' folder of the respective module, and add the file path to the corresponding files.cmake in the resource section
+like this:
+\code
+set(RESOURCE_FILES
+Interactions/dummyStatemachine.xml
+)
+\endcode
+
+Loading the statemachine pattern can then be done by simply calling
+\code
+#include "mitkModule.h"
+#include <mitkGetModuleContext.h>
+
+Module* module = GetModuleContext()->GetModule();
+
+mitk::PointSetDataInteractor::m_CurrentInteractor = mitk::PointSetDataInteractor::New();
+m_CurrentInteractor->LoadStateMachine("dummyStatemachine.xml", module);
+\endcode
+here module is optional, if none is provided the core module is assumed.
+
+The third possibility is to build up a configuration by vector of mitk::PropertyLists, where each item describes an event configuration.
+
+In the following example a configuration is build which defines two event variants using basic properties,
+for a full list of usable properties see mitkInteractionEventConst.h
+\code
+#include "mitkPropertyList.h"
+
+#include "mitkEventConfig.h"
+
+// First event
+mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
+// Setting the EventClass property to 'MousePressEvent'
+propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MousePressEvent");
+// Setting the Event variant value to 'MousePressEventVariantÄ
+propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MousePressEventVariant");
+// set control and alt buttons as modifiers
+propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
+// Second event
+mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
+propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MouseReleaseEvent");
+propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MouseReleaseEventVariant");
+propertyList2->SetStringProperty("Modifiers","SHIFT");
+
+// putting both descriptions in a vector
+std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();
+configDescription->push_back(propertyList1);
+configDescription->push_back(propertyList2);
+// create the config object
+mitk::EventConfig newConfig(configDescription);
+\endcode
+
+\section ModifyDisplayInteractorBehavior How to modify the display interactor behavior
+
+Sometimes it may be desirable to change the behaviour of the mitk::DisplayInteractor which controls zooming, panning and scrolling, e.g. when a
+Tool is activated that reacts to the same events. Changing the behavior of the DisplayInteractor (or possibly any other EventHandler) can be achieved from anywhere
+in the code by requesting the InteractionEventObserver and assigning an alternative configuration to it, as demonstrated in this example:
+
+\code
+
+std::ifstream* configStream = new std::ifstream( #path to alternative configuration file# );
+mitk::EventConfig newConfig(configStream);
+
+// Requesting all registered EventObservers
+std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+
+for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+{
+    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    // filtering: only adjust the DisplayInteractor
+    if (displayInteractor != NULL)
+    {
+        displayInteractor->SetEventConfig(newConfig);
+    }
+}
+
+\endcode
+
+*/

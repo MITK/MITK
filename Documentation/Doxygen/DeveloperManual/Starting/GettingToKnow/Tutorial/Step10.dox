@@ -31,7 +31,7 @@ for it:
 \code
   m_CurrentInteractor = mitk::PointSetDataInteractor::New();
   m_CurrentInteractor->LoadStateMachine("PointSet.xml");
-  m_CurrentInteractor->LoadEventConfig("PointSetConfig.xml");
+  m_CurrentInteractor->SetEventConfig("PointSetConfig.xml");
 \endcode
 
 Lastly the DataNode is added to the DataInteractor
@@ -65,7 +65,9 @@ Mandatory for each event description is the event class and the event variant. T
 \b Mouse \b Buttons \n
 
 mitk::MouseButtons represent the buttons. They can be used for two attributes. First the EventButton which describes the button that triggered the event,
-this allways is a single button. Secondly the ButtonState attribute that describes which buttons were pressed at the moment the event has been generated.
+this allways is a single button.\dontinclude mitkInteractionEventConst.h
+\skipline  // Special Keys
+\until // End special keys Secondly the ButtonState attribute that describes which buttons were pressed at the moment the event has been generated.
 For example assume the right mouse button and the middle mouse button are already pressed, now also the left mouse button is pressed too and generates a second event,
 this would be described as follows:
 
@@ -275,7 +277,12 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
-\section HowToDataInteractor Implementation a new DataInteractor
+\section ReferenceToIncludeFiles Integration of the pattern and configuration files
+
+See \ref IncludeFiles for a description.
+
+
+\section HowToDataInteractor Implementation of a new DataInteractor
 
 DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
 \code

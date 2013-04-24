@@ -46,6 +46,4 @@ mitk::TbssRoiImageSource::OutputType* mitk::TbssRoiImageSource::GetOutput(unsign
                      (this->ProcessObject::GetOutput(idx));
 }
 
-
-
 #endif //__MITK_NRRD_TBSS_VOULMES_IO_FACTORY_CPP__

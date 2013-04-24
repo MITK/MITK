@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataToNavigationDataFilter::NavigationDataToNavigationDataFilter()
 : mitk::NavigationDataSource()
 {
+mitk::NavigationData::Pointer output = mitk::NavigationData::New();
+this->SetNumberOfRequiredOutputs(1);
+this->SetNthOutput(0, output.GetPointer());
 }
 
 
@@ -85,11 +88,11 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigat
 
 void mitk::NavigationDataToNavigationDataFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create outputs for all inputs
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
-      DataObjectPointer newOutput = this->MakeOutput(idx);
+      mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);
     }
     this->Modified();

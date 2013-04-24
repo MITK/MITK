@@ -87,7 +87,7 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
   cvReleaseImage(&rgbOpenCVImage);
 }
 
-mitk::ImageSource::OutputImageType* mitk::OpenCVToMitkImageFilter::GetOutput( unsigned int /*idx*/ )
+mitk::ImageSource::OutputImageType* mitk::OpenCVToMitkImageFilter::GetOutput()
 {
   return m_Image;
 }

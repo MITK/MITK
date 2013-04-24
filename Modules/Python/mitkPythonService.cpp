@@ -261,35 +261,31 @@ bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::
         // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
         int dim = image->GetDimension();
         mitk::PixelType pixelType = image->GetPixelType();
-        itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelTypeId();
+        itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
 
         // default pixeltype: unsigned short
         QString type = "US";
         if( ioPixelType == itk::ImageIOBase::SCALAR )
         {
-          if( pixelType.GetTypeId() == typeid(double) )
+          if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE )
             type = "D";
-          else if( pixelType.GetTypeId() == typeid(float) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT )
             type = "F";
-          if( pixelType.GetTypeId() == typeid(long double) )
-            type = "LD";
-          else if( pixelType.GetTypeId() == typeid(short) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT)
             type = "SS";
-          else if( pixelType.GetTypeId() == typeid(signed char) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR )
             type = "SC";
-          else if( pixelType.GetTypeId() == typeid(signed int) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::INT )
             type = "SI";
-          else if( pixelType.GetTypeId() == typeid(signed long) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG )
             type = "SL";
-          else if( pixelType.GetTypeId() == typeid(signed short) )
-            type = "SS";
-          else if( pixelType.GetTypeId() == typeid(unsigned char) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR )
             type = "UC";
-          else if( pixelType.GetTypeId() == typeid(unsigned int) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT )
             type = "UI";
-          else if( pixelType.GetTypeId() == typeid(unsigned long) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG )
             type = "UL";
-          else if( pixelType.GetTypeId() == typeid(unsigned short) )
+          else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT )
             type = "US";
         }
 

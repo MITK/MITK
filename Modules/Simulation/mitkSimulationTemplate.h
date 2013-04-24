@@ -36,7 +36,7 @@ namespace mitk
     bool Parse(const std::string& contents);
     bool RequestedRegionIsOutsideOfTheBufferedRegion();
     bool SetProperties(DataNode::Pointer dataNode) const;
-    void SetRequestedRegion(itk::DataObject* data);
+    void SetRequestedRegion(const itk::DataObject* data);
     void SetRequestedRegionToLargestPossibleRegion();
     void UpdateOutputInformation();
     bool VerifyRequestedRegion();

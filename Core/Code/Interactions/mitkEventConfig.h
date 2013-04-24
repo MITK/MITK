@@ -75,11 +75,43 @@ namespace mitk
      * construct an EventConfig object. If the resource is invalid, the created
      * EventConfig object will also be invalid.
      *
-     * @param
+     * @param inputStream std::ifstream to XML configuration file
      */
     EventConfig(std::ifstream* inputStream);
 
+    /**
+     * @brief Construct an EventConfig object based on a vector of mitk::PropertyLists
+     *
+     * Constructs the EventObject based on a description provided by vector of property values, where each mitk::PropertyList describes
+     * one Event.
+     * <b> Example </b>
+     \code
+      #include "mitkPropertyList.h"
+      #include "mitkInteractionEventConst.h"
+      #include "mitkEventConfig.h"
 
+      // First event
+      mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
+      // Setting the EventClass property to 'MousePressEvent'
+      propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MousePressEvent");
+      // Setting the Event variant value to 'MousePressEventVariantÄ
+      propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MousePressEventVariant");
+      // set control and alt buttons as modifiers
+      propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
+      // Second event
+      mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
+      propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MouseReleaseEvent");
+      propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MouseReleaseEventVariant");
+      propertyList2->SetStringProperty("Modifiers","SHIFT");
+
+      // putting both descriptions in a vector
+      std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();
+      configDescription->push_back(propertyList1);
+      configDescription->push_back(propertyList2);
+      // create the config object
+      mitk::EventConfig newConfig(configDescription);
+     \endcode
+     */
     EventConfig(std::vector<PropertyList::Pointer> *configDescription );
 
     EventConfig& operator=(const EventConfig& other);

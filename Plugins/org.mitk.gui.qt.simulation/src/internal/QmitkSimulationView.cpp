@@ -90,9 +90,7 @@ void QmitkSimulationView::OnDTSpinBoxValueChanged(double value)
   mitk::Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(m_Selection->GetData());
   sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
 
-  rootNode->setDt(value == 0.0
-    ? simulation->GetDefaultDT()
-    : value);
+  rootNode->setDt(std::max(0.0, value));
 }
 
 void QmitkSimulationView::OnNodeRemovedFromDataStorage(const mitk::DataNode* node)
@@ -138,7 +136,7 @@ void QmitkSimulationView::OnResetButtonClicked()
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
   sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
 
-  m_Controls.dtSpinBox->setValue(0.0);
+  m_Controls.dtSpinBox->setValue(simulation->GetDefaultDT());
   sofaSimulation->reset(rootNode.get());
 
   rootNode->setTime(0.0);
@@ -166,16 +164,23 @@ void QmitkSimulationView::OnSimulationComboBoxSelectionChanged(const mitk::DataN
   if (node != NULL)
   {
     m_Selection = m_Controls.simulationComboBox->GetSelectedNode();
+    mitk::Simulation* simulation = static_cast<mitk::Simulation*>(m_Selection->GetData());
+
     m_Controls.sceneGroupBox->setEnabled(true);
     m_Controls.snapshotButton->setEnabled(true);
-    static_cast<mitk::Simulation*>(m_Selection->GetData())->SetAsActiveSimulation();
+
+    simulation->SetAsActiveSimulation();
+    m_Controls.dtSpinBox->setValue(simulation->GetDefaultDT());
   }
   else
   {
     m_Selection = NULL;
+
     m_Controls.sceneGroupBox->setEnabled(false);
     m_Controls.snapshotButton->setEnabled(false);
+
     mitk::Simulation::SetActiveSimulation(NULL);
+    m_Controls.dtSpinBox->setValue(0.0);
   }
 }
 

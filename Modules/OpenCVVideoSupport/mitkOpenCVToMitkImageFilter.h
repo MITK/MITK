@@ -54,7 +54,7 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     itkSetMacro(CopyBuffer, bool);
     itkGetMacro(CopyBuffer, bool);
 
-    OutputImageType* GetOutput(unsigned int idx);
+    OutputImageType* GetOutput(void);
 
   protected:
 

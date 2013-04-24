@@ -48,11 +48,15 @@ public:
 
   virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
+  OutputType* GetOutput()
+  {
+      return itkDynamicCastInDebugMode<OutputType*>( this->GetPrimaryOutput() );
+  }
+
   //OutputType * GetOutput(unsigned int idx);
 
   //void SetOutput(OutputType* output);
 
-  //OutputType* GetOutput()
   //{return Superclass::GetOutput();}
 
   OutputType* GetOutput(unsigned int idx);

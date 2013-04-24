@@ -178,7 +178,7 @@ void mitk::Simulation::SetDefaultDT(double dt)
   m_DefaultDT = std::max(0.0, dt);
 }
 
-void mitk::Simulation::SetRequestedRegion(itk::DataObject*)
+void mitk::Simulation::SetRequestedRegion(const itk::DataObject*)
 {
 }
 

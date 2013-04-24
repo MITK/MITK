@@ -112,3 +112,15 @@ void mitk::SimulationReader::SetFilePrefix(const char* aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
 }
+
+mitk::BaseDataSource::DataObjectPointer mitk::SimulationReader::MakeOutput(DataObjectPointerArraySizeType)
+{
+  return mitk::Simulation::New().GetPointer();
+}
+
+mitk::BaseDataSource::DataObjectPointer mitk::SimulationReader::MakeOutput(const DataObjectIdentifierType& name)
+{
+  return this->IsIndexedOutputName(name)
+    ? this->MakeOutput(this->MakeIndexFromOutputName(name))
+    : mitk::Simulation::New().GetPointer();
+}

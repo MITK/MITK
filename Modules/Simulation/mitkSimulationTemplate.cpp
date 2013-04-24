@@ -301,7 +301,7 @@ bool mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) c
   return true;
 }
 
-void mitk::SimulationTemplate::SetRequestedRegion(itk::DataObject*)
+void mitk::SimulationTemplate::SetRequestedRegion(const itk::DataObject*)
 {
 }
 

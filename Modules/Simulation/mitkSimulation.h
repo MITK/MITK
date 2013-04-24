@@ -125,7 +125,7 @@ namespace mitk
      */
     void SetDefaultDT(double dt);
 
-    void SetRequestedRegion(itk::DataObject* data);
+    void SetRequestedRegion(const itk::DataObject* data);
 
     void SetRequestedRegionToLargestPossibleRegion();
 

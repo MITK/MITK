@@ -14,8 +14,8 @@ set(MODULE_TESTS
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
-   mitkNavigationDataToPointSetFilterTest.cpp
-   mitkNavigationDataTransformFilterTest.cpp
+   # mitkNavigationDataToPointSetFilterTest.cpp commented out because of bug 15022
+   # mitkNavigationDataTransformFilterTest.cpp commented out because of bug 15023
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp

@@ -41,9 +41,7 @@ namespace itk
 {
 
   template <class TInputImage, class TOutputImage>
-  void
-  TensorToL2NormImageFilter<TInputImage, TOutputImage>
-  ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
+  void TensorToL2NormImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
   {
     typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
     typedef ImageRegionConstIterator<InputImageType>  IteratorInputType;

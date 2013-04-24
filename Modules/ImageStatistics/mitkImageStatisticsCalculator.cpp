@@ -76,7 +76,8 @@ ImageStatisticsCalculator::ImageStatisticsCalculator()
   m_PlanarFigureCoordinate1 (0)
 {
   m_EmptyHistogram = HistogramType::New();
-  HistogramType::SizeType histogramSize;
+  m_EmptyHistogram->SetMeasurementVectorSize(2);
+  HistogramType::SizeType histogramSize(2);
   histogramSize.Fill( 256 );
   m_EmptyHistogram->Initialize( histogramSize );
 

@@ -3,7 +3,7 @@ if(APPLE)
   # versions are not able to find it.
   cmake_minimum_required(VERSION 2.8.8)
 else()
-  cmake_minimum_required(VERSION 2.8.4)
+  cmake_minimum_required(VERSION 2.8.5)
 endif()
 
 #-----------------------------------------------------------------------------

@@ -48,9 +48,9 @@ namespace mitk
 
     virtual void Update();
 
-    virtual mitk::BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
+    BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
 
-    virtual mitk::BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
+    BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
 
   protected:
 

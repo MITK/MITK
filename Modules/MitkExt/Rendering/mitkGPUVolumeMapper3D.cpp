@@ -165,7 +165,9 @@ void mitk::GPUVolumeMapper3D::DeinitGPU(mitk::BaseRenderer* renderer)
   if(ls->m_gpuInitialized)
   {
     GPU_INFO << "deinitializing gpu-slicing-vr";
-
+    // deinit renderwindow, this is needed to release the memory allocated on the gpu
+    // to prevent leaking memory on the gpu
+    ls->m_MapperGPU->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetVTKWindow());
     ls->m_VolumePropertyGPU = NULL;
     ls->m_MapperGPU = NULL;
     ls->m_VolumeGPU = NULL;

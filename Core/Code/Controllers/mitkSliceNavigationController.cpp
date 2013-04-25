@@ -211,6 +211,11 @@ SliceNavigationController::Update(
 
     // initialize the viewplane
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
+    Geometry3D::ConstPointer currentGeometry = NULL;
+    if (m_InputWorldTimeGeometry.IsNotNull())
+      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
+    else
+      currentGeometry = m_InputWorldGeometry3D;
 
     m_CreatedWorldGeometry = NULL;
     switch ( viewDirection )
@@ -234,12 +239,12 @@ SliceNavigationController::Update(
       {
         const SlicedGeometry3D *worldSlicedGeometry =
           dynamic_cast< const SlicedGeometry3D * >(
-            m_InputWorldGeometry3D.GetPointer());
+            currentGeometry.GetPointer());
 
         if ( worldSlicedGeometry != NULL )
         {
           slicedWorldGeometry = static_cast< SlicedGeometry3D * >(
-            m_InputWorldGeometry3D->Clone().GetPointer());
+            currentGeometry->Clone().GetPointer());
           break;
         }
       }
@@ -248,21 +253,21 @@ SliceNavigationController::Update(
     case Axial:
       slicedWorldGeometry = SlicedGeometry3D::New();
       slicedWorldGeometry->InitializePlanes(
-        m_InputWorldGeometry3D, PlaneGeometry::Axial,
+        currentGeometry, PlaneGeometry::Axial,
         top, frontside, rotated );
       slicedWorldGeometry->SetSliceNavigationController( this );
       break;
 
     case Frontal:
       slicedWorldGeometry = SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes( m_InputWorldGeometry3D,
+      slicedWorldGeometry->InitializePlanes( currentGeometry,
         PlaneGeometry::Frontal, top, frontside, rotated );
       slicedWorldGeometry->SetSliceNavigationController( this );
       break;
 
     case Sagittal:
       slicedWorldGeometry = SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes( m_InputWorldGeometry3D,
+      slicedWorldGeometry->InitializePlanes( currentGeometry,
         PlaneGeometry::Sagittal, top, frontside, rotated );
       slicedWorldGeometry->SetSliceNavigationController( this );
       break;

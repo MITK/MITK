@@ -121,21 +121,13 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
     Point3D minimum = GetGeometryForTimeStep(step)->GetCornerPoint(false,false,false);
     Point3D maximum = GetGeometryForTimeStep(step)->GetCornerPoint(true,true,true);
 
-    Point3D minimumWorld;
-    GetGeometryForTimeStep(step)->IndexToWorld(minimum, minimumWorld);
-    Point3D maximumWorld;
-    GetGeometryForTimeStep(step)->IndexToWorld(maximum, maximumWorld);
-
-    points->push_back(minimumWorld);
-    points->push_back(maximumWorld);
+    points->push_back(minimum);
+    points->push_back(maximum);
   }
+  m_BoundingBox->SetPoints(points);
+  m_BoundingBox->ComputeBoundingBox();
+  this->Modified();
 
-  if (lastModifiedTime >= this->GetMTime())
-  {
-    m_BoundingBox->SetPoints(points);
-    m_BoundingBox->ComputeBoundingBox();
-    this->Modified();
-  }
 }
 
 mitk::ScalarType mitk::TimeGeometry::GetExtendInWorld (unsigned int direction) const

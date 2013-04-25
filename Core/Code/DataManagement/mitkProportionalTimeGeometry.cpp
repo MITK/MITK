@@ -157,7 +157,8 @@ void mitk::ProportionalTimeGeometry::Initialize (Geometry3D * geometry, TimeStep
   this->ReserveSpaceForGeometries(timeSteps);
   for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
   {
-    this->SetTimeStepGeometry(dynamic_cast<Geometry3D *>(geometry->Clone().GetPointer()), currentStep);
+    //AffineGeometryFrame3D::Pointer clonedGeometry = geometry->Clone();
+    this->SetTimeStepGeometry(geometry, currentStep);
   }
   m_FirstTimePoint = geometry->GetTimeBounds()[0];
   m_StepDuration = geometry->GetTimeBounds()[1] - geometry->GetTimeBounds()[0];

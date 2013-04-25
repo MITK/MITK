@@ -360,7 +360,7 @@ RenderingManager
   bool boundingBoxInitialized = false;
 
   TimeGeometry::ConstPointer timeGeometry = dataGeometry;
-  TimeGeometry::Pointer modifiedGeometry = dataGeometry->Clone().GetPointer();
+  TimeGeometry::Pointer modifiedGeometry = dataGeometry->Clone();
 
 
   // //TODO_GOETZ previously this code section has been disabled by

@@ -154,14 +154,14 @@ mitk::TimeGeometry::Pointer mitk::ProportionalTimeGeometry::Clone() const
 void mitk::ProportionalTimeGeometry::Initialize (Geometry3D * geometry, TimeStepType timeSteps)
 {
   timeSteps = (timeSteps > 0) ? timeSteps : 1;
+  m_FirstTimePoint = geometry->GetTimeBounds()[0];
+  m_StepDuration = geometry->GetTimeBounds()[1] - geometry->GetTimeBounds()[0];
   this->ReserveSpaceForGeometries(timeSteps);
   for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
   {
     //AffineGeometryFrame3D::Pointer clonedGeometry = geometry->Clone();
     this->SetTimeStepGeometry(geometry, currentStep);
   }
-  m_FirstTimePoint = geometry->GetTimeBounds()[0];
-  m_StepDuration = geometry->GetTimeBounds()[1] - geometry->GetTimeBounds()[0];
   Update();
 }
 

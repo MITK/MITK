@@ -178,11 +178,11 @@ SliceNavigationController::Update(
   SliceNavigationController::ViewDirection viewDirection,
   bool top, bool frontside, bool rotated )
 {
-  const TimeGeometry* worldTimeGeometry = m_InputWorldTimeGeometry.GetPointer();
+  TimeGeometry::ConstPointer worldTimeGeometry = m_InputWorldTimeGeometry;
 
   if( m_BlockUpdate ||
       ( m_InputWorldTimeGeometry.IsNull() && m_InputWorldGeometry3D.IsNull() ) ||
-      ( (worldTimeGeometry != NULL) && (worldTimeGeometry->GetNumberOfTimeSteps() == 0) )
+      ( (worldTimeGeometry.IsNotNull()) && (worldTimeGeometry->GetNumberOfTimeSteps() == 0) )
     )
   {
     return;
@@ -213,7 +213,10 @@ SliceNavigationController::Update(
     SlicedGeometry3D::Pointer slicedWorldGeometry = NULL;
     Geometry3D::ConstPointer currentGeometry = NULL;
     if (m_InputWorldTimeGeometry.IsNotNull())
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
+      if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
+        currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
+      else
+        currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
     else
       currentGeometry = m_InputWorldGeometry3D;
 
@@ -221,7 +224,7 @@ SliceNavigationController::Update(
     switch ( viewDirection )
     {
     case Original:
-      if ( worldTimeGeometry != NULL )
+      if ( worldTimeGeometry.IsNotNull())
       {
         m_CreatedWorldGeometry = worldTimeGeometry->Clone().GetPointer();
 
@@ -283,7 +286,7 @@ SliceNavigationController::Update(
       // initialize TimeGeometry
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
     }
-    if ( worldTimeGeometry == NULL )
+    if ( worldTimeGeometry.IsNull())
     {
       m_CreatedWorldGeometry = ProportionalTimeGeometry::New();
       dynamic_cast<ProportionalTimeGeometry *>(m_CreatedWorldGeometry.GetPointer())->Initialize(slicedWorldGeometry, 1);

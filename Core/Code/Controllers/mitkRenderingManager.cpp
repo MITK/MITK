@@ -360,7 +360,9 @@ RenderingManager
   bool boundingBoxInitialized = false;
 
   TimeGeometry::ConstPointer timeGeometry = dataGeometry;
-  TimeGeometry::Pointer modifiedGeometry = dataGeometry->Clone();
+  TimeGeometry::Pointer modifiedGeometry = NULL;
+  if (dataGeometry!=NULL)
+    modifiedGeometry = dataGeometry->Clone();
 
 
   // //TODO_GOETZ previously this code section has been disabled by

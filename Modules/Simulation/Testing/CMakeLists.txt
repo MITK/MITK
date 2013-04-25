@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
 
-if(NOT WIN32)
+if(APPLE)
   mitkAddCustomModuleTest(mitkSimulationTest mitkSimulationTest ${MITK_DATA_DIR}/Simulation/liver.scn)
   mitkAddCustomModuleTest(mitkSimulationTemplateTest mitkSimulationTemplateTest ${MITK_DATA_DIR}/Simulation/liver.scn.template)
 endif()

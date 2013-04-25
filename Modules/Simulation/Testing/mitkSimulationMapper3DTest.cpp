@@ -58,7 +58,7 @@ int mitkSimulationMapper3DTest(int argc, char* argv[])
   simulationNode->SetBoolProperty("Simulation.Options.Wire Frame", true);
 
   // renderingTestHelper.SaveReferenceScreenShot(".../CMakeExternals/Source/MITK-Data/Simulation/mapper1024x768REF_2.png");
-  MITK_TEST_CONDITION(renderingTestHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "Compare visual model (wire frame) with reference image.")
+  MITK_TEST_CONDITION(renderingTestHelper.CompareRenderWindowAgainstReference(argc, argv, 531.0) == true, "Compare visual model (wire frame) with reference image.")
 
   MITK_TEST_END()
 }

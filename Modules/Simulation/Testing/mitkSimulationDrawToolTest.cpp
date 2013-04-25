@@ -67,7 +67,7 @@ int mitkSimulationDrawToolTest(int argc, char* argv[])
   simulationNode->SetBoolProperty("Simulation.Options.Wire Frame", true);
 
   // renderingTestHelper.SaveReferenceScreenShot(".../CMakeExternals/Source/MITK-Data/Simulation/drawTool1024x768REF_3.png");
-  MITK_TEST_CONDITION(renderingTestHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "Compare collision models (wire frame) with reference image.")
+  MITK_TEST_CONDITION(renderingTestHelper.CompareRenderWindowAgainstReference(argc, argv, 336.0) == true, "Compare collision models (wire frame) with reference image.")
 
   simulationNode->SetBoolProperty("Simulation.Collision.Collision Models", false);
   simulationNode->SetBoolProperty("Simulation.Mapping.Visual Mappings", true);

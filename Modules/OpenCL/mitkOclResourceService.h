@@ -32,7 +32,7 @@ class OclResourceService
 {
 public:
   /** @brief Returns a valid OpenCL Context (if applicable) or NULL if none present */
-  virtual cl_context GetContext() = 0;
+  virtual cl_context GetContext() const = 0;
 
   /** @brief Returns a valid cl_command_queue related to the (one) OpenCL context */
   virtual cl_command_queue GetCommandQueue() const = 0;
@@ -44,7 +44,7 @@ public:
   virtual bool GetIsFormatSupported( cl_image_format* format ) = 0;
 
   /** @brief Puts the OpenCL Context info in std::cout */
-  virtual void PrintContextInfo() = 0;
+  virtual void PrintContextInfo() const = 0;
 
   /** @brief Insert program into the internal program storage
    *

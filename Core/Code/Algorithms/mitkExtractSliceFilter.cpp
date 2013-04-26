@@ -182,12 +182,14 @@ void mitk::ExtractSliceFilter::GenerateData(){
     /*
     * Transform the origin to center based coordinates.
     * Note:
-    * This is needed besause vtk's origin is center based too (!!!) ( see 'The VTK book' page 88 )
-    * and the worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
+    * The worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
     * has its origin at the corner of the voxel and needs to be transformed.
     */
-    origin += right * ( m_OutPutSpacing[0] * 0.5 );
-    origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+    if( !(m_WorldGeometry->GetImageGeometry()))
+    {
+      origin += right * ( m_OutPutSpacing[0] * 0.5 );
+      origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+    }
 
 
 
@@ -417,15 +419,14 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 
-    //the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
+
     Point3D sliceOrigin = originalGeometry->GetOrigin();
 
-    sliceOrigin += right * ( m_OutPutSpacing[0] * 0.5 );
-    sliceOrigin += bottom * ( m_OutPutSpacing[1] * 0.5 );
-
-    //a worldGeometry is no imageGeometry, thus it is manually set to true
-    originalGeometry->ImageGeometryOn();
-
+    if( !(m_WorldGeometry->GetImageGeometry()))
+    {
+      //the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
+      originalGeometry->ChangeImageGeometryConsideringOriginOffset(true);
+    }
 
     /*At this point we have to adjust the geometry because the origin isn't correct.
     The wrong origin is related to the rotation of the current world geometry plane.

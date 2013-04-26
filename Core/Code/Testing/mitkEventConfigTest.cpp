@@ -89,10 +89,9 @@ int mitkEventConfigTest(int argc, char* argv[])
         , "03 Check Mouse- and Key-Events "  );
 
   // Construction providing a input stream
-  std::istream* configStream = new std::ifstream(argv[1]);
-  mitk::EventConfig newConfig2(*configStream);
+  std::ifstream configStream(argv[1]);
+  mitk::EventConfig newConfig2(configStream);
 
-  delete configStream;
   MITK_TEST_CONDITION_REQUIRED(
          newConfig2.IsValid() == true
           , "01 Check if file can be loaded and is valid" );

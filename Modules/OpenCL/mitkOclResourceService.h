@@ -44,7 +44,7 @@ public:
   virtual bool GetIsFormatSupported( cl_image_format* format ) = 0;
 
   /** @brief Puts the OpenCL Context info in std::cout */
-  virtual void PrintContextInfo() = 0;
+  virtual void PrintContextInfo() const = 0;
 
   /** @brief Insert program into the internal program storage
    *

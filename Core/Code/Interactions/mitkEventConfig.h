@@ -77,7 +77,7 @@ namespace mitk
      *
      * @param inputStream std::ifstream to XML configuration file
      */
-    EventConfig(std::ifstream* inputStream);
+    EventConfig(std::istream &inputStream);
 
     /**
      * @brief Construct an EventConfig object based on a vector of mitk::PropertyLists
@@ -112,7 +112,7 @@ namespace mitk
       mitk::EventConfig newConfig(configDescription);
      \endcode
      */
-    EventConfig(std::vector<PropertyList::Pointer> *configDescription );
+    EventConfig(const std::vector<PropertyList::Pointer>& configDescription );
 
     EventConfig& operator=(const EventConfig& other);
 

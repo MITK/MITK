@@ -89,10 +89,10 @@ int mitkEventConfigTest(int argc, char* argv[])
         , "03 Check Mouse- and Key-Events "  );
 
   // Construction providing a input stream
-  std::ifstream* configStream = new std::ifstream(argv[1]);
-  mitk::EventConfig newConfig2(configStream);
+  std::istream* configStream = new std::ifstream(argv[1]);
+  mitk::EventConfig newConfig2(*configStream);
 
-  //delete configStream;
+  delete configStream;
   MITK_TEST_CONDITION_REQUIRED(
          newConfig2.IsValid() == true
           , "01 Check if file can be loaded and is valid" );
@@ -136,7 +136,7 @@ int mitkEventConfigTest(int argc, char* argv[])
   configDescription->push_back(propertyList1);
   configDescription->push_back(propertyList2);
 
-  mitk::EventConfig newConfig3(configDescription);
+  mitk::EventConfig newConfig3(*configDescription);
 
   mitk::MousePressEvent::Pointer mousePress1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey | mitk::InteractionEvent::ControlKey ,mitk::InteractionEvent::NoButton );
   mitk::MouseReleaseEvent::Pointer mousePress2 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );

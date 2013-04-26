@@ -263,16 +263,11 @@ mitk::EventConfig::EventConfig(const std::string& filename, const Module* module
   }
 }
 
-mitk::EventConfig::EventConfig(std::ifstream *inputStream)
+mitk::EventConfig::EventConfig(std::istream &inputStream)
  : d(new EventConfigPrivate)
 {
-  if(!inputStream->is_open())
-  {
-    MITK_ERROR << "Tried to create EventConfig from invalid input stream.";
-    return;
-  }
   EventConfig newConfig;
-  newConfig.d->m_XmlParser.SetStream(inputStream);
+  newConfig.d->m_XmlParser.SetStream(&inputStream);
   bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
   if (success)
   {
@@ -280,10 +275,11 @@ mitk::EventConfig::EventConfig(std::ifstream *inputStream)
   }
 }
 
-mitk::EventConfig::EventConfig(std::vector<PropertyList::Pointer> *configDescription)
+mitk::EventConfig::EventConfig(const std::vector<PropertyList::Pointer> &configDescription)
 : d(new EventConfigPrivate)
 {
-  for (std::vector<PropertyList::Pointer>::iterator it = configDescription->begin(); it != configDescription->end(); ++it) {
+  std::vector<PropertyList::Pointer>::const_iterator it_end = configDescription.end();
+  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it) {
 
     InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
     if (event.IsNotNull())

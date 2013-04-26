@@ -24,7 +24,6 @@ OclResourceService::~OclResourceService()
 OclResourceServiceImpl::OclResourceServiceImpl()
   : m_Context(NULL), m_Devices(NULL), m_ProgramStorage()
 {
-  this->CreateContext();
 }
 
 OclResourceServiceImpl::~OclResourceServiceImpl()
@@ -51,20 +50,27 @@ OclResourceServiceImpl::~OclResourceServiceImpl()
   }
 
   // if context was created release it
-  if(m_Context)
+  if( m_Context )
     clReleaseContext( this->m_Context );
 }
 
-cl_context OclResourceServiceImpl::GetContext() const
+cl_context OclResourceServiceImpl::GetContext()
 {
+  if( !this->CreateContext() )
+  {
+    MITK_ERROR("OclResourceService.GetContext") << "No context was created. Returning NULL.";
+  }
+
   return m_Context;
 }
 
 cl_command_queue OclResourceServiceImpl::GetCommandQueue() const
 {
   // check if queue valid
-  cl_int clErr = clGetCommandQueueInfo( m_CommandQueue, CL_QUEUE_CONTEXT, NULL, NULL, NULL );
-  if( clErr != CL_SUCCESS )
+  cl_context clQueueContext;
+
+  cl_int clErr = clGetCommandQueueInfo( m_CommandQueue, CL_QUEUE_CONTEXT, sizeof(clQueueContext), &clQueueContext, NULL );
+  if( clErr != CL_SUCCESS || clQueueContext != this->m_Context )
   {
     MITK_WARN << "Have no valid command queue. Query returned : " << GetOclErrorAsString( clErr );
     return NULL;
@@ -89,10 +95,8 @@ bool OclResourceServiceImpl::GetIsFormatSupported(cl_image_format *fmt)
 
 void OclResourceServiceImpl::PrintContextInfo()
 {
-  if( m_Context == NULL){
-    MITK_ERROR("OpenCL.ResourceService") << "No OpenCL Context available ";
-  }
-  else
+  // context and devices available
+  if( this->CreateContext() && m_Devices )
   {
     oclPrintDeviceInfo( m_Devices[0] );
   }
@@ -135,8 +139,8 @@ cl_program OclResourceServiceImpl::GetProgram(const std::string &name) const
 
 void OclResourceServiceImpl::InvalidateStorage()
 {
-  // do nothing if no context present
-  if(m_Context == NULL)
+  // do nothing if no context present, there is also no storage
+  if( !this->CreateContext() )
     return;
 
   // query the map
@@ -147,6 +151,7 @@ void OclResourceServiceImpl::InvalidateStorage()
     // query the program build status
     cl_build_status status;
     unsigned int query = clGetProgramBuildInfo( it->second, m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, NULL );
+    CHECK_OCL_ERR( query )
 
     MITK_DEBUG << "Quering status for " << it->first << std::endl;
 
@@ -180,7 +185,7 @@ void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 
 unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension, cl_mem_object_type _imagetype)
 {
-  if(m_Context==NULL)
+  if( !this->CreateContext() )
     return 0;
 
   unsigned int retValue = 0;
@@ -212,43 +217,61 @@ unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension,
   return retValue;
 }
 
-void OclResourceServiceImpl::CreateContext()
+bool OclResourceServiceImpl::CreateContext()
 {
   cl_int clErr = 0;
   size_t szParmDataBytes;
   cl_platform_id cpPlatform;
   cl_device_id m_cdDevice;
 
-  try{
-    clErr = oclGetPlatformID( &cpPlatform);
-    CHECK_OCL_ERR( clErr );
+  static bool CreateContextFailed = false;
 
-    clErr = clGetDeviceIDs( cpPlatform, CL_DEVICE_TYPE_GPU, 1, &m_cdDevice, NULL);
-    CHECK_OCL_ERR( clErr );
+  if( m_Context != NULL )
+    return true;
 
-    this->m_Context = clCreateContext( 0, 1, &m_cdDevice, NULL, NULL, &clErr);
-    CHECK_OCL_ERR( clErr );
-
-    // get the info size
-    clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, 0,NULL, &szParmDataBytes );
-    this->m_Devices = (cl_device_id*) malloc(szParmDataBytes);
-
-    // get device info
-    clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, szParmDataBytes, m_Devices, NULL);
-    CHECK_OCL_ERR( clErr );
-
-    // create command queue
-    m_CommandQueue = clCreateCommandQueue(m_Context,  m_Devices[0], 0, &clErr);
-    CHECK_OCL_ERR( clErr );
-
-    this->PrintContextInfo( );
-
-    // collect available image formats for current context
-    this->m_ImageFormats = mitk::OclImageFormats::New();
-    this->m_ImageFormats->SetGPUContext(m_Context);
-  }
-  catch( std::exception& e)
+  if( CreateContextFailed )
   {
-    MITK_ERROR("OpenCL.ResourceService") << "Exception while creating context: \n" << e.what();
+    MITK_ERROR("OpenCL.ResourceService") << "No OpenCL Context available ";
+    return false;
   }
+  else if( m_Context == NULL )
+  {
+
+    try{
+      clErr = oclGetPlatformID( &cpPlatform);
+      CHECK_OCL_ERR( clErr );
+
+      clErr = clGetDeviceIDs( cpPlatform, CL_DEVICE_TYPE_GPU, 1, &m_cdDevice, NULL);
+      CHECK_OCL_ERR( clErr );
+
+      this->m_Context = clCreateContext( 0, 1, &m_cdDevice, NULL, NULL, &clErr);
+      CreateContextFailed = (clErr != CL_SUCCESS);
+
+      // get the info size
+      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, 0,NULL, &szParmDataBytes );
+      this->m_Devices = (cl_device_id*) malloc(szParmDataBytes);
+
+      // get device info
+      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, szParmDataBytes, m_Devices, NULL);
+      CHECK_OCL_ERR( clErr );
+
+      // create command queue
+      m_CommandQueue = clCreateCommandQueue(m_Context,  m_Devices[0], 0, &clErr);
+      CHECK_OCL_ERR( clErr );
+
+      this->PrintContextInfo( );
+
+      // collect available image formats for current context
+      this->m_ImageFormats = mitk::OclImageFormats::New();
+      this->m_ImageFormats->SetGPUContext(m_Context);
+    }
+    catch( std::exception& e)
+    {
+      MITK_ERROR("OpenCL.ResourceService") << "Exception while creating context: \n" << e.what();
+    }
+
+  }
+
+  return true;
+
 }

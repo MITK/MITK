@@ -42,7 +42,7 @@ public:
 
   ~OclResourceServiceImpl();
 
-  cl_context GetContext() const;
+  cl_context GetContext();
 
   cl_command_queue GetCommandQueue() const;
 
@@ -63,7 +63,7 @@ public:
   unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type _imagetype);
 
 private:
-  void CreateContext();
+  bool CreateContext();
 
   /** The context */
   cl_context m_Context;

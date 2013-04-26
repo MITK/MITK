@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/vnl_quaternion.txx>
 
 #include <fstream>
+#include <iomanip>
 
 int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
 {
@@ -46,6 +47,8 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   std::cout << "Testing mapping Map(pt3d_mm, pt2d_mm) and compare with expected: ";
   mitk::Point2D testpt2d_mm;
   planegeometry->Map(pt3d_mm, testpt2d_mm);
+  std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm;
+  std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm;
   if(mitk::Equal(pt2d_mm, testpt2d_mm, 2*mitk::eps) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -58,6 +61,9 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   pt2d_units[0] = width/2.0;     pt2d_units[1] = height/2.0;
   pt2d_mm[0]    = widthInMM/2.0; pt2d_mm[1]    = heightInMM/2.0;
   planegeometry->IndexToWorld(pt2d_units, testpt2d_mm);
+
+  std::cout << std::setprecision(12) << "Expected pt2d_mm " << pt2d_mm;
+  std::cout << std::setprecision(12) << "Result testpt2d_mm " << testpt2d_mm;
   if(mitk::Equal(pt2d_mm, testpt2d_mm, 2*mitk::eps) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -68,6 +74,9 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
   std::cout << "Testing WorldToIndex(pt2d_mm, pt2d_units) and compare with expected: ";
   mitk::Point2D testpt2d_units;
   planegeometry->WorldToIndex(pt2d_mm, testpt2d_units);
+
+  std::cout << std::setprecision(12) << "Expected pt2d_units " << pt2d_units;
+  std::cout << std::setprecision(12) << "Result testpt2d_units " << testpt2d_units;
   if(mitk::Equal(pt2d_units, testpt2d_units, 3*mitk::eps) == false)
   {
     std::cout<<"[FAILED]"<<std::endl;

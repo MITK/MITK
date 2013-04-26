@@ -210,7 +210,3 @@ unsigned int OclResourceServiceImpl::GetMaximumImageSize(unsigned int dimension,
   return retValue;
 }
 
-bool OclResourceServiceImpl::CreateContext() const
-{
-
-}

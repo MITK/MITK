@@ -158,8 +158,6 @@ public:
   unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type _imagetype);
 
 private:
-  bool CreateContext() const;
-
   mutable OclContextCollection* m_ContextCollection;
 
   /** Map containing all available (allready compiled) OpenCL Programs */

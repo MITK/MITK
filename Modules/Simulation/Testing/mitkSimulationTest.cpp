@@ -14,21 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// #include <mitkSimulation.h>
+#include <mitkSimulation.h>
+#include <mitkSimulationObjectFactory.h>
 #include <mitkTestingMacros.h>
 
-// static void GetRootNode_SimulationIsNotInitialized_ReturnsNullPointer()
-// {
-//   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
-//   sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
-//   MITK_TEST_CONDITION(!rootNode, "GetRootNode_SimulationIsNotInitialized_ReturnsNullPointer")
-// }
+static void GetRootNode_SimulationNotInitialized_ReturnsNullPointer()
+{
+  mitk::Simulation::Pointer simulation = mitk::Simulation::New();
+  sofa::simulation::Node::SPtr rootNode = simulation->GetRootNode();
+  MITK_TEST_CONDITION(!rootNode, "GetRootNode_SimulationNotInitialized_ReturnsNullPointer")
+}
 
 int mitkSimulationTest(int, char* [])
 {
+  mitk::RegisterSimulationObjectFactory();
+
   MITK_TEST_BEGIN("mitkSimulationTest")
 
-  // GetRootNode_SimulationIsNotInitialized_ReturnsNullPointer();
+  GetRootNode_SimulationNotInitialized_ReturnsNullPointer();
 
   MITK_TEST_END()
 }

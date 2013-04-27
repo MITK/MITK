@@ -35,12 +35,22 @@ const float mitk::Simulation::ScaleFactor = 1.0f; // 1000.0f
 
 static sofa::simulation::Simulation::SPtr CreateSimulation(mitk::Simulation::SimulationType type = mitk::Simulation::Tree)
 {
-  if (type == mitk::Simulation::DAG)
-    return sofa::core::objectmodel::New<sofa::simulation::graph::DAGSimulation>();
-  else if (type == mitk::Simulation::Bgl)
-    return sofa::core::objectmodel::New<sofa::simulation::bgl::BglSimulation>();
-  else
-    return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
+  const std::string key = "MultiMappingObject";
+
+  if (sofa::simulation::xml::BaseElement::NodeFactory::HasKey(key))
+    sofa::simulation::xml::BaseElement::NodeFactory::ResetEntry(key);
+
+  switch (type)
+  {
+    case mitk::Simulation::DAG:
+      return sofa::core::objectmodel::New<sofa::simulation::graph::DAGSimulation>();
+
+    case mitk::Simulation::Bgl:
+      return sofa::core::objectmodel::New<sofa::simulation::bgl::BglSimulation>();
+
+    default:
+      return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
+  }
 }
 
 void mitk::Simulation::SetActiveSimulation(mitk::Simulation* simulation)

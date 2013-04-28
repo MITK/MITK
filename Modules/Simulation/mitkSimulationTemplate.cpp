@@ -214,7 +214,7 @@ std::string mitk::SimulationTemplate::CreateSimulation() const
 {
   if (!m_IsInitialized)
   {
-    MITK_ERROR << "Simulation template is not initialized!";
+    MITK_DEBUG << "Simulation template is not initialized!";
     return "";
   }
 
@@ -231,7 +231,7 @@ std::string mitk::SimulationTemplate::CreateSimulation() const
 
       if (it == m_VariableContents.end())
       {
-        MITK_ERROR << "Template '" << m_VariableContents[i].second << "' not found!";
+        MITK_DEBUG << "Template '" << m_VariableContents[i].second << "' not found!";
         return "";
       }
 
@@ -252,7 +252,7 @@ bool mitk::SimulationTemplate::Parse(const std::string& contents)
 {
   if (m_IsInitialized)
   {
-    MITK_ERROR << "Simulation template is already initialized!";
+    MITK_DEBUG << "Simulation template is already initialized!";
     return false;
   }
 
@@ -276,19 +276,19 @@ bool mitk::SimulationTemplate::SetProperties(mitk::DataNode::Pointer dataNode) c
 {
   if (dataNode.IsNull())
   {
-    MITK_ERROR << "Data node does not exist!";
+    MITK_DEBUG << "Data node does not exist!";
     return false;
   }
 
   if (!m_IsInitialized)
   {
-    MITK_ERROR << "Simulation template is not initialized!";
+    MITK_DEBUG << "Simulation template is not initialized!";
     return false;
   }
 
   if (dynamic_cast<SimulationTemplate*>(dataNode->GetData()) != this)
   {
-    MITK_ERROR << "Data node does not own this simulation template!";
+    MITK_DEBUG << "Data node does not own this simulation template!";
     return false;
   }
 

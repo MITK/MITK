@@ -14,74 +14,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkIOUtil.h>
 #include <mitkSimulationObjectFactory.h>
 #include <mitkSimulationTemplate.h>
 #include <mitkTestingMacros.h>
 
-int mitkSimulationTemplateTest(int argc, char* argv[])
+static mitk::DataNode::Pointer CreateDataNode(mitk::SimulationTemplate::Pointer simulationTemplate)
 {
-  MITK_TEST_BEGIN("mitkSimulationTemplateTest")
-
-  MITK_TEST_CONDITION_REQUIRED(argc == 2, "Test if command line has argument.")
-
-  MITK_TEST_OUTPUT(<< "Register SimulationObjectFactory.")
-  mitk::RegisterSimulationObjectFactory();
-
-  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
-  MITK_TEST_CONDITION_REQUIRED(simulationTemplate.IsNotNull(), "Create simulation template.")
-
-  std::string contents = simulationTemplate->CreateSimulation();
-  MITK_TEST_CONDITION(contents.empty(), "Try to create simulation from template.")
-
-  bool boolResult = simulationTemplate->SetProperties(NULL);
-  MITK_TEST_CONDITION(!boolResult, "Try to set properties of non-existent data node.")
-
-  boolResult = simulationTemplate->SetProperties(mitk::DataNode::New());
-  MITK_TEST_CONDITION(!boolResult, "Try to set properties of empty data node.")
-
-  boolResult = simulationTemplate->Parse("");
-  MITK_TEST_CONDITION(boolResult, "Parse empty simulation template.");
-
-  boolResult = simulationTemplate->Parse("");
-  MITK_TEST_CONDITION(!boolResult, "Try to parse already initialized simulation template.")
-
-  boolResult = simulationTemplate->SetProperties(mitk::DataNode::New());
-  MITK_TEST_CONDITION(!boolResult, "Try to set properties of empty data node again.")
-
-  contents = simulationTemplate->CreateSimulation();
-  MITK_TEST_CONDITION(contents.empty(), "Create empty simulation.")
-
-  simulationTemplate = mitk::SimulationTemplate::New();
-  MITK_TEST_CONDITION_REQUIRED(simulationTemplate.IsNotNull(), "Create another simulation template.")
-
-  contents = "<!-- -->";
-  boolResult = simulationTemplate->Parse(contents);
-  MITK_TEST_CONDITION(boolResult, "Parse static simulation template.")
-
-  std::string contents2 = simulationTemplate->CreateSimulation();
-  MITK_TEST_CONDITION(contents == contents2, "Create simulation.")
-
-  simulationTemplate = mitk::SimulationTemplate::New();
-  MITK_TEST_CONDITION_REQUIRED(simulationTemplate.IsNotNull(), "Create another simulation template.")
-
-  contents = "{'F'}|{id='A'}|{id = 'B' type='string'}|{id ='C' type=\t\t\n\t'int'}|{id= 'D' type='float'}|{id='E' default='E'}|{id='F' type='int', default='1'}|{id='G' type='float' default='0.5'}|{'E'}";
-  boolResult = simulationTemplate->Parse(contents);
-  MITK_TEST_CONDITION(boolResult, "Parse simulation template.")
-
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
   dataNode->SetData(simulationTemplate);
-  boolResult = simulationTemplate->SetProperties(dataNode);
-  MITK_TEST_CONDITION(boolResult, "Set properties of corresponding data node.")
+  return dataNode;
+}
 
-  dataNode->SetStringProperty("A", "A");
-  dataNode->SetIntProperty("F", 2);
-  contents = simulationTemplate->CreateSimulation();
-  MITK_TEST_CONDITION(contents == "2|A||0|0|E|2|0.5|E", "Create Simulation")
+static void CreateSimulation_NotInitialized_ReturnsEmptyString()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  MITK_TEST_CONDITION(simulationTemplate->CreateSimulation().empty(), "CreateSimulation_NotInitialized_ReturnsEmptyString")
+}
 
-  // TODOs
-  // - Ambiguous IDs
-  // - Syntax errors
+static void SetProperties_InputIsNull_ReturnsFalse()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  MITK_TEST_CONDITION(!simulationTemplate->SetProperties(NULL), "SetProperties_InputIsNull_ReturnsFalse")
+}
+
+static void SetProperties_NotInitialized_ReturnsFalse()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate);
+  MITK_TEST_CONDITION(!simulationTemplate->SetProperties(dataNode), "SetProperties_NotInitialized_ReturnsFalse")
+}
+
+static void SetProperties_ContainsTemplateAndReference_SetsPropertyAndReturnsTrue()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Atoll' default='Bora'} {'Atoll'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate);
+  bool boolResult = simulationTemplate->SetProperties(dataNode);
+  std::size_t numProperties = dataNode->GetPropertyList()->GetMap()->size();
+  std::string stringResult;
+  dataNode->GetStringProperty("Atoll", stringResult);
+  MITK_TEST_CONDITION(boolResult && numProperties == 1 && stringResult == "Bora", "SetProperties_ContainsTemplateAndReference_SetsPropertyAndReturnsTrue")
+}
+
+int mitkSimulationTemplateTest(int, char* [])
+{
+  mitk::RegisterSimulationObjectFactory();
+
+  MITK_TEST_BEGIN("mitkSimulationTemplateTest")
+
+    CreateSimulation_NotInitialized_ReturnsEmptyString();
+
+    SetProperties_InputIsNull_ReturnsFalse();
+    SetProperties_NotInitialized_ReturnsFalse();
+    SetProperties_ContainsTemplateAndReference_SetsPropertyAndReturnsTrue();
 
   MITK_TEST_END()
 }

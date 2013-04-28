@@ -86,13 +86,16 @@ static void DrawSimulation(mitk::Simulation::Pointer simulation, bool updateCont
 
   simulation->SetAsActiveSimulation();
 
+  MITK_INFO << "A";
   if (updateContext)
     rootNode->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
 
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
 
   sofaSimulation->updateVisual(rootNode.get());
+  MITK_INFO << "B";
   sofaSimulation->draw(sofa::core::visual::VisualParams::defaultInstance(), rootNode.get());
+  MITK_INFO << "C";
 }
 
 static vtkIdType GetNumberOfPolys(mitk::Surface::Pointer surface, unsigned int t = 0)
@@ -256,7 +259,6 @@ int mitkSimulationTest(int argc, char* argv[])
   const std::string filename = argv[1];
   const double dt = lexical_cast<double>(argv[2]);
   const vtkIdType numPolys = lexical_cast<vtkIdType>(argv[3]);
-
 
   mitk::RegisterSimulationObjectFactory();
 

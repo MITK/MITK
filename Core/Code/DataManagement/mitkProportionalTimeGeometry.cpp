@@ -14,8 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <mitkProportionalTimeGeometry.h>
+#include <limits>
 
-mitk::ProportionalTimeGeometry::ProportionalTimeGeometry()
+mitk::ProportionalTimeGeometry::ProportionalTimeGeometry() :
+  m_FirstTimePoint(0.0),
+  m_StepDuration(1.0)
 {
 }
 
@@ -25,6 +28,8 @@ mitk::ProportionalTimeGeometry::~ProportionalTimeGeometry()
 
 void mitk::ProportionalTimeGeometry::Initialize()
 {
+  m_FirstTimePoint = 0.0;
+  m_StepDuration = 1.0;
 }
 
 mitk::TimeStepType mitk::ProportionalTimeGeometry::GetNumberOfTimeSteps () const
@@ -157,10 +162,28 @@ void mitk::ProportionalTimeGeometry::Initialize (Geometry3D * geometry, TimeStep
   m_FirstTimePoint = geometry->GetTimeBounds()[0];
   m_StepDuration = geometry->GetTimeBounds()[1] - geometry->GetTimeBounds()[0];
   this->ReserveSpaceForGeometries(timeSteps);
+  try{
   for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
   {
-    //AffineGeometryFrame3D::Pointer clonedGeometry = geometry->Clone();
-    this->SetTimeStepGeometry(geometry, currentStep);
+    mitk::TimeBounds timeBounds;
+    if (timeSteps > 1)
+    {
+      timeBounds[0] = m_FirstTimePoint + currentStep * m_StepDuration;
+      timeBounds[1] = m_FirstTimePoint + (currentStep+1) * m_StepDuration;
+    }
+    else
+    {
+      timeBounds = geometry->GetTimeBounds();
+    }
+
+    AffineGeometryFrame3D::Pointer clonedGeometry = geometry->Clone();
+    this->SetTimeStepGeometry(dynamic_cast<Geometry3D*> (clonedGeometry.GetPointer()), currentStep);
+    GetGeometryForTimeStep(currentStep)->SetTimeBounds(timeBounds);
+  }
+  }
+  catch (...)
+  {
+    MITK_INFO << "Cloning of geometry produced an error!";
   }
   Update();
 }

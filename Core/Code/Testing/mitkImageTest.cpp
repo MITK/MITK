@@ -294,7 +294,7 @@ int mitkImageTest(int argc, char* argv[])
   mitk::Point3D position = geom_origin + (geom_origin - geom_center);
   MITK_TEST_CONDITION_REQUIRED( image->GetPixelValueByWorldCoordinate(position, timestep) == 0, "Test access to the outside of the image")
 
-
+  {
   // testing the clone method of mitk::Image
   mitk::Image::Pointer cloneImage = image->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension() == image->GetDimension(), "Clone (testing dimension)");
@@ -311,7 +311,7 @@ int mitkImageTest(int argc, char* argv[])
   {
     MITK_TEST_CONDITION_REQUIRED(cloneImage->GetDimension(i) == image->GetDimension(i), "Clone (testing dimension " << i << ")");
   }
-
+  }
   //access via itk
   if(image->GetDimension()> 3)    // CastToItk only works with 3d images so we need to check for 4d images
   {
@@ -324,11 +324,17 @@ int mitkImageTest(int argc, char* argv[])
 
   if(image->GetDimension()==3)
   {
-    typedef itk::Image<float,3> ItkFloatImage3D;
+    typedef itk::Image<double,3> ItkFloatImage3D;
     ItkFloatImage3D::Pointer itkimage;
+    try
+    {
     mitk::CastToItkImage(image, itkimage);
     MITK_TEST_CONDITION_REQUIRED(itkimage.IsNotNull(), "Test conversion to itk::Image!");
-
+    }
+    catch (std::exception& e)
+    {
+      MITK_INFO << e.what();
+    }
     mitk::Point3D itkPhysicalPoint;
     image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
     MITK_INFO << "ITKPoint " << itkPhysicalPoint[0] << " "<< itkPhysicalPoint[1] << " "<< itkPhysicalPoint[2] << "";

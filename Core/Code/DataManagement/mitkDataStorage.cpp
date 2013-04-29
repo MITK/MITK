@@ -322,14 +322,14 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
             const TimeBounds & curTimeBounds = node->GetData()->GetGeometry(i)->GetTimeBounds();
             TimePointType currentTimePoint = node->GetData()->GetTimeGeometry()->TimeStepToTimePoint(i);
             // get the minimal time of all objects in the DataStorage
-            if ((curTimeBounds[0]+currentTimePoint<minimalTime)&&(curTimeBounds[0]+currentTimePoint>stmin))
+            if ((curTimeBounds[0]<minimalTime)&&(curTimeBounds[0]>stmin))
             {
-              minimalTime=curTimeBounds[0]+currentTimePoint;
+              minimalTime=curTimeBounds[0];
             }
             // get the maximal time of all objects in the DataStorage
-            if ((curTimeBounds[1]+currentTimePoint>maximalTime)&&(curTimeBounds[1]<stmax))
+            if ((curTimeBounds[1]>maximalTime)&&(curTimeBounds[1]<stmax))
             {
-              maximalTime = curTimeBounds[1]+currentTimePoint;
+              maximalTime = curTimeBounds[1];
             }
             // get the minimal TimeBound of all time steps of the current DataNode
             if (curTimeBounds[1]-curTimeBounds[0]<minimalIntervallSize)

@@ -151,7 +151,7 @@ protected:
   */
   void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                     mitk::PlanarFigure * planarFigure,
-                    mitk::Point2D &firstPoint,
+                    mitk::Point2D &anchorPoint,
                     mitk::Geometry2D * planarFigureGeometry2D,
                     const mitk::Geometry2D * rendererGeometry2D,
                     mitk::DisplayGeometry * displayGeometry );
@@ -161,7 +161,7 @@ protected:
   */
   void RenderQuantities( mitk::PlanarFigure * planarFigure,
                          mitk::BaseRenderer * renderer,
-                         mitk::Point2D firstPoint,
+                         mitk::Point2D anchorPoint,
                          double &annotationOffset,
                          float globalOpacity,
                          PlanarFigureDisplayMode lineDisplayMode );
@@ -171,7 +171,7 @@ protected:
   */
   void RenderAnnotations( mitk::BaseRenderer * renderer,
                           std::string name,
-                          mitk::Point2D firstPoint,
+                          mitk::Point2D anchorPoint,
                           float globalOpacity,
                           PlanarFigureDisplayMode lineDisplayMode,
                           double &annotationOffset );
@@ -210,7 +210,7 @@ protected:
   */
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry);
@@ -220,7 +220,7 @@ protected:
   * PaintPolyLine().
   */
   void DrawMainLines( mitk::PlanarFigure* figure,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;
@@ -230,7 +230,7 @@ protected:
   * PaintPolyLine().
   */
   void DrawHelperLines( mitk::PlanarFigure* figure,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;

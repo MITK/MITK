@@ -183,7 +183,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
 template <class TInputScalarType, class TOutputScalarType>
 void
 MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarType>
-::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, int /*threadId*/)
+::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType /*threadId*/)
 {
 
   // Get input gradient image pointer

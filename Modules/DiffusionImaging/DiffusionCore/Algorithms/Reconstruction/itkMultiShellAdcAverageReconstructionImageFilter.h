@@ -79,7 +79,7 @@ namespace itk
     ~MultiShellAdcAverageReconstructionImageFilter() {}
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
     void S_S0Normalization( vnl_vector<double> & vec, const double & S0 );
     void calculateAdcFromSignal( vnl_vector<double> & vec, const double & bValue);
     void calculateSignalFromAdc( vnl_vector<double> & vec, const double & bValue, const double & referenceSignal);

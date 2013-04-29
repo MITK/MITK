@@ -134,10 +134,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     lineDisplayMode = PF_HOVER;
   }
 
-  mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
+  mitk::Point2D anchorPoint; anchorPoint[0] = 0; anchorPoint[1] = 1;
 
   // render the actual lines of the PlanarFigure
-  RenderLines(lineDisplayMode, planarFigure, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
+  RenderLines(lineDisplayMode, planarFigure, anchorPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
 
   // position-offset of the annotations, is set in RenderAnnotations() and
   // used in RenderQuantities()
@@ -147,18 +147,18 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   float globalOpacity = 1.0;
   node->GetFloatProperty("opacity", globalOpacity);
 
-  // draw name near the first point (if present)
+  // draw name near the anchor point (point located on the right)
   std::string name = node->GetName();
   if ( m_DrawName && !name.empty() )
   {
-    RenderAnnotations(renderer, name, firstPoint, globalOpacity, lineDisplayMode, annotationOffset);
+    RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
 
-  // draw feature quantities (if requested) next to the first point,
+  // draw feature quantities (if requested) next to the anchor point,
   // but under the name (that is where 'annotationOffset' is used)
   if ( m_DrawQuantities )
   {
-    RenderQuantities(planarFigure, renderer, firstPoint, annotationOffset, globalOpacity, lineDisplayMode);
+    RenderQuantities(planarFigure, renderer, anchorPoint, annotationOffset, globalOpacity, lineDisplayMode);
   }
 
   if ( m_DrawControlPoints )
@@ -174,11 +174,13 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 void mitk::PlanarFigureMapper2D::PaintPolyLine(
   mitk::PlanarFigure::PolyLineType vertices,
   bool closed,
-  Point2D& firstPoint,
+  Point2D& anchorPoint,
   const Geometry2D* planarFigureGeometry2D,
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
+  mitk::Point2D rightMostPoint;
+  rightMostPoint.Fill( itk::NumericTraits<float>::min() );
 
   // transform all vertices into Point2Ds in display-Coordinates and store them in vector
   std::vector<mitk::Point2D> pointlist;
@@ -190,6 +192,9 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
     pointlist.push_back(displayPoint);
+
+    if ( displayPoint[0] > rightMostPoint[0] )
+      rightMostPoint = displayPoint;
   }
 
   // now paint all the points in one run
@@ -210,13 +215,13 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   }
   glEnd();
 
-  firstPoint = (*pointlist.begin());
+  anchorPoint = rightMostPoint;
 }
 
 
 void mitk::PlanarFigureMapper2D::DrawMainLines(
   mitk::PlanarFigure* figure,
-  Point2D& firstPoint,
+  Point2D& anchorPoint,
   const Geometry2D* planarFigureGeometry2D,
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
@@ -228,14 +233,14 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
 
     this->PaintPolyLine( polyline,
       figure->IsClosed(),
-      firstPoint, planarFigureGeometry2D,
+      anchorPoint, planarFigureGeometry2D,
       rendererGeometry2D, displayGeometry );
   }
 }
 
 void mitk::PlanarFigureMapper2D::DrawHelperLines(
   mitk::PlanarFigure* figure,
-  Point2D& firstPoint,
+  Point2D& anchorPoint,
   const Geometry2D* planarFigureGeometry2D,
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
@@ -257,7 +262,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
 
     // ... and once normally above the shadow.
     this->PaintPolyLine( helperPolyLine, false,
-      firstPoint, planarFigureGeometry2D,
+      anchorPoint, planarFigureGeometry2D,
       rendererGeometry2D, displayGeometry );
   }
 }
@@ -673,7 +678,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
 
 void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * renderer,
                                                     std::string name,
-                                                    mitk::Point2D firstPoint,
+                                                    mitk::Point2D anchorPoint,
                                                     float globalOpacity,
                                                     PlanarFigureDisplayMode lineDisplayMode,
                                                     double &annotationOffset )
@@ -682,14 +687,14 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
   if ( openGLrenderer )
   {
     openGLrenderer->WriteSimpleText( name,
-      firstPoint[0] + 6.0, firstPoint[1] + 4.0,
+      anchorPoint[0] + 6.0, anchorPoint[1] + 4.0,
       0,
       0,
       0,
       globalOpacity ); //this is a shadow
 
     openGLrenderer->WriteSimpleText( name,
-      firstPoint[0] + 5.0, firstPoint[1] + 5.0,
+      anchorPoint[0] + 5.0, anchorPoint[1] + 5.0,
       m_LineColor[lineDisplayMode][0],
       m_LineColor[lineDisplayMode][1],
       m_LineColor[lineDisplayMode][2],
@@ -702,7 +707,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
 
 void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFigure,
                                                    mitk::BaseRenderer * renderer,
-                                                   mitk::Point2D firstPoint,
+                                                   mitk::Point2D anchorPoint,
                                                    double &annotationOffset,
                                                    float globalOpacity,
                                                    PlanarFigureDisplayMode lineDisplayMode )
@@ -730,14 +735,14 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
   if ( openGLrenderer )
   {
     openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
-      firstPoint[0] + 6.0, firstPoint[1] + 4.0 + annotationOffset,
+      anchorPoint[0] + 6.0, anchorPoint[1] + 4.0 + annotationOffset,
       0,
       0,
       0,
       globalOpacity ); //this is a shadow
 
     openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
-      firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset,
+      anchorPoint[0] + 5.0, anchorPoint[1] + 5.0 + annotationOffset,
       m_LineColor[lineDisplayMode][0],
       m_LineColor[lineDisplayMode][1],
       m_LineColor[lineDisplayMode][2],
@@ -750,7 +755,7 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
 
 void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDisplayMode,
                                               mitk::PlanarFigure * planarFigure,
-                                              mitk::Point2D &firstPoint,
+                                              mitk::Point2D &anchorPoint,
                                               mitk::Geometry2D * planarFigureGeometry2D,
                                               const mitk::Geometry2D * rendererGeometry2D,
                                               mitk::DisplayGeometry * displayGeometry )
@@ -781,14 +786,14 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
-                         firstPoint,
+                         anchorPoint,
                          planarFigureGeometry2D,
                          rendererGeometry2D,
                          displayGeometry );
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
-                           firstPoint,
+                           anchorPoint,
                            planarFigureGeometry2D,
                            rendererGeometry2D,
                            displayGeometry );
@@ -820,14 +825,14 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
 
     // Draw the outline for all polylines if requested
     this->DrawMainLines( planarFigure,
-                         firstPoint,
+                         anchorPoint,
                          planarFigureGeometry2D,
                          rendererGeometry2D,
                          displayGeometry );
 
     // Draw the outline for all helper objects if requested
     this->DrawHelperLines( planarFigure,
-                           firstPoint,
+                           anchorPoint,
                            planarFigureGeometry2D,
                            rendererGeometry2D,
                            displayGeometry );
@@ -854,7 +859,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
 
     // Draw the main line for all polylines
     this->DrawMainLines( planarFigure,
-      firstPoint,
+      anchorPoint,
       planarFigureGeometry2D,
       rendererGeometry2D,
       displayGeometry );
@@ -874,7 +879,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
 
     // Draw helper objects
     this->DrawHelperLines( planarFigure,
-      firstPoint,
+      anchorPoint,
       planarFigureGeometry2D,
       rendererGeometry2D,
       displayGeometry );

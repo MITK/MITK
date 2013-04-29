@@ -212,8 +212,8 @@ mitk::ImageVtkAccessor* mitk::Image::GetVtkImageData(int t, int n)
   if(volume.GetPointer()==NULL || volume->GetVtkImageData(this) == NULL)
     return NULL;
 
-
-  float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
+  SlicedGeometry3D* geom3d = GetSlicedGeometry(t);
+  float *fspacing = const_cast<float *>(geom3d->GetFloatSpacing());
   double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
   volume->GetVtkImageData(this)->SetSpacing( dspacing );
 
@@ -820,8 +820,10 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
     dimension = 4;
 
   Initialize( type, dimension, dimensions, channels );
-
-  SetTimeGeometry(geometry.Clone().GetPointer());
+  if (geometry.GetNumberOfTimeSteps() > 1)
+    SetTimeGeometry(geometry.Clone().GetPointer());
+  else
+    Superclass::SetGeometry(geometry.GetGeometryForTimeStep(0));
 /* //Old //TODO_GOETZ Really necessary?
   mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBoxInWorld()->GetBounds();
   if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )

@@ -69,6 +69,8 @@ set(H_FILES
 
   Interfaces/mitkIDataNodeReader.h
 
+  Rendering/mitkLocalStorageHandler.h
+
   IO/mitkPixelTypeTraits.h
 )
 

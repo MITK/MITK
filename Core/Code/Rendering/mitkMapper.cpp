@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkProperties.h"
 
+
 mitk::Mapper::Mapper()
   :m_TimeStep( 0 )
 {

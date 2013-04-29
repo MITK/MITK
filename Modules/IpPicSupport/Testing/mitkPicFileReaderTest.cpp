@@ -86,7 +86,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       }
       std::cout<<"[PASSED]"<<std::endl;
 
-      std::cout << "Testing type of geometry (TimeSlicedGeometry expected): ";
+      std::cout << "Testing type of geometry (TimeGeometry expected): ";
       mitk::TimeGeometry* timeGeometry;
       timeGeometry = reader->GetOutput()->GetTimeGeometry();
       if(timeGeometry==NULL)
@@ -96,7 +96,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       }
       std::cout<<"[PASSED]"<<std::endl;
 
-      std::cout << "Testing availability of first geometry contained in the TimeSlicedGeometry: ";
+      std::cout << "Testing availability of first geometry contained in the TimeGeometry: ";
       if(timeGeometry->GetGeometryForTimeStep(0)==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;
@@ -104,7 +104,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       }
       std::cout<<"[PASSED]"<<std::endl;
 
-      std::cout << "Testing type of first geometry contained in the TimeSlicedGeometry (SlicedGeometry3D expected): ";
+      std::cout << "Testing type of first geometry contained in the TimeGeometry (SlicedGeometry3D expected): ";
       mitk::SlicedGeometry3D* slicedgeometry;
       slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(0));
       if(slicedgeometry==NULL)
@@ -141,16 +141,6 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       }
       std::cout<<"[PASSED]"<<std::endl;
 
-      std::cout << "Testing extent in units of image of TimeSlicedGeometry: ";
-      if((fabs(timeGeometry->GetExtendInWorld(0)-picheader->n[0])>mitk::eps) || (fabs(timeGeometry->GetExtendInWorld(1)-picheader->n[1])>mitk::eps)
-        || (picheader->dim>2 && (fabs(timeGeometry->GetExtendInWorld(2)-picheader->n[2])>mitk::eps))
-        || (picheader->dim>3 && (abs((mitkIpInt4_t) timeGeometry->GetNumberOfTimeSteps()- (mitkIpInt4_t) picheader->n[3])>0))
-        )
-      {
-        std::cout<<"[FAILED]"<<std::endl;
-        return EXIT_FAILURE;
-      }
-      std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing consistency of spacing from matrix and stored spacing in the first SlicedGeometry3D: ";
       mitk::Vector3D spacing;

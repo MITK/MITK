@@ -72,7 +72,7 @@ mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeSte
       m_StepDuration <= std::numeric_limits<TimePointType>::min() ||
       m_StepDuration >= std::numeric_limits<TimePointType>::max())
   {
-    return 0;
+    return static_cast<TimePointType>(timeStep);
   }
 
   return m_FirstTimePoint + timeStep * m_StepDuration;

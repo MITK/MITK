@@ -43,7 +43,7 @@ mitk::PlanarFigure::PlanarFigure()
   this->SetProperty( "closed", mitk::BoolProperty::New( false ) );
 
   // Currently only single-time-step geometries are supported
-  this->InitializeTimeSlicedGeometry( 1 );
+  this->InitializeTimeGeometry( 1 );
 }
 
 
@@ -537,7 +537,7 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
 }
 
 
-void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
+void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {
   mitk::Geometry2D::Pointer geometry2D = mitk::Geometry2D::New();
   geometry2D->Initialize();

@@ -71,7 +71,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
   //aus GenerateData
     mitk::Mesh::Pointer input = const_cast<mitk::Mesh*>(this->GetInput());
 
-    // Get the TimeSlicedGeometry of the input object
+    // Get the TimeGeometry of the input object
     const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
     if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
     {

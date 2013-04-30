@@ -168,7 +168,7 @@ namespace mitk
       slicedGeometry->InitializeEvenlySpaced(planeGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(2));
       slicedGeometry->SetSpacing(spacing);
 
-      // re-initialize TimeSlicedGeometry
+      // re-initialize TimeGeometry
       dynamic_cast<ProportionalTimeGeometry *>(static_cast<OutputType*>(this->GetOutput(0))->GetTimeGeometry())->Initialize(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
 
       buffer = NULL;

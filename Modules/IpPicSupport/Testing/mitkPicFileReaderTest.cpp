@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPicFileReader.h"
 #include "mitkPicHelper.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 #include <itksys/SystemTools.hxx>
 #include <itkImageFileReader.h>

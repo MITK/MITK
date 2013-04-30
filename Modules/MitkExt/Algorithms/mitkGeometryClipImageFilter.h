@@ -34,7 +34,7 @@ namespace mitk {
 //## @brief Filter for clipping an image with a Geometry2D
 //##
 //## The given geometry for clipping can be either a Geometry2D
-//## or a TimeSlicedGeometry containing multiple instances
+//## or a TimeGeometry containing multiple instances
 //## of Geometry2D
 //##
 //## \todo add AutoOrientLabels, which makes the "left" side (minimum X value) side of the image get one defined label.

@@ -161,7 +161,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   }
 
   //
-  // get the TimeSlicedGeometry of the input object
+  // get the TimeGeometry of the input object
   //
   mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >( this->GetInput() );
 

@@ -57,9 +57,9 @@ SOFA plugins are supported by MITK and can be loaded during runtime. For more in
 
 \subsection org_mitk_gui_qt_simulationSimulationTemplates Simulation Templates
 
-Simulation templates are extended SOFA scene files with the file extension <tt>.scn.template</tt>.
+Simulation templates are extended SOFA scene files and have the file extension <tt>.scn.template</tt>.
 They contain special strings which are parsed and displayed as properties in the Properties View.
-You can create a true simulation scene from a simulation template via its context menu in the Data Manager.
+You can create a simulation scene from a simulation template via its context menu in the Data Manager.
 Behind the scenes all templates of a simulation template file are replaced by concrete values.
 This simulation scene is saved in the same directory as the simulation template and automatically loaded.
 
@@ -78,13 +78,18 @@ The syntax for templates is as follows:
 <tt>id</tt> must be unique and is parsed as property name, i.e. use periods to arrange properties in tree order.
 <tt>type</tt> is optional and its default is <tt>string</tt>.
 Other valid types are <tt>int</tt> and <tt>float</tt>.
-<tt>default</tt> is also optional and specify the default value of the property.
+<tt>default</tt> is also optional and specifies the default value of the property.
 
 Since IDs must be unique but some values are supposed to appear in multiple places in a simulation template, you can specify references to templates as follows:
 
 \code
 {'Collision.Alarm Distance'}
 \endcode
+
+\warning
+Braces are only allowed to open or close templates and references.
+References must begin with <tt>{'</tt> and end with <tt>'}'</tt>.
+You must escape single quotation marks C-style, e.g. <tt>{id='Flinders\'s Cat' default='Trim'}</tt>.
 
 A good practice is to list all templates within XML comments at the beginning of the simulation template file and to just reference them as needed.
 

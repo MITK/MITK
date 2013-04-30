@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sofa/simulation/common/UpdateContextVisitor.h>
 #include <sofa/simulation/tree/GNode.h>
 #include <sstream>
-#include <string>
 
 template <typename T>
 static T lexical_cast(const std::string& string)
@@ -110,48 +109,48 @@ static vtkIdType GetNumberOfPolys(mitk::Surface::Pointer surface, unsigned int t
   return numPolys;
 }
 
-static void SetActiveSimulation_SimulationIsNull_NoActiveSimulation()
+static void SetActiveSimulation_InputIsNull_NoActiveSimulation()
 {
   mitk::Simulation::SetActiveSimulation(NULL);
-  MITK_TEST_CONDITION(NoActiveSimulation(), "SetActiveSimulation_SimulationIsNull_NoActiveSimulation")
+  MITK_TEST_CONDITION(NoActiveSimulation(), "SetActiveSimulation_InputIsNull_NoActiveSimulation")
 }
 
-static void SetAsActiveSimulation_SimulationIsNotInitialized_IsActiveSimulation()
+static void SetAsActiveSimulation_NotInitialized_IsActiveSimulation()
 {
   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
   simulation->SetAsActiveSimulation();
-  MITK_TEST_CONDITION(IsActiveSimulation(simulation), "SetAsActiveSimulation_SimulationIsNotInitialized_IsActiveSimulation")
+  MITK_TEST_CONDITION(IsActiveSimulation(simulation), "SetAsActiveSimulation_NotInitialized_IsActiveSimulation")
 }
 
-static void SetAsActiveSimulation_SimulationIsInitialized_IsActiveSimulation(const std::string& filename)
+static void SetAsActiveSimulation_Initialized_IsActiveSimulation(const std::string& filename)
 {
   mitk::Simulation::Pointer simulation = LoadSimulation(filename);
   simulation->SetAsActiveSimulation();
-  MITK_TEST_CONDITION(IsActiveSimulation(simulation), "SetAsActiveSimulation_SimulationIsInitialized_IsActiveSimulation")
+  MITK_TEST_CONDITION(IsActiveSimulation(simulation), "SetAsActiveSimulation_Initialized_IsActiveSimulation")
 }
 
-static void GetRootNode_SimulationIsNotInitialized_ReturnsNull()
+static void GetRootNode_NotInitialized_ReturnsNull()
 {
   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
-  MITK_TEST_CONDITION(!simulation->GetRootNode(), "GetRootNode_SimulationIsNotInitialized_ReturnsNull")
+  MITK_TEST_CONDITION(!simulation->GetRootNode(), "GetRootNode_NotInitialized_ReturnsNull")
 }
 
-static void GetRootNode_SimulationIsInitialized_ReturnsRootNode(const std::string& filename)
+static void GetRootNode_Initialized_ReturnsRootNode(const std::string& filename)
 {
   mitk::Simulation::Pointer simulation = LoadSimulation(filename);
-  MITK_TEST_CONDITION(simulation->GetRootNode(), "GetRootNode_SimulationIsInitialized_ReturnsRootNode")
+  MITK_TEST_CONDITION(simulation->GetRootNode(), "GetRootNode_Initialized_ReturnsRootNode")
 }
 
-static void GetDefaultDT_SimulationIsNotInitialized_ReturnsZero()
+static void GetDefaultDT_NotInitialized_ReturnsZero()
 {
   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
-  MITK_TEST_CONDITION(mitk::Equal(simulation->GetDefaultDT(), 0.0), "GetDefaultDT_SimulationIsNotInitialized_ReturnsZero")
+  MITK_TEST_CONDITION(mitk::Equal(simulation->GetDefaultDT(), 0.0), "GetDefaultDT_NotInitialized_ReturnsZero")
 }
 
-static void GetDefaultDT_SimulationIsInitialized_ReturnsDefaultDT(const std::string& filename, double dt)
+static void GetDefaultDT_Initialized_ReturnsDefaultDT(const std::string& filename, double dt)
 {
   mitk::Simulation::Pointer simulation = LoadSimulation(filename);
-  MITK_TEST_CONDITION(mitk::Equal(simulation->GetDefaultDT(), dt), "GetDefaultDT_SimulationIsInitialized_ReturnsDefaultDT")
+  MITK_TEST_CONDITION(mitk::Equal(simulation->GetDefaultDT(), dt), "GetDefaultDT_Initialized_ReturnsDefaultDT")
 }
 
 static void GetDrawTool_Always_ReturnsDrawTool()
@@ -196,7 +195,7 @@ static void SetDefaultDT_InputIsNegative_DefaultDTIsZero()
   MITK_TEST_CONDITION(mitk::Equal(simulation->GetDefaultDT(), 0.0), "SetDefaultDT_InputIsNegative_DefaultDTIsZero")
 }
 
-static void TakeSnapshot_SimulationIsNotInitialized_ReturnsNull()
+static void TakeSnapshot_NotInitialized_ReturnsNull()
 {
   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
   MITK_TEST_CONDITION(simulation->TakeSnapshot().IsNull(), "TakeSnapshot_SimulationIsNotInitialized_ReturnsNull");
@@ -210,11 +209,11 @@ static void TakeSnapshot_SimulationWasDrawn_ReturnsSurface(const std::string& fi
   MITK_TEST_CONDITION(GetNumberOfPolys(snapshot) == numPolys, "TakeSnapshot_SimulationWasDrawn_ReturnsSurface");
 }
 
-static void AppendSnapshot_SimulationIsNotInitialized_ReturnsFalse()
+static void AppendSnapshot_NotInitialized_ReturnsFalse()
 {
   mitk::Simulation::Pointer simulation = mitk::Simulation::New();
   mitk::Surface::Pointer record = mitk::Surface::New();
-  MITK_TEST_CONDITION(!simulation->AppendSnapshot(record), "AppendSnapshot_SimulationIsNotInitialized_ReturnsFalse");
+  MITK_TEST_CONDITION(!simulation->AppendSnapshot(record), "AppendSnapshot_NotInitialized_ReturnsFalse");
 }
 
 static void AppendSnapshot_InputIsNull_ReturnsFalse(const std::string& filename)
@@ -261,15 +260,15 @@ int mitkSimulationTest(int argc, char* argv[])
 
   MITK_TEST_BEGIN("mitkSimulationTest")
 
-    SetActiveSimulation_SimulationIsNull_NoActiveSimulation();
-    SetAsActiveSimulation_SimulationIsNotInitialized_IsActiveSimulation();
-    SetAsActiveSimulation_SimulationIsInitialized_IsActiveSimulation(filename);
+    SetActiveSimulation_InputIsNull_NoActiveSimulation();
+    SetAsActiveSimulation_NotInitialized_IsActiveSimulation();
+    SetAsActiveSimulation_Initialized_IsActiveSimulation(filename);
 
-    GetRootNode_SimulationIsNotInitialized_ReturnsNull();
-    GetRootNode_SimulationIsInitialized_ReturnsRootNode(filename);
+    GetRootNode_NotInitialized_ReturnsNull();
+    GetRootNode_Initialized_ReturnsRootNode(filename);
 
-    GetDefaultDT_SimulationIsNotInitialized_ReturnsZero();
-    GetDefaultDT_SimulationIsInitialized_ReturnsDefaultDT(filename, dt);
+    GetDefaultDT_NotInitialized_ReturnsZero();
+    GetDefaultDT_Initialized_ReturnsDefaultDT(filename, dt);
 
     GetDrawTool_Always_ReturnsDrawTool();
 
@@ -281,10 +280,10 @@ int mitkSimulationTest(int argc, char* argv[])
     SetDefaultDT_InputIsPositive_DefaultDTEqualsInput();
     SetDefaultDT_InputIsNegative_DefaultDTIsZero();
 
-    TakeSnapshot_SimulationIsNotInitialized_ReturnsNull();
+    TakeSnapshot_NotInitialized_ReturnsNull();
     TakeSnapshot_SimulationWasDrawn_ReturnsSurface(filename, numPolys);
 
-    AppendSnapshot_SimulationIsNotInitialized_ReturnsFalse();
+    AppendSnapshot_NotInitialized_ReturnsFalse();
     AppendSnapshot_InputIsNull_ReturnsFalse(filename);
     AppendSnapshot_InputIsEmpty_AppendsSnapshotAndReturnsTrue(filename, numPolys);
     AppendSnapshot_InputIsNotEmpty_AppendsSnapshotAndReturnsTrue(filename, numPolys);

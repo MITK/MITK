@@ -177,7 +177,6 @@ struct TbssSelListener : ISelectionListener
             }
 
 
-            std::string name = nodeData->GetNameOfClass();
             if(QString("PlanarCircle").compare(nodeData->GetNameOfClass())==0)
             {
               if(!foundStartRoi)
@@ -193,7 +192,7 @@ struct TbssSelListener : ISelectionListener
                 foundEndRoi = true;
               }
             }
-          } // end CHECK nodeData != NULL
+          }
 
         }
 
@@ -1656,10 +1655,12 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
   // Implement a way to obtain skeleton and skeletonFA without sml workspace
 
+  bool ok;
   double threshold = QInputDialog::getDouble(m_Controls->m_CreateRoi, tr("Set an FA threshold"),
-                                                      tr("Threshold:"), QLineEdit::Normal,
-                                                      0.2);
+                                                      tr("Threshold:"), 0.2, 0.0, 1.0, 2, &ok);
 
+  if(!ok)
+    return;
 
   mitk::Image::Pointer image;
 

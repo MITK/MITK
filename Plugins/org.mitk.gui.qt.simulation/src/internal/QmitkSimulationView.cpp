@@ -126,7 +126,7 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
       dataNode->SetName(m_Record->GetTimeSteps() == 1 ? "Snapshot" : "Record");
 
       this->GetDataStorage()->Add(dataNode, m_Selection);
-      InitializeViews(this->GetRenderWindowPart(), m_Record->GetTimeSlicedGeometry());
+      InitializeViews(this->GetRenderWindowPart(), m_Record->GetTimeGeometry());
 
       m_Record = NULL;
     }

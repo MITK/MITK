@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarFigureInteractor.h>
 #include <mitkGlobalInteraction.h>
 
-//===needed when timeSlicedGeometry is null to invoke rendering mechansims ====
+//===needed when timeGeometry is null to invoke rendering mechansims ====
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 

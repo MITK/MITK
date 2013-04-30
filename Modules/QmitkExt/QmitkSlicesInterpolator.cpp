@@ -512,7 +512,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         int clickedSliceDimension(-1);
         int clickedSliceIndex(-1);
 
-        // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
+        // calculate real slice position, i.e. slice of the image and not slice of the TimeGeometry
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
         mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, timeStep );
         m_FeedbackNode->SetData( interpolation );
@@ -927,10 +927,10 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
-      const mitk::TimeGeometry* timeSlicedGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
-      if (timeSlicedGeometry)
+      const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
+      if (timeGeometry)
       {
-        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
+        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeGeometry), renderer->GetSlice() );
 
         if ( renderer->GetCurrentWorldGeometry2DNode() )
         {

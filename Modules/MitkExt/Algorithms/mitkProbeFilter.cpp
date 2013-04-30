@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProbeFilter.h"
 #include "mitkSurface.h"
 #include "mitkImage.h"
-#include "mitkTimeSlicedGeometry.h"
 
 #include <vtkPolyDataSource.h>
 #include <vtkProbeFilter.h>
@@ -82,11 +81,11 @@ void mitk::ProbeFilter::GenerateOutputInformation()
     geometry3D->SetBounds(source->GetTimeGeometry()->GetBoundsInWorld());
     geometry3D->SetTimeBounds(source->GetTimeGeometry()->GetGeometryForTimeStep(0)->GetTimeBounds());
 
-    TimeSlicedGeometry::Pointer outputTimeSlicedGeometry = TimeSlicedGeometry::New();
-    outputTimeSlicedGeometry->InitializeEvenlyTimed(geometry3D, source->GetTimeGeometry()->GetNumberOfTimeSteps());
+    ProportionalTimeGeometry::Pointer outputTimeGeometry = ProportionalTimeGeometry::New();
+    outputTimeGeometry->Initialize(geometry3D, source->GetTimeGeometry()->GetNumberOfTimeSteps());
 
-    output->Expand(outputTimeSlicedGeometry->GetTimeSteps());
-    output->SetGeometry( outputTimeSlicedGeometry );
+    output->Expand(outputTimeGeometry->GetNumberOfTimeSteps());
+    output->SetTimeGeometry( outputTimeGeometry );
   }
   else
     output->SetGeometry( static_cast<Geometry3D*>(input->GetGeometry()->Clone().GetPointer()) );

@@ -85,7 +85,7 @@ struct IRenderingManager {
   /**
    * Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
-   * global TimeSlicedGeometry.
+   * global TimeGeometry.
    */
   virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry,
                                bool initializeGlobalTimeSNC = false) = 0;

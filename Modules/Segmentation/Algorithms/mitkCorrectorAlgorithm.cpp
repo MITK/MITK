@@ -88,19 +88,6 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
   temporarySlice->SetTimeGeometry(originalGeometry);
 
-  // temporarySlice is our return value (user  can get it by calling GetOutput() )
-
-//  CalculateDifferenceImage( temporarySlice, inputImage );
-//  if ( m_DifferenceImage.IsNotNull() && inputImage->GetTimeGeometry() )
-//  {
-//    AffineGeometryFrame3D::Pointer originalGeometryAGF = inputImage->GetTimeGeometry()->Clone();
-//    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
-//    m_DifferenceImage->SetGeometry( originalGeometry );
-//  }
-//  else
-//  {
-//    itkExceptionMacro("Original image does not have a 'Time sliced geometry'! Cannot copy.");
-//  }
 }
 
 void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic)

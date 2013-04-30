@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkImage.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "mitkDataNode.h"
 #include "mitkGeometryData.h"
 #include "mitkGeometry2DData.h"
@@ -69,21 +68,6 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateOutputInformation()
   {
     mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
     output->SetGeometry(curvedGeometry);
-
-    /*
-    mitk::TimeSlicedGeometry::Pointer timeGeometry = mitk::TimeSlicedGeometry::New();
-    mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
-
-    timeGeometry->InitializeEvenlyTimed ( curvedGeometry, input->GetPointSetSeriesSize() );
-
-    for ( unsigned int t = 1; t < input->GetPointSetSeriesSize(); ++t )
-    {
-      mitk::ThinPlateSplineCurvedGeometry::Pointer tmpCurvedGeometry = mitk::ThinPlateSplineCurvedGeometry::New();
-      timeGeometry->SetGeometry3D ( tmpCurvedGeometry.GetPointer(), t );
-    }
-    output->SetGeometry ( timeGeometry );
-    output->SetGeometry2D ( curvedGeometry ); // @FIXME SetGeometry2D of mitk::Geometry2DData reinitializes the TimeSlicedGeometry to 1 time step
-    */
   }
 }
 

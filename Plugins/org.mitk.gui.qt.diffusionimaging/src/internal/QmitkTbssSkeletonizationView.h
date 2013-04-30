@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkTbssSkeletonizationView_h
 
 // Blueberry
-#include <berryISelectionListener.h>
-#include <berryIPartListener.h>
-#include <berryIStructuredSelection.h>
+//#include <berryISelectionListener.h>
+//#include <berryIPartListener.h>
+//#include <berryIStructuredSelection.h>
 
 // itk
 #include "itkImage.h"
@@ -100,8 +100,8 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
 
     void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-    berry::ISelectionListener::Pointer m_SelListener;
-    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    //berry::ISelectionListener::Pointer m_SelListener;
+    //berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     bool m_IsInitialized;
 

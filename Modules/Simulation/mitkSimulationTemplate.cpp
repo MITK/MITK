@@ -170,9 +170,6 @@ static std::string ParseValue(const std::string& templ, const std::string& value
     }
   }
 
-  if (index2 == std::string::npos)
-    mitkThrow() << "Could not parse " << templ << ": Value of " << valueName << " is not enclosed within single quotation marks!";
-
   return UnescapeSingleQuotationMarks(templ.substr(index, index2 - index));
 }
 

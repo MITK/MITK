@@ -71,6 +71,151 @@ static void Parse_OpeningBraceBeforeClosingBrace_ThrowsException()
   _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id='A' default='1' {id='B' default='2'}}"), mitk::Exception, "Parse_OpeningBraceBeforeClosingBrace_ThrowsException")
 }
 
+static void Parse_TooShortToBeReference_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{}"), mitk::Exception, "Parse_TooShortToBeReference_ThrowsException")
+}
+
+static void Parse_NumberOfSingleQuotationMarksIsOdd_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{'Flinders's cat'}"), mitk::Exception, "Parse_NumberOfSingleQuotationMarksIsOdd_ThrowsException")
+}
+
+static void Parse_ReferenceDoesNotEndCorrectly_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{'Flinders\\'s cat}"), mitk::Exception, "Parse_ReferenceDoesNotEndCorrectly_ThrowsException")
+}
+
+static void Parse_ReferenceIsEmpty_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{''}"), mitk::Exception, "Parse_ReferenceIsEmpty_ThrowsException")
+}
+
+static void Parse_TooShortToBeTemplate_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id=}"), mitk::Exception, "Parse_TooShortToBeTemplate_ThrowsException")
+}
+
+static void Parse_IdIsEmpty_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id=''}"), mitk::Exception, "Parse_IdIsEmpty_ThrowsException")
+}
+
+static void Parse_UnknownType_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id='Trim' type='Cat'}"), mitk::Exception, "Parse_UnknownType_ThrowsException")
+}
+
+static void Parse_ValueIsAmbiguous_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id='Matthew' id='Flinders'}"), mitk::Exception, "Parse_ValueIsAmbiguous_ThrowsException")
+}
+
+static void Parse_IdNotFound_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{type='int' value='42'}"), mitk::Exception, "Parse_IdNotFound_ThrowsException")
+}
+
+static void Parse_NoAssignmentToValue_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id default=''}"), mitk::Exception, "Parse_NoAssignmentToValue_ThrowsException")
+}
+
+static void Parse_ValueIsNotEnclosedWithSingleQuotationMarks_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id=Flinders\\'s Cat}"), mitk::Exception, "Parse_ValueIsNotEnclosedWithSingleQuotationMarks_ThrowsException")
+}
+
+static void Parse_TypeMismatch_ThrowsException()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  _MITK_TEST_FOR_EXCEPTION(simulationTemplate->Parse("{id='Answer' type='int' default='forty-two'}"), mitk::Exception, "Parse_TypeMismatch_ThrowsException")
+}
+
+static void Parse_ValueContainsEscapedSingleQuotationMark_IsUnescapedAfterParsing()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Flinders\\'s Cat' default='Trim'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  std::string value;
+  dataNode->GetStringProperty("Flinders's Cat", value);
+  MITK_TEST_CONDITION(value == "Trim", "Parse_ValueContainsEscapedSingleQuotationMark_IsUnescapedAfterParsing")
+}
+
+static void Parse_Float_ParsedAsFloatProperty()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Pi' type='float' default='3.14'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  float value;
+  MITK_TEST_CONDITION(dataNode->GetFloatProperty("Pi", value) && mitk::Equal(value, 3.14f), "Parse_Float_ParsedAsFloatProperty")
+}
+
+static void Parse_Int_ParsedAsIntProperty()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Answer' type='int' default='42'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  int value;
+  MITK_TEST_CONDITION(dataNode->GetIntProperty("Answer", value) && value == 42, "Parse_Int_ParsedAsIntProperty")
+}
+
+static void Parse_String_ParsedAsStringProperty()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Cat' type='string' default='Trim'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  std::string value;
+  MITK_TEST_CONDITION(dataNode->GetStringProperty("Cat", value) && value == "Trim", "Parse_String_ParsedAsStringProperty")
+}
+
+static void Parse_FloatDefaultValue_IsZero()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Zero' type='float'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  float value;
+  MITK_TEST_CONDITION(dataNode->GetFloatProperty("Zero", value) && mitk::Equal(value, 0.0f), "Parse_FloatDefaultValue_IsZero")
+}
+
+static void Parse_IntDefaultValue_IsZero()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Zero' type='int'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  int value;
+  MITK_TEST_CONDITION(dataNode->GetIntProperty("Zero", value) && value == 0, "Parse_IntDefaultValue_IsZero")
+}
+
+static void Parse_StringDefaultValue_IsEmpty()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Empty' type='string'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  std::string value;
+  MITK_TEST_CONDITION(dataNode->GetStringProperty("Empty", value) && value.empty(), "Parse_StringDefaultValue_IsEmpty")
+}
+
+static void Parse_NoType_ParsedAsString()
+{
+  mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
+  simulationTemplate->Parse("{id='Captain' default='Flinders'}");
+  mitk::DataNode::Pointer dataNode = CreateDataNode(simulationTemplate, true);
+  std::string value;
+  MITK_TEST_CONDITION(dataNode->GetStringProperty("Captain", value) && value == "Flinders", "Parse_NoType_ParsedAsString")
+}
+
 static void SetProperties_InputIsNull_ReturnsFalse()
 {
   mitk::SimulationTemplate::Pointer simulationTemplate = mitk::SimulationTemplate::New();
@@ -136,6 +281,26 @@ int mitkSimulationTemplateTest(int, char* [])
     Parse_AlreadyInitialized_ReturnsFalse();
     Parse_EOFBeforeClosingBrace_ThrowsException();
     Parse_OpeningBraceBeforeClosingBrace_ThrowsException();
+    Parse_TooShortToBeReference_ThrowsException();
+    Parse_NumberOfSingleQuotationMarksIsOdd_ThrowsException();
+    Parse_ReferenceDoesNotEndCorrectly_ThrowsException();
+    Parse_ReferenceIsEmpty_ThrowsException();
+    Parse_TooShortToBeTemplate_ThrowsException();
+    Parse_IdIsEmpty_ThrowsException();
+    Parse_UnknownType_ThrowsException();
+    Parse_ValueIsAmbiguous_ThrowsException();
+    Parse_IdNotFound_ThrowsException();
+    Parse_NoAssignmentToValue_ThrowsException();
+    Parse_ValueIsNotEnclosedWithSingleQuotationMarks_ThrowsException();
+    Parse_TypeMismatch_ThrowsException();
+    Parse_ValueContainsEscapedSingleQuotationMark_IsUnescapedAfterParsing();
+    Parse_Float_ParsedAsFloatProperty();
+    Parse_Int_ParsedAsIntProperty();
+    Parse_String_ParsedAsStringProperty();
+    Parse_FloatDefaultValue_IsZero();
+    Parse_IntDefaultValue_IsZero();
+    Parse_StringDefaultValue_IsEmpty();
+    Parse_NoType_ParsedAsString();
 
     SetProperties_InputIsNull_ReturnsFalse();
     SetProperties_NotInitialized_ReturnsFalse();

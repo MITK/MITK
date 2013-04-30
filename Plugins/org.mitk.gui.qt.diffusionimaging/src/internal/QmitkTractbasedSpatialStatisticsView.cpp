@@ -92,7 +92,7 @@ const std::string QmitkTractbasedSpatialStatisticsView::VIEW_ID = "org.mitk.view
 
 using namespace berry;
 
-
+/*
 struct TbssSelListener : ISelectionListener
 {
 
@@ -251,6 +251,8 @@ struct TbssSelListener : ISelectionListener
 };
 
 
+*/
+
 QmitkTractbasedSpatialStatisticsView::QmitkTractbasedSpatialStatisticsView()
 : QmitkFunctionality()
 , m_Controls( 0 )
@@ -304,6 +306,115 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
     m_Controls->m_TbssImageLabel->setText("Please select an image");
   }
 
+
+  bool foundTbssRoi = false;
+  bool foundTbss = false;
+  bool found3dImage = false;
+  bool found4dImage = false;
+  bool foundFiberBundle = false;
+  bool foundStartRoi = false;
+  bool foundEndRoi = false;
+
+  mitk::TbssRoiImage* roiImage;
+  mitk::TbssImage* image;
+  mitk::Image* img;
+  mitk::FiberBundleX* fib;
+  mitk::PlanarFigure* start;
+  mitk::PlanarFigure* end;
+
+  m_CurrentStartRoi = NULL;
+  m_CurrentEndRoi = NULL;
+
+
+
+  for ( int i=0; i<nodes.size(); i++ )
+  {
+
+    // only look at interesting types
+    // check for valid data
+    mitk::BaseData* nodeData = nodes[i]->GetData();
+    if( nodeData )
+    {
+      if(QString("TbssRoiImage").compare(nodeData->GetNameOfClass())==0)
+      {
+        foundTbssRoi = true;
+        roiImage = static_cast<mitk::TbssRoiImage*>(nodeData);
+      }
+      else if (QString("TbssImage").compare(nodeData->GetNameOfClass())==0)
+      {
+        foundTbss = true;
+        image = static_cast<mitk::TbssImage*>(nodeData);
+      }
+      else if(QString("Image").compare(nodeData->GetNameOfClass())==0)
+      {
+        img = static_cast<mitk::Image*>(nodeData);
+        if(img->GetDimension() == 3)
+        {
+          found3dImage = true;
+        }
+        else if(img->GetDimension() == 4)
+        {
+          found4dImage = true;
+        }
+      }
+
+      else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
+      {
+        foundFiberBundle = true;
+        fib = static_cast<mitk::FiberBundleX*>(nodeData);
+        this->m_CurrentFiberNode = nodes[i];
+      }
+
+
+      if(QString("PlanarCircle").compare(nodeData->GetNameOfClass())==0)
+      {
+        if(!foundStartRoi)
+        {
+          start = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+          this->m_CurrentStartRoi = nodes[i];
+          foundStartRoi =  true;
+        }
+        else
+        {
+          end = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+          this->m_CurrentEndRoi = nodes[i];
+          foundEndRoi = true;
+        }
+      }
+    }
+  }
+
+
+  this->m_Controls->m_CreateRoi->setEnabled(found3dImage);
+  this->m_Controls->m_ImportFsl->setEnabled(found4dImage);
+
+
+
+  if(foundTbss && foundTbssRoi)
+  {
+    this->Plot(image, roiImage);
+  }
+
+  if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
+  {
+    this->PlotFiberBundle(fib, img, start, end);
+  }
+
+  else if(found3dImage == true && foundFiberBundle)
+  {
+    this->PlotFiberBundle(fib, img);
+  }
+
+  if(found3dImage)
+  {
+    this->InitPointsets();
+  }
+
+  this->m_Controls->m_Cut->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi);
+  this->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+  this->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+  this->m_Controls->m_Average->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+
 }
 
 void QmitkTractbasedSpatialStatisticsView::InitPointsets()
@@ -345,12 +456,14 @@ void QmitkTractbasedSpatialStatisticsView::CreateQtPartControl( QWidget *parent 
     this->CreateConnections();
   }
 
-  m_SelListener = berry::ISelectionListener::Pointer(new TbssSelListener(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
+
+
+  //m_SelListener = berry::ISelectionListener::Pointer(new TbssSelListener(this));
+  //this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  //berry::ISelection::ConstPointer sel(
+  //  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  //m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  //m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
 
   m_IsInitialized = false;
 
@@ -369,8 +482,8 @@ void QmitkTractbasedSpatialStatisticsView::Activated()
 
   berry::ISelection::ConstPointer sel(
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
+  //m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  //m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkTractbasedSpatialStatisticsView::Deactivated()
@@ -599,6 +712,8 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
 
 
   std::string name = "";
+
+  /*
   for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
     i != m_CurrentSelection->End(); ++i)
   {
@@ -618,6 +733,25 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
       }
     }
   }
+
+
+  */
+
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+
+  for ( int i=0; i<nodes.size(); i++ )
+  {
+    if(QString("Image").compare(nodes[i]->GetData()->GetNameOfClass())==0)
+    {
+      mitk::Image* img = static_cast<mitk::Image*>(nodes[i]->GetData());
+      if(img->GetDimension() == 4)
+      {
+        importer->SetImportVolume(img);
+        name = nodes[i]->GetName();
+      }
+    }
+  }
+
 
   mitk::TbssImage::Pointer tbssImage;
 
@@ -1278,13 +1412,14 @@ void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetNotAvailable()
   m_MultiWidget = NULL;
 }
 
+/*
 void QmitkTractbasedSpatialStatisticsView::AdjustPlotMeasure(const QString & text)
 {
   berry::ISelection::ConstPointer sel(
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
-}
+}*/
 
 void QmitkTractbasedSpatialStatisticsView::Clustering()
 {
@@ -1664,6 +1799,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
   mitk::Image::Pointer image;
 
+  /*
   for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
     i != m_CurrentSelection->End(); ++i)
   {
@@ -1680,6 +1816,21 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
           image = img;
         }
       }
+    }
+  }
+  */
+
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+
+  for ( int i=0; i<nodes.size(); i++ )
+  {
+    if(QString("Image").compare(nodes[i]->GetData()->GetNameOfClass())==0)
+    {
+        mitk::Image* img = static_cast<mitk::Image*>(nodes[i]->GetData());
+        if(img->GetDimension() == 3)
+        {
+          image = img;
+        }
     }
   }
 

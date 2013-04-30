@@ -128,7 +128,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void Clustering();
 
-    void AdjustPlotMeasure(const QString & text);
+    //void AdjustPlotMeasure(const QString & text);
 
     void Clicked(const QwtDoublePoint& pos);
 
@@ -159,8 +159,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
     void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
-    berry::ISelectionListener::Pointer m_SelListener;
-    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    //berry::ISelectionListener::Pointer m_SelListener;
+    //berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     bool m_IsInitialized;
 

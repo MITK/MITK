@@ -794,8 +794,8 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
     m_Controls.m_RedoTransformation->setEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->checkLandmarkError();
@@ -832,8 +832,8 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->checkLandmarkError();
@@ -1082,12 +1082,12 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
     }
 
     pointsGeometry->Compose(matrix);
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0);
     movingGeometry->Compose(matrix);
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();
@@ -1157,12 +1157,12 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
       return;
     }
     pointsGeometry->Compose(matrix);
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0);
     movingGeometry->Compose(matrix);
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();

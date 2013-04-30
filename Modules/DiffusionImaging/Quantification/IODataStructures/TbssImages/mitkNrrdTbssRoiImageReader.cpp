@@ -169,7 +169,7 @@ namespace mitk
       slicedGeometry->SetSpacing(spacing);
 
       // re-initialize TimeSlicedGeometry
-      static_cast<OutputType*>(this->GetOutput(0))->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
+      dynamic_cast<ProportionalTimeGeometry *>(static_cast<OutputType*>(this->GetOutput(0))->GetTimeGeometry())->Initialize(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
 
       buffer = NULL;
       MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetOutput(0))->GetPixelType().GetNumberOfComponents() << std::endl;

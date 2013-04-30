@@ -34,8 +34,10 @@ public:
   typedef itk::SmartPointer<Self>    Pointer;
 
   /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
+  itkFactorylessNewMacro(Self)
+  LightObject::Pointer CreateObject()
+  {
+    typename T::Pointer p = T::New();
     p->Register();
     return p.GetPointer();
   }
@@ -60,6 +62,25 @@ PlanarFigureWriterFactory::PlanarFigureWriterFactory()
 
 PlanarFigureWriterFactory::~PlanarFigureWriterFactory()
 {
+}
+
+itk::ObjectFactoryBase::Pointer PlanarFigureWriterFactory::GetInstance()
+{
+  static itk::ObjectFactoryBase::Pointer factory(mitk::PlanarFigureWriterFactory::New().GetPointer());
+  return factory;
+}
+
+void PlanarFigureWriterFactory::RegisterOneFactory(void)
+{
+  if ( GetInstance()->GetReferenceCount() == 1 )
+  {
+    ObjectFactoryBase::RegisterFactory( GetInstance().GetPointer() );
+  }
+}
+
+void PlanarFigureWriterFactory::UnRegisterOneFactory(void)
+{
+  ObjectFactoryBase::UnRegisterFactory( GetInstance().GetPointer() );
 }
 
 const char* PlanarFigureWriterFactory::GetITKSourceVersion() const

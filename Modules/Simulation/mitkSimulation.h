@@ -34,7 +34,7 @@ namespace mitk
    * Make sure to manually initilalize the SOFA simulation.
    *
    * SOFA can conceptionally handle only one simulation at a time, however, MITK %Simulation allows to load several simulation scenes in parallel.
-   * Therfore it is necessary and important to set a simulation as active simulation when using it.
+   * Therefore it is necessary to set a simulation as active simulation when using it.
    * You can do this either by calling SetAsActiveSimulation() or by calling the static SetActiveSimulation() method.
    *
    * You can take snapshots of simulations represented as 3D surfaces by calling TakeSnapshot() or easily record simulations as 3D+t surfaces by calling AppendSnapshot().

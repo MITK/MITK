@@ -42,13 +42,6 @@ namespace mitk
   class Simulation_EXPORT Simulation : public BaseData
   {
   public:
-    enum SimulationType
-    {
-      Tree,
-      DAG,
-      Bgl
-    };
-
     mitkClassMacro(Simulation, BaseData);
     itkNewMacro(Self);
 

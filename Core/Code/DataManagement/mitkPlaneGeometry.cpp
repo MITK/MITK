@@ -686,7 +686,7 @@ PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 }
 
 
-AffineGeometryFrame3D::Pointer
+Geometry3D::Pointer
 PlaneGeometry::Clone() const
 {
   Self::Pointer newGeometry = new PlaneGeometry(*this);

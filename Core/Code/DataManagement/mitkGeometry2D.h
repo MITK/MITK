@@ -226,7 +226,7 @@ public:
 
   virtual void SetExtentInMM(int direction, ScalarType extentInMM);
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual Geometry3D::Pointer Clone() const;
 
   /**
    * \brief Set the geometrical frame of reference in which this Geometry2D

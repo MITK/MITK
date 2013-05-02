@@ -156,9 +156,8 @@ mitk::TimeGeometry::Pointer mitk::ProportionalTimeGeometry::Clone() const
   newTimeGeometry->Expand(this->GetNumberOfTimeSteps());
   for (TimeStepType i =0; i < GetNumberOfTimeSteps(); ++i)
   {
-    AffineGeometryFrame3D::Pointer pointer = GetGeometryForTimeStep(i)->Clone();
-    Geometry3D* tempGeometry = dynamic_cast<Geometry3D*> (pointer.GetPointer());
-    newTimeGeometry->SetTimeStepGeometry(tempGeometry,i);
+    Geometry3D::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
+    newTimeGeometry->SetTimeStepGeometry(tempGeometry.GetPointer(),i);
   }
   TimeGeometry::Pointer finalPointer = dynamic_cast<TimeGeometry*>(newTimeGeometry.GetPointer());
   return finalPointer;
@@ -184,8 +183,8 @@ void mitk::ProportionalTimeGeometry::Initialize (Geometry3D * geometry, TimeStep
       timeBounds = geometry->GetTimeBounds();
     }
 
-    AffineGeometryFrame3D::Pointer clonedGeometry = geometry->Clone();
-    this->SetTimeStepGeometry(dynamic_cast<Geometry3D*> (clonedGeometry.GetPointer()), currentStep);
+    Geometry3D::Pointer clonedGeometry = geometry->Clone();
+    this->SetTimeStepGeometry(clonedGeometry.GetPointer(), currentStep);
     GetGeometryForTimeStep(currentStep)->SetTimeBounds(timeBounds);
   }
   }

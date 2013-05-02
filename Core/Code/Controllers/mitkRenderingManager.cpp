@@ -376,15 +376,15 @@ RenderingManager
     assert(modifiedGeometry.IsNotNull());
 
     // construct an affine transform from it
-    AffineGeometryFrame3D::TransformType::Pointer transform = AffineGeometryFrame3D::TransformType::New();
+    Geometry3D::TransformType::Pointer transform = Geometry3D::TransformType::New();
     assert( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform() );
     transform->SetMatrix( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetMatrix() );
     transform->SetOffset( modifiedGeometry->GetGeometryForTimeStep(0)->GetIndexToWorldTransform()->GetOffset() );
 
     // get transform matrix
-    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
-      const_cast< AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
-    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
+    Geometry3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
+      const_cast< Geometry3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
+    Geometry3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
 
     // get offset and bound
     Vector3D offset = modifiedGeometry->GetIndexToWorldTransform()->GetOffset();
@@ -453,7 +453,7 @@ RenderingManager
     modifiedGeometry->SetBounds(newBounds);
 
     // set new offset and direction matrix
-    AffineGeometryFrame3D::TransformType::MatrixType newMatrixITK( newMatrix );
+    Geometry3D::TransformType::MatrixType newMatrixITK( newMatrix );
     transform->SetMatrix( newMatrixITK );
     transform->SetOffset( offset );
     modifiedGeometry->SetIndexToWorldTransform( transform );

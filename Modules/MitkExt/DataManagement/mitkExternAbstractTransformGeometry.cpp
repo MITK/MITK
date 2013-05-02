@@ -52,7 +52,7 @@ void mitk::ExternAbstractTransformGeometry::SetParametricBounds(const BoundingBo
   }
 }
 
-mitk::AffineGeometryFrame3D::Pointer mitk::ExternAbstractTransformGeometry::Clone() const
+mitk::Geometry3D::Pointer mitk::ExternAbstractTransformGeometry::Clone() const
 {
   Self::Pointer newGeometry = new ExternAbstractTransformGeometry(*this);
   newGeometry->UnRegister();

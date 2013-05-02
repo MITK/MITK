@@ -798,8 +798,8 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
 {
   mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  AffineGeometryFrame3D::Pointer geometry3D = geometry.Clone();
-  timeGeometry->Initialize(dynamic_cast<Geometry3D*>(geometry3D.GetPointer()), tDim);
+  Geometry3D::Pointer geometry3D = geometry.Clone();
+  timeGeometry->Initialize(geometry3D.GetPointer(), tDim);
   this->Initialize(type, *timeGeometry, channels, tDim);
 }
 

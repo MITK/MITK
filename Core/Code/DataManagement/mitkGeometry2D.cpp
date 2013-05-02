@@ -247,7 +247,7 @@ mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
   return (pt3d_units[2] > m_BoundingBox->GetBounds()[4]);
 }
 
-mitk::AffineGeometryFrame3D::Pointer
+mitk::Geometry3D::Pointer
 mitk::Geometry2D::Clone() const
 {
   Self::Pointer newGeometry = new Geometry2D(*this);

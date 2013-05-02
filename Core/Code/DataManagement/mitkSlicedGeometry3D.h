@@ -170,7 +170,7 @@ public:
   virtual void SetDirectionVector(const mitk::Vector3D& directionVector);
   itkGetConstMacro(DirectionVector, const mitk::Vector3D&);
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const;
+  virtual Geometry3D::Pointer Clone() const;
 
   static const std::string SLICES;
   const static std::string DIRECTION_VECTOR;

@@ -399,7 +399,7 @@ public:
   virtual void SetBounds( const BoundingBox::BoundsArrayType &bounds );
 
 
-  AffineGeometryFrame3D::Pointer Clone() const;
+  Geometry3D::Pointer Clone() const;
 
 
   /** Implements operation to re-orient the plane */

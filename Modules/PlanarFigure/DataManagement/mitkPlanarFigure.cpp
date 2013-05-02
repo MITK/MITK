@@ -658,8 +658,8 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
   m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
 
   //copy geometry 2D of planar figure
-  AffineGeometryFrame3D::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
-  SetGeometry2D((mitk::Geometry2D*)affineGeometry.GetPointer());
+  Geometry3D::Pointer affineGeometry = oldFigure->m_Geometry2D->Clone();
+  SetGeometry2D(dynamic_cast<mitk::Geometry2D*>(affineGeometry.GetPointer()));
 
   for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
   {

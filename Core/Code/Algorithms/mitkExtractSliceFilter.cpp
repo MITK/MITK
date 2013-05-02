@@ -409,7 +409,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     //set the geometry from current worldgeometry for the reusultimage
     //this is needed that the image has the correct mitk geometry
     //the originalGeometry is the Geometry of the result slice
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
+    Geometry3D::Pointer originalGeometryAGF = m_WorldGeometry->Clone();
     Geometry2D::Pointer originalGeometry = dynamic_cast<Geometry2D*>( originalGeometryAGF.GetPointer() );
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());

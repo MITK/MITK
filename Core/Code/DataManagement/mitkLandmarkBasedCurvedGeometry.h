@@ -42,7 +42,7 @@ public:
 
   virtual void ComputeGeometry() = 0;
 
-  virtual AffineGeometryFrame3D::Pointer Clone() const = 0;
+  virtual Geometry3D::Pointer Clone() const = 0;
 
 protected:
   LandmarkBasedCurvedGeometry();

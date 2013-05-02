@@ -117,7 +117,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     {
       // Let the output use the input geometry to appropriately transform the
       // coordinate system.
-      mitk::AffineGeometryFrame3D::TransformType *affineTransform =
+      mitk::Geometry3D::TransformType *affineTransform =
         planeGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();
@@ -302,7 +302,7 @@ void mitk::Geometry2DDataToSurfaceFilter::GenerateOutputInformation()
     {
       // Let the output use the input geometry to appropriately transform the
       // coordinate system.
-      mitk::AffineGeometryFrame3D::TransformType *affineTransform =
+      mitk::Geometry3D::TransformType *affineTransform =
         abstractGeometry->GetIndexToWorldTransform();
 
       TimeGeometry *timeGeometry = output->GetTimeGeometry();

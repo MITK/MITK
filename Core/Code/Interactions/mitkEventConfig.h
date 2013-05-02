@@ -60,13 +60,59 @@ namespace mitk
      * @brief Construct an EventConfig object based on a XML configuration file.
      *
      * Uses the specified resource file containing an XML event configuration to
-     * construct a EventConfig object. If the resource is invalid, the created
+     * construct an EventConfig object. If the resource is invalid, the created
      * EventConfig object will also be invalid.
      *
      * @param filename The resource name relative to the Interactions resource folder.
      * @param module
      */
     EventConfig(const std::string& filename, const Module* module = NULL);
+
+    /**
+     * @brief Construct an EventConfig object based on a XML configuration file.
+     *
+     * Uses the specified istream refering to a file containing an XML event configuration to
+     * construct an EventConfig object. If the resource is invalid, the created
+     * EventConfig object will also be invalid.
+     *
+     * @param inputStream std::ifstream to XML configuration file
+     */
+    EventConfig(std::istream &inputStream);
+
+    /**
+     * @brief Construct an EventConfig object based on a vector of mitk::PropertyLists
+     *
+     * Constructs the EventObject based on a description provided by vector of property values, where each mitk::PropertyList describes
+     * one Event.
+     * <b> Example </b>
+     \code
+      #include "mitkPropertyList.h"
+      #include "mitkInteractionEventConst.h"
+      #include "mitkEventConfig.h"
+
+      // First event
+      mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
+      // Setting the EventClass property to 'MousePressEvent'
+      propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MousePressEvent");
+      // Setting the Event variant value to 'MousePressEventVariantÄ
+      propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MousePressEventVariant");
+      // set control and alt buttons as modifiers
+      propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
+      // Second event
+      mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
+      propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass.c_str(), "MouseReleaseEvent");
+      propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant.c_str(), "MouseReleaseEventVariant");
+      propertyList2->SetStringProperty("Modifiers","SHIFT");
+
+      // putting both descriptions in a vector
+      std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();
+      configDescription->push_back(propertyList1);
+      configDescription->push_back(propertyList2);
+      // create the config object
+      mitk::EventConfig newConfig(configDescription);
+     \endcode
+     */
+    EventConfig(const std::vector<PropertyList::Pointer>& configDescription );
 
     EventConfig& operator=(const EventConfig& other);
 

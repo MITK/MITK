@@ -27,24 +27,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
+: m_PlanarFigureIOFactory(PlanarFigureIOFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if ( !alreadyDone )
   {
     RegisterIOFactories();
 
-    itk::ObjectFactoryBase::RegisterFactory( PlanarFigureIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( m_PlanarFigureIOFactory );
 
     PlanarFigureWriterFactory::RegisterOneFactory();
 
     m_FileWriters.push_back( PlanarFigureWriter::New().GetPointer() );
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
-
     CreateFileExtensionsMap();
 
     alreadyDone = true;
   }
+}
+
+mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
+{
+  PlanarFigureWriterFactory::UnRegisterOneFactory();
+  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
@@ -89,7 +94,7 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 const char* mitk::PlanarFigureObjectFactory::GetFileExtensions()
 {
   return "";
-};
+}
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetFileExtensionsMap()
 {

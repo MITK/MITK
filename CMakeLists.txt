@@ -446,7 +446,7 @@ if(NOT MSVC_VERSION)
     #-Wsign-promo
     -fdiagnostics-show-option
     )
-    mitkFunctionCheckCompilerFlags2(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
+    mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)
   endforeach()
 endif()
 
@@ -464,7 +464,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
   # Doing so should allow to build package made for distribution using older linux distro.
   if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    mitkFunctionCheckCompilerFlags2("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
+    mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
   endif()
   if(MINGW)
     # suppress warnings about auto imported symbols

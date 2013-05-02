@@ -35,19 +35,13 @@ public:
   virtual const char* GetDescription(void) const;
 
   /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
+  itkFactorylessNewMacro(Self)
 
   /** Register one factory of this type  */
-  static void RegisterOneFactory(void)
-  {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
-    {
-      PlanarFigureWriterFactory::Pointer pfwf = PlanarFigureWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( pfwf );
-      IsRegistered = true;
-    }
-  }
+  static void RegisterOneFactory(void);
+
+  /** UnRegister one factory of this type  */
+  static void UnRegisterOneFactory(void);
 
 protected:
   PlanarFigureWriterFactory();
@@ -57,6 +51,7 @@ private:
   PlanarFigureWriterFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+  static itk::ObjectFactoryBase::Pointer GetInstance();
 };
 
 } // end namespace mitk

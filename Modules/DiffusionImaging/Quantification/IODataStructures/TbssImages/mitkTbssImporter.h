@@ -101,5 +101,4 @@ namespace mitk
 
 }
 
-//#include "mitkTbssImporter.cpp"
 #endif // __mitkTbssImporter_h

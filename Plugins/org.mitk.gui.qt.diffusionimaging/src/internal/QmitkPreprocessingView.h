@@ -81,10 +81,14 @@ protected slots:
   void DoReduceGradientDirections();
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
+  void DoAdcAverage();
+  void UpdateDwiBValueMapRounder(int i);
 
 protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
   void DoExtractBOWithoutAveraging();
+
+  void UpdateBValueTableWidget();
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );

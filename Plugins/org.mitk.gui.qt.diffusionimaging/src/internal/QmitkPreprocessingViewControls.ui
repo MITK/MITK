@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1080</height>
+    <height>1114</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -67,8 +67,8 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
-       <widget class="QTableWidget" name="m_BvalueTable">
+      <item row="1" column="0">
+       <widget class="QTableWidget" name="m_B_ValueMap_TableWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -108,20 +108,23 @@
         </column>
        </widget>
       </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="0" column="0">
+       <widget class="QSpinBox" name="m_B_ValueMap_Rounder_SpinBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This rounder allowes you to manipulate &lt;a name=&quot;result_box&quot;/&gt;the classification of the b-Values to the corresponding shells. But is not manipulating the original b-Values or data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="minimum">
+         <number>1</number>
         </property>
-       </spacer>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>10</number>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
         <property name="enabled">
          <bool>false</bool>
@@ -139,6 +142,19 @@
          <string>Show gradients</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1" rowspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -212,16 +228,7 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QFormLayout" name="formLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <item row="0" column="1">
@@ -303,16 +310,7 @@
          <enum>QFrame::Raised</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
+         <property name="margin">
           <number>0</number>
          </property>
          <property name="spacing">

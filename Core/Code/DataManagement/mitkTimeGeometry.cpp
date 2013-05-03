@@ -151,3 +151,16 @@ void mitk::TimeGeometry::ExecuteOperation(mitk::Operation* op)
     GetGeometryForTimeStep(step)->ExecuteOperation(op);
   }
 }
+
+void mitk::TimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+{
+  //Superclass::PrintSelf(os,indent);
+  os << indent << " TimeSteps: " << this->GetNumberOfTimeSteps() << std::endl;
+
+  os << std::endl;
+  os << indent << " GetGeometryForTimeStep(0): ";
+  if(GetGeometryForTimeStep(0)==NULL)
+    os << "NULL" << std::endl;
+  else
+    GetGeometryForTimeStep(0)->Print(os, indent);
+}

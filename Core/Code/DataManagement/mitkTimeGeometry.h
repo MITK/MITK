@@ -225,6 +225,8 @@ namespace mitk {
     */
     virtual void ExecuteOperation(Operation *op);
 
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
   }; // end class TimeGeometry
 
 } // end namespace MITK

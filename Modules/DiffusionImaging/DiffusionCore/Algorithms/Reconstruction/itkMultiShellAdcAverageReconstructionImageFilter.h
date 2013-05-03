@@ -70,8 +70,9 @@ namespace itk
     itkGetMacro(TargetGradientDirections, GradientDirectionContainerType::Pointer)
     itkGetMacro(TargetBValue, float)
 
-    itkGetMacro(BValue,float)
-    itkSetMacro(BValue,float)
+    itkGetMacro(BValue, double)
+    itkSetMacro(BValue, double)
+
     inline void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
 
   protected:

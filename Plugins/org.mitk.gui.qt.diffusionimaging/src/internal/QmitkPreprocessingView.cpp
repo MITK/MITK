@@ -189,7 +189,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_ShowGradientsButton->setEnabled(foundDwiVolume);
     m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
     m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
-
+    m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
 
     foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
     {

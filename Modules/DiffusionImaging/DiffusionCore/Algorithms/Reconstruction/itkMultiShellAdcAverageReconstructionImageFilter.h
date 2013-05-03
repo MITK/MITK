@@ -68,7 +68,8 @@ namespace itk
     itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
 
     itkGetMacro(TargetGradientDirections, GradientDirectionContainerType::Pointer)
-    itkGetMacro(TargetBValue, float)
+
+    itkGetMacro(TargetBValue, double)
 
     itkGetMacro(BValue, double)
     itkSetMacro(BValue, double)
@@ -104,7 +105,7 @@ namespace itk
 
     unsigned int m_allDirectionsSize;
 
-    };
+   };
 
 
 } // end of namespace

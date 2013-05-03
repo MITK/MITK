@@ -73,6 +73,22 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapp
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 )
+#Test reslice interpolation
+#note: nearest mode is already tested by swivel test
+mitkAddCustomModuleTest(ResliceInterpolationIsLinear mitkImageVtkMapper2DResliceInterpolationPropertyTest
+                        1 #linear
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefLinear.png #corresponding reference screenshot LINEAR
+)
+
+mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceInterpolationPropertyTest
+                        3 #cubic
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefCubic.png #corresponding reference screenshot CUBIC
+)
+#End test reslice interpolation
 
 # Testing of the rendering of binary images
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice

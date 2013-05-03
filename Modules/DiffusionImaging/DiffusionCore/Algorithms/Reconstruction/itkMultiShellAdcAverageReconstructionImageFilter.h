@@ -69,12 +69,12 @@ namespace itk
 
     GradientDirectionContainerType::Pointer GetTargetGradientDirections(){return m_TargetGradientDirections;}
 
-    double GetTargetBValue(){return m_TargetBValue;}
+    double GetTargetB_Value(){return m_TargetB_Value;}
 
-    double GetBValue(){return m_BValue;}
-    void SetBValue(double val){m_BValue = val;}
+    double GetB_Value(){return m_B_Value;}
+    void SetB_Value(double val){m_B_Value = val;}
 
-    void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
+    void SetOriginalBValueMap(BValueMap inp){m_B_ValueMap = inp;}
 
   protected:
     MultiShellAdcAverageReconstructionImageFilter();
@@ -91,10 +91,10 @@ namespace itk
     GradientDirectionContainerType::Pointer m_TargetGradientDirections;   ///< container for the subsampled output gradient directions
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions
 
-    BValueMap m_BValueMap;
-    double m_BValue;
+    BValueMap m_B_ValueMap;
+    double m_B_Value;
 
-    double m_TargetBValue;
+    double m_TargetB_Value;
 
     std::vector<double> m_WeightsVector;
 

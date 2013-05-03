@@ -170,7 +170,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
   MITK_INFO << "Input:" << std::endl << std::endl
             << "    GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
             << "    Shells: " << (m_B_ValueMap.size() - 1) << std::endl
-            << "    ReferenceImages: " << m_B_ValueMap.at(0.0).size() << std::endl;
+            << "    ReferenceImages: " << m_B_ValueMap[0.0].size() << std::endl;
 
   MITK_INFO << "Output:" << std::endl << std::endl
             << "    OutImageVectorLength: " << outImage->GetVectorLength() << std::endl

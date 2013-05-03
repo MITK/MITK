@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
+#include <itkMultiShellAdcAverageReconstructionImageFilter.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -115,9 +116,49 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
+        connect( (QObject*)(m_Controls->m_AdcAverage), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
+
 
     }
 }
+
+void QmitkPreprocessingView::DoAdcAverage()
+{
+  if (m_DiffusionImage.IsNull())
+      return;
+
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef itk::MultiShellAdcAverageReconstructionImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  typedef DiffusionImageType::BValueMap BValueMap;
+
+  BValueMap originalShellMap = m_DiffusionImage->GetB_ValueMap();
+
+  GradientDirectionContainerType::Pointer gradientContainer = m_DiffusionImage->GetDirections();
+
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(m_DiffusionImage->GetVectorImage());
+  filter->SetOriginalGradientDirections(gradientContainer);
+  filter->SetOriginalBValueMap(originalShellMap);
+  filter->SetBValue(m_DiffusionImage->GetB_Value());
+  filter->Update();
+
+  DiffusionImageType::Pointer image = DiffusionImageType::New();
+  image->SetVectorImage( filter->GetOutput() );
+  image->SetB_Value( filter->GetTargetBValue() );
+  //image->SetOriginalDirections( filter->GetTargetGradientDirections() );
+  image->SetDirections( filter->GetTargetGradientDirections() );
+  //image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
+  image->InitializeFromVectorImage();
+
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData( image );
+  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+
+  imageNode->SetName((name+"_averaged").toStdString().c_str());
+  GetDefaultDataStorage()->Add(imageNode);
+
+}
+
 
 void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
@@ -148,7 +189,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_ShowGradientsButton->setEnabled(foundDwiVolume);
     m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
     m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
-
+    m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
 
     foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
     {

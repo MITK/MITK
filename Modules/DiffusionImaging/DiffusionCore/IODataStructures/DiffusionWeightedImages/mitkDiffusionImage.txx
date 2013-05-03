@@ -368,7 +368,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
   {
     float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
-    double rounded = int((currentBvalue+7.5)/10)*10;
+    double rounded = int((currentBvalue+7.5)/100)*100;
     m_B_ValueMap[rounded].push_back(gdcit.Index());
   }
 

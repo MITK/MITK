@@ -99,10 +99,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnSetupNavigation();
     /**
-    \brief This method performs the visualisation of all NavigationDatas and performs the PointSet recording if activated.
-    */
-    void RenderScene();
-    /**
     \brief This method reacts on toolbox item changes.
     */
     void OnToolBoxCurrentChanged(int index);
@@ -121,7 +117,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     /**
     \brief This method activates the virtual camera.
     */
-    void OnVirtualCamera(int toolNr, bool on);
+    void OnVirtualCamera(bool on);
     /**
     \brief This method activates the permanent registration based on one tool's position.
     */
@@ -167,14 +163,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method destroys the filter pipeline.
     */
     void DestroyIGTPipeline();
-    /**
-    \brief This method starts the continuos update of the tracking device and the rendering.
-    */
-    void StartContinuousUpdate();
-    /**
-    \brief This method stops the continuos update of the tracking device and the rendering.
-    */
-    void StopContinuousUpdate();
+
 
     /**
     \brief This method creates a DataNode for fiducial PointSets.
@@ -192,12 +181,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method destroys the instrument visualization.
     */
     void DestroyInstrumentVisualization(mitk::DataStorage* ds, mitk::TrackingDevice::Pointer tracker);
-
-    /**
-    \brief This method creates a widget with all input objects needed for the PointSet recording.
-    */
-    QWidget* CreatePointSetRecordingWidget(QWidget* parent);
-
     /**
     \brief This method returns a PointSet with three vritual points transformed from the position and orientation of the given NavigationData. This method is needed to calculate the source points for permanent registration from one tool's position.
     */
@@ -221,22 +204,19 @@ private:
   QTimer* m_Timer;
 
   QToolBox* m_ToolBox;
-  QComboBox* m_PSRecToolSelectionComboBox;
-  QSpinBox* m_PSRecordingSpinBox;
-  QPushButton* m_PointSetRecordPushButton;
 
   mitk::PointSet::Pointer m_PSRecordingPointSet;
 
   QmitkNDIConfigurationWidget* m_NDIConfigWidget;  // tracking device configuration widget
   QmitkFiducialRegistrationWidget* m_RegistrationWidget; // landmark registration widget
-  QmitkUpdateTimerWidget* m_RenderingTimerWidget; // update timer widget for rendering and updating
-  QmitkToolTrackingStatusWidget* m_ToolStatusWidget; // tracking status visualizer widget
 
   std::string m_RegistrationTrackingFiducialsName;
   std::string m_RegistrationImageFiducialsName;
 
   std::string m_PointSetRecordingDataNodeName;
   bool m_PointSetRecording;
+  bool m_PermanentRegistration;
+  bool m_CameraView;
 
   mitk::DataNode::Pointer m_ImageFiducialsDataNode;
   mitk::DataNode::Pointer m_TrackerFiducialsDataNode;
@@ -251,6 +231,7 @@ private:
 
   mitk::NavigationData::Pointer m_InstrumentNavigationData;
   mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
+  mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

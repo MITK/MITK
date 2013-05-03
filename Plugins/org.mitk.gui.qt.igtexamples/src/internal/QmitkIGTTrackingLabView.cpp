@@ -104,9 +104,7 @@ void QmitkIGTTrackingLabView::CreateConnections()
 {
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(UpdateTimer()));
-
   connect( m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnToolBoxCurrentChanged(int)) );
-
   connect( m_Controls.m_UsePermanentRegistrationToggle, SIGNAL(toggled(bool)), this, SLOT(OnPermanentRegistration(bool)) );
   connect( m_Controls.m_TrackingDeviceSelectionWidget, SIGNAL(NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer)), this, SLOT(OnSetupNavigation()) );
   connect( m_Controls.m_UseAsPointerButton, SIGNAL(clicked()), this, SLOT(OnInstrumentSelected()) );
@@ -114,13 +112,10 @@ void QmitkIGTTrackingLabView::CreateConnections()
   connect( m_RegistrationWidget, SIGNAL(AddedTrackingFiducial()), this, SLOT(OnAddRegistrationTrackingFiducial()) );
   connect( m_RegistrationWidget, SIGNAL(PerformFiducialRegistration()), this, SLOT(OnRegisterFiducials()) );
 
-
   //initialize Combo Box
   m_Controls.m_ObjectComboBox->SetDataStorage(this->GetDataStorage());
-  //m_Controls.m_ObjectComboBox->SetAutoSelectNewItems(false);
-  //m_Controls->m_ObjectComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
-
-
+  m_Controls.m_ObjectComboBox->SetAutoSelectNewItems(false);
+  m_Controls.m_ObjectComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 }
 
 void QmitkIGTTrackingLabView::UpdateTimer()
@@ -134,7 +129,10 @@ void QmitkIGTTrackingLabView::OnAddRegistrationTrackingFiducial()
   mitk::NavigationData::Pointer nd = m_InstrumentNavigationData;
 
   if( nd.IsNull() || !nd->IsDataValid())
+  {
     QMessageBox::warning( 0, "Invalid tracking data", "Navigation data is not available or invalid!", QMessageBox::Ok );
+    return;
+  }
 
   if(m_TrackerFiducialsDataNode.IsNotNull() && m_TrackerFiducialsDataNode->GetData() != NULL)
   {
@@ -234,41 +232,23 @@ void QmitkIGTTrackingLabView::InitializeFilters()
 
 }
 
-void QmitkIGTTrackingLabView::OnRegisterFiducials( )
+void QmitkIGTTrackingLabView::OnRegisterFiducials()
 {
+  //Check for initialization
+  if (!CheckRegistrationInitialization()) return;
+
   /* retrieve fiducials from data storage */
   mitk::DataStorage* ds = this->GetDefaultDataStorage();
-
-
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
-
-  if (imageFiducials.IsNull() || trackerFiducials.IsNull())
-  {
-    QMessageBox::warning(NULL, "Registration not possible", "Fiducial data objects not found. \n"
-      "Please set 3 or more fiducials in the image and with the tracking system.\n\n"
-      "Registration is not possible");
-    return;
-  }
-
-  unsigned int minFiducialCount = 3; // \Todo: move to view option
-  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
-  {
-    QMessageBox::warning(NULL, "Registration not possible", QString("Not enough fiducial pairs found. At least %1 fiducial must "
-      "exist for the image and the tracking system respectively.\n"
-      "Currently, %2 fiducials exist for the image, %3 fiducials exist for the tracking system").arg(minFiducialCount).arg(imageFiducials->GetSize()).arg(trackerFiducials->GetSize()));
-    return;
-  }
 
   //convert point sets to vtk poly data
   vtkSmartPointer<vtkPoints> sourcePoints = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
-
   for (int i=0; i<imageFiducials->GetSize(); i++)
     {
     double point[3] = {imageFiducials->GetPoint(i)[0],imageFiducials->GetPoint(i)[1],imageFiducials->GetPoint(i)[2]};
     sourcePoints->InsertNextPoint(point);
-
     double point_targets[3] = {trackerFiducials->GetPoint(i)[0],trackerFiducials->GetPoint(i)[1],trackerFiducials->GetPoint(i)[2]};
     targetPoints->InsertNextPoint(point_targets);
     }
@@ -701,13 +681,49 @@ void QmitkIGTTrackingLabView::OnVirtualCamera(int toolNr, bool on)
 
 }
 
+bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
+{
+  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
+  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
+
+  if (m_Controls.m_ObjectComboBox->GetSelectedNode().IsNull())
+  {
+    QMessageBox::warning(NULL, "Registration not possible", "No object selected for registration.\nRegistration is not possible");
+    return false;
+  }
+
+  if (imageFiducials.IsNull() || trackerFiducials.IsNull())
+  {
+    QMessageBox::warning(NULL, "Registration not possible", "Fiducial data objects not found. \n"
+      "Please set 3 or more fiducials in the image and with the tracking system.\n\n"
+      "Registration is not possible");
+    return false;
+  }
+
+  unsigned int minFiducialCount = 3; // \Todo: move to view option
+  if ((imageFiducials->GetSize() < minFiducialCount) || (trackerFiducials->GetSize() < minFiducialCount) || (imageFiducials->GetSize() != trackerFiducials->GetSize()))
+  {
+    QMessageBox::warning(NULL, "Registration not possible", QString("Not enough fiducial pairs found. At least %1 fiducial must "
+      "exist for the image and the tracking system respectively.\n"
+      "Currently, %2 fiducials exist for the image, %3 fiducials exist for the tracking system").arg(minFiducialCount).arg(imageFiducials->GetSize()).arg(trackerFiducials->GetSize()));
+    return false;
+  }
+
+  return true;
+}
+
 
 void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 {
   MITK_INFO << "Permanent registration" << on;
   if(on)
     {
-
+    if(!CheckRegistrationInitialization())
+    {
+      m_Controls.m_UsePermanentRegistrationToggle->setChecked(false);
+      return;
+    }
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
 
     //connect filter to source
@@ -746,7 +762,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
   else
     {
     //stop timer
-      m_Timer->stop();
+    if (m_Timer->isActive()) m_Timer->stop();
 
     //delete filter
     m_PermanentRegistrationFilter = NULL;

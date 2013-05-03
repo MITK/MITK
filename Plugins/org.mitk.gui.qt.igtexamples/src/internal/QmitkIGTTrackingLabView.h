@@ -212,6 +212,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
 
     mitk::Vector3D  m_DirectionOfProjectionVector;///< vector for direction of projection of instruments
 
+    bool CheckRegistrationInitialization();///< Checks if everything is initialized for registration. Gives error messages and returns false if not.
+
 
 
 private:

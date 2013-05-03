@@ -341,6 +341,13 @@ void QmitkImageNavigatorView::OnRefetch()
   if (m_IRenderWindowPart)
   {
     mitk::Geometry3D::ConstPointer geometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
+    mitk::TimeGeometry::ConstPointer timeGeometry = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+
+    if (geometry.IsNull() && timeGeometry.IsNotNull())
+    {
+      mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
+      geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+    }
 
     if (geometry.IsNotNull())
     {

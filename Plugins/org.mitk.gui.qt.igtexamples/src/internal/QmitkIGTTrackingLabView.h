@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
+#include <QTimer>
 
 class QmitkNDIConfigurationWidget;
 class QmitkFiducialRegistrationWidget;
@@ -78,6 +79,9 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     virtual void CreateQtPartControl(QWidget *parent);
 
   protected slots:
+
+    void UpdateTimer();
+
     /**
     \brief This method adds a new fiducial to the tracker fiducials PointSet.
     */
@@ -95,29 +99,9 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnSetupNavigation();
     /**
-    \brief This method changes the name of a specific tool.
-    */
-    void OnChangeToolName(int index, QString name);
-    /**
-    \brief This method creates the surface representation for a tool loaded from file.
-    */
-    void OnToolLoaded(int index, mitk::DataNode::Pointer toolNode);
-    /**
-    \brief This method starts the navigation.
-    */
-    void OnStartNavigation();
-    /**
-    \brief This method stops the navigation.
-    */
-    void OnStopNavigation();
-    /**
     \brief This method performs the visualisation of all NavigationDatas and performs the PointSet recording if activated.
     */
     void RenderScene();
-    /**
-    \brief This method should be called if new tools have been added to the tracking device.
-    */
-    void OnToolsAdded(QStringList toolsList);
     /**
     \brief This method reacts on toolbox item changes.
     */
@@ -141,7 +125,12 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     /**
     \brief This method activates the permanent registration based on one tool's position.
     */
-    void OnPermanentRegistration(int toolID, bool on);
+    void OnPermanentRegistration(bool on);
+
+    void OnInstrumentSelected();
+
+    void OnObjectmarkerSelected();
+
 
 
   protected:
@@ -216,8 +205,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
 
 
     mitk::TrackingDeviceSource::Pointer m_Source; ///< source that connects to the tracking device
-    mitk::NavigationDataLandmarkTransformFilter::Pointer m_FiducialRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates
-    mitk::NavigationDataLandmarkTransformFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
+
+    mitk::NavigationDataObjectVisualizationFilter::Pointer m_PermanentRegistrationFilter; ///< this filter transforms from tracking coordinates into mitk world coordinates if needed it is interconnected before the FiducialEegistrationFilter
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter
     mitk::CameraVisualization::Pointer m_VirtualView; ///< filter to update the vtk camera according to the reference navigation data
 
@@ -226,6 +215,8 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
 
 
 private:
+
+  QTimer* m_Timer;
 
   QToolBox* m_ToolBox;
   QComboBox* m_PSRecToolSelectionComboBox;
@@ -255,6 +246,9 @@ private:
   mitk::NavigationData::OrientationType m_PermanentRegistrationInitialOrientation;
 
   mitk::PointSet::Pointer m_PermanentRegistrationSourcePoints;
+
+  mitk::NavigationData::Pointer m_InstrumentNavigationData;
+  mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

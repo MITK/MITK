@@ -69,6 +69,7 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
         //reset everything
         m_CurrentSource = NULL;
         m_CurrentStorage = NULL;
+        emit NavigationDataSourceSelected(m_CurrentSource);
         return;
       }
 
@@ -98,6 +99,8 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
       MITK_WARN << "Found a tool storage, but it has not the same number of tools like the NavigationDataSource. This storage won't be used because it isn't the right one.";
       m_CurrentStorage = NULL;
       }
+
+    emit NavigationDataSourceSelected(m_CurrentSource);
   }
 
 mitk::NavigationDataSource::Pointer QmitkNavigationDataSourceSelectionWidget::GetSelectedNavigationDataSource()

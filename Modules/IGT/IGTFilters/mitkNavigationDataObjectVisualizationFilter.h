@@ -80,6 +80,14 @@ namespace mitk {
     virtual void TransformOrientationOn(unsigned int index);  ///< sets the TransformOrientation flag to true for the given index
     virtual void TransformOrientationOff(unsigned int index); ///< sets the TransformOrientation flag to false for the given index
 
+    /** @brief Defines an offset for a representation object. This offset is applied before the object is visualized.
+     *         If no offset is given, no offset will be used. To deactivate the offset just set it to NULL.
+     */
+    void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);
+
+    /** @return Returns the offset of a represenation object. Returns NULL if there is no offset. */
+    mitk::AffineTransform3D::Pointer GetOffset(int index);
+
     /**
     *\brief Get the number of added BaseData associated to NavigationData
     * \return Returns the size of the internal map
@@ -97,6 +105,7 @@ namespace mitk {
 
   protected:
     typedef std::map<itk::ProcessObject::DataObjectPointerArraySizeType, bool> BooleanInputMap;
+    typedef std::map<unsigned int, mitk::AffineTransform3D::Pointer> OffsetPointerMap;
 
     /**
     * \brief Constructor
@@ -114,6 +123,7 @@ namespace mitk {
     RepresentationPointerMap m_RepresentationList;
     BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
+    OffsetPointerMap m_OffsetList;
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */

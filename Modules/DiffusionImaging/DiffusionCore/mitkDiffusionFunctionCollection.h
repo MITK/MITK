@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "DiffusionCoreExports.h"
-#include "vector.h"
-#include "map.h"
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
 #include "itkVectorContainer.h"

@@ -37,7 +37,7 @@ namespace itk
     typedef MultiShellAdcAverageReconstructionImageFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< itk::VectorImage<TOutputScalarType,3>, itk::VectorImage<TOutputScalarType,3> > Superclass;
+    typedef ImageToImageFilter< itk::VectorImage<TInputScalarType,3>, itk::VectorImage<TOutputScalarType,3> > Superclass;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
     /** Method for creation through the object factory. */
@@ -64,17 +64,17 @@ namespace itk
     typedef std::vector<unsigned int>           IndicesVector;
     typedef std::map<double, IndicesVector>     BValueMap;
 
-    itkGetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
-    itkSetMacro(OriginalGradientDirections, GradientDirectionContainerType::Pointer)
+    GradientDirectionContainerType::Pointer GetOriginalGradientDirections(){return m_OriginalGradientDirections;}
+    void SetOriginalGradientDirections(GradientDirectionContainerType::Pointer ptr){m_OriginalGradientDirections = ptr;}
 
-    itkGetMacro(TargetGradientDirections, GradientDirectionContainerType::Pointer)
+    GradientDirectionContainerType::Pointer GetTargetGradientDirections(){return m_TargetGradientDirections;}
 
-    itkGetMacro(TargetBValue, double)
+    double GetTargetBValue(){return m_TargetBValue;}
 
-    itkGetMacro(BValue, double)
-    itkSetMacro(BValue, double)
+    double GetBValue(){return m_BValue;}
+    void SetBValue(double val){m_BValue = val;}
 
-    inline void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
+    void SetOriginalBValueMap(BValueMap inp){m_BValueMap = inp;}
 
   protected:
     MultiShellAdcAverageReconstructionImageFilter();

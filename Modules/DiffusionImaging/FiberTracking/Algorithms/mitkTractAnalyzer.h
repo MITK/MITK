@@ -52,25 +52,6 @@ public:
 
 
 
-  /*
-  void SetSkeleton(CharImageType::Pointer skeleton)
-  {
-    m_Skeleton = skeleton;
-  }
-
-  void SetMeanSkeleton(FloatImageType::Pointer i)
-  {
-    m_MeanSkeleton = i;
-  }*/
-
-
-  /* Unused method - would introduce circular dependency to the new module structure
-   * of the diffusion imaging
-  void SetTbssImage(mitk::TbssImage::Pointer tbssImg)
-  {
-    m_TbssImage = tbssImg;
-  }*/
-
   void SetProjections(ProjectionsImageType::Pointer projections)
   {
     m_Projections = projections;
@@ -125,11 +106,8 @@ public:
 protected:
 
 
-  //CharImageType::Pointer m_Skeleton;
   CharImageType::Pointer m_RoiImg;
   ProjectionsImageType::Pointer m_Projections;
-  //FloatImageType::Pointer m_MeanSkeleton;
-  //mitk::TbssImage::Pointer m_TbssImage;
 
   mitk::Image::Pointer m_InputImage;
 

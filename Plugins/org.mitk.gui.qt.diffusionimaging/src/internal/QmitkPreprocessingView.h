@@ -83,6 +83,7 @@ protected slots:
   void DoHalfSphereGradientDirections();
   void DoAdcAverage();
   void UpdateDwiBValueMapRounder(int i);
+  void DoLengthCorrection();
 
 protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */

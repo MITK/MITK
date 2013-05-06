@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1114</height>
+    <height>1149</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -67,6 +67,25 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="2" column="0">
+       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Show gradients</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QTableWidget" name="m_B_ValueMap_TableWidget">
         <property name="sizePolicy">
@@ -108,6 +127,19 @@
         </column>
        </widget>
       </item>
+      <item row="0" column="2" rowspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item row="0" column="0">
        <widget class="QSpinBox" name="m_B_ValueMap_Rounder_SpinBox">
         <property name="toolTip">
@@ -124,37 +156,12 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
+      <item row="0" column="1">
+       <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
         <property name="text">
-         <string>Show gradients</string>
+         <string>Create Corrected Diffusion Image</string>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1" rowspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>

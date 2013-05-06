@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
 #include <itkMultiShellAdcAverageReconstructionImageFilter.h>
+#include <itkDwiGradientLengthCorrectionFilter.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -118,11 +119,37 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
     connect( (QObject*)(m_Controls->m_AdcAverage), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
     connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
-
-
+    connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
   }
 }
 
+void QmitkPreprocessingView::DoLengthCorrection()
+{
+  if (m_DiffusionImage.IsNull())
+    return;
+
+  typedef mitk::DiffusionImage<DiffusionPixelType>  DiffusionImageType;
+  typedef itk::DwiGradientLengthCorrectionFilter  FilterType;
+
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetRoundingValue( m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
+  filter->SetReferenceBValue(m_DiffusionImage->GetB_Value());
+  filter->SetReferenceGradientDirectionContainer(m_DiffusionImage->GetDirections());
+  filter->Update();
+
+  DiffusionImageType::Pointer image = DiffusionImageType::New();
+  image->SetVectorImage( m_DiffusionImage->GetVectorImage());
+  image->SetB_Value( m_DiffusionImage->GetB_Value() );
+  image->SetDirections( filter->GetOutputGradientDirectionContainer());
+  image->InitializeFromVectorImage();
+
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData( image );
+  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+
+  imageNode->SetName((name+"_rounded").toStdString().c_str());
+  GetDefaultDataStorage()->Add(imageNode);
+}
 
 void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
 {
@@ -150,12 +177,12 @@ void QmitkPreprocessingView::DoAdcAverage()
   filter->SetInput(m_DiffusionImage->GetVectorImage());
   filter->SetOriginalGradientDirections(gradientContainer);
   filter->SetOriginalBValueMap(originalShellMap);
-  filter->SetBValue(m_DiffusionImage->GetB_Value());
+  filter->SetB_Value(m_DiffusionImage->GetB_Value());
   filter->Update();
 
   DiffusionImageType::Pointer image = DiffusionImageType::New();
   image->SetVectorImage( filter->GetOutput() );
-  image->SetB_Value( filter->GetTargetBValue() );
+  image->SetB_Value( filter->GetTargetB_Value() );
   //image->SetOriginalDirections( filter->GetTargetGradientDirections() );
   image->SetDirections( filter->GetTargetGradientDirections() );
   //image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
@@ -173,6 +200,19 @@ void QmitkPreprocessingView::DoAdcAverage()
 
 void QmitkPreprocessingView::UpdateBValueTableWidget()
 {
+
+  foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
+  {
+    m_Controls->m_ReductionFrame->layout()->removeWidget(box);
+    delete box;
+  }
+  foreach(QSpinBox * box, m_ReduceGradientSpinboxes)
+  {
+    m_Controls->m_ReductionFrame->layout()->removeWidget(box);
+    delete box;
+  }
+  m_ReduceGradientCheckboxes.clear();
+  m_ReduceGradientSpinboxes.clear();
 
   if (m_DiffusionImage.IsNull())
   {
@@ -258,20 +298,6 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
   if(foundDwiVolume)m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(m_DiffusionImage->GetB_ValueMap_Rounder());
-
-
-  foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
-  {
-    m_Controls->m_ReductionFrame->layout()->removeWidget(box);
-    delete box;
-  }
-  foreach(QSpinBox * box, m_ReduceGradientSpinboxes)
-  {
-    m_Controls->m_ReductionFrame->layout()->removeWidget(box);
-    delete box;
-  }
-  m_ReduceGradientCheckboxes.clear();
-  m_ReduceGradientSpinboxes.clear();
 
   UpdateBValueTableWidget();
 

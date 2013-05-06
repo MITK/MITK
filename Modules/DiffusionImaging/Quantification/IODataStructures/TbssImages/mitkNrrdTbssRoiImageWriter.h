@@ -135,6 +135,4 @@ protected:
 
 } // end of namespace mitk
 
-//#include "mitkNrrdTbssRoiImageWriter.cpp"
-
 #endif

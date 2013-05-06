@@ -95,7 +95,6 @@ protected:
 
   VectorImageType::Pointer m_DirectionImage;
 
-  //FloatVectorImageType::Pointer m_FixedDirImage;
 
   int round(float x)
   {

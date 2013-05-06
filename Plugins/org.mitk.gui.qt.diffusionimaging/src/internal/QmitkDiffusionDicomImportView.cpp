@@ -645,7 +645,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         diffImage->SetVectorImage(vecImage);
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
-        diffImage->UpdateBValueList();
+        diffImage->UpdateBValueMap();
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 

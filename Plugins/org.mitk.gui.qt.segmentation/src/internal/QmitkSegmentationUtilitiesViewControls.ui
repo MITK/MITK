@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkSegmentationUtilitiesViewControls</class>
+ <widget class="QWidget" name="QmitkSegmentationUtilitiesViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>399</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QToolBox" name="toolBoxSegmentationUtilities">
+     <property name="accessibleName">
+      <string/>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="pageBoolean">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>375</width>
+        <height>292</height>
+       </rect>
+      </property>
+      <attribute name="icon">
+       <iconset resource="../../resources/utilities.qrc">
+        <normaloff>:/utilities/utilities_boolean.xpm</normaloff>:/utilities/utilities_boolean.xpm</iconset>
+      </attribute>
+      <attribute name="label">
+       <string>Boolean Operations</string>
+      </attribute>
+      <attribute name="toolTip">
+       <string>Boolean Operations On Segmentations</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Data Selection:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QmitkDataStorageComboBox" name="cmbSegmentationImage1"/>
+          </item>
+          <item>
+           <widget class="QmitkDataStorageComboBox" name="cmbSegmentationImage2"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblBooleanOperationWarning">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 3, 6);</string>
+         </property>
+         <property name="text">
+          <string>Please select two different segmentation images above.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QToolButton" name="btnDifference">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Difference</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/utilities.qrc">
+             <normaloff>:/utilities/btnDifference.png</normaloff>:/utilities/btnDifference.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnUnion">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Union</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/utilities.qrc">
+             <normaloff>:/utilities/btnUnion.png</normaloff>:/utilities/btnUnion.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnIntersection">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Intersection</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../resources/utilities.qrc">
+             <normaloff>:/utilities/btnIntersection.png</normaloff>:/utilities/btnIntersection.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageMorphologic">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>375</width>
+        <height>292</height>
+       </rect>
+      </property>
+      <attribute name="icon">
+       <iconset resource="../../resources/utilities.qrc">
+        <normaloff>:/utilities/utilities_morphology.xpm</normaloff>:/utilities/utilities_morphology.xpm</iconset>
+      </attribute>
+      <attribute name="label">
+       <string>Morphological Operations</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Data Selection:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QComboBox" name="cmbSelectImage">
+            <property name="toolTip">
+             <string>Select a binary image</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblMorphologicOperationsWarning">
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 3, 6);</string>
+         </property>
+         <property name="text">
+          <string>Please select a segmentation above.</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QToolButton" name="btnClosing">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Closing</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnOpening">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Opening</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnDilatation">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Dilatation</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QToolButton" name="btnFillHoles">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Fill Holes</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnErosion">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Erosion</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnPlaceholder">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Placeholder</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageMasking">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>375</width>
+        <height>292</height>
+       </rect>
+      </property>
+      <attribute name="icon">
+       <iconset resource="../../resources/utilities.qrc">
+        <normaloff>:/utilities/utilities_masking.xpm</normaloff>:/utilities/utilities_masking.xpm</iconset>
+      </attribute>
+      <attribute name="label">
+       <string>Image Masking</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Masking-Mode:</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QRadioButton" name="rbMaskSurface">
+            <property name="toolTip">
+             <string>Fill a surface into an image</string>
+            </property>
+            <property name="text">
+             <string>Surface-Masking</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbMaskImage">
+            <property name="toolTip">
+             <string>Cut a image's region using a binary mask</string>
+            </property>
+            <property name="text">
+             <string>Image-Masking</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Data Selection:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QComboBox" name="cmbMaskingData">
+            <property name="toolTip">
+             <string>Select the reference image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cmbReferenceData">
+            <property name="toolTip">
+             <string>Select the mask you want to use</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnMaskImage">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Mask Image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../resources/utilities.qrc"/>
+ </resources>
+ <connections/>
+</ui>

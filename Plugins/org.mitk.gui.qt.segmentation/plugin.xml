@@ -24,6 +24,11 @@
       category="org.mitk.views.general"
       icon="resources/regiongrowing.xpm"
       class="QmitkRegionGrowingView" />
+    <view
+      id="org.mitk.views.segmentationutilities"
+      name= "SegmentationUtilities"
+      class= "QmitkSegmentationUtilitiesView"
+      icon= "resources/segmentationUtilities.xpm" />
   </extension>
   
   <extension point="org.blueberry.ui.preferencePages">

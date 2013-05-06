@@ -83,12 +83,12 @@ protected slots:
   void CreateNewSegmentation();
 
   // reaction to the button "New segmentation"
-  void CreateSegmentationFromSurface();
+//  void CreateSegmentationFromSurface();
 
   // called when one of "Manual", "Organ", "Lesion" pages of the QToolbox is selected
-  void ToolboxStackPageChanged(int id);
+//  void ToolboxStackPageChanged(int id);
 
-  void OnSurfaceSelectionChanged();
+//  void OnSurfaceSelectionChanged();
 
   void OnWorkingNodeVisibilityChanged();
 

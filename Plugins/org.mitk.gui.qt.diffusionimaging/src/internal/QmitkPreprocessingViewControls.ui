@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1114</height>
+    <height>1120</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -191,6 +191,25 @@
         </property>
         <property name="text">
          <string>Extract all B0 images without averaging</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_CalcAdcButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Calculate ADC map</string>
         </property>
        </widget>
       </item>

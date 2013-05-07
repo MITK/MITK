@@ -82,6 +82,7 @@ protected slots:
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
   void DoAdcAverage();
+  void DoAdcCalculation();
 
 protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */

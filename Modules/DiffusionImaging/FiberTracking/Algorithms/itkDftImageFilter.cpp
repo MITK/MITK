@@ -40,7 +40,7 @@ DftImageFilter< TPixelType >
 
 template< class TPixelType >
 void DftImageFilter< TPixelType >
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int threadId)
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadId)
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 

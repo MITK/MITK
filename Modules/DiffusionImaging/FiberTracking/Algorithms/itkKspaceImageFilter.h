@@ -65,7 +65,7 @@ namespace itk{
     ~KspaceImageFilter() {}
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadId);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
     void AfterThreadedGenerateData();
 
     typename InputImageType::Pointer    m_SpectrumImage;

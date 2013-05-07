@@ -107,9 +107,7 @@ set(H_FILES
   Algorithms/itkShCoefficientImageImporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
-
-
-
+  Algorithms/itkAdcImageFilter.h
 )
 
 set( TOOL_FILES

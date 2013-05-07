@@ -92,7 +92,7 @@ namespace itk{
 
     double RoundToNearest(double num);
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int threadId);
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
     void AfterThreadedGenerateData();
 
     FiberPolyDataType AddPolyData(FiberPolyDataType poly1, FiberPolyDataType poly2);

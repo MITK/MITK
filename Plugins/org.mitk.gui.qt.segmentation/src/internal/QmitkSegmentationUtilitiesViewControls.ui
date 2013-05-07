@@ -26,7 +26,7 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="pageBoolean">
       <property name="geometry">
@@ -55,22 +55,22 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QmitkDataStorageComboBox" name="cmbSegmentationImage1"/>
+           <widget class="QmitkDataStorageComboBox" name="cmbBooleanOperationsSegImage1"/>
           </item>
           <item>
-           <widget class="QmitkDataStorageComboBox" name="cmbSegmentationImage2"/>
+           <widget class="QmitkDataStorageComboBox" name="cmbBooleanOperationsSegImage2"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblBooleanOperationWarning">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 3, 6);</string>
+            </property>
+            <property name="text">
+             <string>Select two different segmentation images above</string>
+            </property>
+           </widget>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblBooleanOperationWarning">
-         <property name="styleSheet">
-          <string notr="true">color: rgb(255, 3, 6);</string>
-         </property>
-         <property name="text">
-          <string>Please select two different segmentation images above.</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -188,23 +188,23 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
-           <widget class="QComboBox" name="cmbSelectImage">
+           <widget class="QmitkDataStorageComboBox" name="cmbMorphologicalOperationsSegImage">
             <property name="toolTip">
              <string>Select a binary image</string>
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QLabel" name="lblMorphologicOperationsWarning">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 3, 6);</string>
+            </property>
+            <property name="text">
+             <string>Select a segmentation above</string>
+            </property>
+           </widget>
+          </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="lblMorphologicOperationsWarning">
-         <property name="styleSheet">
-          <string notr="true">color: rgb(255, 3, 6);</string>
-         </property>
-         <property name="text">
-          <string>Please select a segmentation above.</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -368,6 +368,22 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
+           <widget class="QRadioButton" name="rbMaskImage">
+            <property name="toolTip">
+             <string>Cut a image's region using a binary mask</string>
+            </property>
+            <property name="text">
+             <string>Image-Masking</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QRadioButton" name="rbMaskSurface">
             <property name="toolTip">
              <string>Fill a surface into an image</string>
@@ -376,17 +392,7 @@
              <string>Surface-Masking</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbMaskImage">
-            <property name="toolTip">
-             <string>Cut a image's region using a binary mask</string>
-            </property>
-            <property name="text">
-             <string>Image-Masking</string>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -406,16 +412,26 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QComboBox" name="cmbMaskingData">
+           <widget class="QmitkDataStorageComboBox" name="cmbMaskingReferenceData">
+            <property name="toolTip">
+             <string>Select the mask you want to use</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QmitkDataStorageComboBox" name="cmbMaskingData">
             <property name="toolTip">
              <string>Select the reference image</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="cmbReferenceData">
-            <property name="toolTip">
-             <string>Select the mask you want to use</string>
+           <widget class="QLabel" name="lblMaskingWarnings">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 3, 6);</string>
+            </property>
+            <property name="text">
+             <string>Select a regular image and a binary image above</string>
             </property>
            </widget>
           </item>

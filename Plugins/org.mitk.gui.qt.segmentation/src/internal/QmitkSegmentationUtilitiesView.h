@@ -22,7 +22,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+
 #include "ui_QmitkSegmentationUtilitiesViewControls.h"
+
+namespace mitk
+{
+class Surface;
+}
 
 
 /**
@@ -43,7 +53,22 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+    QmitkSegmentationUtilitiesView();
+
   protected slots:
+
+    void OnImageMaskingToggled(bool);
+    void OnSurfaceMaskingToggled(bool);
+    void OnMaskImagePressed();
+    void OnMaskingDataSelectionChanged(const mitk::DataNode*);
+    void OnMaskingReferenceDataSelectionChanged(const mitk::DataNode*);
+
+    void OnMorphologicalOperationsDataSelectionChanged(const mitk::DataNode*);
+    //TODO create slots for all morphological buttons
+
+    void OnBooleanOperationsSegImage1SelectionChanged(const mitk::DataNode*);
+    void OnBooleanOperationsSegImage2SelectionChanged(const mitk::DataNode*);
+    //TODO create slots for all boolean buttons
 
   protected:
 
@@ -56,6 +81,17 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes );
 
     Ui::QmitkSegmentationUtilitiesViewControls m_Controls;
+
+private:
+
+    void EnableBooleanButtons(bool);
+
+    mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
+    mitk::NodePredicateAnd::Pointer m_IsOfTypeSurface;
+    mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
+    mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
+    mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
+    mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
 
 };
 

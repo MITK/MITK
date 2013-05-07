@@ -87,9 +87,9 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
     for(BValueMap::const_iterator it = m_B_ValueMap.begin();it != m_B_ValueMap.end(); it++)
     {
       if((*it).first == 0.0) continue;
-      // if any #ShellDirection < 15 --> itkException (No interpolation possible)
-      if((*it).second.size() < 15){
-        MITK_INFO << "Abort: No interpolation possible Shell-" << (*it).first << " has less than 15 directions.";
+      // if any #ShellDirection < 6 --> itkException (No interpolation possible)
+      if((*it).second.size() < 6){
+        MITK_INFO << "Abort: No interpolation possible Shell-" << (*it).first << " has less than 6 directions.";
         itkExceptionMacro(<<"No interpolation possible");
       }
     }
@@ -105,7 +105,7 @@ void MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScal
       //- calculate maxShOrder
       const IndicesVector currentShell = it->second;
       unsigned int SHMaxOrder = 12;
-      while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size())
+      while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size() && ((SHMaxOrder+1)*(SHMaxOrder+2)/2) >= 4 )
       {
         SHMaxOrder -= 2 ;
       }

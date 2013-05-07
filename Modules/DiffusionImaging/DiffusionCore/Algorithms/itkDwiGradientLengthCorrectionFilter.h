@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include <vnl/vnl_vector_fixed.h>
 #include <itkVectorContainer.h>
+#include "DiffusionCoreExports.h"
 
 namespace itk
 {
 
-  class DwiGradientLengthCorrectionFilter : public ProcessObject
+  class DiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
   {
 
   public:

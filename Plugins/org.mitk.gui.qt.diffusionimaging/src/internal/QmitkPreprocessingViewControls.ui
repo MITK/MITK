@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1149</height>
+    <height>1273</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -160,7 +160,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Create Corrected Diffusion Image</string>
+         <string>Round b-Value</string>
         </property>
        </widget>
       </item>

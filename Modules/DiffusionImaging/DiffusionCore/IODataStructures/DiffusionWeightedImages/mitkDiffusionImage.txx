@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
-  : m_VectorImage(0), m_Directions(0), m_OriginalDirections(0), m_B_Value(-1.0), m_VectorImageAdaptor(0), m_B_ValueMap_Rounder(100)
+  : m_VectorImage(0), m_Directions(0), m_OriginalDirections(0), m_B_Value(-1.0), m_VectorImageAdaptor(0)
 {
   MeasurementFrameType mf;
   for(int i=0; i<3; i++)
@@ -368,8 +368,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
   {
     float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
-    double rounded = int((currentBvalue + 0.5 * m_B_ValueMap_Rounder)/m_B_ValueMap_Rounder)*m_B_ValueMap_Rounder;
-    m_B_ValueMap[rounded].push_back(gdcit.Index());
+    m_B_ValueMap[currentBvalue].push_back(gdcit.Index());
   }
 }
 

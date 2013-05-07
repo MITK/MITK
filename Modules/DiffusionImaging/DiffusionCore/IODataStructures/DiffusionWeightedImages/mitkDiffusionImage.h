@@ -93,8 +93,6 @@ public:
 
   itkGetMacro(B_Value, float)
   itkSetMacro(B_Value, float)
-  itkGetMacro(B_ValueMap_Rounder, int)
-  itkSetMacro(B_ValueMap_Rounder, int)
 
   BValueMap GetB_ValueMap(){ return m_B_ValueMap; }
 
@@ -115,10 +113,6 @@ protected:
   int                                       m_DisplayIndex;
   MeasurementFrameType                      m_MeasurementFrame;
   BValueMap                                 m_B_ValueMap;
-  int                                       m_B_ValueMap_Rounder;
-
-
-
   unsigned long    m_DirectionsObserverTag;
 };
 

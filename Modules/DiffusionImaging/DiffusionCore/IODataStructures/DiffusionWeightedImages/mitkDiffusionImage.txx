@@ -305,7 +305,7 @@ void mitk::DiffusionImage<TPixelType>::ApplyMeasurementFrame()
     c++;
   }
 
-  UpdateBValueList();
+  UpdateBValueMap();
   AddDirectionsContainerObserver();
 }
 
@@ -360,7 +360,7 @@ bool mitk::DiffusionImage<TPixelType>::IsMultiBval()
 }
 
 template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
+void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 {
   m_B_ValueMap.clear();
 
@@ -368,18 +368,8 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueList()
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
   {
     float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
-    double rounded = int((currentBvalue+7.5)/100)*100;
-    m_B_ValueMap[rounded].push_back(gdcit.Index());
+    m_B_ValueMap[currentBvalue].push_back(gdcit.Index());
   }
-
-  /*
-  BValueMap::iterator it = m_B_ValueMap.begin();
-  for(;it != m_B_ValueMap.end(); it++)
-  {
-    MITK_INFO << it->first << " : " << it->second.size();
-  }
-  */
-
 }
 
 template<typename TPixelType>
@@ -417,7 +407,7 @@ void mitk::DiffusionImage<TPixelType>::AddDirectionsContainerObserver()
   typedef DiffusionImage< TPixelType > Self;
   typedef itk::SimpleMemberCommand< Self >  DCCommand ;
   typename DCCommand::Pointer command = DCCommand::New();
-  command->SetCallbackFunction(this, &Self::UpdateBValueList);
+  command->SetCallbackFunction(this, &Self::UpdateBValueMap);
 }
 
 template<typename TPixelType>

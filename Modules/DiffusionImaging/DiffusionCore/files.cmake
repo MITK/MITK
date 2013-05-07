@@ -52,6 +52,7 @@ set(CPP_FILES
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
+  Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -107,6 +108,7 @@ set(H_FILES
   Algorithms/itkShCoefficientImageImporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
+  Algorithms/itkDwiGradientLengthCorrectionFilter.h
 
 
 

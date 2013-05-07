@@ -60,7 +60,7 @@ void itk::DwiGradientLengthCorrectionFilter::GenerateData()
     const double twonorm = it.Value().two_norm();
     const double currentBValue = m_ReferenceBValue*twonorm*twonorm ;
     const double roundedBValue = int((currentBValue + 0.5 * m_RoundingValue)/m_RoundingValue)*m_RoundingValue;
-    const double f = roundedBValue/m_ReferenceBValue;
+    const double f = std::sqrt(roundedBValue/m_ReferenceBValue);
     GradientDirectionType grad = it.Value();
     m_OutputGradientDirectionContainer->push_back( grad.normalize() * f );
   }

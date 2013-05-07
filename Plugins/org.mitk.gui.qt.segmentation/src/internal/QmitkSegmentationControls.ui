@@ -49,7 +49,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string/>
+      <string>Data Selection</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>

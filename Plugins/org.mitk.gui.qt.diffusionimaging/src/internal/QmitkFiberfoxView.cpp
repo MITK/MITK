@@ -1076,10 +1076,14 @@ void QmitkFiberfoxView::GenerateImage()
 
         // add signal contrast model
         mitk::SignalDecay<double> contrastModel;
-        contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
-        contrastModel.SetTE(this->m_Controls->m_TEbox->value());
-        contrastModel.SetTline(lineReadoutTime);
-        artifactList.push_back(&contrastModel);
+        if (m_Controls->m_RelaxationBox->isChecked())
+        {
+            contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
+            contrastModel.SetTE(this->m_Controls->m_TEbox->value());
+            contrastModel.SetTline(lineReadoutTime);
+            artifactList.push_back(&contrastModel);
+            artifactModelString += "_RELAX";
+        }
 
         // add N/2 ghosting
         double kOffset = 0;
@@ -1124,6 +1128,8 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
         tractsToDwiFilter->SetFiberRadius(m_Controls->m_FiberRadius->value());
         tractsToDwiFilter->SetSignalScale(m_Controls->m_SignalScaleBox->value());
+        if (m_Controls->m_InterpolationShrink->value()<1000)
+            tractsToDwiFilter->SetUseInterpolation(true);
 
         if (m_TissueMask.IsNotNull())
         {

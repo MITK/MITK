@@ -87,6 +87,7 @@ public:
     itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
     itkSetMacro( kOffset, double )
     itkSetMacro( tLine, double )
+    itkSetMacro( UseInterpolation, bool )
 
     void GenerateData();
 
@@ -130,6 +131,7 @@ protected:
     double                              m_FiberRadius;
     double                              m_SignalScale;
     mitk::LevelWindow                   m_LevelWindow;
+    bool                                m_UseInterpolation;
 };
 }
 

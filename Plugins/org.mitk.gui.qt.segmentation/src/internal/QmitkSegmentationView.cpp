@@ -872,6 +872,18 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
   }
 }
 
+void QmitkSegmentationView::OnTabWidgetChanged(int id)
+{
+  //2D Tab ID = 0
+  //3D Tab ID = 1
+  if (id == 0)
+  {
+    //Deactivate possible active tool
+    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
+    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
+  }
+}
+
 
 void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData)
 {
@@ -1036,6 +1048,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
 //  connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
 //  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
+
+  connect( m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
 //  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
 //      this, SLOT( OnSurfaceSelectionChanged( ) ) );

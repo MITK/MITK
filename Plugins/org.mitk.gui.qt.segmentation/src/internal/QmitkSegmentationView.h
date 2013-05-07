@@ -97,6 +97,8 @@ protected slots:
 
   void OnShowMarkerNodes(bool);
 
+  void OnTabWidgetChanged(int);
+
 protected:
 
   // a type for handling lists of DataNodes

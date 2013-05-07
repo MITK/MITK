@@ -155,9 +155,8 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
 {
   if (m_DiffusionImage.IsNull())
     return;
-  m_DiffusionImage->SetB_ValueMap_Rounder(i);
   m_DiffusionImage->UpdateBValueMap();
-  UpdateBValueTableWidget();
+  UpdateBValueTableWidget(i);
 }
 
 void QmitkPreprocessingView::DoAdcAverage()
@@ -198,7 +197,7 @@ void QmitkPreprocessingView::DoAdcAverage()
 }
 
 
-void QmitkPreprocessingView::UpdateBValueTableWidget()
+void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
 {
 
   foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
@@ -228,10 +227,19 @@ void QmitkPreprocessingView::UpdateBValueTableWidget()
     typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
     typedef mitk::DiffusionImage<short*>::BValueMap::iterator BValueMapIterator;
 
-    BValueMap bValMap =  m_DiffusionImage->GetB_ValueMap();
-    BValueMapIterator it = bValMap.begin();
+    BValueMapIterator it;
+
+    BValueMap roundedBValueMap;
+    GradientDirectionContainerType::ConstIterator gdcit;
+    for( gdcit = m_DiffusionImage->GetDirections()->Begin(); gdcit != m_DiffusionImage->GetDirections()->End(); ++gdcit)
+    {
+      float currentBvalue = std::floor(m_DiffusionImage->GetB_Value(gdcit.Index()));
+      double rounded = int((currentBvalue + 0.5 * i)/i)*i;
+      roundedBValueMap[rounded].push_back(gdcit.Index());
+    }
+
     m_Controls->m_B_ValueMap_TableWidget->clear();
-    m_Controls->m_B_ValueMap_TableWidget->setRowCount(bValMap.size() );
+    m_Controls->m_B_ValueMap_TableWidget->setRowCount(roundedBValueMap.size() );
     QStringList headerList;
     headerList << "b-Value" << "Number of gradients";
     m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
@@ -240,13 +248,13 @@ void QmitkPreprocessingView::UpdateBValueTableWidget()
     QCheckBox* checkBox;
     QSpinBox* spinBox;
     int i = 0 ;
-    for(;it != bValMap.end(); it++)
+    for(it = roundedBValueMap.begin() ;it != roundedBValueMap.end(); it++)
     {
       m_Controls->m_B_ValueMap_TableWidget->setItem(i,0,new QTableWidgetItem(QString::number(it->first)));
       m_Controls->m_B_ValueMap_TableWidget->setItem(i,1,new QTableWidgetItem(QString::number(it->second.size())));
 
       // Reduce Gradients GUI adaption
-      if(it->first != 0 && bValMap.size() > 1){
+      if(it->first != 0 && roundedBValueMap.size() > 1){
         checkBox = new QCheckBox(QString::number(it->first) + " with " + QString::number(it->second.size()) + " directions");
         checkBox->setEnabled(true);
         checkBox->setChecked(true);
@@ -297,9 +305,11 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
   m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
-  if(foundDwiVolume)m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(m_DiffusionImage->GetB_ValueMap_Rounder());
+  m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
+  m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
+  if(foundDwiVolume)m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(10);
 
-  UpdateBValueTableWidget();
+  UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
 
   if (foundDwiVolume)
   {

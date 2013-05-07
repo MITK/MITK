@@ -67,7 +67,14 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="2" column="0">
+      <item row="1" column="0">
+       <widget class="Line" name="line_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
        <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
         <property name="enabled">
          <bool>false</bool>
@@ -86,7 +93,27 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="4" column="0">
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCommandLinkButton" name="m_AdcAverage">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>ADC Average (Multi-Shell)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
        <widget class="QTableWidget" name="m_B_ValueMap_TableWidget">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -127,23 +154,26 @@
         </column>
        </widget>
       </item>
-      <item row="0" column="2" rowspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
+        <property name="enabled">
+         <bool>false</bool>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
+        <property name="text">
+         <string>Create Corrected Diffusion Image</string>
         </property>
-       </spacer>
+       </widget>
       </item>
-      <item row="0" column="0">
+      <item row="2" column="0">
        <widget class="QSpinBox" name="m_B_ValueMap_Rounder_SpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This rounder allowes you to manipulate &lt;a name=&quot;result_box&quot;/&gt;the classification of the b-Values to the corresponding shells. But is not manipulating the original b-Values or data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
         </property>
         <property name="minimum">
          <number>1</number>
@@ -156,10 +186,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
-        <property name="text">
-         <string>Create Corrected Diffusion Image</string>
+      <item row="6" column="0">
+       <widget class="Line" name="line_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -302,19 +332,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="m_AdcAverage">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>ADC Average (Multi-Shell)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -352,6 +369,19 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">

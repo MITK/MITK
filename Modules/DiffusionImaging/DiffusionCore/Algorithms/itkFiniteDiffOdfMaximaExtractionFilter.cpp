@@ -316,7 +316,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
 
 template< class PixelType, int ShOrder, int NrOdfDirections >
 void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
-::ThreadedGenerateData( const OutputImageRegionType& outputRegionForThread, int threadID )
+::ThreadedGenerateData( const OutputImageRegionType& outputRegionForThread, ThreadIdType threadID )
 {
     typename CoefficientImageType::Pointer ShCoeffImage = static_cast< CoefficientImageType* >( this->ProcessObject::GetInput(0) );
 

@@ -50,6 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 #include <mitkPointSet.h>
+#include <itkAdcImageFilter.h>
 
 #include <QTableWidgetItem>
 #include <QTableWidget>
@@ -120,6 +121,7 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AdcAverage), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
     connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
     connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
+        connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
   }
 }
 
@@ -194,6 +196,31 @@ void QmitkPreprocessingView::DoAdcAverage()
   imageNode->SetName((name+"_averaged").toStdString().c_str());
   GetDefaultDataStorage()->Add(imageNode);
 
+}
+
+void QmitkPreprocessingView::DoAdcCalculation()
+{
+  if (m_DiffusionImage.IsNull())
+      return;
+
+  typedef mitk::DiffusionImage< DiffusionPixelType >            DiffusionImageType;
+  typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
+
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(m_DiffusionImage->GetVectorImage());
+  filter->SetGradientDirections(m_DiffusionImage->GetDirections());
+  filter->SetB_value(m_DiffusionImage->GetB_Value());
+  filter->Update();
+
+  mitk::Image::Pointer image = mitk::Image::New();
+  image->InitializeByItk( filter->GetOutput() );
+  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData( image );
+  QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
+
+  imageNode->SetName((name+"_ADC").toStdString().c_str());
+  GetDefaultDataStorage()->Add(imageNode);
 }
 
 
@@ -308,6 +335,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
   m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
   if(foundDwiVolume)m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(10);
+  m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
 
   UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
 

@@ -109,6 +109,7 @@ set(H_FILES
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
+  Algorithms/itkAdcImageFilter.h
 
 
 

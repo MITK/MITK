@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1273</height>
+    <height>1290</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -109,7 +109,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>ADC Average (Multi-Shell)</string>
+         <string>ADC average (multi-shell)</string>
         </property>
        </widget>
       </item>
@@ -160,7 +160,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Round b-Value</string>
+         <string>Round b-value</string>
         </property>
        </widget>
       </item>
@@ -170,7 +170,7 @@
          <bool>false</bool>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This rounder allowes you to manipulate &lt;a name=&quot;result_box&quot;/&gt;the classification of the b-Values to the corresponding shells. But is not manipulating the original b-Values or data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Round b-values to nearest multiple of this value (click &amp;quot;Round b-value&amp;quot; to create new image with these values).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="correctionMode">
          <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
@@ -244,6 +244,25 @@
         </property>
         <property name="text">
          <string>Extract all B0 images without averaging</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_CalcAdcButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>If multiple baseline acquisitions are present, the default behaviour is to output an averaged image.</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Calculate ADC map</string>
         </property>
        </widget>
       </item>

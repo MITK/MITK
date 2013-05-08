@@ -163,14 +163,14 @@ template< class TTensorPixelType,
           class TPDPixelType>
 void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
 TPDPixelType>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int )
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
 
     typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
     typedef ImageRegionConstIterator< InputImageType >  InputIteratorType;
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
+    typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     ImageRegionIterator< OutputImageType > outIt(outputImage, outputRegionForThread);
     InputIteratorType inIt(inputImagePointer, outputRegionForThread );

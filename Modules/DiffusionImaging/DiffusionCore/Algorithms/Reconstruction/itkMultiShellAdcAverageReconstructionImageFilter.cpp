@@ -242,8 +242,9 @@ MultiShellAdcAverageReconstructionImageFilter<TInputScalarType, TOutputScalarTyp
         InterpVector.put(i,b[currentShell[i]]);
       //MITK_INFO << "InputVector(RAWSIGNAL:"<< shellIndex <<")";
       //MITK_INFO << InterpVector ;
-      //- normalization of the raw Signal
+      //- normalization of the raw Signal divided by Reference Signal
       S_S0Normalization(InterpVector, BZeroAverage);
+
       //MITK_INFO << "InputVector(NORMALIZED:"<< shellIndex <<")";
       //MITK_INFO << InterpVector ;
       //- interpolate the Signal if necessary using corresponding interpolationSHBasis

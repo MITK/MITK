@@ -366,10 +366,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 
   GradientDirectionContainerType::ConstIterator gdcit;
   for( gdcit = this->m_Directions->Begin(); gdcit != this->m_Directions->End(); ++gdcit)
-  {
-    float currentBvalue = std::floor(GetB_Value(gdcit.Index()));
-    m_B_ValueMap[currentBvalue].push_back(gdcit.Index());
-  }
+    m_B_ValueMap[GetB_Value(gdcit.Index())].push_back(gdcit.Index());
 }
 
 template<typename TPixelType>
@@ -385,7 +382,14 @@ float mitk::DiffusionImage<TPixelType>::GetB_Value(int i)
   else
   {
     double twonorm = m_Directions->ElementAt(i).two_norm();
-    return m_B_Value*twonorm*twonorm ;
+    double bval = m_B_Value*twonorm*twonorm;
+
+    if (bval<0)
+        bval = ceil(bval - 0.5);
+    else
+        bval = floor(bval + 0.5);
+
+    return bval;
   }
 }
 

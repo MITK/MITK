@@ -43,6 +43,9 @@ void
 AdcImageFilter< TInPixelType, TOutPixelType>
 ::BeforeThreadedGenerateData()
 {
+    typename OutputImageType::Pointer outputImage =
+            static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    outputImage->FillBuffer(0.0);
 }
 
 template< class TInPixelType, class TOutPixelType >
@@ -104,7 +107,8 @@ AdcImageFilter< TInPixelType, TOutPixelType>
                 outval /= c;
         }
 
-        oit.Set( outval );
+        if (outval==outval && outval<10000)
+            oit.Set( outval );
 
         ++oit;
         ++git;

@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCylinderSource.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkCellArray.h>
 #include <vtkVectorText.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -72,7 +71,7 @@ m_ShowAngles(false),
 m_ShowDistantLines(false),
 m_LineWidth(1),
 m_PointLineWidth(1),
-m_Point2DSize(2),
+m_Point2DSize(8),
 m_IdGlyph(3), // default: cross
 m_FillGlyphs(false)
 {
@@ -119,16 +118,19 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
     return true;
   }
   else
-  if(fabs(in[1])>0)
-  {
-    out[0]=1;
-    out[1]=-in[0]/in[1];
-    out.Normalize();
-    return true;
-  }
-  else
-    return false;
+    if(fabs(in[1])>0)
+    {
+      out[0]=1;
+      out[1]=-in[0]/in[1];
+      out.Normalize();
+      return true;
+    }
+    else
+      return false;
 }
+
+
+
 
 
 void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* renderer)
@@ -142,6 +144,27 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     ls->m_PropAssemblies->RemovePart(ls->m_SelectedActors);
   if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_ContourActors))
     ls->m_PropAssemblies->RemovePart(ls->m_ContourActors);
+  if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextActor))
+    ls->m_PropAssemblies->RemovePart(ls->m_VtkTextActor);
+
+  unsigned i = 0;
+  for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
+  {
+    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextLabelActors.at(i)))
+      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextLabelActors.at(i));
+  }
+
+   for(i=0; i< ls->m_VtkTextDistanceActors.size(); i++)
+  {
+    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextDistanceActors.at(i)))
+      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextDistanceActors.at(i));
+  }
+
+    for(i=0; i< ls->m_VtkTextAngleActors.size(); i++)
+  {
+    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextAngleActors.at(i)))
+      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextAngleActors.at(i));
+  }
 
 
   // exceptional displaying for PositionTracker -> MouseOrientationTool
@@ -162,6 +185,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   if (update == true)
     input->Update();
 
+  //TODO: insert last changes on timestamps
   int timestep = this->GetTimestep();
 
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
@@ -195,185 +219,273 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   // current point in point set
   itk::Point<float> point;
-  itk::Point<float> pointPredecessor;
+  // predecessor of current point
+  itk::Point<float> lastPoint;
 
   // reset the point sets
   ls->m_UnselectedPoints->Reset();
   ls->m_SelectedPoints->Reset();
+
   ls->m_ContourPoints->Reset();
+  ls->m_ContourLines->Reset();
 
   ls->m_UnselectedScales->Reset();
   ls->m_SelectedScales->Reset();
 
   ls->m_DistancesBetweenPoints->Reset();
 
+  ls->m_VtkContourPolyData->Reset();
+
+  ls->m_VtkTextLabelActors.clear();
+  ls->m_VtkTextDistanceActors.clear();
+  ls->m_VtkTextAngleActors.clear();
+
   ls->m_UnselectedScales->SetNumberOfComponents(3);
   ls->m_SelectedScales->SetNumberOfComponents(3);
 
-  int NumberOfSelectedPoints = 0;
-  int NumberOfUnselectedPoints = 0;
-  int NumberOfContourPoints = 0;
+  int NumberContourPoints = 0;
+  bool pointsOnSameSideOfPlane = false;
 
   const int text2dDistance = 10;
 
-  bool pointInArray = false;
-  bool pointsOnSameSideOfPlane = false;
-
   Point3D p;                      // currently visited point
-    Point3D lastP;                  // last visited point
-    Vector3D vec;                   // p - lastP
-    Vector3D lastVec;               // lastP - point before lastP
-    vec.Fill(0);
+  Point3D lastP;                  // last visited point
+  Vector3D vec;                   // p - lastP
+  Vector3D lastVec;               // lastP - point before lastP
+  vec.Fill(0);
 
-    mitk::Point3D projected_p;      // p projected on viewplane
+  mitk::Point3D projected_p;      // p projected on viewplane
 
-    Point2D pt2d;       // projected_p in display coordinates
-    Point2D lastPt2d;   // last projected_p in display coordinates
-    Point2D preLastPt2d;// projected_p in display coordinates before lastPt2d
+  Point2D pt2d;       // projected_p in display coordinates
+  Point2D lastPt2d;   // last projected_p in display coordinates
+  Point2D preLastPt2d;// projected_p in display coordinates before lastPt2
 
+  //float vtkp[3];
 
+  vtkLinearTransform* linearTransform = GetDataNode()->GetVtkTransform();
+
+  // get display geometry
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
   // get plane geometry
-  mitk::PlaneGeometry::ConstPointer planeGeo = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  mitk::PlaneGeometry::ConstPointer planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+
+  int count = 0;
 
   for (pointsIter=itkPointSet->GetPoints()->Begin();
     pointsIter!=itkPointSet->GetPoints()->End();
     pointsIter++)
   {
-    if( pointsIter != itkPointSet->GetPoints()->Begin())
-    {
-      pointsIterPredecessor = pointsIter;
-      pointsIterPredecessor--;
-    }
+
+    lastP = p; // valid for number of points count > 0
+    lastPt2d = pt2d;  // valid for number of points count > 0
+    preLastPt2d = lastPt2d; // valid only for count > 1
+
+    lastVec = vec;    // valid only for counter > 1
+    lastPoint = point;
 
     // get current point in point set
     point = pointsIter->Value();
+
+    //itk2vtk(point, vtkp);
+    //linearTransform->TransformPoint(vtkp, vtkp);
+    //vtk2itk(vtkp,point);
+
     p[0] = point[0];
     p[1] = point[1];
     p[2] = point[2];
 
+    displayGeometry->Project(p, projected_p);
+    displayGeometry->Map(projected_p, pt2d);
+    displayGeometry->WorldToDisplay(pt2d, pt2d);
+
+    vec = p-lastP;    // valid only for counter > 0
+
     // compute distance to current plane
-    float diff = planeGeo->DistanceFromPlane(point);
+    float diff = planeGeometry->DistanceFromPlane(point);
+    diff = diff * diff;
+
+    //MouseOrientation
+    bool isInputDevice=false;
+    this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice);
 
     // point is close to current plane
-    if(diff < 4.0)
+    if(!isInputDevice && (diff < 4.0))
     {
 
       // is point selected or not?
       if (pointDataIter->Value().selected)
       {
-        ls->m_SelectedPoints->InsertPoint(NumberOfSelectedPoints,point[0],point[1],point[2]);
+        ls->m_SelectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_SelectedScales->InsertNextTuple3(m_Point2DSize + (2/diff),0,0);
-        NumberOfSelectedPoints++;
-
+        ls->m_SelectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
       }
       else
       {
-        ls->m_UnselectedPoints->InsertPoint(NumberOfUnselectedPoints,point[0],point[1],point[2]);
+        ls->m_UnselectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize + (2/diff),0,0);
-        NumberOfUnselectedPoints++;
+        ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
+      }
+
+
+      //---- LABEL -----//
+
+      //  paint label for each point if available
+      if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label")) != NULL)
+      {
+        const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
+          this->GetDataNode()->GetProperty("label"))->GetValue();
+        std::string l = pointLabel;
+        if (input->GetSize()>1)
+        {
+          char buffer[20];
+          sprintf(buffer,"%d",pointsIter->Index());
+          std::stringstream ss;
+          ss << pointsIter->Index();
+          l.append(ss.str());
+        }
+
+        ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
+
+        ls->m_VtkTextActor->SetPosition(pt2d[0] + text2dDistance, pt2d[1] + text2dDistance);
+        ls->m_VtkTextActor->SetInput(l.c_str());
+        ls->m_VtkTextActor->GetTextProperty()->SetOpacity( 100 );
+
+        float unselectedColor[4];
+
+        //check if there is a color property
+        GetDataNode()->GetColor(unselectedColor);
+
+        if (unselectedColor != NULL)
+          ls->m_VtkTextActor->GetTextProperty()->SetColor(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
+        else
+         ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f);
+
+         ls->m_VtkTextLabelActors.push_back(ls->m_VtkTextActor);
 
       }
     }
 
-    // add points that are needed for the contour
-    if( (pointsIter != itkPointSet->GetPoints()->Begin()) )
-    {
-      pointPredecessor = pointsIterPredecessor->Value();
+    // draw contour, distance text and angle text
 
+    // lines between points, which intersect the current plane, are drawn
+    if( m_Polygon && count > 0 )
+    {
       ScalarType distance =    displayGeometry->GetWorldGeometry()->SignedDistance(point);
-      ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(pointPredecessor);
+      ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastPoint);
 
       pointsOnSameSideOfPlane = (distance * lastDistance) > 0.5;
       if ( !pointsOnSameSideOfPlane ) // points on different sides of plane -> draw it
       {
 
-        float distancePoints = point.EuclideanDistanceTo(pointPredecessor);
+        vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
+
+        ls->m_ContourPoints->InsertNextPoint(lastPoint[0],lastPoint[1],lastPoint[2]);
+        line->GetPointIds()->SetId(0, NumberContourPoints);
+        NumberContourPoints++;
+
+        ls->m_ContourPoints->InsertNextPoint(point[0], point[1], point[2]);
+        line->GetPointIds()->SetId(1, NumberContourPoints);
+        NumberContourPoints++;
+
+        ls->m_ContourLines->InsertNextCell(line);
 
 
-        if(!pointInArray)
+        if(m_ShowDistances) // calculate and print distance between adjacent points
         {
-          ls->m_ContourPoints->InsertPoint(NumberOfContourPoints, pointPredecessor[0],pointPredecessor[1],pointPredecessor[2]);
-          NumberOfContourPoints++;
-         // ls->m_DistancesBetweenPoints->InsertComponent(-4.0f);
+
+          float distancePoints = point.EuclideanDistanceTo(lastPoint);
+
+          std::stringstream buffer;
+          buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distancePoints<<" mm";
+
+          // compute desired position of text
+          Vector2D vec2d = pt2d-lastPt2d;
+          makePerpendicularVector2D(vec2d, vec2d);
+          Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d ) * 0.5 + vec2d * text2dDistance;
+
+          ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
+
+          ls->m_VtkTextActor->SetPosition(pos2d[0],pos2d[1]);
+          ls->m_VtkTextActor->SetInput(buffer.str().c_str());
+          ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0, 1.0, 0.0);
+
+          ls->m_VtkTextDistanceActors.push_back(ls->m_VtkTextActor);
+
         }
-        ls->m_ContourPoints->InsertPoint(NumberOfContourPoints, point[0],point[1],point[2]);
-        NumberOfContourPoints++;
-        //ls->m_DistancesBetweenPoints->InsertPoint(distancePoints);
-        pointInArray = true;
 
+         // TODO !!
+        if(m_ShowAngles && count > 1) // calculate and print angle between connected lines
+        {
+            std::stringstream buffer;
+             //(char) 176 is the degrees sign
+             buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
 
+             MITK_INFO <<" grad " << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi <<endl;
 
-        if(m_ShowDistances) // calculate and print a distance
-           {
+             //compute desired position of text
+             Vector2D vec2d = pt2d-lastPt2d;
+             vec2d.Normalize();
+             Vector2D lastVec2d = lastPt2d-preLastPt2d;
+             lastVec2d.Normalize();
+             vec2d=vec2d-lastVec2d;
+             vec2d.Normalize();
+             Vector2D pos2d = lastPt2d.GetVectorFromOrigin() + vec2d * text2dDistance * text2dDistance;
 
-              displayGeometry->Project(p, projected_p);
-              displayGeometry->Map(projected_p, pt2d);
-              displayGeometry->WorldToDisplay(pt2d, pt2d);
+             // THE POSITIONS ARE INVALID!
+            MITK_INFO << pos2d[0] << " " << pos2d[1] <<endl;
 
-              std::stringstream buffer;
-              //float distance = vec.GetNorm();
-              buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distancePoints<<" mm";
+             ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
 
-              Vector2D vec2d = pt2d-lastPt2d;
-              makePerpendicularVector2D(vec2d, vec2d);
+             ls->m_VtkTextActor->SetPosition(pos2d[0],pos2d[1]);
+             ls->m_VtkTextActor->SetInput(buffer.str().c_str());
+             ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0, 1.0, 0.0);
 
-              Vector2D pos2d = (lastPt2d.GetVectorFromOrigin()+pt2d)*0.5+vec2d*text2dDistance;
-
-              mitk::VtkPropRenderer* propRenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-              propRenderer->WriteSimpleText(buffer.str(), pos2d[0], pos2d[1]);
-              //this->WriteTextXY(pos2d[0], pos2d[1], buffer.str(),renderer);
-         }
-
-
-      }
-      else
-      {
-        pointInArray = false;
+             ls->m_VtkTextAngleActors.push_back(ls->m_VtkTextActor);
+        }
       }
     }
+
     if(pointDataIter != itkPointSet->GetPointData()->End())
     {
       pointDataIter++;
+      count++;
     }
 
   }
 
+// iteratoren ?
+  for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
+  {
+    ls->m_PropAssemblies->AddPart(ls->m_VtkTextLabelActors.at(i));
+  }
 
+  for(i=0; i< ls->m_VtkTextDistanceActors.size(); i++)
+  {
+    ls->m_PropAssemblies->AddPart(ls->m_VtkTextDistanceActors.at(i));
+  }
 
-  //create lines between the points which are close to the plane
+  for(i=0; i< ls->m_VtkTextAngleActors.size(); i++)
+  {
+    ls->m_PropAssemblies->AddPart(ls->m_VtkTextAngleActors.at(i));
+  }
 
+  //---- CONTOUR -----//
+
+  //create lines between the points which intersect the plane
   if (m_Polygon)
   {
-    // insert first point again if contour should be closed
-    if(m_PolygonClosed){
+    // draw line between first and last point
+    if(m_PolygonClosed && NumberContourPoints > 1){
 
-    pointsIter=itkPointSet->GetPoints()->Begin();
-    // get current point in point set
-    point = pointsIter->Value();
-    ls->m_ContourPoints->InsertPoint(NumberOfContourPoints,point[0],point[1],point[2]);
-    NumberOfContourPoints++;
-
-   }
-
-    int NumberOfPoints = ls->m_ContourPoints->GetNumberOfPoints();
-
-    vtkSmartPointer <vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
-    polyLine->GetPointIds()->SetNumberOfIds(NumberOfPoints);
-
-    for(unsigned int i=0; i< NumberOfPoints; i++)
-    {
-      polyLine->GetPointIds()->SetId(i,i);
+      vtkSmartPointer<vtkLine> closingLine = vtkSmartPointer<vtkLine>::New();
+      closingLine->GetPointIds()->SetId(0, NumberContourPoints-1); // last point
+      closingLine->GetPointIds()->SetId(1, 0); // first point
+      ls->m_ContourLines->InsertNextCell(closingLine);
     }
 
-    vtkSmartPointer<vtkCellArray> cells = vtkSmartPointer<vtkCellArray>::New();
-    cells->InsertNextCell(polyLine);
-
     ls->m_VtkContourPolyData->SetPoints(ls->m_ContourPoints);
-    ls->m_VtkContourPolyData->SetLines(cells);
+    ls->m_VtkContourPolyData->SetLines(ls->m_ContourLines);
 
     ls->m_VtkContourPolyDataMappers->SetInput(ls->m_VtkContourPolyData);
     ls->m_ContourActors->SetMapper(ls->m_VtkContourPolyDataMappers);
@@ -383,109 +495,12 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   }
 
-  // create label
-  if(m_ShowDistances)
- // {
-  /*vtkSmartPointer<vtkVectorText> label;
-  vtkSmartPointer<vtkTransform> aLabelTransform;
-  vtkSmartPointer<vtkTransformPolyDataFilter> labelTransform;
-
-  for (pointsIter=itkPointSet->GetPoints()->Begin();
-    pointsIter!=itkPointSet->GetPoints()->End();
-    pointsIter++)
-  {
-
-    // todo label nur auf den punkten die angezeigt werden
-
-     // char buffer[20];
-    //  std::string l = pointLabel;
-      std::string l = "baeh";
-      //if ( input->GetSize()>1 )
-      //{
-      //  sprintf(buffer,"%d",j+1);
-      //  l.append(buffer);
-      //}
-      // Define the text for the label
-      label = vtkSmartPointer<vtkVectorText>::New();
-      label->SetText(l.c_str());
-
-      //# Set up a transform to move the label to a new position.
-      aLabelTransform = vtkSmartPointer<vtkTransform>::New();
-      aLabelTransform->Identity();
-      itk::Point<float> point1 = pointsIter->Value();
-      aLabelTransform->Translate(point1[0]+2,point1[1]+2,point1[2]);
-      aLabelTransform->Scale(5.7,5.7,5.7);
-
-      //# Move the label to a new position.
-
-      labelTransform = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-      labelTransform->SetTransform(aLabelTransform);
-      labelTransform->SetInput(label->GetOutput());
-
-      ls->m_VtkTextPolyData->AddInput(labelTransform->GetOutput());
-}
-  }*/
-
-
-
-
-
-
-
-
-// show label
-
-   const int text2dDistance = 10;
-    // now paint text if available
-
-     for (pointsIter=itkPointSet->GetPoints()->Begin();
-    pointsIter!=itkPointSet->GetPoints()->End();
-    pointsIter++){
-
-    //  displayGeometry->Map(projected_p, pt2d);
-     //   displayGeometry->WorldToDisplay(pt2d, pt2d);
-
-      point = pointsIter->Value();
-        if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()
-              ->GetProperty("label")) != NULL)
-        {
-          const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
-            this->GetDataNode()->GetProperty("label"))->GetValue();
-          std::string l = pointLabel;
-          if (input->GetSize()>1)
-          {
-            // char buffer[20];
-            // sprintf(buffer,"%d",it->Index());
-            std::stringstream ss;
-            ss << pointsIter->Index();
-            l.append(ss.str());
-          }
-          //if (unselectedColor != NULL)
-         // {
-            //mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-         //   float rgb[3];//yellow
-         //   rgb[0] = unselectedColor[0]; rgb[1] = unselectedColor[1]; rgb[2] = unselectedColor[2];
-          //  renderer->WriteSimpleText(l, point[0] + text2dDistance, point[1] + text2dDistance,rgb[0], rgb[1],rgb[2]);
-         // }
-         // else
-        //  {
-            mitk::VtkPropRenderer* propRenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-            propRenderer->WriteSimpleText(l, point[0] + text2dDistance, point[1] + text2dDistance,0.0,1.0,0.0);
-        //  }
-        }
-     }
-
-  ls->m_VtkTextPolyDataMapper->SetInput(ls->m_VtkTextPolyData->GetOutput());
-  ls->m_VtkTextActor->SetMapper(ls->m_VtkTextPolyDataMapper);
-
-  ls->m_PropAssemblies->AddPart(ls->m_VtkTextActor);
-
   // the point set must be transformed in order to obtain the appropriate glyph orientation
   // according to the current view
   vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> a,b = vtkSmartPointer<vtkMatrix4x4>::New();
 
-  a = planeGeo->GetVtkTransform()->GetMatrix();
+  a = planeGeometry->GetVtkTransform()->GetMatrix();
   b->DeepCopy( a );
 
   // delete transformation from matrix, only take orientation
@@ -530,12 +545,13 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_PropAssemblies->AddPart(ls->m_UnselectedActors);
 
 
-    //---- SELECTED POINTS  -----//
+  //---- SELECTED POINTS  -----//
 
-   ls->m_SelectedGlyphSource2D->SetGlyphTypeToDiamond();
-   ls->m_SelectedGlyphSource2D->FilledOff();
+  ls->m_SelectedGlyphSource2D->SetGlyphTypeToDiamond();
+  ls->m_SelectedGlyphSource2D->CrossOn();
+  ls->m_SelectedGlyphSource2D->FilledOff();
 
-   // apply transform
+  // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterS = vtkSmartPointer<vtkTransformFilter>::New();
   transformFilterS->SetInputConnection(ls->m_SelectedGlyphSource2D->GetOutputPort());
   transformFilterS->SetTransform(transform);
@@ -597,7 +613,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
 
   //check for color props and use it for rendering of selected/unselected points and contour
-  //due to different params in VTK (double/float) we have to convert!
+  //due to different params in VTK (double/float) we have to convert
 
 
   float unselectedColor[4];
@@ -616,8 +632,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     ls->m_UnselectedActors->VisibilityOn();
     ls->m_SelectedActors->VisibilityOn();
 
-   // ApplyAllProperties(renderer, ls->m_UnselectedActors);
-   // ApplyAllProperties(renderer, ls->m_SelectedActors);
+    // ApplyAllProperties(renderer, ls->m_UnselectedActors);
+    // ApplyAllProperties(renderer, ls->m_SelectedActors);
 
     //check if there is a color property
     GetDataNode()->GetColor(unselectedColor);
@@ -699,7 +715,7 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite ); // width of the line from one point to another
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(2), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
+  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points

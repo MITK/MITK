@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkGlyph3D.h>
 #include <vtkGlyphSource2D.h>
 #include <vtkFloatArray.h>
+#include <vtkCellArray.h>
+#include <vtkTextActor.h>
 
 class vtkActor;
 class vtkPropAssembly;
@@ -37,6 +39,7 @@ class vtkGlyphSource2D;
 class vtkSphereSource;
 class vtkGlyph3D;
 class vtkFloatArray;
+
 
 namespace mitk {
 
@@ -146,39 +149,49 @@ namespace mitk {
       vtkSmartPointer<vtkPoints> m_SelectedPoints;
       vtkSmartPointer<vtkPoints> m_ContourPoints;
 
+      vtkSmartPointer<vtkCellArray> m_ContourLines;
+
       vtkSmartPointer<vtkGlyph3D> m_UnselectedGlyph3D;
       vtkSmartPointer<vtkGlyph3D> m_SelectedGlyph3D;
 
-     vtkSmartPointer<vtkFloatArray> m_DistancesBetweenPoints;
-     vtkSmartPointer<vtkFloatArray> m_UnselectedScales;
-     vtkSmartPointer<vtkFloatArray> m_SelectedScales;
+      vtkSmartPointer<vtkFloatArray> m_DistancesBetweenPoints;
+      vtkSmartPointer<vtkFloatArray> m_UnselectedScales;
+      vtkSmartPointer<vtkFloatArray> m_SelectedScales;
 
-     vtkSmartPointer<vtkGlyphSource2D> m_UnselectedGlyphSource2D;
-     vtkSmartPointer<vtkGlyphSource2D> m_SelectedGlyphSource2D;
+      vtkSmartPointer<vtkGlyphSource2D> m_UnselectedGlyphSource2D;
+      vtkSmartPointer<vtkGlyphSource2D> m_SelectedGlyphSource2D;
 
-    vtkSmartPointer<vtkAppendPolyData> m_VtkTextPolyData;
-    vtkSmartPointer<vtkPolyDataMapper> m_VtkTextPolyDataMapper;
-    vtkSmartPointer<vtkActor> m_VtkTextActor;
+      //vtkSmartPointer<vtkAppendPolyData> m_VtkTextPolyData;
+      //vtkSmartPointer<vtkPolyDataMapper> m_VtkTextPolyDataMapper;
+
+      vtkSmartPointer<vtkTextActor> m_VtkTextActor;
+
+      std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextLabelActors;
+      std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextDistanceActors;
+      std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextAngleActors;
+
 
 
       LocalStorage()
       {
 
-        m_VtkTextPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
-        m_VtkTextPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        m_VtkTextActor = vtkSmartPointer<vtkActor>::New();
+       // m_VtkTextPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
+        //m_VtkTextPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+       // m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
+
 
         // mappers
         m_VtkUnselectedPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
         m_VtkSelectedPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
         m_VtkContourPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
 
-         // scales
-         m_UnselectedScales = vtkSmartPointer<vtkFloatArray>::New();
-         m_SelectedScales = vtkSmartPointer<vtkFloatArray>::New();
+        // scales
+        m_UnselectedScales = vtkSmartPointer<vtkFloatArray>::New();
+        m_SelectedScales = vtkSmartPointer<vtkFloatArray>::New();
 
-         // distances
-         m_DistancesBetweenPoints = vtkSmartPointer<vtkFloatArray>::New();
+        // distances
+        m_DistancesBetweenPoints = vtkSmartPointer<vtkFloatArray>::New();
 
         // polydata
         m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -197,6 +210,9 @@ namespace mitk {
         m_UnselectedPoints = vtkSmartPointer<vtkPoints>::New();
         m_SelectedPoints = vtkSmartPointer<vtkPoints>::New();
         m_ContourPoints = vtkSmartPointer<vtkPoints>::New();
+
+        // lines
+        m_ContourLines = vtkSmartPointer<vtkCellArray>::New();
 
         // glyphs
         m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();

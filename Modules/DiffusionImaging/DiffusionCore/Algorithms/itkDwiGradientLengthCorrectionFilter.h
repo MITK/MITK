@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-  class DiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
-  {
+class DiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
+{
 
-  public:
+public:
     typedef DwiGradientLengthCorrectionFilter                                                           Self;
     typedef SmartPointer<Self>                                                                          Pointer;
     typedef SmartPointer<const Self>                                                                    ConstPointer;
@@ -54,17 +54,19 @@ namespace itk
 
     // output
     itkGetMacro(OutputGradientDirectionContainer, GradientDirectionContainerType::Pointer)
+    itkGetMacro(NewBValue, double)
 
-  protected:
-    DwiGradientLengthCorrectionFilter();
+    protected:
+        DwiGradientLengthCorrectionFilter();
     ~DwiGradientLengthCorrectionFilter();
 
+    double m_NewBValue;
     double m_ReferenceBValue;
     int m_RoundingValue;
 
     GradientDirectionContainerType::Pointer m_ReferenceGradientDirectionContainer;
     GradientDirectionContainerType::Pointer m_OutputGradientDirectionContainer;
-   };
+};
 
 
 } // end of namespace

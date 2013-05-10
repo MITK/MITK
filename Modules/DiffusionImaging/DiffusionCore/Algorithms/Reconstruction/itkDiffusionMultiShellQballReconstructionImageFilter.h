@@ -60,8 +60,8 @@ public:
 
     typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
 
-    typedef std::map<double, std::vector<unsigned int> > BValueMap;
-    typedef std::map<double, std::vector<unsigned int> >::iterator BValueMapIteraotr;
+    typedef std::map<unsigned int, std::vector<unsigned int> > BValueMap;
+    typedef std::map<unsigned int, std::vector<unsigned int> >::iterator BValueMapIteraotr;
     typedef std::vector<unsigned int> IndiciesVector;
 
     // --------------------------------------------------------------------------------------------//

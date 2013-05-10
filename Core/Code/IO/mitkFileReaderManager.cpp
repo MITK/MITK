@@ -34,10 +34,12 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
 
   // Get best Reader
   mitk::IFileReader* reader = GetReader(extension);
-
-  //Read
-  //return reader->Read(path);
-  return 0;
+  // Throw exception if no compatible reader was found
+  if (reader == 0) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
+  itk::SmartPointer<mitk::BaseData> result = reader->Read(path);
+  // TODO evil HotFix: We are loosing the smartpointer reference here otherwise...
+  result->Register();
+  return result;
 }
 
 
@@ -45,7 +47,9 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
 
 mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, mitk::ModuleContext* context )
 {
-  return context->GetService<mitk::IFileReader>(GetReaderList(extension, context).front());
+  std::list <mitk::ServiceReference> results = GetReaderList(extension, context);
+  if (results.size() == 0) return 0;
+  return context->GetService<mitk::IFileReader>(results.front());
 }
 
 std::list <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, mitk::ModuleContext* context )

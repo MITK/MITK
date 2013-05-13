@@ -175,7 +175,7 @@ public:
       }
   };
 
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);

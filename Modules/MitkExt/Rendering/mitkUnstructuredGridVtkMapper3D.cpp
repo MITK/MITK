@@ -123,31 +123,40 @@ vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
 void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
 
-  m_Assembly->VisibilityOn();
-
-  m_ActorWireframe->GetProperty()->SetAmbient(1.0);
-  m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
-  m_ActorWireframe->GetProperty()->SetSpecular(0.0);
-
   mitk::DataNode::ConstPointer node = this->GetDataNode();
-  mitk::TransferFunctionProperty::Pointer transferFuncProp;
-  if (node->GetProperty(transferFuncProp, "TransferFunction"))
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(needGenerateData)
   {
-    mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
-    if (transferFunction->GetColorTransferFunction()->GetSize() < 2)
+    ls->UpdateGenerateDataTime();
+
+    m_Assembly->VisibilityOn();
+
+    m_ActorWireframe->GetProperty()->SetAmbient(1.0);
+    m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
+    m_ActorWireframe->GetProperty()->SetSpecular(0.0);
+
+    mitk::TransferFunctionProperty::Pointer transferFuncProp;
+    if (node->GetProperty(transferFuncProp, "TransferFunction"))
     {
-      mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
-      if (input.IsNull()) return;
+      mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
+      if (transferFunction->GetColorTransferFunction()->GetSize() < 2)
+      {
+        mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
+        if (input.IsNull()) return;
 
-      vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
-      if (grid == 0) return;
+        vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
+        if (grid == 0) return;
 
-      double* scalarRange = grid->GetScalarRange();
-      vtkColorTransferFunction* colorFunc = transferFunction->GetColorTransferFunction();
-      colorFunc->RemoveAllPoints();
-      colorFunc->AddRGBPoint(scalarRange[0], 1, 0, 0);
-      colorFunc->AddRGBPoint((scalarRange[0] + scalarRange[1])/2.0, 0, 1, 0);
-      colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
+        double* scalarRange = grid->GetScalarRange();
+        vtkColorTransferFunction* colorFunc = transferFunction->GetColorTransferFunction();
+        colorFunc->RemoveAllPoints();
+        colorFunc->AddRGBPoint(scalarRange[0], 1, 0, 0);
+        colorFunc->AddRGBPoint((scalarRange[0] + scalarRange[1])/2.0, 0, 1, 0);
+        colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
+      }
     }
   }
 

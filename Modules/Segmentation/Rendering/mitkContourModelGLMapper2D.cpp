@@ -37,6 +37,8 @@ mitk::ContourModelGLMapper2D::~ContourModelGLMapper2D()
 
 void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
@@ -74,7 +76,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   renderingContour->UpdateOutputInformation();
 
 
-  if( renderingContour->GetMTime() < this->m_LastUpdateTime )
+  if( renderingContour->GetMTime() < ls->GetLastGenerateDataTime() )
     updateNeccesary = false;
 
   if(renderingContour->GetNumberOfVertices(timestep) < 1)

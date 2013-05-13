@@ -202,8 +202,6 @@ namespace mitk {
     //\brief not thread-safe
     itk::WeakPointer<DataNode> m_DataNode;
 
-    /** \brief timestamp of last update of stored data */
-    itk::TimeStamp m_LastUpdateTime;
 
   private:
 
@@ -224,8 +222,25 @@ namespace mitk {
 
     /** \brief Base class for mapper specific rendering ressources.
      */
-    class BaseLocalStorage
+    class MITK_CORE_EXPORT BaseLocalStorage
     {
+      public:
+
+
+      bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
+
+      inline void UpdateGenerateDataTime()
+      {
+        m_LastGenerateDataTime.Modified();
+      }
+
+      inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
+
+      protected:
+
+      /** \brief timestamp of last update of stored data */
+      itk::TimeStamp m_LastGenerateDataTime;
+
     };
 
 
@@ -244,6 +259,7 @@ namespace mitk {
         std::map<mitk::BaseRenderer *,L*> m_BaseRenderer2LS;
 
       public:
+
 
         /** \brief deallocates a local storage for a specifc BaseRenderer (if the
          * BaseRenderer is itself deallocating it in its destructor, it has to set

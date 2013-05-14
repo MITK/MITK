@@ -107,6 +107,13 @@ namespace mitk
     virtual const char** GetXPM() const = 0;
 
     /**
+     * \brief Returns the path of an icon.
+     *
+     * This icon is preferred to the XPM icon.
+     */
+    virtual std::string GetIconPath() const { return ""; }
+
+    /**
     \brief Returns the name of this tool. Make it short!
 
     This name has to fit into some kind of button in most applications, so take some time to think of a good name!

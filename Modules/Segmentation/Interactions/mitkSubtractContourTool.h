@@ -51,6 +51,7 @@ class Segmentation_EXPORT SubtractContourTool : public ContourTool
     itkNewMacro(SubtractContourTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

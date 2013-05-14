@@ -48,6 +48,7 @@ class Segmentation_EXPORT DrawPaintbrushTool : public PaintbrushTool
     itkNewMacro(DrawPaintbrushTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

@@ -126,6 +126,14 @@ const char** mitk::LiveWireTool2D::GetXPM() const
 
 
 
+std::string mitk::LiveWireTool2D::GetIconPath() const
+{
+  return ":/Segmentation/LiveWire_48x48.png";
+}
+
+
+
+
 const char* mitk::LiveWireTool2D::GetName() const
 {
   return "LiveWire";

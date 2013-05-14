@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qtoolbutton.h>
 #include <QList>
+#include <QResizeEvent>
 #include <qtooltip.h>
 #include <qmessagebox.h>
 #include <qlayout.h>
@@ -35,6 +36,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_DisplayedGroups("default"),
  m_LayoutColumns(2),
  m_ShowNames(true),
+ m_AutoShowNamesWidth(0),
  m_GenerateAccelerators(false),
  m_ToolGUIWidget(NULL),
  m_LastToolGUI(NULL),
@@ -495,6 +497,9 @@ void QmitkToolSelectionBox::RecreateButtons()
     // mmueller
     button->setCheckable ( true );
 
+    if(currentToolID == m_ToolManager->GetActiveToolID())
+      button->setChecked(true);
+
     QString label;
     if (m_GenerateAccelerators)
     {
@@ -521,9 +526,32 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setFont( currentFont );
     }
 
-    //button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
-    // mmueller
-    button->setIcon( QIcon( QPixmap( tool->GetXPM() ) ) );       // an icon
+    std::string iconPath = tool->GetIconPath();
+
+    if (iconPath.empty())
+    {
+      button->setIcon(QIcon(QPixmap(tool->GetXPM())));
+    }
+    else
+    {
+      button->setIcon(QIcon(iconPath.c_str()));
+
+      if (m_ShowNames)
+      {
+        if (m_LayoutColumns == 1)
+          button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        else
+          button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+        button->setIconSize(QSize(24, 24));
+      }
+      else
+      {
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        button->setIconSize(QSize(32, 32));
+        button->setToolTip(tooltip);
+      }
+    }
 
     if (m_GenerateAccelerators)
     {
@@ -565,7 +593,6 @@ void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
   QMessageBox::information(NULL, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
-
 void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups)
 {
   if (m_DisplayedGroups != toolGroups)
@@ -601,6 +628,20 @@ void QmitkToolSelectionBox::SetShowNames(bool show)
   }
 }
 
+void QmitkToolSelectionBox::SetAutoShowNamesWidth(int width)
+{
+  width = std::max(0, width);
+
+  if (m_AutoShowNamesWidth != width)
+  {
+    m_AutoShowNamesWidth = width;
+
+    if (width != 0)
+      this->SetShowNames(this->width() >= m_AutoShowNamesWidth);
+    else
+      this->SetShowNames(true);
+  }
+}
 
 void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
 {
@@ -610,7 +651,6 @@ void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
     RecreateButtons();
   }
 }
-
 
 void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
 {
@@ -627,10 +667,16 @@ void QmitkToolSelectionBox::showEvent( QShowEvent* e )
   SetGUIEnabledAccordingToToolManagerState();
 }
 
-
 void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
 {
   QWidget::hideEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
 }
 
+void QmitkToolSelectionBox::resizeEvent( QResizeEvent* e )
+{
+  QWidget::resizeEvent(e);
+
+  if (m_AutoShowNamesWidth != 0)
+      this->SetShowNames(e->size().width() >= m_AutoShowNamesWidth);
+}

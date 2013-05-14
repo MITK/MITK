@@ -67,6 +67,11 @@ const char** mitk::RegionGrowingTool::GetXPM() const
   return mitkRegionGrowingTool_xpm;
 }
 
+std::string mitk::RegionGrowingTool::GetIconPath() const
+{
+  return ":/Segmentation/RegionGrowing_48x48.png";
+}
+
 const char* mitk::RegionGrowingTool::GetName() const
 {
   return "Region Growing";

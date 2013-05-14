@@ -73,3 +73,7 @@ Rendering/mitkContourModelMapper2D.cpp
 Rendering/mitkContourModelMapper3D.cpp
 Rendering/mitkContourModelGLMapper2D.cpp
 )
+
+set(QRC_FILES
+  resources/Segmentation.qrc
+)

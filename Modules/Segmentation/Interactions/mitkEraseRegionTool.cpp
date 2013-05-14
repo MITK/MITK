@@ -37,6 +37,11 @@ const char** mitk::EraseRegionTool::GetXPM() const
   return mitkEraseRegionTool_xpm;
 }
 
+std::string mitk::EraseRegionTool::GetIconPath() const
+{
+  return ":/Segmentation/Erase_48x48.png";
+}
+
 const char* mitk::EraseRegionTool::GetName() const
 {
   return "Erase";

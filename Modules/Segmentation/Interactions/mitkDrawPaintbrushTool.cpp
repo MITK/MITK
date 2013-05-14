@@ -36,6 +36,11 @@ const char** mitk::DrawPaintbrushTool::GetXPM() const
   return mitkDrawPaintbrushTool_xpm;
 }
 
+std::string mitk::DrawPaintbrushTool::GetIconPath() const
+{
+  return ":/Segmentation/Paint_48x48.png";
+}
+
 const char* mitk::DrawPaintbrushTool::GetName() const
 {
   return "Paint";

@@ -257,11 +257,12 @@ set(CPP_FILES
 
   Interfaces/mitkInteractionEventObserver.cpp
 
+  IO/mitkAbstractFileReader.cpp
+  IO/mitkLegacyFileReaderService.cpp
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
-  IO/mitkAbstractFileReader.cpp
   IO/mitkFileReaderManager.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp

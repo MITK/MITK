@@ -17,15 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLegacyFileReaderService.h>
 #include <usGetModuleContext.h>
+#include <mitkIOUtil.h>
 
 //#include <mitkBaseData.h>
 
-mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension, mitk::FileReader* reader)
+mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension)
 {
   if (extension == "") mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension." ;
-  if (reader == 0) mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without a FileReader to Wrap." ;
   m_Extension = extension;
-  m_Reader = reader;
+  m_Priority = 0; // Default priority for legacy reader
   RegisterMicroservice(mitk::GetModuleContext());
 }
 
@@ -38,20 +38,11 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 itk::SmartPointer<mitk::BaseData> mitk::LegacyFileReaderService::Read(const std::string& path)
 {
-//  m_Reader->SetFileName(path);
-//  m_Reader->
-  return 0;
+  return mitk::IOUtil::LoadDataNode(path)->GetData();
 }
 
 itk::SmartPointer<mitk::BaseData> mitk::LegacyFileReaderService::Read(const std::istream& stream )
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
   return 0;
-}
-
-bool mitk::LegacyFileReaderService::CanRead(const std::string& path) const
-{
-  // Default implementation only checks if extension is correct
-  std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
-  return (m_Extension == pathEnd);
 }

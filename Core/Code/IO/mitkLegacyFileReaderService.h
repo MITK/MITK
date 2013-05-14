@@ -46,20 +46,16 @@ namespace mitk {
 
     mitkClassMacro( LegacyFileReaderService, AbstractFileReader);
 
-    mitkNewMacro2Param( Self, std::string , mitk::FileReader*);
+    mitkNewMacro1Param( Self, std::string );
 
     virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0);
 
     virtual itk::SmartPointer<BaseData> Read(const std::istream& stream );
 
-    virtual bool CanRead(const std::string& path) const;
-
 
 protected:
-    LegacyFileReaderService(std::string extension, mitk::FileReader* reader);
+    LegacyFileReaderService(std::string extension);
     virtual ~LegacyFileReaderService();
-
-    mitk::FileReader* m_Reader;
 
 };
 } // namespace mitk

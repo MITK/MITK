@@ -60,6 +60,7 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     itkNewMacro(RegionGrowingTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

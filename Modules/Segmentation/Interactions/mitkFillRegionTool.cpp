@@ -36,6 +36,11 @@ const char** mitk::FillRegionTool::GetXPM() const
   return mitkFillRegionTool_xpm;
 }
 
+std::string mitk::FillRegionTool::GetIconPath() const
+{
+  return ":/Segmentation/Fill_48x48.png";
+}
+
 const char* mitk::FillRegionTool::GetName() const
 {
   return "Fill";

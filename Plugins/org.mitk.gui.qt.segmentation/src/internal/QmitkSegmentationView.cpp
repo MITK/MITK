@@ -99,6 +99,7 @@ void QmitkSegmentationView::Activated()
   // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
+    m_Controls->m_ManualToolSelectionBox->SetAutoShowNamesWidth(0); // TODO: kislinsk
     m_Controls->m_ManualToolSelectionBox->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );

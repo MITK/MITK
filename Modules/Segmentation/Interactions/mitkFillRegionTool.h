@@ -45,6 +45,7 @@ class Segmentation_EXPORT FillRegionTool : public SetRegionTool
     itkNewMacro(FillRegionTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

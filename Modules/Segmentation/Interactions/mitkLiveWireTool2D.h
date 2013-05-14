@@ -52,6 +52,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     itkNewMacro(LiveWireTool2D);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

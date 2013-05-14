@@ -36,6 +36,11 @@ const char** mitk::AddContourTool::GetXPM() const
   return mitkAddContourTool_xpm;
 }
 
+std::string mitk::AddContourTool::GetIconPath() const
+{
+  return ":/Segmentation/Add_48x48.png";
+}
+
 const char* mitk::AddContourTool::GetName() const
 {
   return "Add";

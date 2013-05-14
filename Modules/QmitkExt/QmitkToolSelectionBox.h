@@ -99,6 +99,7 @@ class QmitkExt_EXPORT QmitkToolSelectionBox : public QWidget
 
     virtual void SetLayoutColumns(int);
     virtual void SetShowNames(bool);
+    virtual void SetAutoShowNamesWidth(int width);
     virtual void SetGenerateAccelerators(bool);
 
     virtual void SetToolGUIArea( QWidget* parentWidget );
@@ -112,6 +113,7 @@ class QmitkExt_EXPORT QmitkToolSelectionBox : public QWidget
 
     void showEvent( QShowEvent* );
     void hideEvent( QHideEvent* );
+    void resizeEvent( QResizeEvent* );
 
     void RecreateButtons();
     void SetOrUnsetButtonForActiveTool();
@@ -129,6 +131,7 @@ class QmitkExt_EXPORT QmitkToolSelectionBox : public QWidget
 
     int  m_LayoutColumns;
     bool m_ShowNames;
+    int m_AutoShowNamesWidth;
     bool m_GenerateAccelerators;
 
     QWidget* m_ToolGUIWidget;

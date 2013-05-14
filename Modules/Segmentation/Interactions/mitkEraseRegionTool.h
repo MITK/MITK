@@ -46,6 +46,7 @@ class Segmentation_EXPORT EraseRegionTool : public SetRegionTool
     itkNewMacro(EraseRegionTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
   protected:

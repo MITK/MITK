@@ -56,6 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+#include <itkAddArtifactsToDwiImageFilter.h>
 
 #include <QMessageBox>
 
@@ -745,6 +746,46 @@ void QmitkFiberfoxView::GenerateImage()
 
     if (m_SelectedBundles.empty())
     {
+        if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
+        {
+            for (int i=0; i<m_SelectedImages.size(); i++)
+            {
+
+                QString artifactModelString("");
+
+                if (!dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData()))
+                    continue;
+                mitk::DiffusionImage<short>::Pointer diffImg = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData());
+
+                double noiseVariance = 0;
+                if (m_Controls->m_AddNoise->isChecked())
+                {
+                    noiseVariance = m_Controls->m_NoiseLevel->value();
+                    artifactModelString += "_NOISE";
+                    artifactModelString += QString::number(noiseVariance);
+                }
+                mitk::RicianNoiseModel<short> noiseModel;
+                noiseModel.SetNoiseVariance(noiseVariance);
+
+                itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
+                filter->SetInput(diffImg->GetVectorImage());
+
+                //            filter->SetkOffset(m_Controls->doubleSpinBox->value());
+                filter->SetNoiseModel(&noiseModel);
+                filter->Update();
+
+                mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+                mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
+                image->SetVectorImage( filter->GetOutput() );
+                image->SetB_Value(diffImg->GetB_Value());
+                image->SetDirections(diffImg->GetDirections());
+                image->InitializeFromVectorImage();
+                resultNode->SetData( image );
+                resultNode->SetName(m_SelectedImages.at(i)->GetName()+artifactModelString.toStdString());
+                GetDataStorage()->Add(resultNode);
+            }
+            return;
+        }
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
                     m_Controls->m_SizeX->value(),
                     m_Controls->m_SizeY->value(),
@@ -1103,8 +1144,8 @@ void QmitkFiberfoxView::GenerateImage()
             CastToItkImage< ItkDoubleImgType >(img, itkImg);
 
             if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
-                imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
-                imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+                    imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                    imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
                 tractsToDwiFilter->SetFrequencyMap(itkImg);
         }
 

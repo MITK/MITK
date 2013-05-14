@@ -30,7 +30,7 @@ m_Extension ("")
 
 mitk::AbstractFileReader::~AbstractFileReader()
 {
-  UnregisterMicroservice(mitk::GetModuleContext());
+
 }
 
 ////////////////// Filenames etc. //////////////////

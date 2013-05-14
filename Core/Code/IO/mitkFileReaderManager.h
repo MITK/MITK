@@ -51,12 +51,12 @@ class MITK_CORE_EXPORT FileReaderManager
     static mitk::BaseData::Pointer Read(const std::string& path);
 
     template <class T>
-    static T* Read(const std::string& path);
-   // {
-   //   if (this->m_Controls->m_ServiceList->currentRow()==-1) return NULL;
-   //   mitk::ServiceReference ref = GetServiceForListItem( this->m_Controls->m_ServiceList->currentItem() );
-   //   return ( m_Context->GetService<T>(ref) );
-   /// }
+    static T* Read(const std::string& path)
+    {
+      mitk::BaseData::Pointer basedata = Read(path);
+      T* result = dynamic_cast<T*> (basedata.GetPointer());
+      return result;
+    }
 
     /**
     * Returns a compatible Reader to the given file extension

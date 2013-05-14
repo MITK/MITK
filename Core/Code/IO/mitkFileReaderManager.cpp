@@ -37,8 +37,6 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
   // Throw exception if no compatible reader was found
   if (reader == 0) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
   itk::SmartPointer<mitk::BaseData> result = reader->Read(path);
-  // TODO evil HotFix: We are loosing the smartpointer reference here otherwise...
-  result->Register();
   return result;
 }
 

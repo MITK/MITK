@@ -40,15 +40,15 @@ class DiffusionCore_EXPORT gradients
 private:
   typedef std::vector<unsigned int> IndiciesVector;
   typedef std::map<double, IndiciesVector > BValueMap;
-  typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
+  typedef vnl_vector_fixed< double, 3 > GradientDirectionType;
+  typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
 public:
-  static std::vector<unsigned int> GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer );
-
-  static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer);
+  static std::vector<unsigned int> GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType *refGradientsContainer );
+  static bool CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType * refGradientsContainer);
   static vnl_matrix<double> ComputeSphericalHarmonicsBasis(const vnl_matrix<double> & QBallReference, const unsigned int & LOrder);
-  static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, GradientDirectionContainerType::Pointer refGradientsContainer);
-  static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, mitk::gradients::GradientDirectionContainerType::Pointer origninalGradentcontainer);
+  static vnl_matrix<double> ComputeSphericalFromCartesian(const IndiciesVector  & refShell, const GradientDirectionContainerType * refGradientsContainer);
+  static mitk::gradients::GradientDirectionContainerType::Pointer CreateNormalizedUniqueGradientDirectionContainer(const BValueMap &bValueMap, const GradientDirectionContainerType * origninalGradentcontainer);
 
 
   template<typename type>

@@ -200,12 +200,12 @@ void UltrasoundSupport::GlobalReinit()
 
 UltrasoundSupport::UltrasoundSupport()
 {
-m_DevicePersistence = mitk::USDevicePersistence::New();
-m_DevicePersistence->RestoreLastDevices();
+  m_DevicePersistence = mitk::USDevicePersistence::New();
+  m_DevicePersistence->RestoreLastDevices();
 }
 
 UltrasoundSupport::~UltrasoundSupport()
 {
-m_DevicePersistence->StoreCurrentDevices();
-m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
+  m_DevicePersistence->StoreCurrentDevices();
+  m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
 }

@@ -2,7 +2,7 @@
   \defgroup org_mitk_gui_qt_ultrasound org.mitk.gui.qt.ultrasound
   \ingroup MITKPlugins
 
-  \brief Describe your plugin here.
+  \brief A plugin that manages and views images from ultrasound devices.
   
 */
 

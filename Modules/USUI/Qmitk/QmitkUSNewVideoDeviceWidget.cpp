@@ -136,7 +136,7 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
   // If no VideoDevice is given, throw an exception
   if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") != 0){
     // TODO Alert if bad path
-    mitkThrow() << "NewVideoDeviceWidget recieved an incompatible Device Type to edit. Devicetype was: " << device->GetDeviceClass();
+    mitkThrow() << "NewVideoDeviceWidget recieved an incompatible device type to edit. Type was: " << device->GetDeviceClass();
   }
   m_TargetDevice = static_cast<mitk::USVideoDevice*> (device.GetPointer());
   m_Active = true;

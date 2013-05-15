@@ -95,7 +95,7 @@ double mitk::sh::Yj(int m, int l, double theta, double phi)
 
 //------------------------- gradients-function ------------------------------------
 
-std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
+std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType * refGradientsContainer )
 {
 
   IndiciesVector directioncontainer;
@@ -135,7 +135,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map
 }
 
 
-bool mitk::gradients::CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer)
+bool mitk::gradients::CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap,  const GradientDirectionContainerType * refGradientsContainer)
 {
   BValueMap::const_iterator mapIterator = refBValueMap.begin();
 
@@ -170,16 +170,17 @@ double mitk::gradients::dot (vnl_vector_fixed< type ,3> const& v1, vnl_vector_fi
   return result ;
 }
 
-vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const IndiciesVector & refShell, GradientDirectionContainerType::Pointer refGradientsContainer)
+vnl_matrix<double> mitk::gradients::ComputeSphericalFromCartesian(const IndiciesVector & refShell, const GradientDirectionContainerType * refGradientsContainer)
 {
 
   vnl_matrix<double> Q(3, refShell.size());
 
   for(unsigned int i = 0; i < refShell.size(); i++)
   {
-    double x = refGradientsContainer->ElementAt(refShell[i]).normalize().get(0);
-    double y = refGradientsContainer->ElementAt(refShell[i]).normalize().get(1);
-    double z = refGradientsContainer->ElementAt(refShell[i]).normalize().get(2);
+    GradientDirectionType dir = refGradientsContainer->ElementAt(refShell[i]);
+    double x = dir.normalize().get(0);
+    double y = dir.normalize().get(1);
+    double z = dir.normalize().get(2);
     double cart[3];
     mitk::sh::Cart2Sph(x,y,z,cart);
     Q(0,i) = cart[0];
@@ -204,9 +205,8 @@ vnl_matrix<double> mitk::gradients::ComputeSphericalHarmonicsBasis(const vnl_mat
   return SHBasisOutput;
 }
 
-mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(
-    const mitk::gradients::BValueMap & bValueMap,
-    mitk::gradients::GradientDirectionContainerType::Pointer origninalGradentcontainer)
+mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::CreateNormalizedUniqueGradientDirectionContainer(const mitk::gradients::BValueMap & bValueMap,
+    const GradientDirectionContainerType *origninalGradentcontainer)
 {
   mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
   BValueMap::const_iterator mapIterator = bValueMap.begin();
@@ -240,7 +240,8 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::Create
       }
       if(!directionExist)
       {
-        directioncontainer->push_back(origninalGradentcontainer->ElementAt(wntIndex).normalize());
+        GradientDirectionType dir(origninalGradentcontainer->ElementAt(wntIndex));
+        directioncontainer->push_back(dir.normalize());
       }
     }
   }

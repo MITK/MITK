@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPyramidImageRegistrationMethod.h"
 
 #include "mitkException.h"
+#include "mitkImageAccessByItk.h"
 
 mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
   : m_FixedImage(NULL),
@@ -60,6 +61,12 @@ void mitk::PyramidImageRegistrationMethod::Update()
     mitkThrow() << " Moving image is null";
   }
 
+  if( m_FixedImage->GetDimension() != 3 ||
+      m_MovingImage->GetDimension() != 3 )
+  {
+    mitkThrow() << " Only 3D Images supported.";
+  }
 
+  AccessTwoImagesFixedDimensionByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
 
 }

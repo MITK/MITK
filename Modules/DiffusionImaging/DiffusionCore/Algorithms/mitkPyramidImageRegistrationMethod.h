@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkBaseProcess.h"
 
+#include "mitkPyramidRegistrationMethodHelper.h"
+
 
 namespace mitk
 {
@@ -108,6 +110,132 @@ protected:
   bool m_CrossModalityRegistration;
 
   bool m_UseAffineTransform;
+
+  template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+  void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2)
+  {
+    typedef typename itk::Image< TPixel1, VImageDimension1> FixedImageType;
+    typedef typename itk::Image< TPixel2, VImageDimension2> MovingImageType;
+    typedef typename itk::MultiResolutionImageRegistrationMethod< FixedImageType, MovingImageType > RegistrationType;
+    typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
+
+    typedef itk::AffineTransform< double >  AffineTransformType;
+    typedef itk::Euler3DTransform< double >  RigidTransformType;
+    typedef itk::MatrixOffsetTransformBase< double, VImageDimension1, VImageDimension2 > BaseTransformType;
+
+    typedef typename itk::MattesMutualInformationImageToImageMetric< FixedImageType, MovingImageType > MMIMetricType;
+    typedef typename itk::NormalizedCorrelationImageToImageMetric< FixedImageType, MovingImageType > NCMetricType;
+    typedef typename itk::ImageToImageMetric< FixedImageType, MovingImageType> BaseMetricType;
+
+    typename itk::LinearInterpolateImageFunction<MovingImageType, double>::Pointer interpolator =
+        itk::LinearInterpolateImageFunction<MovingImageType, double>::New();
+
+    typename BaseMetricType::Pointer metric;
+
+    if( m_CrossModalityRegistration )
+    {
+      metric = MMIMetricType::New();
+    }
+    else
+    {
+      metric = NCMetricType::New();
+    }
+
+    // initial parameter dimension ( affine = default )
+    unsigned int paramDim = 12;
+    typename BaseTransformType::ParametersType initialParams(paramDim);
+    initialParams.Fill(0);
+
+    typename BaseTransformType::Pointer transform;
+    if( m_UseAffineTransform )
+    {
+      transform = AffineTransformType::New();
+    }
+    else
+    {
+      transform = RigidTransformType::New();
+      paramDim = 6;
+    }
+
+    typename FixedImageType::Pointer referenceImage = itkImage1;
+    typename MovingImageType::Pointer movingImage = itkImage2;
+
+    typename RegistrationType::Pointer registration = RegistrationType::New();
+    unsigned int max_pyramid_lvl = 4;
+    unsigned int max_schedule_val = 8;
+    typename FixedImageType::RegionType::SizeType image_size = referenceImage->GetLargestPossibleRegion().GetSize();
+    unsigned int min_value = std::min( image_size[0], std::min( image_size[1], image_size[2]));
+
+    // condition for the top level pyramid image
+    float optmaxstep = 16;
+    float optminstep = 0.1f;
+    if( min_value / max_schedule_val < 8 )
+    {
+      //max_pyramid_lvl--;
+      max_schedule_val /= 2;
+      optmaxstep *= 0.25f;
+      optminstep *= 0.1f;
+
+      //std::cout << "Changed default pyramid: lvl " << max_pyramid_lvl << std::endl;
+    }
+
+    typename RegistrationType::ScheduleType fixedSchedule(max_pyramid_lvl,3);
+    fixedSchedule.Fill(1);
+
+    fixedSchedule[0][0] = max_schedule_val;
+    fixedSchedule[0][1] = max_schedule_val;
+    fixedSchedule[0][2] = max_schedule_val;
+
+    for( unsigned int i=1; i<max_pyramid_lvl; i++)
+    {
+      fixedSchedule[i][0] = std::max( fixedSchedule[i-1][0]/2, 1u);
+      fixedSchedule[i][1] = std::max( fixedSchedule[i-1][1]/2, 1u);
+      fixedSchedule[i][2] = std::max( fixedSchedule[i-1][2]/2, 1u);
+    }
+
+    typename OptimizerType::Pointer optimizer = OptimizerType::New();
+    typename OptimizerType::ScalesType optScales( paramDim );
+    optScales.Fill(10.0);
+
+    optScales[paramDim-3] = 1.0/1000;
+    optScales[paramDim-2] = 1.0/1000;
+    optScales[paramDim-1] = 1.0/1000;
+
+    optimizer->SetScales( optScales );
+    optimizer->SetInitialPosition( initialParams );
+    optimizer->SetNumberOfIterations( 100 );
+    optimizer->SetGradientMagnitudeTolerance( 1e-4 );
+    optimizer->SetRelaxationFactor( 0.7 );
+    optimizer->SetMaximumStepLength( optmaxstep );
+    optimizer->SetMinimumStepLength( optminstep );
+
+    // INPUT IMAGES
+    registration->SetFixedImage( referenceImage );
+    //registration->SetFixedImageRegion( maskedRegion );
+    registration->SetMovingImage( movingImage );
+    registration->SetSchedules( fixedSchedule, fixedSchedule);
+    // OTHER INPUTS
+    registration->SetMetric( metric );
+    registration->SetOptimizer( optimizer );
+    registration->SetTransform( transform.GetPointer() );
+    registration->SetInterpolator( interpolator );
+    registration->SetInitialTransformParameters( initialParams );
+
+    typename PyramidOptControlCommand<RegistrationType>::Pointer pyramid_observer =
+        PyramidOptControlCommand<RegistrationType>::New();
+
+    registration->AddObserver( itk::IterationEvent(), pyramid_observer );
+
+    try
+    {
+      registration->Update();
+    }
+    catch (itk::ExceptionObject &e)
+    {
+      MITK_ERROR << "[Registration Update] Caught ITK exception: ";
+      MITK_ERROR << e;
+    }
+  }
 
 };
 

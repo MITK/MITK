@@ -276,7 +276,12 @@ void mitk::ExampleInteractor::ConnectActionsAndFunctions()
 }
 \endcode
 
-\section HowToDataInteractor Implementation a new DataInteractor
+\section ReferenceToIncludeFiles Integration of the pattern and configuration files
+
+See \ref IncludeFiles for a description.
+
+
+\section HowToDataInteractor Implementation of a new mitk::DataInteractor
 
 DataInteractors are to inherit from mitk::DataInteractor. Their functionality is implemented in functions that follow this interface:
 \code

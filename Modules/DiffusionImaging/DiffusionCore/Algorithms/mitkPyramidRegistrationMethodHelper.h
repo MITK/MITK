@@ -29,6 +29,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEuler3DTransform.h>
 
 #include <itkMultiResolutionImageRegistrationMethod.h>
+#include <itkImageMomentsCalculator.h>
+
+#include "mitkImageAccessByItk.h"
+
+/**
+ * @brief Provides same functionality as \a AccessTwoImagesFixedDimensionByItk for a subset of types
+ *
+ *  For now, the subset defined is only short and float.
+ */
+#define AccessTwoImagesFixedDimensionTypeSubsetByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension) \
+{                                                                                                   \
+  const mitk::PixelType& pixelType1 = mitkImage1->GetPixelType();                                   \
+  const mitk::PixelType& pixelType2 = mitkImage2->GetPixelType();                                   \
+  const mitk::Image* constImage1 = mitkImage1;                                                      \
+  const mitk::Image* constImage2 = mitkImage2;                                                      \
+  mitk::Image* nonConstImage1 = const_cast<mitk::Image*>(constImage1);                              \
+  mitk::Image* nonConstImage2 = const_cast<mitk::Image*>(constImage2);                              \
+  nonConstImage1->Update();                                                                         \
+  nonConstImage2->Update();                                                                         \
+  _checkSpecificDimension(mitkImage1, (dimension));                                                 \
+  _checkSpecificDimension(mitkImage2, (dimension));                                                 \
+  _accessTwoImagesByItkForEach(itkImageTypeFunction, ((short, dimension))((float, dimension)), ((short, dimension))((float, dimension)) ) \
+  {                                                                                                 \
+    std::string msg("Pixel type ");                                                                 \
+    msg.append(pixelType1.GetComponentTypeAsString() );                                             \
+    msg.append(" or pixel type ");                                                                  \
+    msg.append(pixelType2.GetComponentTypeAsString() );                                             \
+    msg.append(" is not in " MITK_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));        \
+    throw mitk::AccessByItkException(msg);                                                          \
+  }                                                                                                 \
+}
+
 
 /**
  * @brief The PyramidOptControlCommand class stears the step lenght of the
@@ -58,5 +90,6 @@ public:
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
 };
+
 
 #endif // MITKPYRAMIDREGISTRATIONMETHODHELPER_H

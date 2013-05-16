@@ -53,6 +53,7 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
+  Algorithms/mitkPyramidImageRegistrationMethod.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp

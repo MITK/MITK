@@ -331,6 +331,12 @@ set(CPP_FILES
   Rendering/vtkNeverTranslucentTexture.cpp
   Rendering/mitkRenderingTestHelper.cpp
 
+  Rendering/Overlays/mitkOverlay.cpp
+  Rendering/Overlays/mitkOverlayManager.cpp
+  Rendering/Overlays/mitkTextOverlay.cpp
+  Rendering/Overlays/mitkBaseLayouter.cpp
+  Rendering/Overlays/mitkOverlayLayouter.cpp
+
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp

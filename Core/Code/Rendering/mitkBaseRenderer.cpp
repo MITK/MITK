@@ -45,6 +45,7 @@
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 #include "mitkInteractionConst.h"
+#include "Overlays/mitkOverlayManager.h"
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -366,6 +367,11 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
     else
       Modified();
   }
+}
+
+void mitk::BaseRenderer::SetOverlayManager(mitk::OverlayManager *overlayManager)
+{
+  this->m_OverlayManager = overlayManager;
 }
 
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)

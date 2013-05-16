@@ -95,6 +95,41 @@ public:
 
   void Update();
 
+  /**
+   * @brief Get the number of parameters optimized ( 12 or 6 )
+   *
+   * @return number of paramters
+   */
+  unsigned int GetNumberOfParameters()
+  {
+    unsigned int retValue = 12;
+    if(!m_UseAffineTransform)
+      retValue = 6;
+
+    return retValue;
+  }
+
+  /**
+   * @brief Copies the estimated parameters to the given array
+   * @param paramArray, target array for copy, make sure to allocate enough space
+   */
+  void GetParameters( double* paramArray)
+  {
+    if( m_EstimatedParameters == NULL )
+    {
+      mitkThrow() << "No parameters were estimated yet, call Update() first.";
+    }
+
+    unsigned int dim = 12;
+    if( !m_UseAffineTransform )
+      dim = 6;
+
+    for( unsigned int i=0; i<dim; i++)
+    {
+      *(paramArray+i) = m_EstimatedParameters[i];
+    }
+  }
+
 
 protected:
   PyramidImageRegistrationMethod();
@@ -110,6 +145,8 @@ protected:
   bool m_CrossModalityRegistration;
 
   bool m_UseAffineTransform;
+
+  double* m_EstimatedParameters;
 
   template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
   void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2)
@@ -130,6 +167,24 @@ protected:
     typename itk::LinearInterpolateImageFunction<MovingImageType, double>::Pointer interpolator =
         itk::LinearInterpolateImageFunction<MovingImageType, double>::New();
 
+
+/*
+ *  moment initialization not default settings, to be used as soon as initialization settings available
+    typedef typename itk::ImageMomentsCalculator< FixedImageType >  FImageMoments;
+    typedef typename itk::ImageMomentsCalculator< MovingImageType > MImageMoments;
+
+    typename FImageMoments::Pointer f_moments = FImageMoments::New();
+    f_moments->SetImage( itkImage1 );
+    f_moments->Compute();
+
+    typename MImageMoments::Pointer m_moments = MImageMoments::New();
+    m_moments->SetImage( itkImage2 );
+    m_moments->Compute();
+
+    itk::Vector< double, 3> f_cog = f_moments->GetCenterOfGravity();
+    itk::Vector< double, 3> m_cog = m_moments->GetCenterOfGravity();
+*/
+
     typename BaseMetricType::Pointer metric;
 
     if( m_CrossModalityRegistration )
@@ -141,11 +196,10 @@ protected:
       metric = NCMetricType::New();
     }
 
+
+
     // initial parameter dimension ( affine = default )
     unsigned int paramDim = 12;
-    typename BaseTransformType::ParametersType initialParams(paramDim);
-    initialParams.Fill(0);
-
     typename BaseTransformType::Pointer transform;
     if( m_UseAffineTransform )
     {
@@ -157,8 +211,23 @@ protected:
       paramDim = 6;
     }
 
+    typename BaseTransformType::ParametersType initialParams(paramDim);
+
+    initialParams.Fill(0);
+    if( m_UseAffineTransform )
+    {
+      initialParams[0] = initialParams[4] = initialParams[8] = 1;
+    }
+
+  /*
+   * moment initialization not default settings, to be used as soon as initialization settings available
+    initialParams[paramDim-3] =  m_cog[2] - c_cog[2];
+    initialParams[paramDim-2] =  m_cog[1] - c_cog[1];
+    initialParams[paramDim-1] =  m_cog[0] - c_cog[0];
+*/
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
+    typename FixedImageType::RegionType maskedRegion = referenceImage->GetLargestPossibleRegion();
 
     typename RegistrationType::Pointer registration = RegistrationType::New();
     unsigned int max_pyramid_lvl = 4;
@@ -167,7 +236,7 @@ protected:
     unsigned int min_value = std::min( image_size[0], std::min( image_size[1], image_size[2]));
 
     // condition for the top level pyramid image
-    float optmaxstep = 16;
+    float optmaxstep = 12;
     float optminstep = 0.1f;
     if( min_value / max_schedule_val < 8 )
     {
@@ -211,7 +280,7 @@ protected:
 
     // INPUT IMAGES
     registration->SetFixedImage( referenceImage );
-    //registration->SetFixedImageRegion( maskedRegion );
+    registration->SetFixedImageRegion( maskedRegion );
     registration->SetMovingImage( movingImage );
     registration->SetSchedules( fixedSchedule, fixedSchedule);
     // OTHER INPUTS
@@ -233,8 +302,23 @@ protected:
     catch (itk::ExceptionObject &e)
     {
       MITK_ERROR << "[Registration Update] Caught ITK exception: ";
-      MITK_ERROR << e;
+      mitkThrow() << "Registration failed with exception: " << e.what();
     }
+
+    if( m_EstimatedParameters != NULL)
+    {
+      delete [] m_EstimatedParameters;
+    }
+
+    m_EstimatedParameters = new double[paramDim];
+
+    typename BaseTransformType::ParametersType finalParameters = registration->GetLastTransformParameters();
+    for( unsigned int i=0; i<paramDim; i++)
+    {
+      m_EstimatedParameters[i] = finalParameters[i];
+    }
+
+
   }
 
 };

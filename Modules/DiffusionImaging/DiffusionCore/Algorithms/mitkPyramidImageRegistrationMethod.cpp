@@ -23,14 +23,18 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
   : m_FixedImage(NULL),
     m_MovingImage(NULL),
     m_CrossModalityRegistration(true),
-    m_UseAffineTransform(true)
+    m_UseAffineTransform(true),
+    m_EstimatedParameters(NULL)
 {
 
 }
 
 mitk::PyramidImageRegistrationMethod::~PyramidImageRegistrationMethod()
 {
-
+  if( m_EstimatedParameters != NULL)
+  {
+    delete [] m_EstimatedParameters;
+  }
 }
 
 void mitk::PyramidImageRegistrationMethod::SetFixedImage(mitk::Image::Pointer fixed)
@@ -61,12 +65,19 @@ void mitk::PyramidImageRegistrationMethod::Update()
     mitkThrow() << " Moving image is null";
   }
 
-  if( m_FixedImage->GetDimension() != 3 ||
-      m_MovingImage->GetDimension() != 3 )
+  unsigned int allowedDimension = 3;
+
+  if( m_FixedImage->GetDimension() != allowedDimension ||
+      m_MovingImage->GetDimension() != allowedDimension )
   {
     mitkThrow() << " Only 3D Images supported.";
   }
 
-  AccessTwoImagesFixedDimensionByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
+  //
+  // One possibility: use the FixedDimesnionByItk, but this instantiates ALL possible
+  // pixel type combinations!
+  // AccessTwoImagesFixedDimensionByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
+  // in helper: TypeSubset : short, float
+  AccessTwoImagesFixedDimensionTypeSubsetByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
 
 }

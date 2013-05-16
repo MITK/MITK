@@ -361,6 +361,22 @@ void TractsToDWIImageFilter::GenerateData()
         m_FrequencyMap = resampler->GetOutput();
     }
 
+    // initialize volume fraction images
+    m_VolumeFractions.clear();
+    for (int i=0; i<m_FiberModels.size()+m_NonFiberModels.size(); i++)
+    {
+        ItkDoubleImgType::Pointer tempimg = ItkDoubleImgType::New();
+        tempimg->SetSpacing( m_UpsampledSpacing );
+        tempimg->SetOrigin( m_Origin );
+        tempimg->SetDirection( m_DirectionMatrix );
+        tempimg->SetLargestPossibleRegion( m_UpsampledImageRegion );
+        tempimg->SetBufferedRegion( m_UpsampledImageRegion );
+        tempimg->SetRequestedRegion( m_UpsampledImageRegion );
+        tempimg->Allocate();
+        tempimg->FillBuffer(0);
+        m_VolumeFractions.push_back(tempimg);
+    }
+
     // resample fiber bundle for sufficient voxel coverage
     double segmentVolume = 0.0001;
     float minSpacing = 1;
@@ -376,7 +392,7 @@ void TractsToDWIImageFilter::GenerateData()
     if (mmRadius>0)
         segmentVolume = M_PI*mmRadius*mmRadius*minSpacing/m_VolumeAccuracy;
 
-    // generate double images to wokr with because we don't want to lose precision
+    // generate double images to work with because we don't want to lose precision
     // we use a separate image for each compartment model
     std::vector< DoubleDwiType::Pointer > compartments;
     for (int i=0; i<m_FiberModels.size()+m_NonFiberModels.size(); i++)
@@ -548,15 +564,19 @@ void TractsToDWIImageFilter::GenerateData()
                 {
                     DoubleDwiType::PixelType pix; pix.Fill(0.0);
                     compartments.at(i)->SetPixel(index, pix);
+                    m_VolumeFractions.at(i)->SetPixel(index, voxelVolume);
                 }
             }
             else
             {
+                m_VolumeFractions.at(0)->SetPixel(index, f);
+
                 double nonf = voxelVolume-f;    // non-fiber volume
                 double inter = 0;
                 if (m_FiberModels.size()>1)
                     inter = nonf * f/voxelVolume;   // intra-axonal fraction of non fiber compartment scales linearly with f
                 double other = nonf - inter;        // rest of compartment
+                double singleinter = inter/(m_FiberModels.size()-1);
 
                 // adjust non-fiber and intra-axonal signal
                 for (int i=1; i<m_FiberModels.size(); i++)
@@ -565,14 +585,16 @@ void TractsToDWIImageFilter::GenerateData()
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index);
                     if (pix[baselineIndex]>0)
                         pix /= pix[baselineIndex];
-                    pix *= inter;
+                    pix *= singleinter;
                     doubleDwi->SetPixel(index, pix);
+                    m_VolumeFractions.at(i)->SetPixel(index, singleinter);
                 }
                 for (int i=0; i<m_NonFiberModels.size(); i++)
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*other*m_NonFiberModels[i]->GetWeight();
                     doubleDwi->SetPixel(index, pix);
+                    m_VolumeFractions.at(i+m_FiberModels.size())->SetPixel(index, other*m_NonFiberModels[i]->GetWeight());
                 }
             }
         }

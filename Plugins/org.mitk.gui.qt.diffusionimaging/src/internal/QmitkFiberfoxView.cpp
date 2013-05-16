@@ -1211,7 +1211,7 @@ void QmitkFiberfoxView::GenerateImage()
 
         if (m_Controls->m_KspaceImageBox->isChecked())
         {
-            itk::Image<double, 3>::Pointer kspace = tractsToDwiFilter->GetKspaceImage();
+            itk::TractsToDWIImageFilter::ItkDoubleImgType::Pointer kspace = tractsToDwiFilter->GetKspaceImage();
             mitk::Image::Pointer image = mitk::Image::New();
             image->InitializeByItk(kspace.GetPointer());
             image->SetVolume(kspace->GetBufferPointer());
@@ -1220,6 +1220,22 @@ void QmitkFiberfoxView::GenerateImage()
             node->SetData( image );
             node->SetName(m_SelectedBundles.at(i)->GetName()+"_k-space");
             GetDataStorage()->Add(node, m_SelectedBundles.at(i));
+        }
+
+        if (m_Controls->m_VolumeFractionsBox->isChecked())
+        {
+            std::vector< itk::TractsToDWIImageFilter::ItkDoubleImgType::Pointer > volumeFractions = tractsToDwiFilter->GetVolumeFractions();
+            for (int k=0; k<volumeFractions.size(); k++)
+            {
+                mitk::Image::Pointer image = mitk::Image::New();
+                image->InitializeByItk(volumeFractions.at(k).GetPointer());
+                image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
+
+                mitk::DataNode::Pointer node = mitk::DataNode::New();
+                node->SetData( image );
+                node->SetName(m_SelectedBundles.at(i)->GetName()+"_CompartmentVolume-"+QString::number(k).toStdString());
+                GetDataStorage()->Add(node, m_SelectedBundles.at(i));
+            }
         }
 
         mitk::BaseData::Pointer basedata = resultNode->GetData();

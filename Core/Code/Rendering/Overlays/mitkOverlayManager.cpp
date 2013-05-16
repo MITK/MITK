@@ -25,10 +25,7 @@ mitk::OverlayManager::~OverlayManager()
 {
 }
 
-mitk::OverlayManager::LocalStorage::~LocalStorage()
+void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
 {
-}
-
-mitk::OverlayManager::LocalStorage::LocalStorage()
-{
+  m_OverlayList.push_back(overlay);
 }

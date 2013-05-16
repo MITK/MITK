@@ -18,9 +18,10 @@
 #define TEXTOVERLAY_H
 
 #include "mitkOverlay.h"
-#include <vtkActor.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextActor.h>
+
 
 namespace mitk {
 

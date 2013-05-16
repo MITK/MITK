@@ -29,7 +29,7 @@ bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(
     mitk::BaseRenderer *renderer,
     mitk::Overlay *overlay)
 {
-  if( mapper && m_LastGenerateDataTime < overlay -> GetMTime () )
+  if( m_LastGenerateDataTime < overlay -> GetMTime () )
     return true;
 
   if( renderer && m_LastGenerateDataTime < renderer -> GetTimeStepUpdateTime ( ) )

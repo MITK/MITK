@@ -19,57 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkExports.h"
 #include <itkObject.h>
-#include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include <mitkBaseRenderer.h>
+#include "mitkOverlay.h"
 
 namespace mitk {
 
-class OverlayManager : public itk::Object {
+class MITK_CORE_EXPORT OverlayManager : public itk::Object {
 public:
-
-//  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-//  /**
-//       * To render transveral, coronal, and sagittal, the mapper is called three times.
-//       * For performance reasons, the corresponding data for each view is saved in the
-//       * internal helper class LocalStorage. This allows rendering n views with just
-//       * 1 mitkMapper using n vtkMapper.
-//       * */
-//  class LocalStorage
-//  {
-
-//    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
-
-//    inline void UpdateGenerateDataTime()
-//    {
-//      m_LastGenerateDataTime.Modified();
-//    }
-
-//    inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
-
-//  public:
-//    /** \brief Actor of a 2D render window. */
-//    vtkSmartPointer<vtkActor> m_Actor;
-
-//    /** \brief Timestamp of last update of stored data. */
-//    itk::TimeStamp m_LastUpdateTime;
-
-//    /** \brief Default constructor of the local storage. */
-//    LocalStorage();
-//    /** \brief Default deconstructor of the local storage. */
-//    ~LocalStorage();
-
-//  protected:
-
-//    /** \brief timestamp of last update of stored data */
-//    itk::TimeStamp m_LastGenerateDataTime;
-//  };
 
   mitkClassMacro(OverlayManager, itk::Object);
   itkNewMacro(OverlayManager);
 
-//  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-//  mitk::LocalStorageHandler<LocalStorage> m_LSH;
+  void AddOverlay(Overlay::Pointer overlay);
 
 protected:
 
@@ -80,6 +41,8 @@ protected:
   virtual ~OverlayManager();
 
 private:
+
+  std::vector<Overlay::Pointer> m_OverlayList;
 
   /** \brief copy constructor */
   OverlayManager( const OverlayManager &);

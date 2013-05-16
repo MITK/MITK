@@ -20,14 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
+#include "mitkBaseRenderer.h"
 
 
 namespace mitk {
 
-class Overlay : public itk::Object {
+class MITK_CORE_EXPORT Overlay : public itk::Object {
 public:
 
   mitkClassMacro(Overlay, itk::Object);
+  itkNewMacro(Overlay);
 
 protected:
 

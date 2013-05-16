@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
 
@@ -31,6 +32,7 @@ public:
   itkNewMacro(OverlayManager);
 
   void AddOverlay(Overlay::Pointer overlay);
+  void PrepareOverlays(BaseRenderer *baseRenderer);
 
 protected:
 

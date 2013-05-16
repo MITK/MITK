@@ -219,7 +219,8 @@ namespace mitk
     //## \sa m_Slice
     virtual void SetSlice(unsigned int slice);
 
-    void SetOverlayManager(OverlayManager* overlayManager);
+    void SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager);
+    itk::SmartPointer<OverlayManager> GetOverlayManager();
 
     itkGetConstMacro(Slice, unsigned int)
 
@@ -481,6 +482,8 @@ namespace mitk
     //##Documentation
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
+
+    void AddAllOverlays();
 
 
   private:

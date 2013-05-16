@@ -369,9 +369,14 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
   }
 }
 
-void mitk::BaseRenderer::SetOverlayManager(mitk::OverlayManager *overlayManager)
+void mitk::BaseRenderer::SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager)
 {
   this->m_OverlayManager = overlayManager;
+}
+
+itk::SmartPointer<mitk::OverlayManager> mitk::BaseRenderer::GetOverlayManager()
+{
+  return m_OverlayManager;
 }
 
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
@@ -532,6 +537,14 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
     m_EmptyWorldGeometry = true;
   else
     m_EmptyWorldGeometry = false;
+}
+
+void mitk::BaseRenderer::AddAllOverlays()
+{
+  if(m_OverlayManager.IsNotNull())
+  {
+    m_OverlayManager->PrepareOverlays(this);
+  }
 }
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject & geometrySendEvent)

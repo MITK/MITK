@@ -50,10 +50,10 @@ public:
     ~LocalStorage();
   };
 
-  mitkClassMacro(TextOverlay, mitk::Overlay);
-
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+  mitkClassMacro(TextOverlay, mitk::Overlay);
 
 protected:
 

@@ -43,7 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPushButton>
 #include <QMenu>
 #include <QCursor>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QMessageBox>
 
 
@@ -63,6 +63,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   :QWidget(parent),
     ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
     m_Interpolator( mitk::SegmentationInterpolationController::New() ),
+    m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
     m_MultiWidget(NULL),
     m_ToolManager(NULL),
     m_Initialized(false),
@@ -71,50 +72,40 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false)
 {
-
-  m_SurfaceInterpolator = mitk::SurfaceInterpolationController::GetInstance();
-  QHBoxLayout* layout = new QHBoxLayout(this);
-
   m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
-  QGridLayout* grid = new QGridLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
-  m_RBtnEnable3DInterpolation = new QRadioButton("3D",this);
-  connect(m_RBtnEnable3DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
-  m_RBtnEnable3DInterpolation->setChecked(true);
-  m_RBtnEnable3DInterpolation->setToolTip("Interpolate a binary volume from a set of arbitrarily arranged contours.");
-  grid->addWidget(m_RBtnEnable3DInterpolation,0,0);
 
-  m_BtnAccept3DInterpolation = new QPushButton("Accept", this);
-  m_BtnAccept3DInterpolation->setEnabled(false);
-  connect(m_BtnAccept3DInterpolation, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
-  grid->addWidget(m_BtnAccept3DInterpolation, 0,1);
 
-  m_CbShowMarkers = new QCheckBox("Show Position Nodes", this);
-  m_CbShowMarkers->setChecked(false);
-  connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
-  connect(m_CbShowMarkers, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
-  grid->addWidget(m_CbShowMarkers,0,2);
+  QVBoxLayout* vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
-  m_RBtnEnable2DInterpolation = new QRadioButton("2D",this);
-  connect(m_RBtnEnable2DInterpolation, SIGNAL(toggled(bool)), this, SLOT(On2DInterpolationEnabled(bool)));
-  m_RBtnEnable2DInterpolation ->setToolTip("Interpolate contours in left-out slices from a set of slice-by-slice arranged contours.");
-  grid->addWidget(m_RBtnEnable2DInterpolation,1,0);
+  m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
+  m_CmbInterpolation->addItem("Disabled");
+  m_CmbInterpolation->addItem("2-Dimensional");
+  m_CmbInterpolation->addItem("3-Dimensional");
+  vboxLayout->addWidget(m_CmbInterpolation);
 
-  m_BtnAcceptInterpolation = new QPushButton("Accept", this);
-  m_BtnAcceptInterpolation->setEnabled( false );
-  connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
-  grid->addWidget(m_BtnAcceptInterpolation,1,1);
+  m_BtnApply2D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  vboxLayout->addWidget(m_BtnApply2D);
 
-  m_BtnAcceptAllInterpolations = new QPushButton("... for all slices", this);
-  m_BtnAcceptAllInterpolations->setEnabled( false );
-  connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
-  grid->addWidget(m_BtnAcceptAllInterpolations,1,2);
+  m_BtnApplyForAllSlices2D = new QPushButton("Apply for all slices", m_GroupBoxEnableExclusiveInterpolationMode);
+  vboxLayout->addWidget(m_BtnApplyForAllSlices2D);
 
-  m_RBtnDisableInterpolation = new QRadioButton("Disable", this);
-  connect(m_RBtnDisableInterpolation, SIGNAL(toggled(bool)), this, SLOT(OnInterpolationDisabled(bool)));
-  m_RBtnDisableInterpolation->setToolTip("Disable interpolation.");
-  grid->addWidget(m_RBtnDisableInterpolation, 2,0);
+  m_BtnApply3D = new QPushButton("Apply", m_GroupBoxEnableExclusiveInterpolationMode);
+  vboxLayout->addWidget(m_BtnApply3D);
 
+  m_ChkShowPositionNodes = new QCheckBox("Show Position Nodes", m_GroupBoxEnableExclusiveInterpolationMode);
+  vboxLayout->addWidget(m_ChkShowPositionNodes);
+
+  this->HideAllInterpolationControls();
+
+  connect(m_CmbInterpolation, SIGNAL(currentIndexChanged(int)), this, SLOT(OnInterpolationMethodChanged(int)));
+  connect(m_BtnApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
+  connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
+  connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
+  connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
+  connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SIGNAL(SignalShowMarkerNodes(bool)));
+
+  QHBoxLayout* layout = new QHBoxLayout(this);
   layout->addWidget(m_GroupBoxEnableExclusiveInterpolationMode);
   this->setLayout(layout);
 
@@ -353,6 +344,64 @@ void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
   }
 }
 
+
+
+void QmitkSlicesInterpolator::HideAllInterpolationControls()
+{
+  this->Show2DInterpolationControls(false);
+  this->Show3DInterpolationControls(false);
+}
+
+void QmitkSlicesInterpolator::Show2DInterpolationControls(bool show)
+{
+  m_BtnApply2D->setVisible(show);
+  m_BtnApplyForAllSlices2D->setVisible(show);
+}
+
+void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
+{
+  m_BtnApply3D->setVisible(show);
+  m_ChkShowPositionNodes->setVisible(show);
+}
+
+
+
+void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
+{
+  switch(index)
+  {
+    case 0: // Disabled
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation");
+      this->HideAllInterpolationControls();
+      this->OnInterpolationActivated(false);
+      this->On3DInterpolationActivated(false);
+      this->Show3DInterpolationResult(false);
+      break;
+
+    case 1: // 2D
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
+      this->HideAllInterpolationControls();
+      this->Show2DInterpolationControls(true);
+      this->OnInterpolationActivated(true);
+      this->On3DInterpolationActivated(false);
+      m_Interpolator->Activate2DInterpolation(true);
+      break;
+
+    case 2: // 3D
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
+      this->HideAllInterpolationControls();
+      this->Show3DInterpolationControls(true);
+      this->OnInterpolationActivated(false);
+      this->On3DInterpolationActivated(true);
+      break;
+
+    default:
+      MITK_ERROR << "Unknown interpolation method!";
+      m_CmbInterpolation->setCurrentIndex(0);
+      break;
+  }
+}
+
 void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 {
   mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_DataStorage->GetSubset(mitk::NodePredicateProperty::New("isContourMarker"
@@ -540,7 +589,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   if(interpolatedSurface.IsNotNull())
   {
-    m_BtnAccept3DInterpolation->setEnabled(true);
+    m_BtnApply3D->setEnabled(true);
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -555,7 +604,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   }
   else if (interpolatedSurface.IsNull())
   {
-    m_BtnAccept3DInterpolation->setEnabled(false);
+    m_BtnApply3D->setEnabled(false);
 
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
@@ -706,7 +755,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
     segmentationNode->SetData(s2iFilter->GetOutput());
-    m_RBtnDisableInterpolation->setChecked(true);
+    m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->Show3DInterpolationResult(false);
   }
@@ -767,8 +816,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
     QWidget::setEnabled( workingNode != NULL );
 
-    m_BtnAcceptAllInterpolations->setEnabled( on );
-    m_BtnAcceptInterpolation->setEnabled( on );
+    m_BtnApply2D->setEnabled( on );
     m_FeedbackNode->SetVisibility( on );
 
     if (!on)
@@ -872,25 +920,25 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
           }
           else
           {
-            m_RBtnDisableInterpolation->toggle();
+            m_CmbInterpolation->setCurrentIndex(0);
           }
         }
         else if (!m_3DInterpolationEnabled)
         {
           this->Show3DInterpolationResult(false);
-          m_BtnAccept3DInterpolation->setEnabled(m_3DInterpolationEnabled);
+          m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
         }
       }
       else
       {
         QWidget::setEnabled( false );
-        m_CbShowMarkers->setEnabled(m_3DInterpolationEnabled);
+        m_ChkShowPositionNodes->setEnabled(m_3DInterpolationEnabled);
       }
     }
     if (!m_3DInterpolationEnabled)
     {
        this->Show3DInterpolationResult(false);
-       m_BtnAccept3DInterpolation->setEnabled(m_3DInterpolationEnabled);
+       m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
     }
   }
   catch(...)

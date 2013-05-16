@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <map>
 
+#include <QComboBox>
+#include <QFrame>
 #include <QRadioButton>
 #include <QGroupBox>
 #include <QCheckBox>
@@ -203,6 +205,8 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void On3DInterpolationActivated(bool);
 
+    void OnInterpolationMethodChanged(int index);
+
     void OnMultiWidgetDeleted(QObject*);
 
     //Enhancement for 3D interpolation
@@ -261,6 +265,10 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void Show3DInterpolationResult(bool);
 
+    void HideAllInterpolationControls();
+    void Show2DInterpolationControls(bool show);
+    void Show3DInterpolationControls(bool show);
+
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
@@ -277,16 +285,12 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     unsigned int InterpolationInfoChangedObserverTag;
     unsigned int SurfaceInterpolationInfoChangedObserverTag;
 
-    QPushButton* m_BtnAcceptInterpolation;
-    QPushButton* m_BtnAcceptAllInterpolations;
-
-    //Enhancement for 3D Surface Interpolation
-    QRadioButton* m_RBtnEnable2DInterpolation;
-    QRadioButton* m_RBtnEnable3DInterpolation;
-    QRadioButton* m_RBtnDisableInterpolation;
     QGroupBox* m_GroupBoxEnableExclusiveInterpolationMode;
-    QPushButton* m_BtnAccept3DInterpolation;
-    QCheckBox* m_CbShowMarkers;
+    QComboBox* m_CmbInterpolation;
+    QPushButton* m_BtnApply2D;
+    QPushButton* m_BtnApplyForAllSlices2D;
+    QPushButton* m_BtnApply3D;
+    QCheckBox* m_ChkShowPositionNodes;
 
     mitk::DataNode::Pointer m_FeedbackNode;
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;

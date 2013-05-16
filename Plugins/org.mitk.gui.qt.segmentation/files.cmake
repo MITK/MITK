@@ -52,7 +52,7 @@ set(CACHED_RESOURCE_FILES
 
 set(QRC_FILES
   resources/segmentation.qrc
-  #resources/boolean.qrc
+  resources/boolean.qrc
   resources/regiongrowing.qrc
   resources/utilities.qrc
 )

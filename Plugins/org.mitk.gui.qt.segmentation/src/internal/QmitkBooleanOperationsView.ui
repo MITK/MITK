@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>295</width>
+    <width>245</width>
     <height>374</height>
    </rect>
   </property>
@@ -153,6 +153,9 @@
      </property>
      <property name="text">
       <string>Please select two different segmentation images above.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

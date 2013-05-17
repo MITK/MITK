@@ -134,7 +134,7 @@ namespace mitk
       return this->m_Reslicer->GetResliceAxes();
     }
 
-    enum ResliceInterpolation { RESLICE_NEAREST, RESLICE_LINEAR, RESLICE_CUBIC };
+    enum ResliceInterpolation { RESLICE_NEAREST=0, RESLICE_LINEAR=1, RESLICE_CUBIC=3 };
 
     void SetInterpolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->m_InterpolationMode = interpolation; }
 

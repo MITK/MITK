@@ -139,6 +139,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             for (int z=0; z<inputRegion.GetSize(2); z++)
             {
                 ++disp;
+
+                std::vector< SliceType::Pointer > compartmentSlices;
                 // extract slice from channel g
                 for (int y=0; y<inputRegion.GetSize(1); y++)
                     for (int x=0; x<inputRegion.GetSize(0); x++)
@@ -148,19 +150,22 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         typename DiffusionImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
-                        SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g]/m_SignalScale;
+                        SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g];
                         slice->SetPixel(index2D, pix2D);
 
                         if (fMap.IsNotNull())
                             fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
                     }
+                compartmentSlices.push_back(slice);
 
                 // fourier transform slice
                 typename ComplexSliceType::Pointer fSlice;
                 typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
-                idft->SetInput(slice);
+
+                idft->SetCompartmentImages(compartmentSlices);
                 idft->SetkOffset(m_kOffset);
                 idft->SettLine(m_tLine);
+                idft->SetSimulateRelaxation(false);
                 idft->SetFrequencyMap(fMap);
                 idft->Update();
 
@@ -189,7 +194,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
 
-                        double signal = newSlice->GetPixel(index2D)*m_SignalScale;
+                        double signal = newSlice->GetPixel(index2D);
                         if (signal>0)
                             signal = floor(signal+0.5);
                         else

@@ -50,7 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDotModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
-#include <mitkSignalDecay.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkNodePredicateOr.h>
@@ -1130,17 +1129,6 @@ void QmitkFiberfoxView::GenerateImage()
         if ( y>imageRegion.GetSize(1) )
             lineReadoutTime *= (double)imageRegion.GetSize(1)/y;
 
-        // add signal contrast model
-        mitk::SignalDecay<double> contrastModel;
-        if (m_Controls->m_RelaxationBox->isChecked())
-        {
-            contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
-            contrastModel.SetTE(this->m_Controls->m_TEbox->value());
-            contrastModel.SetTline(lineReadoutTime);
-            artifactList.push_back(&contrastModel);
-            artifactModelString += "_RELAX";
-        }
-
         // add N/2 ghosting
         double kOffset = 0;
         if (m_Controls->m_AddGhosts->isChecked())
@@ -1168,6 +1156,10 @@ void QmitkFiberfoxView::GenerateImage()
         if (fiberBundle->GetNumFibers()<=0)
             continue;
 
+        if (m_Controls->m_RelaxationBox->isChecked())
+            artifactModelString += "_RELAX";
+
+        tractsToDwiFilter->SetSimulateRelaxation(m_Controls->m_RelaxationBox->isChecked());
         tractsToDwiFilter->SetImageRegion(imageRegion);
         tractsToDwiFilter->SetSpacing(spacing);
         tractsToDwiFilter->SetOrigin(origin);
@@ -1179,6 +1171,8 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetKspaceArtifacts(artifactList);
         tractsToDwiFilter->SetkOffset(kOffset);
         tractsToDwiFilter->SettLine(m_Controls->m_LineReadoutTimeBox->value());
+        tractsToDwiFilter->SettInhom(this->m_Controls->m_T2starBox->value());
+        tractsToDwiFilter->SetTE(this->m_Controls->m_TEbox->value());
         tractsToDwiFilter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         tractsToDwiFilter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
         tractsToDwiFilter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
@@ -1223,19 +1217,6 @@ void QmitkFiberfoxView::GenerateImage()
         resultNode->AddProperty("Fiberfox.PureFiberVoxels", BoolProperty::New(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked()));
         resultNode->AddProperty("binary", BoolProperty::New(false));
         resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(tractsToDwiFilter->GetLevelWindow()) );
-
-        if (m_Controls->m_KspaceImageBox->isChecked())
-        {
-            itk::TractsToDWIImageFilter::ItkDoubleImgType::Pointer kspace = tractsToDwiFilter->GetKspaceImage();
-            mitk::Image::Pointer image = mitk::Image::New();
-            image->InitializeByItk(kspace.GetPointer());
-            image->SetVolume(kspace->GetBufferPointer());
-
-            mitk::DataNode::Pointer node = mitk::DataNode::New();
-            node->SetData( image );
-            node->SetName(m_SelectedBundles.at(i)->GetName()+"_k-space");
-            GetDataStorage()->Add(node, m_SelectedBundles.at(i));
-        }
 
         if (m_Controls->m_VolumeFractionsBox->isChecked())
         {

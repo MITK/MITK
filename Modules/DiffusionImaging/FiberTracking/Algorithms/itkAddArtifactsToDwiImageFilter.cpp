@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <boost/progress.hpp>
+#include <itkImageDuplicator.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,6 +37,8 @@ template< class TPixelType >
 AddArtifactsToDwiImageFilter< TPixelType >
 ::AddArtifactsToDwiImageFilter()
     : m_NoiseModel(NULL)
+    , m_RingingModel(NULL)
+    , m_FrequencyMap(NULL)
     , m_kOffset(0)
     , m_tLine(1)
 {
@@ -86,21 +89,14 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     typename DiffusionImageType::Pointer inputImage  = static_cast< DiffusionImageType * >( this->ProcessObject::GetInput(0) );
     itk::ImageRegion<3> inputRegion = inputImage->GetLargestPossibleRegion();
 
-    typename DiffusionImageType::Pointer outputImage = DiffusionImageType::New();
-    outputImage->SetSpacing( inputImage->GetSpacing() );
-    outputImage->SetOrigin( inputImage->GetOrigin() );
-    outputImage->SetDirection( inputImage->GetDirection() );
-    outputImage->SetLargestPossibleRegion( inputRegion );
-    outputImage->SetBufferedRegion( inputRegion );
-    outputImage->SetRequestedRegion( inputRegion );
-    outputImage->SetVectorLength( inputImage->GetVectorLength() );
-    outputImage->Allocate();
+    typename itk::ImageDuplicator<DiffusionImageType>::Pointer duplicator = itk::ImageDuplicator<DiffusionImageType>::New();
+    duplicator->SetInputImage( inputImage );
+    duplicator->Update();
+    typename DiffusionImageType::Pointer outputImage = duplicator->GetOutput();
 
     unsigned int upsampling = 1;
     if (m_RingingModel!=NULL)
-    {
         upsampling = m_RingingModel->GetKspaceCropping();
-    }
 
     // create slice object
     typename SliceType::Pointer slice = SliceType::New();
@@ -126,65 +122,68 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->Allocate();
     }
 
-    boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
-    for (int g=0; g<inputImage->GetVectorLength(); g++)
-        for (int z=0; z<inputRegion.GetSize(2); z++)
-        {
-            ++disp;
-            // extract slice from channel g
-            for (int y=0; y<inputRegion.GetSize(1); y++)
-                for (int x=0; x<inputRegion.GetSize(0); x++)
-                {
-                    typename SliceType::IndexType index2D;
-                    index2D[0]=x; index2D[1]=y;
-                    typename DiffusionImageType::IndexType index3D;
-                    index3D[0]=x; index3D[1]=y; index3D[2]=z;
-
-                    TPixelType pix2D = inputImage->GetPixel(index3D)[g];
-                    slice->SetPixel(index2D, pix2D);
-
-                    if (fMap.IsNotNull())
-                        fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
-                }
-
-            // fourier transform slice
-            typename ComplexSliceType::Pointer fSlice;
-            typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
-            idft->SetInput(slice);
-            idft->SetkOffset(m_kOffset);
-            idft->SettLine(m_tLine);
-            idft->SetFrequencyMap(fMap);
-            idft->Update();
-
-            fSlice = idft->GetOutput();
-
-            if (m_RingingModel!=NULL)
+    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_RingingModel!=NULL)
+    {
+        boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
+        for (int g=0; g<inputImage->GetVectorLength(); g++)
+            for (int z=0; z<inputRegion.GetSize(2); z++)
             {
-                fSlice = RearrangeSlice(fSlice);
-                fSlice = m_RingingModel->AddArtifact(fSlice);
-            }
+                ++disp;
+                // extract slice from channel g
+                for (int y=0; y<inputRegion.GetSize(1); y++)
+                    for (int x=0; x<inputRegion.GetSize(0); x++)
+                    {
+                        typename SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+                        typename DiffusionImageType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
-            // inverse fourier transform slice
-            typename SliceType::Pointer newSlice;
-            typename itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
-            dft->SetInput(fSlice);
-            dft->Update();
-            newSlice = dft->GetOutput();
+                        TPixelType pix2D = inputImage->GetPixel(index3D)[g];
+                        slice->SetPixel(index2D, pix2D);
 
-            // put slice back into channel g
-            for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
-                for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
+                        if (fMap.IsNotNull())
+                            fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
+                    }
+
+                // fourier transform slice
+                typename ComplexSliceType::Pointer fSlice;
+                typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
+                idft->SetInput(slice);
+                idft->SetkOffset(m_kOffset);
+                idft->SettLine(m_tLine);
+                idft->SetFrequencyMap(fMap);
+                idft->Update();
+
+                fSlice = idft->GetOutput();
+
+                if (m_RingingModel!=NULL)
                 {
-                    typename DiffusionImageType::IndexType index3D;
-                    index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                    typename DiffusionImageType::PixelType pix3D = outputImage->GetPixel(index3D);
-                    typename SliceType::IndexType index2D;
-                    index2D[0]=x; index2D[1]=y;
-
-                    pix3D[g] = newSlice->GetPixel(index2D);
-                    outputImage->SetPixel(index3D, pix3D);
+                    fSlice = RearrangeSlice(fSlice);
+                    fSlice = m_RingingModel->AddArtifact(fSlice);
                 }
-        }
+
+                // inverse fourier transform slice
+                typename SliceType::Pointer newSlice;
+                typename itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
+                dft->SetInput(fSlice);
+                dft->Update();
+                newSlice = dft->GetOutput();
+
+                // put slice back into channel g
+                for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
+                    {
+                        typename DiffusionImageType::IndexType index3D;
+                        index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        typename DiffusionImageType::PixelType pix3D = outputImage->GetPixel(index3D);
+                        typename SliceType::IndexType index2D;
+                        index2D[0]=x; index2D[1]=y;
+
+                        pix3D[g] = newSlice->GetPixel(index2D);
+                        outputImage->SetPixel(index3D, pix3D);
+                    }
+            }
+    }
 
     if (m_NoiseModel!=NULL)
     {

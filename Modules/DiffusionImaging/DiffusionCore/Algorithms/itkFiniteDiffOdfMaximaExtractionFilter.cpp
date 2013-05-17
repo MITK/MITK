@@ -186,6 +186,13 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     itk::Matrix<double, 3, 3> direction = ShCoeffImage->GetDirection();
     ImageRegion<3> imageRegion = ShCoeffImage->GetLargestPossibleRegion();
 
+    if (m_MaskImage.IsNotNull())
+    {
+        origin = m_MaskImage->GetOrigin();
+        direction = m_MaskImage->GetDirection();
+        imageRegion = m_MaskImage->GetLargestPossibleRegion();
+    }
+
     m_DirectionImageContainer = ItkDirectionImageContainer::New();
     for (int i=0; i<m_MaxNumPeaks; i++)
     {
@@ -283,7 +290,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
             center[1] = index[1];
             center[2] = index[2];
             itk::Point<double> worldCenter;
-            ShCoeffImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
+            m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
 
             itk::Point<double> worldStart;
             worldStart[0] = worldCenter[0]-dir[0]/2 * minSpacing;
@@ -408,6 +415,7 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         for (int i=0; i<num; i++)
         {
             vnl_vector<double> dir = peaks.at(i);
+
             ItkDirectionImage::Pointer img = m_DirectionImageContainer->GetElement(i);
 
             switch (m_NormalizationMethod)
@@ -421,8 +429,10 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
                 dir /= max;
                 break;
             }
+//            dir[0] = -dir[0];
+//            dir[2] = -dir[2];
 
-            dir = ShCoeffImage->GetDirection()*dir;
+            dir = m_MaskImage->GetDirection()*dir;
             itk::Vector< float, 3 > pixel;
             pixel.SetElement(0, dir[0]);
             pixel.SetElement(1, dir[1]);

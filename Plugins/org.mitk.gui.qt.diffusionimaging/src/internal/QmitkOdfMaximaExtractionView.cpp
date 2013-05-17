@@ -166,6 +166,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
         node->SetName("_ShCoefficientImage");
+        node->SetVisibility(false);
         GetDataStorage()->Add(node);
     }
 
@@ -526,6 +527,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
     }

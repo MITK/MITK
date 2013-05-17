@@ -78,7 +78,6 @@ public:
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
     itkSetMacro( NumberOfRepetitions, unsigned int )    ///< number of acquisition repetitions to reduce noise (default is no additional repetition)
     itkSetMacro( TissueMask, ItkUcharImgType::Pointer ) ///< voxels outside of this binary mask contain only noise (are treated as air)
-    itkGetMacro( KspaceImage, ItkDoubleImgType::Pointer )
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
@@ -88,6 +87,10 @@ public:
     itkSetMacro( kOffset, double )
     itkSetMacro( tLine, double )
     itkSetMacro( UseInterpolation, bool )
+
+    // output
+    itkGetMacro( KspaceImage, ItkDoubleImgType::Pointer )
+    std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
 
     void GenerateData();
 
@@ -132,6 +135,7 @@ protected:
     double                              m_SignalScale;
     mitk::LevelWindow                   m_LevelWindow;
     bool                                m_UseInterpolation;
+    std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;  ///< one double image for each compartment containing the corresponding volume fraction per voxel
 };
 }
 

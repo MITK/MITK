@@ -91,7 +91,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     return;
   }
 
-    this->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( m_TimeStep ) );
+  this->m_InputImageGeometry = input->GetTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
 
   if(!m_WorldGeometry)
   {
@@ -193,13 +193,11 @@ void mitk::ExtractSliceFilter::GenerateData(){
       origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
     }
 
-
-
-    //set the tranform for reslicing.
-    // Use inverse transform of the input geometry for reslicing the 3D image.
-    // This is needed if the image volume already transformed
-    if(m_ResliceTransform.IsNotNull())
-      m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
+     /*Set a transform to be applied to the resampling grid from given geometry.
+     Note: Applying a transform to the resampling grid (which lies in the output coordinate system)
+     is equivalent to applying the inverse of that transform to the input volume.*/
+    if(m_InputImageGeometry.IsNotNull())
+      m_Reslicer->SetResliceTransform(m_InputImageGeometry->GetVtkTransform()->GetLinearInverse());
 
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D),
@@ -216,8 +214,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     if(abstractGeometry != NULL)
     {
-      m_ResliceTransform = abstractGeometry;
-
       extent[0] = abstractGeometry->GetParametricExtent(0);
       extent[1] = abstractGeometry->GetParametricExtent(1);
 
@@ -262,7 +258,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   }
 
-  if(m_ResliceTransform.IsNotNull()){
+  if(m_InputImageGeometry.IsNotNull()){
     //if the resliceTransform is set the reslice axis are recalculated.
     //Thus the geometry information is not fitting. Therefor a unitSpacingFilter
     //is used to set up a global spacing of 1 and compensate the transform.

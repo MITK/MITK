@@ -71,6 +71,7 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
+    virtual std::string GetIconPath() const;
 
   protected:
 

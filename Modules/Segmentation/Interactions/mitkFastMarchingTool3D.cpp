@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkApplicationCursor.h"
 
-#include "mitkFastMarchingTool3D.xpm"
+//#include "mitkFastMarchingTool3D.xpm"
 
 #include "mitkInteractionConst.h"
 
@@ -117,7 +117,12 @@ float mitk::FastMarchingTool3D::CanHandleEvent( StateEvent const *stateEvent) co
 
 const char** mitk::FastMarchingTool3D::GetXPM() const
 {
-  return mitkFastMarchingTool3D_xpm;
+  return NULL;//mitkFastMarchingTool3D_xpm;
+}
+
+std::string mitk::FastMarchingTool3D::GetIconPath() const
+{
+  return ":/Segmentation/Add_48x48.png";
 }
 
 const char* mitk::FastMarchingTool3D::GetName() const

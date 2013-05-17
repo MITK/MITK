@@ -767,10 +767,25 @@ void QmitkFiberfoxView::GenerateImage()
                 mitk::RicianNoiseModel<short> noiseModel;
                 noiseModel.SetNoiseVariance(noiseVariance);
 
+                if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )
+                {
+                    this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
+                    QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
+                }
+                double lineReadoutTime = m_Controls->m_LineReadoutTimeBox->value();
+
+                // add N/2 ghosting
+                double kOffset = 0;
+                if (m_Controls->m_AddGhosts->isChecked())
+                {
+                    artifactModelString += "_GHOST";
+                    kOffset = m_Controls->m_kOffsetBox->value();
+                }
+
                 itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
                 filter->SetInput(diffImg->GetVectorImage());
-
-                //            filter->SetkOffset(m_Controls->doubleSpinBox->value());
+                filter->SettLine(lineReadoutTime);
+                filter->SetkOffset(kOffset);
                 filter->SetNoiseModel(&noiseModel);
                 filter->Update();
 

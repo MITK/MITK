@@ -157,8 +157,7 @@ std::vector< TractsToDWIImageFilter::DoubleDwiType::Pointer > TractsToDWIImageFi
                             index3D[0]=x; index3D[1]=y; index3D[2]=z;
                             SliceType::IndexType index2D;
                             index2D[0]=x; index2D[1]=y;
-                            double kpix = sqrt(fSlice->GetPixel(index2D).real()*fSlice->GetPixel(index2D).real()+fSlice->GetPixel(index2D).imag()*fSlice->GetPixel(index2D).imag());
-                            m_KspaceImage->SetPixel(index3D, m_KspaceImage->GetPixel(index3D)+kpix);
+                            m_KspaceImage->SetPixel(index3D, m_KspaceImage->GetPixel(index3D)+idft->GetSpectrumImage()->GetPixel(index2D) );
                         }
 
                 // fourier transform slice

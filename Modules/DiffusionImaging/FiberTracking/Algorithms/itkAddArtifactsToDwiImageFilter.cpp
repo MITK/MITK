@@ -41,6 +41,7 @@ AddArtifactsToDwiImageFilter< TPixelType >
     , m_FrequencyMap(NULL)
     , m_kOffset(0)
     , m_tLine(1)
+    , m_SignalScale(100)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -98,32 +99,41 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     if (m_RingingModel!=NULL)
         upsampling = m_RingingModel->GetKspaceCropping();
 
+    // is input slize size even?
+    int x=inputRegion.GetSize(0); int y=inputRegion.GetSize(1);
+    if ( x%2 == 1 )
+        x += 1;
+    if ( y%2 == 1 )
+        y += 1;
+
     // create slice object
     typename SliceType::Pointer slice = SliceType::New();
-    ImageRegion<2> region;
-    region.SetSize(0, inputRegion.GetSize(0));
-    region.SetSize(1, inputRegion.GetSize(1));
-    slice->SetLargestPossibleRegion( region );
-    slice->SetBufferedRegion( region );
-    slice->SetRequestedRegion( region );
+    ImageRegion<2> sliceRegion;
+    sliceRegion.SetSize(0, x);
+    sliceRegion.SetSize(1, y);
+    slice->SetLargestPossibleRegion( sliceRegion );
+    slice->SetBufferedRegion( sliceRegion );
+    slice->SetRequestedRegion( sliceRegion );
     slice->Allocate();
+    slice->FillBuffer(0.0);
 
     // frequency map slice
     typename SliceType::Pointer fMap = NULL;
     if (m_FrequencyMap.IsNotNull())
     {
         fMap = SliceType::New();
-        ImageRegion<2> region;
-        region.SetSize(0, inputRegion.GetSize(0));
-        region.SetSize(1, inputRegion.GetSize(1));
-        fMap->SetLargestPossibleRegion( region );
-        fMap->SetBufferedRegion( region );
-        fMap->SetRequestedRegion( region );
+        fMap->SetLargestPossibleRegion( sliceRegion );
+        fMap->SetBufferedRegion( sliceRegion );
+        fMap->SetRequestedRegion( sliceRegion );
         fMap->Allocate();
+        fMap->FillBuffer(0.0);
     }
 
     if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_RingingModel!=NULL)
     {
+        MITK_INFO << "Adjusting complex signal";
+        MITK_INFO << "line readout time: " << m_tLine;
+        MITK_INFO << "line offset: " << m_kOffset;
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (int g=0; g<inputImage->GetVectorLength(); g++)
             for (int z=0; z<inputRegion.GetSize(2); z++)
@@ -138,7 +148,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         typename DiffusionImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
-                        TPixelType pix2D = inputImage->GetPixel(index3D)[g];
+                        SliceType::PixelType pix2D = (SliceType::PixelType)inputImage->GetPixel(index3D)[g]/m_SignalScale;
                         slice->SetPixel(index2D, pix2D);
 
                         if (fMap.IsNotNull())
@@ -170,8 +180,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 newSlice = dft->GetOutput();
 
                 // put slice back into channel g
-                for (int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
-                    for (int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
+                for (int y=0; y<inputRegion.GetSize(1); y++)
+                    for (int x=0; x<inputRegion.GetSize(0); x++)
                     {
                         typename DiffusionImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;
@@ -179,7 +189,13 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
 
-                        pix3D[g] = newSlice->GetPixel(index2D);
+                        double signal = newSlice->GetPixel(index2D)*m_SignalScale;
+                        if (signal>0)
+                            signal = floor(signal+0.5);
+                        else
+                            signal = ceil(signal-0.5);
+
+                        pix3D[g] = signal;
                         outputImage->SetPixel(index3D, pix3D);
                     }
             }
@@ -187,8 +203,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
     if (m_NoiseModel!=NULL)
     {
-        ImageRegionIterator<DiffusionImageType> it1 (outputImage, outputImage->GetLargestPossibleRegion());
-        boost::progress_display disp2(outputImage->GetLargestPossibleRegion().GetNumberOfPixels());
+        ImageRegionIterator<DiffusionImageType> it1 (outputImage, inputRegion);
+        boost::progress_display disp2(inputRegion.GetNumberOfPixels());
         while(!it1.IsAtEnd())
         {
             ++disp2;

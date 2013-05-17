@@ -36,6 +36,7 @@ KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
     : m_tLine(1)
     , m_kOffset(0)
+    , m_FrequencyMap(NULL)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -103,7 +104,7 @@ void KspaceImageFilter< TPixelType >
         else
             kx += m_kOffset;    // add gradient delay induced offset
 
-        double t = fromMaxEcho + (ky*szx+temp_k)*dt;
+        double t = fromMaxEcho + (ky*szx+temp_k)*dt;    // dephasing time
 
         vcl_complex<double> s(0,0);
         InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );

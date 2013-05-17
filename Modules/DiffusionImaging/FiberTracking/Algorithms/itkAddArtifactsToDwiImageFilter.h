@@ -79,6 +79,7 @@ namespace itk{
     ItkDoubleImgType::Pointer           m_FrequencyMap;
     double                              m_kOffset;
     double                              m_tLine;
+    double                              m_SignalScale;
 
   private:
 

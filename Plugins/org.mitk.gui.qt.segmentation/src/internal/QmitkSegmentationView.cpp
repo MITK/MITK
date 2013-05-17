@@ -77,7 +77,7 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
 {
   if (!nodes) return;
 
-  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
   if (!toolManager) return;
   for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
   {
@@ -99,8 +99,10 @@ void QmitkSegmentationView::Activated()
   // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
-    m_Controls->m_ManualToolSelectionBox->SetAutoShowNamesWidth(250);
-    m_Controls->m_ManualToolSelectionBox->setEnabled( true );
+    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
+    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );
 
@@ -135,9 +137,10 @@ void QmitkSegmentationView::Deactivated()
 {
   if( m_Controls )
   {
-    m_Controls->m_ManualToolSelectionBox->setEnabled( false );
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
+    m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
-    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
+    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( false );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( false );
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
@@ -193,7 +196,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   // tell the interpolation about toolmanager and multiwidget (and data storage)
   if (m_Controls && m_MultiWidget)
   {
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
     m_Controls->m_SlicesInterpolator->SetDataStorage( *(this->GetDefaultDataStorage()));
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
   }
@@ -206,7 +209,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
 void QmitkSegmentationView::CreateNewSegmentation()
 {
-  mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
+  mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
@@ -275,14 +278,18 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
     // ask the user about an organ type and name, add this information to the image's (!) propertylist
     // create a new image of the same dimensions and smallest possible pixel type
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
     mitk::Tool* firstTool = toolManager->GetToolById(0);
     if (firstTool)
     {
       try
       {
+        std::string newNodeName = dialog->GetSegmentationName().toStdString();
+        if(newNodeName.empty())
+          newNodeName = "no_name";
+
       mitk::DataNode::Pointer emptySegmentation =
-        firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
+        firstTool->CreateEmptySegmentationNode( image, newNodeName, dialog->GetColor() );
 
       //Here we change the reslice interpolation mode for a segmentation, so that contours in rotated slice can be shown correctly
       emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_NEAREST) );
@@ -301,9 +308,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
             this->GetPreferences()->PutByteArray("Organ-Color-List", stringForStorage );
             this->GetPreferences()->Flush();
 
-            if(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0))
+            if(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0))
             {
-              m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0)->SetSelected(false);
+              m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0)->SetSelected(false);
             }
             emptySegmentation->SetSelected(true);
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
@@ -341,8 +348,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
 void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 {
-  m_Controls->m_ManualToolSelectionBox->setEnabled(false);
-  if (!m_Controls->m_ManualToolSelectionBox->isEnabled())
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
+  if (!m_Controls->m_ManualToolSelectionBox2D->isEnabled())
   {
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
   }
@@ -385,8 +392,8 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
     {
       m_Controls->segImageSelector->RemoveNode(node);
       m_Controls->patImageSelector->AddNode(node);
-      if (m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0) == node)
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData(NULL);
+      if (m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0) == node)
+        m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->SetWorkingData(NULL);
       return;
     }
   }
@@ -452,9 +459,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
       this->GetDataStorage()->Remove(it->Value());
     }
 
-    if ((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
+    if ((m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
     {
-      this->SetToolManagerSelection(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0), NULL);
+      this->SetToolManagerSelection(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0), NULL);
       this->UpdateWarningLabel("Select or create a segmentation!");
     }
 
@@ -470,7 +477,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
       m_BinaryPropertyObserverTags.erase(tempNode);
   }
 
-  if((m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) == node))
+  if((m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0) == node))
   {
     //as we don't know which node was actually removed e.g. our reference node, disable 'New Segmentation' button.
     //consider the case that there is no more image in the datastorage
@@ -492,7 +499,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 //  }
 
 //  mitk::DataNode::Pointer imageNode
-//      = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
+//      = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
 //  mitk::Image::Pointer image(0);
 //  if (imageNode.IsNotNull())
 //    image = dynamic_cast<mitk::Image*>( imageNode->GetData() );
@@ -528,7 +535,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
 //  if( id == 0 )
 //  {
-//    mitk::DataNode::Pointer workingData =   m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
+//    mitk::DataNode::Pointer workingData =   m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
 //    if( workingData.IsNotNull() )
 //    {
 //      m_Controls->segImageSelector->setCurrentIndex( m_Controls->segImageSelector->Find(workingData) );
@@ -538,7 +545,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 //  // this is just a workaround, should be removed when all tools support 3D+t
 //  if (id==2) // lesions
 //  {
-//    mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
+//    mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
 //    if (node.IsNotNull())
 //    {
 //      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
@@ -650,11 +657,11 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
 {
   mitk::SegTool2D::Pointer manualSegmentationTool;
 
-  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetTools().size();
+  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetTools().size();
 
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetToolById(i));
+    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetToolById(i));
 
     if (manualSegmentationTool)
     {
@@ -799,7 +806,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
         }
         else
         {
-          if (m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0) != selectedNode)
+          if (m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0) != selectedNode)
           {
             SetToolManagerSelection(selectedNode, NULL);
             //May be a bug in the selection services. A node which is deselected will be passed as selected node to the OnSelectionChanged function
@@ -880,7 +887,7 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   if (id == 0)
   {
     //Deactivate possible active tool
-    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
+    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
     //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
   }
 }
@@ -891,7 +898,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
   // called as a result of new BlueBerry selections
   //   tells the ToolManager for manual segmentation about new selections
   //   updates GUI information about what the user should select
-  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
   toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
   toolManager->SetWorkingData(  const_cast<mitk::DataNode*>(workingData));
 
@@ -1005,16 +1012,27 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
 
-  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
   toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
   assert ( toolManager );
 
+  //use the same ToolManager instance for our 3D Tools
+  m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
+
   // all part of open source MITK
-  m_Controls->m_ManualToolSelectionBox->SetGenerateAccelerators(true);
-  m_Controls->m_ManualToolSelectionBox->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer );
-  m_Controls->m_ManualToolSelectionBox->SetDisplayedToolGroups("Add Subtract Paint Wipe 'Region Growing' Correction Fill Erase LiveWire");
-  m_Controls->m_ManualToolSelectionBox->SetLayoutColumns(3);
-  m_Controls->m_ManualToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
+  m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
+  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Paint Wipe 'Region Growing' Correction Fill Erase LiveWire");
+  m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
+  m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+
+  //setup 3D Tools
+  m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
+  m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
+  //specify tools to be added to 3D Tool area
+  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("");
+  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(2);
+  m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
   // available only in the 3M application
 //  if ( !m_Controls->m_OrganToolSelectionBox->children().count() )

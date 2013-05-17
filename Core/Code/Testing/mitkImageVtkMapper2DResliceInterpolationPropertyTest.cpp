@@ -73,7 +73,7 @@ int mitkImageVtkMapper2DResliceInterpolationPropertyTest(int argc, char* argv[])
   }
 
   //threshold for CompareRenderWindowAgainstReference
-  double threshold = 0.15;//difference between interpolation modes is very small
+  double threshold = 0.35;//difference between interpolation modes is very small
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, threshold) == true, "CompareRenderWindowAgainstReference test result positive?" );

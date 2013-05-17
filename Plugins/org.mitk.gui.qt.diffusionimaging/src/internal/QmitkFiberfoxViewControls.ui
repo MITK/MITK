@@ -1433,7 +1433,7 @@
              <item row="10" column="0">
               <widget class="QCheckBox" name="m_VolumeFractionsBox">
                <property name="toolTip">
-                <string>Output one image per compartment containing the corresponding volume fractions (in mm³) per voxel.</string>
+                <string>Output one image per compartment containing the corresponding volume fractions per voxel.</string>
                </property>
                <property name="text">
                 <string>Output Volume Fractions</string>

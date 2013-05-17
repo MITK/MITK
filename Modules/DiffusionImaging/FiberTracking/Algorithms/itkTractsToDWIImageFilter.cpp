@@ -564,7 +564,7 @@ void TractsToDWIImageFilter::GenerateData()
                 {
                     DoubleDwiType::PixelType pix; pix.Fill(0.0);
                     compartments.at(i)->SetPixel(index, pix);
-                    m_VolumeFractions.at(i)->SetPixel(index, voxelVolume);
+                    m_VolumeFractions.at(i)->SetPixel(index, 1);
                 }
             }
             else
@@ -587,14 +587,14 @@ void TractsToDWIImageFilter::GenerateData()
                         pix /= pix[baselineIndex];
                     pix *= singleinter;
                     doubleDwi->SetPixel(index, pix);
-                    m_VolumeFractions.at(i)->SetPixel(index, singleinter);
+                    m_VolumeFractions.at(i)->SetPixel(index, singleinter/voxelVolume);
                 }
                 for (int i=0; i<m_NonFiberModels.size(); i++)
                 {
                     DoubleDwiType::Pointer doubleDwi = compartments.at(i+m_FiberModels.size());
                     DoubleDwiType::PixelType pix = doubleDwi->GetPixel(index) + m_NonFiberModels[i]->SimulateMeasurement()*other*m_NonFiberModels[i]->GetWeight();
                     doubleDwi->SetPixel(index, pix);
-                    m_VolumeFractions.at(i+m_FiberModels.size())->SetPixel(index, other*m_NonFiberModels[i]->GetWeight());
+                    m_VolumeFractions.at(i+m_FiberModels.size())->SetPixel(index, other/voxelVolume*m_NonFiberModels[i]->GetWeight());
                 }
             }
         }
@@ -602,7 +602,7 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // do k-space stuff
-    if (!m_KspaceArtifacts.empty())
+    if (!m_KspaceArtifacts.empty() || m_kOffset>0)
     {
         MITK_INFO << "Adjusting complex signal";
         compartments = DoKspaceStuff(compartments);

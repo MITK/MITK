@@ -58,6 +58,7 @@ namespace mitk
     void Reset();
 
     void drawPoints(const std::vector<Vector3>& points, float pointSize, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+    void drawPoints(const std::vector<Vector3>& points, float pointSize, const std::vector<Vec4f> colors);
     void drawLines(const std::vector<Vector3>& points, float lineWidth, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawLines(const std::vector<Vector3>& points, const std::vector<Vec2i>& indices, float lineWidth, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawTriangles(const std::vector<Vector3>& points, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
@@ -67,6 +68,7 @@ namespace mitk
     void drawTriangleStrip(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawTriangleFan(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawFrame(const Vector3& position, const Quaternion& orientation, const Vec3f& size);
+    void drawFrame(const Vector3& position, const Quaternion& orientation, const Vec3f& size, const Vec4f& color);
     void drawSpheres(const std::vector<Vector3>& points, const std::vector<float>& radii, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawSpheres(const std::vector<Vector3>& points, float radius, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawCone(const Vector3& point1, const Vector3& point2, float radius1, float radius2, const Vec4f color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f), int subdivisions = 16);
@@ -81,6 +83,7 @@ namespace mitk
     void drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color = Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
     void drawTriangle(const Vector3& point1, const Vector3& point2, const Vector3& point3, const Vector3& normal, const Vec4f& color1, const Vec4f& color2, const Vec4f& color3);
     void drawSphere(const Vector3& position, float radius);
+    void drawBoundingBox(const Vector3& min, const Vector3& max);
     void pushMatrix();
     void popMatrix();
     void multMatrix(float* matrix);

@@ -164,4 +164,13 @@
           icon="resources/phantom.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fieldmapgenerator"
+          name="Fieldmap Generator"
+          class="QmitkFieldmapGeneratorView"
+          icon="resources/odf.png" />
+  </extension>
+
+
+
 </plugin>

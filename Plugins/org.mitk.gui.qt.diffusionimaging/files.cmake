@@ -43,6 +43,7 @@ set(INTERNAL_CPP_FILES
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
   QmitkFiberExtractionView.cpp
+  QmitkFieldmapGeneratorView.cpp
 )
 
 set(UI_FILES
@@ -75,6 +76,7 @@ set(UI_FILES
   src/QmitkDotModelParametersWidgetControls.ui
   src/QmitkBallModelParametersWidgetControls.ui
   src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/internal/QmitkFieldmapGeneratorViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -116,6 +118,7 @@ set(MOC_H_FILES
   src/QmitkDotModelParametersWidget.h
   src/QmitkBallModelParametersWidget.h
   src/QmitkAstrosticksModelParametersWidget.h
+  src/internal/QmitkFieldmapGeneratorView.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -148,6 +151,7 @@ set(CACHED_RESOURCE_FILES
   resources/qball.png
   resources/StreamlineTracking.png
   resources/dwi2.png
+  resources/odf.png
   resources/refresh.xpm
 )
 

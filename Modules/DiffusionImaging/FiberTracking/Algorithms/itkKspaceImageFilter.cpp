@@ -36,39 +36,41 @@ KspaceImageFilter< TPixelType >
 ::KspaceImageFilter()
     : m_tLine(1)
     , m_kOffset(0)
+    , m_FrequencyMap(NULL)
+    , m_SimulateRelaxation(true)
 {
-    this->SetNumberOfRequiredInputs( 1 );
+
 }
 
 template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
-    typename InputImageType::Pointer inputImage  = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
-    m_SpectrumImage = InputImageType::New();
-    m_SpectrumImage->SetSpacing( inputImage->GetSpacing() );
-    m_SpectrumImage->SetOrigin( inputImage->GetOrigin() );
-    m_SpectrumImage->SetDirection( inputImage->GetDirection() );
-    m_SpectrumImage->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
-    m_SpectrumImage->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
-    m_SpectrumImage->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
-    m_SpectrumImage->Allocate();
-    m_SpectrumImage->FillBuffer(0);
+    typename OutputImageType::Pointer outputImage = OutputImageType::New();
+    outputImage->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
+    outputImage->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
+    outputImage->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
+    outputImage->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    outputImage->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    outputImage->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    outputImage->Allocate();
 
+    m_SimulateDistortions = true;
     if (m_FrequencyMap.IsNull())
     {
+        m_SimulateDistortions = false;
         m_FrequencyMap = InputImageType::New();
-        m_FrequencyMap->SetSpacing( inputImage->GetSpacing() );
-        m_FrequencyMap->SetOrigin( inputImage->GetOrigin() );
-        m_FrequencyMap->SetDirection( inputImage->GetDirection() );
-        m_FrequencyMap->SetLargestPossibleRegion( inputImage->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetBufferedRegion( inputImage->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetRequestedRegion( inputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetSpacing( outputImage->GetSpacing() );
+        m_FrequencyMap->SetOrigin( outputImage->GetOrigin() );
+        m_FrequencyMap->SetDirection( outputImage->GetDirection() );
+        m_FrequencyMap->SetLargestPossibleRegion( outputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetBufferedRegion( outputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetRequestedRegion( outputImage->GetLargestPossibleRegion() );
         m_FrequencyMap->Allocate();
         m_FrequencyMap->FillBuffer(0);
     }
 
-    m_tLine /= 1000;
+    this->SetNthOutput(0, outputImage);
 }
 
 template< class TPixelType >
@@ -80,7 +82,6 @@ void KspaceImageFilter< TPixelType >
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
-    typename InputImageType::Pointer inputImage  = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
     double szx = outputImage->GetLargestPossibleRegion().GetSize(0);
     double szy = outputImage->GetLargestPossibleRegion().GetSize(1);
@@ -103,25 +104,35 @@ void KspaceImageFilter< TPixelType >
         else
             kx += m_kOffset;    // add gradient delay induced offset
 
-        double t = fromMaxEcho + (ky*szx+temp_k)*dt;
+        double t = fromMaxEcho + (ky*szx+temp_k)*dt;    // dephasing time
 
         vcl_complex<double> s(0,0);
-        InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );
+
+        InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )
         {
             double x = it.GetIndex()[0];
             double y = it.GetIndex()[1];
 
-            vcl_complex<double> f(it.Get(), 0);
-            s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy) + m_FrequencyMap->GetPixel(it.GetIndex())*10*t ) );
+            vcl_complex<double> f(0, 0);
+
+            // sum compartment signals and simulate relaxation
+            for (int i=0; i<m_CompartmentImages.size(); i++)
+                if (m_SimulateRelaxation)
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * exp(-(m_TE+t)/m_T2.at(i) -fabs(t)/m_Tinhom), 0);
+                else
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) );
+
+            // simulate distortions and ghosting
+            if (m_SimulateDistortions)
+                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy) + m_FrequencyMap->GetPixel(it.GetIndex())*10*t ) );
+            else
+                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy)) );
 
             ++it;
         }
         s /= numPix;
-        double magn = sqrt(s.real()*s.real()+s.imag()*s.imag());
-        m_SpectrumImage->SetPixel(oit.GetIndex(), magn);
         oit.Set(s);
-
         ++oit;
     }
 }
@@ -130,37 +141,7 @@ template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::AfterThreadedGenerateData()
 {
-    ImageRegion<2> region = m_SpectrumImage->GetLargestPossibleRegion();
-    typename InputImageType::Pointer rearrangedSlice = InputImageType::New();
-    rearrangedSlice->SetLargestPossibleRegion( region );
-    rearrangedSlice->SetBufferedRegion( region );
-    rearrangedSlice->SetRequestedRegion( region );
-    rearrangedSlice->Allocate();
 
-    int xHalf = region.GetSize(0)/2;
-    int yHalf = region.GetSize(1)/2;
-
-    for (int y=0; y<region.GetSize(1); y++)
-        for (int x=0; x<region.GetSize(0); x++)
-        {
-            typename InputImageType::IndexType idx;
-            idx[0]=x; idx[1]=y;
-            TPixelType pix = m_SpectrumImage->GetPixel(idx);
-
-            if( idx[0] <  xHalf )
-                idx[0] = idx[0] + xHalf;
-            else
-                idx[0] = idx[0] - xHalf;
-
-            if( idx[1] <  yHalf )
-                idx[1] = idx[1] + yHalf;
-            else
-                idx[1] = idx[1] - yHalf;
-
-            rearrangedSlice->SetPixel(idx, pix);
-        }
-
-    m_SpectrumImage = rearrangedSlice;
 }
 
 }

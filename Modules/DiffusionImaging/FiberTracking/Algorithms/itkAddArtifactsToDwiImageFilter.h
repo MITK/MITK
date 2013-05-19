@@ -14,11 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-/*===================================================================
-
-This file is based heavily on a corresponding ITK filter.
-
-===================================================================*/
 #ifndef __itkAddArtifactsToDwiImageFilter_h_
 #define __itkAddArtifactsToDwiImageFilter_h_
 
@@ -79,6 +74,7 @@ namespace itk{
     ItkDoubleImgType::Pointer           m_FrequencyMap;
     double                              m_kOffset;
     double                              m_tLine;
+    double                              m_SignalScale;
 
   private:
 

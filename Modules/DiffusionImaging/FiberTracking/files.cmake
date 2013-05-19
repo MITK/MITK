@@ -91,7 +91,6 @@ set(H_FILES
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkSignalDecay.h
 )
 
 set(RESOURCE_FILES

@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <boost/progress.hpp>
 #include <itkImageDuplicator.h>
+#include <itkResampleDwiImageFilter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -95,10 +96,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     duplicator->Update();
     typename DiffusionImageType::Pointer outputImage = duplicator->GetOutput();
 
-    unsigned int upsampling = 1;
-    if (m_RingingModel!=NULL)
-        upsampling = m_RingingModel->GetKspaceCropping();
-
     // is input slize size even?
     int x=inputRegion.GetSize(0); int y=inputRegion.GetSize(1);
     if ( x%2 == 1 )
@@ -117,6 +114,15 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     slice->Allocate();
     slice->FillBuffer(0.0);
 
+    ImageRegion<2> upsampledSliceRegion;
+    unsigned int upsampling = 1;
+    if (m_RingingModel!=NULL)
+    {
+        upsampling = m_RingingModel->GetKspaceCropping();
+        upsampledSliceRegion.SetSize(0, x*upsampling);
+        upsampledSliceRegion.SetSize(1, y*upsampling);
+    }
+
     // frequency map slice
     typename SliceType::Pointer fMap = NULL;
     if (m_FrequencyMap.IsNotNull())
@@ -134,6 +140,15 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         MITK_INFO << "Adjusting complex signal";
         MITK_INFO << "line readout time: " << m_tLine;
         MITK_INFO << "line offset: " << m_kOffset;
+        if (m_FrequencyMap.IsNotNull())
+            MITK_INFO << "frequency map is set";
+        else
+            MITK_INFO << "no frequency map set";
+        if (m_RingingModel!=NULL)
+            MITK_INFO << "Gibbs ringing enabled";
+        else
+            MITK_INFO << "Gibbs ringing disabled";
+
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (int g=0; g<inputImage->GetVectorLength(); g++)
             for (int z=0; z<inputRegion.GetSize(2); z++)
@@ -142,8 +157,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                 std::vector< SliceType::Pointer > compartmentSlices;
                 // extract slice from channel g
-                for (int y=0; y<inputRegion.GetSize(1); y++)
-                    for (int x=0; x<inputRegion.GetSize(0); x++)
+                for (int y=0; y<sliceRegion.GetSize(1); y++)
+                    for (int x=0; x<sliceRegion.GetSize(0); x++)
                     {
                         typename SliceType::IndexType index2D;
                         index2D[0]=x; index2D[1]=y;
@@ -156,7 +171,20 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         if (fMap.IsNotNull())
                             fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
                     }
-                compartmentSlices.push_back(slice);
+
+                if (upsampling>1)
+                {
+                    itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
+                    resampler->SetInput(slice);
+                    resampler->SetOutputParametersFromImage(slice);
+                    resampler->SetSize(upsampledSliceRegion.GetSize());
+                    resampler->SetOutputSpacing(slice->GetSpacing()/upsampling);
+                    resampler->Update();
+                    typename SliceType::Pointer upslice = resampler->GetOutput();
+                    compartmentSlices.push_back(upslice);
+                }
+                else
+                    compartmentSlices.push_back(slice);
 
                 // fourier transform slice
                 typename ComplexSliceType::Pointer fSlice;

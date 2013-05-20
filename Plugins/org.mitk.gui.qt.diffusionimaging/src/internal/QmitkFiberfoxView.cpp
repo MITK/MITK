@@ -743,6 +743,44 @@ void QmitkFiberfoxView::GenerateImage()
     origin[2] = spacing[2]/2;
     itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
+    if (m_SelectedImage.IsNotNull())
+    {
+        mitk::Image* img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
+        itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
+        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
+
+        imageRegion = itkImg->GetLargestPossibleRegion();
+        spacing = itkImg->GetSpacing();
+        origin = itkImg->GetOrigin();
+        directionMatrix = itkImg->GetDirection();
+    }
+
+    DiffusionSignalModel<double>::GradientListType gradientList;
+    double bVal = 1000;
+    if (m_SelectedDWI.IsNull())
+    {
+        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+        bVal = m_Controls->m_BvalueBox->value();
+    }
+    else
+    {
+        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        imageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
+        spacing = dwi->GetVectorImage()->GetSpacing();
+        origin = dwi->GetVectorImage()->GetOrigin();
+        directionMatrix = dwi->GetVectorImage()->GetDirection();
+        bVal = dwi->GetB_Value();
+        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirections();
+        for (int i=0; i<dirs->Size(); i++)
+        {
+            DiffusionSignalModel<double>::GradientType g;
+            g[0] = dirs->at(i)[0];
+            g[1] = dirs->at(i)[1];
+            g[2] = dirs->at(i)[2];
+            gradientList.push_back(g);
+        }
+    }
+
     if (m_SelectedBundles.empty())
     {
         if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
@@ -751,6 +789,7 @@ void QmitkFiberfoxView::GenerateImage()
             {
 
                 QString artifactModelString("");
+                mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
 
                 if (!dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData()))
                     continue;
@@ -786,9 +825,38 @@ void QmitkFiberfoxView::GenerateImage()
                 filter->SettLine(lineReadoutTime);
                 filter->SetkOffset(kOffset);
                 filter->SetNoiseModel(&noiseModel);
+
+                mitk::GibbsRingingArtifact<double> gibbsModel;
+                if (m_Controls->m_AddGibbsRinging->isChecked())
+                {
+                    resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
+                    gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
+                    filter->SetRingingModel(&gibbsModel);
+                }
+
+                if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
+                {
+                    mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
+                    mitk::Image* img = dynamic_cast<mitk::Image*>(fMapNode->GetData());
+                    ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+                    CastToItkImage< ItkDoubleImgType >(img, itkImg);
+
+                    if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                            imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                            imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+                    {
+                        filter->SetFrequencyMap(itkImg);
+                        artifactModelString += "_DISTORTED";
+                    }
+                }
+
                 filter->Update();
 
-                mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+                resultNode->AddProperty("Fiberfox.Line-Offset", DoubleProperty::New(kOffset));
+                resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
+                resultNode->AddProperty("Fiberfox.Tinhom", IntProperty::New(m_Controls->m_T2starBox->value()));
+                resultNode->AddProperty("binary", BoolProperty::New(false));
+
                 mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
                 image->SetVectorImage( filter->GetOutput() );
                 image->SetB_Value(diffImg->GetB_Value());
@@ -832,45 +900,6 @@ void QmitkFiberfoxView::GenerateImage()
 
         return;
     }
-
-    if (m_SelectedImage.IsNotNull())
-    {
-        mitk::Image* img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
-        itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
-        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
-
-        imageRegion = itkImg->GetLargestPossibleRegion();
-        spacing = itkImg->GetSpacing();
-        origin = itkImg->GetOrigin();
-        directionMatrix = itkImg->GetDirection();
-    }
-
-    DiffusionSignalModel<double>::GradientListType gradientList;
-    double bVal = 1000;
-    if (m_SelectedDWI.IsNull())
-    {
-        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
-        bVal = m_Controls->m_BvalueBox->value();
-    }
-    else
-    {
-        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
-        imageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
-        spacing = dwi->GetVectorImage()->GetSpacing();
-        origin = dwi->GetVectorImage()->GetOrigin();
-        directionMatrix = dwi->GetVectorImage()->GetDirection();
-        bVal = dwi->GetB_Value();
-        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirections();
-        for (int i=0; i<dirs->Size(); i++)
-        {
-            DiffusionSignalModel<double>::GradientType g;
-            g[0] = dirs->at(i)[0];
-            g[1] = dirs->at(i)[1];
-            g[2] = dirs->at(i)[2];
-            gradientList.push_back(g);
-        }
-    }
-
 
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
@@ -1149,7 +1178,10 @@ void QmitkFiberfoxView::GenerateImage()
             if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
                     imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
                     imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+            {
                 tractsToDwiFilter->SetFrequencyMap(itkImg);
+                artifactModelString += "_DISTORTED";
+            }
         }
 
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());

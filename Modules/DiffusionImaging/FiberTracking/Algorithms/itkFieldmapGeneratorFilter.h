@@ -44,14 +44,15 @@ public:
     typedef itk::ImageRegion<3>                     OutputImageRegionType;
     typedef itk::Matrix<double, 3, 3>               MatrixType;
 
-    itkNewMacro(Self);
-    itkTypeMacro( FieldmapGeneratorFilter, ImageSource );
+    itkNewMacro(Self)
+    itkTypeMacro( FieldmapGeneratorFilter, ImageSource )
 
-    itkSetMacro( Spacing, itk::Vector<double> );
-    itkSetMacro( Origin, mitk::Point3D );
-    itkSetMacro( DirectionMatrix, MatrixType );
-    itkSetMacro( ImageRegion, OutputImageRegionType );
-
+    itkSetMacro( Spacing, itk::Vector<double> )
+    itkSetMacro( Origin, mitk::Point3D )
+    itkSetMacro( DirectionMatrix, MatrixType )
+    itkSetMacro( ImageRegion, OutputImageRegionType )
+    void SetGradient( vnl_vector_fixed< double, 3 > gradient ) { m_Gradient=gradient; }
+    void SetOffset( vnl_vector_fixed< double, 3 > offset ) { m_Offset=offset; }
     void SetVariances( std::vector< double > variances ) { m_Variances=variances; }
     void SetHeights( std::vector< double > heights ) { m_Heights=heights; }
     void SetWorldPositions( std::vector< mitk::Point3D > worldPositions ) { m_WorldPositions=worldPositions; }
@@ -71,6 +72,8 @@ protected:
     std::vector< double >               m_Variances;
     std::vector< double >               m_Heights;
     std::vector< mitk::Point3D >        m_WorldPositions;
+    vnl_vector_fixed< double, 3 >       m_Gradient;
+    vnl_vector_fixed< double, 3 >       m_Offset;
 };
 
 }

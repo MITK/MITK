@@ -120,6 +120,9 @@ void MrtrixPeakImageConverter< PixelType >
                     }
                     dirVec[3] = 0;
 
+                    if (dirVec.magnitude()<0.0001)
+                        continue;
+
                     vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
                     itk::ContinuousIndex<double, 4> center;
                     center[0] = index[0];
@@ -165,8 +168,7 @@ void MrtrixPeakImageConverter< PixelType >
                     pixel.SetElement(2, dirVec[2]);
                     directionImage->SetPixel(index2, pixel);
 
-                    if (dirVec.magnitude()>0.0001)
-                        m_NumDirectionsImage->SetPixel(index2, m_NumDirectionsImage->GetPixel(index2)+1);
+                    m_NumDirectionsImage->SetPixel(index2, m_NumDirectionsImage->GetPixel(index2)+1);
                 }
         m_DirectionImageContainer->InsertElement(m_DirectionImageContainer->Size(), directionImage);
     }

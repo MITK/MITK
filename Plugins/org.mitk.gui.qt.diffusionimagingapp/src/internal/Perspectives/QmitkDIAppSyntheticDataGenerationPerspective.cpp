@@ -50,6 +50,10 @@ void QmitkDIAppSyntheticDataGenerationPerspective::CreateInitialLayout(berry::IP
   lo = layout->GetViewLayout("org.mitk.views.fiberprocessing");
   lo->SetCloseable(false);
 
+  left->AddView("org.mitk.views.fiberextraction");
+  lo = layout->GetViewLayout("org.mitk.views.fiberextraction");
+  lo->SetCloseable(false);
+
   left->AddView("org.mitk.views.fieldmapgenerator");
   lo = layout->GetViewLayout("org.mitk.views.fieldmapgenerator");
   lo->SetCloseable(false);

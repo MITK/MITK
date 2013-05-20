@@ -24,7 +24,8 @@ namespace itk{
 template< class OutputImageType >
 FieldmapGeneratorFilter< OutputImageType >::FieldmapGeneratorFilter()
 {
-
+    m_Gradient.fill(0.0);
+    m_Offset.fill(0.0);
 }
 
 template< class OutputImageType >
@@ -56,10 +57,13 @@ void FieldmapGeneratorFilter< OutputImageType >::ThreadedGenerateData( const Out
     while( !oit.IsAtEnd() )
     {
         double value = 0;
+        IndexType idx = oit.GetIndex();
+        for (int i=0; i<3; i++)
+            value += idx[i]*m_Gradient[i] + m_Offset[i];
+
         for (int i=0; i<m_WorldPositions.size(); i++)
         {
             mitk::Point3D c = m_WorldPositions.at(i);
-            IndexType idx = oit.GetIndex();
             itk::Point<double, 3> vertex;
             outImage->TransformIndexToPhysicalPoint(idx, vertex);
             double dist = c.EuclideanDistanceTo(vertex);

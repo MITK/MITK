@@ -162,6 +162,14 @@ void QmitkFieldmapGeneratorView::GenerateFieldmap()
             worldPositions.push_back(point);
         }
 
+    vnl_vector_fixed< double, 3 > gradient, offset;
+    gradient[0] = m_Controls->m_xGradientBox->value();
+    gradient[1] = m_Controls->m_yGradientBox->value();
+    gradient[2] = m_Controls->m_zGradientBox->value();
+    offset[0] = m_Controls->m_xOffsetBox->value();
+    offset[1] = m_Controls->m_yOffsetBox->value();
+    offset[2] = m_Controls->m_zOffsetBox->value();
+
     itk::FieldmapGeneratorFilter< FieldMapType >::Pointer filter = itk::FieldmapGeneratorFilter< FieldMapType >::New();
     filter->SetHeights(heights);
     filter->SetVariances(variances);
@@ -170,6 +178,8 @@ void QmitkFieldmapGeneratorView::GenerateFieldmap()
     filter->SetOrigin(origin);
     filter->SetDirectionMatrix(directionMatrix);
     filter->SetImageRegion(imageRegion);
+    filter->SetGradient(gradient);
+    filter->SetOffset(offset);
     filter->Update();
 
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();

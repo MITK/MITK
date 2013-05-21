@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkSurface.h>
 
 #include "ui_QmitkSegmentationUtilitiesViewControls.h"
 
@@ -70,6 +71,10 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView
     void OnBooleanOperationsSegImage2SelectionChanged(const mitk::DataNode*);
     //TODO create slots for all boolean buttons
 
+    void OnSurface2ImagePressed();
+    void OnSurface2ImageDataSelectionChanged(const mitk::DataNode*);
+    void OnSurface2ImageReferenceDataSelectionChanged(const mitk::DataNode*);
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -79,6 +84,12 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes );
+
+    /// \brief Mask an image with a mask. Note, input and mask images must be of the same size.
+    mitk::Image::Pointer MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage );
+
+    /// \brief Convert a surface to an binary image.
+    mitk::Image::Pointer ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface );
 
     Ui::QmitkSegmentationUtilitiesViewControls m_Controls;
 

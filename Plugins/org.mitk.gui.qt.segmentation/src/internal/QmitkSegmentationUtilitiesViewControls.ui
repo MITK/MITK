@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
+    <width>289</width>
     <height>418</height>
    </rect>
   </property>
@@ -26,15 +26,134 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
+     <widget class="QWidget" name="pageMasking">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>271</width>
+        <height>280</height>
+       </rect>
+      </property>
+      <attribute name="icon">
+       <iconset resource="../../resources/utilities.qrc">
+        <normaloff>:/utilities/utilities_masking.png</normaloff>:/utilities/utilities_masking.png</iconset>
+      </attribute>
+      <attribute name="label">
+       <string>Image Masking</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Data Selection:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QmitkDataStorageComboBox" name="cmbMaskingReferenceData">
+            <property name="toolTip">
+             <string>Select the mask you want to use</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QmitkDataStorageComboBox" name="cmbMaskingData">
+            <property name="toolTip">
+             <string>Select the reference image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblMaskingWarnings">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 3, 6);</string>
+            </property>
+            <property name="text">
+             <string>Select a regular image and a binary image</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Masking-Mode:</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QRadioButton" name="rbMaskImage">
+            <property name="toolTip">
+             <string>Cut a image's region using a binary mask</string>
+            </property>
+            <property name="text">
+             <string>Image-Masking</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbMaskSurface">
+            <property name="toolTip">
+             <string>Fill a surface into an image</string>
+            </property>
+            <property name="text">
+             <string>Surface-Masking</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnMaskImage">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Mask Image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="pageBoolean">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>271</width>
+        <height>280</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -169,8 +288,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>271</width>
+        <height>280</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -344,63 +463,25 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="pageMasking">
+     <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>271</width>
+        <height>280</height>
        </rect>
       </property>
       <attribute name="icon">
        <iconset resource="../../resources/utilities.qrc">
-        <normaloff>:/utilities/utilities_masking.xpm</normaloff>:/utilities/utilities_masking.xpm</iconset>
+        <normaloff>:/utilities/utilities_surface2image.png</normaloff>:/utilities/utilities_surface2image.png</iconset>
       </attribute>
       <attribute name="label">
-       <string>Image Masking</string>
+       <string>Surface to Image</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Masking-Mode:</string>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QRadioButton" name="rbMaskImage">
-            <property name="toolTip">
-             <string>Cut a image's region using a binary mask</string>
-            </property>
-            <property name="text">
-             <string>Image-Masking</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbMaskSurface">
-            <property name="toolTip">
-             <string>Fill a surface into an image</string>
-            </property>
-            <property name="text">
-             <string>Surface-Masking</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="groupBox_5">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -410,28 +491,28 @@
          <property name="title">
           <string>Data Selection:</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
+         <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
-           <widget class="QmitkDataStorageComboBox" name="cmbMaskingReferenceData">
+           <widget class="QmitkDataStorageComboBox" name="cmbSurface2ImageReferenceData">
             <property name="toolTip">
              <string>Select the mask you want to use</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QmitkDataStorageComboBox" name="cmbMaskingData">
+           <widget class="QmitkDataStorageComboBox" name="cmbSurface2ImageData">
             <property name="toolTip">
              <string>Select the reference image</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lblMaskingWarnings">
+           <widget class="QLabel" name="lblSurface2ImageWarnings">
             <property name="styleSheet">
              <string notr="true">color: rgb(255, 3, 6);</string>
             </property>
             <property name="text">
-             <string>Select a regular image and a binary image above</string>
+             <string>Select a regular image and a surface</string>
             </property>
            </widget>
           </item>
@@ -439,24 +520,21 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnMaskImage">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
+        <widget class="QPushButton" name="btnSurface2Image">
          <property name="text">
-          <string>Mask Image</string>
+          <string>Convert</string>
          </property>
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_3">
+        <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>40</height>
+           <height>129</height>
           </size>
          </property>
         </spacer>

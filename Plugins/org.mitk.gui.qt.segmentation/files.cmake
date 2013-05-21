@@ -46,7 +46,7 @@ set(CACHED_RESOURCE_FILES
   resources/boolean.png
   resources/deformablePlane.png
   resources/regiongrowing.xpm
-  resources/segmentationUtilities.xpm
+  resources/segmentationUtilities.png
   plugin.xml
 )
 

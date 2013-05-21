@@ -58,6 +58,7 @@ Interactions/mitkSegmentationsProcessingTool.cpp
 Interactions/mitkSetRegionTool.cpp
 Interactions/mitkSegTool2D.cpp
 Interactions/mitkSubtractContourTool.cpp
+Interactions/mitkWatershedTool.cpp
 Interactions/mitkContourModelInteractor.cpp
 Interactions/mitkContourModelLiveWireInteractor.cpp
 Interactions/mitkLiveWireTool2D.cpp

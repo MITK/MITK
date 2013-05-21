@@ -81,6 +81,7 @@ set(CPP_FILES
  QmitkDrawPaintbrushToolGUI.cpp
  QmitkErasePaintbrushToolGUI.cpp
  QmitkBinaryThresholdToolGUI.cpp
+ QmitkWatershedToolGUI.cpp
  QmitkCalculateGrayValueStatisticsToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
  # QmitkMaterialEditor.cpp
@@ -198,6 +199,7 @@ set(MOC_H_FILES
  QmitkDrawPaintbrushToolGUI.h
  QmitkErasePaintbrushToolGUI.h
  QmitkBinaryThresholdToolGUI.h
+ QmitkWatershedToolGUI.h
  QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h

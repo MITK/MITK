@@ -5,6 +5,7 @@
         <file>btnIntersection.png</file>
         <file>btnUnion.png</file>
         <file>utilities_morphology.xpm</file>
-        <file>utilities_masking.xpm</file>
+        <file>utilities_masking.png</file>
+        <file>utilities_surface2image.png</file>
     </qresource>
 </RCC>

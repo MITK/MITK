@@ -278,18 +278,14 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   {
 
     lastP = p; // valid for number of points count > 0
-    lastPt2d = pt2d;  // valid for number of points count > 0
     preLastPt2d = lastPt2d; // valid only for count > 1
+    lastPt2d = pt2d;  // valid for number of points count > 0
 
     lastVec = vec;    // valid only for counter > 1
-    lastPoint = point;
+    lastPoint = point; // eventuell überflüssig!
 
     // get current point in point set
     point = pointsIter->Value();
-
-    //itk2vtk(point, vtkp);
-    //linearTransform->TransformPoint(vtkp, vtkp);
-    //vtk2itk(vtkp,point);
 
     p[0] = point[0];
     p[1] = point[1];
@@ -309,7 +305,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     bool isInputDevice=false;
     this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice);
 
-    // point is close to current plane
+    // if point is close to current plane ( distance < 4) it will be displayed
     if(!isInputDevice && (diff < 4.0))
     {
 
@@ -377,7 +373,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       pointsOnSameSideOfPlane = (distance * lastDistance) > 0.5;
       if ( !pointsOnSameSideOfPlane ) // points on different sides of plane -> draw it
       {
-
         vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 
         ls->m_ContourPoints->InsertNextPoint(lastPoint[0],lastPoint[1],lastPoint[2]);
@@ -393,7 +388,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
         if(m_ShowDistances) // calculate and print distance between adjacent points
         {
-
           float distancePoints = point.EuclideanDistanceTo(lastPoint);
 
           std::stringstream buffer;
@@ -414,26 +408,21 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
         }
 
-         // TODO !!
         if(m_ShowAngles && count > 1) // calculate and print angle between connected lines
         {
             std::stringstream buffer;
-             //(char) 176 is the degrees sign
+             //(char) 176 is the degree sign
              buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
 
-             MITK_INFO <<" grad " << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi <<endl;
-
-             //compute desired position of text
+            //compute desired position of text
              Vector2D vec2d = pt2d-lastPt2d;
              vec2d.Normalize();
              Vector2D lastVec2d = lastPt2d-preLastPt2d;
              lastVec2d.Normalize();
              vec2d=vec2d-lastVec2d;
              vec2d.Normalize();
+             // middle between two vectors which enclose the angle
              Vector2D pos2d = lastPt2d.GetVectorFromOrigin() + vec2d * text2dDistance * text2dDistance;
-
-             // THE POSITIONS ARE INVALID!
-            MITK_INFO << pos2d[0] << " " << pos2d[1] <<endl;
 
              ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
 
@@ -451,7 +440,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       pointDataIter++;
       count++;
     }
-
   }
 
 // iteratoren ?
@@ -478,9 +466,15 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     // draw line between first and last point
     if(m_PolygonClosed && NumberContourPoints > 1){
 
+
+    //  ls->m_ContourPoints->InsertNextPoint(lastPoint[0],lastPoint[1],lastPoint[2]);
+    //  ls->m_ContourPoints->InsertNextPoint(point[0], point[1], point[2]);
+
+      //TODO: hierzu auch winkel und angle etc. funktioniert auch nicht!
       vtkSmartPointer<vtkLine> closingLine = vtkSmartPointer<vtkLine>::New();
-      closingLine->GetPointIds()->SetId(0, NumberContourPoints-1); // last point
-      closingLine->GetPointIds()->SetId(1, 0); // first point
+      closingLine->GetPointIds()->SetId(0, 0); // first point
+      closingLine->GetPointIds()->SetId(1, NumberContourPoints-1); // last point index
+
       ls->m_ContourLines->InsertNextCell(closingLine);
     }
 

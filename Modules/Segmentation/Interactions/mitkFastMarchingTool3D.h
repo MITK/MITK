@@ -73,6 +73,9 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual const char* GetName() const;
     virtual std::string GetIconPath() const;
 
+    Message1<int> ThresholdChanged;
+    void SetThreshold(int value);
+
   protected:
 
     FastMarchingTool3D();

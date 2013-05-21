@@ -130,6 +130,11 @@ const char* mitk::FastMarchingTool3D::GetName() const
   return "FastMarching3D";
 }
 
+void mitk::FastMarchingTool3D::SetThreshold(int value)
+{
+  m_UpperThreshold = (float)value / 10.0;
+}
+
 void mitk::FastMarchingTool3D::Activated()
 {
   Superclass::Activated();

@@ -18,13 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileReader.h>
 #include <usGetModuleContext.h>
 #include <itksys/SystemTools.hxx>
-//#include <mitkBaseData.h>
+#include <fstream>
 
 
 
 mitk::AbstractFileReader::AbstractFileReader() :
 m_Priority (0),
 m_Extension ("")
+{
+}
+
+mitk::AbstractFileReader::AbstractFileReader(std::string extension, std::string description) :
+m_Priority (0),
+m_Extension (extension),
+m_Description (description)
 {
 }
 
@@ -105,8 +112,11 @@ mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
+  if ( m_Description == "" )
+    MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
   mitk::ServiceProperties result;
   result[mitk::IFileReader::PROP_EXTENSION]    = m_Extension;
+  result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
@@ -147,4 +157,9 @@ int mitk::AbstractFileReader::GetPriority() const
 std::string mitk::AbstractFileReader::GetExtension() const
 {
   return m_Extension;
+}
+
+std::string mitk::AbstractFileReader::GetDescription() const
+{
+  return m_Description;
 }

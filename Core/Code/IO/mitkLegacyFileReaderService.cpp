@@ -21,10 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <mitkBaseData.h>
 
-mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension)
+mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension, std::string description)
 {
   if (extension == "") mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension." ;
   m_Extension = extension;
+  m_Description = description;
   m_Priority = 0; // Default priority for legacy reader
   RegisterMicroservice(mitk::GetModuleContext());
 }

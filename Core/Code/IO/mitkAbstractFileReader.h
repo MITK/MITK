@@ -93,6 +93,8 @@ namespace mitk {
 
     virtual std::string GetExtension() const;
 
+    virtual std::string GetDescription() const;
+
     virtual std::list< std::string > GetSupportedOptions() const;
 
     virtual bool CanRead(const std::string& path) const;
@@ -102,6 +104,7 @@ namespace mitk {
 
 protected:
     AbstractFileReader();
+    AbstractFileReader(std::string extension, std::string description);
     virtual ~AbstractFileReader();
 
     // Filenames etc..
@@ -111,6 +114,7 @@ protected:
 
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;
+    std::string m_Description;
     int m_Priority;
     std::list< std::string > m_Options; // Options supported by this reader. Can be left emtpy if no special options are required
 

@@ -104,23 +104,7 @@ void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
 {
   if (m_BinaryThresholdULTool.IsNotNull())
   {
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this ); // needs a QWidget as parent, "this" is not QWidget
-    dialog->setPrompt("What did you just segment?");
-    int dialogReturnValue = dialog->exec();
-
-    std::string organName = dialog->GetSegmentationName().toLocal8Bit().data();
-    mitk::Color color     = dialog->GetColor();
-
-    delete dialog;
-
-    if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
-    {
-      m_BinaryThresholdULTool->AcceptCurrentThresholdValue( organName, color );
-    }
-    else
-    {
-      m_BinaryThresholdULTool->CancelThresholding();
-    }
+    m_BinaryThresholdULTool->AcceptCurrentThresholdValue();
   }
 }
 

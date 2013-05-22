@@ -54,7 +54,7 @@ namespace mitk
     virtual void Deactivated();
 
     virtual void SetThresholdValues(int lower, int upper);
-    virtual void AcceptCurrentThresholdValue(const std::string& organName, const Color& color);
+    virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
 
@@ -65,7 +65,7 @@ namespace mitk
 
     void SetupPreviewNode();
 
-    void CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organType, const Color& color);
+    void CreateNewSegmentationFromThreshold(DataNode* node);
 
     void OnRoiDataChanged();
     void UpdatePreview();

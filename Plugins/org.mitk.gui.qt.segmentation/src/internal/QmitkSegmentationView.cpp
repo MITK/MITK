@@ -209,6 +209,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
 void QmitkSegmentationView::CreateNewSegmentation()
 {
+
   mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
   {
@@ -326,6 +327,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
             this->ApplyDisplayOptions( emptySegmentation );
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
+            toolManager->SetWorkingData(emptySegmentation);
+
 //            m_Controls->segImageSelector->show();
           }
           catch (std::bad_alloc)
@@ -1005,7 +1008,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   this->UpdateWarningLabel("Please load an image");
 
   if( m_Controls->patImageSelector->GetSelectedNode().IsNotNull() )
-    this->UpdateWarningLabel("Select or create a segmentation");
+    this->UpdateWarningLabel("Select or create a new segmentation");
 
   m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->segImageSelector->SetPredicate(m_IsABinaryImagePredicate);
@@ -1030,7 +1033,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
-  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("");
+  m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds'");
   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(2);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 

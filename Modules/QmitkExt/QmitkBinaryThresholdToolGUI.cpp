@@ -63,14 +63,14 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
   layout->addWidget( m_Slider );
 
-  QPushButton* okButton = new QPushButton("Create Segmentation", this);
+  QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
   layout->addWidget( okButton );
 
   mainLayout->addLayout(layout);
 
-  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+ connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
@@ -132,25 +132,8 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 {
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( this ); // needs a QWidget as parent, "this" is not QWidget
-    dialog->setPrompt("What did you just segment?");
-    int dialogReturnValue = dialog->exec();
-
-    std::string organName = dialog->GetSegmentationName().toStdString();
-    mitk::Color color     = dialog->GetColor();
-
-    delete dialog;
-
-    if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
-    {
       this->thresholdAccepted();
-      m_BinaryThresholdTool->AcceptCurrentThresholdValue( organName, color );
-    }
-    else
-    {
-      this->thresholdCanceled();
-      m_BinaryThresholdTool->CancelThresholding();
-    }
+      m_BinaryThresholdTool->AcceptCurrentThresholdValue();
   }
 }
 

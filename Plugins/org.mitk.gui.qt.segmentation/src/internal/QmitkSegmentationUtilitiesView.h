@@ -27,6 +27,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkSurface.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageAccessByItk.h>
+
+#include <itkBinaryBallStructuringElement.h>
+#include <itkBinaryCrossStructuringElement.h>
+#include <itkBinaryErodeImageFilter.h>
+#include <itkBinaryDilateImageFilter.h>
+#include <itkBinaryMorphologicalOpeningImageFilter.h>
+#include <itkBinaryMorphologicalClosingImageFilter.h>
+#include <itkBinaryFillholeImageFilter.h>
+
+
 
 #include "ui_QmitkSegmentationUtilitiesViewControls.h"
 
@@ -64,8 +76,19 @@ class QmitkSegmentationUtilitiesView : public QmitkAbstractView
     void OnMaskingDataSelectionChanged(const mitk::DataNode*);
     void OnMaskingReferenceDataSelectionChanged(const mitk::DataNode*);
 
+    /// \brief Called when the image selection for the morphological operations was changed
     void OnMorphologicalOperationsDataSelectionChanged(const mitk::DataNode*);
-    //TODO create slots for all morphological buttons
+
+    ///@{
+    /**
+    * \brief Performs a morphological operation on selected image.
+    */
+     void OnbtnClosingClicked();
+     void OnbtnOpeningClicked();
+     void OnbtnDilatationClicked();
+     void OnbtnErosionClicked();
+     void OnbtnFillHolesClicked();
+    ///@}
 
     void OnBooleanOperationsSegImage1SelectionChanged(const mitk::DataNode*);
     void OnBooleanOperationsSegImage2SelectionChanged(const mitk::DataNode*);
@@ -97,12 +120,35 @@ private:
 
     void EnableBooleanButtons(bool);
 
+
+    ///@{
+    /**
+    * \brief Implements morphological filters with itk functions
+    */
+    template<typename TPixel, unsigned int VDimension>
+    void itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor);
+
+    template<typename TPixel, unsigned int VDimension>
+    void itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor);
+
+    template<typename TPixel, unsigned int VDimension>
+    void itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor);
+
+    template<typename TPixel, unsigned int VDimension>
+    void itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor);
+
+    template<typename TPixel, unsigned int VDimension>
+    void itkFillhole(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor);
+    ///@}
+
     mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
     mitk::NodePredicateAnd::Pointer m_IsOfTypeSurface;
     mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
     mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
     mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
     mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
+
+
 
 };
 

@@ -47,7 +47,7 @@ AddArtifactsToDwiImageFilter< TPixelType >
 
 
 template< class TPixelType >
-typename AddArtifactsToDwiImageFilter< TPixelType >::ComplexSliceType::Pointer AddArtifactsToDwiImageFilter< TPixelType >::RearrangeSlice(typename ComplexSliceType::Pointer slice)
+AddArtifactsToDwiImageFilter< TPixelType >::ComplexSliceType::Pointer AddArtifactsToDwiImageFilter< TPixelType >::RearrangeSlice(ComplexSliceType::Pointer slice)
 {
     ImageRegion<2> region = slice->GetLargestPossibleRegion();
     typename ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();

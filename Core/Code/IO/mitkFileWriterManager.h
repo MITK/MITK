@@ -15,46 +15,68 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef FileWriterInterface_H_HEADER_INCLUDED_C1E7E521
-#define FileWriterInterface_H_HEADER_INCLUDED_C1E7E521
+#ifndef FileWriterManager_H_HEADER_INCLUDED_C1E7E521
+#define FileWriterManager_H_HEADER_INCLUDED_C1E7E521
 
 #include <MitkExports.h>
 #include <mitkBaseData.h>
-#include <mitkFileWriterInterface.h>
+#include <mitkIFileWriter.h>
+
+// Microservices
+#include <mitkServiceReference.h>
+#include <mitkGetModuleContext.h>
+
 
 namespace mitk {
 
 //##Documentation
 //## @brief
 //## @ingroup Process
-class MITK_CORE_EXPORT FileWriterInterface
+class MITK_CORE_EXPORT FileWriterManager
 {
   public:
 
-/**
-*
-**/
+    /**
+    * Writes the file located at <code>path</code> and returns the
+    * contents as a DataNode.
+    *
+    * This method will select the best available Writer in the service
+    * registry for the task.
+    *
+    * UnsupportedFileException: If no compatible Writer was found
+    * FileNotFoundException: If no file was found at <code>path</code>
+    * FileWriteException: If the selected Writer failed to Write the file
+    **/
 
-    void Write(std::string path, mitk::BaseData::Pointer data);
+    static void Write(mitk::BaseData::Pointer data, const std::string& path);
 
     template <class T>
-    T* Read(std::string path);
+    static T* Write(const std::string& path)
+    {
+      mitk::BaseData::Pointer basedata = Write(path);
+      T* result = dynamic_cast<T*> (basedata.GetPointer());
+      return result;
+    }
 
-/**
-* Returns a compatible Reader to the given file extension
-**/
-    mitk::FileWriterInterface::Pointer GetWriter(mitk::BaseData::Pointer datatype);
+    /**
+    * Returns a compatible Writer to the given file extension
+    **/
+    static mitk::IFileWriter* GetWriter(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    mitk::FileWriterInterface::Pointer GetWriter(std::string extension, std::list<std::string> properties );
+    static mitk::IFileWriter* GetWriter(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
-    mitk::FileWriterInterface::Pointer GetWriters(std::string extension);
+    static std::list <mitk::IFileWriter*> GetWriters(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
 
-    mitk::FileWriterInterface::Pointer GetWriters(std::string extension, std::list<std::string> properties );
+    static std::list <mitk::IFileWriter*> GetWriters(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
-  protected:
-    FileWriterInterface();
-    virtual ~FileWriterInterface();
+protected:
+    //FileWriterManager();
+    //virtual ~FileWriterManager();
+
+    static std::list< mitk::ServiceReference > GetWriterList(const std::string& extension, mitk::ModuleContext* context);
+
+    static bool WriterSupportsOptions(mitk::IFileWriter* Writer, std::list<std::string> options);
 
 };
 } // namespace mitk
-#endif /* FileWriterInterface_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* FileWriterManager_H_HEADER_INCLUDED_C1E7E521 */

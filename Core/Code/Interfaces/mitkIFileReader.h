@@ -138,6 +138,13 @@ namespace mitk {
     virtual std::string GetExtension() const = 0;
 
     /**
+    * \brief Returns a human readable description of the file format.
+    *
+    * This will be used in FileDialogs for example.
+    */
+    virtual std::string GetDescription() const = 0;
+
+    /**
     * \brief returns a list of the supported Options
     *
     * Options are strings that are treated as flags when passed to the read method.

@@ -21,6 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGetModuleContext.h"
 #include "mitkModuleContext.h"
 #include <mitkBaseData.h>
+#include <mitkBaseDataIOFactory.h>
+#include <mitkLegacyFileReaderService.h>
+#include <mitkImage.h>
+
+
+#include <mitkPointSetReader.h>
+#include <mitkPointSet.h>
+
 
 #include <itkProcessObject.h>
 #include <itkLightObject.h>
@@ -51,6 +59,7 @@ public:
   {
    m_Extension = extension;
    m_Priority = priority;
+   m_Description = "This is a dummy description.";
    this->RegisterMicroservice(mitk::GetModuleContext());
   }
 
@@ -141,6 +150,26 @@ int mitkFileReaderManagerTest(int argc , char* argv[])
   returnedList = mitk::FileReaderManager::GetReaders("test", options);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one readers when one matching reader was found, asking for all compatibles");
   MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correctness of result from former query");
+
+  // And now to verify a working read chain for a mps file:
+  mitk::PointSetReader::Pointer psr = mitk::PointSetReader::New();
+  mitk::BaseData::Pointer basedata;
+  basedata = mitk::FileReaderManager::Read("F://Build//MITK-Data//pointSet.mps");
+  MITK_TEST_CONDITION_REQUIRED(basedata.IsNotNull(), "Testing correct read of PointSet");
+
+  // Testing templated call to ReaderManager
+  mitk::PointSet::Pointer pointset = mitk::FileReaderManager::Read< mitk::PointSet >("F://Build//MITK-Data//pointSet.mps");
+  MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(), "Testing templated call of Read()");
+
+  // And now for something completely different... (Debug)
+  mitk::LegacyFileReaderService::Pointer lfr = mitk::LegacyFileReaderService::New(".nrrd", "Nearly Raw Raster Data");
+  returned = mitk::FileReaderManager::GetReader(".nrrd");
+  MITK_TEST_CONDITION_REQUIRED(lfr == returned, "Testing correct retrieval of specific FileReader with Options: Low priority reader with specific option");
+
+  mitk::BaseData::Pointer image = mitk::FileReaderManager::Read("F://Build//MITK-Data//Pic2DplusT.nrrd");
+  MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Testing whether BaseData is empty or not");
+  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*> (image.GetPointer());
+  MITK_TEST_CONDITION_REQUIRED(image2.IsNotNull(), "Testing if BaseData is an image");
 
   // always end with this!
   MITK_TEST_END();

@@ -65,7 +65,7 @@ const char** mitk::BinaryThresholdULTool::GetXPM() const
 
 const char* mitk::BinaryThresholdULTool::GetName() const
 {
-  return "ThresholdingUL";
+  return "Two Thresholds";
 }
 
 void mitk::BinaryThresholdULTool::Activated()

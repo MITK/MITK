@@ -29,6 +29,11 @@
       name= "SegmentationUtilities"
       class= "QmitkSegmentationUtilitiesView"
       icon= "resources/segmentationUtilities.png" />
+    <view
+      id="org.mitk.views.segmentationutilities2"
+      name="Segmentation Utilities"
+      class="QmitkSegmentationUtilities2View"
+      icon="resources/SegmentationUtilities_48x48.png" />
   </extension>
   
   <extension point="org.blueberry.ui.preferencePages">

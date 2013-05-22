@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDeformableClippingPlaneView.h"
 #include "src/internal/regiongrowing/QmitkRegionGrowingView.h"
 #include "QmitkSegmentationUtilitiesView.h"
+#include "SegmentationUtilities/QmitkSegmentationUtilities2View.h"
 
 using namespace mitk;
 
@@ -42,6 +43,7 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDeformableClippingPlaneView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkRegionGrowingView, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilities2View, context)
 }
 
 void PluginActivator::stop(ctkPluginContext *)

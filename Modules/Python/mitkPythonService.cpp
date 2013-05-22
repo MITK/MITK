@@ -151,7 +151,7 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
     if(commandIssued)
     {
         this->NotifyObserver(pythonCommand.toStdString());
-        m_ErrorOccured = PythonQt::self()->handleError();
+        m_ErrorOccured = PythonQt::self()->errorOccured();
     }
 
     return result.toString().toStdString();
@@ -499,6 +499,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
   this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "print \"Using ITK version \" + itk.Version.GetITKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
 
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
@@ -516,6 +517,7 @@ bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
   this->Execute( "import vtk", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "print \"Using VTK version \" + vtk.vtkVersion.GetVTKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
   m_VtkWrappingAvailable = !this->PythonErrorOccured();
 
   return m_VtkWrappingAvailable;

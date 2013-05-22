@@ -88,6 +88,7 @@ set(CPP_FILES
  # QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
  # QmitkDataStorageComboBox.cpp
+ QmitkOtsuTool3DGUI.cpp
 
  QmitkHistogram.cpp
  QmitkHistogramWidget.cpp
@@ -226,6 +227,7 @@ set(MOC_H_FILES
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
  QmitkAdaptiveRegionGrowingWidget.h
+ QmitkOtsuTool3DGUI.h
 
  QmitkHistogramJSWidget.h
 

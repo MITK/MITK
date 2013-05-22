@@ -46,7 +46,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   this->m_SeedIndex[1]=0;
   this->m_SeedIndex[2]=0;
   this->m_MeasurementFrame.set_identity();
-  this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image and a Mask Image
+  this->SetNumberOfRequiredInputs(1); //Filter needs a DWI image and a Mask Image, but check will be outside itkProcessObject and inside GenerateData()
 
 
   m_ClockPtr = RealTimeClock::New();

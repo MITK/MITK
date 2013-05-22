@@ -26,15 +26,15 @@
       <string/>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageBoolean">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>381</width>
+        <height>310</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -169,8 +169,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>381</width>
+        <height>310</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -210,44 +210,43 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QToolButton" name="btnClosing">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+          <widget class="QLabel" name="label">
            <property name="text">
-            <string>Closing</string>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextUnderIcon</enum>
+            <string>Radius</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="btnOpening">
-           <property name="enabled">
-            <bool>false</bool>
+          <widget class="QSlider" name="sliderMorphFactor">
+           <property name="minimum">
+            <number>1</number>
            </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="maximum">
+            <number>20</number>
            </property>
-           <property name="text">
-            <string>Opening</string>
+           <property name="pageStep">
+            <number>1</number>
            </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
          <item>
+          <widget class="QSpinBox" name="spinBoxMorphFactor">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
           <widget class="QToolButton" name="btnDilatation">
            <property name="enabled">
             <bool>false</bool>
@@ -266,30 +265,7 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QToolButton" name="btnFillHoles">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Fill Holes</string>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextUnderIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
+         <item row="0" column="1">
           <widget class="QToolButton" name="btnErosion">
            <property name="enabled">
             <bool>false</bool>
@@ -308,8 +284,8 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QToolButton" name="btnPlaceholder">
+         <item row="1" column="0">
+          <widget class="QToolButton" name="btnClosing">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -320,7 +296,48 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Placeholder</string>
+            <string>Closing</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QToolButton" name="btnOpening">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Opening</string>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextUnderIcon</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QToolButton" name="btnFillHoles">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Fills holes in the binary image globally. No radius required.</string>
+           </property>
+           <property name="text">
+            <string>Fill Holes (global)</string>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -349,8 +366,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>375</width>
-        <height>292</height>
+        <width>271</width>
+        <height>207</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -478,5 +495,38 @@
  <resources>
   <include location="../../resources/utilities.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sliderMorphFactor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBoxMorphFactor</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>186</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBoxMorphFactor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderMorphFactor</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>164</x>
+     <y>167</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>124</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -81,7 +81,7 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
   m_SelectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
 
-  // polydata
+   // polydata
   m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
   m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -202,6 +202,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       ls->m_PropAssembly->RemovePart(ls->m_VtkTextAngleActors.at(i));
   }
 
+   // polydata
+  ls->m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
+  ls->m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
+  ls->m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
+
 
   // exceptional displaying for PositionTracker -> MouseOrientationTool
   int mapperID;
@@ -232,7 +237,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     return;
   }
 
-
+  //iterator for point set
   mitk::PointSet::PointsContainer::Iterator pointsIter;
   mitk::PointSet::PointsContainer::Iterator pointsIterPredecessor;
   pointsIterPredecessor = itkPointSet->GetPoints()->Begin();
@@ -264,9 +269,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_SelectedScales->Reset();
 
   ls->m_DistancesBetweenPoints->Reset();
-
-  ls->m_VtkContourPolyData->Reset();
-  ls->m_VtkContourPolyData->DeleteCells();
 
   ls->m_VtkTextLabelActors.clear();
   ls->m_VtkTextDistanceActors.clear();

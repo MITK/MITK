@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLookupTableProperty.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPointSet.h"
-#include "mitkPointSetGLMapper2D.h"
+#include "mitkPointSetVtkMapper2D.h"
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkPolyDataGLMapper2D.h"
 #include "mitkProperties.h"
@@ -120,7 +120,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
   if(pointSet.IsNotNull())
   {
-    mitk::PointSetGLMapper2D::SetDefaultProperties(node);
+    mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
@@ -192,7 +192,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       }
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
-        newMapper = mitk::PointSetGLMapper2D::New();
+        newMapper = mitk::PointSetVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
     }

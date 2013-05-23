@@ -69,6 +69,8 @@ class MITK_CORE_EXPORT FileReaderManager
 
     static std::list <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
 
+    static std::string GetSupportedExtensions();
+
 protected:
     //FileReaderManager();
     //virtual ~FileReaderManager();

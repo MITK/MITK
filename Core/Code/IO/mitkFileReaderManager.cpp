@@ -88,6 +88,35 @@ std::list <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::st
   return result;
 }
 
+//////////////////// GENERIC INFORMATION ////////////////////
+
+std::string mitk::FileReaderManager::GetSupportedExtensions()
+{
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  std::list<mitk::ServiceReference> refs = GetReaderList("", context);
+  std::list<std::string> entries; // Will contain Description + Extension (Human readable)
+  std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
+  for (std::list<mitk::ServiceReference>::const_iterator iterator = refs.begin(), end = refs.end(); iterator != end; ++iterator)
+  {
+    // Generate List of Extensions
+    if (iterator == refs.begin()) // First entry without semicolon
+      knownExtensions += iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+    else // Ad semicolon for each following entry
+      knownExtensions += "; " + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+
+    // Generate List of human readable entries composed of Description + Extension
+    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION).ToString() + "(" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString() + ");;";
+    entries.push_back(entry);
+  }
+  entries.sort();
+  entries.push_front("Known Extensions (" + knownExtensions + ");;");
+  entries.push_front("All (*);;");
+
+  std::string result;
+  for (std::list<std::string>::const_iterator iterator = entries.begin(), end = entries.end(); iterator != end; ++iterator)
+    result = result.append(*iterator);
+  return result;
+}
 
 //////////////////// INTERNAL CODE ////////////////////
 
@@ -118,7 +147,11 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, s
 std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const std::string& extension, mitk::ModuleContext* context )
 {
   // filter for class and extension
-  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::IFileReader::PROP_EXTENSION + "=" + extension + "))";
+  std::string filter;
+  if (extension == "")
+    filter = "";
+  else
+    filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileReader)(" + mitk::IFileReader::PROP_EXTENSION + "=" + extension + "))";
   std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileReader", filter);
   result.sort();
   std::reverse(result.begin(), result.end());

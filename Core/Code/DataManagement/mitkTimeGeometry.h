@@ -94,15 +94,22 @@ namespace mitk {
 
     /**
     * \brief Converts a time step to a time point
+    *
+    * Wenn keine gültige Zeit wird theoretischer Puntk berechnet
     */
     virtual TimePointType  TimeStepToTimePoint (TimeStepType timeStep) const = 0;
     /**
     * \brief Converts a time point to the corresponding time step
+    *
+    * Wenn negative invalide Zeit Zeitschritt gleich 0
+    * wenn positive invalide Zeit virtueller Zeitschritt
     */
     virtual TimeStepType   TimePointToTimeStep (TimePointType timePoint) const = 0;
 
     /**
     * \brief Returns the geometry of a specific time point
+    *
+    * Kann, aber muss keine tatsaechliche Variante sein
     */
     virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
@@ -112,6 +119,8 @@ namespace mitk {
 
     /**
     * \brief Returns a clone of the geometry of a specific time point
+    *
+    * Invalid time steps returns a null-pointer
     */
     virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
     /**

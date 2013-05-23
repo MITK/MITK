@@ -80,8 +80,10 @@ mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeSte
 
 mitk::TimeStepType mitk::ProportionalTimeGeometry::TimePointToTimeStep( TimePointType timePoint) const
 {
-  assert(timePoint >= m_FirstTimePoint);
-  return static_cast<TimeStepType>((timePoint -m_FirstTimePoint) / m_StepDuration);
+  if (m_FirstTimePoint <= timePoint)
+    return static_cast<TimeStepType>((timePoint -m_FirstTimePoint) / m_StepDuration);
+  else
+    return 0;
 }
 
 mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const

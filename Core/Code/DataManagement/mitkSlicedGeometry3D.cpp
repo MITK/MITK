@@ -765,7 +765,11 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
               iter != m_Geometry2Ds.end();
               ++iter)
            {
-              (*iter)->ExecuteOperation(operation);
+              // Test for empty slices, which can happen if evenly spaced geometry
+              if ((*iter).IsNotNull())
+              {
+                (*iter)->ExecuteOperation(operation);
+              }
            }
 
           // rotate overall geometry

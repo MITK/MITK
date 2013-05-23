@@ -608,6 +608,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     return;
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
   // toggle visibility
   bool visible = true;
@@ -718,8 +719,11 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     ls->m_ContourActor->VisibilityOff();
   }
 
+  if(needGenerateData)
+  {
   // create new vtk render objects (e.g. a circle for a point)
   this->CreateVTKRenderObjects(renderer);
+  }
 
 }
 

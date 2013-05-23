@@ -55,12 +55,63 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 
 
+mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
+{
 
+  // points
+  m_UnselectedPoints = vtkSmartPointer<vtkPoints>::New();
+  m_SelectedPoints = vtkSmartPointer<vtkPoints>::New();
+  m_ContourPoints = vtkSmartPointer<vtkPoints>::New();
+
+  // scales
+  m_UnselectedScales = vtkSmartPointer<vtkFloatArray>::New();
+  m_SelectedScales = vtkSmartPointer<vtkFloatArray>::New();
+
+  // distances
+  m_DistancesBetweenPoints = vtkSmartPointer<vtkFloatArray>::New();
+
+  // lines
+  m_ContourLines = vtkSmartPointer<vtkCellArray>::New();
+
+  // glyph source (provides the different shapes)
+  m_UnselectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
+  m_SelectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
+
+  // glyphs
+  m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
+  m_SelectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
+
+  // polydata
+  m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
+  m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
+  m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
+
+  // actors
+  m_UnselectedActor = vtkSmartPointer <vtkActor>::New();
+  m_SelectedActor = vtkSmartPointer <vtkActor>::New();
+  m_ContourActor = vtkSmartPointer <vtkActor>::New();
+
+  // mappers
+  m_VtkUnselectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_VtkSelectedPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_VtkContourPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+  // propassembly
+  m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
+
+}
+
+mitk::PointSetVtkMapper2D::LocalStorage::~LocalStorage()
+{
+}
+
+// input for this mapper ( = point set)
 const mitk::PointSet* mitk::PointSetVtkMapper2D::GetInput()
 {
   return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
+// constructor
 mitk::PointSetVtkMapper2D::PointSetVtkMapper2D()
 : m_Polygon(false),
 m_PolygonClosed(false),
@@ -71,42 +122,30 @@ m_ShowAngles(false),
 m_ShowDistantLines(false),
 m_LineWidth(1),
 m_PointLineWidth(1),
-m_Point2DSize(8),
+m_Point2DSize(6),
 m_IdGlyph(3), // default: cross
 m_FillGlyphs(false)
 {
 }
 
+// destructor
 mitk::PointSetVtkMapper2D::~PointSetVtkMapper2D()
 {
 }
 
+// toggles visiblity of the prop assembly
 void mitk::PointSetVtkMapper2D::ResetMapper( BaseRenderer* renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  ls->m_PropAssemblies->VisibilityOff();
+  ls->m_PropAssembly->VisibilityOff();
 }
 
+// returns propassembly
 vtkProp* mitk::PointSetVtkMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-  return ls->m_PropAssemblies;
+  return ls->m_PropAssembly;
 }
-
-
-/*
-void mitk::PointSetVtkMapper2D::ReleaseGraphicsResources(vtkWindow *renWin)
-{
-LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-ls-> m_PointsAssembly->ReleaseGraphicsResources(renWin);
-
-ls->m_SelectedActor->ReleaseGraphicsResources(renWin);
-ls->m_UnselectedActor->ReleaseGraphicsResources(renWin);
-ls->m_ContourActor->ReleaseGraphicsResources(renWin);
-}
-*/
-
-
 
 static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& out)
 {
@@ -130,40 +169,37 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 }
 
 
-
-
-
 void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* renderer)
 {
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_UnselectedActors))
-    ls->m_PropAssemblies->RemovePart(ls->m_UnselectedActors);
-  if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_SelectedActors))
-    ls->m_PropAssemblies->RemovePart(ls->m_SelectedActors);
-  if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_ContourActors))
-    ls->m_PropAssemblies->RemovePart(ls->m_ContourActors);
-  if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextActor))
-    ls->m_PropAssemblies->RemovePart(ls->m_VtkTextActor);
+  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_UnselectedActor))
+    ls->m_PropAssembly->RemovePart(ls->m_UnselectedActor);
+  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_SelectedActor))
+    ls->m_PropAssembly->RemovePart(ls->m_SelectedActor);
+  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_ContourActor))
+    ls->m_PropAssembly->RemovePart(ls->m_ContourActor);
+  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextActor))
+    ls->m_PropAssembly->RemovePart(ls->m_VtkTextActor);
 
   unsigned i = 0;
   for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
   {
-    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextLabelActors.at(i)))
-      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextLabelActors.at(i));
+    if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextLabelActors.at(i)))
+      ls->m_PropAssembly->RemovePart(ls->m_VtkTextLabelActors.at(i));
   }
 
-   for(i=0; i< ls->m_VtkTextDistanceActors.size(); i++)
+  for(i=0; i< ls->m_VtkTextDistanceActors.size(); i++)
   {
-    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextDistanceActors.at(i)))
-      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextDistanceActors.at(i));
+    if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextDistanceActors.at(i)))
+      ls->m_PropAssembly->RemovePart(ls->m_VtkTextDistanceActors.at(i));
   }
 
-    for(i=0; i< ls->m_VtkTextAngleActors.size(); i++)
+  for(i=0; i< ls->m_VtkTextAngleActors.size(); i++)
   {
-    if(ls->m_PropAssemblies->GetParts()->IsItemPresent(ls->m_VtkTextAngleActors.at(i)))
-      ls->m_PropAssemblies->RemovePart(ls->m_VtkTextAngleActors.at(i));
+    if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextAngleActors.at(i)))
+      ls->m_PropAssembly->RemovePart(ls->m_VtkTextAngleActors.at(i));
   }
 
 
@@ -192,7 +228,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   if ( itkPointSet.GetPointer() == NULL)
   {
-    ls->m_PropAssemblies->VisibilityOff();
+    ls->m_PropAssembly->VisibilityOff();
     return;
   }
 
@@ -217,12 +253,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     return;
   }
 
-  // current point in point set
-  itk::Point<float> point;
-  // predecessor of current point
-  itk::Point<float> lastPoint;
-
-  // reset the point sets
+  // empty point sets, cellarrays, scalars
   ls->m_UnselectedPoints->Reset();
   ls->m_SelectedPoints->Reset();
 
@@ -235,6 +266,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_DistancesBetweenPoints->Reset();
 
   ls->m_VtkContourPolyData->Reset();
+  ls->m_VtkContourPolyData->DeleteCells();
 
   ls->m_VtkTextLabelActors.clear();
   ls->m_VtkTextDistanceActors.clear();
@@ -248,6 +280,9 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   const int text2dDistance = 10;
 
+  // current point in point set
+  itk::Point<float> point;
+
   Point3D p;                      // currently visited point
   Point3D lastP;                  // last visited point
   Vector3D vec;                   // p - lastP
@@ -260,7 +295,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   Point2D lastPt2d;   // last projected_p in display coordinates
   Point2D preLastPt2d;// projected_p in display coordinates before lastPt2
 
-  //float vtkp[3];
 
   vtkLinearTransform* linearTransform = GetDataNode()->GetVtkTransform();
 
@@ -282,7 +316,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     lastPt2d = pt2d;  // valid for number of points count > 0
 
     lastVec = vec;    // valid only for counter > 1
-    lastPoint = point; // eventuell überflüssig!
 
     // get current point in point set
     point = pointsIter->Value();
@@ -355,27 +388,27 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         if (unselectedColor != NULL)
           ls->m_VtkTextActor->GetTextProperty()->SetColor(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
         else
-         ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f);
+          ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0f, 1.0f, 0.0f);
 
-         ls->m_VtkTextLabelActors.push_back(ls->m_VtkTextActor);
+        ls->m_VtkTextLabelActors.push_back(ls->m_VtkTextActor);
 
       }
     }
 
-    // draw contour, distance text and angle text
+    // draw contour, distance text and angle text in render window
 
     // lines between points, which intersect the current plane, are drawn
     if( m_Polygon && count > 0 )
     {
       ScalarType distance =    displayGeometry->GetWorldGeometry()->SignedDistance(point);
-      ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastPoint);
+      ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastP);
 
       pointsOnSameSideOfPlane = (distance * lastDistance) > 0.5;
       if ( !pointsOnSameSideOfPlane ) // points on different sides of plane -> draw it
       {
         vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 
-        ls->m_ContourPoints->InsertNextPoint(lastPoint[0],lastPoint[1],lastPoint[2]);
+        ls->m_ContourPoints->InsertNextPoint(lastP[0],lastP[1],lastP[2]);
         line->GetPointIds()->SetId(0, NumberContourPoints);
         NumberContourPoints++;
 
@@ -388,14 +421,14 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
         if(m_ShowDistances) // calculate and print distance between adjacent points
         {
-          float distancePoints = point.EuclideanDistanceTo(lastPoint);
+          float distancePoints = point.EuclideanDistanceTo(lastP);
 
           std::stringstream buffer;
           buffer<<std::fixed <<std::setprecision(m_DistancesDecimalDigits)<<distancePoints<<" mm";
 
-          // compute desired position of text
+          // compute desired display position of text
           Vector2D vec2d = pt2d-lastPt2d;
-          makePerpendicularVector2D(vec2d, vec2d);
+          makePerpendicularVector2D(vec2d, vec2d); // text is rendered within text2dDistance perpendicular to current line
           Vector2D pos2d = (lastPt2d.GetVectorFromOrigin() + pt2d ) * 0.5 + vec2d * text2dDistance;
 
           ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
@@ -410,27 +443,28 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
         if(m_ShowAngles && count > 1) // calculate and print angle between connected lines
         {
-            std::stringstream buffer;
-             //(char) 176 is the degree sign
-             buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
+          std::stringstream buffer;
+          //(char) 176 is the degree sign
+          buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
 
-            //compute desired position of text
-             Vector2D vec2d = pt2d-lastPt2d;
-             vec2d.Normalize();
-             Vector2D lastVec2d = lastPt2d-preLastPt2d;
-             lastVec2d.Normalize();
-             vec2d=vec2d-lastVec2d;
-             vec2d.Normalize();
-             // middle between two vectors which enclose the angle
-             Vector2D pos2d = lastPt2d.GetVectorFromOrigin() + vec2d * text2dDistance * text2dDistance;
+          //compute desired display position of text
+          Vector2D vec2d = pt2d-lastPt2d;             // first arm enclosing the angle
+          vec2d.Normalize();
+          Vector2D lastVec2d = lastPt2d-preLastPt2d;  // second arm enclosing the angle
+          lastVec2d.Normalize();
+          vec2d=vec2d-lastVec2d;                      // vector connecting both arms
+          vec2d.Normalize();
 
-             ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
+          // middle between two vectors that enclose the angle
+          Vector2D pos2d = lastPt2d.GetVectorFromOrigin() + vec2d * text2dDistance * text2dDistance;
 
-             ls->m_VtkTextActor->SetPosition(pos2d[0],pos2d[1]);
-             ls->m_VtkTextActor->SetInput(buffer.str().c_str());
-             ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0, 1.0, 0.0);
+          ls->m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
 
-             ls->m_VtkTextAngleActors.push_back(ls->m_VtkTextActor);
+          ls->m_VtkTextActor->SetPosition(pos2d[0],pos2d[1]);
+          ls->m_VtkTextActor->SetInput(buffer.str().c_str());
+          ls->m_VtkTextActor->GetTextProperty()->SetColor(0.0, 1.0, 0.0);
+
+          ls->m_VtkTextAngleActors.push_back(ls->m_VtkTextActor);
         }
       }
     }
@@ -442,50 +476,45 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     }
   }
 
-// iteratoren ?
+  // add each single text actor to the assembly
   for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
   {
-    ls->m_PropAssemblies->AddPart(ls->m_VtkTextLabelActors.at(i));
+    ls->m_PropAssembly->AddPart(ls->m_VtkTextLabelActors.at(i));
   }
 
   for(i=0; i< ls->m_VtkTextDistanceActors.size(); i++)
   {
-    ls->m_PropAssemblies->AddPart(ls->m_VtkTextDistanceActors.at(i));
+    ls->m_PropAssembly->AddPart(ls->m_VtkTextDistanceActors.at(i));
   }
 
   for(i=0; i< ls->m_VtkTextAngleActors.size(); i++)
   {
-    ls->m_PropAssemblies->AddPart(ls->m_VtkTextAngleActors.at(i));
+    ls->m_PropAssembly->AddPart(ls->m_VtkTextAngleActors.at(i));
   }
 
   //---- CONTOUR -----//
 
+
   //create lines between the points which intersect the plane
   if (m_Polygon)
   {
-    // draw line between first and last point
+    // draw line between first and last point which is rendered
     if(m_PolygonClosed && NumberContourPoints > 1){
 
-
-    //  ls->m_ContourPoints->InsertNextPoint(lastPoint[0],lastPoint[1],lastPoint[2]);
-    //  ls->m_ContourPoints->InsertNextPoint(point[0], point[1], point[2]);
-
-      //TODO: hierzu auch winkel und angle etc. funktioniert auch nicht!
       vtkSmartPointer<vtkLine> closingLine = vtkSmartPointer<vtkLine>::New();
-      closingLine->GetPointIds()->SetId(0, 0); // first point
-      closingLine->GetPointIds()->SetId(1, NumberContourPoints-1); // last point index
-
+      closingLine->GetPointIds()->SetId(0, 0); // index of first point
+      closingLine->GetPointIds()->SetId(1, NumberContourPoints-1); // index of last point
       ls->m_ContourLines->InsertNextCell(closingLine);
     }
 
     ls->m_VtkContourPolyData->SetPoints(ls->m_ContourPoints);
     ls->m_VtkContourPolyData->SetLines(ls->m_ContourLines);
 
-    ls->m_VtkContourPolyDataMappers->SetInput(ls->m_VtkContourPolyData);
-    ls->m_ContourActors->SetMapper(ls->m_VtkContourPolyDataMappers);
-    ls->m_ContourActors->GetProperty()->SetLineWidth(m_LineWidth);
+    ls->m_VtkContourPolyDataMapper->SetInput(ls->m_VtkContourPolyData);
+    ls->m_ContourActor->SetMapper(ls->m_VtkContourPolyDataMapper);
+    ls->m_ContourActor->GetProperty()->SetLineWidth(m_LineWidth);
 
-    ls->m_PropAssemblies->AddPart(ls->m_ContourActors);
+    ls->m_PropAssembly->AddPart(ls->m_ContourActor);
 
   }
 
@@ -532,11 +561,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_UnselectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_UnselectedGlyph3D->SetVectorModeToUseVector();
 
+  ls->m_VtkUnselectedPolyDataMapper->SetInput(ls->m_UnselectedGlyph3D->GetOutput());
+  ls->m_UnselectedActor->SetMapper(ls->m_VtkUnselectedPolyDataMapper);
+  ls->m_UnselectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
-  ls->m_VtkUnselectedPolyDataMappers->SetInput(ls->m_UnselectedGlyph3D->GetOutput());
-  ls->m_UnselectedActors->SetMapper(ls->m_VtkUnselectedPolyDataMappers);
-
-  ls->m_PropAssemblies->AddPart(ls->m_UnselectedActors);
+  ls->m_PropAssembly->AddPart(ls->m_UnselectedActor);
 
 
   //---- SELECTED POINTS  -----//
@@ -560,10 +589,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_SelectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_SelectedGlyph3D->SetVectorModeToUseVector();
 
-  ls->m_VtkSelectedPolyDataMappers->SetInput(ls->m_SelectedGlyph3D->GetOutput());
-  ls->m_SelectedActors->SetMapper(ls->m_VtkSelectedPolyDataMappers);
+  ls->m_VtkSelectedPolyDataMapper->SetInput(ls->m_SelectedGlyph3D->GetOutput());
+  ls->m_SelectedActor->SetMapper(ls->m_VtkSelectedPolyDataMapper);
+  ls->m_SelectedActor->GetProperty()->SetLineWidth(m_PointLineWidth);
 
-  ls->m_PropAssemblies->AddPart(ls->m_SelectedActors);
+  ls->m_PropAssembly->AddPart(ls->m_SelectedActor);
 
 }
 
@@ -582,13 +612,13 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetVisibility(visible, renderer, "visible");
   if(!visible)
   {
-    ls->m_UnselectedActors->VisibilityOff();
-    ls->m_SelectedActors->VisibilityOff();
-    ls->m_ContourActors->VisibilityOff();
-    ls->m_PropAssemblies->VisibilityOff();
+    ls->m_UnselectedActor->VisibilityOff();
+    ls->m_SelectedActor->VisibilityOff();
+    ls->m_ContourActor->VisibilityOff();
+    ls->m_PropAssembly->VisibilityOff();
     return;
   }else{
-    ls->m_PropAssemblies->VisibilityOn();
+    ls->m_PropAssembly->VisibilityOn();
   }
 
   node->GetBoolProperty("show contour",       m_Polygon, renderer);
@@ -623,11 +653,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   // apply color and opacity
   if(m_ShowPoints)
   {
-    ls->m_UnselectedActors->VisibilityOn();
-    ls->m_SelectedActors->VisibilityOn();
-
-    // ApplyAllProperties(renderer, ls->m_UnselectedActors);
-    // ApplyAllProperties(renderer, ls->m_SelectedActors);
+    ls->m_UnselectedActor->VisibilityOn();
+    ls->m_SelectedActor->VisibilityOn();
 
     //check if there is a color property
     GetDataNode()->GetColor(unselectedColor);
@@ -648,25 +675,23 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     selectedColor[2] = tmpColor[2];
     selectedColor[3] = 1.0f; // alpha value
 
-    ls->m_SelectedActors->GetProperty()->SetColor(selectedColor);
-    ls->m_SelectedActors->GetProperty()->SetOpacity(opacity);
+    ls->m_SelectedActor->GetProperty()->SetColor(selectedColor);
+    ls->m_SelectedActor->GetProperty()->SetOpacity(opacity);
 
-    ls->m_UnselectedActors->GetProperty()->SetColor(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-    ls->m_UnselectedActors->GetProperty()->SetOpacity(opacity);
+    ls->m_UnselectedActor->GetProperty()->SetColor(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+    ls->m_UnselectedActor->GetProperty()->SetOpacity(opacity);
 
   }
   else
   {
-    ls->m_UnselectedActors->VisibilityOff();
-    ls-> m_SelectedActors->VisibilityOff();
+    ls->m_UnselectedActor->VisibilityOff();
+    ls-> m_SelectedActor->VisibilityOff();
   }
 
 
   if (m_Polygon)
   {
-    ls->m_ContourActors->VisibilityOn();
-
-    //ApplyAllProperties(renderer, ls->m_ContourActors);
+    ls->m_ContourActor->VisibilityOn();
 
     //get contour color property
     if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
@@ -683,41 +708,34 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     contourColor[2] = tmpColor[2];
     contourColor[3] = 1.0f;
 
-    ls->m_ContourActors->GetProperty()->SetColor(contourColor);
-    ls->m_ContourActors->GetProperty()->SetOpacity(opacity);
+    ls->m_ContourActor->GetProperty()->SetColor(contourColor);
+    ls->m_ContourActor->GetProperty()->SetOpacity(opacity);
   }
   else
   {
-    ls->m_ContourActors->VisibilityOff();
+    ls->m_ContourActor->VisibilityOff();
   }
 
   // create new vtk render objects (e.g. a circle for a point)
   this->CreateVTKRenderObjects(renderer);
 
-
-}
-
-
-void mitk::PointSetVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
-{
-  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 }
 
 
 
 void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite ); // width of the line from one point to another
-  node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
-  node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
+  node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite );
+  node->AddProperty( "point 2D size", mitk::IntProperty::New(6), renderer, overwrite );
+  node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
-  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points
-  node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide distance measure (not always available)
-  node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown
-  node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide angle measurement (not always available)
-  node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite ); //show the line between to points from a distant view (equals "always on top" option)
-  node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite ); // default to draw pointset above images (they have a default layer of 0)
+  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite );
+  node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite );
 
   mitk::EnumerationProperty::Pointer glyphType = mitk::EnumerationProperty::New();
   glyphType->AddEnum("None", 0);

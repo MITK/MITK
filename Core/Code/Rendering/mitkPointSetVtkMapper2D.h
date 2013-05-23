@@ -44,61 +44,53 @@ class vtkFloatArray;
 namespace mitk {
 
   class PointSet;
-  //TODO -- change commentar!
 
   /**
-  * @brief Vtk-based mapper for PointSet
+  * @brief Vtk-based 2D mapper for PointSet
   *
   * Due to the need of different colors for selected
   * and unselected points and the facts, that we also have a contour and
   * labels for the points, the vtk structure is build up the following way:
   *
-  * We have two AppendPolyData, one selected, and one unselected and one
+  * We have three PolyData, one selected, and one unselected and one
   * for a contour between the points. Each one is connected to an own
-  * PolyDaraMapper and an Actor. The different color for the unselected and
+  * PolyDataMapper and an Actor. The different color for the unselected and
   * selected state and for the contour is read from properties.
   *
-  * "unselectedcolor", "selectedcolor" and "contourcolor" are the strings,
-  * that are looked for. Pointlabels are added besides the selected or the
-  * deselected points.
+  * This mapper has several additional functionalities, such as rendering
+  * a contour between points, calculating and displaying distances or angles
+  * between points.
   *
   * Then the three Actors are combined inside a vtkPropAssembly and this
   * object is returned in GetProp() and so hooked up into the rendering
   * pipeline.
 
-  * Properties that can be set for point sets and influence the PointSetVTKMapper3D are:
+  * Properties that can be set for point sets and influence the PointSetVTKMapper2D are:
   *
-
-  *   - \b "color": (ColorProperty*) Color of the point set
-  *   - \b "Opacity": (FloatProperty) Opacity of the point set
-  *   - \b "show contour": (BoolProperty) If the contour of the points are visible
-  *   - \b "contourSizeProp":(FloatProperty) Contour size of the points
-
-
-  The default properties are:
-
-  *   - \b "line width": (IntProperty::New(2), renderer, overwrite )
-  *   - \b "pointsize": (FloatProperty::New(1.0), renderer, overwrite)
-  *   - \b "selectedcolor": (ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite)  //red
-  *   - \b "color": (ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite)  //yellow
-  *   - \b "show contour": (BoolProperty::New(false), renderer, overwrite )
-  *   - \b "contourcolor": (ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite)
-  *   - \b "contoursize": (FloatProperty::New(0.5), renderer, overwrite )
-  *   - \b "close contour": (BoolProperty::New(false), renderer, overwrite )
-  *   - \b "show points": (BoolProperty::New(true), renderer, overwrite )
-  *   - \b "updateDataOnRender": (BoolProperty::New(true), renderer, overwrite )
-
-
-
-  *Other properties looked for are:
+  *   - \b "line width": (IntProperty 2)               // line width of the line from one point to another
+  *   - \b "point line width": (IntProperty 1)         // line width of the cross marking a point
+  *   - \b "point 2D size": (IntProperty 6)            // size of the glyph marking a point
+  *   - \b "show contour": (BoolProperty false)        // enable contour rendering between points (lines)
+  *   - \b "close contour": (BoolProperty false)       // if enabled, the open strip is closed (first point connected with last point)
+  *   - \b "show points": (BoolProperty true)          // show or hide points
+  *   - \b "show distances": (BoolProperty false)      // show or hide distance measure
+  *   - \b "distance decimal digits": (IntProperty 2)  // set the number of decimal digits to be shown when rendering the distance information
+  *   - \b "show angles": (BoolProperty false)         // show or hide angle measurement
+  *   - \b "show distant lines": (BoolProperty false)  // show the line between to points from a distant view (equals "always on top" option)
+  *   - \b "layer": (IntProperty 1)                    // default is drawing pointset above images (they have a default layer of 0)
+  *   - \b "glyph type" (EnumerationProperty Cross)    // provides different shapes marking a point
+  *       0 = "None", 1 = "Vertex", 2 = "Dash", 3 = "Cross", 4 = "ThickCross", 5 = "Triangle", 6 = "Square", 7 = "Circle",
+  *       8 = "Diamond", 9 = "Arrow", 10 = "ThickArrow", 11 = "HookedArrow", 12 = "Cross"
+  *   - \b "fill glyphs": (BoolProperty::New(false))   // fill or do not fill the glyph shape
   *
-  *   - \b "show contour": if set to on, lines between the points are shown
-  *   - \b "close contour": if set to on, the open strip is closed (first point
-  *       connected with last point)
-  *   - \b "pointsize": size of the points mapped
-  *   - \b "label": text of the Points to show besides points
-  *   - \b "contoursize": size of the contour drawn between the points
-  *       (if not set, the pointsize is taken)
+  *
+  * Other Properties used here but not defined in this class:
+  *
+  *   - \b "selectedcolor": (ColorProperty (1.0f, 0.0f, 0.0f))  // default color of the selected pointset e.g. the current point is red
+  *   - \b "contourcolor" : (ColorProperty (1.0f, 0.0f, 0.0f))  // default color for the contour is red
+  *   - \b "color": (ColorProperty (1.0f, 1.0f, 0.0f))          // default color of the (unselected) pointset is yellow
+  *   - \b "opacity": (FloatProperty 1.0)                       // opacity of point set, contours
+  *   - \b "label": (StringProperty NULL)     // a label can be defined for each point, which is rendered in proximity to the point
   *
   * @ingroup Mapper
   */
@@ -109,122 +101,71 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    //TODO: change to GetInputConnection()
     virtual const mitk::PointSet* GetInput();
 
-    //overwritten from VtkMapper3D to be able to return a
-    //m_PropAssemblies which is much faster than a vtkAssembly
+    /** \brief returns the a prop assembly */
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
+    /** \brief set the default properties for this mapper */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
-
-    //void ReleaseGraphicsResources(vtkWindow *renWin);
-
-
-    //enum Glyph2DType{Vertex, Dash, Cross, ThickCross, Triangle, Square, Circle, Diamond, Arrow, ThickArrow, HookedArrow};
-
-
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
+
     public:
 
-      // use std::vector because of the three 2D render windows
-      vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMappers;
-      vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMappers;
-      vtkSmartPointer<vtkPolyDataMapper> m_VtkContourPolyDataMappers;
+      /* constructor */
+      LocalStorage();
 
-      vtkSmartPointer<vtkPolyData> m_VtkUnselectedPointListPolyData;
-      vtkSmartPointer<vtkPolyData> m_VtkSelectedPointListPolyData;
-      vtkSmartPointer<vtkPolyData> m_VtkContourPolyData;
+      /* destructor */
+      ~LocalStorage();
 
-      vtkSmartPointer<vtkActor> m_UnselectedActors;
-      vtkSmartPointer<vtkActor> m_SelectedActors;
-      vtkSmartPointer<vtkActor> m_ContourActors;
-
-      vtkSmartPointer<vtkPropAssembly> m_PropAssemblies;
-
+      // points
       vtkSmartPointer<vtkPoints> m_UnselectedPoints;
       vtkSmartPointer<vtkPoints> m_SelectedPoints;
       vtkSmartPointer<vtkPoints> m_ContourPoints;
 
-      vtkSmartPointer<vtkCellArray> m_ContourLines;
-
-      vtkSmartPointer<vtkGlyph3D> m_UnselectedGlyph3D;
-      vtkSmartPointer<vtkGlyph3D> m_SelectedGlyph3D;
-
-      vtkSmartPointer<vtkFloatArray> m_DistancesBetweenPoints;
+      // scales
       vtkSmartPointer<vtkFloatArray> m_UnselectedScales;
       vtkSmartPointer<vtkFloatArray> m_SelectedScales;
 
+      // distances
+      vtkSmartPointer<vtkFloatArray> m_DistancesBetweenPoints;
+
+      // lines
+      vtkSmartPointer<vtkCellArray> m_ContourLines;
+
+      // glyph source (provides different shapes for the points)
       vtkSmartPointer<vtkGlyphSource2D> m_UnselectedGlyphSource2D;
       vtkSmartPointer<vtkGlyphSource2D> m_SelectedGlyphSource2D;
 
-      //vtkSmartPointer<vtkAppendPolyData> m_VtkTextPolyData;
-      //vtkSmartPointer<vtkPolyDataMapper> m_VtkTextPolyDataMapper;
+      // glyph
+      vtkSmartPointer<vtkGlyph3D> m_UnselectedGlyph3D;
+      vtkSmartPointer<vtkGlyph3D> m_SelectedGlyph3D;
 
+      // polydata
+      vtkSmartPointer<vtkPolyData> m_VtkUnselectedPointListPolyData;
+      vtkSmartPointer<vtkPolyData> m_VtkSelectedPointListPolyData;
+      vtkSmartPointer<vtkPolyData> m_VtkContourPolyData;
+
+      // actor
+      vtkSmartPointer<vtkActor> m_UnselectedActor;
+      vtkSmartPointer<vtkActor> m_SelectedActor;
+      vtkSmartPointer<vtkActor> m_ContourActor;
       vtkSmartPointer<vtkTextActor> m_VtkTextActor;
 
       std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextLabelActors;
       std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextDistanceActors;
       std::vector < vtkSmartPointer<vtkTextActor> > m_VtkTextAngleActors;
 
+      // mappers
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
+      vtkSmartPointer<vtkPolyDataMapper> m_VtkContourPolyDataMapper;
 
-
-      LocalStorage()
-      {
-
-       // m_VtkTextPolyData = vtkSmartPointer<vtkAppendPolyData>::New();
-        //m_VtkTextPolyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-
-       // m_VtkTextActor = vtkSmartPointer<vtkTextActor>::New();
-
-
-        // mappers
-        m_VtkUnselectedPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
-        m_VtkSelectedPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
-        m_VtkContourPolyDataMappers = vtkSmartPointer<vtkPolyDataMapper>::New();
-
-        // scales
-        m_UnselectedScales = vtkSmartPointer<vtkFloatArray>::New();
-        m_SelectedScales = vtkSmartPointer<vtkFloatArray>::New();
-
-        // distances
-        m_DistancesBetweenPoints = vtkSmartPointer<vtkFloatArray>::New();
-
-        // polydata
-        m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
-        m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
-        m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
-
-        // actors
-        m_UnselectedActors = vtkSmartPointer <vtkActor>::New();
-        m_SelectedActors = vtkSmartPointer <vtkActor>::New();
-        m_ContourActors = vtkSmartPointer <vtkActor>::New();
-
-        // propassembly
-        m_PropAssemblies = vtkSmartPointer <vtkPropAssembly>::New();
-
-        // points
-        m_UnselectedPoints = vtkSmartPointer<vtkPoints>::New();
-        m_SelectedPoints = vtkSmartPointer<vtkPoints>::New();
-        m_ContourPoints = vtkSmartPointer<vtkPoints>::New();
-
-        // lines
-        m_ContourLines = vtkSmartPointer<vtkCellArray>::New();
-
-        // glyphs
-        m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
-        m_SelectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
-
-        // glyph source (provides the different shapes)
-        m_UnselectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
-        m_SelectedGlyphSource2D = vtkSmartPointer<vtkGlyphSource2D>::New();
-
-      }
-
-      ~LocalStorage() {};
+      // propassembly
+      vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
 
     };
 
@@ -233,15 +174,21 @@ namespace mitk {
 
 
   protected:
+
+    /* constructor */
     PointSetVtkMapper2D();
 
+    /* destructor */
     virtual ~PointSetVtkMapper2D();
 
+    /* applies the color and opacity properties and calls CreateVTKRenderObjects */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    /* toggles visiblity of the propassembly */
     virtual void ResetMapper( BaseRenderer* renderer );
-    virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
+    /* fills the vtk objects */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer* renderer);
 
+    // properties
     bool m_Polygon;
     bool m_PolygonClosed;
     bool m_ShowPoints;
@@ -252,9 +199,6 @@ namespace mitk {
     int  m_LineWidth;
     int m_PointLineWidth;
     int m_Point2DSize;
-    //Glyph2DType m_GlyphType;
-    //mitk::EnumerationProperty::IdType
-
     int m_IdGlyph;
     bool m_FillGlyphs;
 

@@ -90,10 +90,10 @@ std::list <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::st
 
 //////////////////// GENERIC INFORMATION ////////////////////
 
-std::string mitk::FileReaderManager::GetSupportedExtensions()
+std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& extension)
 {
   mitk::ModuleContext* context = mitk::GetModuleContext();
-  std::list<mitk::ServiceReference> refs = GetReaderList("", context);
+  std::list<mitk::ServiceReference> refs = GetReaderList(extension, context);
   std::list<std::string> entries; // Will contain Description + Extension (Human readable)
   std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
   for (std::list<mitk::ServiceReference>::const_iterator iterator = refs.begin(), end = refs.end(); iterator != end; ++iterator)

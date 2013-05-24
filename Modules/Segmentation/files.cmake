@@ -61,6 +61,7 @@ Interactions/mitkSubtractContourTool.cpp
 Interactions/mitkContourModelInteractor.cpp
 Interactions/mitkContourModelLiveWireInteractor.cpp
 Interactions/mitkLiveWireTool2D.cpp
+Interactions/mitkFastMarchingTool.cpp
 Interactions/mitkFastMarchingTool3D.cpp
 IO/mitkContourModelIOFactory.cpp
 IO/mitkContourModelReader.cpp

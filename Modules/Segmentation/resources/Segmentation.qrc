@@ -10,5 +10,6 @@
     <file>Fill_48x48.png</file>
     <file>Erase_48x48.png</file>
     <file>LiveWire_48x48.png</file>
+    <file>FastMarching_48x48.png</file>
   </qresource>
 </RCC>

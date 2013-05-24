@@ -118,7 +118,7 @@ const char** mitk::FastMarchingTool3D::GetXPM() const
 
 std::string mitk::FastMarchingTool3D::GetIconPath() const
 {
-  return ":/Segmentation/Add_48x48.png";
+  return ":/Segmentation/FastMarching_48x48.png";
 }
 
 const char* mitk::FastMarchingTool3D::GetName() const

@@ -36,21 +36,17 @@ namespace mitk {
 
 mitk::FastMarchingTool3D::FastMarchingTool3D()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
+m_IsLivePreviewEnabled(false),
 m_LowerThreshold(200),
 m_UpperThreshold(200),
 m_InitialLowerThreshold(0.0),
 m_InitialUpperThreshold(100.0),
 m_InitialStoppingValue(100),
 m_StoppingValue(100),
-m_ScreenYDifference(0),
-m_MouseDistanceScaleFactor(0.5),
 sigma(1.0),
 alpha(-0.5),
 beta(3.0)
 {
-  CONNECT_ACTION( AcNEWPOINT, OnMousePressed );
-  CONNECT_ACTION( AcMOVEPOINT, OnMouseMoved );
-  CONNECT_ACTION( AcFINISHMOVEMENT, OnMouseReleased );
   CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
@@ -105,7 +101,7 @@ float mitk::FastMarchingTool3D::CanHandleEvent( StateEvent const *stateEvent) co
 {
   float returnValue = Superclass::CanHandleEvent(stateEvent);
 
-  //we wan
+  //we can handle delete
   if(stateEvent->GetId() == 12 )
   {
     returnValue = 1.0;
@@ -130,9 +126,49 @@ const char* mitk::FastMarchingTool3D::GetName() const
   return "FastMarching3D";
 }
 
-void mitk::FastMarchingTool3D::SetThreshold(int value)
+void mitk::FastMarchingTool3D::SetUpperThreshold(int value)
 {
   m_UpperThreshold = (float)value / 10.0;
+  thresholder->SetUpperThreshold( m_UpperThreshold );
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetLowerThreshold(int value)
+{
+  m_LowerThreshold = (float)value / 10.0;
+  thresholder->SetLowerThreshold( m_LowerThreshold );
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetMu(int value)
+{
+  beta = (float)value / 10.0;
+  sigmoid->SetBeta( beta );
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetStandardDeviation(int value)
+{
+  alpha = (float)value / 10.0;
+  sigmoid->SetAlpha( alpha );
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetStoppingValue(int value)
+{
+  m_StoppingValue = (float)value / 10.0;
+  fastMarching->SetStoppingValue( m_StoppingValue );
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetLivePreviewEnabled(bool enabled)
+{
+  m_IsLivePreviewEnabled = enabled;
 }
 
 void mitk::FastMarchingTool3D::Activated()
@@ -158,6 +194,7 @@ void mitk::FastMarchingTool3D::Activated()
   m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
   CastToItkImage(m_ReferenceSlice, m_SliceInITK);
   smoothing->SetInput( m_SliceInITK );
+
 }
 
 void mitk::FastMarchingTool3D::Deactivated()
@@ -170,99 +207,42 @@ void mitk::FastMarchingTool3D::Deactivated()
 }
 
 
-bool mitk::FastMarchingTool3D::OnMousePressed (Action* action, const StateEvent* stateEvent)
+void mitk::FastMarchingTool3D::ConfirmSegmentation()
 {
-  /*++++++++remenber mouse position to determine movement++++++++*/
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
-  //if click happpened in another renderwindow or slice then reset pipeline and preview
-  //if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
-  //{
-  //  this->ResetFastMarching(positionEvent);
-  //}
-  //m_LastEventSender = positionEvent->GetSender();
-  //m_LastEventSlice = m_LastEventSender->GetSlice();
-
-  m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
-
-
-  return true;
-}
-
-
-bool mitk::FastMarchingTool3D::OnMouseMoved(Action* action, const StateEvent* stateEvent)
-{
-  /*++++++++change parameters according to mouse move++++++++*/
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (positionEvent)
-  {
-    //determine movement in x and y direction
-    ApplicationCursor* cursor = ApplicationCursor::GetInstance();
-    if (!cursor) return false;
-    m_ScreenXDifference += cursor->GetCursorPosition()[0] - m_LastScreenPosition[0];
-    m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
-    cursor->SetCursorPosition( m_LastScreenPosition );
-
-    m_StoppingValue = std::max<mitk::ScalarType>(0.0, m_InitialStoppingValue + m_ScreenXDifference * m_MouseDistanceScaleFactor);
-    m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
-
-    //thresholder->SetLowerThreshold( m_LowerThreshold );
-    fastMarching->SetStoppingValue( m_StoppingValue );
-    thresholder->SetUpperThreshold( m_UpperThreshold );
-
+  //if not preview was not enabled the pipeline may be not executed yet
+  if(!m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
-  }
-  return true;
-}
 
-
-bool mitk::FastMarchingTool3D::OnMouseReleased(Action* action, const StateEvent* stateEvent)
-{
   /*+++++++combine preview image with already performed segmentation++++++*/
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (positionEvent)
+  if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
   {
-    // remember parameters for next time
-    m_InitialLowerThreshold = m_LowerThreshold;
-    m_InitialUpperThreshold = m_UpperThreshold;
-    m_InitialStoppingValue = m_StoppingValue;
+    //logical or combination of preview and segmentation slice
+    OutputImageType::Pointer segmentationImage = OutputImageType::New();
 
-    if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
-    {
-      //logical or combination of preview and segmentation slice
-      OutputImageType::Pointer segmentationSlice = OutputImageType::New();
+    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    CastToItkImage( workingImage, segmentationImage );
 
-      mitk::Image::Pointer workingSlice = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-      CastToItkImage( workingSlice, segmentationSlice );
+    typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
+    OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
 
-      typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
-      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+    orFilter->SetInput(0, thresholder->GetOutput());
+    orFilter->SetInput(1, segmentationImage);
+    orFilter->Update();
 
-      orFilter->SetInput(0, thresholder->GetOutput());
-      orFilter->SetInput(1, segmentationSlice);
-      orFilter->Update();
+    mitk::Image::Pointer segmentationResult = mitk::Image::New();
 
-      mitk::Image::Pointer segmentationResult = mitk::Image::New();
+    mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+    segmentationResult->GetGeometry()->SetOrigin(workingImage->GetGeometry()->GetOrigin());
+    segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingImage->GetGeometry()->GetIndexToWorldTransform());
 
-      mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
-      segmentationResult->GetGeometry()->SetOrigin(workingSlice->GetGeometry()->GetOrigin());
-      segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingSlice->GetGeometry()->GetIndexToWorldTransform());
+    this->m_ResultImageNode->SetData(segmentationResult);
+    this->m_ToolManager->GetWorkingData(0)->SetData(segmentationResult);
 
-      this->m_ResultImageNode->SetData(segmentationResult);
-      this->m_ToolManager->GetWorkingData(0)->SetData(segmentationResult);
-      //write to segmentation volume and hide preview image
-      //this->WriteBackSegmentationResult(positionEvent, segmentationResult );
-
-      this->m_ResultImageNode->SetVisibility(false);
-      this->ClearSeeds();
-    }
-
+    this->m_ResultImageNode->SetVisibility(false);
+    this->ClearSeeds();
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  return true;
 }
 
 
@@ -271,14 +251,6 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
   /*++++++++++++Add a new seed point for FastMarching algorithm+++++++++++*/
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-
-  //if click happpened in another renderwindow or slice then reset pipeline and preview
-  //if( (m_LastEventSender != positionEvent->GetSender()) || (m_LastEventSlice != positionEvent->GetSender()->GetSlice()) )
-  //{
-  //  this->ResetFastMarching(positionEvent);
-  //}
-  //m_LastEventSender = positionEvent->GetSender();
-  //m_LastEventSlice = m_LastEventSender->GetSlice();
 
 
   mitk::Point3D clickInIndex;
@@ -298,8 +270,11 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
 
   m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   //preview result by updating the pipeline - this is not done automatically for changing seeds
-  this->UpdatePreviewImage();
+  if(m_IsLivePreviewEnabled)
+    this->UpdatePreviewImage();
   return true;
 }
 
@@ -316,8 +291,11 @@ bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateE
     //delete last point in pointset - somehow ugly
     m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
 
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
     //preview result by updating the pipeline - this is not done automatically for changing seeds
-    this->UpdatePreviewImage();
+    if(m_IsLivePreviewEnabled)
+      this->UpdatePreviewImage();
   }
   return true;
 }

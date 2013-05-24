@@ -73,8 +73,14 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual const char* GetName() const;
     virtual std::string GetIconPath() const;
 
-    Message1<int> ThresholdChanged;
-    void SetThreshold(int value);
+    void SetUpperThreshold(int value);
+    void SetLowerThreshold(int value);
+    void SetMu(int value);
+    void SetStoppingValue(int value);
+    void SetStandardDeviation(int value);
+
+    virtual void ConfirmSegmentation();
+    virtual void SetLivePreviewEnabled(bool enabled);
 
   protected:
 
@@ -87,9 +93,6 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual void Deactivated();
 
     /*Actions of StateMachine pattern*/
-    virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMouseMoved   (Action*, const StateEvent*);
-    virtual bool OnMouseReleased(Action*, const StateEvent*);
     virtual bool OnAddPoint     (Action*, const StateEvent*);
     virtual bool OnDelete       (Action*, const StateEvent*);
 
@@ -113,9 +116,7 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     ScalarType m_InitialStoppingValue;
     ScalarType m_StoppingValue;
 
-    Point2I m_LastScreenPosition;
-    int m_ScreenYDifference;
-    int m_ScreenXDifference;
+    bool m_IsLivePreviewEnabled;
 
   private:
 

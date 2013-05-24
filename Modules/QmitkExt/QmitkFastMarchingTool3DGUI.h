@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QSlider;
 class QLabel;
 class QFrame;
+class QPushButton;
+#include <QCheckBox>;
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -45,26 +47,36 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnSliderValueChanged(int value);
-
-    void VisualizePaintbrushSize(int size);
+    void OnUpperThresholdChanged(int value);
+    void OnLowerThresholdChanged(int value);
+    void OnMuChanged(int value);
+    void OnStoppingValueChanged(int value);
+    void OnStandardDeviationChanged(int value);
+    void OnConfirmSegmentation();
+    void OnLivePreviewCheckBoxChanged(int value);
 
 protected:
 
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  QSlider* m_ThresholdSlider;
-  QLabel* m_ThresholdLabel;
+  QSlider* m_UpperThresholdSlider;
+  QLabel* m_UpperThresholdLabel;
 
-  //QSlider* m_StoppingValueSlider;
-  //QLabel* m_StoppingValueLabel;
+  QSlider* m_LowerThresholdSlider;
+  QLabel* m_LowerThresholdLabel;
 
-  //QSlider* m_MuSlider;
-  //QLabel* m_MuLabel;
+  QSlider* m_StoppingValueSlider;
+  QLabel* m_StoppingValueLabel;
 
-  //QSlider* m_StandardDeviationSlider;
-  //QLabel* m_StandardDeviationLabel;
+  QSlider* m_MuSlider;
+  QLabel* m_MuLabel;
+
+  QSlider* m_StandardDeviationSlider;
+  QLabel* m_StandardDeviationLabel;
+
+  QPushButton* m_ConfirmButton;
+  QCheckBox* m_LivePreviewCheckBox;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 };

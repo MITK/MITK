@@ -58,7 +58,7 @@ namespace mitk
     DiffSliceOperation();
 
     /** \brief */
-    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, AffineGeometryFrame3D* sliceGeometry, unsigned int timestep, AffineGeometryFrame3D* currentWorldGeometry);
+    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, Geometry3D* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry);
 
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
@@ -79,14 +79,14 @@ namespace mitk
     unsigned int GetTimeStep(){return this->m_TimeStep;}
 
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetSliceGeometry(AffineGeometryFrame3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
+    void SetSliceGeometry(Geometry3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    AffineGeometryFrame3D* GetSliceGeometry(){return this->m_SliceGeometry;}
+    Geometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
 
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetCurrentWorldGeometry(AffineGeometryFrame3D* worldGeometry){this->m_WorldGeometry = worldGeometry;}
+    void SetCurrentWorldGeometry(Geometry3D* worldGeometry){this->m_WorldGeometry = worldGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    AffineGeometryFrame3D* GetWorldGeometry(){return this->m_WorldGeometry;}
+    Geometry3D* GetWorldGeometry(){return this->m_WorldGeometry;}
 
 
   protected:
@@ -102,11 +102,11 @@ namespace mitk
 
     vtkSmartPointer<vtkImageData> m_Slice;
 
-    AffineGeometryFrame3D::Pointer m_SliceGeometry;
+    Geometry3D::Pointer m_SliceGeometry;
 
     unsigned int m_TimeStep;
 
-    AffineGeometryFrame3D::Pointer m_WorldGeometry;
+    Geometry3D::Pointer m_WorldGeometry;
 
     bool m_ImageIsValid;
 

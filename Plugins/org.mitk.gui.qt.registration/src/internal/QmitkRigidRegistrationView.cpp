@@ -597,7 +597,7 @@ void QmitkRigidRegistrationView::UndoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     this->SetRedoEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -646,7 +646,7 @@ void QmitkRigidRegistrationView::RedoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     this->SetUndoEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

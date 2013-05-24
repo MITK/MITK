@@ -223,7 +223,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     std::cout << std::endl;
 
     // Fixed image geometry
-    //     mitk::AffineGeometryFrame3D::Pointer m_FixedGeometryCopy = m_FixedNode->GetData()->GetGeometry()->Clone();
+    //     mitk::Geometry3D::Pointer m_FixedGeometryCopy = m_FixedNode->GetData()->GetGeometry()->Clone();
     //     std::cout << "Fixed Image Geometry (IndexToWorldTransform)"  << std::endl;
     //     std::cout << m_FixedGeometryCopy->GetIndexToWorldTransform()->GetMatrix();
     //     center = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetCenter();
@@ -420,7 +420,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
 
     // now adapt all children geometries accordingly if children exist
     std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
-    std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>::iterator iter2;
     mitk::DataNode::Pointer childNode;
     for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ )
     {
@@ -428,7 +428,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       if (childNode.IsNotNull())
       {
         mitk::Geometry3D* childGeometry;
-        mitk::AffineGeometryFrame3D::Pointer childImageGeometry;
+        mitk::Geometry3D::Pointer childImageGeometry;
         // Calculate the World to ITK-Physical transform for the moving mask
         childGeometry = (*iter).second;
         iter2 = m_ChildNodes2.find(childNode);

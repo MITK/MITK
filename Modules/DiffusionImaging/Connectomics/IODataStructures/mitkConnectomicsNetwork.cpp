@@ -500,7 +500,7 @@ void mitk::ConnectomicsNetwork::UpdateBounds( )
   }
 
   this->GetGeometry()->SetFloatBounds(bounds);
-  this->GetTimeSlicedGeometry()->UpdateInformation();
+  this->GetTimeGeometry()->Update();
 }
 
 void mitk::ConnectomicsNetwork::PruneUnconnectedSingleNodes()

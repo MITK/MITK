@@ -777,7 +777,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
   if(!m_UndoPointsGeometryList.empty())
   {
     mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
-    m_RedoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
+    m_RedoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
     m_MovingLandmarks->SetGeometry(m_UndoPointsGeometryList.back());
     m_UndoPointsGeometryList.pop_back();
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
@@ -786,7 +786,7 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
-    m_RedoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingGeometry.GetPointer()));
+    m_RedoGeometryList.push_back(movingGeometry.GetPointer());
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
@@ -794,8 +794,8 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
     m_Controls.m_RedoTransformation->setEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->checkLandmarkError();
@@ -815,7 +815,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
   if(!m_RedoPointsGeometryList.empty())
   {
     mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
-    m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
+    m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
     m_MovingLandmarks->SetGeometry(m_RedoPointsGeometryList.back());
     m_RedoPointsGeometryList.pop_back();
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
@@ -824,7 +824,7 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0)->Clone();
-    m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingGeometry.GetPointer()));
+    m_UndoGeometryList.push_back(movingGeometry.GetPointer());
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
@@ -832,8 +832,8 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
     m_MovingNode->SetMapper(1, NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->checkLandmarkError();
@@ -1009,11 +1009,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
   {
     mitk::Geometry3D::Pointer pointsGeometry = m_MovingLandmarks->GetGeometry(0);
     mitk::Geometry3D::Pointer movingLandmarksGeometry = m_MovingLandmarks->GetGeometry(0)->Clone();
-    m_UndoPointsGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingLandmarksGeometry.GetPointer()));
+    m_UndoPointsGeometryList.push_back(movingLandmarksGeometry.GetPointer());
 
     mitk::BaseData::Pointer originalData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer originalDataGeometry = originalData->GetGeometry(0)->Clone();
-    m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(originalDataGeometry.GetPointer()));
+    m_UndoGeometryList.push_back(originalDataGeometry.GetPointer());
 
     vtkIdType pointId;
     vtkPoints* vPointsSource=vtkPoints::New();
@@ -1082,12 +1082,12 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
     }
 
     pointsGeometry->Compose(matrix);
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0);
     movingGeometry->Compose(matrix);
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();
@@ -1157,12 +1157,12 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
       return;
     }
     pointsGeometry->Compose(matrix);
-    m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
+    m_MovingLandmarks->GetTimeGeometry()->Update();
 
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     mitk::Geometry3D::Pointer movingGeometry = movingData->GetGeometry(0);
     movingGeometry->Compose(matrix);
-    movingData->GetTimeSlicedGeometry()->UpdateInformation();
+    movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();

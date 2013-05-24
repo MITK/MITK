@@ -70,7 +70,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
             dataStorage->Add(node);
 
             // Initialize the RenderWindow
-            mitk::TimeSlicedGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
+            mitk::TimeGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
             mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
         }
     }

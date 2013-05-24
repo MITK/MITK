@@ -99,7 +99,7 @@ void mitk::Surface::ClearData()
 const mitk::Surface::RegionType& mitk::Surface::GetLargestPossibleRegion() const
 {
   m_LargestPossibleRegion.SetIndex(3, 0);
-  m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
+  m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->GetNumberOfTimeSteps());
 
   return m_LargestPossibleRegion;
 }
@@ -114,7 +114,7 @@ void mitk::Surface::InitializeEmpty()
   if (!m_PolyDatas.empty())
     this->ClearData();
 
-  Superclass::InitializeTimeSlicedGeometry();
+  Superclass::InitializeTimeGeometry();
 
   m_PolyDatas.push_back(NULL);
   m_Initialized = true;
@@ -186,14 +186,14 @@ void mitk::Surface::UpdateOutputInformation()
   if (m_CalculateBoundingBox == true && !m_PolyDatas.empty())
     this->CalculateBoundingBox();
   else
-    this->GetTimeSlicedGeometry()->UpdateInformation();
+    this->GetTimeGeometry()->Update();
 }
 
 void mitk::Surface::CalculateBoundingBox()
 {
-  mitk::TimeSlicedGeometry* timeSlicedGeometry = this->GetTimeSlicedGeometry();
+  TimeGeometry* timeGeometry = this->GetTimeGeometry();
 
-  if (timeSlicedGeometry->GetTimeSteps() != m_PolyDatas.size())
+  if (timeGeometry->GetNumberOfTimeSteps() != m_PolyDatas.size())
     mitkThrow() << "Number of geometry time steps is inconsistent with number of poly data pointers.";
 
   for (unsigned int i = 0; i < m_PolyDatas.size(); ++i)
@@ -208,7 +208,7 @@ void mitk::Surface::CalculateBoundingBox()
       polyData->GetBounds(bounds);
     }
 
-    mitk::Geometry3D::Pointer geometry = timeSlicedGeometry->GetGeometry3D(i);
+    Geometry3D::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);
 
     if (geometry.IsNull())
       mitkThrow() << "Time-sliced geometry is invalid (equals NULL).";
@@ -216,7 +216,7 @@ void mitk::Surface::CalculateBoundingBox()
     geometry->SetFloatBounds(bounds);
   }
 
-  timeSlicedGeometry->UpdateInformation();
+  timeGeometry->Update();
   m_CalculateBoundingBox = false;
 }
 

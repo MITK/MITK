@@ -21,11 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDataObject.h>
 
 #include "mitkBaseProcess.h"
-#include "mitkTimeSlicedGeometry.h"
+#include "mitkTimeGeometry.h"
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
-
 
 namespace mitk {
 
@@ -43,62 +42,67 @@ class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 public:
   mitkClassMacro(BaseData,itk::DataObject)
 
-  //##Documentation
-  //## @brief Return the TimeSlicedGeometry of the data as const pointer.
-  //##
-  //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
-  //## be sure that the geometry is up-to-date.
-  //##
-  //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-  const mitk::TimeSlicedGeometry* GetTimeSlicedGeometry() const
+  /**
+  * \brief Return the TimeGeo of the data as const pointer.
+  *
+  * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  * be sure that the geometry is up-to-date.
+  *
+  * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+  */
+  const mitk::TimeGeometry* GetTimeGeometry() const
   {
-    return m_TimeSlicedGeometry.GetPointer();
+    return m_TimeGeometry.GetPointer();
   }
 
-  //##Documentation
-  //## @brief Return the TimeSlicedGeometry of the data as pointer.
-  //##
-  //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
-  //## be sure that the geometry is up-to-date.
-  //##
-  //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
-  mitk::TimeSlicedGeometry* GetTimeSlicedGeometry()
+  /**
+  * @brief Return the TimeGeometry of the data as pointer.
+  *
+  * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  * be sure that the geometry is up-to-date.
+  *
+  * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+  */
+  mitk::TimeGeometry* GetTimeGeometry()
   {
-    return m_TimeSlicedGeometry.GetPointer();
+    return m_TimeGeometry.GetPointer();
   }
 
-  //##Documentation
-  //## @brief Return the Geometry3D of the data.
-  //##
-  //## The method does not simply return the value of the m_TimeSlicedGeometry
-  //## member. Before doing this, it makes sure that the TimeSlicedGeometry
-  //## is up-to-date (by setting the update extent to largest possible and
-  //## calling UpdateOutputInformation).
-  const mitk::TimeSlicedGeometry* GetUpdatedTimeSlicedGeometry();
+  /**
+  * @brief Return the Geometry3D of the data.
+  *
+  * The method does not simply return the value of the m_TimeGeometry
+  * member. Before doing this, it makes sure that the TimeGeometry
+  * is up-to-date (by setting the update extent to largest possible and
+  * calling UpdateOutputInformation).
+  */
+  const mitk::TimeGeometry* GetUpdatedTimeGeometry();
 
-  //##Documentation
-  //## @brief Expands the TimeSlicedGeometry to a number of TimeSteps.
-  //##
-  //## The method expands the TimeSlicedGeometry to the given number of TimeSteps,
-  //## filling newly created elements with empty geometries. Sub-classes should override
-  //## this method to handle the elongation of their data vectors, too.
-  //## Note that a shrinking is neither possible nor intended.
+  /**
+  * \brief Expands the TimeGeometry to a number of TimeSteps.
+  *
+  * The method expands the TimeGeometry to the given number of TimeSteps,
+  * filling newly created elements with empty geometries. Sub-classes should override
+  * this method to handle the elongation of their data vectors, too.
+  * Note that a shrinking is neither possible nor intended.
+  */
   virtual void Expand( unsigned int timeSteps );
 
-  //##Documentation
-  //## @brief Return the Geometry3D of the data at time \a t.
-  //##
-  //## The method does not simply return
-  //## m_TimeSlicedGeometry->GetGeometry(t).
-  //## Before doing this, it makes sure that the Geometry3D is up-to-date
-  //## (by setting the update extent appropriately and calling
-  //## UpdateOutputInformation).
-  //##
-  //## @todo Appropriate setting of the update extent is missing.
+  /**
+  * \brief Return the Geometry3D of the data at time \a t.
+  *
+  * The method does not simply return
+  * m_TimeGeometry->GetGeometry(t).
+  * Before doing this, it makes sure that the Geometry3D is up-to-date
+  * (by setting the update extent appropriately and calling
+  * UpdateOutputInformation).
+  *
+  * @todo Appropriate setting of the update extent is missing.
+  */
   const mitk::Geometry3D* GetUpdatedGeometry(int t=0);
 
   //##Documentation
-  //## @brief Return the geometry, which is a TimeSlicedGeometry, of the data
+  //## @brief Return the geometry, which is a TimeGeometry, of the data
   //## as non-const pointer.
   //##
   //## \warning No update will be called. Use GetUpdatedGeometry() if you cannot
@@ -107,9 +111,9 @@ public:
   //## Normally used in GenerateOutputInformation of subclasses of BaseProcess.
   mitk::Geometry3D* GetGeometry(int t=0) const
   {
-    if(m_TimeSlicedGeometry.IsNull())
+    if(m_TimeGeometry.IsNull())
       return NULL;
-    return m_TimeSlicedGeometry->GetGeometry3D(t);
+    return m_TimeGeometry->GetGeometryForTimeStep(t);
   }
 
   //##Documentation
@@ -125,7 +129,7 @@ public:
   //## UpdateOutputInformation().
   //## \note Implementations of this methods in derived classes must take care
   //## that the geometry is updated by calling
-  //## GetTimeSlicedGeometry()->UpdateInformation()
+  //## GetTimeGeometry()->UpdateInformation()
   //## \em after calling its source's BaseProcess::UpdateOutputInformation().
   void UpdateOutputInformation();
 
@@ -229,12 +233,13 @@ public:
   //## Assumes the data object has only 1 time step ( is a 3D object ).
   //##
   //## For convenience (and historic) reasons, it is also possible to set a complete
-  //## mitk::TimeSlicedGeometry*, which will be referenced (not copied!).
+  //## mitk::TimeGeometry*, which will be referenced (not copied!).
   //##
   //## @warning This method will normally be called internally by the sub-class of BaseData
   //## during initialization.
   //## \sa SetClonedGeometry
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+  virtual void SetTimeGeometry (TimeGeometry* geometry);
 
   //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of the data.
@@ -242,6 +247,7 @@ public:
   //##
   //## \sa SetGeometry
   virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
+  virtual void SetClonedTimeGeometry (const TimeGeometry* geometry);
 
   //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of a given time step.
@@ -299,13 +305,13 @@ public:
   itk::SmartPointer<mitk::BaseDataSource> GetSource() const;
 
   //##Documentation
-  //## @brief Get the number of time steps from the Timeslicedgeometry
+  //## @brief Get the number of time steps from the TimeGeometry
   //## As the base data has not a data vector given by itself, the number
   //## of time steps is defined over the time sliced geometry. In sub classes,
   //## a better implementation could be over the length of the data vector.
   unsigned int GetTimeSteps() const
   {
-    return m_TimeSlicedGeometry->GetTimeSteps();
+    return m_TimeGeometry->GetNumberOfTimeSteps();
   }
 
 
@@ -325,10 +331,10 @@ protected:
   ~BaseData();
 
   //##Documentation
-  //## @brief Initialize the TimeSlicedGeometry for a number of time steps.
-  //## The TimeSlicedGeometry is initialized empty and evenly timed.
+  //## \brief Initialize the TimeGeometry for a number of time steps.
+  //## The TimeGeometry is initialized empty and evenly timed.
   //## In many cases it will be necessary to overwrite this in sub-classes.
-  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
+  virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
   //##Documentation
   //## @brief reset to non-initialized state, release memory
@@ -337,7 +343,7 @@ protected:
   //##Documentation
   //## @brief Pure virtual; Must be used in subclasses to get a data object to a
   //## valid state. Should at least create one empty object and call
-  //## Superclass::InitializeTimeSlicedGeometry() to ensure an existing valid geometry
+  //## Superclass::InitializeTimeGeometry() to ensure an existing valid geometry
   virtual void InitializeEmpty(){}
 
 
@@ -357,7 +363,7 @@ private:
   //##
   PropertyList::Pointer m_PropertyList;
 
-  TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
+  TimeGeometry::Pointer m_TimeGeometry;
 
 };
 

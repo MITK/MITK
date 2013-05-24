@@ -110,7 +110,7 @@ void QmitkSimulationView::OnRecordButtonToggled(bool toggled)
       dataNode->SetName(m_Record->GetTimeSteps() == 1 ? "Snapshot" : "Record");
 
       this->GetDataStorage()->Add(dataNode, m_Selection);
-      mitk::RenderingManager::GetInstance()->InitializeViews(m_Record->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      mitk::RenderingManager::GetInstance()->InitializeViews(m_Record->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
       m_Record = NULL;
     }

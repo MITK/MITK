@@ -456,7 +456,7 @@ void mitk::ContourModel::InitializeEmpty()
   this->m_ContourSeries.push_back(mitk::ContourElement::New());
 
   //set number of timesteps to one
-  this->InitializeTimeSlicedGeometry(1);
+  this->InitializeTimeGeometry(1);
 
   m_SelectedVertex = NULL;
   this->m_lineInterpolation = ContourModel::LINEAR;
@@ -540,7 +540,7 @@ void mitk::ContourModel::UpdateOutputInformation()
       }
     }
   }
-  GetTimeSlicedGeometry()->UpdateInformation();
+  GetTimeGeometry()->Update();
 }
 
 

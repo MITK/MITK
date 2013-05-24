@@ -53,6 +53,9 @@ set(H_FILES
   Common/mitkServiceBaseObject.h
   Common/mitkTestingMacros.h
 
+  DataManagement/mitkProportionalTimeGeometry.h
+  DataManagement/mitkTimeGeometry.h
+  DataManagement/mitkBaseGeometry.h
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkImagePixelAccessor.h
@@ -117,6 +120,9 @@ set(CPP_FILES
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkInteractorCameraController.cpp
   Controllers/mitkVtkLayerController.cpp
+  DataManagement/mitkProportionalTimeGeometry.cpp
+  DataManagement/mitkTimeGeometry.cpp
+  DataManagement/mitkBaseGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp
@@ -189,7 +195,6 @@ set(CPP_FILES
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
-  DataManagement/mitkTimeSlicedGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp

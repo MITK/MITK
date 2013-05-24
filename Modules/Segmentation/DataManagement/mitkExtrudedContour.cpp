@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtrudedContour.h"
 #include "mitkVector.h"
 #include "mitkBaseProcess.h"
+#include "mitkProportionalTimeGeometry.h"
 
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkPolyData.h>
@@ -42,7 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ExtrudedContour::ExtrudedContour()
   : m_Contour(NULL), m_ClippingGeometry(NULL), m_AutomaticVectorGeneration(false)
 {
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(1);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(1);
+  SetTimeGeometry(timeGeometry);
 
   FillVector3D(m_Vector, 0.0, 0.0, 1.0);
   m_RightVector.Fill(0.0);
@@ -346,13 +349,16 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   itk2vtk(origin, m_Origin);
 
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
-  mitk::Geometry3D::Pointer g3d = timeGeometry->GetGeometry3D( 0 );
+  mitk::Geometry3D::Pointer g3d = GetGeometry( 0 );
   assert( g3d.IsNotNull() );
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());
   g3d->TransferItkToVtkTransform();
-  timeGeometry->InitializeEvenlyTimed(g3d, 1);
+
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(g3d,1);
+  SetTimeGeometry(timeGeometry);
+
 }
 
 unsigned long mitk::ExtrudedContour::GetMTime() const

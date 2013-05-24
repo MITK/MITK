@@ -446,7 +446,7 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-          this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
+          this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
     //the default camera position is rather unfortunate,
     //that's why we set our own position according to the surface center
@@ -635,7 +635,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_MitkDistanceImage.IsNotNull())
   {
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
-          this->m_MitkDistanceImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+          this->m_MitkDistanceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
   }
   if(this->m_SurfaceNode.IsNotNull())
   {

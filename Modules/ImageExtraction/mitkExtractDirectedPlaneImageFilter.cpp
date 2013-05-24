@@ -74,9 +74,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     return;
   }
 
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
   if ( ( inputTimeGeometry == NULL )
-    || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
+    || ( inputTimeGeometry->GetNumberOfTimeSteps() == 0 ) )
   {
     itkWarningMacro(<<"Error reading input image geometry.");
     return;
@@ -89,12 +89,12 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     ScalarType time = m_WorldGeometry->GetTimeBounds()[0];
     if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
     {
-      timestep = inputTimeGeometry->MSToTimeStep( time );
+      timestep = inputTimeGeometry->TimePointToTimeStep( time );
     }
   }
   else timestep = m_TargetTimestep;
 
-  if ( inputTimeGeometry->IsValidTime( timestep ) == false )
+  if ( inputTimeGeometry->IsValidTimeStep( timestep ) == false )
   {
     itkWarningMacro(<<"This is not a valid timestep: "<<timestep);
     return;
@@ -133,10 +133,10 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Vector3D right, bottom, normal;
   Vector3D rightInIndex, bottomInIndex;
 
-  assert( input->GetTimeSlicedGeometry() == inputTimeGeometry );
+  assert( input->GetTimeGeometry() == inputTimeGeometry );
 
   // take transform of input image into account
-  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( timestep );
+  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
   if ( inputGeometry == NULL )
   {
     itkWarningMacro(<<"There is no Geometry3D at given timestep "<<timestep);

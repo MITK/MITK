@@ -138,10 +138,10 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   }
   memset( segmentation->GetData(), 0, byteSize );
 
-  if (original->GetTimeSlicedGeometry() )
+  if (original->GetTimeGeometry() )
   {
-    TimeSlicedGeometry::Pointer originalGeometry = original->GetTimeSlicedGeometry()->Clone();
-    segmentation->SetGeometry( originalGeometry );
+    itk::LightObject::Pointer originalGeometry = original->GetTimeGeometry()->Clone();
+    segmentation->SetTimeGeometry( dynamic_cast<TimeGeometry*> (originalGeometry.GetPointer()) );
   }
   else
   {

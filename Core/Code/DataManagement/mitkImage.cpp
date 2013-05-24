@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageStatisticsHolder.h"
 #include "mitkPixelTypeMultiplex.h"
+#include <mitkProportionalTimeGeometry.h>
 
 #include <vtkImageData.h>
 
@@ -47,7 +48,8 @@ m_ImageDescriptor(NULL), m_OffsetTable(NULL), m_CompleteData(NULL), m_ImageStati
 
   //Since the above called "Initialize" method doesn't take the geometry into account we need to set it
   //here manually
-  this->SetGeometry(dynamic_cast<mitk::TimeSlicedGeometry*>(other.GetTimeSlicedGeometry()->Clone().GetPointer()));
+  itk::LightObject::Pointer cloned = other.GetTimeGeometry()->Clone();
+  this->SetTimeGeometry(dynamic_cast<TimeGeometry*>(cloned.GetPointer()));
 
   if (this->GetDimension() > 3)
   {
@@ -211,8 +213,8 @@ mitk::ImageVtkAccessor* mitk::Image::GetVtkImageData(int t, int n)
   if(volume.GetPointer()==NULL || volume->GetVtkImageData(this) == NULL)
     return NULL;
 
-
-  float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
+  SlicedGeometry3D* geom3d = GetSlicedGeometry(t);
+  float *fspacing = const_cast<float *>(geom3d->GetFloatSpacing());
   double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
   volume->GetVtkImageData(this)->SetSpacing( dspacing );
 
@@ -771,11 +773,13 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     slicedGeometry->SetTimeBounds(timebounds);
   }
 
-  TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
-  timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
-  timeSliceGeometry->ImageGeometryOn();
-
-  SetGeometry(timeSliceGeometry);
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  for (TimeStepType step = 0; step < timeGeometry->GetNumberOfTimeSteps(); ++step)
+  {
+    timeGeometry->GetGeometryForTimeStep(step)->ImageGeometryOn();
+  }
+  SetTimeGeometry(timeGeometry);
 
   ImageDataItemPointer dnull=NULL;
 
@@ -794,38 +798,38 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
 void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels, int tDim )
 {
+  mitk::ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  Geometry3D::Pointer geometry3D = geometry.Clone();
+  timeGeometry->Initialize(geometry3D.GetPointer(), tDim);
+  this->Initialize(type, *timeGeometry, channels, tDim);
+}
+
+void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeometry& geometry, unsigned int channels, int tDim )
+{
+  const ProportionalTimeGeometry& ptG = dynamic_cast<const ProportionalTimeGeometry&>(geometry);
   unsigned int dimensions[5];
-  dimensions[0] = (unsigned int)(geometry.GetExtent(0)+0.5);
-  dimensions[1] = (unsigned int)(geometry.GetExtent(1)+0.5);
-  dimensions[2] = (unsigned int)(geometry.GetExtent(2)+0.5);
-  dimensions[3] = 0;
+  dimensions[0] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(0)+0.5);
+  dimensions[1] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(1)+0.5);
+  dimensions[2] = (unsigned int)(geometry.GetGeometryForTimeStep(0)->GetExtent(2)+0.5);
+  dimensions[3] = (tDim > 0) ? tDim : geometry.GetNumberOfTimeSteps();
   dimensions[4] = 0;
 
   unsigned int dimension = 2;
   if ( dimensions[2] > 1 )
     dimension = 3;
-
-  if ( tDim > 0)
-  {
-    dimensions[3] = tDim;
-  }
-  else
-  {
-    const mitk::TimeSlicedGeometry* timeGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>(&geometry);
-    if ( timeGeometry != NULL )
-    {
-      dimensions[3] = timeGeometry->GetTimeSteps();
-    }
-  }
-
   if ( dimensions[3] > 1 )
     dimension = 4;
 
   Initialize( type, dimension, dimensions, channels );
-
-  SetGeometry(static_cast<Geometry3D*>(geometry.Clone().GetPointer()));
-
-  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBox()->GetBounds();
+  if (geometry.GetNumberOfTimeSteps() > 1)
+  {
+    itk::LightObject::Pointer cloned = geometry.Clone();
+    SetTimeGeometry(dynamic_cast<TimeGeometry *>(cloned.GetPointer()));
+  }
+  else
+    Superclass::SetGeometry(geometry.GetGeometryForTimeStep(0));
+/* //Old //TODO_GOETZ Really necessary?
+  mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBoxInWorld()->GetBounds();
   if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )
   {
     SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
@@ -839,8 +843,10 @@ this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
     slicedGeometry->SetBounds(bounds);
     slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.GetVnlVector().data_block());
 
-    GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
-  }
+    ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+    timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+    SetTimeGeometry(timeGeometry);
+  }*/
 }
 
 void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
@@ -852,7 +858,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::
 
 void mitk::Image::Initialize(const mitk::Image* image)
 {
-  Initialize(image->GetPixelType(), *image->GetTimeSlicedGeometry());
+  Initialize(image->GetPixelType(), *image->GetTimeGeometry());
 }
 
 void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim, int pDim)
@@ -969,7 +975,10 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   // re-initialize SlicedGeometry3D
   slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
-  GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+
+  ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
+  timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
+  SetTimeGeometry(timeGeometry);
 
   delete [] tmpDimensions;
 }
@@ -1153,7 +1162,8 @@ void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
     MITK_INFO << "WARNING: Applied a non-image geometry onto an image. Please be SURE that this geometry is pixel-center-based! If it is not, you need to call Geometry3D->ChangeImageGeometryConsideringOriginOffset(true) before calling image->setGeometry(..)\n";
   }
   Superclass::SetGeometry(aGeometry3D);
-  GetTimeSlicedGeometry()->ImageGeometryOn();
+  for (TimeStepType step = 0; step < GetTimeGeometry()->GetNumberOfTimeSteps(); ++step)
+    GetTimeGeometry()->GetGeometryForTimeStep(step)->ImageGeometryOn();
 }
 
 void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const

@@ -135,7 +135,7 @@ private:
   VnlVector targetRight;
   Vector3D targetSpacing;
   ScalarType halfWidthInMM, halfHeightInMM;
-  mitk::AffineGeometryFrame3D::BoundsArrayType bounds;
+  mitk::Geometry3D::BoundsArrayType bounds;
   Point3D origin;
 };
 

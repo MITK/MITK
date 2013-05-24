@@ -319,9 +319,9 @@ protected:
    * Must be implemented in sub-classes. */
   virtual void EvaluateFeaturesInternal() = 0;
 
-  /** \brief Initializes the TimeSlicedGeometry describing the (time-resolved)
+  /** \brief Initializes the TimeGeometry describing the (time-resolved)
    * geometry of this figure. Note that each time step holds one Geometry2D. */
-  virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
+  virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
   /** \brief defines the number of PolyLines that will be available */
   void SetNumberOfPolyLines( unsigned int numberOfPolyLines );

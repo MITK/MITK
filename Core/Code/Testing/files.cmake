@@ -42,7 +42,7 @@ set(MODULE_TESTS
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
-  mitkTimeSlicedGeometryTest.cpp
+  mitkTimeGeometryTest.cpp
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp

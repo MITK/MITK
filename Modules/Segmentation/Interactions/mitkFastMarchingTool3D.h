@@ -85,6 +85,9 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
 
     virtual void SetCurrentTimeStep(int t);
 
+        /// \brief Clear all seed point.
+    void ClearSeeds();
+
   protected:
 
     FastMarchingTool3D();
@@ -102,9 +105,6 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
     void UpdatePreviewImage();
-
-    /// \brief Clear all seed point.
-    void ClearSeeds();
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void ResetFastMarching(const PositionEvent* positionEvent);

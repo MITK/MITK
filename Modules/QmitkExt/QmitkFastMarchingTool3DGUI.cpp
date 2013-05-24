@@ -139,6 +139,9 @@ m_UpperThresholdSlider(NULL)
   layout->addWidget(m_LivePreviewCheckBox, 5,0);
   connect( m_LivePreviewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnLivePreviewCheckBoxChanged(int)) );
 
+  m_ClearSeedsButton = new QPushButton("Clear seeds");
+  layout->addWidget(m_ClearSeedsButton, 5,1);
+  connect( m_ClearSeedsButton, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -244,4 +247,10 @@ void QmitkFastMarchingTool3DGUI::OnStepperRefetch()
 {
   //event from image navigator recieved - timestep has changed
    m_FastMarchingTool->SetCurrentTimeStep(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep());
+}
+
+void QmitkFastMarchingTool3DGUI::OnClearSeeds()
+{
+  //event from image navigator recieved - timestep has changed
+   m_FastMarchingTool->ClearSeeds();
 }

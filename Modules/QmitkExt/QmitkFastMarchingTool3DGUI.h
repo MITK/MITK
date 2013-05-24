@@ -58,6 +58,7 @@ public:
     void OnConfirmSegmentation();
     void OnLivePreviewCheckBoxChanged(int value);
     void OnStepperRefetch();
+    void OnClearSeeds();
 
 protected:
 
@@ -80,6 +81,7 @@ protected:
   QLabel* m_StandardDeviationLabel;
 
   QPushButton* m_ConfirmButton;
+  QPushButton* m_ClearSeedsButton;
   QCheckBox* m_LivePreviewCheckBox;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;

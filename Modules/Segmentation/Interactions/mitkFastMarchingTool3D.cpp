@@ -354,6 +354,10 @@ void mitk::FastMarchingTool3D::ClearSeeds()
   fastMarching->Modified();
 
   m_SeedsAsPointSet->Clear();
+
+  m_ResultImageNode->SetVisibility(false);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 

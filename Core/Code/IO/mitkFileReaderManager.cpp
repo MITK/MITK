@@ -22,6 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkModuleContext.h>
 #include <usServiceProperties.h>
 
+// Legacy Support
+#include <mitkCoreObjectFactory.h>
+
+std::list< mitk::LegacyFileReaderService::Pointer > mitk::FileReaderManager::m_LegacyReader;
+
+//const std::string mitk::IFileWriter::PROP_EXTENSION = "org.mitk.services.FileWriter.Extension";
 
 //////////////////// READING DIRECTLY ////////////////////
 
@@ -173,4 +179,20 @@ std::list< mitk::ServiceReference > mitk::FileReaderManager::GetReaderList(const
   result.sort();
   std::reverse(result.begin(), result.end());
   return result;
+}
+
+void mitk::FileReaderManager::RegisterLegacyReaders()
+{
+  // We are not really interested in the string, but this function will make sure to merge
+  // all extensions of all registered Factories into the map that we will work with.
+  mitk::CoreObjectFactory::GetInstance()->GetFileExtensions();
+  std::multimap<std::string, std::string> fileExtensionMap = mitk::CoreObjectFactory::GetInstance()->GetFileExtensionsMap();
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+    //only add if no reader already registered under that extension
+   if(GetReader(it->first) == 0)
+   {
+     std::string extension = it->first;
+     mitk::LegacyFileReaderService::Pointer lfrs = mitk::LegacyFileReaderService::New(extension.erase(0,1), it->second);
+     m_LegacyReader.push_back(lfrs);
+   }
 }

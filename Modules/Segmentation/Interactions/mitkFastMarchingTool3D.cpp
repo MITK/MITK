@@ -232,6 +232,14 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     OutputImageType::Pointer segmentationImage = OutputImageType::New();
 
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    {
+      mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+      timeSelector->SetInput( workingImage );
+      timeSelector->SetTimeNr( m_CurrentTimeStep );
+      timeSelector->UpdateLargestPossibleRegion();
+      workingImage = timeSelector->GetOutput();
+    }
     CastToItkImage( workingImage, segmentationImage );
 
     typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;

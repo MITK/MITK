@@ -172,6 +172,9 @@ void mitk::FastMarchingTool3D::SetStoppingValue(int value)
 void mitk::FastMarchingTool3D::SetLivePreviewEnabled(bool enabled)
 {
   m_IsLivePreviewEnabled = enabled;
+
+  if(enabled)//an update may be needed
+    this->UpdatePreviewImage();
 }
 
 void mitk::FastMarchingTool3D::Activated()

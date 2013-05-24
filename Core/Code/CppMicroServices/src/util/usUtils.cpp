@@ -145,7 +145,7 @@ void AutoLoadModulesFromPath(const std::string& absoluteBasePath, const std::str
         libPath += DIR_SEP;
       }
       libPath += entryFileName;
-      US_INFO << "Auto-loading module " << libPath;
+      //US_INFO << "Auto-loading module " << libPath;
 
       if (!load_impl(libPath))
       {

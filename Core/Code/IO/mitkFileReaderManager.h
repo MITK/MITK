@@ -50,6 +50,8 @@ class MITK_CORE_EXPORT FileReaderManager
 
     static mitk::BaseData::Pointer Read(const std::string& path);
 
+    static std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0);
+
     template <class T>
     static T* Read(const std::string& path)
     {

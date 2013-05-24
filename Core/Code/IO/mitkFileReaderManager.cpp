@@ -40,6 +40,23 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
   return result;
 }
 
+std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles)
+{
+  std::list< mitk::BaseData::Pointer > result;
+  for (std::list<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)
+  {
+    try
+    {
+      result.push_back(Read( *iterator ));
+    }
+    catch (...)
+    {
+      if (unreadableFiles) unreadableFiles->push_back( *iterator );
+    }
+  }
+  return result;
+}
+
 
 //////////////////// GETTING READERS ////////////////////
 
@@ -100,12 +117,12 @@ std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& e
   {
     // Generate List of Extensions
     if (iterator == refs.begin()) // First entry without semicolon
-      knownExtensions += iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+      knownExtensions += "*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
     else // Ad semicolon for each following entry
-      knownExtensions += "; " + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
+      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString();
 
     // Generate List of human readable entries composed of Description + Extension
-    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION).ToString() + "(" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString() + ");;";
+    std::string entry = iterator->GetProperty(mitk::IFileReader::PROP_DESCRIPTION).ToString() + "(*" + iterator->GetProperty(mitk::IFileReader::PROP_EXTENSION).ToString() + ");;";
     entries.push_back(entry);
   }
   entries.sort();

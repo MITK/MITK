@@ -479,8 +479,17 @@ void QmitkSegmentationUtilitiesView::OnbtnClosingClicked()
    this->BusyCursorOn();
    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->GetData());
    mitk::Image::Pointer resultImage;
-   AccessFixedPixelTypeByItk_2(selectedImage, itkClosing, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
-   m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+
+   try
+   {
+      AccessFixedPixelTypeByItk_2(selectedImage, itkClosing, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
+      m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+   }
+   catch ( itk::ExceptionObject* itkObj)
+   {
+      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+   }
+
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    this->BusyCursorOff();
 }
@@ -489,8 +498,17 @@ void QmitkSegmentationUtilitiesView::OnbtnOpeningClicked()
    this->BusyCursorOn();
    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->GetData());
    mitk::Image::Pointer resultImage;
-   AccessFixedPixelTypeByItk_2(selectedImage, itkOpening, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
-   m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+
+   try
+   {
+      AccessFixedPixelTypeByItk_2(selectedImage, itkOpening, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
+      m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+   }
+   catch ( itk::ExceptionObject* itkObj)
+   {
+      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+   }
+
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    this->BusyCursorOff();
 }
@@ -499,8 +517,17 @@ void QmitkSegmentationUtilitiesView::OnbtnDilatationClicked()
    this->BusyCursorOn();
    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->GetData());
    mitk::Image::Pointer resultImage;
-   AccessFixedPixelTypeByItk_2(selectedImage, itkDilate, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
-   m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+
+   try
+   {
+      AccessFixedPixelTypeByItk_2(selectedImage, itkDilate, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
+      m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+   }
+   catch ( itk::ExceptionObject* itkObj)
+   {
+      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+   }
+
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    this->BusyCursorOff();
 }
@@ -509,8 +536,17 @@ void QmitkSegmentationUtilitiesView::OnbtnErosionClicked()
    this->BusyCursorOn();
    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->GetData());
    mitk::Image::Pointer resultImage;
-   AccessFixedPixelTypeByItk_2(selectedImage, itkErode, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
-   m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+
+   try
+   {
+      AccessFixedPixelTypeByItk_2(selectedImage, itkErode, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
+      m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+   }
+   catch ( itk::ExceptionObject* itkObj)
+   {
+      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+   }
+
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    this->BusyCursorOff();
 }
@@ -520,8 +556,17 @@ void QmitkSegmentationUtilitiesView::OnbtnFillHolesClicked()
    this->BusyCursorOn();
    mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->GetData());
    mitk::Image::Pointer resultImage;
-   AccessFixedPixelTypeByItk_2(selectedImage, itkFillhole, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
-   m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+
+   try
+   {
+      AccessFixedPixelTypeByItk_2(selectedImage, itkFillhole, (unsigned char), resultImage, m_Controls.spinBoxMorphFactor->value());
+      m_Controls.cmbMorphologicalOperationsSegImage->GetSelectedNode()->SetData(resultImage);
+   }
+   catch ( itk::ExceptionObject* itkObj)
+   {
+      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+   }
+
    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
    this->BusyCursorOff();
 }
@@ -534,70 +579,110 @@ void QmitkSegmentationUtilitiesView::OnbtnFillHolesClicked()
 template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
-
    typedef itk::Image<TPixel, VDimension> ImageType;
    typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
+   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
    typedef itk::BinaryErodeImageFilter< ImageType , ImageType, BallType > BallErodeFilterType;
+   typedef itk::BinaryErodeImageFilter< ImageType , ImageType, CrossType > CrossErodeFilterType;
 
-   typename BallErodeFilterType::Pointer m_BallErodeFilter = BallErodeFilterType::New();
-   BallType m_Ball;
-
-    m_Ball.SetRadius(factor);
-    m_Ball.CreateStructuringElement();
-
-    m_BallErodeFilter->SetKernel(m_Ball);
-    m_BallErodeFilter->SetInput(sourceImage);
-    m_BallErodeFilter->SetErodeValue(1);
-    m_BallErodeFilter->BoundaryToForegroundOn();
-    m_BallErodeFilter->UpdateLargestPossibleRegion();
-
-    mitk::CastToMitkImage(m_BallErodeFilter->GetOutput(), resultImage);
+   if (m_Controls.radioButtonMorphoBall->isChecked())
+   {
+      BallType ball;
+      ball.SetRadius(factor);
+      ball.CreateStructuringElement();
+      typename BallErodeFilterType::Pointer erodeFilter = BallErodeFilterType::New();
+      erodeFilter->SetKernel(ball);
+      erodeFilter->SetInput(sourceImage);
+      erodeFilter->SetErodeValue(1);
+      //erodeFilter->BoundaryToForegroundOn();
+      erodeFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
+   }
+   else
+   {
+      CrossType cross;
+      cross.SetRadius(factor);
+      cross.CreateStructuringElement();
+      typename CrossErodeFilterType::Pointer erodeFilter = CrossErodeFilterType::New();
+      erodeFilter->SetKernel(cross);
+      erodeFilter->SetInput(sourceImage);
+      erodeFilter->SetErodeValue(1);
+      //erodeFilter->BoundaryToForegroundOn();
+      erodeFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
+   }
 }
 
 template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
-
    typedef itk::Image<TPixel, VDimension> ImageType;
    typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
+   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
    typedef itk::BinaryDilateImageFilter< ImageType , ImageType, BallType > BallDilateFilterType;
+   typedef itk::BinaryDilateImageFilter< ImageType , ImageType, CrossType > CrossDilateFilterType;
 
-   typename BallDilateFilterType::Pointer m_BallDilateFilter = BallDilateFilterType::New();
-   BallType m_Ball;
-
-   m_Ball.SetRadius(factor);
-   m_Ball.CreateStructuringElement();
-
-   m_BallDilateFilter->SetKernel(m_Ball);
-   m_BallDilateFilter->SetInput(sourceImage);
-   m_BallDilateFilter->SetDilateValue(1);
-   m_BallDilateFilter->BoundaryToForegroundOn();
-   m_BallDilateFilter->UpdateLargestPossibleRegion();
-
-   mitk::CastToMitkImage(m_BallDilateFilter->GetOutput(), resultImage);
+   if (m_Controls.radioButtonMorphoBall->isChecked())
+   {
+      BallType ball;
+      ball.SetRadius(factor);
+      ball.CreateStructuringElement();
+      typename BallDilateFilterType::Pointer dilateFilter = BallDilateFilterType::New();
+      dilateFilter->SetKernel(ball);
+      dilateFilter->SetInput(sourceImage);
+      dilateFilter->SetDilateValue(1);
+      dilateFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(dilateFilter->GetOutput(), resultImage);
+   }
+   else
+   {
+      CrossType cross;
+      cross.SetRadius(factor);
+      cross.CreateStructuringElement();
+      typename CrossDilateFilterType::Pointer dilateFilter = CrossDilateFilterType::New();
+      dilateFilter->SetKernel(cross);
+      dilateFilter->SetInput(sourceImage);
+      dilateFilter->SetDilateValue(1);
+      dilateFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(dilateFilter->GetOutput(), resultImage);
+   }
 }
 
 template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
-
    typedef itk::Image<TPixel, VDimension> ImageType;
    typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
+   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
    typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, BallType > BallOpeningFiltertype;
+   typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, CrossType > CrossOpeningFiltertype;
 
-   typename BallOpeningFiltertype::Pointer m_BallOpeningFilter = BallOpeningFiltertype::New();
-   BallType m_Ball;
-
-   m_Ball.SetRadius(factor);
-   m_Ball.CreateStructuringElement();
-
-   m_BallOpeningFilter->SetKernel(m_Ball);
-   m_BallOpeningFilter->SetInput(sourceImage);
-   m_BallOpeningFilter->SetForegroundValue(1);
-   m_BallOpeningFilter->SetBackgroundValue(0);
-   m_BallOpeningFilter->UpdateLargestPossibleRegion();
-
-   mitk::CastToMitkImage(m_BallOpeningFilter->GetOutput(), resultImage);
+   if (m_Controls.radioButtonMorphoBall->isChecked())
+   {
+      BallType ball;
+      ball.SetRadius(factor);
+      ball.CreateStructuringElement();
+      typename BallOpeningFiltertype::Pointer openingFilter = BallOpeningFiltertype::New();
+      openingFilter->SetKernel(ball);
+      openingFilter->SetInput(sourceImage);
+      openingFilter->SetForegroundValue(1);
+      openingFilter->SetBackgroundValue(0);
+      openingFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(openingFilter->GetOutput(), resultImage);
+   }
+   else
+   {
+      CrossType cross;
+      cross.SetRadius(factor);
+      cross.CreateStructuringElement();
+      typename CrossOpeningFiltertype::Pointer openingFilter = CrossOpeningFiltertype::New();
+      openingFilter->SetKernel(cross);
+      openingFilter->SetInput(sourceImage);
+      openingFilter->SetForegroundValue(1);
+      openingFilter->SetBackgroundValue(0);
+      openingFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(openingFilter->GetOutput(), resultImage);
+   }
 }
 
 
@@ -607,40 +692,47 @@ void QmitkSegmentationUtilitiesView::itkClosing(itk::Image<TPixel, VDimension>* 
 
    typedef itk::Image<TPixel, VDimension> ImageType;
    typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
+   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
    typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, BallType > BallClosingFilterType;
+   typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, CrossType > CrossClosingFilterType;
 
-   typename BallClosingFilterType::Pointer m_BallClosingFilter = BallClosingFilterType::New();
-   BallType m_Ball;
+   if (m_Controls.radioButtonMorphoBall->isChecked())
+   {
+      BallType ball;
+      ball.SetRadius(factor);
+      ball.CreateStructuringElement();
+      typename BallClosingFilterType::Pointer closingFilter = BallClosingFilterType::New();
+      closingFilter->SetKernel(ball);
+      closingFilter->SetInput(sourceImage);
+      closingFilter->SetForegroundValue(1);
+      closingFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(closingFilter->GetOutput(), resultImage);
+   }
+   else
+   {
+      CrossType cross;
+      cross.SetRadius(factor);
+      cross.CreateStructuringElement();
+      typename CrossClosingFilterType::Pointer closingFilter = CrossClosingFilterType::New();
+      closingFilter->SetKernel(cross);
+      closingFilter->SetInput(sourceImage);
+      closingFilter->SetForegroundValue(1);
+      closingFilter->UpdateLargestPossibleRegion();
+      mitk::CastToMitkImage(closingFilter->GetOutput(), resultImage);
+   }
 
-   m_Ball.SetRadius(factor);
-   m_Ball.CreateStructuringElement();
-
-   m_BallClosingFilter->SetKernel(m_Ball);
-   m_BallClosingFilter->SetInput(sourceImage);
-   m_BallClosingFilter->SetForegroundValue(1);
-   m_BallClosingFilter->UpdateLargestPossibleRegion();
-
-   mitk::CastToMitkImage(m_BallClosingFilter->GetOutput(), resultImage);
 }
 
 template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkFillhole(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
-
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef itk::BinaryFillholeImageFilter< ImageType > BallFillholeFilterType;
+   typedef itk::BinaryFillholeImageFilter< ImageType > FillHoleFilterType;
+   typename FillHoleFilterType::Pointer fillholeFilter = FillHoleFilterType::New();
 
-   typename BallFillholeFilterType::Pointer m_BallFillholefilter = BallFillholeFilterType::New();
-   BallType m_Ball;
+   fillholeFilter->SetInput(sourceImage);
+   fillholeFilter->SetForegroundValue(1);
+   fillholeFilter->UpdateLargestPossibleRegion();
 
-   m_Ball.SetRadius(factor);
-   m_Ball.CreateStructuringElement();
-
-   //m_BallFillholefilter->SetKernel(m_Ball);
-   m_BallFillholefilter->SetInput(sourceImage);
-   m_BallFillholefilter->SetForegroundValue(1);
-   m_BallFillholefilter->UpdateLargestPossibleRegion();
-
-   mitk::CastToMitkImage(m_BallFillholefilter->GetOutput(), resultImage);
+   mitk::CastToMitkImage(fillholeFilter->GetOutput(), resultImage);
 }

@@ -7,5 +7,10 @@
         <file>utilities_morphology.xpm</file>
         <file>utilities_masking.png</file>
         <file>utilities_surface2image.png</file>
+        <file>morphClosing.xpm</file>
+        <file>morphDilate.xpm</file>
+        <file>morphErode.xpm</file>
+        <file>morphFillholes.xpm</file>
+        <file>morphOpening.xpm</file>
     </qresource>
 </RCC>

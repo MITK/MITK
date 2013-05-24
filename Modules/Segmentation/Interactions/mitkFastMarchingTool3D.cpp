@@ -196,7 +196,7 @@ void mitk::FastMarchingTool3D::Activated()
 
 
   m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() > 3)
+  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceSlice );
@@ -355,7 +355,7 @@ void mitk::FastMarchingTool3D::ResetFastMarching(const PositionEvent* positionEv
   //reset reference slice according to the plane where the click happened
   m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
 
-  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() == 4)
+  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
     timeSelector->SetInput( m_ReferenceSlice );

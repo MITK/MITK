@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 
 #include "itkOrImageFilter.h"
+#include "mitkImageTimeSelector.h"
+
 
 
 namespace mitk {
@@ -37,6 +39,7 @@ namespace mitk {
 mitk::FastMarchingTool3D::FastMarchingTool3D()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
 m_IsLivePreviewEnabled(false),
+m_CurrentTimeStep(0),
 m_LowerThreshold(200),
 m_UpperThreshold(200),
 m_InitialLowerThreshold(0.0),
@@ -191,7 +194,16 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSetNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode);
 
+
   m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() > 3)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput( m_ReferenceSlice );
+    timeSelector->SetTimeNr( m_CurrentTimeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    m_ReferenceSlice = timeSelector->GetOutput();
+  }
   CastToItkImage(m_ReferenceSlice, m_SliceInITK);
   smoothing->SetInput( m_SliceInITK );
 
@@ -343,6 +355,15 @@ void mitk::FastMarchingTool3D::ResetFastMarching(const PositionEvent* positionEv
   //reset reference slice according to the plane where the click happened
   m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
 
+  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() == 4)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput( m_ReferenceSlice );
+    timeSelector->SetTimeNr( m_CurrentTimeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    m_ReferenceSlice = timeSelector->GetOutput();
+  }
+
   //reset input of FastMarching pipeline
   CastToItkImage(m_ReferenceSlice, m_SliceInITK);
   smoothing->SetInput( m_SliceInITK );
@@ -350,4 +371,9 @@ void mitk::FastMarchingTool3D::ResetFastMarching(const PositionEvent* positionEv
   //clear all seeds and preview empty result
   this->ClearSeeds();
   this->UpdatePreviewImage();
+}
+
+void mitk::FastMarchingTool3D::SetCurrentTimeStep(int t)
+{
+  m_CurrentTimeStep = t;
 }

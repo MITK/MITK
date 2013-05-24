@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkSigmoidImageFilter.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
+
 namespace mitk
 {
 
@@ -82,6 +83,8 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual void ConfirmSegmentation();
     virtual void SetLivePreviewEnabled(bool enabled);
 
+    virtual void SetCurrentTimeStep(int t);
+
   protected:
 
     FastMarchingTool3D();
@@ -95,6 +98,7 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     /*Actions of StateMachine pattern*/
     virtual bool OnAddPoint     (Action*, const StateEvent*);
     virtual bool OnDelete       (Action*, const StateEvent*);
+
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
     void UpdatePreviewImage();
@@ -117,6 +121,8 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     ScalarType m_StoppingValue;
 
     bool m_IsLivePreviewEnabled;
+
+    int m_CurrentTimeStep;
 
   private:
 

@@ -23,11 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpainter.h>
+#include "mitkStepper.h"
+#include "mitkBaseRenderer.h"
+
 
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkFastMarchingTool3DGUI, "")
 
 QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI()
 :QmitkToolGUI(),
+m_TimeIsConnected(false),
 m_UpperThresholdSlider(NULL)
 {
   this->setContentsMargins( 0, 0, 0, 0 );
@@ -146,6 +150,21 @@ QmitkFastMarchingTool3DGUI::~QmitkFastMarchingTool3DGUI()
 void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool3D*>( tool );
+
+  //listen to timestep change events
+  mitk::BaseRenderer::Pointer renderer;
+  renderer = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") );
+  if (renderer.IsNotNull() && !m_TimeIsConnected)
+  {
+    mitk::Stepper * stepper = renderer->GetSliceNavigationController()->GetTime();
+    m_TimeStepper = new QmitkStepperAdapter(this,
+      stepper,
+      "exampleStepper");
+
+    connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(OnStepperRefetch()));
+
+    m_TimeIsConnected = true;
+  }
 }
 
 void QmitkFastMarchingTool3DGUI::OnUpperThresholdChanged(int value)
@@ -218,4 +237,11 @@ void QmitkFastMarchingTool3DGUI::OnLivePreviewCheckBoxChanged(int value)
   {
     m_FastMarchingTool->SetLivePreviewEnabled(b);
   }
+}
+
+
+void QmitkFastMarchingTool3DGUI::OnStepperRefetch()
+{
+  //event from image navigator recieved - timestep has changed
+   m_FastMarchingTool->SetCurrentTimeStep(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep());
 }

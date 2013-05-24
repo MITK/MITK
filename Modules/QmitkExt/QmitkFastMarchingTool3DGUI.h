@@ -27,6 +27,9 @@ class QFrame;
 class QPushButton;
 #include <QCheckBox>;
 
+
+#include "QmitkStepperAdapter.h"
+
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::FastMarchingTool.
@@ -54,6 +57,7 @@ public:
     void OnStandardDeviationChanged(int value);
     void OnConfirmSegmentation();
     void OnLivePreviewCheckBoxChanged(int value);
+    void OnStepperRefetch();
 
 protected:
 
@@ -79,6 +83,9 @@ protected:
   QCheckBox* m_LivePreviewCheckBox;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
+
+  bool m_TimeIsConnected;
+  QmitkStepperAdapter* m_TimeStepper;
 };
 
 #endif

@@ -32,6 +32,8 @@ public:
   void SetFocus();
 
 private:
+  void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
+
   Ui::QmitkSegmentationUtilities2ViewControls m_Controls;
 };
 

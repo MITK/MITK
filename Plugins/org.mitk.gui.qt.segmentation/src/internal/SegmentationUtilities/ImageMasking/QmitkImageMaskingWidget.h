@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkImageMaskingWidget_h
 #define QmitkImageMaskingWidget_h
 
-#include <QWidget>
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
 class QmitkImageMaskingWidget : public QWidget

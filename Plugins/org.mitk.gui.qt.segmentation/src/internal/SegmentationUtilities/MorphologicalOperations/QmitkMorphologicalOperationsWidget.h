@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMorphologicalOperationsWidget_h
 #define QmitkMorphologicalOperationsWidget_h
 
-#include <QWidget>
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
 class QmitkMorphologicalOperationsWidget : public QWidget

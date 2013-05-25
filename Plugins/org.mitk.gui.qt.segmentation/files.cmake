@@ -15,6 +15,7 @@ set(INTERNAL_CPP_FILES
   regiongrowing/QmitkRegionGrowingView.cpp
   QmitkOtsuAction.cpp
   QmitkSegmentationUtilitiesView.cpp
+  Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilities2View.cpp
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
@@ -27,6 +28,7 @@ set(UI_FILES
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
   src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
+  src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilities2ViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
@@ -47,6 +49,7 @@ set(MOC_H_FILES
   src/internal/regiongrowing/QmitkRegionGrowingView.h
   src/internal/QmitkOtsuAction.h
   src/internal/QmitkSegmentationUtilitiesView.h
+  src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilities2View.h
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h

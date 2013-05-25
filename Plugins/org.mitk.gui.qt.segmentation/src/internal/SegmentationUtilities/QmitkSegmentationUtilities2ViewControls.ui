@@ -23,12 +23,30 @@
    <string notr="true">icon-size: 32px 32px</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="accessibleName">
       <string/>
      </property>
+     <property name="styleSheet">
+      <string notr="true">::tab
+{
+  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 palette(light), stop:1 palette(midlight));
+}
+
+::tab:selected
+{
+  background: palette(highlight);
+  color: palette(highlighted-text);
+}</string>
+     </property>
      <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <property name="tabSpacing">
       <number>0</number>
      </property>
     </widget>

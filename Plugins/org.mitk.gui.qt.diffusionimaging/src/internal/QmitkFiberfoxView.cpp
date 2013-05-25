@@ -50,7 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDotModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
-#include <mitkSignalDecay.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkNodePredicateOr.h>
@@ -109,9 +108,10 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_VarianceBox->setVisible(false);
         m_Controls->m_GibbsRingingFrame->setVisible(false);
-        m_Controls->m_NoiseFrame->setVisible(true);
+        m_Controls->m_NoiseFrame->setVisible(false);
         m_Controls->m_GhostFrame->setVisible(false);
         m_Controls->m_DistortionsFrame->setVisible(false);
+        m_Controls->m_EddyFrame->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -140,6 +140,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddNoise, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddNoise(int)));
         connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
+        connect((QObject*) m_Controls->m_AddEddy, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddEddy(int)));
 
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -266,6 +267,14 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
 {
     if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
+}
+
+void QmitkFiberfoxView::OnAddEddy(int value)
+{
+    if (value>0)
+        m_Controls->m_EddyFrame->setVisible(true);
+    else
+        m_Controls->m_EddyFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnAddDistortions(int value)
@@ -744,6 +753,44 @@ void QmitkFiberfoxView::GenerateImage()
     origin[2] = spacing[2]/2;
     itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
 
+    if (m_SelectedImage.IsNotNull())
+    {
+        mitk::Image* img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
+        itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
+        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
+
+        imageRegion = itkImg->GetLargestPossibleRegion();
+        spacing = itkImg->GetSpacing();
+        origin = itkImg->GetOrigin();
+        directionMatrix = itkImg->GetDirection();
+    }
+
+    DiffusionSignalModel<double>::GradientListType gradientList;
+    double bVal = 1000;
+    if (m_SelectedDWI.IsNull())
+    {
+        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
+        bVal = m_Controls->m_BvalueBox->value();
+    }
+    else
+    {
+        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
+        imageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
+        spacing = dwi->GetVectorImage()->GetSpacing();
+        origin = dwi->GetVectorImage()->GetOrigin();
+        directionMatrix = dwi->GetVectorImage()->GetDirection();
+        bVal = dwi->GetB_Value();
+        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirections();
+        for (int i=0; i<dirs->Size(); i++)
+        {
+            DiffusionSignalModel<double>::GradientType g;
+            g[0] = dirs->at(i)[0];
+            g[1] = dirs->at(i)[1];
+            g[2] = dirs->at(i)[2];
+            gradientList.push_back(g);
+        }
+    }
+
     if (m_SelectedBundles.empty())
     {
         if (m_SelectedDWI.IsNotNull()) // add artifacts to existing diffusion weighted image
@@ -752,6 +799,7 @@ void QmitkFiberfoxView::GenerateImage()
             {
 
                 QString artifactModelString("");
+                mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
 
                 if (!dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedImages.at(i)->GetData()))
                     continue;
@@ -767,14 +815,74 @@ void QmitkFiberfoxView::GenerateImage()
                 mitk::RicianNoiseModel<short> noiseModel;
                 noiseModel.SetNoiseVariance(noiseVariance);
 
+                if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )
+                {
+                    this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
+                    QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
+                }
+                double lineReadoutTime = m_Controls->m_LineReadoutTimeBox->value();
+
+                // add N/2 ghosting
+                double kOffset = 0;
+                if (m_Controls->m_AddGhosts->isChecked())
+                {
+                    artifactModelString += "_GHOST";
+                    kOffset = m_Controls->m_kOffsetBox->value();
+                }
+
+
+                if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )
+                {
+                    this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
+                    QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
+                }
+
                 itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
                 filter->SetInput(diffImg->GetVectorImage());
-
-                //            filter->SetkOffset(m_Controls->doubleSpinBox->value());
+                filter->SettLine(lineReadoutTime);
+                filter->SetkOffset(kOffset);
                 filter->SetNoiseModel(&noiseModel);
+                filter->SetGradientList(gradientList);
+                filter->SetTE(this->m_Controls->m_TEbox->value());
+
+                if (m_Controls->m_AddEddy->isChecked())
+                {
+                    filter->SetSimulateEddyCurrents(true);
+                    filter->SetEddyGradientStrength(m_Controls->m_EddyGradientStrength->value());
+                    artifactModelString += "_EDDY";
+                }
+
+                mitk::GibbsRingingArtifact<double> gibbsModel;
+                if (m_Controls->m_AddGibbsRinging->isChecked())
+                {
+                    resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
+                    gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
+                    filter->SetRingingModel(&gibbsModel);
+                }
+
+                if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
+                {
+                    mitk::DataNode::Pointer fMapNode = m_Controls->m_FrequencyMapBox->GetSelectedNode();
+                    mitk::Image* img = dynamic_cast<mitk::Image*>(fMapNode->GetData());
+                    ItkDoubleImgType::Pointer itkImg = ItkDoubleImgType::New();
+                    CastToItkImage< ItkDoubleImgType >(img, itkImg);
+
+                    if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
+                            imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
+                            imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+                    {
+                        filter->SetFrequencyMap(itkImg);
+                        artifactModelString += "_DISTORTED";
+                    }
+                }
+
                 filter->Update();
 
-                mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+                resultNode->AddProperty("Fiberfox.Line-Offset", DoubleProperty::New(kOffset));
+                resultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
+                resultNode->AddProperty("Fiberfox.Tinhom", IntProperty::New(m_Controls->m_T2starBox->value()));
+                resultNode->AddProperty("binary", BoolProperty::New(false));
+
                 mitk::DiffusionImage<short>::Pointer image = mitk::DiffusionImage<short>::New();
                 image->SetVectorImage( filter->GetOutput() );
                 image->SetB_Value(diffImg->GetB_Value());
@@ -818,45 +926,6 @@ void QmitkFiberfoxView::GenerateImage()
 
         return;
     }
-
-    if (m_SelectedImage.IsNotNull())
-    {
-        mitk::Image* img = dynamic_cast<mitk::Image*>(m_SelectedImage->GetData());
-        itk::Image< float, 3 >::Pointer itkImg = itk::Image< float, 3 >::New();
-        CastToItkImage< itk::Image< float, 3 > >(img, itkImg);
-
-        imageRegion = itkImg->GetLargestPossibleRegion();
-        spacing = itkImg->GetSpacing();
-        origin = itkImg->GetOrigin();
-        directionMatrix = itkImg->GetDirection();
-    }
-
-    DiffusionSignalModel<double>::GradientListType gradientList;
-    double bVal = 1000;
-    if (m_SelectedDWI.IsNull())
-    {
-        gradientList = GenerateHalfShell(m_Controls->m_NumGradientsBox->value());;
-        bVal = m_Controls->m_BvalueBox->value();
-    }
-    else
-    {
-        mitk::DiffusionImage<short>::Pointer dwi = dynamic_cast<mitk::DiffusionImage<short>*>(m_SelectedDWI->GetData());
-        imageRegion = dwi->GetVectorImage()->GetLargestPossibleRegion();
-        spacing = dwi->GetVectorImage()->GetSpacing();
-        origin = dwi->GetVectorImage()->GetOrigin();
-        directionMatrix = dwi->GetVectorImage()->GetDirection();
-        bVal = dwi->GetB_Value();
-        mitk::DiffusionImage<short>::GradientDirectionContainerType::Pointer dirs = dwi->GetDirections();
-        for (int i=0; i<dirs->Size(); i++)
-        {
-            DiffusionSignalModel<double>::GradientType g;
-            g[0] = dirs->at(i)[0];
-            g[1] = dirs->at(i)[1];
-            g[2] = dirs->at(i)[2];
-            gradientList.push_back(g);
-        }
-    }
-
 
     for (int i=0; i<m_SelectedBundles.size(); i++)
     {
@@ -1115,17 +1184,6 @@ void QmitkFiberfoxView::GenerateImage()
         if ( y>imageRegion.GetSize(1) )
             lineReadoutTime *= (double)imageRegion.GetSize(1)/y;
 
-        // add signal contrast model
-        mitk::SignalDecay<double> contrastModel;
-        if (m_Controls->m_RelaxationBox->isChecked())
-        {
-            contrastModel.SetTinhom(this->m_Controls->m_T2starBox->value());
-            contrastModel.SetTE(this->m_Controls->m_TEbox->value());
-            contrastModel.SetTline(lineReadoutTime);
-            artifactList.push_back(&contrastModel);
-            artifactModelString += "_RELAX";
-        }
-
         // add N/2 ghosting
         double kOffset = 0;
         if (m_Controls->m_AddGhosts->isChecked())
@@ -1146,13 +1204,27 @@ void QmitkFiberfoxView::GenerateImage()
             if (imageRegion.GetSize(0)==itkImg->GetLargestPossibleRegion().GetSize(0) &&
                     imageRegion.GetSize(1)==itkImg->GetLargestPossibleRegion().GetSize(1) &&
                     imageRegion.GetSize(2)==itkImg->GetLargestPossibleRegion().GetSize(2))
+            {
                 tractsToDwiFilter->SetFrequencyMap(itkImg);
+                artifactModelString += "_DISTORTED";
+            }
+        }
+
+        if (m_Controls->m_AddEddy->isChecked())
+        {
+            tractsToDwiFilter->SetSimulateEddyCurrents(true);
+            tractsToDwiFilter->SetEddyGradientStrength(m_Controls->m_EddyGradientStrength->value());
+            artifactModelString += "_EDDY";
         }
 
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());
         if (fiberBundle->GetNumFibers()<=0)
             continue;
 
+        if (m_Controls->m_RelaxationBox->isChecked())
+            artifactModelString += "_RELAX";
+
+        tractsToDwiFilter->SetSimulateRelaxation(m_Controls->m_RelaxationBox->isChecked());
         tractsToDwiFilter->SetImageRegion(imageRegion);
         tractsToDwiFilter->SetSpacing(spacing);
         tractsToDwiFilter->SetOrigin(origin);
@@ -1164,6 +1236,8 @@ void QmitkFiberfoxView::GenerateImage()
         tractsToDwiFilter->SetKspaceArtifacts(artifactList);
         tractsToDwiFilter->SetkOffset(kOffset);
         tractsToDwiFilter->SettLine(m_Controls->m_LineReadoutTimeBox->value());
+        tractsToDwiFilter->SettInhom(this->m_Controls->m_T2starBox->value());
+        tractsToDwiFilter->SetTE(this->m_Controls->m_TEbox->value());
         tractsToDwiFilter->SetNumberOfRepetitions(m_Controls->m_RepetitionsBox->value());
         tractsToDwiFilter->SetEnforcePureFiberVoxels(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked());
         tractsToDwiFilter->SetInterpolationShrink(m_Controls->m_InterpolationShrink->value());
@@ -1208,19 +1282,6 @@ void QmitkFiberfoxView::GenerateImage()
         resultNode->AddProperty("Fiberfox.PureFiberVoxels", BoolProperty::New(m_Controls->m_EnforcePureFiberVoxelsBox->isChecked()));
         resultNode->AddProperty("binary", BoolProperty::New(false));
         resultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(tractsToDwiFilter->GetLevelWindow()) );
-
-        if (m_Controls->m_KspaceImageBox->isChecked())
-        {
-            itk::TractsToDWIImageFilter::ItkDoubleImgType::Pointer kspace = tractsToDwiFilter->GetKspaceImage();
-            mitk::Image::Pointer image = mitk::Image::New();
-            image->InitializeByItk(kspace.GetPointer());
-            image->SetVolume(kspace->GetBufferPointer());
-
-            mitk::DataNode::Pointer node = mitk::DataNode::New();
-            node->SetData( image );
-            node->SetName(m_SelectedBundles.at(i)->GetName()+"_k-space");
-            GetDataStorage()->Add(node, m_SelectedBundles.at(i));
-        }
 
         if (m_Controls->m_VolumeFractionsBox->isChecked())
         {

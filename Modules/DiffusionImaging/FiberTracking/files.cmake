@@ -65,6 +65,7 @@ set(H_FILES
   Algorithms/itkKspaceImageFilter.h
   Algorithms/itkDftImageFilter.h
   Algorithms/itkAddArtifactsToDwiImageFilter.h
+  Algorithms/itkFieldmapGeneratorFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h
@@ -90,7 +91,6 @@ set(H_FILES
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkSignalDecay.h
 )
 
 set(RESOURCE_FILES

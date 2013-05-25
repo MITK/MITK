@@ -113,6 +113,7 @@ set(CPP_FILES
  QmitkRegionGrow3DToolGUI.cpp
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
+ QmitkFastMarchingTool3DGUI.cpp
 
  QmitkAdaptiveRegionGrowingWidget.cpp
 
@@ -226,6 +227,7 @@ set(MOC_H_FILES
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
  QmitkAdaptiveRegionGrowingWidget.h
+ QmitkFastMarchingTool3DGUI.h
 
  QmitkHistogramJSWidget.h
 

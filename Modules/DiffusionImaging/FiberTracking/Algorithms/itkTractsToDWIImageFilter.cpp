@@ -53,6 +53,8 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     , m_tInhom(50)
     , m_TE(100)
     , m_FrequencyMap(NULL)
+    , m_EddyGradientStrength(0.001)
+    , m_SimulateEddyCurrents(false)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -96,6 +98,16 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
     newImage->SetRequestedRegion( m_ImageRegion );
     newImage->SetVectorLength( images.at(0)->GetVectorLength() );
     newImage->Allocate();
+
+    MatrixType transform = m_DirectionMatrix;
+    for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+        {
+            if (j<2)
+                transform[i][j] *= m_UpsampledSpacing[j];
+            else
+                transform[i][j] *= m_Spacing[j];
+        }
 
     boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (int g=0; g<images.at(0)->GetVectorLength(); g++)
@@ -146,7 +158,13 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
             idft->SetTE(m_TE);
             idft->SetTinhom(m_tInhom);
             idft->SetSimulateRelaxation(m_SimulateRelaxation);
+            idft->SetSimulateEddyCurrents(m_SimulateEddyCurrents);
+            idft->SetEddyGradientMagnitude(m_EddyGradientStrength);
+            idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);
+            idft->SetDirectionMatrix(transform);
+            idft->SetDiffusionGradientDirection(m_FiberModels.at(0)->GetGradientDirection(g));
             idft->SetFrequencyMap(fMap);
+            idft->SetSignalScale(m_SignalScale);
             idft->Update();
 
             ComplexSliceType::Pointer fSlice;
@@ -585,10 +603,11 @@ void TractsToDWIImageFilter::GenerateData()
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
-    if (m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation)
+    if (m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents)
     {
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);
+        m_SignalScale = 1;
     }
     else
     {

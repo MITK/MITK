@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
+#include <itkImageFileWriter.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -38,8 +39,13 @@ KspaceImageFilter< TPixelType >
     , m_kOffset(0)
     , m_FrequencyMap(NULL)
     , m_SimulateRelaxation(true)
+    , m_SimulateEddyCurrents(false)
+    , m_Tau(70)
+    , m_EddyGradientMagnitude(30)
+    , m_IsBaseline(true)
+    , m_SignalScale(1)
 {
-
+    m_DiffusionGradientDirection.Fill(0.0);
 }
 
 template< class TPixelType >
@@ -54,6 +60,15 @@ void KspaceImageFilter< TPixelType >
     outputImage->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
     outputImage->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
     outputImage->Allocate();
+
+    typename InputImageType::Pointer tempImage = InputImageType::New();
+    tempImage->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
+    tempImage->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
+    tempImage->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
+    tempImage->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    tempImage->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    tempImage->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    tempImage->Allocate();
 
     m_SimulateDistortions = true;
     if (m_FrequencyMap.IsNull())
@@ -70,7 +85,19 @@ void KspaceImageFilter< TPixelType >
         m_FrequencyMap->FillBuffer(0);
     }
 
+    double gamma = 42576000;    // Gyromagnetic ratio in Hz/T
+    if (m_DiffusionGradientDirection.GetNorm()>0.001)
+    {
+        m_DiffusionGradientDirection.Normalize();
+        m_EddyGradientMagnitude /= 1000; // eddy gradient magnitude in T/m
+        m_DiffusionGradientDirection = m_DiffusionGradientDirection * m_EddyGradientMagnitude *  gamma;
+        m_IsBaseline = false;
+    }
+    else
+        m_EddyGradientMagnitude = gamma*m_EddyGradientMagnitude/1000;
+
     this->SetNthOutput(0, outputImage);
+    this->SetNthOutput(1, tempImage);
 }
 
 template< class TPixelType >
@@ -78,6 +105,7 @@ void KspaceImageFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadId)
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    typename InputImageType::Pointer tempImage = static_cast< InputImageType * >(this->ProcessObject::GetOutput(1));
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
 
@@ -92,22 +120,37 @@ void KspaceImageFilter< TPixelType >
 
     while( !oit.IsAtEnd() )
     {
-        double kx = oit.GetIndex()[0];
-        double ky = oit.GetIndex()[1];
+        itk::Index< 2 > kIdx;
+        kIdx[0] = oit.GetIndex()[0];
+        kIdx[1] = oit.GetIndex()[1];
 
-        int temp_k = kx;
-        if (oit.GetIndex()[1]%2 == 1)
+        double t = fromMaxEcho + ((double)kIdx[1]*szx+(double)kIdx[0])*dt;    // dephasing time
+
+        // calculate eddy current decay factors
+        double eddyDecay = 0;
+        if (m_SimulateEddyCurrents)
+            eddyDecay = exp(-(m_TE/2 + t)/m_Tau) * t/1000;
+
+        // calcualte signal relaxation factors
+        std::vector< double > relaxFactor;
+        if (m_SimulateRelaxation)
         {
-            temp_k = szx-kx-1;  // reverse readout direction
-            kx -= m_kOffset;    // add gradient delay induced offset
+            for (int i=0; i<m_CompartmentImages.size(); i++)
+                relaxFactor.push_back(exp(-(m_TE+t)/m_T2.at(i) -fabs(t)/m_Tinhom));
+        }
+
+        double temp_k = kIdx[0];
+        if (oit.GetIndex()[1]%2 == 1)   // reverse readout direction and add ghosting
+        {
+            kIdx[0] = szx-kIdx[0]-1;  // reverse readout direction
+            temp_k = (double)kIdx[0]-m_kOffset;    // add gradient delay induced offset
         }
         else
-            kx += m_kOffset;    // add gradient delay induced offset
+            temp_k += m_kOffset;    // add gradient delay induced offset
 
-        double t = fromMaxEcho + (ky*szx+temp_k)*dt;    // dephasing time
+//        tempImage->SetPixel(kIdx, t );
 
         vcl_complex<double> s(0,0);
-
         InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
         while( !it.IsAtEnd() )
         {
@@ -119,22 +162,44 @@ void KspaceImageFilter< TPixelType >
             // sum compartment signals and simulate relaxation
             for (int i=0; i<m_CompartmentImages.size(); i++)
                 if (m_SimulateRelaxation)
-                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * exp(-(m_TE+t)/m_T2.at(i) -fabs(t)/m_Tinhom), 0);
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) * m_SignalScale, 0);
                 else
-                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) );
+                    f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * m_SignalScale );
 
-            // simulate distortions and ghosting
+            // simulate eddy currents and other distortions
+            double omega_t = 0;
+            if ( m_SimulateEddyCurrents )
+            {
+                if (!m_IsBaseline)
+                {
+                    itk::Vector< double, 3 > pos; pos[0] = x-szx/2; pos[1] = y-szy/2; pos[2] = m_Z;
+                    pos = m_DirectionMatrix*pos/1000;   // vector from image center to current position (in meter)
+
+                    omega_t += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2])*eddyDecay;
+
+                }
+                else
+                    omega_t += m_EddyGradientMagnitude*eddyDecay;
+            }
             if (m_SimulateDistortions)
-                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy) + m_FrequencyMap->GetPixel(it.GetIndex())*10*t ) );
-            else
-                s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/szx + ky*y/szy)) );
+                omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
+
+            // actual DFT term
+            s += f * exp( std::complex<double>(0, 2 * M_PI * (temp_k*x/szx + (double)kIdx[1]*y/szy) + omega_t ) );
 
             ++it;
         }
+
         s /= numPix;
-        oit.Set(s);
+        outputImage->SetPixel(kIdx, s);
         ++oit;
     }
+
+//    typedef itk::ImageFileWriter< InputImageType > WriterType;
+//    typename WriterType::Pointer writer = WriterType::New();
+//    writer->SetFileName("/local/dist.nrrd");
+//    writer->SetInput(tempImage);
+//    writer->Update();
 }
 
 template< class TPixelType >

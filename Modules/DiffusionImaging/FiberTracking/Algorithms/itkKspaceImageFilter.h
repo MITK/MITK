@@ -48,21 +48,30 @@ namespace itk{
     itkNewMacro(Self);
 
     /** Runtime information support. */
-    itkTypeMacro(KspaceImageFilter, ImageToImageFilter);
+    itkTypeMacro(KspaceImageFilter, ImageToImageFilter)
 
     typedef typename itk::Image< double, 2 >                InputImageType;
     typedef typename InputImageType::Pointer                InputImagePointerType;
     typedef typename Superclass::OutputImageType            OutputImageType;
     typedef typename Superclass::OutputImageRegionType      OutputImageRegionType;
+    typedef itk::Matrix<double, 3, 3>                       MatrixType;
 
-    itkSetMacro( FrequencyMap, typename InputImageType::Pointer );
-    itkSetMacro( tLine, double );
-    itkSetMacro( kOffset, double );
-    itkSetMacro( TE, double);
-    itkSetMacro( Tinhom, double);
-    itkSetMacro( SimulateRelaxation, bool );
+    itkSetMacro( FrequencyMap, typename InputImageType::Pointer )
+    itkSetMacro( tLine, double )
+    itkSetMacro( kOffset, double )
+    itkSetMacro( TE, double)
+    itkSetMacro( Tinhom, double)
+    itkSetMacro( Tau, double)
+    itkSetMacro( SimulateRelaxation, bool )
+    itkSetMacro( SimulateEddyCurrents, bool )
+    itkSetMacro( Z, double )
+    itkSetMacro( DirectionMatrix, MatrixType )
+    itkSetMacro( SignalScale, double )
+
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; }
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }
+    void SetDiffusionGradientDirection(itk::Vector<double,3> g) { m_DiffusionGradientDirection=g; }
+    void SetEddyGradientMagnitude(double g_mag) { m_EddyGradientMagnitude=g_mag; }    ///< in T/m
 
   protected:
     KspaceImageFilter();
@@ -72,6 +81,10 @@ namespace itk{
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
     void AfterThreadedGenerateData();
 
+    bool                                    m_SimulateRelaxation;
+    bool                                    m_SimulateDistortions;
+    bool                                    m_SimulateEddyCurrents;
+
     typename InputImageType::Pointer        m_FrequencyMap;
     double                                  m_tLine;
     double                                  m_kOffset;
@@ -80,8 +93,13 @@ namespace itk{
     double                                  m_TE;
     std::vector< double >                   m_T2;
     std::vector< InputImagePointerType >    m_CompartmentImages;
-    bool                                    m_SimulateRelaxation;
-    bool                                    m_SimulateDistortions;
+    itk::Vector<double,3>                   m_DiffusionGradientDirection;
+    double                                  m_Tau;                          ///< eddy current decay constant
+    double                                  m_EddyGradientMagnitude;   ///< in T/m
+    double                                  m_Z;
+    MatrixType                              m_DirectionMatrix;
+    bool                                    m_IsBaseline;
+    double                                  m_SignalScale;
 
   private:
 

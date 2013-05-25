@@ -108,9 +108,10 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_AdvancedFiberOptionsFrame->setVisible(false);
         m_Controls->m_VarianceBox->setVisible(false);
         m_Controls->m_GibbsRingingFrame->setVisible(false);
-        m_Controls->m_NoiseFrame->setVisible(true);
+        m_Controls->m_NoiseFrame->setVisible(false);
         m_Controls->m_GhostFrame->setVisible(false);
         m_Controls->m_DistortionsFrame->setVisible(false);
+        m_Controls->m_EddyFrame->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -139,6 +140,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_AddNoise, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddNoise(int)));
         connect((QObject*) m_Controls->m_AddGhosts, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddGhosts(int)));
         connect((QObject*) m_Controls->m_AddDistortions, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddDistortions(int)));
+        connect((QObject*) m_Controls->m_AddEddy, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnAddEddy(int)));
 
         connect((QObject*) m_Controls->m_ConstantRadiusBox, SIGNAL(stateChanged(int)), (QObject*) this, SLOT(OnConstantRadius(int)));
         connect((QObject*) m_Controls->m_CopyBundlesButton, SIGNAL(clicked()), (QObject*) this, SLOT(CopyBundles()));
@@ -265,6 +267,14 @@ void QmitkFiberfoxView::OnConstantRadius(int value)
 {
     if (value>0 && m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
+}
+
+void QmitkFiberfoxView::OnAddEddy(int value)
+{
+    if (value>0)
+        m_Controls->m_EddyFrame->setVisible(true);
+    else
+        m_Controls->m_EddyFrame->setVisible(false);
 }
 
 void QmitkFiberfoxView::OnAddDistortions(int value)
@@ -820,11 +830,27 @@ void QmitkFiberfoxView::GenerateImage()
                     kOffset = m_Controls->m_kOffsetBox->value();
                 }
 
+
+                if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )
+                {
+                    this->m_Controls->m_TEbox->setValue( imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() );
+                    QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(this->m_Controls->m_TEbox->value())+" ms");
+                }
+
                 itk::AddArtifactsToDwiImageFilter< short >::Pointer filter = itk::AddArtifactsToDwiImageFilter< short >::New();
                 filter->SetInput(diffImg->GetVectorImage());
                 filter->SettLine(lineReadoutTime);
                 filter->SetkOffset(kOffset);
                 filter->SetNoiseModel(&noiseModel);
+                filter->SetGradientList(gradientList);
+                filter->SetTE(this->m_Controls->m_TEbox->value());
+
+                if (m_Controls->m_AddEddy->isChecked())
+                {
+                    filter->SetSimulateEddyCurrents(true);
+                    filter->SetEddyGradientStrength(m_Controls->m_EddyGradientStrength->value());
+                    artifactModelString += "_EDDY";
+                }
 
                 mitk::GibbsRingingArtifact<double> gibbsModel;
                 if (m_Controls->m_AddGibbsRinging->isChecked())
@@ -1182,6 +1208,13 @@ void QmitkFiberfoxView::GenerateImage()
                 tractsToDwiFilter->SetFrequencyMap(itkImg);
                 artifactModelString += "_DISTORTED";
             }
+        }
+
+        if (m_Controls->m_AddEddy->isChecked())
+        {
+            tractsToDwiFilter->SetSimulateEddyCurrents(true);
+            tractsToDwiFilter->SetEddyGradientStrength(m_Controls->m_EddyGradientStrength->value());
+            artifactModelString += "_EDDY";
         }
 
         mitk::FiberBundleX::Pointer fiberBundle = dynamic_cast<mitk::FiberBundleX*>(m_SelectedBundles.at(i)->GetData());

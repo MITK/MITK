@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDftImageFilter.h>
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkGibbsRingingArtifact.h>
+#include <mitkDiffusionSignalModel.h>
 
 namespace itk{
 
@@ -54,12 +55,17 @@ namespace itk{
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef typename itk::KspaceImageFilter< double >::OutputImageType  ComplexSliceType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
+    typedef itk::Matrix<double, 3, 3>                                   MatrixType;
 
     void SetRingingModel(GibbsRingingType* ringingModel){ m_RingingModel = ringingModel; }
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }
     itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
     itkSetMacro( kOffset, double )
     itkSetMacro( tLine, double )
+    itkSetMacro( SimulateEddyCurrents, bool )
+    itkSetMacro( EddyGradientStrength, double )
+    void SetGradientList(mitk::DiffusionSignalModel<double>::GradientListType list) { m_GradientList=list; }
+    itkSetMacro( TE, double )
 
   protected:
     AddArtifactsToDwiImageFilter();
@@ -74,7 +80,10 @@ namespace itk{
     ItkDoubleImgType::Pointer           m_FrequencyMap;
     double                              m_kOffset;
     double                              m_tLine;
-    double                              m_SignalScale;
+    bool                                m_SimulateEddyCurrents;
+    double                              m_EddyGradientStrength;
+    mitk::DiffusionSignalModel<double>::GradientListType m_GradientList;
+    double                              m_TE;
 
   private:
 

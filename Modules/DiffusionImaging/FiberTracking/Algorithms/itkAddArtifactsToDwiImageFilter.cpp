@@ -42,7 +42,9 @@ AddArtifactsToDwiImageFilter< TPixelType >
     , m_FrequencyMap(NULL)
     , m_kOffset(0)
     , m_tLine(1)
-    , m_SignalScale(100)
+    , m_EddyGradientStrength(0.001)
+    , m_SimulateEddyCurrents(false)
+    , m_TE(100)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -135,8 +137,13 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->FillBuffer(0.0);
     }
 
-    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_RingingModel!=NULL)
+    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_RingingModel!=NULL || m_SimulateEddyCurrents)
     {
+        MatrixType transform = inputImage->GetDirection();
+        for (int i=0; i<3; i++)
+            for (int j=0; j<3; j++)
+                    transform[i][j] *= inputImage->GetSpacing()[j];
+
         MITK_INFO << "Adjusting complex signal";
         MITK_INFO << "line readout time: " << m_tLine;
         MITK_INFO << "line offset: " << m_kOffset;
@@ -148,6 +155,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             MITK_INFO << "Gibbs ringing enabled";
         else
             MITK_INFO << "Gibbs ringing disabled";
+
+        if (m_SimulateEddyCurrents)
+            MITK_INFO << "Simulating eddy currents";
 
         boost::progress_display disp(inputImage->GetVectorLength()*inputRegion.GetSize(2));
         for (int g=0; g<inputImage->GetVectorLength(); g++)
@@ -195,6 +205,12 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 idft->SettLine(m_tLine);
                 idft->SetSimulateRelaxation(false);
                 idft->SetFrequencyMap(fMap);
+                idft->SetDiffusionGradientDirection(m_GradientList.at(g));
+                idft->SetSimulateEddyCurrents(m_SimulateEddyCurrents);
+                idft->SetEddyGradientMagnitude(m_EddyGradientStrength);
+                idft->SetTE(m_TE);
+                idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
+                idft->SetDirectionMatrix(transform);
                 idft->Update();
 
                 fSlice = idft->GetOutput();

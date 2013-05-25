@@ -88,7 +88,9 @@ public:
     itkSetMacro( tInhom, double )
     itkSetMacro( TE, double )
     itkSetMacro( UseInterpolation, bool )
+    itkSetMacro( SimulateEddyCurrents, bool )
     itkSetMacro( SimulateRelaxation, bool )
+    itkSetMacro( EddyGradientStrength, double )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -139,6 +141,8 @@ protected:
     bool                                m_UseInterpolation;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;  ///< one double image for each compartment containing the corresponding volume fraction per voxel
     bool                                m_SimulateRelaxation;
+    bool                                m_SimulateEddyCurrents;
+    double                              m_EddyGradientStrength;
 };
 }
 

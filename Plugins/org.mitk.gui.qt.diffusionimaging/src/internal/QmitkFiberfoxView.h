@@ -91,6 +91,7 @@ protected slots:
     void OnAddNoise(int value);
     void OnAddGhosts(int value);
     void OnAddDistortions(int value);
+    void OnAddEddy(int value);
     void OnConstantRadius(int value);
 
 protected:

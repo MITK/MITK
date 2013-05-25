@@ -39,7 +39,6 @@ int mitkGibbsTrackingTest(int argc, char* argv[])
   mitk::FiberBundleX::Pointer fib1;
 
   try{
-
     MITK_INFO << "Q-Ball image: " << argv[1];
     MITK_INFO << "Mask image: " << argv[2];
     MITK_INFO << "Parameter file: " << argv[3];

@@ -236,7 +236,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
 
-        if (points==NULL)
+        if (points==NULL || numPoints<=0)
             continue;
 
         int numFibers2 = fib->GetNumFibers();
@@ -247,7 +247,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
             int numPoints2 = cell2->GetNumberOfPoints();
             vtkPoints* points2 = cell2->GetPoints();
 
-            if (points2==NULL)
+            if (points2==NULL || numPoints2<=0)
                 continue;
 
             // check endpoints

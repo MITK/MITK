@@ -243,7 +243,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::SubtractBundle(mitk::FiberBundle
         bool contained = false;
         for( int i2=0; i2<numFibers2; i2++ )
         {
-            vtkCell* cell2 = fib->GetFiberPolyData()->GetCell(i);
+            vtkCell* cell2 = fib->GetFiberPolyData()->GetCell(i2);
             int numPoints2 = cell2->GetNumberOfPoints();
             vtkPoints* points2 = cell2->GetPoints();
 

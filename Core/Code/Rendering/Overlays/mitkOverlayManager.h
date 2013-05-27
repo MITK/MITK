@@ -34,6 +34,36 @@ public:
   void AddOverlay(Overlay::Pointer overlay);
   void PrepareOverlays(BaseRenderer *baseRenderer);
 
+  /** \brief Base class for mapper specific rendering ressources.
+   */
+  class MITK_CORE_EXPORT LocalStorage
+  {
+  public:
+
+    /** \brief Timestamp of last update of stored data. */
+    itk::TimeStamp m_LastUpdateTime;
+
+    /** \brief Default constructor of the local storage. */
+    LocalStorage();
+    /** \brief Default deconstructor of the local storage. */
+    ~LocalStorage();
+
+    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::OverlayManager *overlaymanager);
+
+    inline void UpdateGenerateDataTime()
+    {
+      m_LastGenerateDataTime.Modified();
+    }
+
+    inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
+
+  protected:
+
+    /** \brief timestamp of last update of stored data */
+    itk::TimeStamp m_LastGenerateDataTime;
+
+  };
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

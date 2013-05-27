@@ -332,8 +332,10 @@ set(CPP_FILES
   Rendering/mitkRenderingTestHelper.cpp
 
   Rendering/Overlays/mitkOverlay.cpp
+  Rendering/Overlays/mitkVtkOverlay.cpp
   Rendering/Overlays/mitkOverlayManager.cpp
   Rendering/Overlays/mitkTextOverlay.cpp
+  Rendering/Overlays/mitkTextOverlay3D.cpp
   Rendering/Overlays/mitkBaseLayouter.cpp
   Rendering/Overlays/mitkOverlayLayouter.cpp
 

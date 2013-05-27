@@ -14,18 +14,19 @@
 
   ===================================================================*/
 
-#ifndef TEXTOVERLAY_H
-#define TEXTOVERLAY_H
+#ifndef TextOverlay3D_H
+#define TextOverlay3D_H
 
-#include "mitkOverlay.h"
+#include "mitkVtkOverlay.h"
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
-#include <vtkTextActor.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
 
 
 namespace mitk {
 
-class MITK_CORE_EXPORT TextOverlay : public mitk::Overlay {
+class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -39,7 +40,9 @@ public:
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkTextActor> m_textActor;
+    vtkSmartPointer<vtkFollower> m_follower;
+
+    vtkSmartPointer<vtkVectorText> m_textSource;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -48,12 +51,10 @@ public:
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
+
   };
 
   void MitkRender(BaseRenderer *renderer);
-
-  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
@@ -64,28 +65,43 @@ public:
   //## @sa m_MapOfPropertyLists
   mitk::PropertyList* GetBRPropertyList(mitk::BaseRenderer* renderer);
 
-  mitkClassMacro(TextOverlay, mitk::Overlay);
-  itkNewMacro(TextOverlay);
+  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+  mitkClassMacro(TextOverlay3D, mitk::Overlay);
+  itkNewMacro(TextOverlay3D);
+
+  void setPosition3D(Point3D position3D);
+
+  void setText(std::string text);
+
+  void setPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
+
+  Point3D getPosition3D();
+
+  std::string getText();
+
+  Point3D getPosition3D(mitk::BaseRenderer* renderer);
 
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit TextOverlay();
+  explicit TextOverlay3D();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~TextOverlay();
+  virtual ~TextOverlay3D();
 
 private:
 
   /** \brief copy constructor */
-  TextOverlay( const TextOverlay &);
+  TextOverlay3D( const TextOverlay3D &);
 
   /** \brief assignment operator */
-  TextOverlay &operator=(const TextOverlay &);
+  TextOverlay3D &operator=(const TextOverlay3D &);
 
 };
 
 } // namespace mitk
-#endif // TEXTOVERLAY_H
+#endif // TextOverlay3D_H
 
 

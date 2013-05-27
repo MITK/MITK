@@ -14,50 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef OVERLAY_H
-#define OVERLAY_H
+#ifndef VTKOVERLAY_H
+#define VTKOVERLAY_H
 
 #include <MitkExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
+#include "mitkOverlay.h"
 #include "mitkBaseRenderer.h"
 
 
 namespace mitk {
 
-class MITK_CORE_EXPORT Overlay : public itk::Object {
+class MITK_CORE_EXPORT VtkOverlay : public Overlay {
 public:
-
-  typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
-
-  /** \brief Base class for mapper specific rendering ressources.
-   */
-  class MITK_CORE_EXPORT BaseLocalStorage
-  {
-  public:
-
-
-    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Overlay *overlay);
-
-    inline void UpdateGenerateDataTime()
-    {
-      m_LastGenerateDataTime.Modified();
-    }
-
-    PropertyList::Pointer GetPropertyList();
-
-    inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
-
-
-
-  protected:
-
-    /** \brief timestamp of last update of stored data */
-    itk::TimeStamp m_LastGenerateDataTime;
-
-    PropertyList::Pointer m_PropertyList;
-
-  };
 
   virtual void MitkRender(BaseRenderer *renderer) = 0;
 
@@ -79,23 +49,23 @@ public:
   //## @sa m_MapOfPropertyLists
   virtual mitk::PropertyList* GetBRPropertyList(mitk::BaseRenderer* renderer) = 0 ;
 
-  mitkClassMacro(Overlay, itk::Object);
+  mitkClassMacro(VtkOverlay, Overlay);
 
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit Overlay();
+  explicit VtkOverlay();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~Overlay();
+  virtual ~VtkOverlay();
 
 private:
 
   /** \brief copy constructor */
-  Overlay( const Overlay &);
+  VtkOverlay( const VtkOverlay &);
 
   /** \brief assignment operator */
-  Overlay &operator=(const Overlay &);
+  VtkOverlay &operator=(const VtkOverlay &);
 
   //##Documentation
   //## @brief BaseRenderer-independent PropertyList

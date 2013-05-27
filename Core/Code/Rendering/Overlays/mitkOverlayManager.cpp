@@ -35,6 +35,29 @@ void mitk::OverlayManager::PrepareOverlays(mitk::BaseRenderer* baseRenderer)
   for(int i=0 ; i<m_OverlayList.size() ; i++)
   {
     mitk::Overlay::Pointer overlay = m_OverlayList[i];
-    overlay->Render(); //TODO
+//    overlay->Render(); //TODO
+    overlay->MitkRender(baseRenderer);
   }
+}
+
+
+bool mitk::OverlayManager::LocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, OverlayManager *overlaymanager)
+{
+  if( m_LastGenerateDataTime < overlaymanager -> GetMTime () )
+    return true;
+
+  if( renderer && m_LastGenerateDataTime < renderer -> GetTimeStepUpdateTime ( ) )
+    return true;
+
+  return false;
+}
+
+
+mitk::OverlayManager::LocalStorage::~LocalStorage()
+{
+}
+
+mitk::OverlayManager::LocalStorage::LocalStorage()
+{
+
 }

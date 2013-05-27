@@ -18,11 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Overlay::Overlay()
 {
+  m_PropertyList = mitk::PropertyList::New();
 }
 
 
 mitk::Overlay::~Overlay()
 {
+}
+
+mitk::PropertyList *mitk::Overlay::GetPropertyList()
+{
+  return m_PropertyList;
 }
 
 bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Overlay *overlay)
@@ -34,4 +40,11 @@ bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer 
     return true;
 
   return false;
+}
+
+mitk::PropertyList::Pointer mitk::Overlay::BaseLocalStorage::GetPropertyList()
+{
+  if (m_PropertyList.IsNull())
+    m_PropertyList = mitk::PropertyList::New();
+  return m_PropertyList;
 }

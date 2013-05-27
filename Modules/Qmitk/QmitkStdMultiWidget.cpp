@@ -260,7 +260,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   layer = mitk::IntProperty::New(1000);
   planeNode->SetProperty("layer",layer);
 
-  mitk::OverlayManager::Pointer overlayManager;
+  mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::New();
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(overlayManager);
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(overlayManager);
   mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(overlayManager);

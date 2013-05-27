@@ -209,6 +209,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 
   }
 
+  this->AddAllOverlays();
+
   if (lastVtkBased == false)
     Disable2DOpenGL();
 

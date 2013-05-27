@@ -110,6 +110,7 @@ public:
     mitk::RotationOperation* rotation = new mitk::RotationOperation(mitk::OpROTATE,pointOfRotation, vectorOfRotation, angleOfRotation);
 
     image->GetTimeGeometry()->ExecuteOperation(rotation);
+    delete rotation;
 
     expectedPoint[0] = 2.6080379;
     expectedPoint[1] = -0.75265157;
@@ -319,12 +320,271 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
   }
 
-  void GetGeometryForTimeStep_ImageInvalidTimeStep_CorrectGeometry(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
     mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT+1);
     MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned");
+  }
+
+  void GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimePoint(DimT-0.5);
+    MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry returned");
+
+    mitk::Point3D expectedPoint;
+    expectedPoint[0] = 3*0.5;
+    expectedPoint[1] = 3*0.33;
+    expectedPoint[2] = 3*0.78;
+    mitk::Point3D originalPoint;
+    originalPoint[0] = 3;
+    originalPoint[1] = 3;
+    originalPoint[2] = 3;
+    mitk::Point3D worldPoint;
+    geometry3D->IndexToWorld(originalPoint, worldPoint);
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+  }
+
+  void GetGeometryForTimePoint_4DImageInvalidTimePoint_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimePoint(DimT+1);
+    MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned with invalid time point");
+  }
+
+  void GetGeometryForTimePoint_4DImageNEgativInvalidTimePoint_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::TimePointType timePoint = (-1.0*(DimT)) -1;
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimePoint(timePoint);
+    MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned with invalid negativ time point");
+  }
+
+  void GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryCloneForTimeStep(DimT-1);
+    MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry returned");
+
+    mitk::Point3D expectedPoint;
+    expectedPoint[0] = 3*0.5;
+    expectedPoint[1] = 3*0.33;
+    expectedPoint[2] = 3*0.78;
+    mitk::Point3D originalPoint;
+    originalPoint[0] = 3;
+    originalPoint[1] = 3;
+    originalPoint[2] = 3;
+    mitk::Point3D worldPoint;
+    geometry3D->IndexToWorld(originalPoint, worldPoint);
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+
+    mitk::Vector3D translationVector;
+    translationVector[0] = 5;
+    translationVector[1] = 8;
+    translationVector[2] = 7;
+    geometry3D->Translate(translationVector);
+
+    geometry3D = geometry->GetGeometryForTimeStep(DimT-1);
+    geometry3D->IndexToWorld(originalPoint, worldPoint);
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation not changed. ");
+  }
+
+  void GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryCloneForTimeStep(DimT+1);
+    MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned");
+  }
+
+  void SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryCloneForTimeStep(DimT-1);
+    MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry returned");
+
+    mitk::Vector3D translationVector;
+    translationVector[0] = 5;
+    translationVector[1] = 8;
+    translationVector[2] = 7;
+    geometry3D->Translate(translationVector);
+
+    geometry->SetTimeStepGeometry(geometry3D,DimT-1);
+
+    mitk::Point3D expectedPoint;
+    expectedPoint[0] = 3*0.5+5;
+    expectedPoint[1] = 3*0.33+8;
+    expectedPoint[2] = 3*0.78+7;
+    mitk::Point3D originalPoint;
+    originalPoint[0] = 3;
+    originalPoint[1] = 3;
+    originalPoint[2] = 3;
+    mitk::Point3D worldPoint;
+    geometry->GetGeometryForTimeStep(DimT-1)->IndexToWorld(originalPoint, worldPoint);
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
+  }
+
+  void Expand_ImageDoubleSize_SizeChanged(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    MITK_TEST_CONDITION(geometry->GetNumberOfTimeSteps()==DimT, "Number of time Steps match expection. ");
+
+    geometry->Expand(DimT * 2);
+    MITK_TEST_CONDITION(geometry->GetNumberOfTimeSteps()==DimT*2, "Number of time Steps match expection. ");
+
+    mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT*2 -1);
+    MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry is generated. ");
+  }
+
+  void CheckBounds_Image_PointsAsExpected(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    mitk::Point3D expectedPoint;
+
+    expectedPoint[0] = -0.5*0.5;
+    expectedPoint[1] = -0.5*0.33;
+    expectedPoint[2] = -0.5*0.78;
+    mitk::Point3D point =  geometry->GetCornerPointInWorld(0);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 0 as expected ");
+    point =  geometry->GetCornerPointInWorld(true,true,true);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 0 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(1);
+    expectedPoint[0] = -0.5*0.5;
+    expectedPoint[1] = -0.5*0.33;
+    expectedPoint[2] = 19.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "GBounding Point 1 as expected ");
+    point =  geometry->GetCornerPointInWorld(true,true,false);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 1 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(2);
+    expectedPoint[0] = -0.5*0.5;
+    expectedPoint[1] = 24.5*0.33;
+    expectedPoint[2] = -0.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 2 as expected ");
+    point =  geometry->GetCornerPointInWorld(true,false,true);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 2 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(3);
+    expectedPoint[0] = -0.5*0.5;
+    expectedPoint[1] = 24.5*0.33;
+    expectedPoint[2] = 19.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 3 as expected  ");
+    point =  geometry->GetCornerPointInWorld(true,false,false);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 3 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(4);
+    expectedPoint[0] = 29.5*0.5;
+    expectedPoint[1] = -0.5*0.33;
+    expectedPoint[2] = -0.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 4 as expected  ");
+    point =  geometry->GetCornerPointInWorld(false,true,true);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 4 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(5);
+    expectedPoint[0] = 29.5*0.5;
+    expectedPoint[1] = -0.5*0.33;
+    expectedPoint[2] = 19.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 5 as expected  ");
+    point =  geometry->GetCornerPointInWorld(false,true,false);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 5 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(6);
+    expectedPoint[0] = 29.5*0.5;
+    expectedPoint[1] = 24.5*0.33;
+    expectedPoint[2] = -0.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 6 as expected  ");
+    point =  geometry->GetCornerPointInWorld(false,false,true);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 6 as expected ");
+
+    point =  geometry->GetCornerPointInWorld(7);
+    expectedPoint[0] = 29.5*0.5;
+    expectedPoint[1] = 24.5*0.33;
+    expectedPoint[2] = 19.5*0.78;
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 7 as expected  ");
+    point =  geometry->GetCornerPointInWorld(false,false,false);
+    MITK_TEST_CONDITION(mitk::Equal(expectedPoint, point), "Bounding Point 7 as expected ");
+  }
+
+  void CheckLength_Image_AsExpected(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    double dimension = geometry->GetDiagonalLengthInWorld();
+    MITK_TEST_CONDITION(mitk::Equal(dimension,23.160796233014466 ), "Length  as expected ");
+
+    dimension = geometry->GetDiagonalLength2InWorld();
+    MITK_TEST_CONDITION(mitk::Equal(dimension,536.42248214721712 ), "Square length as expected ");
+  }
+
+  void CheckPointInside_ImagePointInside_True(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    mitk::Point3D expectedPoint;
+
+    expectedPoint[0] = 10;
+    expectedPoint[1] = 5;
+    expectedPoint[2] = 5;
+    bool isInside =  geometry->IsWorldPointInside(expectedPoint);
+    MITK_TEST_CONDITION(isInside, "Point is inside Image...");
+  }
+
+  void CheckPointInside_ImagePointOutside_False(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    mitk::Point3D expectedPoint;
+
+    expectedPoint[0] = 100;
+    expectedPoint[1] = 500;
+    expectedPoint[2] = 500;
+    bool isInside =  geometry->IsWorldPointInside(expectedPoint);
+    MITK_TEST_CONDITION(!isInside, "Point is outside Image...");
+  }
+
+  void CheckBounds_Image_AsSet(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
+    bool isEqual = true;
+    isEqual = isEqual && mitk::Equal(bound[0], -0.5*0.5);
+    isEqual = isEqual && mitk::Equal(bound[1], 29.5*0.5);
+    isEqual = isEqual && mitk::Equal(bound[2], -0.5*0.33);
+    isEqual = isEqual && mitk::Equal(bound[3], 24.5*0.33);
+    isEqual = isEqual && mitk::Equal(bound[4], -0.5*0.78);
+    isEqual = isEqual && mitk::Equal(bound[5], 19.5*0.78);
+
+    MITK_TEST_CONDITION(isEqual, "Bounds as precalculated...");
+  }
+
+  void CheckExtent_Image_AsSet(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  {
+    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
+    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+
+    mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
+    bool isEqual = true;
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), 30*0.5);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), 25*0.33);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(2), 20*0.78);
+
+    MITK_TEST_CONDITION(isEqual, "Extent as precalculated...");
   }
 };
 
@@ -356,7 +616,18 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(30,25,20,1);
   testClass.TimePointToTimeStep_ImageValidTimePoint_TimePoint(30,25,20,1);
   testClass.GetGeometryForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
-  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_CorrectGeometry(30,25,20,1);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(30,25,20,1);
+  testClass.GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
+  testClass.Expand_ImageDoubleSize_SizeChanged(30,25,20,1);
+  testClass.CheckBounds_Image_PointsAsExpected(30,25,20,1);
+  testClass.CheckLength_Image_AsExpected(30,25,20,1);
+  testClass.CheckPointInside_ImagePointInside_True(30,25,20,1);
+  testClass.CheckPointInside_ImagePointOutside_False(30,25,20,1);
+  testClass.CheckBounds_Image_AsSet(30,25,20,1);
+  testClass.CheckExtent_Image_AsSet(30,25,20,1);
 
 /*
 
@@ -387,7 +658,20 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.TimePointToTimeStep_4DImageInvalidTimePoint_TimePoint(30,25,20,5);
   testClass.TimePointToTimeStep_4DImageNegativInvalidTimePoint_TimePoint(30,25,20,5);
   testClass.GetGeometryForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
-  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_CorrectGeometry(30,25,20,5);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,5);
+  testClass.GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(30,25,20,5);
+  testClass.GetGeometryForTimePoint_4DImageInvalidTimePoint_NullPointer(30,25,20,5);
+  testClass.GetGeometryForTimePoint_4DImageNEgativInvalidTimePoint_NullPointer(30,25,20,5);
+  testClass.GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,5);
+  testClass.SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
+  testClass.Expand_ImageDoubleSize_SizeChanged(30,25,20,5);
+  testClass.CheckBounds_Image_PointsAsExpected(30,25,20,5);
+  testClass.CheckLength_Image_AsExpected(30,25,20,5);
+  testClass.CheckPointInside_ImagePointInside_True(30,25,20,5);
+  testClass.CheckPointInside_ImagePointOutside_False(30,25,20,5);
+  testClass.CheckBounds_Image_AsSet(30,25,20,5);
+  testClass.CheckExtent_Image_AsSet(30,25,20,5);
 
 /*
 

@@ -61,8 +61,8 @@ bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 mitk::ScalarType mitk::Cylinder::GetVolume()
 {
   TimeGeometry* geometry = GetTimeGeometry();
-  return   geometry->GetExtendInWorld(0) * 0.5
-    * geometry->GetExtendInWorld(2) * 0.5
+  return   geometry->GetExtentInWorld(0) * 0.5
+    * geometry->GetExtentInWorld(2) * 0.5
     * vnl_math::pi
-    * geometry->GetExtendInWorld(1);
+    * geometry->GetExtentInWorld(1);
 }

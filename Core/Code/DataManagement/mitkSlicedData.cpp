@@ -338,6 +338,7 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
       slicedGeometry->SetSpacing(aSpacing);
     }
   }
+  timeGeometry->Update();
 }
 
 

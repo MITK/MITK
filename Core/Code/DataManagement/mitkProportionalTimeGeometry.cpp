@@ -107,7 +107,9 @@ mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimePoint(TimePo
 
 mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
 {
-    return m_GeometryVector[timeStep].GetPointer();
+  if (timeStep > m_GeometryVector.size())
+    return 0;
+  return m_GeometryVector[timeStep]->Clone();
 }
 
 bool mitk::ProportionalTimeGeometry::IsValid()

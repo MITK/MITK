@@ -91,7 +91,7 @@ double mitk::TimeGeometry::GetDiagonalLength2InWorld() const
   return diagonalvector.GetSquaredNorm();
 }
 
-double mitk::TimeGeometry::GetDiagonalLengthinWorld() const
+double mitk::TimeGeometry::GetDiagonalLengthInWorld() const
 {
   return sqrt(GetDiagonalLength2InWorld());
 }
@@ -130,7 +130,7 @@ void mitk::TimeGeometry::UpdateBoundingBox ()
 
 }
 
-mitk::ScalarType mitk::TimeGeometry::GetExtendInWorld (unsigned int direction) const
+mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld (unsigned int direction) const
 {
   assert(direction < 3);
   assert(m_BoundingBox.IsNotNull());

@@ -47,8 +47,14 @@ namespace mitk {
   /**
   * \brief Manages the geometries of a data object for each time step
   *
-  * For each time step a geometry object is kept, which defines
-  * the position and transformation of the BasicObject.
+  * This class is an abstract class. The concrete implementation
+  * depends on the way the different time steps are managed.
+  *
+  * The time is defined either by a time step or a time point. Time steps
+  * are non-negativ integers starting from 0. A time point is is an float value
+  * which gives the passed time since start in ms. Be aware that the starting
+  * point is not fixed so it is possible that the same time point  defines two
+  * different time depending on the start time of the used time geometry.
   */
   class MITK_CORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
   {
@@ -64,18 +70,30 @@ namespace mitk {
 
   public:
     mitkClassMacro(TimeGeometry, itk::Object);
-
+    itkCloneMacro(Self);
 
     /**
     * \brief Returns the number of time steps.
+    *
+    * Returns the number of time steps for which
+    * geometries are saved. The number of time steps
+    * is also the upper bound of the time steps. The
+    * minimum time steps is always 0.
     */
     virtual TimeStepType     GetNumberOfTimeSteps() const = 0;
     /**
     * \brief Returns the first time point for which the object is valid.
+    *
+    * Returns the first valid time point for this geometry. If only one
+    * time steps available it usually goes from -max to +max. The time point
+    * is given in ms.
     */
     virtual TimePointType    GetMinimumTimePoint () const = 0;
     /**
     * \brief Returns the last time point for which the object is valid
+    *
+    * Gives the last time point for which a valid geometrie is saved in
+    * this time geometry. The time point is given in ms.
     */
     virtual TimePointType    GetMaximumTimePoint () const = 0;
 
@@ -85,46 +103,80 @@ namespace mitk {
     virtual TimeBounds GetTimeBounds( ) const = 0;
     /**
     * \brief Tests if a given time point is covered by this object
+    *
+    * Returns true if a geometry can be returned for the given time
+    * point and falls if not. The time point must be given in ms.
     */
     virtual bool IsValidTimePoint (TimePointType timePoint) const = 0;
     /**
     * \brief Test for the given time step if a geometry is availible
+    *
+    * Returns true if a geometry is defined for the given time step.
+    * Otherwise false is returned.
+    * The time step is defined as positiv number.
     */
     virtual bool IsValidTimeStep  (TimeStepType timeStep) const = 0;
 
     /**
     * \brief Converts a time step to a time point
     *
-    * Wenn keine gültige Zeit wird theoretischer Puntk berechnet
+    * Converts a time step to a time point in a way that
+    * the new time point indicates the same geometry as the time step.
+    * If the original time steps does not point to a valid geometry,
+    * a time point is calculated that also does not point to a valid
+    * geometry, but no exception is raised.
     */
     virtual TimePointType  TimeStepToTimePoint (TimeStepType timeStep) const = 0;
     /**
     * \brief Converts a time point to the corresponding time step
     *
-    * Wenn negative invalide Zeit Zeitschritt gleich 0
-    * wenn positive invalide Zeit virtueller Zeitschritt
+    * Converts a time point to a time step in a way that
+    * the new time step indicates the same geometry as the time point.
+    * If a negativ invalid time point is given always time step 0 is
+    * returned. If an positiv invalid time step is given an invalid
+    * time step will be returned.
     */
     virtual TimeStepType   TimePointToTimeStep (TimePointType timePoint) const = 0;
 
     /**
     * \brief Returns the geometry of a specific time point
     *
-    * Kann, aber muss keine tatsaechliche Variante sein
+    * Returns the geometry which defines the given time point. If
+    * the given time point is invalid an null-pointer is returned.
+    *
+    * The pointer to the returned geometry may point to the saved
+    * geometry but this is not necessarily the case. So a change to
+    * the returned geometry may or may not afflict the geometry for the
+    * time point or all time points depending on the used implementation
+    * of TimeGeometry.
     */
     virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
     * \brief Returns the geometry which corresponds to the given time step
+    *
+    * Returns the geometry which defines the given time step. If
+    * the given time step is invalid an null-pointer is returned.
+    *
+    * The pointer to the returned geometry may point to the saved
+    * geometry but this is not necessarily the case. So a change to
+    * the returned geometry may or may not afflict the geometry for the
+    * time step or all time steps depending on the used implementation
+    * of TimeGeometry.
     */
     virtual Geometry3D* GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
 
     /**
     * \brief Returns a clone of the geometry of a specific time point
     *
-    * Invalid time steps returns a null-pointer
+    * If an invalid time step is given (e.g. no geometry is defined for this time step)
+    * a null-pointer will be returned.
     */
     virtual Geometry3D::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
     /**
     * \brief Sets the geometry for a given time step
+    *
+    * Sets the geometry for the given time steps. This may also afflects other
+    * time steps, depending on the implementation of TimeGeometry.
     */
     virtual void SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep) = 0;
 
@@ -168,7 +220,7 @@ namespace mitk {
     /**
     * \brief Get the length of the diagonal of the bounding-box in mm
     */
-    double GetDiagonalLengthinWorld() const;
+    double GetDiagonalLengthInWorld() const;
 
     /**
     * \brief Test whether the point \a p (world coordinates in mm) is inside the bounding box
@@ -203,7 +255,7 @@ namespace mitk {
     /**
     * \brief Returns the Extend of the bounding in the given direction
     */
-    ScalarType GetExtendInWorld (unsigned int direction) const;
+    ScalarType GetExtentInWorld (unsigned int direction) const;
 
     /**
     * \brief Makes a deep copy of the current object

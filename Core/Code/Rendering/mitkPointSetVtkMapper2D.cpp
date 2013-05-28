@@ -406,7 +406,10 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastP);
 
       pointsOnSameSideOfPlane = (distance * lastDistance) > 0.5;
-      if ( !pointsOnSameSideOfPlane ) // points on different sides of plane -> draw it
+
+      // Points must be on different side of plane in order to draw a contour.
+      // If "show distant lines" is enabled this condition is disregarded.
+      if ( !pointsOnSameSideOfPlane || m_ShowDistantLines)
       {
         vtkSmartPointer<vtkLine> line = vtkSmartPointer<vtkLine>::New();
 

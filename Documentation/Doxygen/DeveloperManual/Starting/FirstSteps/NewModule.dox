@@ -1,4 +1,72 @@
 /**
 \page NewModulePage How to create a new MITK Module
  
+
+\subsection CreateFolder Create File Structure
+
+Create a folder for your module within /Modules  e.g. 'NewModule' and add it to the CMakeLists.txt
+
+\code
+set(module_dirs
+    ...
+    NewModule
+)
+\endcode
+
+
+Within your module create the following files:
+
+
+CMakeLists.txt:
+\code
+MITK_CREATE_MODULE(NewModule #<-- module name
+  SUBPROJECTS
+  INCLUDE_DIRS NewModuleFilters NewModuleServices #<-- sub-folders of module
+  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
+  DEPENDS Mitk #<-- modules on which your module depends on
+)
+
+## create US config
+CONFIGURE_FILE(mitkNewModuleConfig.h.in ${PROJECT_BINARY_DIR}/mitkNewModuleConfig.h @ONLY)
+
+ADD_SUBDIRECTORY(Testing) #
+\endcode
+
+Create empty mitkNewModuleConfig.h.in (?? why ?? )
+
+files.cmake referencing to the source files.
+
+\code
+SET(CPP_FILES
+  NewModuleFilters/File1.cpp
+  NewModuleFilters/File2.cpp
+
+  NewModuleServices/Filter1.cpp
+)
+\endcode
+
+
+Testing: Set up your test as usual in Mitk:
+
+Testing/files.cmake
+\code
+SET(MODULE_TESTS
+   mitkNewModuleTest.cpp
+)
+
+SET(MODULE_CUSTOM_TESTS
+  mitkNewModuleTestCustomTest.cpp # custom test with special input parameters
+)
+\endcode
+
+
+Testing/CMakeLists.txt
+\code
+MITK_CREATE_MODULE_TESTS()
+if(BUILD_TESTING AND MODULE_IS_ENABLED)
+  mitkAddCustomModuleTest(mitkNewModuleTestName mitkNewModuleTest ${MITK_DATA_DIR}/CommonTestData/graph.txt
+)
+endif()
+\endcode
+
 */

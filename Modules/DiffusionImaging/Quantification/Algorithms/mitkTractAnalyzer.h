@@ -14,21 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-/*===================================================================
 
-This file is based heavily on a corresponding ITK filter.
-
-===================================================================*/
 #ifndef __mitkTractAnalyzer_h_
 #define __mitkTractAnalyzer_h_
 
-#include "FiberTrackingExports.h"
+#include "QuantificationExports.h"
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include "mitkImage.h"
 #include "mitkImageCast.h"
 
-//#include <mitkTbssImage.h>
+#include <mitkTbssRoiImage.h>
+#include <mitkPointSet.h>
 
 
 namespace mitk{
@@ -36,7 +33,7 @@ namespace mitk{
  */
 
 
-class FiberTracking_EXPORT TractAnalyzer
+class Quantification_EXPORT TractAnalyzer
 {
 
 public:
@@ -50,50 +47,39 @@ public:
   typedef itk::Image<float,4> ProjectionsImageType;
   typedef itk::VectorImage<float, 3> VectorImageType;
 
+  void BuildGraph();
 
 
-  void SetProjections(ProjectionsImageType::Pointer projections)
-  {
-    m_Projections = projections;
-  }
-
-  void BuildGraph(itk::Index<3> startPoint, itk::Index<3> endPoint);
-
+ /*
   std::vector< itk::Index<3> > GetPath()
   {
     return m_Path;
   }
 
-  void SetFileName(std::string fname)
-  {
-    m_FileName = fname;
-  }
-
-  void SetFileNameLong(std::string fname)
-  {
-    m_FileNameLong = fname;
-  }
-
-  void SetRoi(std::vector< itk::Index<3> > roi)
-  {
-    m_Roi = roi;
-  }
 
   CharImageType::Pointer GetRoiImage()
   {
     return m_RoiImg;
   }
 
-  void SetGroups(std::vector< std::pair<std::string, int> > groups)
+
+
+*/
+
+  mitk::TbssRoiImage::Pointer GetRoiImage()
   {
-    m_Groups = groups;
+    return m_TbssRoi;
   }
 
-  void MeasureRoi();
 
   void SetInputImage(mitk::Image::Pointer inputImage)
   {
     m_InputImage = inputImage;
+  }
+
+  void SetPointSet(mitk::PointSet::Pointer pointSet)
+  {
+    m_PointSetNode = pointSet;
   }
 
 
@@ -102,26 +88,33 @@ public:
     m_Threshold = threshold;
   }
 
+  std::string GetPathDescription()
+  {
+    return m_PathDescription;
+  }
 
 protected:
 
 
-  CharImageType::Pointer m_RoiImg;
-  ProjectionsImageType::Pointer m_Projections;
+
+  std::vector< itk::Index<3> > CreateSegment(itk::Index<3> startPoint, itk::Index<3> endPoint);
+
+
+  mitk::TbssRoiImage::Pointer m_TbssRoi;
+
+  //CharImageType::Pointer m_RoiImg;
 
   mitk::Image::Pointer m_InputImage;
 
   double m_Threshold;
 
-  std::vector< itk::Index<3> > m_Path;
+  //std::vector< itk::Index<3> > m_Path;
 
-  std::string m_FileName;
+  mitk::PointSet::Pointer m_PointSetNode;
 
-  std::string m_FileNameLong; // For the regression analysis 'friendly' file
+  std::string m_PathDescription;
 
-  std::vector< std::pair<std::string, int> > m_Groups;
 
-  std::vector< itk::Index<3> > m_Roi;
 
 private:
 
@@ -130,4 +123,3 @@ private:
 }
 
 #endif //__itkTractAnalyzer_h_
-

@@ -24,8 +24,6 @@ set(CPP_FILES
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
-  # Algorithms
-  Algorithms/mitkTractAnalyzer.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp

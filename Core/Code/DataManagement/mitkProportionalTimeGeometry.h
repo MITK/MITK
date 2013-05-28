@@ -37,8 +37,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   /**
-  * \brief la
+  * \brief Organizes geometries over proportional time steps
   *
+  * For this TimeGeometry implementation it is assumed that
+  * the durations of the time steps are equidistant, e.g.
+  * the durations of the time steps in one ProportionalTimeGeometry
+  * are the same. The geometries of the time steps are independent,
+  * and not linked to each other. Since the timeBounds of the
+  * geometries are different for each time step it is not possible
+  * to set the same geometry to different time steps. Instead
+  * copies should be used.
   *
   * \addtogroup geometry
   */

@@ -36,11 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-//  typedef itk::BoundingBox<unsigned long, 3, double>   BoundingBox;
-//  typedef itk::FixedArray<ScalarType,2>                TimeBounds;
-
-
-//  typedef unsigned long TimePointType;
   typedef float         TimePointType;
   typedef std::size_t   TimeStepType;
 
@@ -55,6 +50,8 @@ namespace mitk {
   * which gives the passed time since start in ms. Be aware that the starting
   * point is not fixed so it is possible that the same time point  defines two
   * different time depending on the start time of the used time geometry.
+  *
+  * \addtogroup geometry
   */
   class MITK_CORE_EXPORT TimeGeometry : public itk::Object, public OperationActor
   {

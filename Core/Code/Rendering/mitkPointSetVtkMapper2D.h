@@ -182,11 +182,15 @@ namespace mitk {
     /* destructor */
     virtual ~PointSetVtkMapper2D();
 
-    /* applies the color and opacity properties and calls CreateVTKRenderObjects */
+    /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    /* toggles visiblity of the propassembly */
+    /* \brief Toggles visiblity of the propassembly */
     virtual void ResetMapper( BaseRenderer* renderer );
-    /* fills the vtk objects */
+    /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
+    * This function iterates over the input point set and uses a specific shape defined in vtk glyph source
+    * to mark each point. The glyphs need to be rotated in the 2D- render windows
+    * in order to be ortogonal to the view vector. Therefore, the rotation of the current PlaneGeometry is
+    * used to determine the appropriate orienation of the glyphs. */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer* renderer);
 
     // properties

@@ -99,7 +99,9 @@ to add additional Interactors/Listeners.
 
 \subsection QVTKRendering_userGuideMapper How to write your own Mapper
 
-If you want to write your own mapper, you first need to decide whether you want to write a VTK-based mapper or a GL-based mapper. However, you need to derive from the respective classes.
+If you want to write your own mapper, you first need to decide whether you want to write a VTK-based mapper or a GL-based mapper. 
+We recommend  to write a VTK-based mapper, as VTK is easy to learn and some GL-based mappers can have unexpected site effects. 
+However, you need to derive from the respective classes.
 
 In the following we provide some programming hints for writing a Vtk-based mapper:
 

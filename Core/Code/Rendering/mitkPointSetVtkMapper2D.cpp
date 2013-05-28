@@ -634,9 +634,9 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
   node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
-  mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("glyph type", renderer));
+  mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("Pointset.2D.shape", renderer));
   m_IdGlyph = eP->GetValueAsId();
-  node->GetBoolProperty("fill glyphs",        m_FillGlyphs, renderer);
+  node->GetBoolProperty("Pointset.2D.fill shape", m_FillGlyphs, renderer);
 
 
   //check for color props and use it for rendering of selected/unselected points and contour
@@ -757,9 +757,9 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   glyphType->AddEnum("ThickArrow", 10);
   glyphType->AddEnum("HookedArrow", 11);
   glyphType->SetValue("Cross");
-  node->AddProperty( "glyph type", glyphType, renderer, overwrite);
+  node->AddProperty( "Pointset.2D.shape", glyphType, renderer, overwrite);
 
-  node->AddProperty("fill glyphs", mitk::BoolProperty::New(false), renderer, overwrite); // fill or do not fill the glyph shape
+  node->AddProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(false), renderer, overwrite); // fill or do not fill the glyph shape
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

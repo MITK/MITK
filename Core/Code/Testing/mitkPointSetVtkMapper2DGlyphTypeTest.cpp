@@ -38,7 +38,7 @@ int mitkPointSetVtkMapper2DGlyphTypeTest(int argc, char* argv[])
 
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::ViewDirection::Sagittal);
 
-  mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"))->GetProperty("glyph type"));
+  mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"))->GetProperty("Pointset.2D.shape"));
   // render triangles instead of crosses
   eP->SetValue(5);
 

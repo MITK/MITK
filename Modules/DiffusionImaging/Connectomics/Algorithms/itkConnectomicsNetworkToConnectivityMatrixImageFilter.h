@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-  class ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
+  class ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< double, 2 > >
   {
 
   public:
@@ -36,7 +36,7 @@ namespace itk
     typedef SmartPointer< Self > Pointer;
     typedef SmartPointer< const Self > ConstPointer;
 
-    typedef itk::Image< unsigned short, 2 > OutputImageType;
+    typedef itk::Image< double, 2 > OutputImageType;
     typedef OutputImageType::PixelType OutPixelType;
 
     typedef mitk::ConnectomicsNetwork  InputType;

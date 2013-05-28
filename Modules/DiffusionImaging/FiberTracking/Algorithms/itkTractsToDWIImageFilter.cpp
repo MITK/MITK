@@ -416,32 +416,31 @@ void TractsToDWIImageFilter::GenerateData()
     double interpFact = 2*atan(-0.5*m_InterpolationShrink);
     double maxVolume = 0;
 
-    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
-
     MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
         ++disp;
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+
+        vtkCell* cell = fiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
         if (numPoints<2)
             continue;
 
         for( int j=0; j<numPoints; j++)
         {
-            double* temp = fiberPolyData->GetPoint(points[j]);
+            double* temp = points->GetPoint(j);
             itk::Point<float, 3> vertex = GetItkPoint(temp);
             itk::Vector<double> v = GetItkVector(temp);
 
             itk::Vector<double, 3> dir(3);
             if (j<numPoints-1)
-                dir = GetItkVector(fiberPolyData->GetPoint(points[j+1]))-v;
+                dir = GetItkVector(points->GetPoint(j+1))-v;
             else
-                dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
+                dir = v-GetItkVector(points->GetPoint(j-1));
 
             itk::Index<3> idx;
             itk::ContinuousIndex<float, 3> contIndex;

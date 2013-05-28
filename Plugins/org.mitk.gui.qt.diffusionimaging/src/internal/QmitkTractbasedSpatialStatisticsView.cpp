@@ -1147,26 +1147,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
   mitk::Image::Pointer image;
 
-  /*
-  for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-    i != m_CurrentSelection->End(); ++i)
-  {
-    // extract datatree node
-    if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-    {
-      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-
-      if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
-      {
-        mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
-        if(img->GetDimension() == 3)
-        {
-          image = img;
-        }
-      }
-    }
-  }
-  */
 
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
@@ -1193,119 +1173,27 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   analyzer.SetInputImage(image);
   analyzer.SetThreshold(threshold);
 
+  // Set Pointset to analyzer
+  analyzer.SetPointSet(m_PointSetNode);
+
+  // Run Analyzer
+  analyzer.BuildGraph();
+
+  // Obtain tbss roi image from analyzer
+  mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();
+
+  tbssRoi->SetStructure(m_Controls->m_Structure->text().toStdString());
+
+  // get path description and set to interface
+  std::string pathDescription = analyzer.GetPathDescription();
+  m_Controls->m_PathTextEdit->setPlainText(QString(pathDescription.c_str()));
 
 
-  int n = 0;
-  if(m_PointSetNode.IsNotNull())
-  {
-    n = m_PointSetNode->GetSize();
-    if(n==0)
-    {
-      QMessageBox msgBox;
-      msgBox.setText("No points have been set yet.");
-      msgBox.exec();
-    }
-  }
-  else{
-    QMessageBox msgBox;
-    msgBox.setText("No points have been set yet.");
-    msgBox.exec();
-  }
-
-  std::string pathDescription = "";
-  std::vector< itk::Index<3> > totalPath;
-
-  if(n>0)
-  {
-    for(int i=0; i<n-1; ++i)
-    {
-      mitk::Point3D p = m_PointSetNode->GetPoint(i);
-      mitk::Point3D p2 = m_PointSetNode->GetPoint(i+1);
-
-
-      itk::Index<3> StartPoint; mitk::ProgressBar::GetInstance()->Progress();
-
-      itk::Index<3> EndPoint;
-      image->GetGeometry()->WorldToIndex(p,StartPoint);
-      image->GetGeometry()->WorldToIndex(p2,EndPoint);
-      MITK_INFO << "create roi";
-
-
-      analyzer.BuildGraph(StartPoint, EndPoint);
-      std::vector< itk::Index<3> > path = analyzer.GetPath();
-
-
-      for(std::vector< itk::Index<3> >::iterator it = path.begin();
-          it != path.end(); it++)
-      {
-        itk::Index<3> ix = *it;
-
-        if (!(ix==EndPoint))
-        { mitk::ProgressBar::GetInstance()->Progress();
-
-          totalPath.push_back(ix);
-          std::stringstream ss;
-          ss << ix[0] << " " << ix[1] << " " << ix[2] << "\n";
-          pathDescription += ss.str();
-        }
-        else
-        {
-          // Only when dealing with the last segment the last point should be added. This one will not occur
-          // as the first point of the next roi segment.
-          if(i == (n-2))
-          {
-            totalPath.push_back(EndPoint);
-            std::stringstream ss;
-            ss << EndPoint[0] << " " << EndPoint[1] << " " << EndPoint[2] << "\n";
-            pathDescription += ss.str();
-          }
-
-        }
-      }
+  // Add roi image to datastorage
+  AddTbssToDataStorage(tbssRoi, m_Controls->m_RoiName->text().toStdString());
 
 
 
-    }
-
-    m_Controls->m_PathTextEdit->setPlainText(QString(pathDescription.c_str()));
-
-
-    FloatImageType::Pointer itkImg = FloatImageType::New();
-    mitk::CastToItkImage(image, itkImg);
-
-    CharImageType::Pointer roiImg = CharImageType::New();
-    roiImg->SetRegions(itkImg->GetLargestPossibleRegion().GetSize());
-    roiImg->SetOrigin(itkImg->GetOrigin());
-    roiImg->SetSpacing(itkImg->GetSpacing());
-    roiImg->SetDirection(itkImg->GetDirection());
-    roiImg->Allocate();
-    roiImg->FillBuffer(0);
-
-
-    std::vector< itk::Index<3> > roi;
-
-    std::vector< itk::Index<3> >::iterator it;
-    for(it = totalPath.begin();
-        it != totalPath.end();
-        it++)
-    {
-      itk::Index<3> ix = *it;
-      roiImg->SetPixel(ix, 1);
-      roi.push_back(ix);
-    }
-
-
-    mitk::TbssRoiImage::Pointer tbssRoi = mitk::TbssRoiImage::New();
-
-    tbssRoi->SetRoi(roi);
-    tbssRoi->SetImage(roiImg);
-    tbssRoi->SetStructure(m_Controls->m_Structure->text().toStdString());
-    tbssRoi->InitializeFromImage();
-
-    AddTbssToDataStorage(tbssRoi, m_Controls->m_RoiName->text().toStdString());
-
-
-  }
 
 }
 

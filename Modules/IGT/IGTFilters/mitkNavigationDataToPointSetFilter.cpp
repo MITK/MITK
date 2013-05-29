@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataToPointSetFilter::NavigationDataToPointSetFilter()
 {
+  mitk::PointSet::Pointer output = mitk::PointSet::New();
+  this->SetNumberOfRequiredOutputs(1);
+  this->SetNthOutput(0, output.GetPointer());
 
   this->SetNumberOfRequiredInputs(1);
 
@@ -91,19 +94,19 @@ void mitk::NavigationDataToPointSetFilter::CreateOutputsForAllInputs()
   switch (m_OperationMode)
   {
   case Mode3D:
-    this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create one pointset output for each navigation data input
+    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create one pointset output for each navigation data input
     break;
   case Mode3DMean:
-    this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create one pointset output for each navigation data input
+    this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create one pointset output for each navigation data input
     break;
   case Mode4D:
-    this->SetNumberOfOutputs(1); // create just one output pointset that will contain all input navigation data objects
+    this->SetNumberOfIndexedOutputs(1); // create just one output pointset that will contain all input navigation data objects
     break;
   default:
     break;
   }
 
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
@@ -115,7 +118,7 @@ void mitk::NavigationDataToPointSetFilter::CreateOutputsForAllInputs()
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
 {
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)  // for each output PointSet
   {
     mitk::PointSet* output = this->GetOutput(i);
     assert(output);
@@ -137,17 +140,17 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   //make it editable through a Set method if needed
 
   //check for outputs and inputs
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
   {
     assert(this->GetOutput(i));
     assert(this->GetInput(i));
   }
 
   //vector of counters for each output
-  std::vector<unsigned int> counterVec(this->GetNumberOfOutputs(),0);
+  std::vector<unsigned int> counterVec(this->GetNumberOfIndexedOutputs(),0);
 
   //vector of old timesteps for each output
-  std::vector<mitk::NavigationData::TimeStampType> vectorOldTime(this->GetNumberOfOutputs());
+  std::vector<mitk::NavigationData::TimeStampType> vectorOldTime(this->GetNumberOfIndexedOutputs());
 
   //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
   mitk::PointSet::PointIdentifier newPointId = this->GetOutput()->GetSize();
@@ -155,7 +158,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   bool numberForMean_is_reached = false;
   while (!numberForMean_is_reached)
   {
-    for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+    for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
     {
         mitk::PointSet* output = this->GetOutput(i);
         const mitk::NavigationData* input = this->GetInput(i);
@@ -196,7 +199,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
         // \TODO: regard ringbuffersize
     }
     numberForMean_is_reached = true;
-    for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+    for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
     {
       if (counterVec[i]<m_NumberForMean)
         numberForMean_is_reached = false;
@@ -205,7 +208,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   }
 
   //divide with counterVec
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
   {
     mitk::PointSet* output = this->GetOutput(i);
     mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
@@ -220,7 +223,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {
   mitk::PointSet* output = this->GetOutput();
   assert(output);
-  for (unsigned int index = 0; index < this->GetNumberOfInputs(); index++)
+  for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
     const mitk::NavigationData* nd = GetInput(index);
     assert(nd);

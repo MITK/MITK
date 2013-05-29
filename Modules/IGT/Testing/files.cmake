@@ -14,7 +14,7 @@ set(MODULE_TESTS
    mitkNavigationDataSourceTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
-   # mitkNavigationDataToPointSetFilterTest.cpp commented out because of bug 15022
+   mitkNavigationDataToPointSetFilterTest.cpp
    # mitkNavigationDataTransformFilterTest.cpp commented out because of bug 15023
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
@@ -24,7 +24,7 @@ set(MODULE_TESTS
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
    mitkVirtualTrackingDeviceTest.cpp
-   mitkNavigationDataPlayerTest.cpp # see bug 11636
+   mitkNavigationDataPlayerTest.cpp # see bug 11636 (extend this test by microservices)
    mitkTrackingDeviceSourceTest.cpp
    mitkTrackingDeviceSourceConfiguratorTest.cpp
    mitkNavigationDataEvaluationFilterTest.cpp

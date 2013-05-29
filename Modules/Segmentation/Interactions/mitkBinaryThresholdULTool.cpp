@@ -213,6 +213,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
         }
 
         m_ToolManager->SetWorkingData( emptySegmentation );
+        m_ToolManager->GetWorkingData(0)->Modified();
       }
     }
   }

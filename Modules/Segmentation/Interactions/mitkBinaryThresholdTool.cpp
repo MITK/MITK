@@ -154,7 +154,8 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
       if (DataStorage* storage = m_ToolManager->GetDataStorage())
       {
         if (storage->Exists(m_ThresholdFeedbackNode))
-          storage->Remove(m_ThresholdFeedbackNode);
+           storage->Remove(m_ThresholdFeedbackNode);
+
         storage->Add( m_ThresholdFeedbackNode, m_OriginalImageNode );
       }
 
@@ -192,7 +193,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
 
   if (node)
   {
-    Image::Pointer image = dynamic_cast<Image*>( m_NodeForThresholding->GetData() );
+    Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNotNull())
     {
       DataNode::Pointer emptySegmentation = m_ToolManager->GetWorkingData(0);
@@ -240,6 +241,8 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
         }
 
         m_ToolManager->SetWorkingData( emptySegmentation );
+        m_ToolManager->GetWorkingData(0)->Modified();
+
       }
     }
   }

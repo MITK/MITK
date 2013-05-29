@@ -310,10 +310,9 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation match expection. ");
   }
 
-  void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
-    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT+1);
     MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned");
   }
@@ -385,10 +384,9 @@ public:
     MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint), "Geometry transformation not changed. ");
   }
 
-  void GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(mitk::BaseData* baseData, unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
-    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
     mitk::Geometry3D::Pointer geometry3D = geometry->GetGeometryCloneForTimeStep(DimT+1);
     MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned");
   }
@@ -563,18 +561,42 @@ public:
     MITK_TEST_CONDITION(isEqual, "Bounds as precalculated...");
   }
 
-  void CheckExtent_Image_AsSet(unsigned int DimX, unsigned int DimY, unsigned int DimZ, unsigned int DimT)
+  void CheckExtent_BaseData_AsSet(mitk::BaseData* baseData, double extentX, double extentY, double extentZ)
   {
-    mitk::Image::Pointer image = mitk::ImageGenerator::GenerateRandomImage<float>(DimX, DimY, DimZ, DimT,0.5,0.33,0.78,100);
-    mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
+    mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
 
     mitk::BoundingBox::BoundsArrayType bound =  geometry->GetBoundsInWorld();
     bool isEqual = true;
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), 30*0.5);
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), 25*0.33);
-    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(2), 20*0.78);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(0), extentX);//30*0.5);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(1), extentY);//25*0.33);
+    isEqual = isEqual && mitk::Equal(geometry->GetExtentInWorld(2), extentZ);//20*0.78);
 
     MITK_TEST_CONDITION(isEqual, "Extent as precalculated...");
+  }
+
+  mitk::PointSet::Pointer makePointset()
+  {
+    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+    mitk::Point3D pointA, pointB, pointC;
+    pointA.Fill(1);
+    pointB.Fill(2);
+    pointC.Fill(3);
+    pointSet->SetPoint(1,pointA);
+    pointSet->SetPoint(2,pointB);
+    pointSet->SetPoint(3,pointC);
+    pointSet->Update();
+    MITK_INFO<< pointSet->GetPoint(0);
+    MITK_INFO<< pointSet->GetPoint(1);
+    MITK_INFO<< pointSet->GetPoint(2);
+    MITK_INFO<< pointSet->GetPoint(3);
+
+    mitk::PointSet::Pointer pointSet2 = pointSet->Clone();
+    MITK_INFO<< pointSet2->GetPoint(0);
+    MITK_INFO<< pointSet2->GetPoint(1);
+    MITK_INFO<< pointSet2->GetPoint(2);
+    MITK_INFO<< pointSet2->GetPoint(3);
+
+    return pointSet;
   }
 };
 
@@ -607,10 +629,10 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(image->Clone(), 30,25,20,1);
   testClass.TimePointToTimeStep_ImageValidTimePoint_TimePoint(image->Clone(), 30,25,20,1);
   testClass.GetGeometryForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
-  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,20,1);
   testClass.GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(30,25,20,1);
   testClass.GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
-  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,20,1);
   testClass.SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
   testClass.Expand_ImageDoubleSize_SizeChanged(30,25,20,1);
   testClass.CheckBounds_Image_PointsAsExpected(30,25,20,1);
@@ -618,7 +640,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.CheckPointInside_ImagePointInside_True(30,25,20,1);
   testClass.CheckPointInside_ImagePointOutside_False(30,25,20,1);
   testClass.CheckBounds_Image_AsSet(30,25,20,1);
-  testClass.CheckExtent_Image_AsSet(30,25,20,1);
+  testClass.CheckExtent_BaseData_AsSet(image->Clone(), 30*0.5,25*0.33,20*0.78);
 
 /*
 
@@ -650,12 +672,12 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.TimePointToTimeStep_4DImageInvalidTimePoint_TimePoint(30,25,20,5);
   testClass.TimePointToTimeStep_4DImageNegativInvalidTimePoint_TimePoint(30,25,20,5);
   testClass.GetGeometryForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
-  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,5);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,20,5);
   testClass.GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(30,25,20,5);
   testClass.GetGeometryForTimePoint_4DImageInvalidTimePoint_NullPointer(30,25,20,5);
   testClass.GetGeometryForTimePoint_4DImageNEgativInvalidTimePoint_NullPointer(30,25,20,5);
   testClass.GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
-  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,5);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,20,5);
   testClass.SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(30,25,20,5);
   testClass.Expand_ImageDoubleSize_SizeChanged(30,25,20,5);
   testClass.CheckBounds_Image_PointsAsExpected(30,25,20,5);
@@ -663,7 +685,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.CheckPointInside_ImagePointInside_True(30,25,20,5);
   testClass.CheckPointInside_ImagePointOutside_False(30,25,20,5);
   testClass.CheckBounds_Image_AsSet(30,25,20,5);
-  testClass.CheckExtent_Image_AsSet(30,25,20,5);
+  testClass.CheckExtent_BaseData_AsSet(image->Clone(), 30*0.5,25*0.33,20*0.78);
 
 /*
 
@@ -680,9 +702,9 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   pointA.Fill(1);
   pointB.Fill(2);
   pointC.Fill(3);
-  pointSet->SetPoint(1,pointA);
-  pointSet->SetPoint(2,pointB);
-  pointSet->SetPoint(3,pointC);
+  pointSet->SetPoint(0,pointA);
+  pointSet->SetPoint(1,pointB);
+  pointSet->SetPoint(2,pointC);
   testClass.Translation_Image_MovedOrigin(pointSet->Clone(),30,25,20,1);
   //testClass.Rotate_Image_RotatedPoint(pointSet->Clone(),30,25,20,1);
   //testClass.Scale_Image_ScaledPoint(30,25,20,1);
@@ -698,10 +720,10 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(pointSet->Clone(),30,25,20,1);
   testClass.TimePointToTimeStep_ImageValidTimePoint_TimePoint(pointSet->Clone(),30,25,20,1);
   //testClass.GetGeometryForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
-  //testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(pointSet->Clone(), 30,25,20,1);
   //testClass.GetGeometryForTimePoint_ImageValidTimePoint_CorrectGeometry(30,25,20,1);
   //testClass.GetGeometryCloneForTimeStep_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
-  //testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(30,25,20,1);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(pointSet->Clone(), 30,25,20,1);
   //testClass.SetTimeStepGeometry_ImageValidTimeStep_CorrectGeometry(30,25,20,1);
   //testClass.Expand_ImageDoubleSize_SizeChanged(30,25,20,1);
   //testClass.CheckBounds_Image_PointsAsExpected(30,25,20,1);
@@ -709,7 +731,7 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   //testClass.CheckPointInside_ImagePointInside_True(30,25,20,1);
   //testClass.CheckPointInside_ImagePointOutside_False(30,25,20,1);
   //testClass.CheckBounds_Image_AsSet(30,25,20,1);
-  //testClass.CheckExtent_Image_AsSet(30,25,20,1);
+  testClass.CheckExtent_BaseData_AsSet(pointSet->Clone(),2,2,2 );
 
   MITK_TEST_END();
 

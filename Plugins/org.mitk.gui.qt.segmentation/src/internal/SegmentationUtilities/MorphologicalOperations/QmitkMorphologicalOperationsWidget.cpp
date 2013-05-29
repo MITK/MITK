@@ -15,9 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMorphologicalOperationsWidget.h"
+#include <mitkSliceNavigationController.h>
 
-QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
 }

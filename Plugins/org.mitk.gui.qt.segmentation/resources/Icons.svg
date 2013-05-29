@@ -193,11 +193,11 @@
      borderopacity="0.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="0"
-     inkscape:zoom="2.5274391"
-     inkscape:cx="-131.36924"
-     inkscape:cy="-75.377051"
+     inkscape:zoom="3.5743387"
+     inkscape:cx="-248.8316"
+     inkscape:cy="14.907617"
      inkscape:document-units="px"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer8"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1018"
@@ -1580,6 +1580,110 @@
          id="path4955"
          d="m -97.037608,899.72564 c 1.053535,-7.83495 17.4303,-12.31753 23.208337,-5.65907 4.665289,5.37616 5.313738,21.46326 -2.279392,23.53663 -2.84013,0.77552 -2.97128,-10.19566 -5.284037,-8.61723 -1.784315,1.21777 -6.79947,-1.84848 -8.910347,-5.01601 -1.604756,-2.40805 -7.573523,1.99493 -6.734561,-4.24432 z"
          style="fill:#bf264a;fill-opacity:0.48404254;stroke:#c0264b;stroke-width:1.29999983;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Boolean Difference"
+     sodipodi:insensitive="true">
+    <g
+       transform="translate(-54.972257,-38.513914)"
+       id="g3986-1"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\BooleanDifference_48x48.png"
+       inkscape:export-xdpi="89.07"
+       inkscape:export-ydpi="89.07">
+      <g
+         id="g4014"
+         transform="translate(-6.7261759,37.587454)">
+        <rect
+           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           id="rect3982-7"
+           width="32"
+           height="32"
+           x="-274.9819"
+           y="1022.3405" />
+        <path
+           sodipodi:type="arc"
+           style="fill:#999999;fill-opacity:1;stroke:none"
+           id="path3984-4"
+           sodipodi:cx="-337.49576"
+           sodipodi:cy="985.89172"
+           sodipodi:rx="18.595898"
+           sodipodi:ry="18.595898"
+           d="m -318.89986,985.89172 a 18.595898,18.595898 0 1 1 -37.1918,0 18.595898,18.595898 0 1 1 37.1918,0 z"
+           transform="matrix(0.86040482,0,0,0.86040482,47.623043,174.07452)" />
+      </g>
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer8"
+     inkscape:label="Boolean Union"
+     sodipodi:insensitive="true">
+    <g
+       id="g3986"
+       transform="translate(-3.5367938,-1.3221171)"
+       style="fill:#bf264b;fill-opacity:1"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\BooleanUnion_48x48.png"
+       inkscape:export-xdpi="89.07"
+       inkscape:export-ydpi="89.07">
+      <rect
+         y="1022.3405"
+         x="-274.9819"
+         height="32"
+         width="32"
+         id="rect3982"
+         style="fill:#bf264b;fill-opacity:1;stroke:none" />
+      <path
+         transform="matrix(0.86040482,0,0,0.86040482,47.623043,174.07452)"
+         d="m -318.89986,985.89172 a 18.595898,18.595898 0 1 1 -37.1918,0 18.595898,18.595898 0 1 1 37.1918,0 z"
+         sodipodi:ry="18.595898"
+         sodipodi:rx="18.595898"
+         sodipodi:cy="985.89172"
+         sodipodi:cx="-337.49576"
+         id="path3984"
+         style="fill:#bf264b;fill-opacity:1;stroke:none"
+         sodipodi:type="arc" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer9"
+     inkscape:label="Boolean Intersection"
+     sodipodi:insensitive="true">
+    <g
+       id="g3986-0"
+       transform="translate(-121.4427,-2.9047467)">
+      <g
+         id="g4069"
+         transform="translate(-18.744726,34.691732)"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\BooleanIntersection_48x48.png"
+         inkscape:export-xdpi="89.07"
+         inkscape:export-ydpi="89.07">
+        <rect
+           y="988.70966"
+           x="-256.78168"
+           height="32"
+           width="32"
+           id="rect3982-2"
+           style="fill:#999999;fill-opacity:1;stroke:none" />
+        <path
+           transform="matrix(0.86040482,0,0,0.86040482,65.823282,140.44364)"
+           d="m -318.89986,985.89172 a 18.595898,18.595898 0 1 1 -37.1918,0 18.595898,18.595898 0 1 1 37.1918,0 z"
+           sodipodi:ry="18.595898"
+           sodipodi:rx="18.595898"
+           sodipodi:cy="985.89172"
+           sodipodi:cx="-337.49576"
+           id="path3984-45"
+           style="fill:#999999;fill-opacity:1;stroke:none"
+           sodipodi:type="arc" />
+        <path
+           inkscape:connector-curvature="0"
+           id="rect3982-9"
+           d="m -240.53168,988.70966 c 0,8.7535 7.02819,15.86694 15.75,15.99994 l 0,-15.99994 -15.75,0 z"
+           style="fill:#bf264b;fill-opacity:1;stroke:none" />
+      </g>
     </g>
   </g>
 </svg>

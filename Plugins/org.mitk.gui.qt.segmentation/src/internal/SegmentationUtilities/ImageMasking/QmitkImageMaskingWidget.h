@@ -17,14 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkImageMaskingWidget_h
 #define QmitkImageMaskingWidget_h
 
+#include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
-class QmitkImageMaskingWidget : public QWidget
+class QmitkImageMaskingWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkImageMaskingWidget(QWidget* parent = NULL);
+  explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
   ~QmitkImageMaskingWidget();
 
 private:

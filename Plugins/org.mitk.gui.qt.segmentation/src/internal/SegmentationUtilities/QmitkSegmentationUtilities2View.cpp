@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MorphologicalOperations/QmitkMorphologicalOPerationsWidget.h"
 
 QmitkSegmentationUtilities2View::QmitkSegmentationUtilities2View()
+  : m_BooleanOperationsWidget(NULL),
+    m_ImageMaskingWidget(NULL),
+    m_MorphologicalOperationsWidget(NULL)
 {
 }
 
@@ -31,9 +34,19 @@ void QmitkSegmentationUtilities2View::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 
-  this->AddUtilityWidget(new QmitkBooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
-  this->AddUtilityWidget(new QmitkImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
-  this->AddUtilityWidget(new QmitkMorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+
+  mitk::SliceNavigationController* timeNavigationController = renderWindowPart != NULL
+    ? renderWindowPart->GetTimeNavigationController()
+    : NULL;
+
+  m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(timeNavigationController, parent);
+  m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
+  m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
+
+  this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
+  this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
+  this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
 }
 
 void QmitkSegmentationUtilities2View::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
@@ -44,4 +57,20 @@ void QmitkSegmentationUtilities2View::AddUtilityWidget(QWidget* widget, const QI
 void QmitkSegmentationUtilities2View::SetFocus()
 {
   m_Controls.toolBox->setFocus();
+}
+
+void QmitkSegmentationUtilities2View::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  mitk::SliceNavigationController* timeNavigationController = renderWindowPart->GetTimeNavigationController();
+
+  m_BooleanOperationsWidget->SetTimeNavigationController(timeNavigationController);
+  m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
+  m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
+}
+
+void QmitkSegmentationUtilities2View::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+{
+  m_BooleanOperationsWidget->SetTimeNavigationController(NULL);
+  m_ImageMaskingWidget->SetTimeNavigationController(NULL);
+  m_MorphologicalOperationsWidget->SetTimeNavigationController(NULL);
 }

@@ -15,9 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkImageMaskingWidget.h"
+#include <mitkSliceNavigationController.h>
 
-QmitkImageMaskingWidget::QmitkImageMaskingWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
 }

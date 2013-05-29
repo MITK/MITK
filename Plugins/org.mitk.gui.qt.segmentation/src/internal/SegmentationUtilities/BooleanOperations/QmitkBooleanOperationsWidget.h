@@ -17,20 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkBooleanOperationsWidget_h
 #define QmitkBooleanOperationsWidget_h
 
+#include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
+#include <mitkBooleanOperation.h>
 
-class QmitkBooleanOperationsWidget : public QWidget
+class QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkBooleanOperationsWidget(QWidget* parent = NULL);
+  explicit QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
   ~QmitkBooleanOperationsWidget();
 
 private slots:
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+  void OnDiffernceButtonClicked();
+  void OnIntersectionButtonClicked();
+  void OnUnionButtonClicked();
 
 private:
+  void EnableButtons(bool enable = true);
+  void DoBooleanOperation(mitk::BooleanOperation::Type type);
+
   Ui::QmitkBooleanOperationsWidgetControls m_Controls;
 };
 

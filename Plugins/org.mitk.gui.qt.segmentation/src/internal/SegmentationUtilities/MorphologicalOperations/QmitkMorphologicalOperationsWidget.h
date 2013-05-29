@@ -17,14 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMorphologicalOperationsWidget_h
 #define QmitkMorphologicalOperationsWidget_h
 
+#include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
-class QmitkMorphologicalOperationsWidget : public QWidget
+class QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkMorphologicalOperationsWidget(QWidget* parent = NULL);
+  explicit QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
   ~QmitkMorphologicalOperationsWidget();
 
 private:

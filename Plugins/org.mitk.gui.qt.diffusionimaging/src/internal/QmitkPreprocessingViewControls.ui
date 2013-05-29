@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>892</width>
-    <height>1290</height>
+    <height>1306</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -67,49 +67,17 @@
       <string>Info</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="6" column="0">
+       <widget class="Line" name="line_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="Line" name="line_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string>Show gradients</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="Line" name="line_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QCommandLinkButton" name="m_AdcAverage">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>ADC average (multi-shell)</string>
         </property>
        </widget>
       </item>
@@ -164,6 +132,32 @@
         </property>
        </widget>
       </item>
+      <item row="5" column="0">
+       <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>Show gradients</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QSpinBox" name="m_B_ValueMap_Rounder_SpinBox">
         <property name="enabled">
@@ -186,10 +180,118 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="Line" name="line_5">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_msGroupBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Multiple q-Shell Image Average Methods</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_7">
+      <item>
+       <widget class="QLabel" name="m_msLabel1">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Average multiple q-Shells and create a new diffusion weighted image resulting in one shell.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="m_rbAdc">
+        <property name="text">
+         <string>ADC fit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="m_rbAdcKurtosis">
+        <property name="text">
+         <string>Kurtosis fit</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="m_rbBiExp">
+        <property name="text">
+         <string>Analytical bi-exponential fit (Agnaj 2010)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="m_msLine1">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_useWeightsCheckBox">
+        <property name="text">
+         <string>Weighted (shell weights correspond to the shell information level)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="m_msLine2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="m_msLabel2">
+        <property name="text">
+         <string>Target b-Value</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="m_targetBValue">
+        <property name="toolTip">
+         <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+        </property>
+        <property name="statusTip">
+         <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+        </property>
+        <property name="whatsThis">
+         <string comment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured." extracomment="Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.">Accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a &quot;Merge radius&quot; &gt; 0 is configured.</string>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <double>10000.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_msProcess">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a new Diffusion Weighted Image (DWI) using an ADC average over all q-shells.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Process Image</string>
         </property>
        </widget>
       </item>

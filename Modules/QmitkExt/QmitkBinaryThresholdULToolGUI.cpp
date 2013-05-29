@@ -64,7 +64,7 @@ m_RangeSlider(NULL)
 
   mainLayout->addLayout(layout);
 
-  QPushButton* okButton = new QPushButton("Ok", this);
+  QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
   mainLayout->addWidget( okButton );

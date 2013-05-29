@@ -79,10 +79,10 @@ namespace mitk {
   *   - \b "show angles": (BoolProperty false)         // show or hide angle measurement
   *   - \b "show distant lines": (BoolProperty false)  // show the line between to points from a distant view (equals "always on top" option)
   *   - \b "layer": (IntProperty 1)                    // default is drawing pointset above images (they have a default layer of 0)
-  *   - \b "glyph type" (EnumerationProperty Cross)    // provides different shapes marking a point
+  *   - \b "PointSet.2D.shape" (EnumerationProperty Cross)    // provides different shapes marking a point
   *       0 = "None", 1 = "Vertex", 2 = "Dash", 3 = "Cross", 4 = "ThickCross", 5 = "Triangle", 6 = "Square", 7 = "Circle",
   *       8 = "Diamond", 9 = "Arrow", 10 = "ThickArrow", 11 = "HookedArrow", 12 = "Cross"
-  *   - \b "fill glyphs": (BoolProperty::New(false))   // fill or do not fill the glyph shape
+  *   - \b "PointSet.2D.fill shape": (BoolProperty::New(false))   // fill or do not fill the glyph shape
   *
   *
   * Other Properties used here but not defined in this class:

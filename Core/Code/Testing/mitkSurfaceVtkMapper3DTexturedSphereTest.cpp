@@ -43,7 +43,7 @@ int mitkSurfaceVtkMapper3DTexturedSphereTest(int argc, char* argv[])
     // compare rendering to reference image
     MITK_TEST_BEGIN("mitkSurfaceVtkMapper3DTexturedSphereTest")
 
-    mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
     //This is a test for a 3D surface, thus we need to set the mapper ID to 3D
     renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
 

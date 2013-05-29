@@ -36,20 +36,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 //VTK Testing to compare the rendered image pixel-wise against a reference screen shot
 #include "vtkTesting.h"
 
-mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height)
+mitk::RenderingTestHelper::RenderingTestHelper(int width, int height)
   : m_AutomaticallyCloseRenderWindow(true)
 {
   this->Initialize(width, height);
 }
 
-mitkRenderingTestHelper::mitkRenderingTestHelper(int width, int height, int argc, char* argv[])
+mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, int argc, char* argv[])
   : m_AutomaticallyCloseRenderWindow(true)
 {
   this->Initialize(width, height);
   this->SetInputFileNames(argc, argv);
 }
 
-void mitkRenderingTestHelper::Initialize(int width, int height)
+void mitk::RenderingTestHelper::Initialize(int width, int height)
 {
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
@@ -66,11 +66,11 @@ void mitkRenderingTestHelper::Initialize(int width, int height)
   this->PrintGLInfo();
 }
 
-mitkRenderingTestHelper::~mitkRenderingTestHelper()
+mitk::RenderingTestHelper::~RenderingTestHelper()
 {
 }
 
-void mitkRenderingTestHelper::PrintGLInfo()
+void mitk::RenderingTestHelper::PrintGLInfo()
 {
   GLint maxTextureSize;
 
@@ -84,22 +84,22 @@ void mitkRenderingTestHelper::PrintGLInfo()
             << "- GL_EXTENSIONS: "<< glGetString(GL_EXTENSIONS);
 }
 
-void mitkRenderingTestHelper::SetMapperID( mitk::BaseRenderer::StandardMapperSlot id)
+void mitk::RenderingTestHelper::SetMapperID( mitk::BaseRenderer::StandardMapperSlot id)
 {
   m_RenderWindow->GetRenderer()->SetMapperID(id);
 }
 
-void mitkRenderingTestHelper::SetMapperIDToRender3D()
+void mitk::RenderingTestHelper::SetMapperIDToRender3D()
 {
   this->SetMapperID(mitk::BaseRenderer::Standard3D);
 }
 
-void mitkRenderingTestHelper::SetMapperIDToRender2D()
+void mitk::RenderingTestHelper::SetMapperIDToRender2D()
 {
   this->SetMapperID(mitk::BaseRenderer::Standard2D);
 }
 
-void mitkRenderingTestHelper::Render()
+void mitk::RenderingTestHelper::Render()
 {
   //if the datastorage is initialized and at least 1 image is loaded render it
   if(m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1 )
@@ -121,12 +121,12 @@ void mitkRenderingTestHelper::Render()
 
 }
 
-mitk::DataStorage::Pointer mitkRenderingTestHelper::GetDataStorage()
+mitk::DataStorage::Pointer mitk::RenderingTestHelper::GetDataStorage()
 {
   return m_DataStorage;
 }
 
-void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
+void mitk::RenderingTestHelper::SetInputFileNames(int argc, char* argv[])
 {
   //i is set 1, because 0 is the testname as string
   //parse parameters
@@ -145,35 +145,35 @@ void mitkRenderingTestHelper::SetInputFileNames(int argc, char* argv[])
   }
 }
 
-void mitkRenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
+void mitk::RenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
 {
   mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController()->SetDefaultViewDirection(viewDirection);
   mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
 }
 
-void mitkRenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation)
+void mitk::RenderingTestHelper::ReorientSlices(mitk::Point3D origin, mitk::Vector3D rotation)
 {
   mitk::SliceNavigationController::Pointer sliceNavigationController =
       mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetSliceNavigationController();
   sliceNavigationController->ReorientSlices(origin, rotation);
 }
 
-vtkRenderer* mitkRenderingTestHelper::GetVtkRenderer()
+vtkRenderer* mitk::RenderingTestHelper::GetVtkRenderer()
 {
   return m_RenderWindow->GetRenderer()->GetVtkRenderer();
 }
 
-void mitkRenderingTestHelper::SetImageProperty(const char *propertyKey, mitk::BaseProperty* property )
+void mitk::RenderingTestHelper::SetImageProperty(const char *propertyKey, mitk::BaseProperty* property )
 {
   this->m_DataStorage->GetNode(mitk::NodePredicateDataType::New("Image"))->SetProperty(propertyKey, property);
 }
 
-vtkRenderWindow* mitkRenderingTestHelper::GetVtkRenderWindow()
+vtkRenderWindow* mitk::RenderingTestHelper::GetVtkRenderWindow()
 {
   return m_RenderWindow->GetVtkRenderWindow();
 }
 
-bool mitkRenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
+bool mitk::RenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
 {
   this->Render();
 
@@ -189,7 +189,7 @@ bool mitkRenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char
 }
 
 //method to save a screenshot of the renderwindow (e.g. create a reference screenshot)
-void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
+void mitk::RenderingTestHelper::SaveAsPNG(std::string fileName)
 {
   vtkSmartPointer<vtkRenderer> renderer = this->GetVtkRenderer();
   bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
@@ -207,17 +207,17 @@ void mitkRenderingTestHelper::SaveAsPNG(std::string fileName)
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }
 
-void mitkRenderingTestHelper::SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow)
+void mitk::RenderingTestHelper::SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow)
 {
   m_AutomaticallyCloseRenderWindow = automaticallyCloseRenderWindow;
 }
 
-void mitkRenderingTestHelper::SaveReferenceScreenShot(std::string fileName)
+void mitk::RenderingTestHelper::SaveReferenceScreenShot(std::string fileName)
 {
   this->SaveAsPNG(fileName);
 }
 
-void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
+void mitk::RenderingTestHelper::AddToStorage(const std::string &filename)
 {
   try
   {
@@ -230,7 +230,7 @@ void mitkRenderingTestHelper::AddToStorage(const std::string &filename)
   }
 }
 
-void mitkRenderingTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
+void mitk::RenderingTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 {
   this->m_DataStorage->Add(node);
   mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );

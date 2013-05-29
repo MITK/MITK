@@ -35,7 +35,7 @@ int mitkImageVtkMapper2DResliceInterpolationPropertyTest(int argc, char* argv[])
   //note: this test is supposed to test the reslice interpolation modes not the swiveling itself
   MITK_TEST_BEGIN("mitkImageVtkMapper2DResliceInterpolationPropertyTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   //get resliceInterpolation from comandline arg
   int resliceInterpolation = atoi(argv[argc-4]);

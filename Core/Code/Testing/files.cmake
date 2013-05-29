@@ -57,7 +57,6 @@ set(MODULE_TESTS
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
-  #QmitkRenderingTestHelper.cpp
   mitkExceptionTest.cpp
   mitkExtractSliceFilterTest.cpp
   mitkLogTest.cpp

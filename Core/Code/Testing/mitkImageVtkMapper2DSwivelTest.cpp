@@ -31,7 +31,7 @@ int mitkImageVtkMapper2DSwivelTest(int argc, char* argv[])
   //compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DSwivelTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
   //center point for rotation
   mitk::Point3D centerPoint;
   centerPoint.Fill(0.0f);

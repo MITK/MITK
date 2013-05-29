@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
 #include <itkMultiShellAdcAverageReconstructionImageFilter.h>
+#include <itkMultiShellRadialAdcKurtosisImageFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
 
 // mitk includes
@@ -118,7 +119,7 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
-        //connect( (QObject*)(m_Controls->m_AdcAverage), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
+        connect( (QObject*)(m_Controls->m_msProcess), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
         connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
         connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
         connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
@@ -164,7 +165,7 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
 void QmitkPreprocessingView::DoAdcAverage()
 {
     typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-    typedef itk::MultiShellAdcAverageReconstructionImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+    typedef itk::MultiShellRadialAdcKurtosisImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
     typedef DiffusionImageType::BValueMap BValueMap;
 
     for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
@@ -205,6 +206,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
 
     typedef mitk::DiffusionImage< DiffusionPixelType >            DiffusionImageType;
     typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
+
 
 
     for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)

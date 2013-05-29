@@ -83,8 +83,8 @@ namespace itk
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
     void S_S0Normalization( vnl_vector<double> & vec, const double & S0 );
-    void calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> SignalMatrix);
-    void calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> lsfCoeffs, const double & bValue, const double & referenceSignal);
+    void calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double>  & SignalMatrix);
+    void calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & bValue, const double & referenceSignal);
 
 
 
@@ -113,7 +113,7 @@ namespace itk
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMultiShellAdcAverageReconstructionImageFilter.cpp"
+#include "itkMultiShellRadialAdcKurtosisImageFilter.cpp"
 #endif
 
 

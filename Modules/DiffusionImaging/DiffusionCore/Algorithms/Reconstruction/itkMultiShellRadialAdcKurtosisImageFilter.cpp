@@ -95,7 +95,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   }
 
   m_ShellInterpolationMatrixVector.reserve(m_B_ValueMap.size()-1);
-  m_lsfParameterMatrix(m_B_ValueMap.size()-1,2);
+  vnl_matrix<double> lsfParameterMatrix(m_B_ValueMap.size()-1,2);
 
   // for each shell
   BValueMap::const_iterator it = m_B_ValueMap.begin();
@@ -133,15 +133,15 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     //              |.      |
     //              |b_n 1/6|
 
-    m_lsfParameterMatrix.put(shellIndex, 0, it->first);
-    m_lsfParameterMatrix.put(shellIndex, 1, 1./6.);
+    lsfParameterMatrix.put(shellIndex, 0, it->first);
+    lsfParameterMatrix.put(shellIndex, 1, 1./6.);
 
     ++shellIndex;
 
   }
 
-  vnl_matrix_inverse<double> A_A(m_lsfParameterMatrix.transpose() * m_lsfParameterMatrix);
-  m_lsfParameterMatrix(A_A.inverse() * m_lsfParameterMatrix.transpose());
+  vnl_matrix_inverse<double> A_A(lsfParameterMatrix.transpose() * lsfParameterMatrix);
+  m_lsfParameterMatrix = A_A.inverse() * lsfParameterMatrix.transpose();
 
 
   m_WeightsVector.reserve(m_B_ValueMap.size()-1);
@@ -247,10 +247,6 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     shellIterator++; //skip bZeroImages
     unsigned int shellIndex = 0;
 
-
-    vnl_matrix<double> y(2,1);
-    vnl_vector<double> x(numberOfShells);
-
     while(shellIterator != m_B_ValueMap.end())
     {
       // reset Data
@@ -278,7 +274,7 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     }
 
     // row_i = {D, D^2*K}
-    vnl_matrix<double> lsfCoeffs(m_B_ValueMap.size() -1 , 2);
+    vnl_matrix<double> lsfCoeffs(m_allDirectionsSize , 2);
     calculateLsfCoeffs(lsfCoeffs,SignalMatrix);
 
     calculateSignalFromLsfCoeffs(SignalVector,lsfCoeffs,m_TargetB_Value,BZeroAverage);
@@ -287,6 +283,7 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       out.SetElement(i,SignalVector.get(i-1));
 
     oit.Set(out);
+    MITK_INFO << out;
     ++oit;
     ++iit;
   }
@@ -305,12 +302,13 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> SignalMatrix)
+::calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> & SignalMatrix)
 {
   for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)
   {
     // x = (A' A)^-1 A' b
     vnl_vector<double> lsfCoeffsVector(m_lsfParameterMatrix * SignalMatrix.get_row(i));
+    MITK_INFO << lsfCoeffsVector;
     lsfCoeffs.set_row(i, lsfCoeffsVector);
   }
 }
@@ -318,7 +316,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> lsfCoeffs, const double & bValue, const double & referenceSignal)
+::calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & bValue, const double & referenceSignal)
 {
   for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++)
     // S = S0 * e^(-b*D + 1/6*D^2*K)

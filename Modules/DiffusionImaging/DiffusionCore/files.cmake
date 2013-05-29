@@ -39,6 +39,8 @@ set(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
+  IODataStructures/mitkRegistrationObject.cpp
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp

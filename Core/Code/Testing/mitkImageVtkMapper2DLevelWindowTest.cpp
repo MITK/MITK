@@ -31,7 +31,7 @@ int mitkImageVtkMapper2DLevelWindowTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
   //chose a level window: here we randomly chosen the blood preset.
   mitk::LevelWindowPreset* levelWindowPreset = mitk::LevelWindowPreset::New();
   bool loadedPreset = levelWindowPreset->LoadPreset();

@@ -30,7 +30,7 @@ int mitkImageVtkMapper2DTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   //use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;

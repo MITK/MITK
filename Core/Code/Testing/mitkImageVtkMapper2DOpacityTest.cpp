@@ -30,7 +30,7 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
   //Set the opacity for all images
   renderingHelper.SetImageProperty("opacity", mitk::FloatProperty::New(0.5f));
   //for now this test renders in coronal view direction

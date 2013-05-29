@@ -31,7 +31,7 @@ int mitkSimulationDrawToolTest(int argc, char* argv[])
   mitk::RegisterSimulationObjectFactory();
 
   MITK_TEST_OUTPUT(<< "Create RenderingTestHelper.")
-  mitkRenderingTestHelper renderingTestHelper(1024, 768, argc, argv);
+  mitk::RenderingTestHelper renderingTestHelper(1024, 768, argc, argv);
   renderingTestHelper.SetMapperIDToRender3D();
 
   mitk::DataNode* simulationNode = renderingTestHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Simulation"));

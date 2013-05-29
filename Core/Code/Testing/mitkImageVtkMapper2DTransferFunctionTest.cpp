@@ -33,7 +33,7 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DTransferFunctionTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   //define an arbitrary colortransferfunction
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();

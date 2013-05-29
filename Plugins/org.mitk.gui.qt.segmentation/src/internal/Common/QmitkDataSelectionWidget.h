@@ -19,11 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkDataSelectionWidgetControls.h>
 #include <mitkDataNode.h>
+#include <vector>
 
 namespace mitk
 {
   class NodePredicateBase;
 }
+
+class QmitkDataStorageComboBox;
 
 class QmitkDataSelectionWidget : public QWidget
 {
@@ -45,17 +48,18 @@ public:
   unsigned int AddDataStorageComboBox(const QString &labelText, Predicate predicate);
   unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = NULL);
 
-  mitk::DataNode::Pointer GetSelection(unsigned int id);
+  mitk::DataNode::Pointer GetSelection(unsigned int index);
   void SetHelpText(const QString& text);
 
 signals:
-  void SelectionChanged(unsigned int id, const mitk::DataNode* selection);
+  void SelectionChanged(unsigned int index, const mitk::DataNode* selection);
 
 private slots:
   void OnSelectionChanged(const mitk::DataNode* selection);
 
 private:
   Ui::QmitkDataSelectionWidgetControls m_Controls;
+  std::vector<QmitkDataStorageComboBox*> m_DataStorageComboBoxes;
 };
 
 #endif

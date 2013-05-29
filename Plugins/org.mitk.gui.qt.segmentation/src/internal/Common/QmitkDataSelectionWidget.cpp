@@ -26,7 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <QmitkDataStorageComboBox.h>
 #include <QLabel>
+#include <algorithm>
 #include <cassert>
+#include <iterator>
 
 static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::Predicate predicate)
 {
@@ -104,20 +106,14 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &lab
   connect(comboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectionChanged(const mitk::DataNode *)));
   m_Controls.gridLayout->addWidget(comboBox, row, 1);
 
-  return static_cast<unsigned int>(row);
+  m_DataStorageComboBoxes.push_back(comboBox);
+  return static_cast<unsigned int>(m_DataStorageComboBoxes.size() - 1);
 }
 
-mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int id)
+mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int index)
 {
-  assert(id < m_Controls.gridLayout->rowCount());
-
-  QWidget* widget = m_Controls.gridLayout->itemAtPosition(id, 1)->widget();
-  assert(widget != NULL);
-
-  QmitkDataStorageComboBox* comboBox = dynamic_cast<QmitkDataStorageComboBox*>(widget);
-  assert(comboBox != NULL);
-
-  return comboBox->GetSelectedNode();
+  assert(index < m_DataStorageComboBoxes.size());
+  return m_DataStorageComboBoxes[index]->GetSelectedNode();
 }
 
 void QmitkDataSelectionWidget::SetHelpText(const QString& text)
@@ -137,16 +133,8 @@ void QmitkDataSelectionWidget::SetHelpText(const QString& text)
 
 void QmitkDataSelectionWidget::OnSelectionChanged(const mitk::DataNode* selection)
 {
-  int rowCount = m_Controls.gridLayout->rowCount();
+  std::vector<QmitkDataStorageComboBox*>::iterator it = std::find(m_DataStorageComboBoxes.begin(), m_DataStorageComboBoxes.end(), sender());
+  assert(it != m_DataStorageComboBoxes.end());
 
-  for (int row = 1; row < rowCount; ++row)
-  {
-    if (m_Controls.gridLayout->itemAtPosition(row, 1)->widget() == sender())
-    {
-      emit SelectionChanged(row, selection);
-      return;
-    }
-  }
-
-  assert(false);
+  emit SelectionChanged(std::distance(m_DataStorageComboBoxes.begin(), it), selection);
 }

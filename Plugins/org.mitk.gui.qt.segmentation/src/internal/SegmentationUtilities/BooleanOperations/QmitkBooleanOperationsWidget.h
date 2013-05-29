@@ -28,13 +28,10 @@ public:
   ~QmitkBooleanOperationsWidget();
 
 private slots:
-  void OnSelectionChanged(unsigned int id, const mitk::DataNode* selection);
+  void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
 
 private:
   Ui::QmitkBooleanOperationsWidgetControls m_Controls;
-
-  unsigned int m_1stID;
-  unsigned int m_2ndID;
 };
 
 #endif

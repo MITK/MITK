@@ -549,6 +549,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       {
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
         button->setIconSize(QSize(32, 32));
+        button->setStyleSheet("padding: 4px");
         button->setToolTip(tooltip);
       }
     }

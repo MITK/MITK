@@ -25,7 +25,7 @@ class QSlider;
 class QLabel;
 class QFrame;
 class QPushButton;
-#include <QCheckBox>;
+#include <QCheckBox>
 
 
 #include "QmitkStepperAdapter.h"

@@ -124,41 +124,41 @@ const char* mitk::FastMarchingTool::GetName() const
   return "FastMarching";
 }
 
-void mitk::FastMarchingTool::SetUpperThreshold(int value)
+void mitk::FastMarchingTool::SetUpperThreshold(float value)
 {
-  m_UpperThreshold = (float)value / 10.0;
+  m_UpperThreshold = value;
   thresholder->SetUpperThreshold( m_UpperThreshold );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool::SetLowerThreshold(int value)
+void mitk::FastMarchingTool::SetLowerThreshold(float value)
 {
-  m_LowerThreshold = (float)value / 10.0;
+  m_LowerThreshold = value;
   thresholder->SetLowerThreshold( m_LowerThreshold );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool::SetMu(int value)
+void mitk::FastMarchingTool::SetMu(float value)
 {
-  beta = (float)value / 10.0;
+  beta = value;
   sigmoid->SetBeta( beta );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool::SetStandardDeviation(int value)
+void mitk::FastMarchingTool::SetStandardDeviation(float value)
 {
-  alpha = (float)value / 10.0;
+  alpha = value;
   sigmoid->SetAlpha( alpha );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool::SetStoppingValue(int value)
+void mitk::FastMarchingTool::SetStoppingValue(float value)
 {
-  m_StoppingValue = (float)value / 10.0;
+  m_StoppingValue = value;
   fastMarching->SetStoppingValue( m_StoppingValue );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
@@ -320,6 +320,8 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
     {
       std::cerr << "Exception caught !" << std::endl;
       std::cerr << excep << std::endl;
+      std::cerr << "Reseting step." << std::endl;
+      this->ResetFastMarching();
       return;
     }
 

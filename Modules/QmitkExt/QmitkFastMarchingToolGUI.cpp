@@ -154,7 +154,7 @@ void QmitkFastMarchingToolGUI::OnUpperThresholdChanged(int value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetUpperThreshold( value );
+    m_FastMarchingTool->SetUpperThreshold( (float)value / 10.0 );
 
     //visualize slider value
     m_UpperThresholdLabel->setText(QString("%1 ").arg(float(value)/10.0));
@@ -165,7 +165,7 @@ void QmitkFastMarchingToolGUI::OnLowerThresholdChanged(int value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetLowerThreshold( value );
+    m_FastMarchingTool->SetLowerThreshold( (float)value / 10.0 );
 
     //visualize slider value
     m_LowerThresholdLabel->setText(QString("%1 ").arg(float(value)/10.0));
@@ -176,7 +176,7 @@ void QmitkFastMarchingToolGUI::OnMuChanged(int value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetMu( value );
+    m_FastMarchingTool->SetMu( (float)value / 10.0 );
 
     //visualize slider value
     m_MuLabel->setText(QString("%1 ").arg(float(value)/10.0));
@@ -187,7 +187,7 @@ void QmitkFastMarchingToolGUI::OnStandardDeviationChanged(int value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetStandardDeviation( value );
+    m_FastMarchingTool->SetStandardDeviation( (float)value / 10.0 );
 
     //visualize slider value
     m_StandardDeviationLabel->setText(QString("%1 ").arg(float(value)/10.0));
@@ -198,7 +198,7 @@ void QmitkFastMarchingToolGUI::OnStoppingValueChanged(int value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetStoppingValue( value );
+    m_FastMarchingTool->SetStoppingValue( (float)value / 10.0 );
 
     //visualize slider value
     m_StoppingValueLabel->setText(QString("%1 ").arg(float(value)/10.0));
@@ -224,6 +224,5 @@ void QmitkFastMarchingToolGUI::OnLivePreviewCheckBoxChanged(int value)
 
 void QmitkFastMarchingToolGUI::OnClearSeeds()
 {
-  //event from image navigator recieved - timestep has changed
    m_FastMarchingTool->ClearSeeds();
 }

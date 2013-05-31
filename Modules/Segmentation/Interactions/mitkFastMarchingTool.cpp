@@ -321,7 +321,7 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
       std::cerr << "Exception caught !" << std::endl;
       std::cerr << excep << std::endl;
       std::cerr << "Reseting step." << std::endl;
-      this->ResetFastMarching();
+      this->ResetToInitialState();
       return;
     }
 
@@ -365,4 +365,48 @@ void mitk::FastMarchingTool::ResetFastMarching(const PositionEvent* positionEven
   //clear all seeds and preview empty result
   this->ClearSeeds();
   this->UpdatePreviewImage();
+}
+
+
+void mitk::FastMarchingTool::ResetToInitialState()
+{
+  m_SeedsAsPointSet->Clear();
+  m_ResultImageNode->SetVisibility(false);
+
+  m_SliceInITK = InternalImageType::New();
+
+  thresholder = ThresholdingFilterType::New();
+  thresholder->SetLowerThreshold( m_LowerThreshold );
+  thresholder->SetUpperThreshold( m_UpperThreshold );
+  thresholder->SetOutsideValue( 0 );
+  thresholder->SetInsideValue( 1.0 );
+
+  smoothing = SmoothingFilterType::New();
+  smoothing->SetTimeStep( 0.125 );
+  smoothing->SetNumberOfIterations( 5 );
+  smoothing->SetConductanceParameter( 9.0 );
+
+  gradientMagnitude = GradientFilterType::New();
+  gradientMagnitude->SetSigma( sigma );
+
+  sigmoid = SigmoidFilterType::New();
+  sigmoid->SetAlpha( alpha );
+  sigmoid->SetBeta( beta );
+  sigmoid->SetOutputMinimum( 0.0 );
+  sigmoid->SetOutputMaximum( 1.0 );
+
+  fastMarching = FastMarchingFilterType::New();
+  fastMarching->SetStoppingValue( m_StoppingValue );
+
+  seeds = NodeContainer::New();
+  seeds->Initialize();
+  fastMarching->SetTrialPoints( seeds );
+
+
+  //set up pipeline
+  smoothing->SetInput( m_SliceInITK );
+  gradientMagnitude->SetInput( smoothing->GetOutput() );
+  sigmoid->SetInput( gradientMagnitude->GetOutput() );
+  fastMarching->SetInput( sigmoid->GetOutput() );
+  thresholder->SetInput( fastMarching->GetOutput() );
 }

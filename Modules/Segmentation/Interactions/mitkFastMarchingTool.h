@@ -107,6 +107,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     /// \brief Reset all relevant inputs of the itk pipeline.
     void ResetFastMarching(const PositionEvent* positionEvent);
 
+    void ResetToInitialState();
+
     mitk::BaseRenderer* m_LastEventSender;
     unsigned int m_LastEventSlice;
     mitk::PositionEvent* m_PositionEvent;

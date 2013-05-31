@@ -73,7 +73,8 @@ namespace mitk {
     * You should specify either a FileName or FilePrefix. Use FilePrefix if
     * the data is stored in multiple files.
     */
-    virtual std::string GetFilePrefix() const = 0;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual std::string GetFilePrefix() const = 0;
 
     /**
     * \brief Set the File Prefix of the file that will be read.
@@ -81,7 +82,8 @@ namespace mitk {
     * You should specify either a FileName or FilePrefix. Use FilePrefix if
     * the data is stored in multiple files.
     */
-    virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
 
     /**
     * \brief Get the specified file pattern for the file(s) to load.
@@ -90,7 +92,8 @@ namespace mitk {
     * You should specify either a FileName or FilePrefix. Use FilePrefix if
     * the data is stored in multiple files.
     */
-    virtual std::string GetFilePattern() const = 0;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual std::string GetFilePattern() const = 0;
 
     /**
     * \brief Set the specified file pattern for the file(s) to load.
@@ -99,7 +102,8 @@ namespace mitk {
     * You should specify either a FileName or FilePrefix. Use FilePrefix if
     * the data is stored in multiple files.
     */
-    virtual void SetFilePattern(const std::string& aFilePattern) = 0;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
     /**
     * \brief Reads the specified file and returns its contents.

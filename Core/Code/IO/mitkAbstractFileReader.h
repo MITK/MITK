@@ -60,14 +60,16 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual std::string GetFilePrefix() const;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual std::string GetFilePrefix() const;
 
     //##Documentation
     //## @brief Specify file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const std::string& aFilePrefix);
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    // virtual void SetFilePrefix(const std::string& aFilePrefix);
 
     //##Documentation
     //## @brief Get the specified file pattern for the file(s) to load. The
@@ -75,7 +77,8 @@ namespace mitk {
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if
     //## the data is stored in multiple files.
-    virtual std::string GetFilePattern() const;
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual std::string GetFilePattern() const;
 
     /**
     @brief Specified file pattern for the file(s) to load. The sprintf
@@ -83,7 +86,8 @@ namespace mitk {
 
     You should specify either a FileName or FilePrefix. Use FilePrefix if
     the data is stored in multiple files. */
-    virtual void SetFilePattern(const std::string& aFilePattern);
+    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
+    //virtual void SetFilePattern(const std::string& aFilePattern);
 
     virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0);
 

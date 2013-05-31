@@ -52,25 +52,29 @@ void mitk::AbstractFileReader::SetFileName(const std::string aFileName)
  m_FileName = aFileName;
 }
 
-std::string mitk::AbstractFileReader::GetFilePrefix() const
-{
-  return m_FilePrefix;
-}
 
-void mitk::AbstractFileReader::SetFilePrefix(const std::string& aFilePrefix)
-{
-  m_FilePrefix = aFilePrefix;
-}
+// FILE PATTERN mechanic is currently deactivated until decision has been reached on how to handle patterns //
 
-std::string mitk::AbstractFileReader::GetFilePattern() const
-{
-  return m_FilePattern;
-}
 
-void mitk::AbstractFileReader::SetFilePattern(const std::string& aFilePattern)
-{
-  m_FilePattern = aFilePattern;
-}
+//std::string mitk::AbstractFileReader::GetFilePrefix() const
+//{
+//  return m_FilePrefix;
+//}
+//
+//void mitk::AbstractFileReader::SetFilePrefix(const std::string& aFilePrefix)
+//{
+//  m_FilePrefix = aFilePrefix;
+//}
+//
+//std::string mitk::AbstractFileReader::GetFilePattern() const
+//{
+//  return m_FilePattern;
+//}
+//
+//void mitk::AbstractFileReader::SetFilePattern(const std::string& aFilePattern)
+//{
+//  m_FilePattern = aFilePattern;
+//}
 
 ////////////////////// Reading /////////////////////////
 

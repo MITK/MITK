@@ -74,8 +74,6 @@ class MITK_CORE_EXPORT FileReaderManager
 
     static std::string GetSupportedExtensions(const std::string& extension = "");
 
-    static void RegisterLegacyReaders();
-
 protected:
     //FileReaderManager();
     //virtual ~FileReaderManager();
@@ -83,8 +81,6 @@ protected:
     static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension, mitk::ModuleContext* context);
 
     static bool ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options);
-
-    static std::list< mitk::LegacyFileReaderService::Pointer > m_LegacyReader;
 
 };
 } // namespace mitk

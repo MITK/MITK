@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include "mitkCoreObjectFactoryBase.h"
 #include "mitkFileWriterWithInformation.h"
+#include <mitkLegacyFileReaderService.h>
+
 namespace mitk {
 
 class Event;
@@ -42,6 +44,7 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
     virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
+    static void RegisterLegacyReaders(mitk::CoreObjectFactoryBase::Pointer factory);
   protected:
     CoreObjectFactory();
     void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
@@ -54,6 +57,7 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     MultimapType m_FileExtensionsMap;
     std::string m_SaveFileExtensions;
     MultimapType m_SaveFileExtensionsMap;
+    static std::list< mitk::LegacyFileReaderService::Pointer > m_LegacyReaders;
 
 };
 

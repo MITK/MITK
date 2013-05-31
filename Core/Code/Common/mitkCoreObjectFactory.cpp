@@ -65,11 +65,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
+// Legacy Support:
+#include <mitkFileReaderManager.h>
+#include <mitkLegacyFileReaderService.h>
+
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
+
+std::list< mitk::LegacyFileReaderService::Pointer > mitk::CoreObjectFactory::m_LegacyReaders;
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
   MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
   m_ExtraFactories.insert(CoreObjectFactoryBase::Pointer(factory));
+  // Register Legacy Reader
+  this->RegisterLegacyReaders(this);
 }
 
 void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *factory)
@@ -361,6 +369,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
 
+  RegisterLegacyReaders(this);
 }
 
 /**
@@ -389,7 +398,8 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileEx
   return m_SaveFileExtensionsMap;
 }
 
-mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
+mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters()
+{
   FileWriterList allWriters = m_FileWriters;
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
     FileWriterList list2 = (*it)->GetFileWriters();
@@ -397,7 +407,24 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
   }
   return allWriters;
 }
-void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
+void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int)
+{
 
+}
+
+void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase::Pointer factory)
+{
+  // We are not really interested in the string, but this function will make sure to merge
+  // all extensions of all registered Factories into the map that we will work with.
+  factory->GetFileExtensions();
+  std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+    //only add if no reader already registered under that extension
+    if(mitk::FileReaderManager::GetReader(it->first) == 0)
+   {
+     std::string extension = it->first;
+     mitk::LegacyFileReaderService::Pointer lfrs = mitk::LegacyFileReaderService::New(extension.erase(0,1), it->second);
+     m_LegacyReaders.push_back(lfrs);
+   }
 }
 

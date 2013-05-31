@@ -83,15 +83,16 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
 void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Type type)
 {
-  assert(m_TimeNavigationController != NULL);
+  mitk::SliceNavigationController* timeNavigationController = this->GetTimeNavigationController();
+  assert(timeNavigationController != NULL);
 
-  mitk::Image::ConstPointer segmentation1 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(0)->GetData());
-  mitk::Image::ConstPointer segmentation2 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(1)->GetData());
+  mitk::Image::ConstPointer segmentation0 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(0)->GetData());
+  mitk::Image::ConstPointer segmentation1 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(1)->GetData());
 
   try
   {
-    unsigned int time = this->GetTimeNavigationController()->GetTime()->GetPos();
-    mitk::BooleanOperation booleanOperation(type, segmentation1, segmentation2, time);
+    unsigned int time = timeNavigationController->GetTime()->GetPos();
+    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, time);
   }
   catch (const mitk::Exception &exception)
   {

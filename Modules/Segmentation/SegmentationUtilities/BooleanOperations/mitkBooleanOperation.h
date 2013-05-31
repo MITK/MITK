@@ -46,8 +46,8 @@ namespace mitk
     void ValidateSegmentations() const;
 
     Type m_Type;
+    Image::ConstPointer m_Segmentation0;
     Image::ConstPointer m_Segmentation1;
-    Image::ConstPointer m_Segmentation2;
     unsigned int m_Time;
   };
 }

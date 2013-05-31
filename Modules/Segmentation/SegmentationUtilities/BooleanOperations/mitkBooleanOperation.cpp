@@ -33,10 +33,10 @@ static mitk::Image::ConstPointer Get3DSegmentation(mitk::Image::ConstPointer seg
   return imageTimeSelector->GetOutput();
 }
 
-mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::ConstPointer segmentation1, mitk::Image::ConstPointer segmentation2, unsigned int time)
+mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::ConstPointer segmentation0, mitk::Image::ConstPointer segmentation1, unsigned int time)
   : m_Type(type),
+    m_Segmentation0(segmentation0),
     m_Segmentation1(segmentation1),
-    m_Segmentation2(segmentation2),
     m_Time(time)
 {
   this->ValidateSegmentations();
@@ -85,9 +85,9 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::ConstPointer segm
 
 void mitk::BooleanOperation::ValidateSegmentations() const
 {
+  this->ValidateSegmentation(m_Segmentation0);
   this->ValidateSegmentation(m_Segmentation1);
-  this->ValidateSegmentation(m_Segmentation2);
 
-  if (m_Segmentation1->GetDimension() != m_Segmentation2->GetDimension())
+  if (m_Segmentation0->GetDimension() != m_Segmentation1->GetDimension())
     mitkThrow() << "Segmentations have different dimensions!";
 }

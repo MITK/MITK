@@ -154,6 +154,12 @@ void mitk::LiveWireTool2D::Deactivated()
 {
   this->FinishTool();
 
+  Superclass::Deactivated();
+}
+
+
+void mitk::LiveWireTool2D::ConfirmSegmentation()
+{
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if ( !workingNode ) return;
 
@@ -210,8 +216,6 @@ void mitk::LiveWireTool2D::Deactivated()
   }
 
   m_Contours.clear();
-
-  Superclass::Deactivated();
 }
 
 

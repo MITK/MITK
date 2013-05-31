@@ -419,12 +419,16 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase:
   factory->GetFileExtensions();
   std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
   for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+  {
     //only add if no reader already registered under that extension
+    std::string extension = it->first;
+    extension = extension.erase(0,1);
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     if(mitk::FileReaderManager::GetReader(it->first) == 0)
    {
-     std::string extension = it->first;
-     mitk::LegacyFileReaderService::Pointer lfrs = mitk::LegacyFileReaderService::New(extension.erase(0,1), it->second);
+     mitk::LegacyFileReaderService::Pointer lfrs = mitk::LegacyFileReaderService::New(extension, it->second);
      m_LegacyReaders.push_back(lfrs);
    }
+  }
 }
 

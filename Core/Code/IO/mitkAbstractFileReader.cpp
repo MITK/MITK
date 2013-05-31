@@ -118,6 +118,8 @@ mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
   if ( m_Description == "" )
     MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
+  std::transform(m_Extension.begin(), m_Extension.end(), m_Extension.begin(), ::tolower);
+
   mitk::ServiceProperties result;
   result[mitk::IFileReader::PROP_EXTENSION]    = m_Extension;
   result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;

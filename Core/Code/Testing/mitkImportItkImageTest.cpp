@@ -168,7 +168,11 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
   for( unsigned int i=0; i<27; i++)
   {
     equal &= (ground_truth[i] == output_data[i]);
-    std::cout << ground_truth[i] << " ? " << output_data[i] << "\n";
+    if(!equal)
+    {
+      std::cout << "  :: At position " << i << " :  " <<ground_truth[i] << " ? " << output_data[i] << "\n";
+      break;
+    }
   }
 
   MITK_TEST_CONDITION(equal, " Imported output data equals the ground truth");

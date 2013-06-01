@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkRandomImageSource.h>
 
+#include <itkBinaryThresholdImageFilter.h>
+
+#include "mitkImageAccessByItk.h"
+
 
 /**
  * Create a test image with random pixel values. The image size is determined by the input parameter.
@@ -83,6 +87,96 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageFixedValue(size_
 
   return itkImage;
 }
+
+/**
+ *  An ITK-based filter for thresholding.
+ *
+ *  The filter represents the typical usage of ITK-like filters inside MITK. It is to be called for an mitk::Image
+ *  by using the AccessByItk macro. The filter executes the binary threshold filter and imports the result into the
+ *  output by using the ImportItkImage method.
+ *
+ *  @param output mitk::Image to hold the result of the filter
+ *  @param th[] two double values to set the lower/upper threshold
+ */
+template<typename TPixel, unsigned int VDimensions>
+static void ItkThresholdFilter(
+    const itk::Image<TPixel, VDimensions>* image,
+    mitk::Image::Pointer& output,
+    const double th[])
+{
+    typedef itk::Image<TPixel, VDimensions> InputImageType;
+    typedef itk::Image<unsigned int, VDimensions> OutputImageType;
+    typedef itk::BinaryThresholdImageFilter<
+      InputImageType, OutputImageType> BinaryThresholdFilterType;
+
+    typename BinaryThresholdFilterType::Pointer thresholder =
+      BinaryThresholdFilterType::New();
+    thresholder->SetInput(image);
+    thresholder->SetLowerThreshold(th[0]);
+    thresholder->SetUpperThreshold(th[1]);
+    thresholder->SetInsideValue(255);
+    thresholder->SetOutsideValue(0);
+    thresholder->Update();
+
+    try
+    {
+      output = mitk::ImportItkImage(thresholder->GetOutput());
+    }
+    catch(itk::ExceptionObject&)
+    {
+      MITK_TEST_FAILED_MSG(<<"Thresholding computation failed");
+    }
+}
+
+/**
+ * Creates an mitk::Image, executes the binary threshold filter through AccessByItk and
+ * checks whether the image data was correctly imported back to an mitk::Image.
+ */
+template< typename TPixel>
+bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
+{
+  // data for 3x3x3 image
+  const unsigned int dimensions[3] = {3,3,3};
+  TPixel* image_data = new TPixel[27];
+
+  // ground truth for result check
+  unsigned int* ground_truth = new unsigned int[27];
+  double threshold[2] = { 9.0, 18.0 };
+
+  // fill image
+  for( unsigned int i=0; i<27; i++)
+  {
+    image_data[i] = static_cast<TPixel>(i * 10);
+
+    ground_truth[i] = 255;
+    if( i < threshold[0] || i > threshold[1] )
+      ground_truth[i] = 0;
+  }
+
+  mitk::Image::Pointer input = mitk::Image::New();
+  input->Initialize( mitk::MakeScalarPixelType<TPixel>(), 3, dimensions );
+  input->SetImportVolume( image_data );
+
+
+  mitk::Image::Pointer output = mitk::Image::New();
+  AccessByItk_2(input, ItkThresholdFilter, output, threshold );
+
+  mitk::ImagePixelReadAccessor< unsigned int, 3 > readAccessor( output );
+  const unsigned int* output_data = readAccessor.GetConstData();
+
+  bool equal = true;
+  for( unsigned int i=0; i<27; i++)
+  {
+    equal &= (ground_truth[i] == output_data[i]);
+    std::cout << ground_truth[i] << " ? " << output_data[i] << "\n";
+  }
+
+  MITK_TEST_CONDITION(equal, " Imported output data equals the ground truth");
+
+  return equal;
+
+}
+
 
 /**
  * Compares the meta information of both given images for equality.
@@ -231,6 +325,11 @@ int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<float, 4>();// "Import succesfull on float");
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 4>();// "Import succesfull on uchar");
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 4>();// "Import succesfull on int");
+
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<short>();// "Import succesfull on 3D short");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<float>();// "Import succesfull on float");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<unsigned char>();// "Import succesfull on uchar");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<int>();// "Import succesfull on int");
 
 
   MITK_TEST_END()

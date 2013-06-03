@@ -33,7 +33,7 @@ int mitkPointSetVtkMapper2DTest(int argc, char* argv[])
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   // sagittal view direction
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::ViewDirection::Sagittal);
+  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );

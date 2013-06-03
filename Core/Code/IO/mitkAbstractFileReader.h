@@ -89,9 +89,9 @@ namespace mitk {
     // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
     //virtual void SetFilePattern(const std::string& aFilePattern);
 
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path = 0);
+    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path = 0, mitk::DataStorage *ds = 0 );
 
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream ) = 0;
+    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
 
     virtual int GetPriority() const;
 

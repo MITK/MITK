@@ -37,14 +37,14 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path)
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path, mitk::DataStorage *ds)
 {
   std::list< mitk::BaseData::Pointer > result;
   result.push_front(mitk::IOUtil::LoadDataNode(path)->GetData());
   return result;
 }
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& stream )
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& stream, mitk::DataStorage *ds)
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
   std::list< mitk::BaseData::Pointer > result;

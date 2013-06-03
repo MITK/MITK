@@ -48,9 +48,9 @@ namespace mitk {
 
     mitkNewMacro2Param( Self, std::string, std::string);
 
-    virtual std::list< mitk::BaseData::Pointer > Read(const std::string& path = 0);
+    virtual std::list< mitk::BaseData::Pointer > Read(const std::string& path = 0, mitk::DataStorage *ds = 0);
 
-    virtual std::list< mitk::BaseData::Pointer > Read(const std::istream& stream );
+    virtual std::list< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage *ds = 0 );
 
 
 protected:

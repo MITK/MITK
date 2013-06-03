@@ -74,18 +74,18 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapp
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 )
-mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2DTest
-                        ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAlone640x480REF.png #corresponding reference screenshot
-)
+#mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2DTest
+#                        ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAlone640x480REF.png #corresponding reference screenshot
+#)
 mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2DImageTest
                         ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/RenderingTestData/PointSetForPic3D.mps #input point set and image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Pic3DPointSetForPic3D640x480REF.png #corresponding reference screenshot
 )
-mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2DGlyphTypeTest
-                         ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
-                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneGlyphType640x480REF.png #corresponding reference screenshot
-)
+#mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2DGlyphTypeTest
+#                         ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
+#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneGlyphType640x480REF.png #corresponding reference screenshot
+#)
 
 #Test reslice interpolation
 #note: nearest mode is already tested by swivel test

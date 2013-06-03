@@ -297,9 +297,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   Point2D lastPt2d;   // last projected_p in display coordinates
   Point2D preLastPt2d;// projected_p in display coordinates before lastPt2
 
-
-  vtkLinearTransform* linearTransform = GetDataNode()->GetVtkTransform();
-
   // get display geometry
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
@@ -370,7 +367,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         if (input->GetSize()>1)
         {
           char buffer[20];
-          sprintf(buffer,"%d",pointsIter->Index());
+          sprintf(buffer,"%u",pointsIter->Index());
           std::stringstream ss;
           ss << pointsIter->Index();
           l.append(ss.str());

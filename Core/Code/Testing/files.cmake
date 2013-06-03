@@ -113,6 +113,8 @@ set(MODULE_CUSTOM_TESTS
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
+    mitkSurfaceGLMapper2DColorTest.cpp
+    mitkSurfaceGLMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
 )

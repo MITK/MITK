@@ -30,7 +30,7 @@ int mitkPointSetVtkMapper2DImageTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkPointSetVtkMapper2DImageTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );

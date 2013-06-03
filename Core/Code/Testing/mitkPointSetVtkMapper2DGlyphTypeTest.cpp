@@ -34,7 +34,7 @@ int mitkPointSetVtkMapper2DGlyphTypeTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkPointSetVtkMapper2DGlyphTypeTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::ViewDirection::Sagittal);
 

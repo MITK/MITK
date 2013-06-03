@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGeometry2DDataMapper2D.h>
 #include <mitkGeometry2DDataMapper2D.h>
 #include <mitkImageVtkMapper2D.h>
-#include <mitkPointSetGLMapper2D.h>
+#include <mitkPointSetVtkMapper2D.h>
 #include <mitkPolyDataGLMapper2D.h>
 #include <mitkSurfaceGLMapper2D.h>
 
@@ -128,7 +128,7 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ImageVtkMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
-  mapper = mitk::PointSetGLMapper2D::New();
+  mapper = mitk::PointSetVtkMapper2D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PointSetGLMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )

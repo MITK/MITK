@@ -117,6 +117,9 @@ set(MODULE_CUSTOM_TESTS
     mitkSurfaceGLMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
+    mitkPointSetVtkMapper2DTest.cpp
+    mitkPointSetVtkMapper2DImageTest.cpp
+    mitkPointSetVtkMapper2DGlyphTypeTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

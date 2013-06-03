@@ -312,6 +312,7 @@ set(CPP_FILES
   Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
+  Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
   Rendering/mitkPolyDataGLMapper2D.cpp
   Rendering/mitkSurfaceGLMapper2D.cpp

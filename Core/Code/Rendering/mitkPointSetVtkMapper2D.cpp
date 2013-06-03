@@ -366,8 +366,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         std::string l = pointLabel;
         if (input->GetSize()>1)
         {
-          char buffer[20];
-          sprintf(buffer,"%u",pointsIter->Index());
           std::stringstream ss;
           ss << pointsIter->Index();
           l.append(ss.str());

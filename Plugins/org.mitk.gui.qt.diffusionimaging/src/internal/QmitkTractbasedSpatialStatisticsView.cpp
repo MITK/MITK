@@ -1177,7 +1177,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   analyzer.SetPointSet(m_PointSetNode);
 
   // Run Analyzer
-  analyzer.BuildGraph();
+  analyzer.MakeRoi();
 
   // Obtain tbss roi image from analyzer
   mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();

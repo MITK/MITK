@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QuantificationExports.h"
 #include <itkImage.h>
-#include <itkVectorImage.h>
 #include "mitkImage.h"
 #include "mitkImageCast.h"
 
@@ -40,54 +39,72 @@ public:
 
 
   TractAnalyzer();
-  ~TractAnalyzer() {};
+  ~TractAnalyzer() {}
 
+
+  /** Image type definitions */
   typedef itk::Image<char,3> CharImageType;
   typedef itk::Image<float,3> FloatImageType;
-  typedef itk::Image<float,4> ProjectionsImageType;
-  typedef itk::VectorImage<float, 3> VectorImageType;
-
-  void BuildGraph();
 
 
- /*
-  std::vector< itk::Index<3> > GetPath()
-  {
-    return m_Path;
-  }
-
-
-  CharImageType::Pointer GetRoiImage()
-  {
-    return m_RoiImg;
-  }
+  /** \brief Main method for region of interest calculation
+   *
+   * A region of interest is calculated adding the segments between the points on the ROI
+   * that was specified by the user.
+   */
+  void MakeRoi();
 
 
 
-*/
-
+  /** \brief Sets the input image
+   *
+   * The region of interest is calculated on a 3D image. This is generally the mean FA skeleton as calculated
+   * in the standard TBSS pipeline (see http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/TBSS).
+   */
   mitk::TbssRoiImage::Pointer GetRoiImage()
   {
     return m_TbssRoi;
   }
 
 
+  /** \brief Sets the input image
+   *
+   * The region of interest is calculated on a 3D image. This is generally the mean FA skeleton as calculated
+   * in the standard TBSS pipeline (see http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/TBSS).
+   */
   void SetInputImage(mitk::Image::Pointer inputImage)
   {
     m_InputImage = inputImage;
   }
 
+
+  /** \brief Sets the user-defined point set
+   *
+   * Set the user-defined point sets. The region of interest must pass through these points.
+   */
   void SetPointSet(mitk::PointSet::Pointer pointSet)
   {
     m_PointSetNode = pointSet;
   }
 
 
+  /** \brief Sets a lower bound for the threshold.
+   *
+   * Low fractional anisotropy values can indicate partial volume of non white matter tissue.
+   * This thresholds limits the search for a region of interest to voxels with a minimum value.
+   */
   void SetThreshold(double threshold)
   {
     m_Threshold = threshold;
   }
 
+
+
+  /** \brief Returns a string with the indices of points on the region of interest
+   *
+   * The region of interest calculated by the TractAnalyzer contains a list of ITK indices.
+   * This method returns a string containing these indices for display in the GUI
+   */
   std::string GetPathDescription()
   {
     return m_PathDescription;
@@ -97,21 +114,27 @@ protected:
 
 
 
+  /** \brief Calculates a segment of the region of interest
+   *
+   * The region of interest is calculated on a 3D image. This is generally the mean FA skeleton as calculated
+   * in the standard TBSS pipeline (see http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/TBSS).
+   */
   std::vector< itk::Index<3> > CreateSegment(itk::Index<3> startPoint, itk::Index<3> endPoint);
 
 
+  /** \brief Output TbssRoiImage */
   mitk::TbssRoiImage::Pointer m_TbssRoi;
 
-  //CharImageType::Pointer m_RoiImg;
-
+  /** \brief Inputimage */
   mitk::Image::Pointer m_InputImage;
 
+  /** \brief Threshold for ROI search */
   double m_Threshold;
 
-  //std::vector< itk::Index<3> > m_Path;
-
+  /** \brief User defined point set */
   mitk::PointSet::Pointer m_PointSetNode;
 
+  /** \brief Path description in as string for display in GUI */
   std::string m_PathDescription;
 
 

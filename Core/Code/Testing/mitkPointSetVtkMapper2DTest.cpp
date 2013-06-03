@@ -30,7 +30,7 @@ int mitkPointSetVtkMapper2DTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkPointSetVtkMapper2DTest")
 
-  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   // sagittal view direction
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::ViewDirection::Sagittal);

@@ -35,7 +35,7 @@ class PointSet;
 //## @ingroup Mapper
 
 /** \deprecatedSince{2013_06} This mapper is deprecated. */
-DEPRECATED(class MitkExt_EXPORT LineMapper2D) : public PointSetGLMapper2D
+class MitkExt_EXPORT DEPRECATED(LineMapper2D) : public PointSetGLMapper2D
 {
 public:
   mitkClassMacro(LineMapper2D, PointSetGLMapper2D);

@@ -322,67 +322,13 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   //transform ct image
   mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
   imageTransform->Compose(newTransform);
-  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed leads to an error
+  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
   itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
   itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
   newImageTransform->SetMatrix(rotationFloatNew);
   newImageTransform->SetOffset(translationFloatNew);
   m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
 
-}
-
-
-void QmitkIGTTrackingLabView::OnTrackerDisconnected()
-{
-  this->DestroyInstrumentVisualization(this->GetDefaultDataStorage(), m_NDIConfigWidget->GetTracker());
-}
-
-
-mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateInstrumentVisualization(mitk::DataStorage* ds, const char* toolName)
-{
-    //const char* toolName = tracker->GetTool(i)->GetToolName();
-    mitk::DataNode::Pointer toolRepresentationNode;
-    toolRepresentationNode = ds->GetNamedNode(toolName); // check if node with same name already exists
-
-    if(toolRepresentationNode.IsNotNull())
-      ds->Remove(toolRepresentationNode); // remove old node with same name
-
-    toolRepresentationNode = this->CreateConeRepresentation( toolName );
-
-    ds->Add(toolRepresentationNode); // adds node to data storage
-
-    return toolRepresentationNode;
-}
-
-
-mitk::DataNode::Pointer QmitkIGTTrackingLabView::CreateConeRepresentation( const char* label )
-{
-
-  //new data
-  mitk::Cone::Pointer activeToolData = mitk::Cone::New();
-  vtkConeSource* vtkData = vtkConeSource::New();
-
-  vtkData->SetRadius(7.5);
-  vtkData->SetHeight(15.0);
-  vtkData->SetDirection(m_DirectionOfProjectionVector[0],m_DirectionOfProjectionVector[1],m_DirectionOfProjectionVector[2]);
-  vtkData->SetCenter(0.0, 0.0, 7.5);
-  vtkData->SetResolution(20);
-  vtkData->CappingOn();
-  vtkData->Update();
-  activeToolData->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-
-  //new node
-  mitk::DataNode::Pointer coneNode = mitk::DataNode::New();
-  coneNode->SetData(activeToolData);
-  coneNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New( label ));
-  coneNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));
-  coneNode->GetPropertyList()->SetProperty("visible", mitk::BoolProperty::New(true));
-  coneNode->SetColor(1.0,0.0,0.0);
-  coneNode->SetOpacity(0.85);
-  coneNode->Modified();
-
-  return coneNode;
 }
 
 void QmitkIGTTrackingLabView::DestroyIGTPipeline()
@@ -550,21 +496,6 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
     m_PointSetRecording = false;
   }
 }
-
-void QmitkIGTTrackingLabView::DestroyInstrumentVisualization(mitk::DataStorage* ds, mitk::TrackingDevice::Pointer tracker)
-{
-  if(ds == NULL || tracker.IsNull())
-    return;
-
-  for(int i=0; i < tracker->GetToolCount(); ++i)
-  {
-    mitk::DataNode::Pointer dn = ds->GetNamedNode(tracker->GetTool(i)->GetToolName());
-
-    if(dn.IsNotNull())
-      ds->Remove(dn);
-  }
-}
-
 
 void QmitkIGTTrackingLabView::GlobalReinit()
 {

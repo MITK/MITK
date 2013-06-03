@@ -91,10 +91,6 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     */
     void OnRegisterFiducials();
     /**
-    \brief This method should be called if deconnecting the tracker.
-    */
-    void OnTrackerDisconnected();
-    /**
     \brief This method sets up the navigation pipeline before tracking is started.
     */
     void OnSetupNavigation();
@@ -169,18 +165,7 @@ class QmitkIGTTrackingLabView : public QmitkFunctionality
     \brief This method creates a DataNode for fiducial PointSets.
     */
     mitk::DataNode::Pointer CreateRegistrationFiducialsNode( const std::string& label, const mitk::Color& color);
-    /**
-    \brief This method creates the visualization for all connected instruments.
-    */
-    mitk::DataNode::Pointer CreateInstrumentVisualization(mitk::DataStorage* ds, const char* toolName); // create 3D models for all connected tools
-    /**
-    \brief This method creates a DataNode of a 3D cone object.
-    */
-    mitk::DataNode::Pointer CreateConeRepresentation(const char* label = ""); // create a 3D cone as representation for a tool
-    /**
-    \brief This method destroys the instrument visualization.
-    */
-    void DestroyInstrumentVisualization(mitk::DataStorage* ds, mitk::TrackingDevice::Pointer tracker);
+
     /**
     \brief This method returns a PointSet with three vritual points transformed from the position and orientation of the given NavigationData. This method is needed to calculate the source points for permanent registration from one tool's position.
     */

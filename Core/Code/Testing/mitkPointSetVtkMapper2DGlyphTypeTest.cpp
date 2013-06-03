@@ -36,7 +36,7 @@ int mitkPointSetVtkMapper2DGlyphTypeTest(int argc, char* argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::ViewDirection::Sagittal);
+  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
 
   mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"))->GetProperty("Pointset.2D.shape"));
   // render triangles instead of crosses

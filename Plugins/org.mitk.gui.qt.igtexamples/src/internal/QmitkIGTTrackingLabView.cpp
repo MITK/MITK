@@ -117,10 +117,14 @@ void QmitkIGTTrackingLabView::CreateConnections()
   //start timer
   m_Timer->start(30);
 
-  //initialize Combo Box
+  //initialize Combo Boxes
   m_Controls.m_ObjectComboBox->SetDataStorage(this->GetDataStorage());
   m_Controls.m_ObjectComboBox->SetAutoSelectNewItems(false);
   m_Controls.m_ObjectComboBox->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+
+  m_Controls.m_ImageComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_ImageComboBox->SetAutoSelectNewItems(false);
+  m_Controls.m_ImageComboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
 }
 
 void QmitkIGTTrackingLabView::UpdateTimer()
@@ -309,12 +313,22 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
     translationFloat[k] = m->GetElement(k,3);
   }
 
-  //create new transform object
+  //transform surface
   mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
   newTransform->SetMatrix(rotationFloat);
   newTransform->SetOffset(translationFloat);
-
   m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+
+  //transform ct image
+  mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
+  imageTransform->Compose(newTransform);
+  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed leads to an error
+  itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
+  itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
+  newImageTransform->SetMatrix(rotationFloatNew);
+  newImageTransform->SetOffset(translationFloatNew);
+  m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+
 }
 
 
@@ -666,6 +680,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //connect filter to source
     m_PermanentRegistrationFilter->SetInput(this->m_ObjectmarkerNavigationData);
 
+    //TODO: add image when bug is fixed
     mitk::AffineTransform3D::Pointer initialTransform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
 
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());

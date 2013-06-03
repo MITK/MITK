@@ -152,7 +152,64 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
-           <widget class="QmitkDataStorageComboBox" name="m_ObjectComboBox"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QCheckBox" name="m_SurfaceActive">
+              <property name="text">
+               <string>Surface:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QmitkDataStorageComboBox" name="m_ObjectComboBox"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QCheckBox" name="m_ImageActive">
+              <property name="text">
+               <string>DICOM Image:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QmitkDataStorageComboBox" name="m_ImageComboBox"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -299,6 +356,14 @@
       </layout>
      </widget>
      <widget class="QWidget" name="page_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>342</width>
+        <height>881</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Camera View</string>
       </attribute>

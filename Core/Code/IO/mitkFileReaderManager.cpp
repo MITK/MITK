@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //////////////////// READING DIRECTLY ////////////////////
 
-mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
+std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::Read(const std::string& path)
 {
   mitk::ModuleContext * context = mitk::GetModuleContext();
   // Find extension
@@ -40,7 +40,7 @@ mitk::BaseData::Pointer mitk::FileReaderManager::Read(const std::string& path)
   mitk::IFileReader* reader = GetReader(extension);
   // Throw exception if no compatible reader was found
   if (reader == 0) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
-  itk::SmartPointer<mitk::BaseData> result = reader->Read(path);
+  std::list< itk::SmartPointer<mitk::BaseData> > result = reader->Read(path);
   return result;
 }
 
@@ -51,7 +51,7 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std:
   {
     try
     {
-      result.push_back(Read( *iterator ));
+      result.merge(Read( *iterator ));
     }
     catch (...)
     {

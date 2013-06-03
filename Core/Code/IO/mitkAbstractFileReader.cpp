@@ -78,7 +78,7 @@ void mitk::AbstractFileReader::SetFileName(const std::string aFileName)
 
 ////////////////////// Reading /////////////////////////
 
-itk::SmartPointer<mitk::BaseData> mitk::AbstractFileReader::Read(const std::string& path)
+std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path)
 {
   if (! itksys::SystemTools::FileExists(path.c_str()))
     mitkThrow() << "File '" + path + "' not found.";

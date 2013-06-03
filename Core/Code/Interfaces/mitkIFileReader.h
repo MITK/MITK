@@ -111,7 +111,7 @@ namespace mitk {
     * If you extend this class, it does make sense to more closely specify the
     * result's class.
     */
-    virtual itk::SmartPointer<BaseData> Read(const std::string& path = 0) = 0;
+    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path = 0) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.
@@ -119,7 +119,7 @@ namespace mitk {
     * If you extend this class, it does make sense to more closely specify the
     * result's class.
     */
-    virtual itk::SmartPointer<BaseData> Read(const std::istream& stream ) = 0;
+    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream ) = 0;
 
     /**
     * \brief Returns the priority which defined how 'good' the FileReader can handle it's file format.

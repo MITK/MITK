@@ -37,13 +37,16 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-itk::SmartPointer<mitk::BaseData> mitk::LegacyFileReaderService::Read(const std::string& path)
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path)
 {
-  return mitk::IOUtil::LoadDataNode(path)->GetData();
+  std::list< mitk::BaseData::Pointer > result;
+  result.push_front(mitk::IOUtil::LoadDataNode(path)->GetData());
+  return result;
 }
 
-itk::SmartPointer<mitk::BaseData> mitk::LegacyFileReaderService::Read(const std::istream& stream )
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& stream )
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
-  return 0;
+  std::list< mitk::BaseData::Pointer > result;
+  return result;
 }

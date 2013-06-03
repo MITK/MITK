@@ -49,15 +49,15 @@ class MITK_CORE_EXPORT FileReaderManager
     * FileReadException: If the selected reader failed to read the file
     **/
 
-    static mitk::BaseData::Pointer Read(const std::string& path);
+    static std::list< itk::SmartPointer<BaseData> > Read(const std::string& path);
 
     static std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0);
 
     template <class T>
     static T* Read(const std::string& path)
     {
-      mitk::BaseData::Pointer basedata = Read(path);
-      T* result = dynamic_cast<T*> (basedata.GetPointer());
+      std::list<mitk::BaseData::Pointer> basedatas = Read(path);
+      T* result = dynamic_cast<T*> (basedatas.front().GetPointer());
       return result;
     }
 

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
+#include "mitkPointSetShapeProperty.h"
 #include <vtkSmartPointer.h>
 #include <vtkAppendPolyData.h>
 #include <vtkGlyph3D.h>

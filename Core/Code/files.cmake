@@ -204,6 +204,7 @@ set(CPP_FILES
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
+  DataManagement/mitkPointSetShapeProperty.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp

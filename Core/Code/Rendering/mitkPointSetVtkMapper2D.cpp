@@ -81,7 +81,7 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   m_UnselectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
   m_SelectedGlyph3D = vtkSmartPointer<vtkGlyph3D>::New();
 
-   // polydata
+  // polydata
   m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
   m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -202,7 +202,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       ls->m_PropAssembly->RemovePart(ls->m_VtkTextAngleActors.at(i));
   }
 
-   // polydata
+  // polydata
   ls->m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   ls->m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
   ls->m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -366,6 +366,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         std::string l = pointLabel;
         if (input->GetSize()>1)
         {
+          char buffer[20];
+          sprintf(buffer,"%u",pointsIter->Index());
           std::stringstream ss;
           ss << pointsIter->Index();
           l.append(ss.str());
@@ -632,14 +634,18 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
   node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
-  mitk::EnumerationProperty* eP = dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("Pointset.2D.shape", renderer));
-  m_IdGlyph = eP->GetValueAsId();
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillGlyphs, renderer);
+
+
+  mitk::PointSetShapeProperty::Pointer shape = dynamic_cast<mitk::PointSetShapeProperty*>(this->GetDataNode()->GetProperty( "Pointset.2D.shape", renderer ));
+  if(shape.IsNotNull())
+  {
+    m_IdGlyph = shape->GetPointSetShape();
+  }
 
 
   //check for color props and use it for rendering of selected/unselected points and contour
   //due to different params in VTK (double/float) we have to convert
-
 
   float unselectedColor[4];
   vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
@@ -719,8 +725,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
 
   if(needGenerateData)
   {
-  // create new vtk render objects (e.g. a circle for a point)
-  this->CreateVTKRenderObjects(renderer);
+    // create new vtk render objects (e.g. a circle for a point)
+    this->CreateVTKRenderObjects(renderer);
   }
 
 }
@@ -740,24 +746,10 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite );
+  node->AddProperty( "Pointset.2D.fill shape", mitk::BoolProperty::New(false), renderer, overwrite); // fill or do not fill the glyph shape
 
-  mitk::EnumerationProperty::Pointer glyphType = mitk::EnumerationProperty::New();
-  glyphType->AddEnum("None", 0);
-  glyphType->AddEnum("Vertex", 1);
-  glyphType->AddEnum("Dash", 2);
-  glyphType->AddEnum("Cross", 3);
-  glyphType->AddEnum("ThickCross", 4);
-  glyphType->AddEnum("Triangle", 5);
-  glyphType->AddEnum("Square", 6);
-  glyphType->AddEnum("Circle", 7);
-  glyphType->AddEnum("Diamond", 8);
-  glyphType->AddEnum("Arrow", 9);
-  glyphType->AddEnum("ThickArrow", 10);
-  glyphType->AddEnum("HookedArrow", 11);
-  glyphType->SetValue("Cross");
-  node->AddProperty( "Pointset.2D.shape", glyphType, renderer, overwrite);
-
-  node->AddProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(false), renderer, overwrite); // fill or do not fill the glyph shape
+  mitk::PointSetShapeProperty::Pointer pointsetShapeProperty = mitk::PointSetShapeProperty::New();
+  node->AddProperty( "Pointset.2D.shape", pointsetShapeProperty, renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

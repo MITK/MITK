@@ -649,8 +649,6 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   vtkFloatingPointType selectedColor[4]={1.0f,0.0f,0.0f,1.0f};    //red
   vtkFloatingPointType contourColor[4]={1.0f,0.0f,0.0f,1.0f};     //red
 
-  //different types for color
-  mitk::Color tmpColor;
   float opacity = 1.0;
 
   GetDataNode()->GetOpacity(opacity, renderer);
@@ -667,18 +665,20 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     //get selected color property
     if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor")) != NULL)
     {
-      tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor"))->GetValue();
-
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("selectedcolor"))->GetValue();
+      selectedColor[0] = tmpColor[0];
+      selectedColor[1] = tmpColor[1];
+      selectedColor[2] = tmpColor[2];
+      selectedColor[3] = 1.0f; // alpha value
     }
     else if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("selectedcolor")) != NULL)
     {
-      tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("selectedcolor"))->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("selectedcolor"))->GetValue();
+      selectedColor[0] = tmpColor[0];
+      selectedColor[1] = tmpColor[1];
+      selectedColor[2] = tmpColor[2];
+      selectedColor[3] = 1.0f; // alpha value
     }
-
-    selectedColor[0] = tmpColor[0];
-    selectedColor[1] = tmpColor[1];
-    selectedColor[2] = tmpColor[2];
-    selectedColor[3] = 1.0f; // alpha value
 
     ls->m_SelectedActor->GetProperty()->SetColor(selectedColor);
     ls->m_SelectedActor->GetProperty()->SetOpacity(opacity);
@@ -701,17 +701,20 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     //get contour color property
     if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor")) != NULL)
     {
-      tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("contourcolor"))->GetValue();
+      contourColor[0] = tmpColor[0];
+      contourColor[1] = tmpColor[1];
+      contourColor[2] = tmpColor[2];
+      contourColor[3] = 1.0f;
     }
     else if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor")) != NULL)
     {
-      tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))->GetValue();
+      mitk::Color tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("contourcolor"))->GetValue();
+      contourColor[0] = tmpColor[0];
+      contourColor[1] = tmpColor[1];
+      contourColor[2] = tmpColor[2];
+      contourColor[3] = 1.0f;
     }
-
-    contourColor[0] = tmpColor[0];
-    contourColor[1] = tmpColor[1];
-    contourColor[2] = tmpColor[2];
-    contourColor[3] = 1.0f;
 
     ls->m_ContourActor->GetProperty()->SetColor(contourColor);
     ls->m_ContourActor->GetProperty()->SetOpacity(opacity);

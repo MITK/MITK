@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkRandomImageSource.h>
 
-#include <itkBinaryThresholdImageFilter.h>
+#include <itkThresholdImageFilter.h>
 
 #include "mitkImageAccessByItk.h"
 
@@ -105,22 +105,18 @@ static void ItkThresholdFilter(
     const double th[])
 {
     typedef itk::Image<TPixel, VDimensions> InputImageType;
-    typedef itk::Image<unsigned int, VDimensions> OutputImageType;
-    typedef itk::BinaryThresholdImageFilter<
-      InputImageType, OutputImageType> BinaryThresholdFilterType;
+    typedef itk::Image<TPixel, VDimensions> OutputImageType;
+    typedef itk::ThresholdImageFilter< InputImageType > ThresholdFilterType;
 
-    typename BinaryThresholdFilterType::Pointer thresholder =
-      BinaryThresholdFilterType::New();
+    typename ThresholdFilterType::Pointer thresholder =
+      ThresholdFilterType::New();
     thresholder->SetInput(image);
-    thresholder->SetLowerThreshold(th[0]);
-    thresholder->SetUpperThreshold(th[1]);
-    thresholder->SetInsideValue(255);
-    thresholder->SetOutsideValue(0);
+    thresholder->ThresholdOutside(th[0], th[1]);
     thresholder->Update();
 
     try
     {
-      output = mitk::ImportItkImage(thresholder->GetOutput());
+      output = mitk::GrabItkImageMemory(thresholder->GetOutput());
     }
     catch(itk::ExceptionObject&)
     {
@@ -140,37 +136,39 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
   TPixel* image_data = new TPixel[27];
 
   // ground truth for result check
-  unsigned int* ground_truth = new unsigned int[27];
-  double threshold[2] = { 9.0, 18.0 };
+  TPixel* ground_truth = new TPixel[27];
+  double threshold[2] = { 90.0, 180.0 };
 
   // fill image
   for( unsigned int i=0; i<27; i++)
   {
     image_data[i] = static_cast<TPixel>(i * 10);
 
-    ground_truth[i] = 255;
-    if( i < threshold[0] || i > threshold[1] )
-      ground_truth[i] = 0;
+    ground_truth[i] = 0;
+    if( image_data[i] >= threshold[0] && image_data[i] <= threshold[1] )
+      ground_truth[i] = static_cast<TPixel>(i * 10);
+
   }
 
   mitk::Image::Pointer input = mitk::Image::New();
   input->Initialize( mitk::MakeScalarPixelType<TPixel>(), 3, dimensions );
   input->SetImportVolume( image_data );
 
-
   mitk::Image::Pointer output = mitk::Image::New();
+  //output->Initialize(input);
   AccessByItk_2(input, ItkThresholdFilter, output, threshold );
 
-  mitk::ImagePixelReadAccessor< unsigned int, 3 > readAccessor( output );
-  const unsigned int* output_data = readAccessor.GetConstData();
+  mitk::ImagePixelReadAccessor< TPixel, 3 > readAccessor( output );
+  const TPixel* output_data = readAccessor.GetConstData();
 
   bool equal = true;
   for( unsigned int i=0; i<27; i++)
   {
+
     equal &= (ground_truth[i] == output_data[i]);
     if(!equal)
     {
-      std::cout << "  :: At position " << i << " :  " <<ground_truth[i] << " ? " << output_data[i] << "\n";
+      MITK_INFO << "  :: At position " << i << " :  " <<ground_truth[i] << " ? " << output_data[i] << "\n";
       break;
     }
   }
@@ -330,7 +328,7 @@ int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 4>();// "Import succesfull on uchar");
   Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 4>();// "Import succesfull on int");
 
-  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<short>();// "Import succesfull on 3D short");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<short>();// "Import successful on 3D short");
   Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<float>();// "Import succesfull on float");
   Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<unsigned char>();// "Import succesfull on uchar");
   Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<int>();// "Import succesfull on int");

@@ -317,17 +317,23 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
   newTransform->SetMatrix(rotationFloat);
   newTransform->SetOffset(translationFloat);
-  m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+  if(m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNotNull())
+  {
+    m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+  }
 
   //transform ct image
-  mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
-  imageTransform->Compose(newTransform);
-  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-  itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
-  itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
-  newImageTransform->SetMatrix(rotationFloatNew);
-  newImageTransform->SetOffset(translationFloatNew);
-  m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+  if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
+  {
+    mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
+    imageTransform->Compose(newTransform);
+    mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+    itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
+    itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
+    newImageTransform->SetMatrix(rotationFloatNew);
+    newImageTransform->SetOffset(translationFloatNew);
+    m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+  }
 
 }
 

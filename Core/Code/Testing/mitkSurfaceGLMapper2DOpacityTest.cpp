@@ -42,7 +42,7 @@ int mitkSurfaceGLMapper2DOpacityTest(int argc, char* argv[])
   //####################
   //Use this to generate a reference screenshot or save the file.
   //(Only in your local version of the test!)
-  if(true)
+  if(false)
   {
     renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
   }

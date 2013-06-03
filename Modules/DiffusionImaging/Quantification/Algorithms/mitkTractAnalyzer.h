@@ -28,8 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk{
-/** \class TractAnalyzer
- */
+/**
+  * \brief Creates a region of interest for tract-specific analysis of existing TBSS data
+  *
+  * This class needs a 3D image (typically a mean FA skeleton as produced by the standard TBSS pipeline of FSL)
+  * and a user-defined point set defining the points through which the region of interest should pass.
+  */
 
 
 class Quantification_EXPORT TractAnalyzer

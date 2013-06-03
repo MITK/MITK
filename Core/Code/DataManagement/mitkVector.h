@@ -397,7 +397,16 @@ template <typename TCoordRep, unsigned int NPointDimension>
   inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2, TCoordRep eps=mitk::eps)
 {
   vnl_vector_fixed<TCoordRep, NPointDimension> diff = vector1-vector2;
-  return diff.squared_magnitude() < mitk::eps;
+  bool returnValue = true;
+  for( unsigned int i=0; i<diff.size(); i++)
+  {
+    if(diff[i]>eps || diff[i]<-eps)
+    {
+     returnValue = false;
+    }
+  }
+
+  return returnValue;
 }
 
 template <typename U, typename V, unsigned int NRows, unsigned int NColumns>

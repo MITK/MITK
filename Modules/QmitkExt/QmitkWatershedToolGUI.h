@@ -40,6 +40,7 @@ class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 
   public:
     mitkClassMacro(QmitkWatershedToolGUI, QmitkToolGUI);
+    itkNewMacro(QmitkWatershedToolGUI);
 
   protected slots:
 

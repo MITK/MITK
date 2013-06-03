@@ -48,6 +48,11 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
     mitkClassMacro(WatershedTool, AutoSegmentationTool);
     itkNewMacro(WatershedTool);
 
+    void DoIt();
+
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
+
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
 

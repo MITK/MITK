@@ -136,12 +136,21 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     lsfParameterMatrix.put(shellIndex, 0, it->first);
     lsfParameterMatrix.put(shellIndex, 1, 1./6.);
 
+
+
     ++shellIndex;
 
   }
+  MITK_INFO << "lsfParameteR(1)";
+  MITK_INFO << lsfParameterMatrix;
 
   vnl_matrix_inverse<double> A_A(lsfParameterMatrix.transpose() * lsfParameterMatrix);
+  MITK_INFO << "lsfParameteR(2)";
+  MITK_INFO << A_A;
+
   m_lsfParameterMatrix = A_A.inverse() * lsfParameterMatrix.transpose();
+  MITK_INFO << "lsfParameteR(3)";
+  MITK_INFO << m_lsfParameterMatrix;
 
 
   m_WeightsVector.reserve(m_B_ValueMap.size()-1);
@@ -293,9 +302,10 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::S_S0Normalization( vnl_vector<double> & vec, const double & S0 )
 {
   for(unsigned int i = 0; i < vec.size(); i++){
-    vec[i] /= S0;
-    if(vec[i]>1.0) vec[i] = 1;
-    if(vec[i]<0.0) vec[i] = 0;
+    vec[i] = std::log( vec[i]/S0 );
+    if(vec[i]>1.0) vec[i] = 1.;
+    if(vec[i]<0.0) vec[i] = 0.;
+
   }
 }
 
@@ -308,7 +318,6 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   {
     // x = (A' A)^-1 A' b
     vnl_vector<double> lsfCoeffsVector(m_lsfParameterMatrix * SignalMatrix.get_row(i));
-    MITK_INFO << lsfCoeffsVector;
     lsfCoeffs.set_row(i, lsfCoeffsVector);
   }
 }
@@ -318,9 +327,13 @@ template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & bValue, const double & referenceSignal)
 {
-  for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++)
+  for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++){
     // S = S0 * e^(-b*D + 1/6*D^2*K)
-    vec[i] = referenceSignal * exp((-bValue) * lsfCoeffs(i,0) + 1./6. * lsfCoeffs(i,1));
+    double D = lsfCoeffs(i,0);
+    double K = lsfCoeffs(i,1) / (D*D);
+    MITK_INFO << D << " " << K;
+    vec[i] = referenceSignal * exp((-bValue) * D + 1./6. * D* D * K);
+  }
 }
 
 

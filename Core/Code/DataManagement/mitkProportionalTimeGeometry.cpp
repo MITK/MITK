@@ -44,7 +44,10 @@ mitk::TimePointType mitk::ProportionalTimeGeometry::GetMinimumTimePoint () const
 
 mitk::TimePointType mitk::ProportionalTimeGeometry::GetMaximumTimePoint () const
 {
-  return m_FirstTimePoint + m_StepDuration * GetNumberOfTimeSteps();
+  TimePointType timePoint = m_FirstTimePoint + m_StepDuration * GetNumberOfTimeSteps();
+  if (timePoint >std::numeric_limits<TimePointType>().max())
+    timePoint = std::numeric_limits<TimePointType>().max();
+  return timePoint;
 }
 
 mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds () const
@@ -100,8 +103,13 @@ mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeSt
 
 mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimePoint(TimePointType timePoint) const
 {
-  TimeStepType timeStep = this->TimePointToTimeStep(timePoint);
-  return this->GetGeometryForTimeStep(timeStep);
+  if (this->IsValidTimePoint(timePoint))
+  {
+    TimeStepType timeStep = this->TimePointToTimeStep(timePoint);
+    return this->GetGeometryForTimeStep(timeStep);
+  }
+  else
+    return NULL;
 }
 
 

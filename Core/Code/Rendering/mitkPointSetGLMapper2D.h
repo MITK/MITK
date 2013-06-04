@@ -58,10 +58,10 @@ class PointSet;
 /** \deprecatedSince{2013_06} This mapper is replaced by PointSetVtkMapper2D. The child classes of this class are deprecated.
  * To further ensure their functionality PointSetGLMapper2D cannot be removed and is set deprecated too.
  */
-class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
+class DEPRECATED() MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper
 {
 public:
-  DEPRECATED(mitkClassMacro(PointSetGLMapper2D, GLMapper));
+  mitkClassMacro(PointSetGLMapper2D, GLMapper);
 
   itkNewMacro(Self);
 

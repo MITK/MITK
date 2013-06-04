@@ -117,7 +117,7 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
 
 }
 
-int mitkGrabItkImageMemoryTest( int, char** )
+int mitkGrabItkImageMemoryTest( int /*argc*/, char* /*argv*/[] )
 {
   MITK_TEST_BEGIN("mitkGrabItkImageMemoryTest")
 

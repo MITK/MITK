@@ -218,7 +218,7 @@ void Assert_ItkImageImportSucceded_ReturnsTrue()
 int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
 {
 
-  MITK_TEST_BEGIN("ImportItkImageTest")
+  MITK_TEST_BEGIN("mitkImportItkImageTest")
 
   Assert_ItkImageImportSucceded_ReturnsTrue<short, 3>();// "Import succesfull on 3D short");
   Assert_ItkImageImportSucceded_ReturnsTrue<float, 3>();// "Import succesfull on float");

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  *  @param output mitk::Image to hold the result of the filter
  *  @param th[] two double values to set the lower/upper threshold
  */
+//! [ItkThresholdFilter]
 template<typename TPixel, unsigned int VDimensions>
 static void ItkThresholdFilter(
     const itk::Image<TPixel, VDimensions>* image,
@@ -58,6 +59,7 @@ static void ItkThresholdFilter(
       MITK_TEST_FAILED_MSG(<<"Thresholding computation failed");
     }
 }
+//! [ItkThresholdFilter]
 
 /**
  * Creates an mitk::Image, executes the binary threshold filter through AccessByItk and
@@ -89,9 +91,10 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
   input->Initialize( mitk::MakeScalarPixelType<TPixel>(), 3, dimensions );
   input->SetImportVolume( image_data );
 
+//! [OutOfScopeCall]
   mitk::Image::Pointer output = mitk::Image::New();
-  //output->Initialize(input);
   AccessByItk_2(input, ItkThresholdFilter, output, threshold );
+//! [OutOfScopeCall]
 
   mitk::ImagePixelReadAccessor< TPixel, 3 > readAccessor( output );
   const TPixel* output_data = readAccessor.GetConstData();

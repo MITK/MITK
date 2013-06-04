@@ -238,9 +238,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   }
 
   //iterator for point set
-  mitk::PointSet::PointsContainer::Iterator pointsIter;
-  mitk::PointSet::PointsContainer::Iterator pointsIterPredecessor;
-  pointsIterPredecessor = itkPointSet->GetPoints()->Begin();
+  mitk::PointSet::PointsContainer::Iterator pointsIter = itkPointSet->GetPoints()->Begin();
+  mitk::PointSet::PointsContainer::Iterator pointsIterPredecessor = itkPointSet->GetPoints()->Begin();
 
 
   // PointDataContainer has additional information to each point, e.g. whether
@@ -282,20 +281,25 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   const int text2dDistance = 10;
 
+  // initialize points with a random start value
+
   // current point in point set
-  itk::Point<float> point;
+  itk::Point<float> point = pointsIter->Value();
 
-  Point3D p;                      // currently visited point
-  Point3D lastP;                  // last visited point
-  Vector3D vec;                   // p - lastP
-  Vector3D lastVec;               // lastP - point before lastP
+  mitk::Point3D p = point;              // currently visited point
+  mitk::Point3D lastP = point;          // last visited point
+  mitk::Vector3D vec;                   // p - lastP
+  mitk::Vector3D lastVec;               // lastP - point before lastP
   vec.Fill(0);
+  lastVec.Fill(0);
 
-  mitk::Point3D projected_p;      // p projected on viewplane
+  mitk::Point3D projected_p = point;     // p projected on viewplane
 
-  Point2D pt2d;       // projected_p in display coordinates
-  Point2D lastPt2d;   // last projected_p in display coordinates
-  Point2D preLastPt2d;// projected_p in display coordinates before lastPt2
+  mitk::Point2D pt2d;
+  pt2d[0] = point[0];                    // projected_p in display coordinates
+  pt2d[1] = point[1];
+  mitk::Point2D lastPt2d = pt2d;         // last projected_p in display coordinates
+  mitk::Point2D preLastPt2d = pt2d ;     // projected_p in display coordinates before lastPt2
 
   // get display geometry
   mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();

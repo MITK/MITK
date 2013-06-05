@@ -55,16 +55,6 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
   }
 }
 
-static mitk::DataStorage::Pointer GetDataStorage()
-{
-  mitk::IDataStorageService::Pointer service =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-  assert(service.IsNotNull());
-
-  return service->GetDefaultDataStorage()->GetDataStorage();
-}
-
 QmitkDataSelectionWidget::QmitkDataSelectionWidget(QWidget* parent)
   : QWidget(parent)
 {
@@ -102,12 +92,22 @@ unsigned int QmitkDataSelectionWidget::AddDataStorageComboBox(const QString &lab
     m_Controls.gridLayout->addWidget(label, row, 0);
   }
 
-  QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(GetDataStorage(), predicate, m_Controls.dataSelectionWidget);
+  QmitkDataStorageComboBox* comboBox = new QmitkDataStorageComboBox(this->GetDataStorage(), predicate, m_Controls.dataSelectionWidget);
   connect(comboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectionChanged(const mitk::DataNode *)));
   m_Controls.gridLayout->addWidget(comboBox, row, 1);
 
   m_DataStorageComboBoxes.push_back(comboBox);
   return static_cast<unsigned int>(m_DataStorageComboBoxes.size() - 1);
+}
+
+mitk::DataStorage::Pointer QmitkDataSelectionWidget::GetDataStorage() const
+{
+  mitk::IDataStorageService::Pointer service =
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  assert(service.IsNotNull());
+
+  return service->GetDefaultDataStorage()->GetDataStorage();
 }
 
 mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int index)

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ui_QmitkDataSelectionWidgetControls.h>
 #include <mitkDataNode.h>
+#include <mitkDataStorage.h>
 #include <vector>
 
 namespace mitk
@@ -48,6 +49,7 @@ public:
   unsigned int AddDataStorageComboBox(const QString &labelText, Predicate predicate);
   unsigned int AddDataStorageComboBox(const QString &labelText, mitk::NodePredicateBase* predicate = NULL);
 
+  mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);
   void SetHelpText(const QString& text);
 

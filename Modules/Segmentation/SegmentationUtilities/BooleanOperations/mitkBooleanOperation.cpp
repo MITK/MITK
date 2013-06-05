@@ -16,9 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBooleanOperation.h"
 #include <mitkExceptionMacro.h>
+#include <mitkImageCast.h>
 #include <mitkImageTimeSelector.h>
+#include <itkAndImageFilter.h>
+#include <itkNotImageFilter.h>
+#include <itkOrImageFilter.h>
 
-static mitk::Image::ConstPointer Get3DSegmentation(mitk::Image::ConstPointer segmentation, unsigned int time)
+typedef itk::Image<unsigned char, 3> ImageType;
+
+static mitk::Image::Pointer Get3DSegmentation(mitk::Image::Pointer segmentation, unsigned int time)
 {
   if (segmentation->GetDimension() != 4)
     return segmentation;
@@ -33,7 +39,14 @@ static mitk::Image::ConstPointer Get3DSegmentation(mitk::Image::ConstPointer seg
   return imageTimeSelector->GetOutput();
 }
 
-mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::ConstPointer segmentation0, mitk::Image::ConstPointer segmentation1, unsigned int time)
+static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, unsigned int time)
+{
+  ImageType::Pointer result;
+  mitk::CastToItkImage(Get3DSegmentation(segmentation, time), result);
+  return result;
+}
+
+mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::Pointer segmentation0, mitk::Image::Pointer segmentation1, unsigned int time)
   : m_Type(type),
     m_Segmentation0(segmentation0),
     m_Segmentation1(segmentation1),
@@ -48,10 +61,87 @@ mitk::BooleanOperation::~BooleanOperation()
 
 mitk::Image::Pointer mitk::BooleanOperation::GetResult() const
 {
-  return NULL;
+  Image::Pointer result;
+
+  switch (m_Type)
+  {
+    case Difference:
+      result = this->GetDifference();
+      break;
+
+    case Intersection:
+      result = this->GetIntersection();
+      break;
+
+    case Union:
+      result = this->GetUnion();
+      break;
+
+    default:
+      mitkThrow() << "Unknown boolean operation type '" << m_Type << "'!";
+  }
+
+  return result;
 }
 
-void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::ConstPointer segmentation) const
+mitk::Image::Pointer mitk::BooleanOperation::GetDifference() const
+{
+  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
+  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+
+  itk::NotImageFilter<ImageType, ImageType>::Pointer notFilter = itk::NotImageFilter<ImageType, ImageType>::New();
+  notFilter->SetInput(input2);
+
+  itk::AndImageFilter<ImageType, ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+  andFilter->SetInput1(input1);
+  andFilter->SetInput2(notFilter->GetOutput());
+
+  andFilter->UpdateLargestPossibleRegion();
+
+  Image::Pointer result = Image::New();
+  CastToMitkImage<ImageType>(andFilter->GetOutput(), result);
+
+  result->DisconnectPipeline();
+  return result;
+}
+
+mitk::Image::Pointer mitk::BooleanOperation::GetIntersection() const
+{
+  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
+  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+
+  itk::AndImageFilter<ImageType, ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+  andFilter->SetInput1(input1);
+  andFilter->SetInput2(input2);
+
+  andFilter->UpdateLargestPossibleRegion();
+
+  Image::Pointer result = Image::New();
+  CastToMitkImage<ImageType>(andFilter->GetOutput(), result);
+
+  result->DisconnectPipeline();
+  return result;
+}
+
+mitk::Image::Pointer mitk::BooleanOperation::GetUnion() const
+{
+  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
+  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+
+  itk::OrImageFilter<ImageType, ImageType>::Pointer orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
+  orFilter->SetInput1(input1);
+  orFilter->SetInput2(input2);
+
+  orFilter->UpdateLargestPossibleRegion();
+
+  Image::Pointer result = Image::New();
+  CastToMitkImage<ImageType>(orFilter->GetOutput(), result);
+
+  result->DisconnectPipeline();
+  return result;
+}
+
+void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentation) const
 {
   if (segmentation.IsNull())
     mitkThrow() << "Segmentation is NULL!";

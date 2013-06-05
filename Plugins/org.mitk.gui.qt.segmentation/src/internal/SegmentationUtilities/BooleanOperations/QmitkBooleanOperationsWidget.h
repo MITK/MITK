@@ -31,7 +31,7 @@ public:
 
 private slots:
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
-  void OnDiffernceButtonClicked();
+  void OnDifferenceButtonClicked();
   void OnIntersectionButtonClicked();
   void OnUnionButtonClicked();
 

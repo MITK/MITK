@@ -33,7 +33,7 @@ namespace mitk
       Union
     };
 
-    BooleanOperation(Type type, Image::ConstPointer segmentation1, Image::ConstPointer segmentation2, unsigned int time = 0);
+    BooleanOperation(Type type, Image::Pointer segmentation1, Image::Pointer segmentation2, unsigned int time = 0);
     ~BooleanOperation();
 
     Image::Pointer GetResult() const;
@@ -42,12 +42,16 @@ namespace mitk
     BooleanOperation(const BooleanOperation &);
     BooleanOperation & operator=(const BooleanOperation &);
 
-    void ValidateSegmentation(Image::ConstPointer segmentation) const;
+    Image::Pointer GetDifference() const;
+    Image::Pointer GetIntersection() const;
+    Image::Pointer GetUnion() const;
+
+    void ValidateSegmentation(Image::Pointer segmentation) const;
     void ValidateSegmentations() const;
 
     Type m_Type;
-    Image::ConstPointer m_Segmentation0;
-    Image::ConstPointer m_Segmentation1;
+    Image::Pointer m_Segmentation0;
+    Image::Pointer m_Segmentation1;
     unsigned int m_Time;
   };
 }

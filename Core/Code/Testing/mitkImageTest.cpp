@@ -94,7 +94,7 @@ public:
       double valueOld = *(frameOld->GetMatrix()[i]);
 
       //MITK_INFO << "Index: " << i << " Old: " << valueOld << " New: " << valueNew << " Difference:" << valueOld-valueNew<< std::endl;
-      matrixEqual = matrixEqual && mitk::Equal(valueNew, valueOld, 0.001*mitk::eps);
+      matrixEqual = matrixEqual && mitk::Equal(valueNew, valueOld, mitk::eps);
     }
     MITK_TEST_CONDITION(matrixEqual, "Matrix elements of cloned matrix equal original matrix");
 

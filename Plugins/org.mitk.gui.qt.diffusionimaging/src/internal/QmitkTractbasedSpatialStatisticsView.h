@@ -99,23 +99,27 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
   protected slots:
 
-
-    //void Masking();
-
+    // Creates Roi
     void CreateRoi();
 
     void Clicked(const QwtDoublePoint& pos);
 
+    // Import of FSL TBSS data
     void TbssImport();
 
+    // Add a group as metadata. This metadata is required by the plotting functionality
     void AddGroup();
 
+    // Remove a group
     void RemoveGroup();
 
+    // Copies the values displayed in the plot widget to clipboard, i.e. exports the data
     void CopyToClipboard();
 
+    // Method to cut away parts of fiber bundles that should not be plotted.
     void Cut();
 
+    // Adjust plot
     void PerformChange();
 
 
@@ -143,84 +147,17 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     QmitkStdMultiWidget* m_MultiWidget;
 
 
-    std::vector<CharImageType::IndexType> SortPoints(CharImageType::Pointer roi, CharImageType::IndexType currentPoint);
-
-    bool PointVisited(std::vector<CharImageType::IndexType> points, CharImageType::IndexType point);
-
-    // Modifies the current point by reference and returns true if no more points need to be visited
-    CharImageType::IndexType FindNextPoint(std::vector<CharImageType::IndexType> pointsVisited,
-      CharImageType::IndexType currentPoint, CharImageType::Pointer roi, bool &ready);
-
-
-
-
-    //void DoInitializeGridByVectorImage(FloatVectorImageType::Pointer vectorpic, CharImageType::Pointer roi ,std::string name);
-
-
-    /*
-
-    // Tokenizer needed for the roi files
-    void Tokenize(const std::string& str,
-                  std::vector<std::string>& tokens,
-                  const std::string& delimiters = " ")
-    {
-      // Skip delimiters at beginning.
-      std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-      // Find first "non-delimiter".
-      std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-      while (std::string::npos != pos || std::string::npos != lastPos)
-      {
-          // Found a token, add it to the vector.
-          tokens.push_back(str.substr(lastPos, pos - lastPos));
-          // Skip delimiters.  Note the "not_of"
-          lastPos = str.find_first_not_of(delimiters, pos);
-          // Find next "non-delimiter"
-          pos = str.find_first_of(delimiters, lastPos);
-      }
-    }
-
-    */
-
-    mitk::DataNode::Pointer readNode(std::string f)
-    {
-      mitk::DataNode::Pointer node;
-      mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-      try
-      {
-        nodeReader->SetFileName(f);
-        nodeReader->Update();
-        node = nodeReader->GetOutput();
-      }
-      catch(...) {
-        MITK_ERROR << "Could not read file";
-        return NULL;
-      }
-
-      return node;
-    }
-
-    /*template < typename TPixel, unsigned int VImageDimension >
-    void ToITK4D( itk::Image<TPixel, VImageDimension>* inputImage, Float4DImageType::Pointer& outputImage );*/
-
-
-    std::string ReadFile(std::string whatfile);
-
     std::vector< itk::Index<3> > m_Roi;
 
     mitk::FiberBundleX* m_Fib;
-
-    std::string m_CurrentStructure;
 
     mitk::Geometry3D* m_CurrentGeometry;
 
     QmitkTbssTableModel* m_GroupModel;
 
 
-
     void AddTbssToDataStorage(mitk::Image* image, std::string name);
 
-    mitk::TbssImage::Pointer m_CurrentTbssMetaImage;
 
     VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
 
@@ -228,6 +165,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 
     mitk::DataNode::Pointer m_CurrentStartRoi; // needed when a plot should only show values between a start end end roi
+
     mitk::DataNode::Pointer m_CurrentEndRoi; // idem dito
 
 

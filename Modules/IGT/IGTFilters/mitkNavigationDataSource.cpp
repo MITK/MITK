@@ -42,7 +42,7 @@ mitk::NavigationDataSource::~NavigationDataSource()
 
 mitk::NavigationData* mitk::NavigationDataSource::GetOutput()
 {
-  if (this->GetNumberOfOutputs() < 1)
+  if (this->GetNumberOfIndexedOutputs() < 1)
     return NULL;
 
   return static_cast<NavigationData*>(this->ProcessObject::GetPrimaryOutput());
@@ -108,10 +108,10 @@ void mitk::NavigationDataSource::GraftOutput(itk::DataObject *graft)
 
 void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
 {
-  if ( idx >= this->GetNumberOfOutputs() )
+  if ( idx >= this->GetNumberOfIndexedOutputs() )
   {
     itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
+      " but this filter only has " << this->GetNumberOfIndexedOutputs() << " Outputs.");
   }
 
   if ( !graft )

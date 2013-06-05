@@ -53,7 +53,7 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
   else
   {
     m_DataElem->QueryIntAttribute("ToolCount", &toolcount);
-    this->SetNumberOfOutputs(toolcount);
+    this->SetNumberOfRequiredOutputs(toolcount);
 
     mitk::NavigationData::Pointer emptyNd = mitk::NavigationData::New();
     mitk::NavigationData::PositionType position;
@@ -65,11 +65,12 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
     emptyNd->SetDataValid(false);
 
     mitk::NavigationData::Pointer tmp;
-    for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
+
+    for (unsigned int index = 0; index < this->GetNumberOfRequiredOutputs(); index++)
     {
       tmp = mitk::NavigationData::New();
       tmp->Graft(emptyNd);
-      this->SetNthOutput(index, tmp);
+      this->SetNthOutput(index, tmp.GetPointer());
     }
 
     // find out _NumberOfSnapshots
@@ -170,7 +171,7 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   // very important: go through the tools (there could be more than one)
   mitk::NavigationData::Pointer tmp;
 
-  for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
+  for (unsigned int index = 0; index < this->GetNumberOfIndexedOutputs(); index++)
   {
     // go to the first element
     if(!m_CurrentElem)

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 // Qt
 #include "QMessageBox.h"
@@ -49,13 +50,29 @@ void mitk::OtsuTool3D::Activated()
 {
   if (m_ToolManager)
   {
-    m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
+    m_OriginalImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+
+    m_BinaryPreviewNode = mitk::DataNode::New();
+    m_BinaryPreviewNode->SetName("Binary_Preview");
+    //m_BinaryPreviewNode->SetBoolProperty("helper object", true);
+    //m_BinaryPreviewNode->SetProperty("binary", mitk::BoolProperty::New(true));
+    m_ToolManager->GetDataStorage()->Add( this->m_BinaryPreviewNode );
+
+    m_MultiLabelResultNode = mitk::DataNode::New();
+    m_MultiLabelResultNode->SetName("Otsu_Preview");
+    //m_MultiLabelResultNode->SetBoolProperty("helper object", true);
+    m_MultiLabelResultNode->SetVisibility(true);
+
+    m_ToolManager->GetDataStorage()->Add( this->m_MultiLabelResultNode );
   }
 }
 
 void mitk::OtsuTool3D::Deactivated()
 {
-
+  m_ToolManager->GetDataStorage()->Remove( this->m_MultiLabelResultNode );
+  m_MultiLabelResultNode = NULL;
+  m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
+  m_BinaryPreviewNode = NULL;
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -77,13 +94,8 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
     if (proceed != QMessageBox::Ok) return;
   }
 
-  mitk::Image::Pointer mitkImage = 0;
-
-  mitkImage = dynamic_cast<mitk::Image*>( this->m_OriginalImageNode->GetData() );
-
   try
   {
-    // get selected mitk image
     const unsigned short dim = 3;
     typedef short InputPixelType;
     typedef unsigned char OutputPixelType;
@@ -98,55 +110,84 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
     filter->SetNumberOfThresholds(numberOfThresholds);
 
     InputImageType::Pointer itkImage;
-    mitk::CastToItkImage(mitkImage, itkImage);
+    mitk::CastToItkImage(m_OriginalImage, itkImage);
 
     filter->SetInput( itkImage );
 
     filter->Update();
 
-    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    std::string nameOfResultImage = this->m_OriginalImageNode->GetName();
-    nameOfResultImage.append("Otsu");
-    resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-    resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
+    mitk::Image::Pointer multiLabelSegmentation = mitk::Image::New();
+    mitk::CastToMitkImage( filter->GetOutput(), multiLabelSegmentation);
+    multiLabelSegmentation->GetGeometry()->SetOrigin(m_OriginalImage->GetGeometry()->GetOrigin());
+    multiLabelSegmentation->GetGeometry()->SetIndexToWorldTransform(m_OriginalImage->GetGeometry()->GetIndexToWorldTransform());
+
+    this->m_MultiLabelResultNode->SetData(multiLabelSegmentation);
+    m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
     renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-    resultNode->SetProperty("Image Rendering.Mode", renderingMode);
-
+    m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-
     mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-
     vtkLookupTable *lookupTable = vtkLookupTable::New();
     lookupTable->SetHueRange(1.0, 0.0);
     lookupTable->SetSaturationRange(1.0, 1.0);
     lookupTable->SetValueRange(1.0, 1.0);
     lookupTable->SetTableRange(-1.0, 1.0);
     lookupTable->Build();
-
     lut->SetVtkLookupTable(lookupTable);
-
     prop->SetLookupTable(lut);
-    resultNode->SetProperty("LookupTable",prop);
-
+    m_MultiLabelResultNode->SetProperty("LookupTable",prop);
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
     levelwindow.SetRangeMinMax(0, numberOfThresholds);
     levWinProp->SetLevelWindow( levelwindow );
-    resultNode->SetProperty( "levelwindow", levWinProp );
-
-    resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
-
-
-    this->m_ToolManager->GetDataStorage()->Add(resultNode, this->m_OriginalImageNode);
+    m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
 
     //this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
-
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   catch( std::exception& err )
   {
-    MITK_ERROR(this->GetNameOfClass()) << err.what();
+    MITK_ERROR(this->GetName()) << err.what();
   }
+}
+
+void mitk::OtsuTool3D::ConfirmSegmentation()
+{
+  this->m_ToolManager->GetWorkingData(0)->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+}
+
+void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
+{
+  m_MultiLabelResultNode->SetVisibility(false);
+  //pixel with regionID -> binary image
+  const unsigned short dim = 3;
+  typedef unsigned char PixelType;
+
+  typedef itk::Image< PixelType, dim > InputImageType;
+  typedef itk::Image< PixelType, dim > OutputImageType;
+
+  typedef itk::BinaryThresholdImageFilter< InputImageType, OutputImageType > FilterType;
+
+  FilterType::Pointer filter = FilterType::New();
+
+  InputImageType::Pointer itkImage;
+
+  mitk::Image::Pointer multiLabelSegmentation = dynamic_cast<mitk::Image*>(m_MultiLabelResultNode->GetData());
+  mitk::CastToItkImage(multiLabelSegmentation, itkImage);
+
+  filter->SetInput(itkImage);
+  filter->SetLowerThreshold(regionID);
+  filter->SetUpperThreshold(regionID);
+  filter->Update();
+  mitk::Image::Pointer binarySegmentation;
+  mitk::CastToMitkImage( filter->GetOutput(), binarySegmentation);
+  m_BinaryPreviewNode->SetData(binarySegmentation);
+  m_BinaryPreviewNode->SetVisibility(true);
+  m_BinaryPreviewNode->SetProperty("outline binary", mitk::BoolProperty::New(false));
+  m_BinaryPreviewNode->SetOpacity(1.0);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 const char* mitk::OtsuTool3D::GetName() const

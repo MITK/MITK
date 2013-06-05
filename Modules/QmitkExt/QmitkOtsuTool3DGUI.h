@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "QmitkExtExports.h"
 #include "mitkOtsuTool3D.h"
+#include <QListWidget.h>
 
 class QSpinBox;
 class QLabel;
@@ -51,6 +52,10 @@ class QmitkExt_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnSpinboxValueAccept();
 
+    void OnSegmentationRegionAccept();
+
+    void OnItemSelectionChanged();
+
   protected:
 
     QmitkOtsuTool3DGUI();
@@ -58,9 +63,9 @@ class QmitkExt_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     QSpinBox* m_Spinbox;
     QLabel* m_SizeLabel;
+    QListWidget* m_selectionListWidget;
 
     mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 };
 
 #endif
-

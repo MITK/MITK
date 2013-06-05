@@ -34,12 +34,18 @@ namespace mitk{
       virtual void Deactivated();
 
       void RunSegmentation( int regions);
+      void ConfirmSegmentation();
+      void UpdateBinaryPreview(int regionID);
 
     protected:
       OtsuTool3D();
       virtual ~OtsuTool3D();
 
-      mitk::DataNode::Pointer m_OriginalImageNode;
+      mitk::Image::Pointer m_OriginalImage;
+      //holds the user selected binary segmentation
+      mitk::DataNode::Pointer m_BinaryPreviewNode;
+      //holds the multilabel result as a preview image
+      mitk::DataNode::Pointer m_MultiLabelResultNode;
 
   };//class
 }//namespace

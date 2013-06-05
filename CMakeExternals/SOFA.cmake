@@ -39,7 +39,7 @@ if(MITK_USE_SOFA)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL http://dl.dropboxusercontent.com/u/5822501/SOFA-rev9479.tar.gz
+      URL http://mitk.org/download/thirdparty/SOFA-rev9479.tar.gz
       URL_MD5 fa43e6183abb8fc36c86ec43a095fdc2
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""

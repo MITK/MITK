@@ -55,6 +55,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
+    /// \brief Convert all current contour objects to binary segmentation image.
+    void ConfirmSegmentation();
+
   protected:
 
     LiveWireTool2D();

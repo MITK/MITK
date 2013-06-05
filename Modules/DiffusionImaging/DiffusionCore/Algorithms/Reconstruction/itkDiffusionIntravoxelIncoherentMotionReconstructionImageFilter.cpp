@@ -184,13 +184,13 @@ MeasAndBvals DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, T
     retval.N = newmeas.size();
 
     retval.meas.set_size(retval.N);
-    for(int i=0; i<newmeas.size(); i++)
+    for(size_t i=0; i<newmeas.size(); i++)
     {
         retval.meas[i] = newmeas[i];
     }
 
     retval.bvals.set_size(retval.N);
-    for(int i=0; i<newbvals.size(); i++)
+    for(size_t i=0; i<newbvals.size(); i++)
     {
         retval.bvals[i] = newbvals[i];
     }

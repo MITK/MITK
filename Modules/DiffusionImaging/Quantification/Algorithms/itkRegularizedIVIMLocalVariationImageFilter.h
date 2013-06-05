@@ -136,7 +136,7 @@ protected:
    * \sa ImageToImageFilter::ThreadedGenerateData(),
    *     ImageToImageFilter::GenerateData() */
   void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                            int threadId );
+                            ThreadIdType threadId );
 
 private:
   RegularizedIVIMLocalVariationImageFilter(const Self&); //purposely not implemented

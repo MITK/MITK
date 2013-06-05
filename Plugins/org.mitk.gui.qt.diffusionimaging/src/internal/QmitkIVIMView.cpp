@@ -427,7 +427,7 @@ void QmitkIVIMView::FittIVIMStart()
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
     mitk::DiffusionImage<short>* img = 0;
-    for ( int i=0; i<nodes.size(); i++ )
+    for ( unsigned int i=0; i<nodes.size(); i++ )
     {
         img = dynamic_cast<mitk::DiffusionImage<short>*>(nodes.at(i)->GetData());
         if (img)
@@ -730,14 +730,14 @@ void QmitkIVIMView::ClipboardCurveButtonClicked()
     {
 
         QString clipboard("Measurement Points\n");
-        for ( int i=0; i<m_Snap.bvalues.size(); i++)
+        for ( unsigned int i=0; i<m_Snap.bvalues.size(); i++)
         {
             clipboard = clipboard.append( "%L1 \t" )
                     .arg( m_Snap.bvalues[i], 0, 'f', 2 );
         }
         clipboard = clipboard.append( "\n" );
 
-        for ( int i=0; i<m_Snap.allmeas.size(); i++)
+        for ( unsigned int i=0; i<m_Snap.allmeas.size(); i++)
         {
             clipboard = clipboard.append( "%L1 \t" )
                     .arg( m_Snap.allmeas[i], 0, 'f', 2 );

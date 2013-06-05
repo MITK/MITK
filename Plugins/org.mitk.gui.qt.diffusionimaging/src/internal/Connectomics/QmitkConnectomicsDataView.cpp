@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkConnectomicsNetworkWriter.h>
 
 const std::string QmitkConnectomicsDataView::VIEW_ID = "org.mitk.views.connectomicsdata";
 
@@ -337,6 +338,8 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
     return;
 }
 
+#include <mitkConnectomicsObjectFactory.h>
+
 void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
 {
     if ( m_SelectedParcellationImage.IsNull() || m_SelectedFiberBundles.empty() )
@@ -358,13 +361,28 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
         m_ConnectomicsNetworkCreator->CreateNetworkFromFibersAndSegmentation();
         mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
 
+
         //add network to datastorage
-        QString name(m_SelectedFiberBundles.at(i)->GetName().c_str());
-        name += "_Connectome";
+        QString name("/local/data/Fibercup/connectomics/networks/");
+        name += m_SelectedFiberBundles.at(i)->GetName().c_str();
+        name += "_Connectome.cnf";
         networkNode->SetData( m_ConnectomicsNetworkCreator->GetNetwork() );
         networkNode->SetName( name.toStdString().c_str() );
-        this->GetDefaultDataStorage()->Add( networkNode, m_SelectedParcellationImage );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+        mitk::ConnectomicsNetwork::Pointer nw = m_ConnectomicsNetworkCreator->GetNetwork();
+
+        mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+        for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+        {
+            if ( (*it)->CanWriteBaseDataType(nw.GetPointer()) ) {
+                MITK_INFO << "writing " << name.toStdString();
+                (*it)->SetFileName( name.toStdString().c_str() );
+                (*it)->DoWrite( nw.GetPointer() );
+            }
+        }
+
+        //this->GetDefaultDataStorage()->Add( networkNode, m_SelectedParcellationImage );
+        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 
 }

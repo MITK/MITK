@@ -855,8 +855,8 @@ void QmitkFiberfoxView::GenerateImage()
                 mitk::GibbsRingingArtifact<double> gibbsModel;
                 if (m_Controls->m_AddGibbsRinging->isChecked())
                 {
-                    resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
-                    gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
+                    resultNode->AddProperty("Fiberfox.k-Space-Undersampling", DoubleProperty::New(m_Controls->m_KspaceUndersamplingBox->value()));
+                    gibbsModel.SetKspaceCropping(m_Controls->m_KspaceUndersamplingBox->value());
                     filter->SetRingingModel(&gibbsModel);
                 }
 
@@ -1164,8 +1164,8 @@ void QmitkFiberfoxView::GenerateImage()
         if (m_Controls->m_AddGibbsRinging->isChecked())
         {
             artifactModelString += "_RINGING";
-            resultNode->AddProperty("Fiberfox.k-Space-Undersampling", IntProperty::New(m_Controls->m_KspaceUndersamplingBox->currentText().toInt()));
-            gibbsModel.SetKspaceCropping((double)m_Controls->m_KspaceUndersamplingBox->currentText().toInt());
+            resultNode->AddProperty("Fiberfox.k-Space-Undersampling", DoubleProperty::New(m_Controls->m_KspaceUndersamplingBox->value()));
+            gibbsModel.SetKspaceCropping(m_Controls->m_KspaceUndersamplingBox->value());
             artifactList.push_back(&gibbsModel);
         }
 

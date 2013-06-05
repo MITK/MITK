@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
 #include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+#include <mitkIOUtil.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -469,13 +470,38 @@ void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePush
             filter->SetRescaleConnectivity(m_Controls->rescaleCheckBox->isChecked());
             filter->Update();
 
+//            mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
+//            connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
+
+//            connectivityMatrixImageNode->SetName( name.toStdString().c_str() );
+//            this->GetDefaultDataStorage()->Add(connectivityMatrixImageNode, node );
+
             mitk::Image::Pointer connectivityMatrixImage = mitk::ImportItkImage( filter->GetOutput())->Clone();
-            mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
-            connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
-            QString name(node->GetName().c_str());
-            name += "_ConnectivityMatrix";
-            connectivityMatrixImageNode->SetName( name.toStdString().c_str() );
-            this->GetDefaultDataStorage()->Add(connectivityMatrixImageNode, node );
+            if (m_Controls->binaryCheckBox->isChecked())
+            {
+                QString name("/local/data/Fibercup/connectomics/connectivity_matrices/binary/");
+                name += node->GetName().c_str();
+                name += "_ConnectivityMatrix.nrrd";
+                mitk::IOUtil::SaveImage(connectivityMatrixImage, name.toStdString().c_str());
+
+                QString name2("/local/data/Fibercup/connectomics/pics/binary/");
+                name2 += node->GetName().c_str();
+                name2 += "_ConnectivityMatrix.png";
+                mitk::IOUtil::SaveImage(connectivityMatrixImage, name2.toStdString().c_str());
+            }
+            else
+            {
+                QString name("/local/data/Fibercup/connectomics/connectivity_matrices/");
+                name += node->GetName().c_str();
+                name += "_ConnectivityMatrix.nrrd";
+                mitk::IOUtil::SaveImage(connectivityMatrixImage, name.toStdString().c_str());
+
+                QString name2("/local/data/Fibercup/connectomics/pics/");
+                name2 += node->GetName().c_str();
+                name2 += "_ConnectivityMatrix.png";
+                mitk::IOUtil::SaveImage(connectivityMatrixImage, name2.toStdString().c_str());
+            }
         }
     }
 }
+

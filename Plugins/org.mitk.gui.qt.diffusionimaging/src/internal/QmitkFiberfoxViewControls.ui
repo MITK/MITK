@@ -1710,6 +1710,16 @@
           <string>Noise and other Artifacts</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="m_AddGhosts">
+            <property name="text">
+             <string>Add N/2 Ghosts</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0">
            <widget class="QFrame" name="m_GhostFrame">
             <property name="enabled">
@@ -1833,7 +1843,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="11" column="0">
            <widget class="QFrame" name="m_GibbsRingingFrame">
             <property name="enabled">
              <bool>true</bool>
@@ -1871,53 +1881,25 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="m_KspaceUndersamplingBox">
+              <widget class="QDoubleSpinBox" name="m_KspaceUndersamplingBox">
                <property name="toolTip">
-                <string>Image is upsampled using this factor, afterwards fourier transformed, cropped to the original size and then inverse fourier transformed.</string>
+                <string>A larger offset increases the inensity of the ghost image.</string>
                </property>
-               <property name="currentIndex">
-                <number>0</number>
+               <property name="decimals">
+                <number>2</number>
                </property>
-               <item>
-                <property name="text">
-                 <string>2</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>16</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>32</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>64</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>128</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>256</string>
-                </property>
-               </item>
+               <property name="minimum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>4.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.100000000000000</double>
+               </property>
               </widget>
              </item>
             </layout>
@@ -2040,16 +2022,6 @@
               </widget>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="m_AddGhosts">
-            <property name="text">
-             <string>Add N/2 Ghosts</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
            </widget>
           </item>
           <item row="7" column="0">
@@ -2217,7 +2189,6 @@
   <tabstop>m_AddDistortions</tabstop>
   <tabstop>m_FrequencyMapBox</tabstop>
   <tabstop>m_AddGibbsRinging</tabstop>
-  <tabstop>m_KspaceUndersamplingBox</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>

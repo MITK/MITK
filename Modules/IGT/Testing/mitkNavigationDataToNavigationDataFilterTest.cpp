@@ -96,13 +96,11 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 11, "testing SetInput(10) produces 11 outputs");
   MITK_TEST_CONDITION(myFilter->GetInput(10) == nd1, "testing Set-/GetInput(10)");
 
-  /* COMMENTED OUT BECAUSE OF BUG 15017!
-  myFilter->SetInput(10, NULL); //this doesn't remove the output any more in ITK4
+  myFilter->SetInput(10, NULL);
   MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 10, "testing SetInput(10, NULL) removes output with index 10");
 
   myFilter->SetInput(1, NULL);
   MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 10, "testing SetInput(1, NULL) does not change number of outputs");
-  */
 
   // always end with this!
   MITK_TEST_END();

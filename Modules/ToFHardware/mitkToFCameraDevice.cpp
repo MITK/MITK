@@ -31,6 +31,13 @@ namespace mitk
     this->m_DistanceArray = NULL;
     this->m_PropertyList = mitk::PropertyList::New();
 
+    //By default, all devices have no further images (just a distance image)
+    //If a device provides more data (e.g. RGB, Intensity, Amplitde images,
+    //the property has to be true.
+    this->m_PropertyList->SetBoolProperty("HasRGBImage", false);
+    this->m_PropertyList->SetBoolProperty("HasIntensityImage", false);
+    this->m_PropertyList->SetBoolProperty("HasAmplitudeImage", false);
+
     this->m_MultiThreader = itk::MultiThreader::New();
     this->m_ImageMutex = itk::FastMutexLock::New();
     this->m_CameraActiveMutex = itk::FastMutexLock::New();

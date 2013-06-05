@@ -58,7 +58,7 @@ namespace mitk
     SimulationMapper3D(const Self&);
     Self& operator=(const Self&);
 
-    mitk::Mapper::LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
+    mitk::LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
   };
 }
 

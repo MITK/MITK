@@ -54,12 +54,6 @@ bool mitk::BaseProperty::AssignProperty(const BaseProperty& rhs)
   return false;
 }
 
-mitk::BaseProperty::Pointer mitk::BaseProperty::Clone() const
-{
-  Pointer result = dynamic_cast<BaseProperty*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 bool mitk::BaseProperty::operator==(const BaseProperty& property) const
 {
   return (typeid(*this) == typeid(property) && IsEqual(property));

@@ -91,6 +91,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
 QmitkDataManagerView::QmitkDataManagerView()
+    : m_GlobalReinitOnNodeDelete(true)
 {
 }
 
@@ -406,6 +407,10 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   {
     contextMenuAction->SetFunctionality(this);
   }
+  else if(className == "QmitkCreateSimulationAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
   contextMenuAction->Run( this->GetCurrentSelection() ); // run the action
 }
 
@@ -419,6 +424,8 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
 
   if( m_NodeTreeModel->GetShowNodesContainingNoDataFlag()!= prefs->GetBool("Show nodes containing no data", false) )
     m_NodeTreeModel->SetShowNodesContainingNoData( !m_NodeTreeModel->GetShowNodesContainingNoDataFlag() );
+
+  m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 
   m_NodeTreeView->expandAll();
 
@@ -703,7 +710,8 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
     {
       node = *it;
       this->GetDataStorage()->Remove(node);
-      this->GlobalReinit(false);
+      if (m_GlobalReinitOnNodeDelete)
+          this->GlobalReinit(false);
     }
   }
 }
@@ -863,7 +871,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
       nameOfResultImage.append("Otsu");
       resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
       resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-      resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
+      resultNode->SetData( mitk::ImportItkImage(filter->GetOutput())->Clone());
 
       this->GetDataStorage()->Add(resultNode, node);
 

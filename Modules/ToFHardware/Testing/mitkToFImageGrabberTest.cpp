@@ -92,8 +92,8 @@ int mitkToFImageGrabberTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(tofImageGrabber->GetCaptureHeight()==captureHeight,"Test GetCaptureHeight()");
   MITK_TEST_OUTPUT(<<"Call Update()");
   tofImageGrabber->Update();
-  mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput(0);
-  MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,distanceImage),"Test GetOutput(0)");
+  mitk::Image::Pointer distanceImage = tofImageGrabber->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED(CompareImages(expectedResultImage,distanceImage),"Test GetOutput()");
   picFileReader->SetFileName(amplitudeFileName);
   picFileReader->Update();
   mitk::Image::Pointer amplitudeImage = tofImageGrabber->GetOutput(1);

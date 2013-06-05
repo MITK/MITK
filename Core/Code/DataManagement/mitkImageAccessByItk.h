@@ -57,7 +57,7 @@ public:
 #define _accessByItkPixelTypeException(pixelType, pixelTypeSeq)                        \
   {                                                                                    \
     std::string msg("Pixel type ");                                                    \
-    msg.append(pixelType.GetItkTypeAsString());                                        \
+    msg.append(pixelType.GetPixelTypeAsString());                                        \
     msg.append(" is not in " MITK_PP_STRINGIZE(pixelTypeSeq));                         \
     throw mitk::AccessByItkException(msg);                                             \
   }

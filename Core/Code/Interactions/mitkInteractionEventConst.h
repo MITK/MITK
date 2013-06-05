@@ -18,6 +18,7 @@
 #define MITKINTERACTEVENTCONST_H
 
 #include <string>
+#include <MitkExports.h>
 
 namespace mitk
 {
@@ -25,7 +26,7 @@ namespace mitk
 /**
  * @brief Constants to describe Mouse Events and special Key Events.
  */
-struct InteractionEventConst
+struct MITK_CORE_EXPORT InteractionEventConst
 {
   // XML Tags
   static const std::string xmlTagConfigRoot; // = "config";

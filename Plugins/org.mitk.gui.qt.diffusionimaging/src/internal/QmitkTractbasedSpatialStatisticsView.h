@@ -113,11 +113,6 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
   protected slots:
 
 
-    //void OutputValues();
-
-
-
-   // void InitializeGridByVectorImage();
 
     void Masking();
 
@@ -126,9 +121,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void CreateRoi();
 
 
-    void Clustering();
 
-    void AdjustPlotMeasure(const QString & text);
 
     void Clicked(const QwtDoublePoint& pos);
 
@@ -158,9 +151,6 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     void InitPointsets();
 
     void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-    berry::ISelectionListener::Pointer m_SelListener;
-    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     bool m_IsInitialized;
 

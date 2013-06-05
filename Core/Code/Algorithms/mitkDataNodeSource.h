@@ -34,12 +34,12 @@ namespace mitk
  * for mitk::DataNodeSource.
  * @ingroup Process
  */
-  class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
+class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( DataNodeSource, itk::ProcessObject );
+    mitkClassMacro( DataNodeSource, itk::ProcessObject )
 
-    itkNewMacro( Self );
+    itkNewMacro( Self )
 
     typedef mitk::DataNode OutputType;
 
@@ -51,32 +51,20 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx );
+    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx );
 
     /**
-     * Allows to set the output of the base data source.
-     * @param output the intended output of the base data source
+     * This is a default implementation to make sure we have something.
+     * Once all the subclasses of ProcessObject provide an appopriate
+     * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
+     * virtual.
      */
-    virtual void SetOutput( OutputType* output );
+    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
 
-    /**
-     * Allows to set the n-th output of the base data source.
-     * @param output the intended output of the base data source
-     */
-    virtual void SetOutput( unsigned int idx, OutputType* output );
-
-    /**
-     * Returns the output with index 0 of the base data source
-     * @returns the output
-     */
-    virtual OutputType* GetOutput();
-
-    /**
-     * Returns the n'th output of the base data source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    virtual OutputType* GetOutput ( unsigned int idx );
+    OutputType* GetOutput();
+    const OutputType* GetOutput() const;
+    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
+    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
 
 protected:
 

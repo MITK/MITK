@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkVolumeRenderingProperty.h"
 #include "mitkModalityProperty.h"
 #include "mitkRenderingModeProperty.h"
+#include "mitkPointSetShapeProperty.h"
 
 #define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname) \
  \
@@ -72,6 +73,7 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkScalarModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkVolumeRenderingProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(ModalityProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(RenderingModeProperty);
+MITK_REGISTER_ENUM_SUB_SERIALIZER(PointSetShapeProperty);
 
 
 #endif

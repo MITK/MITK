@@ -366,16 +366,11 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  //Check if the new working data has already a contourlist for 3D interpolation
-  this->SetCurrentContourListID();
+  //For the 3D interpolation
+  SetCurrentContourListID();
   if (m_2DInterpolationEnabled)
   {
     OnInterpolationActivated( true ); // re-initialize if needed
-  }
-  if (m_3DInterpolationEnabled)
-  {
-    //On3DInterpolationActivated( true);
-    SetCurrentContourListID();
   }
 }
 

@@ -40,7 +40,7 @@ int mitkTbssRoiNrrdImageReaderTest(int argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED( roiReader->CanReadFile(argv[1], "", ""), "Testing CanReadFile() method with valid input file name!");
   roiReader->Update();
 
-  mitk::TbssRoiImage* roiImg = roiReader->GetOutput(0);
+  mitk::TbssRoiImage* roiImg = roiReader->GetOutput();
 
   MITK_TEST_CONDITION_REQUIRED(roiImg != NULL, "Testing that roiImg is not null");
 

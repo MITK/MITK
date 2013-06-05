@@ -47,7 +47,7 @@ namespace mitk
     //void SetRequestedRegionToLargestPossibleRegion();
     //bool RequestedRegionIsOutsideOfTheBufferedRegion();
     //virtual bool VerifyRequestedRegion();
-    //void SetRequestedRegion(itk::DataObject *data);
+    //void SetRequestedRegion( const itk::DataObject *data);
 
     ImageType::Pointer GetImage()
     {

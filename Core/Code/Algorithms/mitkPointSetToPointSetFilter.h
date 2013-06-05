@@ -43,6 +43,8 @@ namespace mitk
 
     typedef InputType::ConstPointer InputTypeConstPointer;
 
+
+    using itk::ProcessObject::SetInput;
     /**
     * Sets the input of this process object
     * @param input the input

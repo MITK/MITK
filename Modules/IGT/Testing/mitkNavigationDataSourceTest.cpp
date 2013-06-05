@@ -79,11 +79,11 @@ class mitkNavigationDataSourceTestClass
     myFilter->GraftOutput(nd1);
     mitk::NavigationData::Pointer out = myFilter->GetOutput();
     MITK_TEST_CONDITION(out.GetPointer() != nd1.GetPointer(), "testing if output is same object as source of graft");
-    MITK_TEST_CONDITION( mitk::Equal(out->GetPosition(), nd1->GetPosition()) &&
-                         mitk::Equal(out->GetOrientation(), nd1->GetOrientation()) &&
-                         (out->GetCovErrorMatrix() == nd1->GetCovErrorMatrix()) &&
-                         (out->IsDataValid() == nd1->IsDataValid()) &&
-                         mitk::Equal(out->GetTimeStamp(), nd1->GetTimeStamp()), "testing if content of output is equal to input of Graft");
+    MITK_TEST_CONDITION(mitk::Equal(out->GetPosition(), nd1->GetPosition()),"testing position equality after graft")
+    MITK_TEST_CONDITION(mitk::Equal(out->GetOrientation(), nd1->GetOrientation()),"testing orientation equality after graft")
+    MITK_TEST_CONDITION((out->GetCovErrorMatrix() == nd1->GetCovErrorMatrix()),"testing error matrix equality after graft")
+    MITK_TEST_CONDITION((out->IsDataValid() == nd1->IsDataValid()),"testing data valid equality after graft")
+    MITK_TEST_CONDITION(mitk::Equal(out->GetIGTTimeStamp(), nd1->GetIGTTimeStamp()), "testing timestamp equality after graft");
 
     //test method GetParameters()
     mitk::PropertyList::ConstPointer list = myFilter->GetParameters();
@@ -95,7 +95,7 @@ class mitkNavigationDataSourceTestClass
     //test invalid call of methods
     MyNavigationDataSourceTest::Pointer myFilter = MyNavigationDataSourceTest::New();
 
-    mitk::NavigationData::Pointer testOutput = myFilter->GetOutput(0);
+    mitk::NavigationData::Pointer testOutput = myFilter->GetOutput();
     MITK_TEST_CONDITION(testOutput.IsNull(), "testing GetOutput(int) before initialization");
 
     testOutput = myFilter->GetOutput("test");

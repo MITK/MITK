@@ -55,6 +55,7 @@ public:
     virtual void CreateQtPartControl(QWidget *parent);
     void SetFocus();
 
+    typedef itk::Image<double, 3>           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
@@ -87,6 +88,10 @@ protected slots:
     void OnVarianceChanged(double value);
     void OnDistributionChanged(int value);
     void OnAddGibbsRinging(int value);
+    void OnAddNoise(int value);
+    void OnAddGhosts(int value);
+    void OnAddDistortions(int value);
+    void OnAddEddy(int value);
     void OnConstantRadius(int value);
 
 protected:

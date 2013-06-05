@@ -90,12 +90,6 @@ bool mitk::VtkResliceInterpolationProperty::AddEnum( const std::string& name, co
   return Superclass::AddEnum( name, id );
 }
 
-mitk::VtkResliceInterpolationProperty::Pointer mitk::VtkResliceInterpolationProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::VtkResliceInterpolationProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

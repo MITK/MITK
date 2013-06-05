@@ -129,7 +129,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     imageTimeSelector->SetInput(image);
     imageTimeSelector->SetTimeNr(timeNr);
     imageTimeSelector->UpdateLargestPossibleRegion();
-    image = imageTimeSelector->GetOutput();
+    image = imageTimeSelector->GetOutput(0);
   }
 
   ImageToItk<CharImageType>::Pointer imageToItkFilter = ImageToItk<CharImageType>::New();
@@ -406,7 +406,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   imageToSurfaceFilter->SmoothOn();
   imageToSurfaceFilter->SetDecimate(ImageToSurfaceFilter::NoDecimation);
 
-  m_Surface = imageToSurfaceFilter->GetOutput();
+  m_Surface = imageToSurfaceFilter->GetOutput(0);
 
   ProgressBar::GetInstance()->Progress(1);
 

@@ -52,8 +52,6 @@ public:
 
     typedef LevelWindow ValueType;
 
-    Pointer Clone() const;
-
     virtual ~LevelWindowProperty();
 
     const mitk::LevelWindow & GetLevelWindow() const;

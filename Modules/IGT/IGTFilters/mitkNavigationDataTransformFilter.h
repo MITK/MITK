@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkQuaternionRigidTransform.h>
 #include <itkTransform.h>
+#include <itkVersorRigid3DTransform.h>
 
 
 namespace mitk {
@@ -37,7 +38,7 @@ namespace mitk {
 
   public:
 
-    typedef itk::Rigid3DTransform< double > TransformType;
+    typedef itk::VersorRigid3DTransform< double > TransformType;
 
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);

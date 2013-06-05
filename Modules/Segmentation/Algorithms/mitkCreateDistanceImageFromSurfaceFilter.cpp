@@ -22,6 +22,9 @@ mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter
   m_DistanceImageVolume = 50000;
   this->m_UseProgressBar = false;
   this->m_ProgressStepSize = 5;
+
+  mitk::Image::Pointer output = mitk::Image::New();
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 
@@ -57,7 +60,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::GenerateData()
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunctionValues()
 {
-  unsigned int numberOfInputs = this->GetNumberOfInputs();
+  unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
 
   if (numberOfInputs == 0)
   {
@@ -468,7 +471,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetInput( unsigned int idx, con
 
 const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput()
 {
-    if (this->GetNumberOfInputs() < 1)
+    if (this->GetNumberOfIndexedInputs() < 1)
         return NULL;
 
     return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(0));
@@ -477,7 +480,7 @@ const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput()
 
 const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput( unsigned int idx)
 {
-    if (this->GetNumberOfInputs() < 1)
+    if (this->GetNumberOfIndexedInputs() < 1)
         return NULL;
 
     return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(idx));
@@ -485,17 +488,29 @@ const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput( unsig
 
 void mitk::CreateDistanceImageFromSurfaceFilter::RemoveInputs(mitk::Surface* input)
 {
-    this->RemoveInput(input);
+  DataObjectPointerArraySizeType nb = this->GetNumberOfIndexedInputs();
+
+  for(DataObjectPointerArraySizeType i = 0; i < nb; i++)
+  {
+    if( this->GetInput(i) == input )
+    {
+      this->RemoveInput(i);
+      return;
+    }
+  }
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::Reset()
 {
-  for (unsigned int i = 0; i < this->GetNumberOfInputs(); i++)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedInputs(); i++)
   {
     this->PopBackInput();
   }
-  this->SetNumberOfInputs(0);
-  this->SetNumberOfOutputs(1);
+  this->SetNumberOfIndexedInputs(0);
+  this->SetNumberOfIndexedOutputs(1);
+
+  mitk::Image::Pointer output = mitk::Image::New();
+  this->SetNthOutput(0, output.GetPointer());
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::SetUseProgressBar(bool status)

@@ -45,7 +45,7 @@ mitk::InterpolateLinesFilter::~InterpolateLinesFilter()
 void mitk::InterpolateLinesFilter::GenerateOutputInformation()
 {
   mitk::Mesh::ConstPointer input  = this->GetInput();
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
@@ -60,7 +60,7 @@ void mitk::InterpolateLinesFilter::GenerateOutputInformation()
 void mitk::InterpolateLinesFilter::GenerateData()
 {
   mitk::Mesh::ConstPointer input  = this->GetInput();
-  mitk::Surface::Pointer output = this->GetOutput();
+  mitk::Surface::Pointer output = this->GetOutput(0);
 
   vtkPolyData *polyData = vtkPolyData::New();
   vtkPoints *points = vtkPoints::New();

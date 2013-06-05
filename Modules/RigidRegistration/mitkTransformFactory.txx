@@ -238,19 +238,20 @@ namespace mitk {
       }
       return transformPointer.GetPointer();
     }
-    else if (transform == TransformParameters::RIGID3DTRANSFORM)
-    {
-      //return MakeRigidTransform<VImageDimension>();
-      if (VImageDimension == 3)
-      {
-        typename itk::Rigid3DTransform< double >::Pointer transformPointer = itk::Rigid3DTransform< double >::New();
-        transformPointer->SetIdentity();
-        m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
-        m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-        m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
-      }
-    }
+    //TODO remove rigid3dTransform
+//    else if (transform == TransformParameters::RIGID3DTRANSFORM)
+//    {
+//      //return MakeRigidTransform<VImageDimension>();
+//      if (VImageDimension == 3)
+//      {
+//        typename itk::Rigid3DTransform< double >::Pointer transformPointer = itk::Rigid3DTransform< double >::New();
+//        transformPointer->SetIdentity();
+//        m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
+//        m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
+//        m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
+//        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+//      }
+//    }
     else if (transform == TransformParameters::EULER3DTRANSFORM)
     {
       if (VImageDimension == 3)

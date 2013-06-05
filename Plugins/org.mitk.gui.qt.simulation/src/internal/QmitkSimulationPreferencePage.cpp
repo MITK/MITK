@@ -15,60 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkSimulationPreferencePage.h"
-#include <sofa/helper/system/PluginManager.h>
-#include <berryIPreferencesService.h>
+#include <mitkGetSimulationPreferences.h>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <cassert>
+#include <sofa/helper/system/PluginManager.h>
 
 typedef sofa::helper::system::Plugin Plugin;
 typedef sofa::helper::system::PluginManager PluginManager;
 typedef sofa::helper::system::PluginManager::PluginIterator PluginIterator;
 typedef sofa::helper::system::PluginManager::PluginMap PluginMap;
 
-berry::IPreferences::Pointer getSimulationPreferences()
-{
-  berry::ServiceRegistry& serviceRegistry = berry::Platform::GetServiceRegistry();
-  berry::IPreferencesService::Pointer preferencesService = serviceRegistry.GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-  berry::IPreferences::Pointer preferences = preferencesService->GetSystemPreferences();
-  return preferences->Node("/org.mitk.views.simulation");
-}
-
-void initSOFAPlugins(berry::IPreferences::Pointer preferences)
-{
-  if (preferences.IsNull())
-    return;
-
-  QString pluginPaths = preferences->GetByteArray(QmitkSimulationPreferencePage::PLUGIN_PATHS, "").c_str();
-
-  if (pluginPaths.isEmpty())
-    return;
-
-  QStringList pluginPathList = pluginPaths.split(';', QString::SkipEmptyParts);
-  QStringListIterator it(pluginPathList);
-
-  typedef sofa::helper::system::PluginManager PluginManager;
-  PluginManager& pluginManager = PluginManager::getInstance();
-
-  while (it.hasNext())
-  {
-    std::string path = it.next().toStdString();
-    std::ostringstream errlog;
-
-    pluginManager.loadPlugin(path, &errlog);
-
-    if (errlog.str().empty())
-      pluginManager.getPluginMap()[path].initExternalModule();
-  }
-}
-
-const std::string QmitkSimulationPreferencePage::PLUGIN_PATHS = "plugin paths";
-
 QmitkSimulationPreferencePage::QmitkSimulationPreferencePage()
-  : m_Preferences(getSimulationPreferences()),
+  : m_Preferences(mitk::GetSimulationPreferences()),
     m_Control(NULL)
 {
-  initSOFAPlugins(m_Preferences);
 }
 
 QmitkSimulationPreferencePage::~QmitkSimulationPreferencePage()
@@ -113,6 +73,9 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
 #endif
 
   std::string path = QFileDialog::getOpenFileName(m_Control, "Add SOFA Library", "", filter).toStdString();
+
+  if (path.empty())
+    return;
 
   PluginManager &pluginManager = PluginManager::getInstance();
   std::ostringstream errlog;
@@ -218,7 +181,7 @@ bool QmitkSimulationPreferencePage::PerformOk()
     pluginPaths += it->first;
   }
 
-  m_Preferences->PutByteArray(PLUGIN_PATHS, pluginPaths);
+  m_Preferences->PutByteArray("plugin paths", pluginPaths);
   return true;
 }
 

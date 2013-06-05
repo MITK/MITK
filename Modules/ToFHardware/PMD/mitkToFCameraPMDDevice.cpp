@@ -40,8 +40,8 @@ namespace mitk
       ok = m_Controller->OpenCameraConnection();
       if (ok)
       {
-        this->m_CaptureWidth = m_Controller->GetCaptureWidth();
-        this->m_CaptureHeight = m_Controller->GetCaptureHeight();
+        this->m_CaptureWidth = m_Controller->GetInternalCaptureWidth();
+        this->m_CaptureHeight = m_Controller->GetInternalCaptureHeight();
         this->m_SourceDataSize = m_Controller->GetSourceDataStructSize();
         this->m_PixelNumber = this->m_CaptureWidth * this->m_CaptureHeight;
 
@@ -257,7 +257,7 @@ namespace mitk
       {
         for (int j=0; j<this->m_CaptureWidth; j++)
         {
-          distanceArray[i*this->m_CaptureWidth+j] = 1000 * this->m_DistanceArray[(i+1)*this->m_CaptureWidth-1-j];
+          distanceArray[i*this->m_CaptureWidth+j] = this->m_DistanceArray[(i+1)*this->m_CaptureWidth-1-j];
         }
       }
       imageSequence = this->m_ImageSequence;

@@ -8,7 +8,7 @@ set(INTERNAL_CPP_FILES
   QmitkSegmentationPostProcessing.cpp
   QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
-  QmitkStatisticsAction.cpp
+  #QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
   QmitkBooleanOperationsView.cpp
   QmitkDeformableClippingPlaneView.cpp
@@ -30,7 +30,7 @@ set(MOC_H_FILES
   src/internal/QmitkSegmentationPostProcessing.h
   src/internal/QmitkThresholdAction.h
   src/internal/QmitkCreatePolygonModelAction.h
-  src/internal/QmitkStatisticsAction.h
+  #src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkBooleanOperationsView.h
   src/internal/QmitkDeformableClippingPlaneView.h

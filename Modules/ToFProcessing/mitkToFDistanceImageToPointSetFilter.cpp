@@ -180,7 +180,7 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);

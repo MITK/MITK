@@ -35,6 +35,32 @@ namespace itk
   template < typename TValueType > class VariableLengthVector;
 }
 
+#define MITK_PIXEL_COMPONENT_TYPE(type,ctype,name)     \
+  template <> struct mitk::MapPixelComponentType<type> \
+  {                                                    \
+    static const int value = ctype; \
+  } \
+  template <> std::string mitk::PixelComponentTypeToString() \
+  { \
+    return name; \
+  }
+
+namespace mitk {
+
+static const int PixelUserType = itk::ImageIOBase::MATRIX + 1;
+static const int PixelComponentUserType = itk::ImageIOBase::DOUBLE + 1;
+
+/**
+ * Maps pixel component types (primitive types like int, short, double, etc. and custom
+ * types) to and integer constant. Specialize this template for custom types by using the
+ * #MITK_PIXEL_COMPONENT_TYPE macro.
+ */
+template<typename T>
+struct MapPixelComponentType
+{
+  static const int value = itk::ImageIOBase::MapPixelType<T>::CType;
+};
+
 /**
   \brief This is an implementation of a type trait to provide a compile-time check for PixelType used in
   the instantiation of an itk::Image
@@ -202,14 +228,18 @@ struct MapCompositePixelType< itk::Matrix< C,N > >
 template< class T, bool Primitive>
 struct MapPixelType
 {
-  static const itkIOPixelType IOType = MapCompositePixelType<T>::IOCompositeType;
+  static const itkIOPixelType IOPixelType = MapCompositePixelType<T>::IOCompositeType;
+  static const int IOComponentType = MapPixelComponentType<typename GetComponentType<T>::ComponentType>::value;
 };
 
 /** \brief Partial specialization for setting the IOPixelType for primitive types to SCALAR */
 template<class T>
 struct MapPixelType< T, true>
 {
-  static const itkIOPixelType IOType = itk::ImageIOBase::SCALAR;
+  static const itkIOPixelType IOPixelType = itk::ImageIOBase::SCALAR;
+  static const int IOComponentType = MapPixelComponentType<T>::value;
 };
+
+} // end namespace mitk
 
 #endif // PIXELTYPETRAITS_H

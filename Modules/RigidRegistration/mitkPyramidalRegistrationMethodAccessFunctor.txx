@@ -223,7 +223,7 @@ void PyramidalRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<TPixel,
   // Start the registration process
   try
   {
-    registration->StartRegistration();
+    registration->Update();
   }
   catch( itk::ExceptionObject & err )
   {

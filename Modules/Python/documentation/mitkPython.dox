@@ -14,4 +14,30 @@ Under the hood, the MITK build system takes care that the wrapping build process
 
 <h1>Known problems and workarounds</h1>
 
+<p>System: Linux/OSX/gcc<br />
+Problem: An error during the build process occurs:
+<pre>
+Linking CXX shared library libPythonQt.so
+/usr/bin/ld: error: /usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../../../lib/libpython2.7.a(abstract.o): requires dynamic R_X86_64_PC32 reloc against 'PyErr_Occurred' which may overflow at runtime; recompile with -fPIC
+</pre>
+<strong>Workaround</strong>: Try setting the CMake var PYTHON_LIBRARY to the shared object, e.g. /usr/lib/libpython2.7.so
+</p>
+<p>System: Linux/gcc (maybe Mac OS)<br />
+Problem: An error during the build process occurs:
+<pre>
+Scanning dependencies of target install_wrapitk_compatibility
+[ 40%] Built target install_wrapitk_compatibility
+[ 40%] Generating swigrun.xml
+gccxml_cc1plus: error: gccxml_builtins.h: No such file or directory
+make[5]: *** [Wrapping/WrapITK/SwigRuntime/swigrun.xml] Error 1
+make[4]: *** [Wrapping/WrapITK/SwigRuntime/CMakeFiles/SwigRuntimePython.dir/all] Error 2
+make[3]: *** [all] Error 2
+make[2]: *** [ITK-cmake/src/ITK-stamp/ITK-build] Error 2
+make[1]: *** [CMakeFiles/ITK.dir/all] Error 2
+make: *** [all] Error 2
+</pre>
+<strong>Workaround</strong>: Install CableSwig from the software repo and set the CMake var EXTERNAL_CableSwig_DIR to the directory containing CableSwigConfig.cmake, on linux usually /usr/lib/CableSwig
+</p>
+
+
  */

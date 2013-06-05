@@ -16,32 +16,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimulation.h"
 #include "mitkSimulationMapper3D.h"
-#include "mitkSimulationObjectFactory.h"
 #include "mitkSimulationModel.h"
+#include "mitkSimulationObjectFactory.h"
+#include "mitkSimulationTemplate.h"
 #include <mitkCoreObjectFactory.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/simulation/common/xml/initXml.h>
 
-mitk::SimulationObjectFactory::SimulationObjectFactory()
-  : m_SimulationIOFactory(SimulationIOFactory::New())
+static void InitializeSOFA()
 {
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
-
-  const std::string description = "SOFA Scene Files";
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml", description));
-
   sofa::component::init();
   sofa::simulation::xml::initXml();
 
-  int SimulationModelClass = sofa::core::RegisterObject("").add<SimulationModel>();
+  int SimulationModelClass = sofa::core::RegisterObject("").add<mitk::SimulationModel>();
   sofa::core::ObjectFactory::AddAlias("OglModel", "SimulationModel", true);
   sofa::core::ObjectFactory::AddAlias("VisualModel", "SimulationModel", true);
 }
 
+mitk::SimulationObjectFactory::SimulationObjectFactory()
+  : m_SimulationIOFactory(SimulationIOFactory::New()),
+    m_SimulationTemplateIOFactory(SimulationTemplateIOFactory::New())
+{
+  itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
+  itk::ObjectFactoryBase::RegisterFactory(m_SimulationTemplateIOFactory);
+
+  std::string description = "SOFA Scene Files";
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml", description));
+
+  description = "SOFA Scene File Templates";
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn.template", description));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.xml.template", description));
+
+  InitializeSOFA();
+}
+
 mitk::SimulationObjectFactory::~SimulationObjectFactory()
 {
+  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationTemplateIOFactory);
   itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationIOFactory);
 }
 
@@ -100,29 +113,24 @@ void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   if (node != NULL)
   {
     if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+    {
       SimulationMapper3D::SetDefaultProperties(node);
+    }
+    else if (dynamic_cast<SimulationTemplate*>(node->GetData()) != NULL)
+    {
+      SimulationTemplate* simulationTemplate = static_cast<SimulationTemplate*>(node->GetData());
+      simulationTemplate->SetProperties(node);
+    }
   }
 }
 
-class RegisterSimulationObjectFactory
+void mitk::RegisterSimulationObjectFactory()
 {
-public:
-  RegisterSimulationObjectFactory()
-    : m_Factory(mitk::SimulationObjectFactory::New())
+  static bool alreadyRegistered = false;
+
+  if (!alreadyRegistered)
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SimulationObjectFactory::New());
+    alreadyRegistered = true;
   }
-
-  ~RegisterSimulationObjectFactory()
-  {
-    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory);
-  }
-
-private:
-  RegisterSimulationObjectFactory(const RegisterSimulationObjectFactory&);
-  RegisterSimulationObjectFactory& operator=(const RegisterSimulationObjectFactory&);
-
-  mitk::SimulationObjectFactory::Pointer m_Factory;
-};
-
-static RegisterSimulationObjectFactory registerSimulationObjectFactory;
+}

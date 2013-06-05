@@ -156,7 +156,6 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
     nameOfResultImage.append("Otsu");
     resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
     resultNode->SetProperty("binary", mitk::BoolProperty::New(false) );
-
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
     renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
     resultNode->SetProperty("Image Rendering.Mode", renderingMode);
@@ -179,7 +178,7 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
+    levelwindow.SetRangeMinMax(0, numberOfThresholds);
     levWinProp->SetLevelWindow( levelwindow );
     resultNode->SetProperty( "levelwindow", levWinProp );
 

@@ -60,9 +60,6 @@ public:
 
   itkNewMacro(Self);
 
-  Pointer Clone() const;
-
-
   /** \brief Get/Set min/max of transfer function range for initialization. */
   itkSetMacro(Min,int);
 

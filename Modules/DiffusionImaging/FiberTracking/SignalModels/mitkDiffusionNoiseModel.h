@@ -43,6 +43,7 @@ public:
     virtual void AddNoise(PixelType& pixel) = 0;
 
     void SetNoiseVariance(double var){ m_NoiseVariance = var; }
+    double GetNoiseVariance(){ return m_NoiseVariance; }
 
 protected:
 

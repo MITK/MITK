@@ -114,7 +114,7 @@ DataNode::Pointer IOUtil::LoadDataNode(const std::string path)
             mitkThrow() << "An exception occured during loading the file " << path << ". Exception says could not find data.";
         }
 
-        mitk::DataNode::Pointer node = reader->GetOutput(0);
+        mitk::DataNode::Pointer node = reader->GetOutput();
 
         if(node.IsNull())
         {

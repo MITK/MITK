@@ -50,9 +50,9 @@ public:
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
-  itkNewMacro(Self);
+  itkNewMacro(Self)
   itkTypeMacro( StochasticTractographyFilter,
-            ImageToImageFilter );
+            ImageToImageFilter )
 
   /** Types for the DWI Input Image **/
   typedef TInputDWIImage InputDWIImageType;
@@ -89,32 +89,33 @@ public:
     TractOrientationContainerType;
 
   /** the number of Tracts to generate **/
-  itkSetMacro( TotalTracts, unsigned int);
-  itkGetMacro( TotalTracts, unsigned int);
+  itkSetMacro( TotalTracts, unsigned int)
+  itkGetMacro( TotalTracts, unsigned int)
 
   /** the maximum length of Tract **/
-  itkSetMacro( MaxTractLength, unsigned int );
-  itkGetMacro( MaxTractLength, unsigned int );
+  itkSetMacro( MaxTractLength, unsigned int )
+  itkGetMacro( MaxTractLength, unsigned int )
 
   /** Set/Get bvalues **/
-  itkSetConstObjectMacro( bValues, bValueContainerType );
-  itkGetConstObjectMacro( bValues, bValueContainerType );
+  itkSetConstObjectMacro( bValues, bValueContainerType )
+  itkGetConstObjectMacro( bValues, bValueContainerType )
 
   /** Set/Get of gradient directions **/
-  itkSetConstObjectMacro( Gradients, GradientDirectionContainerType );
-  itkGetConstObjectMacro( Gradients, GradientDirectionContainerType );
+  itkSetConstObjectMacro( Gradients, GradientDirectionContainerType )
+  itkGetConstObjectMacro( Gradients, GradientDirectionContainerType )
 
   /** Set/Get the White Matter Probability Input image **/
   /* At each voxel specifies the probability of a mylinated fiber existing
      at that location.  This probability is interpreted to be the probability
      that a fiber tract passes through that region.
      */
-  itkSetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType, 1);
-  itkGetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType, 1);
+  itkSetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType)
+  itkGetInputMacro(WhiteMatterProbabilityImage, InputWhiteMatterProbabilityImageType)
 
   //overide the built in set input function
   //we need to create a new cache everytime we change the input image
   //but we need to preserve it when the input image is the same
+  using Superclass::SetInput;
   void SetInput( typename InputDWIImageType::Pointer dwiimagePtr ){
     Superclass::SetInput( dwiimagePtr );
     //update the likelihood cache
@@ -133,26 +134,26 @@ public:
   }
 
   /** Set/Get the seed index **/
-  itkSetMacro( SeedIndex, typename InputDWIImageType::IndexType );
-  itkGetMacro( SeedIndex, typename InputDWIImageType::IndexType );
+  itkSetMacro( SeedIndex, typename InputDWIImageType::IndexType )
+  itkGetMacro( SeedIndex, typename InputDWIImageType::IndexType )
 
   /** Set/Get the list of directions to sample **/
-  itkSetConstObjectMacro( SampleDirections, TractOrientationContainerType );
-  itkGetConstObjectMacro( SampleDirections, TractOrientationContainerType );
+  itkSetConstObjectMacro( SampleDirections, TractOrientationContainerType )
+  itkGetConstObjectMacro( SampleDirections, TractOrientationContainerType )
 
   /** Set/Get the Measurement Frame **/
-  itkSetMacro( MeasurementFrame, MeasurementFrameType );
-  itkGetMacro( MeasurementFrame, MeasurementFrameType );
+  itkSetMacro( MeasurementFrame, MeasurementFrameType )
+  itkGetMacro( MeasurementFrame, MeasurementFrameType )
 
   /** Set/Get the Maximum Likelihood Cache Size, the max num. of cached voxels **/
-  itkSetMacro( MaxLikelihoodCacheSize, unsigned int );
-  itkGetMacro( MaxLikelihoodCacheSize, unsigned int );
+  itkSetMacro( MaxLikelihoodCacheSize, unsigned int )
+  itkGetMacro( MaxLikelihoodCacheSize, unsigned int )
 
   /** Get the Tracts that are generated **/
-  itkGetObjectMacro( OutputTractContainer, TractContainerType );
+  itkGetObjectMacro( OutputTractContainer, TractContainerType )
 
   /** Get TensorImage **/
-  itkGetObjectMacro( OutputTensorImage, OutputTensorImageType );
+  itkGetObjectMacro( OutputTensorImage, OutputTensorImageType )
 
   void GenerateData();
   void GenerateTractContainerOutput( void );

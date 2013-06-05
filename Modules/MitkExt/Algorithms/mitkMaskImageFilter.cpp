@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::MaskImageFilter::MaskImageFilter() : m_Mask(NULL)
 {
-  this->SetNumberOfInputs(2);
+  this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
   m_InputTimeSelector  = mitk::ImageTimeSelector::New();
   m_MaskTimeSelector   = mitk::ImageTimeSelector::New();

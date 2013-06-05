@@ -53,10 +53,12 @@ class PointSet;
 * - \b "label": StringProperty with a label for this point set
 */
 //## @ingroup Mapper
+
+/** \deprecatedSince{2013_06} This mapper is deprecated. */
 class MitkExt_EXPORT SplineMapper2D : public PointSetGLMapper2D
 {
 public:
-  mitkClassMacro ( SplineMapper2D, PointSetGLMapper2D );
+  DEPRECATED(mitkClassMacro ( SplineMapper2D, PointSetGLMapper2D ));
 
   itkNewMacro ( Self );
 

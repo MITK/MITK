@@ -57,8 +57,6 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( m_Controls.crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
   connect( m_Controls.crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-
-
   //connect (m_Controls.m_ActiveVideoDevices, SIGNAL())
 
   // Initializations
@@ -124,13 +122,12 @@ if (m_Device->GetDeviceClass()=="org.mitk.modules.us.USVideoDevice")
 else
       {
       MITK_WARN << "No USVideoDevice: Cannot Crop!";
-      }
+  }
 }
 
 void UltrasoundSupport::OnClickedViewDevice()
 {
   m_FrameCounter = 0;
-
   // We use the activity state of the timer to determine whether we are currently viewing images
   if ( ! m_Timer->isActive() ) // Activate Imaging
   {
@@ -203,12 +200,12 @@ void UltrasoundSupport::GlobalReinit()
 
 UltrasoundSupport::UltrasoundSupport()
 {
-m_DevicePersistence = mitk::USDevicePersistence::New();
-m_DevicePersistence->RestoreLastDevices();
+  m_DevicePersistence = mitk::USDevicePersistence::New();
+  m_DevicePersistence->RestoreLastDevices();
 }
 
 UltrasoundSupport::~UltrasoundSupport()
 {
-m_DevicePersistence->StoreCurrentDevices();
-m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
+  m_DevicePersistence->StoreCurrentDevices();
+  m_Controls.m_DeviceManagerWidget->DisconnectAllDevices();
 }

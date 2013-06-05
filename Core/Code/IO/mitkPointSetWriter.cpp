@@ -56,7 +56,7 @@ mitk::PointSetWriter::PointSetWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
     this->SetNumberOfRequiredInputs( 1 );
-    this->SetNumberOfOutputs( 1 );
+    this->SetNumberOfIndexedOutputs( 1 );
     this->SetNthOutput( 0, mitk::PointSet::New().GetPointer() );
     m_Indent = 2;
     m_IndentDepth = 0;
@@ -191,7 +191,7 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
 void mitk::PointSetWriter::ResizeInputs( const unsigned int& num )
 {
     unsigned int prevNum = this->GetNumberOfInputs();
-    this->SetNumberOfInputs( num );
+    this->SetNumberOfIndexedInputs( num );
     for ( unsigned int i = prevNum; i < num; ++i )
     {
         this->SetNthInput( i, mitk::PointSet::New().GetPointer() );

@@ -90,14 +90,8 @@ mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(const mitk::
 
   if(eps > 0)
   {
-    if(true ) //currently no method with better performance is available
-    {
-      return BruteForceGetVertexAt(point, eps);
-    }
-    else
-    {
-      return OptimizedGetVertexAt(point, eps);
-    }
+    //currently no method with better performance is available
+    return BruteForceGetVertexAt(point, eps);
   }//if eps < 0
   return NULL;
 }

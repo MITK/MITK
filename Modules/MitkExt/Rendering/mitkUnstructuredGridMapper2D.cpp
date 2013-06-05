@@ -51,35 +51,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::UnstructuredGridMapper2D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
 
-   mitk::DataNode::ConstPointer node = this->GetDataNode();
-  if ( node.IsNull() )
-    return;
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
-  if (!node->GetProperty(m_ScalarMode, "scalar mode"))
+  if(needGenerateData)
   {
-    m_ScalarMode = mitk::VtkScalarModeProperty::New(0);
-  }
+    ls->UpdateGenerateDataTime();
 
-  if (!node->GetProperty(m_ScalarVisibility, "scalar visibility"))
-  {
-    m_ScalarVisibility = mitk::BoolProperty::New(true);
-  }
+    mitk::DataNode::ConstPointer node = this->GetDataNode();
+    if ( node.IsNull() )
+      return;
 
-  if (!node->GetProperty(m_Outline, "outline polygons"))
-  {
-    m_Outline = mitk::BoolProperty::New(false);
-  }
+    if (!node->GetProperty(m_ScalarMode, "scalar mode"))
+    {
+      m_ScalarMode = mitk::VtkScalarModeProperty::New(0);
+    }
 
-  if (!node->GetProperty(m_Color, "color"))
-  {
-    m_Color = mitk::ColorProperty::New(1.0f, 1.0f, 1.0f);
-  }
+    if (!node->GetProperty(m_ScalarVisibility, "scalar visibility"))
+    {
+      m_ScalarVisibility = mitk::BoolProperty::New(true);
+    }
 
-  if (!node->GetProperty(m_LineWidth, "line width"))
-  {
-    m_LineWidth = mitk::IntProperty::New(1);
-  }
+    if (!node->GetProperty(m_Outline, "outline polygons"))
+    {
+      m_Outline = mitk::BoolProperty::New(false);
+    }
 
+    if (!node->GetProperty(m_Color, "color"))
+    {
+      m_Color = mitk::ColorProperty::New(1.0f, 1.0f, 1.0f);
+    }
+
+    if (!node->GetProperty(m_LineWidth, "line width"))
+    {
+      m_LineWidth = mitk::IntProperty::New(1);
+    }
+
+  }
   mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( GetDataNode()->GetData() );
   assert( input );
 
@@ -209,7 +217,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   const int numberOfPolys = contour->GetNumberOfPolys();
 
   const bool useCellData = m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
-              m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA;
+      m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA;
   const bool usePointData = m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA;
 
   Point3D p;
@@ -409,12 +417,12 @@ mitk::UnstructuredGridMapper2D
   vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetVtkProp(renderer));
   if (assembly)
   {
-  vtkProp3DCollection* collection = assembly->GetParts();
-  collection->InitTraversal();
-  vtkProp3D* prop3d = 0;
-  do
-  {
-    prop3d = collection->GetNextProp3D();
+    vtkProp3DCollection* collection = assembly->GetParts();
+    collection->InitTraversal();
+    vtkProp3D* prop3d = 0;
+    do
+    {
+      prop3d = collection->GetNextProp3D();
       vtkActor* actor = dynamic_cast<vtkActor*>( prop3d );
       if (actor)
       {
@@ -464,7 +472,7 @@ mitk::UnstructuredGridMapper2D
     if (!grid.IsNull())
       return static_cast<vtkPointSet*>(grid->GetVtkUnstructuredGrid());
 
-      return 0;
+    return 0;
   }
   else
   {
@@ -532,25 +540,25 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
 
 bool mitk::UnstructuredGridMapper2D::IsConvertibleToVtkPointSet(mitk::BaseRenderer * renderer)
 {
-    return ( GetVtkPointSet(renderer) != 0 );
+  return ( GetVtkPointSet(renderer) != 0 );
 }
 
 mitk::UnstructuredGridMapper2D::UnstructuredGridMapper2D()
 {
-    m_Plane = vtkPlane::New();
-    m_Slicer = vtkPointSetSlicer::New();
+  m_Plane = vtkPlane::New();
+  m_Slicer = vtkPointSetSlicer::New();
 
-    m_Slicer->SetSlicePlane( m_Plane );
+  m_Slicer->SetSlicePlane( m_Plane );
 
-    m_ScalarsToColors = 0;
-    m_ScalarsToOpacity = 0;
-    m_VtkPointSet = 0;
+  m_ScalarsToColors = 0;
+  m_ScalarsToOpacity = 0;
+  m_VtkPointSet = 0;
 
-    //m_LUT = vtkLookupTable::New();
-    //m_LUT->SetTableRange( 0, 255 );
-    //m_LUT->SetNumberOfColors( 255 );
-    //m_LUT->SetRampToLinear ();
-    //m_LUT->Build();
+  //m_LUT = vtkLookupTable::New();
+  //m_LUT->SetTableRange( 0, 255 );
+  //m_LUT->SetNumberOfColors( 255 );
+  //m_LUT->SetRampToLinear ();
+  //m_LUT->Build();
 }
 
 

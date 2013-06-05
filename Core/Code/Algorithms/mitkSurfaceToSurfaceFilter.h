@@ -41,6 +41,7 @@ public:
 
   typedef itk::DataObject::Pointer DataObjectPointer;
 
+  using itk::ProcessObject::SetInput;
   virtual void SetInput( const mitk::Surface* surface );
 
   virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
@@ -50,8 +51,6 @@ public:
   virtual const mitk::Surface* GetInput( unsigned int idx );
 
   virtual void CreateOutputsForAllInputs(unsigned int idx);
-
-  virtual void RemoveInputs(mitk::Surface* input);
 
 protected:
   SurfaceToSurfaceFilter();

@@ -44,7 +44,7 @@ private:
     typedef itk::Vector<MeasurementType, 1> MeasurementVectorType;
     typedef itk::Statistics::ListSample<MeasurementVectorType> ListSampleType;
 
-    typedef itk::Statistics::Histogram<MeasurementType, 1> HistogramType;
+    typedef itk::Statistics::Histogram<MeasurementType> HistogramType;
 
     HistogramType::Pointer m_UGHistogram;
 

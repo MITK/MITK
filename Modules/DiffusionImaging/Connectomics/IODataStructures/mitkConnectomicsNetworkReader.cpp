@@ -258,3 +258,18 @@ bool mitk::ConnectomicsNetworkReader::CanReadFile(
   return false;
 }
 
+mitk::BaseDataSource::DataObjectPointer mitk::ConnectomicsNetworkReader::MakeOutput(const DataObjectIdentifierType &name)
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject*>(OutputType::New().GetPointer());
+}
+
+mitk::BaseDataSource::DataObjectPointer mitk::ConnectomicsNetworkReader::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
+{
+  return OutputType::New().GetPointer();
+}
+

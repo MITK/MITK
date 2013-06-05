@@ -2,7 +2,7 @@ set(CPP_FILES
 
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
-  DicomImport/mitkGroupDiffusionHeadersFilter.cpp
+  # DicomImport/mitkGroupDiffusionHeadersFilter.cpp
   DicomImport/mitkDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkGEDicomDiffusionImageHeaderReader.cpp
   DicomImport/mitkPhilipsDicomDiffusionImageHeaderReader.cpp
@@ -52,6 +52,7 @@ set(CPP_FILES
   # Algorithms
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
+  Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -74,6 +75,7 @@ set(H_FILES
   Algorithms/Reconstruction/itkPointShell.h
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
+  Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
@@ -106,6 +108,8 @@ set(H_FILES
   Algorithms/itkShCoefficientImageImporter.h
   Algorithms/itkOdfMaximaExtractionFilter.h
   Algorithms/itkResampleDwiImageFilter.h
+  Algorithms/itkDwiGradientLengthCorrectionFilter.h
+  Algorithms/itkAdcImageFilter.h
 
 
 

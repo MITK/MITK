@@ -57,8 +57,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
 
-#include <itkMultiThreader.h>
-
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
@@ -127,18 +125,16 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   if(ls->m_cpuInitialized)
     return;
 
-  int numThreads = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+  ls->m_MapperCPU = vtkSmartPointer<vtkFixedPointVolumeRayCastMapper>::New();
+  int numThreads = ls->m_MapperCPU->GetNumberOfThreads( );
 
   GPU_INFO << "initializing cpu-raycast-vr (vtkFixedPointVolumeRayCastMapper) (" << numThreads << " threads)";
 
-  ls->m_MapperCPU = vtkSmartPointer<vtkFixedPointVolumeRayCastMapper>::New();
   ls->m_MapperCPU->SetSampleDistance(1.0);
 //  ls->m_MapperCPU->LockSampleDistanceToInputSpacingOn();
   ls->m_MapperCPU->SetImageSampleDistance(1.0);
   ls->m_MapperCPU->IntermixIntersectingGeometryOn();
   ls->m_MapperCPU->SetAutoAdjustSampleDistances(0);
-
-  ls->m_MapperCPU->SetNumberOfThreads( numThreads );
 
   ls->m_VolumePropertyCPU = vtkSmartPointer<vtkVolumeProperty>::New();
   ls->m_VolumePropertyCPU->ShadeOn();
@@ -165,7 +161,9 @@ void mitk::GPUVolumeMapper3D::DeinitGPU(mitk::BaseRenderer* renderer)
   if(ls->m_gpuInitialized)
   {
     GPU_INFO << "deinitializing gpu-slicing-vr";
-
+    // deinit renderwindow, this is needed to release the memory allocated on the gpu
+    // to prevent leaking memory on the gpu
+    ls->m_MapperGPU->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetVTKWindow());
     ls->m_VolumePropertyGPU = NULL;
     ls->m_MapperGPU = NULL;
     ls->m_VolumeGPU = NULL;

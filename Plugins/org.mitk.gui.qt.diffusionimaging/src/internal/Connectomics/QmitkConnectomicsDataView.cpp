@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingManager.h"
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
-#include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
+//#include <itkConnectomicsNetworkToConnectivityMatrixImageFilter.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"

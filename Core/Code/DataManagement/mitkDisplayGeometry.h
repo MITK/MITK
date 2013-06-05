@@ -74,7 +74,7 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     itkNewMacro(Self);
 
     /// \brief duplicates the geometry, NOT useful for this sub-class
-    virtual AffineGeometryFrame3D::Pointer Clone() const;
+    virtual itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsValid() const;
 

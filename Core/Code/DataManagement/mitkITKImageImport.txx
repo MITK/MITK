@@ -104,7 +104,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateInputRequestedRegion()
 }
 
 template <class TInputImage>
-void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::DataObject *output)
+void mitk::ITKImageImport<TInputImage>::SetNthOutput(DataObjectPointerArraySizeType idx, itk::DataObject *output)
 {
   if((output == NULL) && (idx == 0))
   {

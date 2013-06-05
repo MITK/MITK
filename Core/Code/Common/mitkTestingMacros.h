@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <iostream>
 
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <mitkTestManager.h>
 
 namespace mitk {

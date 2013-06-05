@@ -29,7 +29,7 @@ namespace mitk
   /** \brief
   */
 
-  class FiberTracking_EXPORT FiberBundleXReader : public FileReader, public BaseProcess
+  class FiberTracking_EXPORT FiberBundleXReader : public FileReader, public BaseDataSource
   {
   public:
 
@@ -38,7 +38,7 @@ namespace mitk
 
     typedef mitk::FiberBundleX OutputType;
 
-    mitkClassMacro( FiberBundleXReader, BaseProcess );
+    mitkClassMacro( FiberBundleXReader, BaseDataSource );
     itkNewMacro(Self);
 
     const char* GetFileName() const;
@@ -54,6 +54,10 @@ namespace mitk
 //    itkGetMacro(TractContainer, ContainerType::Pointer);
 
     virtual void Update();
+
+    BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
+
+    BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
 
   protected:
 

@@ -46,6 +46,7 @@ public:
 
     /** Realizes actual signal generation. Has to be implemented in subclass. **/
     virtual PixelType SimulateMeasurement() = 0;
+    GradientType GetGradientDirection(int i) { return m_GradientList.at(i); }
     void SetFiberDirection(GradientType fiberDirection){ m_FiberDirection = fiberDirection; }
     void SetGradientList(GradientListType gradientList) { m_GradientList = gradientList; }
     void SetT2(double T2) { m_T2 = T2; }

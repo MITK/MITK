@@ -200,7 +200,7 @@ public:
     itk::Vector<TCoordRep,NPointDimension> normalizedDirection = m_Direction;
     normalizedDirection.Normalize();
 
-    normalizedDirection *= dot_product(diff.Get_vnl_vector(), normalizedDirection.Get_vnl_vector());
+    normalizedDirection *= dot_product(diff.GetVnlVector(), normalizedDirection.GetVnlVector());
 
     return this->m_Point + normalizedDirection;
   }
@@ -242,7 +242,7 @@ public:
   {
     vnl_vector<TCoordRep> normal;
 
-    normal = vnl_cross_3d( m_Direction.Get_vnl_vector(), line.GetDirection().Get_vnl_vector() );
+    normal = vnl_cross_3d( m_Direction.GetVnlVector(), line.GetDirection().GetVnlVector() );
 
     if ( normal.squared_magnitude() < eps )
       return true;

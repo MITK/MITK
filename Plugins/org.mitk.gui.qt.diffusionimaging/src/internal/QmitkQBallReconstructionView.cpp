@@ -809,6 +809,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
     coeffsNode->SetData( coeffsImage );
     coeffsNode->SetProperty( "name", mitk::StringProperty::New(
                                QString(nodename.c_str()).append("_coeffs").toStdString()) );
+    coeffsNode->SetVisibility(false);
     nodes->push_back(coeffsNode);
   }
 

@@ -11,4 +11,10 @@
           name="Simulation"
           class="QmitkSimulationPreferencePage" />
   </extension>
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="SimulationTemplate"
+                       label="Create Simulation"
+                       icon=""
+                       class="QmitkCreateSimulationAction" />
+  </extension>
 </plugin>

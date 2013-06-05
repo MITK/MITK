@@ -158,19 +158,19 @@ namespace mitk {
       */
       virtual void GraftOutput(itk::DataObject *graft);
 
-      /**
-      * \brief Make a DataObject of the correct type to used as the specified output.
-      *
-      * This method is automatically called when DataObject::DisconnectPipeline()
-      * is called.  DataObject::DisconnectPipeline, disconnects a data object
-      * from being an output of its current source.  When the data object
-      * is disconnected, the ProcessObject needs to construct a replacement
-      * output data object so that the ProcessObject is in a valid state.
-      * Subclasses of USImageVideoSource that have outputs of different
-      * data types must overwrite this method so that proper output objects
-      * are created.
-      */
-      virtual DataObjectPointer MakeOutput(unsigned int idx);
+//      /**
+//      * \brief Make a DataObject of the correct type to used as the specified output.
+//      *
+//      * This method is automatically called when DataObject::DisconnectPipeline()
+//      * is called.  DataObject::DisconnectPipeline, disconnects a data object
+//      * from being an output of its current source.  When the data object
+//      * is disconnected, the ProcessObject needs to construct a replacement
+//      * output data object so that the ProcessObject is in a valid state.
+//      * Subclasses of USImageVideoSource that have outputs of different
+//      * data types must overwrite this method so that proper output objects
+//      * are created.
+//      */
+//      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
       //########### GETTER & SETTER ##################//
 

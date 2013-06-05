@@ -322,14 +322,17 @@ namespace mitk
     }
     else if (strcmp(propertyKey, "AmplitudeImageFileName") == 0)
     {
+      this->m_PropertyList->SetBoolProperty("HasAmplitudeImage", true);
       myController->SetAmplitudeImageFileName(strValue);
     }
     else if (strcmp(propertyKey, "IntensityImageFileName") == 0)
     {
+      this->m_PropertyList->SetBoolProperty("HasIntensityImage", true);
       myController->SetIntensityImageFileName(strValue);
     }
     else if (strcmp(propertyKey, "RGBImageFileName") == 0)
     {
+      this->m_PropertyList->SetBoolProperty("HasRGBImage", true);
       myController->SetRGBImageFileName(strValue);
     }
   }

@@ -24,8 +24,6 @@ set(CPP_FILES
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
-  # Algorithms
-  Algorithms/mitkTractAnalyzer.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp
@@ -62,6 +60,10 @@ set(H_FILES
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkKspaceImageFilter.h
+  Algorithms/itkDftImageFilter.h
+  Algorithms/itkAddArtifactsToDwiImageFilter.h
+  Algorithms/itkFieldmapGeneratorFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h
@@ -87,7 +89,6 @@ set(H_FILES
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
   SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkSignalDecay.h
 )
 
 set(RESOURCE_FILES

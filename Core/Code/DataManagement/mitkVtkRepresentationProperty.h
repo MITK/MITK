@@ -45,8 +45,6 @@ public:
 
   mitkNewMacro1Param(VtkRepresentationProperty, const std::string&);
 
-  Pointer Clone() const;
-
   /**
    * Returns the current representation value as defined by VTK constants.
    * @returns the current representation as VTK constant.

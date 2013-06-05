@@ -33,10 +33,12 @@ class PointSet;
 //## uses the information from the PointSet to build up the lines.
 //## Only lines in 2D in one Slice are drawn, not between slices!
 //## @ingroup Mapper
+
+/** \deprecatedSince{2013_06} This mapper is deprecated. */
 class MitkExt_EXPORT LineMapper2D : public PointSetGLMapper2D
 {
 public:
-  mitkClassMacro(LineMapper2D, PointSetGLMapper2D);
+  DEPRECATED(mitkClassMacro(LineMapper2D, PointSetGLMapper2D));
   itkNewMacro(Self);
 
   //##Documentation

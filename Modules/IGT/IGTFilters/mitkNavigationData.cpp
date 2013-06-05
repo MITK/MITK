@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationData::NavigationData() : itk::DataObject(),
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
-m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0),
+m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_IGTTimeStamp(0.0),
 m_Name()
 {
   m_Position.Fill(0.0);
@@ -58,7 +58,7 @@ void mitk::NavigationData::Graft( const DataObject *data )
   this->SetPosition(nd->GetPosition());
   this->SetOrientation(nd->GetOrientation());
   this->SetDataValid(nd->IsDataValid());
-  this->SetTimeStamp(nd->GetTimeStamp());
+  this->SetIGTTimeStamp(nd->GetIGTTimeStamp());
   this->SetHasPosition(nd->GetHasPosition());
   this->SetHasOrientation(nd->GetHasOrientation());
   this->SetCovErrorMatrix(nd->GetCovErrorMatrix());
@@ -77,7 +77,7 @@ void mitk::NavigationData::PrintSelf(std::ostream& os, itk::Indent indent) const
   this->Superclass::PrintSelf(os, indent);
   os << indent << "data valid: "     << this->IsDataValid() << std::endl;
   os << indent << "Position: "       << this->GetPosition() << std::endl;
-  os << indent << "TimeStamp: "      << this->GetTimeStamp() << std::endl;
+  os << indent << "TimeStamp: "      << this->GetIGTTimeStamp() << std::endl;
   os << indent << "HasPosition: "    << this->GetHasPosition() << std::endl;
   os << indent << "HasOrientation: " << this->GetHasOrientation() << std::endl;
   os << indent << "CovErrorMatrix: " << this->GetCovErrorMatrix() << std::endl;

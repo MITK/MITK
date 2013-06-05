@@ -662,7 +662,7 @@ bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType
         m_Snap = filter->GetSnapshot();
         m_DStarMap = filter->GetOutput(2);
         m_DMap = filter->GetOutput(1);
-        m_fMap = filter->GetOutput(0);
+        m_fMap = filter->GetOutput();
     }
     catch (itk::ExceptionObject &ex)
     {

@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBoundingObjectGroup.h"
 #include "mitkBaseProcess.h"
 #include <vtkLinearTransform.h>
-#include <itkSmartPointerForwardReference.txx>
-
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
 :m_BoundingObjects(0),

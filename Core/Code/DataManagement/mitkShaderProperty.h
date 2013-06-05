@@ -48,8 +48,6 @@ public:
 
   mitkNewMacro1Param(ShaderProperty, const std::string&);
 
-  Pointer Clone() const;
-
   /**
    * Returns the current scalar mode value as defined by VTK constants.
    * @returns the current scalar mode as VTK constant.

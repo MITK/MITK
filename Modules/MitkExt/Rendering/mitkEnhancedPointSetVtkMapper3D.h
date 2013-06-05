@@ -84,6 +84,8 @@ namespace mitk {
 
     void ReleaseGraphicsResources(vtkWindow *renWin);
 
+    LocalStorageHandler<BaseLocalStorage> m_LSH;
+
   protected:
     EnhancedPointSetVtkMapper3D();
 

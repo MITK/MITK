@@ -129,16 +129,20 @@ namespace itk
       itkGetMacro (ActivateTimeOut, bool);
 
       // \brief returns shortest Path as vector
-      std::vector< itk::Index<3> > GetVectorPath();
+      std::vector< IndexType > GetVectorPath();
 
       // \brief returns Multiple shortest Paths. You can call this function, when u performed a multiple shortest path search (one start, several ends)
-      std::vector< std::vector< itk::Index<3> > > GetMultipleVectorPaths();
+      std::vector< std::vector< IndexType > > GetMultipleVectorPaths();
 
       // \brief returns the vector order image. It shows in which order the pixels were checked. good for debugging. Be sure to have m_StoreVectorOrder=true
       OutputImagePointer GetVectorOrderImage();
 
       // \brief returns the distance image. It shows the distances from the startpoint to all other pixels. Be sure to have m_CalcAllDistances=true
       OutputImagePointer GetDistanceImage();
+
+
+      // \brief Fill m_VectorPath
+      void MakeShortestPathVector();
 
       // \brief cleans up the filter
       void CleanUp();
@@ -171,10 +175,14 @@ namespace itk
       bool multipleEndPoints;
 
       bool m_ActivateTimeOut; // if true, then i search max. 30 secs. then abort
+
+      bool m_Initialized;
+
+
       CostFunctionTypePointer m_CostFunction;
       IndexType m_StartIndex, m_EndIndex;
-      std::vector< itk::Index<3> > m_VectorPath;
-      std::vector< std::vector< itk::Index<3> > > m_MultipleVectorPaths;
+      std::vector< IndexType > m_VectorPath;
+      std::vector< std::vector< IndexType > > m_MultipleVectorPaths;
 
 
       std::vector< NodeNumType > m_VectorOrder;
@@ -183,8 +191,7 @@ namespace itk
 
       ShortestPathImageFilter();
 
-      // \brief Fill m_VectorPath
-      void MakeShortestPathVector();
+      ~ShortestPathImageFilter();
 
       // \brief Create all the outputs
       void MakeOutputs();

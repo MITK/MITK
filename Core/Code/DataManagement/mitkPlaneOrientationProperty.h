@@ -52,8 +52,6 @@ public:
 
   mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
-  Pointer Clone() const;
-
   enum
   {
     PLANE_DECORATION_NONE,

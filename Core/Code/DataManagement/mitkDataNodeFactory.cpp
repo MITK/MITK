@@ -57,8 +57,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIOFactory.h>
 #include <itkImageIORegion.h>
 #include <itkImageSeriesReader.h>
-#include <itkDICOMImageIO2.h>
-#include <itkDICOMSeriesFileNames.h>
 #include <itkGDCMImageIO.h>
 
 #ifdef NOMINMAX
@@ -181,7 +179,7 @@ void mitk::DataNodeFactory::GenerateData()
         node->SetData(baseData);
         this->SetDefaultCommonProperties( node );
 
-        this->SetOutput(i, node);
+        this->SetOutput(this->MakeNameFromOutputIndex(i), node);
       }
     }
     if(!usedNewDTNF && ( m_FileName != "" ) && !(m_Serie == false))
@@ -192,7 +190,7 @@ void mitk::DataNodeFactory::GenerateData()
 void mitk::DataNodeFactory::ResizeOutputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs( num );
+  this->SetNumberOfIndexedOutputs( num );
   for ( unsigned int i = prevNum; i < num; ++i )
   {
     this->SetNthOutput( i, this->MakeOutput( i ).GetPointer() );
@@ -241,7 +239,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   {
     MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
     this->ResizeOutputs(1);
-    DataNode::Pointer node = this->GetOutput(0);
+    DataNode::Pointer node = this->GetOutput();
     mitk::DicomSeriesReader::StringContainer stringvec;
     stringvec.push_back(this->GetFileName());
     if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))

@@ -184,52 +184,52 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImagePointer iP) const
     inData->SetScalarType( VTK_BIT );
     scalars = vtkBitArray::New();
   }
-  else*/ if ( m_PixelType->GetTypeId() == typeid(char) )
+  else*/ if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
   {
     inData->SetScalarType( VTK_CHAR );
     scalars = vtkCharArray::New();
   }
-  else if (   m_PixelType->GetTypeId() == typeid(unsigned char))
+  else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UCHAR)
   {
     inData->SetScalarType( VTK_UNSIGNED_CHAR );
     scalars = vtkUnsignedCharArray::New();
   }
-  else if (  m_PixelType->GetTypeId() == typeid(short) )
+  else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::SHORT )
   {
     inData->SetScalarType( VTK_SHORT );
     scalars = vtkShortArray::New();
   }
-  else if (   m_PixelType->GetTypeId() == typeid(unsigned short) )
+  else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::USHORT )
   {
     inData->SetScalarType( VTK_UNSIGNED_SHORT );
     scalars = vtkUnsignedShortArray::New();
   }
-  else if (  m_PixelType->GetTypeId() == typeid(int) )
+  else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::INT )
   {
     inData->SetScalarType( VTK_INT );
     scalars = vtkIntArray::New();
   }
-  else if (   m_PixelType->GetTypeId() == typeid(unsigned int) )
+  else if (   m_PixelType->GetComponentType() == itk::ImageIOBase::UINT )
   {
     inData->SetScalarType( VTK_UNSIGNED_INT );
     scalars = vtkUnsignedIntArray::New();
   }
-  else if ( m_PixelType->GetTypeId() == typeid(long int) )
+  else if ( m_PixelType->GetComponentType() == itk::ImageIOBase::LONG )
   {
     inData->SetScalarType( VTK_LONG );
     scalars = vtkLongArray::New();
   }
-  else if (  m_PixelType->GetTypeId() == typeid(unsigned long int) )
+  else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::ULONG )
   {
     inData->SetScalarType( VTK_UNSIGNED_LONG );
     scalars = vtkUnsignedLongArray::New();
   }
-  else if (  m_PixelType->GetTypeId() == typeid(float)  )
+  else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::FLOAT  )
   {
     inData->SetScalarType( VTK_FLOAT );
     scalars = vtkFloatArray::New();
   }
-  else if (  m_PixelType->GetTypeId() == typeid(double)  )
+  else if (  m_PixelType->GetComponentType() == itk::ImageIOBase::DOUBLE  )
   {
     inData->SetScalarType( VTK_DOUBLE );
     scalars = vtkDoubleArray::New();

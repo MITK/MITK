@@ -101,7 +101,7 @@ namespace itk {
     }
 
     typename OutputImageType::Pointer b0Image =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+      static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
     typename OutputImageType::RegionType outregion = this->GetInput()->GetLargestPossibleRegion();
     b0Image->SetSpacing(this->GetInput()->GetSpacing());
     b0Image->SetOrigin(this->GetInput()->GetOrigin());

@@ -17,85 +17,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigureSource.h"
 
+#include "mitkPlanarCircle.h"
+
 mitk::PlanarFigureSource::PlanarFigureSource()
 {
-    // Create the output. We use static_cast<> here because we know the default
-    // output must be of type TOutputImage
-    //OutputType::Pointer output = static_cast<OutputType*>( this->MakeOutput( 0 ).GetPointer() );
-
-    //if ( output.GetPointer() == NULL )
-    //{
-    //    itkWarningMacro(<<"Output could not be created!");
-    //}
-    //this->ProcessObject::SetNumberOfRequiredOutputs( 1 );
-    //this->ProcessObject::SetNthOutput( 0, output.GetPointer() );
+  // Create the output.
+  itk::DataObject::Pointer output = this->MakeOutput(0);
+  Superclass::SetNumberOfRequiredOutputs(1);
+  Superclass::SetNthOutput(0, output);
 }
 
 
 mitk::PlanarFigureSource::~PlanarFigureSource()
 {}
 
-
-mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureSource::MakeOutput ( unsigned int )
-{
-  return NULL;
-}
-
-
-void mitk::PlanarFigureSource::SetOutput( OutputType* output )
-{
-    this->SetNthOutput( 0, output );
-}
-
-
-mitk::PlanarFigureSource::OutputType* mitk::PlanarFigureSource::GetOutput()
-{
-    if ( this->GetNumberOfOutputs() < 1 )
-    {
-        return 0;
-    }
-
-    if ( static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) ) == NULL )
-        itkWarningMacro(<<"Output is NULL!");
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( 0 ) );
-}
-
-
-mitk::PlanarFigureSource::OutputType* mitk::PlanarFigureSource::GetOutput ( unsigned int idx )
-{
-    return static_cast<OutputType*> ( this->ProcessObject::GetOutput( idx ) );
-}
-
 void mitk::PlanarFigureSource::GenerateInputRequestedRegion()
 {
     this->ProcessObject::GenerateInputRequestedRegion();
 }
 
-
-void mitk::PlanarFigureSource::GraftOutput(itk::DataObject *graft)
+itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  this->GraftNthOutput(0, graft);
+    return static_cast<itk::DataObject *>(PlanarCircle::New().GetPointer());
 }
 
 
-void mitk::PlanarFigureSource::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
+itk::DataObject::Pointer mitk::PlanarFigureSource::MakeOutput( const DataObjectIdentifierType & name )
 {
-  if ( idx >= this->GetNumberOfOutputs() )
-  {
-    itkExceptionMacro(<<"Requested to graft output " << idx <<
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }
-
-  if ( !graft )
-  {
-    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
-  }
-
-  itk::DataObject* output = this->GetOutput(idx);
-  if ( !output )
-  {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
-  }
-  // Call Graft on NavigationData to copy member data
-  output->Graft( graft );
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(PlanarCircle::New().GetPointer());
 }
+
+mitkBaseDataSourceGetOutputDefinitions(mitk::PlanarFigureSource)

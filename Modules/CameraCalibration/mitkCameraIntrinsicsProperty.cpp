@@ -52,12 +52,6 @@ CameraIntrinsicsProperty::CameraIntrinsicsProperty( mitk::CameraIntrinsics::Poin
   : BaseProperty(), m_Value( value )
 {}
 
-CameraIntrinsicsProperty::Pointer CameraIntrinsicsProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer CameraIntrinsicsProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

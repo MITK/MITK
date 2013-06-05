@@ -1,5 +1,5 @@
 project(BlueBerry)
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.5)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
@@ -199,7 +199,7 @@ if(BLUEBERRY_BUILD_TESTING)
 
   set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
   get_target_property(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
-  if(APPLE AND _is_macosx_bundle) 
+  if(APPLE AND _is_macosx_bundle)
     set(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
   endif()
 
@@ -212,7 +212,7 @@ if(BLUEBERRY_BUILD_TESTING)
 #    Testing/org.blueberry.core.runtime.tests:ON
 #    Testing/org.blueberry.osgi.tests:ON
   )
-  
+
   if(BLUEBERRY_ENABLE_GUI_TESTING)
 #    list(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 

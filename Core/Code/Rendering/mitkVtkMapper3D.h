@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   // typedef allows integration of mappers into the new mapper architecture
-  // @deprecated Use VtkMapper instead
+  // \deprecatedSince{2013_03} Use VtkMapper instead
   DEPRECATED(typedef VtkMapper VtkMapper3D);
 
 } // namespace mitk

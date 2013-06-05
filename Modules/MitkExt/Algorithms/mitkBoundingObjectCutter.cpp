@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkBoundingObject.h"
 #include "mitkGeometry3D.h"
+#include <math.h>
 //#include "itkImageRegionIteratorWithIndex.h"
 
 namespace mitk
@@ -47,7 +48,7 @@ BoundingObjectCutter::BoundingObjectCutter()
   : m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
     m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0), m_UseWholeInputRegion(false)
 {
-  this->SetNumberOfInputs(2);
+  this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
   m_InputTimeSelector  = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();
@@ -119,15 +120,15 @@ void BoundingObjectCutter::GenerateOutputInformation()
   // build region out of bounding-box of bounding-object
   mitk::SlicedData::IndexType  index=m_InputRequestedRegion.GetIndex(); //init times and channels
   mitk::BoundingBox::PointType min = boBoxRelativeToImage->GetMinimum();
-  index[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0]);
-  index[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1]);
-  index[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2]);
+  index[0] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(min[0]));
+  index[1] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(min[1]));
+  index[2] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(min[2]));
 
   mitk::SlicedData::SizeType   size = m_InputRequestedRegion.GetSize(); //init times and channels
   mitk::BoundingBox::PointType max = boBoxRelativeToImage->GetMaximum();
-  size[0] = (mitk::SlicedData::SizeType::SizeValueType)(max[0])-index[0];
-  size[1] = (mitk::SlicedData::SizeType::SizeValueType)(max[1])-index[1];
-  size[2] = (mitk::SlicedData::SizeType::SizeValueType)(max[2])-index[2];
+  size[0] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(max[0])-index[0]);
+  size[1] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(max[1])-index[1]);
+  size[2] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(max[2])-index[2]);
 
   mitk::SlicedData::RegionType boRegion(index, size);
 

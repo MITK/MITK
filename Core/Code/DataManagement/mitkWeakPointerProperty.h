@@ -41,8 +41,6 @@ namespace mitk {
     itkNewMacro(WeakPointerProperty);
     mitkNewMacro1Param(WeakPointerProperty, itk::Object*);
 
-    Pointer Clone() const;
-
     virtual ~WeakPointerProperty();
 
     typedef itk::WeakPointer<itk::Object> ValueType;

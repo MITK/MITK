@@ -151,10 +151,6 @@ KinectController::~KinectController()
         }
       }
 
-      // Mirror data
-      d->m_ConnectionCheck = d->ErrorText(d->m_Context.SetGlobalMirror(!d->m_Context.GetGlobalMirror()));
-      if (!d->m_ConnectionCheck) return false;
-
       // Start data generation
       d->m_ConnectionCheck = d->ErrorText(d->m_Context.StartGeneratingAll());
       if (!d->m_ConnectionCheck) return false;

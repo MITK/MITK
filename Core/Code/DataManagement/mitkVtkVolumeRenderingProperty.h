@@ -48,8 +48,6 @@ public:
 
   mitkNewMacro1Param(VtkVolumeRenderingProperty, const std::string&);
 
-  Pointer Clone() const;
-
   /**
    * Returns the current volume rendering type
    */

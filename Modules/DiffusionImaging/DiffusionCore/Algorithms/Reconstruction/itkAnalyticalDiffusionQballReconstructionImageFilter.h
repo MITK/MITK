@@ -242,7 +242,7 @@ protected:
     void ComputeReconstructionMatrix();
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const
-                               OutputImageRegionType &outputRegionForThread, int);
+                               OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
 private:
 

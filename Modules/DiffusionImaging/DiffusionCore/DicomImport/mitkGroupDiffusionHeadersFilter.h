@@ -73,6 +73,10 @@ namespace mitk
 
     OutputType GetOutput();
 
+    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType ){}
+
+    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& ) {}
+
     virtual void GenerateOutputInformation();
 
     virtual void Update();

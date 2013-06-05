@@ -78,6 +78,11 @@ namespace mitk
       cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
       device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
+      device->SetBoolProperty("HasRGBImage", true);
+      device->SetBoolProperty("HasAmplitudeImage", false);
+      device->SetBoolProperty("HasIntensityImage", false);
+      device->SetBoolProperty("KinectReconstructionMode", true);
+
       return device.GetPointer();
     }
     //Member variable as variable for our DeviceNumber

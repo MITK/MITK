@@ -73,35 +73,20 @@ int mitkPlayerLoadAndRenderDepthDataTest(int argc, char* argv[])
     // setup a renderwindow of fixed size X*Y
     // render the datastorage
     // compare rendering to reference image
-    mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
     //Set the opacity for all images
     //for now this test renders in sagittal view direction
     renderingHelper.AddNodeToStorage(node);
-    renderingHelper.Render();
 
     //use this to generate a reference screenshot or save the file:
     bool generateReferenceScreenshot = false;
     if(generateReferenceScreenshot)
     {
-      renderingHelper.SaveAsPNG("/home/kilgus/Pictures/output.png");
+      renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/output.png");
     }
 
-    //### Usage of vtkRegressionTestImage:
-    //vtkRegressionTestImage( vtkRenderWindow )
-    //Set a vtkRenderWindow containing the desired scene.
-    //vtkRegressionTestImage automatically searches in argc and argv[]
-    //for a path a valid image with -V. If the test failed with the
-    //first image (foo.png) check if there are images of the form
-    //foo_N.png (where N=1,2,3...) and compare against them.
-    renderingHelper.PrepareRender();
-    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
-
-    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
-    //0 = test failed
-    //1 = test passed
-    //2 = test not run
-    //3 = something with vtkInteraction
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
+    //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
     //Wait some time to avoid threading issues.
     itksys::SystemTools::Delay(1000);

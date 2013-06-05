@@ -69,7 +69,7 @@ public:
   typedef SmartPointer<const Self> ConstPointer;
 
   /** */
-  itkNewMacro( Self);
+  itkNewMacro( Self)
 
   /** Generate Data. The image will be divided into a number of pieces, a number of threads
   will be spawned and Threaded GenerateData() will be called in each thread. */

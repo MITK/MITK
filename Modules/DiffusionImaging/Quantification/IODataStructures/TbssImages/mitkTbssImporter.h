@@ -54,9 +54,6 @@ namespace mitk
 
     mitk::TbssImage::Pointer Import();
 
-    mitk::TbssImage::Pointer ImportMeta();
-
-
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
     {
       m_Groups = groups;
@@ -65,11 +62,6 @@ namespace mitk
     std::vector< std::pair<std::string, int> > GetGroupInfo()
     {
       return m_Groups;
-    }
-
-    void SetTbssDatasets(std::vector< std::pair<std::string, std::string> > files)
-    {
-      m_MetaFiles = files;
     }
 
     void SetMeasurementInfo(std::string s)
@@ -96,7 +88,6 @@ namespace mitk
 
     DataImageType::Pointer m_Data;
     std::vector< std::pair<std::string, int> > m_Groups;
-    std::vector< std::pair<std::string, std::string> > m_MetaFiles;
 
     std::string m_MeasurementInfo;
 
@@ -104,12 +95,10 @@ namespace mitk
     mitk::Image::Pointer m_InputVolume;
 
 
-    mitk::TbssImage::MetaDataFunction RetrieveTbssFunction(std::string s);
 
 
   };
 
 }
 
-//#include "mitkTbssImporter.cpp"
 #endif // __mitkTbssImporter_h

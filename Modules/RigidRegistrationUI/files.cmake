@@ -34,7 +34,7 @@ set(CPP_FILES
   RigidRegistrationTransforms/QmitkScaleLogarithmicTransformView.cpp
   RigidRegistrationTransforms/QmitkAffineTransformView.cpp
   RigidRegistrationTransforms/QmitkFixedCenterOfRotationAffineTransformView.cpp
-  RigidRegistrationTransforms/QmitkRigid3DTransformView.cpp
+  #RigidRegistrationTransforms/QmitkRigid3DTransformView.cpp
   RigidRegistrationTransforms/QmitkEuler3DTransformView.cpp
   RigidRegistrationTransforms/QmitkCenteredEuler3DTransformView.cpp
   RigidRegistrationTransforms/QmitkQuaternionRigidTransformView.cpp
@@ -82,7 +82,7 @@ set(UI_FILES
   RigidRegistrationTransforms/QmitkScaleLogarithmicTransformControls.ui
   RigidRegistrationTransforms/QmitkAffineTransformControls.ui
   RigidRegistrationTransforms/QmitkFixedCenterOfRotationAffineTransformControls.ui
-  RigidRegistrationTransforms/QmitkRigid3DTransformControls.ui
+  #RigidRegistrationTransforms/QmitkRigid3DTransformControls.ui
   RigidRegistrationTransforms/QmitkEuler3DTransformControls.ui
   RigidRegistrationTransforms/QmitkCenteredEuler3DTransformControls.ui
   RigidRegistrationTransforms/QmitkQuaternionRigidTransformControls.ui

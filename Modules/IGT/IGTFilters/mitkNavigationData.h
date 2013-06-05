@@ -82,13 +82,13 @@ namespace mitk {
       */
       itkSetMacro(DataValid, bool);
       /**
-      * \brief sets the timestamp of the NavigationData object
+      * \brief sets the IGT timestamp of the NavigationData object
       */
-      itkSetMacro(TimeStamp, TimeStampType);
+      itkSetMacro(IGTTimeStamp, TimeStampType);
       /**
-      * \brief gets the timestamp of the NavigationData object
+      * \brief gets the IGT timestamp of the NavigationData object
       */
-      itkGetConstMacro(TimeStamp, TimeStampType);
+      itkGetConstMacro(IGTTimeStamp, TimeStampType);
       /**
       * \brief sets the HasPosition flag of the NavigationData object
       */
@@ -196,7 +196,7 @@ namespace mitk {
       /**
       * \brief contains the time at which the tracking data was recorded
       */
-      TimeStampType m_TimeStamp;
+      TimeStampType m_IGTTimeStamp;
       /**
       * \brief name of the navigation data
       */

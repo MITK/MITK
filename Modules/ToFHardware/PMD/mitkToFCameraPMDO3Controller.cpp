@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToFConfig.h"
 #include "mitkToFPMDConfig.h"
 
+#include "vnl/vnl_matrix.h"
+
 // IP Adress of the Camera, change here if needed
 #define CAMERA_ADDR "192.168.0.69"
 #define SOURCE_PARAM "192.168.0.69"
@@ -55,6 +57,8 @@ namespace mitk
       ErrorText(m_PMDRes);
       m_CaptureWidth = m_DataDescription.img.numColumns;
       m_CaptureHeight = m_DataDescription.img.numRows;
+      m_InternalCaptureWidth = m_CaptureWidth;
+      m_InternalCaptureHeight = m_CaptureHeight;
       m_PixelNumber = m_CaptureWidth*m_CaptureHeight;
       m_NumberOfBytes = m_PixelNumber * sizeof(float);
       m_SourceDataSize = m_DataDescription.size;
@@ -68,4 +72,21 @@ namespace mitk
     else return m_ConnectionCheck;
   }
 
+  void ToFCameraPMDO3Controller::TransformCameraOutput(float* in, float* out, bool isDist)
+  {
+    vnl_matrix<float> inMat = vnl_matrix<float>(m_CaptureHeight,m_CaptureWidth);
+    inMat.copy_in(in);
+    vnl_matrix<float> outMat = vnl_matrix<float>(m_InternalCaptureHeight, m_InternalCaptureWidth);
+    vnl_matrix<float> temp = vnl_matrix<float>(m_InternalCaptureHeight, m_InternalCaptureWidth);
+    outMat = inMat.extract(m_InternalCaptureHeight, m_InternalCaptureWidth, 0,0);
+    outMat.fliplr();
+    if(isDist)
+    {
+      outMat*=1000;
+    }
+    outMat.copy_out(out);
+    inMat.clear();
+    outMat.clear();
+    temp.clear();
+  }
 }

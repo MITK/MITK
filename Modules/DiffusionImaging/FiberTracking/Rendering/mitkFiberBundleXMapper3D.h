@@ -79,7 +79,7 @@ public:
     };
 
     /** \brief This member holds all three LocalStorages for the 3D render window(s). */
-    mitk::Mapper::LocalStorageHandler<FBXLocalStorage3D> m_LSH;
+    mitk::LocalStorageHandler<FBXLocalStorage3D> m_LSH;
 
 
 protected:

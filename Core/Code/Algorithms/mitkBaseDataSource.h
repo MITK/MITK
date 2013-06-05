@@ -15,80 +15,148 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef _MITK_BASE_DATA_SOURCE_H
-#define _MITK_BASE_DATA_SOURCE_H
+#ifndef MITK_BASE_DATA_SOURCE_H
+#define MITK_BASE_DATA_SOURCE_H
 
-#include "mitkBaseProcess.h"
-#include "mitkBaseData.h"
+#include <MitkExports.h>
+#include <mitkCommon.h>
+#include <itkProcessObject.h>
 
-namespace mitk
-{
+#define mitkBaseDataSourceGetOutputDeclarations                          \
+  OutputType* GetOutput();                                               \
+  const OutputType* GetOutput() const;                                   \
+  OutputType* GetOutput(DataObjectPointerArraySizeType idx);             \
+  const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+
+#define mitkBaseDataSourceGetOutputDefinitions(className)                                                              \
+  className::OutputType* className::GetOutput(void)                                                                    \
+  {                                                                                                                    \
+    return itkDynamicCastInDebugMode<OutputType*>( this->GetPrimaryOutput() );                                         \
+  }                                                                                                                    \
+  const className::OutputType* className::GetOutput(void) const                                                        \
+  {                                                                                                                    \
+    return itkDynamicCastInDebugMode<const OutputType*>( this->GetPrimaryOutput() );                                   \
+  }                                                                                                                    \
+  className::OutputType* className::GetOutput(DataObjectPointerArraySizeType idx)                                      \
+  {                                                                                                                    \
+    OutputType* out = dynamic_cast<OutputType*>( this->ProcessObject::GetOutput(idx) );                                \
+    if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )                                                  \
+    {                                                                                                                  \
+      itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () ); \
+    }                                                                                                                  \
+    return out;                                                                                                        \
+  }                                                                                                                    \
+  const className::OutputType* className::GetOutput(DataObjectPointerArraySizeType idx) const                          \
+  {                                                                                                                    \
+    const OutputType* out = dynamic_cast<const OutputType*>( this->ProcessObject::GetOutput(idx) );                    \
+    if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )                                                  \
+    {                                                                                                                  \
+      itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () ); \
+    }                                                                                                                  \
+    return out;                                                                                                        \
+  }
+
+
+namespace mitk {
+
+class BaseData;
 
 /**
- * @brief Superclass of all classes generating base data (instances of class
- * mitk::BaseData) as output.
+ * @brief Superclass of all classes generating some kind of mitk::BaseData.
  *
+ * Superclass of all classes generating some kind of mitk::BaseData.
  * In itk and vtk the generated result of a ProcessObject is only guaranteed
  * to be up-to-date, when Update() of the ProcessObject or the generated
  * DataObject is called immediately before access of the data stored in the
- * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
- * for mitk::BaseDataSource.
+ * DataObject. This is also true for subclasses of mitk::BaseProcess. But
+ * many of the subclasses of mitk::BaseProcess define additional access
+ * functions to the generated output that guarantee an up-to-date result, see
+ * for example mitk::ImageSource.
  * @ingroup Process
  */
-class MITK_CORE_EXPORT BaseDataSource : public BaseProcess
+class MITK_CORE_EXPORT BaseDataSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( BaseDataSource, BaseProcess );
 
-    typedef mitk::BaseData OutputType;
+  mitkClassMacro(BaseDataSource, itk::ProcessObject)
 
-    typedef OutputType::Pointer OutputTypePointer;
+  typedef BaseData OutputType;
+  typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
 
-    /**
-     * Allocates a new output object and returns it. This function
-     * is pure virtual because mitk::BaseData contains pure virtual functions
-     * and can not directly be instantiated. This must be done by subclasses, which
-     * know which subclasses of mitk::BaseData they want to instantiate. Thus, these
-     * classes have to set their output themselves via this->SetOutput(MakeOutput(0))
-     * in the constructor!
-     * @param idx the index of the output for which an object should be created
-     * @returns the new object
-     */
-    virtual itk::DataObject::Pointer MakeOutput ( unsigned int idx ) = 0;
+  mitkBaseDataSourceGetOutputDeclarations
 
-    /**
-     * Allows to set the output of the base data source.
-     * @param output the intended output of the base data source
-     */
-    virtual void SetOutput( OutputType* output );
+  /** @brief Graft the specified BaseData onto this BaseDataSource's output.
+   *
+   * This method is used when a
+   * process object is implemented using a mini-pipeline which is
+   * defined in its GenerateData() method.  The usage is:
+   *
+   * \code
+   *    // setup the mini-pipeline to process the input to this filter
+   *    firstFilterInMiniPipeline->SetInput( this->GetInput() );
 
-    /**
-     * Allows to set the n-th output of the base data source.
-     * @param idx The index of the output
-     * @param output The intended output of the base data source
-     */
-    virtual void SetOutput( unsigned int idx, OutputType* output );
+   *    // setup the mini-pipeline to calculate the correct regions
+   *    // and write to the appropriate bulk data block
+   *    lastFilterInMiniPipeline->GraftOutput( this->GetOutput(0) );
+   *
+   *    // execute the mini-pipeline
+   *    lastFilterInMiniPipeline->Update();
+   *
+   *    // graft the mini-pipeline output back onto this filter's output.
+   *    // this is needed to get the appropriate regions passed back.
+   *    this->GraftOutput( lastFilterInMiniPipeline->GetOutput(0) );
+   * \endcode
+   */
+  virtual void GraftOutput(OutputType* output);
 
-    /**
-     * Returns the output with index 0 of the base data source
-     * @returns the output
-     */
-    virtual OutputType* GetOutput();
+  /**
+   * Graft the specified base data object onto this BaseDataSource's named
+   * output. This is similar to the GraftOutput method except it
+   * allows you to specify which output is affected.
+   * See the GraftOutput for general usage information.
+   */
+  virtual void GraftOutput(const DataObjectIdentifierType & key, OutputType* output);
 
-    /**
-     * Returns the n'th output of the base data source
-     * @param idx the index of the wanted output
-     * @returns the output with index idx.
-     */
-    virtual OutputType* GetOutput ( unsigned int idx );
+  /** @brief Graft the specified base data object onto this BaseDataSource's idx'th
+   * output.
+   *
+   * This is the similar to GraftOutput method except is
+   * allows you specify which output is affected. The specified index
+   * must be a valid output number (less than
+   * ProcessObject::GetNumberOfOutputs()). See the GraftOutput for
+   * general usage information.
+   */
+  virtual void GraftNthOutput(unsigned int idx, OutputType* output);
+
+  /**
+   * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
+   */
+  virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx ) = 0;
+
+  /**
+   * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
+   */
+  virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name) = 0;
+
+  /**
+   * @brief Access itk::ProcessObject::m_Updating
+   *
+   * m_Updating indicates when the pipeline is executing.
+   * It prevents infinite recursion when pipelines have loops.
+   * \sa itk::ProcessObject::m_Updating
+   **/
+  bool Updating() const;
 
 protected:
 
-    BaseDataSource();
+  BaseDataSource();
+  virtual ~BaseDataSource();
 
-    virtual ~BaseDataSource();
+  // purposely not implemented
+  static Pointer New();
 
 };
 
-}
-#endif // #define _MITK_BASE_DATA_SOURCE_H
+} // namespace mitk
+
+#endif /* MITK_BASE_DATA_SOURCE_H */

@@ -42,8 +42,7 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
   public:
 
     mitkClassMacro(BaseProperty,itk::Object)
-
-    Pointer Clone() const;
+    itkCloneMacro(Self)
 
     /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
 
@@ -93,8 +92,6 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object
       @return True if the argument could be assigned to this property.
      */
     virtual bool Assign(const BaseProperty& ) = 0;
-
-    virtual itk::LightObject::Pointer InternalClone() const = 0;
 };
 
 } // namespace mitk

@@ -57,7 +57,7 @@ namespace itk{
     typename OutputImageType::Pointer outImage = this->GetOutput();
 
     // calculate new image parameters
-    mitk::Vector3D newSpacing;
+    itk::Vector<double, 3> newSpacing;
     mitk::Point3D newOrigin;
     itk::Matrix<double, 3, 3> newDirection;
     ImageRegion<3> upsampledRegion;

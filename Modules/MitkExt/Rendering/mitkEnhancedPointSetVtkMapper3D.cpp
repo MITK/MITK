@@ -359,6 +359,16 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
 
 void mitk::EnhancedPointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer * renderer )
 {
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(needGenerateData)
+  {
+    ls->UpdateGenerateDataTime();
+    this->UpdateVtkObjects();
+  }
+
   ApplyProperties(renderer);
 }
 

@@ -37,7 +37,7 @@ public:
   typedef itk::SmartPointer<const Self>ConstPointer;
 
   /// Create an object and return a pointer to it as a mitk::BaseProcess.
-  virtual itk::SmartPointer<BaseProcess> CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
+  virtual itk::SmartPointer<BaseDataSource> CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
   virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) = 0;
 
 protected:

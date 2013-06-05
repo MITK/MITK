@@ -65,26 +65,23 @@ public:
   typedef SmartPointer<const Self> ConstPointer;
 
   /** */
-  itkNewMacro( Self);
+  itkNewMacro( Self)
 
   /** Generate Data. The image will be divided into a number of pieces, a number of threads
   will be spawned and Threaded GenerateData() will be called in each thread. */
   void Project();
 
-  itkSetMacro(DistanceMap, RealImageType::Pointer);
+  itkSetMacro(DistanceMap, RealImageType::Pointer)
 
-  itkSetMacro(Directions, VectorImageType::Pointer);
+  itkSetMacro(Directions, VectorImageType::Pointer)
 
-  itkSetMacro(Skeleton, CharImageType::Pointer);
+  itkSetMacro(Skeleton, CharImageType::Pointer)
 
-  itkSetMacro(Tube, CharImageType::Pointer);
+  itkSetMacro(Tube, CharImageType::Pointer)
 
-  itkSetMacro(AllFA, Float4DImageType::Pointer);
+  itkSetMacro(AllFA, Float4DImageType::Pointer)
 
-  itkGetMacro(Projections, Float4DImageType::Pointer);
-
-  itkGetMacro(Projected, RealImageType::Pointer);
-
+  itkGetMacro(Projections, Float4DImageType::Pointer)
 
 
 protected:
@@ -106,8 +103,6 @@ protected:
   Float4DImageType::Pointer m_Projections;
 
   Float4DImageType::Pointer m_AllFA;
-
-  RealImageType::Pointer m_Projected;
 
   int round(float x)
   {

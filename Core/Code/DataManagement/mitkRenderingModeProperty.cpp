@@ -64,12 +64,6 @@ bool mitk::RenderingModeProperty::AddEnum( const std::string& name, const IdType
   return Superclass::AddEnum( name, id );
 }
 
-mitk::RenderingModeProperty::Pointer mitk::RenderingModeProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::RenderingModeProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

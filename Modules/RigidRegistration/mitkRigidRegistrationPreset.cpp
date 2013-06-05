@@ -599,54 +599,55 @@ namespace mitk {
       double useMo = atof(useMoments.c_str());
       transformValues[15] = useMo;
     }
-    else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
-    {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
-      double useSca = atof(useScales.c_str());
-      transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
-      double sca1 = atof(scale1.c_str());
-      transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
-      double sca2 = atof(scale2.c_str());
-      transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
-      double sca3 = atof(scale3.c_str());
-      transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
-      double sca4 = atof(scale4.c_str());
-      transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
-      double sca5 = atof(scale5.c_str());
-      transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
-      double sca6 = atof(scale6.c_str());
-      transformValues[7] = sca6;
-      std::string scale7 = ReadXMLStringAttribut( "SCALE7", atts );
-      double sca7 = atof(scale7.c_str());
-      transformValues[8] = sca7;
-      std::string scale8 = ReadXMLStringAttribut( "SCALE8", atts );
-      double sca8 = atof(scale8.c_str());
-      transformValues[9] = sca8;
-      std::string scale9 = ReadXMLStringAttribut( "SCALE9", atts );
-      double sca9 = atof(scale9.c_str());
-      transformValues[10] = sca9;
-      std::string scale10 = ReadXMLStringAttribut( "SCALE10", atts );
-      double sca10 = atof(scale10.c_str());
-      transformValues[11] = sca10;
-      std::string scale11 = ReadXMLStringAttribut( "SCALE11", atts );
-      double sca11 = atof(scale11.c_str());
-      transformValues[12] = sca11;
-      std::string scale12 = ReadXMLStringAttribut( "SCALE12", atts );
-      double sca12 = atof(scale12.c_str());
-      transformValues[13] = sca12;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
-      double useIni = atof(useInitializer.c_str());
-      transformValues[14] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
-      double useMo = atof(useMoments.c_str());
-      transformValues[15] = useMo;
-    }
+    //TODO remove rigid3dTransform
+//    else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
+//    {
+//      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+//      double useSca = atof(useScales.c_str());
+//      transformValues[1] = useSca;
+//      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+//      double sca1 = atof(scale1.c_str());
+//      transformValues[2] = sca1;
+//      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+//      double sca2 = atof(scale2.c_str());
+//      transformValues[3] = sca2;
+//      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+//      double sca3 = atof(scale3.c_str());
+//      transformValues[4] = sca3;
+//      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+//      double sca4 = atof(scale4.c_str());
+//      transformValues[5] = sca4;
+//      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+//      double sca5 = atof(scale5.c_str());
+//      transformValues[6] = sca5;
+//      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+//      double sca6 = atof(scale6.c_str());
+//      transformValues[7] = sca6;
+//      std::string scale7 = ReadXMLStringAttribut( "SCALE7", atts );
+//      double sca7 = atof(scale7.c_str());
+//      transformValues[8] = sca7;
+//      std::string scale8 = ReadXMLStringAttribut( "SCALE8", atts );
+//      double sca8 = atof(scale8.c_str());
+//      transformValues[9] = sca8;
+//      std::string scale9 = ReadXMLStringAttribut( "SCALE9", atts );
+//      double sca9 = atof(scale9.c_str());
+//      transformValues[10] = sca9;
+//      std::string scale10 = ReadXMLStringAttribut( "SCALE10", atts );
+//      double sca10 = atof(scale10.c_str());
+//      transformValues[11] = sca10;
+//      std::string scale11 = ReadXMLStringAttribut( "SCALE11", atts );
+//      double sca11 = atof(scale11.c_str());
+//      transformValues[12] = sca11;
+//      std::string scale12 = ReadXMLStringAttribut( "SCALE12", atts );
+//      double sca12 = atof(scale12.c_str());
+//      transformValues[13] = sca12;
+//      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+//      double useIni = atof(useInitializer.c_str());
+//      transformValues[14] = useIni;
+//      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+//      double useMo = atof(useMoments.c_str());
+//      transformValues[15] = useMo;
+//    }
     else if (transform == mitk::TransformParameters::EULER3DTRANSFORM || transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM
           || transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
     {

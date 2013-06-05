@@ -51,11 +51,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
- m_LastEventSender(NULL),
- m_LastEventSlice(0),
- m_Contourmarkername ("Position"),
- m_ShowMarkerNodes (false),
- m_3DInterpolationEnabled(true)
+m_LastEventSender(NULL),
+m_LastEventSlice(0),
+m_Contourmarkername ("Position"),
+m_ShowMarkerNodes (false),
+m_3DInterpolationEnabled(true)
 {
 }
 
@@ -72,8 +72,8 @@ float mitk::SegTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
   //This are the mouse event that are used by the statemachine patterns for zooming and panning. This must be possible although a tool is activ
   if (stateEvent->GetId() == EIDRIGHTMOUSEBTN || stateEvent->GetId() == EIDMIDDLEMOUSEBTN || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDCTRL ||
-      stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
-      stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
+    stateEvent->GetId() == EIDMIDDLEMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSERELEASE || stateEvent->GetId() == EIDRIGHTMOUSEBTNANDMOUSEMOVE ||
+    stateEvent->GetId() == EIDMIDDLEMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNANDMOUSEMOVE || stateEvent->GetId() == EIDCTRLANDRIGHTMOUSEBTNRELEASE )
   {
     //Since the usual segmentation tools currently do not need right click interaction but the mitkDisplayVectorInteractor
     return 0.0;
@@ -101,9 +101,9 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   imageNormal1.Normalize();
   imageNormal2.Normalize();
 
-  imageNormal0.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal0.Get_vnl_vector()) );
-  imageNormal1.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal1.Get_vnl_vector()) );
-  imageNormal2.Set_vnl_vector( vnl_cross_3d<ScalarType>(normal.Get_vnl_vector(),imageNormal2.Get_vnl_vector()) );
+  imageNormal0.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal0.GetVnlVector()) );
+  imageNormal1.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal1.GetVnlVector()) );
+  imageNormal2.SetVnlVector( vnl_cross_3d<ScalarType>(normal.GetVnlVector(),imageNormal2.GetVnlVector()) );
 
   double eps( 0.00001 );
   // axial
@@ -145,6 +145,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   return true;
 }
 
+
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PositionEvent* positionEvent, const Image* image)
 {
   if (!positionEvent) return NULL;
@@ -155,6 +156,12 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   // first, we determine, which slice is affected
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
+  return this->GetAffectedImageSliceAs2DImage(planeGeometry, image, timeStep);
+}
+
+
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry, const Image* image, unsigned int timeStep)
+{
   if ( !image || !planeGeometry ) return NULL;
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -184,6 +191,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   return slice;
 }
 
+
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
@@ -194,6 +202,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
 
   return GetAffectedImageSliceAs2DImage( positionEvent, workingImage );
 }
+
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEvent* positionEvent)
 {
@@ -208,14 +217,46 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* positionEvent, Image* slice)
 {
+  if(!positionEvent) return;
+
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+
+  if( planeGeometry && slice)
+  {
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    Image* image = dynamic_cast<Image*>(workingNode->GetData());
+    unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
+    this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
+
+    slice->DisconnectPipeline();
+    ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+    contourExtractor->SetInput(slice);
+    contourExtractor->Update();
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+    if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
+    {
+      unsigned int pos = this->AddContourmarker(positionEvent);
+      mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+      PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+      mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
+      contour->DisconnectPipeline();
+    }
+  }
+
+}
+
+
+void mitk::SegTool2D::WriteBackSegmentationResult (const PlaneGeometry* planeGeometry, Image* slice, unsigned int timeStep)
+{
+  if(!planeGeometry || !slice) return;
+
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
 
-  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep( image );
 
-    //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
+  //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
   //Set the slice as 'input'
@@ -254,27 +295,14 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
   m_doOperation = NULL;
   /*============= END undo feature block ========================*/
 
-  slice->DisconnectPipeline();
-  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-  contourExtractor->SetInput(slice);
-  contourExtractor->Update();
-  mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-
-  if (m_3DInterpolationEnabled)
-  {
-    unsigned int pos = this->AddContourmarker(positionEvent);
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-    PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
-    contour->DisconnectPipeline();
-  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
 }
 
 void mitk::SegTool2D::SetShowMarkerNodes(bool status)
 {
-    m_ShowMarkerNodes = status;
+  m_ShowMarkerNodes = status;
 }
 
 void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
@@ -331,23 +359,23 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
     }
     else
     {
-        mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
+      mitk::NodePredicateProperty::Pointer isMarker = mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
 
-        mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
+      mitk::DataStorage::SetOfObjects::ConstPointer markers = m_ToolManager->GetDataStorage()->GetDerivations(workingNode,isMarker);
 
-        for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
-          iter != markers->end();
-          ++iter)
+      for ( mitk::DataStorage::SetOfObjects::const_iterator iter = markers->begin();
+        iter != markers->end();
+        ++iter)
+      {
+        std::string nodeName = (*iter)->GetName();
+        unsigned int t = nodeName.find_last_of(" ");
+        unsigned int markerId = atof(nodeName.substr(t+1).c_str())-1;
+        if(id == markerId)
         {
-            std::string nodeName = (*iter)->GetName();
-            unsigned int t = nodeName.find_last_of(" ");
-            unsigned int markerId = atof(nodeName.substr(t+1).c_str())-1;
-            if(id == markerId)
-            {
-                return id;
-            }
+          return id;
         }
-        m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      }
+      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }
   return id;
@@ -370,4 +398,3 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& mess
     << "  - What did you do?" << std::endl
     << "  - What happened (not)? What did you expect?" << std::endl;
 }
-

@@ -137,7 +137,7 @@ void mitk::NavigationDataRecorder::Update()
       dataValid = nd->IsDataValid();
 
       //use this one if you want the timestamps of the source
-      //timestamp = nd->GetTimeStamp();
+      //timestamp = nd->GetIGTTimeStamp();
 
       //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
       if (timestamp >= 0)

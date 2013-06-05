@@ -166,13 +166,11 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::SlicedData::SetRequestedRegion(itk::DataObject *data)
+void mitk::SlicedData::SetRequestedRegion( const itk::DataObject *data)
 {
   m_UseLargestPossibleRegion=false;
 
-  mitk::SlicedData *slicedData;
-
-  slicedData = dynamic_cast<mitk::SlicedData*>(data);
+  const mitk::SlicedData *slicedData = dynamic_cast<const mitk::SlicedData*>(data);
 
   if (slicedData)
   {

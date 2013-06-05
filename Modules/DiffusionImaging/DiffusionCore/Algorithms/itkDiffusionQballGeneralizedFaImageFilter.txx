@@ -66,7 +66,7 @@ namespace itk {
     int )
   {
     typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+      static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();

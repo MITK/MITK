@@ -52,12 +52,6 @@ std::string mitk::StringProperty::GetValueAsString() const
   return m_Value;
 }
 
-mitk::StringProperty::Pointer mitk::StringProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::StringProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

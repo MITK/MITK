@@ -33,5 +33,6 @@
         <file>reset.png</file>
         <file>MapperEfx2D.png</file>
         <file>refresh.xpm</file>
+        <file>odf.png</file>
     </qresource>
 </RCC>

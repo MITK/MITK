@@ -151,7 +151,7 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
     if(commandIssued)
     {
         this->NotifyObserver(pythonCommand.toStdString());
-        m_ErrorOccured = PythonQt::self()->handleError();
+        m_ErrorOccured = PythonQt::self()->errorOccured();
     }
 
     return result.toString().toStdString();
@@ -247,74 +247,69 @@ QString mitk::PythonService::GetTempDataFileName(const std::string& ext) const
 bool mitk::PythonService::CopyToPythonAsItkImage(mitk::Image *image, const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
-    // save image
-    QString fileName = this->GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
-    fileName = QDir::fromNativeSeparators( fileName );
+  // save image
+  QString fileName = this->GetTempDataFileName( mitk::IOUtil::DEFAULTIMAGEEXTENSION );
+  fileName = QDir::fromNativeSeparators( fileName );
 
-    MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
-    if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
+  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
+  if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
+  {
+    MITK_ERROR << "Temporary file could not be created.";
+  }
+  else
+  {
+    // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
+    int dim = image->GetDimension();
+    mitk::PixelType pixelType = image->GetPixelType();
+    itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
+
+    // default pixeltype: unsigned short
+    QString type = "US";
+    if( ioPixelType == itk::ImageIOBase::SCALAR )
     {
-        MITK_ERROR << "Temporary file could not be created.";
-    }
-    else
-    {
-        // TODO CORRECT TYPE SETUP, MAKE MITK_DEBUG("PythonService") MITK_DEBUG("PythonService")
-        int dim = image->GetDimension();
-        mitk::PixelType pixelType = image->GetPixelType();
-        itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelTypeId();
-
-        // default pixeltype: unsigned short
-        QString type = "US";
-        if( ioPixelType == itk::ImageIOBase::SCALAR )
-        {
-          if( pixelType.GetTypeId() == typeid(double) )
-            type = "D";
-          else if( pixelType.GetTypeId() == typeid(float) )
-            type = "F";
-          if( pixelType.GetTypeId() == typeid(long double) )
-            type = "LD";
-          else if( pixelType.GetTypeId() == typeid(short) )
-            type = "SS";
-          else if( pixelType.GetTypeId() == typeid(signed char) )
-            type = "SC";
-          else if( pixelType.GetTypeId() == typeid(signed int) )
-            type = "SI";
-          else if( pixelType.GetTypeId() == typeid(signed long) )
-            type = "SL";
-          else if( pixelType.GetTypeId() == typeid(signed short) )
-            type = "SS";
-          else if( pixelType.GetTypeId() == typeid(unsigned char) )
-            type = "UC";
-          else if( pixelType.GetTypeId() == typeid(unsigned int) )
-            type = "UI";
-          else if( pixelType.GetTypeId() == typeid(unsigned long) )
-            type = "UL";
-          else if( pixelType.GetTypeId() == typeid(unsigned short) )
-            type = "US";
-        }
-
-        MITK_DEBUG("PythonService") << "Got mitk image with type " << type.toStdString() << " and dim " << dim;
-
-        QString command;
-
-        command.append( QString("imageType = itk.Image[itk.%1, %2]\n") .arg( type ).arg( dim ) );
-
-        command.append( QString("readerType = itk.ImageFileReader[imageType]\n") );
-        command.append( QString("reader = readerType.New()\n") );
-        command.append( QString("reader.SetFileName( \"%1\" )\n") .arg(fileName) );
-        command.append( QString("reader.Update()\n") );
-        command.append( QString("%1 = reader.GetOutput()\n").arg( varName ) );
-
-        MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-        this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
-
-        QFile file( fileName );
-        MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
-        file.remove();
-        return true;
+      if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE )
+        type = "D";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT )
+        type = "F";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT)
+        type = "SS";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR )
+        type = "SC";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::INT )
+        type = "SI";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG )
+        type = "SL";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR )
+        type = "UC";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT )
+        type = "UI";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG )
+        type = "UL";
+      else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT )
+        type = "US";
     }
 
-    return false;
+    MITK_DEBUG("PythonService") << "Got mitk image with type " << type.toStdString() << " and dim " << dim;
+
+    QString command;
+
+    command.append( QString("imageType = itk.Image[itk.%1, %2]\n") .arg( type ).arg( dim ) );
+
+    command.append( QString("readerType = itk.ImageFileReader[imageType]\n") );
+    command.append( QString("reader = readerType.New()\n") );
+    command.append( QString("reader.SetFileName( \"%1\" )\n") .arg(fileName) );
+    command.append( QString("reader.Update()\n") );
+    command.append( QString("%1 = reader.GetOutput()\n").arg( varName ) );
+
+    MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+    MITK_INFO << this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
+    QFile file( fileName );
+    MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
+    file.remove();
+    return true;
+  }
+  return false;
 }
 
 mitk::Image::Pointer mitk::PythonService::CopyItkImageFromPython(const std::string &stdvarName)
@@ -503,6 +498,7 @@ bool mitk::PythonService::CopyToPythonAsVtkPolyData( mitk::Surface* surface, con
 bool mitk::PythonService::IsItkPythonWrappingAvailable()
 {
   this->Execute( "import itk\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "print \"Using ITK version \" + itk.Version.GetITKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
 
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
@@ -520,6 +516,7 @@ bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 bool mitk::PythonService::IsVtkPythonWrappingAvailable()
 {
   this->Execute( "import vtk", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "print \"Using VTK version \" + vtk.vtkVersion.GetVTKVersion()\n", IPythonService::SINGLE_LINE_COMMAND );
   m_VtkWrappingAvailable = !this->PythonErrorOccured();
 
   return m_VtkWrappingAvailable;

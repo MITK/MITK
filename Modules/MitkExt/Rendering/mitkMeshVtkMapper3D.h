@@ -63,6 +63,8 @@ public:
   virtual vtkProp* GetVtkProp(mitk::BaseRenderer *renderer);
   virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
+  LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
   MeshVtkMapper3D();
 

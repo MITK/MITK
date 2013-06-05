@@ -94,6 +94,7 @@ void QmitkFiberProcessingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &std
     m_MultiWidget = &stdMultiWidget;
 }
 
+
 void QmitkFiberProcessingView::StdMultiWidgetNotAvailable()
 {
     m_MultiWidget = NULL;

@@ -46,24 +46,6 @@ namespace mitk
     itkNewMacro(Self)
 
 
-    enum MetaDataFunction
-    {
-      MEAN_FA_SKELETON,
-      MEAN_FA_SKELETON_MASK,
-      GRADIENT_X,
-      GRADIENT_Y,
-      GRADIENT_Z,
-      TUBULAR_STRUCTURE,
-      DISTANCE_MAP,
-      MISC
-    };
-
-
-    //void SetRequestedRegionToLargestPossibleReg tbssRoi->SetTbssType(mitk::TbssImage<char>::ROI);ion();
-    //bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    //virtual bool VerifyRequestedRegion();
-    //void SetRequestedRegion(itk::DataObject *data);
-
     ImageType::Pointer GetImage()
     {
       return m_Image;
@@ -90,15 +72,6 @@ namespace mitk
       return m_GroupInfo;
     }
 
-    void SetMetaInfo( std::vector< std::pair<MetaDataFunction, int> > info)
-    {
-      m_MetaInfo = info;
-    }
-
-    std::vector< std::pair<MetaDataFunction, int> > GetMetaInfo()
-    {
-      return m_MetaInfo;
-    }
 
     void SetMeasurementInfo(std::string s)
     {
@@ -118,18 +91,6 @@ namespace mitk
 
 
 
-    itkGetMacro(IsMeta, bool)
-    itkGetMacro(ContainsGradient, bool)
-    itkGetMacro(ContainsMeanSkeleton, bool)
-    itkGetMacro(ContainsSkeletonMask, bool)
-    itkGetMacro(ContainsDistanceMap, bool)
-    itkSetMacro(IsMeta, bool)
-    itkSetMacro(ContainsGradient, bool)
-    itkSetMacro(ContainsMeanSkeleton, bool)
-    itkSetMacro(ContainsSkeletonMask, bool)
-    itkSetMacro(ContainsDistanceMap, bool)
-
-
   protected:
 
     TbssImage();
@@ -141,42 +102,13 @@ namespace mitk
 
     std::vector< std::pair<std::string, int> > m_GroupInfo;
 
-    std::vector< std::pair<MetaDataFunction, int> > m_MetaInfo;
-
     int m_DisplayIndex;
 
     std::string m_MeasurementInfo;
 
-    bool m_IsMeta;
-
-    bool m_ContainsGradient;
-
-    bool m_ContainsMeanSkeleton;
-
-    bool m_ContainsSkeletonMask;
-
-    bool m_ContainsDistanceMap;
-
 
 
   };
-
-/*
-  // Does the same es the normal CastToMitkImage, but needed to reimplemented due to the templatet pixeltype
-  template <typename ItkOutputImageType>
-  void CastToTbssImage(const ItkOutputImageType* itkimage, itk::SmartPointer< mitk::TbssImage >& tbssoutputimage)
-  {
-    if(tbssoutputimage.IsNull())
-    {
-      tbssoutputimage = mitk::TbssImage::New();
-    }
-    tbssoutputimage->InitializeByItk(itkimage);
-    tbssoutputimage->SetChannel(itkimage->GetBufferPointer());
-  }
-
-
-*/
-
 
 
 } // namespace mitk

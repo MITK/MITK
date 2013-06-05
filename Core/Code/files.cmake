@@ -69,12 +69,13 @@ set(H_FILES
 
   Interfaces/mitkIDataNodeReader.h
 
+  Rendering/mitkLocalStorageHandler.h
+
   IO/mitkPixelTypeTraits.h
 )
 
 set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
-  Algorithms/mitkBaseProcess.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
@@ -203,6 +204,7 @@ set(CPP_FILES
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
+  DataManagement/mitkPointSetShapeProperty.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
@@ -311,6 +313,7 @@ set(CPP_FILES
   Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
+  Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
   Rendering/mitkPolyDataGLMapper2D.cpp
   Rendering/mitkSurfaceGLMapper2D.cpp

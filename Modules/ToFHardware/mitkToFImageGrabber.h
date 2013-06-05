@@ -183,7 +183,10 @@ namespace mitk
     char* m_SourceDataArray;///< member holding the current source data array
     unsigned char* m_RgbDataArray; ///< member holding the current rgb data array
     unsigned long m_DeviceObserverTag; ///< tag of the observer for the ToFCameraDevice
-
+    bool m_DistanceImageInitialized; ///< flag indicating whether the distance image is initialized or not
+    bool m_IntensityImageInitialized; ///< flag indicating whether the intensity image is initialized or not
+    bool m_AmplitudeImageInitialized; ///< flag indicating whether the amplitude image is initialized or not
+    bool m_RGBImageInitialized; ///< flag indicating whether the RGB image is initialized or not
     ToFImageGrabber();
 
     ~ToFImageGrabber();

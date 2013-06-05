@@ -165,13 +165,6 @@ bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 }
 
 
-mitk::PropertyList::Pointer mitk::PropertyList::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
-
 void mitk::PropertyList::Clear()
 {
   PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();

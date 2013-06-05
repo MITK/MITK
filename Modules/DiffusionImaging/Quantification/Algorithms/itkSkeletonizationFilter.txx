@@ -258,6 +258,7 @@ namespace itk
   }
 
 
+  // Can provide a vector image to visualize the gradient image used in the search for local maxima.
   template< class TInputImage, class TOutputImage >
   itk::VectorImage<int, 3>::Pointer SkeletonizationFilter<TInputImage, TOutputImage>::GetGradientImage()
   {

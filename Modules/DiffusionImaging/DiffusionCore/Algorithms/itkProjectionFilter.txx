@@ -82,7 +82,7 @@ namespace itk
                 exponentfactor = -0.5 * (dir[0]*dir[0]+dir[1]*dir[1]+dir[2]*dir[2]) / (float)(SEARCHSIGMA*SEARCHSIGMA);
 
 
-              // No cingulum here
+              // No tubular structure here
               if(m_Tube->GetPixel(ix) == 0)
               {
                 for(int iters=0;iters<2;iters++)
@@ -125,13 +125,12 @@ namespace itk
 
 
 
-                  } // endfor(int d=1;d<MAXSEARCHLENGTH;d++)
+                  }
 
-                } // endfor(int iters=0;iters<2;iters++)
-              } // endif (m_Tube->GetPixel(ix) == 0)
+                }
+              }
 
-
-              // Cingulum here
+              // Tubular structure
               else
               {
                 for(int dy=-MAXSEARCHLENGTH; dy<=MAXSEARCHLENGTH;dy++) {
@@ -173,26 +172,26 @@ namespace itk
                       }
 
 
-                    } //endif(r>0)
+                    }
 
-                  } //endfor(int xxx=-MAXSEARCHLENGTH; xxx<=MAXSEARCHLENGTH; xxx++)
-                } // endfor(int dy=-MAXSEARCHLENGTH; dy<=MAXSEARCHLENGTH;y++)
-              } // endelse
+                  }
+                }
+              }
 
               ix4d[0]=x; ix4d[1]=y; ix4d[2]=z; ix4d[3]=t;
               data_4d_projected->SetPixel(ix4d, maxval);
 
-            } // endif(m_Skeleton->GetPixel(x) != 0)
-          } // endfor(int x=1; x<size[0]-1; x++)
-        } // endfor(int y=1; y<size[1]-1; y++)
-      } // endfor(int z=1; z<size[2]-1; z++)
-    } // endfor(int t=0; t<size[3]; t++)
+            }
+          }
+        }
+      }
+    }
 
     m_Projections = data_4d_projected;
 
 
 
-  } // GenerateData()
+  }
 
 
 

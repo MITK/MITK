@@ -48,8 +48,6 @@ public:
 
   mitkNewMacro1Param(GridRepresentationProperty, const std::string& );
 
-  Pointer Clone() const;
-
   /**
    * Sets the representation type to POINTS.
    */

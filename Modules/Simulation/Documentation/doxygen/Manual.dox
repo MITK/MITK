@@ -1,18 +1,55 @@
 /**
 \page SimulationManualPage The MITK Simulation Module
 
-The MITK Simulation Module provides medical simulation capabilities by integrating the Simulation Open Framework Architecture (SOFA) into MITK.
+The MITK simulation module provides medical simulation capabilities by integrating the Simulation Open Framework Architecture (SOFA) into MITK.
 
 \section SimulationManualBuildInstructions Build Instructions
 
-Activate the %CMake option <tt>MITK_USE_SOFA</tt> to automatically download and build SOFA as well as the MITK Simulation Module during the superbuild process.
-Afterwards you can activate simulation-enabled plugins during the MITK build configuration, e.g. <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>.
+Activate the %CMake option <tt>MITK_USE_SOFA</tt> when configuring the MITK superbuild.
+SOFA is automatically downloaded and built during the superbuild (as well as the MITK simulation module, which depends on SOFA).
+Simulation-related plugins can be activated when configuring the MITK build, i.e. activate <tt>MITK_BUILD_org.mitk.gui.qt.simulation</tt>, which will automatically activate <tt>MITK_BUILD_org.mitk.simulation</tt> in turn.
+
+\subsection SimulationManualSOFAPluginBuildInstructions SOFA Plugins
+
+SOFA plugins are built automatically during the MITK superbuild if they are located in the right directory and contain a %CMake script to build them.
+
+SOFA build configuration is originally qmake-based. However, for seamless MITK superbuild integration a %CMake-based build script is used instead.
+After you activated the %CMake option <tt>MITK_USE_SOFA</tt>, SOFA complete with the %CMake-based build script is downloaded during the superbuild.
+Following the MITK superbuild convention for external projects, it is located in the <tt>SOFA-src</tt> directory right beneath the top-level MITK build directory.
+Following the SOFA convention for plugins, they should be located in <tt>applications/plugins</tt>.
+Hence, create an <tt>applications/plugins</tt> directory in <tt>SOFA-src</tt> and place your plugin here, i.e. <tt>SOFA-src/applications/plugins/myplugin</tt>.
+
+The second and last step is to create a <tt>CMakeLists.txt</tt> file inside your plugin directory.
+Use the %CMake function <tt>add_sofa_library()</tt> to easily set up your plugin build script.
+Below is an example of a <tt>CMakeLists.txt</tt> file for a fictional plugin named "myplugin":
+
+\code
+set(MYPLUGIN_SOURES
+  Topologies/MyTopology.cpp
+  MyInteraction.cpp
+)
+
+set(MYPLUGIN_LIBS
+  sofa_base_topology
+  sofa_user_interaction
+)
+
+add_sofa_library(myplugin NO_PREFIX)
+\endcode
+
+The naming of <tt>MYPLUGIN_SOURCES</tt> and <tt>MYPLUGIN_LIBS</tt> is crucial for <tt>add_sofa_library(myplugin)</tt> to find the sources and libraries.
+For more information see <tt>SOFA-src/CMake/AddSOFALibrary.cmake</tt>.
+
+Once your plugin is placed in the right directory and provides a <tt>CMakeLists.txt</tt> file it is built during the MITK superbuild.
+Binaries of your plugin are placed in <tt>SOFA-build/bin</tt>.
+
+SOFA plugins can be loaded at runtime via the simulation preferences by clicking the <tt>Add...</tt> button.
+
+\image html SimulationPreferences.png The simulation preferences dialog box.
 
 \section SimulationManualIntroduction Introduction
 
-It is strongly recommended that you are at least familiar with the basic concepts of SOFA before you proceed reading.
-
-SOFA is intended to be used as a framework by itself. It is split into the following three parts:
+SOFA is split into the following three parts:
 
 <ul>
   <li> Framework
@@ -20,51 +57,37 @@ SOFA is intended to be used as a framework by itself. It is split into the follo
   <li> Applications
 </ul>
 
-While the former two parts make up the actual framework, the latter part is built on top of them and provides end user applications, e.g. runSofa.
+While the former two parts make up the actual framework functionality, the applications part provides end user applications, e.g. <tt>runSofa</tt>.
+The MITK simulation module and plugins replace the applications part of SOFA and make use of the framework and modules parts in terms of a toolkit.
 
-To be able to integrate SOFA into MITK, the MITK Simulation Module conceptionally replaces the application layer and solely uses the framework and module layer as a toolkit.
+\image html SOFA_MITK.png Conceptional layers and dependencies of SOFA and the MITK simulation module.
 
-\section SimulationManualHowToUpdate How to update SOFA
+\remark While the framework and modules parts of SOFA are LGPL-licensed, the applications part, which is not used by MITK, is GPL-licensed.
 
-SOFA is deployed to the MITK superbuild in three ZIP archives, namely
+\section SimulationManualHowToUpdate How to supply SOFA to the MITK Superbuild
 
-<ul>
-  <li> sofa-rev[rev].zip
-  <li> sofa-rev[rev]-cmake.zip
-  <li> sofa-rev[rev]-gl.zip
-</ul>
+\remark If you are not a member of the MITK staff you can safely skip this section.
 
-where [rev] is a substitute for the SVN revision of SOFA, e.g. 8935.
-The follwing process was proven suitable to create these ZIP archives out of a certain SOFA revision.
-Since it is a very time-consuming task you should only update SOFA if it is really necessary!
+SOFA build configuration is originally qmake-based. However, for seamless MITK superbuild integration a %CMake-based build script is used instead.
+To maintain this script and to ensure that it matches the right revision of SOFA we set up a Git repository at <tt>%git\@mitk.org:MITK-SOFA</tt>.
 
-<ol>
-  <li> Follow the instructions of the SOFA framework download website to check out a recent revsion of the trunk form their SVN server into a newly created directory named SOFA-svn (check the dashboard first to see if that revision is likely to compile properly on all supported platforms).
-  <li> To get rid of all SVN files in the source directory use SVN export to export the source code to a separate directory named SOFA-rev[rev].
-  <li> Delete all irrelevant directories and files in SOFA-rev[rev]. Relevant directories and files are:
-       <ul>
-         <li> extlibs/eigen-3.1.1, extlibs/miniBoost, extlibs/miniFlowVR, extlibs/newmat, extlibs/tinyxml
-         <li> framework
-         <li> modules/sofa/component, modules/sofa/simulation, modules/copyright.txt, modules/LGPL-license.txt
-         <li> Authors.txt, LICENCE.txt, readme.txt
-       </ul>
-  <li> Create sofa-rev[rev].zip out of the SOFA-rev[rev] directory.
-  <li> Download the old sofa-rev[old_rev].zip and extract it to SOFA-rev[old_rev].
-  <li> Download the old sofa-rev[old_rev]-cmake.zip and extract it to SOFA-CMake.
-  <li> Download the old sofa-rev[old_rev]-gl.zip and extract it to SOFA-GL.
-  <li> Download a directory diff tool like DirDiff for Windows and compare sofa-rev[old_rev] with sofa_rev[rev] to get an overview of what has changed. Note that you have to look at the .pro files to see which files were added or removed to the projects. Just looking at the files in a project directory is not sufficient!
-  <li> Adapt the CMake files in SOFA-CMake to the changes.
-  <li> Copy SOFA-rev[rev] to SOFA-rev[rev]-Test and also copy SOFA-CMake and SOFA-GL into that directory.
-  <li> Manually apply the patch for SOFA you find in the MITK source tree (MITK/CMakeExternals/PatchSOFA-rev[old_rev].cmake.
-  <li> Try to build SOFA-rev[rev]-Test. Make changes to SOFA-CMake and SOFA-GL files (don't forget to reapply the patch or even change the patch if necessary) until you can build everything successfully.
-  <li> Create sofa-rev[rev]-cmake.zip out of SOFA-CMake and sofa-rev[rev]-gl.zip out of SOFA-GL.
-  <li> Upload all three ZIP archives to a easily accessible location like your public DropBox folder.
-  <li> Update MITK/CMakeExternals/SOFA.cmake to point to the temporary locations and don't forget to update the MD5 hashes and to use an up-to-date patch file, i.e. PatchSOFA-rev[rev].cmake.
-  <li> Try to build MITK. Repeat any of the above steps until you are able to compile and use MITK with SOFA on every supprted plattform.
-  <li> Upload the new SOFA archives to mitk.org and adapt the URLs in MITK/CMakeExternals/SOFA.cmake.
-</ol>
+When the repository was updated a package named <tt>SOFA_<hash>.tar.gz</tt> must be created and uploaded to <tt>%http://mitk.org/download/thirdparty/</tt>.
+<hash> consists of the last eight digits of the SHA1 ID of the commit.
+To use the new package for the MITK superbuild, the URL and MD5 of the package must be updated in <tt>CMakeExternals/SOFA.cmake</tt>.
+
+If you need to patch SOFA sources you must append your patch to <tt>CMakeExternals/PatchSOFA-rev<revision>.cmake</tt>.
+Make sure that you keep the filename up to date regarding the revision of SOFA and update the filename for the patch command in <tt>CMakeExternals/SOFA.cmake</tt> too.
+
+The commit messages of the MITK-SOFA repository contain valuable information on which parts of SOFA must be stripped from a newly checked out revision.
+Please continue writing detailed commit messages when updating the repository.
+
+Updating the repository to a new SOFA revision can be a time-consuming task.
+The best way to keep track of changes and additions to the SOFA sources is to use a free folder comparing tool (e.g. dirdiff).
+Especially look at <tt>.pro</tt> files which describe the individual SOFA projects.
 
 \section SimulationManualDrawing Drawing
+
+It is recommended that you are at least familiar with the basic concepts of SOFA, e.g. scene graphs and visitors, before you proceed reading.
 
 Drawing is done by SOFA at three different places:
 

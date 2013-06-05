@@ -24,12 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK includes
 #include "mitkConnectomicsNetwork.h"
 
-#include "ConnectomicsExports.h"
-
 namespace itk
 {
 
-  class Connectomics_EXPORT ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
+  class ConnectomicsNetworkToConnectivityMatrixImageFilter : public ImageSource< itk::Image< unsigned short, 2 > >
   {
 
   public:
@@ -44,19 +42,19 @@ namespace itk
     typedef mitk::ConnectomicsNetwork  InputType;
 
     itkNewMacro(Self)
-      itkTypeMacro( ConnectomicsNetworkToConnectivityMatrixImageFilter, ImageSource )
+    itkTypeMacro( ConnectomicsNetworkToConnectivityMatrixImageFilter, ImageSource )
 
-      /** Get/Set m_BinaryConnectivity **/
-      itkSetMacro( BinaryConnectivity, bool)
-      itkGetMacro( BinaryConnectivity, bool)
+    /** Get/Set m_BinaryConnectivity **/
+    itkSetMacro( BinaryConnectivity, bool)
+    itkGetMacro( BinaryConnectivity, bool)
 
-      /** Get/Set m_RescaleConnectivity **/
-      itkSetMacro( RescaleConnectivity, bool)
-      itkGetMacro( RescaleConnectivity, bool)
+    /** Get/Set m_RescaleConnectivity **/
+    itkSetMacro( RescaleConnectivity, bool)
+    itkGetMacro( RescaleConnectivity, bool)
 
-      itkSetMacro( InputNetwork, InputType::Pointer)
+    itkSetMacro( InputNetwork, InputType::Pointer)
 
-      void GenerateData();
+    void GenerateData();
 
   protected:
 
@@ -74,9 +72,9 @@ namespace itk
 
 }
 
-//#ifndef ITK_MANUAL_INSTANTIATION
-//#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
-//#endif
+#ifndef ITK_MANUAL_INSTANTIATION
+#include "itkConnectomicsNetworkToConnectivityMatrixImageFilter.cpp"
+#endif
 
 
 #endif /* ITK_ConnectomicsNetworkToConnectivityMatrixImageFilter_H */

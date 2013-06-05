@@ -248,6 +248,14 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
   endif()
 endforeach()
 
+# Optional python variables
+if(MITK_USE_Python)
+    list(APPEND mitk_optional_cache_args
+         -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+         -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY} )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

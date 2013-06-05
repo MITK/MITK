@@ -60,6 +60,8 @@ public:
      */
     virtual void Paint( mitk::BaseRenderer* renderer );
 
+    LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
 
     UnstructuredGridMapper2D();

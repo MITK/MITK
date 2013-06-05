@@ -173,7 +173,7 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
     else
         return;
 
-    mitk::Vector3D spacing = geometry->GetSpacing();
+    itk::Vector<double,3> spacing = geometry->GetSpacing();
     spacing /= m_UpsamplingFactor;
 
     mitk::Point3D newOrigin = geometry->GetOrigin();

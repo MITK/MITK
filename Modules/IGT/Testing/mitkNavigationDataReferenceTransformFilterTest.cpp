@@ -194,9 +194,9 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   pointC[2] = 1;
 
   // quaternion transform the points
-  pointA = quaternionTransform->GetRotationMatrix() * pointA;
-  pointB = quaternionTransform->GetRotationMatrix() * pointB;
-  pointC = quaternionTransform->GetRotationMatrix() * pointC;
+  pointA = quaternionTransform->GetMatrix() * pointA;
+  pointB = quaternionTransform->GetMatrix() * pointB;
+  pointC = quaternionTransform->GetMatrix() * pointC;
 
   bool firstPoint0Same = sourcePos1[0] == myFilter->GetSourceLandmarks()->GetPoint(0)[0] - pointA[0];
   bool firstPoint1Same = sourcePos1[1] == myFilter->GetSourceLandmarks()->GetPoint(0)[1] - pointA[1];

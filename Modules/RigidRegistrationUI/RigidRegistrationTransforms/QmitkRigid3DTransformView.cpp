@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigid3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkRigid3DTransform.h>
+#include <itkVersorRigid3DTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>
 
@@ -51,7 +51,7 @@ itk::Object::Pointer QmitkRigid3DTransformView::GetTransform2(itk::Image<TPixelT
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
   if (VImageDimension == 3)
   {
-    typename itk::Rigid3DTransform< double >::Pointer transformPointer = itk::Rigid3DTransform< double >::New();
+    typename itk::VersorRigid3DTransform< double >::Pointer transformPointer = itk::VersorRigid3DTransform< double >::New();
     transformPointer->SetIdentity();
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];

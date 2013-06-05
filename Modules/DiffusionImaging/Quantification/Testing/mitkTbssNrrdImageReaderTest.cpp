@@ -41,7 +41,7 @@ int mitkTbssNrrdImageReaderTest(int argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED( tbssNrrdReader->CanReadFile(argv[1], "", ""), "Testing CanReadFile() method with valid input file name!");
   tbssNrrdReader->Update();
 
-  mitk::TbssImage* tbssImg = tbssNrrdReader->GetOutput(0);
+  mitk::TbssImage* tbssImg = tbssNrrdReader->GetOutput();
 
   MITK_TEST_CONDITION_REQUIRED(tbssImg != NULL, "Testing that tbssImg is not null");
 

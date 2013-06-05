@@ -83,7 +83,7 @@ const mitk::ImageToLookupTableFilter::InputImageType * mitk::ImageToLookupTableF
 
 void mitk::ImageToLookupTableFilter::GenerateData()
 {
-    this->SetNumberOfOutputs( this->GetNumberOfInputs() );
+    this->SetNumberOfIndexedOutputs( this->GetNumberOfInputs() );
     for (unsigned int inputIdx = 0; inputIdx < this->GetNumberOfInputs() ; ++inputIdx)
     {
         InputImagePointer image = const_cast<mitk::Image*>(this->GetInput( inputIdx ));

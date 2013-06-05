@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkSurface.h>
 #include <sofa/core/visual/VisualParams.h>
-#include <sofa/simulation/bgl/BglSimulation.h>
-#include <sofa/simulation/graph/DAGSimulation.h>
 #include <sofa/simulation/tree/TreeSimulation.h>
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -31,16 +29,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
-const float mitk::Simulation::ScaleFactor = 1000.0f;
+const float mitk::Simulation::ScaleFactor = 1.0f; // 1000.0f
 
-static sofa::simulation::Simulation::SPtr CreateSimulation(mitk::Simulation::SimulationType type = mitk::Simulation::Tree)
+static sofa::simulation::Simulation::SPtr CreateSimulation()
 {
-  if (type == mitk::Simulation::DAG)
-    return sofa::core::objectmodel::New<sofa::simulation::graph::DAGSimulation>();
-  else if (type == mitk::Simulation::Bgl)
-    return sofa::core::objectmodel::New<sofa::simulation::bgl::BglSimulation>();
-  else
-    return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
+  const std::string key = "MultiMappingObject";
+
+  if (sofa::simulation::xml::BaseElement::NodeFactory::HasKey(key))
+    sofa::simulation::xml::BaseElement::NodeFactory::ResetEntry(key);
+
+  return sofa::core::objectmodel::New<sofa::simulation::tree::TreeSimulation>();
 }
 
 void mitk::Simulation::SetActiveSimulation(mitk::Simulation* simulation)
@@ -80,22 +78,26 @@ mitk::Simulation::~Simulation()
   }
 }
 
-void mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
+bool mitk::Simulation::AppendSnapshot(mitk::Surface::Pointer surface) const
 {
-  if (surface.IsNull())
-    return;
-
-  vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
-
-  if (snapshot != NULL)
+  if (surface.IsNotNull())
   {
-    unsigned int timeStep = surface->GetSizeOfPolyDataSeries();
+    vtkSmartPointer<vtkPolyData> snapshot = this->CreateSnapshot();
 
-    if (timeStep != 0 && surface->GetVtkPolyData(timeStep - 1) == NULL)
-      --timeStep;
+    if (snapshot != NULL)
+    {
+      unsigned int timeStep = surface->GetSizeOfPolyDataSeries();
 
-    surface->SetVtkPolyData(snapshot, timeStep);
+      if (timeStep != 0 && surface->GetVtkPolyData(timeStep - 1) == NULL)
+        --timeStep;
+
+      surface->SetVtkPolyData(snapshot, timeStep);
+
+      return true;
+    }
   }
+
+  return false;
 }
 
 vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const
@@ -112,6 +114,9 @@ vtkSmartPointer<vtkPolyData> mitk::Simulation::CreateSnapshot() const
 
   vtkPropCollection* propCollection = propAssembly->GetParts();
   vtkProp* prop = NULL;
+
+  if (propCollection->GetNumberOfItems() == 0)
+    return NULL;
 
   for (propCollection->InitTraversal(); (prop = propCollection->GetNextProp()) != NULL; )
   {
@@ -171,7 +176,7 @@ void mitk::Simulation::SetDefaultDT(double dt)
   m_DefaultDT = std::max(0.0, dt);
 }
 
-void mitk::Simulation::SetRequestedRegion(itk::DataObject*)
+void mitk::Simulation::SetRequestedRegion(const itk::DataObject*)
 {
 }
 

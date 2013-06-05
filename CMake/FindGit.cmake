@@ -23,7 +23,8 @@ mark_as_advanced(GIT_EXECUTABLE)
 if(GIT_EXECUTABLE)
 
   macro(GIT_IS_REPO dir result_var)
-    execute_process(COMMAND ${GIT_EXECUTABLE} status
+    # check if ${dir} is a proper Git repository
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-list -n 1 HEAD
        WORKING_DIRECTORY ${dir}
        RESULT_VARIABLE GIT_error
        OUTPUT_QUIET

@@ -286,7 +286,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
   private:
 
-    std::map<ServiceReference, EventConfig> m_DisplayInteractorConfigs;
+    //std::map<ServiceReference, EventConfig> m_DisplayInteractorConfigs;
 };
 
 } // namespace

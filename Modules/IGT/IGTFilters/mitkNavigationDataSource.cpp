@@ -45,21 +45,24 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput()
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
 
-  return static_cast<NavigationData*>(this->ProcessObject::GetOutput(0));
+  return static_cast<NavigationData*>(this->ProcessObject::GetPrimaryOutput());
 }
 
 
-mitk::NavigationData* mitk::NavigationDataSource::GetOutput(unsigned int idx)
+mitk::NavigationData* mitk::NavigationDataSource::GetOutput(DataObjectPointerArraySizeType idx)
 {
-  if (this->GetNumberOfOutputs() < 1)
-    return NULL;
-  return static_cast<NavigationData*>(this->ProcessObject::GetOutput(idx));
+  NavigationData* out = dynamic_cast<NavigationData*>( this->ProcessObject::GetOutput(idx) );
+  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  {
+    itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( NavigationData ).name () );
+  }
+  return out;
 }
 
 
-mitk::NavigationData* mitk::NavigationDataSource::GetOutput(std::string navDataName)
+mitk::NavigationData* mitk::NavigationDataSource::GetOutput(const std::string& navDataName)
 {
-  DataObjectPointerArray& outputs = this->GetOutputs();
+  DataObjectPointerArray outputs = this->GetOutputs();
   for (DataObjectPointerArray::iterator it = outputs.begin(); it != outputs.end(); ++it)
     if (navDataName == (static_cast<NavigationData*>(it->GetPointer()))->GetName())
       return static_cast<NavigationData*>(it->GetPointer());
@@ -68,7 +71,7 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput(std::string navDataN
 
 itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataSource::GetOutputIndex( std::string navDataName )
 {
-  DataObjectPointerArray& outputs = this->GetOutputs();
+  DataObjectPointerArray outputs = this->GetOutputs();
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
     if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
       return i;
@@ -125,11 +128,19 @@ void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObjec
   output->Graft( graft );
 }
 
-
-itk::ProcessObject::DataObjectPointer mitk::NavigationDataSource::MakeOutput( unsigned int /*idx */)
+itk::DataObject::Pointer mitk::NavigationDataSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
 {
-  mitk::NavigationData::Pointer p = mitk::NavigationData::New();
-  return static_cast<itk::DataObject*>(p.GetPointer());
+    return mitk::NavigationData::New().GetPointer();
+}
+
+itk::DataObject::Pointer mitk::NavigationDataSource::MakeOutput( const DataObjectIdentifierType & name )
+{
+  itkDebugMacro("MakeOutput(" << name << ")");
+  if( this->IsIndexedOutputName(name) )
+    {
+    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    }
+  return static_cast<itk::DataObject *>(mitk::NavigationData::New().GetPointer());
 }
 
 

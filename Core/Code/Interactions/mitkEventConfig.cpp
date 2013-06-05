@@ -86,7 +86,7 @@ struct EventConfigPrivate : public SharedData
   PropertyList::Pointer m_PropertyList;
 
   /**
-   * @brief Temporal list of all properties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
+   * @brief Temporal list of all prMousePressEventoperties of a Event. Used to parse an Input-Event and collect all parameters between the two <input>
    * and </event_variant> tags.
    */
   PropertyList::Pointer m_EventPropertyList;
@@ -260,6 +260,41 @@ mitk::EventConfig::EventConfig(const std::string& filename, const Module* module
   if (success)
   {
     *this = newConfig;
+  }
+}
+
+mitk::EventConfig::EventConfig(std::istream &inputStream)
+ : d(new EventConfigPrivate)
+{
+  EventConfig newConfig;
+  newConfig.d->m_XmlParser.SetStream(&inputStream);
+  bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
+  if (success)
+  {
+    *this = newConfig;
+  }
+}
+
+mitk::EventConfig::EventConfig(const std::vector<PropertyList::Pointer> &configDescription)
+: d(new EventConfigPrivate)
+{
+  std::vector<PropertyList::Pointer>::const_iterator it_end = configDescription.end();
+  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it) {
+
+    InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
+    if (event.IsNotNull())
+    {
+
+      d->m_CurrEventMapping.interactionEvent = event;
+      std::string eventVariant;
+      (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant.c_str(), eventVariant);
+      d->m_CurrEventMapping.variantName = eventVariant;
+      d->InsertMapping(d->m_CurrEventMapping);
+    }
+    else
+    {
+      MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+    }
   }
 }
 

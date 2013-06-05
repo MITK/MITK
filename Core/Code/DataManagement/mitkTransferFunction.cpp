@@ -323,12 +323,6 @@ void TransferFunction::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << indent << "Min: " << m_Min << ", Max: " << m_Max << std::endl;
 }
 
-mitk::TransferFunction::Pointer mitk::TransferFunction::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::TransferFunction::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

@@ -53,6 +53,8 @@ public:
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
+    LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
     /**
      * Constructor. Doesn't do anything...

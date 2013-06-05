@@ -333,7 +333,7 @@ void QmitkPartialVolumeAnalysisView::ExportClusteringResults()
 
     itk::Image< short, 3>::Pointer referenceImage = itk::Image< short, 3>::New();
 
-    mitk::Vector3D newSpacing = geometry->GetSpacing();
+    itk::Vector<double,3> newSpacing = geometry->GetSpacing();
     mitk::Point3D newOrigin = geometry->GetOrigin();
     mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
     newOrigin[0] += bounds.GetElement(0);
@@ -1324,7 +1324,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
         {
 
             mitk::PixelType pixelType = m_SelectedImageMask->GetPixelType();
-            MITK_DEBUG << pixelType.GetItkTypeAsString();
+            MITK_DEBUG << pixelType.GetPixelTypeAsString();
 
             if(pixelType.GetBitsPerComponent() == 16)
             {

@@ -8,7 +8,6 @@ set(MODULE_TESTS
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
-  #mitkEventConfigTest.cpp ## needs to be re-written, test indirect since EventConfig is no longer exported as interface Bug 14529
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
@@ -19,10 +18,11 @@ set(MODULE_TESTS
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
+  mitkImportItkImageTest.cpp
+  mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
-  mitkInteractionEventTest.cpp
-  mitkITKThreadingTest.cpp
+  #mitkITKThreadingTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
@@ -59,7 +59,6 @@ set(MODULE_TESTS
   mitkNodePredicateSourceTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
-  #QmitkRenderingTestHelper.cpp
   mitkExceptionTest.cpp
   mitkExtractSliceFilterTest.cpp
   mitkLogTest.cpp
@@ -100,6 +99,7 @@ set(MODULE_CUSTOM_TESTS
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
+    mitkEventConfigTest.cpp
     mitkNodeDependentPointSetInteractorTest.cpp
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
@@ -108,14 +108,20 @@ set(MODULE_CUSTOM_TESTS
     mitkImageVtkMapper2DTest.cpp
     mitkImageVtkMapper2DLevelWindowTest.cpp
     mitkImageVtkMapper2DOpacityTest.cpp
+    mitkImageVtkMapper2DResliceInterpolationPropertyTest.cpp
     mitkImageVtkMapper2DColorTest.cpp
     mitkImageVtkMapper2DSwivelTest.cpp
     mitkImageVtkMapper2DTransferFunctionTest.cpp
     mitkIOUtilTest.cpp
     mitkSurfaceVtkMapper3DTest
     mitkSurfaceVtkMapper3DTexturedSphereTest.cpp
+    mitkSurfaceGLMapper2DColorTest.cpp
+    mitkSurfaceGLMapper2DOpacityTest.cpp
     mitkVolumeCalculatorTest.cpp
     mitkLevelWindowManagerTest.cpp
+    mitkPointSetVtkMapper2DTest.cpp
+    mitkPointSetVtkMapper2DImageTest.cpp
+    mitkPointSetVtkMapper2DGlyphTypeTest.cpp
 )
 
 set(MODULE_RESOURCE_FILES

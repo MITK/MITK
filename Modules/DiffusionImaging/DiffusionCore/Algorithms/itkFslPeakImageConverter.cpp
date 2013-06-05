@@ -1,4 +1,18 @@
+/*===================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __itkFslPeakImageConverter_cpp
 #define __itkFslPeakImageConverter_cpp
 
@@ -41,7 +55,7 @@ void FslPeakImageConverter< PixelType >
     Matrix<double, 4, 4> direction4 = m_InputImages->GetElement(0)->GetDirection();
     ImageRegion<4> imageRegion4 = m_InputImages->GetElement(0)->GetLargestPossibleRegion();
 
-    Vector<float, 3> spacing3;
+    itk::Vector<double,3> spacing3;
     Point<float, 3> origin3;
     Matrix<double, 3, 3> direction3;
     ImageRegion<3> imageRegion3;

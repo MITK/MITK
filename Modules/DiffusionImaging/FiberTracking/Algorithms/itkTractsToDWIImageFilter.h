@@ -131,7 +131,7 @@ protected:
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
-    unsigned int                        m_Upsampling;
+    double                              m_Upsampling;
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;

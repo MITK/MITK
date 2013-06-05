@@ -268,7 +268,7 @@ void TractsToDWIImageFilter::GenerateData()
         m_DirectionMatrix = m_TissueMask->GetDirection();
         m_ImageRegion = m_TissueMask->GetLargestPossibleRegion();
 
-        if (m_Upsampling>1)
+        if (m_Upsampling>1.00001)
         {
             ImageRegion<3> region = m_ImageRegion;
             region.SetSize(0, m_ImageRegion.GetSize(0)*m_Upsampling);
@@ -317,15 +317,9 @@ void TractsToDWIImageFilter::GenerateData()
 
     // if not, adjust size and dimension (needed for FFT); zero-padding
     if (x!=m_ImageRegion.GetSize(0))
-    {
-        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x << " --> " << x*m_Upsampling;
         m_ImageRegion.SetSize(0, x);
-    }
     if (y!=m_ImageRegion.GetSize(1))
-    {
-        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y << " --> " << y*m_Upsampling;
         m_ImageRegion.SetSize(1, y);
-    }
 
     // apply undersampling to image parameters
     m_UpsampledSpacing = m_Spacing;

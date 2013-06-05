@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 GibbsRingingArtifact< ScalarType >::GibbsRingingArtifact()
-    : m_KspaceCropping(0.1)
+    : m_KspaceCropping(1.1)
 {
 
 }

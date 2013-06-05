@@ -41,12 +41,12 @@ public:
     /** Adds Gibbs ringing to the input slice (by zero padding). **/
     typename ComplexSliceType::Pointer AddArtifact(typename ComplexSliceType::Pointer slice);
 
-    void SetKspaceCropping(int factor){ m_KspaceCropping=factor; }
-    int GetKspaceCropping(){ return m_KspaceCropping; }
+    void SetKspaceCropping(double factor){ m_KspaceCropping=factor; }
+    double GetKspaceCropping(){ return m_KspaceCropping; }
 
 protected:
 
-    int  m_KspaceCropping;
+    double  m_KspaceCropping;
 
 };
 

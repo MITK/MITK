@@ -201,11 +201,11 @@ MeasAndBvals DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, T
 template< class TIn, class TOut>
 void DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int )
+                       ThreadIdType )
 {
 
     typename OutputImageType::Pointer outputImage =
-            static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
+            static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
 

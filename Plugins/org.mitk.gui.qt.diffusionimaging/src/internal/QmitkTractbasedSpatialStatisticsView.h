@@ -46,16 +46,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 
 
+// Image types
 typedef short DiffusionPixelType;
 typedef itk::Image<char, 3> CharImageType;
 typedef itk::Image<unsigned char, 3> UCharImageType;
 typedef itk::Image<float, 4> Float4DImageType;
 typedef itk::Image<float, 3> FloatImageType;
-typedef itk::Vector<int, 3> IntVectorType;
-//typedef itk::VectorImage<int, 3> DirectionImageType;
 typedef itk::VectorImage<float, 3> VectorImageType;
 
-
+// Readers/Writers
 typedef itk::ImageFileReader< CharImageType > CharReaderType;
 typedef itk::ImageFileReader< UCharImageType > UCharReaderType;
 typedef itk::ImageFileWriter< CharImageType > CharWriterType;
@@ -65,28 +64,16 @@ typedef itk::ImageFileReader< Float4DImageType > Float4DReaderType;
 typedef itk::ImageFileWriter< Float4DImageType > Float4DWriterType;
 
 
-struct TbssSelListener;
-
-
 
 /*!
-  \brief QmitkTractbasedSpatialStatisticsView
-
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-  \sa QmitkFunctionalitymitkTbssWorkspaceManager
-  \ingroup Functionalities
+  * \brief This plugin provides an extension for Tract-based spatial statistics (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024)
+  * TBSS enables analyzing the brain by a pipeline of registration, skeletonization, and projection that results in a white matter skeleton
+  * for all subjects that are analyzed statistically. This plugin provides functionality to select single tracts and analyze them seperately.
 */
+
 class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 {
 
-
-  friend struct TbssSelListener;
-
-
-
-  // this is needed for all Qt objesetupUicts that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
@@ -113,22 +100,16 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
   protected slots:
 
 
-
-    void Masking();
-
-
+    //void Masking();
 
     void CreateRoi();
-
-
-
 
     void Clicked(const QwtDoublePoint& pos);
 
     void TbssImport();
 
-
     void AddGroup();
+
     void RemoveGroup();
 
     void CopyToClipboard();
@@ -176,6 +157,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     //void DoInitializeGridByVectorImage(FloatVectorImageType::Pointer vectorpic, CharImageType::Pointer roi ,std::string name);
 
 
+    /*
 
     // Tokenizer needed for the roi files
     void Tokenize(const std::string& str,
@@ -197,6 +179,8 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
           pos = str.find_first_of(delimiters, lastPos);
       }
     }
+
+    */
 
     mitk::DataNode::Pointer readNode(std::string f)
     {

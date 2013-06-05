@@ -1237,7 +1237,7 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
 
 
 
-
+/*
 void QmitkTractbasedSpatialStatisticsView::Masking()
 {
   //QString filename = m_Controls->m_WorkingDirectory->text();
@@ -1313,3 +1313,5 @@ void QmitkTractbasedSpatialStatisticsView::Masking()
     ++outputIt;
   }
 }
+
+*/

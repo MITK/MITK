@@ -46,10 +46,10 @@ QmitkIVIMView::QmitkIVIMView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_Active(false)
     , m_SliceObserverTag1(0), m_SliceObserverTag2(0), m_SliceObserverTag3(0)
     , m_DiffusionImageNode(NULL)
     , m_MaskImageNode(NULL)
+    , m_Active(false)
 {
 }
 
@@ -318,7 +318,10 @@ void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
         m_Controls->m_InputData->setTitle("Input Data");
     }
     else
+    {
         m_Controls->m_VisualizeResultsWidget->setVisible(false);
+        m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+    }
 
     m_Controls->m_ButtonStart->setEnabled( foundOneDiffusionImage );
     m_Controls->m_ButtonAutoThres->setEnabled( foundOneDiffusionImage );
@@ -377,10 +380,10 @@ void QmitkIVIMView::AutoThreshold()
     mitk::CastToItkImage<ImgType>(dimg, img);
 
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-    itw = itw.Begin();
+    itw.GoToBegin();
 
     itk::ImageRegionConstIterator<VecImgType> itr (vecimg, vecimg->GetLargestPossibleRegion() );
-    itr = itr.Begin();
+    itr.GoToBegin();
 
     while(!itr.IsAtEnd())
     {
@@ -716,6 +719,14 @@ void QmitkIVIMView::OutputToDatastorage(std::vector<mitk::DataNode*> nodes)
     }
 
     m_MultiWidget->RequestUpdate();
+
+    // reset the data node labels, the selection in DataManager is lost after adding
+    // a new node -> we cannot directly proceed twice, the DWI ( and MASK) image have to be selected again
+    m_Controls->m_InputData->setTitle("Please Select Input Data");
+    m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
+    m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
+    m_MaskImageNode = NULL;
+    m_DiffusionImageNode = NULL;
 
 }
 

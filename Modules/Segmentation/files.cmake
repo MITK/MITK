@@ -8,6 +8,7 @@ Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
 Algorithms/mitkDiffImageApplier.cpp
 Algorithms/mitkImageToContourFilter.cpp
 Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
+Algorithms/mitkOtsuSegmentationFilter.cpp
 Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
 Algorithms/mitkOverwriteSliceImageFilter.cpp
 Algorithms/mitkReduceContourSetFilter.cpp

@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
+#include "mitkOtsuSegmentationFilter.h"
+#include "
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>
@@ -63,6 +65,11 @@ void mitk::OtsuTool3D::Activated()
     //m_MultiLabelResultNode->SetBoolProperty("helper object", true);
     m_MultiLabelResultNode->SetVisibility(true);
 
+    m_MaskedImagePreviewNode = mitk::DataNode::New();
+    m_MaskedImagePreviewNode->SetName("Volume_Preview");
+    //m_MultiLabelResultNode->SetBoolProperty("helper object", true);
+    m_MaskedImagePreviewNode->SetVisibility(false);
+
     m_ToolManager->GetDataStorage()->Add( this->m_MultiLabelResultNode );
   }
 }
@@ -96,32 +103,12 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
 
   try
   {
-    const unsigned short dim = 3;
-    typedef short InputPixelType;
-    typedef unsigned char OutputPixelType;
+    mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
+    otsuFilter->SetNumberOfThresholds( numberOfThresholds );
+    otsuFilter->SetInput( m_OriginalImage );
+    otsuFilter->Update();
 
-    typedef itk::Image< InputPixelType, dim > InputImageType;
-    typedef itk::Image< OutputPixelType, dim > OutputImageType;
-
-    typedef itk::OtsuMultipleThresholdsImageFilter< InputImageType, OutputImageType > FilterType;
-
-    FilterType::Pointer filter = FilterType::New();
-
-    filter->SetNumberOfThresholds(numberOfThresholds);
-
-    InputImageType::Pointer itkImage;
-    mitk::CastToItkImage(m_OriginalImage, itkImage);
-
-    filter->SetInput( itkImage );
-
-    filter->Update();
-
-    mitk::Image::Pointer multiLabelSegmentation = mitk::Image::New();
-    mitk::CastToMitkImage( filter->GetOutput(), multiLabelSegmentation);
-    multiLabelSegmentation->GetGeometry()->SetOrigin(m_OriginalImage->GetGeometry()->GetOrigin());
-    multiLabelSegmentation->GetGeometry()->SetIndexToWorldTransform(m_OriginalImage->GetGeometry()->GetIndexToWorldTransform());
-
-    this->m_MultiLabelResultNode->SetData(multiLabelSegmentation);
+    this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
     m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
     renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
@@ -139,7 +126,7 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
     m_MultiLabelResultNode->SetProperty("LookupTable",prop);
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, numberOfThresholds);
+    levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
     levWinProp->SetLevelWindow( levelwindow );
     m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
 
@@ -193,4 +180,18 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
 const char* mitk::OtsuTool3D::GetName() const
 {
   return "Otsu Segmentation";
+}
+
+void mitk::OtsuTool3D::UpdateVolumePreview(bool volumeRendering)
+{
+  if (volumeRendering)
+  {
+    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering", true);
+    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering.uselod", true);
+  }
+  else
+  {
+    m_MaskedImagePreviewNode->SetBoolProperty("volumerendering", false);
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkTransform.h>
 
 #include <vtkConeSource.h>
 #include <vtkTransform.h>
@@ -129,7 +130,13 @@ void QmitkIGTTrackingLabView::CreateConnections()
 
 void QmitkIGTTrackingLabView::UpdateTimer()
   {
-  if (m_PermanentRegistration && m_PermanentRegistrationFilter.IsNotNull()) {m_PermanentRegistrationFilter->Update();}
+  if (m_PermanentRegistration && m_PermanentRegistrationFilter.IsNotNull())
+    {
+      mitk::Transform::Pointer newTransform = mitk::Transform::New();
+      newTransform->Concatenate(m_T_MarkerRel);
+      newTransform->Concatenate(mitk::Transform::New(m_ObjectmarkerNavigationData));
+      this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
+    }
 
   if (m_CameraView && m_VirtualView.IsNotNull()) {m_VirtualView->Update();}
 
@@ -301,22 +308,38 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   //convert from vtk to itk data types
   itk::Matrix<float,3,3> rotationFloat = itk::Matrix<float,3,3>();
   itk::Vector<float,3> translationFloat = itk::Vector<float,3>();
+  itk::Matrix<double,3,3> rotationDouble = itk::Matrix<double,3,3>();
+  itk::Vector<double,3> translationDouble = itk::Vector<double,3>();
 
   vtkSmartPointer<vtkMatrix4x4> m = transform->GetMatrix();
   for(int k=0; k<3; k++) for(int l=0; l<3; l++)
   {
     rotationFloat[k][l] = m->GetElement(k,l);
+    rotationDouble[k][l] = m->GetElement(k,l);
 
   }
   for(int k=0; k<3; k++)
   {
     translationFloat[k] = m->GetElement(k,3);
+    translationDouble[k] = m->GetElement(k,3);
   }
+
+  MITK_INFO << "MATRIX: ";
+  for(int k=0; k<=3; k++)
+    {
+    MITK_INFO << m->GetElement(k,0) << " " << m->GetElement(k,1) << " " << m->GetElement(k,2) << " " << m->GetElement(k,3);
+    }
+
+  //save transform
+  m_T_ObjectReg = mitk::Transform::New();
+  m_T_ObjectReg->SetMatrix(m);
 
   //transform surface
   mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
   newTransform->SetMatrix(rotationFloat);
   newTransform->SetOffset(translationFloat);
+
+  //transform surface
   if(m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNotNull())
   {
     m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
@@ -520,14 +543,15 @@ void QmitkIGTTrackingLabView::GlobalReinit()
 
 void QmitkIGTTrackingLabView::OnVirtualCamera(bool on)
 {
-if(on)
-  {
-  if (m_Controls.m_CameraViewSelection->GetSelectedToolID() == -1)
+if (m_Controls.m_CameraViewSelection->GetSelectedToolID() == -1)
     {
     m_Controls.m_ActivateNeedleView->setChecked(false);
     QMessageBox::warning(NULL, "Error", "No tool selected for camera view!");
     return;
     }
+
+if(on)
+  {
   m_VirtualView = mitk::CameraVisualization::New();
   m_VirtualView->SetInput(m_Controls.m_CameraViewSelection->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_CameraViewSelection->GetSelectedToolID()));
 
@@ -575,17 +599,29 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsDataNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsDataNode->GetData());
 
-  if (m_Controls.m_ObjectComboBox->GetSelectedNode().IsNull())
+  if (m_Controls.m_SurfaceActive->isChecked() && m_Controls.m_ObjectComboBox->GetSelectedNode().IsNull())
   {
-    QMessageBox::warning(NULL, "Registration not possible", "No object selected for registration.\nRegistration is not possible");
+    std::string warningMessage = "No surface selected for registration.\nRegistration is not possible";
+    MITK_WARN << warningMessage;
+    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
+    return false;
+  }
+
+  if (m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNull())
+  {
+    std::string warningMessage = "No image selected for registration.\nRegistration is not possible";
+    MITK_WARN << warningMessage;
+    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
     return false;
   }
 
   if (imageFiducials.IsNull() || trackerFiducials.IsNull())
   {
-    QMessageBox::warning(NULL, "Registration not possible", "Fiducial data objects not found. \n"
+    std::string warningMessage = "Fiducial data objects not found. \n"
       "Please set 3 or more fiducials in the image and with the tracking system.\n\n"
-      "Registration is not possible");
+      "Registration is not possible";
+    MITK_WARN << warningMessage;
+    QMessageBox::warning(NULL, "Registration not possible", warningMessage.c_str());
     return false;
   }
 
@@ -604,46 +640,47 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 
 void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 {
-  MITK_INFO << "Permanent registration" << on;
+  MITK_INFO << "Permanent registration: " << on;
   if(on)
     {
+
     if(!CheckRegistrationInitialization())
     {
       m_Controls.m_UsePermanentRegistrationToggle->setChecked(false);
       return;
     }
+
+    //remember initial object transform to calculate the object to marker transform later on
+    mitk::Transform::Pointer T_Object = mitk::Transform::New(this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform());
+
+    //then reset the transform because we will now start to calculate the permenent registration
+    this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
+
+    //create the permanent registration filter
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
 
     //connect filter to source
     m_PermanentRegistrationFilter->SetInput(this->m_ObjectmarkerNavigationData);
 
-    //TODO: add image when bug is fixed
-    mitk::AffineTransform3D::Pointer initialTransform = this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
-
+    //set representation object
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
 
-    itk::Matrix<float,3,3> OffsetR = itk::Matrix<float,3,3>(this->m_ObjectmarkerNavigationData->GetOrientation().rotation_matrix_transpose());
-    itk::Vector<float,3> OffsetT = itk::Vector<float,3>();
-    OffsetT[0] = this->m_ObjectmarkerNavigationData->GetPosition()[0];
-    OffsetT[1] = this->m_ObjectmarkerNavigationData->GetPosition()[1];
-    OffsetT[2] = this->m_ObjectmarkerNavigationData->GetPosition()[2];
 
-    MITK_INFO << "Offset R:" << OffsetR;
-    MITK_INFO << "Orientation Quat:" << m_ObjectmarkerNavigationData->GetOrientation();
 
-    OffsetR = OffsetR.GetInverse();
-    OffsetT = (OffsetR * OffsetT) * -1.;
+    //TODO: add image when bug is fixed
 
-    mitk::AffineTransform3D::Pointer offset = mitk::AffineTransform3D::New();
-    offset->SetMatrix(OffsetR);
-    offset->SetOffset(OffsetT);
 
-    mitk::AffineTransform3D::Pointer overall_transform = mitk::AffineTransform3D::New();
-    overall_transform->SetIdentity();
-    overall_transform->Compose(initialTransform);
-    overall_transform->Compose(offset);
+    //get the marker transform out of the navigation data
+    mitk::Transform::Pointer T_Marker = mitk::Transform::New(this->m_ObjectmarkerNavigationData);
 
-    m_PermanentRegistrationFilter->SetOffset(0,overall_transform);
+
+    mitk::Transform::Pointer T_MarkerRel = mitk::Transform::New();
+    T_MarkerRel->Concatenate(T_Object);
+    T_Marker->Invert();
+    T_MarkerRel->Concatenate(T_Marker);
+
+    //m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel->GetAffineTransform3D());
+    m_T_MarkerRel = T_MarkerRel;
 
     m_PermanentRegistration = true;
     }
@@ -651,6 +688,10 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     {
     //stop permanent registration
     m_PermanentRegistration = false;
+
+    //restore old registration
+    if(m_T_ObjectReg.IsNotNull()) this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());
+    //if(m_T_ObjectReg2.IsNotNull()) this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg2);
 
     //delete filter
     m_PermanentRegistrationFilter = NULL;

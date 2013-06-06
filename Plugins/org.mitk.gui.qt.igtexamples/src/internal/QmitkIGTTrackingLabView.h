@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include <mitkSurface.h>
 #include <mitkCameraVisualization.h>
+#include <mitkTransform.h>
 
 #include <QToolBox>
 #include <QCheckBox>
@@ -217,6 +218,10 @@ private:
   mitk::NavigationData::Pointer m_InstrumentNavigationData;
   mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
   mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
+
+  mitk::Transform::Pointer m_T_MarkerRel;
+  mitk::Transform::Pointer m_T_ObjectReg;
+  mitk::AffineTransform3D::Pointer m_T_ObjectReg2;
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

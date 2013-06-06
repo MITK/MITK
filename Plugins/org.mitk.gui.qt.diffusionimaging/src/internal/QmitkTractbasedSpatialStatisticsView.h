@@ -18,18 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkTractbasedSpatialStatisticsView_h
 
 
-#include <berryISelectionListener.h>
-#include <berryIPartListener.h>
-#include <berryIStructuredSelection.h>
-
-
 #include <QmitkFunctionality.h>
 
 #include "ui_QmitkTractbasedSpatialStatisticsViewControls.h"
 #include <QListWidgetItem>
-
-#include <mitkDiffusionImage.h>
-#include <string>
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -119,7 +111,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Method to cut away parts of fiber bundles that should not be plotted.
     void Cut();
 
-    // Adjust plot
+    // Adjust plot widget
     void PerformChange();
 
 
@@ -129,45 +121,46 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
+    // Creates a plot using a 4D image containing the projections of all subjects and a region of interest
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
+
 
     void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
+
+    // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();
 
-    void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-    bool m_IsInitialized;
-
+    // Pointset and DataNode to contain the PointSet used in ROI creation
     mitk::PointSet::Pointer m_PointSetNode;
     mitk::DataNode::Pointer m_P1;
 
+    // GUI widgets
     Ui::QmitkTractbasedSpatialStatisticsViewControls* m_Controls;
 
+    /* A pointer to the QmitkStdMultiWidget. Used for interaction with the plot widget
+    (clicking in the plot widget makes the image cross jump to the corresponding location
+    on the skeleton).*/
     QmitkStdMultiWidget* m_MultiWidget;
 
-
+    // Used to save the region of interest in a vector of itk::index.
     std::vector< itk::Index<3> > m_Roi;
 
     mitk::FiberBundleX* m_Fib;
 
     mitk::Geometry3D* m_CurrentGeometry;
 
+    // A table model for saving group information in a name,number pair.
     QmitkTbssTableModel* m_GroupModel;
 
-
+    // Convenience function for adding a new image to the datastorage and giving it a name.
     void AddTbssToDataStorage(mitk::Image* image, std::string name);
-
-
-    VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
-
 
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 
-    mitk::DataNode::Pointer m_CurrentStartRoi; // needed when a plot should only show values between a start end end roi
-
-    mitk::DataNode::Pointer m_CurrentEndRoi; // idem dito
-
+    // needed when a plot should only show values between a start end end roi
+    mitk::DataNode::Pointer m_CurrentStartRoi;
+    mitk::DataNode::Pointer m_CurrentEndRoi;
 
 };
 

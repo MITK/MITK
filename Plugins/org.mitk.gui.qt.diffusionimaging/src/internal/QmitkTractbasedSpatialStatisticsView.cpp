@@ -145,6 +145,8 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   }
 
 
+  // Check which datatypes are selected in the datamanager and enable/disable widgets accordingly
+
   bool foundTbssRoi = false;
   bool foundTbss = false;
   bool found3dImage = false;
@@ -295,8 +297,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateQtPartControl( QWidget *parent 
   }
 
 
-  m_IsInitialized = false;
-
   // Table for the FSL TBSS import
   m_GroupModel = new QmitkTbssTableModel();
   m_Controls->m_GroupInfo->setModel(m_GroupModel);
@@ -347,8 +347,6 @@ void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
   {
     // Working with fiber bundles
     std::vector <std::vector<double> > profiles = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
-
-
 
     QString clipboardText;
     for (std::vector<std::vector<double> >::iterator it = profiles.begin(); it
@@ -468,12 +466,6 @@ void QmitkTractbasedSpatialStatisticsView::AddGroup()
     m_GroupModel->setData(index, number, Qt::EditRole);
 
   }
-  else
-  {
-    //QMessageBox::information(this, "Duplicate name");
-  }
-
-
 }
 
 
@@ -484,6 +476,7 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
   mitk::TbssImporter::Pointer importer = mitk::TbssImporter::New();
 
   QList< QPair<QString, int> >list = m_GroupModel->getList();
+
 
   if(list.size() == 0)
   {
@@ -560,6 +553,7 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
   // show the results
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
 
 void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
 {
@@ -1095,13 +1089,6 @@ void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetNotAvailable()
 
 void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 {
-
-  // It is important to load the MeanFASkeletonMask image in MITK to make sure that point selection and
-  // pathfinding is done on the same image
-  //string filename = m_TbssWorkspaceManager.GetInputDir().toStdString() + "/stats/" + m_TbssWorkspaceManager.GetMeanFASkeletonMask().toStdString();
-
-  // Implement a way to obtain skeleton and skeletonFA without sml workspace
-
   bool ok;
   double threshold = QInputDialog::getDouble(m_Controls->m_CreateRoi, tr("Set an FA threshold"),
                                                       tr("Threshold:"), 0.2, 0.0, 1.0, 2, &ok);
@@ -1110,7 +1097,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
     return;
 
   mitk::Image::Pointer image;
-
 
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
@@ -1125,8 +1111,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
         }
     }
   }
-
-
 
   if(image.IsNull())
   {

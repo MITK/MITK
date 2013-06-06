@@ -44,6 +44,7 @@ namespace mitk {
     mitkClassMacro(Transform, itk::Object);
     itkFactorylessNewMacro(Transform);
     mitkNewMacro1Param(Transform, const mitk::NavigationData*);
+    mitkNewMacro1Param(Transform, const mitk::AffineTransform3D*);
     mitkNewMacro1Param(Transform, const std::string&);
 
     ///
@@ -202,6 +203,10 @@ namespace mitk {
     /// \return the navigation data that stores all information
     ///
     mitk::NavigationData::Pointer GetNavigationData() const;
+
+    /** @return Returns the transform as affine transform 3D object.*/
+    mitk::AffineTransform3D::Pointer GetAffineTransform3D();
+
     ///
     /// calls navigationdata::GetPosition()
     ///
@@ -286,6 +291,7 @@ namespace mitk {
   protected:
     Transform();
     Transform(const mitk::NavigationData* nd);
+    Transform(const mitk::AffineTransform3D* nd);
     Transform(const std::string& s);
 
     // everything is stored here

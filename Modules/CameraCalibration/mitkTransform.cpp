@@ -51,6 +51,29 @@ namespace mitk
         m_NavData->Graft(nd);
   }
 
+  Transform::Transform(const mitk::AffineTransform3D* transform)
+    : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )
+  {
+    vnl_matrix_fixed<float,3,3> rotation = vnl_matrix_fixed<float,3,3>();
+    rotation[0][0] = transform->GetMatrix().GetVnlMatrix()[0][0];
+    rotation[0][1] = transform->GetMatrix().GetVnlMatrix()[0][1];
+    rotation[0][2] = transform->GetMatrix().GetVnlMatrix()[0][2];
+    rotation[1][0] = transform->GetMatrix().GetVnlMatrix()[1][0];
+    rotation[1][1] = transform->GetMatrix().GetVnlMatrix()[1][1];
+    rotation[1][2] = transform->GetMatrix().GetVnlMatrix()[1][2];
+    rotation[2][0] = transform->GetMatrix().GetVnlMatrix()[2][0];
+    rotation[2][1] = transform->GetMatrix().GetVnlMatrix()[2][1];
+    rotation[2][2] = transform->GetMatrix().GetVnlMatrix()[2][2];
+    rotation.transpose();
+    this->SetRotation(rotation);
+    mitk::Point3D translation;
+    translation[0] = transform->GetOffset()[0];
+    translation[1] = transform->GetOffset()[1];
+    translation[2] = transform->GetOffset()[2];
+    this->SetPosition(translation);
+  }
+
+
   Transform::Transform(const std::string& s)
     : m_NavData(mitk::NavigationData::New()), m_Type( s )
   {
@@ -411,6 +434,28 @@ namespace mitk
   mitk::NavigationData::Pointer Transform::GetNavigationData() const
   {
     return m_NavData;
+  }
+
+  mitk::AffineTransform3D::Pointer Transform::GetAffineTransform3D()
+  {
+    mitk::AffineTransform3D::Pointer returnValue = mitk::AffineTransform3D::New();
+    itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
+    rotation[0][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][0];
+    rotation[0][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][1];
+    rotation[0][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][2];
+    rotation[1][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][0];
+    rotation[1][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][1];
+    rotation[1][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][2];
+    rotation[2][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][0];
+    rotation[2][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][1];
+    rotation[2][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][2];
+    itk::Vector<float,3> translation = itk::Vector<float,3>();
+    translation[0] = m_NavData->GetPosition()[0];
+    translation[1] = m_NavData->GetPosition()[1];
+    translation[2] = m_NavData->GetPosition()[2];
+    returnValue->SetMatrix(rotation);
+    returnValue->SetOffset(translation);
+    return returnValue;
   }
 
   mitk::Point3D Transform::GetTranslation() const

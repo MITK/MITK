@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkKspaceImageFilter.h>
 #include <itkDftImageFilter.h>
 #include <mitkDiffusionNoiseModel.h>
-#include <mitkGibbsRingingArtifact.h>
 #include <mitkDiffusionSignalModel.h>
 
 namespace itk{
@@ -51,13 +50,11 @@ namespace itk{
 
     typedef typename Superclass::InputImageType                         DiffusionImageType;
     typedef mitk::DiffusionNoiseModel<TPixelType>                       NoiseModelType;
-    typedef mitk::GibbsRingingArtifact<double>                          GibbsRingingType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef typename itk::KspaceImageFilter< double >::OutputImageType  ComplexSliceType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
 
-    void SetRingingModel(GibbsRingingType* ringingModel){ m_RingingModel = ringingModel; }
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }
     itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
     itkSetMacro( kOffset, double )
@@ -66,6 +63,7 @@ namespace itk{
     itkSetMacro( EddyGradientStrength, double )
     void SetGradientList(mitk::DiffusionSignalModel<double>::GradientListType list) { m_GradientList=list; }
     itkSetMacro( TE, double )
+    itkSetMacro( Upsampling, double )
 
   protected:
     AddArtifactsToDwiImageFilter();
@@ -75,7 +73,6 @@ namespace itk{
 
     void GenerateData();
 
-    GibbsRingingType*                   m_RingingModel;
     NoiseModelType*                     m_NoiseModel;
     ItkDoubleImgType::Pointer           m_FrequencyMap;
     double                              m_kOffset;
@@ -84,6 +81,7 @@ namespace itk{
     double                              m_EddyGradientStrength;
     mitk::DiffusionSignalModel<double>::GradientListType m_GradientList;
     double                              m_TE;
+    double                              m_Upsampling;           ///< causes ringing artifacts
 
   private:
 

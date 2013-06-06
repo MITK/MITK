@@ -49,7 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAstroStickModel.h>
 #include <mitkDotModel.h>
 #include <mitkRicianNoiseModel.h>
-#include <mitkGibbsRingingArtifact.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkNodePredicateOr.h>
@@ -852,12 +851,10 @@ void QmitkFiberfoxView::GenerateImage()
                     artifactModelString += "_EDDY";
                 }
 
-                mitk::GibbsRingingArtifact<double> gibbsModel;
                 if (m_Controls->m_AddGibbsRinging->isChecked())
                 {
-                    resultNode->AddProperty("Fiberfox.k-Space-Undersampling", DoubleProperty::New(m_Controls->m_KspaceUndersamplingBox->value()));
-                    gibbsModel.SetKspaceCropping(m_Controls->m_KspaceUndersamplingBox->value());
-                    filter->SetRingingModel(&gibbsModel);
+                    resultNode->AddProperty("Fiberfox.kRinging-Upsampling", DoubleProperty::New(m_Controls->m_ImageUpsamplingBox->value()));
+                    filter->SetUpsampling(m_Controls->m_ImageUpsamplingBox->value());
                 }
 
                 if (m_Controls->m_AddDistortions->isChecked() && m_Controls->m_FrequencyMapBox->GetSelectedNode().IsNotNull())
@@ -1160,13 +1157,11 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::RicianNoiseModel<double> noiseModel;
         noiseModel.SetNoiseVariance(noiseVariance);
 
-        mitk::GibbsRingingArtifact<double> gibbsModel;
         if (m_Controls->m_AddGibbsRinging->isChecked())
         {
             artifactModelString += "_RINGING";
-            resultNode->AddProperty("Fiberfox.k-Space-Undersampling", DoubleProperty::New(m_Controls->m_KspaceUndersamplingBox->value()));
-            gibbsModel.SetKspaceCropping(m_Controls->m_KspaceUndersamplingBox->value());
-            artifactList.push_back(&gibbsModel);
+            resultNode->AddProperty("Fiberfox.Ringing-Upsampling", DoubleProperty::New(m_Controls->m_ImageUpsamplingBox->value()));
+            tractsToDwiFilter->SetUpsampling(m_Controls->m_ImageUpsamplingBox->value());
         }
 
         if ( this->m_Controls->m_TEbox->value() < imageRegion.GetSize(1)*m_Controls->m_LineReadoutTimeBox->value() )

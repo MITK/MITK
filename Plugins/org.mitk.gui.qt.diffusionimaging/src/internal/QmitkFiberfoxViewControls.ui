@@ -1825,6 +1825,9 @@
           </item>
           <item row="9" column="0">
            <widget class="QCheckBox" name="m_AddGibbsRinging">
+            <property name="toolTip">
+             <string>Add ringing artifacts occuring at strong edges in the image.</string>
+            </property>
             <property name="text">
              <string>Add Gibbs Ringing</string>
             </property>
@@ -1873,7 +1876,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>k-Space Undersampling:</string>
+                <string>Upsampling:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1881,9 +1884,9 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="m_KspaceUndersamplingBox">
+              <widget class="QDoubleSpinBox" name="m_ImageUpsamplingBox">
                <property name="toolTip">
-                <string>A larger offset increases the inensity of the ghost image.</string>
+                <string>Larger values increase the ringing range. Beware of performance issues!</string>
                </property>
                <property name="decimals">
                 <number>2</number>
@@ -1892,13 +1895,13 @@
                 <double>1.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>4.000000000000000</double>
+                <double>10.000000000000000</double>
                </property>
                <property name="singleStep">
                 <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>1.100000000000000</double>
+                <double>2.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -1970,7 +1973,7 @@
                 <double>0.001000000000000</double>
                </property>
                <property name="value">
-                <double>0.015000000000000</double>
+                <double>0.001000000000000</double>
                </property>
               </widget>
              </item>
@@ -2026,6 +2029,9 @@
           </item>
           <item row="7" column="0">
            <widget class="QCheckBox" name="m_AddEddy">
+            <property name="toolTip">
+             <string>!!!EXPERIMENTAL!!!</string>
+            </property>
             <property name="text">
              <string>Add Eddy Current Effects</string>
             </property>

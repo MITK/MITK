@@ -54,20 +54,12 @@ void FieldmapGeneratorFilter< OutputImageType >::ThreadedGenerateData( const Out
     typename OutputImageType::Pointer outImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     ImageRegionIterator< OutputImageType > oit(outImage, outputRegionForThread);
 
-    int szx = m_ImageRegion.GetSize(0);
-    int szy = m_ImageRegion.GetSize(1);
-    int szz = m_ImageRegion.GetSize(2);
-
-    double max = szx*szx + szy*szy - szx*szy;
-
     while( !oit.IsAtEnd() )
     {
         double value = 0;
         IndexType idx = oit.GetIndex();
-//        for (int i=0; i<3; i++)
-//            value += std::exp(-(double)idx[i]/32.0)*m_Gradient[i] + m_Offset[i];
-
-        //value += idx[0]*idx[0] + idx[1]*idx[1] - idx[0]*idx[1];
+        for (int i=0; i<3; i++)
+            value += idx[i]*m_Gradient[i] + m_Offset[i];
 
         for (int i=0; i<m_WorldPositions.size(); i++)
         {
@@ -75,29 +67,9 @@ void FieldmapGeneratorFilter< OutputImageType >::ThreadedGenerateData( const Out
             itk::Point<double, 3> vertex;
             outImage->TransformIndexToPhysicalPoint(idx, vertex);
             double dist = c.EuclideanDistanceTo(vertex);
-
-            c[0] -= vertex[0];
-            c[1] -= vertex[1];
-            c[2] -= vertex[2];
-
-            double x = c[0];
-            double y = c[1];
-            double z = c[2];
-
-            dist = fabs(dist) - m_Variances.at(i);
-            if (dist>0)
-                value += (2*z*z-y*y-x*x)/pow(x*x+y*y+z*z,5/2);
-
-
-//            dist = fabs(dist) - m_Variances.at(i);
-//            if (dist<0)
-//                dist = 0;
-//            value += std::exp(-dist/m_Variances.at(i))*m_Heights.at(i);
-
-            // value += m_Heights.at(i)*exp(-dist*dist/(2*m_Variances.at(i)));
+            value += m_Heights.at(i)*exp(-dist*dist/(2*m_Variances.at(i)));
         }
-
-        oit.Set(m_Gradient[0]*value/max);
+        oit.Set(value);
         ++oit;
     }
 

@@ -149,7 +149,6 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
 
             // create k-sapce (inverse fourier transform slices)
             itk::Size<2> outSize; outSize.SetElement(0, m_ImageRegion.GetSize(0)); outSize.SetElement(1, m_ImageRegion.GetSize(1));
-            MITK_INFO << outSize;
             itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
             idft->SetCompartmentImages(compartmentSlices);
             idft->SetT2(t2Vector);

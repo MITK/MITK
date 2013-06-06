@@ -14,13 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include "berryIWorkbenchWindow.h"
-#include "berryIWorkbenchPage.h"
-#include "berryISelectionService.h"
-#include "berryConstants.h"
-#include "berryPlatformUI.h"
-
 // Qmitk
 #include "QmitkTractbasedSpatialStatisticsView.h"
 #include "QmitkStdMultiWidget.h"
@@ -267,10 +260,6 @@ void QmitkTractbasedSpatialStatisticsView::Activated()
 {
   QmitkFunctionality::Activated();
 
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  //m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  //m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkTractbasedSpatialStatisticsView::Deactivated()

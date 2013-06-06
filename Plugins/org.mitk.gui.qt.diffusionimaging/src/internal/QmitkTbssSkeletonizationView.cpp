@@ -14,19 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include <berryIWorkbenchWindow.h>
-#include <berryIWorkbenchPage.h>
-#include <berryISelectionService.h>
-#include <berryConstants.h>
-#include <berryPlatformUI.h>
-
 // Qmitk
 #include "QmitkTbssSkeletonizationView.h"
-#include <QmitkStdMultiWidget.h>
-
-#include <mitkDataNodeObject.h>
-#include <itkCastImageFilter.h>
 
 #include <itkSkeletonizationFilter.h>
 #include <itkProjectionFilter.h>
@@ -36,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 
 // Qt
-#include <QInputDialog>
+#include <QInputDialog>Gaimersheim
 #include <QMessageBox>
 
 //vtk
@@ -118,19 +107,11 @@ void QmitkTbssSkeletonizationView::CreateQtPartControl( QWidget *parent )
     this->CreateConnections();
   }
 
-  m_IsInitialized = false;
-
-
 }
 
 void QmitkTbssSkeletonizationView::Activated()
 {
   QmitkFunctionality::Activated();
-
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  //m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  //m_SelListener.Cast<TbssSkeletonizationSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkTbssSkeletonizationView::Deactivated()

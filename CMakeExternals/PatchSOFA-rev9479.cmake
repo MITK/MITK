@@ -9,6 +9,10 @@ string(REPLACE "RELWITHDEBINFO \"\${SOFA_LIB_DIR}" "RELWITHDEBINFO \"\${SOFA_LIB
 string(REPLACE "MINSIZEREL \"\${SOFA_LIB_DIR}" "MINSIZEREL \"\${SOFA_LIB_DIR}/MinSizeRel" preBuildConfig_cmake "${preBuildConfig_cmake}")
 file(WRITE "cmake/preBuildConfig.cmake" "${preBuildConfig_cmake}")
 
+file(STRINGS "CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "2.8.8" "2.8.5" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "CMakeLists.txt" "${CMakeLists_txt}")
+
 file(APPEND "CMakeLists.txt" "\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)")
 
 file(WRITE "SOFAConfig.cmake.in"

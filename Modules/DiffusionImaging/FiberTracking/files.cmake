@@ -88,7 +88,6 @@ set(H_FILES
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
-  SignalModels/mitkGibbsRingingArtifact.h
 )
 
 set(RESOURCE_FILES

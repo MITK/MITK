@@ -38,13 +38,13 @@ template< class TPixelType >
 AddArtifactsToDwiImageFilter< TPixelType >
 ::AddArtifactsToDwiImageFilter()
     : m_NoiseModel(NULL)
-    , m_RingingModel(NULL)
     , m_FrequencyMap(NULL)
     , m_kOffset(0)
     , m_tLine(1)
     , m_EddyGradientStrength(0.001)
     , m_SimulateEddyCurrents(false)
     , m_TE(100)
+    , m_Upsampling(1)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -117,12 +117,10 @@ void AddArtifactsToDwiImageFilter< TPixelType >
     slice->FillBuffer(0.0);
 
     ImageRegion<2> upsampledSliceRegion;
-    unsigned int upsampling = 1;
-    if (m_RingingModel!=NULL)
+    if (m_Upsampling>1.00001)
     {
-        upsampling = m_RingingModel->GetKspaceCropping();
-        upsampledSliceRegion.SetSize(0, x*upsampling);
-        upsampledSliceRegion.SetSize(1, y*upsampling);
+        upsampledSliceRegion.SetSize(0, x*m_Upsampling);
+        upsampledSliceRegion.SetSize(1, y*m_Upsampling);
     }
 
     // frequency map slice
@@ -137,7 +135,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         fMap->FillBuffer(0.0);
     }
 
-    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_RingingModel!=NULL || m_SimulateEddyCurrents)
+    if ( m_FrequencyMap.IsNotNull() || m_kOffset>0.0 || m_Upsampling>1.00001 || m_SimulateEddyCurrents)
     {
         MatrixType transform = inputImage->GetDirection();
         for (int i=0; i<3; i++)
@@ -151,7 +149,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
             MITK_INFO << "frequency map is set";
         else
             MITK_INFO << "no frequency map set";
-        if (m_RingingModel!=NULL)
+        if (m_Upsampling>1.00001)
             MITK_INFO << "Gibbs ringing enabled";
         else
             MITK_INFO << "Gibbs ringing disabled";
@@ -163,8 +161,6 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         for (int g=0; g<inputImage->GetVectorLength(); g++)
             for (int z=0; z<inputRegion.GetSize(2); z++)
             {
-                ++disp;
-
                 std::vector< SliceType::Pointer > compartmentSlices;
                 // extract slice from channel g
                 for (int y=0; y<sliceRegion.GetSize(1); y++)
@@ -182,13 +178,13 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                             fMap->SetPixel(index2D, m_FrequencyMap->GetPixel(index3D));
                     }
 
-                if (upsampling>1)
+                if (m_Upsampling>1.00001)
                 {
                     itk::ResampleImageFilter<SliceType, SliceType>::Pointer resampler = itk::ResampleImageFilter<SliceType, SliceType>::New();
                     resampler->SetInput(slice);
                     resampler->SetOutputParametersFromImage(slice);
                     resampler->SetSize(upsampledSliceRegion.GetSize());
-                    resampler->SetOutputSpacing(slice->GetSpacing()/upsampling);
+                    resampler->SetOutputSpacing(slice->GetSpacing()/m_Upsampling);
                     resampler->Update();
                     typename SliceType::Pointer upslice = resampler->GetOutput();
                     compartmentSlices.push_back(upslice);
@@ -198,8 +194,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
 
                 // fourier transform slice
                 typename ComplexSliceType::Pointer fSlice;
-                typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
 
+                itk::Size<2> outSize; outSize.SetElement(0, x); outSize.SetElement(1, y);
+                typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetCompartmentImages(compartmentSlices);
                 idft->SetkOffset(m_kOffset);
                 idft->SettLine(m_tLine);
@@ -211,15 +208,9 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 idft->SetTE(m_TE);
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
                 idft->SetDirectionMatrix(transform);
+                idft->SetOutSize(outSize);
                 idft->Update();
-
                 fSlice = idft->GetOutput();
-
-                if (m_RingingModel!=NULL)
-                {
-                    fSlice = RearrangeSlice(fSlice);
-                    fSlice = m_RingingModel->AddArtifact(fSlice);
-                }
 
                 // inverse fourier transform slice
                 typename SliceType::Pointer newSlice;
@@ -247,6 +238,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                         pix3D[g] = signal;
                         outputImage->SetPixel(index3D, pix3D);
                     }
+
+                ++disp;
             }
     }
 

@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkTbssImporter_cpp
 
 #include "mitkTbssImporter.h"
-#include <QDir>
-#include <QStringList>
-#include "itkNrrdImageIO.h"
-#include "mitkImageAccessByItk.h"
+//#include <QDir>
+//#include <QStringList>
+//#include "itkNrrdImageIO.h"
+//#include "mitkImageAccessByItk.h"
 
 namespace mitk
 {
@@ -107,8 +107,6 @@ namespace mitk
       }
     }
 
-
-//    mitk::CastToTbssImage(m_Data.GetPointer(), tbssImg);
 
   tbssImg->SetGroupInfo(m_Groups);
   tbssImg->SetMeasurementInfo(m_MeasurementInfo);

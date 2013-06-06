@@ -7,6 +7,8 @@ find_package(ITK REQUIRED)
 #  message(FATAL_ERROR "MITK only supports a ITK which was built with shared libraries. Turn on BUILD_SHARED_LIBS in your ITK config.")
 #endif(ITK_FOUND AND NOT ITK_BUILD_SHARED)
 
+set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1)
+
 include(${ITK_USE_FILE})
 list(APPEND ALL_LIBRARIES ${ITK_LIBRARIES})
 list(APPEND ALL_INCLUDE_DIRECTORIES ${ITK_INCLUDE_DIRS})

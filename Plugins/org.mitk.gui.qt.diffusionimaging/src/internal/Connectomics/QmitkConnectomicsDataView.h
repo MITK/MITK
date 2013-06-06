@@ -87,12 +87,9 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  mitk::ConnectomicsNetworkCreator::Pointer     m_ConnectomicsNetworkCreator;
+  mitk::ConnectomicsNetworkCreator::Pointer m_ConnectomicsNetworkCreator;
 
-  mitk::ConnectomicsNetworkMapper3D::Pointer    m_NetworkMapper;
-
-  mitk::DataNode::Pointer                       m_SelectedParcellationImage;
-  std::vector< mitk::DataNode::Pointer >        m_SelectedFiberBundles;
+  mitk::ConnectomicsNetworkMapper3D::Pointer m_NetworkMapper;
 
   // Demo/Developer mode toggle
   bool m_demomode;

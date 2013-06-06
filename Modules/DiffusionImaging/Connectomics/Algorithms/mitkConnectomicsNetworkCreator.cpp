@@ -38,10 +38,10 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , idCounter(0)
 , m_LabelToVertexMap()
 , m_LabelToNodePropertyMap()
-, allowLoops( true )
-, m_UseCoMCoordinates( true )
+, allowLoops( false )
+, m_UseCoMCoordinates( false )
 , m_LabelsToCoordinatesMap()
-, m_MappingStrategy( EndElementPosition )
+, m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
 {
 }
@@ -55,7 +55,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_LabelToNodePropertyMap()
 , allowLoops( false )
 , m_LabelsToCoordinatesMap()
-, m_MappingStrategy( EndElementPosition )
+, m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
 {
 }
@@ -90,26 +90,23 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   m_ConNetwork->clear();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
-  {
-      CalculateCenterOfMass();
-  }
-
-  std::cout << m_ConNetwork->GetNumberOfVertices() << std::endl;
 
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
+  vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
+  vLines->InitTraversal();
 
   int numFibers = m_FiberBundle->GetNumFibers();
   for( int fiberID( 0 ); fiberID < numFibers; fiberID++ )
   {
-    vtkCell* cell = fiberPolyData->GetCell(fiberID);
-    int numPoints = cell->GetNumberOfPoints();
-    vtkPoints* points = cell->GetPoints();
+    vtkIdType   numPointsInCell(0);
+    vtkIdType*  pointsInCell(NULL);
+    vLines->GetNextCell ( numPointsInCell, pointsInCell );
 
     TractType::Pointer singleTract = TractType::New();
-    for( int pointInCellID( 0 ); pointInCellID < numPoints ; pointInCellID++)
+    for( int pointInCellID( 0 ); pointInCellID < numPointsInCell ; pointInCellID++)
     {
       // push back point
-      PointType point = GetItkPoint( points->GetPoint( pointInCellID ) );
+      PointType point = GetItkPoint( fiberPolyData->GetPoint( pointsInCell[ pointInCellID ] ) );
       singleTract->InsertElement( singleTract->Size(), point );
     }
 
@@ -658,11 +655,6 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
 
     length = std::sqrt( sum );
 
-    if( length < mitk::eps )
-    {
-        continue;
-    }
-
     // retract
     mitk::Index3D tempIndex;
     int tempLabel( label );
@@ -795,18 +787,6 @@ void mitk::ConnectomicsNetworkCreator::CalculateCenterOfMass()
     }
 
     m_LabelsToCoordinatesMap.insert( std::pair< int, std::vector<double> >( currentLabel, currentCoordinates ) );
-
-    // Peter Hack
-    {
-    CreateNewNode( currentLabel, mitk::Index3D(), true );
-    if( ! ( m_LabelToVertexMap.count( currentLabel ) > 0 ) )
-    {
-      VertexType newVertex = m_ConNetwork->AddVertex( idCounter );
-      idCounter++;
-      SupplyVertexWithInformation(currentLabel, newVertex);
-      m_LabelToVertexMap.insert( std::pair< ImageLabelType, VertexType >( currentLabel, newVertex ) );
-    }
-    }
   }
 
   //can now use center of mass coordinates

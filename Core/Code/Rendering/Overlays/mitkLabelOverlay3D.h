@@ -14,18 +14,19 @@
 
   ===================================================================*/
 
-#ifndef TEXTOVERLAY_H
-#define TEXTOVERLAY_H
+#ifndef LabelOverlay3D_H
+#define LabelOverlay3D_H
 
 #include "mitkVtkOverlay.h"
 #include <mitkLocalStorageHandler.h>
-#include <vtkSmartPointer.h>
-#include <vtkTextActor.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
+#include <vtkTextActor3D.h>
 
 
 namespace mitk {
 
-class MITK_CORE_EXPORT TextOverlay : public mitk::VtkOverlay {
+class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -39,7 +40,10 @@ public:
   {
   public:
     /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkTextActor> m_textActor;
+    vtkSmartPointer<vtkFollower> m_follower;
+
+    vtkSmartPointer<vtkVectorText> m_textSource;
+
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -48,35 +52,48 @@ public:
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
+
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  mitkClassMacro(TextOverlay, mitk::VtkOverlay);
-  itkNewMacro(TextOverlay);
+  mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay);
+  itkNewMacro(LabelOverlay3D);
+
+  void setPosition3D(Point3D position3D);
+
+  void setText(std::string text);
+
+  void setPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
+
+  Point3D getPosition3D();
+
+  std::string getText();
+
+  Point3D getPosition3D(mitk::BaseRenderer* renderer);
 
 protected:
 
   virtual vtkSmartPointer<vtkActor> getVtkActor(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit TextOverlay();
+  explicit LabelOverlay3D();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~TextOverlay();
+  virtual ~LabelOverlay3D();
 
 private:
 
   /** \brief copy constructor */
-  TextOverlay( const TextOverlay &);
+  LabelOverlay3D( const LabelOverlay3D &);
 
   /** \brief assignment operator */
-  TextOverlay &operator=(const TextOverlay &);
+  LabelOverlay3D &operator=(const LabelOverlay3D &);
 
 };
 
 } // namespace mitk
-#endif // TEXTOVERLAY_H
+#endif // LabelOverlay3D_H
 
 

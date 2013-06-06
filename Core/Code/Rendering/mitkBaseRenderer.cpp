@@ -543,7 +543,7 @@ void mitk::BaseRenderer::AddAllOverlays()
 {
   if(m_OverlayManager.IsNotNull())
   {
-    m_OverlayManager->PrepareOverlays(this);
+    m_OverlayManager->UpdateOverlays(this);
   }
 }
 

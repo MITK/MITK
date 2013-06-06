@@ -14,26 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTextOverlay3D.h"
+#include "mitkLabelOverlay3D.h"
 #include <vtkTextProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
 
-mitk::TextOverlay3D::TextOverlay3D()
+mitk::LabelOverlay3D::LabelOverlay3D()
 {
 }
 
 
-mitk::TextOverlay3D::~TextOverlay3D()
+mitk::LabelOverlay3D::~LabelOverlay3D()
 {
 }
 
-mitk::TextOverlay3D::LocalStorage::~LocalStorage()
+mitk::LabelOverlay3D::LocalStorage::~LocalStorage()
 {
 }
 
-mitk::TextOverlay3D::LocalStorage::LocalStorage()
+mitk::LabelOverlay3D::LocalStorage::LocalStorage()
 {
   // Create some text
   m_textSource = vtkSmartPointer<vtkVectorText>::New();
@@ -49,10 +49,21 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
   m_follower->SetMapper( mapper );
   m_follower->GetProperty()->SetColor( 1, 0, 0 ); // red
   m_follower->SetScale(1);
+
+
+  /*
+
+  m_textActor = vtkSmartPointer<vtkTextActor>::New();
+  m_textActor->GetTextProperty()->SetFontSize ( 24 );
+  m_textActor->SetPosition2 ( 10, 40 );
+  m_textActor->SetInput ( "Hello world" );
+  m_textActor->GetTextProperty()->SetColor ( 1.0,0.0,0.0 );
+
+  */
 }
 
 
-//void mitk::TextOverlay3D::MitkRender(mitk::BaseRenderer *renderer)
+//void mitk::LabelOverlay3D::MitkRender(mitk::BaseRenderer *renderer)
 //{
 //  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
 //  ls->m_follower->SetPosition(getPosition3D()[0],getPosition3D()[1],getPosition3D()[2]);
@@ -67,44 +78,45 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
 //}
 
 
-void mitk::TextOverlay3D::setPosition3D(mitk::Point3D position3D)
+void mitk::LabelOverlay3D::setPosition3D(mitk::Point3D position3D)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty);
 }
 
-void mitk::TextOverlay3D::setText(std::string text)
+void mitk::LabelOverlay3D::setText(std::string text)
 {
   SetStringProperty("text", text.c_str());
 }
 
-void mitk::TextOverlay3D::setPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+void mitk::LabelOverlay3D::setPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty,renderer);
 }
 
-mitk::Point3D mitk::TextOverlay3D::getPosition3D()
+mitk::Point3D mitk::LabelOverlay3D::getPosition3D()
 {
   mitk::Point3D position3D;
   GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
   return position3D;
 }
 
-std::string mitk::TextOverlay3D::getText()
+std::string mitk::LabelOverlay3D::getText()
 {
   std::string text;
   GetPropertyList()->GetStringProperty("text", text);
   return text;
 }
 
-mitk::Point3D mitk::TextOverlay3D::getPosition3D(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::LabelOverlay3D::getPosition3D(mitk::BaseRenderer *renderer)
 {
   mitk::Point3D position3D;
   GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
   return position3D;
 }
 
-vtkSmartPointer<vtkActor> mitk::TextOverlay3D::getVtkActor(BaseRenderer *renderer)
+
+vtkSmartPointer<vtkActor> mitk::LabelOverlay3D::getVtkActor(BaseRenderer *renderer)
 {
 }

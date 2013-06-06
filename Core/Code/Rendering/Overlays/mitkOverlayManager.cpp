@@ -30,13 +30,13 @@ void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
   m_OverlayList.push_back(overlay);
 }
 
-void mitk::OverlayManager::PrepareOverlays(mitk::BaseRenderer* baseRenderer)
+void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 {
   for(int i=0 ; i<m_OverlayList.size() ; i++)
   {
     mitk::Overlay::Pointer overlay = m_OverlayList[i];
 //    overlay->Render(); //TODO
-    overlay->MitkRender(baseRenderer);
+    overlay->UpdateOverlay(baseRenderer);
   }
 }
 

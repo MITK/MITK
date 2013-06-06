@@ -19,9 +19,9 @@
 
 #include "mitkVtkOverlay.h"
 #include <mitkLocalStorageHandler.h>
-#include <vtkSmartPointer.h>
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
+#include <vtkTextActor3D.h>
 
 
 namespace mitk {
@@ -44,6 +44,7 @@ public:
 
     vtkSmartPointer<vtkVectorText> m_textSource;
 
+
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
 
@@ -54,21 +55,10 @@ public:
 
   };
 
-  void MitkRender(BaseRenderer *renderer);
-
-  //##Documentation
-  //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
-  //## NULL, the BaseRenderer-independent PropertyList of this DataNode
-  //## is returned.
-  //## @sa GetProperty
-  //## @sa m_PropertyList
-  //## @sa m_MapOfPropertyLists
-  mitk::PropertyList* GetBRPropertyList(mitk::BaseRenderer* renderer);
-
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  mitkClassMacro(TextOverlay3D, mitk::Overlay);
+  mitkClassMacro(TextOverlay3D, mitk::VtkOverlay);
   itkNewMacro(TextOverlay3D);
 
   void setPosition3D(Point3D position3D);
@@ -84,6 +74,8 @@ public:
   Point3D getPosition3D(mitk::BaseRenderer* renderer);
 
 protected:
+
+  virtual vtkSmartPointer<vtkActor> getVtkActor(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit TextOverlay3D();

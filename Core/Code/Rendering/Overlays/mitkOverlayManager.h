@@ -32,7 +32,7 @@ public:
   itkNewMacro(OverlayManager);
 
   void AddOverlay(Overlay::Pointer overlay);
-  void PrepareOverlays(BaseRenderer *baseRenderer);
+  void UpdateOverlays(BaseRenderer *baseRenderer);
 
   /** \brief Base class for mapper specific rendering ressources.
    */

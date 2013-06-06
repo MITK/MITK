@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkOverlay::VtkOverlay()
 {
-  m_PropertyList = mitk::PropertyList::New();
 }
 
 
@@ -26,7 +25,6 @@ mitk::VtkOverlay::~VtkOverlay()
 {
 }
 
-mitk::PropertyList *mitk::VtkOverlay::GetPropertyList()
+void mitk::VtkOverlay::UpdateOverlay(mitk::BaseRenderer *renderer)
 {
-  return m_PropertyList;
 }

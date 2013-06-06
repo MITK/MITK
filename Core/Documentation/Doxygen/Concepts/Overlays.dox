@@ -1,0 +1,27 @@
+/**
+\page OverlaysPage Renderwindow Overlays and Annotations Concepts
+
+\tableofcontents
+
+\section OverlaysPage_Introduction Overlays and Annotations
+
+The Overlays in mitk are a simple way to display additional information on the render windows.
+
+\section ArchitectureSection
+
+\section UsageSection
+
+\section RenderingMethodSection
+
+\subsection VtkBasedRenderingSection
+
+\subsection GenericRenderingSection
+
+\section Text2DSection
+
+\section Text3DSection
+
+\section CustomOverlaySection
+
+
+*/

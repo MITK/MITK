@@ -30,61 +30,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
-#include <qfiledialog.h>
-#include <QDirIterator>
 #include <QInputDialog>
-#include <QDir>
-#include <QStringList>
-#include <QMessageBox>
-#include <QSortFilterProxyModel>
 #include <QClipboard>
 
-#include <itkNiftiImageIO.h>
-#include <itkImageFileReader.h>
 
-#include <iostream>
-#include <fstream>
-#include <limits>
-
-
-#include <itkMultiplyImageFilter.h>
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
-#include <mitkProgressBar.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarFigureInteractor.h>
 
 
-#include <mitkVectorImageMapper2D.h>
-#include "vtkFloatArray.h"
-#include "vtkLinearTransform.h"
 #include "vtkPoints.h"
-#include "mitkSurface.h"
-#include <vtkGlyph3D.h>
-#include "vtkArrowSource.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPointData.h"
 #include <vtkCellArray.h>
 #include <vtkPolyLine.h>
 
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-
-#include <QMessageBox>
-
-#include "mitkITKImageImport.h"
-// #include "mitkImageMapperGL2D.h"
-#include "mitkVolumeDataVtkMapper3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkTensorImage.h"
-
-#include "itkDiffusionTensor3D.h"
-
-
-#define SEARCHSIGMA 10 // length in linear voxel dimens
-
-#define MAXSEARCHLENGTH (3*SEARCHSIGMA)
 
 const std::string QmitkTractbasedSpatialStatisticsView::VIEW_ID = "org.mitk.views.tractbasedspatialstatistics";
 
@@ -431,7 +390,7 @@ void QmitkTractbasedSpatialStatisticsView::RemoveGroup()
 {
 
   QTableView *temp = static_cast<QTableView*>(m_Controls->m_GroupInfo);
- // QSortFilterProxyModel *proxy = static_cast<QSortFilterProxyModel*>(temp->model());
+
   QItemSelectionModel *selectionModel = temp->selectionModel();
 
   QModelIndexList indices = selectionModel->selectedRows();

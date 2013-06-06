@@ -48,28 +48,26 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   label2->setFont( f );
   layout->addWidget(label2,2,0);
 
-  m_ThresholdLabel = new QLabel( " 10", this );
+  m_ThresholdLabel = new QLabel( " 0.5", this );
   f = m_ThresholdLabel->font();
   f.setBold(false);
   m_ThresholdLabel->setFont( f );
   layout->addWidget(m_ThresholdLabel,0,1);
 
-  //m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
   m_SliderThreshold = new QSlider( Qt::Horizontal, this );
   m_SliderThreshold->setMinimum(0);
-  m_SliderThreshold->setMaximum(4095);
+  m_SliderThreshold->setMaximum(100);
   m_SliderThreshold->setPageStep(1);
-  m_SliderThreshold->setValue(1500);
+  m_SliderThreshold->setValue(50);
   connect( m_SliderThreshold, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueThresholdChanged(int)));
   layout->addWidget( m_SliderThreshold, 1, 0, 1, 2 );
 
-  m_LevelLabel = new QLabel( " 10", this );
+  m_LevelLabel = new QLabel( " 0.5", this );
   f = m_LevelLabel->font();
   f.setBold(false);
   m_LevelLabel->setFont( f );
   layout->addWidget(m_LevelLabel,2,1);
 
-  //m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
   m_SliderLevel = new QSlider( Qt::Horizontal, this );
   m_SliderLevel->setMinimum(0);
   m_SliderLevel->setMaximum(100);
@@ -124,8 +122,9 @@ void QmitkWatershedToolGUI::OnSliderValueThresholdChanged(int value)
 {
   if (m_WatershedTool.IsNotNull())
   {
-//    m_WatershedTool->SetSize( value );
-      m_ThresholdLabel->setText(QString::number(value));
+      double realValue = value / 100.;
+      m_WatershedTool->SetThreshold( realValue );
+      m_ThresholdLabel->setText(QString::number(realValue));
   }
 }
 
@@ -133,8 +132,8 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 {
   if (m_WatershedTool.IsNotNull())
   {
-//    m_WatershedTool->SetSize( value );
-      float realValue = value / 100.;
+      double realValue = value / 100.;
+      m_WatershedTool->SetLevel( realValue );
       m_LevelLabel->setText(QString::number(realValue));
   }
 }

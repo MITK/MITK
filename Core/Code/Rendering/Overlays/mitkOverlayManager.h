@@ -18,21 +18,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OVERLAYMANAGER_H
 
 #include "MitkExports.h"
-#include <itkObject.h>
+#include <itkLightObject.h>
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
 #include "mitkBaseRenderer.h"
 
+// Microservices
+#include <usServiceInterface.h>
+#include <usServiceRegistration.h>
+#include <usServiceProperties.h>
+#include <usModuleContext.h>
+
 namespace mitk {
 
-class MITK_CORE_EXPORT OverlayManager : public itk::Object {
+class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
 
-  mitkClassMacro(OverlayManager, itk::Object);
+  mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
 
   void AddOverlay(Overlay::Pointer overlay);
   void UpdateOverlays(BaseRenderer *baseRenderer);
+  void UnregisterAsMicroservice();
+  static const std::string PROP_ID;
 
   /** \brief Base class for mapper specific rendering ressources.
    */
@@ -48,7 +56,7 @@ public:
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
 
-    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::OverlayManager *overlaymanager);
+//    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::OverlayManager *overlaymanager);
 
     inline void UpdateGenerateDataTime()
     {
@@ -82,9 +90,15 @@ private:
   /** \brief assignment operator */
   OverlayManager &operator=(const OverlayManager &);
 
+  void RegisterAsMicroservice();
+
+  mitk::ServiceRegistration m_Registration;
+
 };
 
 } // namespace mitk
+
+US_DECLARE_SERVICE_INTERFACE(mitk::OverlayManager, "org.mitk.services.OverlayManager")
 #endif // OVERLAYMANAGER_H
 
 

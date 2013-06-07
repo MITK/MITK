@@ -1,27 +1,60 @@
 /**
-\page OverlaysPage Renderwindow Overlays and Annotations Concepts
+\page OverlaysPage Overlays and Annotations Concepts
 
 \tableofcontents
 
 \section OverlaysPage_Introduction Overlays and Annotations
 
 The Overlays in mitk are a simple way to display additional information on the render windows.
+<ol>
+  <li>definition of graphical elements that can be displayed in the render windows.
+  <li>it is possible to manage multiple elements in each window. An element is automaticly added in all available render windows.
+  <li>2D and 3D textelements are already defined and are using vtk to create custom annotations. 3D elements can be placed in the coordinate system and are always visible for the camera.
+  <li>
+</ol>
 
-\section ArchitectureSection
+Definition von grafischen Elementen die im Renderwindow angezeigt werden können
+Mehrere Elemente gleichzeitig
+Elemente behindern nicht die Interaktionen mit dem Renderwindow
+evtl auch Interaktion mit Elementen (Buttons, Slider...)
+Textelemente mit einstellbarer Schriftart und Farbe
+Lineal das den Maßstab im Renderwindow angibt
+Position 2D Koordinaten relativ zur Größe des Renderwindows
+3D Verankerungen im Renderwindow
 
-\section UsageSection
+\section ArchitectureSection ArchitectureSection
 
-\section RenderingMethodSection
+\dot
+digraph linker_deps {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  BR [ label="BaseRenderer" ];
+  BL [ label="{BaseLayouter|+ArrangeOverlays()}" ];
+  O [ label="{Overlay|-PropertyList|+UpdateOverlay(BaseRenderer)}" ];
+  OM [ label="{OverlayManager|+AddOverlay()\n+RemoveOverlay()}" ];
+  TO [ label="TextOverlay" ];
+  VTKO [ label="{vtkOverlay|GetVtkActor()}" ];
+  TO -> VTKO;
+  VTKO -> O;
+  OM -> O [style="dashed",label="manages"];
+  OM -> BL [style="dashed"];
+  OM -> BR [style="dashed"];
+  BR -> OM [style="dashed"];
+}
+\enddot
 
-\subsection VtkBasedRenderingSection
+\section UsageSection UsageSection
 
-\subsection GenericRenderingSection
+\section RenderingMethodSection RenderingMethodSection
 
-\section Text2DSection
+\subsection VtkBasedRenderingSection VtkBasedRenderingSection
 
-\section Text3DSection
+\subsection GenericRenderingSection GenericRenderingSection
 
-\section CustomOverlaySection
+\section Text2DSection Text2DSection
+
+\section Text3DSection Text3DSection
+
+\section CustomOverlaySection CustomOverlaySection
 
 
 */

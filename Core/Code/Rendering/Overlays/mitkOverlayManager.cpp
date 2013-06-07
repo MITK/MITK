@@ -15,9 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOverlayManager.h"
+#include "usGetModuleContext.h"
+
+const std::string mitk::OverlayManager::PROP_ID = "org.mitk.services.OverlayManager.ID";
 
 mitk::OverlayManager::OverlayManager()
 {
+  this->RegisterAsMicroservice();
 }
 
 
@@ -41,16 +45,16 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 }
 
 
-bool mitk::OverlayManager::LocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, OverlayManager *overlaymanager)
-{
-  if( m_LastGenerateDataTime < overlaymanager -> GetMTime () )
-    return true;
+//bool mitk::OverlayManager::LocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, OverlayManager *overlaymanager)
+//{
+//  if( m_LastGenerateDataTime < overlaymanager -> GetMTime () )
+//    return true;
 
-  if( renderer && m_LastGenerateDataTime < renderer -> GetTimeStepUpdateTime ( ) )
-    return true;
+//  if( renderer && m_LastGenerateDataTime < renderer -> GetTimeStepUpdateTime ( ) )
+//    return true;
 
-  return false;
-}
+//  return false;
+//}
 
 
 mitk::OverlayManager::LocalStorage::~LocalStorage()
@@ -60,4 +64,23 @@ mitk::OverlayManager::LocalStorage::~LocalStorage()
 mitk::OverlayManager::LocalStorage::LocalStorage()
 {
 
+}
+
+
+void mitk::OverlayManager::RegisterAsMicroservice()
+{
+  mitk::ServiceProperties properties;
+  static int ID = 0;
+  properties[mitk::OverlayManager::PROP_ID] = ID;
+  mitk::ModuleContext* moduleContext = mitk::GetModuleContext();
+  m_Registration = moduleContext->RegisterService<mitk::OverlayManager>(this,properties);
+  ID++;
+}
+
+void mitk::OverlayManager::UnregisterAsMicroservice()
+{
+  if(m_Registration =! NULL)
+  {
+    m_Registration.Unregister();
+  }
 }

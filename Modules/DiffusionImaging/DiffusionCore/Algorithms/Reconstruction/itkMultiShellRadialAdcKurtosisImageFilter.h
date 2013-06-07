@@ -82,8 +82,8 @@ namespace itk
 
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
-    void S_S0Normalization( vnl_vector<double> & vec, const double & S0 );
-    void calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double>  & SignalMatrix);
+    void logarithm( vnl_vector<double> & vec);
+    void calculateCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> & SignalMatrix, const vnl_vector<double> & bValueVector, const double & reference_b_value);
     void calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & bValue, const double & referenceSignal);
 
 
@@ -99,7 +99,7 @@ namespace itk
     std::vector<double> m_WeightsVector;
 
     std::vector<vnl_matrix< double > > m_ShellInterpolationMatrixVector;
-    vnl_matrix<double> m_lsfParameterMatrix;
+    vnl_vector<double> m_bValueVector;
     std::vector<IndicesVector> m_bZeroIndicesSplitVectors;
 
     IndicesVector m_allDirectionsIndicies;

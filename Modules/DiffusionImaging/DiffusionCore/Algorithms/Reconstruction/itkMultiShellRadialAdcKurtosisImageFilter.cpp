@@ -39,9 +39,60 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionIterator.h>
 #include <itkImageRegion.h>
 #include "mitkDiffusionFunctionCollection.h"
+#include "vnl/vnl_least_squares_function.h"
+#include "vnl/algo/vnl_levenberg_marquardt.h"
 
 namespace itk
 {
+
+
+/** baseclass for IVIM fitting algorithms */
+struct lestSquaresFunction: public vnl_least_squares_function
+{
+
+  void set_measurements(const vnl_vector<double>& x)
+  {
+    measurements.set_size(x.size());
+    measurements.copy_in(x.data_block());
+  }
+
+  void set_bvalues(const vnl_vector<double>& x)
+  {
+    b.set_size(x.size());
+    b.copy_in(x.data_block());
+  }
+
+  void set_reference_measuremnt(const double & x)
+  {
+    log_S_0 = x;
+  }
+
+  double log_S_0;
+  vnl_vector<double> measurements;
+  vnl_vector<double> b;
+
+  int N;
+
+  lestSquaresFunction(unsigned int number_of_measurements) :
+      vnl_least_squares_function(2, number_of_measurements, no_gradient)
+  {
+    N = get_number_of_residuals();
+  }
+
+  void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+
+    double D = x[0];
+    double K = x[1];
+
+    for(int s=0; s<N; s++)
+    {
+      double approx = log_S_0-b[s]*D+1/6*b[s]*b[s]*D*D*K;
+      fx[s] = vnl_math_abs( measurements[s] - approx );
+    }
+
+  }
+};
+
 
 template <class TInputScalarType, class TOutputScalarType>
 MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
@@ -95,7 +146,8 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   }
 
   m_ShellInterpolationMatrixVector.reserve(m_B_ValueMap.size()-1);
-  vnl_matrix<double> lsfParameterMatrix(m_B_ValueMap.size()-1,2);
+
+  m_bValueVector = vnl_vector<double>(2);
 
   // for each shell
   BValueMap::const_iterator it = m_B_ValueMap.begin();
@@ -128,29 +180,11 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     //- save interpolationSHBasis
     m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
 
-
-    // lsf Matrix A=|b_1 1/6|
-    //              |.      |
-    //              |b_n 1/6|
-
-    lsfParameterMatrix.put(shellIndex, 0, it->first);
-    lsfParameterMatrix.put(shellIndex, 1, 1./6.);
-
-
+    m_bValueVector.put(shellIndex,it->first);
 
     ++shellIndex;
 
   }
-  MITK_INFO << "lsfParameteR(1)";
-  MITK_INFO << lsfParameterMatrix;
-
-  vnl_matrix_inverse<double> A_A(lsfParameterMatrix.transpose() * lsfParameterMatrix);
-  MITK_INFO << "lsfParameteR(2)";
-  MITK_INFO << A_A;
-
-  m_lsfParameterMatrix = A_A.inverse() * lsfParameterMatrix.transpose();
-  MITK_INFO << "lsfParameteR(3)";
-  MITK_INFO << m_lsfParameterMatrix;
 
 
   m_WeightsVector.reserve(m_B_ValueMap.size()-1);
@@ -269,14 +303,12 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       for(unsigned int i = 0 ; i < currentShell.size(); i++)
         InterpVector.put(i,b[currentShell[i]]);
 
-      //- normalization of the raw Signal divided by Reference Signal
-      S_S0Normalization(InterpVector, BZeroAverage);
+      logarithm(InterpVector);
 
       //- interpolate the Signal if necessary using corresponding interpolationSHBasis
       SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * InterpVector;
 
       SignalMatrix.set_column(shellIndex, SignalVector);
-
 
       shellIterator++;
       shellIndex++;
@@ -284,55 +316,75 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
     // row_i = {D, D^2*K}
     vnl_matrix<double> lsfCoeffs(m_allDirectionsSize , 2);
-    calculateLsfCoeffs(lsfCoeffs,SignalMatrix);
-
+    calculateCoeffs(lsfCoeffs,SignalMatrix, m_bValueVector, std::log(BZeroAverage));
     calculateSignalFromLsfCoeffs(SignalVector,lsfCoeffs,m_TargetB_Value,BZeroAverage);
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));
 
     oit.Set(out);
-    MITK_INFO << out;
+   // MITK_INFO << out;
     ++oit;
     ++iit;
   }
 }
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::S_S0Normalization( vnl_vector<double> & vec, const double & S0 )
+::logarithm( vnl_vector<double> & vec)
 {
   for(unsigned int i = 0; i < vec.size(); i++){
-    vec[i] = std::log( vec[i]/S0 );
-    if(vec[i]>1.0) vec[i] = 1.;
-    if(vec[i]<0.0) vec[i] = 0.;
-
+    if(vec[i] < 0.0) vec[i] = 0.00001;
+    vec[i] = std::log( vec[i] );
   }
+ // MITK_INFO << vec;
 }
 
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::calculateLsfCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> & SignalMatrix)
+::calculateCoeffs(vnl_matrix<double> &lsfCoeffs, const vnl_matrix<double> & SignalMatrix, const vnl_vector<double> & bValueVector, const double & reference_b_value)
 {
+  lestSquaresFunction model(bValueVector.size());
+  vnl_vector<double> initalGuess(2);
+
+
   for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)
   {
-    // x = (A' A)^-1 A' b
-    vnl_vector<double> lsfCoeffsVector(m_lsfParameterMatrix * SignalMatrix.get_row(i));
-    lsfCoeffs.set_row(i, lsfCoeffsVector);
+    model.set_measurements(SignalMatrix.get_row(i));
+    model.set_bvalues(bValueVector);
+    model.set_reference_measuremnt(reference_b_value);
+
+    initalGuess.put(0, 0.8);
+    initalGuess.put(1, 1.0);
+
+    // 3. perform least squares minimization of model results by adapting model parameter
+    vnl_levenberg_marquardt minimizer(model);
+    minimizer.set_f_tolerance( 1e-15 );
+    minimizer.set_max_function_evals( 10000 );
+    bool status = minimizer.minimize(initalGuess);
+    if(!status)
+    {
+      MITK_INFO<< "Minimizer f Error: " << minimizer.get_f_tolerance();
+      MITK_INFO<< "Minimizer end Error: " << minimizer.get_end_error();
+    }
+
+    lsfCoeffs.set_row(i, initalGuess);
   }
+
+  MITK_INFO << lsfCoeffs;
 }
 
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & bValue, const double & referenceSignal)
+::calculateSignalFromLsfCoeffs(vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double &bValue, const double & referenceSignal)
 {
   for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++){
     // S = S0 * e^(-b*D + 1/6*D^2*K)
     double D = lsfCoeffs(i,0);
-    double K = lsfCoeffs(i,1) / (D*D);
-    MITK_INFO << D << " " << K;
-    vec[i] = referenceSignal * exp((-bValue) * D + 1./6. * D* D * K);
+    double K = lsfCoeffs(i,1);
+    //MITK_INFO << D << " " << K;
+    vec[i] = referenceSignal * exp((-bValue) * D + 1./6. * bValue * bValue * D*D*K);
   }
 }
 

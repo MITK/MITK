@@ -52,6 +52,8 @@ public:
 
   virtual void CreateOutputsForAllInputs(unsigned int idx);
 
+  virtual void RemoveInputs( mitk::Surface* surface );
+
 protected:
   SurfaceToSurfaceFilter();
 

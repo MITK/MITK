@@ -24,6 +24,7 @@ mitk::IFileReader::~IFileReader()
 
 const std::string mitk::IFileReader::PROP_EXTENSION = "org.mitk.services.FileReader.Extension";
 const std::string mitk::IFileReader::PROP_DESCRIPTION = "org.mitk.services.FileReader.Description";
+const std::string mitk::IFileReader::PROP_IS_LEGACY = "org.mitk.services.FileReader.IsLegacy";
 
 /**
 * @brief Used to indicate that an image should be read as an binary image.

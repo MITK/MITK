@@ -28,10 +28,11 @@ m_Extension ("")
 {
 }
 
-mitk::AbstractFileWriter::AbstractFileWriter(std::string extension, std::string description) :
+mitk::AbstractFileWriter::AbstractFileWriter(std::string basedataType, std::string extension, std::string description) :
 m_Priority (0),
 m_Extension (extension),
-m_Description (description)
+m_Description (description),
+m_BasedataType(basedataType)
 {
 }
 
@@ -52,27 +53,27 @@ void mitk::AbstractFileWriter::SetFileName(const std::string aFileName)
  m_FileName = aFileName;
 }
 
-std::string mitk::AbstractFileWriter::GetFilePrefix() const
-{
-  return m_FilePrefix;
-}
+//std::string mitk::AbstractFileWriter::GetFilePrefix() const
+//{
+//  return m_FilePrefix;
+//}
+//
+//void mitk::AbstractFileWriter::SetFilePrefix(const std::string& aFilePrefix)
+//{
+//  m_FilePrefix = aFilePrefix;
+//}
+//
+//std::string mitk::AbstractFileWriter::GetFilePattern() const
+//{
+//  return m_FilePattern;
+//}
+//
+//void mitk::AbstractFileWriter::SetFilePattern(const std::string& aFilePattern)
+//{
+//  m_FilePattern = aFilePattern;
+//}
 
-void mitk::AbstractFileWriter::SetFilePrefix(const std::string& aFilePrefix)
-{
-  m_FilePrefix = aFilePrefix;
-}
-
-std::string mitk::AbstractFileWriter::GetFilePattern() const
-{
-  return m_FilePattern;
-}
-
-void mitk::AbstractFileWriter::SetFilePattern(const std::string& aFilePattern)
-{
-  m_FilePattern = aFilePattern;
-}
-
-////////////////////// Reading /////////////////////////
+////////////////////// Writing /////////////////////////
 
 void mitk::AbstractFileWriter::Write(const itk::SmartPointer<BaseData> data, const std::string& path)
 {
@@ -80,7 +81,7 @@ void mitk::AbstractFileWriter::Write(const itk::SmartPointer<BaseData> data, con
     mitkThrow() << "File '" + path + "' not found.";
   std::ifstream stream;
   stream.open(path.c_str());
-  return this->Write(data, stream);
+  this->Write(data, stream);
 }
 
 //////////// µS Registration & Properties //////////////
@@ -112,11 +113,15 @@ mitk::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
+  if ( m_BasedataType == "" )
+    MITK_WARN << "Registered a Writer with no BasedataType defined (m_BasedataType is empty). Writer will not be found by calls from WriterManager.)";
   if ( m_Description == "" )
     MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
+
   mitk::ServiceProperties result;
   result[mitk::IFileWriter::PROP_EXTENSION]    = m_Extension;
   result[mitk::IFileWriter::PROP_DESCRIPTION]    = m_Description;
+  result[mitk::IFileWriter::PROP_BASEDATA_TYPE]    = m_BasedataType;
   result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
@@ -134,11 +139,14 @@ std::list< std::string > mitk::AbstractFileWriter::GetSupportedOptions() const
 
 ////////////////// MISC //////////////////
 
-bool mitk::AbstractFileWriter::CanWrite(const std::string& path) const
+bool mitk::AbstractFileWriter::CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const
 {
-  // Default implementation only checks if extension is correct
+  // Default implementation only checks if extension and basedatatype are correct
   std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
-  return (m_Extension == pathEnd);
+  if ( !(m_Extension == pathEnd)) return false;
+
+  std::string externalDataType = data->GetNameOfClass();
+  return (externalDataType == m_BasedataType);
 }
 
 float mitk::AbstractFileWriter::GetProgress() const
@@ -162,4 +170,9 @@ std::string mitk::AbstractFileWriter::GetExtension() const
 std::string mitk::AbstractFileWriter::GetDescription() const
 {
   return m_Description;
+}
+
+std::string mitk::AbstractFileWriter::GetSupportedBasedataType() const
+{
+  return m_BasedataType;
 }

@@ -36,7 +36,6 @@ namespace mitk {
 }
 
 namespace itk {
-
   template<class T> class SmartPointer;
 }
 
@@ -45,7 +44,7 @@ namespace mitk {
 /**
 * \brief The common interface of all FileWriter.
 *
-* This interface defines the Methods necessary for the FileWriterManager
+* This interface defines the methods necessary for the FileWriterManager
 * to interact with its FileWriters. To implement a new FileWriter, it is
 * recommended to derive from FileWriterAbstract instead of from the Interface,
 * as the abstract class already implements most of the functions.
@@ -67,39 +66,40 @@ namespace mitk {
     */
     virtual void SetFileName(const std::string aFileName) = 0;
 
-    /**
-    * \brief Get the File Prefix of the file that will be written.
-    *
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    virtual std::string GetFilePrefix() const = 0;
+    // File Pattern Functions are currently not used for all writers
+    ///**
+    //* \brief Get the File Prefix of the file that will be written.
+    //*
+    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //* the data is stored in multiple files.
+    //*/
+    //virtual std::string GetFilePrefix() const = 0;
 
-    /**
-    * \brief Set the File Prefix of the file that will be written.
-    *
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
+    ///**
+    //* \brief Set the File Prefix of the file that will be written.
+    //*
+    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //* the data is stored in multiple files.
+    //*/
+    //virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
 
-    /**
-    * \brief Get the specified file pattern for the file(s) to write.
-    *
-    * The sprintf format used to build filename from FilePrefix and number.
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    virtual std::string GetFilePattern() const = 0;
+    ///**
+    //* \brief Get the specified file pattern for the file(s) to write.
+    //*
+    //* The sprintf format used to build filename from FilePrefix and number.
+    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //* the data is stored in multiple files.
+    //*/
+    //virtual std::string GetFilePattern() const = 0;
 
-    /**
-    * \brief Set the specified file pattern for the file(s) to write.
-    *
-    * The sprintf format used to build filename from FilePrefix and number.
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    virtual void SetFilePattern(const std::string& aFilePattern) = 0;
+    ///**
+    //* \brief Set the specified file pattern for the file(s) to write.
+    //*
+    //* The sprintf format used to build filename from FilePrefix and number.
+    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //* the data is stored in multiple files.
+    //*/
+    //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0) = 0;
@@ -107,7 +107,7 @@ namespace mitk {
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream ) = 0;
 
     /**
-    * \brief Returns the priority which defined how 'good' the FileWriter can handle it's file format.
+    * \brief Returns the priority which defines how 'good' the FileWriter can handle it's file format.
     *
     * Default is zero and should only be chosen differently for a reason.
     * The priority is intended to be used by the MicroserviceFramework to determine
@@ -119,12 +119,21 @@ namespace mitk {
     virtual int GetPriority() const = 0 ;
 
     /**
+    * \brief Returns a human readable description of the file format to be written.
+    *
+    * This will be used in FileDialogs for example.
+    */
+    virtual std::string GetDescription() const = 0 ;
+
+    /**
     * \brief returns the file extension that this FileWriter is able to handle.
     *
     * Please enter only the characters after the fullstop, e.g "nrrd" is correct
     * while "*.nrrd" and ".nrrd" are incorrect.
     */
     virtual std::string GetExtension() const = 0;
+
+    virtual std::string GetSupportedBasedataType() const = 0;
 
     /**
     * \brief returns a list of the supported Options
@@ -133,13 +142,15 @@ namespace mitk {
     */
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
-    virtual bool CanWrite(const std::string& path) const = 0;
+    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const = 0;
 
     virtual float GetProgress() const = 0;
 
     // Microservice properties
     static const std::string PROP_EXTENSION;
+    static const std::string PROP_BASEDATA_TYPE;
     static const std::string PROP_DESCRIPTION;
+    static const std::string PROP_IS_LEGACY;
 
 
 protected:

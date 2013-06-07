@@ -23,4 +23,6 @@ mitk::IFileWriter::~IFileWriter()
 }
 
 const std::string mitk::IFileWriter::PROP_EXTENSION = "org.mitk.services.FileWriter.Extension";
+const std::string mitk::IFileWriter::PROP_BASEDATA_TYPE = "org.mitk.services.FileWriter.BasedataType";
 const std::string mitk::IFileWriter::PROP_DESCRIPTION = "org.mitk.services.FileWriter.Description";
+const std::string mitk::IFileWriter::PROP_IS_LEGACY = "org.mitk.services.FileWriter.IsLegacy";

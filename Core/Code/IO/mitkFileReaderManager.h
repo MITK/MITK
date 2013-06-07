@@ -54,7 +54,7 @@ class MITK_CORE_EXPORT FileReaderManager
     static std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0);
 
     template <class T>
-    static T* Read(const std::string& path)
+    static itk::SmartPointer<T>  Read(const std::string& path)
     {
       std::list<mitk::BaseData::Pointer> basedatas = Read(path);
       T* result = dynamic_cast<T*> (basedatas.front().GetPointer());

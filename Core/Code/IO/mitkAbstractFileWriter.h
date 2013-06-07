@@ -55,35 +55,35 @@ namespace mitk {
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
     virtual void SetFileName(const std::string aFileName);
 
-    //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    virtual std::string GetFilePrefix() const;
+    ////##Documentation
+    ////## @brief Get the specified file prefix for the file(s) to load.
+    ////##
+    ////## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    ////## the data is stored in multiple files.
+    //virtual std::string GetFilePrefix() const;
 
-    //##Documentation
-    //## @brief Specify file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    virtual void SetFilePrefix(const std::string& aFilePrefix);
+    ////##Documentation
+    ////## @brief Specify file prefix for the file(s) to load.
+    ////##
+    ////## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    ////## the data is stored in multiple files.
+    //virtual void SetFilePrefix(const std::string& aFilePrefix);
 
-    //##Documentation
-    //## @brief Get the specified file pattern for the file(s) to load. The
-    //## sprintf format used to build filename from FilePrefix and number.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    virtual std::string GetFilePattern() const;
+    ////##Documentation
+    ////## @brief Get the specified file pattern for the file(s) to load. The
+    ////## sprintf format used to build filename from FilePrefix and number.
+    ////##
+    ////## You should specify either a FileName or FilePrefix. Use FilePrefix if
+    ////## the data is stored in multiple files.
+    //virtual std::string GetFilePattern() const;
 
-    /**
-    @brief Specified file pattern for the file(s) to load. The sprintf
-    format used to build filename from FilePrefix and number.
+    ///**
+    //@brief Specified file pattern for the file(s) to load. The sprintf
+    //format used to build filename from FilePrefix and number.
 
-    You should specify either a FileName or FilePrefix. Use FilePrefix if
-    the data is stored in multiple files. */
-    virtual void SetFilePattern(const std::string& aFilePattern);
+    //You should specify either a FileName or FilePrefix. Use FilePrefix if
+    //the data is stored in multiple files. */
+    //virtual void SetFilePattern(const std::string& aFilePattern);
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0);
 
@@ -93,18 +93,20 @@ namespace mitk {
 
     virtual std::string GetExtension() const;
 
+    virtual std::string GetSupportedBasedataType() const;
+
     virtual std::string GetDescription() const;
 
     virtual std::list< std::string > GetSupportedOptions() const;
 
-    virtual bool CanWrite(const std::string& path) const;
+    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const;
 
     virtual float GetProgress() const;
 
 
 protected:
     AbstractFileWriter();
-    AbstractFileWriter(std::string extension, std::string description);
+    AbstractFileWriter(std::string basedataType, std::string extension, std::string description);
     virtual ~AbstractFileWriter();
 
     // Filenames etc..
@@ -114,6 +116,7 @@ protected:
 
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;
+    std::string m_BasedataType;
     std::string m_Description;
     int m_Priority;
     std::list< std::string > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required

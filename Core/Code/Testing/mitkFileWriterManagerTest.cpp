@@ -18,12 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkIFileWriter.h>
 #include <mitkFileWriterManager.h>
+#include <mitkFileReaderManager.h>
 #include <mitkGetModuleContext.h>
 #include <mitkModuleContext.h>
 #include <mitkBaseData.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkLegacyFileWriterService.h>
 #include <mitkImage.h>
+#include <mitkCoreObjectFactory.h>
 
 #include <mitkPointSetWriter.h>
 #include <mitkPointSet.h>
@@ -47,14 +49,18 @@ public:
   mitkClassMacro(DummyWriter, itk::LightObject);
   itkNewMacro(Self);
 
-  virtual void Write(itk::SmartPointer<mitk::BaseData> data, const std::istream& stream )
+  virtual void Write(const mitk::BaseData::Pointer data, const std::string& path)
+  {  }
+
+  virtual void Write(const mitk::BaseData::Pointer data, const std::istream& stream )
   {  }
 
   virtual void SetOptions(std::list< std::string > options )
   { m_Options = options; m_Registration.SetProperties(ConstructServiceProperties());}
 
-  virtual void Init(std::string extension, int priority)
+  virtual void Init(std::string basedataType, std::string extension, int priority)
   {
+   m_BasedataType = basedataType;
    m_Extension = extension;
    m_Priority = priority;
    m_Description = "This is a dummy description.";
@@ -79,11 +85,11 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
   DummyWriter* prettyFlyTestDR = new DummyWriter();
   DummyWriter* awesomeTestDR = new DummyWriter();
 
-  testDR->Init("test",1);
-  otherDR->Init("other",1);
+  testDR->Init("testdata", "test",1);
+  otherDR->Init("testdata", "other",1);
 
-  MITK_TEST_CONDITION_REQUIRED(testDR->CanWrite("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
-  MITK_TEST_CONDITION_REQUIRED(!testDR->CanWrite("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
+ // MITK_TEST_CONDITION_REQUIRED(testDR->CanWrite("/this/is/a/folder/file.test"),"Positive test of default CanRead() implementation");
+ // MITK_TEST_CONDITION_REQUIRED(!testDR->CanWrite("/this/is/a/folder/file.tes"),"Negative test of default CanRead() implementation");
 
   mitk::IFileWriter* returned = mitk::FileWriterManager::GetWriter("test");
 
@@ -93,15 +99,14 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(otherDR == returned,"Testing correct retrieval of FileWriter 2/2");
 
-  mediocreTestDR->Init("test",20);
-  prettyFlyTestDR->Init("test",50);
-  awesomeTestDR->Init("test",100);
+  mediocreTestDR->Init("testdata", "test",20);
+  prettyFlyTestDR->Init("testdata", "test",50);
+  awesomeTestDR->Init("testdata", "test",100);
 
   returned = mitk::FileWriterManager::GetWriter("test");
   MITK_TEST_CONDITION_REQUIRED(awesomeTestDR == returned, "Testing correct priorized retrieval of FileWriter: Best Writer");
 
   // Now to give those Writers some options, then we will try again
-
   std::list<std::string> options;
   options.push_front("isANiceGuy");
   mediocreTestDR->SetOptions(options);
@@ -132,22 +137,27 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
 
   // Onward to test the retrieval of multiple Writers
 
-  //std::list< mitk::IFileWriter* > returnedList;
-  //returnedList = mitk::FileWriterManager::GetWriters("test", options);
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 0, "Testing correct return of zero Writers when no matching Writer was found, asking for all compatibles");
+  std::list< mitk::IFileWriter* > returnedList;
+  returnedList = mitk::FileWriterManager::GetWriters("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 0, "Testing correct return of zero Writers when no matching Writer was found, asking for all compatibles");
 
-  //options.clear();
-  //options.push_back("canFly");
-  //returnedList = mitk::FileWriterManager::GetWriters("test", options);
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two Writers when two matching Writer was found, asking for all compatibles");
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correct priorization of returned Writers with options 1/2");
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.back() == prettyFlyTestDR, "Testing correct priorization of returned Writers with options 2/2");
+  options.clear();
+  options.push_back("canFly");
+  returnedList = mitk::FileWriterManager::GetWriters("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 2, "Testing correct return of two Writers when two matching Writer was found, asking for all compatibles");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correct priorization of returned Writers with options 1/2");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.back() == prettyFlyTestDR, "Testing correct priorization of returned Writers with options 2/2");
 
-  //options.clear();
-  //options.push_back("isAwesome");
-  //returnedList = mitk::FileWriterManager::GetWriters("test", options);
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one Writers when one matching Writer was found, asking for all compatibles");
-  //MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correctness of result from former query");
+  options.clear();
+  options.push_back("isAwesome");
+  returnedList = mitk::FileWriterManager::GetWriters("test", options);
+  MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 1, "Testing correct return of one Writers when one matching Writer was found, asking for all compatibles");
+  MITK_TEST_CONDITION_REQUIRED(returnedList.front() == awesomeTestDR, "Testing correctness of result from former query");
+
+  mitk::CoreObjectFactory::GetInstance();
+  mitk::Image::Pointer image = mitk::FileReaderManager::Read<mitk::Image>("F://Build//MITK-Data//Pic2DplusT.nrrd");
+
+  mitk::FileWriterManager::Write(image.GetPointer(), "F://Build//MITK-Data//Pic2DplusTcopy.nrrd");
 
   //// And now to verify a working read chain for a mps file:
   //mitk::PointSetWriter::Pointer psr = mitk::PointSetWriter::New();

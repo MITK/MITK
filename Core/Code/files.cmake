@@ -261,6 +261,7 @@ set(CPP_FILES
 
   IO/mitkAbstractFileReader.cpp
   IO/mitkAbstractFileWriter.cpp
+  IO/mitkLegacyImageWriterService.cpp
   IO/mitkLegacyFileReaderService.cpp
   IO/mitkLegacyFileWriterService.cpp
   IO/mitkBaseDataIOFactory.cpp

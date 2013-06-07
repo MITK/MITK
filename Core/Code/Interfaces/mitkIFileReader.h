@@ -165,6 +165,7 @@ namespace mitk {
     // Microservice properties
     static const std::string PROP_EXTENSION;
     static const std::string PROP_DESCRIPTION;
+    static const std::string PROP_IS_LEGACY;
 
 
     // Microservice names for defined properties

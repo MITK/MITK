@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactoryBase.h"
 #include "mitkFileWriterWithInformation.h"
 #include <mitkLegacyFileReaderService.h>
+#include <mitkLegacyFileWriterService.h>
+#include <mitkLegacyImageWriterService.h>
 
 namespace mitk {
 
@@ -44,7 +46,9 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
     virtual void UnRegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
-    static void RegisterLegacyReaders(mitk::CoreObjectFactoryBase::Pointer factory);
+    void RegisterLegacyReaders(mitk::CoreObjectFactoryBase::Pointer factory);
+    void RegisterLegacyWriters(/*mitk::CoreObjectFactoryBase::Pointer factory*/);
+    std::string GetDescriptionForExtension(const std::string& extension);
   protected:
     CoreObjectFactory();
     void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
@@ -58,7 +62,8 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     std::string m_SaveFileExtensions;
     MultimapType m_SaveFileExtensionsMap;
     static std::list< mitk::LegacyFileReaderService::Pointer > m_LegacyReaders;
-
+    static std::list< mitk::LegacyFileWriterService::Pointer > m_LegacyWriters;
+    static std::list< mitk::LegacyImageWriterService::Pointer > m_LegacyImageWriters;
 };
 
 } // namespace mitk

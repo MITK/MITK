@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
-#define LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
+#ifndef LegacyImageWriterService_H_HEADER_INCLUDED_C1E7E521
+#define LegacyImageWriterService_H_HEADER_INCLUDED_C1E7E521
 
 // Macro
 #include <MitkExports.h>
@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseData.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkFileWriter.h>
+#include <mitkLegacyFileWriterService.h>
 
 // ITK
 #include <itkObjectFactory.h>
@@ -40,30 +41,22 @@ namespace mitk {
 //##Documentation
 //## @brief
 //## @ingroup Process
-  class MITK_CORE_EXPORT LegacyFileWriterService : public itk::LightObject, public mitk::AbstractFileWriter
+  class MITK_CORE_EXPORT LegacyImageWriterService : public mitk::LegacyFileWriterService
 {
   public:
 
-    mitkClassMacro( LegacyFileWriterService, AbstractFileWriter);
+    mitkClassMacro( LegacyImageWriterService, LegacyFileWriterService);
 
-    mitkNewMacro4Param( Self, mitk::FileWriter::Pointer, std::string, std::string, std::string);
+    mitkNewMacro3Param( Self, std::string, std::string, std::string);
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0);
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream );
-
-    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const;
-
-
 protected:
-    LegacyFileWriterService();
-    LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, std::string basedataType, std::string extension, std::string description);
-    virtual ~LegacyFileWriterService();
-
-    mitk::FileWriter::Pointer m_LegacyWriter;
+    LegacyImageWriterService(std::string basedataType, std::string extension, std::string description);
+    virtual ~LegacyImageWriterService();
 
 };
 } // namespace mitk
 
 
-#endif /* LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521 */
+#endif /* LegacyImageWriterService_H_HEADER_INCLUDED_C1E7E521 */

@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFileWriterManager.h"
 
+// MITK
+#include <mitkCoreObjectFactory.h>
+
 // Microservices
 #include <usGetModuleContext.h>
 #include <mitkModuleContext.h>
@@ -25,19 +28,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //////////////////// WRITING DIRECTLY ////////////////////
 
-void mitk::FileWriterManager::Write(mitk::BaseData::Pointer data, const std::string& path)
+void mitk::FileWriterManager::Write(mitk::BaseData::Pointer data, const std::string& path, mitk::ModuleContext* context)
 {
-  //mitk::ModuleContext * context = mitk::GetModuleContext();
-  //// Find extension
-  //std::string extension = path;
-  //extension.erase(0, path.find_last_of('.'));
+  // Find extension
+  std::string extension = path;
+  extension.erase(0, path.find_last_of('.'));
 
-  //// Get best Writer
-  //mitk::IFileWriter* Writer = GetWriter(extension);
-  //// Throw exception if no compatible Writer was found
-  //if (Writer == 0) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterManager, but no Writer supporting this filetype was found.";
-  //itk::SmartPointer<mitk::BaseData> result = Writer->Write(data, path);
-  //return result;
+  // Get best Writer
+  mitk::IFileWriter* Writer = GetWriter(extension);
+  // Throw exception if no compatible Writer was found
+  if (Writer == 0) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterManager, but no Writer supporting this filetype was found.";
+  Writer->Write(data, path);
 }
 
 
@@ -88,6 +89,22 @@ std::list <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::st
   return result;
 }
 
+//////////////////// GENERIC INFORMATION ////////////////////
+
+std::string mitk::FileWriterManager::GetSupportedExtensions(const std::string& extension)
+{
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  std::list<mitk::ServiceReference> refs = GetWriterList(extension, context);
+  return CreateFileDialogString(refs);
+}
+
+std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& basedataType)
+{
+  mitk::ModuleContext* context = mitk::GetModuleContext();
+  std::list<mitk::ServiceReference> refs = GetWriterListByBasedataType(basedataType, context);
+  return CreateFileDialogString(refs);
+}
+
 
 //////////////////// INTERNAL CODE ////////////////////
 
@@ -111,6 +128,31 @@ bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* Writer, s
   return true; // if all options have been found, return true
 }
 
+std::string mitk::FileWriterManager::CreateFileDialogString(std::list<mitk::ServiceReference> refs)
+{
+  std::list<std::string> entries; // Will contain Description + Extension (Human readable)
+  std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
+  for (std::list<mitk::ServiceReference>::const_iterator iterator = refs.begin(), end = refs.end(); iterator != end; ++iterator)
+  {
+    // Generate List of Extensions
+    if (iterator == refs.begin()) // First entry without semicolon
+      knownExtensions += "*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString();
+    else // Ad semicolon for each following entry
+      knownExtensions += "; *" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString();
+
+    // Generate List of human readable entries composed of Description + Extension
+    std::string entry = iterator->GetProperty(mitk::IFileWriter::PROP_DESCRIPTION).ToString() + "(*" + iterator->GetProperty(mitk::IFileWriter::PROP_EXTENSION).ToString() + ");;";
+    entries.push_back(entry);
+  }
+  entries.sort();
+  entries.push_front("Known Extensions (" + knownExtensions + ");;");
+  entries.push_front("All (*);;");
+
+  std::string result;
+  for (std::list<std::string>::const_iterator iterator = entries.begin(), end = entries.end(); iterator != end; ++iterator)
+    result = result.append(*iterator);
+  return result;
+}
 
 
 //////////////////// uS-INTERACTION ////////////////////
@@ -118,7 +160,21 @@ bool mitk::FileWriterManager::WriterSupportsOptions(mitk::IFileWriter* Writer, s
 std::list< mitk::ServiceReference > mitk::FileWriterManager::GetWriterList(const std::string& extension, mitk::ModuleContext* context )
 {
   // filter for class and extension
-  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileWriter)(" + mitk::IFileWriter::PROP_EXTENSION + "=" + extension + "))";
+  std::string filter;
+  if (extension == "")
+    filter = "";
+  else
+    filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileWriter)(" + mitk::IFileWriter::PROP_EXTENSION + "=" + extension + "))";
+  std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileWriter", filter);
+  result.sort();
+  std::reverse(result.begin(), result.end());
+  return result;
+}
+
+std::list< mitk::ServiceReference > mitk::FileWriterManager::GetWriterListByBasedataType(const std::string& basedataType, mitk::ModuleContext* context )
+{
+  // filter for class and extension
+  std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=org.mitk.services.FileWriter)(" + mitk::IFileWriter::PROP_BASEDATA_TYPE + "=" + basedataType + "))";
   std::list <mitk::ServiceReference> result = context->GetServiceReferences("org.mitk.services.FileWriter", filter);
   result.sort();
   std::reverse(result.begin(), result.end());

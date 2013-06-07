@@ -28,6 +28,10 @@ RegistryObjectFactory::RegistryObjectFactory(ExtensionRegistry* registry)
 {
 }
 
+RegistryObjectFactory::~RegistryObjectFactory()
+{
+}
+
 SmartPointer<RegistryContribution>
 RegistryObjectFactory::CreateContribution(const QString& contributorId,
                                           bool persist)

@@ -19,6 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+IDropTargetListener::~IDropTargetListener()
+{
+}
+
 void IDropTargetListener::Events::AddListener(IDropTargetListener* l)
 {
   if (l == 0) return;

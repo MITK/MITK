@@ -32,6 +32,8 @@ namespace berry {
 struct BERRY_UI_QT IDropTargetListener
 {
 
+  virtual ~IDropTargetListener();
+
   struct Events {
 
     enum Type {

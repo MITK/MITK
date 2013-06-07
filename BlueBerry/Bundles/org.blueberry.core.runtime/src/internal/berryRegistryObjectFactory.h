@@ -44,6 +44,8 @@ public:
 
   RegistryObjectFactory(ExtensionRegistry* registry);
 
+  virtual ~RegistryObjectFactory();
+
   ////////////////////////////////////////////////////////////////////////////
   // Contribution
   virtual SmartPointer<RegistryContribution> CreateContribution(const QString& contributorId,

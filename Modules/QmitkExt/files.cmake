@@ -115,6 +115,7 @@ set(CPP_FILES
  QmitkBoundingObjectWidget.cpp
  QmitkFastMarchingTool3DGUI.cpp
  QmitkLiveWireTool2DGUI.cpp
+ QmitkFastMarchingToolGUI.cpp
 
  QmitkAdaptiveRegionGrowingWidget.cpp
 
@@ -230,6 +231,7 @@ set(MOC_H_FILES
  QmitkAdaptiveRegionGrowingWidget.h
  QmitkFastMarchingTool3DGUI.h
  QmitkLiveWireTool2DGUI.h
+ QmitkFastMarchingToolGUI.h
 
  QmitkHistogramJSWidget.h
 

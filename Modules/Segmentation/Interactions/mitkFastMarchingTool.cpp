@@ -44,10 +44,12 @@ sigma(1.0),
 alpha(-0.5),
 beta(3.0)
 {
+  /* Connect UI events */
   CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 
+  /*setup ITK filters */
   m_SliceInITK = InternalImageType::New();
 
   thresholder = ThresholdingFilterType::New();

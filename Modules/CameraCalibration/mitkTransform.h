@@ -294,6 +294,8 @@ namespace mitk {
     Transform(const mitk::AffineTransform3D* nd);
     Transform(const std::string& s);
 
+    vnl_matrix_fixed<mitk::ScalarType, 3, 3> GetRotationMatrixFromQuaternion(mitk::Quaternion q) const;
+
     // everything is stored here
     mitk::NavigationData::Pointer m_NavData;
 

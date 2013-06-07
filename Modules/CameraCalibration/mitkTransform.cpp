@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransform.h"
 #include <fstream>
 #include <vnl/vnl_inverse.h>
+#include <itkQuaternionRigidTransform.h>
 #include <mitkVnlVectorFixedCaster.h>
 #include <mitkVnlVectorFromCvMat.h>
 #include <mitkVnlMatrixFromCvMat.h>
@@ -89,9 +90,68 @@ namespace mitk
 
   void Transform::Concatenate( mitk::Transform* transform )
   {
-    vnl_matrix_fixed<mitk::ScalarType, 4, 4> mat = transform->GetMatrix();
-    mat = mat * this->GetMatrix(); //
-    this->SetMatrix( mat );
+    //do calculation with double precision for better results:
+
+    //convert to double
+    vnl_matrix_fixed<double, 4, 4> thisMatrix = vnl_matrix_fixed<double, 4, 4>();
+    thisMatrix[0][0] = this->GetMatrix()[0][0];
+    thisMatrix[0][1] = this->GetMatrix()[0][1];
+    thisMatrix[0][2] = this->GetMatrix()[0][2];
+    thisMatrix[0][3] = this->GetMatrix()[0][3];
+    thisMatrix[1][0] = this->GetMatrix()[1][0];
+    thisMatrix[1][1] = this->GetMatrix()[1][1];
+    thisMatrix[1][2] = this->GetMatrix()[1][2];
+    thisMatrix[1][3] = this->GetMatrix()[1][3];
+    thisMatrix[2][0] = this->GetMatrix()[2][0];
+    thisMatrix[2][1] = this->GetMatrix()[2][1];
+    thisMatrix[2][2] = this->GetMatrix()[2][2];
+    thisMatrix[2][3] = this->GetMatrix()[2][3];
+    thisMatrix[3][0] = this->GetMatrix()[3][0];
+    thisMatrix[3][1] = this->GetMatrix()[3][1];
+    thisMatrix[3][2] = this->GetMatrix()[3][2];
+    thisMatrix[3][3] = this->GetMatrix()[3][3];
+
+    vnl_matrix_fixed<double, 4, 4> secondMatrix = vnl_matrix_fixed<double, 4, 4>();
+    secondMatrix[0][0] = transform->GetMatrix()[0][0];
+    secondMatrix[0][1] = transform->GetMatrix()[0][1];
+    secondMatrix[0][2] = transform->GetMatrix()[0][2];
+    secondMatrix[0][3] = transform->GetMatrix()[0][3];
+    secondMatrix[1][0] = transform->GetMatrix()[1][0];
+    secondMatrix[1][1] = transform->GetMatrix()[1][1];
+    secondMatrix[1][2] = transform->GetMatrix()[1][2];
+    secondMatrix[1][3] = transform->GetMatrix()[1][3];
+    secondMatrix[2][0] = transform->GetMatrix()[2][0];
+    secondMatrix[2][1] = transform->GetMatrix()[2][1];
+    secondMatrix[2][2] = transform->GetMatrix()[2][2];
+    secondMatrix[2][3] = transform->GetMatrix()[2][3];
+    secondMatrix[3][0] = transform->GetMatrix()[3][0];
+    secondMatrix[3][1] = transform->GetMatrix()[3][1];
+    secondMatrix[3][2] = transform->GetMatrix()[3][2];
+    secondMatrix[3][3] = transform->GetMatrix()[3][3];
+
+    //concatenate
+    vnl_matrix_fixed<double, 4, 4> resultMatrix =  secondMatrix * thisMatrix;
+
+    //convert back to float
+    vnl_matrix_fixed<mitk::ScalarType, 4, 4> finalMatrix = vnl_matrix_fixed<mitk::ScalarType, 4, 4>();
+    finalMatrix[0][0] = resultMatrix[0][0];
+    finalMatrix[0][1] = resultMatrix[0][1];
+    finalMatrix[0][2] = resultMatrix[0][2];
+    finalMatrix[0][3] = resultMatrix[0][3];
+    finalMatrix[1][0] = resultMatrix[1][0];
+    finalMatrix[1][1] = resultMatrix[1][1];
+    finalMatrix[1][2] = resultMatrix[1][2];
+    finalMatrix[1][3] = resultMatrix[1][3];
+    finalMatrix[2][0] = resultMatrix[2][0];
+    finalMatrix[2][1] = resultMatrix[2][1];
+    finalMatrix[2][2] = resultMatrix[2][2];
+    finalMatrix[2][3] = resultMatrix[2][3];
+    finalMatrix[3][0] = resultMatrix[3][0];
+    finalMatrix[3][1] = resultMatrix[3][1];
+    finalMatrix[3][2] = resultMatrix[3][2];
+    finalMatrix[3][3] = resultMatrix[3][3];
+
+    this->SetMatrix( finalMatrix );
 
   }
 
@@ -370,9 +430,51 @@ namespace mitk
   }
 
   void Transform::Invert()
-  {
-    vnl_matrix_fixed<mitk::ScalarType, 4, 4> tmp(this->GetMatrix());
-    this->SetMatrix( vnl_inverse( tmp ) );
+  { //do calculation with double precision for better results:
+
+    //convert to double
+    vnl_matrix_fixed<double, 4, 4> originMatrix = vnl_matrix_fixed<double, 4, 4>();
+    originMatrix[0][0] = this->GetMatrix()[0][0];
+    originMatrix[0][1] = this->GetMatrix()[0][1];
+    originMatrix[0][2] = this->GetMatrix()[0][2];
+    originMatrix[0][3] = this->GetMatrix()[0][3];
+    originMatrix[1][0] = this->GetMatrix()[1][0];
+    originMatrix[1][1] = this->GetMatrix()[1][1];
+    originMatrix[1][2] = this->GetMatrix()[1][2];
+    originMatrix[1][3] = this->GetMatrix()[1][3];
+    originMatrix[2][0] = this->GetMatrix()[2][0];
+    originMatrix[2][1] = this->GetMatrix()[2][1];
+    originMatrix[2][2] = this->GetMatrix()[2][2];
+    originMatrix[2][3] = this->GetMatrix()[2][3];
+    originMatrix[3][0] = this->GetMatrix()[3][0];
+    originMatrix[3][1] = this->GetMatrix()[3][1];
+    originMatrix[3][2] = this->GetMatrix()[3][2];
+    originMatrix[3][3] = this->GetMatrix()[3][3];
+
+    //invert
+    vnl_matrix_fixed<double, 4, 4> invertedMatrix = vnl_inverse(originMatrix);
+
+
+    //convert back to float
+    vnl_matrix_fixed<mitk::ScalarType, 4, 4> finalMatrix = vnl_matrix_fixed<mitk::ScalarType, 4, 4>();
+    finalMatrix[0][0] = invertedMatrix[0][0];
+    finalMatrix[0][1] = invertedMatrix[0][1];
+    finalMatrix[0][2] = invertedMatrix[0][2];
+    finalMatrix[0][3] = invertedMatrix[0][3];
+    finalMatrix[1][0] = invertedMatrix[1][0];
+    finalMatrix[1][1] = invertedMatrix[1][1];
+    finalMatrix[1][2] = invertedMatrix[1][2];
+    finalMatrix[1][3] = invertedMatrix[1][3];
+    finalMatrix[2][0] = invertedMatrix[2][0];
+    finalMatrix[2][1] = invertedMatrix[2][1];
+    finalMatrix[2][2] = invertedMatrix[2][2];
+    finalMatrix[2][3] = invertedMatrix[2][3];
+    finalMatrix[3][0] = invertedMatrix[3][0];
+    finalMatrix[3][1] = invertedMatrix[3][1];
+    finalMatrix[3][2] = invertedMatrix[3][2];
+    finalMatrix[3][3] = invertedMatrix[3][3];
+
+    this->SetMatrix(finalMatrix);
   }
 
   void Transform::SetMatrix(
@@ -440,15 +542,15 @@ namespace mitk
   {
     mitk::AffineTransform3D::Pointer returnValue = mitk::AffineTransform3D::New();
     itk::Matrix<float,3,3> rotation = itk::Matrix<float,3,3>();
-    rotation[0][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][0];
-    rotation[0][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][1];
-    rotation[0][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[0][2];
-    rotation[1][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][0];
-    rotation[1][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][1];
-    rotation[1][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[1][2];
-    rotation[2][0] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][0];
-    rotation[2][1] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][1];
-    rotation[2][2] = m_NavData->GetOrientation().rotation_matrix_transpose()[2][2];
+    rotation[0][0] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[0][0];
+    rotation[0][1] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[0][1];
+    rotation[0][2] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[0][2];
+    rotation[1][0] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[1][0];
+    rotation[1][1] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[1][1];
+    rotation[1][2] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[1][2];
+    rotation[2][0] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[2][0];
+    rotation[2][1] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[2][1];
+    rotation[2][2] = GetRotationMatrixFromQuaternion(m_NavData->GetOrientation())[2][2];
     itk::Vector<float,3> translation = itk::Vector<float,3>();
     translation[0] = m_NavData->GetPosition()[0];
     translation[1] = m_NavData->GetPosition()[1];
@@ -565,7 +667,42 @@ namespace mitk
 
   vnl_matrix_fixed<mitk::ScalarType, 3, 3> Transform::GetVnlRotationMatrix() const
   {
-    return m_NavData->GetOrientation().rotation_matrix_transpose();
+    return GetRotationMatrixFromQuaternion(m_NavData->GetOrientation());
+  }
+
+  vnl_matrix_fixed<mitk::ScalarType, 3, 3> Transform::GetRotationMatrixFromQuaternion(mitk::Quaternion orientation) const
+  {
+  vnl_matrix_fixed<mitk::ScalarType, 3, 3> returnValue;
+  //variant 1:
+    returnValue = orientation.rotation_matrix_transpose();
+
+  //variant 2:
+
+    //itk::QuaternionRigidTransform<double>::Pointer quatTransform = itk::QuaternionRigidTransform<double>::New();
+
+    //// convert mitk::ScalarType quaternion to double quaternion because of itk bug
+    //vnl_quaternion<double> doubleQuaternion(orientation.x(), orientation.y(), orientation.z(), orientation.r());
+    //quatTransform->SetIdentity();
+    //quatTransform->SetRotation(doubleQuaternion);
+    //quatTransform->Modified();
+
+    ///* because of an itk bug, the transform can not be calculated with float data type.
+    //To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float*/
+    //mitk::AffineTransform3D::MatrixType m;
+    //mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+    //returnValue[0][0] = m[0][0];
+    //returnValue[0][1] = m[0][1];
+    //returnValue[0][2] = m[0][2];
+    //returnValue[1][0] = m[1][0];
+    //returnValue[1][1] = m[1][1];
+    //returnValue[1][2] = m[1][2];
+    //returnValue[2][0] = m[2][0];
+    //returnValue[2][1] = m[2][1];
+    //returnValue[2][2] = m[2][2];
+
+    return returnValue;
+
+
   }
 
   vnl_matrix_fixed<double, 4, 4> Transform::GetVnlDoubleMatrix() const

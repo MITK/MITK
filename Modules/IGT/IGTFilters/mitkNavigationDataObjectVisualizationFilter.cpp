@@ -142,7 +142,9 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
       /* because of an itk bug, the transform can not be calculated with float data type.
       To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
       static AffineTransform3D::MatrixType m;
-      mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+      //mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+      vnl_matrix_fixed<float,3,3> rot = orientation.rotation_matrix_transpose();
+      for(int i=0; i<3; i++) for (int j=0; j<3; j++) m[i][j] = rot[i][j];
       affineTransform->SetMatrix(m);
     }
     if (this->GetTransformPosition(index) == true)

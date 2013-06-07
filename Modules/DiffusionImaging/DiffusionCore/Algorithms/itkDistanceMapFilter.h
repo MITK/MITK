@@ -27,18 +27,10 @@ namespace itk
 template < class TInputImage, class TOutputImage >
 class DistanceMapFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-  /*!
-  \brief itkDistanceMapFilter
-
-  \brief Creates a distance map from a FA skeleton image.
-
-  \sa itkImageToImageFilter
-
-
-  \verbatim
-  Last contributor: $Author: vanbrugg $
-  \endverbatim
-  */
+    /**
+      * \brief This filter creates a map of the distance to the nearest point on a binary mask.
+      *
+      */
 
 public:
 

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkTbssSkeletonizationView.h"
 
+
 #include <itkSkeletonizationFilter.h>
 #include <itkProjectionFilter.h>
 #include <itkDistanceMapFilter.h>
@@ -25,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileReader.h>
 
 // Qt
-#include <QInputDialog>Gaimersheim
+#include <QInputDialog>
 #include <QMessageBox>
 
 //vtk

@@ -290,6 +290,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
   transform->SetSourceLandmarks(sourcePoints);
   transform->SetTargetLandmarks(targetPoints);
+  transform->SetModeToRigidBody();
   transform->Modified();
   transform->Update();
 

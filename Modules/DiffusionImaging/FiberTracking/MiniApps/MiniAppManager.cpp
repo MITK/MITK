@@ -51,8 +51,8 @@ int MiniAppManager::RunMiniApp(int argc, char* argv[])
         }
         else
         {
-            nameOfMiniApp = argv[argc-1];
-            --argc;
+            nameOfMiniApp = argv[1];
+            //--argc;
         }
 
         it = m_Functions.find(nameOfMiniApp);

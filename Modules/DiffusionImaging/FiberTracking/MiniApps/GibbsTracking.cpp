@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiffusionTensor3D.h>
 #include <itkShCoefficientImageImporter.h>
 #include <mitkImageToItk.h>
+#include <mitkIOUtil.h>
+#include "ctkCommandLineParser.h"
 
 template<int shOrder>
 typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit)
@@ -58,24 +60,26 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
 
 int GibbsTracking(int argc, char* argv[])
 {
-    if (argc<6)
-    {
-        std::cout << std::endl;
-        std::cout << "Performes Gibbs Tracking" << std::endl;
-        std::cout << std::endl;
-        std::cout << "usage: " << argv[0] << " <in-filename> <parameter file name> <fib-out-filename> <mask-in-filename> <sh coefficient convention (FSL, MRtrix)>" << std::endl;
-        std::cout << std::endl;
+    ctkCommandLineParser parser;
+    parser.setArgumentPrefix("--", "-");
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", mitk::Any(), false);
+    parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", mitk::Any(), false);
+    parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix) (default = FSL)");
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
+
+    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    if (parsedArgs.size()==0)
         return EXIT_FAILURE;
-    }
+
+    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
+    string paramFileName = mitk::any_cast<string>(parsedArgs["parameters"]);
+    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
 
     try
     {
         RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
-
-        std::cout << "input: " << argv[1] << std::endl;
-        std::cout << "param: "  << argv[2] << std::endl;
-        std::cout << "output: " << argv[3] << std::endl;
 
         // instantiate gibbs tracker
         typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
@@ -85,10 +89,10 @@ int GibbsTracking(int argc, char* argv[])
 
         // load input image
         const std::string s1="", s2="";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[1], s1, s2, false );
+        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
 
         // try to cast to qball image
-        QString inImageName(argv[1]);
+        QString inImageName(inFileName.c_str());
         if( inImageName.endsWith(".qbi") )
         {
             MITK_INFO << "Loading qball image ...";
@@ -127,9 +131,10 @@ int GibbsTracking(int argc, char* argv[])
             MITK_INFO << "using SH-order " << shOrder;
 
             int toolkitConvention = 0;
-            if(argc==6)
+
+            if (parsedArgs.count("shConvention"))
             {
-                QString convention(argv[5]);
+                QString convention(mitk::any_cast<string>(parsedArgs["shConvention"]).c_str());
                 if ( convention.compare("MRtrix", Qt::CaseInsensitive)==0 )
                 {
                     toolkitConvention = 1;
@@ -166,34 +171,27 @@ int GibbsTracking(int argc, char* argv[])
             return EXIT_FAILURE;
 
         // global tracking
-        if(argc>=5)
+        if (parsedArgs.count("mask"))
         {
             typedef itk::Image<float,3> MaskImgType;
-            std::cout << "mask: " << argv[4]<< std::endl;
-            infile = mitk::BaseDataIO::LoadBaseDataFromFile( argv[4], s1, s2, false );
-            mitk::Image::Pointer mitkMaskImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
+            mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(mitk::any_cast<string>(parsedArgs["mask"]));
             MaskImgType::Pointer itk_mask = MaskImgType::New();
             mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);
         }
-        else{
-            std::cout << "perform tracking without mask" << std::endl;
-        }
 
         gibbsTracker->SetDuplicateImage(false);
-        gibbsTracker->SetLoadParameterFile( argv[2] );
+        gibbsTracker->SetLoadParameterFile( paramFileName );
 //        gibbsTracker->SetLutPath( "" );
         gibbsTracker->Update();
 
         mitk::FiberBundleX::Pointer mitkFiberBundle = mitk::FiberBundleX::New(gibbsTracker->GetFiberBundle());
 
-        std::string outfilename = argv[3];
-        MITK_INFO << "searching writer";
         mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
         {
             if ( (*it)->CanWriteBaseDataType(mitkFiberBundle.GetPointer()) ) {
-                (*it)->SetFileName( outfilename.c_str() );
+                (*it)->SetFileName( outFileName.c_str() );
                 (*it)->DoWrite( mitkFiberBundle.GetPointer() );
             }
         }

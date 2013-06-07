@@ -26,6 +26,8 @@ IF(BUILD_FiberTrackingMiniApps)
   SET(FIBERTRACKING_ADDITIONAL_FILES
     MiniAppManager.cpp
     GibbsTracking.cpp
+    StreamlineTracking.cpp
+    TractometerAngularErrorTool.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

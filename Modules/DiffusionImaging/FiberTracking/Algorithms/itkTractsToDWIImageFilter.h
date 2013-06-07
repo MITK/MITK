@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionSignalModel.h>
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkKspaceArtifact.h>
-#include <mitkGibbsRingingArtifact.h>
 
 // ITK
 #include <itkImage.h>
@@ -91,6 +90,7 @@ public:
     itkSetMacro( SimulateEddyCurrents, bool )
     itkSetMacro( SimulateRelaxation, bool )
     itkSetMacro( EddyGradientStrength, double )
+    itkSetMacro( Upsampling, double )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -131,7 +131,7 @@ protected:
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
-    unsigned int                        m_Upsampling;
+    double                              m_Upsampling;           ///< causes ringing artifacts
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;

@@ -599,12 +599,12 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
         vtkPoints* points = cell->GetPoints();
 
         vtkCell* cellOriginal = m_FiberPolyData->GetCell(i);
-        int numPointsOriginal = cell->GetNumberOfPoints();
-        vtkPoints* pointsOriginal = cell->GetPoints();
+        int numPointsOriginal = cellOriginal->GetNumberOfPoints();
+        vtkPoints* pointsOriginal = cellOriginal->GetPoints();
 
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
 
-        if (numPoints>1)
+        if (numPoints>1 && numPointsOriginal)
         {
             if (anyPoint)
             {
@@ -617,7 +617,7 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
                     itk::Index<3> idx;
                     mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                    if ( mask->GetPixel(idx)>0 )
+                    if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
                     {
                         for (int k=0; k<numPointsOriginal; k++)
                         {
@@ -631,23 +631,23 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
             }
             else
             {
-                double* start = points->GetPoint(0);
+                double* start = pointsOriginal->GetPoint(0);
                 itk::Point<float, 3> itkStart;
                 itkStart[0] = start[0]; itkStart[1] = start[1]; itkStart[2] = start[2];
                 itk::Index<3> idxStart;
                 mask->TransformPhysicalPointToIndex(itkStart, idxStart);
 
-                double* end = points->GetPoint(numPoints-1);
+                double* end = pointsOriginal->GetPoint(numPointsOriginal-1);
                 itk::Point<float, 3> itkEnd;
                 itkEnd[0] = end[0]; itkEnd[1] = end[1]; itkEnd[2] = end[2];
                 itk::Index<3> idxEnd;
                 mask->TransformPhysicalPointToIndex(itkEnd, idxEnd);
 
-                if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 )
+                if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
                 {
-                    for (int j=0; j<numPoints; j++)
+                    for (int j=0; j<numPointsOriginal; j++)
                     {
-                        double* p = points->GetPoint(j);
+                        double* p = pointsOriginal->GetPoint(j);
                         vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                         container->GetPointIds()->InsertNextId(id);
                     }

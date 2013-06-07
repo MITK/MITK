@@ -45,7 +45,7 @@ namespace itk{
     typedef ImageSource< Image< vcl_complex< TPixelType >, 2 > > Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
 
     /** Runtime information support. */
     itkTypeMacro(KspaceImageFilter, ImageToImageFilter)
@@ -67,6 +67,7 @@ namespace itk{
     itkSetMacro( Z, double )
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( SignalScale, double )
+    itkSetMacro( OutSize, itk::Size<2> )
 
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; }
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }
@@ -85,6 +86,7 @@ namespace itk{
     bool                                    m_SimulateDistortions;
     bool                                    m_SimulateEddyCurrents;
 
+    typename InputImageType::Pointer        m_TEMPIMAGE;
     typename InputImageType::Pointer        m_FrequencyMap;
     double                                  m_tLine;
     double                                  m_kOffset;
@@ -100,6 +102,7 @@ namespace itk{
     MatrixType                              m_DirectionMatrix;
     bool                                    m_IsBaseline;
     double                                  m_SignalScale;
+    itk::Size<2>                            m_OutSize;
 
   private:
 

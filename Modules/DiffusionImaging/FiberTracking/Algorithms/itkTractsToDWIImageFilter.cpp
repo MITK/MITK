@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 #include <itkImageRegionIteratorWithIndex.h>
-#include <mitkGibbsRingingArtifact.h>
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkBSplineInterpolateImageFunction.h>
@@ -113,7 +112,6 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
     for (int g=0; g<images.at(0)->GetVectorLength(); g++)
         for (int z=0; z<images.at(0)->GetLargestPossibleRegion().GetSize(2); z++)
         {
-            ++disp;
             std::vector< SliceType::Pointer > compartmentSlices;
             std::vector< double > t2Vector;
 
@@ -150,6 +148,7 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
             }
 
             // create k-sapce (inverse fourier transform slices)
+            itk::Size<2> outSize; outSize.SetElement(0, m_ImageRegion.GetSize(0)); outSize.SetElement(1, m_ImageRegion.GetSize(1));
             itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
             idft->SetCompartmentImages(compartmentSlices);
             idft->SetT2(t2Vector);
@@ -165,15 +164,14 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
             idft->SetDiffusionGradientDirection(m_FiberModels.at(0)->GetGradientDirection(g));
             idft->SetFrequencyMap(fMap);
             idft->SetSignalScale(m_SignalScale);
+            idft->SetOutSize(outSize);
             idft->Update();
 
             ComplexSliceType::Pointer fSlice;
             fSlice = idft->GetOutput();
-            fSlice = RearrangeSlice(fSlice);
 
-            // add artifacts
-            for (int a=0; a<m_KspaceArtifacts.size(); a++)
-                fSlice = m_KspaceArtifacts.at(a)->AddArtifact(fSlice);
+            for (int i=0; i<m_KspaceArtifacts.size(); i++)
+                fSlice = m_KspaceArtifacts.at(i)->AddArtifact(fSlice);
 
             // fourier transform slice
             SliceType::Pointer newSlice;
@@ -194,6 +192,7 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
                     newImage->SetPixel(index3D, pix3D);
                 }
 
+            ++disp;
         }
     return newImage;
 }
@@ -253,10 +252,7 @@ void TractsToDWIImageFilter::GenerateData()
     if (baselineIndex<0)
         itkExceptionMacro("No baseline index found!");
 
-    // determine k-space undersampling
-    for (int i=0; i<m_KspaceArtifacts.size(); i++)
-        if ( dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i)) )
-            m_Upsampling = dynamic_cast<mitk::GibbsRingingArtifact<double>*>(m_KspaceArtifacts.at(i))->GetKspaceCropping();
+    // check k-space undersampling
     if (m_Upsampling<1)
         m_Upsampling = 1;
 
@@ -268,8 +264,9 @@ void TractsToDWIImageFilter::GenerateData()
         m_DirectionMatrix = m_TissueMask->GetDirection();
         m_ImageRegion = m_TissueMask->GetLargestPossibleRegion();
 
-        if (m_Upsampling>1)
+        if (m_Upsampling>1.00001)
         {
+            MITK_INFO << "Adding ringing artifacts. Image upsampling factor: " << m_Upsampling;
             ImageRegion<3> region = m_ImageRegion;
             region.SetSize(0, m_ImageRegion.GetSize(0)*m_Upsampling);
             region.SetSize(1, m_ImageRegion.GetSize(1)*m_Upsampling);
@@ -317,15 +314,9 @@ void TractsToDWIImageFilter::GenerateData()
 
     // if not, adjust size and dimension (needed for FFT); zero-padding
     if (x!=m_ImageRegion.GetSize(0))
-    {
-        MITK_INFO << "Adjusting image width: " << m_ImageRegion.GetSize(0) << " --> " << x << " --> " << x*m_Upsampling;
         m_ImageRegion.SetSize(0, x);
-    }
     if (y!=m_ImageRegion.GetSize(1))
-    {
-        MITK_INFO << "Adjusting image height: " << m_ImageRegion.GetSize(1) << " --> " << y << " --> " << y*m_Upsampling;
         m_ImageRegion.SetSize(1, y);
-    }
 
     // apply undersampling to image parameters
     m_UpsampledSpacing = m_Spacing;
@@ -416,32 +407,29 @@ void TractsToDWIImageFilter::GenerateData()
     double interpFact = 2*atan(-0.5*m_InterpolationShrink);
     double maxVolume = 0;
 
-    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
-
     MITK_INFO << "Generating signal of " << m_FiberModels.size() << " fiber compartments";
+    vtkSmartPointer<vtkPolyData> fiberPolyData = fiberBundle->GetFiberPolyData();
     boost::progress_display disp(numFibers);
     for( int i=0; i<numFibers; i++ )
     {
-        ++disp;
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+        vtkCell* cell = fiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
         if (numPoints<2)
             continue;
 
         for( int j=0; j<numPoints; j++)
         {
-            double* temp = fiberPolyData->GetPoint(points[j]);
+            double* temp = points->GetPoint(j);
             itk::Point<float, 3> vertex = GetItkPoint(temp);
             itk::Vector<double> v = GetItkVector(temp);
 
             itk::Vector<double, 3> dir(3);
             if (j<numPoints-1)
-                dir = GetItkVector(fiberPolyData->GetPoint(points[j+1]))-v;
+                dir = GetItkVector(points->GetPoint(j+1))-v;
             else
-                dir = v-GetItkVector(fiberPolyData->GetPoint(points[j-1]));
+                dir = v-GetItkVector(points->GetPoint(j-1));
 
             itk::Index<3> idx;
             itk::ContinuousIndex<float, 3> contIndex;
@@ -528,6 +516,7 @@ void TractsToDWIImageFilter::GenerateData()
                 }
             }
         }
+        ++disp;
     }
 
     MITK_INFO << "Generating signal of " << m_NonFiberModels.size() << " non-fiber compartments";
@@ -541,7 +530,6 @@ void TractsToDWIImageFilter::GenerateData()
 
     while(!it3.IsAtEnd())
     {
-        ++disp3;
         DoubleDwiType::IndexType index = it3.GetIndex();
 
         if (it3.Get()>0)
@@ -599,11 +587,12 @@ void TractsToDWIImageFilter::GenerateData()
             }
         }
         ++it3;
+        ++disp3;
     }
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
-    if (m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents)
+    if (m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_Upsampling>1.00001)
     {
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);

@@ -56,31 +56,32 @@ void KspaceImageFilter< TPixelType >
     outputImage->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
     outputImage->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
     outputImage->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
-    outputImage->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-    outputImage->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-    outputImage->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+    itk::ImageRegion<2> region; region.SetSize(0, m_OutSize[0]);  region.SetSize(1, m_OutSize[1]);
+    outputImage->SetLargestPossibleRegion( region );
+    outputImage->SetBufferedRegion( region );
+    outputImage->SetRequestedRegion( region );
     outputImage->Allocate();
 
-    typename InputImageType::Pointer tempImage = InputImageType::New();
-    tempImage->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
-    tempImage->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
-    tempImage->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
-    tempImage->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-    tempImage->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-    tempImage->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
-    tempImage->Allocate();
+    m_TEMPIMAGE = InputImageType::New();
+    m_TEMPIMAGE->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
+    m_TEMPIMAGE->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
+    m_TEMPIMAGE->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
+    m_TEMPIMAGE->SetLargestPossibleRegion( region );
+    m_TEMPIMAGE->SetBufferedRegion( region );
+    m_TEMPIMAGE->SetRequestedRegion( region );
+    m_TEMPIMAGE->Allocate();
 
     m_SimulateDistortions = true;
     if (m_FrequencyMap.IsNull())
     {
         m_SimulateDistortions = false;
         m_FrequencyMap = InputImageType::New();
-        m_FrequencyMap->SetSpacing( outputImage->GetSpacing() );
-        m_FrequencyMap->SetOrigin( outputImage->GetOrigin() );
-        m_FrequencyMap->SetDirection( outputImage->GetDirection() );
-        m_FrequencyMap->SetLargestPossibleRegion( outputImage->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetBufferedRegion( outputImage->GetLargestPossibleRegion() );
-        m_FrequencyMap->SetRequestedRegion( outputImage->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetSpacing( m_CompartmentImages.at(0)->GetSpacing() );
+        m_FrequencyMap->SetOrigin( m_CompartmentImages.at(0)->GetOrigin() );
+        m_FrequencyMap->SetDirection( m_CompartmentImages.at(0)->GetDirection() );
+        m_FrequencyMap->SetLargestPossibleRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetBufferedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
+        m_FrequencyMap->SetRequestedRegion( m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
         m_FrequencyMap->Allocate();
         m_FrequencyMap->FillBuffer(0);
     }
@@ -97,7 +98,6 @@ void KspaceImageFilter< TPixelType >
         m_EddyGradientMagnitude = gamma*m_EddyGradientMagnitude/1000;
 
     this->SetNthOutput(0, outputImage);
-    this->SetNthOutput(1, tempImage);
 }
 
 template< class TPixelType >
@@ -105,7 +105,6 @@ void KspaceImageFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadId)
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
-    typename InputImageType::Pointer tempImage = static_cast< InputImageType * >(this->ProcessObject::GetOutput(1));
 
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
 
@@ -117,6 +116,11 @@ void KspaceImageFilter< TPixelType >
     double dt = m_tLine/szx;
 
     double fromMaxEcho = - m_tLine*szy/2;
+
+    double in_szx = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0);
+    double in_szy = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1);
+    int xOffset = in_szx-szx;
+    int yOffset = in_szy-szy;
 
     while( !oit.IsAtEnd() )
     {
@@ -139,16 +143,14 @@ void KspaceImageFilter< TPixelType >
                 relaxFactor.push_back(exp(-(m_TE+t)/m_T2.at(i) -fabs(t)/m_Tinhom));
         }
 
-        double temp_k = kIdx[0];
-        if (oit.GetIndex()[1]%2 == 1)   // reverse readout direction and add ghosting
+        double temp_kx = kIdx[0];
+        if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction and add ghosting
         {
-            kIdx[0] = szx-kIdx[0]-1;  // reverse readout direction
-            temp_k = (double)kIdx[0]-m_kOffset;    // add gradient delay induced offset
+            kIdx[0] = szx-kIdx[0]-1;                // reverse readout direction
+            temp_kx = (double)kIdx[0]-m_kOffset;     // add gradient delay induced offset
         }
         else
-            temp_k += m_kOffset;    // add gradient delay induced offset
-
-//        tempImage->SetPixel(kIdx, t );
+            temp_kx += m_kOffset;    // add gradient delay induced offset
 
         vcl_complex<double> s(0,0);
         InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
@@ -184,21 +186,42 @@ void KspaceImageFilter< TPixelType >
             if (m_SimulateDistortions)
                 omega_t += m_FrequencyMap->GetPixel(it.GetIndex())*t/1000;
 
+            // add gibbs ringing offset (cropps k-space)
+            double tempOffsetX = 0;
+            if (temp_kx>=szx/2)
+                tempOffsetX = xOffset;
+            double temp_ky = kIdx[1];
+            if (temp_ky>=szy/2)
+                temp_ky += yOffset;
+
             // actual DFT term
-            s += f * exp( std::complex<double>(0, 2 * M_PI * (temp_k*x/szx + (double)kIdx[1]*y/szy) + omega_t ) );
+            s += f * exp( std::complex<double>(0, 2 * M_PI * ((temp_kx+tempOffsetX)*x/in_szx + temp_ky*y/in_szy) + omega_t ) );
 
             ++it;
         }
 
         s /= numPix;
+
+        /* rearrange slice not needed
+        if( kIdx[0] <  szx/2 )
+            kIdx[0] = kIdx[0] + szx/2;
+        else
+            kIdx[0] = kIdx[0] - szx/2;
+
+        if( kIdx[1] <  szx/2 )
+            kIdx[1] = kIdx[1] + szy/2;
+        else
+            kIdx[1] = kIdx[1] - szy/2;*/
+
+        m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);
         ++oit;
     }
 
 //    typedef itk::ImageFileWriter< InputImageType > WriterType;
 //    typename WriterType::Pointer writer = WriterType::New();
-//    writer->SetFileName("/local/dist.nrrd");
-//    writer->SetInput(tempImage);
+//    writer->SetFileName("/local/kspace.nrrd");
+//    writer->SetInput(m_TEMPIMAGE);
 //    writer->Update();
 }
 

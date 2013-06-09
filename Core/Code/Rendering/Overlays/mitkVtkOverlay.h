@@ -30,13 +30,16 @@ namespace mitk {
 class MITK_CORE_EXPORT VtkOverlay : public Overlay {
 public:
 
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
   void UpdateOverlay(BaseRenderer *renderer);
+  void AddOverlay(BaseRenderer *renderer);
+  void RemoveOverlay(BaseRenderer *renderer);
 
   mitkClassMacro(VtkOverlay, Overlay);
 
 protected:
 
-  virtual vtkSmartPointer<vtkActor> getVtkActor(BaseRenderer *renderer) = 0;
+  virtual vtkSmartPointer<vtkActor> GetVtkActor(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay();

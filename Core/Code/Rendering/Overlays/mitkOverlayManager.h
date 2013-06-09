@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
 #include "mitkBaseRenderer.h"
+#include "mitkLocalStorageHandler.h"
 
 // Microservices
 #include <usServiceInterface.h>
@@ -39,8 +40,9 @@ public:
 
   void AddOverlay(Overlay::Pointer overlay);
   void UpdateOverlays(BaseRenderer *baseRenderer);
-  void UnregisterAsMicroservice();
+  void UnregisterMicroservice();
   static const std::string PROP_ID;
+  static OverlayManager::Pointer GetServiceInstance(int ID = 0);
 
   /** \brief Base class for mapper specific rendering ressources.
    */
@@ -72,6 +74,9 @@ public:
 
   };
 
+  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
@@ -90,9 +95,11 @@ private:
   /** \brief assignment operator */
   OverlayManager &operator=(const OverlayManager &);
 
-  void RegisterAsMicroservice();
+  std::string RegisterMicroservice();
 
   mitk::ServiceRegistration m_Registration;
+
+  std::string m_id;
 
 };
 

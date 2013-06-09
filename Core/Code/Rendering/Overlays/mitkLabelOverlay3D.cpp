@@ -62,7 +62,10 @@ mitk::LabelOverlay3D::LocalStorage::LocalStorage()
   */
 }
 
+void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+{
 
+}
 //void mitk::LabelOverlay3D::MitkRender(mitk::BaseRenderer *renderer)
 //{
 //  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
@@ -78,38 +81,38 @@ mitk::LabelOverlay3D::LocalStorage::LocalStorage()
 //}
 
 
-void mitk::LabelOverlay3D::setPosition3D(mitk::Point3D position3D)
+void mitk::LabelOverlay3D::SetPosition3D(mitk::Point3D position3D)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty);
 }
 
-void mitk::LabelOverlay3D::setText(std::string text)
+void mitk::LabelOverlay3D::SetText(std::string text)
 {
   SetStringProperty("text", text.c_str());
 }
 
-void mitk::LabelOverlay3D::setPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+void mitk::LabelOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty,renderer);
 }
 
-mitk::Point3D mitk::LabelOverlay3D::getPosition3D()
+mitk::Point3D mitk::LabelOverlay3D::GetPosition3D()
 {
   mitk::Point3D position3D;
   GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
   return position3D;
 }
 
-std::string mitk::LabelOverlay3D::getText()
+std::string mitk::LabelOverlay3D::GetText()
 {
   std::string text;
   GetPropertyList()->GetStringProperty("text", text);
   return text;
 }
 
-mitk::Point3D mitk::LabelOverlay3D::getPosition3D(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::LabelOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 {
   mitk::Point3D position3D;
   GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
@@ -117,6 +120,6 @@ mitk::Point3D mitk::LabelOverlay3D::getPosition3D(mitk::BaseRenderer *renderer)
 }
 
 
-vtkSmartPointer<vtkActor> mitk::LabelOverlay3D::getVtkActor(BaseRenderer *renderer)
+vtkSmartPointer<vtkActor> mitk::LabelOverlay3D::GetVtkActor(BaseRenderer *renderer)
 {
 }

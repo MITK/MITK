@@ -56,9 +56,11 @@ public:
   mitkClassMacro(TextOverlay, mitk::VtkOverlay);
   itkNewMacro(TextOverlay);
 
+  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
+
 protected:
 
-  virtual vtkSmartPointer<vtkActor> getVtkActor(BaseRenderer *renderer);
+  virtual vtkSmartPointer<vtkActor> GetVtkActor(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit TextOverlay();

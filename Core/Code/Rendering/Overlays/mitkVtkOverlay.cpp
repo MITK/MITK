@@ -27,4 +27,33 @@ mitk::VtkOverlay::~VtkOverlay()
 
 void mitk::VtkOverlay::UpdateOverlay(mitk::BaseRenderer *renderer)
 {
+  vtkSmartPointer<vtkActor> vtkActor = GetVtkActor(renderer);
+  if(!IsVisible(renderer))
+  {
+    vtkActor->SetVisibility(false);
+    return;
+  }
+  else
+  {
+    vtkActor->SetVisibility(true);
+    UpdateVtkOverlay(renderer);
+  }
+}
+
+void mitk::VtkOverlay::AddOverlay(mitk::BaseRenderer *renderer)
+{
+  vtkSmartPointer<vtkActor> vtkActor = GetVtkActor(renderer);
+  if(!renderer->GetVtkRenderer()->HasViewProp(vtkActor))
+  {
+    renderer->GetVtkRenderer()->AddActor(vtkActor);
+  }
+}
+
+void mitk::VtkOverlay::RemoveOverlay(mitk::BaseRenderer *renderer)
+{
+  vtkSmartPointer<vtkActor> vtkActor = GetVtkActor(renderer);
+  if(!renderer->GetVtkRenderer()->HasViewProp(vtkActor))
+  {
+    renderer->GetVtkRenderer()->RemoveActor(vtkActor);
+  }
 }

@@ -476,7 +476,7 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_CornerAnnotaions[2].textProp->Delete();
   m_CornerAnnotaions[2].ren->Delete();
 
-  m_OverlayManager->UnregisterAsMicroservice();
+  m_OverlayManager->UnregisterMicroservice();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()

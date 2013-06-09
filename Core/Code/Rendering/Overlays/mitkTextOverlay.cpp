@@ -40,15 +40,14 @@ mitk::TextOverlay::LocalStorage::LocalStorage()
   m_textActor->GetTextProperty()->SetColor ( 1.0,0.0,0.0 );
 }
 
-//void mitk::TextOverlay::MitkRender(mitk::BaseRenderer *renderer)
-//{
-//  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
-////  renderer->GetRenderWindow()->GetInteractor();
-//  if(!renderer->GetVtkRenderer()->HasViewProp(ls->m_textActor))
-//    renderer->GetVtkRenderer()->AddActor2D(ls->m_textActor);
-//}
+
+void mitk::TextOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+{
+
+}
 
 
-vtkSmartPointer<vtkActor> mitk::TextOverlay::getVtkActor(BaseRenderer *renderer)
+vtkSmartPointer<vtkActor> mitk::TextOverlay::GetVtkActor(BaseRenderer *renderer)
 {
 }
+

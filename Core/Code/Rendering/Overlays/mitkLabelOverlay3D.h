@@ -61,21 +61,23 @@ public:
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay);
   itkNewMacro(LabelOverlay3D);
 
-  void setPosition3D(Point3D position3D);
+  void SetPosition3D(Point3D position3D);
 
-  void setText(std::string text);
+  void SetText(std::string text);
 
-  void setPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
+  void SetPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
 
-  Point3D getPosition3D();
+  Point3D GetPosition3D();
 
-  std::string getText();
+  std::string GetText();
 
-  Point3D getPosition3D(mitk::BaseRenderer* renderer);
+  Point3D GetPosition3D(mitk::BaseRenderer* renderer);
+
+  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 
 protected:
 
-  virtual vtkSmartPointer<vtkActor> getVtkActor(BaseRenderer *renderer);
+  virtual vtkSmartPointer<vtkActor> GetVtkActor(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit LabelOverlay3D();

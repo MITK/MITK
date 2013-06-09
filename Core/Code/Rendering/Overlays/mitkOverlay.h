@@ -59,6 +59,8 @@ public:
 
   };
 
+  virtual void AddOverlay(BaseRenderer *renderer) = 0;
+  virtual void RemoveOverlay(BaseRenderer *renderer) = 0;
   virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
 
   //##Documentation
@@ -231,6 +233,22 @@ public:
   void SetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer=NULL);
 
   //##Documentation
+  //## @brief Convenience access method for boolean properties (instances
+  //## of BoolProperty). Return value is the value of the property. If the property is
+  //## not found, the value of @a defaultIsOn is returned.
+  //##
+  //## Thus, the return value has a different meaning than in the
+  //## GetBoolProperty method!
+  //## @sa GetBoolProperty
+  bool IsOn(const char* propertyKey, mitk::BaseRenderer* renderer, bool defaultIsOn = true) const
+  {
+    if(propertyKey==NULL)
+      return defaultIsOn;
+    GetBoolProperty(propertyKey, defaultIsOn, renderer);
+    return defaultIsOn;
+  }
+
+  //##Documentation
   //## @brief Convenience access method for accessing the name of an object (instance of
   //## StringProperty with property-key "name")
   //## @return @a true property was found
@@ -274,6 +292,39 @@ public:
   {
     this->SetName(name.c_str());
   }
+
+  //##Documentation
+  //## @brief Convenience access method for visibility properties (instances
+  //## of BoolProperty with property-key "visible")
+  //## @return @a true property was found
+  //## @sa IsVisible
+  bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
+  {
+    return GetBoolProperty(propertyKey, visible, renderer);
+  }
+
+  //##Documentation
+  //## @brief Convenience access method for visibility properties (instances
+  //## of BoolProperty). Return value is the visibility. Default is
+  //## visible==true, i.e., true is returned even if the property (@a
+  //## propertyKey) is not found.
+  //##
+  //## Thus, the return value has a different meaning than in the
+  //## GetVisibility method!
+  //## @sa GetVisibility
+  //## @sa IsOn
+  bool IsVisible(mitk::BaseRenderer* renderer, const char* propertyKey = "visible", bool defaultIsOn = true) const
+  {
+    return IsOn(propertyKey, renderer, defaultIsOn);
+  }
+
+  //##Documentation
+  //## @brief Convenience method for setting visibility properties (instances
+  //## of BoolProperty)
+  //## @param visible If set to true, the data will be rendered. If false, the render will skip this data.
+  //## @param renderer Specify a renderer if the visibility shall be specific to a renderer
+  //## @param propertykey Can be used to specify a user defined name of the visibility propery.
+  void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
   mitkClassMacro(Overlay, itk::Object);
 

@@ -52,59 +52,54 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
 }
 
 
-//void mitk::TextOverlay3D::MitkRender(mitk::BaseRenderer *renderer)
-//{
-//  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
-//  ls->m_follower->SetPosition(getPosition3D()[0],getPosition3D()[1],getPosition3D()[2]);
-//  ls->m_textSource->SetText(getText().c_str());
+void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+{
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  ls->m_follower->SetPosition(GetPosition3D()[0],GetPosition3D()[1],GetPosition3D()[2]);
+  ls->m_textSource->SetText(GetText().c_str());
 
-////  renderer->GetRenderWindow()->GetInteractor();
-//  if(!renderer->GetVtkRenderer()->HasViewProp(ls->m_follower))
-//  {
-//    ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
-//    renderer->GetVtkRenderer()->AddActor2D(ls->m_follower);
-//  }
-//}
+  ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+}
 
 
-void mitk::TextOverlay3D::setPosition3D(mitk::Point3D position3D)
+void mitk::TextOverlay3D::SetPosition3D(mitk::Point3D position3D)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty);
 }
 
-void mitk::TextOverlay3D::setText(std::string text)
+void mitk::TextOverlay3D::SetText(std::string text)
 {
   SetStringProperty("text", text.c_str());
 }
 
-void mitk::TextOverlay3D::setPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+void mitk::TextOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Pos3D", position3dProperty,renderer);
 }
 
-mitk::Point3D mitk::TextOverlay3D::getPosition3D()
+mitk::Point3D mitk::TextOverlay3D::GetPosition3D()
 {
   mitk::Point3D position3D;
   GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
   return position3D;
 }
 
-std::string mitk::TextOverlay3D::getText()
+std::string mitk::TextOverlay3D::GetText()
 {
   std::string text;
   GetPropertyList()->GetStringProperty("text", text);
   return text;
 }
 
-mitk::Point3D mitk::TextOverlay3D::getPosition3D(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::TextOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 {
   mitk::Point3D position3D;
   GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
   return position3D;
 }
 
-vtkSmartPointer<vtkActor> mitk::TextOverlay3D::getVtkActor(BaseRenderer *renderer)
+vtkSmartPointer<vtkActor> mitk::TextOverlay3D::GetVtkActor(BaseRenderer *renderer)
 {
 }

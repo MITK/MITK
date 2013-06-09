@@ -158,6 +158,13 @@ void mitk::Overlay::SetStringProperty( const char* propertyKey, const char* stri
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
 
+void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
+{
+  mitk::BoolProperty::Pointer prop;
+  prop = mitk::BoolProperty::New(visible);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+}
+
 mitk::PropertyList* mitk::Overlay::GetPropertyList(const mitk::BaseRenderer* renderer) const
 {
   if(renderer==NULL)

@@ -245,6 +245,10 @@ namespace mitk
     */
     virtual bool IsEmptyTimeStep( int t) const;
 
+    /** \brief Check if mouse cursor is near the contour.
+    */
+    virtual bool IsNearContour(mitk::Point3D &point, float eps, int timestep);
+
     /** \brief Mark a vertex at an index in the container as selected.
     */
     bool SelectVertexAt(int index, int timestep=0);

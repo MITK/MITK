@@ -161,6 +161,10 @@ namespace mitk
     */
     virtual bool IsClosed();
 
+        /** \brief Returns whether a given point is near a contour, according to eps.
+    */
+    virtual bool IsNearContour(const mitk::Point3D &point, float eps);
+
     /** \brief Close the contour.
     Connect first with last element.
     */

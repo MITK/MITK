@@ -185,6 +185,14 @@ bool mitk::ContourModel::IsEmptyTimeStep( int t) const
 }
 
 
+bool mitk::ContourModel::IsNearContour(mitk::Point3D &point, float eps, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+      return this->m_ContourSeries[timestep]->IsNearContour(point, eps);
+  }
+  return false;
+}
 
 void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
 {

@@ -51,8 +51,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 {
 //
   std::string eventClass, eventVariant;
-  list->GetStringProperty(InteractionEventConst::xmlParameterEventClass.c_str(), eventClass);
-  list->GetStringProperty(InteractionEventConst::xmlParameterEventVariant.c_str(), eventVariant);
+  list->GetStringProperty(InteractionEventConst::xmlParameterEventClass().c_str(), eventClass);
+  list->GetStringProperty(InteractionEventConst::xmlParameterEventVariant().c_str(), eventVariant);
 
 // Query all possible attributes, if they are not present, set their default values.
 // Position Events & Key Events
@@ -72,7 +72,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   pos.Fill(0);
 
 // Parse modifier information
-  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier.c_str(), strModifiers))
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -98,7 +98,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
 // Set EventButton
-  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyEventButton.c_str(), strEventButton))
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyEventButton().c_str(), strEventButton))
   {
     std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
     if (strEventButton == "MIDDLEMOUSEBUTTON")
@@ -120,7 +120,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
 // Parse ButtonStates
-  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyButtonState.c_str(), strButtonState))
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyButtonState().c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -146,7 +146,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
 
 // Key
-  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyKey.c_str(), strKey))
+  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyKey().c_str(), strKey))
   {
     key = "";
   }
@@ -155,7 +155,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     key = strKey;
   }
 // WheelDelta
-  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyScrollDirection.c_str(), strWheelDelta))
+  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyScrollDirection().c_str(), strWheelDelta))
   {
     wheelDelta = 0;
   }
@@ -172,7 +172,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 // Internal Signals Name
-  list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName.c_str(), strSignalName);
+  list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName().c_str(), strSignalName);
 
   /*
    * Here the objects are created

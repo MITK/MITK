@@ -113,6 +113,7 @@ void TestStandardWorkflow()
   //test SetXMLString()
   player->SetXMLString(XML_STRING);
   MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfSnapshots() == 3,"Testing method SetXMLString with 3 navigation datas.");
+  MITK_TEST_CONDITION_REQUIRED(player->GetNumberOfIndexedOutputs() == 2,"Testing number of outputs");
 
   //rest repeat
   player->SetRepeat(true);

@@ -107,7 +107,7 @@ namespace itk
   void
   RegularizedIVIMReconstructionSingleIteration<TInputPixel, TOutputPixel, TRefPixelType>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int threadId)
+    ThreadIdType)
   {
 
     typename OutputImageType::Pointer output = this->GetOutput();
@@ -225,7 +225,7 @@ namespace itk
 //        vnl_matrix<double> estimdash(orig.GetSize(),2);
         vnl_vector_fixed<double,2> step;
         step[0] = 0; step[1]=0;
-        for(int ind=0; ind<m_BValues.size(); ind++)
+        for(size_t ind=0; ind<m_BValues.size(); ind++)
         {
           //MITK_INFO << "refval: " << orig[ind];
           double estim = (1-input_image_it.Get()[0])*exp(-m_BValues[ind]*input_image_it.Get()[1]);

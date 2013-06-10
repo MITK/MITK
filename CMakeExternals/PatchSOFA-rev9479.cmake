@@ -9,10 +9,14 @@ string(REPLACE "RELWITHDEBINFO \"\${SOFA_LIB_DIR}" "RELWITHDEBINFO \"\${SOFA_LIB
 string(REPLACE "MINSIZEREL \"\${SOFA_LIB_DIR}" "MINSIZEREL \"\${SOFA_LIB_DIR}/MinSizeRel" preBuildConfig_cmake "${preBuildConfig_cmake}")
 file(WRITE "cmake/preBuildConfig.cmake" "${preBuildConfig_cmake}")
 
+file(STRINGS "CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "2.8.8" "2.8.5" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "CMakeLists.txt" "${CMakeLists_txt}")
+
 file(APPEND "CMakeLists.txt" "\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)")
 
 file(WRITE "SOFAConfig.cmake.in"
-"add_definitions(-DSOFA_HAVE_EIGEN2;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR)
+"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_HAVE_EIGEN2;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR)
 
 set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/eigen-3.1.1;@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 

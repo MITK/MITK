@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stdlib.h>
 
-
+// constructor LocalStorage
 mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
 {
 
@@ -100,7 +100,7 @@ mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
   m_PropAssembly = vtkSmartPointer <vtkPropAssembly>::New();
 
 }
-
+// destructor LocalStorage
 mitk::PointSetVtkMapper2D::LocalStorage::~LocalStorage()
 {
 }
@@ -111,7 +111,7 @@ const mitk::PointSet* mitk::PointSetVtkMapper2D::GetInput()
   return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
-// constructor
+// constructor PointSetVtkMapper2D
 mitk::PointSetVtkMapper2D::PointSetVtkMapper2D()
 : m_Polygon(false),
 m_PolygonClosed(false),
@@ -123,7 +123,7 @@ m_ShowDistantLines(false),
 m_LineWidth(1),
 m_PointLineWidth(1),
 m_Point2DSize(6),
-m_IdGlyph(3), // default: cross
+m_IdGlyph(mitk::PointSetShapeProperty::CROSS),
 m_FillGlyphs(false)
 {
 }
@@ -239,14 +239,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   //iterator for point set
   mitk::PointSet::PointsContainer::Iterator pointsIter = itkPointSet->GetPoints()->Begin();
-  mitk::PointSet::PointsContainer::Iterator pointsIterPredecessor = itkPointSet->GetPoints()->Begin();
-
 
   // PointDataContainer has additional information to each point, e.g. whether
   // it is selected or not
   mitk::PointSet::PointDataContainer::Iterator pointDataIter;
   pointDataIter = itkPointSet->GetPointData()->Begin();
-
 
   //check if the list for the PointDataContainer is the same size as the PointsContainer.
   //If not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
@@ -638,13 +635,11 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillGlyphs, renderer);
 
-
   mitk::PointSetShapeProperty::Pointer shape = dynamic_cast<mitk::PointSetShapeProperty*>(this->GetDataNode()->GetProperty( "Pointset.2D.shape", renderer ));
   if(shape.IsNotNull())
   {
     m_IdGlyph = shape->GetPointSetShape();
   }
-
 
   //check for color props and use it for rendering of selected/unselected points and contour
   //due to different params in VTK (double/float) we have to convert
@@ -697,7 +692,6 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     ls-> m_SelectedActor->VisibilityOff();
   }
 
-
   if (m_Polygon)
   {
     ls->m_ContourActor->VisibilityOn();
@@ -733,10 +727,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     // create new vtk render objects (e.g. a circle for a point)
     this->CreateVTKRenderObjects(renderer);
   }
-
 }
-
-
 
 void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {

@@ -29,25 +29,24 @@ namespace mitk
 struct MITK_CORE_EXPORT InteractionEventConst
 {
   // XML Tags
-  static const std::string xmlTagConfigRoot; // = "config";
-  static const std::string xmlTagParam; // = "param";
-  static const std::string xmlTagEventVariant; // = "event_variant";
-  static const std::string xmlTagAttribute; // = "attribute";
+  static const std::string xmlTagConfigRoot(); // = "config";
+  static const std::string xmlTagParam(); // = "param";
+  static const std::string xmlTagEventVariant(); // = "event_variant";
+  static const std::string xmlTagAttribute(); // = "attribute";
 
   // XML Param
-  static const std::string xmlParameterName; // = "name";
-  static const std::string xmlParameterValue; // = "value";
-  static const std::string xmlParameterEventVariant; // = "event_variant";
-  static const std::string xmlParameterEventClass; // = "class";
+  static const std::string xmlParameterName(); // = "name";
+  static const std::string xmlParameterValue(); // = "value";
+  static const std::string xmlParameterEventVariant(); // = "event_variant";
+  static const std::string xmlParameterEventClass(); // = "class";
 
   // Event Description
-  static const std::string xmlEventPropertyModifier; // = "Modifiers";
-  static const std::string xmlEventPropertyEventButton; // = "EventButton";
-  static const std::string xmlEventPropertyButtonState; // = "ButtonState";
-  static const std::string xmlEventPropertyKey; // = "Key";
-  static const std::string xmlEventPropertyScrollDirection; // = "ScrollDirection";
-  static const std::string xmlEventPropertySignalName; // = "SignalName";
-
+  static const std::string xmlEventPropertyModifier(); // = "Modifiers";
+  static const std::string xmlEventPropertyEventButton(); // = "EventButton";
+  static const std::string xmlEventPropertyButtonState(); // = "ButtonState";
+  static const std::string xmlEventPropertyKey(); // = "Key";
+  static const std::string xmlEventPropertyScrollDirection(); // = "ScrollDirection";
+  static const std::string xmlEventPropertySignalName(); // = "SignalName";
 };
 
 }     //namespace mitk

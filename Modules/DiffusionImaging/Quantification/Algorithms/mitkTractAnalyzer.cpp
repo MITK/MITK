@@ -40,13 +40,10 @@ using namespace std;
 
 namespace mitk {
 
-  TractAnalyzer::TractAnalyzer()
-  {
-
-  }
+  TractAnalyzer::TractAnalyzer() { }
 
 
-  void TractAnalyzer::BuildGraph()
+  void TractAnalyzer::MakeRoi()
   {
 
     int n = 0;

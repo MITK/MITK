@@ -14,13 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-// Blueberry
-#include "berryIWorkbenchWindow.h"
-#include "berryIWorkbenchPage.h"
-#include "berryISelectionService.h"
-#include "berryConstants.h"
-#include "berryPlatformUI.h"
-
 // Qmitk
 #include "QmitkTractbasedSpatialStatisticsView.h"
 #include "QmitkStdMultiWidget.h"
@@ -30,61 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
-#include <qfiledialog.h>
-#include <QDirIterator>
 #include <QInputDialog>
-#include <QDir>
-#include <QStringList>
-#include <QMessageBox>
-#include <QSortFilterProxyModel>
 #include <QClipboard>
 
-#include <itkNiftiImageIO.h>
-#include <itkImageFileReader.h>
 
-#include <iostream>
-#include <fstream>
-#include <limits>
-
-
-#include <itkMultiplyImageFilter.h>
 #include <mitkTractAnalyzer.h>
 #include <mitkTbssImporter.h>
-#include <mitkProgressBar.h>
 #include <mitkPlanarCircle.h>
 #include <mitkPlanarFigureInteractor.h>
 
 
-#include <mitkVectorImageMapper2D.h>
-#include "vtkFloatArray.h"
-#include "vtkLinearTransform.h"
 #include "vtkPoints.h"
-#include "mitkSurface.h"
-#include <vtkGlyph3D.h>
-#include "vtkArrowSource.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPointData.h"
 #include <vtkCellArray.h>
 #include <vtkPolyLine.h>
 
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-
-#include <QMessageBox>
-
-#include "mitkITKImageImport.h"
-// #include "mitkImageMapperGL2D.h"
-#include "mitkVolumeDataVtkMapper3D.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkTensorImage.h"
-
-#include "itkDiffusionTensor3D.h"
-
-
-#define SEARCHSIGMA 10 // length in linear voxel dimens
-
-#define MAXSEARCHLENGTH (3*SEARCHSIGMA)
 
 const std::string QmitkTractbasedSpatialStatisticsView::VIEW_ID = "org.mitk.views.tractbasedspatialstatistics";
 
@@ -115,7 +67,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   if (!this->IsActivated())
     return;
 
-
+/*
   // Get DataManagerSelection
   if (!this->GetDataManagerSelection().empty())
   {
@@ -143,7 +95,9 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   {
     m_Controls->m_TbssImageLabel->setText("Please select an image");
   }
+*/
 
+  // Check which datatypes are selected in the datamanager and enable/disable widgets accordingly
 
   bool foundTbssRoi = false;
   bool foundTbss = false;
@@ -295,8 +249,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateQtPartControl( QWidget *parent 
   }
 
 
-  m_IsInitialized = false;
-
   // Table for the FSL TBSS import
   m_GroupModel = new QmitkTbssTableModel();
   m_Controls->m_GroupInfo->setModel(m_GroupModel);
@@ -308,10 +260,6 @@ void QmitkTractbasedSpatialStatisticsView::Activated()
 {
   QmitkFunctionality::Activated();
 
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  //m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  //m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
 }
 
 void QmitkTractbasedSpatialStatisticsView::Deactivated()
@@ -347,8 +295,6 @@ void QmitkTractbasedSpatialStatisticsView::CopyToClipboard()
   {
     // Working with fiber bundles
     std::vector <std::vector<double> > profiles = m_Controls->m_RoiPlotWidget->GetIndividualProfiles();
-
-
 
     QString clipboardText;
     for (std::vector<std::vector<double> >::iterator it = profiles.begin(); it
@@ -433,7 +379,7 @@ void QmitkTractbasedSpatialStatisticsView::RemoveGroup()
 {
 
   QTableView *temp = static_cast<QTableView*>(m_Controls->m_GroupInfo);
- // QSortFilterProxyModel *proxy = static_cast<QSortFilterProxyModel*>(temp->model());
+
   QItemSelectionModel *selectionModel = temp->selectionModel();
 
   QModelIndexList indices = selectionModel->selectedRows();
@@ -448,33 +394,7 @@ void QmitkTractbasedSpatialStatisticsView::RemoveGroup()
 
 }
 
-std::string QmitkTractbasedSpatialStatisticsView::ReadFile(std::string whatfile)
-{
-  std::string s = "Select a" + whatfile;
-  QFileDialog* w = new QFileDialog(this->m_Controls->m_ImportFsl, QString(s.c_str()) );
-  w->setFileMode(QFileDialog::ExistingFiles);
-  w->setDirectory("/home");
 
-  if(whatfile == "gradient image")
-  {
-    w->setNameFilter("Tbss gradient images (*.tgi)");
-  }
-
-  // RETRIEVE SELECTION
-  if ( w->exec() != QDialog::Accepted )
-  {
-    return "";
-    MITK_INFO << "Failed to load";
-  }
-
-  QStringList filenames = w->selectedFiles();
-  if (filenames.size() > 0)
-  {
-    std::string retval = filenames.at(0).toStdString();
-    return retval;
-  }
-  return "";
-}
 
 void QmitkTractbasedSpatialStatisticsView::AddGroup()
 {
@@ -494,12 +414,6 @@ void QmitkTractbasedSpatialStatisticsView::AddGroup()
     m_GroupModel->setData(index, number, Qt::EditRole);
 
   }
-  else
-  {
-    //QMessageBox::information(this, "Duplicate name");
-  }
-
-
 }
 
 
@@ -510,6 +424,7 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
   mitk::TbssImporter::Pointer importer = mitk::TbssImporter::New();
 
   QList< QPair<QString, int> >list = m_GroupModel->getList();
+
 
   if(list.size() == 0)
   {
@@ -586,6 +501,7 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
   // show the results
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
 
 void QmitkTractbasedSpatialStatisticsView::Clicked(const QwtDoublePoint& pos)
 {
@@ -1118,26 +1034,9 @@ void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetNotAvailable()
   m_MultiWidget = NULL;
 }
 
-/*
-void QmitkTractbasedSpatialStatisticsView::AdjustPlotMeasure(const QString & text)
-{
-  berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<TbssSelListener>()->DoSelectionChanged(sel);
-}*/
-
-
 
 void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 {
-
-  // It is important to load the MeanFASkeletonMask image in MITK to make sure that point selection and
-  // pathfinding is done on the same image
-  //string filename = m_TbssWorkspaceManager.GetInputDir().toStdString() + "/stats/" + m_TbssWorkspaceManager.GetMeanFASkeletonMask().toStdString();
-
-  // Implement a way to obtain skeleton and skeletonFA without sml workspace
-
   bool ok;
   double threshold = QInputDialog::getDouble(m_Controls->m_CreateRoi, tr("Set an FA threshold"),
                                                       tr("Threshold:"), 0.2, 0.0, 1.0, 2, &ok);
@@ -1146,7 +1045,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
     return;
 
   mitk::Image::Pointer image;
-
 
   std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
@@ -1162,8 +1060,6 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
     }
   }
 
-
-
   if(image.IsNull())
   {
     return;
@@ -1177,7 +1073,7 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
   analyzer.SetPointSet(m_PointSetNode);
 
   // Run Analyzer
-  analyzer.BuildGraph();
+  analyzer.MakeRoi();
 
   // Obtain tbss roi image from analyzer
   mitk::TbssRoiImage::Pointer tbssRoi = analyzer.GetRoiImage();
@@ -1233,83 +1129,4 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
 
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(false);
 
-}
-
-
-
-
-void QmitkTractbasedSpatialStatisticsView::Masking()
-{
-  //QString filename = m_Controls->m_WorkingDirectory->text();
-  QString filename = "E:/Experiments/tbss";
-  QString faFiles = filename + "/AxD";
-  QString maskFiles = filename + "/bin_masks";
-
-
-  QDirIterator faDirIt(faFiles, QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
-  QDirIterator maskDirIt(maskFiles, QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
-
-  std::vector<std::string> faFilenames;
-  std::vector<std::string> maskFilenames;
-  std::vector<std::string> outputFilenames;
-
-  while(faDirIt.hasNext() && maskDirIt.hasNext())
-  {
-    faDirIt.next();
-    maskDirIt.next();
-    if((faDirIt.fileInfo().completeSuffix() == "nii"
-       || faDirIt.fileInfo().completeSuffix() == "mhd"
-       || faDirIt.fileInfo().completeSuffix() == "nii.gz")
-       && (maskDirIt.fileInfo().completeSuffix() == "nii"
-       || maskDirIt.fileInfo().completeSuffix() == "mhd"
-       || maskDirIt.fileInfo().completeSuffix() == "nii.gz"))
-    {
-      faFilenames.push_back(faDirIt.filePath().toStdString());
-      outputFilenames.push_back(faDirIt.fileName().toStdString());
-      maskFilenames.push_back(maskDirIt.filePath().toStdString());
-    }
-  }
-
-  std::vector<std::string>::iterator faIt = faFilenames.begin();
-  std::vector<std::string>::iterator maskIt = maskFilenames.begin();
-  std::vector<std::string>::iterator outputIt = outputFilenames.begin();
-
-  // Now multiply all FA images with their corresponding masks
-
-  QString outputDir = filename;
-  while(faIt != faFilenames.end() && maskIt != maskFilenames.end() && outputIt != outputFilenames.end())
-  {
-    std::cout << "Mask " << *faIt << " with " << *maskIt << std::endl;
-
-    typedef itk::MultiplyImageFilter<FloatImageType, CharImageType, FloatImageType> MultiplicationFilterType;
-
-    FloatReaderType::Pointer floatReader = FloatReaderType::New();
-    CharReaderType::Pointer charReader = CharReaderType::New();
-
-    floatReader->SetFileName(*faIt);
-    //floatReader->Update();
-    //FloatImageType::Pointer faImage = floatReader->GetOutput();
-
-    charReader->SetFileName(*maskIt);
-    //charReader->Update();
-    // CharImageType::Pointer maskImage = charReader->GetOutput();
-
-    MultiplicationFilterType::Pointer multiplicationFilter = MultiplicationFilterType::New();
-    multiplicationFilter->SetInput1(floatReader->GetOutput());
-    multiplicationFilter->SetInput2(charReader->GetOutput());
-    multiplicationFilter->Update();
-
-    //FloatImageType::Pointer maskedImage = FloatImageType::New();
-    //maskedImage = MultiplicationFilter->GetOutput();
-
-    FloatWriterType::Pointer floatWriter = FloatWriterType::New();
-    std::string s = faFiles.toStdString().append("/"+*outputIt);
-    floatWriter->SetFileName(s.c_str());
-    floatWriter->SetInput(multiplicationFilter->GetOutput());
-    floatWriter->Update();
-
-    ++faIt;
-    ++maskIt;
-    ++outputIt;
-  }
 }

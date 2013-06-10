@@ -937,11 +937,6 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 }
 
 
-void QmitkTbssRoiAnalysisWidget::Boxplots()
-{
-  this->Clear();
-}
-
 void QmitkTbssRoiAnalysisWidget::drawBar(int x)
 {
 

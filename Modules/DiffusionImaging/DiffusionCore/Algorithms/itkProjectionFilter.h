@@ -24,15 +24,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
+
+
+/**
+  * \brief Projection part of the TBSS pipeline
+  *
+  * This class performs the projection step of the TBSS pipeline
+  * (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024 )
+  * As input it takes a binary skeleton, a distance map, and a vector image containing the image gradients
+  * that are typically provided by the itkSkeletonizationFilter and the itkDistanceMapFilter.
+  */
+
+
 class ProjectionFilter : public Object
 {
-  /*!
-  \brief itkProjectionFilter
-
-  \brief Performs the Projection Step of the TBSS algorithm from Smith et al. 2006.
-
-
-  */
 
 public:
 
@@ -47,7 +52,6 @@ public:
   typedef itk::Image<float, 4> Float4DImageType;
   typedef itk::Image<float, 3> FloatImageType;
 
- // typedef itk::VectorImageType<float, 3> SubjectVolumesType;
 
 
 public:
@@ -67,20 +71,46 @@ public:
   /** */
   itkNewMacro( Self)
 
-  /** Generate Data. The image will be divided into a number of pieces, a number of threads
-  will be spawned and Threaded GenerateData() will be called in each thread. */
+
+  /** \brief Does the actual projection */
   void Project();
 
+
+  /** \brief Set the distance map
+   *
+   * Sets the distance map that decodes for every voxel the distance to the nearest point on the skeleton.
+   */
   itkSetMacro(DistanceMap, RealImageType::Pointer)
 
+
+  /** \brief Set the directions
+   *
+   * Sets the direction calculated by the TBSS skeletonization algorithm in itkSkeletonizationFilter.
+   */
   itkSetMacro(Directions, VectorImageType::Pointer)
 
+
+  /** \brief Set the binary skeleton
+   *
+   * Sets the binary skeleton that defines on which voxels must be projected.
+   */
   itkSetMacro(Skeleton, CharImageType::Pointer)
 
+
+  /** \brief Set the mask defining tubular structures on the skeleton
+   *
+   * Sets a binary mask that defines wich part of the white matter skeleton are tubular instead of sheet like.
+   * This is important because the a different projection method is used for sheet like structues and
+   * tubular structures.
+   */
   itkSetMacro(Tube, CharImageType::Pointer)
 
+
+  /** \brief Set a 4D image containing the 3D registered FA maps of all study subjects. */
   itkSetMacro(AllFA, Float4DImageType::Pointer)
 
+
+  /** \brief Returns a 4D image containing the skeleton projections of all subjects */
   itkGetMacro(Projections, Float4DImageType::Pointer)
 
 

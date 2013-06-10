@@ -48,14 +48,7 @@ namespace itk
     mitk::ProgressBar::GetInstance()->AddStepsToDo( 3 );
 
     std::cout << "Skeletonize" << std::endl;
-    CalculatePerpendicularDirections();
-  }
 
-
-
-  template< class TInputImage, class TOutputImage >
-  void SkeletonizationFilter<TInputImage, TOutputImage>::CalculatePerpendicularDirections()
-  {
 
     const InputImageType* faImage = this->GetInput();
     typename InputImageType::SizeType size = faImage->GetRequestedRegion().GetSize();
@@ -254,8 +247,8 @@ namespace itk
     Superclass::SetNthOutput( 0, outputImg );
     mitk::ProgressBar::GetInstance()->Progress();
 
-
   }
+
 
 
   // Can provide a vector image to visualize the gradient image used in the search for local maxima.

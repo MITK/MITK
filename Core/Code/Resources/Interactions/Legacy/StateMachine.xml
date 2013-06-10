@@ -3997,6 +3997,11 @@
     <transition NAME="checkPointClick" NEXT_STATE_ID="10" EVENT_ID="1"> <!-- left mbtn = 1 -->
      <action ID="21"/> <!-- AcCHECKPOINT = 21 -->
     </transition>
+    <transition NAME="mouseMove" NEXT_STATE_ID="1" EVENT_ID="520">
+       <!-- MouseMove = 520 -->
+       <action ID="92"/>
+       <!-- AcMOVE = 92 -->
+    </transition>
     <transition NAME="checkContourClick" NEXT_STATE_ID="20" EVENT_ID="5"> <!-- left mbtn + ctrl = 5 -->
      <action ID="31"/> <!-- AcCHECKOBJECT = 31 -->
     </transition>
@@ -4038,9 +4043,6 @@
     </transition>
    </state>
    <state NAME="EditContour" ID="3" >
-    <transition NAME="mouseMoveContour" NEXT_STATE_ID="3" EVENT_ID="534"> <!-- CTRL+leftBN+MouseMove = 534 -->
-     <action ID="92" /> <!-- AcMOVE = 92 -->
-    </transition>
     <transition NAME="mouseReleaseContour" NEXT_STATE_ID="1" EVENT_ID="505"> <!-- left mbtn release = 505 -->
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>

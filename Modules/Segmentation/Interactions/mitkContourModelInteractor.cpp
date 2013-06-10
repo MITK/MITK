@@ -34,7 +34,8 @@ mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
   CONNECT_ACTION( AcCHECKOBJECT, OnCheckContourClick );
   CONNECT_ACTION( AcDELETEPOINT, OnDeletePoint );
   CONNECT_ACTION( AcMOVEPOINT, OnMovePoint );
-  CONNECT_ACTION( AcMOVE, OnMoveContour );
+//  CONNECT_ACTION( AcMOVE, OnMoveContour );
+  CONNECT_ACTION( AcMOVE, OnMove );
   CONNECT_ACTION( AcFINISH, OnFinish );
 }
 
@@ -201,6 +202,33 @@ bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEve
 }
 
 
+bool mitk::ContourModelInteractor::OnMove( Action* action, const StateEvent* stateEvent)
+{
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+
+  mitk::Point3D currentPosition = positionEvent->GetWorldPosition();
+
+  if (contour->IsNearContour(currentPosition, 1.5, timestep))
+  {
+      m_DataNode->SetFloatProperty("contour.width", 4.0 );
+      m_DataNode->SetProperty("contour.color", ColorProperty::New(1,0,0));
+  }
+  else
+  {
+      m_DataNode->SetFloatProperty("contour.width", 2.0 );
+      m_DataNode->SetProperty("contour.color", ColorProperty::New(0,0,1));
+  }
+
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+
+  return true;
+}
 
 
 bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent* stateEvent)

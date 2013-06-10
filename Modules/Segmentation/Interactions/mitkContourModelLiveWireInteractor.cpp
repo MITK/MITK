@@ -53,8 +53,6 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
     return false;
   }
 
-
-
   mitk::StateEvent* newStateEvent = NULL;
 
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
@@ -75,6 +73,8 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
     contour->SetSelectedVertexAsControlPoint();
+
+    m_DataNode->SetBoolProperty( "contour.editing", true );
 
     assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
@@ -106,6 +106,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   }
   else
   {
+    m_DataNode->SetBoolProperty( "contour.editing", false );
     newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
   }
 

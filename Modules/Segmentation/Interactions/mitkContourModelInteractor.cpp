@@ -127,7 +127,6 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>(
     m_DataNode->GetData() );
 
-
   contour->Deselect();
 
   /*
@@ -213,16 +212,7 @@ bool mitk::ContourModelInteractor::OnMove( Action* action, const StateEvent* sta
 
   mitk::Point3D currentPosition = positionEvent->GetWorldPosition();
 
-  if (contour->IsNearContour(currentPosition, 1.5, timestep))
-  {
-      m_DataNode->SetFloatProperty("contour.width", 4.0 );
-      m_DataNode->SetProperty("contour.color", ColorProperty::New(1,0,0));
-  }
-  else
-  {
-      m_DataNode->SetFloatProperty("contour.width", 2.0 );
-      m_DataNode->SetProperty("contour.color", ColorProperty::New(0,0,1));
-  }
+  m_DataNode->SetBoolProperty("contour.hovering", contour->IsNearContour(currentPosition, 1.5, timestep) );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -235,7 +225,6 @@ bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
 
@@ -284,6 +273,7 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
 
 bool mitk::ContourModelInteractor::OnFinish( Action* action, const StateEvent* stateEvent)
 {
+  m_DataNode->SetBoolProperty( "contour.editing", false );
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
   contour->Deselect();

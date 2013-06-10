@@ -4018,8 +4018,8 @@
     <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="530"> <!-- left MouseButton and MouseMove = 530 -->
      <action ID="90" /> <!-- AcMOVEPOINT = 90 -->
     </transition>
-    <transition NAME="mouseRelease" NEXT_STATE_ID="4" EVENT_ID="505"> <!--  left mbtn release = 505 -->
-      <!-- no action -->
+    <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
+      <action ID="44" />      <!-- AcFINISH = 44 -->
     </transition>
    </state>
    <state NAME="PointSelected" ID="4" >

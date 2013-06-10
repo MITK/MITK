@@ -91,7 +91,16 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.color", renderer));
+    bool isEditing = false;
+    GetDataNode()->GetBoolProperty("contour.editing", isEditing);
+
+    mitk::ColorProperty::Pointer colorprop;
+
+    if (isEditing)
+        colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.editing.color", renderer));
+    else
+        colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.color", renderer));
+
     if(colorprop)
     {
       //set the color of the contour
@@ -117,10 +126,13 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contour.width")) != NULL)
-      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("contour.width"))->GetValue();
-    glLineWidth(lineWidth);
+    bool isHovering = false;
+    this->GetDataNode()->GetBoolProperty("contour.hovering", isHovering);
 
+    if (isHovering)
+        this->GetDataNode()->GetFloatProperty("contour.hovering.width", lineWidth);
+    else
+        this->GetDataNode()->GetFloatProperty("contour.width", lineWidth);
 
     bool drawit=false;
 
@@ -165,6 +177,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
         //lastPt2d is not valid in first step
         if( !(pointsIt == renderingContour->IteratorBegin(timestep)) )
         {
+          glLineWidth(lineWidth);
           glBegin (GL_LINES);
           glVertex2f(pt2d[0], pt2d[1]);
           glVertex2f(lastPt2d[0], lastPt2d[1]);
@@ -204,6 +217,9 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       pointsIt++;
     }//end while iterate over controlpoints
+
+    // make sure the line is set back to default value
+    glLineWidth(1);
 
     //close contour if necessary
     if(renderingContour->IsClosed(timestep) && drawit)
@@ -272,8 +288,12 @@ const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
+  node->AddProperty( "contour.editing", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.editing.color", ColorProperty::New(0.1, 0.9, 0.1), renderer, overwrite );
   node->AddProperty( "points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
+  node->AddProperty( "contour.hovering.width", mitk::FloatProperty::New( 3.0 ), renderer, overwrite );
+  node->AddProperty( "contour.hovering", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );

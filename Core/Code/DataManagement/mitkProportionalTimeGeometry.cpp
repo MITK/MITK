@@ -89,7 +89,7 @@ mitk::TimeStepType mitk::ProportionalTimeGeometry::TimePointToTimeStep( TimePoin
     return 0;
 }
 
-mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const
+mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const
 {
   if (IsValidTimeStep(timeStep))
   {
@@ -97,11 +97,11 @@ mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeSt
   }
   else
   {
-    return NULL;
+    return 0;
   }
 }
 
-mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimePoint(TimePointType timePoint) const
+mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimePoint(TimePointType timePoint) const
 {
   if (this->IsValidTimePoint(timePoint))
   {
@@ -109,7 +109,9 @@ mitk::Geometry3D* mitk::ProportionalTimeGeometry::GetGeometryForTimePoint(TimePo
     return this->GetGeometryForTimeStep(timeStep);
   }
   else
-    return NULL;
+  {
+    return 0;
+  }
 }
 
 
@@ -120,7 +122,7 @@ mitk::Geometry3D::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTim
   return m_GeometryVector[timeStep]->Clone();
 }
 
-bool mitk::ProportionalTimeGeometry::IsValid()
+bool mitk::ProportionalTimeGeometry::IsValid() const
 {
   bool isValid = true;
   isValid &= m_GeometryVector.size() > 0;
@@ -147,7 +149,7 @@ void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
   }
 }
 
-void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(Geometry3D *geometry, TimeStepType timeStep)
+void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(Geometry3D* geometry, TimeStepType timeStep)
 {
   assert(timeStep<=m_GeometryVector.size());
   assert(timeStep >= 0);
@@ -175,7 +177,7 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
   return finalPointer;
 }
 
-void mitk::ProportionalTimeGeometry::Initialize (Geometry3D * geometry, TimeStepType timeSteps)
+void mitk::ProportionalTimeGeometry::Initialize (Geometry3D* geometry, TimeStepType timeSteps)
 {
   timeSteps = (timeSteps > 0) ? timeSteps : 1;
   m_FirstTimePoint = geometry->GetTimeBounds()[0];

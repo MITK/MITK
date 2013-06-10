@@ -476,7 +476,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
     mitk::TimeGeometry* tsg = event.GetTimeGeometry();
     if (tsg && m_TimeStep.size() > windowID)
     {
-      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[windowID]));
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[windowID]).GetPointer());
       if (slicedGeometry)
       {
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
@@ -996,7 +996,7 @@ bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& slice
     const mitk::TimeGeometry* timeGeometry = renderer->GetTimeWorldGeometry();
     if (timeGeometry)
     {
-      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(m_TimeStep[windowID]));
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(m_TimeStep[windowID]).GetPointer());
       if (slicedGeometry)
       {
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( renderer->GetSlice() ));

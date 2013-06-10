@@ -96,7 +96,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
       std::cout<<"[PASSED]"<<std::endl;
 
       std::cout << "Testing availability of first geometry contained in the TimeGeometry: ";
-      if(timeGeometry->GetGeometryForTimeStep(0)==NULL)
+      if(timeGeometry->GetGeometryForTimeStep(0).IsNull())
       {
         std::cout<<"[FAILED]"<<std::endl;
         return EXIT_FAILURE;
@@ -105,7 +105,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
 
       std::cout << "Testing type of first geometry contained in the TimeGeometry (SlicedGeometry3D expected): ";
       mitk::SlicedGeometry3D* slicedgeometry;
-      slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(0));
+      slicedgeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeGeometry->GetGeometryForTimeStep(0).GetPointer());
       if(slicedgeometry==NULL)
       {
         std::cout<<"[FAILED]"<<std::endl;

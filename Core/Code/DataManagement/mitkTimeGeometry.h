@@ -36,6 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+  /**
+  * \deprecatedSince{2013_09} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
+  *  Please use the new implementation described in \see DataInteractionPage .
+  */
+
   typedef float         TimePointType;
   typedef std::size_t   TimeStepType;
 
@@ -147,7 +152,7 @@ namespace mitk {
     * time point or all time points depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
+    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const = 0;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -160,7 +165,7 @@ namespace mitk {
     * time step or all time steps depending on the used implementation
     * of TimeGeometry.
     */
-    virtual Geometry3D* GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
+    virtual Geometry3D::Pointer GetGeometryForTimeStep ( TimeStepType timeStep) const = 0;
 
     /**
     * \brief Returns a clone of the geometry of a specific time point
@@ -189,7 +194,7 @@ namespace mitk {
     /**
     * \brief Tests if all necessary informations are set and the object is valid
     */
-    virtual bool IsValid () = 0;
+    virtual bool IsValid () const = 0;
     /**
     * \brief Get the position of the corner number \a id (in world coordinates)
     *

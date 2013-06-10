@@ -232,7 +232,7 @@ SliceNavigationController::Update(
         worldTimeGeometry = m_CreatedWorldGeometry.GetPointer();
 
         slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
-          m_CreatedWorldGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ) );
+          m_CreatedWorldGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).GetPointer() );
 
         if ( slicedWorldGeometry.IsNotNull() )
         {
@@ -306,7 +306,7 @@ SliceNavigationController::Update(
 
       m_BlockUpdate = false;
 
-      assert( worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ) != NULL );
+      assert( worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).IsNotNull() );
 
       slicedWorldGeometry->SetTimeBounds(
         worldTimeGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() )->GetTimeBounds() );
@@ -432,7 +432,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
 {
   //@todo add time to PositionEvent and use here!!
   SlicedGeometry3D* slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
-    m_CreatedWorldGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ) );
+    m_CreatedWorldGeometry->GetGeometryForTimeStep( this->GetTime()->GetPos() ).GetPointer() );
 
   if ( slicedWorldGeometry )
   {

@@ -659,14 +659,36 @@ int mitkTimeGeometryTest(int /*argc*/, char* /*argv*/[])
   testClass.CheckBounds_Image_AsSet(30,25,20,1);
   testClass.CheckExtent_BaseData_AsSet(image->Clone(), 30*0.5,25*0.33,20*0.78);
 
-/*
+
 
   MITK_TEST_OUTPUT(<< "Test for 2D image");
-  testClass.Translation_Image_MovedOrigin(30,25,1 ,1); // Test with 2D-Image
-  testClass.Rotate_Image_RotatedPoint(30,25,1 ,1); // Test with 2D-Image
-  testClass.Scale_Image_ScaledPoint(30,25,1 ,1); // Test with 2D-Image
-
-*/
+  image = mitk::ImageGenerator::GenerateRandomImage<float>(30, 25, 1, 1,0.5,0.33,0.78,100);
+  testClass.Translation_Image_MovedOrigin(30,25,1,1);
+  testClass.Rotate_Image_RotatedPoint(image->Clone(),30,25,1,1);
+  testClass.Scale_Image_ScaledPoint(30,25,1,1);
+  testClass.GetNumberOfTimeSteps_Image_ReturnDimT(image->Clone(),30,25,1,1);
+  testClass.GetMinimumTimePoint_3DImage_Min(image->Clone(),30,25,1,1);
+  testClass.GetMaximumTimePoint_3DImage_Max(image->Clone(),30,25,1,1);
+  testClass.GetTimeBounds_3DImage_ZeroAndDimT(image->Clone(),30,25,1,1);
+  testClass.IsValidTimePoint_ImageValidTimePoint_True(image->Clone(),30,25,1,1);
+  testClass.IsValidTimeStep_ImageValidTimeStep_True(image->Clone(), 30,25,1,1);
+  testClass.IsValidTimeStep_ImageNegativInvalidTimeStep_False(image->Clone(), 30,25,1,1);
+  testClass.IsValidTimeStep_ImageInvalidTimeStep_False(image->Clone(), 30,25,1,1);
+  testClass.TimeStepToTimePoint_ImageValidTimeStep_TimePoint(image->Clone(), 30,25,1,1);
+  testClass.TimeStepToTimePoint_ImageInvalidTimeStep_TimePoint(image->Clone(), 30,25,1,1);
+  testClass.TimePointToTimeStep_ImageValidTimePoint_TimePoint(image->Clone(), 30,25,1,1);
+  testClass.GetGeometryForTimeStep_BaseDataValidTimeStep_CorrectGeometry(image->Clone(), 3,3,3,3*0.5,3*0.33,3*0.78,1);
+  testClass.GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,1,1);
+  testClass.GetGeometryForTimePoint_BaseDataValidTimePoint_CorrectGeometry(image->Clone(), 3,3,3,3*0.5,3*0.33,3*0.78,1);
+  testClass.GetGeometryCloneForTimeStep_BaseDataValidTimeStep_CorrectGeometry(image->Clone(),1);
+  testClass.GetGeometryCloneForTimeStep_ImageInvalidTimeStep_NullPointer(image->Clone(), 30,25,1,1);
+  testClass.SetTimeStepGeometry_BaseDataValidTimeStep_CorrectGeometry(image->Clone(),0.5,0.33,0.78,1);
+  testClass.Expand_BaseDataDoubleSize_SizeChanged(image->Clone(),1);
+  testClass.CheckBounds_BaseData_PointsAsExpected(image->Clone(),-0.5*0.5,-0.5*0.33,-0.5*0.78,29.5*0.5,24.5*0.33,0.5*0.78);
+  testClass.CheckLength_BaseData_AsExpected(image->Clone(), 17.1368287615, 293.6709);
+  testClass.CheckPointInside_BaseDataPointInside_True(image->Clone(),10,5,0);
+  testClass.CheckPointInside_BaseDataPointOutside_False(image->Clone(),100,500,0.5);
+  testClass.CheckExtent_BaseData_AsSet(image->Clone(), 30*0.5,25*0.33,1*0.78);
 
   MITK_TEST_OUTPUT(<< "Test for 3D+time image");
   image = mitk::ImageGenerator::GenerateRandomImage<float>(30, 25, 20, 5,0.5,0.33,0.78,100);

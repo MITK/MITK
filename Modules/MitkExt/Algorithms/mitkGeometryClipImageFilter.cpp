@@ -218,7 +218,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
   }
   else
   {
-    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0));
+    clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
   }
 
   if(clippingGeometryOfCurrentTimeStep == NULL)
@@ -253,7 +253,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
       if(m_TimeClippingGeometry->IsValidTimeStep(timestep) == false)
         continue;
 
-      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep));
+      clippingGeometryOfCurrentTimeStep = dynamic_cast<const Geometry2D*>(m_TimeClippingGeometry->GetGeometryForTimeStep(timestep).GetPointer());
     }
 
     AccessByItk_2(m_InputTimeSelector->GetOutput(),_InternalComputeClippedImage,this,clippingGeometryOfCurrentTimeStep);

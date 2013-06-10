@@ -245,7 +245,7 @@ void SlicesRotator::UpdateRotatableSNCs()
     const TimeGeometry* timeGeometry = (*iter)->GetCreatedWorldGeometry();
     if (!timeGeometry) continue;
 
-    const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeGeometry->GetGeometryForTimeStep(0) );
+    const SlicedGeometry3D* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>( timeGeometry->GetGeometryForTimeStep(0).GetPointer() );
     if (!slicedGeometry) continue;
 
     if (slicedGeometry->IsValidSlice(0))

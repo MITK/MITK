@@ -234,7 +234,7 @@ mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) cons
 {
   if (GetTimeGeometry() == NULL)
     return NULL;
-  return dynamic_cast<SlicedGeometry3D*>(GetTimeGeometry()->GetGeometryForTimeStep(t));
+  return dynamic_cast<SlicedGeometry3D*>(GetTimeGeometry()->GetGeometryForTimeStep(t).GetPointer());
 }
 
 const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)

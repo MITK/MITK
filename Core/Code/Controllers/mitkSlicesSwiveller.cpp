@@ -97,7 +97,7 @@ void SlicesSwiveller::UpdateRelevantSNCs()
 
     const SlicedGeometry3D* slicedGeometry =
       dynamic_cast<const SlicedGeometry3D*>(
-        timeGeometry->GetGeometryForTimeStep(0) );
+        timeGeometry->GetGeometryForTimeStep(0).GetPointer() );
     if (!slicedGeometry) continue;
 
     Geometry2D *firstSlice( NULL );

@@ -85,9 +85,9 @@ void mitk::PointSetToCurvedGeometryFilter::GenerateData()
     itkGenericExceptionMacro ( "output geometry data is NULL!" );
   if ( output->GetTimeGeometry() == NULL )
     itkGenericExceptionMacro ( "Output time sliced geometry is NULL!" );
-  if ( output->GetTimeGeometry()->GetGeometryForTimeStep ( 0 ) == NULL )
+  if ( output->GetTimeGeometry()->GetGeometryForTimeStep ( 0 ).IsNull() )
     itkGenericExceptionMacro ( "Output geometry3d is NULL!" );
-  mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = dynamic_cast<mitk::ThinPlateSplineCurvedGeometry*> ( output->GetTimeGeometry()->GetGeometryForTimeStep( 0 ) );
+  mitk::ThinPlateSplineCurvedGeometry::Pointer curvedGeometry = dynamic_cast<mitk::ThinPlateSplineCurvedGeometry*> ( output->GetTimeGeometry()->GetGeometryForTimeStep( 0 ).GetPointer() );
   if ( curvedGeometry.IsNull() )
     itkGenericExceptionMacro ( "Output geometry3d is not an instance of mitk::ThinPlateSPlineCurvedGeometry!" );
   if ( m_ImageToBeMapped.IsNull() )

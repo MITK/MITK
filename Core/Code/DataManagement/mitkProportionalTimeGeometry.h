@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef ProportialTimeGeometry_h
-#define ProportialTimeGeometry_h
+#ifndef ProportionalTimeGeometry_h
+#define ProportionalTimeGeometry_h
 
 //ITK
 #include <itkBoundingBox.h>
@@ -140,7 +140,7 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D* GetGeometryForTimePoint ( TimePointType timePoint) const;
+    virtual Geometry3D::Pointer GetGeometryForTimePoint ( TimePointType timePoint) const;
     /**
     * \brief Returns the geometry which corresponds to the given time step
     *
@@ -150,12 +150,12 @@ namespace mitk {
     * If the returned geometry is changed this will affect the saved
     * geometry.
     */
-    virtual Geometry3D* GetGeometryForTimeStep  ( TimeStepType timeStep) const;
+    virtual Geometry3D::Pointer GetGeometryForTimeStep  ( TimeStepType timeStep) const;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid
     */
-    virtual bool IsValid ();
+    virtual bool IsValid () const;
 
     /**
     * \brief Initilizes a new object with one time steps which contains an empty geometry.
@@ -197,7 +197,7 @@ namespace mitk {
     *
     * Saves a copy for each time step.
     */
-    void Initialize (Geometry3D * geometry, TimeStepType timeSteps);
+    void Initialize (Geometry3D* geometry, TimeStepType timeSteps);
     /**
     * \brief Initialize the TimeGeometry with empty Geometry3D
     */
@@ -213,4 +213,4 @@ namespace mitk {
   }; // end class ProportialTimeGeometry
 
 } // end namespace MITK
-#endif // ProportialTimeGeometry_h
+#endif // ProportionalTimeGeometry_h

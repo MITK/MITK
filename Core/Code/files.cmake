@@ -333,8 +333,10 @@ set(CPP_FILES
 
   Rendering/Overlays/mitkOverlay.cpp
   Rendering/Overlays/mitkVtkOverlay.cpp
+  Rendering/Overlays/mitkVtkOverlay2D.cpp
+  Rendering/Overlays/mitkVtkOverlay3D.cpp
   Rendering/Overlays/mitkOverlayManager.cpp
-  Rendering/Overlays/mitkTextOverlay.cpp
+  Rendering/Overlays/mitkTextOverlay2D.cpp
   Rendering/Overlays/mitkTextOverlay3D.cpp
   Rendering/Overlays/mitkLabelOverlay3D.cpp
   Rendering/Overlays/mitkBaseLayouter.cpp

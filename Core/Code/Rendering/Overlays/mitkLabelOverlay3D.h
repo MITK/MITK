@@ -17,7 +17,7 @@
 #ifndef LabelOverlay3D_H
 #define LabelOverlay3D_H
 
-#include "mitkVtkOverlay.h"
+#include "mitkVtkOverlay3D.h"
 #include <mitkLocalStorageHandler.h>
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
@@ -26,7 +26,7 @@
 
 namespace mitk {
 
-class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay {
+class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -58,7 +58,7 @@ public:
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay);
+  mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(LabelOverlay3D);
 
   void SetPosition3D(Point3D position3D);

@@ -37,7 +37,6 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
 {
   // Create some text
   m_textSource = vtkSmartPointer<vtkVectorText>::New();
-  m_textSource->SetText( "Hello" );
 
   // Create a mapper
   vtkSmartPointer<vtkPolyDataMapper> mapper =
@@ -51,55 +50,16 @@ mitk::TextOverlay3D::LocalStorage::LocalStorage()
   m_follower->SetScale(1);
 }
 
-
 void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_follower->SetPosition(GetPosition3D()[0],GetPosition3D()[1],GetPosition3D()[2]);
   ls->m_textSource->SetText(GetText().c_str());
-
-  ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
-}
-
-
-void mitk::TextOverlay3D::SetPosition3D(mitk::Point3D position3D)
-{
-  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
-  SetProperty("Pos3D", position3dProperty);
-}
-
-void mitk::TextOverlay3D::SetText(std::string text)
-{
-  SetStringProperty("text", text.c_str());
-}
-
-void mitk::TextOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
-{
-  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
-  SetProperty("Pos3D", position3dProperty,renderer);
-}
-
-mitk::Point3D mitk::TextOverlay3D::GetPosition3D()
-{
-  mitk::Point3D position3D;
-  GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
-  return position3D;
-}
-
-std::string mitk::TextOverlay3D::GetText()
-{
-  std::string text;
-  GetPropertyList()->GetStringProperty("text", text);
-  return text;
-}
-
-mitk::Point3D mitk::TextOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
-{
-  mitk::Point3D position3D;
-  GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
-  return position3D;
 }
 
 vtkSmartPointer<vtkActor> mitk::TextOverlay3D::GetVtkActor(BaseRenderer *renderer)
 {
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+  return ls->m_follower;
 }

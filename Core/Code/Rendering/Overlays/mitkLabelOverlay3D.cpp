@@ -49,36 +49,15 @@ mitk::LabelOverlay3D::LocalStorage::LocalStorage()
   m_follower->SetMapper( mapper );
   m_follower->GetProperty()->SetColor( 1, 0, 0 ); // red
   m_follower->SetScale(1);
-
-
-  /*
-
-  m_textActor = vtkSmartPointer<vtkTextActor>::New();
-  m_textActor->GetTextProperty()->SetFontSize ( 24 );
-  m_textActor->SetPosition2 ( 10, 40 );
-  m_textActor->SetInput ( "Hello world" );
-  m_textActor->GetTextProperty()->SetColor ( 1.0,0.0,0.0 );
-
-  */
 }
 
 void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 {
-
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  ls->m_follower->SetPosition(GetPosition3D()[0],GetPosition3D()[1],GetPosition3D()[2]);
+  ls->m_textSource->SetText(GetText().c_str());
 }
-//void mitk::LabelOverlay3D::MitkRender(mitk::BaseRenderer *renderer)
-//{
-//  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
-//  ls->m_follower->SetPosition(getPosition3D()[0],getPosition3D()[1],getPosition3D()[2]);
-//  ls->m_textSource->SetText(getText().c_str());
 
-////  renderer->GetRenderWindow()->GetInteractor();
-//  if(!renderer->GetVtkRenderer()->HasViewProp(ls->m_follower))
-//  {
-//    ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
-//    renderer->GetVtkRenderer()->AddActor2D(ls->m_follower);
-//  }
-//}
 
 
 void mitk::LabelOverlay3D::SetPosition3D(mitk::Point3D position3D)
@@ -122,4 +101,7 @@ mitk::Point3D mitk::LabelOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 
 vtkSmartPointer<vtkActor> mitk::LabelOverlay3D::GetVtkActor(BaseRenderer *renderer)
 {
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());
+  return ls->m_follower;
 }

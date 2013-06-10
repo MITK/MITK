@@ -28,6 +28,11 @@ namespace mitk {
 class MITK_CORE_EXPORT Overlay : public itk::Object {
 public:
 
+  struct Bounds
+  {
+    Point2D Position;
+    Point2D Size;
+  };
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
 
   /** \brief Base class for mapper specific rendering ressources.
@@ -62,6 +67,9 @@ public:
   virtual void AddOverlay(BaseRenderer *renderer) = 0;
   virtual void RemoveOverlay(BaseRenderer *renderer) = 0;
   virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
+
+  virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Bounds) = 0;
 
   //##Documentation
   //## @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
@@ -292,6 +300,10 @@ public:
   {
     this->SetName(name.c_str());
   }
+
+  void SetText(std::string text);
+
+  std::string GetText();
 
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances

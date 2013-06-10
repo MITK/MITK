@@ -17,7 +17,7 @@
 #ifndef TextOverlay3D_H
 #define TextOverlay3D_H
 
-#include "mitkVtkOverlay.h"
+#include "mitkVtkOverlay3D.h"
 #include <mitkLocalStorageHandler.h>
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
@@ -26,7 +26,7 @@
 
 namespace mitk {
 
-class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay {
+class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -58,20 +58,8 @@ public:
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  mitkClassMacro(TextOverlay3D, mitk::VtkOverlay);
+  mitkClassMacro(TextOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(TextOverlay3D);
-
-  void SetPosition3D(Point3D position3D);
-
-  void SetText(std::string text);
-
-  void SetPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
-
-  Point3D GetPosition3D();
-
-  std::string GetText();
-
-  Point3D GetPosition3D(mitk::BaseRenderer* renderer);
 
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 

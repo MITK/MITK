@@ -14,10 +14,10 @@
 
   ===================================================================*/
 
-#ifndef TEXTOVERLAY_H
-#define TEXTOVERLAY_H
+#ifndef TEXTOVERLAY2D_H
+#define TEXTOVERLAY2D_H
 
-#include "mitkVtkOverlay.h"
+#include "mitkVtkOverlay2D.h"
 #include <mitkLocalStorageHandler.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
@@ -25,7 +25,7 @@
 
 namespace mitk {
 
-class MITK_CORE_EXPORT TextOverlay : public mitk::VtkOverlay {
+class MITK_CORE_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -53,32 +53,44 @@ public:
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
   mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  mitkClassMacro(TextOverlay, mitk::VtkOverlay);
-  itkNewMacro(TextOverlay);
+  mitkClassMacro(TextOverlay2D, mitk::VtkOverlay2D);
+  itkNewMacro(TextOverlay2D);
+
+  void SetPosition(Point3D position3D);
+
+  void SetText(std::string text);
+
+  void SetPosition(Point3D position3D, mitk::BaseRenderer* renderer);
+
+  Point3D GetPosition();
+
+  std::string GetText();
+
+  Point3D GetPosition(mitk::BaseRenderer* renderer);
 
   void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 
 protected:
 
-  virtual vtkSmartPointer<vtkActor> GetVtkActor(BaseRenderer *renderer);
+  virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit TextOverlay();
+  explicit TextOverlay2D();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~TextOverlay();
+  virtual ~TextOverlay2D();
 
 private:
 
   /** \brief copy constructor */
-  TextOverlay( const TextOverlay &);
+  TextOverlay2D( const TextOverlay2D &);
 
   /** \brief assignment operator */
-  TextOverlay &operator=(const TextOverlay &);
+  TextOverlay2D &operator=(const TextOverlay2D &);
 
 };
 
 } // namespace mitk
-#endif // TEXTOVERLAY_H
+#endif // TEXTOVERLAY2D_H
 
 

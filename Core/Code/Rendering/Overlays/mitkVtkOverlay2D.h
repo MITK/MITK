@@ -14,50 +14,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef VTKOVERLAY_H
-#define VTKOVERLAY_H
+#ifndef VTKOVERLAY2D_H
+#define VTKOVERLAY2D_H
 
 #include <MitkExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
-#include "mitkOverlay.h"
+#include "mitkVtkOverlay.h"
 #include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
+#include <vtkActor2D.h>
 
 
 namespace mitk {
 
-class MITK_CORE_EXPORT VtkOverlay : public Overlay {
+class MITK_CORE_EXPORT VtkOverlay2D : public VtkOverlay {
 public:
 
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
-  void UpdateOverlay(BaseRenderer *renderer);
-  void AddOverlay(BaseRenderer *renderer);
-  void RemoveOverlay(BaseRenderer *renderer);
+  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds bounds);
 
-  mitkClassMacro(VtkOverlay, Overlay);
+  mitkClassMacro(VtkOverlay2D, VtkOverlay);
 
 protected:
 
-  virtual vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer) = 0;
+  vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer);
+  virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit VtkOverlay();
+  explicit VtkOverlay2D();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~VtkOverlay();
+  virtual ~VtkOverlay2D();
 
 private:
 
   /** \brief copy constructor */
-  VtkOverlay( const VtkOverlay &);
+  VtkOverlay2D( const VtkOverlay2D &);
 
   /** \brief assignment operator */
-  VtkOverlay &operator=(const VtkOverlay &);
+  VtkOverlay2D &operator=(const VtkOverlay2D &);
 
 };
 
 } // namespace mitk
-#endif // OVERLAY_H
+#endif // VTKOVERLAY2D_H
 
 

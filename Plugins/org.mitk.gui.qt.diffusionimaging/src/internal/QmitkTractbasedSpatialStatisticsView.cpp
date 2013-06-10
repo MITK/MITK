@@ -67,7 +67,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   if (!this->IsActivated())
     return;
 
-
+/*
   // Get DataManagerSelection
   if (!this->GetDataManagerSelection().empty())
   {
@@ -95,7 +95,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   {
     m_Controls->m_TbssImageLabel->setText("Please select an image");
   }
-
+*/
 
   // Check which datatypes are selected in the datamanager and enable/disable widgets accordingly
 

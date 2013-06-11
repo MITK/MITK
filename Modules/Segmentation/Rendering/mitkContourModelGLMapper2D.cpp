@@ -39,8 +39,10 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
+  mitk::DataNode* dataNode = this->GetDataNode();
+
   bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  dataNode->GetVisibility(visible, renderer, "visible");
 
   if ( !visible ) return;
 
@@ -52,7 +54,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
   mitk::ContourModel::Pointer renderingContour = input;
 
   bool subdivision = false;
-  this->GetDataNode()->GetBoolProperty( "subdivision curve", subdivision, renderer );
+
+  dataNode->GetBoolProperty( "subdivision curve", subdivision, renderer );
   if (subdivision)
   {
 
@@ -92,14 +95,14 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     ApplyProperties(renderer);
 
     bool isEditing = false;
-    GetDataNode()->GetBoolProperty("contour.editing", isEditing);
+    dataNode->GetBoolProperty("contour.editing", isEditing);
 
     mitk::ColorProperty::Pointer colorprop;
 
     if (isEditing)
-        colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.editing.color", renderer));
+        colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.editing.color", renderer));
     else
-        colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("contour.color", renderer));
+        colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
 
     if(colorprop)
     {
@@ -110,14 +113,14 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       glColor4f(red,green,blue,0.5);
     }
 
-    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("points.color", renderer));
+    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("points.color", renderer));
     if(!selectedcolor)
     {
       selectedcolor = mitk::ColorProperty::New(1.0,0.0,0.1);
     }
 
 
-    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
+    vtkLinearTransform* transform = dataNode->GetVtkTransform();
 
     //    ContourModel::OutputType point;
     mitk::Point3D point;
@@ -127,12 +130,12 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     float lineWidth = 3.0;
 
     bool isHovering = false;
-    this->GetDataNode()->GetBoolProperty("contour.hovering", isHovering);
+    dataNode->GetBoolProperty("contour.hovering", isHovering);
 
     if (isHovering)
-        this->GetDataNode()->GetFloatProperty("contour.hovering.width", lineWidth);
+        dataNode->GetFloatProperty("contour.hovering.width", lineWidth);
     else
-        this->GetDataNode()->GetFloatProperty("contour.width", lineWidth);
+        dataNode->GetFloatProperty("contour.width", lineWidth);
 
     bool drawit=false;
 
@@ -161,7 +164,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       //draw lines
       bool projectmode=false;
-      GetDataNode()->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
+      dataNode->GetVisibility(projectmode, renderer, "contour.project-onto-plane");
 
       if(projectmode)
       {

@@ -88,7 +88,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
     m_ContourLeft = mitk::ContourModel::New();
 
     //get coordinates of next active vertex downwards from selected vertex
-    int downIndex = SplitContourFromSelectedVertex( contour, m_ContourLeft, false, timestep);
+    int downIndex = this->SplitContourFromSelectedVertex( contour, m_ContourLeft, false, timestep);
 
     mitk::ContourModel::VertexIterator itDown = contour->IteratorBegin() + downIndex;
     m_NextActiveVertexDown = (*itDown)->Coordinates;
@@ -98,7 +98,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
     m_ContourRight = mitk::ContourModel::New();
 
     //get coordinates of next active vertex upwards from selected vertex
-    int upIndex = SplitContourFromSelectedVertex( contour, m_ContourRight, true, timestep);
+    int upIndex = this->SplitContourFromSelectedVertex( contour, m_ContourRight, true, timestep);
 
     mitk::ContourModel::VertexIterator itUp = contour->IteratorBegin() + upIndex;
     m_NextActiveVertexUp = (*itUp)->Coordinates;
@@ -216,7 +216,8 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   newContour->Concatenate( m_ContourRight, timestep );
 
   newContour->SetIsClosed(contour->IsClosed(timestep), timestep);
-  newContour->Deselect();//just to make sure
+  newContour->SelectVertexAt(currentPosition,1.5,timestep);
+  //newContour->Deselect();//just to make sure
   m_DataNode->SetData(newContour);
 
   this->m_lastMousePosition = positionEvent->GetWorldPosition();

@@ -3,7 +3,7 @@
 # configure_file(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in $#{PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
 
 MITK_CREATE_MODULE(Segmentation
-  INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering SegmentationUtilities/BooleanOperations
+  INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering SegmentationUtilities/BooleanOperations SegmentationUtilities/MorphologicalOperations
   DEPENDS Mitk ipSegmentation mitkIpFunc MitkExt MitkGraphAlgorithms
   PACKAGE_DEPENDS QT
   QT_MODULE

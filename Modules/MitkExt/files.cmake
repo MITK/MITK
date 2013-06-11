@@ -114,11 +114,6 @@ set(CPP_FILES
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
 #  Interactions/mitkCreateSurfaceTool.cpp
-  Interactions/mitkMorphologicTool.cpp
-  Interactions/mitkErodeTool.cpp
-  Interactions/mitkDilateTool.cpp
-  Interactions/mitkOpeningTool.cpp
-  Interactions/mitkClosingTool.cpp
   Interactions/mitkPixelManipulationTool.cpp
   Rendering/mitkEnhancedPointSetVtkMapper3D.cpp
   Rendering/mitkImageBackground2D.cpp

@@ -73,7 +73,7 @@ class MITK_CORE_EXPORT FileReader
     /**
     @brief Specifies, whether the file reader also can
     read a file from a memory buffer */
-    virtual bool CanReadFromMemory(  );
+    virtual bool CanReadFromMemory(  ); // TODO Eliminieren, stattdessen abstrakte Klasse welche nach unten StrStream bereitstellt
 
     /**
     @brief Set/Get functions to advise the file reader to

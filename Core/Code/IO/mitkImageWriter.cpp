@@ -255,6 +255,8 @@ void mitk::ImageWriter::GenerateData()
     // use the PicFileWriter for the .pic data type
     if( m_Extension.find(".pic") != std::string::npos )
     {
+      // Don't know who commented that out, but at least give a bleeding warning....
+      MITK_WARN << "Tried to write a PIC File, ignoring call for unknown reasons";
 /*    PicFileWriter::Pointer picWriter = PicFileWriter::New();
     size_t found;
     found = m_FileName.find( m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)

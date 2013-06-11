@@ -68,6 +68,10 @@ set(H_FILES
   Interactions/mitkEventMapperAddOn.h
 
   Interfaces/mitkIDataNodeReader.h
+  Interfaces/mitkIFileWriter.h
+  Interfaces/mitkIFileWriter.cpp
+  Interfaces/mitkIFileReader.h
+  Interfaces/mitkIFileReader.cpp
 
   Rendering/mitkLocalStorageHandler.h
 
@@ -260,12 +264,19 @@ set(CPP_FILES
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp
 
+  IO/mitkAbstractFileReader.cpp
+  IO/mitkAbstractFileWriter.cpp
+  IO/mitkLegacyImageWriterService.cpp
+  IO/mitkLegacyFileReaderService.cpp
+  IO/mitkLegacyFileWriterService.cpp
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
+  IO/mitkFileReaderManager.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
+  IO/mitkFileWriterManager.cpp
   #IO/mitkIpPicGet.c
   IO/mitkImageGenerator.cpp
   IO/mitkImageWriter.cpp

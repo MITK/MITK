@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 int mitk::ShaderRepository::shaderId = 0;
+const bool mitk::ShaderRepository::debug = false;
 
 mitk::ShaderRepository::ShaderRepository()
 {
@@ -116,12 +117,12 @@ int mitk::ShaderRepository::LoadShader(const std::string& filename)
     element->SetId(shaderId++);
     element->LoadProperties(filename);
     shaders.push_back(element);
-    SR_INFO << "found shader '" << element->GetName() << "'";
+    SR_INFO(debug) << "found shader '" << element->GetName() << "'";
     return element->GetId();
   }
   else
   {
-    SR_INFO << "Error: no xml shader file!";
+    SR_INFO(debug) << "Error: no xml shader file!";
     return -1;
   }
 }
@@ -134,7 +135,7 @@ int mitk::ShaderRepository::LoadShader(std::istream& stream, const std::string& 
   element->SetId(shaderId++);
   element->LoadProperties(stream);
   shaders.push_back(element);
-  SR_INFO << "found shader '" << element->GetName() << "'";
+  SR_INFO(debug) << "found shader '" << element->GetName() << "'";
   return element->GetId();
 }
 

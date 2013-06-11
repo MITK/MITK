@@ -155,6 +155,7 @@ protected:
 private:
 
   static int shaderId;
+  static const bool debug;
 
 public:
 

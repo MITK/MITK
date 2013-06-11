@@ -36,6 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
+
+
+
 QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
   : QmitkPlotWidget(parent)
 {
@@ -52,14 +55,8 @@ void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mit
                                                     mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
 {
 
- // mitk::Geometry3D* currentGeometry = fib->GetGeometry();
-
-
-
-
   TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
 
-  //todo: Make number of samples selectable by user
   TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
 
   // Now we have the resampled tracts. Next we should use these points to read out the values
@@ -608,7 +605,7 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
       c++;
     }
 
-    // Devide by the number of profiles to get group average
+    // Divide by the number of profiles to get group average
     for(int i=0; i<averageProfile.size(); i++)
     {
       averageProfile.at(i) = averageProfile.at(i) / size;
@@ -630,7 +627,6 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles()
   m_Vals.clear();
 
   std::vector<double> v1;
-
 
   std::vector <std::vector<double> > groupProfiles = CalculateGroupProfiles();
 
@@ -704,8 +700,71 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles()
 }
 
 
-void QmitkTbssRoiAnalysisWidget::PlotFiber4D()
+void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
+                                             mitk::FiberBundleX *fib,
+                                             mitk::PlanarFigure* startRoi,
+                                             mitk::PlanarFigure* endRoi,
+                                             int number)
 {
+  TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
+
+  TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
+
+  this->Clear();
+
+
+
+  // For every group we have m fibers * n subjects of profiles to fill
+
+  std::vector< std::vector<double> > profiles;
+
+  // calculate individual profiles by going through all n subjects
+  int size = m_Projections->GetVectorLength();
+  for(int s=0; s<size; s++)
+  {
+
+    // Iterate through all tracts
+    int nTracts = resampledTracts.size();
+    for(int t=0; t<nTracts; t++)
+    {
+      // Iterate trough the tract
+      std::vector<double> profile;
+      TractType::iterator it = resampledTracts[t].begin();
+      while(it != resampledTracts[t].end())
+      {
+        PointType p = *it;
+        PointType index;
+        tbssImage->GetGeometry()->WorldToIndex(p, index);
+
+        itk::Index<3> ix;
+        ix[0] = index[0];
+        ix[1] = index[1];
+        ix[2] = index[2];
+        // Get value from image
+
+        profile.push_back(m_Projections->GetPixel(ix).GetElement(s));
+      }
+      profiles.push_back(profile);
+    }
+
+
+    // Now create the group averages (every group contains m fibers * n_i group members
+
+
+
+
+
+  }
+
+
+
+  m_IndividualProfiles = profiles;
+
+
+
+
+
+
 
 }
 
@@ -715,96 +774,6 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
 {
   this->Clear();
   std::vector<TractType>::iterator it = tracts.begin();
-
-
-  // Match points on tracts. Take the smallest tract and match all others on this one
-
-
-  /*
-
-  int min = std::numeric_limits<int>::max();
-  TractType smallestTract;
-  while(it != tracts.end())
-  {
-    TractType tract = *it;
-    if(tract.size()<min)
-    {
-      smallestTract = tract;
-      min = tract.size();
-    }
-    ++it;
-  }
-
-
-  it = tracts.begin();
-  while(it != tracts.end())
-  {
-    TractType tract = *it;
-    if(tract == smallestTract)
-    {
-      ++it;
-      continue;
-    }
-
-    // Finding correspondences between points
-    std::vector<int> correspondingIndices;
-    TractType correspondingPoints;
-
-    for(int i=0; i<smallestTract.size(); i++)
-    {
-      PointType p = smallestTract[i];
-
-      double minDist = std::numeric_limits<float>::max();
-      int correspondingIndex = 0;
-      PointType correspondingPoint;
-
-      // Search for the point on the second tract with the smallest distance
-      // to p and memorize it
-      for(int j=0; j<tract.size(); j++)
-      {
-        PointType p2 = tract[j];
-        double dist = fabs( p.EuclideanDistanceTo(p2) );
-        if(dist < minDist)
-        {
-          correspondingIndex = j;
-          correspondingPoint = p2;
-          minDist = dist;
-        }
-      }
-
-
-      correspondingIndices.push_back(correspondingIndex);
-      correspondingPoints.push_back(correspondingPoint);
-
-
-    }
-
-    if(smallestTract.size() != correspondingIndices.size())
-    {
-
-      MITK_ERROR << "smallest tract and correspondingIndices have no equal size";
-      continue;
-    }
-
-
-    std::cout << "corresponding points\n";
-
-    for(int i=0; i<smallestTract.size(); i++)
-    {
-      PointType p = smallestTract[i];
-      PointType p2 = correspondingPoints[i];
-
-      std::cout << "[" << p[0] << ", " << p[1] << ", " << p[2] << ", ["
-                   << p2[0] << ", " << p2[1] << ", " << p2[2] << "]\n";
-    }
-
-
-    std::cout << std::endl;
-
-    ++it;
-  }
-*/
-
 
 
   // Get the values along the curves from a 3D images. should also contain info about the position on screen.

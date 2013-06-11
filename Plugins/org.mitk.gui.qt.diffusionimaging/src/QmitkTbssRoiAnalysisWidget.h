@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include <mitkFiberBundleX.h>
 #include <mitkPlanarCircle.h>
+#include <mitkTbssImage.h>
 
 
 #include <qwt_plot.h>
@@ -65,7 +66,11 @@ public:
   void DrawProfiles();
 
 
-  void PlotFiber4D();
+  void PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
+                   mitk::FiberBundleX *fib,
+                   mitk::PlanarFigure* startRoi,
+                   mitk::PlanarFigure* endRoi,
+                   int number);
 
 
   void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);

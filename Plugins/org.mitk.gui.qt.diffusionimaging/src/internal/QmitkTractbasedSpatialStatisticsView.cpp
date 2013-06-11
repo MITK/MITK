@@ -1093,7 +1093,25 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
 }
 
+void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
+                                                            mitk::FiberBundleX* fib,
+                                                            mitk::PlanarFigure* startRoi,
+                                                            mitk::PlanarFigure* endRoi)
+{
 
+
+  if(m_Controls->m_TabWidget->currentWidget() == m_Controls->m_MeasureTAB)
+  {
+    m_CurrentGeometry = image->GetGeometry();
+
+    m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
+    m_Controls->m_RoiPlotWidget->SetProjections(image->GetImage());
+    m_Controls->m_RoiPlotWidget->SetMeasure( image->GetMeasurementInfo() );
+    m_Controls->m_RoiPlotWidget->PlotFiber4D(image, fib, startRoi, endRoi, m_Controls->m_Segments->value());
+  }
+
+
+}
 
 void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
                                                            mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi)
@@ -1116,7 +1134,6 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_CurrentGeometry = image->GetGeometry();
 
 
-    std::string resultfile = "";
     std::string structure = roiImage->GetStructure();
 
     m_Controls->m_RoiPlotWidget->SetGroups(image->GetGroupInfo());
@@ -1124,7 +1141,7 @@ void QmitkTractbasedSpatialStatisticsView::Plot(mitk::TbssImage* image, mitk::Tb
     m_Controls->m_RoiPlotWidget->SetRoi(roi);
     m_Controls->m_RoiPlotWidget->SetStructure(structure);
     m_Controls->m_RoiPlotWidget->SetMeasure( image->GetMeasurementInfo() );
-    m_Controls->m_RoiPlotWidget->DrawProfiles(resultfile);
+    m_Controls->m_RoiPlotWidget->DrawProfiles();
   }
 
   m_Controls->m_RoiPlotWidget->SetPlottingFiber(false);

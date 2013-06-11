@@ -35,10 +35,6 @@ namespace mitk {
   class BaseData;
 }
 
-namespace itk {
-  template<class T> class SmartPointer;
-}
-
 namespace mitk {
 
 /**
@@ -121,29 +117,46 @@ namespace mitk {
     /**
     * \brief Returns a human readable description of the file format to be written.
     *
-    * This will be used in FileDialogs for example.
+    * This will be used in FileDialogs for example. It is not necessary to overwrite this method,
+    * instead simply set m_Description in the constructor.
     */
     virtual std::string GetDescription() const = 0 ;
 
     /**
     * \brief returns the file extension that this FileWriter is able to handle.
     *
-    * Please enter only the characters after the fullstop, e.g "nrrd" is correct
-    * while "*.nrrd" and ".nrrd" are incorrect.
+    * Please return only the characters after the fullstop, e.g "nrrd" is correct
+    * while "*.nrrd" and ".nrrd" are incorrect. It is not necessary to overwrite this method,
+    * instead simply set m_Extension in the constructor.
     */
     virtual std::string GetExtension() const = 0;
 
+    /**
+    * \brief returns the itk classname that this FileWriter is able to handle.
+    *
+    * It is not necessary to overwrite this method,
+    * instead simply set m_BaseDataType in the constructor.
+    */
     virtual std::string GetSupportedBasedataType() const = 0;
 
     /**
     * \brief returns a list of the supported Options
     *
     * Options are strings that are treated as flags when passed to the write method.
+    * It is not necessary to overwrite this method,
+    * instead simply fill m_SupportedOptions in the constructor.
     */
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
+    /**
+    * \brief Returns true if this reader can confirm that it can read this file and false otherwise.
+    */
     virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const = 0;
 
+    /**
+    * \brief Returns a value between 0 and 1 depending on the progress of the read.
+    * This method need not necessarily be implemented, always returning zero is accepted.
+    */
     virtual float GetProgress() const = 0;
 
     // Microservice properties
@@ -152,13 +165,9 @@ namespace mitk {
     static const std::string PROP_DESCRIPTION;
     static const std::string PROP_IS_LEGACY;
 
-
 protected:
 
 
-public:
-
-protected:
 };
 
 } // namespace mitk

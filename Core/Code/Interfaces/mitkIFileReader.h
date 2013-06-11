@@ -111,16 +111,12 @@ namespace mitk {
     /**
     * \brief Reads the specified file and returns its contents.
     *
-    * If you extend this class, it does make sense to more closely specify the
-    * result's class.
     */
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path = 0, mitk::DataStorage* ds = 0) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.
     *
-    * If you extend this class, it does make sense to more closely specify the
-    * result's class.
     */
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage* ds  = 0) = 0;
 
@@ -131,8 +127,8 @@ namespace mitk {
     * The priority is intended to be used by the MicroserviceFramework to determine
     * which reader to use if several equivalent readers have been found.
     * It may be used to replace a default reader from MITK in your own project.
-    * If you want to use your own reader for *.nrrd files instead of the default,
-    * just implement it and give it a higher priority than zero.
+    * E.g. if you want to use your own reader for *.nrrd files instead of the default,
+    * implement it and give it a higher priority than zero.
     */
     virtual int GetPriority() const = 0 ;
 
@@ -158,6 +154,9 @@ namespace mitk {
     */
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
+    /**
+    * \brief Returns true if this writer can confirm that it can read this file and false otherwise.
+    */
     virtual bool CanRead(const std::string& path) const = 0;
 
     virtual float GetProgress() const = 0;

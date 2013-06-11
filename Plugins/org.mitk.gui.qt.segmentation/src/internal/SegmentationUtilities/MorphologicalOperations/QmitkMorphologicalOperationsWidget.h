@@ -20,6 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 
+
+/**
+\brief GUI class for Morphological Segmentation Tools.
+
+*/
 class QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
@@ -27,6 +32,20 @@ class QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
 public:
   explicit QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
   ~QmitkMorphologicalOperationsWidget();
+
+
+
+  public slots:
+  void OnbtnClosingClicked();
+  void OnbtnOpeningClicked();
+  void OnbtnDilatationClicked();
+  void OnbtnErosionClicked();
+  void OnbtnFillHolesClicked();
+  void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+
+protected:
+   void enableButtons();
+   void disableButtons();
 
 private:
   Ui::QmitkMorphologicalOperationsWidgetControls m_Controls;

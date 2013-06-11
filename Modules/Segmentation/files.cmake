@@ -75,6 +75,7 @@ set(CPP_FILES
   Rendering/mitkContourModelMapper3D.cpp
   Rendering/mitkContourModelGLMapper2D.cpp
   SegmentationUtilities/BooleanOperations/mitkBooleanOperation.cpp
+  SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )
 
 set(QRC_FILES

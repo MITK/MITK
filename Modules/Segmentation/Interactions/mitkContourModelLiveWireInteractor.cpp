@@ -112,6 +112,9 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
 
   this->HandleEvent( newStateEvent );
 
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+
   return true;
 }
 

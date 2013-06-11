@@ -273,8 +273,8 @@ bool mitk::ContourModelInteractor::OnFinishEditing( Action* action, const StateE
 {
   m_DataNode->SetBoolProperty( "contour.editing", false );
 
-  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
-  contour->Deselect();
+ // mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+ // contour->Deselect();
 
   assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );

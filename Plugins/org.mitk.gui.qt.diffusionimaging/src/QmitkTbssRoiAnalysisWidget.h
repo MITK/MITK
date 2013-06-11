@@ -65,6 +65,9 @@ public:
   void DrawProfiles(std::string preprocessed);
 
 
+  void PlotFiber4D();
+
+
   void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
@@ -206,6 +209,7 @@ protected:
 
   void DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg=false, int number=25);
+
 
 
 

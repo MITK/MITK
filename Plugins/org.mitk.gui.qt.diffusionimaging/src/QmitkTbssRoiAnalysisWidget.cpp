@@ -723,6 +723,12 @@ void QmitkTbssRoiAnalysisWidget::DrawProfiles(std::string preprocessed)
 }
 
 
+void QmitkTbssRoiAnalysisWidget::PlotFiber4D();
+{
+
+}
+
+
 
 void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, bool avg)
 {

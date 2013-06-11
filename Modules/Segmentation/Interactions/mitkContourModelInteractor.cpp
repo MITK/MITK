@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
-:Interactor("ContourModelInteractor", dataNode)
+:Interactor("ContourModelInteractor2", dataNode)
 {
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPointClick );
   CONNECT_ACTION( AcCHECKOBJECT, OnCheckContourClick );
@@ -36,7 +36,7 @@ mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
   CONNECT_ACTION( AcMOVEPOINT, OnMovePoint );
 //  CONNECT_ACTION( AcMOVE, OnMoveContour );
   CONNECT_ACTION( AcMOVE, OnMove );
-  CONNECT_ACTION( AcFINISH, OnFinish );
+  CONNECT_ACTION( AcFINISH, OnFinishEditing );
 }
 
 
@@ -189,7 +189,6 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
 
 bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
 {
-
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
@@ -271,12 +270,12 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
 
 
 
-bool mitk::ContourModelInteractor::OnFinish( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnFinishEditing( Action* action, const StateEvent* stateEvent)
 {
   m_DataNode->SetBoolProperty( "contour.editing", false );
 
-  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
-  contour->Deselect();
+ // mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+ // contour->Deselect();
 
   assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );

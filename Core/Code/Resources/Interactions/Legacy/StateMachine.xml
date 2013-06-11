@@ -4018,8 +4018,8 @@
     <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="530"> <!-- left MouseButton and MouseMove = 530 -->
      <action ID="90" /> <!-- AcMOVEPOINT = 90 -->
     </transition>
-    <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="505"> <!--  left mbtn release = 505 -->
-      <action ID="44" />      <!-- AcFINISH = 44 -->
+    <transition NAME="mouseRelease" NEXT_STATE_ID="4" EVENT_ID="505">
+      <!-- no action -->
     </transition>
    </state>
    <state NAME="PointSelected" ID="4" >
@@ -4050,6 +4050,48 @@
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>
    </state>
+  </stateMachine>
+  <stateMachine NAME="ContourModelInteractor2">
+    <state NAME="Start" ID="1" START_STATE="TRUE">
+      <transition NAME="checkPointClick" NEXT_STATE_ID="10" EVENT_ID="1">
+        <!-- left mbtn = 1 -->
+        <action ID="21"/>
+        <!-- AcCHECKPOINT = 21 -->
+      </transition>
+      <transition NAME="mouseMove" NEXT_STATE_ID="1" EVENT_ID="520">
+        <!-- MouseMove = 520 -->
+        <action ID="92"/>
+        <!-- AcMOVE = 92 -->
+      </transition>
+      <transition NAME="Delete" NEXT_STATE_ID="1" EVENT_ID="12">
+        <!-- Delete = 12 -->
+        <action ID="120"/>
+        <!-- AcDELETEPOINT = 120 -->
+        <action ID="44" />
+        <!-- AcFINISH = 44 -->
+      </transition>
+    </state>
+    <state NAME="Guard_CheckPointClick" ID="10" >
+      <!-- check click on point -->
+      <transition NAME="yes" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <!-- EIDYES = 1004 -->
+        <!-- no action -->
+      </transition>
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <!-- EIDNO = 1003 -->
+        <!-- no action -->
+      </transition>
+    </state>
+    <state NAME="EditPoint" ID="2" >
+      <transition NAME="mouseMove" NEXT_STATE_ID="2" EVENT_ID="530">
+        <!-- left MouseButton and MouseMove = 530 -->
+        <action ID="90" />    <!-- AcMOVEPOINT = 90 -->
+      </transition>
+      <transition NAME="mouseRelease" NEXT_STATE_ID="1" EVENT_ID="505">
+        <action ID="44" />
+        <!-- AcFINISH = 44 -->
+      </transition>
+    </state>
   </stateMachine>
   <stateMachine NAME="LiveWireTool">
    <state NAME="Start" ID="1" START_STATE="TRUE">

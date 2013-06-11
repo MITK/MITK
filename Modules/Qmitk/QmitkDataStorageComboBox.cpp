@@ -77,6 +77,8 @@ mitk::DataNode::Pointer QmitkDataStorageComboBox::GetNode( int index ) const
 
 mitk::DataNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
 {
+   if (count() == 0)
+      return 0;
   int _CurrentIndex = this->currentIndex();
   return (_CurrentIndex >= 0)? this->GetNode(_CurrentIndex): 0;
 }

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <itkObject.h>
 #include <mitkCommon.h>
+#include "mitkBaseRenderer.h"
+#include "mitkOverlay.h"
 
 namespace mitk {
 
@@ -27,6 +29,13 @@ class BaseLayouter : public itk::Object {
 public:
 
   mitkClassMacro(BaseLayouter, itk::Object);
+
+  void SetBaseRenderer(BaseRenderer::Pointer renderer);
+  BaseRenderer::Pointer GetBaseRenderer();
+
+  void AddOverlay(mitk::Overlay::Pointer Overlay);
+  void RemoveOverlay(mitk::Overlay::Pointer Overlay);
+
 
 protected:
 
@@ -36,7 +45,12 @@ protected:
   /** \brief virtual destructor in order to derive from this class */
   virtual ~BaseLayouter();
 
+  std::list<mitk::Overlay::Pointer> GetManagedOverlays();
+
 private:
+
+  mitk::BaseRenderer::Pointer m_BaseRenderer;
+  std::list<mitk::Overlay*> m_ManagedOverlays;
 
   /** \brief copy constructor */
   BaseLayouter( const BaseLayouter &);

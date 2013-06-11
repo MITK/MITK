@@ -34,6 +34,14 @@ mitk::OverlayManager::~OverlayManager()
   m_BaseRendererMap.clear();
 }
 
+void mitk::OverlayManager::PrepareLayout(mitk::BaseRenderer *renderer)
+{
+  LocalStorage* ls = m_BaseRendererMap[renderer];
+  if(ls)
+  {
+  }
+}
+
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
   LocalStorage *l = m_BaseRendererMap[ renderer ];
@@ -85,6 +93,23 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 
 mitk::OverlayManager::LocalStorage::~LocalStorage()
 {
+  m_OverlayLayouterMap.clear();
+}
+
+void mitk::OverlayManager::LocalStorage::SetLayouterToOverlay(mitk::Overlay::Pointer overlay, mitk::BaseLayouter::Pointer layouter)
+{
+  mitk::BaseLayouter::Pointer oldLayouter = m_OverlayLayouterMap[overlay.GetPointer()];
+  if(oldLayouter.IsNotNull())
+  {
+    oldLayouter->RemoveOverlay(overlay);
+  }
+  m_OverlayLayouterMap[overlay.GetPointer()] = layouter;
+  layouter->AddOverlay(overlay);
+}
+
+mitk::BaseLayouter::Pointer mitk::OverlayManager::LocalStorage::GetLayouter(mitk::Overlay::Pointer overlay)
+{
+  return m_OverlayLayouterMap[overlay.GetPointer()];
 }
 
 mitk::OverlayManager::LocalStorage::LocalStorage()
@@ -110,6 +135,16 @@ void mitk::OverlayManager::UnregisterMicroservice()
   {
     m_Registration.Unregister();
   }
+}
+
+void mitk::OverlayManager::SetLayouter(mitk::Overlay::Pointer overlay, mitk::BaseLayouter::Pointer layouter)
+{
+  LocalStorage* ls = m_BaseRendererMap[layouter->GetBaseRenderer().GetPointer()];
+  if(!ls){
+    MITK_WARN << "The used renderer is not part of the OverlayManager. Nothing will happen.";
+    return;
+  }
+  ls->SetLayouterToOverlay(overlay,layouter);
 }
 
 mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(int ID)

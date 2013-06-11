@@ -20,8 +20,26 @@ mitk::BaseLayouter::BaseLayouter()
 {
 }
 
-
 mitk::BaseLayouter::~BaseLayouter()
 {
 }
 
+void mitk::BaseLayouter::SetBaseRenderer(mitk::BaseRenderer::Pointer renderer)
+{
+  m_BaseRenderer = renderer;
+}
+
+mitk::BaseRenderer::Pointer mitk::BaseLayouter::GetBaseRenderer()
+{
+  return m_BaseRenderer;
+}
+
+void mitk::BaseLayouter::AddOverlay(mitk::Overlay::Pointer Overlay)
+{
+  m_ManagedOverlays.push_back(Overlay.GetPointer());
+}
+
+void mitk::BaseLayouter::RemoveOverlay(mitk::Overlay::Pointer Overlay)
+{
+  m_ManagedOverlays.remove(Overlay.GetPointer());
+}

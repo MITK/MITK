@@ -54,3 +54,10 @@ mitk::Point3D mitk::VtkOverlay3D::GetPosition3D()
   GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
   return position3D;
 }
+
+mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
+{
+  mitk::Point3D position3D;
+  GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
+  return position3D;
+}

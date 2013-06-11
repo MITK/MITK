@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
 #include "mitkBaseRenderer.h"
+#include "mitkBaseLayouter.h"
 #include "mitkLocalStorageHandler.h"
 
 // Microservices
@@ -34,6 +35,7 @@ namespace mitk {
 
 class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
+  typedef std::map<Overlay* ,BaseLayouter::Pointer > OverlayLayouterMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
@@ -42,38 +44,31 @@ public:
   void RemoveOverlay(Overlay::Pointer overlay);
   void RemoveAllOverlays();
   void UnregisterMicroservice();
+  void SetLayouter(mitk::Overlay::Pointer overlay, mitk::BaseLayouter::Pointer layouter);
   static const std::string PROP_ID;
   static OverlayManager::Pointer GetServiceInstance(int ID = 0);
 
   /** \brief Base class for mapper specific rendering ressources.
    */
-  class MITK_CORE_EXPORT LocalStorage
+  class LocalStorage
   {
   public:
-
-    /** \brief Timestamp of last update of stored data. */
-    itk::TimeStamp m_LastUpdateTime;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
 
-    inline void UpdateGenerateDataTime()
-    {
-      m_LastGenerateDataTime.Modified();
-    }
-
-    inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
+    void SetLayouterToOverlay(Overlay::Pointer overlay, BaseLayouter::Pointer layouter);
+    BaseLayouter::Pointer GetLayouter(Overlay::Pointer overlay);
 
   protected:
 
-    /** \brief timestamp of last update of stored data */
-    itk::TimeStamp m_LastGenerateDataTime;
+    OverlayLayouterMap m_OverlayLayouterMap;
 
   };
 
-  typedef std::map<mitk::BaseRenderer* ,LocalStorage* > BaseRendererLSMap;
+  typedef std::map<BaseRenderer* ,LocalStorage* > BaseRendererLSMap;
 
   void AddBaseRenderer(BaseRenderer* renderer);
   void UpdateOverlays(BaseRenderer *baseRenderer);
@@ -86,6 +81,8 @@ protected:
   ~OverlayManager();
 
 private:
+
+  void PrepareLayout(BaseRenderer* renderer);
 
   std::list<Overlay::Pointer> m_OverlayList;
 

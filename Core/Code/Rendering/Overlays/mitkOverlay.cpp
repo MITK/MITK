@@ -220,6 +220,18 @@ void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, cons
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
+void mitk::Overlay::SetLayout(int layout, mitk::BaseRenderer *renderer)
+{
+  SetIntProperty("layout",layout,renderer);
+}
+
+int mitk::Overlay::GetLayout(mitk::BaseRenderer *renderer)
+{
+  int layout = 0;
+  GetIntProperty("layout",layout,renderer);
+  return layout;
+}
+
 void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
 {
   mitk::BoolProperty::Pointer prop;

@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkOverlayLayouter.h"
+#include "mitkOverlay2DLayouter.h"
 
-mitk::OverlayLayouter::OverlayLayouter()
+mitk::Overlay2DLayouter::Overlay2DLayouter()
 {
 }
 
 
-mitk::OverlayLayouter::~OverlayLayouter()
+mitk::Overlay2DLayouter::~Overlay2DLayouter()
 {
 }
 

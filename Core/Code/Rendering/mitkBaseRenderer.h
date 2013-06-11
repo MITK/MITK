@@ -483,7 +483,7 @@ namespace mitk
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(Geometry3D* geometry);
 
-    void AddAllOverlays();
+    void UpdateOverlays();
 
 
   private:

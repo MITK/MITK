@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKOVERLAYLAYOUTER_H
-#define MITKOVERLAYLAYOUTER_H
+#ifndef MITKOVERLAY2DLAYOUTER_H
+#define MITKOVERLAY2DLAYOUTER_H
 
 #include <MitkExports.h>
 #include <itkObject.h>
@@ -23,29 +23,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class OverlayLayouter : public mitk::BaseLayouter {
+class Overlay2DLayouter : public mitk::BaseLayouter {
 public:
 
-  mitkClassMacro(OverlayLayouter, mitk::BaseLayouter);
+  mitkClassMacro(Overlay2DLayouter, mitk::BaseLayouter);
+  enum Layout {TopLeft, Top, TopRight, Left, Middle, Right, BottomLeft, Bottom, BottomRight};
 
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit OverlayLayouter();
+  explicit Overlay2DLayouter();
 
   /** \brief virtual destructor in order to derive from this class */
-  virtual ~OverlayLayouter();
+  virtual ~Overlay2DLayouter();
 
 private:
 
   /** \brief copy constructor */
-  OverlayLayouter( const OverlayLayouter &);
+  Overlay2DLayouter( const Overlay2DLayouter &);
 
   /** \brief assignment operator */
-  OverlayLayouter &operator=(const OverlayLayouter &);
+  Overlay2DLayouter &operator=(const Overlay2DLayouter &);
 };
 
 } // namespace mitk
-#endif // MITKOVERLAYLAYOUTER_H
+#endif // MITKOVERLAY2DLAYOUTER_H
 
 

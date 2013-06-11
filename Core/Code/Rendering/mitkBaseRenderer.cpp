@@ -543,7 +543,7 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)
     m_EmptyWorldGeometry = false;
 }
 
-void mitk::BaseRenderer::AddAllOverlays()
+void mitk::BaseRenderer::UpdateOverlays()
 {
   if(m_OverlayManager.IsNotNull())
   {

@@ -22,18 +22,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include "mitkBaseRenderer.h"
 
-
 namespace mitk {
 
 class MITK_CORE_EXPORT Overlay : public itk::Object {
 public:
+
+  class BaseLayouter;
 
   struct Bounds
   {
     itk::Point<double,2> Position;
     itk::Point<double,2> Size;
   };
-  typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::map<const BaseRenderer*,PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::map<const BaseRenderer*,itk::SmartPointer<BaseLayouter>> LayouterMap;
 
   /** \brief Base class for mapper specific rendering ressources.
    */
@@ -321,6 +323,9 @@ public:
   //## FloatProperty)
   void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
 
+  void SetLayout(int layout, mitk::BaseRenderer* renderer);
+
+  int GetLayout(mitk::BaseRenderer* renderer);
 
   void SetText(std::string text);
 

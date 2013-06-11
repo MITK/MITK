@@ -340,7 +340,7 @@ set(CPP_FILES
   Rendering/Overlays/mitkTextOverlay3D.cpp
   Rendering/Overlays/mitkLabelOverlay3D.cpp
   Rendering/Overlays/mitkBaseLayouter.cpp
-  Rendering/Overlays/mitkOverlayLayouter.cpp
+  Rendering/Overlays/mitkOverlay2DLayouter.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h

@@ -39,7 +39,8 @@ public:
   itkNewMacro(OverlayManager);
 
   void AddOverlay(Overlay::Pointer overlay);
-  void UpdateOverlays(BaseRenderer *baseRenderer);
+  void RemoveOverlay(Overlay::Pointer overlay);
+  void RemoveAllOverlays();
   void UnregisterMicroservice();
   static const std::string PROP_ID;
   static OverlayManager::Pointer GetServiceInstance(int ID = 0);
@@ -58,8 +59,6 @@ public:
     /** \brief Default deconstructor of the local storage. */
     ~LocalStorage();
 
-//    bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::OverlayManager *overlaymanager);
-
     inline void UpdateGenerateDataTime()
     {
       m_LastGenerateDataTime.Modified();
@@ -74,20 +73,23 @@ public:
 
   };
 
-  /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-  mitk::LocalStorageHandler<LocalStorage> m_LSH;
+  typedef std::map<mitk::BaseRenderer* ,LocalStorage* > BaseRendererLSMap;
+
+  void AddBaseRenderer(BaseRenderer* renderer);
+  void UpdateOverlays(BaseRenderer *baseRenderer);
 
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit OverlayManager();
 
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~OverlayManager();
+  ~OverlayManager();
 
 private:
 
-  std::vector<Overlay::Pointer> m_OverlayList;
+  std::list<Overlay::Pointer> m_OverlayList;
+
+  BaseRendererLSMap m_BaseRendererMap;
 
   /** \brief copy constructor */
   OverlayManager( const OverlayManager &);

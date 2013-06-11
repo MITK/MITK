@@ -26,19 +26,60 @@ mitk::OverlayManager::OverlayManager()
 
 mitk::OverlayManager::~OverlayManager()
 {
+  BaseRendererLSMap::iterator it;
+  for ( it=m_BaseRendererMap.begin() ; it != m_BaseRendererMap.end(); it++ )
+  {
+    delete (*it).second;
+  }
+  m_BaseRendererMap.clear();
+}
+
+void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
+{
+  LocalStorage *l = m_BaseRendererMap[ renderer ];
+  if(!l)
+  {
+    l = new LocalStorage;
+    m_BaseRendererMap[ renderer ] = l;
+  }
 }
 
 void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
 {
   m_OverlayList.push_back(overlay);
+  BaseRendererLSMap::iterator it;
+  for ( it=m_BaseRendererMap.begin() ; it != m_BaseRendererMap.end(); it++ )
+  {
+    overlay->AddOverlay((*it).first);
+  }
+}
+
+void mitk::OverlayManager::RemoveOverlay(mitk::Overlay::Pointer overlay)
+{
+  m_OverlayList.remove(overlay);
+  BaseRendererLSMap::iterator it;
+  for ( it=m_BaseRendererMap.begin() ; it != m_BaseRendererMap.end(); it++ )
+  {
+    overlay->RemoveOverlay((*it).first);
+  }
+}
+
+void mitk::OverlayManager::RemoveAllOverlays()
+{
+  std::list<Overlay::Pointer>::iterator it;
+  for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
+  {
+    RemoveOverlay(*it);
+  }
+  m_OverlayList.clear();
 }
 
 void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 {
-  for(int i=0 ; i<m_OverlayList.size() ; i++)
+  std::list<Overlay::Pointer>::iterator it;
+  for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
   {
-    mitk::Overlay::Pointer overlay = m_OverlayList[i];
-    overlay->UpdateOverlay(baseRenderer);
+    (*it)->UpdateOverlay(baseRenderer);
   }
 }
 

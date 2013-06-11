@@ -73,11 +73,10 @@ public:
 
   Point3D GetPosition3D(mitk::BaseRenderer* renderer);
 
-  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
-
 protected:
 
-  virtual vtkSmartPointer<vtkActor> GetVtkActor(BaseRenderer *renderer);
+  virtual vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer);
+  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit LabelOverlay3D();

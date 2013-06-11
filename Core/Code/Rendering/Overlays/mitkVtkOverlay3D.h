@@ -30,9 +30,6 @@ namespace mitk {
 class MITK_CORE_EXPORT VtkOverlay3D : public VtkOverlay {
 public:
 
-  Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
-  void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds);
-
   void SetPosition3D(Point3D position3D);
 
   void SetPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
@@ -41,11 +38,14 @@ public:
 
   Point3D GetPosition3D();
 
+  Overlay::Bounds GetBoundsOnDisplay(BaseRenderer*);
+  void SetBoundsOnDisplay(BaseRenderer*, Overlay::Bounds);
+
   mitkClassMacro(VtkOverlay3D, VtkOverlay);
 
 protected:
 
-  vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer) = 0;
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay3D();

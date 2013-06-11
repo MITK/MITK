@@ -42,6 +42,18 @@ void mitk::VtkOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, mitk::
   actor->SetPosition2(bounds.Size[0],bounds.Size[1]);
 }
 
+void mitk::VtkOverlay2D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+{
+  vtkSmartPointer<vtkActor2D> prop = GetVtkActor2D(renderer);
+  float color[3] = {1,1,1};
+  float opacity = 1.0;
+  GetColor(color,renderer);
+  GetOpacity(opacity,renderer);
+  prop->GetProperty()->SetColor(color[0], color[1], color[2]);
+  prop->GetProperty()->SetOpacity(opacity);
+  UpdateVtkOverlay2D(renderer);
+}
+
 
 vtkSmartPointer<vtkProp> mitk::VtkOverlay2D::GetVtkProp(mitk::BaseRenderer *renderer)
 {

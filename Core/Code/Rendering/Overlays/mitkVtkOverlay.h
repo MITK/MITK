@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverlay.h"
 #include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
+#include <vtkProp.h>
 
 
 namespace mitk {
@@ -30,16 +31,15 @@ namespace mitk {
 class MITK_CORE_EXPORT VtkOverlay : public Overlay {
 public:
 
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
+  mitkClassMacro(VtkOverlay, Overlay);
   void UpdateOverlay(BaseRenderer *renderer);
   void AddOverlay(BaseRenderer *renderer);
   void RemoveOverlay(BaseRenderer *renderer);
 
-  mitkClassMacro(VtkOverlay, Overlay);
-
 protected:
 
   virtual vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer) = 0;
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay();

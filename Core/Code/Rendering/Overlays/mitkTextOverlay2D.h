@@ -68,11 +68,10 @@ public:
 
   Point3D GetPosition(mitk::BaseRenderer* renderer);
 
-  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
-
 protected:
 
   virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer);
+  void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer);
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit TextOverlay2D();

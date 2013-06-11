@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include <vtkSmartPointer.h>
 #include <vtkActor2D.h>
+#include <vtkProperty2D.h>
 
 
 namespace mitk {
@@ -31,14 +32,15 @@ namespace mitk {
 class MITK_CORE_EXPORT VtkOverlay2D : public VtkOverlay {
 public:
 
+  mitkClassMacro(VtkOverlay2D, VtkOverlay);
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds bounds);
-
-  mitkClassMacro(VtkOverlay2D, VtkOverlay);
 
 protected:
 
   vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer);
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer);
+  virtual void UpdateVtkOverlay2D(BaseRenderer *renderer) = 0;
   virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */

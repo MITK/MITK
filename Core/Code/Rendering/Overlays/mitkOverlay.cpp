@@ -170,6 +170,56 @@ std::string mitk::Overlay::GetText()
   return text;
 }
 
+bool mitk::Overlay::GetColor(float rgb[], mitk::BaseRenderer* renderer, const char* propertyKey) const
+{
+  mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer));
+  if(colorprop.IsNull())
+    return false;
+
+  memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+  return true;
+}
+
+void mitk::Overlay::SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer, const char* propertyKey)
+{
+  mitk::ColorProperty::Pointer prop;
+  prop = mitk::ColorProperty::New(color);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+}
+
+void mitk::Overlay::SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer, const char* propertyKey)
+{
+  float color[3];
+  color[0]=red;
+  color[1]=green;
+  color[2]=blue;
+  SetColor(color, renderer, propertyKey);
+}
+
+void mitk::Overlay::SetColor(const float rgb[], mitk::BaseRenderer* renderer, const char* propertyKey)
+{
+  mitk::ColorProperty::Pointer prop;
+  prop = mitk::ColorProperty::New(rgb);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+}
+
+bool mitk::Overlay::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey) const
+{
+  mitk::FloatProperty::Pointer opacityprop = dynamic_cast<mitk::FloatProperty*>(GetProperty(propertyKey, renderer));
+  if(opacityprop.IsNull())
+    return false;
+
+  opacity=opacityprop->GetValue();
+  return true;
+}
+
+void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
+{
+  mitk::FloatProperty::Pointer prop;
+  prop = mitk::FloatProperty::New(opacity);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
+}
+
 void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
 {
   mitk::BoolProperty::Pointer prop;

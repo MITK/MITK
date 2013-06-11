@@ -37,7 +37,7 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
 }
 
 
-void mitk::TextOverlay2D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_textActor->GetTextProperty()->SetFontSize ( 24 );
@@ -48,6 +48,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 
 vtkSmartPointer<vtkActor2D> mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer)
 {
-
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  return ls->m_textActor;
 }
 

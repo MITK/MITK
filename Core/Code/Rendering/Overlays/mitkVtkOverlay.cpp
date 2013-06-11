@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVtkOverlay.h"
+#include <vtkProperty.h>
 
 mitk::VtkOverlay::VtkOverlay()
 {
@@ -27,21 +28,23 @@ mitk::VtkOverlay::~VtkOverlay()
 
 void mitk::VtkOverlay::UpdateOverlay(mitk::BaseRenderer *renderer)
 {
-  vtkSmartPointer<vtkActor> vtkActor = GetVtkActor(renderer);
+  vtkSmartPointer<vtkProp> prop = GetVtkProp(renderer);
   if(!IsVisible(renderer))
   {
-    vtkActor->SetVisibility(false);
+    prop->SetVisibility(false);
     return;
   }
   else
   {
-    vtkActor->SetVisibility(true);
+
+    prop->SetVisibility(true);
     UpdateVtkOverlay(renderer);
   }
 }
 
 void mitk::VtkOverlay::AddOverlay(mitk::BaseRenderer *renderer)
 {
+  UpdateOverlay(renderer);
   vtkSmartPointer<vtkProp> vtkProp = GetVtkProp(renderer);
   if(!renderer->GetVtkRenderer()->HasViewProp(vtkProp))
   {

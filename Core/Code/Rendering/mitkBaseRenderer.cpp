@@ -371,7 +371,11 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
 
 void mitk::BaseRenderer::SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager)
 {
+  if(overlayManager.IsNotNull())
+  {
   this->m_OverlayManager = overlayManager;
+  this->m_OverlayManager->AddBaseRenderer(this);
+  }
 }
 
 itk::SmartPointer<mitk::OverlayManager> mitk::BaseRenderer::GetOverlayManager()

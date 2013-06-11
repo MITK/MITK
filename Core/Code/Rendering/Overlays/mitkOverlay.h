@@ -30,8 +30,8 @@ public:
 
   struct Bounds
   {
-    Point2D Position;
-    Point2D Size;
+    itk::Point<double,2> Position;
+    itk::Point<double,2> Size;
   };
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
 
@@ -63,13 +63,6 @@ public:
     PropertyList::Pointer m_PropertyList;
 
   };
-
-  virtual void AddOverlay(BaseRenderer *renderer) = 0;
-  virtual void RemoveOverlay(BaseRenderer *renderer) = 0;
-  virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
-
-  virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Bounds) = 0;
 
   //##Documentation
   //## @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
@@ -301,6 +294,34 @@ public:
     this->SetName(name.c_str());
   }
 
+  //##Documentation
+  //## @brief Convenience access method for color properties (instances of
+  //## ColorProperty)
+  //## @return @a true property was found
+  bool GetColor(float rgb[], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color") const;
+  //##Documentation
+  //## @brief Convenience method for setting color properties (instances of
+  //## ColorProperty)
+  void SetColor(const mitk::Color &color, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  //##Documentation
+  //## @brief Convenience method for setting color properties (instances of
+  //## ColorProperty)
+  void SetColor(float red, float green, float blue, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  //##Documentation
+  //## @brief Convenience method for setting color properties (instances of
+  //## ColorProperty)
+  void SetColor(const float rgb[], mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "color");
+  //##Documentation
+  //## @brief Convenience access method for opacity properties (instances of
+  //## FloatProperty)
+  //## @return @a true property was found
+  bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* propertyKey = "opacity") const;
+  //##Documentation
+  //## @brief Convenience method for setting opacity properties (instances of
+  //## FloatProperty)
+  void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
+
+
   void SetText(std::string text);
 
   std::string GetText();
@@ -337,6 +358,13 @@ public:
   //## @param renderer Specify a renderer if the visibility shall be specific to a renderer
   //## @param propertykey Can be used to specify a user defined name of the visibility propery.
   void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
+
+  virtual void AddOverlay(BaseRenderer *renderer) = 0;
+  virtual void RemoveOverlay(BaseRenderer *renderer) = 0;
+  virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
+
+  virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Bounds) = 0;
 
   mitkClassMacro(Overlay, itk::Object);
 

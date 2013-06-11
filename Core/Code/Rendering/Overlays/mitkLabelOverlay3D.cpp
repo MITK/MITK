@@ -56,6 +56,12 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_follower->SetPosition(GetPosition3D()[0],GetPosition3D()[1],GetPosition3D()[2]);
   ls->m_textSource->SetText(GetText().c_str());
+  float color[3] = {1,1,1};
+  float opacity = 1.0;
+  GetColor(color,renderer);
+  GetOpacity(opacity,renderer);
+  ls->m_follower->GetProperty()->SetColor(color[0], color[1], color[2]);
+  ls->m_follower->GetProperty()->SetOpacity(opacity);
 }
 
 
@@ -99,7 +105,7 @@ mitk::Point3D mitk::LabelOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 }
 
 
-vtkSmartPointer<vtkActor> mitk::LabelOverlay3D::GetVtkActor(BaseRenderer *renderer)
+vtkSmartPointer<vtkProp> mitk::LabelOverlay3D::GetVtkProp(BaseRenderer *renderer)
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_follower->SetCamera(renderer->GetVtkRenderer()->GetActiveCamera());

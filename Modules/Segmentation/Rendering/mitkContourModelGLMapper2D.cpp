@@ -182,6 +182,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glVertex2f(pt2d[0], pt2d[1]);
           glVertex2f(lastPt2d[0], lastPt2d[1]);
           glEnd();
+          glLineWidth(1);
         }
 
 
@@ -218,9 +219,6 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       pointsIt++;
     }//end while iterate over controlpoints
 
-    // make sure the line is set back to default value
-    glLineWidth(1);
-
     //close contour if necessary
     if(renderingContour->IsClosed(timestep) && drawit)
     {
@@ -233,10 +231,12 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       displayGeometry->Map(projected_p, pt2d);
       displayGeometry->WorldToDisplay(pt2d, pt2d);
 
+      glLineWidth(lineWidth);
       glBegin (GL_LINES);
       glVertex2f(lastPt2d[0], lastPt2d[1]);
       glVertex2f( pt2d[0], pt2d[1] );
       glEnd();
+      glLineWidth(1);
     }
 
     //draw selected vertex if exists
@@ -262,7 +262,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       if(scalardiff<0.25)
       {
 
-        float pointsize = 3.2;
+        float pointsize = 5;
         Point2D  tmp;
         glColor3f(0.0, 1.0, 0.0);
         glLineWidth(1);

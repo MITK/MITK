@@ -51,14 +51,14 @@ namespace mitk {
 * This interface defines the Methods necessary for the FileReaderManager
 * to interact with its FileReaders. To implement a new Filereader, it is
 * recommended to derive from FileReaderAbstract instead of from the Interface,
-* as the abstract class already implements most of the functions.
+* as the abstract class already implements most of the functions and also makes sure
+* that your reader will be managed by the FileReaderManager.
 */
 
   struct MITK_CORE_EXPORT IFileReader
 {
 
     virtual ~IFileReader();
-
 
     /**
     * \brief Get the complete file name and path to the file that will be read.
@@ -159,6 +159,10 @@ namespace mitk {
     */
     virtual bool CanRead(const std::string& path) const = 0;
 
+    /**
+    * \brief Returns a value between 0 and 1 depending on the progress of the read.
+    * This method need not necessarily be implemented meaningfully, always returning zero is accepted.
+    */
     virtual float GetProgress() const = 0;
 
     // Microservice properties
@@ -173,10 +177,6 @@ namespace mitk {
 
 protected:
 
-
-public:
-
-protected:
 };
 
 } // namespace mitk

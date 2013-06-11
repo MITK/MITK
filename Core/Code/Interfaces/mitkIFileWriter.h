@@ -38,19 +38,19 @@ namespace mitk {
 namespace mitk {
 
 /**
-* \brief The common interface of all FileWriter.
+* \brief The common interface of all FileWriters.
 *
 * This interface defines the methods necessary for the FileWriterManager
 * to interact with its FileWriters. To implement a new FileWriter, it is
-* recommended to derive from FileWriterAbstract instead of from the Interface,
-* as the abstract class already implements most of the functions.
+* recommended to derive from FileWriterAbstract instead of directly from this Interface,
+* as the abstract class already implements most of the methods and also makes sure that your writer
+* will be managed by the FileWriterManager.
 */
 
   struct MITK_CORE_EXPORT IFileWriter
 {
 
     virtual ~IFileWriter();
-
 
     /**
     * \brief Get the complete file name and path to the file that will be written.
@@ -97,7 +97,6 @@ namespace mitk {
     //*/
     //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
-
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0) = 0;
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream ) = 0;
@@ -117,8 +116,7 @@ namespace mitk {
     /**
     * \brief Returns a human readable description of the file format to be written.
     *
-    * This will be used in FileDialogs for example. It is not necessary to overwrite this method,
-    * instead simply set m_Description in the constructor.
+    * This will be used in FileDialogs for example.
     */
     virtual std::string GetDescription() const = 0 ;
 
@@ -126,16 +124,12 @@ namespace mitk {
     * \brief returns the file extension that this FileWriter is able to handle.
     *
     * Please return only the characters after the fullstop, e.g "nrrd" is correct
-    * while "*.nrrd" and ".nrrd" are incorrect. It is not necessary to overwrite this method,
-    * instead simply set m_Extension in the constructor.
+    * while "*.nrrd" and ".nrrd" are incorrect.
     */
     virtual std::string GetExtension() const = 0;
 
     /**
     * \brief returns the itk classname that this FileWriter is able to handle.
-    *
-    * It is not necessary to overwrite this method,
-    * instead simply set m_BaseDataType in the constructor.
     */
     virtual std::string GetSupportedBasedataType() const = 0;
 
@@ -143,8 +137,6 @@ namespace mitk {
     * \brief returns a list of the supported Options
     *
     * Options are strings that are treated as flags when passed to the write method.
-    * It is not necessary to overwrite this method,
-    * instead simply fill m_SupportedOptions in the constructor.
     */
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
@@ -154,8 +146,8 @@ namespace mitk {
     virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const = 0;
 
     /**
-    * \brief Returns a value between 0 and 1 depending on the progress of the read.
-    * This method need not necessarily be implemented, always returning zero is accepted.
+    * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
+    * This method need not necessarily be implemented meaningfully, always returning zero is accepted.
     */
     virtual float GetProgress() const = 0;
 
@@ -167,12 +159,9 @@ namespace mitk {
 
 protected:
 
-
 };
 
 } // namespace mitk
-
-
 
 // This is the microservice declaration. Do not meddle!
 US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.services.FileWriter")

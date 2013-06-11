@@ -51,6 +51,8 @@ namespace mitk {
 *  <li> (Optional) m_Priority: To make this writer rank higher when choosing writers automatically
 *  <li> (Optional) m_SupportedOptions: To define which options this writer can handle. Options can modify writing behaviour (e.g. set a compression)
 * </ul>
+* You can also use the protected constructor for this.
+*
 * @ingroup Process
 */
   class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter

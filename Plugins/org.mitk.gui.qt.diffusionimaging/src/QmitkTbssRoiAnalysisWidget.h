@@ -62,7 +62,7 @@ public:
   }
 
   /* \brief Draws the group averaged profiles */
-  void DrawProfiles(std::string preprocessed);
+  void DrawProfiles();
 
 
   void PlotFiber4D();
@@ -157,7 +157,7 @@ protected:
 
 
 
-  std::vector< std::vector<double> > CalculateGroupProfiles(std::string preprocessed);
+  std::vector< std::vector<double> > CalculateGroupProfiles();
 
 
 
@@ -212,7 +212,8 @@ protected:
 
 
 
-
+  /* \brief Creates tracts from a mitk::FiberBundleX and two planar figures indicating the start end end point */
+  TractContainerType CreateTracts(mitk::FiberBundleX *fib, mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi);
 
 
 

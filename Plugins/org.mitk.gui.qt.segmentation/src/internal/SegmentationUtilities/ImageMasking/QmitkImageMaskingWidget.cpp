@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
 
+#include <qmessagebox.h>
+
 static const char* const HelpText = "Select a regular image and a binary image";
 
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
@@ -82,10 +84,17 @@ void QmitkImageMaskingWidget::SelectionControll(unsigned int index, const mitk::
   //if Image-Masking is enabled, check if image-dimension of reference and binary image is identical
   if( m_Controls.rbMaskImage->isChecked() )
   {
-    if( node.IsNotNull() && selection )
+    if( dataSelectionWidget->GetSelection(0) == dataSelectionWidget->GetSelection(1) )
     {
-      mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( node->GetData() );
-      mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( selection->GetData() );
+      dataSelectionWidget->SetHelpText("Select two different images above");
+      this->EnableButtons(false);
+      return;
+    }
+
+    else if( node.IsNotNull() && selection )
+    {
+      mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
+      mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
 
       if( referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
       {
@@ -140,13 +149,14 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
   //create result image, get mask node and reference image
-  mitk::Image::Pointer resultImage;
+  mitk::Image::Pointer resultImage(0);
   mitk::DataNode::Pointer maskingNode = dataSelectionWidget->GetSelection(1);
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(dataSelectionWidget->GetSelection(0)->GetData());
 
   if(referenceImage.IsNull() || maskingNode.IsNull() )
   {
-    mitkThrow() << "Selection does not contain an image";
+    MITK_ERROR << "Selection does not contain an image";
+    QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain an image", QMessageBox::Ok );
     m_Controls.btnMaskImage->setEnabled(true);
     return;
   }
@@ -160,12 +170,17 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
     if(maskImage.IsNull() )
     {
-      mitkThrow() << "Selection does not contain a binary image";
+      MITK_ERROR << "Selection does not contain a binary image";
+      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a binary image", QMessageBox::Ok );
       this->EnableButtons();
       return;
     }
 
-    resultImage = this->MaskImage( referenceImage, maskImage );
+    if( referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
+    {
+      resultImage = this->MaskImage( referenceImage, maskImage );
+    }
+
   }
 
   //Do Surface-Masking
@@ -180,17 +195,19 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
     if(surface.IsNull())
     {
-      mitkThrow() << "Selection does not contain a surface";
+      MITK_ERROR << "Selection does not contain a surface";
+      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a surface", QMessageBox::Ok );
       this->EnableButtons();
       return;
     }
 
-    mitk::Image::Pointer mask = this->ConvertSurfaceToImage( referenceImage, surface );
+    mitk::Image::Pointer maskImage = this->ConvertSurfaceToImage( referenceImage, surface );
 
     //2. mask reference image with mask image
-    if(mask.IsNotNull())
+    if(maskImage.IsNotNull() &&
+       referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
     {
-      resultImage = this->MaskImage( referenceImage, mask );
+      resultImage = this->MaskImage( referenceImage, maskImage );
     }
   }
 
@@ -198,7 +215,8 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
   if( resultImage.IsNull() )
   {
-    mitkThrow() << "Masking failed";
+    MITK_ERROR << "Masking failed";
+    QMessageBox::information( this, "Image and Surface Masking", "Masking failed. For more information please see logging window.", QMessageBox::Ok );
     this->EnableButtons();
     mitk::ProgressBar::GetInstance()->Progress(4);
     return;
@@ -220,18 +238,20 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
 {
   mitk::Image::Pointer resultImage(0);
 
-  if( referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
-  {
-    MITK_ERROR << "Image and mask are of different size";
-    return resultImage;
-  }
-
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput( referenceImage );
   maskFilter->SetMask( maskImage );
   maskFilter->OverrideOutsideValueOn();
   maskFilter->SetOutsideValue( referenceImage->GetStatistics()->GetScalarValueMin() );
-  maskFilter->Update();
+  try
+  {
+    maskFilter->Update();
+  }
+  catch(itk::ExceptionObject& excpt)
+  {
+    MITK_ERROR << excpt.GetDescription();
+    return 0;
+  }
 
   resultImage = maskFilter->GetOutput();
 
@@ -253,7 +273,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
   }
   catch(itk::ExceptionObject& excpt)
   {
-    mitkThrow() << excpt.GetDescription();
+    MITK_ERROR << excpt.GetDescription();
     return 0;
   }
 

@@ -51,7 +51,7 @@ void QmitkSegmentationUtilities2View::CreateQtPartControl(QWidget* parent)
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
-  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/utilities_surface2image.png"), "Surface To Image Filter");
+  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/utilities_surface2image.png"), "Surface To Image");
 }
 
 void QmitkSegmentationUtilities2View::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)

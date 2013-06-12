@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkSurfaceToImageFilter.h>
 
+#include <qmessagebox.h>
+
 static const char* const HelpText = "Select a regular image and a surface";
 
 QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
@@ -51,16 +53,18 @@ void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
 void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
-  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( dataSelectionWidget->GetSelection(1)->GetData() );
+  mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
+  mitk::DataNode::Pointer surfaceNode = dataSelectionWidget->GetSelection(1);
 
-  if (image.IsNull() || surface.IsNull() )
+  if (imageNode.IsNull() || surfaceNode.IsNull() )
   {
     dataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
   }
   else
   {
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
+    mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( dataSelectionWidget->GetSelection(1)->GetData() );
     if( image->GetTimeSteps() != surface->GetTimeSteps() )
     {
       dataSelectionWidget->SetHelpText("Image and surface are of different size");
@@ -85,6 +89,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   if( image.IsNull() || surface.IsNull())
   {
     MITK_ERROR << "Selection does not contain an image and/or a surface";
+    QMessageBox::information( this, "Surface To Image", "Selection does not contain an image and/or a surface", QMessageBox::Ok );
     this->EnableButtons();
     return;
   }
@@ -95,7 +100,8 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   if( resultImage.IsNull() )
   {
     MITK_ERROR << "Convert Surface to binary image failed";
-    m_Controls.btnSurface2Image->setEnabled(true);
+    QMessageBox::information( this, "Surface To Image", "Convert Surface to binary image failed", QMessageBox::Ok );
+    this->EnableButtons();
     return;
   }
 

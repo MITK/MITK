@@ -451,52 +451,46 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
 
       if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
       {
-      switch (io->GetComponentType())
-      {
-      // TODO UCHAR MIGHT be PALETTE_COLOR, which would be read by ITK as RGB (which makes sense)!
-      // io->GetPixelType() == itk::ImageIOBase::RGB
-      //                    == itk::ImageIOBase::SCALAR
-      case DcmIoType::UCHAR:
-        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::CHAR:
-        DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::USHORT:
-        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::SHORT:
-        DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::UINT:
-        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::INT:
-        DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::ULONG:
-        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::LONG:
-        DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::FLOAT:
-        DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      case DcmIoType::DOUBLE:
-        DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback);
-        break;
-      default:
-        MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
-      }
+        switch (io->GetComponentType())
+        {
+          case DcmIoType::UCHAR:
+            DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::CHAR:
+            DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::USHORT:
+            DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::SHORT:
+            DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::UINT:
+            DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::INT:
+            DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::ULONG:
+            DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::LONG:
+            DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::FLOAT:
+            DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          case DcmIoType::DOUBLE:
+            DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, correctTilt, callback);
+            break;
+          default:
+            MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
+        }
       }
       else if (io->GetPixelType() == itk::ImageIOBase::RGB)
       {
-          switch (io->GetComponentType())
-          {
-          // TODO UCHAR MIGHT be PALETTE_COLOR, which would be read by ITK as RGB (which makes sense)!
-          // io->GetPixelType() == itk::ImageIOBase::RGB
-          //                    == itk::ImageIOBase::SCALAR
+        switch (io->GetComponentType())
+        {
           case DcmIoType::UCHAR:
             DicomSeriesReader::LoadDicom< itk::RGBPixel<unsigned char> >(filenames, node, sort, check_4d, correctTilt, callback);
             break;
@@ -529,7 +523,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
             break;
           default:
             MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
-          }
+        }
       }
 
       if (node.GetData())

@@ -14,43 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPointSetVtkMapper2D.h"
+
+//mitk includes
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
-#include "mitkColorProperty.h"
-#include "mitkEnumerationProperty.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkPointSet.h"
 
+//vtk includes
 #include <vtkActor.h>
-#include <vtkAppendPolyData.h>
 #include <vtkPropAssembly.h>
-#include <vtkTubeFilter.h>
-#include <vtkRenderer.h>
-#include <vtkSphereSource.h>
-#include <vtkCubeSource.h>
-#include <vtkConeSource.h>
-#include <vtkDiskSource.h>
-#include <vtkCylinderSource.h>
-#include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkVectorText.h>
-#include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkPolyDataAlgorithm.h>
 #include <vtkTransform.h>
 #include <vtkGlyph3D.h>
 #include <vtkTransformFilter.h>
-#include <vtkLinearTransform.h>
 #include <vtkLine.h>
-#include <vtkSource.h>
 #include <vtkGlyphSource2D.h>
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
-#include <vtkPolyLine.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
+#include <vtkCellArray.h>
 
 #include <stdlib.h>
 
@@ -113,8 +98,8 @@ const mitk::PointSet* mitk::PointSetVtkMapper2D::GetInput()
 
 // constructor PointSetVtkMapper2D
 mitk::PointSetVtkMapper2D::PointSetVtkMapper2D()
-: m_Polygon(false),
-m_PolygonClosed(false),
+: m_ShowContour(false),
+m_CloseContour(false),
 m_ShowPoints(true),
 m_ShowDistances(false),
 m_DistancesDecimalDigits(1),
@@ -123,8 +108,8 @@ m_ShowDistantLines(false),
 m_LineWidth(1),
 m_PointLineWidth(1),
 m_Point2DSize(6),
-m_IdGlyph(mitk::PointSetShapeProperty::CROSS),
-m_FillGlyphs(false)
+m_IDShapeProperty(mitk::PointSetShapeProperty::CROSS),
+m_FillShape(false)
 {
 }
 
@@ -133,7 +118,7 @@ mitk::PointSetVtkMapper2D::~PointSetVtkMapper2D()
 {
 }
 
-// toggles visiblity of the prop assembly
+// reset mapper so that nothing is displayed e.g. toggle visiblity of the propassembly
 void mitk::PointSetVtkMapper2D::ResetMapper( BaseRenderer* renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -147,10 +132,14 @@ vtkProp* mitk::PointSetVtkMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
   return ls->m_PropAssembly;
 }
 
+
 static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& out)
 {
+  // The dot product of orthogonal vectors is zero.
+  // In two dimensions the slopes of perpendicular lines are negative reciprocals.
   if((fabs(in[0])>0) && ( (fabs(in[0])>fabs(in[1])) || (in[1] == 0) ) )
   {
+    // negative reciprocal
     out[0]=-in[1]/in[0];
     out[1]=1;
     out.Normalize();
@@ -160,6 +149,7 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
     if(fabs(in[1])>0)
     {
       out[0]=1;
+      // negative reciprocal
       out[1]=-in[0]/in[1];
       out.Normalize();
       return true;
@@ -174,16 +164,12 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_UnselectedActor))
-    ls->m_PropAssembly->RemovePart(ls->m_UnselectedActor);
-  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_SelectedActor))
-    ls->m_PropAssembly->RemovePart(ls->m_SelectedActor);
-  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_ContourActor))
-    ls->m_PropAssembly->RemovePart(ls->m_ContourActor);
-  if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextActor))
-    ls->m_PropAssembly->RemovePart(ls->m_VtkTextActor);
-
   unsigned i = 0;
+
+  // The vtk text actors need to be removed manually from the propassembly
+  // since the same vtk text actors are not overwriten within this function,
+  // but new actors are added to the propassembly each time this function is executed.
+  // Thus, the actors from the last call must be removed in the beginning.
   for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
   {
     if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextLabelActors.at(i)))
@@ -202,33 +188,23 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       ls->m_PropAssembly->RemovePart(ls->m_VtkTextAngleActors.at(i));
   }
 
-  // polydata
+  // initialize polydata here, otherwise we have update problems when
+  // executing this function again
   ls->m_VtkUnselectedPointListPolyData = vtkSmartPointer<vtkPolyData>::New();
   ls->m_VtkSelectedPointListPolyData = vtkSmartPointer <vtkPolyData>::New();
   ls->m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
 
 
-  // exceptional displaying for PositionTracker -> MouseOrientationTool
-  int mapperID;
-  bool isInputDevice=false;
-  if( this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice )
-  {
-    if( this->GetDataNode()->GetIntProperty("BaseRendererMapperID",mapperID) && mapperID == 2)
-      return; //The event for the PositionTracker came from the 3d widget and  not needs to be displayed
-  }
-
   // get input point set and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
-  /* only update the input data, if the property tells us to */
+  // only update the input data, if the property tells us to
   bool update = true;
   this->GetDataNode()->GetBoolProperty("updateDataOnRender", update);
   if (update == true)
     input->Update();
 
-  //TODO: insert last changes on timestamps
   int timestep = this->GetTimestep();
-
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
 
   if ( itkPointSet.GetPointer() == NULL)
@@ -284,7 +260,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   itk::Point<float> point = pointsIter->Value();
 
   mitk::Point3D p = point;              // currently visited point
-  mitk::Point3D lastP = point;          // last visited point
+  mitk::Point3D lastP = point;          // last visited point (predecessor in point set of "point")
   mitk::Vector3D vec;                   // p - lastP
   mitk::Vector3D lastVec;               // lastP - point before lastP
   vec.Fill(0);
@@ -295,13 +271,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   mitk::Point2D pt2d;
   pt2d[0] = point[0];                    // projected_p in display coordinates
   pt2d[1] = point[1];
-  mitk::Point2D lastPt2d = pt2d;         // last projected_p in display coordinates
+  mitk::Point2D lastPt2d = pt2d;         // last projected_p in display coordinates (predecessor in point set of "pt2d")
   mitk::Point2D preLastPt2d = pt2d ;     // projected_p in display coordinates before lastPt2
 
-  // get display geometry
-  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
-  // get plane geometry
+  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
   mitk::PlaneGeometry::ConstPointer planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
   int count = 0;
@@ -334,12 +308,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     float diff = planeGeometry->DistanceFromPlane(point);
     diff = diff * diff;
 
-    //MouseOrientation
-    bool isInputDevice=false;
-    this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice);
-
     // if point is close to current plane ( distance < 4) it will be displayed
-    if(!isInputDevice && (diff < 4.0))
+    if(diff < 4.0)
     {
 
       // is point selected or not?
@@ -396,7 +366,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     // draw contour, distance text and angle text in render window
 
     // lines between points, which intersect the current plane, are drawn
-    if( m_Polygon && count > 0 )
+    if( m_ShowContour && count > 0 )
     {
       ScalarType distance =    displayGeometry->GetWorldGeometry()->SignedDistance(point);
       ScalarType lastDistance =    displayGeometry->GetWorldGeometry()->SignedDistance(lastP);
@@ -497,10 +467,10 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
 
   //create lines between the points which intersect the plane
-  if (m_Polygon)
+  if (m_ShowContour)
   {
     // draw line between first and last point which is rendered
-    if(m_PolygonClosed && NumberContourPoints > 1){
+    if(m_CloseContour && NumberContourPoints > 1){
 
       vtkSmartPointer<vtkLine> closingLine = vtkSmartPointer<vtkLine>::New();
       closingLine->GetPointIds()->SetId(0, 0); // index of first point
@@ -541,9 +511,9 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   //---- UNSELECTED POINTS  -----//
 
   // apply properties to glyph
-  ls->m_UnselectedGlyphSource2D->SetGlyphType(m_IdGlyph);
+  ls->m_UnselectedGlyphSource2D->SetGlyphType(m_IDShapeProperty);
 
-  if(m_FillGlyphs)
+  if(m_FillShape)
     ls->m_UnselectedGlyphSource2D->FilledOn();
   else
     ls->m_UnselectedGlyphSource2D->FilledOff();
@@ -607,6 +577,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     return;
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
+  // check whether the input data has been changed
   bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
   // toggle visibility
@@ -623,8 +595,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     ls->m_PropAssembly->VisibilityOn();
   }
 
-  node->GetBoolProperty("show contour",       m_Polygon, renderer);
-  node->GetBoolProperty("close contour",      m_PolygonClosed, renderer);
+  node->GetBoolProperty("show contour",       m_ShowContour, renderer);
+  node->GetBoolProperty("close contour",      m_CloseContour, renderer);
   node->GetBoolProperty("show points",        m_ShowPoints, renderer);
   node->GetBoolProperty("show distances",     m_ShowDistances, renderer);
   node->GetIntProperty("distance decimal digits",     m_DistancesDecimalDigits, renderer);
@@ -633,12 +605,12 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
   node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
-  node->GetBoolProperty("Pointset.2D.fill shape", m_FillGlyphs, renderer);
+  node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
 
   mitk::PointSetShapeProperty::Pointer shape = dynamic_cast<mitk::PointSetShapeProperty*>(this->GetDataNode()->GetProperty( "Pointset.2D.shape", renderer ));
   if(shape.IsNotNull())
   {
-    m_IdGlyph = shape->GetPointSetShape();
+    m_IDShapeProperty = shape->GetPointSetShape();
   }
 
   //check for color props and use it for rendering of selected/unselected points and contour
@@ -692,7 +664,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     ls-> m_SelectedActor->VisibilityOff();
   }
 
-  if (m_Polygon)
+  if (m_ShowContour)
   {
     ls->m_ContourActor->VisibilityOn();
 

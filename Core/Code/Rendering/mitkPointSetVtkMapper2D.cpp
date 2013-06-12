@@ -118,7 +118,7 @@ mitk::PointSetVtkMapper2D::~PointSetVtkMapper2D()
 {
 }
 
-// toggles visiblity of the prop assembly
+// reset mapper so that nothing is displayed e.g. toggle visiblity of the propassembly
 void mitk::PointSetVtkMapper2D::ResetMapper( BaseRenderer* renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -132,11 +132,14 @@ vtkProp* mitk::PointSetVtkMapper2D::GetVtkProp(mitk::BaseRenderer * renderer)
   return ls->m_PropAssembly;
 }
 
-// TODO
+
 static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& out)
 {
+  // The dot product of orthogonal vectors is zero.
+  // In two dimensions the slopes of perpendicular lines are negative reciprocals.
   if((fabs(in[0])>0) && ( (fabs(in[0])>fabs(in[1])) || (in[1] == 0) ) )
   {
+    // negative reciprocal
     out[0]=-in[1]/in[0];
     out[1]=1;
     out.Normalize();
@@ -146,6 +149,7 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
     if(fabs(in[1])>0)
     {
       out[0]=1;
+      // negative reciprocal
       out[1]=-in[0]/in[1];
       out.Normalize();
       return true;
@@ -166,7 +170,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   // since the same vtk text actors are not overwriten within this function,
   // but new actors are added to the propassembly each time this function is executed.
   // Thus, the actors from the last call must be removed in the beginning.
-
   for(i=0; i< ls->m_VtkTextLabelActors.size(); i++)
   {
     if(ls->m_PropAssembly->GetParts()->IsItemPresent(ls->m_VtkTextLabelActors.at(i)))
@@ -192,15 +195,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   ls->m_VtkContourPolyData = vtkSmartPointer<vtkPolyData>::New();
 
 
-  // exceptional displaying for PositionTracker -> MouseOrientationTool
-  int mapperID;
-  bool isInputDevice=false;
-  if( this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice )
-  {
-    if( this->GetDataNode()->GetIntProperty("BaseRendererMapperID",mapperID) && mapperID == 2)
-      return; //The event for the PositionTracker came from the 3d widget and  not needs to be displayed
-  }
-
   // get input point set and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
 
@@ -211,7 +205,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     input->Update();
 
   int timestep = this->GetTimestep();
-
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
 
   if ( itkPointSet.GetPointer() == NULL)
@@ -315,12 +308,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     float diff = planeGeometry->DistanceFromPlane(point);
     diff = diff * diff;
 
-    //MouseOrientation
-    bool isInputDevice=false;
-    this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice);
-
     // if point is close to current plane ( distance < 4) it will be displayed
-    if(!isInputDevice && (diff < 4.0))
+    if(diff < 4.0)
     {
 
       // is point selected or not?
@@ -588,6 +577,8 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     return;
 
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
+  // check whether the input data has been changed
   bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
   // toggle visibility

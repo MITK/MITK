@@ -41,7 +41,6 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
     caster->Update();
 
     typename FilterType::Pointer filter = FilterType::New();
-
     switch (toolkit)
     {
     case 0:
@@ -53,7 +52,6 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
     default:
         filter->SetToolkit(FilterType::FSL);
     }
-
     filter->SetInputImage(caster->GetOutput());
     filter->GenerateData();
     return filter->GetQballImage();
@@ -66,7 +64,7 @@ int GibbsTracking(int argc, char* argv[])
     parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", mitk::Any(), false);
     parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", mitk::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
-    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix) (default = FSL)");
+    parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
     parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
 
     map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);

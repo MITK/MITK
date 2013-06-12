@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.cpp"
 #include <mitkAny.h>
 #include <itkImageFileWriter.h>
-//#include <QString>
-//#include <QFile>
-//#include <QTextStream>
 #include <itkTractsToVectorImageFilter.h>
 #include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>

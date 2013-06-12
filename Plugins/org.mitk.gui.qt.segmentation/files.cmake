@@ -21,6 +21,7 @@ set(INTERNAL_CPP_FILES
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.cpp
+  SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.cpp
 )
 
 set(UI_FILES
@@ -34,6 +35,7 @@ set(UI_FILES
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
+  src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -56,6 +58,7 @@ set(MOC_H_FILES
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.h
+  src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

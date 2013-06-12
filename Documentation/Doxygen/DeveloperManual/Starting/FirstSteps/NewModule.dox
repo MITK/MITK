@@ -1,10 +1,11 @@
 /**
 \page NewModulePage How to create a new MITK Module
- 
 
-\subsection CreateFolder Create File Structure
+\subsection CreateFolder 1) Create a Folder for your Module
 
-Create a folder for your module within /Modules  e.g. 'NewModule' and add it to the CMakeLists.txt
+First, create a folder for your module within /Modules  e.g. 'NewModule'. 
+You need to add the new Folder to the CMakeLists.txt in the Module directory as well as well.
+Open /Modules/CMakeLists.txt, it should be pretty clear how to add the Module, just insert it into the set(module_dirs) section. 
 
 \code
 set(module_dirs
@@ -13,11 +14,13 @@ set(module_dirs
 )
 \endcode
 
+Inside the folder create a new folder called "Testing", which will later contain the module tests.
+Also create subfolders for you sourceFiles, for example "NewModuleFilters" and "NewModuleSourceFiles".
 
-Within your module create the following files:
+\subsection CreateCMakeLists 2) Create CMakeLists.txt
 
+Within your module create the following file named CMakeLists.txt with the following content:
 
-CMakeLists.txt:
 \code
 MITK_CREATE_MODULE(NewModule #<-- module name
   SUBPROJECTS
@@ -26,15 +29,22 @@ MITK_CREATE_MODULE(NewModule #<-- module name
   DEPENDS Mitk #<-- modules on which your module depends on
 )
 
-## create US config
-CONFIGURE_FILE(mitkNewModuleConfig.h.in ${PROJECT_BINARY_DIR}/mitkNewModuleConfig.h @ONLY)
-
-ADD_SUBDIRECTORY(Testing) #
+ADD_SUBDIRECTORY(Testing) #<-- Directory for tests
 \endcode
 
-Create empty mitkNewModuleConfig.h.in (?? why ?? )
+Choose a fitting module name. This name should only contain Letters (both upper- and lowercase), no numbers, no underscores etc.
+This name will be used to qualify your Module within the MITK Framework, so make sure it is unique.
+Typically, the name will be the same as name of the Folder the Module resides in.
 
-files.cmake referencing to the source files.
+It is good practice to create subfolders in your module to structure your classes.
+Make sure to include these folders in the List of subfolders, or CMake will not find the internal Files.
+
+In the DEPENDS section, you can enter the modules that your module requires to function.
+You will not be able to use classes from modules that are not listed here.
+
+\subsection Createfilesdotcmake 3) Create files.cmake
+
+Next, create a new file and name it files.cmake, containing the following:
 
 \code
 SET(CPP_FILES
@@ -45,28 +55,24 @@ SET(CPP_FILES
 )
 \endcode
 
+Add each .cpp file you create to this file.
+Also, only add you .cpp files here, not the header files!
 
-Testing: Set up your test as usual in Mitk:
+\subsection CreateTEstingEnvironment 4) Set up the Test environment 
 
-Testing/files.cmake
+Inside your "Testing" Folder, create a new files.cmake containing the following:
+
 \code
 SET(MODULE_TESTS
    mitkNewModuleTest.cpp
 )
 
-SET(MODULE_CUSTOM_TESTS
-  mitkNewModuleTestCustomTest.cpp # custom test with special input parameters
-)
-\endcode
+Also, create a new CMakeLists.text:
 
-
-Testing/CMakeLists.txt
 \code
 MITK_CREATE_MODULE_TESTS()
-if(BUILD_TESTING AND MODULE_IS_ENABLED)
-  mitkAddCustomModuleTest(mitkNewModuleTestName mitkNewModuleTest ${MITK_DATA_DIR}/CommonTestData/graph.txt
-)
-endif()
 \endcode
 
 */
+
+That's it! Enjoy your new module!

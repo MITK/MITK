@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkBooleanOperationsWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
+class QmitkSurfaceToImageWidget;
 
 class QmitkSegmentationUtilities2View : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -46,6 +47,7 @@ private:
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
+  QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;
 };
 
 #endif

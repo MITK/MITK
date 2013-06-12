@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkImageMaskingWidgetControls</class>
- <widget class="QWidget" name="QmitkImageMaskingWidgetControls">
+ <class>QmitkSurfaceToImageWidgetControls</class>
+ <widget class="QWidget" name="QmitkSurfaceToImageWidgetControls">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>197</width>
+    <width>142</width>
     <height>300</height>
    </rect>
   </property>
@@ -15,35 +15,9 @@
     <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true"/>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Masking-Mode</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QRadioButton" name="rbMaskImage">
-        <property name="text">
-         <string>Image-Masking</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rbMaskSurface">
-        <property name="text">
-         <string>Surface-Masking</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnMaskImage">
+    <widget class="QPushButton" name="btnSurface2Image">
      <property name="text">
-      <string>Mask Image</string>
+      <string>Convert</string>
      </property>
     </widget>
    </item>

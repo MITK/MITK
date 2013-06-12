@@ -116,6 +116,17 @@ mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int inde
   return m_DataStorageComboBoxes[index]->GetSelectedNode();
 }
 
+void QmitkDataSelectionWidget::SetPredicate(unsigned int index, Predicate predicate)
+{
+  this->SetPredicate(index, CreatePredicate(predicate));
+}
+
+void QmitkDataSelectionWidget::SetPredicate(unsigned int index, mitk::NodePredicateBase* predicate)
+{
+  assert(index < m_DataStorageComboBoxes.size());
+  m_DataStorageComboBoxes[index]->SetPredicate(predicate);
+}
+
 void QmitkDataSelectionWidget::SetHelpText(const QString& text)
 {
   if (!text.isEmpty())

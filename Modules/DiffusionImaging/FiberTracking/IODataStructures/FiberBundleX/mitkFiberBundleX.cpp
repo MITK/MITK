@@ -1495,15 +1495,18 @@ bool mitk::FiberBundleX::RemoveLongFibers(float lengthInMM)
     return true;
 }
 
-void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, double continuity, double bias )
+void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance, double tension, double continuity, double bias )
 {
+    if (pointDistance<=0)
+        return;
+
     vtkSmartPointer<vtkPoints> vtkSmoothPoints = vtkSmartPointer<vtkPoints>::New(); //in smoothpoints the interpolated points representing a fiber are stored.
 
     //in vtkcells all polylines are stored, actually all id's of them are stored
     vtkSmartPointer<vtkCellArray> vtkSmoothCells = vtkSmartPointer<vtkCellArray>::New(); //cellcontainer for smoothed lines
     vtkIdType pointHelperCnt = 0;
 
-    MITK_INFO << "Resampling fibers";
+    MITK_INFO << "Smoothing fibers";
     boost::progress_display disp(m_NumFibers);
     for (int i=0; i<m_NumFibers; i++)
     {
@@ -1517,8 +1520,7 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, doubl
             newPoints->InsertNextPoint(points->GetPoint(j));
 
         float length = m_FiberLengths.at(i);
-        length /=10;
-        int sampling = pointsPerCm*length;
+        int sampling = std::ceil(length/pointDistance);
 
         vtkSmartPointer<vtkKochanekSpline> xSpline = vtkSmartPointer<vtkKochanekSpline>::New();
         vtkSmartPointer<vtkKochanekSpline> ySpline = vtkSmartPointer<vtkKochanekSpline>::New();
@@ -1560,12 +1562,12 @@ void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm, double tension, doubl
     m_FiberPolyData->SetLines(vtkSmoothCells);
     UpdateColorCoding();
     UpdateFiberGeometry();
-    m_FiberSampling = pointsPerCm;
+    m_FiberSampling = 10/pointDistance;
 }
 
-void mitk::FiberBundleX::DoFiberSmoothing(int pointsPerCm)
+void mitk::FiberBundleX::DoFiberSmoothing(float pointDistance)
 {
-    DoFiberSmoothing(pointsPerCm, 0, 0, 0 );
+    DoFiberSmoothing(pointDistance, 0, 0, 0 );
 }
 
 // Resample fiber to get equidistant points

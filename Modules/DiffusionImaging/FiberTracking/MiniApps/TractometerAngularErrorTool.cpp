@@ -49,6 +49,7 @@ int TractometerAngularErrorTool(int argc, char* argv[])
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
     parser.addArgument("athresh", "a", ctkCommandLineParser::Float, "angular threshold in degrees. closer fiber directions are regarded as one direction and clustered together.", 25, true);
     parser.addArgument("verbose", "v", ctkCommandLineParser::Bool, "output optional and intermediate calculation results");
+    parser.addArgument("ignore", "n", ctkCommandLineParser::Bool, "don't increase error for missing or too many directions");
 
     map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -71,6 +72,10 @@ int TractometerAngularErrorTool(int argc, char* argv[])
     bool verbose = false;
     if (parsedArgs.count("verbose"))
         verbose = mitk::any_cast<bool>(parsedArgs["verbose"]);
+
+    bool ignore = false;
+    if (parsedArgs.count("ignore"))
+        ignore = mitk::any_cast<bool>(parsedArgs["ignore"]);
 
     try
     {
@@ -187,6 +192,7 @@ int TractometerAngularErrorTool(int argc, char* argv[])
         evaluationFilter->SetImageSet(directionImageContainer);
         evaluationFilter->SetReferenceImageSet(referenceImageContainer);
         evaluationFilter->SetMaskImage(itkMaskImage);
+        evaluationFilter->SetIgnoreMissingDirections(ignore);
         evaluationFilter->Update();
 
         if (verbose)
@@ -209,7 +215,6 @@ int TractometerAngularErrorTool(int argc, char* argv[])
 
         ofstream file;
         file.open (logFile.c_str());
-        file << "Writing this to a file.\n";
 
         string sens = "Mean:";
         sens.append(",");

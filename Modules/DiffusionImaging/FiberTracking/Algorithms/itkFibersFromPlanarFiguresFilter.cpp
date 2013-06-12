@@ -45,7 +45,7 @@ namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
     : m_Density(1000)
-    , m_FiberSampling(5)
+    , m_FiberSampling(1)
     , m_Tension(0)
     , m_Continuity(0)
     , m_Bias(0)

@@ -212,7 +212,6 @@ int GibbsTracking(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
 RegisterFiberTrackingMiniApp(GibbsTracking);

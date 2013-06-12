@@ -27,6 +27,7 @@ IF(BUILD_FiberTrackingMiniApps)
     MiniAppManager.cpp
     GibbsTracking.cpp
     StreamlineTracking.cpp
+    FiberProcessing.cpp
     TractometerAngularErrorTool.cpp
   )
 

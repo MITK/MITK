@@ -28,7 +28,7 @@ set(INTERNAL_CPP_FILES
   QmitkStochasticFiberTrackingView.cpp
   QmitkStreamlineTrackingView.cpp
   QmitkFiberProcessingView.cpp
-  QmitkFiberBundleDeveloperView.cpp
+#  QmitkFiberBundleDeveloperView.cpp
   QmitkPartialVolumeAnalysisView.cpp
   QmitkIVIMView.cpp
   QmitkTractbasedSpatialStatisticsView.cpp
@@ -58,7 +58,7 @@ set(UI_FILES
   src/internal/QmitkStochasticFiberTrackingViewControls.ui
   src/internal/QmitkStreamlineTrackingViewControls.ui
   src/internal/QmitkFiberProcessingViewControls.ui
-  src/internal/QmitkFiberBundleDeveloperViewControls.ui
+#  src/internal/QmitkFiberBundleDeveloperViewControls.ui
   src/internal/QmitkPartialVolumeAnalysisViewControls.ui
   src/internal/QmitkIVIMViewControls.ui
   src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui

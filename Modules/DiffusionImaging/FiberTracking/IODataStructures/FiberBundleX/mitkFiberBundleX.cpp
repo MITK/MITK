@@ -1101,17 +1101,17 @@ void mitk::FiberBundleX::UpdateFiberGeometry()
     this->SetGeometry(geometry);
 }
 
-QStringList mitk::FiberBundleX::GetAvailableColorCodings()
+std::vector<std::string> mitk::FiberBundleX::GetAvailableColorCodings()
 {
-    QStringList availableColorCodings;
+    std::vector<std::string> availableColorCodings;
     int numColors = m_FiberPolyData->GetPointData()->GetNumberOfArrays();
     for(int i=0; i<numColors; i++)
     {
-        availableColorCodings.append(m_FiberPolyData->GetPointData()->GetArrayName(i));
+        availableColorCodings.push_back(m_FiberPolyData->GetPointData()->GetArrayName(i));
     }
 
     //this controlstructure shall be implemented by the calling method
-    if (availableColorCodings.isEmpty())
+    if (availableColorCodings.empty())
         MITK_DEBUG << "no colorcodings available in fiberbundleX";
 
     return availableColorCodings;

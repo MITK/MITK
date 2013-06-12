@@ -32,10 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MISC
 #include <fstream>
-#include <QFile>
+// #include <QFile>
 #include <tinyxml.h>
 #include <math.h>
 #include <boost/progress.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace itk{
 
@@ -416,32 +418,32 @@ bool GibbsTrackingFilter< ItkQBallImageType >::LoadParameters()
         hRoot = TiXmlHandle(pElem);
         pElem = hRoot.FirstChildElement("parameter_set").Element();
 
-        QString iterations(pElem->Attribute("iterations"));
-        m_Iterations = iterations.toULong();
+        string iterations(pElem->Attribute("iterations"));
+        m_Iterations = boost::lexical_cast<unsigned long>(iterations);
 
-        QString particleLength(pElem->Attribute("particle_length"));
-        m_ParticleLength = particleLength.toFloat();
+        string particleLength(pElem->Attribute("particle_length"));
+        m_ParticleLength = boost::lexical_cast<float>(particleLength);
 
-        QString particleWidth(pElem->Attribute("particle_width"));
-        m_ParticleWidth = particleWidth.toFloat();
+        string particleWidth(pElem->Attribute("particle_width"));
+        m_ParticleWidth = boost::lexical_cast<float>(particleWidth);
 
-        QString partWeight(pElem->Attribute("particle_weight"));
-        m_ParticleWeight = partWeight.toFloat();
+        string partWeight(pElem->Attribute("particle_weight"));
+        m_ParticleWeight = boost::lexical_cast<float>(partWeight);
 
-        QString startTemp(pElem->Attribute("temp_start"));
-        m_StartTemperature = startTemp.toFloat();
+        string startTemp(pElem->Attribute("temp_start"));
+        m_StartTemperature = boost::lexical_cast<float>(startTemp);
 
-        QString endTemp(pElem->Attribute("temp_end"));
-        m_EndTemperature = endTemp.toFloat();
+        string endTemp(pElem->Attribute("temp_end"));
+        m_EndTemperature = boost::lexical_cast<float>(endTemp);
 
-        QString inExBalance(pElem->Attribute("inexbalance"));
-        m_InexBalance = inExBalance.toFloat();
+        string inExBalance(pElem->Attribute("inexbalance"));
+        m_InexBalance = boost::lexical_cast<float>(inExBalance);
 
-        QString fiberLength(pElem->Attribute("fiber_length"));
-        m_MinFiberLength = fiberLength.toFloat();
+        string fiberLength(pElem->Attribute("fiber_length"));
+        m_MinFiberLength = boost::lexical_cast<float>(fiberLength);
 
-        QString curvThres(pElem->Attribute("curvature_threshold"));
-        m_CurvatureThreshold = cos(curvThres.toFloat()*M_PI/180);
+        string curvThres(pElem->Attribute("curvature_threshold"));
+        m_CurvatureThreshold = cos(boost::lexical_cast<float>(curvThres)*M_PI/180);
         m_AbortTracking = false;
         MITK_INFO << "GibbsTrackingFilter: parameter file loaded successfully";
         return true;
@@ -476,21 +478,20 @@ bool GibbsTrackingFilter< ItkQBallImageType >::SaveParameters()
         documentXML.LinkEndChild(mainXML);
 
         TiXmlElement* paramXML = new TiXmlElement("parameter_set");
-        paramXML->SetAttribute("iterations", QString::number(m_Iterations).toStdString());
-        paramXML->SetAttribute("particle_length", QString::number(m_ParticleLength).toStdString());
-        paramXML->SetAttribute("particle_width", QString::number(m_ParticleWidth).toStdString());
-        paramXML->SetAttribute("particle_weight", QString::number(m_ParticleWeight).toStdString());
-        paramXML->SetAttribute("temp_start", QString::number(m_StartTemperature).toStdString());
-        paramXML->SetAttribute("temp_end", QString::number(m_EndTemperature).toStdString());
-        paramXML->SetAttribute("inexbalance", QString::number(m_InexBalance).toStdString());
-        paramXML->SetAttribute("fiber_length", QString::number(m_MinFiberLength).toStdString());
-        paramXML->SetAttribute("curvature_threshold", QString::number(m_CurvatureThreshold).toStdString());
+        paramXML->SetAttribute("iterations", boost::lexical_cast<string>(m_Iterations));
+        paramXML->SetAttribute("particle_length", boost::lexical_cast<string>(m_ParticleLength));
+        paramXML->SetAttribute("particle_width", boost::lexical_cast<string>(m_ParticleWidth));
+        paramXML->SetAttribute("particle_weight", boost::lexical_cast<string>(m_ParticleWeight));
+        paramXML->SetAttribute("temp_start", boost::lexical_cast<string>(m_StartTemperature));
+        paramXML->SetAttribute("temp_end", boost::lexical_cast<string>(m_EndTemperature));
+        paramXML->SetAttribute("inexbalance", boost::lexical_cast<string>(m_InexBalance));
+        paramXML->SetAttribute("fiber_length", boost::lexical_cast<string>(m_MinFiberLength));
+        paramXML->SetAttribute("curvature_threshold", boost::lexical_cast<string>(m_CurvatureThreshold));
         mainXML->LinkEndChild(paramXML);
 
-        QString filename(m_SaveParameterFile.c_str());
-        if(!filename.endsWith(".gtp"))
-            filename += ".gtp";
-        documentXML.SaveFile( filename.toStdString() );
+        if(!boost::algorithm::ends_with(m_SaveParameterFile, ".gtp"))
+            m_SaveParameterFile.append(".gtp");
+        documentXML.SaveFile( m_SaveParameterFile );
 
         MITK_INFO << "GibbsTrackingFilter: parameter file saved successfully";
         return true;

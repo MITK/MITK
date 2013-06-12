@@ -27,11 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkCommandLineParser.cpp"
 #include <mitkAny.h>
 #include <itkImageFileWriter.h>
-#include <QString>
-#include <QFile>
-#include <QTextStream>
+//#include <QString>
+//#include <QFile>
+//#include <QTextStream>
 #include <itkTractsToVectorImageFilter.h>
 #include <mitkIOUtil.h>
+#include <boost/lexical_cast.hpp>
+#include <iostream>
+#include <fstream>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -138,9 +141,9 @@ int TractometerAngularErrorTool(int argc, char* argv[])
             for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
             {
                 if ( (*it)->CanWriteBaseDataType(directions.GetPointer()) ) {
-                    QString outfilename(outRoot.c_str());
-                    outfilename += "_VECTOR_FIELD.fib";
-                    (*it)->SetFileName( outfilename.toStdString().c_str() );
+                    string outfilename = outRoot;
+                    outfilename.append("_VECTOR_FIELD.fib");
+                    (*it)->SetFileName( outfilename.c_str() );
                     (*it)->DoWrite( directions.GetPointer() );
                 }
             }
@@ -151,12 +154,14 @@ int TractometerAngularErrorTool(int argc, char* argv[])
                 itk::TractsToVectorImageFilter::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
                 typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter::ItkDirectionImageType > WriterType;
                 WriterType::Pointer writer = WriterType::New();
-                QString outfilename(outRoot.c_str());
-                outfilename += "_DIRECTION_";
-                outfilename += QString::number(i);
-                outfilename += ".nrrd";
-                MITK_INFO << "writing " << outfilename.toStdString();
-                writer->SetFileName(outfilename.toStdString().c_str());
+
+                string outfilename = outRoot;
+                outfilename.append("_DIRECTION_");
+                outfilename.append(boost::lexical_cast<string>(i));
+                outfilename.append(".nrrd");
+
+                MITK_INFO << "writing " << outfilename;
+                writer->SetFileName(outfilename.c_str());
                 writer->SetInput(itkImg);
                 writer->Update();
             }
@@ -166,10 +171,12 @@ int TractometerAngularErrorTool(int argc, char* argv[])
                 ItkUcharImgType::Pointer numDirImage = fOdfFilter->GetNumDirectionsImage();
                 typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
                 WriterType::Pointer writer = WriterType::New();
-                QString outfilename(outRoot.c_str());
-                outfilename += "_NUM_DIRECTIONS.nrrd";
-                MITK_INFO << "writing " << outfilename.toStdString();
-                writer->SetFileName(outfilename.toStdString().c_str());
+
+                string outfilename = outRoot;
+                outfilename.append("_NUM_DIRECTIONS.nrrd");
+
+                MITK_INFO << "writing " << outfilename;
+                writer->SetFileName(outfilename.c_str());
                 writer->SetInput(numDirImage);
                 writer->Update();
             }
@@ -187,43 +194,51 @@ int TractometerAngularErrorTool(int argc, char* argv[])
             EvaluationFilterType::OutputImageType::Pointer angularErrorImage = evaluationFilter->GetOutput(0);
             typedef itk::ImageFileWriter< EvaluationFilterType::OutputImageType > WriterType;
             WriterType::Pointer writer = WriterType::New();
-            QString outfilename(outRoot.c_str());
-            outfilename += "_ERROR_IMAGE.nrrd";
-            writer->SetFileName(outfilename.toStdString().c_str());
+
+            string outfilename = outRoot;
+            outfilename.append("_ERROR_IMAGE.nrrd");
+
+            MITK_INFO << "writing " << outfilename;
+            writer->SetFileName(outfilename.c_str());
             writer->SetInput(angularErrorImage);
             writer->Update();
         }
 
-        QString logFile(outRoot.c_str()); logFile += "_ANGULAR_ERROR.csv";
-        QFile file(logFile);
-        file.open(QIODevice::WriteOnly | QIODevice::Text);
-        QTextStream out(&file);
-        QString sens = QString("Mean:");
-        sens += ",";
-        sens += QString::number(evaluationFilter->GetMeanAngularError());
-        sens += ";";
+        string logFile = outRoot;
+        logFile.append("_ANGULAR_ERROR.csv");
 
-        sens += QString("Median:");
-        sens += ",";
-        sens += QString::number(evaluationFilter->GetMedianAngularError());
-        sens += ";";
+        ofstream file;
+        file.open (logFile.c_str());
+        file << "Writing this to a file.\n";
 
-        sens += QString("Maximum:");
-        sens += ",";
-        sens += QString::number(evaluationFilter->GetMaxAngularError());
-        sens += ";";
+        string sens = "Mean:";
+        sens.append(",");
+        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMeanAngularError()));
+        sens.append(";\n");
 
-        sens += QString("Minimum:");
-        sens += ",";
-        sens += QString::number(evaluationFilter->GetMinAngularError());
-        sens += ";";
+        sens.append("Median:");
+        sens.append(",");
+        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMedianAngularError()));
+        sens.append(";\n");
 
-        sens += QString("STDEV:");
-        sens += ",";
-        sens += QString::number(std::sqrt(evaluationFilter->GetVarAngularError()));
-        sens += ";";
+        sens.append("Maximum:");
+        sens.append(",");
+        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMaxAngularError()));
+        sens.append(";\n");
 
-        out << sens;
+        sens.append("Minimum:");
+        sens.append(",");
+        sens.append(boost::lexical_cast<string>(evaluationFilter->GetMinAngularError()));
+        sens.append(";\n");
+
+        sens.append("STDEV:");
+        sens.append(",");
+        sens.append(boost::lexical_cast<string>(std::sqrt(evaluationFilter->GetVarAngularError())));
+        sens.append(";\n");
+
+        file << sens;
+
+        file.close();
 
         MITK_INFO << "DONE";
     }

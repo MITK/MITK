@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkIOUtil.h>
 #include "ctkCommandLineParser.h"
+#include <boost/algorithm/string.hpp>
 
 template<int shOrder>
 typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit)
@@ -92,8 +93,7 @@ int GibbsTracking(int argc, char* argv[])
         std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
 
         // try to cast to qball image
-        QString inImageName(inFileName.c_str());
-        if( inImageName.endsWith(".qbi") )
+        if( boost::algorithm::ends_with(inFileName, ".qbi") )
         {
             MITK_INFO << "Loading qball image ...";
             mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
@@ -101,7 +101,7 @@ int GibbsTracking(int argc, char* argv[])
             mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
             gibbsTracker->SetQBallImage(itk_qbi.GetPointer());
         }
-        else if( inImageName.endsWith(".dti") )
+        else if( boost::algorithm::ends_with(inFileName, ".dti") )
         {
             MITK_INFO << "Loading tensor image ...";
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
@@ -110,7 +110,7 @@ int GibbsTracking(int argc, char* argv[])
             mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
             gibbsTracker->SetTensorImage(itk_dti);
         }
-        else if ( inImageName.endsWith(".nii") )
+        else if ( boost::algorithm::ends_with(inFileName, ".nii") )
         {
             MITK_INFO << "Loading sh-coefficient image ...";
             mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(infile.at(0).GetPointer());
@@ -134,8 +134,9 @@ int GibbsTracking(int argc, char* argv[])
 
             if (parsedArgs.count("shConvention"))
             {
-                QString convention(mitk::any_cast<string>(parsedArgs["shConvention"]).c_str());
-                if ( convention.compare("MRtrix", Qt::CaseInsensitive)==0 )
+                string convention = mitk::any_cast<string>(parsedArgs["shConvention"]).c_str();
+
+                if ( boost::algorithm::equals(convention, "MRtrix") )
                 {
                     toolkitConvention = 1;
                     MITK_INFO << "Using MRtrix style sh-coefficient convention";

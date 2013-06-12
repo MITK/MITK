@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h> // my be replaced by class
 #include <vtkDataSet.h>
 
-#include <QStringList>
+//#include <QStringList>
 
 #include <mitkPlanarFigure.h>
 
@@ -95,7 +95,7 @@ public:
     // get/set data
     void SetFiberPolyData(vtkSmartPointer<vtkPolyData>, bool updateGeometry = true);
     vtkSmartPointer<vtkPolyData> GetFiberPolyData();
-    QStringList GetAvailableColorCodings();
+    std::vector< std::string > GetAvailableColorCodings();
     char* GetCurrentColorCoding();
     itkGetMacro( NumFibers, int)
     itkGetMacro( FiberSampling, int)

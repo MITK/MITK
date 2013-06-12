@@ -23,13 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInternalEvent.h"
 #include "mitkMouseMoveEvent.h"
 #include "mitkRenderingManager.h"
+#include "mitkRotationOperation.h"
 #include "mitkSurface.h"
 
 #include <mitkPointOperation.h>
 
+#include <vtkCamera.h>
 #include <vtkDataArray.h>
+#include <vtkInteractorStyle.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
+#include <vtkRenderWindowInteractor.h>
 
 mitk::AffineDataInteractor3D::AffineDataInteractor3D()
 {
@@ -231,7 +235,7 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
   if ((interactionEvent->GetSender()) != NULL)
     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
-    // If data is an mitk::Surface, extract it
+  // If data is an mitk::Surface, extract it
   Surface::Pointer surface = dynamic_cast< Surface* >(this->GetDataNode()->GetData());
   vtkPolyData* polyData = NULL;
   if (surface.IsNotNull())
@@ -261,9 +265,82 @@ bool mitk::AffineDataInteractor3D::TranslateObject (StateMachineAction*, Interac
 
   return true;
 }
-bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent*)
+
+bool mitk::AffineDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  return true;
+  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+    return false;
+
+  vtkCamera* camera = NULL;
+  vtkRenderer *currentVtkRenderer = NULL;
+
+  if ((interactionEvent->GetSender()) != NULL)
+  {
+    vtkRenderWindow* renderWindow = interactionEvent->GetSender()->GetRenderWindow();
+    if ( renderWindow != NULL )
+    {
+      vtkRenderWindowInteractor* renderWindowInteractor = renderWindow->GetInteractor();
+      if ( renderWindowInteractor != NULL )
+      {
+        currentVtkRenderer = renderWindowInteractor->GetInteractorStyle()->GetCurrentRenderer();
+        if ( currentVtkRenderer != NULL )
+          camera = currentVtkRenderer->GetActiveCamera();
+      }
+    }
+  }
+  if ( camera )
+  {
+    vtkFloatingPointType vpn[3];
+    camera->GetViewPlaneNormal( vpn );
+
+    Vector3D viewPlaneNormal;
+    viewPlaneNormal[0] = vpn[0];
+    viewPlaneNormal[1] = vpn[1];
+    viewPlaneNormal[2] = vpn[2];
+
+    Vector3D interactionMove;
+    interactionMove[0] = m_CurrentPickedPoint[0] - m_InitialPickedPoint[0];
+    interactionMove[1] = m_CurrentPickedPoint[1] - m_InitialPickedPoint[1];
+    interactionMove[2] = m_CurrentPickedPoint[2] - m_InitialPickedPoint[2];
+
+
+    Vector3D rotationAxis = itk::CrossProduct( viewPlaneNormal, interactionMove );
+    rotationAxis.Normalize();
+
+    m_CurrentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+
+    int *size = currentVtkRenderer->GetSize();
+    double l2 =
+      (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
+      (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
+      (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
+      (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
+
+    double rotationAngle = 360.0 * sqrt(l2/(size[0]*size[0]+size[1]*size[1]));
+
+    // Use center of data bounding box as center of rotation
+    Point3D rotationCenter = m_OriginalGeometry->GetCenter();
+
+    int timeStep = 0;
+    if ((interactionEvent->GetSender()) != NULL)
+      timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+
+    // Reset current Geometry3D to original state (pre-interaction) and
+    // apply rotation
+    RotationOperation op( OpROTATE, rotationCenter, rotationAxis, rotationAngle );
+    Geometry3D::Pointer newGeometry = static_cast< Geometry3D * >(
+      m_OriginalGeometry->Clone().GetPointer() );
+    newGeometry->ExecuteOperation( &op );
+    mitk::TimeSlicedGeometry::Pointer timeSlicedGeometry = this->GetDataNode()->GetData()->GetTimeSlicedGeometry();
+    if (timeSlicedGeometry.IsNotNull())
+    {
+      timeSlicedGeometry->SetGeometry3D( newGeometry, timeStep );
+    }
+    return true;
+  }
+  else
+    return false;
 }
 
 

@@ -1,10 +1,13 @@
 <config>
-  <event_variant class="MouseMoveEvent" name="MovePointer">
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
   </event_variant>
-  <event_variant class="MousePressEvent" name="InitTranslatation">
+  <event_variant name="InitTranslatation" class="MousePressEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndTranslatation">
+  <event_variant name="ObjectTranslation" class="MouseMoveEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="EndTranslatation" class="MouseReleaseEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
 </config>

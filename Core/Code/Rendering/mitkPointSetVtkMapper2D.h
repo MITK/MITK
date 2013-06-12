@@ -179,8 +179,8 @@ namespace mitk {
     /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     /* \brief Called in mitk::Mapper::Update
-    /* If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
-    /* displayed e.g. toggle visiblity of the propassembly */
+    * If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
+    * displayed e.g. toggle visiblity of the propassembly */
     virtual void ResetMapper( BaseRenderer* renderer );
 
      /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.

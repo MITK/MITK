@@ -44,21 +44,27 @@ void mitk::OverlayManager::PrepareLayout(mitk::BaseRenderer *renderer)
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
-  LocalStorage *l = m_BaseRendererMap[ renderer ];
-  if(!l)
+  int nRenderers = m_BaseRendererList.size();
+  m_BaseRendererList.remove(renderer);
+  m_BaseRendererList.push_back(renderer);
+
+  if(nRenderers < m_BaseRendererList.size())
   {
-    l = new LocalStorage;
-    m_BaseRendererMap[ renderer ] = l;
+    std::list<Overlay::Pointer>::iterator it;
+    for ( it=m_OverlayList.begin() ; it != m_OverlayList.end(); it++ )
+    {
+      (*it)->AddOverlay(renderer);
+    }
   }
 }
 
 void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
 {
   m_OverlayList.push_back(overlay);
-  BaseRendererLSMap::iterator it;
-  for ( it=m_BaseRendererMap.begin() ; it != m_BaseRendererMap.end(); it++ )
+  BaseRendererList::iterator it;
+  for ( it=m_BaseRendererList.begin() ; it != m_BaseRendererList.end(); it++ )
   {
-    overlay->AddOverlay((*it).first);
+    overlay->AddOverlay((*it));
   }
 }
 

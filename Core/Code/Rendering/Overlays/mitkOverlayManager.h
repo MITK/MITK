@@ -35,7 +35,8 @@ namespace mitk {
 
 class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
-  typedef std::map<Overlay* ,BaseLayouter::Pointer > OverlayLayouterMap;
+  typedef std::list<BaseRenderer*> BaseRendererList;
+  typedef std::list<Overlay::Pointer> OverlayList;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
@@ -44,31 +45,8 @@ public:
   void RemoveOverlay(Overlay::Pointer overlay);
   void RemoveAllOverlays();
   void UnregisterMicroservice();
-  void SetLayouter(mitk::Overlay::Pointer overlay, mitk::BaseLayouter::Pointer layouter);
   static const std::string PROP_ID;
   static OverlayManager::Pointer GetServiceInstance(int ID = 0);
-
-  /** \brief Base class for mapper specific rendering ressources.
-   */
-  class LocalStorage
-  {
-  public:
-
-    /** \brief Default constructor of the local storage. */
-    LocalStorage();
-    /** \brief Default deconstructor of the local storage. */
-    ~LocalStorage();
-
-    void SetLayouterToOverlay(Overlay::Pointer overlay, BaseLayouter::Pointer layouter);
-    BaseLayouter::Pointer GetLayouter(Overlay::Pointer overlay);
-
-  protected:
-
-    OverlayLayouterMap m_OverlayLayouterMap;
-
-  };
-
-  typedef std::map<BaseRenderer* ,LocalStorage* > BaseRendererLSMap;
 
   void AddBaseRenderer(BaseRenderer* renderer);
   void UpdateOverlays(BaseRenderer *baseRenderer);
@@ -84,9 +62,9 @@ private:
 
   void PrepareLayout(BaseRenderer* renderer);
 
-  std::list<Overlay::Pointer> m_OverlayList;
+  OverlayList m_OverlayList;
 
-  BaseRendererLSMap m_BaseRendererMap;
+  BaseRendererList m_BaseRendererList;
 
   /** \brief copy constructor */
   OverlayManager( const OverlayManager &);

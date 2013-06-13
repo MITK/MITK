@@ -194,10 +194,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateSolutionMatrixAndFunction
 
 void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 {
-  typedef itk::Image<double, 3> DistanceImageType;
-  typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
-  typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
-
   DistanceImageType::Pointer distanceImg = DistanceImageType::New();
 
   //Determin the bounding box of the delineated contours
@@ -335,7 +331,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
         currentPoint[2] = currentIndex[2]*m_DistanceImageSpacing + zmin;
 
         distance = this->CalculateDistanceValue(currentPoint);
-        if ( abs(distance) <= m_DistanceImageSpacing*2 )
+        if ( abs(distance) <= m_DistanceImageSpacing )
         {
           nIt.SetPixel(relativeNbIdx[i], distance);
           narrowbandPoints.push(currentIndex);
@@ -347,48 +343,103 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   ImageIterator imgRegionIterator (distanceImg, distanceImg->GetLargestPossibleRegion());
   imgRegionIterator.GoToBegin();
 
-  double prevPixelVal = 1;
+  // Fist we set the border slices of the image to value 1000 so that we can perform a
+  // region growing afterwards starting from the middle of the image
 
-  unsigned int _size[3] = { (unsigned int)(size[0] - 1), (unsigned int)(size[1] - 1), (unsigned int)(size[2] - 1) };
+  DistanceImageType::SizeType reqSize;
 
-  //Set every pixel inside the surface to -10 except the edge point (so that the received surface is closed)
-  while (!imgRegionIterator.IsAtEnd()) {
+  reqSize[0] = distanceImg->GetLargestPossibleRegion().GetSize()[0];
+  reqSize[1] = distanceImg->GetLargestPossibleRegion().GetSize()[1];
+  reqSize[2] = 1;
 
-    if ( imgRegionIterator.Get() == 10 && prevPixelVal < 0 )
+  DistanceImageType::IndexType reqStart;
+  reqStart[0] = 0;
+  reqStart[1] = 0;
+  reqStart[2] = 0;
+
+  DistanceImageType::RegionType reqRegion;
+
+  reqRegion.SetSize(reqSize);
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  reqStart[0] = 0;
+  reqStart[1] = 0;
+  reqStart[2] = distanceImg->GetLargestPossibleRegion().GetSize()[2]-1;
+
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  reqSize[0] = 1;
+  reqSize[1] = distanceImg->GetLargestPossibleRegion().GetSize()[1];
+  reqSize[2] = distanceImg->GetLargestPossibleRegion().GetSize()[2];;
+
+  reqStart[0] = 0;
+  reqStart[1] = 0;
+  reqStart[2] = 0;
+
+  reqRegion.SetSize(reqSize);
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  reqStart[0] = distanceImg->GetLargestPossibleRegion().GetSize()[0]-1;
+  reqStart[1] = 0;
+  reqStart[2] = 0;
+
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  reqSize[0] = distanceImg->GetLargestPossibleRegion().GetSize()[0];
+  reqSize[1] = 1;
+  reqSize[2] = distanceImg->GetLargestPossibleRegion().GetSize()[2];;
+
+  reqStart[0] = 0;
+  reqStart[1] = 0;
+  reqStart[2] = 0;
+
+  reqRegion.SetSize(reqSize);
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  reqStart[0] = 0;
+  reqStart[1] = distanceImg->GetLargestPossibleRegion().GetSize()[1]-1;
+  reqStart[2] = 0;
+
+  reqRegion.SetIndex(reqStart);
+
+  this->FillImageRegion(reqRegion, 1000, distanceImg);
+
+  // Now we make some kind of region growing from the middle of the image to set all
+  // inner pixels to -10. In this way we assure to extract a valid surface
+  NeighborhoodImageIterator nIt2(radius, distanceImg, distanceImg->GetLargestPossibleRegion());
+
+  currentIndex[0] = distanceImg->GetLargestPossibleRegion().GetSize()[0]*0.5;
+  currentIndex[1] = distanceImg->GetLargestPossibleRegion().GetSize()[1]*0.5;
+  currentIndex[2] = distanceImg->GetLargestPossibleRegion().GetSize()[2]*0.5;
+
+  narrowbandPoints.push(currentIndex);
+  distanceImg->SetPixel(currentIndex, -10);
+
+  while ( !narrowbandPoints.empty() )
+  {
+
+    nIt2.SetLocation(narrowbandPoints.front());
+    narrowbandPoints.pop();
+
+    for (int i = 0; i < 6; i++)
     {
-
-      while (imgRegionIterator.Get() == 10)
+      if( nIt2.GetPixel(relativeNbIdx[i]) == 10)
       {
-        if (imgRegionIterator.GetIndex()[0] == _size[0] || imgRegionIterator.GetIndex()[1] == _size[1] || imgRegionIterator.GetIndex()[2] == _size[2]
-            || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U )
-        {
-          imgRegionIterator.Set(10);
-          prevPixelVal = 10;
-          ++imgRegionIterator;
-          break;
-        }
-        else
-        {
-          imgRegionIterator.Set(-10);
-          ++imgRegionIterator;
-          prevPixelVal = -10;
-        }
-
+          currentIndex = nIt2.GetIndex(relativeNbIdx[i]);
+          nIt2.SetPixel(relativeNbIdx[i], -10);
+          narrowbandPoints.push(currentIndex);
       }
-
     }
-    else if (imgRegionIterator.GetIndex()[0] == _size[0] || imgRegionIterator.GetIndex()[1] == _size[1] || imgRegionIterator.GetIndex()[2] == _size[2]
-            || imgRegionIterator.GetIndex()[0] == 0U || imgRegionIterator.GetIndex()[1] == 0U || imgRegionIterator.GetIndex()[2] == 0U)
-    {
-      imgRegionIterator.Set(10);
-      prevPixelVal = 10;
-      ++imgRegionIterator;
-    }
-    else {
-        prevPixelVal = imgRegionIterator.Get();
-        ++imgRegionIterator;
-    }
-
   }
 
   Image::Pointer resultImage = this->GetOutput();
@@ -400,6 +451,19 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   CastToMitkImage(distanceImg, resultImage);
   resultImage->GetGeometry()->SetOrigin(origin);
+}
+
+void mitk::CreateDistanceImageFromSurfaceFilter::FillImageRegion(DistanceImageType::RegionType reqRegion,
+                                                                 DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image)
+{
+  image->SetRequestedRegion(reqRegion);
+  ImageIterator it (image, image->GetRequestedRegion());
+  while (!it.IsAtEnd())
+  {
+    it.Set(pixelValue);
+    ++it;
+  }
+
 }
 
 

@@ -246,19 +246,6 @@ bool mitk::ContourModel::IsClosed( int timestep)
   return false;
 }
 
-
-
-bool mitk::ContourModel::SelectVertexAt(int index, int timestep)
-{
-  if(!this->IsEmptyTimeStep(timestep))
-  {
-    return (this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(index));
-  }
-  return false;
-}
-
-
-
 bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
@@ -269,6 +256,35 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int tim
 }
 
 
+bool mitk::ContourModel::SelectVertexAt(int index, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    return (this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(index));
+  }
+  return false;
+}
+/*
+bool mitk::ContourModel::SetControlVertexAt(mitk::Point3D &point, float eps, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
+    if (ve
+  }
+  return false;
+}
+
+bool mitk::ContourModel::SetControlVertexAt(int index, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+      this->m_ContourSeries[timestep]->GetVertexAt(index)->IsControlPoint = true;
+      return true;
+  }
+  return false;
+}
+*/
 
 bool mitk::ContourModel::RemoveVertex(VertexType* vertex, int timestep)
 {
@@ -444,6 +460,26 @@ void mitk::ContourModel::Clear()
   this->Modified();
 }
 
+
+void mitk::ContourModel::Interpolate(int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_ContourSeries[timestep]->Interpolate();
+    this->InvokeEvent( ContourModelClosedEvent() );
+    this->Modified();
+  }
+}
+
+void mitk::ContourModel::RedistributeControlVertices(int period, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_ContourSeries[timestep]->RedistributeControlVertices(this->GetSelectedVertex(), period);
+    this->InvokeEvent( ContourModelClosedEvent() );
+    this->Modified();
+  }
+}
 
 
 void mitk::ContourModel::ClearData()

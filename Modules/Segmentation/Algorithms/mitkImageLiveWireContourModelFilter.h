@@ -65,13 +65,14 @@ namespace mitk {
     typedef itk::Image< float,  2 > FloatImageType;
     typedef itk::ShortestPathImageFilter< FloatImageType, FloatImageType > ShortestPathImageFilterType;
     typedef itk::ShortestPathCostFunctionLiveWire< FloatImageType >        CostFunctionType;
+    typedef std::vector< FloatImageType::IndexType >                       ShortestPathType;
 
 
-    /** \brief start point in worldcoordinates*/
+    /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
     itkGetMacro(StartPoint, mitk::Point3D);
 
-    /** \brief end point in woorldcoordinates*/
+    /** \brief end point in woorld coordinates*/
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
@@ -116,6 +117,8 @@ namespace mitk {
 
     void GenerateData();
 
+    void UpdateLiveWire();
+
     /** \brief start point in worldcoordinates*/
     mitk::Point3D m_StartPoint;
 
@@ -142,10 +145,13 @@ namespace mitk {
     unsigned int m_Timestep;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
 
     template<typename TPixel, unsigned int VImageDimension>
     void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
+
+    FloatImageType::Pointer m_PreProcessedImage;
+
   };
 
 }

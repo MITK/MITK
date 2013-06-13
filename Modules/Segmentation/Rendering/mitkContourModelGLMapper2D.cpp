@@ -113,7 +113,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
       glColor4f(red,green,blue,0.5);
     }
 
-    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("points.color", renderer));
+    mitk::ColorProperty::Pointer selectedcolor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.points.color", renderer));
     if(!selectedcolor)
     {
       selectedcolor = mitk::ColorProperty::New(1.0,0.0,0.1);
@@ -143,6 +143,8 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     Point2D pt2d;       // projected_p in display coordinates
     Point2D lastPt2d;
+
+    int index = 0;
 
     while ( pointsIt != renderingContour->IteratorEnd(timestep) )
     {
@@ -188,11 +190,47 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glLineWidth(1);
         }
 
+        bool showControlPoints = false;
+        dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
 
-        //draw active points
-        if ((*pointsIt)->IsControlPoint)
+        if (showControlPoints)
         {
-          float pointsize = 4;
+            //draw active points
+            if ((*pointsIt)->IsControlPoint)
+            {
+              float pointsize = 4;
+              Point2D  tmp;
+
+              Vector2D horz,vert;
+              horz[1]=0;
+              vert[0]=0;
+              horz[0]=pointsize;
+              vert[1]=pointsize;
+              glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
+              glLineWidth(1);
+              //a rectangle around the point with the selected color
+              glBegin (GL_LINE_LOOP);
+              tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
+              tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+              tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
+              tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+              glEnd();
+              glLineWidth(1);
+              //the actual point in the specified color to see the usual color of the point
+              glColor3f(colorprop->GetColor().GetRed(),colorprop->GetColor().GetGreen(),colorprop->GetColor().GetBlue());
+              glPointSize(1);
+              glBegin (GL_POINTS);
+              tmp=pt2d;             glVertex2fv(&tmp[0]);
+              glEnd ();
+            }
+        }
+
+        bool showPoints = false;
+        dataNode->GetBoolProperty("contour.points.show", showPoints);
+
+        if (showPoints)
+        {
+          float pointsize = 3;
           Point2D  tmp;
 
           Vector2D horz,vert;
@@ -200,7 +238,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           vert[0]=0;
           horz[0]=pointsize;
           vert[1]=pointsize;
-          glColor3f(selectedcolor->GetColor().GetRed(), selectedcolor->GetColor().GetBlue(), selectedcolor->GetColor().GetGreen());
+          glColor3f(0.0, 0.0, 0.0);
           glLineWidth(1);
           //a rectangle around the point with the selected color
           glBegin (GL_LINE_LOOP);
@@ -217,6 +255,20 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           tmp=pt2d;             glVertex2fv(&tmp[0]);
           glEnd ();
         }
+
+/*
+        std::string l;
+        std::stringstream ss;
+        ss << index;
+        l.append(ss.str());
+
+        mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+        float rgb[3];
+        rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
+        OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+
+        index++;
+*/
       }
 
       pointsIt++;
@@ -293,7 +345,9 @@ void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mi
   node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.editing", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.editing.color", ColorProperty::New(0.1, 0.9, 0.1), renderer, overwrite );
-  node->AddProperty( "points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
+  node->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
+  node->AddProperty( "contour.points.show", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.controlpoints.show", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering.width", mitk::FloatProperty::New( 3.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering", mitk::BoolProperty::New( false ), renderer, overwrite );

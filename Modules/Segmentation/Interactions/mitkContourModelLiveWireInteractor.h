@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkContourModelInteractor.h"
-#include <mitkContourModel.h>
-#include <mitkDataNode.h>
 
 #include <mitkImageLiveWireContourModelFilter.h>
 
@@ -48,6 +46,17 @@ namespace mitk
     mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
     mitkNewMacro1Param(Self, DataNode*);
 
+    virtual void SetLeftLiveWireContourModelNode (mitk::DataNode* _arg)
+    {
+            this->m_LeftLiveWireContourNode = _arg;
+            this->Modified();
+    }
+
+    virtual void SetRightLiveWireContourModelNode (mitk::DataNode* _arg)
+    {
+            this->m_RightLiveWireContourNode = _arg;
+            this->Modified();
+    }
 
     virtual void SetWorkingImage (mitk::Image* _arg)
     {
@@ -68,17 +77,22 @@ namespace mitk
     virtual bool OnDeletePoint(Action*, const StateEvent*);
     virtual bool OnMovePoint(Action*, const StateEvent*);
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
+    virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent);
 
     int SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour,
       mitk::ContourModel* destinationContour,
       bool fromSelectedUpwards,
       int timestep);
 
+    void CorrectIntersections(mitk::ContourModel* cprev, mitk::ContourModel* cnext);
+
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingImage;
 
     mitk::Point3D m_NextActiveVertexDown;
     mitk::Point3D m_NextActiveVertexUp;
+    mitk::DataNode::Pointer m_LeftLiveWireContourNode;
+    mitk::DataNode::Pointer m_RightLiveWireContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
     mitk::ContourModel::Pointer m_ContourRight;
 

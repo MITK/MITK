@@ -217,12 +217,33 @@ namespace mitk
     */
     VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
+    void Interpolate();
+
+    VertexListType* GetControlVertices();
+
+    void RedistributeControlVertices(const VertexType* selected, int period);
 
   protected:
 
     ContourElement();
     ContourElement(const mitk::ContourElement &other);
     virtual ~ContourElement();
+
+    /** \brief Finds the 4th order bezier curve between given indexes.
+    Adapted from vtkBezierContourLineInterpolator
+    \param idx1 - first index
+    \param idx2 - second index
+    */
+    void DoBezierInterpolation( int idx1, int idx2, VertexListType* vertices );
+
+    int GetNthNodeSlope( int n, double slope[3]);
+
+   void ComputeMidpoint( double p1[3], double p2[3], double mid[3] )
+    {
+      mid[0] = (p1[0] + p2[0])/2;
+      mid[1] = (p1[1] + p2[1])/2;
+      mid[2] = (p1[2] + p2[2])/2;
+    }
 
     VertexListType* m_Vertices; //double ended queue with vertices
     bool m_IsClosed;

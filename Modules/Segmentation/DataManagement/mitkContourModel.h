@@ -93,11 +93,11 @@ namespace mitk
       this->m_SelectedVertex = NULL;
     }
 
-    /** \brief Deselect vertex.
+    /** \brief Set selected vertex as control point
     */
     void SetSelectedVertexAsControlPoint(bool isControlPoint=true)
     {
-      if(this->m_SelectedVertex && (this->m_SelectedVertex->IsControlPoint != isControlPoint) )
+      if (this->m_SelectedVertex)
       {
         m_SelectedVertex->IsControlPoint = isControlPoint;
         this->Modified();
@@ -253,6 +253,10 @@ namespace mitk
     */
     bool SelectVertexAt(int index, int timestep=0);
 
+    /** \brief Mark a vertex at an index in the container as control point.
+    */
+//    bool SetControlVertexAt(int index, int timestep=0);
+
     /** \brief Mark a vertex at a given position in 3D space.
 
     \pararm point - query point in 3D space
@@ -262,6 +266,14 @@ namespace mitk
     @return true = vertex found;  false = no vertex found
     */
     bool SelectVertexAt(mitk::Point3D &point, float eps, int timestep=0);
+/*
+    \pararm point - query point in 3D space
+    \pararm eps - radius for nearest neighbour search (error bound).
+    \pararm timestep - search at this timestep
+
+    @return true = vertex found;  false = no vertex found
+    */
+//    bool SetControlVertexAt(mitk::Point3D &point, float eps, int timestep=0);
 
     /** \brief Remove a vertex at given index within the container.
 
@@ -362,6 +374,12 @@ namespace mitk
     */
     void ExecuteOperation(Operation* operation);
 
+    /** \brief Rebuilds all line segments for timestep according to the active type of interpolation method
+    \param timestep - at this timestep all lines will be rebuilt.
+    */
+    virtual void Interpolate(int timestep);
+
+    virtual void RedistributeControlVertices(int period, int timestep);
 
   protected:
 

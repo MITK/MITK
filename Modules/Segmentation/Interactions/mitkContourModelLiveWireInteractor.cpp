@@ -32,8 +32,8 @@ mitk::ContourModelLiveWireInteractor::ContourModelLiveWireInteractor(DataNode* d
 {
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
 
-  mitk::ContourModel::Pointer m_ContourLeft = mitk::ContourModel::New();
-  mitk::ContourModel::Pointer m_ContourRight = mitk::ContourModel::New();
+  //mitk::ContourModel::Pointer m_ContourLeft = mitk::ContourModel::New();
+  //mitk::ContourModel::Pointer m_ContourRight = mitk::ContourModel::New();
   m_NextActiveVertexDown.Fill(0);
   m_NextActiveVertexUp.Fill(0);
 }
@@ -60,7 +60,6 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>(
     m_DataNode->GetData() );
 
-
   contour->Deselect();
 
   /*
@@ -69,22 +68,19 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   */
   mitk::Point3D click = positionEvent->GetWorldPosition();
 
-
   if (contour->SelectVertexAt(click, 1.5, timestep) )
   {
+//    contour->RedistributeControlVertices(10,timestep);
+
     contour->SetSelectedVertexAsControlPoint();
 
     m_DataNode->SetBoolProperty( "contour.editing", true );
+    this->m_LeftLiveWireContourNode->SetVisibility(true);
+    this->m_RightLiveWireContourNode->SetVisibility(true);
 
-    assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
-    mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
     m_lastMousePosition = click;
 
-
-    mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
-
-    //
     m_ContourLeft = mitk::ContourModel::New();
 
     //get coordinates of next active vertex downwards from selected vertex
@@ -93,8 +89,6 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
     mitk::ContourModel::VertexIterator itDown = contour->IteratorBegin() + downIndex;
     m_NextActiveVertexDown = (*itDown)->Coordinates;
 
-
-    //
     m_ContourRight = mitk::ContourModel::New();
 
     //get coordinates of next active vertex upwards from selected vertex
@@ -102,11 +96,12 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
 
     mitk::ContourModel::VertexIterator itUp = contour->IteratorBegin() + upIndex;
     m_NextActiveVertexUp = (*itUp)->Coordinates;
-
   }
   else
   {
     m_DataNode->SetBoolProperty( "contour.editing", false );
+    this->m_LeftLiveWireContourNode->SetVisibility(false);
+    this->m_RightLiveWireContourNode->SetVisibility(false);
     newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
   }
 
@@ -117,8 +112,6 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
 
   return true;
 }
-
-
 
 bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
 {
@@ -132,17 +125,30 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
 
     mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
     newContour->Expand(contour->GetTimeSteps());
-    newContour->Concatenate( m_ContourLeft, timestep );
 
+    newContour->Concatenate( m_ContourLeft, timestep );
 
     //recompute contour between neighbored two active control points
     this->m_LiveWireFilter->SetStartPoint( m_NextActiveVertexDown );
     this->m_LiveWireFilter->SetEndPoint( m_NextActiveVertexUp );
     this->m_LiveWireFilter->Update();
 
-    mitk::ContourModel::Pointer liveWireContour = mitk::ContourModel::New();
-    liveWireContour = this->m_LiveWireFilter->GetOutput();
+    mitk::ContourModel *liveWireContour = this->m_LiveWireFilter->GetOutput();
 
+    if (!liveWireContour)
+    {
+        MITK_WARN << "could not retrieve liveWireContour";
+        return false;
+    }
+
+    if (liveWireContour->GetNumberOfVertices() < 3)
+    {
+        MITK_WARN << "liveWireContour has less than 3 points";
+        return false;
+    }
+
+    liveWireContour->RemoveVertexAt( 0, timestep);
+    liveWireContour->RemoveVertexAt( liveWireContour->GetNumberOfVertices(timestep) - 1, timestep);
 
     //insert new liveWire computed points
     newContour->Concatenate( liveWireContour, timestep );
@@ -153,7 +159,6 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
 
     m_DataNode->SetData(newContour);
 
-
     assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
     mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 
@@ -161,66 +166,112 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
   return true;
 }
 
-
-
-
 bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
+  mitk::Point3D currentPosition = positionEvent->GetWorldPosition();
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+/*
+  if (m_ContourLeft->GetNumberOfVertices() < 3)
+  {
+    MITK_WARN << "contour left has less than 3 points";
+    return false;
+  }
 
+
+  if (m_ContourRight->GetNumberOfVertices() < 3)
+  {
+    MITK_WARN << "contour right has less than 3 points";
+    return false;
+  }
+*/
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());
 
-  /*++++++++++++++ concatenate LEFT ++++++++++++++++++++++++++++++*/
-  newContour->Concatenate( m_ContourLeft, timestep );
+  // concatenate left original contour
+  newContour->Concatenate( this->m_ContourLeft, timestep );
 
-
-  mitk::Point3D currentPosition = positionEvent->GetWorldPosition();
-
-
-  /*+++++++++++++++ start computation ++++++++++++++++++++*/
   //recompute contour between previous active vertex and selected vertex
   this->m_LiveWireFilter->SetStartPoint( m_NextActiveVertexDown );
   this->m_LiveWireFilter->SetEndPoint( currentPosition );
   this->m_LiveWireFilter->Update();
 
-  mitk::ContourModel::Pointer liveWireContour = mitk::ContourModel::New();
-  liveWireContour = this->m_LiveWireFilter->GetOutput();
+  mitk::ContourModel::Pointer leftLiveWire = this->m_LiveWireFilter->GetOutput();
+  if (!leftLiveWire)
+  {
+    MITK_WARN << "could not retrieve leftLiveWire";
+    return false;
+  }
+
+  if (leftLiveWire->GetNumberOfVertices() < 3)
+  {
+    MITK_WARN << "leftLiveWire has less than 3 points";
+    leftLiveWire->Clear();
+    return false;
+  }
 
   //remove point at current position because it is included in next livewire segment too.
-  liveWireContour->RemoveVertexAt( liveWireContour->GetNumberOfVertices(timestep) - 1, timestep);
+  //leftLiveWire->RemoveVertexAt( leftLiveWire->GetNumberOfVertices(timestep) - 1, timestep);
+  leftLiveWire->RemoveVertexAt( 0, timestep);
 
-  /*++++++++++++++ concatenate LIVEWIRE ++++++++++++++++++++++++++++++*/
-  //insert new liveWire computed points
-  newContour->Concatenate( liveWireContour, timestep );
+  newContour->Deselect();
 
+  leftLiveWire->SelectVertexAt(leftLiveWire->GetNumberOfVertices(timestep) - 1, timestep);
+  leftLiveWire->SetSelectedVertexAsControlPoint(true);
+
+  m_LeftLiveWireContourNode->SetData(leftLiveWire);
+
+  //m_LiveWireContourLeft->Interpolate(timestep);
+
+  // concatenate left live wire
+  newContour->Concatenate( leftLiveWire, timestep );
 
   //recompute contour between selected vertex and next active vertex
   this->m_LiveWireFilter->SetStartPoint( currentPosition );
   this->m_LiveWireFilter->SetEndPoint( m_NextActiveVertexUp );
   this->m_LiveWireFilter->Update();
 
-  liveWireContour = this->m_LiveWireFilter->GetOutput();
+  mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
+  if (!rightLiveWire)
+  {
+    MITK_WARN << "could not retrieve leftLiveWire";
+    return false;
+  }
+
+  if (rightLiveWire->GetNumberOfVertices() < 3)
+  {
+    MITK_WARN << "rightLiveWire has less than 3 points";
+    rightLiveWire->Clear();
+    return false;
+  }
+
+  rightLiveWire->RemoveVertexAt( 0, timestep);
+  //rightLiveWire->RemoveVertexAt( rightLiveWire->GetNumberOfVertices(timestep) - 1, timestep);
+
+  m_RightLiveWireContourNode->SetData(rightLiveWire);
+  //m_LiveWireContourRight->Interpolate(timestep);
+
+  // concatenate right live wire
+  newContour->Concatenate( rightLiveWire, timestep );
 
   //make point at mouse position active again, so it is drawn
-  const_cast<mitk::ContourModel::VertexType*>( liveWireContour->GetVertexAt(0, timestep) )->IsControlPoint = true;
+  const_cast<mitk::ContourModel::VertexType*>( newContour->GetVertexAt(0, timestep) )->IsControlPoint = true;
 
-  /*++++++++++++++ concatenate RIGHT ++++++++++++++++++++++++++++++*/
-  //insert new liveWire computed points
-  newContour->Concatenate( liveWireContour, timestep );
-  /*------------------------------------------------*/
-
-
+  // concatenate right original contour
+//  mitk::ContourModel *contourRight = dynamic_cast<mitk::ContourModel *>( this->m_ContourRight->GetData() );
   newContour->Concatenate( m_ContourRight, timestep );
 
   newContour->SetIsClosed(contour->IsClosed(timestep), timestep);
-  newContour->SelectVertexAt(currentPosition,1.5,timestep);
-  //newContour->Deselect();//just to make sure
+//  newContour->SelectVertexAt(currentPosition,1.5,timestep);
+
+  //newContour->RedistributeControlVertices( 10, timestep );
+
+  //newContour->Interpolate(timestep);
+
   m_DataNode->SetData(newContour);
 
   this->m_lastMousePosition = positionEvent->GetWorldPosition();
@@ -233,7 +284,9 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
 
 
-int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour, mitk::ContourModel* destinationContour, bool fromSelectedUpwards, int timestep)
+int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour,
+                                                                         mitk::ContourModel* destinationContour,
+                                                                         bool fromSelectedUpwards, int timestep)
 {
 
   mitk::ContourModel::VertexIterator end =sourceContour->IteratorEnd();
@@ -256,7 +309,7 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
 
     if(itUp != end)
     {
-      itUp++;//step once up otherwise the the loop breaks immediately
+      itUp++;//step once up otherwise the loop breaks immediately
     }
 
     while( itUp != end && !((*itUp)->IsControlPoint)){ itUp++; }
@@ -351,4 +404,32 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
       return std::distance( begin, itDown) - 1;
     }
   }
+}
+
+void mitk::ContourModelLiveWireInteractor::CorrectIntersections(mitk::ContourModel* cprev, mitk::ContourModel* cnext)
+{
+
+}
+
+bool mitk::ContourModelLiveWireInteractor::OnFinishEditing( Action* action, const StateEvent* stateEvent)
+{
+  m_DataNode->SetBoolProperty( "contour.editing", false );
+
+  int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
+
+  mitk::ContourModel *leftLiveWire = dynamic_cast<mitk::ContourModel *>( this->m_LeftLiveWireContourNode->GetData() );
+  leftLiveWire->Clear(timestep);
+
+  mitk::ContourModel *rightLiveWire = dynamic_cast<mitk::ContourModel *>( this->m_RightLiveWireContourNode->GetData() );
+  rightLiveWire->Clear(timestep);
+
+  this->m_LeftLiveWireContourNode->SetVisibility(false);
+  this->m_RightLiveWireContourNode->SetVisibility(false);
+ // mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+ // contour->Deselect();
+
+  assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
+
+  return true;
 }

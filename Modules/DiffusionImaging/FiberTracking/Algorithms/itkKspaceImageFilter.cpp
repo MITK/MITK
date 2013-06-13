@@ -130,6 +130,18 @@ void KspaceImageFilter< TPixelType >
 
         double t = fromMaxEcho + ((double)kIdx[1]*szx+(double)kIdx[0])*dt;    // dephasing time
 
+
+        // rearrange slice
+        if( kIdx[0] <  szx/2 )
+            kIdx[0] = kIdx[0] + szx/2;
+        else
+            kIdx[0] = kIdx[0] - szx/2;
+
+        if( kIdx[1] <  szx/2 )
+            kIdx[1] = kIdx[1] + szy/2;
+        else
+            kIdx[1] = kIdx[1] - szy/2;
+
         // calculate eddy current decay factors
         double eddyDecay = 0;
         if (m_SimulateEddyCurrents)
@@ -147,7 +159,7 @@ void KspaceImageFilter< TPixelType >
         if (oit.GetIndex()[1]%2 == 1)               // reverse readout direction and add ghosting
         {
             kIdx[0] = szx-kIdx[0]-1;                // reverse readout direction
-            temp_kx = (double)kIdx[0]-m_kOffset;     // add gradient delay induced offset
+            temp_kx = (double)kIdx[0]-m_kOffset;    // add gradient delay induced offset
         }
         else
             temp_kx += m_kOffset;    // add gradient delay induced offset
@@ -201,17 +213,6 @@ void KspaceImageFilter< TPixelType >
         }
 
         s /= numPix;
-
-        /* rearrange slice not needed
-        if( kIdx[0] <  szx/2 )
-            kIdx[0] = kIdx[0] + szx/2;
-        else
-            kIdx[0] = kIdx[0] - szx/2;
-
-        if( kIdx[1] <  szx/2 )
-            kIdx[1] = kIdx[1] + szy/2;
-        else
-            kIdx[1] = kIdx[1] - szy/2;*/
 
         m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);

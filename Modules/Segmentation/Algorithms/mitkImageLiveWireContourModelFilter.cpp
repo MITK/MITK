@@ -162,8 +162,8 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
 
   //maximum value in each direction for size
   FloatImageType::SizeType size;
-  size[0] = abs( startPoint[0] - endPoint[0] );
-  size[1] = abs( startPoint[1] - endPoint[1] );
+  size[0] = abs( startPoint[0] - endPoint[0] ) + 1;
+  size[1] = abs( startPoint[1] - endPoint[1] ) + 1;
 
   MITK_INFO << "start region: " << startRegion[0] << " " << startRegion[1];
   MITK_INFO << "size: " << size[0] << " " << size[1];

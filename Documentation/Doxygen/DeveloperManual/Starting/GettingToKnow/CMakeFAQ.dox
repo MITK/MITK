@@ -3,9 +3,12 @@
 
 \section CMAKE_FAQ_General A general comment
 
-MITK uses %CMake for configuration. If you want to develop either using MITK as a toolkit or by extending the capabilities of the applications provided by us we recommend using %CMake for your own prject as well. While it might be possible to use MITK in conjunction with other options, such as QMake or setting up your own project manually it will invariably use a lot of work and probably hacks as well. As we have no experience in this we will not be able to help you, so be prepared to have to do a lot of tweaking on your own.
+MITK uses %CMake for configuration. If you want to develop either using MITK as a toolkit or by extending the capabilities of the applications provided by us, we recommend using %CMake for your own project too.
+While it might be possible to use MITK in conjunction with other options, such as QMake or setting up your own project manually it will invariably involve a lot of work and probably hacks as well.
+As we do have no experience with this, we will not be able to help you.
+Be prepared to do a lot of tweaking on by yourself.
 
-This guide does not try to give a general introduction to Cmake, instead it tries to answer some basic questions that might arise for those new to %CMake, to help you get started on MITK. For a more comprehensive introduction on %CMake see <a href="http://www.cmake.org/cmake/help/cmake_tutorial.html">here</a>.
+This guide does not try to give a general introduction to CMake, instead it tries to answer some basic questions that might arise for those new to %CMake, to help you get started on MITK. For a more comprehensive introduction on %CMake see <a href="http://www.cmake.org/cmake/help/cmake_tutorial.html">here</a>.
 
 We will assume in this guide, that the path to your source is /MITK/.
 

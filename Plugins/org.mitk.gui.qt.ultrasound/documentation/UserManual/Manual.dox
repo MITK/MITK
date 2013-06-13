@@ -28,7 +28,7 @@ We have made good experiences with epiphan Grabbers and currently recommend the 
 
 To configure an ultrasound device, connect the ultrasound device to the grabber and the grabber to the computer. Start the ultrasound device and open the ultrasound plugin. The devicemanager will open.
 
-\image html devicemanager.png "MITK Screenshot with the devicemanager activated"
+\image html devicemanagement.png "MITK Screenshot with the devicemanager activated"
 
 Any currently configured devices are listed in the box, which accordingly is empty now.
 Click "New Device".
@@ -44,7 +44,7 @@ Most ultrasound images are grey scale, so using a grey scale conversion doesn't 
 
 Click Add Device to save your changes.
 
-\image html devicemanager_2.png "Devicemanager with configured device"
+\image html ddevicemanagement_2.png "Devicemanager with configured device"
 
 \section org_mitk_gui_qt_ultrasoundActivateConnect Activation and Connection
 

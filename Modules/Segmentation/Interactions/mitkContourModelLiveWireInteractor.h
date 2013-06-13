@@ -84,8 +84,6 @@ namespace mitk
       bool fromSelectedUpwards,
       int timestep);
 
-    void CorrectIntersections(mitk::ContourModel* cprev, mitk::ContourModel* cnext);
-
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingImage;
 

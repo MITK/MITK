@@ -381,6 +381,8 @@ namespace mitk
 
     virtual void RedistributeControlVertices(int period, int timestep);
 
+    static void CorrectIntersections(mitk::ContourModel* prev, mitk::ContourModel* next, int timestep);
+
   protected:
 
     ContourModel();

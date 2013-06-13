@@ -67,7 +67,6 @@ namespace mitk {
     typedef itk::ShortestPathCostFunctionLiveWire< FloatImageType >        CostFunctionType;
     typedef std::vector< FloatImageType::IndexType >                       ShortestPathType;
 
-
     /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
     itkGetMacro(StartPoint, mitk::Point3D);

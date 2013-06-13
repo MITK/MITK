@@ -588,7 +588,34 @@ void mitk::ContourModel::UpdateOutputInformation()
 }
 
 
+void mitk::ContourModel::CorrectIntersections(mitk::ContourModel* prev, mitk::ContourModel* next, int timestep)
+{
+    VertexIterator  prevIter = prev->IteratorBegin(timestep);
 
+    while (prevIter != prev->IteratorEnd(timestep))
+    {
+        VertexIterator  nextIter = next->IteratorBegin(timestep);
+        while (nextIter != next->IteratorEnd(timestep))
+        {
+            if ( (*prevIter)->Coordinates == (*nextIter)->Coordinates )
+            {
+                // remove intersecting points
+                next->RemoveVertex( (*nextIter), timestep);
+                prev->RemoveVertex( (*prevIter), timestep);
+
+                // reset iterators
+                prevIter = prev->IteratorBegin(timestep);
+                nextIter = next->IteratorBegin(timestep);
+             //   MITK_INFO << "REMOVING NODE";
+            }
+            else
+            {
+                nextIter++;
+            }
+        }
+        prevIter++;
+    }
+}
 
 void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
 {

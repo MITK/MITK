@@ -133,16 +133,16 @@ void mitk::LiveWireTool2D::Deactivated()
 
   ContourUtils::Pointer contourUtils = mitk::ContourUtils::New();
 
-  /*+++++++++++++++++++++++ for all contours in list (currently created by tool) ++++++++++++++++++++++++++++++++++++*/
+  // for all contours in list (currently created by tool)
   std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> >::iterator it = m_Contours.begin();
   while(it != m_Contours.end() )
   {
 
-    //++++++++++if node contains data
+    // if node contains data
     if( it->first->GetData() )
     {
 
-      //+++++++++++++++if this is a contourModel
+      // if this is a contourModel
       mitk::ContourModel* contourModel = dynamic_cast<mitk::ContourModel*>(it->first->GetData());
       if( contourModel )
       {
@@ -154,7 +154,7 @@ void mitk::LiveWireTool2D::Deactivated()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(it->second, workingImage, currentTimestep);
 
-          /*++++++++++++++++++++++ transfer to plain old contour to use contour util functionality +++++++++++++++++++++++*/
+          // transfer to plain old contour to use contour util functionality
           mitk::Contour::Pointer plainOldContour = mitk::Contour::New();
           mitk::ContourModel::VertexIterator iter = contourModel->IteratorBegin(currentTimestep);
           while(iter != contourModel->IteratorEnd(currentTimestep) )
@@ -162,8 +162,6 @@ void mitk::LiveWireTool2D::Deactivated()
             plainOldContour->AddVertex( (*iter)->Coordinates );
             iter++;
           }
-          /*-------------------------------------------------------------------------------*/
-
 
           mitk::Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, plainOldContour, true, false);
           contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
@@ -194,13 +192,8 @@ void mitk::LiveWireTool2D::Deactivated()
   Superclass::Deactivated();
 }
 
-
-
-
 bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* stateEvent)
 {
-  MITK_INFO << "started";
-
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
@@ -249,7 +242,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_RightLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.0), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(true), NULL, true );
-  m_RightLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(true), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(false), NULL, true );
 
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
@@ -265,12 +258,11 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   itk::Index<3> idx;
   m_WorkingSlice->GetGeometry()->WorldToIndex(click, idx);
 
-  /*+++++++++++++++++++++++ get the pixel the gradient in region of 5x5 ++++++++++++++++++++++++++*/
+  // get the pixel the gradient in region of 5x5
   itk::Index<3> indexWithHighestGradient;
   AccessFixedDimensionByItk_2(m_WorkingSlice, FindHighestGradientMagnitudeByITK, 2, idx, indexWithHighestGradient);
-  /*----------------------------------------------------------------------------------------------------------------*/
 
-  //itk::Index to mitk::Point3D
+  // itk::Index to mitk::Point3D
   click[0] = indexWithHighestGradient[0];
   click[1] = indexWithHighestGradient[1];
   click[2] = indexWithHighestGradient[2];
@@ -285,8 +277,6 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
-  MITK_INFO << "3";
 
   return true;
 }

@@ -63,13 +63,12 @@ int PeakExtraction(int argc, char* argv[])
     parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", mitk::Any(), false);
     parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", mitk::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
-
     parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
     parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
     parser.addArgument("peakthres", "r", ctkCommandLineParser::Float, "peak threshold relative to largest peak", 0.4, true);
     parser.addArgument("abspeakthres", "a", ctkCommandLineParser::Float, "absolute peak threshold weighted with local GFA value", 0.06, true);
-
     parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
+    parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
 
     map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -100,6 +99,10 @@ int PeakExtraction(int argc, char* argv[])
     if (parsedArgs.count("abspeakthres"))
         absPeakThres = mitk::any_cast<float>(parsedArgs["abspeakthres"]);
 
+    bool noFlip = false;
+    if (parsedArgs.count("noFlip"))
+        noFlip = mitk::any_cast<bool>(parsedArgs["noFlip"]);
+
     MITK_INFO << "image: " << imageName;
     MITK_INFO << "outroot: " << outRoot;
     if (!maskImageName.empty())
@@ -122,8 +125,6 @@ int PeakExtraction(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
         typedef itk::FiniteDiffOdfMaximaExtractionFilter< float, 4, 20242 > MaximaExtractionFilterType;
         MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
-
-        mitk::Geometry3D::Pointer geometry = image->GetGeometry();
 
         int toolkitConvention = 0;
 
@@ -170,21 +171,29 @@ int PeakExtraction(int argc, char* argv[])
             caster->Update();
             itk::Image< float, 4 >::Pointer itkImage = caster->GetOutput();
 
-            itk::FixedArray<bool, 4> flipAxes;
-            flipAxes[0] = true;
-            flipAxes[1] = true;
-            flipAxes[2] = false;
-            flipAxes[3] = false;
-            itk::FlipImageFilter< itk::Image< float, 4 > >::Pointer flipper = itk::FlipImageFilter< itk::Image< float, 4 > >::New();
-            flipper->SetInput(itkImage);
-            flipper->SetFlipAxes(flipAxes);
-            flipper->Update();
-            itk::Image< float, 4 >::Pointer flipped = flipper->GetOutput();
-            flipped->SetDirection(itkImage->GetDirection());
-            flipped->SetOrigin(itkImage->GetOrigin());
-
             ConverterType::Pointer converter = ConverterType::New();
-            converter->SetInputImage(flipped);
+
+            if (noFlip)
+            {
+                converter->SetInputImage(itkImage);
+            }
+            else
+            {
+                itk::FixedArray<bool, 4> flipAxes;
+                flipAxes[0] = true;
+                flipAxes[1] = true;
+                flipAxes[2] = false;
+                flipAxes[3] = false;
+                itk::FlipImageFilter< itk::Image< float, 4 > >::Pointer flipper = itk::FlipImageFilter< itk::Image< float, 4 > >::New();
+                flipper->SetInput(itkImage);
+                flipper->SetFlipAxes(flipAxes);
+                flipper->Update();
+                itk::Image< float, 4 >::Pointer flipped = flipper->GetOutput();
+                flipped->SetDirection(itkImage->GetDirection());
+                flipped->SetOrigin(itkImage->GetOrigin());
+
+                converter->SetInputImage(flipped);
+            }
 
             switch (toolkitConvention)
             {

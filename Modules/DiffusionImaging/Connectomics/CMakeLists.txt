@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE( Connectomics
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS DiffusionCore FiberTracking
+  DEPENDS DiffusionCore FiberTracking QmitkExt
 )
 
 add_subdirectory(Testing)

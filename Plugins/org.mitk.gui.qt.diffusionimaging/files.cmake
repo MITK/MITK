@@ -95,7 +95,7 @@ set(MOC_H_FILES
   src/internal/QmitkStochasticFiberTrackingView.h
   src/internal/QmitkStreamlineTrackingView.h
   src/internal/QmitkFiberProcessingView.h
-  src/internal/QmitkFiberBundleDeveloperView.h
+#  src/internal/QmitkFiberBundleDeveloperView.h
   src/internal/QmitkPartialVolumeAnalysisView.h
   src/QmitkPartialVolumeAnalysisWidget.h
   src/internal/QmitkIVIMView.h

@@ -6,6 +6,6 @@ MITK_CREATE_MODULE(MitkUS
 )
 
 ## create US config
-CONFIGURE_FILE(mitkUSConfig.h.in ${PROJECT_BINARY_DIR}/mitkUSConfig.h @ONLY)
+#CONFIGURE_FILE(mitkUSConfig.h.in ${PROJECT_BINARY_DIR}/mitkUSConfig.h @ONLY)
 
 ADD_SUBDIRECTORY(Testing)

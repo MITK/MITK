@@ -256,19 +256,23 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glEnd ();
         }
 
-/*
-        std::string l;
-        std::stringstream ss;
-        ss << index;
-        l.append(ss.str());
+        bool showNumbers = false;
+        dataNode->GetBoolProperty("contour.numbers.show", showNumbers);
 
-        mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-        float rgb[3];
-        rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
-        OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+        if (showNumbers)
+        {
+            std::string l;
+            std::stringstream ss;
+            ss << index;
+            l.append(ss.str());
+
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+            float rgb[3];
+            rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
+            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+        }
 
         index++;
-*/
       }
 
       pointsIt++;
@@ -351,6 +355,7 @@ void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mi
   node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering.width", mitk::FloatProperty::New( 3.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.numbers.show", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );

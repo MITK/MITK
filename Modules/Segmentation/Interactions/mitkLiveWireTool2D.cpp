@@ -37,31 +37,10 @@ namespace mitk {
 }
 
 
-
 mitk::LiveWireTool2D::LiveWireTool2D()
 :SegTool2D("LiveWireTool")
 {
-    /*
-  m_Contour = mitk::ContourModel::New();
-  m_ContourModelNode = mitk::DataNode::New();
-  m_ContourModelNode->SetData( m_Contour );
-  m_ContourModelNode->SetProperty("name", StringProperty::New("working contour node"));
-  m_ContourModelNode->SetProperty("visible", BoolProperty::New(true));
-  m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), NULL, true );
-  m_ContourModelNode->AddProperty( "selectedcolor", ColorProperty::New(1.0, 0.0, 0.1), NULL, true );
-
-
-  m_LiveWireContour = mitk::ContourModel::New();
-  m_LiveWireContourNode = mitk::DataNode::New();
-  //m_LiveWireContourNode->SetData( m_LiveWireContour );
-  m_LiveWireContourNode->SetProperty("name", StringProperty::New("active livewire node"));
-  m_LiveWireContourNode->SetProperty("visible", BoolProperty::New(true));
-  m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
-  m_LiveWireContourNode->AddProperty( "selectedcolor", ColorProperty::New(0.5, 0.5, 0.1), NULL, true );
-*/
-
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
-
 
   // great magic numbers
   CONNECT_ACTION( AcINITNEWOBJECT, OnInitLiveWire );
@@ -72,7 +51,6 @@ mitk::LiveWireTool2D::LiveWireTool2D()
   CONNECT_ACTION( AcDELETEPOINT, OnLastSegmentDelete );
   CONNECT_ACTION( AcADDLINE, OnMouseMoved );
 }
-
 
 
 
@@ -260,6 +238,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LeftLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(true), NULL, true );
+  m_LeftLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(true), NULL, true );
 
   m_RightLiveWireContour = mitk::ContourModel::New();
   m_RightLiveWireContour->Expand(timestep+1);
@@ -270,6 +249,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_RightLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.0), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(true), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(true), NULL, true );
 
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );

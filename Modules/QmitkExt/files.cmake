@@ -117,7 +117,7 @@ set(CPP_FILES
  QmitkLiveWireTool2DGUI.cpp
  QmitkFastMarchingToolGUI.cpp
 
- QmitkAdaptiveRegionGrowingWidget.cpp
+ QmitkAdaptiveRegionGrowingToolGUI.cpp
 
  QmitkModuleTableModel.cpp
  QmitkModulesDialog.cpp
@@ -228,7 +228,7 @@ set(MOC_H_FILES
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
- QmitkAdaptiveRegionGrowingWidget.h
+ QmitkAdaptiveRegionGrowingToolGUI.h
  QmitkFastMarchingTool3DGUI.h
  QmitkLiveWireTool2DGUI.h
  QmitkFastMarchingToolGUI.h
@@ -269,7 +269,7 @@ set(UI_FILES
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
-  QmitkAdaptiveRegionGrowingWidgetControls.ui
+  QmitkAdaptiveRegionGrowingToolGUIControls.ui
 )
 
 set(QRC_FILES

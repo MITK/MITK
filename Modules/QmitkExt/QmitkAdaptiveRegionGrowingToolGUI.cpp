@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "QmitkAdaptiveRegionGrowingWidget.h"
+#include "QmitkAdaptiveRegionGrowingToolGUI.h"
 
 #include "QmitkStdMultiWidget.h"
 
@@ -35,9 +35,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkImageIterator.h>
 
-QmitkAdaptiveRegionGrowingWidget::QmitkAdaptiveRegionGrowingWidget(QWidget * parent) :
-QWidget(parent), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0)
+#include "itkOrImageFilter.h"
+#include "mitkImageCast.h"
+
+
+MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
+
+QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent) :
+QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0), m_DataStorage(NULL)
 {
+  this->setParent(parent);
+
   m_Controls.setupUi(this);
 
   // muellerm, 8.8.12.: assure no limits for thresholding (there can be images with pixel values above 4000!!!)
@@ -51,9 +59,12 @@ QWidget(parent), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSugge
   this->CreateConnections();
   this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface","RGSeedpoint");
 
+  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
-QmitkAdaptiveRegionGrowingWidget::~QmitkAdaptiveRegionGrowingWidget()
+
+
+QmitkAdaptiveRegionGrowingToolGUI::~QmitkAdaptiveRegionGrowingToolGUI()
 {
     //Removing the observer of the PointSet node
     mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
@@ -64,10 +75,26 @@ QmitkAdaptiveRegionGrowingWidget::~QmitkAdaptiveRegionGrowingWidget()
     }
 
     this->RemoveHelperNodes();
-
 }
 
-void QmitkAdaptiveRegionGrowingWidget::RemoveHelperNodes()
+
+void QmitkAdaptiveRegionGrowingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
+{
+  m_RegionGrow3DTool = dynamic_cast<mitk::AdaptiveRegionGrowingTool*> (tool);
+  if(m_RegionGrow3DTool.IsNotNull())
+  {
+    this->m_InputImageNode = this->m_RegionGrow3DTool->GetReferenceData();
+    this->m_DataStorage = this->m_RegionGrow3DTool->GetDataStorage();
+    this->EnableControls(true);
+  }
+  else
+  {
+    this->EnableControls(false);
+  }
+}
+
+
+void QmitkAdaptiveRegionGrowingToolGUI::RemoveHelperNodes()
 {
   mitk::DataNode::Pointer seedNode = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
   if( seedNode.IsNotNull() )
@@ -82,7 +109,7 @@ void QmitkAdaptiveRegionGrowingWidget::RemoveHelperNodes()
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::CreateConnections()
+void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
 {
     //Connecting GUI components
     connect( (QObject*) (m_Controls.m_pbDefineSeedPoint), SIGNAL( toggled(bool) ), this, SLOT( SetSeedPointToggled(bool)) );
@@ -97,7 +124,7 @@ void QmitkAdaptiveRegionGrowingWidget::CreateConnections()
     connect( m_Controls.m_UpperThresholdSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetUpperThresholdValue(double)));
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface, std::string seedPoint)
+void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface, std::string seedPoint)
 {
   m_NAMEFORLABLEDSEGMENTATIONIMAGE = labledSegmentation;
   m_NAMEFORBINARYIMAGE = binaryImage;
@@ -105,22 +132,22 @@ void QmitkAdaptiveRegionGrowingWidget::SetDataNodeNames(std::string labledSegmen
   m_NAMEFORSEEDPOINT = seedPoint;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkAdaptiveRegionGrowingToolGUI::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   m_DataStorage = dataStorage;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
+void QmitkAdaptiveRegionGrowingToolGUI::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 {
   m_MultiWidget = multiWidget;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetInputImageNode(mitk::DataNode* node)
+void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 {
   m_InputImageNode = node;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetSeedPointToggled(bool toggled)
+void QmitkAdaptiveRegionGrowingToolGUI::SetSeedPointToggled(bool toggled)
 {
   if (m_InputImageNode.IsNull())
   {
@@ -146,8 +173,8 @@ void QmitkAdaptiveRegionGrowingWidget::SetSeedPointToggled(bool toggled)
     pointSetNode->SetData(pointSet);
 
     //Watch for point added or modified
-    itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingWidget>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingWidget>::New();
-    pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingWidget::OnPointAdded);
+    itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::New();
+    pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded);
     m_PointSetAddObserverTag = pointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
 
     //add to DataStorage
@@ -169,7 +196,7 @@ void QmitkAdaptiveRegionGrowingWidget::SetSeedPointToggled(bool toggled)
     mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
     if (node == NULL)
     {
-      QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingWidget", "No seed point node found!");
+      QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", "No seed point node found!");
       return;
     }
 
@@ -189,7 +216,7 @@ void QmitkAdaptiveRegionGrowingWidget::SetSeedPointToggled(bool toggled)
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::OnPointAdded()
+void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 {
   mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
 
@@ -199,13 +226,13 @@ void QmitkAdaptiveRegionGrowingWidget::OnPointAdded()
 
       if (pointSet.IsNull())
       {
-          QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingWidget", "PointSetNode does not contain a pointset");
+          QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", "PointSetNode does not contain a pointset");
           return;
       }
 
       mitk::Image* image = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
 
-      mitk::Point3D seedPoint = pointSet->GetPointSet(m_MultiWidget->GetTimeNavigationController()->GetTime()->GetPos())->GetPoints()->ElementAt(0);
+      mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);
 
       m_SeedpointValue = image->GetPixelValueByWorldCoordinate(seedPoint);
 
@@ -298,7 +325,7 @@ void QmitkAdaptiveRegionGrowingWidget::OnPointAdded()
 
 
 
-void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
+void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
 {
 
   if (m_InputImageNode.IsNull())
@@ -328,7 +355,10 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
     return;
   }
-  if (!(seedPointSet->GetSize(m_MultiWidget->GetTimeNavigationController()->GetTime()->GetPos()) > 0))
+
+  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
+
+  if (!(seedPointSet->GetSize(timeStep)))
   {
     m_Controls.m_pbRunSegmentation->setEnabled(true);
     m_Controls.m_pbDefineSeedPoint->setHidden(false);
@@ -336,7 +366,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
     return;
   }
 
-  int timeStep = m_MultiWidget->GetTimeNavigationController()->GetTime()->GetPos();
+
   mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
   mitk::Image::Pointer orgImage = dynamic_cast<mitk::Image*> (m_InputImageNode->GetData());
@@ -369,7 +399,7 @@ void QmitkAdaptiveRegionGrowingWidget::RunSegmentation()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingWidget::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
+void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef typename InputImageType::IndexType IndexType;
@@ -474,7 +504,7 @@ void QmitkAdaptiveRegionGrowingWidget::StartRegionGrowing(itk::Image<TPixel, VIm
   mitk::ProgressBar::GetInstance()->Progress(357);
 }
 
-void QmitkAdaptiveRegionGrowingWidget::InitializeLevelWindow()
+void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
 {
   //get the preview from the datatree
   mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
@@ -525,15 +555,18 @@ void QmitkAdaptiveRegionGrowingWidget::InitializeLevelWindow()
   }
   lastSliderPosition = this->m_SeedpointValue + this->m_DetectedLeakagePoint-1;
 
-  this->m_MultiWidget->levelWindowWidget->GetManager()->SetAutoTopMostImage(false);
-  this->m_MultiWidget->levelWindowWidget->GetManager()->SetLevelWindowProperty(static_cast<mitk::LevelWindowProperty*>(newNode->GetProperty("levelwindow")));
+  if(m_MultiWidget)
+  {
+    this->m_MultiWidget->levelWindowWidget->GetManager()->SetAutoTopMostImage(false);
+    this->m_MultiWidget->levelWindowWidget->GetManager()->SetLevelWindowProperty(static_cast<mitk::LevelWindowProperty*>(newNode->GetProperty("levelwindow")));
+  }
 
   if (m_UseVolumeRendering)
   this->UpdateVolumeRenderingThreshold((int) (*level + 0.5));//lower threshold for labeled image
 
 }
 
-void QmitkAdaptiveRegionGrowingWidget::ChangeLevelWindow(int newValue)
+void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(int newValue)
 {
   if (m_SliderInitialized)
   {
@@ -571,7 +604,7 @@ void QmitkAdaptiveRegionGrowingWidget::ChangeLevelWindow(int newValue)
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::DecreaseSlider()
+void QmitkAdaptiveRegionGrowingToolGUI::DecreaseSlider()
 {
   //moves the slider one step to the left, when the "-"-button is pressed
   if (this->m_Controls.m_Slider->value() != this->m_Controls.m_Slider->minimum())
@@ -582,7 +615,7 @@ void QmitkAdaptiveRegionGrowingWidget::DecreaseSlider()
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::IncreaseSlider()
+void QmitkAdaptiveRegionGrowingToolGUI::IncreaseSlider()
 {
   //moves the slider one step to the right, when the "+"-button is pressed
   if (this->m_Controls.m_Slider->value() != this->m_Controls.m_Slider->maximum())
@@ -593,7 +626,7 @@ void QmitkAdaptiveRegionGrowingWidget::IncreaseSlider()
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::ConfirmSegmentation()
+void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 {
   //get image node
   if(m_InputImageNode.IsNull())
@@ -631,87 +664,73 @@ void QmitkAdaptiveRegionGrowingWidget::ConfirmSegmentation()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void QmitkAdaptiveRegionGrowingWidget::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
+void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
-    /*
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->GetWorkingData()->GetData());
+
+  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
+
+  if (originalSegmentation)
+  {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
-    typedef itk::BinaryThresholdImageFilter<InputImageType, SegmentationType> ThresholdFilterType;
 
-    typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
-    filter->SetInput(itkImage);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
 
-    mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
-    if (newNode.IsNull())
-      return;
-
-    mitk::LevelWindow tempLevelWindow;
-
-    newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); //get the levelWindow associated with the preview
-
-    filter->SetUpperThreshold(tempLevelWindow.GetRangeMax());
-    if (m_CurrentRGDirectionIsUpwards)
+    //select single 3D volume if we have more than one time step
+    SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
+    if(originalSegmentation->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
-        filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput( originalSegmentation );
+      timeSelector->SetTimeNr( timeStep );
+      timeSelector->UpdateLargestPossibleRegion();
+      CastToItkImage( timeSelector->GetOutput(), originalSegmentationInITK );
     }
-    else
+    else //use original
     {
-        filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
+      CastToItkImage( originalSegmentation, originalSegmentationInITK );
     }
 
-    filter->Update();
-    */
-
-    // muellerm, 6.8. change:
-    // instead of using the not working threshold filter, implemented a manual creation
-    // of the binary image in an easy way: every pixel unequal zero in the preview (input)
-    // image is a one in the resulting segmentation. at the same time overwrite the preview
-    // with zeros to invalidate it
-    // Allocate empty image
-    typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
-    typename SegmentationType::Pointer segmentationImage = SegmentationType::New();
-    segmentationImage->SetRegions( itkImage->GetLargestPossibleRegion() );
-    segmentationImage->SetOrigin( itkImage->GetOrigin() );
-    segmentationImage->SetDirection( itkImage->GetDirection() );
-    segmentationImage->SetSpacing( itkImage->GetSpacing() );
-    segmentationImage->Allocate();
-
-    itk::ImageRegionIterator<SegmentationType> itOutput( segmentationImage, segmentationImage->GetLargestPossibleRegion() );
+    //Fill current preiview image in segmentation image
+    itk::ImageRegionIterator<SegmentationType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
     itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
     itOutput.GoToBegin();
     itInput.GoToBegin();
-    while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
-    {
-        if( itInput.Value() != 0 )
-            itOutput.Set( 1 );
-        else
-            itOutput.Set( 0 );
 
-        // overwrite preview, so it wont disturb as when we see our resulting segmentation
-        //itInput.Set( 0 );
-        ++itOutput;
-        ++itInput;
+    //calculate threhold from slider value
+    int currentTreshold = 0;
+    if (m_CurrentRGDirectionIsUpwards)
+    {
+      currentTreshold = m_UPPERTHRESHOLD - m_Controls.m_Slider->value() + 1;
+    }
+    else
+    {
+      currentTreshold = m_Controls.m_Slider->value() - m_LOWERTHRESHOLD;
     }
 
-    mitk::Image::Pointer new_image = mitk::Image::New();
-    mitk::CastToMitkImage( segmentationImage, new_image );
+    //iterate over image and set pixel in segmentation according to thresholded labeled image
+    while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
+    {
+      //Use threshold slider to determine if pixel is set to 1
+      if( itInput.Value() != 0 && itInput.Value() > currentTreshold )
+      {
+        itOutput.Set( 1 );
+      }
 
-    mitk::DataNode::Pointer segNode = mitk::DataNode::New();
-    segNode->SetData(new_image);
-    segNode->SetName("RegionGrowing_Result");
-    segNode->SetBoolProperty("binary", mitk::BoolProperty::New(true));
+      ++itOutput;
+      ++itInput;
+    }
 
-    //delete the old image, if there was one:
-    mitk::DataNode::Pointer prevSegNode = m_DataStorage->GetNamedNode("RegionGrowing_Result");
-    m_DataStorage->Remove(prevSegNode);
 
-    m_DataStorage->Add(segNode, m_InputImageNode);
+    //combine current working segmentation image with our region growing result
+    originalSegmentation->SetVolume( (void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer()), timeStep);
+
+    originalSegmentation->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::EnableControls(bool enable)
+void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
 {
   //set the labels below the slider
   this->m_Controls.m_RSliderLabelLower->setText("Shrink");
@@ -723,7 +742,8 @@ void QmitkAdaptiveRegionGrowingWidget::EnableControls(bool enable)
   this->m_Controls.m_pbDefineSeedPoint->setEnabled(enable);
 
   // Check if seed point is already set, if not leave RunSegmentation disabled
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
+  //if even m_DataStorage is NULL leave node NULL
+  mitk::DataNode::Pointer node = m_DataStorage?m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT):NULL;
   if (node.IsNull()) {
     this->m_Controls.m_pbRunSegmentation->setEnabled(false);
   }
@@ -733,7 +753,8 @@ void QmitkAdaptiveRegionGrowingWidget::EnableControls(bool enable)
   }
 
   // Check if a segmentation exists, if not leave segmentation dependent disabled.
-  node = m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  //if even m_DataStorage is NULL leave node NULL
+  node = m_DataStorage?m_DataStorage->GetNamedNode(m_NAMEFORLABLEDSEGMENTATIONIMAGE):NULL;
   if (node.IsNull()) {
       this->m_Controls.m_DecreaseTH->setEnabled(false);
       this->m_Controls.m_IncreaseTH->setEnabled(false);
@@ -753,7 +774,7 @@ void QmitkAdaptiveRegionGrowingWidget::EnableControls(bool enable)
   this->m_Controls.m_cbVolumeRendering->setEnabled(enable);
 }
 
-void QmitkAdaptiveRegionGrowingWidget::EnableVolumeRendering(bool enable)
+void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
 {
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
 
@@ -777,7 +798,7 @@ void QmitkAdaptiveRegionGrowingWidget::EnableVolumeRendering(bool enable)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkAdaptiveRegionGrowingWidget::UpdateVolumeRenderingThreshold(int thValue)
+void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thValue)
 {
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
 
@@ -829,14 +850,14 @@ void QmitkAdaptiveRegionGrowingWidget::UpdateVolumeRenderingThreshold(int thValu
 
 }
 
-void QmitkAdaptiveRegionGrowingWidget::UseVolumeRendering(bool on)
+void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)
 {
   m_UseVolumeRendering = on;
 
   this->EnableVolumeRendering(on);
 }
 
-void QmitkAdaptiveRegionGrowingWidget::OnDefineThresholdBoundaries(bool status)
+void QmitkAdaptiveRegionGrowingToolGUI::OnDefineThresholdBoundaries(bool status)
 {
     m_Controls.m_LowerThresholdSpinBox->setEnabled(status);
     m_Controls.m_UpperThresholdSpinBox->setEnabled(status);
@@ -844,17 +865,17 @@ void QmitkAdaptiveRegionGrowingWidget::OnDefineThresholdBoundaries(bool status)
     m_Controls.lb_UpperTh->setEnabled(status);
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetLowerThresholdValue( double lowerThreshold )
+void QmitkAdaptiveRegionGrowingToolGUI::SetLowerThresholdValue( double lowerThreshold )
 {
   m_LOWERTHRESHOLD = lowerThreshold;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::SetUpperThresholdValue( double upperThreshold)
+void QmitkAdaptiveRegionGrowingToolGUI::SetUpperThresholdValue( double upperThreshold)
 {
   m_UPPERTHRESHOLD = upperThreshold;
 }
 
-void QmitkAdaptiveRegionGrowingWidget::Deactivated()
+void QmitkAdaptiveRegionGrowingToolGUI::Deactivated()
 {
   this->DeactivateSeedPointMode();
 
@@ -870,12 +891,12 @@ void QmitkAdaptiveRegionGrowingWidget::Deactivated()
   m_Controls.m_cbVolumeRendering->setChecked(false);
 }
 
-void QmitkAdaptiveRegionGrowingWidget::Activated()
+void QmitkAdaptiveRegionGrowingToolGUI::Activated()
 {
 
 }
 
-void QmitkAdaptiveRegionGrowingWidget::ActivateSeedPointMode()
+void QmitkAdaptiveRegionGrowingToolGUI::ActivateSeedPointMode()
 {
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
   if(node.IsNotNull())
@@ -893,7 +914,7 @@ void QmitkAdaptiveRegionGrowingWidget::ActivateSeedPointMode()
   }
 }
 
-void QmitkAdaptiveRegionGrowingWidget::DeactivateSeedPointMode()
+void QmitkAdaptiveRegionGrowingToolGUI::DeactivateSeedPointMode()
 {
   //set the cursor to default again
   QApplication::restoreOverrideCursor();

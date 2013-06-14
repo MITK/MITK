@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkAdaptiveRegionGrowingWidget" name="m_AdaptiveRGWidget" native="true"/>
+    <widget class="QmitkAdaptiveRegionGrowingToolGUI" name="m_AdaptiveRGWidget" native="true"/>
    </item>
    <item>
     <spacer name="spacer">
@@ -54,9 +54,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkAdaptiveRegionGrowingWidget</class>
+   <class>QmitkAdaptiveRegionGrowingToolGUI</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkAdaptiveRegionGrowingWidget.h</header>
+   <header location="global">QmitkAdaptiveRegionGrowingToolGUI.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

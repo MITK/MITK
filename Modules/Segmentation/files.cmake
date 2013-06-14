@@ -63,6 +63,7 @@ set(CPP_FILES
   Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
+  Interactions/mitkAdaptiveRegionGrowingTool.cpp
   IO/mitkContourModelIOFactory.cpp
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp

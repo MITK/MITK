@@ -131,6 +131,11 @@ cl_program OclResourceServiceImpl::GetProgram(const std::string &name)
   if( it != m_ProgramStorage.end() )
   {
     it->second.mutex.Lock();
+    // first check if the program was deleted
+    // while waiting on the mutex
+    if ( it->second.counter == 0 )
+      mitkThrow() << "Requested OpenCL Program (" << name <<") not found."
+                  << "(deleted while waiting on the mutex)";
     // increase the reference counter
     // by one if the program is requestet
     it->second.counter += 1;
@@ -178,6 +183,7 @@ void OclResourceServiceImpl::InvalidateStorage()
 void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 {
   ProgramMapType::iterator it = m_ProgramStorage.find(name);
+  cl_int status = 0;
   cl_program program = NULL;
 
   if( it != m_ProgramStorage.end() )
@@ -187,6 +193,7 @@ void OclResourceServiceImpl::RemoveProgram(const std::string& name)
     it->second.counter -= 1;
     it->second.mutex.Unlock();
 
+    // remove from the storage
     if( it->second.counter == 0 )
     {
       program = it->second.program;
@@ -198,7 +205,10 @@ void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 
     // delete the program
     if( program )
-      clReleaseProgram(program);
+    {
+      status = clReleaseProgram(program);
+      CHECK_OCL_ERR( status );
+    }
   }
   else
   {

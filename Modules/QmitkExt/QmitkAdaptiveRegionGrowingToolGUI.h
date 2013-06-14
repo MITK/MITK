@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef QMITK_AdaptiveRegionGrowingWidget_H
-#define QMITK_AdaptiveRegionGrowingWidget_H
+#ifndef QMITK_QmitkAdaptiveRegionGrowingGUI_H
+#define QMITK_QmitkAdaptiveRegionGrowingGUI_H
 
 
 #include "mitkDataStorage.h"
@@ -23,38 +23,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 
 #include "qwidget.h"
-#include "ui_QmitkAdaptiveRegionGrowingWidgetControls.h"
+#include "ui_QmitkAdaptiveRegionGrowingGUIControls.h"
 
 #include "QmitkExtExports.h"
 
+#include "QmitkToolGUI.h"
+
 class QmitkStdMultiWidget;
 class DataNode;
-class QmitkAdaptiveRegionGrowingWidgetControls;
+class QmitkAdaptiveRegionGrowingGUIControls;
 
 
 /*!
 *
-* \brief QmitkAdaptiveRegionGrowingWidget
+* \brief QmitkAdaptiveRegionGrowingGUI
 *
 * Adaptive Region Growing View class of the segmentation.
 *
 */
 
-class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingWidget : public QWidget
+class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingGUI : public QmitkToolGUI
 {
 
   Q_OBJECT
 
 public:
-  typedef QmitkAdaptiveRegionGrowingWidget   Self;
+  mitkClassMacro(QmitkAdaptiveRegionGrowingGUI, QmitkToolGUI);
+
+  itkNewMacro(QmitkAdaptiveRegionGrowingGUI);
 
   /**
   * @brief Constructor.
   **/
-  QmitkAdaptiveRegionGrowingWidget(QWidget *parent=0);
+  QmitkAdaptiveRegionGrowingGUI(QmitkToolGUI *parent=0);
 
   /** \brief Destructor. */
-  virtual ~QmitkAdaptiveRegionGrowingWidget();
+  virtual ~QmitkAdaptiveRegionGrowingGUI();
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
@@ -77,7 +81,7 @@ public:
   /**
   * @brief The created GUI from the .ui-File. This Attribute is obligatory
   */
-  Ui::QmitkAdaptiveRegionGrowingWidgetControls m_Controls;
+  Ui::QmitkAdaptiveRegionGrowingGUIControls m_Controls;
 
 protected slots:
 

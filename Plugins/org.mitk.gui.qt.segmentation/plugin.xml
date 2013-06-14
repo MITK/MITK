@@ -18,12 +18,12 @@
        name="Clipping Plane"
        class="QmitkDeformableClippingPlaneView"
        icon="resources/deformablePlane.png" />
-    <view
+    <!--<view
       id="org.mitk.views.regiongrowing"
       name="RegionGrowing"
       category="org.mitk.views.general"
       icon="resources/regiongrowing.xpm"
-      class="QmitkRegionGrowingView" />
+      class="QmitkRegionGrowingView" /> -->
     <view
       id="org.mitk.views.segmentationutilities"
       name= "SegmentationUtilities"

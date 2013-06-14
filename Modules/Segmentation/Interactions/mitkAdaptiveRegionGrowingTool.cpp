@@ -14,43 +14,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkAdaptiveRegionGrowing.h"
+#include "mitkAdaptiveRegionGrowingTool.h"
 
 #include "mitkToolManager.h"
 
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, AdaptiveRegionGrowing, "AdaptiveRegionGrowing");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
 }
 
-mitk::AdaptiveRegionGrowing::AdaptiveRegionGrowing()
+mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
+{
+
+}
+
+mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
 {
 }
 
-mitk::AdaptiveRegionGrowing::~AdaptiveRegionGrowing()
-{
-}
-
-const char** mitk::AdaptiveRegionGrowing::GetXPM() const
+const char** mitk::AdaptiveRegionGrowingTool::GetXPM() const
 {
   return NULL;
 }
 
-const char* mitk::AdaptiveRegionGrowing::GetName() const
+const char* mitk::AdaptiveRegionGrowingTool::GetName() const
 {
   return "RegionGrowing";
 }
 
-std::string mitk::AdaptiveRegionGrowing::GetIconPath() const
+std::string mitk::AdaptiveRegionGrowingTool::GetIconPath() const
 {
-  return ":/Segmentation/Add_48x48.png";
+  return ":/Segmentation/RegionGrowing_48x48.png";
 }
 
-void mitk::AdaptiveRegionGrowing::Activated()
+void mitk::AdaptiveRegionGrowingTool::Activated()
 {
 
 }
 
-void mitk::AdaptiveRegionGrowing::Deactivated()
+void mitk::AdaptiveRegionGrowingTool::Deactivated()
 {
+}
+
+mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetReferenceData(){
+  return this->m_ToolManager->GetReferenceData(0);
+}
+
+mitk::DataStorage* mitk::AdaptiveRegionGrowingTool::GetDataStorage(){
+  return this->m_ToolManager->GetDataStorage();
+}
+
+mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetWorkingData(){
+  return this->m_ToolManager->GetWorkingData(0);
 }

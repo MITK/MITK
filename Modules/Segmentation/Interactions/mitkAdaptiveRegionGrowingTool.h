@@ -14,31 +14,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkAdaptiveRegionGrowing_h_Included
-#define mitkAdaptiveRegionGrowing_h_Included
+#ifndef mitkAdaptiveRegionGrowingTool_h_Included
+#define mitkAdaptiveRegionGrowingTool_h_Included
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
-
+#include "mitkDataStorage.h"
 
 namespace mitk
 {
 
   /**
-  \brief Dummy Tool for AdaptiveRegionGrowingWidget.
+  \brief Dummy Tool for AdaptiveRegionGrowingToolWidget.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
 
   */
-  class Segmentation_EXPORT AdaptiveRegionGrowing : public AutoSegmentationTool
+  class Segmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
 
-    mitkClassMacro(AdaptiveRegionGrowing, AutoSegmentationTool);
-    itkNewMacro(AdaptiveRegionGrowing);
+    mitkClassMacro(AdaptiveRegionGrowingTool, AutoSegmentationTool);
+    itkNewMacro(AdaptiveRegionGrowingTool);
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
@@ -47,11 +47,15 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
+    mitk::DataNode* GetReferenceData();
+    mitk::DataNode* GetWorkingData();
+    mitk::DataStorage* GetDataStorage();
+
 
   protected:
 
-    AdaptiveRegionGrowing(); // purposely hidden
-    virtual ~AdaptiveRegionGrowing();
+    AdaptiveRegionGrowingTool(); // purposely hidden
+    virtual ~AdaptiveRegionGrowingTool();
 
   };
 

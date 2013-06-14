@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef QMITK_QmitkAdaptiveRegionGrowingGUI_H
-#define QMITK_QmitkAdaptiveRegionGrowingGUI_H
+#ifndef QMITK_QmitkAdaptiveRegionGrowingToolGUI_H
+#define QMITK_QmitkAdaptiveRegionGrowingToolGUI_H
 
 
 #include "mitkDataStorage.h"
@@ -23,42 +23,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 
 #include "qwidget.h"
-#include "ui_QmitkAdaptiveRegionGrowingGUIControls.h"
+#include "ui_QmitkAdaptiveRegionGrowingToolGUIControls.h"
 
 #include "QmitkExtExports.h"
 
 #include "QmitkToolGUI.h"
 
+#include "mitkAdaptiveRegionGrowingTool.h"
+
 class QmitkStdMultiWidget;
 class DataNode;
-class QmitkAdaptiveRegionGrowingGUIControls;
+class QmitkAdaptiveRegionGrowingToolGUIControls;
 
 
 /*!
 *
-* \brief QmitkAdaptiveRegionGrowingGUI
+* \brief QmitkAdaptiveRegionGrowingToolGUI
 *
 * Adaptive Region Growing View class of the segmentation.
 *
 */
 
-class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingGUI : public QmitkToolGUI
+class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public QmitkToolGUI
 {
 
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkAdaptiveRegionGrowingGUI, QmitkToolGUI);
+  mitkClassMacro(QmitkAdaptiveRegionGrowingToolGUI, QmitkToolGUI);
 
-  itkNewMacro(QmitkAdaptiveRegionGrowingGUI);
+  itkNewMacro(QmitkAdaptiveRegionGrowingToolGUI);
 
-  /**
-  * @brief Constructor.
-  **/
-  QmitkAdaptiveRegionGrowingGUI(QmitkToolGUI *parent=0);
+  QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent=0);
 
-  /** \brief Destructor. */
-  virtual ~QmitkAdaptiveRegionGrowingGUI();
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
@@ -81,7 +78,7 @@ public:
   /**
   * @brief The created GUI from the .ui-File. This Attribute is obligatory
   */
-  Ui::QmitkAdaptiveRegionGrowingGUIControls m_Controls;
+  Ui::QmitkAdaptiveRegionGrowingToolGUIControls m_Controls;
 
 protected slots:
 
@@ -107,7 +104,14 @@ protected slots:
 
     void SetUpperThresholdValue(double upperThreshold);
 
+    void OnNewToolAssociated(mitk::Tool*);
+
 protected:
+
+  mitk::AdaptiveRegionGrowingTool::Pointer m_RegionGrow3DTool;
+
+  /** \brief Destructor. */
+  virtual ~QmitkAdaptiveRegionGrowingToolGUI();
 
   //Pointer to the main widget to be able to reach the renderer
   QmitkStdMultiWidget* m_MultiWidget;

@@ -756,14 +756,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     }
 
 
-    mitk::Image::Pointer segmentationResult = mitk::Image::New();
-
-    mitk::CastToMitkImage(originalSegmentationInITK, segmentationResult);
-    segmentationResult->GetGeometry()->SetOrigin(originalSegmentation->GetGeometry()->GetOrigin());
-    segmentationResult->GetGeometry()->SetIndexToWorldTransform(originalSegmentation->GetGeometry()->GetIndexToWorldTransform());
-
     //combine current working segmentation image with our region growing result
-    originalSegmentation->SetVolume( /*(void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer())*/segmentationResult->GetData(), timeStep);
+    originalSegmentation->SetVolume( (void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer()), timeStep);
 
     originalSegmentation->Modified();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

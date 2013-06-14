@@ -107,7 +107,9 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     void UpdatePreviewImage();
 
     /// \brief Reset all relevant inputs of the itk pipeline.
-    void ResetFastMarching(const PositionEvent* positionEvent);
+    void ResetFastMarching();
+    /// \brief Reinit filters.
+    void ResetToInitialState();
 
 
     Image::Pointer m_ReferenceSlice;

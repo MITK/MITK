@@ -355,7 +355,10 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
     return;
   }
-  if (!(seedPointSet->GetSize(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep()) > 0))
+
+  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
+
+  if (!(seedPointSet->GetSize(timeStep)))
   {
     m_Controls.m_pbRunSegmentation->setEnabled(true);
     m_Controls.m_pbDefineSeedPoint->setHidden(false);
@@ -363,7 +366,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
-  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
+
   mitk::PointSet::PointType seedPoint = seedPointSet->GetPointSet(timeStep)->GetPoints()->Begin().Value();
 
   mitk::Image::Pointer orgImage = dynamic_cast<mitk::Image*> (m_InputImageNode->GetData());
@@ -663,7 +666,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  mitk::Image* originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->GetWorkingData()->GetData());
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->GetWorkingData()->GetData());
+
+  int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
 
   if (originalSegmentation)
   {
@@ -709,26 +714,59 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
 
     SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
-    CastToItkImage( originalSegmentation, originalSegmentationInITK );
+    if(originalSegmentation->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+    {
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput( originalSegmentation );
+      timeSelector->SetTimeNr( timeStep );
+      timeSelector->UpdateLargestPossibleRegion();
+      CastToItkImage( timeSelector->GetOutput(), originalSegmentationInITK );
+    }
+    else
+    {
+      CastToItkImage( originalSegmentation, originalSegmentationInITK );
+    }
 
+    //Fill current preiview image in segmentation image
     itk::ImageRegionIterator<SegmentationType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
     itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
     itOutput.GoToBegin();
     itInput.GoToBegin();
+
+    int currentTreshold = 0;
+    if (m_CurrentRGDirectionIsUpwards)
+    {
+      currentTreshold = m_UPPERTHRESHOLD - m_Controls.m_Slider->value() + 1;
+    }
+    else
+    {
+      currentTreshold = m_Controls.m_Slider->value() - m_LOWERTHRESHOLD;
+    }
+
     while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
     {
-      if( itInput.Value() != 0 )
+      //Use threshold slider to determine if pixel is set to 1
+      if( itInput.Value() != 0 && itInput.Value() > currentTreshold )
+      {
         itOutput.Set( 1 );
+      }
 
-      // overwrite preview, so it wont disturb as when we see our resulting segmentation
-      //itInput.Set( 0 );
       ++itOutput;
       ++itInput;
     }
 
-    //combine current working segmentation image with our region growing result
 
-    mitk::GrabItkImageMemory(originalSegmentationInITK, originalSegmentation);
+    mitk::Image::Pointer segmentationResult = mitk::Image::New();
+
+    mitk::CastToMitkImage(originalSegmentationInITK, segmentationResult);
+    segmentationResult->GetGeometry()->SetOrigin(originalSegmentation->GetGeometry()->GetOrigin());
+    segmentationResult->GetGeometry()->SetIndexToWorldTransform(originalSegmentation->GetGeometry()->GetIndexToWorldTransform());
+
+    //combine current working segmentation image with our region growing result
+    originalSegmentation->SetVolume( /*(void*)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer())*/segmentationResult->GetData(), timeStep);
+
+    originalSegmentation->Modified();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

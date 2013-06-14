@@ -667,6 +667,82 @@ mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(ItkUcharImgTy
     return mitk::FiberBundleX::New(newPolyData);
 }
 
+mitk::FiberBundleX::Pointer mitk::FiberBundleX::RemoveFibersOutside(ItkUcharImgType* mask, bool invert)
+{
+    float minSpacing = 1;
+    if(mask->GetSpacing()[0]<mask->GetSpacing()[1] && mask->GetSpacing()[0]<mask->GetSpacing()[2])
+        minSpacing = mask->GetSpacing()[0];
+    else if (mask->GetSpacing()[1] < mask->GetSpacing()[2])
+        minSpacing = mask->GetSpacing()[1];
+    else
+        minSpacing = mask->GetSpacing()[2];
+
+    mitk::FiberBundleX::Pointer fibCopy = this->GetDeepCopy();
+    fibCopy->ResampleFibers(minSpacing/10);
+    vtkSmartPointer<vtkPolyData> polyData =fibCopy->GetFiberPolyData();
+
+    vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
+
+    MITK_INFO << "Cutting fibers";
+    boost::progress_display disp(m_NumFibers);
+    for (int i=0; i<m_NumFibers; i++)
+    {
+        ++disp;
+
+        vtkCell* cell = polyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        if (numPoints>1)
+        {
+            int newNumPoints = 0;
+            for (int j=0; j<numPoints; j++)
+            {
+                double* p = points->GetPoint(j);
+
+                itk::Point<float, 3> itkP;
+                itkP[0] = p[0]; itkP[1] = p[1]; itkP[2] = p[2];
+                itk::Index<3> idx;
+                mask->TransformPhysicalPointToIndex(itkP, idx);
+
+                if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) && !invert )
+                {
+                    vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                    container->GetPointIds()->InsertNextId(id);
+                    newNumPoints++;
+                }
+                else if ( (mask->GetPixel(idx)<=0 || !mask->GetLargestPossibleRegion().IsInside(idx)) && invert )
+                {
+                    vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                    container->GetPointIds()->InsertNextId(id);
+                    newNumPoints++;
+                }
+                else if (newNumPoints>0)
+                {
+                    vtkNewCells->InsertNextCell(container);
+
+                    newNumPoints = 0;
+                    container = vtkSmartPointer<vtkPolyLine>::New();
+                }
+            }
+
+            if (newNumPoints>0)
+                vtkNewCells->InsertNextCell(container);
+        }
+
+    }
+
+    if (vtkNewCells->GetNumberOfCells()<=0)
+        return NULL;
+
+    vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
+    newPolyData->SetPoints(vtkNewPoints);
+    newPolyData->SetLines(vtkNewCells);
+    return mitk::FiberBundleX::New(newPolyData);
+}
+
 mitk::FiberBundleX::Pointer mitk::FiberBundleX::ExtractFiberSubset(mitk::PlanarFigure* pf)
 {
     if (pf==NULL)
@@ -1405,17 +1481,23 @@ bool mitk::FiberBundleX::ApplyCurvatureThreshold(float minRadius, bool deleteFib
 
 bool mitk::FiberBundleX::RemoveShortFibers(float lengthInMM)
 {
+    MITK_INFO << "Removing short fibers";
     if (lengthInMM<=0 || lengthInMM<m_MinFiberLength)
+    {
+        MITK_INFO << "No fibers shorter than " << lengthInMM << " mm found!";
         return true;
+    }
 
     if (lengthInMM>m_MaxFiberLength)    // can't remove all fibers
+    {
+        MITK_WARN << "Process aborted. No fibers would be left!";
         return false;
+    }
 
     vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();
     float min = m_MaxFiberLength;
 
-    MITK_INFO << "Removing short fibers";
     boost::progress_display disp(m_NumFibers);
     for (int i=0; i<m_NumFibers; i++)
     {

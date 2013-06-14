@@ -64,9 +64,9 @@ int FiberProcessing(int argc, char* argv[])
 
     parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample fiber with the given point distance (in mm)");
     parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth fiber with the given point distance (in mm)");
-    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum fiber length");
-    parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum fiber length");
-    parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius");
+    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum fiber length (in mm)");
+    parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum fiber length (in mm)");
+    parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius (in mm)");
     parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
     map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);

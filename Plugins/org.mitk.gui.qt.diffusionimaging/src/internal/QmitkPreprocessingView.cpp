@@ -339,7 +339,6 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
     m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
     m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
-    if(foundDwiVolume)m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(10);
     m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
 
     UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());

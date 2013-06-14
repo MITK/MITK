@@ -207,7 +207,18 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
   }
 }
 
-
+void mitk::ContourModel::RemoveIntersections(mitk::ContourModel* other, int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    if( !this->m_ContourSeries[timestep]->IsClosed() )
+    {
+      this->m_ContourSeries[timestep]->RemoveIntersections(other->m_ContourSeries[timestep]);
+      this->InvokeEvent( ContourModelSizeChangeEvent() );
+      this->Modified();
+    }
+  }
+}
 
 mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep)
 {
@@ -587,35 +598,6 @@ void mitk::ContourModel::UpdateOutputInformation()
   GetTimeSlicedGeometry()->UpdateInformation();
 }
 
-
-void mitk::ContourModel::CorrectIntersections(mitk::ContourModel* prev, mitk::ContourModel* next, int timestep)
-{
-    VertexIterator  prevIter = prev->IteratorBegin(timestep);
-
-    while (prevIter != prev->IteratorEnd(timestep))
-    {
-        VertexIterator  nextIter = next->IteratorBegin(timestep);
-        while (nextIter != next->IteratorEnd(timestep))
-        {
-            if ( (*prevIter)->Coordinates == (*nextIter)->Coordinates )
-            {
-                // remove intersecting points
-                next->RemoveVertex( (*nextIter), timestep);
-                prev->RemoveVertex( (*prevIter), timestep);
-
-                // reset iterators
-                prevIter = prev->IteratorBegin(timestep);
-                nextIter = next->IteratorBegin(timestep);
-             //   MITK_INFO << "REMOVING NODE";
-            }
-            else
-            {
-                nextIter++;
-            }
-        }
-        prevIter++;
-    }
-}
 
 void mitk::ContourModel::ExecuteOperation(mitk::Operation* operation)
 {

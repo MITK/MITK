@@ -185,6 +185,11 @@ namespace mitk
     */
     void Concatenate(mitk::ContourElement* other);
 
+    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
+        FindFirstIntersection(mitk::ContourElement* other);
+
+    void RemoveIntersections(mitk::ContourElement* other);
+
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
     */

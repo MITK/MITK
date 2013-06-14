@@ -227,11 +227,11 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LeftLiveWireContourNode = mitk::DataNode::New();
   m_LeftLiveWireContourNode->SetData( m_LeftLiveWireContour );
   m_LeftLiveWireContourNode->SetName("left node");
-  m_LeftLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(1, 1, 0), NULL, true );
+  m_LeftLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(1, 0, 0), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
-  m_LeftLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(false), NULL, true );
+  m_LeftLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(false), NULL, true );
-  m_LeftLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(false), NULL, true );
+  m_LeftLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(true), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
   m_RightLiveWireContour = mitk::ContourModel::New();
@@ -239,11 +239,11 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_RightLiveWireContourNode = mitk::DataNode::New();
   m_RightLiveWireContourNode->SetData( m_RightLiveWireContour );
   m_RightLiveWireContourNode->SetName("right node");
-  m_RightLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(1, 1, 0), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0, 0, 1), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.0), NULL, true );
-  m_RightLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(false), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(false), NULL, true );
-  m_RightLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(false), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.numbers.show", BoolProperty::New(true), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );

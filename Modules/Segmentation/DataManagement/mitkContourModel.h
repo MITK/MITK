@@ -204,6 +204,8 @@ namespace mitk
     */
     void Concatenate(mitk::ContourModel* other, int timestep=0);
 
+    void RemoveIntersections(mitk::ContourModel* other, int timestep=0);
+
     /** \brief Returns a const VertexIterator at the start element of the contour.
     @throw mitk::Exception if the timestep is invalid.
     */
@@ -380,8 +382,6 @@ namespace mitk
     virtual void Interpolate(int timestep);
 
     virtual void RedistributeControlVertices(int period, int timestep);
-
-    static void CorrectIntersections(mitk::ContourModel* prev, mitk::ContourModel* next, int timestep);
 
   protected:
 

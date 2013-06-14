@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkContourElement.h>
 #include <vtkMath.h>
+#include <algorithm>
 
 mitk::ContourElement::ContourElement()
 {
@@ -330,7 +331,50 @@ void mitk::ContourElement::Concatenate(mitk::ContourElement* other)
   }
 }
 
+std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
+mitk::ContourElement::FindFirstIntersection(mitk::ContourElement* other)
+{
+    VertexIterator thisIt =  this->m_Vertices->begin();
+    VertexIterator thisEnd =  this->m_Vertices->end();
 
+    VertexIterator otherEnd =  other->m_Vertices->end();
+
+    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator> match(thisEnd,otherEnd);
+
+    while (thisIt != thisEnd)
+    {
+        VertexIterator otherIt =  other->m_Vertices->begin();
+
+        while (otherIt != otherEnd)
+        {
+            if ( (*thisIt)->Coordinates == (*otherIt)->Coordinates )
+            {
+                match.first = thisIt;
+                match.second = otherIt;
+                return match;
+            }
+
+            otherIt++;
+        }
+
+        thisIt++;
+    }
+
+    return match;
+}
+
+void mitk::ContourElement::RemoveIntersections(mitk::ContourElement* other)
+{
+  if( other->GetSize() > 0)
+  {
+
+   // VertexIterator _where = this->FindFirstIntersection(other);
+    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator> match = this->FindFirstIntersection(other);
+
+    this->m_Vertices->erase(match.first, this->m_Vertices->end());
+    other->m_Vertices->erase(other->m_Vertices->begin(), match.second );
+  }
+}
 
 bool mitk::ContourElement::RemoveVertex(mitk::ContourElement::VertexType* vertex)
 {

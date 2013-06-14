@@ -131,7 +131,7 @@ class OclResourceServiceImpl
     : public US_BASECLASS_NAME, public OclResourceService
 {
 public:
-  typedef std::map< std::string, cl_program > ProgramMapType;
+  typedef std::map< std::string, std::pair< int, cl_program> > ProgramMapType;
 
   OclResourceServiceImpl();
 
@@ -149,7 +149,7 @@ public:
 
   void InsertProgram(cl_program _program_in, std::string name, bool forceOverride=true);
 
-  cl_program GetProgram(const std::string&name) const;
+  cl_program GetProgram(const std::string&name);
 
   void InvalidateStorage();
 

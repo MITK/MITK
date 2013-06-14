@@ -16,9 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclResourceServiceImpl_p.h"
 
+#include <itkSimpleFastMutexLock.h>
+
+// mutex for referencecounting of th cl_program
+static itk::SimpleFastMutexLock RefCountMutex;
+
 OclResourceService::~OclResourceService()
 {
-
 }
 
 OclResourceServiceImpl::OclResourceServiceImpl()
@@ -34,7 +38,7 @@ OclResourceServiceImpl::~OclResourceServiceImpl()
     ProgramMapType::iterator it = m_ProgramStorage.begin();
     while(it != m_ProgramStorage.end() )
     {
-      clReleaseProgram( it->second );
+      clReleaseProgram( it->second.second );
       m_ProgramStorage.erase( it++ );
     }
   }
@@ -98,9 +102,14 @@ void OclResourceServiceImpl::PrintContextInfo() const
 void OclResourceServiceImpl::InsertProgram(cl_program _program_in, std::string name, bool forceOverride)
 {
   std::pair< ProgramMapType::iterator, bool> retValue;
-  typedef std::pair< std::string, cl_program > MapElemPair;
+  typedef std::pair < int, cl_program > ValuePair;
+  typedef std::pair < std::string, ValuePair > MapElemPair;
 
-  retValue = m_ProgramStorage.insert( MapElemPair(name, _program_in) );
+  // program is not stored, insert first instance (1)
+  RefCountMutex.Lock();
+  retValue = m_ProgramStorage.insert( MapElemPair(name, ValuePair(1, _program_in)) );
+  RefCountMutex.Unlock();
+
   // insertion failed, i.e. a program with same name exists
   if( !retValue.second )
   {
@@ -108,23 +117,28 @@ void OclResourceServiceImpl::InsertProgram(cl_program _program_in, std::string n
     if( forceOverride )
     {
       // overwrite old instance
-      m_ProgramStorage[name] = _program_in;
+      m_ProgramStorage[name].second = _program_in;
       overrideMsg +=" The old program was overwritten!";
     }
 
     MITK_WARN("OpenCL.ResourceService") << "The program " << name << " already exists." << overrideMsg;
-
   }
 }
 
-cl_program OclResourceServiceImpl::GetProgram(const std::string &name) const
+cl_program OclResourceServiceImpl::GetProgram(const std::string &name)
 {
-  ProgramMapType::const_iterator it;
-  it = m_ProgramStorage.find(name);
+  ProgramMapType::iterator it = m_ProgramStorage.find(name);
 
   if( it != m_ProgramStorage.end() )
   {
-    return it->second;
+    RefCountMutex.Lock();
+    // increase the reference counter
+    // by one if the program is requestet
+    it->second.first += 1;
+    RefCountMutex.Unlock();
+
+    // return the cl_program
+    return it->second.second;
   }
 
   mitkThrow() << "Requested OpenCL Program (" << name <<") not found.";
@@ -143,7 +157,7 @@ void OclResourceServiceImpl::InvalidateStorage()
   {
     // query the program build status
     cl_build_status status;
-    unsigned int query = clGetProgramBuildInfo( it->second, m_ContextCollection->m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, NULL );
+    unsigned int query = clGetProgramBuildInfo( it->second.second, m_ContextCollection->m_Devices[0], CL_PROGRAM_BUILD_STATUS, sizeof(cl_int), &status, NULL );
     CHECK_OCL_ERR( query )
 
     MITK_DEBUG << "Quering status for " << it->first << std::endl;
@@ -165,10 +179,25 @@ void OclResourceServiceImpl::InvalidateStorage()
 void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 {
   ProgramMapType::iterator it = m_ProgramStorage.find(name);
+  cl_program program = NULL;
 
   if( it != m_ProgramStorage.end() )
   {
-    m_ProgramStorage.erase(it);
+    RefCountMutex.Lock();
+    // decrease reference by one
+    it->second.first -= 1;
+    // if it is the last reference
+    // delete entry
+    if(it->second.first == 0)
+    {
+      program = it->second.second;
+      m_ProgramStorage.erase(it);
+    }
+
+    RefCountMutex.Unlock();
+    // delete the program
+    if( program )
+      clReleaseProgram(program);
   }
   else
   {

@@ -672,47 +672,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
   if (originalSegmentation)
   {
-    /*
-    typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
-    typedef itk::BinaryThresholdImageFilter<InputImageType, SegmentationType> ThresholdFilterType;
-
-    typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
-    filter->SetInput(itkImage);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-
-    mitk::DataNode::Pointer newNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
-    if (newNode.IsNull())
-    return;
-
-    mitk::LevelWindow tempLevelWindow;
-
-    newNode->GetLevelWindow(tempLevelWindow, NULL, "levelwindow"); //get the levelWindow associated with the preview
-
-    filter->SetUpperThreshold(tempLevelWindow.GetRangeMax());
-    if (m_CurrentRGDirectionIsUpwards)
-    {
-    filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
-    }
-    else
-    {
-    filter->SetLowerThreshold(tempLevelWindow.GetLevel()+0.5);
-    }
-
-    filter->Update();
-    */
-
-    // muellerm, 6.8. change:
-    // instead of using the not working threshold filter, implemented a manual creation
-    // of the binary image in an easy way: every pixel unequal zero in the preview (input)
-    // image is a one in the resulting segmentation. at the same time overwrite the preview
-    // with zeros to invalidate it
-    // Allocate empty image
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
     typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
 
 
+    //select single 3D volume if we have more than one time step
     SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
     if(originalSegmentation->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
@@ -722,7 +686,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
       timeSelector->UpdateLargestPossibleRegion();
       CastToItkImage( timeSelector->GetOutput(), originalSegmentationInITK );
     }
-    else
+    else //use original
     {
       CastToItkImage( originalSegmentation, originalSegmentationInITK );
     }
@@ -733,6 +697,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     itOutput.GoToBegin();
     itInput.GoToBegin();
 
+    //calculate threhold from slider value
     int currentTreshold = 0;
     if (m_CurrentRGDirectionIsUpwards)
     {
@@ -743,6 +708,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
       currentTreshold = m_Controls.m_Slider->value() - m_LOWERTHRESHOLD;
     }
 
+    //iterate over image and set pixel in segmentation according to thresholded labeled image
     while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
     {
       //Use threshold slider to determine if pixel is set to 1

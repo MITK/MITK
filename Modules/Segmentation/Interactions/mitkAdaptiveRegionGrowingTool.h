@@ -26,7 +26,8 @@ namespace mitk
 {
 
   /**
-  \brief Dummy Tool for AdaptiveRegionGrowingToolWidget.
+  \brief Dummy Tool for AdaptiveRegionGrowingToolGUI to get Tool functionality for AdaptiveRegionGrowing.
+  The actual logic is implemented in QmitkAdaptiveRegionGrowingToolGUI.
 
   \ingroup ToolManagerEtAl
   \sa mitk::Tool

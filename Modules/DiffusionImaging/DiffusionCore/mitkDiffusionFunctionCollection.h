@@ -41,6 +41,7 @@ private:
   typedef std::vector<unsigned int> IndiciesVector;
   typedef std::map<unsigned int, IndiciesVector > BValueMap;
   typedef itk::VectorContainer< unsigned int, vnl_vector_fixed< double, 3 > > GradientDirectionContainerType;
+  typedef vnl_vector_fixed<double , 3 > GradientDirectionType;
 
 public:
   static std::vector<unsigned int> GetAllUniqueDirections(const BValueMap &bValueMap, GradientDirectionContainerType *refGradientsContainer );

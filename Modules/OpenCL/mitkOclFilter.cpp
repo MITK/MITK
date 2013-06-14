@@ -60,19 +60,12 @@ mitk::OclFilter::~OclFilter()
   // release program
   if (m_ClProgram)
   {
-    cl_int clErr = 0;
-
     mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
     OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
     // remove program from storage
     resources->RemoveProgram(m_FilterID);
-
-    // release program
-    clErr = clReleaseProgram(this->m_ClProgram);
-    CHECK_OCL_ERR(clErr);
   }
-
 }
 
 bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim )
@@ -187,7 +180,6 @@ void mitk::OclFilter::CompileSource()
     MITK_ERROR("ocl.filter") << "Could not load from source";
     m_Initialized = false;
   }
-
 }
 
 void mitk::OclFilter::SetWorkingSize(unsigned int locx, unsigned int dimx, unsigned int locy, unsigned int dimy, unsigned int locz, unsigned int dimz)

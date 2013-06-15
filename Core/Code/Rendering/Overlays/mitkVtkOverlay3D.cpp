@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VtkOverlay3D::VtkOverlay3D()
 {
+  mitk::Point3D offsetVector;
+  offsetVector[0]=offsetVector[1]=offsetVector[2]=0;
+  SetOffsetVector(offsetVector);
 }
 
 
@@ -36,28 +39,28 @@ void mitk::VtkOverlay3D::SetBoundsOnDisplay(mitk::BaseRenderer*, mitk::Overlay::
 {
 }
 
-void mitk::VtkOverlay3D::SetPosition3D(mitk::Point3D position3D)
-{
-  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
-  SetProperty("Pos3D", position3dProperty);
-}
-
 void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
-  SetProperty("Pos3D", position3dProperty,renderer);
-}
-
-mitk::Point3D mitk::VtkOverlay3D::GetPosition3D()
-{
-  mitk::Point3D position3D;
-  GetPropertyValue < mitk::Point3D > ("Pos3D", position3D);
-  return position3D;
+  SetProperty("Position3D", position3dProperty,renderer);
 }
 
 mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 {
   mitk::Point3D position3D;
-  GetPropertyValue<mitk::Point3D>("Pos3D", position3D, renderer);
+  GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
   return position3D;
+}
+
+void mitk::VtkOverlay3D::SetOffsetVector(Point3D OffsetVector, mitk::BaseRenderer *renderer)
+{
+  mitk::Point3dProperty::Pointer OffsetVectorProperty = mitk::Point3dProperty::New(OffsetVector);
+  SetProperty("OffsetVector", OffsetVectorProperty,renderer);
+}
+
+mitk::Point3D mitk::VtkOverlay3D::GetOffsetVector(mitk::BaseRenderer *renderer)
+{
+  mitk::Point3D OffsetVector;
+  GetPropertyValue<mitk::Point3D>("OffsetVector", OffsetVector, renderer);
+  return OffsetVector;
 }

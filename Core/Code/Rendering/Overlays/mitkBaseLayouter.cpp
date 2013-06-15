@@ -36,10 +36,18 @@ mitk::BaseRenderer::Pointer mitk::BaseLayouter::GetBaseRenderer()
 
 void mitk::BaseLayouter::AddOverlay(mitk::Overlay::Pointer Overlay)
 {
+  if(Overlay->m_LayoutedBy && Overlay->m_LayoutedBy != this)
+    Overlay->m_LayoutedBy->RemoveOverlay(Overlay);
+  Overlay->m_LayoutedBy = this;
   m_ManagedOverlays.push_back(Overlay.GetPointer());
 }
 
 void mitk::BaseLayouter::RemoveOverlay(mitk::Overlay::Pointer Overlay)
 {
   m_ManagedOverlays.remove(Overlay.GetPointer());
+}
+
+std::string mitk::BaseLayouter::GetIdentifier()
+{
+  return m_Identifier;
 }

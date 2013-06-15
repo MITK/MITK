@@ -27,6 +27,7 @@ namespace mitk {
 class BaseLayouter;
 
 class MITK_CORE_EXPORT Overlay : public itk::Object {
+  friend class BaseLayouter;
 public:
 
   struct Bounds
@@ -35,7 +36,6 @@ public:
     itk::Point<double,2> Size;
   };
   typedef std::map<const BaseRenderer*,PropertyList::Pointer> MapOfPropertyLists;
-  typedef std::map<const BaseRenderer*,itk::SmartPointer<BaseLayouter> > LayouterMap;
 
   /** \brief Base class for mapper specific rendering ressources.
    */
@@ -323,10 +323,6 @@ public:
   //## FloatProperty)
   void SetOpacity(float opacity, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "opacity");
 
-  void SetLayout(itk::SmartPointer<BaseLayouter> layouter, mitk::BaseRenderer* renderer);
-
-  itk::SmartPointer<BaseLayouter> GetLayout(mitk::BaseRenderer* renderer);
-
   void SetText(std::string text);
 
   std::string GetText();
@@ -392,8 +388,6 @@ protected:
   //## @brief Map associating each BaseRenderer with its own PropertyList
   mutable MapOfPropertyLists m_MapOfPropertyLists;
 
-  LayouterMap m_MapOfLayouters;
-
   //##Documentation
   //## @brief Timestamp of the last change of m_Data
   itk::TimeStamp m_DataReferenceChangedTime;
@@ -407,6 +401,8 @@ private:
 
   /** \brief assignment operator */
   Overlay &operator=(const Overlay &);
+
+  BaseLayouter* m_LayoutedBy;
 
 };
 

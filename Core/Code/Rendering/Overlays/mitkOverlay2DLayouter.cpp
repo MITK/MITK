@@ -16,8 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOverlay2DLayouter.h"
 
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT = "STANDARD_2D_TOPLEFT";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_TOP = "STANDARD_2D_TOP";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_TOPRIGHT = "STANDARD_2D_TOPRIGHT";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_LEFT = "STANDARD_2D_LEFT";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_MIDDLE = "STANDARD_2D_MIDDLE";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_RIGHT = "STANDARD_2D_RIGHT";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_BOTTOMLEFT = "STANDARD_2D_BOTTOMLEFT";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM = "STANDARD_2D_BOTTOM";
+const std::string mitk::Overlay2DLayouter::STANDARD_2D_BOTTOMRIGHT = "STANDARD_2D_BOTTOMRIGHT";
+
 mitk::Overlay2DLayouter::Overlay2DLayouter()
 {
+
 }
 
 
@@ -25,3 +36,7 @@ mitk::Overlay2DLayouter::~Overlay2DLayouter()
 {
 }
 
+void mitk::Overlay2DLayouter::PrepareLayout()
+{
+
+}

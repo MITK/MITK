@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOverlay.h"
-#include "mitkBaseLayouter.h"
 
 mitk::Overlay::Overlay()
 {
@@ -221,28 +220,28 @@ void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, cons
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
-void mitk::Overlay::SetLayout(mitk::BaseLayouter::Pointer layout, mitk::BaseRenderer* renderer)
-{
-  if(renderer==NULL || layout.IsNull())
-    return;
+//void mitk::Overlay::SetLayout(mitk::BaseLayouter::Pointer layout, mitk::BaseRenderer* renderer)
+//{
+//  if(renderer==NULL || layout.IsNull())
+//    return;
 
-  mitk::BaseLayouter::Pointer & OldLayout = m_MapOfLayouters[renderer];
+//  mitk::BaseLayouter::Pointer & OldLayout = m_MapOfLayouters[renderer];
 
-  if(OldLayout.IsNotNull())
-    OldLayout->RemoveOverlay(this);
+//  if(OldLayout.IsNotNull())
+//    OldLayout->RemoveOverlay(this);
 
-  m_MapOfLayouters[renderer] = layout;
-}
+//  m_MapOfLayouters[renderer] = layout;
+//}
 
-mitk::BaseLayouter::Pointer mitk::Overlay::GetLayout(mitk::BaseRenderer *renderer)
-{
-  if(renderer==NULL)
-    return NULL;
+//mitk::BaseLayouter::Pointer mitk::Overlay::GetLayout(mitk::BaseRenderer *renderer)
+//{
+//  if(renderer==NULL)
+//    return NULL;
 
-  mitk::BaseLayouter::Pointer & layout = m_MapOfLayouters[renderer];
+//  mitk::BaseLayouter::Pointer & layout = m_MapOfLayouters[renderer];
 
-  return layout;
-}
+//  return layout;
+//}
 
 void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
 {

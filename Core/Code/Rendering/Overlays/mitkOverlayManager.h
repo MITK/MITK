@@ -37,15 +37,20 @@ class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
   typedef std::list<BaseRenderer*> BaseRendererList;
   typedef std::list<Overlay::Pointer> OverlayList;
+  typedef std::map<const std::string,BaseLayouter::Pointer > LayouterMap;
+  typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
 
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
 
-  void AddOverlay(Overlay::Pointer overlay);
+  void AddOverlay(Overlay::Pointer overlay, BaseRenderer* renderer = NULL);
   void RemoveOverlay(Overlay::Pointer overlay);
   void RemoveAllOverlays();
   void UnregisterMicroservice();
   static const std::string PROP_ID;
+  void SetLayouter(Overlay::Pointer overlay, const std::string identifier, BaseRenderer* renderer = NULL);
+  BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string identifier);
+  void AddLayouter(BaseRenderer* renderer, BaseLayouter::Pointer layouter);
   static OverlayManager::Pointer GetServiceInstance(int ID = 0);
 
   void AddBaseRenderer(BaseRenderer* renderer);
@@ -60,11 +65,11 @@ protected:
 
 private:
 
-  void PrepareLayout(BaseRenderer* renderer);
-
   OverlayList m_OverlayList;
 
   BaseRendererList m_BaseRendererList;
+
+  LayouterRendererMap m_LayouterMap;
 
   /** \brief copy constructor */
   OverlayManager( const OverlayManager &);

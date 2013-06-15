@@ -61,17 +61,6 @@ public:
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(LabelOverlay3D);
 
-  void SetPosition3D(Point3D position3D);
-
-  void SetText(std::string text);
-
-  void SetPosition3D(Point3D position3D, mitk::BaseRenderer* renderer);
-
-  Point3D GetPosition3D();
-
-  std::string GetText();
-
-  Point3D GetPosition3D(mitk::BaseRenderer* renderer);
 
 protected:
 

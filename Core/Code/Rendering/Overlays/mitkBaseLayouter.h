@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class BaseLayouter : public itk::Object {
+class MITK_CORE_EXPORT BaseLayouter : public itk::Object {
 public:
 
   mitkClassMacro(BaseLayouter, itk::Object);
@@ -35,6 +35,8 @@ public:
 
   void AddOverlay(mitk::Overlay::Pointer Overlay);
   void RemoveOverlay(mitk::Overlay::Pointer Overlay);
+  std::string GetIdentifier();
+  virtual void PrepareLayout() = 0;
 
 
 protected:
@@ -46,6 +48,7 @@ protected:
   virtual ~BaseLayouter();
 
   std::list<mitk::Overlay::Pointer> GetManagedOverlays();
+  std::string m_Identifier;
 
 private:
 

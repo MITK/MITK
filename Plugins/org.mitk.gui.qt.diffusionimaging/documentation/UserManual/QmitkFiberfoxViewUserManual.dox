@@ -26,7 +26,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li <b>Real Time Fibers</b>: If checked, each parameter adjustment (fiducial position, number of fibers, ...) will be directly applied to the selected fiber bundle. If unchecked, the fibers will only be generated if the corresponding button "Generate Fibers" is clicked.
 \li <b>Advanced Options</b>: Show/hide advanced options
 \li <b>#Fibers</b>: Specifies the number of fibers that will be generated for the selected bundle.
-\li <b>Fiber Sampling</b>: Adjusts the number of points per cm that make up the fiber. A higher sampling rate is needed if high curvatures are modeled.
+\li <b>Fiber Sampling</b>: Adjusts the distenace of the fiber sampling points (in mm). A higher sampling rate is needed if high curvatures are modeled.
 \li <b>Tension, Continuity, Bias</b>: Parameters controlling the shape of the splines interpolation the fiducials. See <a href="http://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Wikipedia</a> for details.
 
 
@@ -90,6 +90,7 @@ For a detailed description of the single models, please refer to Panagiotaki <em
 \li <b>Rician Noise</b>: Add Rician noise with the specified variance to the signal.
 \li <b>N/2 Ghosts</b>: Specify the offset between successive lines in k-space. This offset causes ghost images in distance N/2 in phase direction due to the alternating EPI readout directions.
 \li <b>Distortions</b>: Simulate distortions due to magnetic field inhomogeneities. This is achieved by adding an additional phase during the readout process. The input is a frequency map specifying the inhomogeneities.
+\li <b>Eddy Currents</b>: EXPERIMENTAL! This feature is currently being tested and might not yet behave as expected!
 \li <b>Gibbs Ringing</b>: Ringing artifacts occurring on edges in the image due to the frequency low-pass filtering caused by the limited size of the k-space. The higher the oversampling factor, the larger the distance from the corresponding edge in which the ringing is still visible. Keep in mind that increasing the oversampling factor results in a quadratic increase of computation time.
 
 \section QmitkFiberfoxViewUserManualKnownIssues Known Issues

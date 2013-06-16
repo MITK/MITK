@@ -230,6 +230,36 @@
          <property name="margin">
           <number>0</number>
          </property>
+         <item row="4" column="0">
+          <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Generate a binary image containing all selected ROIs. Select at least one ROI (planar figure) and a reference fiber bundle or image.</string>
+           </property>
+           <property name="text">
+            <string>ROI Image</string>
+           </property>
+          </widget>
+         </item>
          <item row="3" column="0">
           <widget class="QCommandLinkButton" name="m_SubstractBundles">
            <property name="enabled">
@@ -257,6 +287,36 @@
            </property>
            <property name="text">
             <string>Substract</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCommandLinkButton" name="m_JoinBundles">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Merge selected fiber bundles. Select at least two fiber bundles to execute.</string>
+           </property>
+           <property name="text">
+            <string>Join</string>
            </property>
           </widget>
          </item>
@@ -290,21 +350,8 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="3" column="1">
-          <widget class="QCommandLinkButton" name="m_JoinBundles">
+         <item row="1" column="1">
+          <widget class="QCommandLinkButton" name="m_Extract3dButton">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -326,10 +373,10 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Merge selected fiber bundles. Select at least two fiber bundles to execute.</string>
+            <string>Extract fibers passing through the selected binary mask.</string>
            </property>
            <property name="text">
-            <string>Join</string>
+            <string>Passing Mask</string>
            </property>
           </widget>
          </item>
@@ -363,38 +410,8 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QCommandLinkButton" name="m_GenerateRoiImage">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>11</pointsize>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>Generate a binary image containing all selected ROIs. Select at least one ROI (planar figure) and a reference fiber bundle or image.</string>
-           </property>
-           <property name="text">
-            <string>ROI Image</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QCommandLinkButton" name="m_Extract3dButton">
+         <item row="2" column="0">
+          <widget class="QCommandLinkButton" name="m_RemoveOutsideMaskButton">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -416,10 +433,40 @@
             </font>
            </property>
            <property name="toolTip">
-            <string>Extract fibers passing through the selected binary mask.</string>
+            <string>Remove all fiber parts outside of the mask.</string>
            </property>
            <property name="text">
-            <string>Passing Mask</string>
+            <string>Remove Outside Mask</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCommandLinkButton" name="m_RemoveInsideMaskButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>Remove all fiber parts inside of the mask.</string>
+           </property>
+           <property name="text">
+            <string>Remove Inside Mask</string>
            </property>
           </widget>
          </item>

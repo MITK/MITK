@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCellArray.h>
 
 //not essential for mapper
-#include <QTime>
+// #include <QTime>
 
 mitk::FiberBundleXMapper3D::FiberBundleXMapper3D()
 {
@@ -57,8 +57,8 @@ void mitk::FiberBundleXMapper3D::GenerateData(mitk::BaseRenderer *renderer)
 
     //MITK_INFO << "GENERATE DATA FOR FBX :)";
     //=====timer measurement====
-    QTime myTimer;
-    myTimer.start();
+//    QTime myTimer;
+//    myTimer.start();
     //==========================
 
 

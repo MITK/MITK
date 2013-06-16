@@ -12,8 +12,8 @@
 #include "mitkFiberBundleXMapper3D.h"
 #include "mitkFiberBundleXMapper2D.h"
 
-#include "mitkFiberBundleXThreadMonitorMapper3D.h"
-#include "mitkFiberBundleXThreadMonitor.h"
+//#include "mitkFiberBundleXThreadMonitorMapper3D.h"
+//#include "mitkFiberBundleXThreadMonitor.h"
 
 
 

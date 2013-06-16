@@ -81,7 +81,7 @@ protected slots:
 
     /** update fibers if any parameter changes */
     void OnFiberDensityChanged(int value);
-    void OnFiberSamplingChanged(int value);
+    void OnFiberSamplingChanged(double value);
     void OnTensionChanged(double value);
     void OnContinuityChanged(double value);
     void OnBiasChanged(double value);

@@ -40,13 +40,13 @@ public:
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
 
-    void SetBvalue(float bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
-    void SetDiffusivity(float diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
+    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }                     ///< b-value used to generate the artificial signal
+    void SetDiffusivity(ScalarType diffusivity) { m_Diffusivity = diffusivity; } ///< Scalar diffusion constant
 
 protected:
 
-    float   m_BValue;       ///< b-value used to generate the artificial signal
-    float   m_Diffusivity;  ///< Scalar diffusion constant
+    ScalarType   m_BValue;       ///< b-value used to generate the artificial signal
+    ScalarType   m_Diffusivity;  ///< Scalar diffusion constant
 };
 
 }

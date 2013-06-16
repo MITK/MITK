@@ -97,7 +97,7 @@ AdcImageFilter< TInPixelType, TOutPixelType>
                     if (b>0)
                     {
                         double S = pix[i];
-                        outval += -std::log(S/S0)/b;
+                        outval -= std::log(S/S0)/b;
                         c++;
                     }
                 }

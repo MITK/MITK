@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
+#include "MiniAppManager.h"
 
 #include <vector>
 #include <iostream>
@@ -34,10 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkQBallImage.h>
 #include <mitkBaseData.h>
-#include <QmitkCommonFunctionality.h>
 #include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
+#include "ctkCommandLineParser.h"
+#include <boost/lexical_cast.hpp>
 
 /**
  * Short program to average redundant gradients in dwi-files
@@ -54,35 +55,63 @@ mitk::FiberBundleX::Pointer LoadFib(std::string filename)
     return dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
 }
 
-int mitkFiberProcessing(int argc, char* argv[])
+int FiberProcessing(int argc, char* argv[])
 {
-    MITK_TEST_BEGIN("mitkFiberBundleXTest");
+    ctkCommandLineParser parser;
+    parser.setArgumentPrefix("--", "-");
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input fiber bundle (.fib)", mitk::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
 
-    if ( argc<6 )
-    {
-        std::cout << argv[0] << " <input file> <point distance> <min. length threshold mm> <curvature threshold mm (radius)> <mirror SCT> <output file>" << std::endl;
-        std::cout << std::endl;
+    parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample fiber with the given point distance (in mm)");
+    parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth fiber with the given point distance (in mm)");
+    parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "Minimum fiber length (in mm)");
+    parser.addArgument("maxLength", "m", ctkCommandLineParser::Float, "Maximum fiber length (in mm)");
+    parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius (in mm)");
+    parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
+
+    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    if (parsedArgs.size()==0)
         return EXIT_FAILURE;
-    }
+
+    float pointDist = -1;
+    if (parsedArgs.count("resample"))
+        pointDist = mitk::any_cast<float>(parsedArgs["resample"]);
+
+    float smoothDist = -1;
+    if (parsedArgs.count("smooth"))
+        smoothDist = mitk::any_cast<float>(parsedArgs["smooth"]);
+
+    float minFiberLength = -1;
+    if (parsedArgs.count("minLength"))
+        minFiberLength = mitk::any_cast<float>(parsedArgs["minLength"]);
+
+    float maxFiberLength = -1;
+    if (parsedArgs.count("maxLength"))
+        maxFiberLength = mitk::any_cast<float>(parsedArgs["maxLength"]);
+
+    float curvThres = -1;
+    if (parsedArgs.count("minCurv"))
+        curvThres = mitk::any_cast<float>(parsedArgs["minCurv"]);
+
+    int axis = 0;
+    if (parsedArgs.count("mirror"))
+        axis = mitk::any_cast<int>(parsedArgs["mirror"]);
+
+    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
+    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
 
     try
     {
         RegisterDiffusionCoreObjectFactory();
         RegisterFiberTrackingObjectFactory();
 
-        mitk::FiberBundleX::Pointer fib = LoadFib(argv[1]);
-        int pointDist = QString(argv[2]).toFloat();
-        float lenThres = QString(argv[3]).toFloat();
-        float curvThres = QString(argv[4]).toFloat();
+        mitk::FiberBundleX::Pointer fib = LoadFib(inFileName);
 
-        std::string outfilename;
-        if (argc==7)
-            outfilename = argv[6];
-        else
-            outfilename = argv[1];
+        if (minFiberLength>0)
+            fib->RemoveShortFibers(minFiberLength);
 
-        if (lenThres>0)
-            fib->RemoveShortFibers(lenThres);
+        if (maxFiberLength>0)
+            fib->RemoveLongFibers(maxFiberLength);
 
         if (curvThres>0)
             fib->ApplyCurvatureThreshold(curvThres, false);
@@ -90,7 +119,9 @@ int mitkFiberProcessing(int argc, char* argv[])
         if (pointDist>0)
             fib->ResampleFibers(pointDist);
 
-        int axis = QString(argv[5]).toInt();
+        if (smoothDist>0)
+            fib->DoFiberSmoothing(smoothDist);
+
         if (axis/100==1)
             fib->MirrorFibers(0);
 
@@ -104,8 +135,8 @@ int mitkFiberProcessing(int argc, char* argv[])
         for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
         {
             if ( (*it)->CanWriteBaseDataType(fib.GetPointer()) ) {
-                MITK_INFO << "writing " << outfilename;
-                (*it)->SetFileName( outfilename.c_str() );
+                MITK_INFO << "writing " << outFileName;
+                (*it)->SetFileName( outFileName.c_str() );
                 (*it)->DoWrite( fib.GetPointer() );
             }
         }
@@ -125,7 +156,5 @@ int mitkFiberProcessing(int argc, char* argv[])
         MITK_INFO << "ERROR!?!";
         return EXIT_FAILURE;
     }
-    MITK_INFO << "DONE";
-
-    MITK_TEST_END();
 }
+RegisterFiberTrackingMiniApp(FiberProcessing);

@@ -19,6 +19,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li Chose an image volume to place the markers used to define the fiber pathway. If you don't have such an image available switch to the "Signal Generation" tab, define the size and spacing of the desired image and click "Generate Image". If no fiber bundle is selected, this will generate a dummy image that can be used to place the fiducials.
 \li Start placing fiducials at the desired positions to define the fiber pathway. To do that, click on the button with the circle pictogram, then click at the desired position and plane in the image volume and drag your mouse while keeping the button pressed to generate a circular shape. Adjust the shape using the control points (Fig. 2). The position of control point D introduces a twist of the fibers between two successive fiducials. The actual fiber generation is triggered automatically as soon as you place the second control point.
 \li In some cases the fibers are entangled in a way that can't be resolved by introducing an additional fiber twist. Fiberfox tries to avoid these situations, which arise from different normal orientations of succeeding fiducials, automatically. In rare cases this is not successful. Use the double-arrow button to flip the fiber positions of the selected fiducial in one dimension. Either the problem is resolved now or you can resolve it manually by adjusting the twist-control point.
+\li To create non elliptical fiber profile shapes switch to the Fiber Extraction View. This view provides tools to extract subesets of fibers from fiber bundles and enables to cut out arbitrary polygonal fiber shapes from existing bundles.
 
 \image html Fiberfox-Fiducial.png Fig. 2: Control points defining the actual shape of the fiducial. A specifies the fiducials position in space, B and C the two ellipse radii and D the twisting angle between two successive fiducials.
 
@@ -26,7 +27,7 @@ Fiber strands are defined simply by placing markers in a 3D image volume. The fi
 \li <b>Real Time Fibers</b>: If checked, each parameter adjustment (fiducial position, number of fibers, ...) will be directly applied to the selected fiber bundle. If unchecked, the fibers will only be generated if the corresponding button "Generate Fibers" is clicked.
 \li <b>Advanced Options</b>: Show/hide advanced options
 \li <b>#Fibers</b>: Specifies the number of fibers that will be generated for the selected bundle.
-\li <b>Fiber Sampling</b>: Adjusts the number of points per cm that make up the fiber. A higher sampling rate is needed if high curvatures are modeled.
+\li <b>Fiber Sampling</b>: Adjusts the distenace of the fiber sampling points (in mm). A higher sampling rate is needed if high curvatures are modeled.
 \li <b>Tension, Continuity, Bias</b>: Parameters controlling the shape of the splines interpolation the fiducials. See <a href="http://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline">Wikipedia</a> for details.
 
 
@@ -90,6 +91,7 @@ For a detailed description of the single models, please refer to Panagiotaki <em
 \li <b>Rician Noise</b>: Add Rician noise with the specified variance to the signal.
 \li <b>N/2 Ghosts</b>: Specify the offset between successive lines in k-space. This offset causes ghost images in distance N/2 in phase direction due to the alternating EPI readout directions.
 \li <b>Distortions</b>: Simulate distortions due to magnetic field inhomogeneities. This is achieved by adding an additional phase during the readout process. The input is a frequency map specifying the inhomogeneities.
+\li <b>Eddy Currents</b>: EXPERIMENTAL! This feature is currently being tested and might not yet behave as expected!
 \li <b>Gibbs Ringing</b>: Ringing artifacts occurring on edges in the image due to the frequency low-pass filtering caused by the limited size of the k-space. The higher the oversampling factor, the larger the distance from the corresponding edge in which the ringing is still visible. Keep in mind that increasing the oversampling factor results in a quadratic increase of computation time.
 
 \section QmitkFiberfoxViewUserManualKnownIssues Known Issues

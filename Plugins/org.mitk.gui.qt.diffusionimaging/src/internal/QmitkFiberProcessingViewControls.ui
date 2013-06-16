@@ -203,22 +203,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QSpinBox" name="m_ResampleFibersSpinBox">
-        <property name="toolTip">
-         <string>Points per cm</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>50</number>
-        </property>
-        <property name="value">
-         <number>5</number>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="0">
        <widget class="QCommandLinkButton" name="m_PruneFibersButton">
         <property name="enabled">
@@ -464,6 +448,25 @@
         </property>
         <property name="text">
          <string>Color By Scalar Map</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="m_ResampleFibersSpinBox">
+        <property name="toolTip">
+         <string>Fiber point distance in mm</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>

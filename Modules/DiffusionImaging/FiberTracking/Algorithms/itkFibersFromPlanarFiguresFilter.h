@@ -68,7 +68,7 @@ public:
     void SetFlipList(FlipListType fliplist){ m_FlipList = fliplist; }           ///< contains flags indicating a flip of the 2D fiber x-coordinates (needed to resolve some unwanted fiber twisting)
     void SetFiducials(FiducialListType fiducials){ m_Fiducials = fiducials; }   ///< container of the planar ellipses used as fiducials for the fiber generation process
     itkSetMacro(Density, int)                                                   ///< number of fibers per bundle
-    itkSetMacro(FiberSampling, int)                                             ///< sampling points of the fibers per cm
+    itkSetMacro(FiberSampling, double)                                             ///< sampling points of the fibers per cm
     itkSetMacro(Tension, double)                                                ///< tension parameter of the Kochanek-Bartels splines
     itkSetMacro(Continuity, double)                                             ///< continuity parameter of the Kochanek-Bartels splines
     itkSetMacro(Bias, double)                                                   ///< bias parameter of the Kochanek-Bartels splines
@@ -89,7 +89,7 @@ protected:
     FiducialListType    m_Fiducials;            ///< container of the planar ellipses used as fiducials for the fiber generation process
     FiberContainerType  m_FiberBundles;         ///< container for the output fiber bundles
     int                 m_Density;              ///< number of fibers per bundle
-    int                 m_FiberSampling;        ///< sampling points of the fibers per cm
+    double              m_FiberSampling;        ///< sampling points of the fibers per cm
     double              m_Tension;              ///< tension parameter of the Kochanek-Bartels splines
     double              m_Continuity;           ///< continuity parameter of the Kochanek-Bartels splines
     double              m_Bias;                 ///< bias parameter of the Kochanek-Bartels splines

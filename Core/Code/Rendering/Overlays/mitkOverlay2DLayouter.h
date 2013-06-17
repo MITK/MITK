@@ -38,8 +38,10 @@ public:
   static const std::string STANDARD_2D_BOTTOM;
   static const std::string STANDARD_2D_BOTTOMRIGHT;
 
-  static Overlay2DLayouter::Pointer CreateLayouter(Alignment alignment)
+  static Overlay2DLayouter::Pointer CreateLayouter(Alignment alignment, BaseRenderer* renderer)
   {
+    if(renderer == NULL)
+      return NULL;
     std::string identifier;
     switch (alignment) {
     case TopLeft:
@@ -76,38 +78,42 @@ public:
     mitk::Overlay2DLayouter::Pointer layouter = mitk::Overlay2DLayouter::New();
     layouter->m_Alignment = alignment;
     layouter->m_Identifier = identifier;
+    layouter->SetBaseRenderer(renderer);
     return layouter;
 
   }
 
-  static Overlay2DLayouter::Pointer CreateLayouter(std::string identifier)
+  static Overlay2DLayouter::Pointer CreateLayouter(std::string identifier, BaseRenderer* renderer)
   {
+    if(renderer == NULL)
+      return NULL;
     Alignment alignment;
     if(identifier.compare(0,11,"STANDARD_2D") != 0)
       return NULL;
-    if(identifier.compare(12,identifier.size()-1,STANDARD_2D_TOPLEFT) == 0)
+    if(identifier.compare(STANDARD_2D_TOPLEFT) == 0)
       alignment = TopLeft;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_TOP) == 0)
+    else if(identifier.compare(STANDARD_2D_TOP) == 0)
       alignment = Top;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_TOPRIGHT) == 0)
+    else if(identifier.compare(STANDARD_2D_TOPRIGHT) == 0)
       alignment = TopRight;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_LEFT) == 0)
+    else if(identifier.compare(STANDARD_2D_LEFT) == 0)
       alignment = Left;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_MIDDLE) == 0)
+    else if(identifier.compare(STANDARD_2D_MIDDLE) == 0)
       alignment = Middle;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_RIGHT) == 0)
+    else if(identifier.compare(STANDARD_2D_RIGHT) == 0)
       alignment = Right;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_BOTTOMLEFT) == 0)
+    else if(identifier.compare(STANDARD_2D_BOTTOMLEFT) == 0)
       alignment = BottomLeft;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_BOTTOM) == 0)
+    else if(identifier.compare(STANDARD_2D_BOTTOM) == 0)
       alignment = Bottom;
-    else if(identifier.compare(12,identifier.size()-1,STANDARD_2D_BOTTOMRIGHT) == 0)
+    else if(identifier.compare(STANDARD_2D_BOTTOMRIGHT) == 0)
       alignment = BottomRight;
     else return NULL;
 
     mitk::Overlay2DLayouter::Pointer layouter = mitk::Overlay2DLayouter::New();
     layouter->m_Alignment = alignment;
     layouter->m_Identifier = identifier;
+    layouter->SetBaseRenderer(renderer);
     return layouter;
   }
 

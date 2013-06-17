@@ -36,6 +36,14 @@ public:
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer);
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Overlay::Bounds bounds);
 
+  void SetPosition2D(Point2D position2D, mitk::BaseRenderer* renderer = NULL);
+
+  Point2D GetPosition2D(mitk::BaseRenderer* renderer = NULL);
+
+  void SetOffsetVector(Point2D OffsetVector, mitk::BaseRenderer* renderer = NULL);
+
+  Point2D GetOffsetVector(mitk::BaseRenderer* renderer = NULL);
+
 protected:
 
   vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer);

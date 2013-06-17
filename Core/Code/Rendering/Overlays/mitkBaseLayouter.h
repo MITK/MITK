@@ -30,8 +30,8 @@ public:
 
   mitkClassMacro(BaseLayouter, itk::Object);
 
-  void SetBaseRenderer(BaseRenderer::Pointer renderer);
-  BaseRenderer::Pointer GetBaseRenderer();
+  void SetBaseRenderer(BaseRenderer* renderer);
+  BaseRenderer *GetBaseRenderer();
 
   void AddOverlay(mitk::Overlay::Pointer Overlay);
   void RemoveOverlay(mitk::Overlay::Pointer Overlay);
@@ -47,12 +47,12 @@ protected:
   /** \brief virtual destructor in order to derive from this class */
   virtual ~BaseLayouter();
 
-  std::list<mitk::Overlay::Pointer> GetManagedOverlays();
+  std::list<mitk::Overlay*> GetManagedOverlays();
   std::string m_Identifier;
 
 private:
 
-  mitk::BaseRenderer::Pointer m_BaseRenderer;
+  mitk::BaseRenderer* m_BaseRenderer;
   std::list<mitk::Overlay*> m_ManagedOverlays;
 
   /** \brief copy constructor */

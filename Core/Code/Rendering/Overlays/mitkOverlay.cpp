@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOverlay.h"
 
-mitk::Overlay::Overlay()
+mitk::Overlay::Overlay() : m_LayoutedBy(NULL)
 {
   m_PropertyList = mitk::PropertyList::New();
 }

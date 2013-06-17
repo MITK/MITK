@@ -19,9 +19,15 @@
 
 #include "mitkVtkOverlay3D.h"
 #include <mitkLocalStorageHandler.h>
-#include <vtkFollower.h>
-#include <vtkVectorText.h>
-#include <vtkTextActor3D.h>
+#include <vtkStringArray.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyData.h>
+#include <vtkActor2D.h>
+#include <vtkProperty2D.h>
+#include <mitkPointSet.h>
+#include <vtkPointSetToLabelHierarchy.h>
+#include <vtkLabelPlacementMapper.h>
+#include <vtkIntArray.h>
 
 
 namespace mitk {
@@ -39,11 +45,12 @@ public:
   class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
-    /** \brief Actor of a 2D render window. */
-    vtkSmartPointer<vtkFollower> m_follower;
-
-    vtkSmartPointer<vtkVectorText> m_textSource;
-
+    vtkSmartPointer<vtkPolyData> m_Points;
+    vtkSmartPointer<vtkActor2D> m_LabelsActor;
+    vtkSmartPointer<vtkIntArray> m_Sizes;
+    vtkSmartPointer<vtkStringArray> m_Labels;
+    vtkSmartPointer<vtkLabelPlacementMapper> m_LabelMapper;
+    vtkSmartPointer<vtkPointSetToLabelHierarchy> m_PointSetToLabelHierarchyFilter;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;
@@ -61,6 +68,9 @@ public:
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(LabelOverlay3D);
 
+  void SetLabelVector(std::vector<const char *> LabelVector);
+  void SetPriorityVector(std::vector<int> PriorityVector);
+  void SetLabelCoordinates(mitk::PointSet::Pointer LabelCoordinates);
 
 protected:
 
@@ -74,6 +84,10 @@ protected:
   virtual ~LabelOverlay3D();
 
 private:
+
+  std::vector<const char*> m_LabelVector;
+  std::vector<int> m_PriorityVector;
+  mitk::PointSet::Pointer m_LabelCoordinates;
 
   /** \brief copy constructor */
   LabelOverlay3D( const LabelOverlay3D &);

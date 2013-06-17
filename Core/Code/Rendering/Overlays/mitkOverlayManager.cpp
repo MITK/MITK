@@ -53,7 +53,7 @@ void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
   }
 }
 
-void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay, BaseRenderer *renderer)
+void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
 {
   m_OverlayList.push_back(overlay);
   BaseRendererList::iterator it;
@@ -90,6 +90,7 @@ void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
   {
     (*it)->UpdateOverlay(baseRenderer);
   }
+  UpdateLayouts(baseRenderer);
 }
 
 std::string mitk::OverlayManager::RegisterMicroservice()
@@ -119,11 +120,23 @@ void mitk::OverlayManager::SetLayouter(mitk::Overlay::Pointer overlay, const std
     BaseLayouter::Pointer layouter = GetLayouter(renderer,identifier);
     if(layouter.IsNull())
     {
-      MITK_WARN << "Layouter " << identifier << " does cannot be found or created!";
+      MITK_WARN << "Layouter " << identifier << " cannot be found or created!";
       return;
     }
     else
+    {
       layouter->AddOverlay(overlay);
+    }
+  }
+}
+
+void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
+{
+  LayouterMap layouters = m_LayouterMap[renderer];
+  LayouterMap::iterator it;
+  for ( it=layouters.begin() ; it != layouters.end(); it++ )
+  {
+    (it->second)->PrepareLayout();
   }
 }
 
@@ -150,7 +163,7 @@ mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer
   BaseLayouter::Pointer layouter = m_LayouterMap[renderer][identifier];
   if(layouter.IsNull())
   {
-    layouter = mitk::Overlay2DLayouter::CreateLayouter(identifier);
+    layouter = mitk::Overlay2DLayouter::CreateLayouter(identifier, renderer);
     AddLayouter(renderer,layouter);
   }
   return layouter;

@@ -38,5 +38,16 @@ mitk::Overlay2DLayouter::~Overlay2DLayouter()
 
 void mitk::Overlay2DLayouter::PrepareLayout()
 {
-
+  int i = 0;
+  std::list<mitk::Overlay*> managedOverlays = GetManagedOverlays();
+  std::list<mitk::Overlay*>::iterator it;
+  for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+  {
+    mitk::Overlay* overlay = *it;
+    mitk::Overlay::Bounds bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+    bounds.Position[0] = i++;
+    bounds.Position[1] = i++;
+    i+=50;
+    overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+  }
 }

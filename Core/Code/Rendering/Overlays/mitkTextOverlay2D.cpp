@@ -41,9 +41,15 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_textActor->GetTextProperty()->SetFontSize ( 24 );
-  ls->m_textActor->SetPosition2 ( 10, 40 );
-  ls->m_textActor->SetInput ( "Hello world" );
-  ls->m_textActor->GetTextProperty()->SetColor ( 1.0,0.0,0.0 );
+  ls->m_textActor->SetPosition ( GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0], GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1] );
+  MITK_INFO<< GetPosition2D(renderer);
+  ls->m_textActor->SetInput ( GetText().c_str());
+  float color[3] = {1,1,1};
+  float opacity = 1.0;
+  GetColor(color,renderer);
+  GetOpacity(opacity,renderer);
+  ls->m_textActor->GetTextProperty()->SetColor ( color[0], color[1], color[2]);
+  ls->m_textActor->GetTextProperty()->SetOpacity(opacity);
 }
 
 vtkSmartPointer<vtkActor2D> mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer)

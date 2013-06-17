@@ -56,18 +56,6 @@ public:
   mitkClassMacro(TextOverlay2D, mitk::VtkOverlay2D);
   itkNewMacro(TextOverlay2D);
 
-  void SetPosition(Point3D position3D);
-
-  void SetText(std::string text);
-
-  void SetPosition(Point3D position3D, mitk::BaseRenderer* renderer);
-
-  Point3D GetPosition();
-
-  std::string GetText();
-
-  Point3D GetPosition(mitk::BaseRenderer* renderer);
-
 protected:
 
   virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer);

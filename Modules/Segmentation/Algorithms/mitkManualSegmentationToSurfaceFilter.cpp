@@ -118,7 +118,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       double range[2];
       vtkimage->GetScalarRange(range);
 
-      MITK_INFO<<range[1];
+      MITK_DEBUG << "Current scalar max is: " << range[1];
       if (range[1]!=0) //too little slices, image smoothing eliminates all segmentation pixels
       {
         vtkimage = gaussian->GetOutput(); //->Out

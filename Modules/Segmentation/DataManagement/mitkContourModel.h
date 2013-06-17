@@ -212,6 +212,11 @@ namespace mitk
     */
     VertexIterator IteratorBegin( int timestep=0);
 
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator IteratorEnd( int timestep=0);
+
     /** \brief Close the contour.
     The last control point will be linked with the first point.
     */
@@ -228,11 +233,6 @@ namespace mitk
     true - The last control point will be linked with the first point.
     */
     virtual void SetIsClosed(bool isClosed, int timestep=0);
-
-    /** \brief Returns a const VertexIterator at the end element of the contour.
-    @throw mitk::Exception if the timestep is invalid.
-    */
-    VertexIterator IteratorEnd( int timestep=0);
 
     /** \brief Returns the number of vertices at a given timestep.
 
@@ -258,7 +258,7 @@ namespace mitk
 
     /** \brief Mark a vertex at an index in the container as control point.
     */
-//    bool SetControlVertexAt(int index, int timestep=0);
+    bool SetControlVertexAt(int index, int timestep=0);
 
     /** \brief Mark a vertex at a given position in 3D space.
 
@@ -276,7 +276,7 @@ namespace mitk
 
     @return true = vertex found;  false = no vertex found
     */
-//    bool SetControlVertexAt(mitk::Point3D &point, float eps, int timestep=0);
+    bool SetControlVertexAt(mitk::Point3D &point, float eps, int timestep=0);
 
     /** \brief Remove a vertex at given index within the container.
 

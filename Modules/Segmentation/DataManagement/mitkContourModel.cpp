@@ -275,13 +275,17 @@ bool mitk::ContourModel::SelectVertexAt(int index, int timestep)
   }
   return false;
 }
-/*
+
 bool mitk::ContourModel::SetControlVertexAt(mitk::Point3D &point, float eps, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
     VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
-    if (ve
+    if (vertex != NULL)
+    {
+        vertex->IsControlPoint = true;
+        return true;
+    }
   }
   return false;
 }
@@ -290,12 +294,15 @@ bool mitk::ContourModel::SetControlVertexAt(int index, int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
-      this->m_ContourSeries[timestep]->GetVertexAt(index)->IsControlPoint = true;
-      return true;
+      VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(index);
+      if (vertex != NULL)
+      {
+        vertex->IsControlPoint = true;
+        return true;
+     }
   }
   return false;
 }
-*/
 
 bool mitk::ContourModel::RemoveVertex(VertexType* vertex, int timestep)
 {

@@ -190,8 +190,8 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   this->m_LiveWireFilter->ClearRepulsivePoints();
 
   typedef mitk::ImageLiveWireContourModelFilter::InternalImageType::IndexType IndexType;
-  mitk::ContourModel::ConstVertexIterator iter = leftLiveWire->IteratorBegin();
-  for (;iter != leftLiveWire->IteratorEnd(); iter++)
+  mitk::ContourModel::ConstVertexIterator iter = leftLiveWire->IteratorBegin(timestep);
+  for (;iter != leftLiveWire->IteratorEnd(timestep); iter++)
   {
       IndexType idx;
       this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);

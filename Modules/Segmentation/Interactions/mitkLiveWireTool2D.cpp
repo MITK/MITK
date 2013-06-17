@@ -227,7 +227,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LeftLiveWireContourNode = mitk::DataNode::New();
   m_LeftLiveWireContourNode->SetData( m_LeftLiveWireContour );
   m_LeftLiveWireContourNode->SetName("left node");
-  m_LeftLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(1, 0, 0), NULL, true );
+  m_LeftLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_LeftLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(false), NULL, true );
@@ -239,7 +239,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_RightLiveWireContourNode = mitk::DataNode::New();
   m_RightLiveWireContourNode->SetData( m_RightLiveWireContour );
   m_RightLiveWireContourNode->SetName("right node");
-  m_RightLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0, 0, 1), NULL, true );
+  m_RightLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.0), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.points.show", BoolProperty::New(true), NULL, true );
   m_RightLiveWireContourNode->AddProperty( "contour.controlpoints.show", BoolProperty::New(false), NULL, true );
@@ -303,23 +303,9 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  //remove duplicate first vertex, it's already contained in m_Contour
-  m_LiveWireContour->RemoveVertexAt(0, timestep);
-
-
-  /* TODO fix this hack*/
-  //set last to active added point
-  if( m_LiveWireContour->GetNumberOfVertices(timestep) > 0)
-  {
-    const_cast<mitk::ContourModel::VertexType*>( m_LiveWireContour->GetVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep) )->IsControlPoint = true;
-  }
-
-  //merge contours
-  m_Contour->Concatenate(m_LiveWireContour, timestep);
-
   // we clear here all previous repulsive points but it would be better to keep them
   // so that the calculated live wire does not intersect any part of the working contour
-  m_LiveWireFilter->ClearRepulsivePoints();
+  //m_LiveWireFilter->ClearRepulsivePoints();
 
   typedef mitk::ImageLiveWireContourModelFilter::InternalImageType::IndexType IndexType;
   mitk::ContourModel::ConstVertexIterator iter = m_LiveWireContour->IteratorBegin(timestep);
@@ -333,6 +319,14 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   this->m_LiveWireFilter->Update();
 
+  //remove duplicate first vertex, it's already contained in m_Contour
+  m_LiveWireContour->RemoveVertexAt(0, timestep);
+
+  // set last added point as control point
+  m_LiveWireContour->SetControlVertexAt(m_LiveWireContour->GetNumberOfVertices(timestep)-1, timestep);
+
+  //merge contours
+  m_Contour->Concatenate(m_LiveWireContour, timestep);
 
   //clear the livewire contour and reset the corresponding datanode
   m_LiveWireContour->Clear(timestep);
@@ -367,21 +361,17 @@ bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* state
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-  /* END check if event can be handled */
-
 
   // actual LiveWire computation
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
   m_LiveWireFilter->SetEndPoint(const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition()));
 
-  m_LiveWireFilter->SetTimestep(timestep);
+  m_LiveWireFilter->SetTimeStep(m_TimeStep);
   m_LiveWireFilter->Update();
 
-  //ContourModel::VertexType* currentVertex = const_cast<ContourModel::VertexType*>(m_LiveWireContour->GetVertexAt(0));
-
-  this->m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
-  this->m_LiveWireContourNode->SetData( this->m_LiveWireContour );
+  m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
+  m_LiveWireContourNode->SetData( this->m_LiveWireContour );
 
   //render
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -454,13 +444,12 @@ bool mitk::LiveWireTool2D::OnFinish( Action* action, const StateEvent* stateEven
 {
   // finish livewire tool interaction
 
-  /* check if event can be handled */
+  // check if event can be handled
   if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
-  /* END check if event can be handled */
-
+  // END check if event can be handled
 
   //actual timestep
   int timestep = positionEvent->GetSender()->GetTimeStep();

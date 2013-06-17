@@ -30,7 +30,7 @@ mitk::ContourSet::~ContourSet()
 
 void mitk::ContourSet::AddContour(unsigned int index, mitk::Contour::Pointer contour)
 {
-  m_ContourVector.insert(std::make_pair<unsigned long, mitk::Contour::Pointer>( index , contour) );
+  m_ContourVector.insert(std::make_pair( index , contour) );
 }
 
 

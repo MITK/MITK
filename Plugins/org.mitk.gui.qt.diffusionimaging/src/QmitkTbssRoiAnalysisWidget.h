@@ -163,7 +163,13 @@ protected:
 
 
   std::vector< std::vector<double> > CalculateGroupProfiles();
+  std::vector< std::vector<double> > CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
+                                                                  mitk::FiberBundleX *fib,
+                                                                  mitk::PlanarFigure* startRoi,
+                                                                  mitk::PlanarFigure* endRoi,
+                                                                  int number);
 
+  void Plot(std::vector <std::vector<double> > groupProfiles);
 
 
   void Tokenize(const std::string& str,

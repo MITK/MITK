@@ -187,14 +187,19 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
     this->Plot(image, roiImage);
   }
 
-  if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
+  else if(found3dImage && foundFiberBundle && foundStartRoi && foundEndRoi)
   {
     this->PlotFiberBundle(fib, img, start, end);
   }
 
-  else if(found3dImage == true && foundFiberBundle)
+  else if(found3dImage && foundFiberBundle)
   {
     this->PlotFiberBundle(fib, img);
+  }
+
+  else if(foundTbss && foundStartRoi && foundEndRoi && foundFiberBundle)
+  {
+    this->PlotFiber4D(image, fib, start, end);
   }
 
   if(found3dImage)

@@ -622,81 +622,186 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
 
 void QmitkTbssRoiAnalysisWidget::DrawProfiles()
 {
-  this->Clear();
-
-  m_Vals.clear();
-
-  std::vector<double> v1;
-
   std::vector <std::vector<double> > groupProfiles = CalculateGroupProfiles();
+  Plot(groupProfiles);
+}
+
+void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<double> > groupProfiles)
+{
+    this->Clear();
+    m_Vals.clear();
+    std::vector<double> v1;
 
 
-  std::vector<double> xAxis;
-  for(int i=0; i<groupProfiles.at(0).size(); ++i)
-  {
-    xAxis.push_back((double)i);
-  }
-
-
-  // fill m_Vals. This might be used by the user to copy data to the clipboard
-  for(int i=0; i<groupProfiles.size(); i++)
-  {
-
-    v1.clear();
-
-
-    for(int j=0; j<groupProfiles.at(i).size(); j++)
+    std::vector<double> xAxis;
+    for(int i=0; i<groupProfiles.at(0).size(); ++i)
     {
-      v1.push_back(groupProfiles.at(i).at(j));
+      xAxis.push_back((double)i);
     }
 
-    m_Vals.push_back(v1);
 
-  }
+    // fill m_Vals. This might be used by the user to copy data to the clipboard
+    for(int i=0; i<groupProfiles.size(); i++)
+    {
 
-  std::string title = m_Measure + " profiles on the ";
-  title.append(m_Structure);
-  this->SetPlotTitle( title.c_str() );
-  QPen pen( Qt::SolidLine );
-  pen.setWidth(2);
+      v1.clear();
 
 
+      for(int j=0; j<groupProfiles.at(i).size(); j++)
+      {
+        v1.push_back(groupProfiles.at(i).at(j));
+      }
 
-  std::vector< std::pair<std::string, int> >::iterator it;
-  it = m_Groups.begin();
+      m_Vals.push_back(v1);
 
-  int c = 0; //the current profile number
+    }
 
-  QColor colors[4] = {Qt::green, Qt::blue, Qt::yellow, Qt::red};
-
-  while(it != m_Groups.end() && groupProfiles.size() > 0)
-  {
-
-    std::pair< std::string, int > group = *it;
-
-    pen.setColor(colors[c]);
-    int curveId = this->InsertCurve( group.first.c_str() );
-    this->SetCurveData( curveId, xAxis, groupProfiles.at(c) );
+    std::string title = m_Measure + " profiles on the ";
+    title.append(m_Structure);
+    this->SetPlotTitle( title.c_str() );
+    QPen pen( Qt::SolidLine );
+    pen.setWidth(2);
 
 
-    this->SetCurvePen( curveId, pen );
 
-    c++;
-    it++;
+    std::vector< std::pair<std::string, int> >::iterator it;
+    it = m_Groups.begin();
 
-  }
+    int c = 0; //the current profile number
+
+    QColor colors[4] = {Qt::green, Qt::blue, Qt::yellow, Qt::red};
+
+    while(it != m_Groups.end() && groupProfiles.size() > 0)
+    {
+
+      std::pair< std::string, int > group = *it;
+
+      pen.setColor(colors[c]);
+      int curveId = this->InsertCurve( group.first.c_str() );
+      this->SetCurveData( curveId, xAxis, groupProfiles.at(c) );
 
 
-  QwtLegend *legend = new QwtLegend;
-  this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
+      this->SetCurvePen( curveId, pen );
+
+      c++;
+      it++;
+
+    }
 
 
-  std::cout << m_Measure << std::endl;
-  this->m_Plot->setAxisTitle(0, m_Measure.c_str());
-  this->m_Plot->setAxisTitle(3, "Position");
+    QwtLegend *legend = new QwtLegend;
+    this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
-  this->Replot();
 
+    std::cout << m_Measure << std::endl;
+    this->m_Plot->setAxisTitle(0, m_Measure.c_str());
+    this->m_Plot->setAxisTitle(3, "Position");
+
+    this->Replot();
+}
+
+
+std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
+                                                                                            mitk::FiberBundleX *fib,
+                                                                                            mitk::PlanarFigure* startRoi,
+                                                                                            mitk::PlanarFigure* endRoi,
+                                                                                            int number)
+{
+    TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
+
+    TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
+
+    int nTracts = resampledTracts.size();
+
+    this->Clear();
+
+
+    // For every group we have m fibers * n subjects of profiles to fill
+
+    std::vector< std::vector<double> > profiles;
+
+    // calculate individual profiles by going through all n subjects
+    int size = m_Projections->GetVectorLength();
+    for(int s=0; s<size; s++)
+    {
+
+      // Iterate through all tracts
+
+      for(int t=0; t<nTracts; t++)
+      {
+        // Iterate trough the tract
+        std::vector<double> profile;
+        TractType::iterator it = resampledTracts[t].begin();
+        while(it != resampledTracts[t].end())
+        {
+          PointType p = *it;
+          PointType index;
+          tbssImage->GetGeometry()->WorldToIndex(p, index);
+
+          itk::Index<3> ix;
+          ix[0] = index[0];
+          ix[1] = index[1];
+          ix[2] = index[2];
+          // Get value from image
+
+          profile.push_back(m_Projections->GetPixel(ix).GetElement(s));
+
+          it++;
+        }
+        profiles.push_back(profile);
+      }
+
+
+
+
+    }
+
+    m_IndividualProfiles = profiles;
+
+    // Now create the group averages (every group contains m fibers * n_i group members
+
+    std::vector< std::pair<std::string, int> >::iterator it;
+    it = m_Groups.begin();
+    int c = 0; //the current profile number
+
+    // Calculate the group averages
+    std::vector< std::vector<double> > groupProfiles;
+
+    while(it != m_Groups.end() && profiles.size() > 0)
+    {
+      std::pair<std::string, int> p = *it;
+      int size = p.second;
+
+      //initialize a vector of the right length with zeroes
+      std::vector<double> averageProfile;
+      for(int i=0; i<profiles.at(0).size(); i++)
+      {
+        averageProfile.push_back(0.0);
+      }
+
+      // Average the right number of profiles
+
+      for(int i=0; i<size*nTracts; i++)
+      {
+        for(int j=0; j<averageProfile.size(); ++j)
+        {
+          averageProfile.at(j) = averageProfile.at(j) + profiles.at(c).at(j);
+        }
+        c++;
+      }
+
+      // Divide by the number of profiles to get group average
+      for(int i=0; i<averageProfile.size(); i++)
+      {
+        averageProfile.at(i) = averageProfile.at(i) / (size*nTracts);
+      }
+
+      groupProfiles.push_back(averageProfile);
+
+      ++it;
+    }
+
+    return groupProfiles;
 }
 
 
@@ -706,64 +811,10 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
                                              mitk::PlanarFigure* endRoi,
                                              int number)
 {
-  TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
-
-  TractContainerType resampledTracts = ParameterizeTracts(tracts, number);
-
-  this->Clear();
 
 
-
-  // For every group we have m fibers * n subjects of profiles to fill
-
-  std::vector< std::vector<double> > profiles;
-
-  // calculate individual profiles by going through all n subjects
-  int size = m_Projections->GetVectorLength();
-  for(int s=0; s<size; s++)
-  {
-
-    // Iterate through all tracts
-    int nTracts = resampledTracts.size();
-    for(int t=0; t<nTracts; t++)
-    {
-      // Iterate trough the tract
-      std::vector<double> profile;
-      TractType::iterator it = resampledTracts[t].begin();
-      while(it != resampledTracts[t].end())
-      {
-        PointType p = *it;
-        PointType index;
-        tbssImage->GetGeometry()->WorldToIndex(p, index);
-
-        itk::Index<3> ix;
-        ix[0] = index[0];
-        ix[1] = index[1];
-        ix[2] = index[2];
-        // Get value from image
-
-        profile.push_back(m_Projections->GetPixel(ix).GetElement(s));
-      }
-      profiles.push_back(profile);
-    }
-
-
-    // Now create the group averages (every group contains m fibers * n_i group members
-
-
-
-
-
-  }
-
-
-
-  m_IndividualProfiles = profiles;
-
-
-
-
-
+  std::vector <std::vector<double> > groupProfiles = CalculateGroupProfilesFibers(tbssImage, fib, startRoi, endRoi, number);
+  Plot(groupProfiles);
 
 
 }

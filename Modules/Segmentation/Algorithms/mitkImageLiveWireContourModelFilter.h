@@ -57,15 +57,14 @@ namespace mitk {
     mitkClassMacro(ImageLiveWireContourModelFilter, ContourModelSource);
     itkNewMacro(Self);
 
-
     typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
 
-    typedef itk::Image< float,  2 > InternalImageType;
+    typedef itk::Image< float,  2 >                                              InternalImageType;
     typedef itk::ShortestPathImageFilter< InternalImageType, InternalImageType > ShortestPathImageFilterType;
-    typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >        CostFunctionType;
-    typedef std::vector< InternalImageType::IndexType >                       ShortestPathType;
+    typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >           CostFunctionType;
+    typedef std::vector< InternalImageType::IndexType >                          ShortestPathType;
 
     /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
@@ -82,10 +81,21 @@ namespace mitk {
     itkSetMacro(UseDynamicCostMap, bool);
     itkGetMacro(UseDynamicCostMap, bool);
 
+    /** \brief Actual time step
+    */
+    itkSetMacro(TimeStep, unsigned int);
+    itkGetMacro(TimeStep, unsigned int);
+
+    /** \brief Clear all repulsive points used in the cost function
+    */
     void ClearRepulsivePoints();
 
+    /** \brief Set a vector with repulsive points to use in the cost function
+    */
     void SetRepulsivePoints(const ShortestPathType& points);
 
+    /** \brief Add a single repulsive point
+    */
     void AddRepulsivePoint( const InternalImageType::IndexType& idx );
 
     virtual void SetInput( const InputType *input);
@@ -101,16 +111,6 @@ namespace mitk {
 
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
-
-    void SetTimestep( unsigned int timestep )
-    {
-      m_Timestep = timestep;
-    }
-
-    unsigned int GetTimestep()
-    {
-      return m_Timestep;
-    }
 
   protected:
     ImageLiveWireContourModelFilter();
@@ -144,9 +144,10 @@ namespace mitk {
     /** \brief Flag to use a dynmic cost map or not*/
     bool m_UseDynamicCostMap;
 
+    /** \brief Flag to decide whether to run image pre-processing*/
     bool m_ImageModified;
 
-    unsigned int m_Timestep;
+    unsigned int m_TimeStep;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);

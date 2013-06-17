@@ -33,7 +33,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostMap = false;
   m_ImageModified = false;
-  m_Timestep = 0;
+  m_TimeStep = 0;
 }
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
@@ -199,7 +199,6 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
   m_CostFunction->SetRequestedRegion(region);
   m_CostFunction->SetUseCostMap(m_UseDynamicCostMap);
 
-
   // calculate shortest path between start and end point
   m_ShortestPathFilter->SetFullNeighborsMode(true);
   //m_ShortestPathFilter->SetInput( m_CostFunction->SetImage(m_InternalImage) );
@@ -220,7 +219,7 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
   this->SetNthOutput(0, output.GetPointer());
 
 //  OutputType::Pointer output = dynamic_cast<OutputType*> ( this->GetOutput() );
-  output->Expand(m_Timestep+1);
+  output->Expand(m_TimeStep+1);
 
 //  output->Clear();
 
@@ -236,7 +235,7 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
     currentPoint[2] = 0.0;
 
     input->GetGeometry()->IndexToWorld(currentPoint, currentPoint);
-    output->AddVertex(currentPoint, false, m_Timestep);
+    output->AddVertex(currentPoint, false, m_TimeStep);
 
     pathIterator++;
   }
@@ -246,18 +245,20 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
 bool mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMap(mitk::ContourModel* path)
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
-  if(input)
+  if(!input) return false;
+
+  try
   {
     AccessFixedDimensionByItk_1(input,CreateDynamicCostMapByITK, 2, path);
-    return true;
   }
-  else
+  catch( itk::ExceptionObject & e )
   {
+    MITK_INFO << "Exception caught during dynamic cost map alculation: " << e;
     return false;
   }
+
+  return true;
 }
-
-
 
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path )

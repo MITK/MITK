@@ -66,6 +66,7 @@ namespace mitk
     typedef mitk::ContourElement::VertexType VertexType;
     typedef mitk::ContourElement::VertexListType VertexListType;
     typedef mitk::ContourElement::VertexIterator VertexIterator;
+    typedef mitk::ContourElement::ConstVertexIterator ConstVertexIterator;
     typedef std::vector< mitk::ContourElement::Pointer > ContourModelSeries;
     /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 

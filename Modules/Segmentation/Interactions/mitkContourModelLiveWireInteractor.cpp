@@ -169,6 +169,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   //recompute contour between previous active vertex and selected vertex
   this->m_LiveWireFilter->SetStartPoint( m_NextActiveVertexDown );
   this->m_LiveWireFilter->SetEndPoint( currentPosition );
+  this->m_LiveWireFilter->ClearRepulsivePoints();
   this->m_LiveWireFilter->Update();
 
   mitk::ContourModel::Pointer leftLiveWire = this->m_LiveWireFilter->GetOutput();
@@ -181,9 +182,24 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
     return false;
   }
 
+  leftLiveWire->RemoveVertexAt(0, timestep);
+
   //recompute contour between selected vertex and next active vertex
   this->m_LiveWireFilter->SetStartPoint( currentPosition );
   this->m_LiveWireFilter->SetEndPoint( m_NextActiveVertexUp );
+  this->m_LiveWireFilter->ClearRepulsivePoints();
+
+  typedef mitk::ImageLiveWireContourModelFilter::InternalImageType::IndexType IndexType;
+  mitk::ContourModel::ConstVertexIterator iter = leftLiveWire->IteratorBegin();
+  for (;iter != leftLiveWire->IteratorEnd(); iter++)
+  {
+      IndexType idx;
+      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
+
+      this->m_LiveWireFilter->AddRepulsivePoint( idx );
+  }
+
+ // this->m_LiveWireFilter-SetLastShortestPathAsRepulsivePoints();
   this->m_LiveWireFilter->Update();
 
   mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
@@ -197,23 +213,26 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
     return false;
   }
 
+  rightLiveWire->RemoveVertexAt(0, timestep);
+
+  // seba continue here
+  leftLiveWire->SelectVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
+  leftLiveWire->SetSelectedVertexAsControlPoint(true);
+
   // set corrected left live wire to its node
   m_LeftLiveWireContourNode->SetData(leftLiveWire);
 
   // set corrected right live wire to its node
   m_RightLiveWireContourNode->SetData(rightLiveWire);
-
+/*
   leftLiveWire->RemoveIntersections(rightLiveWire, timestep);
-//  mitk::ContourModel::CorrectIntersections(leftLiveWire, rightLiveWire, timestep);
 
   if (leftLiveWire->GetNumberOfVertices() < 1)
     return false;
 
   if (rightLiveWire->GetNumberOfVertices() < 1)
     return false;
-
-  rightLiveWire->SelectVertexAt(0, timestep);
-  rightLiveWire->SetSelectedVertexAsControlPoint(true);
+*/
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
 

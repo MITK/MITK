@@ -62,10 +62,10 @@ namespace mitk {
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
 
-    typedef itk::Image< float,  2 > FloatImageType;
-    typedef itk::ShortestPathImageFilter< FloatImageType, FloatImageType > ShortestPathImageFilterType;
-    typedef itk::ShortestPathCostFunctionLiveWire< FloatImageType >        CostFunctionType;
-    typedef std::vector< FloatImageType::IndexType >                       ShortestPathType;
+    typedef itk::Image< float,  2 > InternalImageType;
+    typedef itk::ShortestPathImageFilter< InternalImageType, InternalImageType > ShortestPathImageFilterType;
+    typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >        CostFunctionType;
+    typedef std::vector< InternalImageType::IndexType >                       ShortestPathType;
 
     /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
@@ -82,6 +82,11 @@ namespace mitk {
     itkSetMacro(UseDynamicCostMap, bool);
     itkGetMacro(UseDynamicCostMap, bool);
 
+    void ClearRepulsivePoints();
+
+    void SetRepulsivePoints(const ShortestPathType& points);
+
+    void AddRepulsivePoint( const InternalImageType::IndexType& idx );
 
     virtual void SetInput( const InputType *input);
 
@@ -149,7 +154,7 @@ namespace mitk {
     template<typename TPixel, unsigned int VImageDimension>
     void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
 
-    FloatImageType::Pointer m_PreProcessedImage;
+    InternalImageType::Pointer m_InternalImage;
 
   };
 

@@ -28,7 +28,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfIndexedOutputs( 1 );
   this->SetNthOutput(0, output.GetPointer());
-  m_CostFunction = ImageLiveWireContourModelFilter::CostFunctionType::New();
+  m_CostFunction = CostFunctionType::New();
   m_ShortestPathFilter = ShortestPathImageFilterType::New();
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostMap = false;
@@ -134,20 +134,41 @@ template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
   typedef itk::Image< TPixel, VImageDimension >                   InputImageType;
-  typedef itk::CastImageFilter< InputImageType, FloatImageType >  CastFilterType;
+  typedef itk::CastImageFilter< InputImageType, InternalImageType >  CastFilterType;
 
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
   castFilter->SetInput(inputImage);
   castFilter->Update();
-  m_PreProcessedImage = castFilter->GetOutput();
-  m_CostFunction->SetImage( m_PreProcessedImage );
-  m_ShortestPathFilter->SetInput( m_PreProcessedImage );
+  m_InternalImage = castFilter->GetOutput();
+  m_CostFunction->SetImage( m_InternalImage );
+  m_ShortestPathFilter->SetInput( m_InternalImage );
+}
+
+void mitk::ImageLiveWireContourModelFilter::ClearRepulsivePoints()
+{
+    m_CostFunction->ClearRepulsivePoints();
+}
+
+void mitk::ImageLiveWireContourModelFilter::AddRepulsivePoint( const InternalImageType::IndexType& idx )
+{
+    m_CostFunction->AddRepulsivePoint(idx);
+}
+
+void mitk::ImageLiveWireContourModelFilter::SetRepulsivePoints(const ShortestPathType& points)
+{
+  m_CostFunction->ClearRepulsivePoints();
+
+  ShortestPathType::const_iterator iter = points.begin();
+  for (;iter != points.end(); iter++)
+  {
+      m_CostFunction->AddRepulsivePoint( (*iter) );
+  }
 }
 
 void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
 {
 // compute the requested region for itk filters
-  FloatImageType::IndexType startPoint, endPoint;
+  InternalImageType::IndexType startPoint, endPoint;
 
   startPoint[0] = m_StartPointInIndex[0];
   startPoint[1] = m_StartPointInIndex[1];
@@ -155,18 +176,15 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
   endPoint[0] = m_EndPointInIndex[0];
   endPoint[1] = m_EndPointInIndex[1];
 
-  //minimum value in each direction for startRegion
-  FloatImageType::IndexType startRegion;
+  // minimum value in each direction for startRegion
+  InternalImageType::IndexType startRegion;
   startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
   startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
 
-  //maximum value in each direction for size
-  FloatImageType::SizeType size;
+  // maximum value in each direction for size
+  InternalImageType::SizeType size;
   size[0] = abs( startPoint[0] - endPoint[0] ) + 1;
   size[1] = abs( startPoint[1] - endPoint[1] ) + 1;
-
- // MITK_INFO << "start region: " << startRegion[0] << " " << startRegion[1];
- // MITK_INFO << "size: " << size[0] << " " << size[1];
 
   CostFunctionType::RegionType region;
   region.SetSize( size );
@@ -175,15 +193,16 @@ void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
   //inputImage->SetRequestedRegion(region);
 
   // extracts features from image and calculates costs
-  //m_CostFunction->SetImage(m_PreProcessedImage);
+  //m_CostFunction->SetImage(m_InternalImage);
   m_CostFunction->SetStartIndex(startPoint);
   m_CostFunction->SetEndIndex(endPoint);
   m_CostFunction->SetRequestedRegion(region);
   m_CostFunction->SetUseCostMap(m_UseDynamicCostMap);
 
+
   // calculate shortest path between start and end point
   m_ShortestPathFilter->SetFullNeighborsMode(true);
-  //m_ShortestPathFilter->SetInput( m_CostFunction->SetImage(m_PreProcessedImage) );
+  //m_ShortestPathFilter->SetInput( m_CostFunction->SetImage(m_InternalImage) );
   m_ShortestPathFilter->SetMakeOutputImage(false);
 
   //m_ShortestPathFilter->SetCalcAllDistances(true);

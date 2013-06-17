@@ -423,9 +423,14 @@ void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
   if(m_Fib == NULL || m_CurrentTbssImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
     return;
 
-  //DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
-  PlotFiber4D(m_CurrentTbssImage, m_Fib, m_CurrentStartRoi, m_CurrentEndRoi, number);
-
+  if(m_PlottingFiberBundle)
+  {
+    DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
+  }
+  else
+  {
+    PlotFiber4D(m_CurrentTbssImage, m_Fib, m_CurrentStartRoi, m_CurrentEndRoi, number);
+  }
 }
 
 
@@ -811,7 +816,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
                                              mitk::PlanarFigure* endRoi,
                                              int number)
 {
-
+  m_PlottingFiberBundle = false;
   m_Fib = fib;
   m_CurrentStartRoi = startRoi;
   m_CurrentEndRoi = endRoi;
@@ -825,6 +830,9 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
 
 void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mitk::Image *img, bool avg)
 {
+
+  m_PlottingFiberBundle = true;
+
   this->Clear();
   std::vector<TractType>::iterator it = tracts.begin();
 

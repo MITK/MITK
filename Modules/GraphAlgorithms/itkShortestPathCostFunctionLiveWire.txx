@@ -85,7 +85,7 @@ namespace itk
         {
             if ( p1 == (*iter) || p2 == (*iter) )
             {
-                costs = 1.0;
+                costs = 1000;
                 return costs;
             }
         }

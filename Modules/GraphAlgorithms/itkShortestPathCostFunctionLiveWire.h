@@ -84,6 +84,9 @@ namespace itk
      /** \brief Add repulsive point*/
     virtual void AddRepulsivePoint( IndexType index );
 
+    virtual int GetNumberOfRepulsivePoints()
+    { return this->m_RepulsivePoints.size(); }
+
     /** \brief Clear repulsive path*/
     virtual void ClearRepulsivePoints(  );
 

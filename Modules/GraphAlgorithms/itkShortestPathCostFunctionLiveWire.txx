@@ -69,6 +69,27 @@ namespace itk
   double ShortestPathCostFunctionLiveWire<TInputImageType>
     ::GetCost(IndexType p1 ,IndexType  p2)
   {
+    // local component costs
+    // weights
+    double w1;
+    double w2;
+    double w3;
+    double costs = 0.0;
+
+    // use repulsive points
+    if (m_UseRepulsivePoints)
+    {
+        std::vector<  IndexType  >::const_iterator iter = m_RepulsivePoints.begin();
+
+        for (;iter != m_RepulsivePoints.end(); iter++)
+        {
+            if ( p1 == (*iter) || p2 == (*iter) )
+            {
+                costs = 1.0;
+                return costs;
+            }
+        }
+    }
 
     unsigned long xMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[0];
     unsigned long yMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[1];
@@ -183,7 +204,6 @@ namespace itk
       {//use linear mapping
         gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
       }
-
     }
     else
     {//use linear mapping
@@ -250,14 +270,8 @@ namespace itk
 
     double gradientDirectionCost = acos( scalarProduct ) / 3.14159265;
 
-    // local component costs
-    // weights
-    double w1;
-    double w2;
-    double w3;
-    double costs = 0.0;
-
-    if (this->m_UseCostMap){
+    if (this->m_UseCostMap)
+    {
       w1 = 0.43;
       w2= 0.43;
       w3 = 0.14;
@@ -279,19 +293,6 @@ namespace itk
     {
       //diagonal neighbor
       costScale = sqrt(2.0);
-    }
-
-    // use repulsive points
-
-    if (m_UseRepulsivePoints)
-    {
-        std::vector<  IndexType  >::const_iterator iter = m_RepulsivePoints.begin();
-
-        for (;iter != m_RepulsivePoints.end(); iter++)
-        {
-            if ( p1 == (*iter) || p2 == (*iter) )
-                costs = 1.0;
-        }
     }
 
     costs *= costScale;

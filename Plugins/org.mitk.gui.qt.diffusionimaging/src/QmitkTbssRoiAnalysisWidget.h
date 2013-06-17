@@ -206,13 +206,11 @@ protected:
   TractContainerType ParameterizeTracts(TractContainerType tracts, int number);
 
 
-
-
   TractContainerType m_CurrentTracts;
 
 
-
   mitk::Image* m_CurrentImage;
+  mitk::TbssImage* m_CurrentTbssImage;
 
   mitk::PlanarFigure* m_CurrentStartRoi;
   mitk::PlanarFigure* m_CurrentEndRoi;

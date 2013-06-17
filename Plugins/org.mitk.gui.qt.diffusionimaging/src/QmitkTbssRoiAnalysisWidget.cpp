@@ -420,11 +420,11 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
 
 void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
 {
-  if(m_Fib == NULL || m_CurrentImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
+  if(m_Fib == NULL || m_CurrentTbssImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
     return;
 
-  DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
-
+  //DoPlotFiberBundles(m_Fib, m_CurrentImage, m_CurrentStartRoi, m_CurrentEndRoi, avg, number);
+  PlotFiber4D(m_CurrentTbssImage, m_Fib, m_CurrentStartRoi, m_CurrentEndRoi, number);
 
 }
 
@@ -512,7 +512,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
 
 mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
 {
-  TractContainerType tractsAtIndex;
+
 
   float xSum = 0.0;
   float ySum = 0.0;
@@ -812,10 +812,12 @@ void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
                                              int number)
 {
 
-
+  m_Fib = fib;
+  m_CurrentStartRoi = startRoi;
+  m_CurrentEndRoi = endRoi;
+  m_CurrentTbssImage = tbssImage;
   std::vector <std::vector<double> > groupProfiles = CalculateGroupProfilesFibers(tbssImage, fib, startRoi, endRoi, number);
   Plot(groupProfiles);
-
 
 }
 

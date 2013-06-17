@@ -67,35 +67,6 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   if (!this->IsActivated())
     return;
 
-/*
-  // Get DataManagerSelection
-  if (!this->GetDataManagerSelection().empty())
-  {
-    mitk::DataNode::Pointer sourceImageNode = this->GetDataManagerSelection().front();
-    mitk::Image::Pointer sourceImage = dynamic_cast<mitk::Image*>(sourceImageNode->GetData());
-
-    if (!sourceImage)
-    {
-      m_Controls->m_TbssImageLabel->setText(
-        QString( sourceImageNode->GetName().c_str() ) + " is no image"
-        );
-
-      return;
-    }
-
-    // set Text
-    m_Controls->m_TbssImageLabel->setText(
-      QString( sourceImageNode->GetName().c_str() ) + " (" +
-      QString::number(sourceImage->GetDimension()) + "D)"
-      );
-
-
-  }
-  else
-  {
-    m_Controls->m_TbssImageLabel->setText("Please select an image");
-  }
-*/
 
   // Check which datatypes are selected in the datamanager and enable/disable widgets accordingly
 
@@ -208,8 +179,8 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   }
 
   this->m_Controls->m_Cut->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi);
-  this->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
-  this->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
+  this->m_Controls->m_SegmentLabel->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && (found3dImage || foundTbss));
+  this->m_Controls->m_Segments->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && (found3dImage || foundTbss));
   this->m_Controls->m_Average->setEnabled(foundFiberBundle && foundStartRoi && foundEndRoi && found3dImage);
 
 }

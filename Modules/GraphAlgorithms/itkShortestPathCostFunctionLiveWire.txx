@@ -26,9 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCannyEdgeDetectionImageFilter.h>
 #include <itkCastImageFilter.h>
 #include <itkGradientImageFilter.h>
-#include <itkGradientRecursiveGaussianImageFilter.h>
 #include <itkGradientMagnitudeImageFilter.h>
-#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkLaplacianImageFilter.h>
 
 
@@ -40,7 +38,7 @@ namespace itk
   ShortestPathCostFunctionLiveWire<TInputImageType>
     ::ShortestPathCostFunctionLiveWire()
   {
-    m_UseRepulsivePoint = false;
+    m_UseRepulsivePoints = false;
     m_GradientMax = 0.0;
     m_Initialized = false;
     m_UseCostMap = false;
@@ -51,20 +49,18 @@ namespace itk
 
   template<class TInputImageType>
   void ShortestPathCostFunctionLiveWire<TInputImageType>
-    ::AddRepulsivePoint(  itk::Index<3>  c )
+    ::AddRepulsivePoint( IndexType  index )
   {
-    m_RepulsivePoints.push_back(c);
-    m_UseRepulsivePoint = true;
+    m_RepulsivePoints.push_back(index);
+    m_UseRepulsivePoints = true;
   }
-
-
 
   template<class TInputImageType>
   void ShortestPathCostFunctionLiveWire<TInputImageType>
     ::ClearRepulsivePoints()
   {
     m_RepulsivePoints.clear();
-    m_UseRepulsivePoint = false;
+    m_UseRepulsivePoints = false;
   }
 
 
@@ -84,13 +80,10 @@ namespace itk
 
     double gradientMagnitude;
 
-    /* ++++++++++++++++++++ GradientMagnitude costs ++++++++++++++++++++++++++*/
-
+    // Gradient Magnitude costs
     gradientMagnitude = this->m_GradientMagnImage->GetPixel(p2);
     gradientX = m_GradientImage->GetPixel(p2)[0];
     gradientY = m_GradientImage->GetPixel(p2)[1];
-
-
 
     if(m_UseCostMap && !m_CostMap.empty())
     {
@@ -129,7 +122,6 @@ namespace itk
         right1 = temp;
       }
 
-
       if( right1 == m_CostMap.begin() )
       {
         left1 = end;
@@ -153,8 +145,7 @@ namespace itk
       double partRight1, partRight2, partLeft1, partLeft2;
       partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
 
-
-      /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      /*
       f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
 
       gaussian approximation
@@ -163,6 +154,7 @@ namespace itk
       v(bin) is the value in the map
       k(bin) is the key
       */
+
       if( left2 != end )
       {
         partLeft2 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, left2->first, left2->second);
@@ -182,8 +174,6 @@ namespace itk
       {
         partRight2 = ShortestPathCostFunctionLiveWire<TInputImageType>::Gaussian(keyOfX, right2->first, right2->second);
       }
-      /*----------------------------------------------------------------------------*/
-
 
       if( m_MaxMapCosts > 0.0 )
       {
@@ -199,18 +189,13 @@ namespace itk
     {//use linear mapping
       //value between 0 (good) and 1 (bad)
       gradientCost = 1.0 - (gradientMagnitude / m_GradientMax);
-
     }
-    /* -----------------------------------------------------------------------------*/
 
-
-
-    /* ++++++++++++++++++++ Laplacian zero crossing costs ++++++++++++++++++++++++++*/
+    //  Laplacian zero crossing costs
     // f(p) =     0;   if I(p)=0
     //     or     1;   if I(p)!=0
     double laplacianCost;
     typename Superclass::PixelType laplaceImageValue;
-
 
     laplaceImageValue = m_EdgeImage->GetPixel(p2);
 
@@ -223,11 +208,7 @@ namespace itk
       laplacianCost = 0.0;
     }
 
-    /* -----------------------------------------------------------------------------*/
-
-
-
-    /* ++++++++++++++++++++ Gradient direction costs ++++++++++++++++++++++++++*/
+    // Gradient direction costs
     //vector q-p   i.e. p2-p1
     double vQP[2];
     vQP[0] = p2[0] - p1[0];
@@ -253,7 +234,6 @@ namespace itk
     // gradient vector at p1
     double nGradientAtP2[2];
 
-
     nGradientAtP2[0] = m_GradientImage->GetPixel(p2)[0];
     nGradientAtP2[1] = m_GradientImage->GetPixel(p2)[1];
 
@@ -269,13 +249,9 @@ namespace itk
     }
 
     double gradientDirectionCost = acos( scalarProduct ) / 3.14159265;
-    /*------------------------------------------------------------------------*/
 
-
-
-
-    /*+++++++++++++++++++++  local component costs +++++++++++++++++++++++++++*/
-    /*weights*/
+    // local component costs
+    // weights
     double w1;
     double w2;
     double w3;
@@ -292,9 +268,8 @@ namespace itk
     }
     costs = w1 * laplacianCost + w2 * gradientCost + w3 * gradientDirectionCost;
 
-
-      //scale by euclidian distance
-      double costScale;
+    //scale by euclidian distance
+    double costScale;
     if( p1[0] == p2[0] || p1[1] == p2[1])
     {
       //horizontal or vertical neighbor
@@ -304,6 +279,19 @@ namespace itk
     {
       //diagonal neighbor
       costScale = sqrt(2.0);
+    }
+
+    // use repulsive points
+
+    if (m_UseRepulsivePoints)
+    {
+        std::vector<  IndexType  >::const_iterator iter = m_RepulsivePoints.begin();
+
+        for (;iter != m_RepulsivePoints.end(); iter++)
+        {
+            if ( p1 == (*iter) || p2 == (*iter) )
+                costs = 1.0;
+        }
     }
 
     costs *= costScale;
@@ -351,11 +339,6 @@ namespace itk
       statisticsImageFilter->Update();
 
       m_GradientMax = statisticsImageFilter->GetMaximum();
-
-
-
-      //Filter class is instantiated
-      /*typedef itk::GradientRecursiveGaussianImageFilter<TInputImageType, VectorOutputImageType> GradientFilterType;*/
 
       typedef itk::GradientImageFilter< FloatImageType >  GradientFilterType;
 

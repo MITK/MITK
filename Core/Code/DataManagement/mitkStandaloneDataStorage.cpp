@@ -73,7 +73,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
 
     /* Store node and an empty children list in derivations adjacency list */
     mitk::DataStorage::SetOfObjects::Pointer childrenPointer = mitk::DataStorage::SetOfObjects::New();
-    mitk::DataStorage::SetOfObjects::ConstPointer children = children.GetPointer();
+    mitk::DataStorage::SetOfObjects::ConstPointer children =  childrenPointer.GetPointer();
     m_DerivedNodes.insert(std::make_pair(node, children));
 
     /* create entry in derivations adjacency list for each parent of the new node */

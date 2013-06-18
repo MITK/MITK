@@ -86,7 +86,7 @@ struct lestSquaresFunction: public vnl_least_squares_function
 
     for(int s=0; s<N; s++)
     {
-      double approx = std::log(reference_measurement) - b[s]*D + 1./6.*b[s]*b[s]*K;
+      double approx = std::log(reference_measurement) - b[s]*D + 1./6.*b[s]*b[s]*D*D*K;
       fx[s] = vnl_math_abs( std::log(measurements[s]) - approx );
     }
 
@@ -303,10 +303,10 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       for(unsigned int i = 0 ; i < currentShell.size(); i++)
         InterpVector.put(i,b[currentShell[i]]);
 
-      //logarithm(InterpVector);
-
-      //- interpolate the Signal if necessary using corresponding interpolationSHBasis
+     // MITK_INFO << InterpVector;
+      //- interpolate the Signal using corresponding interpolationSHBasis
       SignalVector = m_ShellInterpolationMatrixVector.at(shellIndex) * InterpVector;
+     // MITK_INFO << SignalVector;
 
       SignalMatrix.set_column(shellIndex, SignalVector);
 
@@ -314,9 +314,8 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       shellIndex++;
     }
 
-    // row_i = {D, D^2*K}
     vnl_matrix<double> lsfCoeffs(m_allDirectionsSize , 2);
-    calculateCoeffs(lsfCoeffs,SignalMatrix, m_bValueVector, /*std::log*/(BZeroAverage));
+    calculateCoeffs(lsfCoeffs,SignalMatrix, m_bValueVector, BZeroAverage);
     calculateSignalFromLsfCoeffs(SignalVector,lsfCoeffs,m_TargetB_Value,BZeroAverage);
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
@@ -359,13 +358,14 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
     // 3. perform least squares minimization of model results by adapting model parameter
     vnl_levenberg_marquardt minimizer(model);
-    minimizer.set_f_tolerance( 1e-15 );
-    minimizer.set_max_function_evals( 100 );
+    minimizer.set_f_tolerance( 0.1 );
+    minimizer.set_max_function_evals( 1000 );
     bool status = minimizer.minimize(initalGuess);
     if(!status)
     {
       MITK_INFO<< "Minimizer f Error: " << minimizer.get_f_tolerance();
       MITK_INFO<< "Minimizer end Error: " << minimizer.get_end_error();
+      MITK_INFO<< initalGuess;
     }
 
     lsfCoeffs.set_row(i, initalGuess);
@@ -382,7 +382,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++){
     // S = S0 * e^(-b*D + 1/6*D^2*K)
     double D = lsfCoeffs(i,0);
-    double K = lsfCoeffs(i,1) / (D*D) ;
+    double K = lsfCoeffs(i,1);
     //MITK_INFO << D << " " << K;
     vec[i] = referenceSignal * exp((-bValue) * D + 1./6. * bValue * bValue * D*D*K);
   }

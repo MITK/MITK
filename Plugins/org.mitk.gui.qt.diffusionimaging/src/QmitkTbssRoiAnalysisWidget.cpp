@@ -757,8 +757,6 @@ std::vector< std::vector<double> > QmitkTbssRoiAnalysisWidget::CalculateGroupPro
       }
 
 
-
-
     }
 
     m_IndividualProfiles = profiles;
@@ -837,13 +835,12 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
   std::vector<TractType>::iterator it = tracts.begin();
 
 
-  // Get the values along the curves from a 3D images. should also contain info about the position on screen.
   std::vector< std::vector <double > > profiles;
 
   it = tracts.begin();
   while(it != tracts.end())
   {
-    std::cout << "Tract\n";
+
     TractType tract = *it;
     TractType::iterator tractIt = tract.begin();
 
@@ -852,8 +849,6 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
     while(tractIt != tract.end())
     {
       PointType p = *tractIt;
-      std::cout << p[0] << ' ' << p[1] << ' ' << p[2] << '\n';
-
 
       // Get value from image
       profile.push_back( (double)img->GetPixelValueByWorldCoordinate(p) );
@@ -903,7 +898,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
       averageProfile.at(i) += profile.at(i) / profiles.size();
     }
 
-    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    int curveId = this->InsertCurve( "" );
 
     this->SetCurveData( curveId, xAxis, profile );
 
@@ -926,7 +921,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(TractContainerType tracts, mit
       xAxis.push_back((double)i);
     }
 
-    int curveId = this->InsertCurve( QString::number(id).toStdString().c_str() );
+    int curveId = this->InsertCurve( "" );
     this->SetCurveData( curveId, xAxis, averageProfile );
 
 

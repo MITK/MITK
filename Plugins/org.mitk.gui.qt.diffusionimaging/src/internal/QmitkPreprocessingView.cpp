@@ -120,7 +120,7 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
     connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
     connect( (QObject*)(m_Controls->m_msProcess), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
-    connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
+    connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateBValueTableWidget(int)));
     connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
     connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
   }
@@ -154,13 +154,6 @@ void QmitkPreprocessingView::DoLengthCorrection()
   GetDefaultDataStorage()->Add(imageNode);
 }
 
-void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
-{
-  if (m_DiffusionImage.IsNull())
-    return;
-  m_DiffusionImage->UpdateBValueMap();
-  UpdateBValueTableWidget(i);
-}
 
 void QmitkPreprocessingView::DoAdcAverage()
 {
@@ -168,7 +161,7 @@ void QmitkPreprocessingView::DoAdcAverage()
   typedef itk::MultiShellRadialAdcKurtosisImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
   typedef DiffusionImageType::BValueMap BValueMap;
 
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
     BValueMap originalShellMap = inImage->GetB_ValueMap();
@@ -185,9 +178,7 @@ void QmitkPreprocessingView::DoAdcAverage()
     DiffusionImageType::Pointer outImage = DiffusionImageType::New();
     outImage->SetVectorImage( filter->GetOutput() );
     outImage->SetB_Value( filter->GetTargetB_Value() );
-    //image->SetOriginalDirections( filter->GetTargetGradientDirections() );
     outImage->SetDirections( filter->GetTargetGradientDirections() );
-    //image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
     outImage->InitializeFromVectorImage();
 
     mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
@@ -208,8 +199,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
   typedef itk::AdcImageFilter< DiffusionPixelType, double >     FilterType;
 
 
-
-  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  for (unsigned int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
     DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
     FilterType::Pointer filter = FilterType::New();
@@ -251,7 +241,6 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
 
     BValueMapIterator it;
     BValueMap roundedBValueMap;
-
 
     GradientDirectionContainerType::ConstIterator gdcit;
     for( gdcit = m_DiffusionImage->GetDirections()->Begin(); gdcit != m_DiffusionImage->GetDirections()->End(); ++gdcit)
@@ -313,10 +302,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
   m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
 
-  UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
-
-
-  // Reduce Gradients GUI adaption
+    // Reduce Gradients GUI adaption
   foreach(QCheckBox * box, m_ReduceGradientCheckboxes)
   {
     m_Controls->m_ReductionFrame->layout()->removeWidget(box);
@@ -330,9 +316,10 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
   m_ReduceGradientCheckboxes.clear();
   m_ReduceGradientSpinboxes.clear();
 
+  UpdateBValueTableWidget(m_Controls->m_B_ValueMap_Rounder_SpinBox->value());
+
   if (foundDwiVolume)
   {
-
     // Reduce Gradients GUI adaption
     typedef mitk::DiffusionImage<short*>::BValueMap BValueMap;
     BValueMap::iterator it;

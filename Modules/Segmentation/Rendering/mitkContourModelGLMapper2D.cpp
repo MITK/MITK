@@ -94,15 +94,7 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    bool isEditing = false;
-    dataNode->GetBoolProperty("contour.editing", isEditing);
-
-    mitk::ColorProperty::Pointer colorprop;
-
-    if (isEditing)
-        colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.editing.color", renderer));
-    else
-        colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("contour.color", renderer));
 
     if(colorprop)
     {
@@ -179,23 +171,30 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       if(drawit)
       {
-        //lastPt2d is not valid in first step
-        if( !(pointsIt == renderingContour->IteratorBegin(timestep)) )
-        {
-          glLineWidth(lineWidth);
-          glBegin (GL_LINES);
-          glVertex2f(pt2d[0], pt2d[1]);
-          glVertex2f(lastPt2d[0], lastPt2d[1]);
-          glEnd();
-          glLineWidth(1);
-        }
+
+         bool showSegments = false;
+         dataNode->GetBoolProperty("contour.segments.show", showSegments);
+
+         if (showSegments)
+         {
+            //lastPt2d is not valid in first step
+            if( !(pointsIt == renderingContour->IteratorBegin(timestep)) )
+            {
+              glLineWidth(lineWidth);
+              glBegin (GL_LINES);
+              glVertex2f(pt2d[0], pt2d[1]);
+              glVertex2f(lastPt2d[0], lastPt2d[1]);
+              glEnd();
+              glLineWidth(1);
+            }
+         }
 
         bool showControlPoints = false;
         dataNode->GetBoolProperty("contour.controlpoints.show", showControlPoints);
 
         if (showControlPoints)
         {
-            //draw active points
+            //draw ontrol points
             if ((*pointsIt)->IsControlPoint)
             {
               float pointsize = 4;
@@ -256,10 +255,10 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
           glEnd ();
         }
 
-        bool showNumbers = false;
-        dataNode->GetBoolProperty("contour.numbers.show", showNumbers);
+        bool showPointsNumbers = false;
+        dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
 
-        if (showNumbers)
+        if (showPointsNumbers)
         {
             std::string l;
             std::stringstream ss;
@@ -269,6 +268,22 @@ void mitk::ContourModelGLMapper2D::Paint(mitk::BaseRenderer * renderer)
             mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];
             rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
+            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+        }
+
+        bool showControlPointsNumbers = false;
+        dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
+
+        if (showControlPointsNumbers && (*pointsIt)->IsControlPoint)
+        {
+            std::string l;
+            std::stringstream ss;
+            ss << index;
+            l.append(ss.str());
+
+            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+            float rgb[3];
+            rgb[0] = 1.0; rgb[1] = 1.0; rgb[2] = 0.0;
             OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
         }
 
@@ -347,15 +362,15 @@ const mitk::ContourModel* mitk::ContourModelGLMapper2D::GetInput(void)
 void mitk::ContourModelGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "contour.color", ColorProperty::New(0.9, 1.0, 0.1), renderer, overwrite );
-  node->AddProperty( "contour.editing", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "contour.editing.color", ColorProperty::New(0.1, 0.9, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.color", ColorProperty::New(1.0, 0.0, 0.1), renderer, overwrite );
   node->AddProperty( "contour.points.show", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.segments.show", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "contour.controlpoints.show", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering.width", mitk::FloatProperty::New( 3.0 ), renderer, overwrite );
   node->AddProperty( "contour.hovering", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "contour.numbers.show", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.points.text", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "contour.controlpoints.text", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   node->AddProperty( "subdivision curve", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "contour.project-onto-plane", mitk::BoolProperty::New( false ), renderer, overwrite );

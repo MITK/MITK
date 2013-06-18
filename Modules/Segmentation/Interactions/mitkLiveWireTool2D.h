@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkSegTool2D.h"
 #include <mitkContourModel.h>
-#include <mitkDataNode.h>
-
+#include <mitkContourModelLiveWireInteractor.h>
 #include <mitkImageLiveWireContourModelFilter.h>
 
 namespace mitk
@@ -108,6 +107,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     mitk::DataNode::Pointer m_LeftLiveWireContourNode;
     mitk::DataNode::Pointer m_RightLiveWireContourNode;
 
+    mitk::ContourModelLiveWireInteractor::Pointer m_LiveWireInteractor;
 
     //the current reference image
     mitk::Image::Pointer m_WorkingSlice;

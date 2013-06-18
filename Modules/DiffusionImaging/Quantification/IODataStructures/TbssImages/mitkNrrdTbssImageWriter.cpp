@@ -60,6 +60,47 @@ void mitk::NrrdTbssImageWriter::GenerateData()
   itk::VectorImage<float, 3>::Pointer img = input->GetImage();
 
 
+
+
+  std::string key;
+  std::string val;
+
+
+  /* For the case of a tbss image containing data of the patients:
+     Save info about the groups and the type of measurement */
+
+
+
+
+  std::vector< std::pair <std::string, int> > groups = input->GetGroupInfo();
+  std::vector< std::pair <std::string, int> >::iterator it = groups.begin();
+
+  int i=0;
+  while(it != groups.end())
+  {
+    std::pair<std::string, int> p = *it;
+
+    key = "Group_index_" + boost::lexical_cast<std::string>(i);
+    val = " " + p.first + " " + boost::lexical_cast<std::string>(p.second);
+    //sprintf( keybuffer, "Group_index_%04d", std::string(i) );
+    // sprintf( valbuffer, "%1d %1d", p.first, p.second);
+
+    //std::cout << valbuffer << std::endl;
+
+    //itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+    itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+    it++;
+    ++i;
+  }
+
+  key = "Measurement info";
+  val = input->GetMeasurementInfo();
+  itk::EncapsulateMetaData< std::string >(input->GetImage()->GetMetaDataDictionary(),key,val);
+
+
+
+
+
   typedef itk::VectorImage<float,3> ImageType;
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();

@@ -4129,7 +4129,7 @@
      <action ID="44" /> <!-- AcFINISH = 44 -->
     </transition>
     <transition NAME="no" NEXT_STATE_ID="2" EVENT_ID="1003"> <!-- EIDNO = 1003 -->
-     <action ID="10" /> <!-- AcADDPOINT = 10 -->
+      <!-- <action ID="10" />  AcADDPOINT = 10 -->
     </transition>
    </state>
   </stateMachine>

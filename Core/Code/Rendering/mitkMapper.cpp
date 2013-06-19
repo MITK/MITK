@@ -131,7 +131,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 }
 
 
-const bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(
+bool mitk::Mapper::BaseLocalStorage::IsGenerateDataRequired(
     mitk::BaseRenderer *renderer,
     mitk::Mapper *mapper,
     mitk::DataNode *dataNode)

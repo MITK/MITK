@@ -90,7 +90,7 @@ void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
   }
 }
 
-const bool mitk::VtkMapper::HasVtkProp( const vtkProp *prop, BaseRenderer *renderer )
+bool mitk::VtkMapper::HasVtkProp( const vtkProp *prop, BaseRenderer *renderer )
 {
   vtkProp *myProp = this->GetVtkProp( renderer );
 

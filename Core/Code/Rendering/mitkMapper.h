@@ -218,9 +218,9 @@ namespace mitk {
       public:
 
 
-      const bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
+      bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
 
-      inline const void UpdateGenerateDataTime()
+      inline void UpdateGenerateDataTime()
       {
         m_LastGenerateDataTime.Modified();
       }

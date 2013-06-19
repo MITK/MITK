@@ -6,12 +6,12 @@
 The Ultrasound Module provides a microservice Based API for ultrasound devices.
 The main features are:
 <ul>
-  <li> Microservice-enabled Lifecycle Management, allowing other modules to easily consume USDevice-Functionality.
+  <li> Microservice-enabled Life cycle Management, allowing other modules to easily consume USDevice-Functionality.
   <li>  handling and processing of ultrasound image data
   <li> Metadata for Ultrasound images 
-  <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Framegrabber
+  <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Frame grabber
   <ul>
-    <li> Fast image preprocessing capabilities(Greyscale Conversion, Cropping) via OpenCV
+    <li> Fast image preprocessing capabilities(Grey scale Conversion, Cropping) via OpenCV
 	<li> Advanced image processing functions via mitk filters.
   </ul>
   <li> Connection of API-Enabled devices (specifically the Telemed LogicScan 128 is a work in progress)
@@ -32,21 +32,21 @@ Ultrasound Devices are managed in a simple hierarchy:
 
 <ul>
   <li> mitk::USDevice: The common superclass for all ultrasound devices. Deriving from this class will make sure that US-specific GUI-Components will be able to interact with your class.
-  Especially, the Microservcie Lifecycle is modeled in this Module.
-  <li> mitk::USVideDevice: This class can be used for every Ultrasound device that is connected to the PC via a Framegrabber or similar Video input device. It offers image preprocessing functionality via OpenCV. 
-  The \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink enables the USer to create USVideDevices.
+  Especially, the Microservice Life cycle is modeled in this Module.
+  <li> mitk::USVideoDevice: This class can be used for every Ultrasound device that is connected to the PC via a Frame grabber or similar Video input device. It offers image preprocessing functionality via OpenCV. 
+  The \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink enables the user to create USVideoDevice.
   There also is a reusable Widget for this Task in the USUI Module.
   <li> mitk::USApiDevice: This is a work-in-progress class that will contain a common superclass for Devices with API support. 
 </ul>
 
-\section USDeviceLifecycle USDevice Lifecycle
+\section USDeviceLifecycle USDevice Life cycle
 
 Once you a USDevice is constructed, it can be connected via call to mitk::USDevice::Connect().
-This will cause the Device to register itself in the Microservice Framework and will make the device available to other Modules, the UltrasoundSUpport Plugin and the USDeviceManagerWidget in the USUI Module.
+This will cause the Device to register itself in the Microservice Framework and will make the device available to other Modules, the UltrasoundSupport Plugin and the USDeviceManagerWidget in the USUI Module.
 The Connect() method is not virtual and should never be overwritten.
 Instead, override mitk::USDevice::OnConnect(), which will be called during the connection Process and enables you to react to this event. 
-A connected device is available to other modules, but is not aquiring image data.
-Analogously to Connect, there is a function mitk::USDevice::Activate which will start the image aquisition.
+A connected device is available to other modules, but is not acquiring image data.
+Analogously to Connect, there is a function mitk::USDevice::Activate which will start the image acquisition.
 Again, this method is not virtual, override mitk::USDevice::OnActivate to react to activation.
 
 Matching functions mitk::USDevice::Disconnect(), mitk::USDevice::OnDisconnect, mitk::USDevice::Deactivate, mitk::USDevice::OnDeactivate exist as well.
@@ -57,5 +57,7 @@ The following diagram illustrates the situation:
 
 The blue message symbols indicate that the corresponding method of the subclass is called to react to the event.
 
-  
+\section USDWidgets available Widgets
+
+There are two Widgets available that ca be used for plugin development. The USDeviceManagerWidget can view connected USDevices and allows the user to activate, deactivate and disconnect devices. The NewVideoDeviceWidget allows the user to configure a frame grabber or other video input as a USVideoDevice. Both Plugins are described in more detail in the \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin Documentation\endlink.
 */

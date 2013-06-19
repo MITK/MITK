@@ -6,7 +6,8 @@
 The Ultrasound Module provides a microservice Based API for ultrasound devices.
 The main features are:
 <ul>
-  <li> handling and processing of ultrasound image data
+  <li> Microservice-enabled Lifecycle Management, allowing other modules to easily consume USDevice-Functionality.
+  <li>  handling and processing of ultrasound image data
   <li> Metadata for Ultrasound images 
   <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Framegrabber
   <ul>
@@ -24,6 +25,37 @@ This module requires OpenCV to be enabled in the superbuild options via CMAKE.
 Its functionality is made available to the User via the \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink
 
 \section USDeviceHierarchy Ultrasound Device Hierarchy
+
+Ultrasound Devices are managed in a simple hierarchy:
+
+\image html USHierarchy.png
+
+<ul>
+  <li> mitk::USDevice: The common superclass for all ultrasound devices. Deriving from this class will make sure that US-specific GUI-Components will be able to interact with your class.
+  Especially, the Microservcie Lifecycle is modeled in this Module.
+  <li> mitk::USVideDevice: This class can be used for every Ultrasound device that is connected to the PC via a Framegrabber or similar Video input device. It offers image preprocessing functionality via OpenCV. 
+  The \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink enables the USer to create USVideDevices.
+  There also is a reusable Widget for this Task in the USUI Module.
+  <li> mitk::USApiDevice: This is a work-in-progress class that will contain a common superclass for Devices with API support. 
+</ul>
+
+\section USDeviceLifecycle USDevice Lifecycle
+
+Once you a USDevice is constructed, it can be connected via call to mitk::USDevice::Connect().
+This will cause the Device to register itself in the Microservice Framework and will make the device available to other Modules, the UltrasoundSUpport Plugin and the USDeviceManagerWidget in the USUI Module.
+The Connect() method is not virtual and should never be overwritten.
+Instead, override mitk::USDevice::OnConnect(), which will be called during the connection Process and enables you to react to this event. 
+A connected device is available to other modules, but is not aquiring image data.
+Analogously to Connect, there is a function mitk::USDevice::Activate which will start the image aquisition.
+Again, this method is not virtual, override mitk::USDevice::OnActivate to react to activation.
+
+Matching functions mitk::USDevice::Disconnect(), mitk::USDevice::OnDisconnect, mitk::USDevice::Deactivate, mitk::USDevice::OnDeactivate exist as well.
+
+The following diagram illustrates the situation:
+
+\image html USLifecycle.png
+
+The blue message symbols indicate that the corresponding method of the subclass is called to react to the event.
 
   
 */

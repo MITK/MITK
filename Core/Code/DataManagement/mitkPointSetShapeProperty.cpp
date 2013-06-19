@@ -45,7 +45,7 @@ mitk::PointSetShapeProperty::PointSetShapeProperty( const std::string& value )
     MITK_WARN << "Invalid point set shape";
 }
 
-int mitk::PointSetShapeProperty::GetPointSetShape()
+const int mitk::PointSetShapeProperty::GetPointSetShape()
 {
   return static_cast<int>( this->GetValueAsId() );
 }

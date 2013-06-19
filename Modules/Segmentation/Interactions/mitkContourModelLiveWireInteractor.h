@@ -79,16 +79,20 @@ namespace mitk
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
     virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent);
 
-    int SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour,
-      mitk::ContourModel* destinationContour,
-      bool fromSelectedUpwards,
-      int timestep);
+    int SplitContourFromSelectedVertex(mitk::ContourModel* srcContour,
+                                       mitk::ContourModel* destContour,
+                                       bool fromSelectedUpwards,
+                                       int timestep);
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingImage;
 
     mitk::Point3D m_NextActiveVertexDown;
     mitk::Point3D m_NextActiveVertexUp;
+
+    mitk::ContourModel::VertexIterator m_NextActiveVertexDownIter;
+    mitk::ContourModel::VertexIterator m_NextActiveVertexUpIter;
+
     mitk::DataNode::Pointer m_LeftLiveWireContourNode;
     mitk::DataNode::Pointer m_RightLiveWireContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
@@ -96,6 +100,6 @@ namespace mitk
 
   };
 
-} // namespace
+} // namespace mitk
 
-#endif
+#endif // mitkContourModelLiveWireInteractor_h_Included

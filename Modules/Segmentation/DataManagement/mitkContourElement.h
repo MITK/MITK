@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _MITK_ContourElement_H_
-#define _MITK_ContourElement_H_
+#ifndef _mitkContourElement_H_
+#define _mitkContourElement_H_
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -49,8 +49,7 @@ namespace mitk
     mitkCloneMacro(Self);
 
 
-/*+++++++++++++++++++++ Data container representing vertices +++++++++++++++++*/
-
+// Data container representing vertices
 
     /** \brief Represents a single vertex of contour.
     */
@@ -68,79 +67,79 @@ namespace mitk
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
     };
-/*+++++++++++++++++++++ END Data container representing vertices ++++++++++++++*/
+// END Data container representing vertices
 
-
-/*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef ContourModelVertex VertexType;
     typedef std::deque<VertexType*> VertexListType;
     typedef VertexListType::iterator VertexIterator;
     typedef VertexListType::const_iterator ConstVertexIterator;
-/*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
+    //  start of inline methods
 
-
-/*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
-
-    /** \brief Return a const iterator a the front. */
+    /** \brief Return a const iterator a the front.
+    */
     virtual ConstVertexIterator ConstIteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
-    /** \brief Return a const iterator a the end. */
+    /** \brief Return a const iterator a the end.
+    */
     virtual ConstVertexIterator ConstIteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
-    /** \brief Return an iterator a the front. */
+    /** \brief Return an iterator a the front.
+    */
     virtual VertexIterator IteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
-    /** \brief Return an iterator a the end. */
+    /** \brief Return an iterator a the end.
+    */
     virtual VertexIterator IteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
-    /** \brief Returns the number of contained vertices. */
+    /** \brief Returns the number of contained vertices.
+    */
     virtual int GetSize()
     {
       return this->m_Vertices->size();
     }
-/*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
-
-
+    //   end of inline methods
 
     /** \brief Add a vertex at the end of the contour
-    \param vertex - coordinates in 3D space.
-    \param isControlPoint - is the vertex a special control point.*/
-    virtual void AddVertex(mitk::Point3D &vertex, bool isControlPoint);
+    \param point - coordinates in 3D space.
+    \param isControlPoint - is the vertex a special control point.
+    */
+    virtual void AddVertex(mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the end of the contour
-    \param vertex - a ContourModelVertex.
+    \param vertex - a contour element vertex.
     */
     virtual void AddVertex(VertexType &vertex);
 
     /** \brief Add a vertex at the front of the contour
-    \param vertex - coordinates in 3D space.
-    \param isControlPoint - is the vertex a special control point.*/
-    virtual void AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint);
+    \param point - coordinates in 3D space.
+    \param isControlPoint - is the vertex a control point.
+    */
+    virtual void AddVertexAtFront(mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the front of the contour
-    \param vertex - a ContourModelVertex.
+    \param vertex - a contour element vertex.
     */
     virtual void AddVertexAtFront(VertexType &vertex);
 
     /** \brief Add a vertex at a given index of the contour
-    \param vertex - coordinates in 3D space.
+    \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a special control point.
     \param index - the index to be inserted at.
     */
-    virtual void InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index);
+    virtual void InsertVertexAtIndex(mitk::Point3D &point, bool isControlPoint, int index);
 
     /** \brief Returns the vertex a given index
     \param index
@@ -161,7 +160,9 @@ namespace mitk
     */
     virtual bool IsClosed();
 
-        /** \brief Returns whether a given point is near a contour, according to eps.
+    /** \brief Returns whether a given point is near a contour, according to eps.
+    \param point - query position in 3D space.
+    \param eps - the error bound for search algorithm.
     */
     virtual bool IsNearContour(const mitk::Point3D &point, float eps);
 
@@ -185,9 +186,9 @@ namespace mitk
     */
     void Concatenate(mitk::ContourElement* other);
 
-    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
-        FindFirstIntersection(mitk::ContourElement* other);
-
+    /** \brief Removes intersected vertices between two contour elements
+    \param other - a given contour element.
+    */
     void RemoveIntersections(mitk::ContourElement* other);
 
     /** \brief Remove the given vertex from the container if exists.
@@ -222,10 +223,16 @@ namespace mitk
     */
     VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
+    /** \brief Generate and interpolated version of the contour element based on the
+    active interpolation method
+    */
     void Interpolate();
 
     VertexListType* GetControlVertices();
 
+    /** \brief Uniformly redistribute control points with a given period (in number of vertices)
+    \param period - number of vertices between control points.
+    */
     void RedistributeControlVertices(const VertexType* selected, int period);
 
   protected:
@@ -234,14 +241,25 @@ namespace mitk
     ContourElement(const mitk::ContourElement &other);
     virtual ~ContourElement();
 
-    /** \brief Finds the 4th order bezier curve between given indexes.
+    /** \brief Finds the 4-th order bezier curve between given indexes.
     Adapted from vtkBezierContourLineInterpolator
     \param idx1 - first index
     \param idx2 - second index
     */
     void DoBezierInterpolation( int idx1, int idx2, VertexListType* vertices );
 
-    int GetNthNodeSlope( int n, double slope[3]);
+    /** \brief Returns a pair with two iterators pointing to the vertices where
+    the contour element intersects (i.e. has the same coordinates) with another given contour element
+    \param other - a given contour element.
+    */
+    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
+        FindFirstIntersection(mitk::ContourElement* other);
+
+    /** \brief Calculates the slope at a given index
+    \param index - the index to get the slope at.
+    \param slope - splope at given index.
+    */
+    bool GetNthNodeSlope( int index, double slope[3]);
 
    void ComputeMidpoint( double p1[3], double p2[3], double mid[3] )
     {
@@ -254,6 +272,6 @@ namespace mitk
     bool m_IsClosed;
 
   };
-}
+} // namespace mitk
 
-#endif
+#endif // _mitkContourElement_H_

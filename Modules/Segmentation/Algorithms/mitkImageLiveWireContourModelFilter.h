@@ -64,7 +64,7 @@ namespace mitk {
     typedef itk::Image< float,  2 >                                              InternalImageType;
     typedef itk::ShortestPathImageFilter< InternalImageType, InternalImageType > ShortestPathImageFilterType;
     typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >           CostFunctionType;
-    typedef std::vector< InternalImageType::IndexType >                          ShortestPathType;
+    typedef std::vector< itk::Index<2> >                                         ShortestPathType;
 
     /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
@@ -94,9 +94,9 @@ namespace mitk {
     */
     void SetRepulsivePoints(const ShortestPathType& points);
 
-    /** \brief Add a single repulsive point
+    /** \brief Add a single repulsive point to use in the cost function
     */
-    void AddRepulsivePoint( const InternalImageType::IndexType& idx );
+    void AddRepulsivePoint( const itk::Index<2>& idx );
 
     virtual void SetInput( const InputType *input);
 

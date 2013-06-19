@@ -667,30 +667,30 @@ void mitk::ContourElement::DoBezierInterpolation( int idx1, int idx2, VertexList
 }
 
 //----------------------------------------------------------------------
-int mitk::ContourElement::GetNthNodeSlope( int n, double slope[3])
+bool mitk::ContourElement::GetNthNodeSlope( int index, double slope[3])
 {
-  if ( n < 0 ||
-    static_cast<unsigned int>(n) >= this->m_Vertices->size() )
+  if ( index < 0 ||
+    static_cast<unsigned int>(index) >= this->m_Vertices->size() )
     {
-    return 0;
+    return false;
     }
 
   int idx1, idx2;
 
-  if ( n == 0 && !this->IsClosed() )
+  if ( index == 0 && !this->IsClosed() )
     {
     idx1 = 0;
     idx2 = 1;
     }
-  else if ( n == this->m_Vertices->size()-1 && !this->IsClosed() )
+  else if ( index == this->m_Vertices->size()-1 && !this->IsClosed() )
     {
     idx1 = this->m_Vertices->size()-2;
     idx2 = idx1+1;
     }
   else
     {
-    idx1 = n - 1;
-    idx2 = n + 1;
+    idx1 = index - 1;
+    idx2 = index + 1;
 
     if ( idx1 < 0 )
       {
@@ -713,5 +713,5 @@ int mitk::ContourElement::GetNthNodeSlope( int n, double slope[3])
       this->m_Vertices->at(idx1)->Coordinates[2];
 
   vtkMath::Normalize( slope );
-  return 1;
+  return true;
 }

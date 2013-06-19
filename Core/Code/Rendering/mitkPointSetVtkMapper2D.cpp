@@ -91,7 +91,7 @@ mitk::PointSetVtkMapper2D::LocalStorage::~LocalStorage()
 }
 
 // input for this mapper ( = point set)
-const mitk::PointSet* mitk::PointSetVtkMapper2D::GetInput()
+const mitk::PointSet* mitk::PointSetVtkMapper2D::GetInput() const
 {
   return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }

@@ -96,7 +96,7 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    virtual const mitk::PointSet* GetInput();
+    virtual const mitk::PointSet* GetInput() const;
 
     /** \brief returns the a prop assembly */
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);

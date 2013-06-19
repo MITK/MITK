@@ -77,6 +77,15 @@ namespace mitk {
   *       0 = "None", 1 = "Vertex", 2 = "Dash", 3 = "Cross", 4 = "ThickCross", 5 = "Triangle", 6 = "Square", 7 = "Circle",
   *       8 = "Diamond", 9 = "Arrow", 10 = "ThickArrow", 11 = "HookedArrow", 12 = "Cross"
   *   - \b "PointSet.2D.fill shape": (BoolProperty false)     // fill or do not fill the glyph shape
+  *   - \b "Pointset.2D.show distant points": (BoolProperty true) // Shows the points cross, even if the point is not in the view's
+  *                                                              current slice. Each point is projected to the 2D image
+  *                                                              plane using mitk::DisplayGeometry. If this property is true and if the
+  *                                                              squared distance between the point and the projected point is < 4 then
+  *                                                              the point is deemed to be close enough to the current slice, and is drawn as
+  *                                                              a cross scaled by the distance away. This has the effect that crosses appear
+  *                                                              smaller as you move away from their true location. If this property is
+  *                                                              false, a projected point must match exactly (apart from rounding error)
+  *                                                              in order to be drawn.
   *
   *
   * Other Properties used here but not defined in this class:
@@ -208,6 +217,7 @@ namespace mitk {
     int m_Point2DSize;              // "point 2D size" property
     int m_IDShapeProperty;          // ID for mitkPointSetShape Enumeration Property "Pointset.2D.shape"
     bool m_FillShape;               // "Pointset.2D.fill shape" property
+    bool m_ShowDistantPoints;       // "Pointset.2D.show distant points" property
 
   };
 

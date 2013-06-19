@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include "mitkOtsuSegmentationFilter.h"
-#include "
 
 // ITK
 #include <itkOtsuMultipleThresholdsImageFilter.h>
@@ -101,42 +100,46 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
     if (proceed != QMessageBox::Ok) return;
   }
 
+  mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
+  otsuFilter->SetNumberOfThresholds( numberOfThresholds );
+  otsuFilter->SetInput( m_OriginalImage );
+
   try
   {
-    mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
-    otsuFilter->SetNumberOfThresholds( numberOfThresholds );
-    otsuFilter->SetInput( m_OriginalImage );
     otsuFilter->Update();
-
-    this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
-    m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
-    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
-    m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
-    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-    mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-    vtkLookupTable *lookupTable = vtkLookupTable::New();
-    lookupTable->SetHueRange(1.0, 0.0);
-    lookupTable->SetSaturationRange(1.0, 1.0);
-    lookupTable->SetValueRange(1.0, 1.0);
-    lookupTable->SetTableRange(-1.0, 1.0);
-    lookupTable->Build();
-    lut->SetVtkLookupTable(lookupTable);
-    prop->SetLookupTable(lut);
-    m_MultiLabelResultNode->SetProperty("LookupTable",prop);
-    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
-    levWinProp->SetLevelWindow( levelwindow );
-    m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
-
-    //this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-  catch( std::exception& err )
+  catch( ... )
   {
-    MITK_ERROR(this->GetName()) << err.what();
+    QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
+    messageBox->exec();
+    delete messageBox;
+    mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
+
+  this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
+  m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
+  mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+  renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+  m_MultiLabelResultNode->SetProperty("Image Rendering.Mode", renderingMode);
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+  vtkLookupTable *lookupTable = vtkLookupTable::New();
+  lookupTable->SetHueRange(1.0, 0.0);
+  lookupTable->SetSaturationRange(1.0, 1.0);
+  lookupTable->SetValueRange(1.0, 1.0);
+  lookupTable->SetTableRange(-1.0, 1.0);
+  lookupTable->Build();
+  lut->SetVtkLookupTable(lookupTable);
+  prop->SetLookupTable(lut);
+  m_MultiLabelResultNode->SetProperty("LookupTable",prop);
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetRangeMinMax(0, numberOfThresholds + 1);
+  levWinProp->SetLevelWindow( levelwindow );
+  m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
+
+  //this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::OtsuTool3D::ConfirmSegmentation()

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkItkImageImport.h"
 
 #include "itkImage.h"
-#include "itkOtsuMultipleThresholdsImageFilter.h"
 
 #include "SegmentationExports.h"
 
@@ -42,11 +41,8 @@ class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
 
  public:
 
-  typedef short InputPixelType;
   typedef unsigned char OutputPixelType;
-  typedef itk::Image< InputPixelType, 3 > itkInputImageType;
   typedef itk::Image< OutputPixelType, 3 > itkOutputImageType;
-  typedef itk::OtsuMultipleThresholdsImageFilter< itkInputImageType, itkOutputImageType > OtsuFilterType;
   typedef mitk::ITKImageImport<itkOutputImageType> ImageConverterType;
 
   mitkClassMacro(OtsuSegmentationFilter,ImageToImageFilter);
@@ -55,7 +51,7 @@ class Segmentation_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
   itkGetMacro(NumberOfThresholds, unsigned int);
   void SetNumberOfThresholds(unsigned int number)
   {
-    if (number < 2)
+    if (number < 1)
     {
       MITK_WARN << "Tried to set an invalid number of thresholds in the OtsuSegmentationFilter.";
       return;

@@ -33,7 +33,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
   // create the visible widgets
   QGridLayout* mainLayout = new QGridLayout( this );
 
-  QLabel* label = new QLabel( "Select number of Regions of Interst: ", this );
+  QLabel* label = new QLabel( "Select number of Regions of Interest: ", this );
   QFont f = label->font();
   f.setBold(false);
   label->setFont( f );
@@ -60,10 +60,6 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
   connect( confirmButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   confirmButton->setFont( f );
   mainLayout->addWidget( confirmButton,1,1 );
-
-  QCheckBox* volumePreview = new QCheckBox("Volume preview", this);
-  connect( volumePreview, SIGNAL(stateChanged(int)), this, SLOT(OnVolumePreviewChecked(int)) );
-  mainLayout->addWidget( volumePreview,1,2 );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -100,10 +96,18 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
 {
   if (m_OtsuTool3DTool.IsNotNull())
   {
-    m_OtsuTool3DTool->RunSegmentation( m_Spinbox->value() );
+    try
+    {
+      m_OtsuTool3DTool->RunSegmentation( m_Spinbox->value() );
+    }
+    catch( ... )
+    {
+      return;
+    }
     //insert regions into widget
     QString itemName;
     QListWidgetItem* item;
+    this->m_selectionListWidget->clear();
     for(int i=0; i<m_Spinbox->value(); ++i) {
       itemName = QString::number(i);
       item = new QListWidgetItem(itemName);

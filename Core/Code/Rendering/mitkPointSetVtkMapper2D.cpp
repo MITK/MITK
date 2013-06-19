@@ -281,6 +281,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   int count = 0;
 
+  double diffTolerance = 0.01; //cause roundoff error
+
   for (pointsIter=itkPointSet->GetPoints()->Begin();
     pointsIter!=itkPointSet->GetPoints()->End();
     pointsIter++)
@@ -309,13 +311,12 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     float diff = planeGeometry->DistanceFromPlane(point);
     diff = diff * diff;
 
-
         // We do want to draw crosses on slices a small distance away
         // from the points true location.
     if((m_ShowDistantPoints && diff < 4.0)
        // We only want crosses on the exact slice of the point
        // (+/- rounding error).
-      || (!m_ShowDistantPoints && diff < scalarDiffTolerance))
+      || (!m_ShowDistantPoints && diff < diffTolerance))
     {
 
       // is point selected or not?
@@ -331,7 +332,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
         // point is scaled according to its distance to the plane
         ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
       }
-
 
       //---- LABEL -----//
 

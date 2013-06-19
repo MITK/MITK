@@ -1,0 +1,29 @@
+/**
+\page USModulePage The Ultrasound Module
+
+\section USModulePageOverview Overview
+
+The Ultrasound Module provides a microservice Based API for ultrasound devices.
+The main features are:
+<ul>
+  <li> handling and processing of ultrasound image data
+  <li> Metadata for Ultrasound images 
+  <li> USVideoDevice class which allows to connect any ultrasound device with a video-out via a Framegrabber
+  <ul>
+    <li> Fast image preprocessing capabilities(Greyscale Conversion, Cropping) via OpenCV
+	<li> Advanced image processing functions via mitk filters.
+  </ul>
+  <li> Connection of API-Enabled devices (specifically the Telemed LogicScan 128 is a work in progress)
+  <ul>
+	<li> Control of API-enabled Devices via MITK (Work in Progress))
+  </ul>
+  <li> Designed to interact with the \link IGTGeneralModulePage IGT Module \endlink for tracking functionality.
+</ul>
+
+This module requires OpenCV to be enabled in the superbuild options via CMAKE.
+Its functionality is made available to the User via the \link org_mitk_gui_qt_ultrasound UltrasoundSupport Plugin \endlink
+
+\section USDeviceHierarchy Ultrasound Device Hierarchy
+
+  
+*/

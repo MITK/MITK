@@ -62,6 +62,13 @@ cl_command_queue OclResourceServiceImpl::GetCommandQueue() const
   // check if queue valid
   cl_context clQueueContext;
 
+  // check if there is a context available
+  // if not create one
+  if( ! m_ContextCollection )
+  {
+    m_ContextCollection = new OclContextCollection();
+  }
+
   cl_int clErr = clGetCommandQueueInfo( m_ContextCollection->m_CommandQueue, CL_QUEUE_CONTEXT, sizeof(clQueueContext), &clQueueContext, NULL );
   if( clErr != CL_SUCCESS || clQueueContext != m_ContextCollection->m_Context )
   {

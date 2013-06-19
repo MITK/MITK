@@ -61,6 +61,10 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
   confirmButton->setFont( f );
   mainLayout->addWidget( confirmButton,1,1 );
 
+  QCheckBox* volumePreview = new QCheckBox("Volume preview", this);
+  connect( volumePreview, SIGNAL(stateChanged(int)), this, SLOT(OnVolumePreviewChecked(int)) );
+  mainLayout->addWidget( volumePreview,1,2 );
+
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
@@ -105,5 +109,12 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       item = new QListWidgetItem(itemName);
       this->m_selectionListWidget->addItem(item);
     }
+  }
+}
+
+void QmitkOtsuTool3DGUI::OnVolumePreviewChecked(int state)
+{
+  if (state == 1)
+  {
   }
 }

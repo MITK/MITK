@@ -56,6 +56,8 @@ class QmitkExt_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnItemSelectionChanged();
 
+    void OnVolumePreviewChecked(int);
+
   protected:
 
     QmitkOtsuTool3DGUI();

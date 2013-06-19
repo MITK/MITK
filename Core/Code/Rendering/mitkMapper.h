@@ -218,14 +218,14 @@ namespace mitk {
       public:
 
 
-      bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
+      const bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
 
-      inline void UpdateGenerateDataTime()
+      inline const void UpdateGenerateDataTime()
       {
         m_LastGenerateDataTime.Modified();
       }
 
-      inline itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
+      inline const itk::TimeStamp & GetLastGenerateDataTime() { return m_LastGenerateDataTime; }
 
       protected:
 

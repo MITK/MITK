@@ -87,7 +87,7 @@ namespace mitk {
       return retval;
     }
 
-    bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer )
+    const bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer )
     {
       return m_OdfMapper->HasVtkProp(prop, renderer);
     }

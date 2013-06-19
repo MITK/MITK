@@ -92,7 +92,7 @@ class MITK_CORE_EXPORT VtkMapper : public Mapper
     *
     * Note: returns false by default; should be implemented for VTK-based
     * Mapper subclasses. */
-    virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
+    virtual const bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
 
     /** \brief Set the vtkTransform of the m_Prop3D for
     * the current time step of \a renderer

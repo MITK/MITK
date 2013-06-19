@@ -78,7 +78,7 @@ public:
   /**
    * Returns the current shape
    */
-  virtual const int GetPointSetShape();
+  virtual int GetPointSetShape();
 
   using BaseProperty::operator=;
 

@@ -126,7 +126,7 @@ int TractometerAngularErrorTool(int argc, char* argv[])
 
 
         // extract directions from fiber bundle
-        itk::TractsToVectorImageFilter::Pointer fOdfFilter = itk::TractsToVectorImageFilter::New();
+        itk::TractsToVectorImageFilter<float>::Pointer fOdfFilter = itk::TractsToVectorImageFilter<float>::New();
         fOdfFilter->SetFiberBundle(inputTractogram);
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
@@ -153,8 +153,8 @@ int TractometerAngularErrorTool(int argc, char* argv[])
             // write direction images
             for (int i=0; i<directionImageContainer->Size(); i++)
             {
-                itk::TractsToVectorImageFilter::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
-                typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter::ItkDirectionImageType > WriterType;
+                itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+                typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
                 WriterType::Pointer writer = WriterType::New();
 
                 string outfilename = outRoot;

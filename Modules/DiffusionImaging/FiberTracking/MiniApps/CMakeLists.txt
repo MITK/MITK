@@ -32,6 +32,7 @@ IF(BUILD_FiberTrackingMiniApps)
     TractometerAngularErrorTool.cpp
     TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
+    ImageFormatConverter.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

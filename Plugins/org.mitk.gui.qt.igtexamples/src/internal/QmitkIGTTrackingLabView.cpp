@@ -132,10 +132,35 @@ void QmitkIGTTrackingLabView::UpdateTimer()
   {
   if (m_PermanentRegistration && m_PermanentRegistrationFilter.IsNotNull())
     {
-      mitk::Transform::Pointer newTransform = mitk::Transform::New();
-      newTransform->Concatenate(m_T_MarkerRel);
-      newTransform->Concatenate(mitk::Transform::New(m_ObjectmarkerNavigationData));
-      this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
+
+      if(m_Controls.m_SurfaceActive->isChecked())
+        {
+        mitk::Transform::Pointer newTransform = mitk::Transform::New();
+        newTransform->Concatenate(m_T_MarkerRel);
+        newTransform->Concatenate(mitk::Transform::New(m_ObjectmarkerNavigationData));
+        this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
+        }
+      if(m_Controls.m_ImageActive->isChecked())
+        {
+        /*
+        mitk::AffineTransform3D::Pointer imageTransform = m_T_ImageGeo;
+        imageTransform->Compose(newTransform->GetAffineTransform3D());
+        mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+        itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
+        itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
+        newImageTransform->SetMatrix(rotationFloatNew);
+        newImageTransform->SetOffset(translationFloatNew);
+        m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+        */
+
+        mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
+        newTransform->SetIdentity();
+        newTransform->Compose(m_T_ImageGeo);
+        newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
+        newTransform->Compose(mitk::Transform::New(m_ObjectmarkerNavigationData)->GetAffineTransform3D());
+        this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+
+        }
     }
 
   if (m_CameraView && m_VirtualView.IsNotNull()) {m_VirtualView->Update();}
@@ -325,11 +350,11 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
     translationDouble[k] = m->GetElement(k,3);
   }
 
-  MITK_INFO << "MATRIX: ";
+  /*MITK_INFO << "MATRIX: ";
   for(int k=0; k<=3; k++)
     {
     MITK_INFO << m->GetElement(k,0) << " " << m->GetElement(k,1) << " " << m->GetElement(k,2) << " " << m->GetElement(k,3);
-    }
+    }*/
 
   //save transform
   m_T_ObjectReg = mitk::Transform::New();
@@ -350,6 +375,8 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
   if(m_Controls.m_ImageActive->isChecked() && m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull())
   {
     mitk::AffineTransform3D::Pointer imageTransform = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
+    m_T_ImageGeo = mitk::AffineTransform3D::New();
+    m_T_ImageGeo->Compose(imageTransform);
     imageTransform->Compose(newTransform);
     mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
     itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
@@ -357,6 +384,7 @@ void QmitkIGTTrackingLabView::OnRegisterFiducials()
     newImageTransform->SetMatrix(rotationFloatNew);
     newImageTransform->SetOffset(translationFloatNew);
     m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+    m_T_ImageReg = m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->GetIndexToWorldTransform();
   }
 
 }
@@ -657,6 +685,8 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //then reset the transform because we will now start to calculate the permenent registration
     this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
 
+    this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageGeo);
+
     //create the permanent registration filter
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
 
@@ -666,10 +696,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //set representation object
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
 
-
-
     //TODO: add image when bug is fixed
-
 
     //get the marker transform out of the navigation data
     mitk::Transform::Pointer T_Marker = mitk::Transform::New(this->m_ObjectmarkerNavigationData);
@@ -692,7 +719,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     //restore old registration
     if(m_T_ObjectReg.IsNotNull()) this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg->GetAffineTransform3D());
-    //if(m_T_ObjectReg2.IsNotNull()) this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ObjectReg2);
+    if(m_T_ImageReg.IsNotNull()) this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageReg);
 
     //delete filter
     m_PermanentRegistrationFilter = NULL;

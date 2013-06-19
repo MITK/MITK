@@ -55,7 +55,7 @@ namespace mitk
   Transform::Transform(const mitk::AffineTransform3D* transform)
     : m_NavData(mitk::NavigationData::New()), m_Type( UNKNOWN_TYPE )
   {
-    vnl_matrix_fixed<float,3,3> rotation = vnl_matrix_fixed<float,3,3>();
+    vnl_matrix_fixed<mitk::ScalarType, 3, 3> rotation = vnl_matrix_fixed<mitk::ScalarType,3,3>();
     rotation[0][0] = transform->GetMatrix().GetVnlMatrix()[0][0];
     rotation[0][1] = transform->GetMatrix().GetVnlMatrix()[0][1];
     rotation[0][2] = transform->GetMatrix().GetVnlMatrix()[0][2];
@@ -65,13 +65,15 @@ namespace mitk
     rotation[2][0] = transform->GetMatrix().GetVnlMatrix()[2][0];
     rotation[2][1] = transform->GetMatrix().GetVnlMatrix()[2][1];
     rotation[2][2] = transform->GetMatrix().GetVnlMatrix()[2][2];
-    rotation.transpose();
+
+    //rotation.transpose();
     this->SetRotation(rotation);
     mitk::Point3D translation;
     translation[0] = transform->GetOffset()[0];
     translation[1] = transform->GetOffset()[1];
     translation[2] = transform->GetOffset()[2];
     this->SetPosition(translation);
+
   }
 
 

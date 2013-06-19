@@ -685,7 +685,8 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //then reset the transform because we will now start to calculate the permenent registration
     this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIdentity();
 
-    this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageGeo);
+    if(m_Controls.m_ImageActive->isChecked())
+      this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(m_T_ImageGeo);
 
     //create the permanent registration filter
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();

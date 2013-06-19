@@ -155,11 +155,27 @@
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
              <widget class="QCheckBox" name="m_SurfaceActive">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
-               <string>Surface:</string>
+               <string/>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
               <property name="checked">
                <bool>true</bool>
+              </property>
+              <property name="tristate">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Surface:</string>
               </property>
              </widget>
             </item>
@@ -177,7 +193,14 @@
              </spacer>
             </item>
             <item>
-             <widget class="QmitkDataStorageComboBox" name="m_ObjectComboBox"/>
+             <widget class="QmitkDataStorageComboBox" name="m_ObjectComboBox">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -189,7 +212,7 @@
                <string>DICOM Image:</string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -207,7 +230,14 @@
              </spacer>
             </item>
             <item>
-             <widget class="QmitkDataStorageComboBox" name="m_ImageComboBox"/>
+             <widget class="QmitkDataStorageComboBox" name="m_ImageComboBox">
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

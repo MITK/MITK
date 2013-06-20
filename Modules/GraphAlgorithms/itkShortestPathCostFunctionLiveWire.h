@@ -81,14 +81,14 @@ namespace itk
     /** \brief Initialize the metric*/
     virtual void Initialize ();
 
-     /** \brief Add repulsive point*/
-    virtual void AddRepulsivePoint( IndexType index );
+     /** \brief Add void pixel in cost map*/
+    virtual void AddRepulsivePoint( const IndexType& index );
 
-    virtual int GetNumberOfRepulsivePoints()
-    { return this->m_RepulsivePoints.size(); }
+     /** \brief Remove void pixel in cost map*/
+    virtual void RemoveRepulsivePoint( const IndexType& index );
 
-    /** \brief Clear repulsive path*/
-    virtual void ClearRepulsivePoints(  );
+    /** \brief Clear repulsive points in cost function*/
+    virtual void ClearRepulsivePoints();
 
     itkSetMacro (RequestedRegion, RegionType);
     itkGetMacro (RequestedRegion, RegionType);
@@ -97,15 +97,7 @@ namespace itk
     itkSetMacro (UseApproximateGradient, bool);
     itkGetMacro (UseApproximateGradient, bool);
 
-    virtual void SetImage(const TInputImageType* _arg)
-    {
-      if (this->m_Image != _arg)
-      {
-        this->m_Image = _arg;
-        this->Modified();
-        this->m_Initialized = false;
-      }
-    }
+    virtual void SetImage(const TInputImageType* _arg);
 
     void SetDynamicCostMap( std::map< int, int > &costMap)
     {
@@ -150,16 +142,15 @@ namespace itk
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
-    typename ImageType::Pointer m_GradientMagnImage;
-    typename UnsignedCharImageType::Pointer m_ZeroCrossingsImage;
-    typename FloatImageType::Pointer m_EdgeImage;
-    typename VectorOutputImageType::Pointer m_GradientImage;
+    UnsignedCharImageType::Pointer m_MaskImage;
+    FloatImageType::Pointer m_GradientMagnitudeImage;
+//    UnsignedCharImageType::Pointer m_ZeroCrossingImage;
+    FloatImageType::Pointer m_EdgeImage;
+    VectorOutputImageType::Pointer m_GradientImage;
 
     double minCosts;
 
     bool m_UseRepulsivePoints;
-
-    std::vector<  IndexType  > m_RepulsivePoints;
 
     typename Superclass::PixelType val;
 

@@ -39,7 +39,6 @@ namespace mitk {
 mitk::LiveWireTool2D::LiveWireTool2D()
 :SegTool2D("LiveWireTool")
 {
-  m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
 
   // great magic numbers
   CONNECT_ACTION( AcINITNEWOBJECT, OnInitLiveWire );
@@ -247,8 +246,9 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   //set current slice as input for ImageToLiveWireContourFilter
   m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
+
+  m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
   m_LiveWireFilter->SetInput(m_WorkingSlice);
-  m_LiveWireFilter->ClearRepulsivePoints();
 
   //map click to pixel coordinates
   mitk::Point3D click = const_cast<mitk::Point3D &>(positionEvent->GetWorldPosition());

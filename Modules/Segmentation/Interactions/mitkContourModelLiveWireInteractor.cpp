@@ -43,7 +43,9 @@ mitk::ContourModelLiveWireInteractor::~ContourModelLiveWireInteractor()
 bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) {
+
+  if (!positionEvent)
+  {
     this->HandleEvent( new mitk::StateEvent(EIDNO, stateEvent->GetEvent()) );
     return false;
   }
@@ -53,11 +55,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
 
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
-  if (!contour)
-  {
-    this->HandleEvent( new mitk::StateEvent(EIDNO, stateEvent->GetEvent()) );
-    return false;
-  }
+  assert ( contour );
 
   contour->Deselect();
 
@@ -87,16 +85,41 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
     m_NextActiveVertexUpIter = contour->IteratorBegin() + upIndex;
     m_NextActiveVertexUp = (*m_NextActiveVertexUpIter)->Coordinates;
 
+    // clear previous void positions
+    this->m_LiveWireFilter->ClearRepulsivePoints();
+
+    // set the current contour as void positions in the cost map
+    // start with down side
+    mitk::ContourModel::VertexIterator iter = contour->IteratorBegin(timestep);
+    for (;iter != m_NextActiveVertexDownIter; iter++)
+    {
+      itk::Index<2> idx;
+      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
+      this->m_LiveWireFilter->AddRepulsivePoint( idx );
+    }
+
+    // continue with upper side
+    iter = m_NextActiveVertexUpIter + 1;
+    for (;iter != contour->IteratorEnd(timestep); iter++)
+    {
+      itk::Index<2> idx;
+      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
+      this->m_LiveWireFilter->AddRepulsivePoint( idx );
+    }
+
+    // let us have the selected point as a control point
+    contour->SetSelectedVertexAsControlPoint(true);
+
+    // finally, allow for leave
     newStateEvent = new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
   }
   else
   {
+    // do not allow for leave
     newStateEvent = new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
   }
 
   this->HandleEvent( newStateEvent );
-
-  contour->SetSelectedVertexAsControlPoint(true);
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -161,11 +184,22 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
   assert ( contour );
 
-  //recompute contour between previous active vertex and selected vertex
+  // recompute left live wire, i.e. the contour between previous active vertex and selected vertex
   this->m_LiveWireFilter->SetStartPoint( this->m_NextActiveVertexDown );
   this->m_LiveWireFilter->SetEndPoint( currentPosition );
 
-  this->m_LiveWireFilter->ClearRepulsivePoints();
+  if (!m_ContourBeingModified.empty())
+  {
+      // remove void positions from the last portion of the contour that was modified
+      std::vector< itk::Index< 2 > >::const_iterator msIter = m_ContourBeingModified.begin();
+      for (;msIter != m_ContourBeingModified.end(); msIter++)
+      {
+        this->m_LiveWireFilter->RemoveRepulsivePoint( (*msIter) );
+      }
+  }
+
+  // update to get the left livewire. Remember that the rest of the contour is already
+  // set as void positions in the filter
   this->m_LiveWireFilter->Update();
 
   mitk::ContourModel::Pointer leftLiveWire = this->m_LiveWireFilter->GetOutput();
@@ -173,37 +207,26 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
   leftLiveWire->RemoveVertexAt(0, timestep);
 
-  //recompute contour between selected vertex and next active vertex
-  this->m_LiveWireFilter->SetStartPoint( currentPosition );
-  this->m_LiveWireFilter->SetEndPoint( m_NextActiveVertexUp );
-  this->m_LiveWireFilter->ClearRepulsivePoints();
-/*
-  mitk::ContourModel::VertexIterator iter = contour->IteratorBegin(timestep);
-  for (;iter != m_NextActiveVertexDownIter; iter++)
-  {
-      itk::Index<2> idx;
-      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
-      this->m_LiveWireFilter->AddRepulsivePoint( idx );
-  }
+  // now the container has to be emty
+  m_ContourBeingModified.clear();
 
-  iter = m_NextActiveVertexUpIter;
-  for (;iter != contour->IteratorEnd(timestep); iter++)
-  {
-      itk::Index<2> idx;
-      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
-      this->m_LiveWireFilter->AddRepulsivePoint( idx );
-  }
-*/
-   // add points from already calculated left live wire
+   // add points from already calculated left live wire contour
   mitk::ContourModel::VertexIterator iter = leftLiveWire->IteratorBegin(timestep);
   for (;iter != leftLiveWire->IteratorEnd(timestep); iter++)
   {
       itk::Index<2> idx;
       this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
-
       this->m_LiveWireFilter->AddRepulsivePoint( idx );
+
+      // keep points from left live wire contour
+      m_ContourBeingModified.push_back(idx);
   }
 
+  // recompute right live wire, i.e. the contour between selected vertex and next active vertex
+  this->m_LiveWireFilter->SetStartPoint( currentPosition );
+  this->m_LiveWireFilter->SetEndPoint( m_NextActiveVertexUp );
+
+  // update filter with all contour points set as void but the right live wire portion to be calculated now
   this->m_LiveWireFilter->Update();
 
   mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
@@ -220,7 +243,14 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   // set corrected right live wire to its node
   m_RightLiveWireContourNode->SetData(rightLiveWire);
 
-
+  iter = rightLiveWire->IteratorBegin(timestep);
+  for (;iter != rightLiveWire->IteratorEnd(timestep); iter++)
+  {
+      itk::Index<2> idx;
+      this->m_WorkingImage->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
+      // keep points from right live wire contour
+      m_ContourBeingModified.push_back(idx);
+  }
 
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());

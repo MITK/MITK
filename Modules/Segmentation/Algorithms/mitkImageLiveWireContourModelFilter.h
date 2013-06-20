@@ -94,9 +94,13 @@ namespace mitk {
     */
     void SetRepulsivePoints(const ShortestPathType& points);
 
-    /** \brief Add a single repulsive point to use in the cost function
+    /** \brief Add a single repulsive point to the cost function
     */
     void AddRepulsivePoint( const itk::Index<2>& idx );
+
+    /** \brief Remove a single repulsive point from the cost function
+    */
+    void RemoveRepulsivePoint( const itk::Index<2>& idx );
 
     virtual void SetInput( const InputType *input);
 

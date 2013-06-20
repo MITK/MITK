@@ -93,6 +93,8 @@ namespace mitk
     mitk::ContourModel::VertexIterator m_NextActiveVertexDownIter;
     mitk::ContourModel::VertexIterator m_NextActiveVertexUpIter;
 
+    std::vector < itk::Index<2> > m_ContourBeingModified;
+
     mitk::DataNode::Pointer m_LeftLiveWireContourNode;
     mitk::DataNode::Pointer m_RightLiveWireContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;

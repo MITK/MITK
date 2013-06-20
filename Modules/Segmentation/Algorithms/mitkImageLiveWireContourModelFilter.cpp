@@ -133,7 +133,7 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
-  typedef itk::Image< TPixel, VImageDimension >                   InputImageType;
+  typedef itk::Image< TPixel, VImageDimension >                      InputImageType;
   typedef itk::CastImageFilter< InputImageType, InternalImageType >  CastFilterType;
 
   typename CastFilterType::Pointer castFilter = CastFilterType::New();
@@ -149,9 +149,14 @@ void mitk::ImageLiveWireContourModelFilter::ClearRepulsivePoints()
     m_CostFunction->ClearRepulsivePoints();
 }
 
-void mitk::ImageLiveWireContourModelFilter::AddRepulsivePoint( const InternalImageType::IndexType& idx )
+void mitk::ImageLiveWireContourModelFilter::AddRepulsivePoint( const itk::Index<2>& idx )
 {
     m_CostFunction->AddRepulsivePoint(idx);
+}
+
+void mitk::ImageLiveWireContourModelFilter::RemoveRepulsivePoint( const itk::Index<2>& idx )
+{
+    m_CostFunction->RemoveRepulsivePoint(idx);
 }
 
 void mitk::ImageLiveWireContourModelFilter::SetRepulsivePoints(const ShortestPathType& points)
@@ -310,8 +315,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   }
 
-
-  /*+++ filter image gradient magnitude +++*/
+  // filter image gradient magnitude
   typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension> > GradientMagnitudeFilterType;
   typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
   gradientFilter->SetInput(inputImage);
@@ -319,7 +323,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
   typename itk::Image<TPixel, VImageDimension>::Pointer gradientMagnImage = gradientFilter->GetOutput();
 
   //get the path
-
 
   //iterator of path
   typename std::vector< itk::Index<VImageDimension> >::iterator pathIterator = shortestPath.begin();
@@ -340,7 +343,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   if( !histogram.empty() )
   {
-
     std::map< int, int >::iterator itMAX;
 
     //get max of histogramm
@@ -356,11 +358,9 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
       it++;
     }
 
-
     std::map< int, int >::key_type keyOfMax = itMAX->first;
 
-
-    /*+++++++++++++++++++++++++ compute the to max of gaussian summation ++++++++++++++++++++++++*/
+    // compute the to max of gaussian summation
     std::map< int, int >::iterator end = histogram.end();
     std::map< int, int >::iterator last = --(histogram.end());
 
@@ -370,7 +370,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     std::map< int, int >::iterator right2;
 
     right1 = itMAX;
-
 
     if(right1 == end || right1 == last )
     {
@@ -382,7 +381,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
       right2 = ++right1;//rght1 + 1
       right1 = temp;
     }
-
 
     if( right1 == histogram.begin() )
     {
@@ -407,8 +405,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     double partRight1, partRight2, partLeft1, partLeft2;
     partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
 
-
-    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /*
     f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
 
     gaussian approximation
@@ -417,6 +414,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     v(bin) is the value in the map
     k(bin) is the key
     */
+
     if( left2 != end )
     {
       partLeft2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, left2->first, left2->second);
@@ -436,7 +434,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     {
       partRight2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, right2->first, right2->second);
     }
-    /*----------------------------------------------------------------------------*/
 
     max = (partRight1 + partRight2 + partLeft1 + partLeft2);
 
@@ -444,5 +441,4 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   this->m_CostFunction->SetDynamicCostMap(histogram);
   this->m_CostFunction->SetCostMapMaximum(max);
-
 }

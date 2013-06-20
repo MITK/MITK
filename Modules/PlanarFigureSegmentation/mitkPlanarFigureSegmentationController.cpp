@@ -23,17 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolygon.h>
 #include <vtkCellArray.h>
 
-#include <vtkMarchingCubes.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 #include "mitkImageWriter.h"
 #include "mitkSurfaceVtkWriter.h"
 #include "mitkImageToSurfaceFilter.h"
 
-#include "itkTimeProbe.h"
-#include "itkResampleImageFilter.h"
-#include "itkInvertIntensityImageFilter.h"
-#include "itkBinaryThresholdImageFilter.h"
 #include "mitkImageAccessByItk.h"
 
 #include "mitkImageCast.h"
@@ -124,14 +119,6 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
     m_DistanceImageCreator->RemoveInputs( m_NormalsFilter->GetOutput( indexOfFigure ) );
     m_NormalsFilter->RemoveInputs( m_ReduceFilter->GetOutput( indexOfFigure ) );
     m_ReduceFilter->RemoveInputs( const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(indexOfFigure)) );
-
-//      PlanarFigureListType::iterator whereIter = m_PlanarFigureList.begin();
-//      whereIter += indexOfFigure;
-//      m_PlanarFigureList.erase( whereIter );
-//
-//      SurfaceListType::iterator surfaceIter = m_SurfaceList.begin();
-//      surfaceIter += indexOfFigure;
-//      m_SurfaceList.erase( surfaceIter );
   }
   else
   {
@@ -281,19 +268,6 @@ mitk::Surface::Pointer mitk::PlanarFigureSegmentationController::CreateSurfaceFr
     points->InsertNextPoint( pointInWorldCoordiantes[0], pointInWorldCoordiantes[1], pointInWorldCoordiantes[2] );
     ++pointCounter;
   }
-
-//   for( int i=0; i<figure->GetNumberOfControlPoints(); i++ )
-//   {
-//     // ... determine the world-coordinates
-//     mitk::Point2D polyLinePoint = figure->GetControlPoint(i);
-//     mitk::Point3D pointInWorldCoordiantes;
-//     figureGeometry->Map( polyLinePoint, pointInWorldCoordiantes );
-//
-//     // and add them as new points to the vtkPoints
-//     points->InsertNextPoint( pointInWorldCoordiantes[0], pointInWorldCoordiantes[1], pointInWorldCoordiantes[2] );
-//     ++pointCounter;
-//   }
-
 
   // create a polygon with the points of the polyline
   polygon->GetPointIds()->SetNumberOfIds( pointCounter );

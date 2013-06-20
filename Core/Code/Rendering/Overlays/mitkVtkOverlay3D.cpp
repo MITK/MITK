@@ -33,6 +33,7 @@ mitk::Overlay::Bounds mitk::VtkOverlay3D::GetBoundsOnDisplay(mitk::BaseRenderer*
 {
   mitk::Overlay::Bounds bounds;
   bounds.Position[0] = bounds.Position[1] = bounds.Size[0] = bounds.Size[1] = 0;
+  return bounds;
 }
 
 void mitk::VtkOverlay3D::SetBoundsOnDisplay(mitk::BaseRenderer*, mitk::Overlay::Bounds)

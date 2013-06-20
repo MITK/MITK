@@ -77,10 +77,11 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   vtkSmartPointer<vtkPoints> points =
     vtkSmartPointer<vtkPoints>::New();
 
-  ls->m_Labels->SetNumberOfValues(m_LabelCoordinates->GetSize());
-  ls->m_Sizes->SetNumberOfValues(m_LabelCoordinates->GetSize());
+  size_t pointsetsize = (size_t) m_LabelCoordinates->GetSize();
+  ls->m_Labels->SetNumberOfValues(pointsetsize);
+  ls->m_Sizes->SetNumberOfValues(pointsetsize);
 
-  for(int i=0 ; i<m_LabelCoordinates->GetSize() ; i++)
+  for(size_t i=0 ; i<pointsetsize ; i++)
   {
     mitk::Point3D coordinate = m_LabelCoordinates->GetPoint(i);
     points->InsertNextPoint(coordinate[0]+GetOffsetVector(renderer)[0], coordinate[1]+GetOffsetVector(renderer)[1], coordinate[2]+GetOffsetVector(renderer)[2]);

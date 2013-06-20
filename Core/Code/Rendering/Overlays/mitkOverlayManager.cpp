@@ -39,7 +39,7 @@ mitk::OverlayManager::~OverlayManager()
 
 void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
 {
-  int nRenderers = m_BaseRendererList.size();
+  size_t nRenderers = m_BaseRendererList.size();
   m_BaseRendererList.remove(renderer);
   m_BaseRendererList.push_back(renderer);
 
@@ -107,7 +107,7 @@ std::string mitk::OverlayManager::RegisterMicroservice()
 
 void mitk::OverlayManager::UnregisterMicroservice()
 {
-  if(m_Registration =! NULL)
+  if(m_Registration)
   {
     m_Registration.Unregister();
   }

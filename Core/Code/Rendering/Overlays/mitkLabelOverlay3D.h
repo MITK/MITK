@@ -32,16 +32,17 @@
 
 namespace mitk {
 
+/** \brief Internal class holding the vtkActor, etc. for each of the 3 2D render windows */
+/** To render transveral, coronal, and sagittal, the mapper is called three times.
+ *For performance reasons, the corresponding data for each view is saved in the
+ *internal helper class LocalStorage.*/
 class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
-  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-  /**
-     * To render transveral, coronal, and sagittal, the mapper is called three times.
-     * For performance reasons, the corresponding data for each view is saved in the
-     * internal helper class LocalStorage. This allows rendering n views with just
-     * 1 mitkMapper using n vtkMapper.
-     * */
+  /** \brief Internal class holding the vtkActor, etc. for each of the 3 2D render windows */
+  /** To render transveral, coronal, and sagittal, the mapper is called three times.
+   *For performance reasons, the corresponding data for each view is saved in the
+   *internal helper class LocalStorage.*/
   class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:

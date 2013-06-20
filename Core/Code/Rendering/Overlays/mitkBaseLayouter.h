@@ -25,6 +25,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+
+
+/** @brief Baseclass of Overlay layouters */
+/**
+ *A BaseLayouter can be implemented to control a set of Overlays by means of position and size.
+ *BaseLayouter::PrepareLayout() should be implemented with a routine to set the position of the internal m_ManagedOverlays List.
+ *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
+ *One type of layouter should always have a unique identifier.
+ *@ingroup Overlays
+*/
 class MITK_CORE_EXPORT BaseLayouter : public itk::Object {
 public:
 
@@ -33,8 +43,14 @@ public:
   void SetBaseRenderer(BaseRenderer* renderer);
   BaseRenderer *GetBaseRenderer();
 
+  /** \brief Adds an Overlay to the internal list of managed Overlays.*/
+  /** By calling this, the previous Layouter of the passed Overlays is called to remove this overlay from its internal list.*/
   void AddOverlay(mitk::Overlay::Pointer Overlay);
+
+  /** \brief Removes the passed Overlay from the m_ManagedOverlays List */
   void RemoveOverlay(mitk::Overlay::Pointer Overlay);
+
+  /** \brief explicit constructor which disallows implicit conversions */
   std::string GetIdentifier();
   virtual void PrepareLayout() = 0;
 

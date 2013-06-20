@@ -112,13 +112,16 @@ void mitk::PlanarFigureSegmentationController::RemovePlanarFigure( mitk::PlanarF
   if ( !figureFound )
     return;
 
-  if ( indexOfFigure == m_PlanarFigureList.size()-1 )
+  // TODO: fix this! The following code had to be removed as the method
+  // RemoveInputs() has been removed in ITK 4
+  // The remaining code works correctly but is slower
+  if ( false && indexOfFigure == m_PlanarFigureList.size()-1 )
   {
     // Ff the removed figure was the last one in the list, we can simply
     // remove the last input from each filter.
-    m_DistanceImageCreator->RemoveInputs( m_NormalsFilter->GetOutput( indexOfFigure ) );
-    m_NormalsFilter->RemoveInputs( m_ReduceFilter->GetOutput( indexOfFigure ) );
-    m_ReduceFilter->RemoveInputs( const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(indexOfFigure)) );
+//     m_DistanceImageCreator->RemoveInputs( m_NormalsFilter->GetOutput( indexOfFigure ) );
+//     m_NormalsFilter->RemoveInput( m_ReduceFilter->GetOutput( indexOfFigure ) );
+//     m_ReduceFilter->RemoveInput( const_cast<mitk::Surface*>(m_ReduceFilter->GetInput(indexOfFigure)) );
   }
   else
   {

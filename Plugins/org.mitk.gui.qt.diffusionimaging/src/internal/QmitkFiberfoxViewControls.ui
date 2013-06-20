@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>493</width>
+    <width>435</width>
     <height>1588</height>
    </rect>
   </property>
@@ -14,6 +14,13 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="m_SaveParametersButton">
+     <property name="text">
+      <string>Save Parameters</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -97,23 +104,13 @@
           <string>Operations</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="4" column="0">
-           <widget class="QCommandLinkButton" name="m_CopyBundlesButton">
+          <item row="5" column="0">
+           <widget class="QCommandLinkButton" name="m_JoinBundlesButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Copy Bundles</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCommandLinkButton" name="m_TransformBundlesButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Transform Selection</string>
+             <string>Join Bundles</string>
             </property>
            </widget>
           </item>
@@ -418,13 +415,23 @@
             </layout>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QCommandLinkButton" name="m_JoinBundlesButton">
+          <item row="4" column="0">
+           <widget class="QCommandLinkButton" name="m_CopyBundlesButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Join Bundles</string>
+             <string>Copy Bundles</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCommandLinkButton" name="m_TransformBundlesButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Transform Selection</string>
             </property>
            </widget>
           </item>
@@ -2100,6 +2107,13 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCommandLinkButton" name="m_LoadParametersButton">
+     <property name="text">
+      <string>Load Parameters</string>
+     </property>
     </widget>
    </item>
   </layout>

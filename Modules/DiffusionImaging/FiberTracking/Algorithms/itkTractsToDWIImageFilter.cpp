@@ -36,7 +36,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
-TractsToDWIImageFilter::TractsToDWIImageFilter()
+
+template< class PixelType >
+TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
     : m_CircleDummy(false)
     , m_VolumeAccuracy(10)
     , m_Upsampling(1)
@@ -62,12 +64,14 @@ TractsToDWIImageFilter::TractsToDWIImageFilter()
     m_ImageRegion.SetSize(2, 10);
 }
 
-TractsToDWIImageFilter::~TractsToDWIImageFilter()
+template< class PixelType >
+TractsToDWIImageFilter< PixelType >::~TractsToDWIImageFilter()
 {
 
 }
 
-TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceStuff( std::vector< DoubleDwiType::Pointer >& images )
+template< class PixelType >
+TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilter< PixelType >::DoKspaceStuff( std::vector< DoubleDwiType::Pointer >& images )
 {
     // create slice object
     ImageRegion<2> sliceRegion;
@@ -197,7 +201,8 @@ TractsToDWIImageFilter::DoubleDwiType::Pointer TractsToDWIImageFilter::DoKspaceS
     return newImage;
 }
 
-TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::RearrangeSlice(ComplexSliceType::Pointer slice)
+template< class PixelType >
+TractsToDWIImageFilter< PixelType >::ComplexSliceType::Pointer TractsToDWIImageFilter< PixelType >::RearrangeSlice(ComplexSliceType::Pointer slice)
 {
     ImageRegion<2> region = slice->GetLargestPossibleRegion();
     ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();
@@ -232,7 +237,8 @@ TractsToDWIImageFilter::ComplexSliceType::Pointer TractsToDWIImageFilter::Rearra
     return rearrangedSlice;
 }
 
-void TractsToDWIImageFilter::GenerateData()
+template< class PixelType >
+void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
     // check input data
     if (m_FiberBundle.IsNull())
@@ -291,7 +297,7 @@ void TractsToDWIImageFilter::GenerateData()
     }
 
     // initialize output dwi image
-    OutputImageType::Pointer outImage = OutputImageType::New();
+    typename OutputImageType::Pointer outImage = OutputImageType::New();
     outImage->SetSpacing( m_Spacing );
     outImage->SetOrigin( m_Origin );
     outImage->SetDirection( m_DirectionMatrix );
@@ -300,7 +306,7 @@ void TractsToDWIImageFilter::GenerateData()
     outImage->SetRequestedRegion( m_ImageRegion );
     outImage->SetVectorLength( m_FiberModels[0]->GetNumGradients() );
     outImage->Allocate();
-    OutputImageType::PixelType temp;
+    typename OutputImageType::PixelType temp;
     temp.SetSize(m_FiberModels[0]->GetNumGradients());
     temp.Fill(0.0);
     outImage->FillBuffer(temp);
@@ -616,13 +622,13 @@ void TractsToDWIImageFilter::GenerateData()
     MITK_INFO << "Finalizing image";
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
-    ImageRegionIterator<DWIImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
+    ImageRegionIterator<OutputImageType> it4 (outImage, outImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_FiberModels[0]->GetNumGradients());
     boost::progress_display disp4(outImage->GetLargestPossibleRegion().GetNumberOfPixels());
     while(!it4.IsAtEnd())
     {
         ++disp4;
-        DWIImageType::IndexType index = it4.GetIndex();
+        typename OutputImageType::IndexType index = it4.GetIndex();
         signal = doubleOutImage->GetPixel(index)*m_SignalScale;
 
         if (m_NoiseModel->GetNoiseVariance() > 0)
@@ -658,7 +664,8 @@ void TractsToDWIImageFilter::GenerateData()
     this->SetNthOutput(0, outImage);
 }
 
-itk::Point<float, 3> TractsToDWIImageFilter::GetItkPoint(double point[3])
+template< class PixelType >
+itk::Point<float, 3> TractsToDWIImageFilter< PixelType >::GetItkPoint(double point[3])
 {
     itk::Point<float, 3> itkPoint;
     itkPoint[0] = point[0];
@@ -667,7 +674,8 @@ itk::Point<float, 3> TractsToDWIImageFilter::GetItkPoint(double point[3])
     return itkPoint;
 }
 
-itk::Vector<double, 3> TractsToDWIImageFilter::GetItkVector(double point[3])
+template< class PixelType >
+itk::Vector<double, 3> TractsToDWIImageFilter< PixelType >::GetItkVector(double point[3])
 {
     itk::Vector<double, 3> itkVector;
     itkVector[0] = point[0];
@@ -676,7 +684,8 @@ itk::Vector<double, 3> TractsToDWIImageFilter::GetItkVector(double point[3])
     return itkVector;
 }
 
-vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(double point[3])
+template< class PixelType >
+vnl_vector_fixed<double, 3> TractsToDWIImageFilter< PixelType >::GetVnlVector(double point[3])
 {
     vnl_vector_fixed<double, 3> vnlVector;
     vnlVector[0] = point[0];
@@ -685,8 +694,8 @@ vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(double point[3]
     return vnlVector;
 }
 
-
-vnl_vector_fixed<double, 3> TractsToDWIImageFilter::GetVnlVector(Vector<float,3>& vector)
+template< class PixelType >
+vnl_vector_fixed<double, 3> TractsToDWIImageFilter< PixelType >::GetVnlVector(Vector<float,3>& vector)
 {
     vnl_vector_fixed<double, 3> vnlVector;
     vnlVector[0] = vector[0];

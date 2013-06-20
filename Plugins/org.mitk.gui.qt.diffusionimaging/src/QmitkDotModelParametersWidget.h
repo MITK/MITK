@@ -40,6 +40,7 @@ public:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
+    void SetT2(double t2){ m_Controls->m_T2box->setValue(t2); }
     unsigned int GetT2(){ return m_Controls->m_T2box->value(); }
 
 public slots:

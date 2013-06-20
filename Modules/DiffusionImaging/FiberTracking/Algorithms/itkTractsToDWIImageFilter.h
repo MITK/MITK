@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cmath>
 
-typedef itk::VectorImage< short, 3 > DWIImageType;
 
 namespace itk
 {
@@ -39,15 +38,18 @@ namespace itk
 /**
 * \brief Generates artificial diffusion weighted image volume from the input fiberbundle using a generic multicompartment model.   */
 
-class TractsToDWIImageFilter : public ImageSource< DWIImageType >
+template< class PixelType >
+class TractsToDWIImageFilter : public ImageSource< itk::VectorImage< PixelType, 3 > >
 {
 
 public:
+
     typedef TractsToDWIImageFilter      Self;
-    typedef ImageSource< DWIImageType > Superclass;
+    typedef ImageSource< itk::VectorImage< PixelType, 3 > > Superclass;
     typedef SmartPointer< Self >        Pointer;
     typedef SmartPointer< const Self >  ConstPointer;
 
+    typedef typename Superclass::OutputImageType                     OutputImageType;
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;

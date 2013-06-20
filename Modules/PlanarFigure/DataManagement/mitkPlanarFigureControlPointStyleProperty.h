@@ -48,8 +48,6 @@ public:
 
   mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const std::string&);
 
-  Pointer Clone() const;
-
   typedef enum
   {
     Square, Circle

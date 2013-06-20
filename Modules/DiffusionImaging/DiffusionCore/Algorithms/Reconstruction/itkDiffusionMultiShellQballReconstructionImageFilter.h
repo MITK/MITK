@@ -111,7 +111,7 @@ protected:
     ~DiffusionMultiShellQballReconstructionImageFilter() { }
     void PrintSelf(std::ostream& os, Indent indent) const;
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
 
 
 private:

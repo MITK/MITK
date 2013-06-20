@@ -34,7 +34,7 @@ namespace mitk {
   * SetTrackingDevice() again to add the new tools as additional outputs of the filter.
   * Otherwise TrackingDeviceSource will raise an std::out_of_range exception when the filter pipeline is executed.
   * the tool number corresponds with the output number, e.g. trackingDevice-GetTool(0) is
-  * the tool that will produce trackingDeviceSourceFilter->GetOutput(0).
+  * the tool that will produce trackingDeviceSourceFilter->GetOutput().
   * \warning If a tool is removed from the tracking device, there will be a mismatch between
   * the outputs and the tool number!
   *

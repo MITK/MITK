@@ -54,6 +54,8 @@ public:
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
+    LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
     ContourModelGLMapper2D();
 

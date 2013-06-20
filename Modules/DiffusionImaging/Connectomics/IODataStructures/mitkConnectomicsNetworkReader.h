@@ -27,14 +27,14 @@ namespace mitk
   /** \brief The reader for connectomics network files (.cnf)
   */
 
-  class ConnectomicsNetworkReader : public FileReader, public BaseProcess
+  class ConnectomicsNetworkReader : public FileReader, public BaseDataSource
   {
   public:
 
 
     typedef mitk::ConnectomicsNetwork OutputType;
 
-    mitkClassMacro( ConnectomicsNetworkReader, BaseProcess );
+    mitkClassMacro( ConnectomicsNetworkReader, BaseDataSource );
     itkNewMacro(Self);
 
     const char* GetFileName() const;
@@ -48,7 +48,9 @@ namespace mitk
 
     virtual void Update();
 
+    BaseDataSource::DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
 
+    BaseDataSource::DataObjectPointer MakeOutput( DataObjectPointerArraySizeType idx);
 
   protected:
 

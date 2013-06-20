@@ -612,6 +612,33 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   }
 }
 
+mitk::DataNode::Pointer SliceNavigationController::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition)
+{
+  mitk::DataNode::Pointer node;
+  int  maxlayer = -32768;
+  bool isHelper (false);
+  if(nodes.IsNotNull())
+  {
+    for (unsigned int x = 0; x < nodes->size(); x++)
+    {
+      nodes->at(x)->GetBoolProperty("helper object", isHelper);
+      if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
+      {
+        int layer = 0;
+        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+        if(layer > maxlayer)
+        {
+          if(static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(m_Renderer))
+          {
+            node = nodes->at(x);
+            maxlayer = layer;
+          }
+        }
+      }
+    }
+  }
+  return node;
+}
 // Relict from the old times, when automous decisions were accepted
 // behavior. Remains in here, because some RenderWindows do exist outside
 // of StdMultiWidgets.
@@ -655,30 +682,38 @@ SliceNavigationController
 
                 mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
                 mitk::Point3D worldposition = posEvent->GetWorldPosition();
-                int  maxlayer = -32768;
+                //int  maxlayer = -32768;
                 mitk::Image::Pointer image3D;
-                // find image with largest layer, that is the image shown on top in the render window
-                for (unsigned int x = 0; x < nodes->size(); x++)
-                {
-                  //Just consider image data that is no helper object. E.g. do not consider nodes created for the slice interpolation
-                  bool isHelper (false);
-                  nodes->at(x)->GetBoolProperty("helper object", isHelper);
+                mitk::DataNode::Pointer node;
+                mitk::DataNode::Pointer topSourceNode;
 
-                  if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
+                bool isBinary (false);
+
+                node = this->GetTopLayerNode(nodes,worldposition);
+                if(node.IsNotNull())
+                {
+                  node->GetBoolProperty("binary", isBinary);
+                  if(isBinary)
                   {
-                    int layer = 0;
-                    if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
-                    if(layer > maxlayer)
+                    mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = baseRenderer->GetDataStorage()->GetSources(node, NULL, true);
+                    if(!sourcenodes->empty())
                     {
-                      if(static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(m_Renderer))
-                      {
-                        image3D = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
-                        maxlayer = layer;
-                      }
+                      topSourceNode = this->GetTopLayerNode(sourcenodes,worldposition);
+                    }
+                    if(topSourceNode.IsNotNull())
+                    {
+                      image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+                    }
+                    else
+                    {
+                      image3D = dynamic_cast<mitk::Image*>(node->GetData());
                     }
                   }
+                  else
+                  {
+                    image3D = dynamic_cast<mitk::Image*>(node->GetData());
+                  }
                 }
-
                 std::stringstream stream;
                 stream.imbue(std::locale::classic());
 

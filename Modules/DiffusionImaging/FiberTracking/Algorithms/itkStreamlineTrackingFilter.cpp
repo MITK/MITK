@@ -565,7 +565,7 @@ template< class TTensorPixelType,
 void StreamlineTrackingFilter< TTensorPixelType,
 TPDPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int threadId)
+                       ThreadIdType threadId)
 {
     FiberPolyDataType poly = m_PolyDataContainer->GetElement(threadId);
     vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();

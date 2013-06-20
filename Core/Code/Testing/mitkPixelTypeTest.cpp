@@ -42,10 +42,10 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   typedef itk::Image<itk::FixedArray< int, 5>, 3> ItkImageType;
   mitk::PixelType itkPtype = mitk::MakePixelType<ItkImageType>();
 
-  MITK_TEST_CONDITION_REQUIRED( ptype.GetTypeId() == typeid(int), "GetTypeId()");
+  MITK_TEST_CONDITION_REQUIRED( ptype.GetComponentType() == itk::ImageIOBase::INT, "GetComponentType()");
  // MITK_TEST_CONDITION( ptype.GetPixelTypeId() == typeid(ItkImageType), "GetPixelTypeId()");
 
-  MITK_INFO << ptype.GetItkTypeAsString();
+  MITK_INFO << ptype.GetPixelTypeAsString();
   MITK_INFO << typeid(ItkImageType).name();
 
   MITK_TEST_CONDITION_REQUIRED( ptype.GetBpe() == 8*sizeof(int)*5, "[ptype] GetBpe()");
@@ -58,27 +58,29 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
 
   // MITK_TEST_CONDITION_REQUIRED( itkPtype == ptype, "[itkPtype = ptype]");
 
-  //MITK_TEST_CONDITION( ptype.GetItkTypeAsString().compare("unknown") == 0, "GetItkTypeAsString()");
+  //MITK_TEST_CONDITION( ptype.GetPixelTypeAsString().compare("unknown") == 0, "GetPixelTypeAsString()");
   {
 
     {
       mitk::PixelType ptype2( ptype);
-      MITK_TEST_CONDITION_REQUIRED( ptype2.GetTypeId() == typeid(int), "ptype2( ptype)- GetTypeId()");
-      MITK_TEST_CONDITION( ptype2.GetPixelTypeId() == ptype.GetPixelTypeId(), "ptype2( ptype)-GetPixelTypeId(");
+      MITK_TEST_CONDITION_REQUIRED( ptype2.GetComponentType() == itk::ImageIOBase::INT, "ptype2( ptype)- GetComponentType()");
+      MITK_TEST_CONDITION( ptype2.GetPixelType() == ptype.GetPixelType(), "ptype2( ptype)-GetPixelType(");
+      MITK_TEST_CONDITION( ptype2.GetComponentType() == ptype.GetComponentType(), "ptype2( ptype)-GetComponentType(");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBpe() == 8*sizeof(int)*5, "ptype2( ptype)-GetBpe()");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetNumberOfComponents() == 5, "ptype2( ptype)-GetNumberOfComponents()");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBitsPerComponent() == 8*sizeof(int), "ptype2( ptype)-GetBitsPerComponent()");
- //     MITK_TEST_CONDITION_REQUIRED( ptype.GetItkTypeAsString().compare("unknown") == 0, "ptype2( ptype)-GetItkTypeAsString()");
+ //     MITK_TEST_CONDITION_REQUIRED( ptype.GetPixelTypeAsString().compare("unknown") == 0, "ptype2( ptype)-GetPixelTypeAsString()");
     }
 
     {
       mitk::PixelType ptype2 = ptype;
-      MITK_TEST_CONDITION_REQUIRED( ptype2.GetTypeId() == typeid(int), "ptype2 = ptype- GetTypeId()");
-      MITK_TEST_CONDITION( ptype2.GetPixelTypeId() == ptype.GetPixelTypeId(), "ptype2 = ptype- GetPixelTypeId(");
+      MITK_TEST_CONDITION_REQUIRED( ptype2.GetComponentType() == itk::ImageIOBase::INT, "ptype2 = ptype- GetComponentType()");
+      MITK_TEST_CONDITION( ptype2.GetPixelType() == ptype.GetPixelType(), "ptype2 = ptype- GetPixelType(");
+      MITK_TEST_CONDITION( ptype2.GetComponentType() == ptype.GetComponentType(), "ptype2( ptype)-GetComponentType(");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBpe() == 8*sizeof(int)*5, "ptype2 = ptype- GetBpe()");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetNumberOfComponents() == 5, "ptype2 = ptype- GetNumberOfComponents()");
       MITK_TEST_CONDITION_REQUIRED( ptype2.GetBitsPerComponent() == 8*sizeof(int), "ptype2 = ptype- GetBitsPerComponent()");
- //     MITK_TEST_CONDITION_REQUIRED( ptype.GetItkTypeAsString().compare("unknown") == 0, "ptype2 = ptype- GetItkTypeAsString()");
+ //     MITK_TEST_CONDITION_REQUIRED( ptype.GetPixelTypeAsString().compare("unknown") == 0, "ptype2 = ptype- GetPixelTypeAsString()");
     }
 
     {
@@ -95,9 +97,9 @@ int mitkPixelTypeTest(int /*argc*/, char* /*argv*/[])
   typedef itk::Image< MyObscurePixelType > MyObscureImageType;
   mitk::PixelType obscurePixelType = mitk::MakePixelType< MyObscureImageType >();
 
-  MITK_TEST_CONDITION( obscurePixelType.GetPixelTypeId() == itk::ImageIOBase::UNKNOWNPIXELTYPE, "PixelTypeId is 'UNKNOWN' ");
+  MITK_TEST_CONDITION( obscurePixelType.GetPixelType() == itk::ImageIOBase::UNKNOWNPIXELTYPE, "PixelTypeId is 'UNKNOWN' ");
   MITK_TEST_CONDITION( obscurePixelType.GetNumberOfComponents() == MyObscurePixelType::Length, "Lenght was set correctly");
-  MITK_TEST_CONDITION( obscurePixelType.GetTypeId() == typeid(MyObscurePixelType::ValueType), "ValueType corresponds."   );
+  MITK_TEST_CONDITION( obscurePixelType.GetComponentType() == mitk::MapPixelComponentType<MyObscurePixelType::ValueType>::value, "ValueType corresponds."   );
 
 
   // test CastableTo

@@ -66,20 +66,20 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
 
     itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
 
-    MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetTypeId() == typeid(float), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetTypeId() == typeid(unsigned char), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetTypeId() == typeid(int), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetTypeId() == typeid(double), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetTypeId() == typeid(float), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetTypeId() == typeid(unsigned char), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetTypeId() == typeid(unsigned int), "Testing if the data type is set correctly.");
-    MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetPixelTypeId() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetPixelType() == scalarType, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetComponentType() == itk::ImageIOBase::INT, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetComponentType() == itk::ImageIOBase::UINT, "Testing if the data type is set correctly.");
+    MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetPixelType() == scalarType, "Testing if the pixel type is set correctly.");
 
     MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMax() <= 577, "Testing if max value holds");
     MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMin() >= 23, "Testing if min value holds");

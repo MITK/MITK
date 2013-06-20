@@ -6,4 +6,5 @@ set(H_FILES
   itkShortestPathCostFunctionTbss.h
   itkShortestPathNode.h
   itkShortestPathImageFilter.h
+  itkShortestPathCostFunctionLiveWire.h
 )

@@ -223,3 +223,25 @@ void QmitkFiducialRegistrationWidget::AdjustButtonSpacing()
     m_Controls->m_spaceHolderGroupBox2->setHidden(false);
   }
 }
+
+void QmitkFiducialRegistrationWidget::SetSourceLandmarkName(QString sourceLandmarkName)
+{
+  QString groupBoxTitle = sourceLandmarkName;
+  groupBoxTitle.append(" Landmarks");
+  m_Controls->sourceLandmarksGroupBox->setTitle(groupBoxTitle);
+  QString buttonText = "Add ";
+  buttonText.append(sourceLandmarkName);
+  buttonText.append(" Landmark");
+  m_Controls->m_AddImageFiducialBtn->setText(buttonText);
+}
+
+void QmitkFiducialRegistrationWidget::SetTargetLandmarkName(QString targetLandmarkName)
+{
+  QString groupBoxTitle = targetLandmarkName;
+  groupBoxTitle.append(" Landmarks");
+  m_Controls->targetLandmarksGroupBox->setTitle(groupBoxTitle);
+  QString buttonText = "Add ";
+  buttonText.append(targetLandmarkName);
+  buttonText.append(" Landmark");
+  m_Controls->m_AddTrackingFiducialBtn->setText(buttonText);
+}

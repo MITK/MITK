@@ -24,18 +24,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
+
+/**
+  * \brief Skeletonization part of the TBSS pipeline
+  *
+  * This class takes a 3D image (typically the mean FA image as calculated in the standard TBSS pipeline)
+  * and performs the non-maximum-suppression (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024 )
+  */
+
+
 template < class TInputImage, class TOutputImage >
 class SkeletonizationFilter : public ImageToImageFilter<TInputImage, TOutputImage>
 {
-  /*!
-  \brief itkSkeletonizationFilter
 
-  \brief Skeletonization algorithm from TBSS (Smith et al. 2006)
-
-  \sa itkImageToImageFilter
-
-
-  */
 
 public:
 
@@ -59,22 +60,23 @@ public:
   /** Superclass */
   typedef ImageToImageFilter<InputImageType, OutputImageType> Superclass;
 
-  /** Smart Pointer */
   typedef SmartPointer<Self> Pointer;
 
-  /** Smart Pointer */
   typedef SmartPointer<const Self> ConstPointer;
 
-  /** */
-  itkNewMacro( Self);
+  itkNewMacro( Self)
 
-  /** Generate Data. The image will be divided into a number of pieces, a number of threads
-  will be spawned and Threaded GenerateData() will be called in each thread. */
+  /** \brief Performs the work */
   virtual void GenerateData();
 
 
+  /** \brief Output the gradient image as itkVectorImage
+   *
+   * Output the gradient image by first converting it to an itk vector image
+   */
   GradientImageType::Pointer GetGradientImage();
 
+  /** \brief Output the gradient image as an itkImage containing vector */
   VectorImageType::Pointer GetVectorImage()
   {
     return m_DirectionImage;
@@ -85,17 +87,11 @@ public:
 
 protected:
 
-  /** Constructor */
   SkeletonizationFilter();
 
-  /** Destructor */
   virtual ~SkeletonizationFilter();
 
-  void CalculatePerpendicularDirections();
-
   VectorImageType::Pointer m_DirectionImage;
-
-  //FloatVectorImageType::Pointer m_FixedDirImage;
 
   int round(float x)
   {

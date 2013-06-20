@@ -26,8 +26,10 @@ class PlanarFigure_EXPORT PlanarFigureObjectFactory : public CoreObjectFactoryBa
 {
 public:
 
-  mitkClassMacro(PlanarFigureObjectFactory,CoreObjectFactoryBase);
-  itkNewMacro(PlanarFigureObjectFactory);
+  mitkClassMacro(PlanarFigureObjectFactory,CoreObjectFactoryBase)
+  itkNewMacro(PlanarFigureObjectFactory)
+
+  ~PlanarFigureObjectFactory();
 
   virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
 
@@ -48,6 +50,10 @@ protected:
   void CreateFileExtensionsMap();
   MultimapType m_FileExtensionsMap;
   MultimapType m_SaveFileExtensionsMap;
+
+private:
+
+  itk::ObjectFactoryBase::Pointer m_PlanarFigureIOFactory;
 };
 
 }

@@ -94,7 +94,7 @@ public:
    * Empty implementation, since the rectangle rendering doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegion(itk::DataObject*);
+  virtual void SetRequestedRegion( const itk::DataObject*);
 
   /**
    * Returns the vtkRenderWindow, which is used

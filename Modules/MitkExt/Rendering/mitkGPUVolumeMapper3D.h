@@ -189,7 +189,7 @@ protected:
     }
   };
 
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 };
 
 } // namespace mitk

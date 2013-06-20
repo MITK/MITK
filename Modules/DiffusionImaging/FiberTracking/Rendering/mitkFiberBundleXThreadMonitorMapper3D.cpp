@@ -68,6 +68,17 @@ const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::
  */
 void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
+
+  const DataNode *node = this->GetDataNode();
+
+  if (m_lastModifiedMonitorNodeTime >= node->GetMTime())
+    return;
+
+  m_lastModifiedMonitorNodeTime = node->GetMTime();
 
   //  MITK_INFO << m_LastUpdateTime;
   FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetDataNode()->GetData() );
@@ -143,22 +154,12 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::Bas
   m_TextActorTerminated->SetDisplayPosition( monitor->getTerminatedPosition()[0], monitor->getTerminatedPosition()[1] );
   //m_TextActorTerminated->Modified();
 
-  bool visible = true;
-  GetDataNode()->GetVisibility(visible, renderer, "visible");
-
-  if ( !visible ) return;
 
   // Calculate time step of the input data for the specified renderer (integer value)
   // this method is implemented in mitkMapper
 //  this->CalculateTimeStep( renderer );
 
-  const DataNode *node = this->GetDataNode();
 
-
-  if (m_lastModifiedMonitorNodeTime < node->GetMTime())
-  {
-    m_lastModifiedMonitorNodeTime = node->GetMTime();
-  }
 }
 
 

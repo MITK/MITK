@@ -21,28 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-//#include "QmitkHistogram.h"
 #include "QmitkExtExports.h"
-#include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include "itkVectorImage.h"
 #include <mitkFiberBundleX.h>
 #include <mitkPlanarCircle.h>
 
 
-//#include <itkHistogram.h>
-
-//#include <vtkQtChartWidget.h>
-#include <vtkQtBarChart.h>
-#include <QStandardItemModel>
 #include <qwt_plot.h>
-#include <QPainter>
 #include <qwt_plot_picker.h>
 
 typedef itk::VectorImage<float,3>     VectorImageType;
-
 typedef std::vector< itk::Index<3> > RoiType;
-
 
 typedef itk::Point<float,3>               PointType;
 typedef std::vector< PointType>           TractType;
@@ -50,8 +40,8 @@ typedef std::vector< TractType > TractContainerType;
 
 
 /**
- * \brief Widget for displaying boxplots
- * framework
+ * \brief Plot widget for TBSS Data
+ * This widget can plot regions of interest on TBSS projection data.
  */
 class DIFFUSIONIMAGING_EXPORT QmitkTbssRoiAnalysisWidget : public QmitkPlotWidget
 {
@@ -64,55 +54,57 @@ public:
   QmitkTbssRoiAnalysisWidget( QWidget * parent);
   virtual ~QmitkTbssRoiAnalysisWidget();
 
+
+  /* \brief Set group information */
   void SetGroups(std::vector< std::pair<std::string, int> > groups)
   {
     m_Groups = groups;
   }
 
+  /* \brief Draws the group averaged profiles */
   void DrawProfiles(std::string preprocessed);
 
 
   void PlotFiberBundles(TractContainerType tracts, mitk::Image* img, bool avg=false);
 
 
-  void Boxplots();
-
+  /* \brief Sets the projections of the individual subjects */
   void SetProjections(VectorImageType::Pointer projections)
   {
     m_Projections = projections;
   }
 
+  /* \brief Set the region of interest*/
   void SetRoi(RoiType roi)
   {
     m_Roi = roi;
   }
 
+  /* \brief Set structure information to display in the plot */
   void SetStructure(std::string structure)
   {
     m_Structure = structure;
   }
 
+  /* \brief Set measurement type for display in the plot */
   void SetMeasure(std::string measure)
   {
     m_Measure = measure;
   }
 
-  QwtPlot* GetPlot()
-  {
-    return m_Plot;
-  }
-
-  QwtPlotPicker* m_PlotPicker;
-
-
-
+  /* \brief Draws a bar to indicate were the user clicked in the plot */
   void drawBar(int x);
 
+
+
+  /* \brief Returns the values of the group averaged profiles */
   std::vector <std::vector<double> > GetVals()
   {
     return m_Vals;
   }
 
+
+  /* \brief Returns the values of the individual subjects profiles */
   std::vector <std::vector<double> > GetIndividualProfiles()
   {
     return m_IndividualProfiles;
@@ -146,6 +138,10 @@ public:
   mitk::Point3D GetPositionInWorld(int index);
   void ModifyPlot(int number, bool avg);
 
+
+
+  QwtPlotPicker* m_PlotPicker;
+
 protected:
 
   mitk::FiberBundleX* m_Fib;
@@ -155,8 +151,6 @@ protected:
 
   std::vector< std::vector<double> > m_IndividualProfiles;
   std::vector< double > m_Average;
-
-
 
 
 

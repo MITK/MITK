@@ -40,10 +40,10 @@ namespace mitk
     mitkClassMacro(DisplayInteractor, EventStateMachine)
     itkNewMacro(Self)
     /**
-     * By this function the Observer gets notifier about new events.
+     * By this function the Observer gets notified about new events.
      * Here it is adapted to pass the events to the state machine in order to use
      * its infrastructure.
-     * It also checks if event is to be accepted when i already has been processed by a DataInteractor.
+     * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
      */
     virtual void Notify(InteractionEvent* interactionEvent, bool isHandled);
   protected:

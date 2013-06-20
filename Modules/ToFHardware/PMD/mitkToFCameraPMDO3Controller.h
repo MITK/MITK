@@ -50,6 +50,11 @@ namespace mitk
 
     ~ToFCameraPMDO3Controller();
 
+    /*
+    \brief method that transforms camera input such that it is ordered correctly.
+    */
+    void TransformCameraOutput(float* in, float* out, bool isDist);
+
   private:
 
     char *m_IPAddress; ///< holds the ip adress the O3 camera is connected to

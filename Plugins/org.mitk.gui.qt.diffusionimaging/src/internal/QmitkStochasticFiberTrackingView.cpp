@@ -48,8 +48,8 @@ QmitkStochasticFiberTrackingView::QmitkStochasticFiberTrackingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_DiffusionImage( NULL )
     , m_SeedRoi( NULL )
+    , m_DiffusionImage( NULL )
 {
 }
 
@@ -197,11 +197,11 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
 
     /* init TractographyFilter */
     TrackingFilterType::Pointer trackingFilter = TrackingFilterType::New();
-    trackingFilter->SetInput(m_DiffusionImage->GetVectorImage().GetPointer());
+    trackingFilter->SetPrimaryInput(m_DiffusionImage->GetVectorImage().GetPointer());
     trackingFilter->SetbValues(vecCont);
     trackingFilter->SetGradients(Pdir);
     trackingFilter->SetMeasurementFrame(measurement_frame);
-    trackingFilter->SetWhiteMatterProbabilityImageInput(wmImage);
+    trackingFilter->SetWhiteMatterProbabilityImage(wmImage);
     trackingFilter->SetTotalTracts(m_Controls->m_SeedsPerVoxelSlider->value());
     trackingFilter->SetMaxLikelihoodCacheSize(m_Controls->m_MaxCacheSizeSlider->value()*1000);
     trackingFilter->SetMaxTractLength(m_Controls->m_MaxTractLengthSlider->value());
@@ -215,7 +215,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
 
     itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
-    it.Begin();
+    it.GoToBegin();
     mitk::Geometry3D* geom = m_DiffusionImage->GetGeometry();
 
     while(!it.IsAtEnd())
@@ -227,6 +227,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
             itk::ImageRegionConstIterator< BinaryImageType >::IndexType seedIdx = it.GetIndex();
             trackingFilter->SetSeedIndex(seedIdx);
             trackingFilter->Update();
+
 
             /* get results from Filter */
             /* write each single tract into member container */

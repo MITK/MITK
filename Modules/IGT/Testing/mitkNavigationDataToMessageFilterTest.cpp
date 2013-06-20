@@ -57,7 +57,7 @@ class MessageReceiverClass
 
     void OnTimeStampChanged(mitk::NavigationData::TimeStampType v, unsigned int index)
     {
-      m_ReceivedData[index]->SetTimeStamp(v);
+      m_ReceivedData[index]->SetIGTTimeStamp(v);
       ++m_MessagesReceived;
     }
 
@@ -96,7 +96,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd1->SetPosition(initialPos);
     nd1->SetOrientation(initialOri);
     nd1->SetPositionAccuracy(11.111);
-    nd1->SetTimeStamp(64.46);
+    nd1->SetIGTTimeStamp(64.46);
     nd1->SetDataValid(true);
 
     myFilter->SetInput(nd1);
@@ -119,7 +119,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetPosition(), nd1->GetPosition()), "Testing PositionChanged message");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetOrientation(), nd1->GetOrientation()), "Testing OrientationChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[0]->GetCovErrorMatrix() == nd1->GetCovErrorMatrix(), "Testing ErrorChanged message");
-    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing TimeStampChanged message");
+    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetIGTTimeStamp(), nd1->GetIGTTimeStamp()), "Testing TimeStampChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[0]->IsDataValid() == nd1->IsDataValid(), "Testing PositionChanged message");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 5, "Correct number of messages send?");
 
@@ -132,10 +132,10 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     /* changing two input parameters */
     mitk::FillVector3D(initialPos, 11.0, 21.0, 31.0);
     nd1->SetPosition(initialPos); // change only one parameter
-    nd1->SetTimeStamp(55.55); // change only one parameter
+    nd1->SetIGTTimeStamp(55.55); // change only one parameter
     output->Update(); // re-execute filter
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetPosition(), nd1->GetPosition()), "Testing PositionChanged message");
-    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing TimeStampChanged message");
+    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetIGTTimeStamp(), nd1->GetIGTTimeStamp()), "Testing TimeStampChanged message");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 8, "only necessary messages send?");  // only 2 new messages send
 
     /* try to add a second input */
@@ -159,7 +159,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd0->SetPosition(initialPos);
     nd0->SetOrientation(initialOri);
     nd0->SetPositionAccuracy(11.111);
-    nd0->SetTimeStamp(64.46);
+    nd0->SetIGTTimeStamp(64.46);
     nd0->SetDataValid(true);
 
     mitk::FillVector3D(initialPos, 2.0, 2.0, 2.0);
@@ -168,7 +168,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd1->SetPosition(initialPos);
     nd1->SetOrientation(initialOri2);
     nd1->SetPositionAccuracy(22.222);
-    nd1->SetTimeStamp(222.2);
+    nd1->SetIGTTimeStamp(222.2);
     nd1->SetDataValid(true);
 
     myFilter->SetInput(0, nd0);
@@ -176,9 +176,9 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0)");
     MITK_TEST_CONDITION(myFilter->GetInput(1) == nd1, "testing Set-/GetInput(1)");
 
-    mitk::NavigationData* output0 = myFilter->GetOutput(0);
+    mitk::NavigationData* output0 = myFilter->GetOutput();
     mitk::NavigationData* output1 = myFilter->GetOutput(1);
-    MITK_TEST_CONDITION_REQUIRED(output0 != NULL, "Testing GetOutput(0)");
+    MITK_TEST_CONDITION_REQUIRED(output0 != NULL, "Testing GetOutput()");
     MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput(1)");
 
     /* register message receiver */
@@ -193,12 +193,12 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetPosition(), nd0->GetPosition()), "Testing PositionChanged message");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetOrientation(), nd0->GetOrientation()), "Testing OrientationChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[0]->GetCovErrorMatrix() == nd0->GetCovErrorMatrix(), "Testing ErrorChanged message");
-    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetTimeStamp(), nd0->GetTimeStamp()), "Testing TimeStampChanged message");
+    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[0]->GetIGTTimeStamp(), nd0->GetIGTTimeStamp()), "Testing TimeStampChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[0]->IsDataValid() == nd0->IsDataValid(), "Testing PositionChanged message");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetPosition(), nd1->GetPosition()), "Testing PositionChanged message");
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetOrientation(), nd1->GetOrientation()), "Testing OrientationChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[1]->GetCovErrorMatrix() == nd1->GetCovErrorMatrix(), "Testing ErrorChanged message");
-    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing TimeStampChanged message");
+    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetIGTTimeStamp(), nd1->GetIGTTimeStamp()), "Testing TimeStampChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[1]->IsDataValid() == nd1->IsDataValid(), "Testing PositionChanged message");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 10, "Correct number of messages send?");
     MITK_TEST_OUTPUT( << "answers.m_MessagesReceived = " << answers.m_MessagesReceived);
@@ -210,11 +210,11 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
 
     /* remove one listener and check that message is not send */
     myFilter->RemoveTimeStampChangedListener(mitk::MessageDelegate2<MessageReceiverClass, mitk::NavigationData::TimeStampType, unsigned int>(&answers, &MessageReceiverClass::OnTimeStampChanged));
-    mitk::NavigationData::TimeStampType oldValue = nd1->GetTimeStamp();
-    nd1->SetTimeStamp(999.9);
+    mitk::NavigationData::TimeStampType oldValue = nd1->GetIGTTimeStamp();
+    nd1->SetIGTTimeStamp(999.9);
     myFilter->Update();
-    MITK_TEST_CONDITION( ! mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing if TimeStamp message is _not_ send after RemoveListener (!= new value)");
-    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), oldValue), "Testing if TimeStamp message is _not_ send after RemoveListener (== old value)");
+    MITK_TEST_CONDITION( ! mitk::Equal(answers.m_ReceivedData[1]->GetIGTTimeStamp(), nd1->GetIGTTimeStamp()), "Testing if TimeStamp message is _not_ send after RemoveListener (!= new value)");
+    MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetIGTTimeStamp(), oldValue), "Testing if TimeStamp message is _not_ send after RemoveListener (== old value)");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 11, "no new messages send?");  // no new message send?
     /* other messages are still send? */
     nd1->SetDataValid(false);

@@ -45,6 +45,8 @@ namespace mitk
     inline ToFCameraPMDControllerTest(){};
     inline ~ToFCameraPMDControllerTest(){};
 
+    inline void TransformCameraOutput(float* in, float* out, bool isDist){};
+
   private:
 
   };

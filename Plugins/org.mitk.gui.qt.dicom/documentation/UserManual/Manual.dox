@@ -3,7 +3,7 @@
 
 \image html dcm-icon.png "Icon of Dicom"
 
-\note To this article requires a basic knowlage of DICOM.
+\note This article requires a basic knowledge of DICOM.
 
 Available sections:
   - \ref org_mitk_gui_qt_dicomOverview

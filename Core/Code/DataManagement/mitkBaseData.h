@@ -113,15 +113,6 @@ public:
   }
 
   //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  virtual void UnRegister() const;
-
-  //##Documentation
-  //## @brief for internal use only. Helps to deal with the
-  //## weak-pointer-problem.
-  virtual int GetExternalReferenceCount() const;
-
-  //##Documentation
   //## @brief Update the information for this BaseData (the geometry in particular)
   //## so that it can be used as an output of a BaseProcess.
   //##
@@ -143,7 +134,7 @@ public:
   //##
   //## This forces a filter to produce all of the output in one execution
   //## (i.e. not streaming) on the next call to Update().
-  void SetRequestedRegionToLargestPossibleRegion()=0;
+  virtual void SetRequestedRegionToLargestPossibleRegion()=0;
 
   //##Documentation
   //## @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
@@ -156,7 +147,7 @@ public:
   //## inside the BufferedRegion from the previous execution (and the
   //## current filter is up to date), then a given filter does not need
   //## to re-execute
-  bool RequestedRegionIsOutsideOfTheBufferedRegion()=0;
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion()=0;
 
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
@@ -224,7 +215,7 @@ public:
   //## region of the data object passed in as a parameter.
   //##
   //## This method is implemented in the concrete subclasses of BaseData.
-  void SetRequestedRegion(itk::DataObject *data)=0;
+  virtual void SetRequestedRegion(const itk::DataObject *data)=0;
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
@@ -305,7 +296,7 @@ public:
    * GetSource() returns a SmartPointer and not a WeakPointer
    * because it is assumed the code calling GetSource() wants to hold a
    * long term reference to the source. */
-  itk::SmartPointer<mitk::BaseProcess> GetSource() const;
+  itk::SmartPointer<mitk::BaseDataSource> GetSource() const;
 
   //##Documentation
   //## @brief Get the number of time steps from the Timeslicedgeometry
@@ -322,6 +313,11 @@ public:
   //## @brief Get the modified time of the last change of the contents
   //## this data object or its geometry.
   virtual unsigned long GetMTime() const;
+
+  /**
+   * \sa itk::ProcessObject::Graft
+   */
+  virtual void Graft(const DataObject*);
 
 protected:
   BaseData();
@@ -350,25 +346,11 @@ protected:
   bool m_RequestedRegionInitialized;
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 
-  mutable itk::SmartPointer<mitk::BaseProcess> m_SmartSourcePointer;
   mutable unsigned int m_SourceOutputIndexDuplicate;
-  //##Documentation
-  //## @brief for internal use only. Helps to deal with the
-  //## weak-pointer-problem.
-  virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
 
   bool m_Initialized;
 
 private:
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_Unregistering;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable bool m_CalculatingExternalReferenceCount;
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  mutable int m_ExternalReferenceCount;
 
   //##Documentation
   //## @brief PropertyList, f.e. to hold pic-tags, tracking-data,..
@@ -377,9 +359,6 @@ private:
 
   TimeSlicedGeometry::Pointer m_TimeSlicedGeometry;
 
-  //##Documentation
-  //## @brief Helps to deal with the weak-pointer-problem.
-  friend class mitk::BaseProcess;
 };
 
 } // namespace mitk

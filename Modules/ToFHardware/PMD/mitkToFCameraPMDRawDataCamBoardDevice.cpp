@@ -35,8 +35,8 @@ namespace mitk
     bool ok = Superclass::ConnectCamera();
     if(ok)
     {
-      this->m_OriginControllerHeight = static_cast<ToFCameraPMDCamBoardController*>(m_Controller.GetPointer())->GetInternalCaptureHeight();
-      this->m_OriginControllerWidth = static_cast<ToFCameraPMDCamBoardController*>(m_Controller.GetPointer())->GetInternalCaptureWidth();
+      this->m_OriginControllerHeight = static_cast<ToFCameraPMDCamBoardController*>(m_Controller.GetPointer())->GetCaptureHeight();
+      this->m_OriginControllerWidth = static_cast<ToFCameraPMDCamBoardController*>(m_Controller.GetPointer())->GetCaptureWidth();
       this->m_PixelNumber = m_OriginControllerHeight* m_OriginControllerWidth;
       this->AllocatePixelArrays();
       this->AllocateSourceData();
@@ -72,45 +72,12 @@ namespace mitk
     channel4 = sourceData;
     cvtkChannelArray->InsertTupleValue(3,channel4);
     vtkChannelArray->DeepCopy(cvtkChannelArray);
-    cvtkChannelArray->Delete();
   }
 
   void ToFCameraPMDRawDataCamBoardDevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )
   {
     ToFCameraPMDRawDataDevice::SetProperty(propertyKey,propertyValue);
     this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-
-    ToFCameraPMDCamBoardController::Pointer myController = dynamic_cast<mitk::ToFCameraPMDCamBoardController*>(this->m_Controller.GetPointer());
-
-    bool boolValue = false;
-    GetBoolProperty(propertyKey, boolValue);
-    if (strcmp(propertyKey, "SetFPNCalibration") == 0)
-    {
-      myController->SetFPNCalibration(boolValue);
-    }
-    else if (strcmp(propertyKey, "SetFPPNCalibration") == 0)
-    {
-      myController->SetFPPNCalibration(boolValue);
-    }
-    else if (strcmp(propertyKey, "SetLinearityCalibration") == 0)
-    {
-      myController->SetLinearityCalibration(boolValue);
-    }
-    else if (strcmp(propertyKey, "SetLensCalibration") == 0)
-    {
-      myController->SetLensCalibration(boolValue);
-    }
-    else if (strcmp(propertyKey, "SetExposureMode") == 0)
-    {
-      if (boolValue)
-      {
-        myController->SetExposureMode(1);
-      }
-      else
-      {
-        myController->SetExposureMode(0);
-      }
-    }
   }
 
   void ToFCameraPMDRawDataCamBoardDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)

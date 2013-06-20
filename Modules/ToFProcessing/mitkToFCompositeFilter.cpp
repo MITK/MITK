@@ -108,7 +108,7 @@ void mitk::ToFCompositeFilter::GenerateData()
       outputImage->SetSlice(inputImage->GetSliceData()->GetData());
     }
   }
-  mitk::Image::Pointer outputDistanceImage = this->GetOutput(0);
+  mitk::Image::Pointer outputDistanceImage = this->GetOutput();
   float* outputDistanceFloatData = (float*)outputDistanceImage->GetSliceData(0, 0, 0)->GetData();
 
   mitk::Image::Pointer inputDistanceImage = this->GetInput();
@@ -145,7 +145,7 @@ void mitk::ToFCompositeFilter::GenerateData()
 void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);

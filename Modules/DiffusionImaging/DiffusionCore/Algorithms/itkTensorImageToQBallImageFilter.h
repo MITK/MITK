@@ -83,7 +83,7 @@ namespace itk
     void BeforeThreadedGenerateData( void );
 
     void ThreadedGenerateData( const
-      OutputImageRegionType &outputRegionForThread, int);
+      OutputImageRegionType &outputRegionForThread, ThreadIdType);
 
     //void GenerateData();
 

@@ -39,8 +39,6 @@ public:
   mitkNewMacro1Param(ResliceMethodProperty, const IdType&);
   mitkNewMacro1Param(ResliceMethodProperty, const std::string&);
 
-  Pointer Clone() const;
-
   using BaseProperty::operator=;
 
 protected:

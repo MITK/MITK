@@ -84,7 +84,7 @@ namespace mitk {
     };
 
     /** \brief This member holds all three LocalStorages for the three 2D render windows. */
-    mitk::Mapper::LocalStorageHandler<FBXLocalStorage> m_LSH;
+    mitk::LocalStorageHandler<FBXLocalStorage> m_LSH;
 
 
 

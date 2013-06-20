@@ -48,7 +48,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   //
   // update the 3D spline, if the accoring mapper has not been updated yet
   //
-  if ( mapper3D->GetLastUpdateTime() < GetDataNode()->GetData()->GetMTime() )
+  //if ( mapper3D->GetLastUpdateTime() < GetDataNode()->GetData()->GetMTime() )
     mapper3D->UpdateSpline();
   vtkPolyData* spline3D = NULL;
   if ( mapper3D->SplinesAreAvailable() )

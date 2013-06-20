@@ -216,7 +216,7 @@ mitk::USImage* mitk::USDevice::GetOutput()
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
 
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(0));
+  return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
 
 
@@ -254,13 +254,6 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
   }
   // Call Graft on USImage to copy member data
   output->Graft( graft );
-}
-
-
-itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /*idx */)
-{
-  mitk::USImage::Pointer p = mitk::USImage::New();
-  return static_cast<itk::DataObject*>(p.GetPointer());
 }
 
 bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){

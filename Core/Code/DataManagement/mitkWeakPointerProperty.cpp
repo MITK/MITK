@@ -73,12 +73,6 @@ void mitk::WeakPointerProperty::SetValue(const ValueType &value)
   SetWeakPointer(value.GetPointer());
 }
 
-mitk::WeakPointerProperty::Pointer mitk::WeakPointerProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::WeakPointerProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

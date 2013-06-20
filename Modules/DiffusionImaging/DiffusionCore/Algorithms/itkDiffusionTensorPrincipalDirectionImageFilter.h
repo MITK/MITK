@@ -1,5 +1,4 @@
 /*===================================================================
-/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -80,7 +79,7 @@ public:
     void PrintSelf(std::ostream& os, Indent indent) const;
 
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int );
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType );
     void AfterThreadedGenerateData();
 
 private:

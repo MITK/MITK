@@ -55,138 +55,138 @@ class QTimer;
 */
 class QmitkToFUtilView : public QmitkAbstractView, public mitk::IZombieViewPart
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
-    Q_OBJECT
+  // this is needed for all Qt objects that should have a Qt meta-object
+  // (everything that derives from QObject and wants to have signal/slots)
+  Q_OBJECT
 
 public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    QmitkToFUtilView();
-    ~QmitkToFUtilView();
+  QmitkToFUtilView();
+  ~QmitkToFUtilView();
 
 
-    virtual void CreateQtPartControl(QWidget *parent);
-    /// \brief Called when the functionality is activated.
-    virtual void Activated();
-    /// \brief Called when the functionality is deactivated. In this case the zombie view of this functionality becomes active!
-    virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView);
+  virtual void CreateQtPartControl(QWidget *parent);
+  /// \brief Called when the functionality is activated.
+  virtual void Activated();
+  /// \brief Called when the functionality is deactivated. In this case the zombie view of this functionality becomes active!
+  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView);
 
-    virtual void Deactivated();
-    virtual void Visible();
-    virtual void Hidden();
+  virtual void Deactivated();
+  virtual void Visible();
+  virtual void Hidden();
 
-    void SetFocus();
+  void SetFocus();
 
 protected slots:
 
-    /*!
+  /*!
     \brief Slot triggered from the timer to update the images and visualization
     */
-    void OnUpdateCamera();
-    /*!
+  void OnUpdateCamera();
+  /*!
     \brief Slot called when the "Connect" button of the ConnectionWidget is pressed
     */
-    void OnToFCameraConnected();
-    /*!
+  void OnToFCameraConnected();
+  /*!
     \brief Slot called when the "Disconnect" button of the ConnectionWidget is pressed
     */
-    void OnToFCameraDisconnected();
-    /*!
+  void OnToFCameraDisconnected();
+  /*!
     \brief Slot called when the camera selection in the ConnectionWidget has changed
     */
-    void OnToFCameraSelected(const QString selected);
-    /*!
+  void OnToFCameraSelected(const QString selected);
+  /*!
     \brief Slot called when the "Start" button of the RecorderWidget is pressed
     */
-    void OnToFCameraStarted();
-    /*!
+  void OnToFCameraStarted();
+  /*!
     \brief Slot called when the "Stop" button of the RecorderWidget is pressed
     */
-    void OnToFCameraStopped();
-    /*!
+  void OnToFCameraStopped();
+  /*!
     \brief Slot invoked when the texture checkbox is checked. Enables the scalar visibility of the surface
     */
-    /**
+  /**
      * @brief OnSurfaceCheckboxChecked Slot beeing called, if the "surface"-checkbox is clicked. This method initializes the surface once, if it is necessary.
      * @param checked Is it checked or not?
      */
-    void OnSurfaceCheckboxChecked(bool checked);
+  void OnSurfaceCheckboxChecked(bool checked);
 
-    void OnTextureCheckBoxChecked(bool checked);
-    /*!
+  void OnTextureCheckBoxChecked(bool checked);
+  /*!
     \brief Slot invoked when the video texture checkbox is checked. Enables the texture of the surface
     */
-    void OnKinectRGBTextureCheckBoxChecked(bool checked);
-    /*!
+  void OnKinectRGBTextureCheckBoxChecked(bool checked);
+  /*!
     \brief Slot invoked when user alters the coronal window input from RGB to Intensity or vice versa.
     */
-    void OnChangeCoronalWindowOutput(int index);
-    /*!
+  void OnChangeCoronalWindowOutput(int index);
+  /*!
     \brief Slot invoked when acquisition mode of Kinect is changed
     */
-    void OnKinectAcquisitionModeChanged();
+  void OnKinectAcquisitionModeChanged();
 
 protected:
 
-    /*!
+  /*!
     \brief initialize the visibility settings of ToF data (images + surface)
     \param useToF true: distance image: widget1, amplitude image: widget 2, intensity image: widget 3; false: standard
     */
-    void UseToFVisibilitySettings(bool useToF);
+  void UseToFVisibilitySettings(bool useToF);
 
-    Ui::QmitkToFUtilViewControls* m_Controls;
+  Ui::QmitkToFUtilViewControls* m_Controls;
 
-    QmitkStdMultiWidget* m_MultiWidget;
+  QmitkStdMultiWidget* m_MultiWidget;
 
-    QTimer* m_Frametimer; ///< Timer used to continuously update the images
+  QTimer* m_Frametimer; ///< Timer used to continuously update the images
 
-    QString m_SelectedCamera; ///< String holding the selected camera
+  QString m_SelectedCamera; ///< String holding the selected camera
 
-    mitk::Image::Pointer m_MitkDistanceImage; ///< member holding a pointer to the distance image of the selected camera
-    mitk::Image::Pointer m_MitkAmplitudeImage; ///< member holding a pointer to the amplitude image of the selected camera
-    mitk::Image::Pointer m_MitkIntensityImage; ///< member holding a pointer to the intensity image of the selected camera
-    mitk::Surface::Pointer m_Surface; ///< member holding a pointer to the surface generated from the distance image of the selected camera
+  mitk::Image::Pointer m_MitkDistanceImage; ///< member holding a pointer to the distance image of the selected camera
+  mitk::Image::Pointer m_MitkAmplitudeImage; ///< member holding a pointer to the amplitude image of the selected camera
+  mitk::Image::Pointer m_MitkIntensityImage; ///< member holding a pointer to the intensity image of the selected camera
+  mitk::Surface::Pointer m_Surface; ///< member holding a pointer to the surface generated from the distance image of the selected camera
 
-    mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode holding the distance image of the selected camera
-    mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode holding the amplitude image of the selected camera
-    mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode holding the intensity image of the selected camera
-    mitk::DataNode::Pointer m_RGBImageNode; ///< DataNode holding the rgb image of the selected camera
-    mitk::DataNode::Pointer m_SurfaceNode; ///< DataNode holding the surface generated from the distanc image of the selected camera
+  mitk::DataNode::Pointer m_DistanceImageNode; ///< DataNode holding the distance image of the selected camera
+  mitk::DataNode::Pointer m_AmplitudeImageNode; ///< DataNode holding the amplitude image of the selected camera
+  mitk::DataNode::Pointer m_IntensityImageNode; ///< DataNode holding the intensity image of the selected camera
+  mitk::DataNode::Pointer m_RGBImageNode; ///< DataNode holding the rgb image of the selected camera
+  mitk::DataNode::Pointer m_SurfaceNode; ///< DataNode holding the surface generated from the distanc image of the selected camera
 
-    // ToF processing and recording filter
-    mitk::ToFImageRecorder::Pointer m_ToFImageRecorder; ///< ToF image recorder used for lossless recording of ToF image data
-    mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< Source of a ToF image processing pipeline. Provides pointers to distance, amplitude and intensity image
-    mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
-    mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
+  // ToF processing and recording filter
+  mitk::ToFImageRecorder::Pointer m_ToFImageRecorder; ///< ToF image recorder used for lossless recording of ToF image data
+  mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< Source of a ToF image processing pipeline. Provides pointers to distance, amplitude and intensity image
+  mitk::ToFDistanceImageToSurfaceFilter::Pointer m_ToFDistanceImageToSurfaceFilter; ///< Filter for calculating a surface representation from a given distance image
+  mitk::ToFCompositeFilter::Pointer m_ToFCompositeFilter; ///< Filter combining several processing steps (thresholding, Median filtering, Bilateral filtering)
 
-    int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
-    // members for calculating the frame rate
-    mitk::RealTimeClock::Pointer m_RealTimeClock; ///< real time clock used to calculate the display framerate
-    int m_StepsForFramerate; ///< number of steps used for calculating the display framerate
-    double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
-    double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
+  int m_2DDisplayCount; ///< member used to determine whether frame rate output should be shown
+  // members for calculating the frame rate
+  mitk::RealTimeClock::Pointer m_RealTimeClock; ///< real time clock used to calculate the display framerate
+  int m_StepsForFramerate; ///< number of steps used for calculating the display framerate
+  double m_2DTimeBefore; ///< holds the time stamp at the beginning of the display framerate measurement
+  double m_2DTimeAfter; ///< holds the time stamp at the end of the display framerate measurement
 
-    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< member holding the intrinsic parameters of the camera
+  mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< member holding the intrinsic parameters of the camera
 private:
 
-    /*!
+  /*!
     \brief helper method to replace data of the specified node. If node does not exist it will be created
     \param nodeName Name of the node
     \param data Data object to be replaced
     \return returns the node
     */
-    mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
+  mitk::DataNode::Pointer ReplaceNodeData(std::string nodeName, mitk::BaseData* data);
 
-    void ProcessVideoTransform();
+  void ProcessVideoTransform();
 
-    /*!
+  /*!
       \brief Reset all GUI related things to default. E.g. show sagittal and coronal slices in the renderwindows.
       */
-    void ResetGUIToDefault();
+  void ResetGUIToDefault();
 
-    mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
+  mitk::ToFSurfaceVtkMapper3D::Pointer m_ToFSurfaceVtkMapper3D;
 };
 
 #endif // _QMITKTOFUTILVIEW_H_INCLUDED

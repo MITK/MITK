@@ -76,25 +76,26 @@ else
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateTrackingDeviceSource()
 {
-mitk::NavigationDataObjectVisualizationFilter::Pointer dummy;
+mitk::NavigationDataObjectVisualizationFilter::Pointer dummy; //this dummy is lost directly after creating the device
 return this->CreateTrackingDeviceSource(dummy);
 }
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateTrackingDeviceSource(mitk::NavigationDataObjectVisualizationFilter::Pointer &visualizationFilter)
 {
-  if (!this->IsCreateTrackingDeviceSourcePossible()) return NULL;
+  if (!this->IsCreateTrackingDeviceSourcePossible()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
+
   mitk::TrackingDeviceSource::Pointer returnValue;
 
   //create tracking device source
   if (m_TrackingDevice->GetType()==mitk::NDIAurora) {returnValue = CreateNDIAuroraTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
   else if (m_TrackingDevice->GetType()==mitk::NDIPolaris) {returnValue = CreateNDIPolarisTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
   else if (m_TrackingDevice->GetType()==mitk::ClaronMicron) {returnValue = CreateMicronTrackerTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
-    //TODO: insert other tracking systems?
-  if (returnValue.IsNull()) return NULL;
+  //TODO: insert other tracking systems?
+  if (returnValue.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
 
   //create visualization filter
   visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools);
-  if (visualizationFilter.IsNull()) return NULL;
+  if (visualizationFilter.IsNull()) {MITK_WARN << "Cannot create tracking decive: " << m_ErrorMessage; return NULL;}
 
   return returnValue;
 }
@@ -131,6 +132,7 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNDIAuroraTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
   {
+  MITK_DEBUG << "Creating Aurora tracking device.";
   mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
   mitk::NDITrackingDevice::Pointer thisDevice = dynamic_cast<mitk::NDITrackingDevice*>(trackingDevice.GetPointer());
 
@@ -186,6 +188,8 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
       navigationTools->AddTool(newToolStorageInRightOrder->GetTool(i));
       }
   returnValue->SetTrackingDevice(thisDevice);
+  MITK_DEBUG << "Number of tools of created tracking device: " << thisDevice->GetToolCount();
+  MITK_DEBUG << "Number of outputs of created source: " << returnValue->GetNumberOfOutputs();
   return returnValue;
   }
 
@@ -215,7 +219,7 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools)
   {
   mitk::NavigationDataObjectVisualizationFilter::Pointer returnValue = mitk::NavigationDataObjectVisualizationFilter::New();
-  for (int i=0; i<trackingDeviceSource->GetNumberOfOutputs(); i++)
+  for (int i=0; i<trackingDeviceSource->GetNumberOfIndexedOutputs(); i++)
     {
     mitk::NavigationTool::Pointer currentTool = navigationTools->GetToolByName(trackingDeviceSource->GetOutput(i)->GetName());
     if (currentTool.IsNull())

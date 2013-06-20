@@ -48,8 +48,6 @@ class MitkExt_EXPORT OrganTypeProperty : public EnumerationProperty
     mitkNewMacro1Param(OrganTypeProperty, const IdType&);
     mitkNewMacro1Param(OrganTypeProperty, const std::string&);
 
-    Pointer Clone() const;
-
     using BaseProperty::operator=;
 
   protected:

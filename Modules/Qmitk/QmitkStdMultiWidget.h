@@ -151,6 +151,8 @@ protected:
 
   void HideAllWidgetToolbars();
 
+  mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
+
 public slots:
 
   /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update

@@ -49,7 +49,7 @@ namespace mitk
     virtual bool IsEmptyTimeStep(unsigned int t) const;
     virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual void SetRequestedRegion(itk::DataObject *data);
+    virtual void SetRequestedRegion(const itk::DataObject *data);
     virtual void SetRequestedRegion(Surface::RegionType *region);
     virtual void SetRequestedRegionToLargestPossibleRegion();
     virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);

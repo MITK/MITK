@@ -85,7 +85,7 @@ namespace mitk {
 
 
     /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
     /** \brief Get the LocalStorage corresponding to the current renderer. */
     LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);

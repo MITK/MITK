@@ -86,6 +86,8 @@ protected:
    */
   LabeledImageLookupTable();
 
+  LabeledImageLookupTable(const LabeledImageLookupTable& other);
+
   /**
    * Virtual destructor
    */
@@ -104,6 +106,10 @@ protected:
 
 
   mitk::LevelWindow m_LevelWindow;
+
+private:
+
+  itk::LightObject::Pointer InternalClone() const;
 };
 
 }

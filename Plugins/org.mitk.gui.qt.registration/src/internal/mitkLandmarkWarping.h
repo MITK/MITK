@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKLANDMARKWARPING_H
 #define MITKLANDMARKWARPING_H
 
-#include "itkDeformationFieldSource.h"
+#include "itkLandmarkDisplacementFieldSource.h"
 #include "itkWarpImageFilter.h"
 #include "itkCommand.h"
 #include "mitkProgressBar.h"
@@ -42,7 +42,7 @@ namespace mitk
     typedef   unsigned char  PixelType;
     typedef   itk::Image< PixelType, Dimension >                                                   FixedImageType;
     typedef   itk::Image< PixelType, Dimension >                                                   MovingImageType;
-    typedef   itk::DeformationFieldSource< DeformationFieldType >                                  DeformationSourceType;
+    typedef   itk::LandmarkDisplacementFieldSource< DeformationFieldType >                                  DeformationSourceType;
     typedef   DeformationSourceType::LandmarkContainerPointer                                      LandmarkContainerPointer;
     typedef   DeformationSourceType::LandmarkContainer                                             LandmarkContainerType;
     typedef   DeformationSourceType::LandmarkPointType                                             LandmarkPointType;

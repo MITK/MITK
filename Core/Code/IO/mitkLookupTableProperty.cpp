@@ -73,12 +73,6 @@ void mitk::LookupTableProperty::SetValue(const ValueType & value)
   SetLookupTable(value);
 }
 
-mitk::LookupTableProperty::Pointer mitk::LookupTableProperty::Clone() const
-{
-  Pointer result = static_cast<Self*>(this->InternalClone().GetPointer());
-  return result;
-}
-
 itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const
 {
   itk::LightObject::Pointer result(new Self(*this));

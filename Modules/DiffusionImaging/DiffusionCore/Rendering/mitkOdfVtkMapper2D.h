@@ -135,7 +135,7 @@ private:
     std::vector< vtkSmartPointer<vtkClipPolyData> >  m_Clippers2;
     vtkImageData*                   m_VtkImage ;
     OdfDisplayGeometry              m_LastDisplayGeometry;
-    mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
 };
 
 } // namespace mitk

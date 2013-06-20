@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkDistanceMapFilter.h"
 
-#include "mitkProgressBar.h"
 #include <itkSignedMaurerDistanceMapImageFilter.h>
 
 
@@ -44,11 +43,6 @@ namespace itk
   template< class TInputImage, class TOutputImage >
   void DistanceMapFilter<TInputImage, TOutputImage>::GenerateData()
   {
-    //----------------------------------------------------------------------//
-    //  Progress bar                                                        //
-    //----------------------------------------------------------------------//
-    //mitk::ProgressBar::GetInstance()->AddStepsToDo( 3 );
-
 
 
     typedef itk::SignedMaurerDistanceMapImageFilter<InputImageType, OutputImageType> DistanceFilterType;

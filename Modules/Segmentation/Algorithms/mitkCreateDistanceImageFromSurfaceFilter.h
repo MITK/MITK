@@ -90,6 +90,10 @@ namespace mitk {
 
     typedef std::vector<Surface::Pointer> SurfaceList;
 
+    typedef itk::Image<double, 3> DistanceImageType;
+    typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
+    typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
+
     mitkClassMacro(CreateDistanceImageFromSurfaceFilter,ImageSource);
     itkNewMacro(Self);
 
@@ -166,6 +170,9 @@ namespace mitk {
                           DistanceImageType::PointType &maxPointInWorldCoordinates,
                           DistanceImageType::IndexType &minPointInIndexCoordinates,
                           DistanceImageType::IndexType &maxPointInIndexCoordinates );
+
+
+    void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
 
     //Datastructures for the interpolation
     CenterList m_Centers;

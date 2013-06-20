@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.properties"
+          name="Properties"
+          class="QmitkPropertyTreeView"
+          icon="resources/icon.png" />
+  </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.PropertiesPreferencePage" name="Properties" class="QmitkPropertiesPreferencePage" />
+  </extension>
+</plugin>

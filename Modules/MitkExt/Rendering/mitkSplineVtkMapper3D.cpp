@@ -63,10 +63,11 @@ void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer
 
 void mitk::SplineVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
   // only update spline if UpdateSpline has not been called from
   // external, e.g. by the SplineMapper2D. But call it the first time when m_SplineUpdateTime = 0 and m_LastUpdateTime = 0.
-  if ( m_SplineUpdateTime < m_LastUpdateTime || m_SplineUpdateTime == 0)
+  if ( m_SplineUpdateTime < ls->GetLastGenerateDataTime() || m_SplineUpdateTime == 0)
   {
     this->UpdateSpline();
     this->ApplyAllProperties(renderer, m_SplinesActor);
@@ -161,10 +162,6 @@ vtkActor* mitk::SplineVtkMapper3D::GetSplinesActor()
     return vtkActor::New();
 }
 
-unsigned long mitk::SplineVtkMapper3D::GetLastUpdateTime() const
-{
-  return m_LastUpdateTime.GetMTime();
-}
 
 void mitk::SplineVtkMapper3D::UpdateSpline()
 {

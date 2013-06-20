@@ -32,6 +32,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="m_Project">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Skeletonize and Project</string>
      </property>

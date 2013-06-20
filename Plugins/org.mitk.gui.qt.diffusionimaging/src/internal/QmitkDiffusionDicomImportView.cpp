@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
-#include "mitkGroupDiffusionHeadersFilter.h"
 #include "mitkDicomDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
@@ -542,7 +541,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         if(m_OutputFolderNameSet) logfile << "Nno files in acquisitions, ABORTING \n";
         continue;
       }
-
       if(nfiles % nTotalAcquis != 0)
       {
         Error("Number of files per acquisition differs between series, ABORTING");
@@ -560,7 +558,9 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(m_OutputFolderNameSet) logfile << "Reading Headers "<< folderName.toStdString() << "\n";
 
       mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
-      mitk::GroupDiffusionHeadersFilter::InputType inHeaders;
+      typedef short PixelValueType;
+      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+      VolumesReader::HeaderContainer inHeaders;
       unsigned int size2 = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size2 ; ++i )
       {
@@ -579,7 +579,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           if(m_OutputFolderNameSet) logfile << e;
           continue;
         }
-
         //Status(std::endl;
       }
       mitk::ProgressBar::GetInstance()->Progress();
@@ -596,8 +595,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       PrintMemoryUsage();
       if(m_OutputFolderNameSet) logfile << "Loading volumes\n";
       Status(QString("Loading Volumes %1").arg(folderName));
-      typedef short PixelValueType;
-      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+
       VolumesReader::Pointer vReader = VolumesReader::New();
       VolumesReader::HeaderContainer hc = inHeaders;
 
@@ -647,7 +645,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         diffImage->SetVectorImage(vecImage);
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
-        diffImage->UpdateBValueList();
+        diffImage->UpdateBValueMap();
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 

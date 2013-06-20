@@ -211,6 +211,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
+  MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
 
   //First check if the created object is valid
   if (m_TrackingDeviceSource.IsNull())
@@ -497,6 +498,8 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
+  MITK_DEBUG << "Number of outputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedOutputs();
+  MITK_DEBUG << "Number of inputs ToolVisualizationFilter: " << m_ToolVisualizationFilter->GetNumberOfIndexedInputs();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   if (m_logging)
     {

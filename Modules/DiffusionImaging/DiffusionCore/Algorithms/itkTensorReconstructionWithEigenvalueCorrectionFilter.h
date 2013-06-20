@@ -148,6 +148,7 @@ namespace itk
 
     itkSetMacro( BValue, TTensorPixelType);
     itkSetMacro( B0Threshold, float);
+    itkSetMacro (Flagstatus, int);
 
     itkGetMacro(PseudoInverse, vnl_matrix<double>);
     itkGetMacro(H, vnl_matrix<double>);
@@ -232,6 +233,7 @@ namespace itk
     vnl_vector<double> m_BVec;
     vnl_vector<short> m_B0Mask;
     vnl_vector<double> m_Voxdim;
+    int  m_Flagstatus;
 
     typename GradientImagesType::Pointer m_GradientImagePointer;
 

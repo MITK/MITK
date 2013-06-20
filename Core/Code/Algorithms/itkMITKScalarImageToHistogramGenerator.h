@@ -18,16 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkMITKScalarImageToHistogramGenerator_h
 
 
-#include "itkScalarImageToListAdaptor.h"
-#include "itkListSampleToHistogramGenerator.h"
-#include "itkObject.h"
+#include <itkImageToListSampleAdaptor.h>
+#include <itkSampleToHistogramFilter.h>
+#include <itkObject.h>
 
 
 namespace itk {
 namespace Statistics {
 
-template< class TImageType, class TMeasurementType =
-           ITK_TYPENAME TImageType::PixelType>
+template <class TImageType, class TMeasurementType = typename TImageType::PixelType>
 class MITKScalarImageToHistogramGenerator : public Object
 {
 public:
@@ -43,23 +42,18 @@ public:
   /** standard New() method support */
   itkNewMacro(Self);
 
-  typedef TImageType                                      ImageType;
-  typedef itk::Statistics::ScalarImageToListAdaptor<
-                                              ImageType
-                                                      >   AdaptorType;
-  typedef typename AdaptorType::Pointer                   AdaptorPointer;
-  typedef typename ImageType::PixelType                   PixelType;
+  typedef TImageType ImageType;
+  typedef itk::Statistics::ImageToListSampleAdaptor<ImageType> AdaptorType;
+  typedef typename AdaptorType::Pointer AdaptorPointer;
+  typedef typename ImageType::PixelType PixelType;
 
-  typedef itk::Statistics::ListSampleToHistogramGenerator<
-                                                AdaptorType,
-                                                TMeasurementType
-                                                          > GeneratorType;
+  typedef itk::Statistics::Histogram<TMeasurementType, itk::Statistics::DenseFrequencyContainer2> HistogramType;
+  typedef itk::Statistics::SampleToHistogramFilter<AdaptorType, HistogramType> GeneratorType;
 
-  typedef typename GeneratorType::Pointer                   GeneratorPointer;
+  typedef typename GeneratorType::Pointer GeneratorPointer;
 
-  typedef typename GeneratorType::HistogramType             HistogramType;
-  typedef typename HistogramType::Pointer                   HistogramPointer;
-  typedef typename HistogramType::ConstPointer              HistogramConstPointer;
+  typedef typename HistogramType::Pointer HistogramPointer;
+  typedef typename HistogramType::ConstPointer HistogramConstPointer;
 
 public:
 

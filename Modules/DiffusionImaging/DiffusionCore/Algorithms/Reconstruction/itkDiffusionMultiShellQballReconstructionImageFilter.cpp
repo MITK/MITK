@@ -575,7 +575,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
 template< class T, class TG, class TO, int L, int NODF>
 void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int /*NumberOfThreads*/)
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType /*NumberOfThreads*/)
 {
 
   itk::TimeProbe clock;
@@ -601,7 +601,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::StandardOneShellReconstruction(const OutputImageRegionType& outputRegionForThread)
 {
   // Get output image pointer
-  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetPrimaryOutput());
   // Get input gradient image pointer
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
@@ -711,7 +711,7 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NODF>
 {
   // Input Gradient Image and Output ODF Image
   typedef typename GradientImagesType::PixelType         GradientVectorType;
-  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetOutput(0));
+  typename OdfImageType::Pointer outputImage = static_cast< OdfImageType * >(ProcessObject::GetPrimaryOutput());
   typename GradientImagesType::Pointer gradientImagePointer = static_cast< GradientImagesType * >( ProcessObject::GetInput(0) );
 
   // Define Image iterators

@@ -41,4 +41,5 @@ MITK_CREATE_MODULE( FiberTracking
 
 if(MODULE_IS_ENABLED)
   add_subdirectory(Testing)
+  add_subdirectory(MiniApps)
 endif()

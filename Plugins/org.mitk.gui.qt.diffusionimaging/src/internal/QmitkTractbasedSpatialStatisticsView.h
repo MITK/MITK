@@ -18,18 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkTractbasedSpatialStatisticsView_h
 
 
-#include <berryISelectionListener.h>
-#include <berryIPartListener.h>
-#include <berryIStructuredSelection.h>
-
-
 #include <QmitkFunctionality.h>
 
 #include "ui_QmitkTractbasedSpatialStatisticsViewControls.h"
 #include <QListWidgetItem>
-
-#include <mitkDiffusionImage.h>
-#include <string>
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
@@ -46,16 +38,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundleX.h>
 
 
+// Image types
 typedef short DiffusionPixelType;
 typedef itk::Image<char, 3> CharImageType;
 typedef itk::Image<unsigned char, 3> UCharImageType;
 typedef itk::Image<float, 4> Float4DImageType;
 typedef itk::Image<float, 3> FloatImageType;
-typedef itk::Vector<int, 3> IntVectorType;
-//typedef itk::VectorImage<int, 3> DirectionImageType;
 typedef itk::VectorImage<float, 3> VectorImageType;
 
-
+// Readers/Writers
 typedef itk::ImageFileReader< CharImageType > CharReaderType;
 typedef itk::ImageFileReader< UCharImageType > UCharReaderType;
 typedef itk::ImageFileWriter< CharImageType > CharWriterType;
@@ -65,28 +56,16 @@ typedef itk::ImageFileReader< Float4DImageType > Float4DReaderType;
 typedef itk::ImageFileWriter< Float4DImageType > Float4DWriterType;
 
 
-struct TbssSelListener;
-
-
 
 /*!
-  \brief QmitkTractbasedSpatialStatisticsView
-
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-  \sa QmitkFunctionalitymitkTbssWorkspaceManager
-  \ingroup Functionalities
+  * \brief This plugin provides an extension for Tract-based spatial statistics (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024)
+  * TBSS enables analyzing the brain by a pipeline of registration, skeletonization, and projection that results in a white matter skeleton
+  * for all subjects that are analyzed statistically. This plugin provides functionality to select single tracts and analyze them seperately.
 */
+
 class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 {
 
-
-  friend struct TbssSelListener;
-
-
-
-  // this is needed for all Qt objesetupUicts that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
@@ -112,36 +91,27 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
   protected slots:
 
-
-    //void OutputValues();
-
-
-
-   // void InitializeGridByVectorImage();
-
-    void Masking();
-
-
-
+    // Creates Roi
     void CreateRoi();
-
-
-    void Clustering();
-
-    void AdjustPlotMeasure(const QString & text);
 
     void Clicked(const QwtDoublePoint& pos);
 
+    // Import of FSL TBSS data
     void TbssImport();
 
-
+    // Add a group as metadata. This metadata is required by the plotting functionality
     void AddGroup();
+
+    // Remove a group
     void RemoveGroup();
 
+    // Copies the values displayed in the plot widget to clipboard, i.e. exports the data
     void CopyToClipboard();
 
+    // Method to cut away parts of fiber bundles that should not be plotted.
     void Cut();
 
+    // Adjust plot widget
     void PerformChange();
 
 
@@ -151,111 +121,46 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
+    // Creates a plot using a 4D image containing the projections of all subjects and a region of interest
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
+
 
     void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
 
+
+    // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();
 
-    void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-    berry::ISelectionListener::Pointer m_SelListener;
-    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-    bool m_IsInitialized;
-
+    // Pointset and DataNode to contain the PointSet used in ROI creation
     mitk::PointSet::Pointer m_PointSetNode;
     mitk::DataNode::Pointer m_P1;
 
+    // GUI widgets
     Ui::QmitkTractbasedSpatialStatisticsViewControls* m_Controls;
 
+    /* A pointer to the QmitkStdMultiWidget. Used for interaction with the plot widget
+    (clicking in the plot widget makes the image cross jump to the corresponding location
+    on the skeleton).*/
     QmitkStdMultiWidget* m_MultiWidget;
 
-
-    std::vector<CharImageType::IndexType> SortPoints(CharImageType::Pointer roi, CharImageType::IndexType currentPoint);
-
-    bool PointVisited(std::vector<CharImageType::IndexType> points, CharImageType::IndexType point);
-
-    // Modifies the current point by reference and returns true if no more points need to be visited
-    CharImageType::IndexType FindNextPoint(std::vector<CharImageType::IndexType> pointsVisited,
-      CharImageType::IndexType currentPoint, CharImageType::Pointer roi, bool &ready);
-
-
-
-
-    //void DoInitializeGridByVectorImage(FloatVectorImageType::Pointer vectorpic, CharImageType::Pointer roi ,std::string name);
-
-
-
-    // Tokenizer needed for the roi files
-    void Tokenize(const std::string& str,
-                  std::vector<std::string>& tokens,
-                  const std::string& delimiters = " ")
-    {
-      // Skip delimiters at beginning.
-      std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-      // Find first "non-delimiter".
-      std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
-
-      while (std::string::npos != pos || std::string::npos != lastPos)
-      {
-          // Found a token, add it to the vector.
-          tokens.push_back(str.substr(lastPos, pos - lastPos));
-          // Skip delimiters.  Note the "not_of"
-          lastPos = str.find_first_not_of(delimiters, pos);
-          // Find next "non-delimiter"
-          pos = str.find_first_of(delimiters, lastPos);
-      }
-    }
-
-    mitk::DataNode::Pointer readNode(std::string f)
-    {
-      mitk::DataNode::Pointer node;
-      mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-      try
-      {
-        nodeReader->SetFileName(f);
-        nodeReader->Update();
-        node = nodeReader->GetOutput();
-      }
-      catch(...) {
-        MITK_ERROR << "Could not read file";
-        return NULL;
-      }
-
-      return node;
-    }
-
-    /*template < typename TPixel, unsigned int VImageDimension >
-    void ToITK4D( itk::Image<TPixel, VImageDimension>* inputImage, Float4DImageType::Pointer& outputImage );*/
-
-
-    std::string ReadFile(std::string whatfile);
-
+    // Used to save the region of interest in a vector of itk::index.
     std::vector< itk::Index<3> > m_Roi;
 
     mitk::FiberBundleX* m_Fib;
 
-    std::string m_CurrentStructure;
-
     mitk::Geometry3D* m_CurrentGeometry;
 
+    // A table model for saving group information in a name,number pair.
     QmitkTbssTableModel* m_GroupModel;
 
-
-
+    // Convenience function for adding a new image to the datastorage and giving it a name.
     void AddTbssToDataStorage(mitk::Image* image, std::string name);
-
-    mitk::TbssImage::Pointer m_CurrentTbssMetaImage;
-
-    VectorImageType::Pointer ConvertToVectorImage(mitk::Image::Pointer mitkImg);
-
 
     mitk::DataNode::Pointer m_CurrentFiberNode; // needed for the index property when interacting with the plot widget
 
-    mitk::DataNode::Pointer m_CurrentStartRoi; // needed when a plot should only show values between a start end end roi
-    mitk::DataNode::Pointer m_CurrentEndRoi; // idem dito
-
+    // needed when a plot should only show values between a start end end roi
+    mitk::DataNode::Pointer m_CurrentStartRoi;
+    mitk::DataNode::Pointer m_CurrentEndRoi;
 
 };
 

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkMapper.h"
 #include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
+#include "mitkLocalStorageHandler.h"
 
 #include <vtkActor.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCollection.h>
+
 
 namespace mitk {
 
@@ -151,7 +153,7 @@ public:
       }
   };
 
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);

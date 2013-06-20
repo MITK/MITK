@@ -21,15 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionSignalModel.h>
 #include <mitkDiffusionNoiseModel.h>
 #include <mitkKspaceArtifact.h>
-#include <mitkGibbsRingingArtifact.h>
-#include <mitkSignalDecay.h>
 
 // ITK
 #include <itkImage.h>
 #include <itkVectorImage.h>
 #include <itkImageSource.h>
-#include <itkFFTRealToComplexConjugateImageFilter.h>
-#include <itkFFTComplexConjugateToRealImageFilter.h>
+#include <itkVnlForwardFFTImageFilter.h>
+#include <itkVnlInverseFFTImageFilter.h>
 
 #include <cmath>
 
@@ -60,7 +58,7 @@ public:
     typedef itk::Matrix<double, 3, 3>                       MatrixType;
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
     typedef itk::Image< double, 2 >                         SliceType;
-    typedef itk::FFTRealToComplexConjugateImageFilter< double, 2 >::OutputImageType ComplexSliceType;
+    typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType ComplexSliceType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -78,12 +76,24 @@ public:
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
     itkSetMacro( NumberOfRepetitions, unsigned int )    ///< number of acquisition repetitions to reduce noise (default is no additional repetition)
     itkSetMacro( TissueMask, ItkUcharImgType::Pointer ) ///< voxels outside of this binary mask contain only noise (are treated as air)
-    itkGetMacro( KspaceImage, ItkDoubleImgType::Pointer )
     void SetNoiseModel(NoiseModelType* noiseModel){ m_NoiseModel = noiseModel; }            ///< generates the noise added to the image values
     void SetFiberModels(DiffusionModelList modelList){ m_FiberModels = modelList; }         ///< generate signal of fiber compartments
     void SetNonFiberModels(DiffusionModelList modelList){ m_NonFiberModels = modelList; }   ///< generate signal of non-fiber compartments
     void SetKspaceArtifacts(KspaceArtifactList artifactList){ m_KspaceArtifacts = artifactList; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
+    itkSetMacro( FrequencyMap, ItkDoubleImgType::Pointer )
+    itkSetMacro( kOffset, double )
+    itkSetMacro( tLine, double )
+    itkSetMacro( tInhom, double )
+    itkSetMacro( TE, double )
+    itkSetMacro( UseInterpolation, bool )
+    itkSetMacro( SimulateEddyCurrents, bool )
+    itkSetMacro( SimulateRelaxation, bool )
+    itkSetMacro( EddyGradientStrength, double )
+    itkSetMacro( Upsampling, double )
+
+    // output
+    std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
 
     void GenerateData();
 
@@ -97,18 +107,23 @@ protected:
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
-    std::vector< DoubleDwiType::Pointer > AddKspaceArtifacts(std::vector< DoubleDwiType::Pointer >& images);
+    DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
     TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    mitk::Vector3D                      m_Spacing;              ///< output image spacing
-    mitk::Vector3D                      m_UpsampledSpacing;
+    itk::Vector<double>                 m_Spacing;              ///< output image spacing
+    itk::Vector<double>                 m_UpsampledSpacing;
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;
     ItkUcharImgType::Pointer            m_TissueMask;           ///< voxels outside of this binary mask contain only noise (are treated as air)
+    ItkDoubleImgType::Pointer           m_FrequencyMap;         ///< map of the B0 inhomogeneities
+    double                              m_kOffset;
+    double                              m_tLine;
+    double                              m_TE;
+    double                              m_tInhom;
     FiberBundleType                     m_FiberBundle;          ///< input fiber bundle
     DiffusionModelList                  m_FiberModels;          ///< generate signal of fiber compartments
     DiffusionModelList                  m_NonFiberModels;       ///< generate signal of non-fiber compartments
@@ -116,14 +131,18 @@ protected:
     NoiseModelType*                     m_NoiseModel;           ///< generates the noise added to the image values
     bool                                m_CircleDummy;
     unsigned int                        m_VolumeAccuracy;
-    ItkDoubleImgType::Pointer           m_KspaceImage;
-    unsigned int                        m_Upsampling;
+    double                              m_Upsampling;           ///< causes ringing artifacts
     unsigned int                        m_NumberOfRepetitions;
     bool                                m_EnforcePureFiberVoxels;
     double                              m_InterpolationShrink;
     double                              m_FiberRadius;
     double                              m_SignalScale;
     mitk::LevelWindow                   m_LevelWindow;
+    bool                                m_UseInterpolation;
+    std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;  ///< one double image for each compartment containing the corresponding volume fraction per voxel
+    bool                                m_SimulateRelaxation;
+    bool                                m_SimulateEddyCurrents;
+    double                              m_EddyGradientStrength;
 };
 }
 

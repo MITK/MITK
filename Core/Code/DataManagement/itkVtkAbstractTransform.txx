@@ -22,7 +22,6 @@ namespace itk {
 
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
-  Superclass(3, 0),
   m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL),
   m_LastVtkAbstractTransformTimeStamp(0)
 {
@@ -99,7 +98,7 @@ TransformVector(const InputVectorType &vect) const
   vnl_vector<TScalarType> vnl_vec;
   float vtkpt[3]={0,0,0};
   float vtkvec[3];
-  mitk::vnl2vtk<TScalarType, float>(vect.Get_vnl_vector(), vtkvec);
+  mitk::vnl2vtk<TScalarType, float>(vect.GetVnlVector(), vtkvec);
   m_VtkAbstractTransform->TransformVectorAtPoint(vtkpt, vtkvec, vtkvec);
   mitk::vtk2itk(vtkvec, outputvector);
   return outputvector;
@@ -222,6 +221,30 @@ itk::VtkAbstractTransform<TScalarType>::GetMTime() const
   }
 
   return Superclass::GetMTime();
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::SetParameters(const ParametersType&)
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::SetFixedParameters(const ParametersType&)
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::ComputeJacobianWithRespectToParameters(const InputPointType&, JacobianType&) const
+{
+  // TODO
+}
+
+template <class TScalarType>
+void itk::VtkAbstractTransform<TScalarType>::ComputeJacobianWithRespectToPosition(const InputPointType&, JacobianType&) const
+{
+  // TODO
 }
 
 } // namespace itk

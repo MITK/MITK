@@ -23,12 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 
-#if ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR == 18 && ITK_VERSION_PATCH == 0
-  #include <mitkItkNonUniformBSpline.h>  // fixed version of a class that is defect in ITK 3.18
-#else
-  #include <itkNonUniformBSpline.h>
-#endif
+//#if ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR == 18 && ITK_VERSION_PATCH == 0
+//  #include <mitkItkNonUniformBSpline.h>  // fixed version of a class that is defect in ITK 3.18
+//#else
+//  #include <itkNonUniformBSpline.h>
+//#endif
 
+#include <mitkItkNonUniformBSpline.h>
 
 namespace mitk {
 

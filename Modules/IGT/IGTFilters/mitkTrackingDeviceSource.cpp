@@ -53,7 +53,7 @@ void mitk::TrackingDeviceSource::GenerateData()
   if (m_TrackingDevice->GetToolCount() < 1)
     return;
 
-  if (this->GetNumberOfOutputs() != m_TrackingDevice->GetToolCount()) // mismatch between tools and outputs. What should we do? Were tools added to the tracking device after SetTrackingDevice() was called?
+  if (this->GetNumberOfIndexedOutputs() != m_TrackingDevice->GetToolCount()) // mismatch between tools and outputs. What should we do? Were tools added to the tracking device after SetTrackingDevice() was called?
   {
     //check this: TODO:
     ////this might happen if a tool is plugged into an aurora during tracking.
@@ -89,7 +89,7 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());
-    nd->SetTimeStamp( mitk::IGTTimeStamp::GetInstance()->GetElapsed() );
+    nd->SetIGTTimeStamp( mitk::IGTTimeStamp::GetInstance()->GetElapsed() );
   }
 }
 
@@ -120,8 +120,10 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
   if (m_TrackingDevice.IsNull())
     return;
 
-  this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
-  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
+  this->SetNumberOfIndexedOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
+  unsigned int numberOfOutputs = this->GetNumberOfIndexedOutputs();
+  MITK_DEBUG << "Number of tools at start of method CreateOutputs(): " << m_TrackingDevice->GetToolCount();
+  MITK_DEBUG << "Number of outputs at start of method CreateOutputs(): " << numberOfOutputs;
   for (unsigned int idx = 0; idx < numberOfOutputs; ++idx)
   {
     if (this->GetOutput(idx) == NULL)
@@ -181,7 +183,7 @@ void mitk::TrackingDeviceSource::StopTracking()
 
 void mitk::TrackingDeviceSource::UpdateOutputInformation()
 {
-  if(this->GetTrackingDevice()->GetToolCount() != this->GetNumberOfOutputs())
+  if(this->GetTrackingDevice()->GetToolCount() != this->GetNumberOfIndexedOutputs())
     this->CreateOutputs();
 
   this->Modified();  // make sure that we need to be updated

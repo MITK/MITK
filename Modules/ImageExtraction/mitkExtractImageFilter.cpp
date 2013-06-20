@@ -48,7 +48,7 @@ void mitk::ExtractImageFilter::GenerateData()
    }
    else if (input->GetDimension() == 4)
    {
-     ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
      timeSelector->SetInput( input );
      timeSelector->SetTimeNr( m_TimeStep );
      timeSelector->UpdateLargestPossibleRegion();
@@ -116,6 +116,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   typedef itk::ExtractImageFilter<ImageType3D, ImageType2D> ExtractImageFilterType;
 
   typename ExtractImageFilterType::Pointer sliceExtractor = ExtractImageFilterType::New();
+  sliceExtractor->SetDirectionCollapseToSubmatrix();
   sliceExtractor->SetInput( itkImage );
 
   inSliceRegion.SetIndex( m_SliceDimension, m_SliceIndex );

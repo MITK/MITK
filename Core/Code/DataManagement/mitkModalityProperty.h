@@ -43,8 +43,6 @@ class MITK_CORE_EXPORT ModalityProperty : public EnumerationProperty
     mitkNewMacro1Param(ModalityProperty, const IdType&);
     mitkNewMacro1Param(ModalityProperty, const std::string&);
 
-    Pointer Clone() const;
-
     using BaseProperty::operator=;
 
   protected:

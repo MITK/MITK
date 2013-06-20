@@ -27,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::TbssImage::TbssImage()
-  : m_IsMeta(false),
-  m_ContainsGradient(false),
-  m_ContainsMeanSkeleton(false),
-  m_ContainsSkeletonMask(false)
 {
 
 }

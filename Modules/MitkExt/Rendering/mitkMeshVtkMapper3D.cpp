@@ -48,14 +48,14 @@ vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform =
-    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+      this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   m_SpheresActor->SetUserTransform(vtktransform);
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
 mitk::MeshVtkMapper3D::MeshVtkMapper3D()
-: m_PropAssembly(NULL)
+  : m_PropAssembly(NULL)
 {
   m_Spheres = vtkAppendPolyData::New();
   m_Contour = vtkPolyData::New();
@@ -90,99 +90,108 @@ mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
 void mitk::MeshVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
 
-  m_PropAssembly->VisibilityOn();
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
 
-  if(m_PropAssembly->GetParts()->IsItemPresent(m_SpheresActor))
-    m_PropAssembly->RemovePart(m_SpheresActor);
-  if(m_PropAssembly->GetParts()->IsItemPresent(m_ContourActor))
-    m_PropAssembly->RemovePart(m_ContourActor);
-
-  m_Spheres->RemoveAllInputs();
-  m_Contour->Initialize();
-
-  mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
-  input->Update();
-
-  mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( this->GetTimestep() );
-
-  if ( itkMesh.GetPointer() == NULL)
+  if(needGenerateData)
   {
-    m_PropAssembly->VisibilityOff();
-    return;
-  }
+    ls->UpdateGenerateDataTime();
 
+    m_PropAssembly->VisibilityOn();
 
-  mitk::Mesh::PointsContainer::Iterator i;
+    if(m_PropAssembly->GetParts()->IsItemPresent(m_SpheresActor))
+      m_PropAssembly->RemovePart(m_SpheresActor);
+    if(m_PropAssembly->GetParts()->IsItemPresent(m_ContourActor))
+      m_PropAssembly->RemovePart(m_ContourActor);
 
-  int j;
+    m_Spheres->RemoveAllInputs();
+    m_Contour->Initialize();
 
-  float floatRgba[4] = {1.0f,1.0f,1.0f,1.0f};
-  vtkFloatingPointType doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
-  mitk::Color tmpColor;
+    mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
+    input->Update();
 
-  // check for color prop and use it for rendering if it exists
-  m_DataNode->GetColor(floatRgba, NULL);
+    mitk::Mesh::DataType::Pointer itkMesh = input->GetMesh( this->GetTimestep() );
 
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetProperty("unselectedcolor")) != NULL)
-  {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor"))->GetValue();
-    floatRgba[0] = tmpColor[0];
-    floatRgba[1] = tmpColor[1];
-    floatRgba[2] = tmpColor[2];
-    floatRgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
-    doubleRgba[0] = floatRgba[0];
-    doubleRgba[1] = floatRgba[1];
-    doubleRgba[2] = floatRgba[2];
-    doubleRgba[3] = floatRgba[3];
-  }
-
-  if(itkMesh->GetNumberOfPoints()>0)
-  {
-    // build m_Spheres->GetOutput() vtkPolyData
-    float pointSize = 2.0;
-    mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
-    if (pointSizeProp.IsNotNull())
-      pointSize = pointSizeProp->GetValue();
-
-    for (j=0, i=itkMesh->GetPoints()->Begin(); i!=itkMesh->GetPoints()->End() ; i++,j++)
+    if ( itkMesh.GetPointer() == NULL)
     {
-      vtkSphereSource *sphere = vtkSphereSource::New();
-
-      sphere->SetRadius(pointSize);
-      sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
-
-      m_Spheres->AddInput(sphere->GetOutput());
-      sphere->Delete();
+      m_PropAssembly->VisibilityOff();
+      return;
     }
 
-    // setup mapper, actor and add to assembly
-    m_SpheresMapper->SetInput(m_Spheres->GetOutput());
-    m_SpheresActor->GetProperty()->SetColor(doubleRgba);
-    m_PropAssembly->AddPart(m_SpheresActor);
-  }
 
-  if(itkMesh->GetNumberOfCells()>0)
-  {
-    // build m_Contour vtkPolyData
+    mitk::Mesh::PointsContainer::Iterator i;
+
+    int j;
+
+    float floatRgba[4] = {1.0f,1.0f,1.0f,1.0f};
+    vtkFloatingPointType doubleRgba[4]={1.0f,1.0f,1.0f,1.0f};
+    mitk::Color tmpColor;
+
+    // check for color prop and use it for rendering if it exists
+    m_DataNode->GetColor(floatRgba, NULL);
+
+    if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetProperty("unselectedcolor")) != NULL)
+    {
+      tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor"))->GetValue();
+      floatRgba[0] = tmpColor[0];
+      floatRgba[1] = tmpColor[1];
+      floatRgba[2] = tmpColor[2];
+      floatRgba[3] = 1.0f; //!!define a new ColorProp to be able to pass alpha value
+      doubleRgba[0] = floatRgba[0];
+      doubleRgba[1] = floatRgba[1];
+      doubleRgba[2] = floatRgba[2];
+      doubleRgba[3] = floatRgba[3];
+    }
+
+    if(itkMesh->GetNumberOfPoints()>0)
+    {
+      // build m_Spheres->GetOutput() vtkPolyData
+      float pointSize = 2.0;
+      mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
+      if (pointSizeProp.IsNotNull())
+        pointSize = pointSizeProp->GetValue();
+
+      for (j=0, i=itkMesh->GetPoints()->Begin(); i!=itkMesh->GetPoints()->End() ; i++,j++)
+      {
+        vtkSphereSource *sphere = vtkSphereSource::New();
+
+        sphere->SetRadius(pointSize);
+        sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
+
+        m_Spheres->AddInput(sphere->GetOutput());
+        sphere->Delete();
+      }
+
+      // setup mapper, actor and add to assembly
+      m_SpheresMapper->SetInput(m_Spheres->GetOutput());
+      m_SpheresActor->GetProperty()->SetColor(doubleRgba);
+      m_PropAssembly->AddPart(m_SpheresActor);
+    }
+
+    if(itkMesh->GetNumberOfCells()>0)
+    {
+      // build m_Contour vtkPolyData
 #ifdef VCL_VC60
-    itkExceptionMacro(<<"MeshVtkMapper3D currently not working for MS Visual C++ 6.0, because MeshUtils are currently not supported.");
+      itkExceptionMacro(<<"MeshVtkMapper3D currently not working for MS Visual C++ 6.0, because MeshUtils are currently not supported.");
 #else
-    m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(itkMesh.GetPointer(), false, false, 0, NULL, m_Contour);
+      m_Contour = MeshUtil<mitk::Mesh::MeshType>::MeshToPolyData(itkMesh.GetPointer(), false, false, 0, NULL, m_Contour);
 #endif
 
-    if(m_Contour->GetNumberOfCells()>0)
-    {
-      // setup mapper, actor and add to assembly
-      m_ContourMapper->SetInput(m_Contour);
-      bool wireframe=true;
-      GetDataNode()->GetVisibility(wireframe, NULL, "wireframe");
-      if(wireframe)
-        m_ContourActor->GetProperty()->SetRepresentationToWireframe();
-      else
-        m_ContourActor->GetProperty()->SetRepresentationToSurface();
-      m_ContourActor->GetProperty()->SetColor(doubleRgba);
-      m_PropAssembly->AddPart(m_ContourActor);
+      if(m_Contour->GetNumberOfCells()>0)
+      {
+        // setup mapper, actor and add to assembly
+        m_ContourMapper->SetInput(m_Contour);
+        bool wireframe=true;
+        GetDataNode()->GetVisibility(wireframe, NULL, "wireframe");
+        if(wireframe)
+          m_ContourActor->GetProperty()->SetRepresentationToWireframe();
+        else
+          m_ContourActor->GetProperty()->SetRepresentationToSurface();
+        m_ContourActor->GetProperty()->SetColor(doubleRgba);
+        m_PropAssembly->AddPart(m_ContourActor);
+      }
     }
+
   }
 
   SetVtkMapperImmediateModeRendering(m_ContourMapper);

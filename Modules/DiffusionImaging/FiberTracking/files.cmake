@@ -1,6 +1,8 @@
 set(CPP_FILES
 
-# DataStructures -> FiberBundleX
+  MiniApps/ctkCommandLineParser.h
+
+  # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
@@ -24,8 +26,6 @@ set(CPP_FILES
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
-  # Algorithms
-  Algorithms/mitkTractAnalyzer.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp
@@ -37,6 +37,8 @@ set(CPP_FILES
 )
 
 set(H_FILES
+  MiniApps/ctkCommandLineParser.h
+
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
@@ -62,6 +64,11 @@ set(H_FILES
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkKspaceImageFilter.h
+  Algorithms/itkDftImageFilter.h
+  Algorithms/itkAddArtifactsToDwiImageFilter.h
+  Algorithms/itkFieldmapGeneratorFilter.h
+  Algorithms/itkEvaluateDirectionImagesFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h
@@ -86,8 +93,6 @@ set(H_FILES
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
-  SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkSignalDecay.h
 )
 
 set(RESOURCE_FILES

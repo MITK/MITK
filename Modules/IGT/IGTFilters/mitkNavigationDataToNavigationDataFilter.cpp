@@ -20,6 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataToNavigationDataFilter::NavigationDataToNavigationDataFilter()
 : mitk::NavigationDataSource()
 {
+mitk::NavigationData::Pointer output = mitk::NavigationData::New();
+this->SetNumberOfRequiredOutputs(1);
+this->SetNthOutput(0, output.GetPointer());
 }
 
 
@@ -36,11 +39,10 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( const NavigationData*
 
 void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, const NavigationData* nd )
 {
-  if ((nd == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
-    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  if ( nd == NULL ) // if an input is set to NULL, remove it
+    this->RemoveInput(idx);
   else
-    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // Process object is not const-correct so the const_cast is required here
-
+    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // ProcessObject is not const-correct so a const_cast is required here
   this->CreateOutputsForAllInputs();
 }
 
@@ -75,7 +77,7 @@ const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput
 
 itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigationDataFilter::GetInputIndex( std::string navDataName )
 {
-  DataObjectPointerArray& outputs = this->GetInputs();
+  DataObjectPointerArray outputs = this->GetInputs();
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
     if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
       return i;
@@ -85,11 +87,11 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigat
 
 void mitk::NavigationDataToNavigationDataFilter::CreateOutputsForAllInputs()
 {
-  this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());  // create outputs for all inputs
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
-      DataObjectPointer newOutput = this->MakeOutput(idx);
+      mitk::NavigationData::Pointer newOutput = mitk::NavigationData::New();
       this->SetNthOutput(idx, newOutput);
     }
     this->Modified();

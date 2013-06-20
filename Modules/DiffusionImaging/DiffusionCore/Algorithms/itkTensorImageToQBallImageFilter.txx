@@ -62,7 +62,7 @@ namespace itk
   template <class TInputScalarType, class TOutputScalarType>
   void
     TensorImageToQBallImageFilter<TInputScalarType, TOutputScalarType>
-    ::ThreadedGenerateData ( const OutputImageRegionType &outputRegionForThread, int threadId )
+    ::ThreadedGenerateData (const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId )
   {
 
     typedef ImageRegionIterator<OutputImageType>      IteratorOutputType;
@@ -72,7 +72,7 @@ namespace itk
     unsigned long step = numPixels/100;
     unsigned long progress = 0;
 
-    IteratorOutputType itOut (this->GetOutput(0), outputRegionForThread);
+    IteratorOutputType itOut (this->GetOutput(), outputRegionForThread);
     IteratorInputType  itIn (this->GetInput(), outputRegionForThread);
 
     if( threadId==0 )

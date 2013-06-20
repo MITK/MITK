@@ -3,7 +3,7 @@ if(APPLE)
   # versions are not able to find it.
   cmake_minimum_required(VERSION 2.8.8)
 else()
-  cmake_minimum_required(VERSION 2.8.4)
+  cmake_minimum_required(VERSION 2.8.5)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -196,6 +196,14 @@ if(MITK_USE_QT)
   find_package(Qt4 4.6.2 REQUIRED)
 endif()
 
+if(MITK_USE_SOFA)
+  set(SOFA_CMAKE_VERSION 2.8.8)
+  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION} OR APPLE)
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
+  endif()
+endif()
+
 
 # Customize the default pixel types for multiplex macros
 
@@ -334,9 +342,8 @@ include(mitkMacroGetLinuxDistribution)
 find_package(ITK REQUIRED)
 find_package(VTK REQUIRED)
 
-if(ITK_USE_SYSTEM_GDCM)
-  find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
-endif()
+find_package(GDCM PATHS ${ITK_GDCM_DIR} REQUIRED)
+include(${GDCM_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
@@ -725,7 +732,7 @@ endif()
 # Construct a list of paths containing runtime directories
 # for MITK applications on Windows
 set(MITK_RUNTIME_PATH
-    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
+    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_DIR}/bin/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
     )
 
 if(QT4_FOUND)

@@ -48,8 +48,6 @@ public:
 
   mitkNewMacro1Param(GridVolumeMapperProperty, const std::string&);
 
-  Pointer Clone() const;
-
   /**
    * Sets the mapper to projected tetrahedra.
    */

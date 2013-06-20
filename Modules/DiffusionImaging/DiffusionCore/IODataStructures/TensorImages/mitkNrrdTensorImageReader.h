@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTensorImage.h"
 #include "mitkTensorImageSource.h"
 #include "itkVectorImage.h"
+#include "itkDiffusionTensor3D.h"
 
 namespace mitk
 {
@@ -63,6 +64,7 @@ namespace mitk
 
   private:
     void operator=(const Self&); //purposely not implemented
+    itk::DiffusionTensor3D<float> ConvertMatrixTypeToFixedArrayType(const itk::DiffusionTensor3D<float>::Superclass::MatrixType & matrix);
   };
 
 } //namespace MITK

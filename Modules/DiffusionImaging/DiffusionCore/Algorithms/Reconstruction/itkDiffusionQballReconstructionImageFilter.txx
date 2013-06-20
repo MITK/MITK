@@ -221,11 +221,11 @@ namespace itk {
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int )
+    ThreadIdType )
   {
     // init output and b-zero iterators
     typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+      static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
     ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);

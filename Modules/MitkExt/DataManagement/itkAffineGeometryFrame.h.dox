@@ -11,8 +11,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -24,11 +24,11 @@
 #include "itkScalableAffineTransform.h"
 #include "itkBoundingBox.h"
 
-namespace itk 
+namespace itk
 {
 
  /** \class AffineGeometryFrame
-  * \brief Describes the geometry of a data object  
+  * \brief Describes the geometry of a data object
   */
 template <class TScalarType = double, unsigned int NDimensions = 3>
 class AffineGeometryFrame : public itk::Object
@@ -52,15 +52,15 @@ public:
 
   /** \brief Get the bounding box */
   itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
-  
+
   const BoundsArrayType GetBounds() const
     {
     assert(m_BoundingBox.IsNotNull());
     return m_BoundingBox->GetBounds();
     }
 
-  /** \brief Set the bounding box Only possible via the BoundsArray 
-   * to make clear that a copy of the bounding-box is stored, 
+  /** \brief Set the bounding box Only possible via the BoundsArray
+   * to make clear that a copy of the bounding-box is stored,
    * not a reference to it.*/
   virtual void SetBounds(const BoundsArrayType& bounds);
 
@@ -77,7 +77,7 @@ public:
   itkGetConstObjectMacro(IndexToObjectTransform, TransformType);
   itkGetObjectMacro(IndexToObjectTransform, TransformType);
   itkSetObjectMacro(IndexToObjectTransform, TransformType);
-  
+
   /** \brief Set/Get the ObjectToNodeTransform */
   itkGetConstObjectMacro(ObjectToNodeTransform, TransformType);
   itkGetObjectMacro(ObjectToNodeTransform, TransformType);
@@ -89,15 +89,12 @@ public:
   itkSetObjectMacro(IndexToWorldTransform, TransformType);
 
 
-  /** \brief Get the IndexToNodeTransform 
+  /** \brief Get the IndexToNodeTransform
    *  This Transform cannot be set, and is just computed internally */
   itkGetConstObjectMacro(IndexToNodeTransform, TransformType);
-  
+
   /** \brief Initialize the geometry frame */
   virtual void Initialize();
-
-  /** Clone the geometry frame */
-  virtual Pointer Clone() const;
 
 protected:
 
@@ -106,7 +103,7 @@ protected:
 
   /** \brief used in clone to initialize the newly created geometry */
   virtual void InitializeGeometry(Self * newGeometry) const;
-  void SetBoundsArray(const BoundsArrayType& bounds, 
+  void SetBoundsArray(const BoundsArrayType& bounds,
                       BoundingBoxPointer& boundingBox);
   mutable BoundingBoxPointer m_BoundingBox;
 
@@ -115,7 +112,7 @@ protected:
   typename TransformType::Pointer m_ObjectToNodeTransform;
   typename TransformType::Pointer m_IndexToNodeTransform;
   typename TransformType::Pointer m_IndexToWorldTransform;
-  
+
 private:
   AffineGeometryFrame(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented

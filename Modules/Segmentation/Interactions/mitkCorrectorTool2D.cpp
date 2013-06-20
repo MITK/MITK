@@ -53,7 +53,7 @@ const char** mitk::CorrectorTool2D::GetXPM() const
 
 std::string mitk::CorrectorTool2D::GetIconPath() const
 {
-  return ":/Segmentation/Correction_48x48";
+  return ":/Segmentation/Correction_48x48.png";
 }
 
 const char* mitk::CorrectorTool2D::GetName() const

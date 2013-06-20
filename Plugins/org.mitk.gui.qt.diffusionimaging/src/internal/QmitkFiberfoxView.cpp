@@ -583,7 +583,7 @@ void QmitkFiberfoxView::SaveParameters()
     parameters.put("fiberfox.image.outputvolumefractions", m_Controls->m_VolumeFractionsBox->isChecked());
 
     parameters.put("fiberfox.image.artifacts.addnoise", m_Controls->m_AddNoise->isChecked());
-    parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_VarianceBox->value());
+    parameters.put("fiberfox.image.artifacts.noisevariance", m_Controls->m_NoiseLevel->value());
     parameters.put("fiberfox.image.artifacts.addghost", m_Controls->m_AddGhosts->isChecked());
     parameters.put("fiberfox.image.artifacts.kspaceLineOffset", m_Controls->m_kOffsetBox->value());
     parameters.put("fiberfox.image.artifacts.distortions", m_Controls->m_AddDistortions->isChecked());
@@ -709,7 +709,7 @@ void QmitkFiberfoxView::LoadParameters()
             m_Controls->m_VolumeFractionsBox->setChecked(v1.second.get<bool>("outputvolumefractions"));
 
             m_Controls->m_AddNoise->setChecked(v1.second.get<bool>("artifacts.addnoise"));
-            m_Controls->m_VarianceBox->setValue(v1.second.get<double>("artifacts.noisevariance"));
+            m_Controls->m_NoiseLevel->setValue(v1.second.get<double>("artifacts.noisevariance"));
             m_Controls->m_AddGhosts->setChecked(v1.second.get<bool>("artifacts.addghost"));
             m_Controls->m_kOffsetBox->setValue(v1.second.get<double>("artifacts.kspaceLineOffset"));
             m_Controls->m_AddDistortions->setChecked(v1.second.get<bool>("artifacts.distortions"));

@@ -5,5 +5,6 @@
      <file>MorphologicalOperations_48x48.png</file>
      <file>utilities_surface2image.png</file>
      <file>SegmentationUtilities_48x48.png</file>
+     <file>CTKWidgets_48x48.png</file>
   </qresource>
 </RCC>

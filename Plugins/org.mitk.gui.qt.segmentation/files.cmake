@@ -22,6 +22,7 @@ set(INTERNAL_CPP_FILES
   SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.cpp
   SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.cpp
+  SegmentationUtilities/CTKWidgets/QmitkCTKWidgetsWidget.cpp
 )
 
 set(UI_FILES
@@ -59,6 +60,7 @@ set(MOC_H_FILES
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidget.h
   src/internal/SegmentationUtilities/SurfaceToImage/QmitkSurfaceToImageWidget.h
+  src/internal/SegmentationUtilities/CTKWidgets/QmitkCTKWidgetsWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -240,6 +240,12 @@ namespace mitk
     */
     int GetNumberOfVertices( int timestep=0);
 
+    /** \brief Returns whether the contour model is empty at a given timestep.
+
+    \pararm timestep - default = 0
+    */
+    bool IsEmpty( int timestep=0);
+
     /** \brief Returns the vertex at the index position within the container.
     */
     virtual const VertexType* GetVertexAt(int index, int timestep=0) const;
@@ -398,7 +404,6 @@ namespace mitk
 
     //Shift a vertex
     void ShiftVertex(VertexType* vertex, mitk::Vector3D &vector);
-
 
     //Storage with time resolved support.
     ContourModelSeries m_ContourSeries;

@@ -105,11 +105,12 @@ namespace itk
     double w3;
     double costs = 0.0;
 
-    // if we are on the mask, leave asap
+    // if we are on the mask, return asap
     if (m_UseRepulsivePoints)
     {
-        if (this->m_MaskImage->GetPixel(p2) != 0)
-            return 255;
+        if ( (this->m_MaskImage->GetPixel(p1) != 0) ||
+             (this->m_MaskImage->GetPixel(p2) != 0) )
+        return 255;
     }
 
     unsigned long xMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[0];

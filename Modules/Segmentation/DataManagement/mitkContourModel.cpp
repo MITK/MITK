@@ -122,6 +122,15 @@ void mitk::ContourModel::InsertVertexAtIndex(mitk::Point3D &vertex, int index, b
 }
 
 
+bool mitk::ContourModel::IsEmpty( int timestep)
+{
+  if(!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->IsEmpty();
+  }
+  return true;
+}
+
 
 int mitk::ContourModel::GetNumberOfVertices( int timestep)
 {

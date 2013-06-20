@@ -38,9 +38,7 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
 {
-
 }
-
 
 mitk::ImageLiveWireContourModelFilter::OutputType* mitk::ImageLiveWireContourModelFilter::GetOutput()
 {
@@ -68,8 +66,6 @@ void mitk::ImageLiveWireContourModelFilter::SetInput ( unsigned int idx, const m
   }
 }
 
-
-
 const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireContourModelFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
@@ -77,14 +73,12 @@ const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireConto
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
-
 const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireContourModelFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
-
 
 void mitk::ImageLiveWireContourModelFilter::GenerateData()
 {

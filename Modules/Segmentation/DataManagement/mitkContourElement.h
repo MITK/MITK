@@ -156,6 +156,10 @@ namespace mitk
     */
     VertexListType* GetVertexList();
 
+    /** \brief Returns whether the contour element is empty.
+    */
+    bool IsEmpty();
+
     /** \brief Returns if the conour is closed or not.
     */
     virtual bool IsClosed();

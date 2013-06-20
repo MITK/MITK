@@ -152,6 +152,9 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
     mitk::ContourModel *liveWireContour = this->m_LiveWireFilter->GetOutput();
     assert ( liveWireContour );
 
+    if ( liveWireContour->IsEmpty(timestep) )
+        return false;
+
     liveWireContour->RemoveVertexAt( 0, timestep);
     liveWireContour->RemoveVertexAt( liveWireContour->GetNumberOfVertices(timestep) - 1, timestep);
 
@@ -188,9 +191,10 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   this->m_LiveWireFilter->SetStartPoint( this->m_NextActiveVertexDown );
   this->m_LiveWireFilter->SetEndPoint( currentPosition );
 
+  // remove void positions from the last portion of the contour that was modified, i.e. between
+  // previous active vertex and next active vertex.
   if (!m_ContourBeingModified.empty())
   {
-      // remove void positions from the last portion of the contour that was modified
       std::vector< itk::Index< 2 > >::const_iterator msIter = m_ContourBeingModified.begin();
       for (;msIter != m_ContourBeingModified.end(); msIter++)
       {
@@ -198,16 +202,17 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
       }
   }
 
-  // update to get the left livewire. Remember that the rest of the contour is already
+  // update to get the left livewire. Remember that the points in the rest of the contour are already
   // set as void positions in the filter
   this->m_LiveWireFilter->Update();
 
   mitk::ContourModel::Pointer leftLiveWire = this->m_LiveWireFilter->GetOutput();
   assert ( leftLiveWire );
 
-  leftLiveWire->RemoveVertexAt(0, timestep);
+  if ( !leftLiveWire->IsEmpty(timestep) )
+    leftLiveWire->RemoveVertexAt(0, timestep);
 
-  // now the container has to be emty
+  // at this point the container has to be empty
   m_ContourBeingModified.clear();
 
    // add points from already calculated left live wire contour
@@ -232,9 +237,11 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
   assert ( rightLiveWire );
 
-  rightLiveWire->RemoveVertexAt(0, timestep);
+  if ( !rightLiveWire->IsEmpty(timestep) )
+    rightLiveWire->RemoveVertexAt(0, timestep);
 
-  leftLiveWire->SetControlVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
+  if ( !leftLiveWire->IsEmpty(timestep) )
+    leftLiveWire->SetControlVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
   //leftLiveWire->SelectVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
 
   // set corrected left live wire to its node

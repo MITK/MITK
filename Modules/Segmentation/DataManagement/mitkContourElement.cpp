@@ -84,6 +84,10 @@ mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(int index)
   return this->m_Vertices->at(index);
 }
 
+bool mitk::ContourElement::IsEmpty()
+{
+  return this->m_Vertices->empty();
+}
 
 
 mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(const mitk::Point3D &point, float eps)

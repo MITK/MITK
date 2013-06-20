@@ -26,6 +26,7 @@ set(CPP_FILES
   Algorithms/mitkImageToContourModelFilter.cpp
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
+  Algorithms/mitkOtsuSegmentationFilter.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkSurfaceInterpolationController.cpp
   # DataManagement/mitkApplyDiffImageOperation.cpp
@@ -51,6 +52,7 @@ set(CPP_FILES
   Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
+  Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkRegionGrow3DTool.cpp
   Interactions/mitkRegionGrowingTool.cpp

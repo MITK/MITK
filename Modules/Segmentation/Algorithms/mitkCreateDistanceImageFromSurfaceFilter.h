@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/algo/vnl_qr.h"
 
-#include "itkImage.h"
+#include "itkImageBase.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkNeighborhoodIterator.h"
 
@@ -76,6 +76,10 @@ namespace mitk {
   public:
 
     typedef vnl_vector_fixed<double,3> PointType;
+
+    typedef itk::Image<double, 3> DistanceImageType;
+    //typedef DistanceImageType::PointType PointType;
+    typedef DistanceImageType::IndexType IndexType;
 
     typedef std::vector< PointType > NormalList;
     typedef std::vector< PointType > CenterList;
@@ -127,6 +131,9 @@ namespace mitk {
     */
     void SetProgressStepSize(unsigned int stepSize);
 
+    void SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage );
+
+
   protected:
     CreateDistanceImageFromSurfaceFilter();
     virtual ~CreateDistanceImageFromSurfaceFilter();
@@ -141,6 +148,25 @@ namespace mitk {
 
     void CreateDistanceImage ();
 
+    /**
+    * \brief This method fills the given variables with the minimum and
+    * maximum coordinates that contain all input-points in index- and
+    * world-coordinates.
+    *
+    * This method iterates over all input-points and transforms them from
+    * world-coordinates to index-coordinates using the transform of the
+    * reference-Image.
+    * Next, the minimal and maximal index-coordinates are determined that
+    * span an area that contains all given input-points.
+    * These index-coordinates are then transformed back to world-coordinates.
+    *
+    * These minimal and maximal points are then set to the given variables.
+    */
+    void DetermineBounds( DistanceImageType::PointType &minPointInWorldCoordinates,
+                          DistanceImageType::PointType &maxPointInWorldCoordinates,
+                          DistanceImageType::IndexType &minPointInIndexCoordinates,
+                          DistanceImageType::IndexType &maxPointInIndexCoordinates );
+
     //Datastructures for the interpolation
     CenterList m_Centers;
     NormalList m_Normals;
@@ -148,6 +174,8 @@ namespace mitk {
     InterpolationWeights m_Weights;
     SolutionMatrix m_SolutionMatrix;
     double m_DistanceImageSpacing;
+
+    itk::ImageBase<3>::Pointer m_ReferenceImage;
 
     unsigned int m_DistanceImageVolume;
 

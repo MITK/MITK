@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 struct paramContainer
 {
-  paramContainer::paramContainer( unsigned int numThresholds, mitk::Image::Pointer image )
+  paramContainer( unsigned int numThresholds, mitk::Image::Pointer image )
     : m_NumberOfThresholds(numThresholds), m_Image(image)
   {
   }
@@ -38,7 +38,7 @@ AccessItkOtsuFilter(itk::Image<TPixel, VImageDimension>* itkImage, paramContaine
   typedef itk::Image< mitk::OtsuSegmentationFilter::OutputPixelType, 3 > itkOutputImageType;
   typedef itk::OtsuMultipleThresholdsImageFilter< itkInputImageType, itkOutputImageType > OtsuFilterType;
 
-  OtsuFilterType::Pointer filter = OtsuFilterType::New();
+  typename OtsuFilterType::Pointer filter = OtsuFilterType::New();
   filter->SetNumberOfThresholds(params.m_NumberOfThresholds);
   filter->SetInput( itkImage );
 

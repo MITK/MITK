@@ -580,8 +580,8 @@ template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
    typedef itk::BinaryErodeImageFilter< ImageType , ImageType, BallType > BallErodeFilterType;
    typedef itk::BinaryErodeImageFilter< ImageType , ImageType, CrossType > CrossErodeFilterType;
 
@@ -617,8 +617,8 @@ template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
    typedef itk::BinaryDilateImageFilter< ImageType , ImageType, BallType > BallDilateFilterType;
    typedef itk::BinaryDilateImageFilter< ImageType , ImageType, CrossType > CrossDilateFilterType;
 
@@ -652,8 +652,8 @@ template<typename TPixel, unsigned int VDimension>
 void QmitkSegmentationUtilitiesView::itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
    typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, BallType > BallOpeningFiltertype;
    typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, CrossType > CrossOpeningFiltertype;
 
@@ -691,8 +691,8 @@ void QmitkSegmentationUtilitiesView::itkClosing(itk::Image<TPixel, VDimension>* 
 {
 
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
    typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, BallType > BallClosingFilterType;
    typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, CrossType > CrossClosingFilterType;
 

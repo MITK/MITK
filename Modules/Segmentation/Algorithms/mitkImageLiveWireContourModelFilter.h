@@ -112,6 +112,7 @@ namespace mitk {
 
     virtual OutputType* GetOutput();
 
+    virtual void DumpMaskImage();
 
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
@@ -147,9 +148,6 @@ namespace mitk {
 
     /** \brief Flag to use a dynmic cost map or not*/
     bool m_UseDynamicCostMap;
-
-    /** \brief Flag to decide whether to run image pre-processing*/
-    bool m_ImageModified;
 
     unsigned int m_TimeStep;
 

@@ -294,12 +294,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
   if ( Superclass::CanHandleEvent(stateEvent) < 1.0 ) return false;
   /* END check if event can be handled */
 
-
   int timestep = positionEvent->GetSender()->GetTimeStep();
-
-  // we clear here all previous repulsive points but it would be better to keep them
-  // so that the calculated live wire does not intersect any part of the working contour
-  //m_LiveWireFilter->ClearRepulsivePoints();
 
   typedef mitk::ImageLiveWireContourModelFilter::InternalImageType::IndexType IndexType;
   mitk::ContourModel::ConstVertexIterator iter = m_LiveWireContour->IteratorBegin(timestep);

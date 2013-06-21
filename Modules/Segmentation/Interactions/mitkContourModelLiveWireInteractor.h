@@ -58,22 +58,14 @@ namespace mitk
             this->Modified();
     }
 
-    virtual void SetWorkingImage (mitk::Image* _arg)
-    {
-      if (this->m_WorkingImage != _arg)
-      {
-        this->m_WorkingImage = _arg;
-        this->m_LiveWireFilter->SetInput(this->m_WorkingImage);
-        this->Modified();
-      }
-    }
+    virtual void SetWorkingImage (mitk::Image* _arg);
 
   protected:
 
     ContourModelLiveWireInteractor(DataNode* dataNode);
     virtual ~ContourModelLiveWireInteractor();
 
-
+    virtual bool OnDumpImage(Action*, const StateEvent*);
     virtual bool OnDeletePoint(Action*, const StateEvent*);
     virtual bool OnMovePoint(Action*, const StateEvent*);
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
@@ -85,7 +77,7 @@ namespace mitk
                                        int timestep);
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
-    mitk::Image::Pointer m_WorkingImage;
+    mitk::Image::Pointer m_WorkingSlice;
 
     mitk::Point3D m_NextActiveVertexDown;
     mitk::Point3D m_NextActiveVertexUp;

@@ -185,8 +185,6 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
   return true;
 }
 
-
-
 bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
 {
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();

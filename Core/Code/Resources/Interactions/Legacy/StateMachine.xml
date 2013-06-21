@@ -4070,6 +4070,9 @@
         <action ID="44" />
         <!-- AcFINISH = 44 -->
       </transition>
+      <transition NAME="Dump Image" NEXT_STATE_ID="1" EVENT_ID="4004">
+        <action ID="130"/>
+      </transition>
     </state>
     <state NAME="Guard_CheckPointClick" ID="10" >
       <!-- check click on point -->

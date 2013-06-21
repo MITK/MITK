@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCastImageFilter.h>
 #include <itkGradientMagnitudeImageFilter.h>
 
+#include "mitkIOUtil.h"
 
 mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
 {
@@ -32,7 +33,6 @@ mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
   m_ShortestPathFilter = ShortestPathImageFilterType::New();
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostMap = false;
-  m_ImageModified = false;
   m_TimeStep = 0;
 }
 
@@ -60,9 +60,8 @@ void mitk::ImageLiveWireContourModelFilter::SetInput ( unsigned int idx, const m
   {
     this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
     this->Modified();
-    this->m_ImageModified = true;
-    m_ShortestPathFilter = ShortestPathImageFilterType::New();
-    m_ShortestPathFilter->SetCostFunction(m_CostFunction);
+
+    AccessFixedDimensionByItk(input, ItkPreProcessImage, 2);
   }
 }
 
@@ -98,12 +97,6 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
     return;
   }
 
-  if( m_ImageModified )
-  {
-    AccessFixedDimensionByItk(input, ItkPreProcessImage, 2);
-    m_ImageModified = false;
-  }
-
   input->GetGeometry()->WorldToIndex(m_StartPoint, m_StartPointInIndex);
   input->GetGeometry()->WorldToIndex(m_EndPoint, m_EndPointInIndex);
 
@@ -117,7 +110,6 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
       catch( itk::ExceptionObject & e )
       {
         MITK_INFO << "Exception caught during live wiring calculation: " << e;
-        m_ImageModified = true;
         return;
       }
   }
@@ -146,6 +138,20 @@ void mitk::ImageLiveWireContourModelFilter::ClearRepulsivePoints()
 void mitk::ImageLiveWireContourModelFilter::AddRepulsivePoint( const itk::Index<2>& idx )
 {
     m_CostFunction->AddRepulsivePoint(idx);
+}
+
+void mitk::ImageLiveWireContourModelFilter::DumpMaskImage()
+{
+    mitk::Image::Pointer mask = mitk::Image::New();
+    mask->InitializeByItk( this->m_CostFunction->GetMaskImage() );
+    mask->SetVolume( this->m_CostFunction->GetMaskImage()->GetBufferPointer() );
+    mitk::IOUtil::SaveImage(mask, "G:\\Data\\mask.nrrd");
+/*
+    mitk::Image::Pointer slice = mitk::Image::New();
+    slice->InitializeByItk( this->m_CostFunction->m_MaskImage.GetPointer() );
+    slice->SetVolume(this->m_CostFunction->m_MaskImage->GetBufferPointer());
+    */
+
 }
 
 void mitk::ImageLiveWireContourModelFilter::RemoveRepulsivePoint( const itk::Index<2>& idx )

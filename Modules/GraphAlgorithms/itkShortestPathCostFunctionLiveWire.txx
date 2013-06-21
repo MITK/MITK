@@ -49,8 +49,7 @@ namespace itk
   void ShortestPathCostFunctionLiveWire<TInputImageType>
     ::AddRepulsivePoint( const IndexType&  index )
   {
-    if (this->m_MaskImage.IsNotNull())
-        this->m_MaskImage->SetPixel(index, 255);
+    m_MaskImage->SetPixel(index, 255);
     m_UseRepulsivePoints = true;
   }
 
@@ -58,8 +57,7 @@ namespace itk
   void ShortestPathCostFunctionLiveWire<TInputImageType>
     ::RemoveRepulsivePoint( const IndexType&  index )
   {
-    if (this->m_MaskImage.IsNotNull())
-        this->m_MaskImage->SetPixel(index, 0);
+    this->m_MaskImage->SetPixel(index, 0);
   }
 
   template<class TInputImageType>
@@ -89,8 +87,7 @@ namespace itk
     ::ClearRepulsivePoints()
   {
     m_UseRepulsivePoints = false;
-    if (this->m_MaskImage.IsNotNull())
-    this->m_MaskImage->FillBuffer(0);
+    m_MaskImage->FillBuffer(0);
   }
 
 
@@ -110,7 +107,7 @@ namespace itk
     {
         if ( (this->m_MaskImage->GetPixel(p1) != 0) ||
              (this->m_MaskImage->GetPixel(p2) != 0) )
-        return 255;
+        return 1000;
     }
 
     unsigned long xMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[0];

@@ -136,16 +136,28 @@ namespace itk
     */
     static double Gaussian(double x, double xOfGaussian, double yOfGaussian);
 
+    const UnsignedCharImageType* GetMaskImage()
+        { return this->m_MaskImage.GetPointer(); };
+
+    const FloatImageType* GetGradientMagnitudeImage()
+        { return this->m_GradientMagnitudeImage.GetPointer(); };
+
+    const FloatImageType* GetEdgeImage()
+        { return this->m_EdgeImage.GetPointer(); };
+
+    const VectorOutputImageType* GetGradientImage()
+        { return this->m_GradientImage.GetPointer(); };
+
   protected:
 
     ShortestPathCostFunctionLiveWire();
 
     virtual ~ShortestPathCostFunctionLiveWire() {};
 
-    UnsignedCharImageType::Pointer m_MaskImage;
+
     FloatImageType::Pointer m_GradientMagnitudeImage;
-//    UnsignedCharImageType::Pointer m_ZeroCrossingImage;
     FloatImageType::Pointer m_EdgeImage;
+    UnsignedCharImageType::Pointer m_MaskImage;
     VectorOutputImageType::Pointer m_GradientImage;
 
     double minCosts;

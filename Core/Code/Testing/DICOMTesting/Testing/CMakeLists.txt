@@ -46,12 +46,6 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     set(expecteddump "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${EXPECTED_DUMP}")
     set(testname "DICOM_Load_${input}")
 
-    # Disable testing this file due to bug:
-    # http://bugs.mitk.org/show_bug.cgi?id=14954
-    # After this has been fixed in ITK (probably vesion 4.4.0)
-    # this file can be included again.
-    if(NOT input STREQUAL "OT-PAL-8-face")
-
     #message(STATUS "DICOM loading test case '${input}'")
     expectFileExists(${inputfilelist})
     expectFileExists(${expecteddump})
@@ -71,8 +65,6 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     add_test(${testname}
              ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
     mitkFunctionAddTestLabel(${testname})
-
-    endif()
 
   endforeach(input allInputs)
 

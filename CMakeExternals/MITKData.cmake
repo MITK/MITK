@@ -13,7 +13,7 @@ set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
 
-  set(revision_tag 5b7f4ef2)
+  set(revision_tag cc0840db)
 
 
   ExternalProject_Add(${proj}

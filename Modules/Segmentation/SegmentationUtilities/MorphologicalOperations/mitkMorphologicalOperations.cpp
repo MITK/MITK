@@ -173,10 +173,10 @@ void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* s
 {
 
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
-   typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, BallType > BallClosingFilterType;
-   typedef itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, CrossType > CrossClosingFilterType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
+   typedef typename itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, BallType > BallClosingFilterType;
+   typedef typename itk::BinaryMorphologicalClosingImageFilter< ImageType , ImageType, CrossType > CrossClosingFilterType;
 
    if (structuralElement == mitk::MorphologicalOperations::BALL)
    {
@@ -209,10 +209,10 @@ template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
-   typedef itk::BinaryErodeImageFilter< ImageType , ImageType, BallType > BallErodeFilterType;
-   typedef itk::BinaryErodeImageFilter< ImageType , ImageType, CrossType > CrossErodeFilterType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
+   typedef typename itk::BinaryErodeImageFilter< ImageType , ImageType, BallType > BallErodeFilterType;
+   typedef typename itk::BinaryErodeImageFilter< ImageType , ImageType, CrossType > CrossErodeFilterType;
 
    if (structuralElement == mitk::MorphologicalOperations::BALL)
    {
@@ -246,10 +246,10 @@ template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor,  mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
-   typedef itk::BinaryDilateImageFilter< ImageType , ImageType, BallType > BallDilateFilterType;
-   typedef itk::BinaryDilateImageFilter< ImageType , ImageType, CrossType > CrossDilateFilterType;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
+   typedef typename itk::BinaryDilateImageFilter< ImageType , ImageType, BallType > BallDilateFilterType;
+   typedef typename itk::BinaryDilateImageFilter< ImageType , ImageType, CrossType > CrossDilateFilterType;
 
    if (structuralElement == mitk::MorphologicalOperations::BALL)
    {
@@ -281,10 +281,10 @@ template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef typename itk::BinaryBallStructuringElement<ImageType::PixelType, VDimension > BallType;
-   typedef typename itk::BinaryCrossStructuringElement<ImageType::PixelType, VDimension > CrossType;
-   typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, BallType > BallOpeningFiltertype;
-   typedef itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, CrossType > CrossOpeningFiltertype;
+   typedef itk::BinaryBallStructuringElement<TPixel, VDimension > BallType;
+   typedef itk::BinaryCrossStructuringElement<TPixel, VDimension > CrossType;
+   typedef typename itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, BallType > BallOpeningFiltertype;
+   typedef typename itk::BinaryMorphologicalOpeningImageFilter< ImageType , ImageType, CrossType > CrossOpeningFiltertype;
 
    if (structuralElement == mitk::MorphologicalOperations::BALL)
    {
@@ -318,7 +318,7 @@ template<typename TPixel, unsigned int VDimension>
 void mitk::MorphologicalOperations::itkFillhole(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage)
 {
    typedef itk::Image<TPixel, VDimension> ImageType;
-   typedef itk::BinaryFillholeImageFilter< ImageType > FillHoleFilterType;
+   typedef typename itk::BinaryFillholeImageFilter< ImageType > FillHoleFilterType;
    typename FillHoleFilterType::Pointer fillholeFilter = FillHoleFilterType::New();
 
    fillholeFilter->SetInput(sourceImage);

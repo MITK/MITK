@@ -6,16 +6,42 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>838</height>
+    <width>195</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QmitkDataSelectionWidget" name="dataSelectionWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="title">
+      <string>Structuring Element</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QRadioButton" name="radioButtonMorphoBall">
+        <property name="text">
+         <string>Ball</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButtonMorphoCross">
+        <property name="text">
+         <string>Cross</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -53,32 +79,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_6">
-     <property name="title">
-      <string>Structuring Element</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QRadioButton" name="radioButtonMorphoBall">
-        <property name="text">
-         <string>Ball</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButtonMorphoCross">
-        <property name="text">
-         <string>Cross</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
@@ -174,7 +174,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0" colspan="2">
+     <item row="2" column="0">
       <widget class="QToolButton" name="btnFillHoles">
        <property name="enabled">
         <bool>false</bool>
@@ -186,10 +186,10 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Fills holes in the binary image globally. No radius required.</string>
+        <string>Globally fills holes in segmentation (radius not required)</string>
        </property>
        <property name="text">
-        <string>Fill Holes (global)</string>
+        <string>Fill Holes</string>
        </property>
        <property name="icon">
         <iconset resource="../../../../resources/utilities.qrc">

@@ -25,7 +25,7 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
 {
   m_Controls.setupUi(this);
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls.dataSelectionWidget->SetHelpText("Please select a segmentation image");
+  m_Controls.dataSelectionWidget->SetHelpText("Select a segmentation above");
 
   connect(m_Controls.btnClosing, SIGNAL(clicked()), this, SLOT(OnbtnClosingClicked()) );
   connect(m_Controls.btnOpening, SIGNAL(clicked()), this, SLOT(OnbtnOpeningClicked()) );

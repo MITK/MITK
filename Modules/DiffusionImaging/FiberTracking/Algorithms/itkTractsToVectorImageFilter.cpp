@@ -66,8 +66,8 @@ void TractsToVectorImageFilter::GenerateData()
     mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
 
     // calculate new image parameters
-    mitk::Vector3D spacing;
-    mitk::Point3D origin;
+    itk::Vector<double> spacing;
+    itk::Point<double> origin;
     itk::Matrix<double, 3, 3> direction;
     ImageRegion<3> imageRegion;
     if (!m_MaskImage.IsNull())

@@ -165,6 +165,7 @@ void QmitkFiberfoxView::UpdateImageParameters()
     m_ImageGenParameters.resultNode = mitk::DataNode::New();
     m_ImageGenParameters.tissueMaskImage = NULL;
     m_ImageGenParameters.frequencyMap = NULL;
+    m_ImageGenParameters.gradientDirections.clear();
 
     if (m_SelectedDWI.IsNotNull())  // use parameters of selected DWI
     {
@@ -325,7 +326,6 @@ void QmitkFiberfoxView::UpdateImageParameters()
     switch (m_Controls->m_Compartment1Box->currentIndex())
     {
     case 0:
-        MITK_INFO << "Using stick model";
         m_StickModel1.SetGradientList(m_ImageGenParameters.gradientDirections);
         m_StickModel1.SetBvalue(m_ImageGenParameters.b_value);
         m_StickModel1.SetDiffusivity(m_Controls->m_StickWidget1->GetD());
@@ -338,7 +338,6 @@ void QmitkFiberfoxView::UpdateImageParameters()
         m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Compartment1.T2", DoubleProperty::New(m_StickModel1.GetT2()) );
         break;
     case 1:
-        MITK_INFO << "Using zeppelin model";
         m_ZeppelinModel1.SetGradientList(m_ImageGenParameters.gradientDirections);
         m_ZeppelinModel1.SetBvalue(m_ImageGenParameters.b_value);
         m_ZeppelinModel1.SetDiffusivity1(m_Controls->m_ZeppelinWidget1->GetD1());
@@ -354,7 +353,6 @@ void QmitkFiberfoxView::UpdateImageParameters()
         m_ImageGenParameters.resultNode->AddProperty("Fiberfox.Compartment1.T2", DoubleProperty::New(m_ZeppelinModel1.GetT2()) );
         break;
     case 2:
-        MITK_INFO << "Using tensor model";
         m_TensorModel1.SetGradientList(m_ImageGenParameters.gradientDirections);
         m_TensorModel1.SetBvalue(m_ImageGenParameters.b_value);
         m_TensorModel1.SetDiffusivity1(m_Controls->m_TensorWidget1->GetD1());

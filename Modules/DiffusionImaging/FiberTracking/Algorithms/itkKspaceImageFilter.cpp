@@ -207,7 +207,7 @@ void KspaceImageFilter< TPixelType >
                 temp_ky += yOffset;
 
             // actual DFT term
-            s += f * exp( std::complex<double>(0, 2 * M_PI * ((temp_kx+tempOffsetX)*x/in_szx + temp_ky*y/in_szy) + omega_t ) );
+            s += f * exp( std::complex<double>(0, 2 * M_PI * ((temp_kx+tempOffsetX)*x/in_szx + temp_ky*y/in_szy + omega_t )) );
 
             ++it;
         }

@@ -77,6 +77,9 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     ImageRegion<2> sliceRegion;
     sliceRegion.SetSize(0, m_UpsampledImageRegion.GetSize()[0]);
     sliceRegion.SetSize(1, m_UpsampledImageRegion.GetSize()[1]);
+    Vector< double, 2 > sliceSpacing;
+    sliceSpacing[0] = m_UpsampledSpacing[0];
+    sliceSpacing[1] = m_UpsampledSpacing[1];
 
     // frequency map slice
     SliceType::Pointer fMap = NULL;
@@ -131,6 +134,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 slice->SetLargestPossibleRegion( sliceRegion );
                 slice->SetBufferedRegion( sliceRegion );
                 slice->SetRequestedRegion( sliceRegion );
+                slice->SetSpacing(sliceSpacing);
                 slice->Allocate();
                 slice->FillBuffer(0.0);
 

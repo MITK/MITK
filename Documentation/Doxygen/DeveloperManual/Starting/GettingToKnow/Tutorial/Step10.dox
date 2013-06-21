@@ -201,7 +201,7 @@ So a valid, but rather useless state machine would like like this:
 
 Optionally a state can be assigned a special mode that influences the event distribution.
 These modes are GRAB_INPUT , PREFER_INPUT and REGULAR (where REGULAR is default and does not need to be indicated).
-See \ref DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
+See \ref DataInteractionTechnicalPage_DispatcherEventDistSection for a description of these modes. Use the special modes only when necessary as they prevent other DataInteractors to
 receive events.
 
 \code

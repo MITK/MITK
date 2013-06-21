@@ -39,7 +39,7 @@ set(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
-  IODataStructures/mitkRegistrationObject.cpp
+  #IODataStructures/mitkRegistrationObject.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp

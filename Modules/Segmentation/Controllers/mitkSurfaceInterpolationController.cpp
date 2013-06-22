@@ -248,6 +248,11 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
     m_MapOfContourLists.insert(std::pair<mitk::Image*, ContourPositionPairList>(segmentation, newList));
     m_InterpolationResult = 0;
     m_CurrentNumberOfReducedContours = 0;
+
+    itk::MemberCommand<SurfaceInterpolationController>::Pointer command = itk::MemberCommand<SurfaceInterpolationController>::New();
+    command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
+    m_SegmentationObserverTags.insert( std::pair<mitk::Image*, unsigned long>( segmentation, segmentation->AddObserver( itk::DeleteEvent(), command ) ) );
+
   }
   else
   {

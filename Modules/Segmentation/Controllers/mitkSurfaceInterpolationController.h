@@ -126,6 +126,8 @@ namespace mitk
 
    ~SurfaceInterpolationController();
 
+   void OnSegmentationDeleted (const itk::Object *caller, const itk::EventObject &event);
+
  private:
 
    struct ContourPositionPair {
@@ -162,6 +164,8 @@ namespace mitk
     unsigned int m_CurrentNumberOfReducedContours;
 
     mitk::Image* m_SelectedSegmentation;
+
+    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
  };
 }
 #endif

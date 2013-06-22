@@ -646,7 +646,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       this->UpdateWarningLabel("Please select or load the according patient image!");
     }
   }
-  if (node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
+  if (!node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
 }
 

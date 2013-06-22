@@ -111,8 +111,8 @@ protected:
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
-    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
-    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
+//    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
+//    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
     itk::Vector<double>                 m_Spacing;              ///< output image spacing
     itk::Vector<double>                 m_UpsampledSpacing;

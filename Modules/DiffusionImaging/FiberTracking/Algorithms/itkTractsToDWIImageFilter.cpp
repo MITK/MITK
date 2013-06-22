@@ -205,41 +205,41 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     return newImage;
 }
 
-template< class PixelType >
-TractsToDWIImageFilter< PixelType >::ComplexSliceType::Pointer TractsToDWIImageFilter< PixelType >::RearrangeSlice(ComplexSliceType::Pointer slice)
-{
-    ImageRegion<2> region = slice->GetLargestPossibleRegion();
-    ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();
-    rearrangedSlice->SetLargestPossibleRegion( region );
-    rearrangedSlice->SetBufferedRegion( region );
-    rearrangedSlice->SetRequestedRegion( region );
-    rearrangedSlice->Allocate();
+//template< class PixelType >
+//TractsToDWIImageFilter< PixelType >::ComplexSliceType::Pointer TractsToDWIImageFilter< PixelType >::RearrangeSlice(ComplexSliceType::Pointer slice)
+//{
+//    ImageRegion<2> region = slice->GetLargestPossibleRegion();
+//    ComplexSliceType::Pointer rearrangedSlice = ComplexSliceType::New();
+//    rearrangedSlice->SetLargestPossibleRegion( region );
+//    rearrangedSlice->SetBufferedRegion( region );
+//    rearrangedSlice->SetRequestedRegion( region );
+//    rearrangedSlice->Allocate();
 
-    int xHalf = region.GetSize(0)/2;
-    int yHalf = region.GetSize(1)/2;
+//    int xHalf = region.GetSize(0)/2;
+//    int yHalf = region.GetSize(1)/2;
 
-    for (int y=0; y<region.GetSize(1); y++)
-        for (int x=0; x<region.GetSize(0); x++)
-        {
-            SliceType::IndexType idx;
-            idx[0]=x; idx[1]=y;
-            vcl_complex< double > pix = slice->GetPixel(idx);
+//    for (int y=0; y<region.GetSize(1); y++)
+//        for (int x=0; x<region.GetSize(0); x++)
+//        {
+//            SliceType::IndexType idx;
+//            idx[0]=x; idx[1]=y;
+//            vcl_complex< double > pix = slice->GetPixel(idx);
 
-            if( idx[0] <  xHalf )
-                idx[0] = idx[0] + xHalf;
-            else
-                idx[0] = idx[0] - xHalf;
+//            if( idx[0] <  xHalf )
+//                idx[0] = idx[0] + xHalf;
+//            else
+//                idx[0] = idx[0] - xHalf;
 
-            if( idx[1] <  yHalf )
-                idx[1] = idx[1] + yHalf;
-            else
-                idx[1] = idx[1] - yHalf;
+//            if( idx[1] <  yHalf )
+//                idx[1] = idx[1] + yHalf;
+//            else
+//                idx[1] = idx[1] - yHalf;
 
-            rearrangedSlice->SetPixel(idx, pix);
-        }
+//            rearrangedSlice->SetPixel(idx, pix);
+//        }
 
-    return rearrangedSlice;
-}
+//    return rearrangedSlice;
+//}
 
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()

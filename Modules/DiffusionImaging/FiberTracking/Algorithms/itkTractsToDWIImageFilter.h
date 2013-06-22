@@ -114,8 +114,8 @@ protected:
 //    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
 //    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    itk::Vector<double>                 m_Spacing;              ///< output image spacing
-    itk::Vector<double>                 m_UpsampledSpacing;
+    mitk::Vector3D                      m_Spacing;              ///< output image spacing
+    itk::Vector<double,3>               m_UpsampledSpacing;
     mitk::Point3D                       m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size

@@ -697,7 +697,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
 
     // check if ToolManager holds valid ReferenceData
-    if (m_ToolManager->GetReferenceData(0) == NULL)
+    if (m_ToolManager->GetReferenceData(0) == NULL || m_ToolManager->GetWorkingData(0) == NULL)
     {
         return;
     }

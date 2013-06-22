@@ -61,6 +61,8 @@ public:
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
     typedef itk::Image< double, 2 >                         SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType ComplexSliceType;
+    typedef itk::Vector< double,3>                      VectorType;
+    typedef itk::Point< double,3>                      PointType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -71,8 +73,8 @@ public:
     itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
-    itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
-    itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
+    itkSetMacro( Spacing, VectorType )                  ///< output image spacing
+    itkSetMacro( Origin, PointType )                    ///< output image origin
     itkSetMacro( DirectionMatrix, MatrixType )          ///< output image rotation
     itkSetMacro( EnforcePureFiberVoxels, bool )         ///< treat all voxels containing at least one fiber as fiber-only (actually disable non-fiber compartments for this voxel).
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
@@ -114,9 +116,9 @@ protected:
 //    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
 //    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    mitk::Vector3D                      m_Spacing;              ///< output image spacing
+    itk::Vector<double,3>              m_Spacing;              ///< output image spacing
     itk::Vector<double,3>               m_UpsampledSpacing;
-    mitk::Point3D                       m_Origin;               ///< output image origin
+    itk::Point<double,3>                m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;

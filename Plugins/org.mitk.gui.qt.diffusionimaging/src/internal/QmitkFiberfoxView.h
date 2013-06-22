@@ -146,8 +146,8 @@ protected:
     /** structure storing the image generation parameters */
     struct ImageParameters {
         itk::ImageRegion<3>                 imageRegion;
-        itk::Vector<double>                 imageSpacing;
-        itk::Point<double>                  imageOrigin;
+        mitk::Vector3D                      imageSpacing;
+        mitk::Point3D                       imageOrigin;
         itk::Matrix<double, 3, 3>           imageDirection;
         unsigned int                        numGradients;
         double                              b_value;

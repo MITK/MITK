@@ -340,9 +340,6 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
     }
   }
 
-  ImageIterator imgRegionIterator (distanceImg, distanceImg->GetLargestPossibleRegion());
-  imgRegionIterator.GoToBegin();
-
   // Fist we set the border slices of the image to value 1000 so that we can perform a
   // region growing afterwards starting from the middle of the image
 

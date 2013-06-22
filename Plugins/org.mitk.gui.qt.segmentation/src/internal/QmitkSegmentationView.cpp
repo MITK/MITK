@@ -345,6 +345,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
   {
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
     m_Controls->m_SlicesInterpolator->Show3DInterpolationResult(false);
+    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
   }
   else
   {

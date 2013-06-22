@@ -366,8 +366,9 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  //For the 3D interpolation
+  //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
+
   if (m_2DInterpolationEnabled)
   {
     OnInterpolationActivated( true ); // re-initialize if needed
@@ -550,7 +551,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     {
       m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
-
     }
   }
   else if (interpolatedSurface.IsNull())

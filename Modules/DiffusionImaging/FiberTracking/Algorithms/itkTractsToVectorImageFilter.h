@@ -22,6 +22,7 @@ namespace itk{
 /**
 * \brief Extracts the voxel-wise main directions of the input fiber bundle.   */
 
+template< class PixelType >
 class TractsToVectorImageFilter : public ImageSource< VectorImage< float, 3 > >
 {
 
@@ -32,7 +33,7 @@ public:
     typedef SmartPointer< const Self > ConstPointer;
 
     typedef itk::Vector<float,3>                    OutputVectorType;
-    typedef itk::Image<OutputVectorType, 3>     OutputImageType;
+    typedef itk::Image<OutputVectorType, 3>         OutputImageType;
     typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
     typedef vnl_vector_fixed< double, 3 >                               DirectionType;

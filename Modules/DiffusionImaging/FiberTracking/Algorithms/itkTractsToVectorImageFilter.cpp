@@ -22,7 +22,8 @@ static bool CompareVectorLengths(const vnl_vector_fixed< double, 3 >& v1, const 
     return (v1.magnitude()>v2.magnitude());
 }
 
-TractsToVectorImageFilter::TractsToVectorImageFilter():
+template< class PixelType >
+TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_AngularThreshold(0.7),
     m_MaskImage(NULL),
     m_NumDirectionsImage(NULL),
@@ -37,12 +38,14 @@ TractsToVectorImageFilter::TractsToVectorImageFilter():
 }
 
 
-TractsToVectorImageFilter::~TractsToVectorImageFilter()
+template< class PixelType >
+TractsToVectorImageFilter< PixelType >::~TractsToVectorImageFilter()
 {
 }
 
 
-vnl_vector_fixed<double, 3> TractsToVectorImageFilter::GetVnlVector(double point[3])
+template< class PixelType >
+vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::GetVnlVector(double point[3])
 {
     vnl_vector_fixed<double, 3> vnlVector;
     vnlVector[0] = point[0];
@@ -52,7 +55,8 @@ vnl_vector_fixed<double, 3> TractsToVectorImageFilter::GetVnlVector(double point
 }
 
 
-itk::Point<float, 3> TractsToVectorImageFilter::GetItkPoint(double point[3])
+template< class PixelType >
+itk::Point<float, 3> TractsToVectorImageFilter< PixelType >::GetItkPoint(double point[3])
 {
     itk::Point<float, 3> itkPoint;
     itkPoint[0] = point[0];
@@ -61,7 +65,8 @@ itk::Point<float, 3> TractsToVectorImageFilter::GetItkPoint(double point[3])
     return itkPoint;
 }
 
-void TractsToVectorImageFilter::GenerateData()
+template< class PixelType >
+void TractsToVectorImageFilter< PixelType >::GenerateData()
 {
     mitk::Geometry3D::Pointer geometry = m_FiberBundle->GetGeometry();
 
@@ -567,7 +572,8 @@ void TractsToVectorImageFilter::GenerateData()
 }
 
 
-std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter::FastClustering(std::vector< vnl_vector_fixed< double, 3 > >& inDirs)
+template< class PixelType >
+std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelType >::FastClustering(std::vector< vnl_vector_fixed< double, 3 > >& inDirs)
 {
     std::vector< vnl_vector_fixed< double, 3 > > outDirs;
     if (inDirs.empty())
@@ -658,7 +664,8 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter::FastClus
 }
 
 
-std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter::Clustering(std::vector< vnl_vector_fixed< double, 3 > >& inDirs)
+template< class PixelType >
+std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter< PixelType >::Clustering(std::vector< vnl_vector_fixed< double, 3 > >& inDirs)
 {
     std::vector< vnl_vector_fixed< double, 3 > > outDirs;
     if (inDirs.empty())
@@ -753,7 +760,8 @@ std::vector< vnl_vector_fixed< double, 3 > > TractsToVectorImageFilter::Clusteri
 }
 
 
-TractsToVectorImageFilter::DirectionContainerType::Pointer TractsToVectorImageFilter::MeanShiftClustering(DirectionContainerType::Pointer dirCont)
+template< class PixelType >
+TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsToVectorImageFilter< PixelType >::MeanShiftClustering(DirectionContainerType::Pointer dirCont)
 {
     DirectionContainerType::Pointer container = DirectionContainerType::New();
 
@@ -799,7 +807,8 @@ TractsToVectorImageFilter::DirectionContainerType::Pointer TractsToVectorImageFi
 }
 
 
-vnl_vector_fixed<double, 3> TractsToVectorImageFilter::ClusterStep(DirectionContainerType::Pointer dirCont, vnl_vector_fixed<double, 3> currentMean)
+template< class PixelType >
+vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::ClusterStep(DirectionContainerType::Pointer dirCont, vnl_vector_fixed<double, 3> currentMean)
 {
     vnl_vector_fixed<double, 3> newMean; newMean.fill(0);
 

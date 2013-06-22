@@ -69,6 +69,7 @@ set(H_FILES
   Algorithms/itkAddArtifactsToDwiImageFilter.h
   Algorithms/itkFieldmapGeneratorFilter.h
   Algorithms/itkEvaluateDirectionImagesFilter.h
+  Algorithms/itkEvaluateTractogramDirectionsFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h

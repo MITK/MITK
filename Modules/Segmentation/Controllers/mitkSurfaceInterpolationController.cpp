@@ -39,8 +39,8 @@ mitk::SurfaceInterpolationController::SurfaceInterpolationController()
 
 mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
 {
-
-  for (ContourListMap::iterator it = m_MapOfContourLists.begin(); it != m_MapOfContourLists.end(); it++)
+  ContourListMap::iterator it = m_MapOfContourLists.begin();
+  for (; it != m_MapOfContourLists.end(); it++)
   {
       for (unsigned int j = 0; j < m_MapOfContourLists[(*it).first].size(); ++j)
       {
@@ -48,6 +48,14 @@ mitk::SurfaceInterpolationController::~SurfaceInterpolationController()
       }
       m_MapOfContourLists.erase(it);
   }
+
+  //Removing all observers
+  std::map<mitk::Image*, unsigned long>::iterator dataIter = m_SegmentationObserverTags.begin();
+  for (; dataIter != m_SegmentationObserverTags.end(); ++dataIter )
+  {
+    (*dataIter).first->GetProperty("visible")->RemoveObserver( (*dataIter).second );
+  }
+  m_SegmentationObserverTags.clear();
 }
 
 mitk::SurfaceInterpolationController* mitk::SurfaceInterpolationController::GetInstance()

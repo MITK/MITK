@@ -1062,6 +1062,10 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
       }
     }
+    else
+    {
+      QWidget::setEnabled(false);
+    }
   }
 }
 

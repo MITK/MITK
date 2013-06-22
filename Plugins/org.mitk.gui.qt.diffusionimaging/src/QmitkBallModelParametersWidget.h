@@ -40,6 +40,9 @@ public:
 
     virtual void CreateQtPartControl(QWidget *parent);
 
+    void SetT2(double t2){ m_Controls->m_T2box->setValue(t2); }
+    void SetD(double d){ m_Controls->m_D1box->setValue(d); }
+
     double GetD(){ return m_Controls->m_D1box->value(); }
     unsigned int GetT2(){ return m_Controls->m_T2box->value(); }
 

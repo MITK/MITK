@@ -49,7 +49,7 @@ namespace itk{
     itkTypeMacro(AddArtifactsToDwiImageFilter, ImageToImageFilter)
 
     typedef typename Superclass::InputImageType                         DiffusionImageType;
-    typedef mitk::DiffusionNoiseModel<TPixelType>                       NoiseModelType;
+    typedef mitk::DiffusionNoiseModel<short>                           NoiseModelType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef typename itk::KspaceImageFilter< double >::OutputImageType  ComplexSliceType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;

@@ -231,16 +231,19 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   if (segmentation == m_SelectedSegmentation)
     return;
 
-  if (segmentation == 0)
-    return;
+  m_ReduceFilter->Reset();
+  m_NormalsFilter->Reset();
+  m_InterpolateSurfaceFilter->Reset();
 
+  if (segmentation == 0)
+  {
+    m_SelectedSegmentation = 0;
+    return;
+  }
   ContourListMap::iterator it = m_MapOfContourLists.find(segmentation);
 
   m_SelectedSegmentation = segmentation;
 
-  m_ReduceFilter->Reset();
-  m_NormalsFilter->Reset();
-  m_InterpolateSurfaceFilter->Reset();
 
   if (it == m_MapOfContourLists.end())
   {
@@ -279,6 +282,14 @@ void mitk::SurfaceInterpolationController::RemoveSegmentationFromContourList(mit
   if (segmentation != 0)
   {
     m_MapOfContourLists.erase(segmentation);
+    if (m_SelectedSegmentation == segmentation)
+    {
+      SetSegmentationImage(NULL);
+      m_SelectedSegmentation = 0;
+    }
+  }
+}
+
 void mitk::SurfaceInterpolationController::OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &/*event*/)
 {
   MITK_INFO<< "SegmentationRemoved!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";

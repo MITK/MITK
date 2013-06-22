@@ -1019,6 +1019,9 @@ void QmitkSlicesInterpolator::OnMultiWidgetDeleted(QObject*)
 
 void QmitkSlicesInterpolator:: SetCurrentContourListID()
 {
+  // New ContourList = hide current interpolation
+  Show3DInterpolationResult(false);
+
   if ( m_DataStorage.IsNotNull() && m_ToolManager )
   {
     mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);

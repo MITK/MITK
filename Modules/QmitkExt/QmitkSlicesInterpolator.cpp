@@ -366,8 +366,9 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  //For the 3D interpolation
+  //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
+
   if (m_2DInterpolationEnabled)
   {
     OnInterpolationActivated( true ); // re-initialize if needed
@@ -537,8 +538,10 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 {
   mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
 
-  if(interpolatedSurface.IsNotNull())
+  if(interpolatedSurface.IsNotNull() && workingNode &&
+     workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))))
   {
     m_BtnAccept3DInterpolation->setEnabled(true);
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
@@ -550,7 +553,6 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
     {
       m_DataStorage->Add(m_3DContourNode);
       m_DataStorage->Add(m_InterpolatedSurfaceNode);
-
     }
   }
   else if (interpolatedSurface.IsNull())
@@ -697,7 +699,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->SetInput(dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData()));
 
     // check if ToolManager holds valid ReferenceData
-    if (m_ToolManager->GetReferenceData(0) == NULL)
+    if (m_ToolManager->GetReferenceData(0) == NULL || m_ToolManager->GetWorkingData(0) == NULL)
     {
         return;
     }
@@ -1019,6 +1021,9 @@ void QmitkSlicesInterpolator::OnMultiWidgetDeleted(QObject*)
 
 void QmitkSlicesInterpolator:: SetCurrentContourListID()
 {
+  // New ContourList = hide current interpolation
+  Show3DInterpolationResult(false);
+
   if ( m_DataStorage.IsNotNull() && m_ToolManager )
   {
     mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
@@ -1029,9 +1034,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
       bool isInterpolationResult(false);
       workingNode->GetBoolProperty("3DInterpolationResult",isInterpolationResult);
 
-      if ((m_MultiWidget != NULL && workingNode->IsSelected() &&
-           workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
-          !isInterpolationResult)
+      if (m_MultiWidget != NULL && !isInterpolationResult)
       {
         QWidget::setEnabled( true );
 
@@ -1057,7 +1060,15 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
         m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
 
+        if (m_Watcher.isRunning())
+          m_Watcher.waitForFinished();
+        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+        m_Watcher.setFuture(m_Future);
       }
+    }
+    else
+    {
+      QWidget::setEnabled(false);
     }
   }
 }

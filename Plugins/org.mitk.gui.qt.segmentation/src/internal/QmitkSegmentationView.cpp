@@ -689,6 +689,18 @@ void QmitkSegmentationView::OnSurfaceSelectionChanged()
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+  if (nodes.size() != 0)
+  {
+    std::string markerName = "Position";
+    unsigned int numberOfNodes = nodes.size();
+    std::string nodeName = nodes.at( 0 )->GetName();
+    if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
+    {
+      this->OnContourMarkerSelected( nodes.at( 0 ) );
+      return;
+    }
+
+  }
   if (m_AutoSelectionEnabled && this->IsActivated())
   {
     if (nodes.size() == 0 && m_Controls->patImageSelector->GetSelectedNode().IsNull())
@@ -700,15 +712,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       mitk::DataNode::Pointer selectedNode = nodes.at(0);
       if(selectedNode.IsNull())
       {
-        return;
-      }
-
-      std::string markerName = "Position";
-      unsigned int numberOfNodes = nodes.size();
-      std::string nodeName = nodes.at( 0 )->GetName();
-      if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
-      {
-        this->OnContourMarkerSelected( nodes.at( 0 ) );
         return;
       }
 

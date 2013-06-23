@@ -318,6 +318,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             this->ApplyDisplayOptions( emptySegmentation );
             this->FireNodeSelected( emptySegmentation );
             this->OnSelectionChanged( emptySegmentation );
+            m_Controls->segImageSelector->SetSelectedNode(emptySegmentation);
 //            m_Controls->segImageSelector->show();
           }
           catch (std::bad_alloc)

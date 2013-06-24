@@ -60,7 +60,12 @@ mitk::BinaryThresholdULTool::~BinaryThresholdULTool()
 
 const char** mitk::BinaryThresholdULTool::GetXPM() const
 {
-  return mitkBinaryThresholdULTool_xpm;
+  return NULL;
+}
+
+std::string mitk::BinaryThresholdULTool::GetIconPath() const
+{
+  return ":/Segmentation/TwoThresholds_48x48.png";
 }
 
 const char* mitk::BinaryThresholdULTool::GetName() const

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkTransformFileWriter.h>
 
+
 int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 {
   if( argc < 4 )
@@ -44,20 +45,21 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
   registrationMethod->SetMovingImage( movingImage );
-  registrationMethod->Update();
 
   if( type_flag == "Rigid" )
   {
-      registrationMethod->SetTransformToRigid();
+    registrationMethod->SetTransformToRigid();
   }
   else if( type_flag == "Affine" )
   {
-      registrationMethod->SetTransformToAffine();
+    registrationMethod->SetTransformToAffine();
   }
   else
   {
-      MITK_WARN << " No type specified, using 'Affine' .";
+    MITK_WARN << " No type specified, using 'Affine' .";
   }
+
+  registrationMethod->Update();
 
   bool imageOutput = false;
   bool transformOutput = false;
@@ -66,93 +68,89 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 
   std::string first_output( argv[4] );
   // check for txt, otherwise suppose it is an image
-  if( first_output.find(".txt") != std::string::npos )
+  if( first_output.find(".tfm") != std::string::npos )
   {
-      transformOutput = true;
-      transform_out_filename = first_output;
+    transformOutput = true;
+    transform_out_filename = first_output;
   }
   else
   {
-      imageOutput = true;
-      image_out_filename = first_output;
+    imageOutput = true;
+    image_out_filename = first_output;
   }
-
 
   if( argc > 4 )
   {
     std::string second_output( argv[5] );
-    if( second_output.find(".txt") != std::string::npos )
+    if( second_output.find(".tfm") != std::string::npos )
     {
-        transformOutput = true;
-        transform_out_filename = first_output;
+      transformOutput = true;
+      transform_out_filename = second_output;
     }
   }
 
-  unsigned int paramCount = registrationMethod->GetNumberOfParameters();
-  double* params = new double[ paramCount ];
-  registrationMethod->GetParameters( &params[0] );
+  MITK_INFO << " Selected output: " << transform_out_filename  << " " << image_out_filename;
 
-  typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
-  BaseTransformType::Pointer base_transform = BaseTransformType::New();
+  try{
 
-  // Affine
-  if( paramCount == 12 )
-  {
-      typedef itk::AffineTransform< double > TransformType;
-      TransformType::Pointer transform = TransformType::New();
+    unsigned int paramCount = registrationMethod->GetNumberOfParameters();
+    double* params = new double[ paramCount ];
+    registrationMethod->GetParameters( &params[0] );
 
-      TransformType::ParametersType affine_params( TransformType::ParametersDimension );
-      registrationMethod->GetParameters( &affine_params[0] );
+    std::cout << "Parameters: ";
+    for( unsigned int i=0; i< paramCount; i++)
+    {
+      std::cout << params[ i ] << " ";
+    }
+    std::cout << std::endl;
 
-      transform->SetParameters( affine_params );
+    if( imageOutput )
+    {
+      mitk::IOUtil::SaveImage( registrationMethod->GetResampledMovingImage(), image_out_filename.c_str() );
+    }
 
-      base_transform = transform;
 
-   /*   if( transformOutput )
+    if( transformOutput )
+    {
+
+      itk::TransformFileWriter::Pointer writer = itk::TransformFileWriter::New();
+
+      // Get transform parameter for resampling / saving
+      // Affine
+      if( paramCount == 12 )
       {
-        itk::TransformFileWriter::Pointer writer = itk::TransformFileWriter::New();
+        typedef itk::AffineTransform< double > TransformType;
+        TransformType::Pointer transform = TransformType::New();
+
+        TransformType::ParametersType affine_params( paramCount );
+        registrationMethod->GetParameters( &affine_params[0] );
+
+        transform->SetParameters( affine_params );
         writer->SetInput( transform );
-        writer->SetFileName( transform_out_filename );
-        writer->Update();
-      }*/
-  }
-  // Rigid
-  else
-  {
-      typedef itk::Rigid3DTransform< double > RigidTransformType;
-      RigidTransformType::Pointer transform = RigidTransformType::New();
-
-      TransformType::ParametersType rigid_params( TransformType::ParametersDimension );
-      registrationMethod->GetParameters( &rigid_params[0] );
-
-      transform->SetParameters( rigid_params );
-
-      base_transform = transform;
-
-
-    /*  if( transformOutput )
+      }
+      // Rigid
+      else
       {
-        itk::TransformFileWriter::Pointer writer = itk::TransformFileWriter::New();
-        writer->SetInput( transform );
-        writer->SetFilename( transform_out_filename );
-        writer->Update();
-      }*/
+        typedef itk::Euler3DTransform< double > RigidTransformType;
+        RigidTransformType::Pointer rtransform = RigidTransformType::New();
+
+        RigidTransformType::ParametersType rigid_params( paramCount );
+        registrationMethod->GetParameters( &rigid_params[0] );
+
+        rtransform->SetParameters( rigid_params );
+        writer->SetInput( rtransform );
+      }
+
+      writer->SetFileName( transform_out_filename );
+      writer->Update();
+    }
+
+  }
+  catch( const std::exception &e)
+  {
+    MITK_ERROR << "Caught exception: " << e.what();
   }
 
-  if( transformOutput )
-  {
-    itk::TransformFileWriter::Pointer writer = itk::TransformFileWriter::New();
-    writer->SetInput( base_transform );
-    writer->SetFileName( transform_out_filename );
-    writer->Update();
-  }
-
-  std::cout << "Parameters: ";
-  for( unsigned int i=0; i< paramCount; i++)
-  {
-    std::cout << params[ i ] << " ";
-  }
-  std::cout << std::endl;
 
   MITK_TEST_END();
 }

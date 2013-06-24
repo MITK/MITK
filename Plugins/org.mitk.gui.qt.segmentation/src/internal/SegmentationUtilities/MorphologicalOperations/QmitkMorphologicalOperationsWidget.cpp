@@ -46,13 +46,22 @@ QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
 
 void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
 {
+   MITK_INFO << "adasda";
+
    QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
    mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
 
    if (node.IsNotNull())
+   {
+      m_Controls.dataSelectionWidget->hide();
       enableButtons();
+   }
    else
+   {
+      m_Controls.dataSelectionWidget->show();
       disableButtons();
+   }
+
 }
 
 

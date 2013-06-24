@@ -68,7 +68,7 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
 
   std::string first_output( argv[4] );
   // check for txt, otherwise suppose it is an image
-  if( first_output.find(".tfm") != std::string::npos )
+  if( first_output.find(".txt") != std::string::npos )
   {
     transformOutput = true;
     transform_out_filename = first_output;
@@ -82,7 +82,7 @@ int mitkPyramidImageRegistrationMethodTest( int argc, char* argv[] )
   if( argc > 4 )
   {
     std::string second_output( argv[5] );
-    if( second_output.find(".tfm") != std::string::npos )
+    if( second_output.find(".txt") != std::string::npos )
     {
       transformOutput = true;
       transform_out_filename = second_output;

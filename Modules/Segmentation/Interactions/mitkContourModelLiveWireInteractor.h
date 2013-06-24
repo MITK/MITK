@@ -46,15 +46,9 @@ namespace mitk
     mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
     mitkNewMacro1Param(Self, DataNode*);
 
-    virtual void SetLeftLiveWireContourModelNode (mitk::DataNode* _arg)
+    virtual void SetEditingContourModelNode (mitk::DataNode* _arg)
     {
-            this->m_LeftLiveWireContourNode = _arg;
-            this->Modified();
-    }
-
-    virtual void SetRightLiveWireContourModelNode (mitk::DataNode* _arg)
-    {
-            this->m_RightLiveWireContourNode = _arg;
+            this->m_EditingContourNode = _arg;
             this->Modified();
     }
 
@@ -87,8 +81,7 @@ namespace mitk
 
     std::vector < itk::Index<2> > m_ContourBeingModified;
 
-    mitk::DataNode::Pointer m_LeftLiveWireContourNode;
-    mitk::DataNode::Pointer m_RightLiveWireContourNode;
+    mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
     mitk::ContourModel::Pointer m_ContourRight;
 

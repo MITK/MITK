@@ -142,6 +142,8 @@ void mitk::ContourModelLiveWireInteractor::SetWorkingImage (mitk::Image* _arg)
   }
 }
 
+// delete me
+
 bool mitk::ContourModelLiveWireInteractor::OnDumpImage( Action* action, const StateEvent* stateEvent)
 {
     this->m_LiveWireFilter->DumpMaskImage();
@@ -269,17 +271,18 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
       return false;
   }
 */
-  if ( !rightLiveWire->IsEmpty(timestep) )
-    rightLiveWire->RemoveVertexAt(0, timestep);
-
   if ( !leftLiveWire->IsEmpty(timestep) )
     leftLiveWire->SetControlVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
 
+  if ( !rightLiveWire->IsEmpty(timestep) )
+    rightLiveWire->RemoveVertexAt(0, timestep);
+
+
   // set corrected left live wire to its node
-  m_LeftLiveWireContourNode->SetData(leftLiveWire);
+ // m_EditingContourNode->SetData(leftLiveWire);
 
   // set corrected right live wire to its node
-  m_RightLiveWireContourNode->SetData(rightLiveWire);
+ // m_RightLiveWireContourNode->SetData(rightLiveWire);
 
 // not really needed
 /*
@@ -294,6 +297,14 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
       m_ContourBeingModified.push_back(idx);
   }
 */
+
+  mitk::ContourModel::Pointer editingContour = mitk::ContourModel::New();
+  editingContour->Expand(contour->GetTimeSteps());
+
+  editingContour->Concatenate( leftLiveWire, timestep );
+  editingContour->Concatenate( rightLiveWire, timestep );
+
+  m_EditingContourNode->SetData(editingContour);
 
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());
@@ -455,16 +466,16 @@ bool mitk::ContourModelLiveWireInteractor::OnFinishEditing( Action* action, cons
 {
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
 
-  mitk::ContourModel *leftLiveWire = dynamic_cast<mitk::ContourModel *>( this->m_LeftLiveWireContourNode->GetData() );
-  assert ( leftLiveWire );
+  mitk::ContourModel *editingContour = dynamic_cast<mitk::ContourModel *>( this->m_EditingContourNode->GetData() );
+  assert ( editingContour );
 
-  leftLiveWire->Clear(timestep);
-
+  editingContour->Clear(timestep);
+/*
   mitk::ContourModel *rightLiveWire = dynamic_cast<mitk::ContourModel *>( this->m_RightLiveWireContourNode->GetData() );
   assert ( rightLiveWire );
 
   rightLiveWire->Clear(timestep);
-
+*/
   assert( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( stateEvent->GetEvent()->GetSender()->GetRenderWindow() );
 

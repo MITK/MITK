@@ -99,13 +99,13 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     //the current LiveWire computed contour
     mitk::ContourModel::Pointer m_LiveWireContour;
-    mitk::ContourModel::Pointer m_RightLiveWireContour;
-    mitk::ContourModel::Pointer m_LeftLiveWireContour;
+    mitk::ContourModel::Pointer m_EditingContour;
+//    mitk::ContourModel::Pointer m_LeftLiveWireContour;
 
     //the corresponding datanode
     mitk::DataNode::Pointer m_LiveWireContourNode;
-    mitk::DataNode::Pointer m_LeftLiveWireContourNode;
-    mitk::DataNode::Pointer m_RightLiveWireContourNode;
+    mitk::DataNode::Pointer m_EditingContourNode;
+//    mitk::DataNode::Pointer m_RightLiveWireContourNode;
 
     mitk::ContourModelLiveWireInteractor::Pointer m_LiveWireInteractor;
 

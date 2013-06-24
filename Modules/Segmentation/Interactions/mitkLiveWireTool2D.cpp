@@ -181,14 +181,14 @@ void mitk::LiveWireTool2D::Deactivated()
 
   m_Contours.clear();
 
-  m_ToolManager->GetDataStorage()->Remove( m_LeftLiveWireContourNode );
-  m_ToolManager->GetDataStorage()->Remove( m_RightLiveWireContourNode );
+//  m_ToolManager->GetDataStorage()->Remove( m_LeftLiveWireContourNode );
+  m_ToolManager->GetDataStorage()->Remove( m_EditingContourNode );
 
-  m_LeftLiveWireContourNode = NULL;
-  m_LeftLiveWireContour = NULL;
+  m_EditingContourNode = NULL;
+  m_EditingContour = NULL;
 
-  m_RightLiveWireContourNode = NULL;
-  m_RightLiveWireContour = NULL;
+//  m_RightLiveWireContourNode = NULL;
+//  m_RightLiveWireContour = NULL;
 
   Superclass::Deactivated();
 }
@@ -222,27 +222,18 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
-  m_LeftLiveWireContour = mitk::ContourModel::New();
-  m_LeftLiveWireContour->Expand(timestep+1);
-  m_LeftLiveWireContourNode = mitk::DataNode::New();
-  m_LeftLiveWireContourNode->SetData( m_LeftLiveWireContour );
-  m_LeftLiveWireContourNode->SetName("left node");
-  m_LeftLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
-  m_LeftLiveWireContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
-  m_LeftLiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
-
-  m_RightLiveWireContour = mitk::ContourModel::New();
-  m_RightLiveWireContour->Expand(timestep+1);
-  m_RightLiveWireContourNode = mitk::DataNode::New();
-  m_RightLiveWireContourNode->SetData( m_RightLiveWireContour );
-  m_RightLiveWireContourNode->SetName("right node");
-  m_RightLiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
-  m_RightLiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
+  m_EditingContour = mitk::ContourModel::New();
+  m_EditingContour->Expand(timestep+1);
+  m_EditingContourNode = mitk::DataNode::New();
+  m_EditingContourNode->SetData( m_EditingContour );
+  m_EditingContourNode->SetName("editing node");
+  m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
+  m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
+  m_EditingContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
   m_ToolManager->GetDataStorage()->Add( m_ContourModelNode );
   m_ToolManager->GetDataStorage()->Add( m_LiveWireContourNode );
-  m_ToolManager->GetDataStorage()->Add( m_RightLiveWireContourNode );
-  m_ToolManager->GetDataStorage()->Add( m_LeftLiveWireContourNode );
+  m_ToolManager->GetDataStorage()->Add( m_EditingContourNode );
 
   //set current slice as input for ImageToLiveWireContourFilter
   m_WorkingSlice = this->GetAffectedReferenceSlice(positionEvent);
@@ -277,9 +268,6 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
 
   return true;
 }
-
-
-
 
 bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEvent)
 {
@@ -337,9 +325,6 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   return true;
 }
-
-
-
 
 bool mitk::LiveWireTool2D::OnMouseMoved( Action* action, const StateEvent* stateEvent)
 {
@@ -462,15 +447,14 @@ void mitk::LiveWireTool2D::FinishTool()
   m_LiveWireContourNode = NULL;
   m_LiveWireContour = NULL;
 
-  //TODO visual feedback for completing livewire tool
+  //change color as visual feedback of completed livewire
   m_ContourModelNode->AddProperty( "contour.color", ColorProperty::New(1.0, 1.0, 0.1), NULL, true );
   m_ContourModelNode->SetName("contour node");
 
   //set the livewire interactor to edit control points
   m_LiveWireInteractor = mitk::ContourModelLiveWireInteractor::New(m_ContourModelNode);
   m_LiveWireInteractor->SetWorkingImage(this->m_WorkingSlice);
-  m_LiveWireInteractor->SetRightLiveWireContourModelNode(this->m_RightLiveWireContourNode);
-  m_LiveWireInteractor->SetLeftLiveWireContourModelNode(this->m_LeftLiveWireContourNode);
+  m_LiveWireInteractor->SetEditingContourModelNode(this->m_EditingContourNode);
   m_ContourModelNode->SetInteractor(m_LiveWireInteractor);
 
   //add interactor to globalInteraction instance

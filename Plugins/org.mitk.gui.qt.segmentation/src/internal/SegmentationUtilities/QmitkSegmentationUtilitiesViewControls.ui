@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkSegmentationUtilities2ViewControls</class>
- <widget class="QWidget" name="QmitkSegmentationUtilities2ViewControls">
+ <class>QmitkSegmentationUtilitiesViewControls</class>
+ <widget class="QWidget" name="QmitkSegmentationUtilitiesViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -55,7 +55,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../../resources/SegmentationUtilities2.qrc"/>
+  <include location="../../../resources/SegmentationUtilities.qrc"/>
  </resources>
  <connections/>
 </ui>

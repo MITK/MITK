@@ -14,14 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkSegmentationUtilities2View.h"
+// #define ENABLE_CTK_WIDGETS_WIDGET
+
+#include "QmitkSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
 #include "MorphologicalOperations/QmitkMorphologicalOPerationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
 #include "CTKWidgets/QmitkCTKWidgetsWidget.h"
 
-QmitkSegmentationUtilities2View::QmitkSegmentationUtilities2View()
+QmitkSegmentationUtilitiesView::QmitkSegmentationUtilitiesView()
   : m_BooleanOperationsWidget(NULL),
     m_ImageMaskingWidget(NULL),
     m_MorphologicalOperationsWidget(NULL),
@@ -30,11 +32,11 @@ QmitkSegmentationUtilities2View::QmitkSegmentationUtilities2View()
 {
 }
 
-QmitkSegmentationUtilities2View::~QmitkSegmentationUtilities2View()
+QmitkSegmentationUtilitiesView::~QmitkSegmentationUtilitiesView()
 {
 }
 
-void QmitkSegmentationUtilities2View::CreateQtPartControl(QWidget* parent)
+void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 
@@ -48,26 +50,29 @@ void QmitkSegmentationUtilities2View::CreateQtPartControl(QWidget* parent)
   m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
   m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
   m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(timeNavigationController, parent);
-  m_CTKWidgetsWidget = new QmitkCTKWidgetsWidget(timeNavigationController, parent);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
   this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/utilities_surface2image.png"), "Surface To Image");
+
+#ifdef ENABLE_CTK_WIDGETS_WIDGET
+  m_CTKWidgetsWidget = new QmitkCTKWidgetsWidget(timeNavigationController, parent);
   this->AddUtilityWidget(m_CTKWidgetsWidget, QIcon(":/SegmentationUtilities/CTKWidgets_48x48.png"), "CTK Widgets");
+#endif
 }
 
-void QmitkSegmentationUtilities2View::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
+void QmitkSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
 {
   m_Controls.toolBox->addItem(widget, icon, text);
 }
 
-void QmitkSegmentationUtilities2View::SetFocus()
+void QmitkSegmentationUtilitiesView::SetFocus()
 {
   m_Controls.toolBox->setFocus();
 }
 
-void QmitkSegmentationUtilities2View::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkSegmentationUtilitiesView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   mitk::SliceNavigationController* timeNavigationController = renderWindowPart->GetTimeNavigationController();
 
@@ -75,14 +80,20 @@ void QmitkSegmentationUtilities2View::RenderWindowPartActivated(mitk::IRenderWin
   m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
   m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
+
+#ifdef ENABLE_CTK_WIDGETS_WIDGET
   m_CTKWidgetsWidget->SetTimeNavigationController(timeNavigationController);
+#endif
 }
 
-void QmitkSegmentationUtilities2View::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+void QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
   m_BooleanOperationsWidget->SetTimeNavigationController(NULL);
   m_ImageMaskingWidget->SetTimeNavigationController(NULL);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(NULL);
   m_SurfaceToImageWidget->SetTimeNavigationController(NULL);
+
+#ifdef ENABLE_CTK_WIDGETS_WIDGET
   m_CTKWidgetsWidget->SetTimeNavigationController(NULL);
+#endif
 }

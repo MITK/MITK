@@ -10,29 +10,14 @@
       name="Segmentation" 
       icon="resources/segmentation.png"
       class="QmitkSegmentationView" />
-    <view id="org.mitk.views.segmentationboolean"
-      name="Boolean Operations"
-      class="QmitkBooleanOperationsView"
-      icon="resources/boolean.png" />
      <view id="org.mitk.views.deformableclippingplane"
        name="Clipping Plane"
        class="QmitkDeformableClippingPlaneView"
        icon="resources/deformablePlane.png" />
-    <!--<view
-      id="org.mitk.views.regiongrowing"
-      name="RegionGrowing"
-      category="org.mitk.views.general"
-      icon="resources/regiongrowing.xpm"
-      class="QmitkRegionGrowingView" /> -->
     <view
       id="org.mitk.views.segmentationutilities"
-      name= "SegmentationUtilities"
-      class= "QmitkSegmentationUtilitiesView"
-      icon= "resources/segmentationUtilities.png" />
-    <view
-      id="org.mitk.views.segmentationutilities2"
       name="Segmentation Utilities"
-      class="QmitkSegmentationUtilities2View"
+      class="QmitkSegmentationUtilitiesView"
       icon="resources/SegmentationUtilities_48x48.png" />
   </extension>
   

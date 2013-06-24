@@ -10,13 +10,11 @@ set(INTERNAL_CPP_FILES
   QmitkCreatePolygonModelAction.cpp
   QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
-  QmitkBooleanOperationsView.cpp
   QmitkDeformableClippingPlaneView.cpp
   regiongrowing/QmitkRegionGrowingView.cpp
   QmitkOtsuAction.cpp
-  QmitkSegmentationUtilitiesView.cpp
   Common/QmitkDataSelectionWidget.cpp
-  SegmentationUtilities/QmitkSegmentationUtilities2View.cpp
+  SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.cpp
@@ -27,12 +25,10 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/internal/QmitkSegmentationControls.ui
-  src/internal/QmitkBooleanOperationsView.ui
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
   src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
-  src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
-  src/internal/SegmentationUtilities/QmitkSegmentationUtilities2ViewControls.ui
+  src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
   src/internal/SegmentationUtilities/MorphologicalOperations/QmitkMorphologicalOperationsWidgetControls.ui
@@ -48,13 +44,11 @@ set(MOC_H_FILES
   src/internal/QmitkCreatePolygonModelAction.h
   src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
-  src/internal/QmitkBooleanOperationsView.h
   src/internal/QmitkDeformableClippingPlaneView.h
   src/internal/regiongrowing/QmitkRegionGrowingView.h
   src/internal/QmitkOtsuAction.h
-  src/internal/QmitkSegmentationUtilitiesView.h
   src/internal/Common/QmitkDataSelectionWidget.h
-  src/internal/SegmentationUtilities/QmitkSegmentationUtilities2View.h
+  src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidget.h
@@ -65,21 +59,18 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   resources/segmentation.png
-  resources/boolean.png
   resources/deformablePlane.png
   resources/regiongrowing.xpm
-  resources/segmentationUtilities.png
   resources/SegmentationUtilities_48x48.png
   plugin.xml
 )
 
 set(QRC_FILES
   resources/segmentation.qrc
-  resources/boolean.qrc
   resources/regiongrowing.qrc
-  resources/utilities.qrc
-  resources/SegmentationUtilities2.qrc
+  resources/SegmentationUtilities.qrc
   resources/BooleanOperationsWidget.qrc
+  resources/MorphologicalOperationsWidget.qrc
 )
 
 set(CPP_FILES)

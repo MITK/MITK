@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 
 #include "QmitkSegmentationView.h"
-#include "QmitkBooleanOperationsView.h"
 #include "QmitkThresholdAction.h"
 #include "QmitkOtsuAction.h"
 #include "QmitkCreatePolygonModelAction.h"
@@ -25,15 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSegmentationPreferencePage.h"
 #include "QmitkDeformableClippingPlaneView.h"
 #include "src/internal/regiongrowing/QmitkRegionGrowingView.h"
-#include "QmitkSegmentationUtilitiesView.h"
-#include "SegmentationUtilities/QmitkSegmentationUtilities2View.h"
+#include "SegmentationUtilities/QmitkSegmentationUtilitiesView.h"
 
 using namespace mitk;
 
 void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkBooleanOperationsView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkOtsuAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
@@ -43,7 +40,6 @@ void PluginActivator::start(ctkPluginContext *context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDeformableClippingPlaneView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkRegionGrowingView, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilities2View, context)
 }
 
 void PluginActivator::stop(ctkPluginContext *)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>195</width>
-    <height>422</height>
+    <width>263</width>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,8 +97,14 @@
         <string>Dilatation</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/utilities.qrc">
-         <normaloff>:/utilities/morphDilate.xpm</normaloff>:/utilities/morphDilate.xpm</iconset>
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Dilate_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Dilate_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -120,8 +126,14 @@
         <string>Erosion</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/utilities.qrc">
-         <normaloff>:/utilities/morphErode.xpm</normaloff>:/utilities/morphErode.xpm</iconset>
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Erode_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Erode_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -143,8 +155,14 @@
         <string>Closing</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/utilities.qrc">
-         <normaloff>:/utilities/morphClosing.xpm</normaloff>:/utilities/morphClosing.xpm</iconset>
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Closing_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Closing_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -166,8 +184,14 @@
         <string>Opening</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/utilities.qrc">
-         <normaloff>:/utilities/morphOpening.xpm</normaloff>:/utilities/morphOpening.xpm</iconset>
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Opening_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Opening_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -192,8 +216,14 @@
         <string>Fill Holes</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/utilities.qrc">
-         <normaloff>:/utilities/morphFillholes.xpm</normaloff>:/utilities/morphFillholes.xpm</iconset>
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/FillHoles_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/FillHoles_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -226,7 +256,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../resources/utilities.qrc"/>
+  <include location="../../../../resources/MorphologicalOperationsWidget.qrc"/>
  </resources>
  <connections>
   <connection>

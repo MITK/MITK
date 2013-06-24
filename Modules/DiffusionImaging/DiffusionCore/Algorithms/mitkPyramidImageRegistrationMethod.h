@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPyramidRegistrationMethodHelper.h"
 
+#include "mitkImageToItk.h"
+#include "mitkITKImageImport.h"
+
 
 namespace mitk
 {
@@ -170,23 +173,6 @@ protected:
         itk::LinearInterpolateImageFunction<MovingImageType, double>::New();
 
 
-/*
- *  moment initialization not default settings, to be used as soon as initialization settings available
-    typedef typename itk::ImageMomentsCalculator< FixedImageType >  FImageMoments;
-    typedef typename itk::ImageMomentsCalculator< MovingImageType > MImageMoments;
-
-    typename FImageMoments::Pointer f_moments = FImageMoments::New();
-    f_moments->SetImage( itkImage1 );
-    f_moments->Compute();
-
-    typename MImageMoments::Pointer m_moments = MImageMoments::New();
-    m_moments->SetImage( itkImage2 );
-    m_moments->Compute();
-
-    itk::Vector< double, 3> f_cog = f_moments->GetCenterOfGravity();
-    itk::Vector< double, 3> m_cog = m_moments->GetCenterOfGravity();
-*/
-
     typename BaseMetricType::Pointer metric;
 
     if( m_CrossModalityRegistration )
@@ -221,12 +207,7 @@ protected:
       initialParams[0] = initialParams[4] = initialParams[8] = 1;
     }
 
-  /*
-   * moment initialization not default settings, to be used as soon as initialization settings available
-    initialParams[paramDim-3] =  m_cog[2] - c_cog[2];
-    initialParams[paramDim-2] =  m_cog[1] - c_cog[1];
-    initialParams[paramDim-1] =  m_cog[0] - c_cog[0];
-*/
+
     typename FixedImageType::Pointer referenceImage = itkImage1;
     typename MovingImageType::Pointer movingImage = itkImage2;
     typename FixedImageType::RegionType maskedRegion = referenceImage->GetLargestPossibleRegion();
@@ -239,13 +220,15 @@ protected:
 
     // condition for the top level pyramid image
     float optmaxstep = 12;
-    float optminstep = 0.5f;
-    if( min_value / max_schedule_val < 8 )
+    float optminstep = 0.1f;
+    unsigned int iterations = 40;
+    if( min_value / max_schedule_val < 16 )
     {
       //max_pyramid_lvl--;
       max_schedule_val /= 2;
-      optmaxstep *= 0.25f;
-      optminstep *= 0.1f;
+      optmaxstep *= 0.5f;
+      optminstep *= 0.2f;
+      iterations *= 1.5;
 
       //std::cout << "Changed default pyramid: lvl " << max_pyramid_lvl << std::endl;
     }
@@ -266,7 +249,7 @@ protected:
 
     typename OptimizerType::Pointer optimizer = OptimizerType::New();
     typename OptimizerType::ScalesType optScales( paramDim );
-    optScales.Fill(1.0);
+    optScales.Fill(5.0);
 
     optScales[paramDim-3] = 1.0/1000;
     optScales[paramDim-2] = 1.0/1000;
@@ -274,11 +257,17 @@ protected:
 
     optimizer->SetScales( optScales );
     optimizer->SetInitialPosition( initialParams );
-    optimizer->SetNumberOfIterations( 100 );
-    optimizer->SetGradientMagnitudeTolerance( 5e-4 );
-    optimizer->SetRelaxationFactor( 0.6 );
+    optimizer->SetNumberOfIterations( iterations );
+    optimizer->SetGradientMagnitudeTolerance( 1e-4 );
+    optimizer->SetRelaxationFactor( 0.7 );
     optimizer->SetMaximumStepLength( optmaxstep );
     optimizer->SetMinimumStepLength( optminstep );
+
+    OptimizerIterationCommand< OptimizerType >::Pointer iterationObserver =
+        OptimizerIterationCommand<OptimizerType>::New();
+
+    unsigned long vopt_tag = optimizer->AddObserver( itk::IterationEvent(), iterationObserver );
+
 
     // INPUT IMAGES
     registration->SetFixedImage( referenceImage );

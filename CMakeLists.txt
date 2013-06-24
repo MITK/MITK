@@ -204,7 +204,6 @@ if(MITK_USE_SOFA)
   endif()
 endif()
 
-
 # Customize the default pixel types for multiplex macros
 
 set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
@@ -321,6 +320,7 @@ include(mitkFunctionGetVersionDescription)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
+include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionCompileSnippets)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
@@ -729,50 +729,6 @@ if(MITK_USE_BLUEBERRY)
 
 endif()
 
-# Construct a list of paths containing runtime directories
-# for MITK applications on Windows
-set(MITK_RUNTIME_PATH
-    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_DIR}/bin/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
-    )
-
-if(QT4_FOUND)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${QT_LIBRARY_DIR}/../bin")
-endif()
-
-if(MITK_USE_BLUEBERRY)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_RUNTIME_LIBRARY_DIRS}/%VS_BUILD_TYPE%")
-  if(DEFINED CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY)
-    if(IS_ABSOLUTE "${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}")
-      set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%")
-    else()
-      set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%")
-    endif()
-  else()
-    set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/%VS_BUILD_TYPE%")
-  endif()
-endif()
-
-if(GDCM_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${GDCM_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-if(OpenCV_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${OpenCV_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-if(SOFA_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${SOFA_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-# DCMTK is statically build
-#if(DCMTK_DIR)
-#  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${DCMTK_DIR}/bin/%VS_BUILD_TYPE%")
-#endif()
-
-if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
-endif()
-
 #-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
@@ -944,6 +900,8 @@ foreach(_module ${_MODULES_CONF_FILES})
   string(REPLACE Config.cmake "" _module_name ${_module})
   list(APPEND MITK_MODULE_NAMES ${_module_name})
 endforeach()
+
+mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_CONFIG "%VS_BUILD_TYPE%")
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)

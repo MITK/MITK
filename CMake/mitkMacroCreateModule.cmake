@@ -360,6 +360,22 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${module_cxx_flags_debug}")
           set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${module_cxx_flags_release}")
 
+          # Add additional library search directories to a global property which
+          # can be evaluated by other CMake macros, e.g. our install scripts.
+          if(MODULE_ADDITIONAL_LIBS)
+            get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+            foreach(_lib_filepath ${MODULE_ADDITIONAL_LIBS})
+              get_filename_component(_search_path "${_lib_filepath}" PATH)
+              if(_search_path)
+                list(APPEND _mitk_additional_library_search_paths "${_search_path}")
+              endif()
+            endforeach()
+            if(_mitk_additional_library_search_paths)
+              list(REMOVE_DUPLICATES _mitk_additional_library_search_paths)
+              set_property(GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS ${_mitk_additional_library_search_paths})
+            endif()
+          endif()
+
           # add the target name to a global property which is used in the top-level
           # CMakeLists.txt file to export the target
           set_property(GLOBAL APPEND PROPERTY MITK_MODULE_TARGETS ${MODULE_PROVIDES})

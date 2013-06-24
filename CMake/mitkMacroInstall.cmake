@@ -132,6 +132,11 @@ macro(_fixup_target)
     endforeach(_plugin)
     set(DIRS ${DIRS})
     list(APPEND DIRS \${PLUGIN_DIRS})
+
+    # Add additional library search dirs, which are aggregated within the MITK_CREATE_MODULE macro.
+    get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+    list(APPEND DIRS ${_mitk_additional_library_search_paths})
+
     list(REMOVE_DUPLICATES DIRS)
 
     # use custom version of BundleUtilities

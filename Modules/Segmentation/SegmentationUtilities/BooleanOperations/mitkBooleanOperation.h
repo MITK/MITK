@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief Executes a boolean operation on two different segmentations.
+   *
+   * All parameters of the boolean operations must be specified during construction.
+   * The actual operation is executed when calling GetResult().
+   */
   class Segmentation_EXPORT BooleanOperation
   {
   public:
@@ -33,9 +38,22 @@ namespace mitk
       Union
     };
 
+    /* \brief Construct a boolean operation.
+     *
+     * Throws an mitk::Exception when segmentations are somehow invalid.
+     *
+     * \param[in] type The type of the boolean operation.
+     * \param[in] segmentation1 The first operand of the boolean operation.
+     * \param[in] segmentation2 The second operand of the boolean operation.
+     * \param[in] The time step at which the operation will be executed.
+     */
     BooleanOperation(Type type, Image::Pointer segmentation1, Image::Pointer segmentation2, unsigned int time = 0);
     ~BooleanOperation();
 
+    /* \brief Execute boolean operation and return resulting segmentation.
+     *
+     * \return The resulting segmentation.
+     */
     Image::Pointer GetResult() const;
 
   private:

@@ -24,6 +24,11 @@ namespace mitk
   class SliceNavigationController;
 }
 
+/** \brief Base class for segmentation utility widgets that need access to the time navigation controller.
+ *
+ * Call GetTimeNavigationController() in your derived class to gain access to the time navigation controller.
+ * The time navigation controller is not not available at all times and hence this method can return NULL.
+ */
 class QmitkSegmentationUtilityWidget : public QWidget
 {
   Q_OBJECT
@@ -32,9 +37,15 @@ public:
   explicit QmitkSegmentationUtilityWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
   virtual ~QmitkSegmentationUtilityWidget();
 
+  /** \brief Usually called only from QmitkSegmentationUtilitiesView::RenderWindowPartActivated() and QmitkSegmentationUtilitiesView::RenderWindowPartDeactivated().
+   */
   void SetTimeNavigationController(mitk::SliceNavigationController* timeNavigationController);
 
 protected:
+  /** \brief Call this method to access the time navigation controller.
+   *
+   * \return Pointer to the time navigation controller or NULL, if it is not available.
+   */
   mitk::SliceNavigationController* GetTimeNavigationController() const;
 
 private:

@@ -347,7 +347,8 @@ bool mitk::SurfaceDeformationInteractor3D
       // Transform mouse move into geometry space
       data->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
       mitk::Point3D origin; origin.Fill( 0.0 );
-      m_Geometry->WorldToIndex( interactionMove, interactionMove );
+      mitk::Vector3D interactionMoveIndex;
+      m_Geometry->WorldToIndex( interactionMove, interactionMoveIndex );
 
 
       // Get picked point and transform into local coordinates
@@ -355,7 +356,7 @@ bool mitk::SurfaceDeformationInteractor3D
       m_Geometry->WorldToIndex( m_InitialPickedPoint, pickedPoint );
       mitk::Vector3D v1 = pickedPoint.GetVectorFromOrigin();
 
-      mitk::Vector3D v2 = m_ObjectNormal * (interactionMove * m_ObjectNormal);
+      mitk::Vector3D v2 = m_ObjectNormal * (interactionMoveIndex * m_ObjectNormal);
 
 
       vtkPoints *originalPoints = m_OriginalPolyData->GetPoints();

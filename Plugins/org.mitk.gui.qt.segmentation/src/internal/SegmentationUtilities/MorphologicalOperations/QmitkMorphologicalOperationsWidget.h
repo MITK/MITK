@@ -42,6 +42,7 @@ public:
   void OnbtnErosionClicked();
   void OnbtnFillHolesClicked();
   void OnSelectionChanged(unsigned int index, const mitk::DataNode* selection);
+  void OnRadioButtonsClicked();
 
 protected:
    void enableButtons();

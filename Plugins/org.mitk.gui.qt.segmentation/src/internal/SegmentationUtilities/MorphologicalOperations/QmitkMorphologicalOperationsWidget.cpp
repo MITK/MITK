@@ -33,6 +33,9 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   connect(m_Controls.btnErosion, SIGNAL(clicked()), this, SLOT(OnbtnErosionClicked()) );
   connect(m_Controls.btnFillHoles, SIGNAL(clicked()), this, SLOT(OnbtnFillHolesClicked()) );
 
+  connect(m_Controls.radioButtonMorphoCross, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()) );
+  connect(m_Controls.radioButtonMorphoBall, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()) );
+
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 }
 
@@ -71,6 +74,15 @@ void QmitkMorphologicalOperationsWidget::disableButtons()
    m_Controls.btnOpening->setEnabled(false);
 }
 
+void QmitkMorphologicalOperationsWidget::OnRadioButtonsClicked()
+{
+   m_Controls.sliderMorphFactor->setEnabled(
+      m_Controls.radioButtonMorphoBall->isChecked());
+
+   m_Controls.spinBoxMorphFactor->setEnabled(
+      m_Controls.radioButtonMorphoBall->isChecked());
+
+}
 
 void QmitkMorphologicalOperationsWidget::OnbtnClosingClicked()
 {

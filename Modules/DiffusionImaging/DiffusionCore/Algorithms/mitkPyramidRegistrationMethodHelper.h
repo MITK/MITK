@@ -79,16 +79,63 @@ public:
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
+    std::cout << "\t - Pyramid level " << registration->GetCurrentLevel() << std::endl;
     if( registration->GetCurrentLevel() == 0 )
       return;
 
+
+
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
 
-    optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
+    std::cout << optimizer->GetStopConditionDescription() << std::endl;
+
+    optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.5f );
     optimizer->SetMinimumStepLength( optimizer->GetMinimumStepLength() * 0.1f );
+    optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
   }
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
+};
+
+
+template <typename OptimizerType>
+class OptimizerIterationCommand : public itk::Command
+{
+public:
+  itkNewMacro( OptimizerIterationCommand )
+
+  void Execute(itk::Object *caller, const itk::EventObject & event)
+  {
+    OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
+
+    unsigned int currentIter = optimizer->GetCurrentIteration();
+    std::cout << "[" << currentIter << "] : " << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition() << std::endl;
+
+/*    typedef typename OptimizerType::CostFunctionType  CostFunctionType;
+    const CostFunctionType *cfcn = optimizer->GetCostFunction();
+
+    const std::string match("MattesMutualInformationImageToImageMetric");
+    const std::string name( cfcn->GetNameOfClass() );
+
+    double compareValue = -0.1;
+
+    if ( name.compare( match ) == 0 )
+    {
+      compareValue = -0.2;
+    }
+
+    if (optimizer->GetValue() > compareValue )
+    {
+      optimizer->StopOptimization();
+      itkGenericExceptionMacro( << " Unrealistic metric value reached. Stopping optimization! ");
+    }
+*/
+  }
+
+  void Execute(const itk::Object * object, const itk::EventObject & event)
+  {
+
+  }
 };
 
 

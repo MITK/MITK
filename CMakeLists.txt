@@ -334,6 +334,7 @@ include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
+include(mitkMacroGetPMDPlatformString)
 
 #-----------------------------------------------------------------------------
 # Prerequesites

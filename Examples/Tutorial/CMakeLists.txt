@@ -11,9 +11,9 @@ else(MISSING)
   # initialize only the source lists which need additional files
   # Step6 is reused in Step7 and Step8. Step6.cpp has to be added
   # explicitly since it is not a member of ${STEP6_CPP} at this point
-  set(STEP6_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6main.cpp)
-  set(STEP7_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step7main.cpp)
-  set(STEP8_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step7.cpp Step8main.cpp)
+  set(STEP6_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6RegionGrowing3.cpp Step6main.cpp)
+  set(STEP7_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6RegionGrowing3.cpp Step6.cpp Step7main.cpp)
+  set(STEP8_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6RegionGrowing3.cpp Step6.cpp Step7.cpp Step8main.cpp)
 
   # some files need Qt wrapping
   QT4_WRAP_CPP(STEP6_MOC_CPP Step6.h)

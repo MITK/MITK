@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "QmitkExtExports.h"
 #include "mitkOtsuTool3D.h"
-#include <QListWidget.h>
+#include <QListWidget>
 
 class QSpinBox;
 class QLabel;

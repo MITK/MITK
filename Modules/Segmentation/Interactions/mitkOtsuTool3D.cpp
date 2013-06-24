@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 
 // Qt
-#include "QMessageBox.h"
+#include <QMessageBox>
 
 #include "mitkRegionGrow3DTool.xpm"
 

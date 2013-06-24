@@ -130,6 +130,8 @@ public:
     }
   }
 
+  mitk::Image::Pointer GetResampledMovingImage();
+
 
 protected:
   PyramidImageRegistrationMethod();
@@ -230,14 +232,14 @@ protected:
     typename FixedImageType::RegionType maskedRegion = referenceImage->GetLargestPossibleRegion();
 
     typename RegistrationType::Pointer registration = RegistrationType::New();
-    unsigned int max_pyramid_lvl = 4;
-    unsigned int max_schedule_val = 8;
+    unsigned int max_pyramid_lvl = 3;
+    unsigned int max_schedule_val = 4;
     typename FixedImageType::RegionType::SizeType image_size = referenceImage->GetLargestPossibleRegion().GetSize();
     unsigned int min_value = std::min( image_size[0], std::min( image_size[1], image_size[2]));
 
     // condition for the top level pyramid image
     float optmaxstep = 12;
-    float optminstep = 0.1f;
+    float optminstep = 0.5f;
     if( min_value / max_schedule_val < 8 )
     {
       //max_pyramid_lvl--;
@@ -264,7 +266,7 @@ protected:
 
     typename OptimizerType::Pointer optimizer = OptimizerType::New();
     typename OptimizerType::ScalesType optScales( paramDim );
-    optScales.Fill(10.0);
+    optScales.Fill(1.0);
 
     optScales[paramDim-3] = 1.0/1000;
     optScales[paramDim-2] = 1.0/1000;
@@ -273,8 +275,8 @@ protected:
     optimizer->SetScales( optScales );
     optimizer->SetInitialPosition( initialParams );
     optimizer->SetNumberOfIterations( 100 );
-    optimizer->SetGradientMagnitudeTolerance( 1e-4 );
-    optimizer->SetRelaxationFactor( 0.7 );
+    optimizer->SetGradientMagnitudeTolerance( 5e-4 );
+    optimizer->SetRelaxationFactor( 0.6 );
     optimizer->SetMaximumStepLength( optmaxstep );
     optimizer->SetMinimumStepLength( optminstep );
 
@@ -318,6 +320,62 @@ protected:
       m_EstimatedParameters[i] = finalParameters[i];
     }
 
+
+  }
+
+  template< typename TPixel, unsigned int VDimension>
+  void ResampleMitkImage( itk::Image<TPixel, VDimension>* itkImage,
+                          mitk::Image::Pointer& outputImage )
+  {
+    typedef typename itk::Image< TPixel, VDimension> ImageType;
+    typedef typename itk::ResampleImageFilter<  ImageType, ImageType, double> ResampleImageFilterType;
+
+    typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
+    typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+
+    typename mitk::ImageToItk< ImageType >::Pointer reference_image = mitk::ImageToItk< ImageType >::New();
+    reference_image->SetInput( this->m_FixedImage );
+    reference_image->Update();
+
+    typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
+    BaseTransformType::Pointer base_transform = BaseTransformType::New();
+
+    if( this->m_UseAffineTransform )
+    {
+        typedef itk::AffineTransform< double > TransformType;
+        TransformType::Pointer transform = TransformType::New();
+
+        TransformType::ParametersType affine_params( TransformType::ParametersDimension );
+        this->GetParameters( &affine_params[0] );
+
+        transform->SetParameters( affine_params );
+
+        base_transform = transform;
+    }
+    // Rigid
+    else
+    {
+        typedef itk::Euler3DTransform< double > RigidTransformType;
+        RigidTransformType::Pointer rtransform = RigidTransformType::New();
+
+        RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
+        this->GetParameters( &rigid_params[0] );
+
+        rtransform->SetParameters( rigid_params );
+
+        base_transform = rtransform;
+    }
+
+    typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+    resampler->SetInput( itkImage );
+    resampler->SetTransform( base_transform );
+    resampler->SetReferenceImage( reference_image->GetOutput() );
+    resampler->UseReferenceImageOn();
+
+    resampler->Update();
+
+
+    mitk::GrabItkImageMemory( resampler->GetOutput(), outputImage);
 
   }
 

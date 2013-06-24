@@ -81,3 +81,16 @@ void mitk::PyramidImageRegistrationMethod::Update()
   AccessTwoImagesFixedDimensionTypeSubsetByItk( m_FixedImage, m_MovingImage, RegisterTwoImages, 3);
 
 }
+
+mitk::Image::Pointer mitk::PyramidImageRegistrationMethod
+::GetResampledMovingImage()
+{
+
+  mitk::Image::Pointer output = mitk::Image::New();
+  //output->Initialize( this->m_FixedImage );
+
+  AccessFixedDimensionByItk_1( this->m_MovingImage, ResampleMitkImage, 3, output );
+
+  return output;
+
+}

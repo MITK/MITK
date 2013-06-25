@@ -13,5 +13,6 @@
     <file>FastMarching_48x48.png</file>
     <file>Threshold_48x48.png</file>
     <file>TwoThresholds_48x48.png</file>
+    <file>Otsu_48x48.png</file>
   </qresource>
 </RCC>

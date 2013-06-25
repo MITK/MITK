@@ -119,10 +119,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="0"
      inkscape:zoom="4.8763961"
-     inkscape:cx="-73.283687"
+     inkscape:cx="-96.866677"
      inkscape:cy="48.564188"
      inkscape:document-units="px"
-     inkscape:current-layer="layer12"
+     inkscape:current-layer="layer13"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1018"
@@ -844,7 +844,7 @@
   <g
      inkscape:groupmode="layer"
      id="layer11"
-     inkscape:label="LiveWire"
+     inkscape:label="Live Wire"
      sodipodi:insensitive="true"
      style="display:inline">
     <g
@@ -924,5 +924,26 @@
         </g>
       </g>
     </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer13"
+     inkscape:label="Otsu"
+     sodipodi:insensitive="true">
+    <text
+       xml:space="preserve"
+       style="font-size:10.22853947px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00adff;fill-opacity:1;stroke:none;font-family:Sans"
+       x="-52.019081"
+       y="997.81415"
+       id="text3119"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\Otsu_48x48.png"
+       inkscape:export-xdpi="223.91353"
+       inkscape:export-ydpi="223.91353"><tspan
+         sodipodi:role="line"
+         id="tspan3121"
+         x="-52.019081"
+         y="997.81415"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#00adff;fill-opacity:1;font-family:Arial Unicode MS;-inkscape-font-specification:Arial Unicode MS">大津</tspan></text>
   </g>
 </svg>

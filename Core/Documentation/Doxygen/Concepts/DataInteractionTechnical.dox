@@ -9,7 +9,7 @@ This page describes some technicalities of the implementation and the workflow, 
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
 
-\section DispatcherSection Dispatcher
+\section DataInteractionTechnicalPage_DispatcherSection Dispatcher
 
 After an event is received by the mitk::Dispatcher it is given to a mitk::DataInteractor that has to decide if it can process this event.
 On a high level this is done by the mitk::EventStateMachine.
@@ -65,7 +65,7 @@ digraph {
 Events that are generated within the scope of the mitk::BaseRenderer are sent to the associated mitk::Dispatcher to be handled.
 
 
-\subsection DispatcherEventDistSection Event Distribution
+\subsection DataInteractionTechnicalPage_DispatcherEventDistSection Event Distribution
 
  A mitk::Dispatcher can operate in different processing modes, which determine how the interactor that receives an event is chosen.
  These modes are managed and set by the mitk::Dispatcher itself.
@@ -94,7 +94,7 @@ Events that are generated within the scope of the mitk::BaseRenderer are sent to
       In this mode mitk::InteractionEventObserver instances ARE informed.
 
 </ul>
-\section StateMachineSection State Machine & Configuration
+\section DataInteractionTechnicalPage_StateMachineSection State Machine & Configuration
 
 A  mitk::EventStateMachine points to a \b state, which in turn references  \b transitions
 (which describe a change from one state to another) and \b actions (indicating which functions are executed when a transition is taken).

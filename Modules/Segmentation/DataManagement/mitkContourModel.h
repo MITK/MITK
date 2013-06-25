@@ -44,7 +44,7 @@ namespace mitk
   A contour can be either open like a single curved line segment or
   closed. A closed contour can for example represent a jordan curve.
 
-  \section mitkPointSetDisplayOptions
+  \section mitkContourModelDisplayOptions Display Options
 
   The default mappers for this data structure are mitk::ContourModelGLMapper2D and
   mitk::ContourModelMapper3D. See these classes for display options which can

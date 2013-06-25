@@ -18,7 +18,7 @@ Each workbench window has its own selection service instance. The service keeps 
 
 \image html SelectionServiceDiagram.png "Selection Service Diagram"
 
-\section WhatCanBeSelected What can be selected?
+\section BlueBerrySelectionServiceIntro_WhatCanBeSelected What can be selected?
 
 From the users point of view a selection is a set of highlighted entries in a viewer like a table or tree widget. A selection can also be a piece of text in an editor.
 
@@ -27,7 +27,7 @@ Internally a selection is a data structure holding the model objects which corre
 \li A list of objects
 \li A piece of text
 
-\section Examples
+\section BlueBerrySelectionServiceIntro_Examples
 The following two examples describe different ways of implementing and using the provided selection services. One example is based on the Qt selection model, the other one is based on the MITK Data node selection.
 
 \li \ref org_mitk_example_gui_selectionservicemitk

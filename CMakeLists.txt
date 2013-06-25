@@ -868,6 +868,8 @@ set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"$
   endif()
 endforeach()
 
+get_property(MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in

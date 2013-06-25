@@ -168,7 +168,7 @@ endif()
 # Create batch files for Windows platforms
 if(WIN32)
   set(template_name "start${_APP_NAME}.bat.in")
-  if(EXISTS ${template_name})
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${template_name}")
     foreach(BUILD_TYPE debug release)
       mitkFunctionCreateWindowsBatchScript(${template_name}
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat

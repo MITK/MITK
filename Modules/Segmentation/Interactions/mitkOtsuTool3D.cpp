@@ -117,6 +117,14 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
     mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
 
+  m_ToolManager->GetDataStorage()->Remove( this->m_MultiLabelResultNode );
+  m_MultiLabelResultNode = NULL;
+  m_MultiLabelResultNode = mitk::DataNode::New();
+  m_MultiLabelResultNode->SetName("Otsu_Preview");
+  m_MultiLabelResultNode->SetVisibility(true);
+  m_ToolManager->GetDataStorage()->Add( this->m_MultiLabelResultNode );
+  m_MultiLabelResultNode->SetOpacity(1.0);
+
   this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
   m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
   mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();

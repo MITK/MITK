@@ -151,7 +151,7 @@
   <customwidget>
    <class>QmitkDataSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>../../Common/QmitkDataSelectionWidget.h</header>
+   <header>internal/Common/QmitkDataSelectionWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

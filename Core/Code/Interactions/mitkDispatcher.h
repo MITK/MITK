@@ -106,7 +106,7 @@ namespace mitk
     void RemoveOrphanedInteractors();
 
     /**
-     * See \ref DispatcherEventDistSection for a description of ProcessEventModes
+     * See \ref DataInteractionTechnicalPage_DispatcherEventDistSection for a description of ProcessEventModes
      */
     ProcessEventMode m_ProcessingMode;
     DataInteractor::Pointer m_SelectedInteractor;

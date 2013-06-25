@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ContourModelInteractor::ContourModelInteractor(DataNode* dataNode)
-:Interactor("ContourModelInteractor2", dataNode)
+:Interactor("ContourModelInteractor", dataNode)
 {
   CONNECT_ACTION( AcCHECKPOINT, OnCheckPointClick );
   CONNECT_ACTION( AcCHECKOBJECT, OnCheckContourClick );
@@ -99,8 +99,6 @@ float mitk::ContourModelInteractor::CanHandleEvent(StateEvent const* stateEvent)
 }
 
 
-
-
 void mitk::ContourModelInteractor::DataChanged()
 {
   //go to initial state
@@ -111,7 +109,6 @@ void mitk::ContourModelInteractor::DataChanged()
   delete nullEvent;
   return;
 }
-
 
 
 bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
@@ -155,7 +152,6 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
 }
 
 
-
 bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
@@ -184,6 +180,7 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
 
   return true;
 }
+
 
 bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
 {

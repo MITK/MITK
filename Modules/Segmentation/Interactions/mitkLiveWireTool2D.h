@@ -94,29 +94,36 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     //the contour already set by the user
     mitk::ContourModel::Pointer m_Contour;
+
     //the corresponding datanode
     mitk::DataNode::Pointer m_ContourModelNode;
 
     //the current LiveWire computed contour
     mitk::ContourModel::Pointer m_LiveWireContour;
-    mitk::ContourModel::Pointer m_EditingContour;
-//    mitk::ContourModel::Pointer m_LeftLiveWireContour;
 
     //the corresponding datanode
     mitk::DataNode::Pointer m_LiveWireContourNode;
-    mitk::DataNode::Pointer m_EditingContourNode;
-//    mitk::DataNode::Pointer m_RightLiveWireContourNode;
 
-    mitk::ContourModelLiveWireInteractor::Pointer m_LiveWireInteractor;
+    // the contour for the editing portion
+    mitk::ContourModel::Pointer m_EditingContour;
+
+    //the corresponding datanode
+    mitk::DataNode::Pointer m_EditingContourNode;
+
+    // the corresponding contour interactor
+    mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
     //the current reference image
     mitk::Image::Pointer m_WorkingSlice;
 
+    // the filter for live wire calculation
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
 
     bool m_CreateAndUseDynamicCosts;
 
-    std::vector< std::pair<mitk::DataNode*, mitk::PlaneGeometry::Pointer> > m_Contours;
+    std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_WorkingContours;
+    std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_EditingContours;
+    std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireInteractors;
 
     template<typename TPixel, unsigned int VImageDimension>
     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);

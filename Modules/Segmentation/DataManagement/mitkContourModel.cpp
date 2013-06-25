@@ -203,26 +203,13 @@ bool mitk::ContourModel::IsNearContour(mitk::Point3D &point, float eps, int time
   return false;
 }
 
-void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
+void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep, bool check)
 {
   if(!this->IsEmptyTimeStep(timestep))
   {
     if( !this->m_ContourSeries[timestep]->IsClosed() )
     {
-      this->m_ContourSeries[timestep]->Concatenate(other->m_ContourSeries[timestep]);
-      this->InvokeEvent( ContourModelSizeChangeEvent() );
-      this->Modified();
-    }
-  }
-}
-
-void mitk::ContourModel::RemoveIntersections(mitk::ContourModel* other, int timestep)
-{
-  if(!this->IsEmptyTimeStep(timestep))
-  {
-    if( !this->m_ContourSeries[timestep]->IsClosed() )
-    {
-      this->m_ContourSeries[timestep]->RemoveIntersections(other->m_ContourSeries[timestep]);
+      this->m_ContourSeries[timestep]->Concatenate(other->m_ContourSeries[timestep], check);
       this->InvokeEvent( ContourModelSizeChangeEvent() );
       this->Modified();
     }
@@ -240,8 +227,6 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timest
     mitkThrow() << "No iterator at invalid timestep " << timestep << ". There are only " << this->GetTimeSteps() << " timesteps available.";
   }
 }
-
-
 
 mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep)
 {
@@ -472,7 +457,6 @@ mitk::Geometry3D* mitk::ContourModel::GetGeometry (int t)const
 }
 
 
-
 void mitk::ContourModel::SetRequestedRegion( const itk::DataObject *data)
 {
   //no support for regions
@@ -487,16 +471,6 @@ void mitk::ContourModel::Clear()
   this->Modified();
 }
 
-
-void mitk::ContourModel::Interpolate(int timestep)
-{
-  if(!this->IsEmptyTimeStep(timestep))
-  {
-    this->m_ContourSeries[timestep]->Interpolate();
-    this->InvokeEvent( ContourModelClosedEvent() );
-    this->Modified();
-  }
-}
 
 void mitk::ContourModel::RedistributeControlVertices(int period, int timestep)
 {
@@ -519,7 +493,6 @@ void mitk::ContourModel::ClearData()
 }
 
 
-
 void mitk::ContourModel::InitializeEmpty()
 {
   //clear data at timesteps
@@ -534,23 +507,17 @@ void mitk::ContourModel::InitializeEmpty()
 }
 
 
-
 void mitk::ContourModel::UpdateOutputInformation()
 {
-
   if ( this->GetSource() )
   {
     this->GetSource()->UpdateOutputInformation();
   }
 
-
-
   //update the bounds of the geometry according to the stored vertices
   float mitkBounds[6];
 
-
   //calculate the boundingbox at each timestep
-
   typedef itk::BoundingBox<unsigned long, 3, ScalarType>        BoundingBoxType;
   typedef BoundingBoxType::PointsContainer                      PointsContainer;
 

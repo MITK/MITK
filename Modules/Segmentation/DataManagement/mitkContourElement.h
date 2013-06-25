@@ -186,14 +186,11 @@ namespace mitk
     virtual void SetIsClosed(bool isClosed);
 
     /** \brief Concatenate the contuor with a another contour.
-    All vertices of the other contour will be add after last vertex.
+    All vertices of the other contour will be added after last vertex.
+    \param other - the other contour
+    \param check - set it true to avoid intersections
     */
-    void Concatenate(mitk::ContourElement* other);
-
-    /** \brief Removes intersected vertices between two contour elements
-    \param other - a given contour element.
-    */
-    void RemoveIntersections(mitk::ContourElement* other);
+    void Concatenate(mitk::ContourElement* other, bool check);
 
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
@@ -201,7 +198,7 @@ namespace mitk
     virtual bool RemoveVertex(VertexType* vertex);
 
     /** \brief Remove a vertex at given index within the container if exists.
-    \param index - the index to be removed at.
+    \param index - the index where the vertex should be removed.
     */
     virtual bool RemoveVertexAt(int index);
 
@@ -235,9 +232,10 @@ namespace mitk
     VertexListType* GetControlVertices();
 
     /** \brief Uniformly redistribute control points with a given period (in number of vertices)
+    \param vertex - the vertex around which the redistribution is done.
     \param period - number of vertices between control points.
     */
-    void RedistributeControlVertices(const VertexType* selected, int period);
+    void RedistributeControlVertices(const VertexType* vertex, int period);
 
   protected:
 
@@ -256,8 +254,7 @@ namespace mitk
     the contour element intersects (i.e. has the same coordinates) with another given contour element
     \param other - a given contour element.
     */
-    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
-        FindFirstIntersection(mitk::ContourElement* other);
+    mitk::ContourElement::VertexIterator FindFirstIntersection(mitk::ContourElement* other);
 
     /** \brief Calculates the slope at a given index
     \param index - the index to get the slope at.

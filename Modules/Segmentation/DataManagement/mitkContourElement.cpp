@@ -320,63 +320,39 @@ mitk::ContourElement::GetControlVertices()
     return newVertices;
 }
 
-void mitk::ContourElement::Concatenate(mitk::ContourElement* other)
+void mitk::ContourElement::Concatenate(mitk::ContourElement* other, bool check)
 {
   if( other->GetSize() > 0)
   {
-    ConstVertexIterator it =  other->m_Vertices->begin();
-    ConstVertexIterator end =  other->m_Vertices->end();
-    //add all vertices of other after last vertex
-    while(it != end)
+    ConstVertexIterator otherIt =  other->m_Vertices->begin();
+    ConstVertexIterator otherEnd =  other->m_Vertices->end();
+    while(otherIt != otherEnd)
     {
-      this->m_Vertices->push_back(*it);
-      it++;
+      if (check)
+      {
+          ConstVertexIterator thisIt =  this->m_Vertices->begin();
+          ConstVertexIterator thisEnd =  this->m_Vertices->end();
+
+          bool found = false;
+          while(thisIt != thisEnd)
+          {
+              if ( (*thisIt)->Coordinates == (*otherIt)->Coordinates )
+              {
+                  found = true;
+                  break;
+              }
+
+              thisIt++;
+          }
+          if (!found)
+              this->m_Vertices->push_back(*otherIt);
+      }
+      else
+      {
+        this->m_Vertices->push_back(*otherIt);
+      }
+      otherIt++;
     }
-  }
-}
-
-std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator>
-mitk::ContourElement::FindFirstIntersection(mitk::ContourElement* other)
-{
-    VertexIterator thisIt =  this->m_Vertices->begin();
-    VertexIterator thisEnd =  this->m_Vertices->end();
-
-    VertexIterator otherEnd =  other->m_Vertices->end();
-
-    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator> match(thisEnd,otherEnd);
-
-    while (thisIt != thisEnd)
-    {
-        VertexIterator otherIt =  other->m_Vertices->begin();
-
-        while (otherIt != otherEnd)
-        {
-            if ( (*thisIt)->Coordinates == (*otherIt)->Coordinates )
-            {
-                match.first = thisIt;
-                match.second = otherIt;
-                return match;
-            }
-
-            otherIt++;
-        }
-
-        thisIt++;
-    }
-
-    return match;
-}
-
-void mitk::ContourElement::RemoveIntersections(mitk::ContourElement* other)
-{
-  if( other->GetSize() > 0)
-  {
-
-   // VertexIterator _where = this->FindFirstIntersection(other);
-    std::pair<mitk::ContourElement::VertexIterator, mitk::ContourElement::VertexIterator> match = this->FindFirstIntersection(other);
-
-    this->m_Vertices->erase(match.first, this->m_Vertices->end());
-    other->m_Vertices->erase(other->m_Vertices->begin(), match.second );
   }
 }
 

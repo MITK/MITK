@@ -46,11 +46,7 @@ namespace mitk
     mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
     mitkNewMacro1Param(Self, DataNode*);
 
-    virtual void SetEditingContourModelNode (mitk::DataNode* _arg)
-    {
-            this->m_EditingContourNode = _arg;
-            this->Modified();
-    }
+    virtual void SetEditingContourModelNode (mitk::DataNode* _arg);
 
     virtual void SetWorkingImage (mitk::Image* _arg);
 
@@ -59,7 +55,6 @@ namespace mitk
     ContourModelLiveWireInteractor(DataNode* dataNode);
     virtual ~ContourModelLiveWireInteractor();
 
-    virtual bool OnDumpImage(Action*, const StateEvent*);
     virtual bool OnDeletePoint(Action*, const StateEvent*);
     virtual bool OnMovePoint(Action*, const StateEvent*);
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);

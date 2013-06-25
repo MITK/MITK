@@ -202,10 +202,10 @@ namespace mitk
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
+    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \pararm check - check for intersections ( default false)
     */
-    void Concatenate(mitk::ContourModel* other, int timestep=0);
-
-    void RemoveIntersections(mitk::ContourModel* other, int timestep=0);
+    void Concatenate(mitk::ContourModel* other, int timestep=0, bool check=false);
 
     /** \brief Returns a const VertexIterator at the start element of the contour.
     @throw mitk::Exception if the timestep is invalid.
@@ -383,11 +383,10 @@ namespace mitk
     */
     void ExecuteOperation(Operation* operation);
 
-    /** \brief Rebuilds all line segments for timestep according to the active type of interpolation method
+    /** \brief Redistributes ontrol vertices with a given period (as number of vertices)
+    \param period - the number of vertices between control points.
     \param timestep - at this timestep all lines will be rebuilt.
     */
-    virtual void Interpolate(int timestep);
-
     virtual void RedistributeControlVertices(int period, int timestep);
 
   protected:

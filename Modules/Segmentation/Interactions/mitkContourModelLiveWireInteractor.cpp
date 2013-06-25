@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ContourModelLiveWireInteractor::ContourModelLiveWireInteractor(DataNode* dataNode)
 :ContourModelInteractor(dataNode)
 {
-  CONNECT_ACTION( AcCLEAR, OnDumpImage ); // auxiliar for debug
+
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
 
   m_NextActiveVertexDown.Fill(0);
@@ -69,7 +69,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   {
     contour->SetSelectedVertexAsControlPoint(false);
 
-    m_lastMousePosition = click;
+    //m_lastMousePosition = click;
 
     m_ContourLeft = mitk::ContourModel::New();
 
@@ -132,6 +132,15 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, co
   return true;
 }
 
+void mitk::ContourModelLiveWireInteractor::SetEditingContourModelNode (mitk::DataNode* _arg)
+{
+  if (this->m_EditingContourNode != _arg)
+  {
+    this->m_EditingContourNode = _arg;
+    this->Modified();
+  }
+}
+
 void mitk::ContourModelLiveWireInteractor::SetWorkingImage (mitk::Image* _arg)
 {
   if (this->m_WorkingSlice != _arg)
@@ -140,16 +149,6 @@ void mitk::ContourModelLiveWireInteractor::SetWorkingImage (mitk::Image* _arg)
     this->m_LiveWireFilter->SetInput(this->m_WorkingSlice);
     this->Modified();
   }
-}
-
-// delete me
-
-bool mitk::ContourModelLiveWireInteractor::OnDumpImage( Action* action, const StateEvent* stateEvent)
-{
-    this->m_LiveWireFilter->DumpMaskImage();
-    mitk::IOUtil::SaveImage(this->m_WorkingSlice, "G:\\Data\\slice.nrrd");
-
-    return true;
 }
 
 bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
@@ -233,9 +232,6 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel::Pointer leftLiveWire = this->m_LiveWireFilter->GetOutput();
   assert ( leftLiveWire );
 
- // if ( leftLiveWire->GetNumberOfVertices(timestep) > 1.5*m_EditingSize )
- //     return false;
-
   if ( !leftLiveWire->IsEmpty(timestep) )
     leftLiveWire->RemoveVertexAt(0, timestep);
 
@@ -263,26 +259,18 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
   mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
   assert ( rightLiveWire );
-/*
+
   // reject strange paths
   if ( abs (rightLiveWire->GetNumberOfVertices(timestep) - leftLiveWire->GetNumberOfVertices(timestep)) > 50 )
   {
-      MITK_INFO << "reject strange path";
       return false;
   }
-*/
+
   if ( !leftLiveWire->IsEmpty(timestep) )
     leftLiveWire->SetControlVertexAt(leftLiveWire->GetNumberOfVertices()-1, timestep);
 
   if ( !rightLiveWire->IsEmpty(timestep) )
     rightLiveWire->RemoveVertexAt(0, timestep);
-
-
-  // set corrected left live wire to its node
- // m_EditingContourNode->SetData(leftLiveWire);
-
-  // set corrected right live wire to its node
- // m_RightLiveWireContourNode->SetData(rightLiveWire);
 
 // not really needed
 /*
@@ -314,15 +302,19 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   newContour->Deselect();
 
   // concatenate left live wire but only if we have more than one vertex
-  if (leftLiveWire->GetNumberOfVertices(timestep)>1)
-      newContour->Concatenate( leftLiveWire, timestep );
+  if (!leftLiveWire->IsEmpty())
+  {
+      newContour->Concatenate( leftLiveWire, timestep, true);
+  }
 
   // set last inserted vertex as selected
   newContour->SelectVertexAt(newContour->GetNumberOfVertices()-1, timestep);
 
   // concatenate right live wire but only if we have more than one vertex
-  if (rightLiveWire->GetNumberOfVertices(timestep)>1)
-      newContour->Concatenate( rightLiveWire, timestep );
+  if (!rightLiveWire->IsEmpty())
+  {
+      newContour->Concatenate( rightLiveWire, timestep, true );
+  }
 
   // concatenate right original contour
   newContour->Concatenate( this->m_ContourRight, timestep );
@@ -331,7 +323,7 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
   m_DataNode->SetData(newContour);
 
-  this->m_lastMousePosition = positionEvent->GetWorldPosition();
+  //this->m_lastMousePosition = positionEvent->GetWorldPosition();
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );

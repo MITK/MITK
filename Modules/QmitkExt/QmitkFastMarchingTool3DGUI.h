@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkExtExports.h"
 #include "mitkFastMarchingTool3D.h"
 
-class QSlider;
+class ctkSliderWidget;
 class QLabel;
 class QFrame;
 class QPushButton;
-#include <QCheckBox>
+class QCheckBox;
 
 
 #include "QmitkStepperAdapter.h"
@@ -50,11 +50,11 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnUpperThresholdChanged(int value);
-    void OnLowerThresholdChanged(int value);
-    void OnMuChanged(int value);
-    void OnStoppingValueChanged(int value);
-    void OnStandardDeviationChanged(int value);
+    void OnUpperThresholdChanged(double);
+    void OnLowerThresholdChanged(double);
+    void OnAlphaChanged(double);
+    void OnBetaChanged(double);
+    void OnStoppingValueChanged(double);
     void OnConfirmSegmentation();
     void OnLivePreviewCheckBoxChanged(int value);
     void OnStepperRefetch();
@@ -65,24 +65,15 @@ protected:
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  QSlider* m_UpperThresholdSlider;
-  QLabel* m_UpperThresholdLabel;
+  ctkSliderWidget* m_UpperThresholdSlider;
+  ctkSliderWidget* m_LowerThresholdSlider;
+  ctkSliderWidget* m_StoppingValueSlider;
+  ctkSliderWidget* m_AlphaSlider;
+  ctkSliderWidget* m_BetaSlider;
 
-  QSlider* m_LowerThresholdSlider;
-  QLabel* m_LowerThresholdLabel;
-
-  QSlider* m_StoppingValueSlider;
-  QLabel* m_StoppingValueLabel;
-
-  QSlider* m_MuSlider;
-  QLabel* m_MuLabel;
-
-  QSlider* m_StandardDeviationSlider;
-  QLabel* m_StandardDeviationLabel;
-
-  QPushButton* m_ConfirmButton;
-  QPushButton* m_ClearSeedsButton;
-  QCheckBox* m_LivePreviewCheckBox;
+  QPushButton* m_btConfirm;
+  QPushButton* m_btClearSeeds;
+  QCheckBox* m_cbxLivePreview;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 

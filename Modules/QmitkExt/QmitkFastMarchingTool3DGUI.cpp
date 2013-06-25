@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
-#include <qslider.h>
+#include <ctkSliderWidget.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
+#include <QCheckBox>
 #include <qpainter.h>
 #include "mitkStepper.h"
 #include "mitkBaseRenderer.h"
@@ -36,111 +37,144 @@ m_TimeIsConnected(false)
   this->setContentsMargins( 0, 0, 0, 0 );
 
   // create the visible widgets
-  QGridLayout *layout = new QGridLayout(this);
+  QVBoxLayout *vlayout = new QVBoxLayout(this);
 
+  // Alpha controls
+  {
+   QHBoxLayout *hlayout = new QHBoxLayout();
+   hlayout->setSpacing(2);
 
-  /*StandardDeviation*/
-  QLabel* labelStandardDeviation = new QLabel("Alpha: ");
-  layout->addWidget(labelStandardDeviation,0,0);
+   QLabel *lbl = new QLabel(this);
+   lbl->setText("Sigmoid Alpha: ");
+   hlayout->addWidget(lbl);
 
-  m_StandardDeviationLabel = new QLabel("-1.0");
-  layout->addWidget(m_StandardDeviationLabel,0,2);
+   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+   hlayout->addItem(sp2);
 
-  m_StandardDeviationSlider = new QSlider( Qt::Horizontal);
-  m_StandardDeviationSlider->setMinimum(-100);
-  m_StandardDeviationSlider->setMaximum(0);
-  m_StandardDeviationSlider->setPageStep(1);
-  m_StandardDeviationSlider->setValue(-10);
-  m_StandardDeviationSlider->setMaximumWidth(200);
-  connect( m_StandardDeviationSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStandardDeviationChanged(int)));
-  layout->addWidget( m_StandardDeviationSlider,0,1);
-  /*END StandardDeviation*/
+   vlayout->addLayout(hlayout);
+  }
 
+  m_AlphaSlider = new ctkSliderWidget(this);
+  m_AlphaSlider->setMinimum(-100);
+  m_AlphaSlider->setMaximum(0);
+  m_AlphaSlider->setPageStep(1);
+  m_AlphaSlider->setValue(-10);
+  m_AlphaSlider->setTracking(false);
+//  m_AlphaSlider->setMaximumWidth(200);
+  m_AlphaSlider->setToolTip("The \"alpha\" parameter in the fast marching 3D algorithm");
+  connect( m_AlphaSlider, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
+  vlayout->addWidget( m_AlphaSlider );
 
-  /*Mu*/
-  QLabel* labelMu = new QLabel("Beta: ");
-  layout->addWidget(labelMu,1,0);
+  // Beta controls
+  {
+   QHBoxLayout *hlayout = new QHBoxLayout();
+   hlayout->setSpacing(2);
 
-  m_MuLabel = new QLabel("5.0");
-  layout->addWidget(m_MuLabel,1,2);
+   QLabel *lbl = new QLabel(this);
+   lbl->setText("Sigmoid Beta: ");
+   hlayout->addWidget(lbl);
 
-  m_MuSlider = new QSlider( Qt::Horizontal);
-  m_MuSlider->setMinimum(0);
-  m_MuSlider->setMaximum(1000);
-  m_MuSlider->setPageStep(1);
-  m_MuSlider->setValue(50);
-  m_MuSlider->setMaximumWidth(200);
-  connect( m_MuSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMuChanged(int)));
-  layout->addWidget( m_MuSlider,1,1);
-  /*END Mu*/
+   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+   hlayout->addItem(sp2);
 
+   vlayout->addLayout(hlayout);
+  }
 
-  /*StoppingValue*/
+  m_BetaSlider = new ctkSliderWidget(this);
+  m_BetaSlider->setMinimum(0);
+  m_BetaSlider->setMaximum(1000);
+  m_BetaSlider->setPageStep(1);
+  m_BetaSlider->setValue(50);
+  m_BetaSlider->setTracking(false);
+//  m_BetaSlider->setMaximumWidth(200);
+  m_BetaSlider->setToolTip("The \"beta\" parameter in the fast marching 3D algorithm");
+  connect( m_BetaSlider, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
+  vlayout->addWidget( m_BetaSlider );
+
+  // stopping value controls
   QLabel* labelStoppingValue = new QLabel("Stopping value: ");
-  layout->addWidget(labelStoppingValue,2,0);
+  vlayout->addWidget( labelStoppingValue );
 
-  m_StoppingValueLabel = new QLabel("50.0");
-  layout->addWidget(m_StoppingValueLabel,2,2);
-
-  m_StoppingValueSlider = new QSlider( Qt::Horizontal);
+  m_StoppingValueSlider = new ctkSliderWidget(this);
   m_StoppingValueSlider->setMinimum(0);
   m_StoppingValueSlider->setMaximum(10000);
   m_StoppingValueSlider->setPageStep(1);
   m_StoppingValueSlider->setValue(500);
-  m_StoppingValueSlider->setMaximumWidth(200);
-  connect( m_StoppingValueSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStoppingValueChanged(int)));
-  layout->addWidget( m_StoppingValueSlider,2,1);
-  /*END StoppingValue*/
+  m_StoppingValueSlider->setTracking(false);
+//  m_StoppingValueSlider->setMaximumWidth(200);
+  m_StoppingValueSlider->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
+  connect( m_StoppingValueSlider, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
+  vlayout->addWidget( m_StoppingValueSlider );
 
+  // upper threshold controls
+  {
+   QHBoxLayout *hlayout = new QHBoxLayout();
+   hlayout->setSpacing(2);
 
-  /*Upperthreshold*/
-  QLabel* labelUpper = new QLabel("Upper Threshold: ");
-  layout->addWidget(labelUpper,3,0);
+   QLabel *lbl = new QLabel(this);
+   lbl->setText("Upper Threshold: ");
+   hlayout->addWidget(lbl);
 
-  m_UpperThresholdLabel = new QLabel("100.0");
-  layout->addWidget(m_UpperThresholdLabel,3,2);
+   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+   hlayout->addItem(sp2);
 
-  m_UpperThresholdSlider = new QSlider( Qt::Horizontal);
+   vlayout->addLayout(hlayout);
+   }
+
+  m_UpperThresholdSlider = new ctkSliderWidget(this);
   m_UpperThresholdSlider->setMinimum(0);
   m_UpperThresholdSlider->setMaximum(10000);
   m_UpperThresholdSlider->setPageStep(1);
   m_UpperThresholdSlider->setValue(1000);
-  m_UpperThresholdSlider->setMaximumWidth(200);
-  connect( m_UpperThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnUpperThresholdChanged(int)));
-  layout->addWidget( m_UpperThresholdSlider,3,1);
-  /*END Upperthreshold*/
+  m_UpperThresholdSlider->setTracking(false);
+//  m_UpperThresholdSlider->setMaximumWidth(200);
+  m_UpperThresholdSlider->setToolTip("The \"upper threshold\" parameter in the fast marching 3D algorithm");
+  connect( m_UpperThresholdSlider, SIGNAL(valueChanged(double)), this, SLOT(OnUpperThresholdChanged(double)));
+  vlayout->addWidget( m_UpperThresholdSlider );
 
+  // lower threshold controls
+  {
+   QHBoxLayout *hlayout = new QHBoxLayout();
+   hlayout->setSpacing(2);
 
-  /*LowerThreshold*/
-  QLabel* labelLower = new QLabel("Lower Threshold: ");
-  layout->addWidget(labelLower,4,0);
+   QLabel *lbl = new QLabel(this);
+   lbl->setText("Lower Threshold: ");
+   hlayout->addWidget(lbl);
 
-  m_LowerThresholdLabel = new QLabel("0.0");
-  layout->addWidget(m_LowerThresholdLabel,4,2);
+   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+   hlayout->addItem(sp2);
 
-  m_LowerThresholdSlider = new QSlider( Qt::Horizontal);
+   vlayout->addLayout(hlayout);
+   }
+
+  m_LowerThresholdSlider = new ctkSliderWidget(this);
   m_LowerThresholdSlider->setMinimum(-100);
   m_LowerThresholdSlider->setMaximum(100);
   m_LowerThresholdSlider->setPageStep(1);
   m_LowerThresholdSlider->setValue(0);
-  m_LowerThresholdSlider->setMaximumWidth(200);
-  connect( m_LowerThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnLowerThresholdChanged(int)));
-  layout->addWidget( m_LowerThresholdSlider,4,1);
-  /*END LowerThreshold*/
+  m_LowerThresholdSlider->setTracking(false);
+//  m_LowerThresholdSlider->setMaximumWidth(200);
+  m_LowerThresholdSlider->setToolTip("The \"lower threshold\" parameter in the fast marching 3D algorithm");
+  connect( m_LowerThresholdSlider, SIGNAL(valueChanged(double)), this, SLOT(OnLowerThresholdChanged(double)));
+  vlayout->addWidget( m_LowerThresholdSlider );
 
-  m_ConfirmButton = new QPushButton("Confirm Segmentation");
-  layout->addWidget(m_ConfirmButton, 6,0);
-  connect( m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
+/*
+  m_cbxLivePreview = new QCheckBox("Live preview");
+  m_cbxLivePreview->setChecked(true);
+  m_cbxLivePreview->setTristate(false);
+  layout->addWidget(m_cbxLivePreview, 5,0);
+  connect( m_cbxLivePreview, SIGNAL(stateChanged(int)), this, SLOT(OnLivePreviewCheckBoxChanged(int)) );
+*/
+  m_btClearSeeds = new QPushButton("Clear");
+  m_btClearSeeds->setToolTip("Clear current result and start over again");
+  //layout->addWidget(m_btClearSeeds, 5,1);
+  vlayout->addWidget(m_btClearSeeds);
+  connect( m_btClearSeeds, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
 
-  m_LivePreviewCheckBox = new QCheckBox("Live preview");
-  m_LivePreviewCheckBox->setChecked(false);
-  m_LivePreviewCheckBox->setTristate(false);
-  layout->addWidget(m_LivePreviewCheckBox, 5,0);
-  connect( m_LivePreviewCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnLivePreviewCheckBoxChanged(int)) );
-
-  m_ClearSeedsButton = new QPushButton("Clear seeds");
-  layout->addWidget(m_ClearSeedsButton, 5,1);
-  connect( m_ClearSeedsButton, SIGNAL(clicked()), this, SLOT(OnClearSeeds()) );
+  m_btConfirm = new QPushButton("Accept");
+  m_btConfirm->setToolTip("Incorporate current result in your working session.");
+  vlayout->addWidget(m_btConfirm);
+  connect( m_btConfirm, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -169,58 +203,43 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnUpperThresholdChanged(int value)
+void QmitkFastMarchingTool3DGUI::OnUpperThresholdChanged(double value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetUpperThreshold( value );
-
-    //visualize slider value
-    m_UpperThresholdLabel->setText(QString("%1 ").arg(float(value)/10.0));
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnLowerThresholdChanged(int value)
+void QmitkFastMarchingTool3DGUI::OnLowerThresholdChanged(double value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetLowerThreshold( value );
-
-    //visualize slider value
-    m_LowerThresholdLabel->setText(QString("%1 ").arg(float(value)/10.0));
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnMuChanged(int value)
+void QmitkFastMarchingTool3DGUI::OnBetaChanged(double value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetMu( value );
-
-    //visualize slider value
-    m_MuLabel->setText(QString("%1 ").arg(float(value)/10.0));
+    m_FastMarchingTool->SetBeta( value );
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnStandardDeviationChanged(int value)
+void QmitkFastMarchingTool3DGUI::OnAlphaChanged(double value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
-    m_FastMarchingTool->SetStandardDeviation( value );
-
-    //visualize slider value
-    m_StandardDeviationLabel->setText(QString("%1 ").arg(float(value)/10.0));
+    m_FastMarchingTool->SetAlpha( value );
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(int value)
+void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetStoppingValue( value );
-
-    //visualize slider value
-    m_StoppingValueLabel->setText(QString("%1 ").arg(float(value)/10.0));
   }
 }
 

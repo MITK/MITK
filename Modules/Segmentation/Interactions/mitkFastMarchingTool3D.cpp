@@ -38,7 +38,7 @@ namespace mitk {
 
 mitk::FastMarchingTool3D::FastMarchingTool3D()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
-m_IsLivePreviewEnabled(false),
+m_IsLivePreviewEnabled(true),
 m_CurrentTimeStep(0),
 m_LowerThreshold(200),
 m_UpperThreshold(200),
@@ -129,41 +129,41 @@ const char* mitk::FastMarchingTool3D::GetName() const
   return "FastMarching3D";
 }
 
-void mitk::FastMarchingTool3D::SetUpperThreshold(int value)
+void mitk::FastMarchingTool3D::SetUpperThreshold(double value)
 {
-  m_UpperThreshold = (float)value / 10.0;
+  m_UpperThreshold = value / 10.0;
   thresholder->SetUpperThreshold( m_UpperThreshold );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool3D::SetLowerThreshold(int value)
+void mitk::FastMarchingTool3D::SetLowerThreshold(double value)
 {
-  m_LowerThreshold = (float)value / 10.0;
+  m_LowerThreshold = value / 10.0;
   thresholder->SetLowerThreshold( m_LowerThreshold );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool3D::SetMu(int value)
+void mitk::FastMarchingTool3D::SetBeta(double value)
 {
-  beta = (float)value / 10.0;
+  beta = value / 10.0;
   sigmoid->SetBeta( beta );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool3D::SetStandardDeviation(int value)
+void mitk::FastMarchingTool3D::SetAlpha(double value)
 {
-  alpha = (float)value / 10.0;
+  alpha = value / 10.0;
   sigmoid->SetAlpha( alpha );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();
 }
 
-void mitk::FastMarchingTool3D::SetStoppingValue(int value)
+void mitk::FastMarchingTool3D::SetStoppingValue(double value)
 {
-  m_StoppingValue = (float)value / 10.0;
+  m_StoppingValue = value / 10.0;
   fastMarching->SetStoppingValue( m_StoppingValue );
   if(m_IsLivePreviewEnabled)
     this->UpdatePreviewImage();

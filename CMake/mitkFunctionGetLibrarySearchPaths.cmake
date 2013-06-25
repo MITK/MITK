@@ -3,7 +3,13 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   set(_search_dirs )
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
   if(_additional_paths)
-    list(APPEND _search_dirs ${_additional_paths})
+    foreach(_path ${_additional_paths})
+      if(EXISTS "${_path}/${intermediate_dir}")
+        list(APPEND _search_dirs "${_path}/${intermediate_dir}")
+      else()
+        list(APPEND _search_dirs ${_path})
+      endif()
+    endforeach()
   endif()
 
   if(MITK_RUNTIME_PATH)
@@ -14,18 +20,24 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     return()
   endif()
 
-  list(APPEND _search_dirs
-    ${MITK_VTK_LIBRARY_DIRS}/${intermediate_dir}
-    ${MITK_ITK_LIBRARY_DIRS}/${intermediate_dir}
-    ${QT_LIBRARY_DIR}
-    ${QT_LIBRARY_DIR}/../bin
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir}
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${intermediate_dir}
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/${intermediate_dir}
-    )
+  foreach(_dir ${MITK_VTK_LIBRARY_DIRS} ${MITK_ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR}
+               ${QT_LIBRARY_DIR}/../bin ${MITK_BINARY_DIR}/bin
+               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins)
+    if(EXISTS "${_dir}/${intermediate_dir}")
+      list(APPEND _search_dirs "${_dir}/${intermediate_dir}")
+    else()
+      list(APPEND _search_dirs ${_dir})
+    endif()
+  endforeach()
+
+  if(WIN32)
+    list(APPEND _search_dirs "${ITK_DIR}/bin")
+  else()
+    list(APPEND _search_dirs "${ITK_DIR}/lib")
+  endif()
 
   if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
-    list(APPEND _search_dirs ${Boost_LIBRARY__search_dirs})
+    list(APPEND _search_dirs ${Boost_LIBRARY_DIRS})
   endif()
   if(GDCM_DIR)
     list(APPEND _search_dirs ${GDCM_DIR}/bin/${intermediate_dir})
@@ -53,7 +65,11 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   if(MITK_LIBRARY_DIRS)
     foreach(lib_dir ${MITK_LIBRARY_DIRS})
-      list(APPEND _search_dirs "${lib_dir}/${intermediate_dir}")
+      if(EXISTS "${lib_dir}/${intermediate_dir}")
+        list(APPEND _search_dirs "${lib_dir}/${intermediate_dir}")
+      else()
+        list(APPEND _search_dirs "${lib_dir}")
+      endif()
     endforeach()
   endif()
 

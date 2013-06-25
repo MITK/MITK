@@ -35,7 +35,24 @@ endmacro()
 # This is used in several install macros
 macro(_fixup_target)
 
+  if(NOT intermediate_dir)
+    if(WIN32 AND NOT MINGW)
+      set(intermediate_dir Release)
+    else()
+      set(intermediate_dir .)
+    endif()
+  endif()
+  mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
+
   install(CODE "
+
+    set(_bundle_dest_dir \"${_bundle_dest_dir}\")
+    if(_bundle_dest_dir)
+      set(_bin_path \"\${CMAKE_INSTALL_PREFIX}/\${_bundle_dest_dir}\")
+    else()
+      set(_bin_path \"\${CMAKE_INSTALL_PREFIX}/bin\")
+    endif()
+
     macro(gp_item_default_embedded_path_override item default_embedded_path_var)
       get_filename_component(_item_name \"\${item}\" NAME)
       get_filename_component(_item_path \"\${item}\" PATH)
@@ -53,12 +70,7 @@ macro(_fixup_target)
         get_filename_component(_item_path \"\${full_path}\" PATH)
       endif()
 
-      set(_bundle_dest_dir \"${_bundle_dest_dir}\")
-      if(_bundle_dest_dir)
-        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/\${_bundle_dest_dir}/plugins\")
-      else()
-        set(_plugins_path \"\${CMAKE_INSTALL_PREFIX}/bin/plugins\")
-      endif()
+      set(_plugins_path \"\${_bin_path}/plugins\")
 
       if(_item_path STREQUAL _plugins_path
          OR (_item_path MATCHES \"\${_plugins_path}/\" AND _item_name MATCHES \"liborg\") # this is for legacy BlueBerry bundle support
@@ -101,18 +113,29 @@ macro(_fixup_target)
     endif()
 
     if(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\")
-      # When installing multiple applications, this will find *all* already installed
-      # and pulled in libraries (except on MacOS). We don't care...
-      file(GLOB_RECURSE GLOBBED_PLUGINS
-        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/lib*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      set(GLOBBED_PLUGINS )
+      set(_bb_osgi_lib \"\${_bin_path}/liborg_blueberry_osgi${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      if(EXISTS \"\${_bb_osgi_lib}\")
+        list(APPEND GLOBBED_PLUGINS \"\${_bb_osgi_lib}\")
+      endif()
+
+      # Iterate over all sub-directories which contain plug-ins
+      # (BlueBerry plug-ins, Qt plug-ins, and auto-load modules)
+      file(GLOB _children \"\${_bin_path}/*\")
+      foreach(_child \${_children})
+        if(IS_DIRECTORY \${_child})
+          file(GLOB_RECURSE _plugins \"\${_child}/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+          if(_plugins)
+            list(APPEND GLOBBED_PLUGINS \${_plugins})
+          endif()
+        endif()
+      endforeach()
     endif()
 
-    set(_qt_plugin_glob_expressions \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    set(GLOBBED_QT_PLUGINS )
     if(CMAKE_SHARED_MODULE_SUFFIX AND NOT CMAKE_SHARED_MODULE_SUFFIX STREQUAL CMAKE_SHARED_LIBRARY_SUFFIX)
-      list(APPEND _qt_plugin_glob_expressions \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_MODULE_SUFFIX}\")
+      file(GLOB_RECURSE GLOBBED_QT_PLUGINS \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_MODULE_SUFFIX}\")
     endif()
-
-    file(GLOB_RECURSE GLOBBED_QT_PLUGINS ${_qt_plugin_glob_expressions})
 
     set(PLUGINS )
     foreach(_plugin ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_PLUGINS})
@@ -125,13 +148,12 @@ macro(_fixup_target)
     endif(PLUGINS)
     message(\"globbed plugins: \${PLUGINS}\")
 
-    set(PLUGIN_DIRS)
+    set(DIRS ${DIRS} ${_search_paths})
     foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
-      list(APPEND PLUGIN_DIRS \${_pluginpath})
+      list(APPEND DIRS \${_pluginpath})
     endforeach(_plugin)
-    set(DIRS ${DIRS})
-    list(APPEND DIRS \${PLUGIN_DIRS})
+
     list(REMOVE_DUPLICATES DIRS)
 
     # use custom version of BundleUtilities

@@ -9,41 +9,12 @@ macro(MITK_INSTALL_TARGETS)
 
   # TODO: how to supply the correct intermediate directory??
   # CMAKE_CFG_INTDIR is not expanded to actual values inside the install(CODE "...") macro ...
-  set(intermediate_dir )
+  set(intermediate_dir .)
   if(WIN32 AND NOT MINGW)
     set(intermediate_dir Release)
   endif()
 
-  set(DIRS
-    ${MITK_VTK_LIBRARY_DIRS}/${intermediate_dir}
-    ${MITK_ITK_LIBRARY_DIRS}/${intermediate_dir}
-    ${QT_LIBRARY_DIR}
-    ${QT_LIBRARY_DIR}/../bin
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir}
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${intermediate_dir}
-    )
-
-  foreach(_lib_dir ${_install_LIBRARY_DIRS})
-    list(APPEND DIRS ${_lib_dir}/${intermediate_dir})
-  endforeach()
-
-  if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
-    list(APPEND DIRS ${Boost_LIBRARY_DIRS})
-  endif()
-  if(GDCM_DIR)
-    list(APPEND DIRS ${GDCM_DIR}/bin/${intermediate_dir})
-  endif()
-  if(OpenCV_DIR)
-    list(APPEND DIRS ${OpenCV_DIR}/bin/${intermediate_dir})
-  endif()
-  if(SOFA_DIR)
-    list(APPEND DIRS ${SOFA_DIR}/bin/${intermediate_dir})
-  endif()
-  if(MITK_USE_BLUEBERRY)
-    list(APPEND DIRS ${CTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir})
-  endif()
-
-  list(REMOVE_DUPLICATES DIRS)
+  mitkFunctionGetLibrarySearchPaths(DIRS ${intermediate_dir})
 
   if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
     set(_qt_is_system_qt 1)

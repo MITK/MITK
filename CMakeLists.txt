@@ -204,7 +204,6 @@ if(MITK_USE_SOFA)
   endif()
 endif()
 
-
 # Customize the default pixel types for multiplex macros
 
 set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
@@ -321,6 +320,7 @@ include(mitkFunctionGetVersionDescription)
 include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
+include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionCompileSnippets)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
@@ -334,6 +334,7 @@ include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
+include(mitkMacroGetPMDPlatformString)
 
 #-----------------------------------------------------------------------------
 # Prerequesites
@@ -729,58 +730,10 @@ if(MITK_USE_BLUEBERRY)
 
 endif()
 
-# Construct a list of paths containing runtime directories
-# for MITK applications on Windows
-set(MITK_RUNTIME_PATH
-    "${VTK_LIBRARY_DIRS}/%VS_BUILD_TYPE%;${ITK_DIR}/bin/%VS_BUILD_TYPE%;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%"
-    )
-
-if(QT4_FOUND)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${QT_LIBRARY_DIR}/../bin")
-endif()
-
-if(MITK_USE_BLUEBERRY)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_RUNTIME_LIBRARY_DIRS}/%VS_BUILD_TYPE%")
-  if(DEFINED CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY)
-    if(IS_ABSOLUTE "${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}")
-      set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%")
-    else()
-      set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CTK_PLUGIN_RUNTIME_OUTPUT_DIRECTORY}/%VS_BUILD_TYPE%")
-    endif()
-  else()
-    set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/%VS_BUILD_TYPE%")
-  endif()
-endif()
-
-if(GDCM_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${GDCM_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-if(OpenCV_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${OpenCV_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-if(SOFA_DIR)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${SOFA_DIR}/bin/%VS_BUILD_TYPE%")
-endif()
-
-# DCMTK is statically build
-#if(DCMTK_DIR)
-#  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${DCMTK_DIR}/bin/%VS_BUILD_TYPE%")
-#endif()
-
-if(MITK_USE_Boost AND MITK_USE_Boost_LIBRARIES AND NOT MITK_USE_SYSTEM_Boost)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${Boost_LIBRARY_DIRS}")
-endif()
-
 #-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
 option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
-
-if(MITK_USE_Python)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
-endif()
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -914,6 +867,8 @@ set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_TARGETS \"${a
 set_target_properties(${target_to_export} PROPERTIES MITK_AUTOLOAD_DIRECTORY \"${autoload_dir}\")")
   endif()
 endforeach()
+
+get_property(MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS_CONFIG GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
 
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)

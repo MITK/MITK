@@ -735,10 +735,6 @@ endif()
 #-----------------------------------------------------------------------------
 option(MITK_USE_Python "Build Python integration for MITK (requires CableSwig)." OFF)
 
-if(MITK_USE_Python)
-  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_PYTHONQT_INSTALL_DIR}/bin")
-endif()
-
 #-----------------------------------------------------------------------------
 # Documentation
 #-----------------------------------------------------------------------------
@@ -901,8 +897,6 @@ foreach(_module ${_MODULES_CONF_FILES})
   string(REPLACE Config.cmake "" _module_name ${_module})
   list(APPEND MITK_MODULE_NAMES ${_module_name})
 endforeach()
-
-mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_CONFIG "%VS_BUILD_TYPE%")
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)

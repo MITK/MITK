@@ -35,6 +35,15 @@ endmacro()
 # This is used in several install macros
 macro(_fixup_target)
 
+  if(NOT intermediate_dir)
+    if(WIN32 AND NOT MINGW)
+      set(intermediate_dir Release)
+    else()
+      set(intermediate_dir .)
+    endif()
+  endif()
+  mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
+
   install(CODE "
 
     set(_bundle_dest_dir \"${_bundle_dest_dir}\")
@@ -139,17 +148,11 @@ macro(_fixup_target)
     endif(PLUGINS)
     message(\"globbed plugins: \${PLUGINS}\")
 
-    set(PLUGIN_DIRS)
+    set(DIRS ${DIRS} ${_search_paths})
     foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
-      list(APPEND PLUGIN_DIRS \${_pluginpath})
+      list(APPEND DIRS \${_pluginpath})
     endforeach(_plugin)
-    set(DIRS ${DIRS})
-    list(APPEND DIRS \${PLUGIN_DIRS})
-
-    # Add additional library search dirs, which are aggregated within the MITK_CREATE_MODULE macro.
-    get_property(_mitk_additional_library_search_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
-    list(APPEND DIRS ${_mitk_additional_library_search_paths})
 
     list(REMOVE_DUPLICATES DIRS)
 

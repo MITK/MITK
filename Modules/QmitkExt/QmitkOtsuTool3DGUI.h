@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "QmitkExtExports.h"
 #include "mitkOtsuTool3D.h"
-#include <QListWidget.h>
+#include <QListWidget>
+#include <QPushButton>
+#include "ui_QmitkOtsuToolWidgetControls.h"
 
 class QSpinBox;
 class QLabel;
@@ -63,11 +65,9 @@ class QmitkExt_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     QmitkOtsuTool3DGUI();
     virtual ~QmitkOtsuTool3DGUI();
 
-    QSpinBox* m_Spinbox;
-    QLabel* m_SizeLabel;
-    QListWidget* m_selectionListWidget;
-
     mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
+
+    Ui_QmitkOtsuToolWidgetControls m_Controls;
 };
 
 #endif

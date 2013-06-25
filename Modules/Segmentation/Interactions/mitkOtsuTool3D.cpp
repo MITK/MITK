@@ -79,6 +79,7 @@ void mitk::OtsuTool3D::Deactivated()
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
   m_BinaryPreviewNode = NULL;
+  m_ToolManager->ActivateTool(-1);
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -138,6 +139,8 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   levWinProp->SetLevelWindow( levelwindow );
   m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
 
+  //m_BinaryPreviewNode->SetVisibility(false);
+//  m_MultiLabelResultNode->SetVisibility(true);
   //this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -78,8 +78,9 @@ namespace mitk {
     typedef vnl_vector_fixed<double,3> PointType;
 
     typedef itk::Image<double, 3> DistanceImageType;
-    //typedef DistanceImageType::PointType PointType;
     typedef DistanceImageType::IndexType IndexType;
+    typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
+    typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
 
     typedef std::vector< PointType > NormalList;
     typedef std::vector< PointType > CenterList;
@@ -90,9 +91,6 @@ namespace mitk {
 
     typedef std::vector<Surface::Pointer> SurfaceList;
 
-    typedef itk::Image<double, 3> DistanceImageType;
-    typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
-    typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
 
     mitkClassMacro(CreateDistanceImageFromSurfaceFilter,ImageSource);
     itkNewMacro(Self);

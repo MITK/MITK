@@ -29,7 +29,7 @@ The widgets are initialized as in the previous steps but with an additional QVBo
 \until hlayout->addWidget(m_LineEditThresholdMax)
 
 
-Then a button is created to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
+This creates a button to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
 
 \dontinclude Step6.cpp
 
@@ -38,7 +38,7 @@ Then a button is created to start the segmentation and its clicked() signal is c
 
 \section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
 
-ITK images are templated whereas mitk::Images are not. To use ITK filters with MITK images, we have to convert From MITK to ITK. To do so, first
+ITK images are templated whereas mitk::Images are not. To use ITK filters with MITK images, we have to convert from MITK to ITK. To do so, first
 define an access method, which is templated as an ITK image is:
 
 \code

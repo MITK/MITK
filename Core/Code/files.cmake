@@ -66,7 +66,6 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
 
   Interactions/mitkEventMapperAddOn.h
-
   Interfaces/mitkIDataNodeReader.h
 
   IO/mitkPixelTypeTraits.h
@@ -253,6 +252,7 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
+  Interactions/mitkToolCommand.cpp
 
   Interfaces/mitkInteractionEventObserver.cpp
   Interfaces/mitkIShaderRepository.cpp

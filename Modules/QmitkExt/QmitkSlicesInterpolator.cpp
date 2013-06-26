@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include <mitkVtkImageOverwrite.h>
 #include <mitkExtractSliceFilter.h>
+#include <mitkImageTimeSelector.h>
 
 #include <itkCommand.h>
 
@@ -323,7 +324,11 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
-  //For the 3D interpolation
+  if (m_ToolManager->GetWorkingData(0) != 0)
+  {
+    m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+  }
+  //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
   if (m_2DInterpolationEnabled)
   {
@@ -520,9 +525,19 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     mitk::UndoStackItem::IncCurrGroupEventId();
     mitk::UndoStackItem::ExecuteIncrement();
 
+    mitk::Image::Pointer image3D = m_Segmentation;
+    unsigned int timeStep( slicer->GetTime()->GetPos() );
+    if (m_Segmentation->GetDimension() == 4)
+    {
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput( m_Segmentation );
+      timeSelector->SetTimeNr( timeStep );
+      timeSelector->Update();
+      image3D = timeSelector->GetOutput();
+    }
     // create a empty diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();
-    diffImage->Initialize( m_Segmentation );
+    diffImage->Initialize( image3D );
 
     // Set all pixels to zero
     mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
@@ -540,7 +555,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     mitk::Point3D origin = reslicePlane->GetOrigin();
     unsigned int totalChangedSlices(0);
-    unsigned int timeStep( slicer->GetTime()->GetPos() );
 
     for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
     {

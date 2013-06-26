@@ -128,6 +128,8 @@ namespace mitk
 
  private:
 
+   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
+
    struct ContourPositionPair {
      Surface::Pointer contour;
      RestorePlanePositionOperation* position;

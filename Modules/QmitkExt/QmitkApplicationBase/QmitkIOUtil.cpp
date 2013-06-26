@@ -217,10 +217,22 @@ QString mitk::QmitkIOUtil::GetFileNameWithQDialog(QString caption, QString defau
         std::string extension = itksys::SystemTools::GetFilenameLastExtension( returnfileName.toStdString() );
         if(extension.empty()) // if no extension has been entered manually into the filename
         {
+            // check if the filter is not null, otherwise we cannot quess (retrieve) the extension
+          if( selectedFilter != NULL)
+          {
+
             // get from combobox selected file extension
             extension = itksys::SystemTools::GetFilenameLastExtension( selectedFilter->toLocal8Bit().constData());
             extension = extension.substr(0, extension.size()-1); //remove the last char ")" from the extension
             returnfileName += QString::fromStdString(extension); //add it to the path which is returned
+          }
+          else
+          {
+            QMessageBox::critical( NULL, "Error while saving image", "No file extension specified. Could not guess any.",
+                                   QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+
+            return QString("");
+          }
         }
     }
 
@@ -256,6 +268,7 @@ void mitk::QmitkIOUtil::SaveToFileWriter( mitk::FileWriterWithInformation::Point
         qProposedFileName.append(fileWriter->GetDefaultFilename());
     }
     qProposedFileName.append(fileWriter->GetDefaultExtension());
+
     qFileName = GetFileNameWithQDialog("Save file", qProposedFileName,
                                        QString::fromAscii(fileWriter->GetFileDialogPattern()));
     //do nothing if the user presses cancel

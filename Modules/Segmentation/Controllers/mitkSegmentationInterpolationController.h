@@ -133,7 +133,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       \param timeStep Which time step to use
     */
-    Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
+    Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep );
 
     void OnImageModified(const itk::EventObject&);
 

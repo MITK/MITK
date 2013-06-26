@@ -95,7 +95,7 @@ public:
   /**
    * \brief struct for data of a point
    */
-  struct PointDataType
+  struct MITK_CORE_EXPORT PointDataType
   {
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected

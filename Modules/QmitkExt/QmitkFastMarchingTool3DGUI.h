@@ -22,11 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFastMarchingTool3D.h"
 
 class ctkSliderWidget;
-class QLabel;
-class QFrame;
 class QPushButton;
-class QCheckBox;
-
 
 #include "QmitkStepperAdapter.h"
 
@@ -56,7 +52,6 @@ public:
     void OnBetaChanged(double);
     void OnStoppingValueChanged(double);
     void OnConfirmSegmentation();
-    void OnLivePreviewCheckBoxChanged(int value);
     void OnStepperRefetch();
     void OnClearSeeds();
 
@@ -65,15 +60,14 @@ protected:
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  ctkSliderWidget* m_UpperThresholdSlider;
-  ctkSliderWidget* m_LowerThresholdSlider;
-  ctkSliderWidget* m_StoppingValueSlider;
-  ctkSliderWidget* m_AlphaSlider;
-  ctkSliderWidget* m_BetaSlider;
+  ctkSliderWidget* m_slUpperThreshold;
+  ctkSliderWidget* m_slLowerThreshold;
+  ctkSliderWidget* m_slStoppingValue;
+  ctkSliderWidget* m_slAlpha;
+  ctkSliderWidget* m_slBeta;
 
   QPushButton* m_btConfirm;
   QPushButton* m_btClearSeeds;
-  QCheckBox* m_cbxLivePreview;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 

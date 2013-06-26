@@ -81,14 +81,11 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   okButton->setFont( f );
   layout->addWidget( okButton, 4, 0, 1, 2 );
 
-
-  /*
-  m_Frame = new QFrame( this );
-  m_Frame->setMinimumSize( QSize(50, 50) );
-  m_Frame->setFrameStyle( QFrame::Box || QFrame::Plain );
-  m_Frame->show();
-  layout->addWidget( m_Frame );
-  */
+  m_InformationLabel = new QLabel("", this);
+  f = m_InformationLabel->font();
+  f.setBold(false);
+  m_InformationLabel->setFont( f );
+  layout->addWidget( m_InformationLabel, 5,0,1,2);
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -140,5 +137,7 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
+  m_InformationLabel->setText("Please wait some time for Computation...");
   m_WatershedTool->DoIt();
+  m_InformationLabel->setText("");
 }

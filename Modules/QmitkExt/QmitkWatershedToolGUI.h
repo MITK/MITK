@@ -60,6 +60,8 @@ class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 
     QLabel* m_ThresholdLabel;
     QLabel* m_LevelLabel;
+    QLabel* m_InformationLabel;
+
     QFrame* m_Frame;
 
     mitk::WatershedTool::Pointer m_WatershedTool;

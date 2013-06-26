@@ -27,10 +27,7 @@ namespace mitk
 class Image;
 
 /**
-  \brief Simple watershed filter tool.
-
-  \sa ExtractImageFilter
-  \sa OverwriteSliceImageFilter
+  \brief Simple watershed segmentation tool.
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl
@@ -56,10 +53,18 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
       m_Level = l;
     }
 
+    /** \brief Grabs the tool reference data and creates an ITK pipeline consisting of a GradientMagnitude
+      * image filter followed by a Watershed image filter. The output of the filter pipeline is then added
+      * to the data storage. */
     void DoIt();
 
+    /** \brief Creates and runs an ITK filter pipeline consisting of the filters: GradientMagnitude-, Watershed- and CastImageFilter.
+      *
+      * \param originalImage The input image, which is delivered by the AccessByItk macro.
+      * \param segmentation A pointer to the output image, which will point to the pipeline output after execution.
+      */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation, unsigned int timeStep );
+    void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation );
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
@@ -73,7 +78,9 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
     virtual void Activated();
     virtual void Deactivated();
 
+    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
     double m_Threshold;
+    /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
     double m_Level;
 };
 

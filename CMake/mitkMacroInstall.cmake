@@ -42,7 +42,6 @@ macro(_fixup_target)
       set(intermediate_dir .)
     endif()
   endif()
-  mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
 
   install(CODE "
 
@@ -148,6 +147,11 @@ macro(_fixup_target)
     endif(PLUGINS)
     message(\"globbed plugins: \${PLUGINS}\")
 
+    set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
+
+    include(mitkFunctionGetLibrarySearchPaths)
+    mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
+
     set(DIRS ${DIRS} ${_search_paths})
     foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
@@ -157,7 +161,6 @@ macro(_fixup_target)
     list(REMOVE_DUPLICATES DIRS)
 
     # use custom version of BundleUtilities
-    set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
 
     fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")

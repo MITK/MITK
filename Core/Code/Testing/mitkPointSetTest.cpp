@@ -607,8 +607,8 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   new0.Fill(0);
   new1.Fill(1);
   new2.Fill(2);
-  pointSet->InsertPoint(0,new0,0);
-  pointSet->InsertPoint(1,new1,0);
+  pointSet->InsertPoint(5,new0, mitk::PTCORNER,0);
+  pointSet->InsertPoint(112,new1,0);
   pointSet->InsertPoint(2,new2,0);
   pointSet->InsertPoint(2,new0,1);
   pointSet->InsertPoint(1,new1,1);
@@ -617,20 +617,32 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   pointSet->InsertPoint(2,new1,2);
   pointSet->InsertPoint(1,new2,2);
 
-  MITK_INFO << "... pointset ts: " << pointSet->GetTimeSteps();
+  MITK_TEST_OUTPUT( << "... pointset ts: " << pointSet->GetTimeSteps() )
   mitk::PointSet::Pointer clonePS = pointSet->Clone();
-  MITK_INFO << "... clone pointset ts: " << clonePS->GetTimeSteps();
+  MITK_TEST_OUTPUT( << "... clone pointset ts: " << clonePS->GetTimeSteps() )
 
   for (unsigned int t=0; t< pointSet->GetTimeSteps(); t++)
   {
-     MITK_INFO << "testing timestep: " << t;
-     for (int i=0; i<pointSet->GetSize(t); i++)
-     {
-        mitk::Point3D point = pointSet->GetPoint(i,t);
-        mitk::Point3D clonedPoint = clonePS->GetPoint(i,t);
-        MITK_INFO << point << " and " << clonedPoint;
-        MITK_TEST_CONDITION_REQUIRED(mitk::Equal(point,clonedPoint), "Cloned PS and PS have same points");
-     }
+    MITK_TEST_OUTPUT( << "testing timestep: " << t )
+    MITK_TEST_CONDITION_REQUIRED(pointSet->GetSize(t) == clonePS->GetSize(t), "Clone has same size")
+
+    // test for equal point coordinates
+    for (mitk::PointSet::PointsConstIterator i = pointSet->Begin(), j = clonePS->Begin();
+        i != pointSet->End() && j != clonePS->End(); ++i, ++j)
+    {
+      MITK_TEST_CONDITION_REQUIRED(i.Index() == j.Index() && mitk::Equal(i.Value(),j.Value()), "Cloned PS and PS have same points")
+    }
+
+    // test for equal point data
+    mitk::PointSet::PointDataContainer* pointDataCont = pointSet->GetPointSet(t)->GetPointData();
+    mitk::PointSet::PointDataContainer* clonePointDataCont = clonePS->GetPointSet(t)->GetPointData();
+    MITK_TEST_CONDITION_REQUIRED(pointDataCont && clonePointDataCont, "Valid point data container")
+    MITK_TEST_CONDITION_REQUIRED(pointDataCont->Size() == clonePointDataCont->Size(), "Cloned point data container has same size")
+    for (mitk::PointSet::PointDataConstIterator i = pointDataCont->Begin(), j = clonePointDataCont->Begin();
+        i != pointDataCont->End() && j != clonePointDataCont->End(); ++i, ++j)
+    {
+      MITK_TEST_CONDITION_REQUIRED(i.Index() == j.Index() && i.Value() == j.Value(), "Cloned PS and PS have same point data")
+    }
   }
 
 

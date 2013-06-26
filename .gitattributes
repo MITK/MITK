@@ -60,6 +60,9 @@ Core/Code/CppMicroServices/**/*.h     copyright=apache-license
 
 # There is no need to check files in the utilities directory for copyright
 Utilities/**    -copyright
+Applications/PluginGenerator/PluginTemplate/src/**/*.h -copyright
+Applications/PluginGenerator/PluginTemplate/src/**/*.cpp -copyright
+Applications/PluginGenerator/ProjectTemplate/Apps/TemplateApp/TemplateApp.cpp -copyright
 
 # ExternalData content links must have LF newlines
 *.md5            crlf=input

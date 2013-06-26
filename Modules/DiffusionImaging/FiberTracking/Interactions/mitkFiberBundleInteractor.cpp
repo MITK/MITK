@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCamera.h>
 #include <vtkInteractorObserver.h>
 
-#include <qapplication.h>
+// #include <qapplication.h>
 
 mitk::FiberBundleInteractor::FiberBundleInteractor(const char * type, DataNode* dataNode)
   : Interactor(type, dataNode), m_LastPosition(0)
@@ -192,7 +192,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
   case AcCHECKHOVERING:
     {
 
-      QApplication::restoreOverrideCursor();
+//      QApplication::restoreOverrideCursor();
 
       // Re-enable VTK interactor (may have been disabled previously)
       if ( renderWindowInteractor != NULL )
@@ -225,7 +225,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         m_CurrentPickedPoint = dpe->GetWorldPosition();
         m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
 
-        QApplication::setOverrideCursor(Qt::UpArrowCursor);
+//        QApplication::setOverrideCursor(Qt::UpArrowCursor);
         this->HandleEvent( new StateEvent( EIDFIGUREHOVER ) );
 
       }

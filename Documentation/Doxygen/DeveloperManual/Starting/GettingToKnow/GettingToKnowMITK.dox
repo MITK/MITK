@@ -1,0 +1,15 @@
+/**
+\page GettingToKnowMITK Getting to know MITK
+
+This section will show you around MITK and acquaint you with the basic concepts.
+
+<ul>
+  <li> \subpage DirectoryStructurePage </li>
+  <li> \subpage TutorialPage</li>
+  <li> \subpage CMAKE_FAQ </li>
+  <li> \subpage StyleGuideAndNotesPage </li>
+  <li> \subpage DocumentationGuide </li>
+  <li> \subpage CodingPage </li>
+  <li> \subpage KnownProblemsPage </li>
+</ul>
+*/

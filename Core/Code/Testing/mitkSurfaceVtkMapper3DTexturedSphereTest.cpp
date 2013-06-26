@@ -43,15 +43,7 @@ int mitkSurfaceVtkMapper3DTexturedSphereTest(int argc, char* argv[])
     // compare rendering to reference image
     MITK_TEST_BEGIN("mitkSurfaceVtkMapper3DTexturedSphereTest")
 
-    // enough parameters?
-    if ( argc < 2 )
-    {
-        MITK_TEST_OUTPUT( << "Usage: " << std::string(*argv) << " [file1 file2 ...] outputfile" )
-                MITK_TEST_OUTPUT( << "Will render a central axial slice of all given files into outputfile" )
-                exit( EXIT_SUCCESS );
-    }
-
-    mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+    mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
     //This is a test for a 3D surface, thus we need to set the mapper ID to 3D
     renderingHelper.SetMapperID(mitk::BaseRenderer::Standard3D);
 
@@ -84,31 +76,15 @@ int mitkSurfaceVtkMapper3DTexturedSphereTest(int argc, char* argv[])
     renderingHelper.AddNodeToStorage(surfaceNode);
     //######## Exmaple code end ########
 
-    renderingHelper.Render();
-
     //use this to generate a reference screenshot or save the file:
     bool generateReferenceScreenshot = false;
     if(generateReferenceScreenshot)
     {
-        renderingHelper.SaveAsPNG("/home/kilgus/Pictures/RenderingTestData/output.png");
+        renderingHelper.SaveReferenceScreenShot("/home/kilgus/Pictures/RenderingTestData/output.png");
     }
 
-    //### Usage of vtkRegressionTestImage:
-    //vtkRegressionTestImage( vtkRenderWindow )
-    //Set a vtkRenderWindow containing the desired scene.
-    //vtkRegressionTestImage automatically searches in argc and argv[]
-    //for a path a valid image with -V. If the test failed with the
-    //first image (foo.png) check if there are images of the form
-    //foo_N.png (where N=1,2,3...) and compare against them.
-    renderingHelper.PrepareRender();
-    int retVal = vtkRegressionTestImage( renderingHelper.GetVtkRenderWindow() );
-
-    //retVal meanings: (see VTK/Rendering/vtkTesting.h)
-    //0 = test failed
-    //1 = test passed
-    //2 = test not run
-    //3 = something with vtkInteraction
-    MITK_TEST_CONDITION( retVal == 1, "VTK test result positive" );
+    //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 50.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
     MITK_TEST_END();
 }

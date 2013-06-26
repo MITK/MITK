@@ -155,6 +155,11 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnSurfaceInterpolationInfoChanged(const itk::EventObject&);
 
+    /**
+     * @brief Set the visibility of the 3d interpolation
+     */
+    void Show3DInterpolationResult(bool);
+
   signals:
 
     void SignalRememberContourPositions(bool);
@@ -258,8 +263,6 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     bool GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex);
 
     void SetCurrentContourListID();
-
-    void Show3DInterpolationResult(bool);
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

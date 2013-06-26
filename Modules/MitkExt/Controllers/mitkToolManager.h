@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
+#include "mitkServiceReference.h"
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -282,6 +283,10 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode* node);
+
+  private:
+
+    //std::map<ServiceReference, EventConfig> m_DisplayInteractorConfigs;
 };
 
 } // namespace

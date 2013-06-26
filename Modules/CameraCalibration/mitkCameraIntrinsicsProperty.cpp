@@ -42,9 +42,21 @@ CameraIntrinsicsProperty::CameraIntrinsicsProperty()
   : BaseProperty()
 {}
 
+CameraIntrinsicsProperty::CameraIntrinsicsProperty(const CameraIntrinsicsProperty& other)
+  : BaseProperty(other)
+{
+
+}
+
 CameraIntrinsicsProperty::CameraIntrinsicsProperty( mitk::CameraIntrinsics::Pointer value )
   : BaseProperty(), m_Value( value )
 {}
+
+itk::LightObject::Pointer CameraIntrinsicsProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}
 
 }
 // namespace mitk

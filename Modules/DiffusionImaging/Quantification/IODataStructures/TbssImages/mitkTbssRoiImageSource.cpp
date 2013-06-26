@@ -33,7 +33,7 @@ mitk::TbssRoiImageSource::TbssRoiImageSource()
 }
 
 
-itk::DataObject::Pointer mitk::TbssRoiImageSource::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::TbssRoiImageSource::MakeOutput( itk::ProcessObject::DataObjectPointerArraySizeType /*idx*/ )
 {
   return static_cast<itk::DataObject*>(mitk::TbssRoiImage::New().GetPointer());
 }
@@ -45,7 +45,5 @@ mitk::TbssRoiImageSource::OutputType* mitk::TbssRoiImageSource::GetOutput(unsign
   return static_cast<OutputType*>
                      (this->ProcessObject::GetOutput(idx));
 }
-
-
 
 #endif //__MITK_NRRD_TBSS_VOULMES_IO_FACTORY_CPP__

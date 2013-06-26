@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKTOFSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
 
 #include "mitkCommon.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
 
@@ -78,11 +78,11 @@ namespace mitk {
   * @ingroup Mapper
   */
 
-class mitkToFProcessing_EXPORT ToFSurfaceVtkMapper3D : public VtkMapper3D
+class mitkToFProcessing_EXPORT ToFSurfaceVtkMapper3D : public VtkMapper
 {
 public:
 
-  mitkClassMacro(ToFSurfaceVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(ToFSurfaceVtkMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 
@@ -175,7 +175,7 @@ public:
       }
   };
 
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);

@@ -39,23 +39,29 @@ itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())
   {
-    AccessByItk(m_FixedImage, GetTransform2);
+    AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 2);
     return m_TransformObject;
   }
   return NULL;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /* itkImage1 */)
+itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
 {
   if (VImageDimension == 2)
   {
     typedef typename itk::Image< TPixelType, 2 >  FixedImage2DType;
     typedef typename itk::Image< TPixelType, 2 >  MovingImage2DType;
-    typename FixedImage2DType::Pointer fixedImage2D;
-    mitk::CastToItkImage(m_FixedImage, fixedImage2D);
-    typename MovingImage2DType::Pointer movingImage2D;
-    mitk::CastToItkImage(m_MovingImage, movingImage2D);
+
+    // the fixedImage is the input parameter (fix for Bug #14626)
+    typename FixedImage2DType::Pointer fixedImage2D = itkImage1;
+
+    // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk =
+        mitk::ImageToItk<MovingImage2DType>::New();
+    movingImageToItk->SetInput(m_MovingImage);
+    movingImageToItk->Update();
+    typename MovingImage2DType::Pointer movingImage2D = movingImageToItk->GetOutput();
 
     typename itk::CenteredSimilarity2DTransform< double >::Pointer transformPointer = itk::CenteredSimilarity2DTransform< double >::New();
     transformPointer->SetIdentity();

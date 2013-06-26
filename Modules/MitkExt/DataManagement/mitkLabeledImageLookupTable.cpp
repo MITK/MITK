@@ -58,6 +58,12 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
 
 }
 
+mitk::LabeledImageLookupTable::LabeledImageLookupTable(const mitk::LabeledImageLookupTable &other)
+  : LookupTable(other)
+  , m_LevelWindow(other.m_LevelWindow)
+{
+}
+
 /**
  * Virtual destructor
  */
@@ -123,4 +129,10 @@ void mitk::LabeledImageLookupTable::GenerateRandomColor ( vtkFloatingPointType& 
 vtkFloatingPointType mitk::LabeledImageLookupTable::GenerateRandomNumber()
 {
   return ( ( ( vtkFloatingPointType ) ( std::rand( ) ) ) / ( ( vtkFloatingPointType ) ( RAND_MAX ) ) );
+}
+
+itk::LightObject::Pointer mitk::LabeledImageLookupTable::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
 }

@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
 mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
@@ -80,6 +80,7 @@ void mitk::PointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
   m_UnselectedActor->ReleaseGraphicsResources(renWin);
   m_ContourActor->ReleaseGraphicsResources(renWin);
 }
+
 
 void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 {
@@ -342,42 +343,45 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 }
 
 
-void mitk::PointSetVtkMapper3D::GenerateData()
-{
-  //create new vtk render objects (e.g. sphere for a point)
-  this->CreateVTKRenderObjects();
-
-  //apply props
-  this->ApplyProperties(m_ContourActor,NULL);
-
-}
-
-
 void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
-  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
-
-  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
-  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
-  // only create new vtk render objects if property values were changed
-  if ( pointSizeProp.IsNotNull() &&  contourSizeProp.IsNotNull() )
-  {
-    if (m_PointSize!=pointSizeProp->GetValue() || m_ContourRadius!= contourSizeProp->GetValue())
-    {
-      this->CreateVTKRenderObjects();
-    }
-  }
-
-  this->ApplyProperties(m_ContourActor,renderer);
-
-  if(IsVisible(renderer)==false)
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if(!visible)
   {
     m_UnselectedActor->VisibilityOff();
     m_SelectedActor->VisibilityOff();
     m_ContourActor->VisibilityOff();
     return;
   }
+
+  // create new vtk render objects (e.g. sphere for a point)
+
+  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
+  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(!needGenerateData)
+  {
+    mitk::FloatProperty * pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
+    mitk::FloatProperty * contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
+
+    // only create new vtk render objects if property values were changed
+    if(pointSizeProp && m_PointSize!=pointSizeProp->GetValue() )
+      needGenerateData = true;
+    if(contourSizeProp && m_ContourRadius!=contourSizeProp->GetValue() )
+      needGenerateData = true;
+  }
+
+  if(needGenerateData)
+  {
+    this->CreateVTKRenderObjects();
+    ls->UpdateGenerateDataTime();
+  }
+
+  this->ApplyAllProperties(renderer, m_ContourActor);
 
   bool showPoints = true;
   this->GetDataNode()->GetBoolProperty("show points", showPoints);
@@ -436,9 +440,9 @@ void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*render
   m_ContourActor->SetUserTransform(vtktransform);
 }
 
-void mitk::PointSetVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor)
 {
-  Superclass::ApplyProperties(actor,renderer);
+  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
   //check for color props and use it for rendering of selected/unselected points and contour
   //due to different params in VTK (double/float) we have to convert!
 
@@ -617,6 +621,7 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
   node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
   node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
+  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);

@@ -10,10 +10,11 @@ set(module_dirs
     IpPicSupport
     MitkExt
     SceneSerialization
+    GraphAlgorithms
     Segmentation
     Qmitk
     QmitkExt
-    GraphAlgorithms
+    Properties
     DiffusionImaging
     GPGPU
     IGT
@@ -35,6 +36,7 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
+    Python
 )
 
 set(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

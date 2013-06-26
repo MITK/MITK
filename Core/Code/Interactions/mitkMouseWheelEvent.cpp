@@ -16,12 +16,12 @@
 
 #include "mitkMouseWheelEvent.h"
 
-mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer = NULL,
-    Point2D mousePosition = NULL,
-    MouseButtons buttonStates = NoButton,
-    ModifierKeys modifiers = NoKey,
-    int wheelDelta = 0)
-: InteractionPositionEvent(baseRenderer, mousePosition, "MouseWheelEvent")
+mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer,
+    const Point2D& mousePosition,
+    MouseButtons buttonStates,
+    ModifierKeys modifiers,
+    int wheelDelta)
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_WheelDelta(wheelDelta)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
@@ -38,12 +38,12 @@ void mitk::MouseWheelEvent::SetWheelDelta(int delta)
   m_WheelDelta = delta;
 }
 
-mitk::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MouseWheelEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MouseWheelEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MouseWheelEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }
@@ -62,13 +62,15 @@ mitk::MouseWheelEvent::~MouseWheelEvent()
 {
 }
 
-bool mitk::MouseWheelEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseWheelEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
 {
-  const mitk::MouseWheelEvent* mwe = dynamic_cast<const MouseWheelEvent*>(interactionEvent.GetPointer());
-  if (mwe == NULL)
-  {
-    return false;
-  }
-  return ((this->GetWheelDelta() * mwe->GetWheelDelta() > 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
-  && this->GetModifiers() == mwe->GetModifiers() && this->GetButtonStates() == mwe->GetButtonStates());
+  const mitk::MouseWheelEvent& mwe = static_cast<const MouseWheelEvent&>(interactionEvent);
+  return ((this->GetWheelDelta() * mwe.GetWheelDelta() > 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
+          && this->GetModifiers() == mwe.GetModifiers() && this->GetButtonStates() == mwe.GetButtonStates() &&
+          Superclass::IsEqual(interactionEvent));
+}
+
+bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+{
+  return (dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL) ;
 }

@@ -13,8 +13,6 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoImagePositionPatient mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
-#see bug 8108
-if(NOT APPLE)
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
@@ -41,6 +39,7 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
   endfunction(expectFileExists)
 
   foreach(input ${allInputs})
+
     # extract only the name of the directory of this very test case
     string(REGEX REPLACE ".*${TESTS_DIR}/([^/]+)/.*" "\\1" input ${input})
     set(inputfilelist "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${INPUT_LISTNAME}")
@@ -78,8 +77,5 @@ AddDicomTestsFromDataRepository(${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${
 AddDicomTestsFromDataRepository(${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 
 AddDicomTestsFromDataRepository(${SOP_CLASSES_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
-
-
-endif() # apple
 
 

@@ -27,15 +27,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::USImageVideoSource::USImageVideoSource()
-: itk::Object()
+: itk::Object(),
+m_VideoCapture(new cv::VideoCapture()),
+m_IsVideoReady(false),
+m_IsGreyscale(false),
+m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
+m_ResolutionOverrideWidth(0),
+m_ResolutionOverrideHeight(0),
+m_ResolutionOverride(false)
 {
-  m_VideoCapture = new cv::VideoCapture();
-  m_IsVideoReady = false;
-  m_IsGreyscale  = false;
-  this->m_OpenCVToMitkFilter = mitk::OpenCVToMitkImageFilter::New();
-  m_ResolutionOverrideWidth = 0;
-  m_ResolutionOverrideHeight = 0;
-  m_ResolutionOverride = false;
+  m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()
@@ -77,6 +78,18 @@ void mitk::USImageVideoSource::SetColorOutput(bool isColor){
   m_IsGreyscale = !isColor;
 }
 
+int mitk::USImageVideoSource::GetImageHeight()
+{
+if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+else return 0;
+}
+
+int mitk::USImageVideoSource::GetImageWidth()
+{
+if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
+else return 0;
+}
+
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
   // First, let's do some basic checks to make sure rectangle is inside of actual image
@@ -85,7 +98,7 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
 
   // We can try and correct too large boundaries
   if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH)) bottomRightX = m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+  if (bottomRightY >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
 
   // Nothing to save, throw an exception
   if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
@@ -133,7 +146,7 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
-  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput(0));
+  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
   // Clean up
   buffer.release();

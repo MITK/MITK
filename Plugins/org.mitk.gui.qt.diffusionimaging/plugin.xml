@@ -93,6 +93,13 @@
           icon="resources/FiberBundleOperations.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fiberextraction"
+          name="Fiber Extraction"
+          class="QmitkFiberExtractionView"
+          icon="resources/FiberBundleOperations.png" />
+  </extension>
+
     <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.fiberbundledeveloper"
           name="FiberDevTool"
@@ -144,13 +151,6 @@
   </extension>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.dwisoftwarephantomview"
-          name="ROI Based Phantoms"
-          class="QmitkDwiSoftwarePhantomView"
-          icon="resources/phantom.png" />
-  </extension>
-
-  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.odfmaximaextraction"
           name="Peak Extraction"
           class="QmitkOdfMaximaExtractionView"
@@ -161,7 +161,16 @@
     <view id="org.mitk.views.fiberfoxview"
           name="Fiberfox"
           class="QmitkFiberfoxView"
-          icon="resources/stochFB.png" />
+          icon="resources/phantom.png" />
   </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.fieldmapgenerator"
+          name="Fieldmap Generator"
+          class="QmitkFieldmapGeneratorView"
+          icon="resources/odf.png" />
+  </extension>
+
+
 
 </plugin>

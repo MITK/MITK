@@ -60,16 +60,12 @@ mitk::OclFilter::~OclFilter()
   // release program
   if (m_ClProgram)
   {
-    cl_int clErr = 0;
+    mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+    OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
 
     // remove program from storage
-    OpenCLActivator::GetResourceServiceRef()->RemoveProgram(m_FilterID);
-
-    // release program
-    clErr = clReleaseProgram(this->m_ClProgram);
-    CHECK_OCL_ERR(clErr);
+    resources->RemoveProgram(m_FilterID);
   }
-
 }
 
 bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim )
@@ -87,7 +83,10 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
 
 bool mitk::OclFilter::Initialize()
 {
-  m_CommandQue = OpenCLActivator::GetResourceServiceRef()->GetCommandQueue();
+  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+
+  m_CommandQue = resources->GetCommandQueue();
 
   cl_int clErr = 0;
   m_Initialized = CHECK_OCL_ERR(clErr);
@@ -102,7 +101,7 @@ bool mitk::OclFilter::Initialize()
   {
     try
     {
-      this->m_ClProgram = OpenCLActivator::GetResourceServiceRef()->GetProgram( this->m_FilterID );
+      this->m_ClProgram = resources->GetProgram( this->m_FilterID );
     }
     catch(const mitk::Exception& e)
     {
@@ -136,7 +135,10 @@ void mitk::OclFilter::CompileSource()
   int clErr = 0;
 
   //get a valid opencl context
-  cl_context gpuContext = OpenCLActivator::GetResourceServiceRef()->GetContext();
+  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+
+  cl_context gpuContext = resources->GetContext();
 
   // load the program source from file
   m_ClSource = oclLoadProgramSource( m_ClFile.c_str(), this->m_Preambel, &szKernelLength);
@@ -165,20 +167,19 @@ void mitk::OclFilter::CompileSource()
     if (clErr != CL_SUCCESS)
     {
       MITK_ERROR("ocl.filter") << "Failed to build source";
-      oclLogBuildInfo(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
-      oclLogBinary(m_ClProgram,  OpenCLActivator::GetResourceServiceRef()->GetCurrentDevice() );
+      oclLogBuildInfo(m_ClProgram, resources->GetCurrentDevice() );
+      oclLogBinary(m_ClProgram, resources->GetCurrentDevice() );
       m_Initialized = false;
     }
 
     // store the succesfully build program into the program storage provided by the resource service
-    OpenCLActivator::GetResourceServiceRef()->InsertProgram(m_ClProgram, m_FilterID, true);
+    resources->InsertProgram(m_ClProgram, m_FilterID, true);
   }
   else
   {
     MITK_ERROR("ocl.filter") << "Could not load from source";
     m_Initialized = false;
   }
-
 }
 
 void mitk::OclFilter::SetWorkingSize(unsigned int locx, unsigned int dimx, unsigned int locy, unsigned int dimy, unsigned int locz, unsigned int dimz)

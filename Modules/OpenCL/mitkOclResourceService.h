@@ -44,7 +44,7 @@ public:
   virtual bool GetIsFormatSupported( cl_image_format* format ) = 0;
 
   /** @brief Puts the OpenCL Context info in std::cout */
-  virtual void PrintContextInfo() = 0;
+  virtual void PrintContextInfo() const = 0;
 
   /** @brief Insert program into the internal program storage
    *
@@ -58,7 +58,7 @@ public:
    * @param name Text identifier of the program.
    * @throws an mitk::Exception in case the program cannot be found
    */
-  virtual cl_program GetProgram(const std::string& name) const = 0;
+  virtual cl_program GetProgram(const std::string& name) = 0;
 
   /** @brief Remove all invalid (=do not compile) programs from the internal storage */
   virtual void InvalidateStorage() = 0;

@@ -25,7 +25,7 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
 
-void mitk::DisplayInteractor::Notify(InteractionEvent::Pointer interactionEvent, bool isHandled)
+void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
   // to use the state machine pattern,
   // the event is passed to the state machine interface to be handled
@@ -46,15 +46,12 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
 }
 
-mitk::DisplayInteractor::DisplayInteractor()
+mitk::DisplayInteractor::DisplayInteractor() :
+    m_IndexToSliceModifier(4),m_AutoRepeat(false), m_AlwaysReact(false),  m_ZoomFactor(2)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
-  m_IndexToSliceModifier = 4;
-  m_AlwaysReact = false;
-  m_AutoRepeat = false;
-  m_ZoomFactor = 2;
 }
 
 mitk::DisplayInteractor::~DisplayInteractor()
@@ -63,11 +60,11 @@ mitk::DisplayInteractor::~DisplayInteractor()
 
 bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetNameOfClass();
     return false;
   }
 
@@ -83,11 +80,11 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  BaseRenderer* sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor: cannot process the event in Move action: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor: cannot process the event in Move action: " << interactionEvent->GetNameOfClass();
     return false;
   }
   // perform translation
@@ -99,11 +96,11 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  const BaseRenderer::Pointer sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetNameOfClass();
     return false;
   }
   float factor = 1.0;
@@ -134,11 +131,10 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetNameOfClass();
     return false;
   }
 
@@ -237,7 +233,7 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == NULL)
   {
-    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetEventClass();
+    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetNameOfClass();
     return false;
   }
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
@@ -342,4 +338,9 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   {
     m_AlwaysReact = false;
   }
+}
+
+bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* /*interactionEvent*/, DataNode* /*dataNode*/)
+{
+  return true;
 }

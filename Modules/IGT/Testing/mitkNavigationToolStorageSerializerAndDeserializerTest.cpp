@@ -201,13 +201,13 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
 
-    if ( stlReader->GetOutput() == NULL )
+    if ( stlReader->GetOutput(0) == NULL )
       {
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
     else
       {
-      testSurface = stlReader->GetOutput();
+      testSurface = stlReader->GetOutput(0);
       myNode->SetData(testSurface);
       }
 
@@ -235,13 +235,13 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
 
-    if ( stlReader->GetOutput() == NULL )
+    if ( stlReader->GetOutput(0) == NULL )
       {
       MITK_TEST_FAILED_MSG(<<"Cannot read stl file.");
       }
     else
       {
-      testSurface2 = stlReader->GetOutput();
+      testSurface2 = stlReader->GetOutput(0);
       myNode2->SetData(testSurface2);
       }
 
@@ -330,6 +330,10 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     catch (mitk::IGTException e)
       {
       exceptionThrown = true;
+      }
+    catch (std::exception& e)
+      {
+      MITK_ERROR << "Unexpected exception catched: " << e.what() << " / filename: " << toolFileName;
       }
     MITK_TEST_CONDITION_REQUIRED(exceptionThrown,"Testing if exception is thrown if a empty zip file is given for deserialization.");
     }

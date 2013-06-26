@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkMapper3D::GetInput()
 {
-  return static_cast<const mitk::UnstructuredGrid * > ( GetData() );
+  return static_cast<const mitk::UnstructuredGrid * > ( GetDataNode()->GetData() );
 }
 
 
@@ -119,41 +119,51 @@ vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
   return m_Assembly;
 }
 
-void mitk::UnstructuredGridVtkMapper3D::GenerateData()
-{
-  m_Assembly->VisibilityOn();
-
-  m_ActorWireframe->GetProperty()->SetAmbient(1.0);
-  m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
-  m_ActorWireframe->GetProperty()->SetSpecular(0.0);
-
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
-  mitk::TransferFunctionProperty::Pointer transferFuncProp;
-  if (node->GetProperty(transferFuncProp, "TransferFunction"))
-  {
-    mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
-    if (transferFunction->GetColorTransferFunction()->GetSize() < 2)
-    {
-      mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
-      if (input.IsNull()) return;
-
-      vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
-      if (grid == 0) return;
-
-      double* scalarRange = grid->GetScalarRange();
-      vtkColorTransferFunction* colorFunc = transferFunction->GetColorTransferFunction();
-      colorFunc->RemoveAllPoints();
-      colorFunc->AddRGBPoint(scalarRange[0], 1, 0, 0);
-      colorFunc->AddRGBPoint((scalarRange[0] + scalarRange[1])/2.0, 0, 1, 0);
-      colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
-    }
-  }
-}
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 {
 
-  if(!IsVisible(renderer))
+  mitk::DataNode::ConstPointer node = this->GetDataNode();
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(needGenerateData)
+  {
+    ls->UpdateGenerateDataTime();
+
+    m_Assembly->VisibilityOn();
+
+    m_ActorWireframe->GetProperty()->SetAmbient(1.0);
+    m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
+    m_ActorWireframe->GetProperty()->SetSpecular(0.0);
+
+    mitk::TransferFunctionProperty::Pointer transferFuncProp;
+    if (node->GetProperty(transferFuncProp, "TransferFunction"))
+    {
+      mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
+      if (transferFunction->GetColorTransferFunction()->GetSize() < 2)
+      {
+        mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
+        if (input.IsNull()) return;
+
+        vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
+        if (grid == 0) return;
+
+        double* scalarRange = grid->GetScalarRange();
+        vtkColorTransferFunction* colorFunc = transferFunction->GetColorTransferFunction();
+        colorFunc->RemoveAllPoints();
+        colorFunc->AddRGBPoint(scalarRange[0], 1, 0, 0);
+        colorFunc->AddRGBPoint((scalarRange[0] + scalarRange[1])/2.0, 0, 1, 0);
+        colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
+      }
+    }
+  }
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible)
   {
     m_Assembly->VisibilityOff();
     return;
@@ -180,7 +190,6 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);
 
-  mitk::DataNode::ConstPointer node = this->GetDataNode();
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
   mitk::DataNode::Pointer bbNode = renderer->GetDataStorage()->GetNamedDerivedNode("Clipping Bounding Object", node);
@@ -211,8 +220,8 @@ void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ 
 void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::DataNode::Pointer node = this->GetDataNode();
-  Superclass::ApplyProperties(m_Actor, renderer);
-  Superclass::ApplyProperties(m_ActorWireframe, renderer);
+  ApplyColorAndOpacityProperties(renderer, m_Actor);
+  ApplyColorAndOpacityProperties(renderer, m_ActorWireframe);
 
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();

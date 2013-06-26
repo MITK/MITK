@@ -45,12 +45,14 @@ class MITK_CORE_EXPORT GroupTagProperty : public BaseProperty
 
   protected:
     GroupTagProperty();
+    GroupTagProperty(const GroupTagProperty&);
 
   private:
 
     // purposely not implemented
-    GroupTagProperty(const GroupTagProperty&);
     GroupTagProperty& operator=(const GroupTagProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty& property) const;
     virtual bool Assign(const BaseProperty& property);

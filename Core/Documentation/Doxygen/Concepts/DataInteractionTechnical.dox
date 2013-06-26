@@ -9,23 +9,23 @@ This page describes some technicalities of the implementation and the workflow, 
 \section DataInteractionTechnicalPage_Introduction Description of Interaction Concept Implementation in MITK
 
 
-\section DispatcherSection Dispatcher
+\section DataInteractionTechnicalPage_DispatcherSection Dispatcher
 
-After an event is received by the Dispatcher it is given to a DataInteractor that has to decide if it can process this event.
+After an event is received by the mitk::Dispatcher it is given to a mitk::DataInteractor that has to decide if it can process this event.
 On a high level this is done by the mitk::EventStateMachine.
 First the state machine asks if the received event is known in the
-configuration. If it does the matching variant name is returned. Then the state machine checks if there exists a transition
+configuration. If it is, the matching variant name is returned. Then the state machine checks if there exists a transition
 in its current state that is triggered by this event variant. If this is the case all actions that are associated with this transition
-are queried and executed. The actions themselves are implemented on DataInteractor level. The following diagram illustrates the process:
+are queried and executed. The actions themselves are implemented on mitk::DataInteractor level. The following diagram illustrates the process:
 
 \image html sm_and_config.png
 
 
-Each BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the DataStorage and the Dispatcher,
-and thereby allowing a DataInteractor to register with a Dispatcher when only knowing the DataNode.
+Each mitk::BaseRenderer creates a mitk::BindDispatcherInteractor object which encapsulates the connection between the mitk::DataStorage and
+the mitk::Dispatcher, and thereby allowing a mitk::DataInteractor to register with a mitk::Dispatcher when only knowing the mitk::DataNode.
 
-BindDispatcherInteractor creates a new Dispatcher object and registers for DataNode events at the DataStorage, as a callback function the
-Dispatchers AddDataInteractor() and RemoveDataInteractor() functions are set.
+mitk::BindDispatcherInteractor creates a new mitk::Dispatcher object and registers for mitk::DataNode events at the mitk::DataStorage, as a callback function the
+dispatchers AddDataInteractor() and RemoveDataInteractor() functions are set.
 
 \dot
 digraph {
@@ -40,9 +40,9 @@ digraph {
 }
 \enddot
 
-This way the Dispatcher is notified about all changes regarding
-DataNodes that are shown in the BaseRenderer. When a node is added, remove or modified the Dispatcher can check it a DataInterator is set,
-and accordingly add or remove this DataInteractor from its internal list.
+This way the mitk::Dispatcher is notified about all changes regarding
+DataNodes that are shown in the mitk::BaseRenderer. When a node is added, remove or modified the mitk::Dispatcher can check if a mitk::DataInterator is set,
+and accordingly add or remove this mitk::DataInteractor from its internal list.
 
 \dot
 digraph {
@@ -62,40 +62,39 @@ digraph {
 }
 \enddot
 
-Events that are generated within the scope of the BaseRenderer are sent to the associated Dispatcher to be handled.
+Events that are generated within the scope of the mitk::BaseRenderer are sent to the associated mitk::Dispatcher to be handled.
 
 
-\subsection DispatcherEventDistSection Event Distribution
+\subsection DataInteractionTechnicalPage_DispatcherEventDistSection Event Distribution
 
- A Dispatcher can operate in different processing modes, which determine how the interactor that receives an event is chosen.
- These modes are managed and set by the Dispatcher itself.
+ A mitk::Dispatcher can operate in different processing modes, which determine how the interactor that receives an event is chosen.
+ These modes are managed and set by the mitk::Dispatcher itself.
 
 <ul>
  <li> \b Regular: \n
     DataInteractors are sorted by their layer, and distribution is stared with the top-most.
 
- <li> \bConnected \b Mouse \b Action:
-
-      A connected mouse action is described by the sequence of Mouse-Press, (optionally) Mouse-Move , Mouse-Release Events.\n
-      Within this sequence all events are sent to the same DateInteractor, the one which received the event from the Mouse-Press action.\n
+ <li> <b>Connected Mouse Action</b>: \n
+    A connected mouse action is described by the sequence of Mouse-Press, (optionally) Mouse-Move , Mouse-Release Events.\n
+      Within this sequence all events are sent to the same mitk::DataInteractor, the one which received the event from the Mouse-Press action.\n
       \b m_ConnectedMouseAction  - is set to true, when a Mouse-Down Event occurs and a DataInterator takes the event and
       \b m_SelectedInteractor is then set to this DataInteractor.\n
       \b m_ConnectedMouseAction is reset to false, after the Mouse-Release Event occurs,\n
       while it is true, the m_SelectedInteractor is the only one that receives Mouse-Events.
 
- <li> \b Grab \b Input:\n
-      Whenever a DataInteractor performs a state change into a state that is marked by the grab input-tag, the Dispatcher switches into this mode.
-      As long as it is in this mode ONLY the selected DataInteractor will receive the event. This mode is ended when the DataInteractor switches back to
-      a state without a tag/ or the REGULAR-tag.\n
-      \note In this mode EventObservers will NOT receive the events.
+ <li> <b>Grab Input</b>:\n
+      Whenever a mitk::DataInteractor performs a state change into a state that is marked by the grab input-tag, the mitk::Dispatcher switches into this mode.
+      As long as it is in this mode ONLY the selected mitk::DataInteractor will receive the event. This mode is ended when the mitk::DataInteractor
+      switches back to a state without a tag/ or the REGULAR-tag.\n
+      \note In this mode mitk::InteractionEventObserver instances will NOT receive the events.
 
    <li> \b Prefer \b Input: \n
-      Basically works as Grab Input, with the difference that if the Interactor in an prefer input state, cannot process the event offered,
+      Basically works as Grab Input, with the difference that if the mitk::DataInteractor is in the prefer input state but cannot process the event offered,
       it will be offered to the other interactors in the regular way.\n
-      In this mode EventObservers ARE informed.
+      In this mode mitk::InteractionEventObserver instances ARE informed.
 
 </ul>
-\section StateMachineSection State Machine & Configuration
+\section DataInteractionTechnicalPage_StateMachineSection State Machine & Configuration
 
 A  mitk::EventStateMachine points to a \b state, which in turn references  \b transitions
 (which describe a change from one state to another) and \b actions (indicating which functions are executed when a transition is taken).

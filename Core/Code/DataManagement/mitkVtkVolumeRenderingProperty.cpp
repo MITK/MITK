@@ -76,3 +76,9 @@ bool mitk::VtkVolumeRenderingProperty::AddEnum( const std::string& name, const I
 {
   return Superclass::AddEnum( name, id );
 }
+
+itk::LightObject::Pointer mitk::VtkVolumeRenderingProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

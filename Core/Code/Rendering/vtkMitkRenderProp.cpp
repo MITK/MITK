@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLODProp3D.h>
 #include <vtkPropAssembly.h>
 
-#include "mitkVtkMapper3D.h"
-#include "mitkVtkMapper2D.h"
+#include "mitkVtkMapper.h"
+#include "mitkGLMapper.h"
 
 
 vtkStandardNewMacro(vtkMitkRenderProp);
@@ -75,40 +75,22 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
   for(MappersMapType::iterator it = mappersMap.begin(); it != mappersMap.end(); it++)
   {
     mitk::Mapper * mapper = (*it).second;
-    mitk::VtkMapper3D::Pointer vtkMapper3D = dynamic_cast<mitk::VtkMapper3D*>(mapper);
-    if(vtkMapper3D)
+
+    mitk::VtkMapper::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapper);
+    if(vtkMapper)
     {
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
       vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
-          vtkMapper3D->GetVtkProp(m_VtkPropRenderer) );
+          vtkMapper->GetVtkProp(m_VtkPropRenderer) );
       if ( propAssembly )
       {
         propAssembly->InitPathTraversal();
       }
 
-      if (vtkMapper3D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1)
+      if (vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1)
         return 1;
-    }
-
-    //TODO bad solution.
-    mitk::VtkMapper2D::Pointer vtkMapper2D = dynamic_cast<mitk::VtkMapper2D*>(mapper);
-    if(vtkMapper2D)
-    {
-      // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
-      // manually (see issue #8186 committed to VTK's Mantis issue tracker)
-      // --> VTK bug resolved on 2008-12-01
-      vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
-          vtkMapper2D->GetVtkProp(m_VtkPropRenderer) );
-      if ( propAssembly )
-      {
-        propAssembly->InitPathTraversal(); //TODO why is this called here???
-      }
-
-      if (vtkMapper2D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1) {
-        return 1;
-      }
     }
   }
   return 0;

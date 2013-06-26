@@ -140,8 +140,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
 
   if (original->GetTimeSlicedGeometry() )
   {
-    AffineGeometryFrame3D::Pointer originalGeometryAGF = original->GetTimeSlicedGeometry()->Clone();
-    TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+    TimeSlicedGeometry::Pointer originalGeometry = original->GetTimeSlicedGeometry()->Clone();
     segmentation->SetGeometry( originalGeometry );
   }
   else

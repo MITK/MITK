@@ -130,11 +130,11 @@ MergeDiffusionImagesFilter<TScalarType>
     this->SetNthOutput (0, outImage);
 
     typedef ImageRegionIterator<DwiImageType>               IteratorOutputType;
-    IteratorOutputType      itOut (this->GetOutput(0), this->GetOutput(0)->GetLargestPossibleRegion());
+    IteratorOutputType      itOut (this->GetOutput(), this->GetOutput()->GetLargestPossibleRegion());
 
     MITK_INFO << "MergeDiffusionImagesFilter: merging images";
     GradientType zeroG; zeroG.fill(0.0);
-    boost::progress_display disp(this->GetOutput(0)->GetLargestPossibleRegion().GetNumberOfPixels());
+    boost::progress_display disp(this->GetOutput()->GetLargestPossibleRegion().GetNumberOfPixels());
     while(!itOut.IsAtEnd())
     {
         ++disp;
@@ -145,18 +145,19 @@ MergeDiffusionImagesFilter<TScalarType>
         int c=0;
         for (int i=0; i<m_GradientLists.size(); i++)
         {
-            double bValue = m_BValues.at(i);
             GradientListType::Pointer gradients = m_GradientLists.at(i);
             typename DwiImageType::Pointer img = m_ImageVolumes.at(i);
 
             for (int j=0; j<gradients->Size(); j++)
             {
                 GradientType g = gradients->GetElement(j);
+                double mag = g.two_norm();
 
-                if (g.magnitude()>0.0001)
+                if (mag>0.0001)
                 {
+                    double frac = m_BValues.at(i)*mag*mag/m_BValue;
                     g.normalize();
-                    g *= std::sqrt(bValue/m_BValue);
+                    g *= sqrt(frac);
                 }
                 else
                     g = zeroG;

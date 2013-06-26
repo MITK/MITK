@@ -68,6 +68,8 @@ protected:
    */
   ShaderProperty( );
 
+  ShaderProperty(const ShaderProperty& other);
+
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the scalar mode is set to default (0).
@@ -97,8 +99,9 @@ protected:
 private:
 
   // purposely not implemented
-  ShaderProperty(const ShaderProperty&);
   ShaderProperty& operator=(const ShaderProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   virtual bool Assign(const BaseProperty &property);
 

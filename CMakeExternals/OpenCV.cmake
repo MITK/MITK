@@ -17,8 +17,25 @@ if(MITK_USE_OpenCV)
 
     set(additional_cmake_args )
     if(MITK_USE_Python)
+      #message(STATUS "PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+      #message(STATUS "PYTHON_DEBUG_LIBRARY: ${PYTHON_DEBUG_LIBRARY}")
+      #message(STATUS "PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}")
+      #message(STATUS "PYTHON_LIBRARY: ${PYTHON_LIBRARY}")
+
       list(APPEND additional_cmake_args
-           -DBUILD_NEW_PYTHON_SUPPORT:BOOL=ON
+         -DBUILD_opencv_python:BOOL=ON
+         -DBUILD_NEW_PYTHON_SUPPORT:BOOL=ON
+         -DPYTHON_DEBUG_LIBRARY:FILEPATH=${PYTHON_DEBUG_LIBRARY}
+         -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+         -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         #-DPYTHON_LIBRARIES=${PYTHON_LIBRARY}
+         #-DPYTHON_DEBUG_LIBRARIES=${PYTHON_DEBUG_LIBRARIES}
+          )
+    else()
+      list(APPEND additional_cmake_args
+         -DBUILD_opencv_python:BOOL=OFF
+         -DBUILD_NEW_PYTHON_SUPPORT:BOOL=OFF
           )
     endif()
 

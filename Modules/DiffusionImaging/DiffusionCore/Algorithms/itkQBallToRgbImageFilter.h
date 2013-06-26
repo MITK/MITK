@@ -77,7 +77,7 @@ protected:
     typename InputImageType::Pointer qballImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
     typename OutputImageType::Pointer outputImage =
-        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+        static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     typename InputImageType::RegionType region = qballImage->GetLargestPossibleRegion();
 

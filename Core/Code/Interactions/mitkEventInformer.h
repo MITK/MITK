@@ -17,7 +17,7 @@
 #ifndef mitkEventInformer_h
 #define mitkEventInformer_h
 
-#include "mitkEventObserver.h"
+#include "mitkInteractionEventObserver.h"
 #include "mitkInteractionEvent.h"
 #include <usServiceInterface.h>
 
@@ -25,7 +25,7 @@
 namespace mitk
 {
   /**
-   * Serves as an interface for the micro service that takes care of informing/registering EventObserver
+   * Serves as an interface for the micro service that takes care of informing/registering InteractionEventObserver
    */
   struct EventInformerService
   {
@@ -33,8 +33,8 @@ namespace mitk
     {
     }
 
-    virtual void RegisterObserver(EventObserver::Pointer eventObserver) = 0;
-    virtual void UnRegisterObserver(EventObserver::Pointer eventObserver) = 0;
+    virtual void RegisterObserver(InteractionEventObserver::Pointer InteractionEventObserver) = 0;
+    virtual void UnRegisterObserver(InteractionEventObserver::Pointer InteractionEventObserver) = 0;
     virtual void NotifyObservers(InteractionEvent::Pointer interactionEvent) = 0;
   };
 

@@ -75,7 +75,7 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   //testing getting the output
   mitk::NavigationData* output = myFilter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
-  MITK_TEST_CONDITION_REQUIRED(output == myFilter->GetOutput(0), "Testing GetOutput() == GetOutput(0)");
+  MITK_TEST_CONDITION_REQUIRED(output == myFilter->GetOutput(), "Testing GetOutput() == GetOutput()");
   MITK_TEST_CONDITION_REQUIRED(output != myFilter->GetOutput(1), "Testing GetOutput() != GetOutput(1)");
 
   // Test setting BaseData

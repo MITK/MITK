@@ -94,6 +94,8 @@ endif()
 us_cache_var(US_ENABLE_AUTOLOADING_SUPPORT OFF BOOL "Enable module auto-loading support")
 us_cache_var(US_ENABLE_SERVICE_FACTORY_SUPPORT ON BOOL "Enable Service Factory support" ADVANCED)
 us_cache_var(US_ENABLE_THREADING_SUPPORT OFF BOOL "Enable threading support")
+us_cache_var(US_ENABLE_DEBUG_OUTPUT OFF BOOL "Enable debug messages" ADVANCED)
+us_cache_var(US_ENABLE_RESOURCE_COMPRESSION ON BOOL "Enable resource compression" ADVANCED)
 us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 
@@ -326,7 +328,6 @@ configure_file(usConfig.h.in ${us_config_h_file})
 
 set(US_RCC_EXECUTABLE_NAME usResourceCompiler)
 set(CppMicroServices_RCC_EXECUTABLE_NAME ${US_RCC_EXECUTABLE_NAME})
-set(US_RCC_EXECUTABLE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${US_RCC_EXECUTABLE_NAME}")
 
 add_subdirectory(tools)
 

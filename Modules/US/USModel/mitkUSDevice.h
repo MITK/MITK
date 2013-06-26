@@ -60,6 +60,14 @@ namespace mitk {
     public:
       mitkClassMacro(USDevice, mitk::ImageSource);
 
+      struct USImageCropArea
+        {
+        int cropLeft;
+        int cropRight;
+        int cropBottom;
+        int cropTop;
+        };
+
      /**
       *\brief These constants are used in conjunction with Microservices
       */
@@ -150,19 +158,19 @@ namespace mitk {
       */
       virtual void GraftOutput(itk::DataObject *graft);
 
-      /**
-      * \brief Make a DataObject of the correct type to used as the specified output.
-      *
-      * This method is automatically called when DataObject::DisconnectPipeline()
-      * is called.  DataObject::DisconnectPipeline, disconnects a data object
-      * from being an output of its current source.  When the data object
-      * is disconnected, the ProcessObject needs to construct a replacement
-      * output data object so that the ProcessObject is in a valid state.
-      * Subclasses of USImageVideoSource that have outputs of different
-      * data types must overwrite this method so that proper output objects
-      * are created.
-      */
-      virtual DataObjectPointer MakeOutput(unsigned int idx);
+//      /**
+//      * \brief Make a DataObject of the correct type to used as the specified output.
+//      *
+//      * This method is automatically called when DataObject::DisconnectPipeline()
+//      * is called.  DataObject::DisconnectPipeline, disconnects a data object
+//      * from being an output of its current source.  When the data object
+//      * is disconnected, the ProcessObject needs to construct a replacement
+//      * output data object so that the ProcessObject is in a valid state.
+//      * Subclasses of USImageVideoSource that have outputs of different
+//      * data types must overwrite this method so that proper output objects
+//      * are created.
+//      */
+//      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx);
 
       //########### GETTER & SETTER ##################//
 
@@ -199,6 +207,9 @@ namespace mitk {
       */
       itkGetMacro(ActiveProbe, mitk::USProbe::Pointer);
 
+      /* @return Returns the area that will be cropped from the US image. Is disabled / [0,0,0,0] by default. */
+      mitk::USDevice::USImageCropArea GetCropArea();
+
       std::string GetDeviceManufacturer();
       std::string GetDeviceModel();
       std::string GetDeviceComment();
@@ -207,6 +218,10 @@ namespace mitk {
       mitk::USProbe::Pointer m_ActiveProbe;
       std::vector<mitk::USProbe::Pointer> m_ConnectedProbes;
       bool m_IsActive;
+      bool m_IsConnected;
+
+      /* @brief defines the area that should be cropped from the US image */
+      USImageCropArea m_CropArea;
 
 
       /*

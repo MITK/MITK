@@ -27,39 +27,41 @@
 #include <mitkInteractionPositionEvent.h>
 #include <mitkInternalEvent.h>
 
-
-std::vector<std::string> &mitk::EventFactory::split(const std::string &s, char delim, std::vector<std::string> &elems)
+namespace
 {
-  std::stringstream ss(s);
-  std::string item;
-  while (std::getline(ss, item, delim))
+  std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems)
   {
-    elems.push_back(item);
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim))
+    {
+      elems.push_back(item);
+    }
+    return elems;
   }
-  return elems;
-}
 
-std::vector<std::string> mitk::EventFactory::split(const std::string &s, char delim)
-{
-  std::vector<std::string> elems;
-  return split(s, delim, elems);
+  std::vector<std::string> split(const std::string &s, char delim)
+  {
+    std::vector < std::string > elems;
+    return split(s, delim, elems);
+  }
 }
 
 mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Pointer list)
 {
-  //
+//
   std::string eventClass, eventVariant;
-  list->GetStringProperty(xmlParameterEventClass.c_str(), eventClass);
-  list->GetStringProperty(xmlParameterEventVariant.c_str(), eventVariant);
+  list->GetStringProperty(InteractionEventConst::xmlParameterEventClass().c_str(), eventClass);
+  list->GetStringProperty(InteractionEventConst::xmlParameterEventVariant().c_str(), eventVariant);
 
-  // Query all possible attributes, if they are not present, set their default values.
-  // Position Events & Key Events
+// Query all possible attributes, if they are not present, set their default values.
+// Position Events & Key Events
   std::string strModifiers;
-  ModifierKeys modifiers = NoKey;
+  InteractionEvent::ModifierKeys modifiers = InteractionEvent::NoKey;
   std::string strEventButton;
-  MouseButtons eventButton = NoButton;
+  InteractionEvent::MouseButtons eventButton = InteractionEvent::NoButton;
   std::string strButtonState;
-  MouseButtons buttonState = NoButton;
+  InteractionEvent::MouseButtons buttonState = InteractionEvent::NoButton;
   std::string strKey;
   std::string key;
   std::string strWheelDelta;
@@ -69,8 +71,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   Point2D pos;
   pos.Fill(0);
 
-  // Parse modifier information
-  if (list->GetStringProperty(xmlEventPropertyModifier.c_str(), strModifiers))
+// Parse modifier information
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyModifier().c_str(), strModifiers))
   {
     std::vector<std::string> mods = split(strModifiers, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -78,15 +80,15 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
       if (*it == "CTRL")
       {
-        modifiers = modifiers | ControlKey;
+        modifiers = modifiers | InteractionEvent::ControlKey;
       }
       else if (*it == "ALT")
       {
-        modifiers = modifiers | AltKey;
+        modifiers = modifiers | InteractionEvent::AltKey;
       }
       else if (*it == "SHIFT")
       {
-        modifiers = modifiers | ShiftKey;
+        modifiers = modifiers | InteractionEvent::ShiftKey;
       }
       else
       {
@@ -95,21 +97,21 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Set EventButton
-  if (list->GetStringProperty(xmlEventPropertyEventButton.c_str(), strEventButton))
+// Set EventButton
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyEventButton().c_str(), strEventButton))
   {
     std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
     if (strEventButton == "MIDDLEMOUSEBUTTON")
     {
-      eventButton = MiddleMouseButton;
+      eventButton = InteractionEvent::MiddleMouseButton;
     }
     else if (strEventButton == "LEFTMOUSEBUTTON")
     {
-      eventButton = LeftMouseButton;
+      eventButton = InteractionEvent::LeftMouseButton;
     }
     else if (strEventButton == "RIGHTMOUSEBUTTON")
     {
-      eventButton = RightMouseButton;
+      eventButton = InteractionEvent::RightMouseButton;
     }
     else
     {
@@ -117,8 +119,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Parse ButtonStates
-  if (list->GetStringProperty(xmlEventPropertyButtonState.c_str(), strButtonState))
+// Parse ButtonStates
+  if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyButtonState().c_str(), strButtonState))
   {
     std::vector<std::string> mods = split(strButtonState, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
@@ -126,15 +128,15 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
       if (*it == "MIDDLEMOUSEBUTTON")
       {
-        buttonState = buttonState | MiddleMouseButton;
+        buttonState = buttonState | InteractionEvent::MiddleMouseButton;
       }
       else if (*it == "LEFTMOUSEBUTTON")
       {
-        buttonState = buttonState | LeftMouseButton;
+        buttonState = buttonState | InteractionEvent::LeftMouseButton;
       }
       else if (*it == "RIGHTMOUSEBUTTON")
       {
-        buttonState = buttonState | RightMouseButton;
+        buttonState = buttonState | InteractionEvent::RightMouseButton;
       }
       else
       {
@@ -143,8 +145,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     }
   }
 
-  // Key
-  if (!list->GetStringProperty(xmlEventPropertyKey.c_str(), strKey))
+// Key
+  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyKey().c_str(), strKey))
   {
     key = "";
   }
@@ -152,8 +154,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     key = strKey;
   }
-  // WheelDelta
-  if (!list->GetStringProperty(xmlEventPropertyScrollDirection.c_str(), strWheelDelta))
+// WheelDelta
+  if (!list->GetStringProperty(InteractionEventConst::xmlEventPropertyScrollDirection().c_str(), strWheelDelta))
   {
     wheelDelta = 0;
   }
@@ -169,8 +171,8 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
       wheelDelta = 1;
     }
   }
-  // Internal Signals Name
-  list->GetStringProperty(xmlEventPropertySignalName.c_str(), strSignalName);
+// Internal Signals Name
+  list->GetStringProperty(InteractionEventConst::xmlEventPropertySignalName().c_str(), strSignalName);
 
   /*
    * Here the objects are created
@@ -193,7 +195,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = MouseReleaseEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
-  else if (eventClass == "KEYEVENT")
+  else if (eventClass == "INTERACTIONKEYEVENT")
   {
     event = InteractionKeyEvent::New(NULL, key, modifiers);
   }
@@ -201,9 +203,9 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   {
     event = MouseWheelEvent::New(NULL, pos, buttonState, modifiers, wheelDelta);
   }
-  else if (eventClass == "POSITIONEVENT")
+  else if (eventClass == "INTERACTIONPOSITIONEVENT")
   {
-    event = InteractionPositionEvent::New(NULL, pos, "PositionEvent");
+    event = InteractionPositionEvent::New(NULL, pos);
   }
   else if (eventClass == "INTERNALEVENT")
   {
@@ -211,7 +213,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "INTERACTIONEVENT")
   {
-    event = InteractionEvent::New(NULL, strSignalName);
+    event = InteractionEvent::New(NULL);
   }
   if (event.IsNull())
   {

@@ -78,7 +78,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[SUCCESS] : number of inputs == number of outputs." << std::endl;
 
 
-  mitk::Surface::Pointer outputSurface = filter->GetOutput(0);
+  mitk::Surface::Pointer outputSurface = filter->GetOutput();
   if ( outputSurface->GetVtkPolyData()->GetNumberOfPolys() != surface->GetVtkPolyData()->GetNumberOfPolys() )
   {
     std::cout << "[FAILED] : number of Polys in PolyData of output != number of Polys in PolyData of input" << std::endl;
@@ -89,7 +89,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
 
 
   filter->Update();
-  outputSurface = filter->GetOutput(0);
+  outputSurface = filter->GetOutput();
   if ( outputSurface->GetSizeOfPolyDataSeries() != surface->GetSizeOfPolyDataSeries() )
   {
     std::cout << "[FAILED] : number of PolyDatas in PolyDataSeries of output != number of PolyDatas of input" << std::endl;
@@ -98,22 +98,22 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[SUCCESS] : Size of PolyDataSeries of input and output are identical." << std::endl;
 
 
-  std::cout << "Testing removeInputs() : " << std::endl;
-  unsigned int numOfInputs = filter->GetNumberOfInputs();
-  filter->RemoveInputs( mitk::Surface::New() );
-  if ( filter->GetNumberOfInputs() != numOfInputs )
-  {
-    std::cout << "[FAILED] : input was removed that was not set." << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : no iput was removed that was not set." << std::endl;
-  filter->RemoveInputs( surface );
-  if ( filter->GetNumberOfInputs() != 0 )
-  {
-    std::cout << "[FAILED] : existing input was not removed correctly." << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
+  //std::cout << "Testing RemoveInputs() : " << std::endl;
+  //unsigned int numOfInputs = filter->GetNumberOfInputs();
+  //filter->RemoveInputs( mitk::Surface::New() );
+  //if ( filter->GetNumberOfInputs() != numOfInputs )
+  //{
+  //  std::cout << "[FAILED] : input was removed that was not set." << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //std::cout << "[SUCCESS] : no input was removed that was not set." << std::endl;
+  //filter->RemoveInputs( surface );
+  //if ( filter->GetNumberOfInputs() != 0 )
+  //{
+  //  std::cout << "[FAILED] : existing input was not removed correctly." << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
 
 
 

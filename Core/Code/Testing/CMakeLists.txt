@@ -1,3 +1,13 @@
+# The core tests need relaxed compiler flags...
+# TODO fix core tests to compile without these additional no-error flags
+if(MSVC_VERSION)
+  # disable deprecated warnings (they would lead to errors)
+  mitkFunctionCheckCAndCXXCompilerFlags("/wd4996" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+else()
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+  mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=deprecated-declarations" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+endif()
+
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
 
@@ -8,6 +18,7 @@ mitkAddCustomModuleTest(mitkDICOMLocaleTest_spacingOk_SC mitkDICOMLocaleTest ${M
 mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest ${MITK_DATA_DIR}/Png2D-bw.png ${MITK_DATA_DIR}/Pic2DplusT.nrrd)
 
 mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
+mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest ${MITK_SOURCE_DIR}/Core/Code/Testing/Resources/Interactions/StatemachineConfigTest.xml)
 
 #mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz)
 mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest  ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd)
@@ -33,6 +44,11 @@ mitkAddCustomModuleTest(mitkIOUtilTest mitkIOUtilTest #test for a randomly chose
 )
 
 
+mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+)
+
+
 if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_GUI_TESTING
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                         ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
@@ -50,14 +66,54 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVt
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dLevelWindowBlood640x480REF.png #corresponding reference #screenshot
 )
-#mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dOpacity640x480 mitkImageVtkMapper2DOpacityTest #test for opacity (=0.5) Pic3D coronal slice
-#                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
-#                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dOpacity640x480REF.png #corresponding reference screenshot
-#)
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dOpacity640x480 mitkImageVtkMapper2DOpacityTest #test for opacity (=0.5) Pic3D coronal slice
+                        ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dOpacity640x480REF.png corresponding reference screenshot
+)
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DSwivelTest #test for a randomly chosen Pic3D swivelled slice
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dSwivel640x480REF.png #corresponding reference screenshot
 )
+mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2DTest
+                        ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAlone640x480REF.png #corresponding reference screenshot
+)
+mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2DImageTest
+                        ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/RenderingTestData/PointSetForPic3D.mps #input point set and image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Pic3DPointSetForPic3D640x480REF.png #corresponding reference screenshot
+)
+mitkAddCustomModuleTest(mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2DGlyphTypeTest
+                         ${MITK_DATA_DIR}/RenderingTestData/openMeAlone.mps #input point set to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/openMeAloneGlyphType640x480REF.png #corresponding reference screenshot
+)
+
+#Test reslice interpolation
+#note: nearest mode is already tested by swivel test
+mitkAddCustomModuleTest(ResliceInterpolationIsLinear mitkImageVtkMapper2DResliceInterpolationPropertyTest
+                        1 #linear
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefLinear.png #corresponding reference screenshot LINEAR
+)
+
+mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceInterpolationPropertyTest
+                        3 #cubic
+                        ${MITK_DATA_DIR}/Pic3D.nrrd
+                        -V
+                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefCubic.png #corresponding reference screenshot CUBIC
+)
+#End test reslice interpolation
+
+# Testing of the rendering of binary images
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImage640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
+                        ${MITK_DATA_DIR}/RenderingTestData/binaryImage.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryImage640x480REF.png #corresponding reference screenshot
+)
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_binaryTestImageWithRef640x480 mitkImageVtkMapper2DTest #test for standard Pic3D axial slice
+                        ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/RenderingTestData/binaryImage.nrrd #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryImageWithRef640x480REF.png #corresponding reference screenshot
+)
+# End of binary image tests
 
 mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVtkMapper3DTest
                         ${MITK_DATA_DIR}/ToF-Data/Kinect_LiverPhantom.vtp
@@ -66,13 +122,34 @@ mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTest_TextureProperty mitkSurfaceVt
                         ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedLiver640x480REF.png #corresponding reference screenshot
 )
 
+mitkAddCustomModuleTest(mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2DTransferFunctionTest
+                        ${MITK_DATA_DIR}/Png2D-bw.png
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/Png2D-bw-TransferFunctionRGBImage640x480REF.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceGLMapper2DColorTest
+                        ${MITK_DATA_DIR}/ball.stl
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballColorRed640x480REF.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkSurfaceGLMapper2DColorTest_DasArmeSchwein mitkSurfaceGLMapper2DColorTest
+                        ${MITK_DATA_DIR}/binary.stl
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/binaryColorRed640x480REF.png #corresponding reference screenshot
+)
+
+mitkAddCustomModuleTest(mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurfaceGLMapper2DOpacityTest #opacity = 50% (0.5)
+                        ${MITK_DATA_DIR}/ball.stl
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/ballOpacity640x480REF.png #corresponding reference screenshot
+)
+
+#Removed due to high rendering error.
 #mitkAddCustomModuleTest(mitkSurfaceVtkMapper3DTexturedSphereTest_Football mitkSurfaceVtkMapper3DTexturedSphereTest
 #                        ${MITK_DATA_DIR}/RenderingTestData/texture.jpg #input texture
 #                        -V
 #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/texturedSphere640x480REF.png corresponding reference screenshot
 #)
 
-SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 #mitkSurfaceVtkMapper3DTest_TextureProperty #mitkSurfaceVtkMapper3DTexturedSphereTest_Football #mitkImageVtkMapper2D_pic3dOpacity640x480
+SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw mitkImageVtkMapper2D_pic3dOpacity640x480 mitkSurfaceGLMapper2DOpacityTest_BallOpacity mitkSurfaceGLMapper2DColorTest_DasArmeSchwein mitkSurfaceGLMapper2DColorTest_RedBall mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
 PROPERTY RUN_SERIAL TRUE)
 
 endif()

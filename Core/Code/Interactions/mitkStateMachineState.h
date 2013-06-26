@@ -19,20 +19,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <string>
-#include <itkObject.h>
-#include <itkWeakPointer.h>
+#include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
 
 namespace mitk {
+  /**
+   * \class StateMachineState
+   * Represents a state of a state machine pattern.
+   * It holds transitions to other states (mitk::StateMachineTransition) and the mode of the current state, see
+   * m_StateMode .
+   */
 
-  // Dispatcher and State Modes
-
-  class MITK_CORE_EXPORT StateMachineState : public itk::Object
+  class MITK_CORE_EXPORT StateMachineState : public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineState, itk::Object);
-    mitkNewMacro2Param(Self, std::string, std::string);
+    mitkClassMacro(StateMachineState, itk::LightObject);
+    mitkNewMacro2Param(Self, const std::string&, const std::string&);
 
 
 
@@ -44,14 +47,14 @@ namespace mitk {
     /**
     * @brief Return Transition which matches given event description.
     **/
-    StateMachineTransition::Pointer GetTransition(std::string eventClass, std::string eventVariant);
+    StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant);
 
     /**
     * @brief Returns the name.
     **/
-    std::string GetName();
+    std::string GetName() const;
 
-    std::string GetMode();
+    std::string GetMode() const;
 
     /**
     * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions.
@@ -61,7 +64,7 @@ namespace mitk {
 
   protected:
 
-    StateMachineState(std::string name, std::string stateMode);
+    StateMachineState(const std::string& name, const std::string& stateMode);
     ~StateMachineState();
 
   private:

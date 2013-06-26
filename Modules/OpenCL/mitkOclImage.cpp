@@ -56,7 +56,10 @@ cl_mem mitk::OclImage::CreateGPUImage(unsigned int _wi, unsigned int _he, unsign
 
   m_BpE = _bpp;
 
-  cl_context gpuContext = OpenCLActivator::GetResourceServiceRef()->GetContext();
+  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+
+  cl_context gpuContext = resources->GetContext();
 
   int clErr;
   m_gpuImage = clCreateBuffer( gpuContext, CL_MEM_READ_WRITE, m_bufferSize * m_BpE, NULL, &clErr);
@@ -148,14 +151,18 @@ int mitk::OclImage::TransferDataToGPU(cl_command_queue gpuComQueue)
 cl_int mitk::OclImage::AllocateGPUImage()
 {
   cl_int clErr = 0;
-  cl_context gpuContext =OpenCLActivator::GetResourceServiceRef()->GetContext();
+
+  mitk::ServiceReference ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+
+  cl_context gpuContext = resources->GetContext();
 
   // initialize both proposed and supported format variables to same value
   this->m_proposedFormat = this->ConvertPixelTypeToOCLFormat();
   this->m_supportedFormat = this->m_proposedFormat;
 
   // test the current format for HW support
-  this->m_formatSupported = OpenCLActivator::GetResourceServiceRef()->GetIsFormatSupported( &(this->m_supportedFormat) );
+  this->m_formatSupported = resources->GetIsFormatSupported( &(this->m_supportedFormat) );
 
   // create an transfer kernel object in case the proposed format is not supported
   if( !(this->m_formatSupported) )

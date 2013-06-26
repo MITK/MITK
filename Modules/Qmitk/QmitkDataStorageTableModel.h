@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// Forward declarations.
 
 ///
+/// \ingroup QmitkModule
 /// \class QmitkDataStorageTableModel
 ///
 /// \brief A table model for a set of DataNodes defined by a predicate.

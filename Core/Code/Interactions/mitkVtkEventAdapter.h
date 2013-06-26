@@ -49,17 +49,17 @@ class MITK_EXPORT VtkEventAdapter
 {
 public:
   /**
-   * \deprecated{Please switch to the appropriate AdaptMousePress/Move/Release-Event function.}
+  \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptMousePressEvent / mitk::AdaptMouseMoveEvent / mitk::AdaptMouseReleaseEvent
+  */
+ DEPRECATED(static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
+ /**
+   \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptMouseWheelEvent
    */
-  static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
-  /**
-    * \deprecated{Please switch to the AdaptMouseWheelEvent function.}
+ DEPRECATED(static mitk::WheelEvent AdaptWheelEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
+ /**
+    \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptInteractionKeyEvent
     */
-  static mitk::WheelEvent AdaptWheelEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
-  /**
-    * \deprecated{Please switch to the AdaptInteractionKeyEvent function.}
-    */
-  static mitk::KeyEvent AdaptKeyEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
+ DEPRECATED(static mitk::KeyEvent AdaptKeyEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
 
   /** New events compatible with the revised interaction scheme */
 

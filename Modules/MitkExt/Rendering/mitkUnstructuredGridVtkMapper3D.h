@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkUnstructuredGrid.h"
 #include "mitkBaseRenderer.h"
 
@@ -43,11 +43,11 @@ namespace mitk {
 //## @brief Vtk-based mapper for UnstructuredGrid
 //##
 //## @ingroup Mapper
-class MitkExt_EXPORT UnstructuredGridVtkMapper3D : public VtkMapper3D
+class MitkExt_EXPORT UnstructuredGridVtkMapper3D : public VtkMapper
 {
 public:
 
-  mitkClassMacro(UnstructuredGridVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(UnstructuredGridVtkMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 
@@ -59,13 +59,14 @@ public:
 
   void ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer);
 
+  LocalStorageHandler<BaseLocalStorage> m_LSH;
+
 protected:
 
   UnstructuredGridVtkMapper3D();
 
   virtual ~UnstructuredGridVtkMapper3D();
 
-  virtual void GenerateData();
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
   virtual void ResetMapper( BaseRenderer* /*renderer*/ );
 

@@ -88,7 +88,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(((myFilter->GetInput(0) == nd1)
                     && (myFilter->GetInput(1) == nd2)), "testing Set-/GetInput(index, data)");
 
-  output = myFilter->GetOutput(0);
+  output = myFilter->GetOutput();
   mitk::NavigationData* output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!
   MITK_TEST_CONDITION(((output != NULL)

@@ -31,14 +31,14 @@
  * Note: A Click with the MiddleButton is to be handled with MousePressEvents
  */
 
-
 namespace mitk
 {
-  class MITK_CORE_EXPORT MouseWheelEvent : public InteractionPositionEvent {
+  class MITK_CORE_EXPORT MouseWheelEvent: public InteractionPositionEvent
+  {
 
   public:
-    mitkClassMacro(MouseWheelEvent,InteractionPositionEvent);
-    mitkNewMacro5Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys, int);
+    mitkClassMacro(MouseWheelEvent,InteractionPositionEvent)
+    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D&, MouseButtons , ModifierKeys, int)
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
@@ -47,11 +47,17 @@ namespace mitk
     int GetWheelDelta() const;
     void SetWheelDelta(int delta);
 
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    MouseWheelEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers, int  wheelDelta);
+    MouseWheelEvent(BaseRenderer* = NULL,
+        const Point2D& mousePosition = Point2D(),
+        MouseButtons buttonStates = NoButton,
+        ModifierKeys modifiers = NoKey,
+        int wheelDelta = 0);
     virtual ~MouseWheelEvent();
+
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     int m_WheelDelta;

@@ -36,27 +36,24 @@ public:
     ~TensorModel();
 
     typedef typename DiffusionSignalModel< ScalarType >::PixelType      PixelType;
-    typedef itk::DiffusionTensor3D< float >                             ItkTensorType;
+    typedef itk::DiffusionTensor3D< ScalarType >                        ItkTensorType;
     typedef typename DiffusionSignalModel< ScalarType >::GradientType   GradientType;
 
     /** Actual signal generation **/
     PixelType SimulateMeasurement();
 
-    void SetKernelDirection(GradientType kernelDirection){ m_KernelDirection = kernelDirection; }
-    void SetKernelTensor(ItkTensorType& tensor);
-    void SetKernelFA(float FA);
-    void SetKernelADC(float ADC);
-    void SetBvalue(float bValue) { m_BValue = bValue; }
+    void SetBvalue(ScalarType bValue) { m_BValue = bValue; }
+    void SetDiffusivity1(ScalarType d1){ m_KernelTensorMatrix[0][0] = d1; }
+    void SetDiffusivity2(ScalarType d2){ m_KernelTensorMatrix[1][1] = d2; }
+    void SetDiffusivity3(ScalarType d3){ m_KernelTensorMatrix[2][2] = d3; }
 
 protected:
 
     /** Calculates tensor matrix from FA and ADC **/
     void UpdateKernelTensor();
-    GradientType                    m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
-    vnl_matrix_fixed<double, 3, 3>  m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
-    float                           m_KernelFA;             ///< FA of the kernel tensor
-    float                           m_KernelADC;            ///< ADC of the kernel tensor
-    float                           m_BValue;               ///< b-value used to generate the artificial signal
+    GradientType                        m_KernelDirection;      ///< Direction of the kernel tensors principal eigenvector
+    vnl_matrix_fixed<ScalarType, 3, 3>  m_KernelTensorMatrix;   ///< 3x3 matrix containing the kernel tensor values
+    ScalarType                          m_BValue;               ///< b-value used to generate the artificial signal
 };
 
 }

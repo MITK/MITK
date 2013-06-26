@@ -270,7 +270,7 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   warper->SetOutputSpacing( itkFixedImage->GetSpacing() );
   warper->SetOutputOrigin( itkFixedImage->GetOrigin() );
   warper->SetOutputDirection (itkFixedImage->GetDirection() );
-  warper->SetDeformationField( deformationField );
+  warper->SetDisplacementField( deformationField );
   warper->Update();
 
   FloatImageType::Pointer outputImage = warper->GetOutput();

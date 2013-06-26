@@ -3,7 +3,7 @@
 
 \tableofcontents
 
-\section InteractionPage_Introduction Introduction to Interaction in MITK
+\section DataInteractionPage_Introduction Introduction to Interaction in MITK
 
 Interaction is a very important task in medical image processing software. Therefore MITK provides a special interaction concept
 that provides the developer with an easy way to develop and maintain user interaction separately from the algorithms processing the input.
@@ -18,74 +18,76 @@ First a a high-level overview about how the different components interact is giv
 \subsection FurtherReadingInteraction Topics related to interaction - further information:
 See the \ref DataInteractionTechnicalPage page for a more technical explanation. \n
 Consult \ref HowToUseDataInteractor for usage information.\n
-See \ref SectionImplementationDataInteractor for an example on how to implement a new DataInteractor \n
+See \ref SectionImplementationDataInteractor for an example on how to implement a new mitk::DataInteractor \n
 for information about how to create new events refer to ImplementNewEventsPage.\n
 The documentation of the depricated former concept can be found at \ref InteractionPage.
+\n
+For a list of changes with respect to the previous interaction concept please refer to the \ref InteractionMigration
 
 
-\section HandlingSection Event Handling & Window Manager Abstraction
+\section DataInteractionPage_HandlingSection Event Handling & GUI Toolkit Abstraction
 
-The following sequence diagram gives an examplary overview of the process from creating an event until executing an action in the DataInteractor.
-This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific window manager.
+The following sequence diagram gives an exemplary overview of the process from creating an event until executing an action in the mitk::DataInteractor.
+This diagram assumes the usage of the Qt framework, but also shows that the interaction concept itself is implemented independent of any specific
+graphical user interface toolkit.
 
 \image html event_handling.png
 <ol>
   <li>a user event is triggered and send to MITK
-  <li>this layler serves as an adapter from window manager (here Qt) events to MITK internal events (later refered to as InteractionEvents).
-  <li>once the event is adapted it is send to a Dispatcher, which is linked to a render window, to be handled.
-  <li>on Dispatcher level all objects are known that can react to incoming events (DataInteractors)
-  <li>a DataInteractor is offered an event and checks its EventConfig object, which returns if a variant if this event has been defined for this DataInteractor.
+  <li>this layer serves as an adapter from the GUI toolkit (here Qt) events to MITK internal events (later referred to as \link mitk::InteractionEvent InteractionEvents\endlink).
+  <li>once the event is adapted it is send to a mitk::Dispatcher, which is linked to a render window, to be handled.
+  <li>on the mitk::Dispatcher level all objects are known that can react to incoming events (mitk::DataInteractor and mitk::InteractionEventObserver instances)
+  <li>a mitk::DataInteractor is offered an event and checks its mitk::EventConfig object, which returns if a variant of this event has been defined for this DataInteractor.
   <li>if the DataInteractor has a variant for the event, it consults its state machine to check if the input can be handled in the current state
-  <li>the actions asociated with a state change (transition) are executed and the event is successfully handled.
+  <li>the actions associated with a state change (transition) are executed and the event is successfully handled.
 </ol>
 
-\section EventPage Events
+\section DataInteractionPage_EventPage Events
 
 Events can describe any sort of user input, such as key strokes, mouse clicks or touch gestures.
 These events are mapped from an UI framework like Qt to an MITK internal representation
-and send to the Dispatcher which in turn deals with further processing of the event.
-These events are not limited to classical input devices but can be extened at will, by introducing new classes which e.g. describe
-events from tracking devices, etc. Refer to \ref ImplementNewEventsPage to see how new events and thereby input devices can be integrated.
-For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \ref DataInteractionTechnicalPage.
+and send to the mitk::Dispatcher which in turn deals with further processing of the event.
+These events are not limited to classical input devices but can be extended at will, by introducing new classes which e.g. describe
+events from tracking devices, etc. Refer to \subpage ImplementNewEventsPage to see how new events and thereby input devices can be integrated.
+For an overview of available Events see mitk::InteractionEvent, for on overview of parameters see the \subpage DataInteractionTechnicalPage.
 
 
-\section EventHandlerSection EventHandler
-Is the term describing objects in general that can handle events. These objects can be devided into two groups, namely
-DataInteractors and EventObserver. Their difference is that DataInteractors are linked with a DataNode which they manipulate,
-whereas EventObserver do not have a DataNode and therefore are not supposed to manipulate any data.
+\section DataInteractionPage_InteractionEventHandlerSection InteractionEventHandler
+Is the term describing objects in general that can handle events. These objects can be divided into two groups, namely
+\link mitk::DataInteractor DataInteractors\endlink and mitk::InteractionEventObserver. Their difference is that mitk::DataInteractor instances are
+linked with a mitk::DataNode which they manipulate, whereas mitk::InteractionEventObserver instances do not have a mitk::DataNode and therefore
+are not supposed to manipulate any data.
 
 \dot
 digraph linker_deps {
   node [shape=record, fontname=Helvetica, fontsize=10];
-  a [ label="EventHandler" ];
-  d [ label="{StateMachine|HandleEvent()}" ];
-  b [ label="{DataInteractor|HandleEvent()}" ];
-  c [ label="{EventObserver|Notify()}" ];
+  a [ label="InteractionEventHandler" ];
+  d [ label="{EventStateMachine|HandleEvent()}" ];
+  b [ label="{DataInteractor|PerformAction()}" ];
   a -> d;
   d -> b;
-  d -> c;
 }
 \enddot
 
-\subsection DataInteractorsSection DataInteractors
-DataInteractors are specialized EventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
+\subsection DataInteractionPage_DataInteractorsSection DataInteractors
+DataInteractors are specialized mitk::InteractionEventHandler which handle events for one spefific DataNode. They are implemented following a concept called state machines
 (see e.g. <a href="http://en.wikipedia.org/wiki/Mealy_machine"> Wikipedia </a>).
 
-\subsubsection StateMachinesSection StateMachines
+\subsubsection DataInteractionPage_StateMachinesSection StateMachines
 
-A specific events action is usually desired to dependent on the content of the data object the state of the interaction.
-For example if the when adding a line by clicking with the mouse, the first to clicks are supposed to add a point.
+A specific events action is usually desired to depend on the content of the data object and the state of the interaction.
+For example when adding a line by clicking with the mouse, the first two clicks are supposed to add a point.
 But the second click should additionally finish the interaction and a subsequent third click should be ignored.
 State machines provide a great way to model such interaction in which the same user interaction can trigger different actions
 depending on the current state. Therefore DataInteractors work with so called state machine patterns.
 The basic idea here is that each interaction can be described by states
 and transitions which in turn trigger actions.
-These patterns define a workflow and different patterns can be applied to the same DataInteractor and cause this DataInteractor
+These patterns define a workflow and different patterns can be applied to the same mitk::DataInteractor and cause this mitk::DataInteractor
 to perform different user interactions.
 This principle is best described by an example.
-Imagine a DataInteractor with the functionality (1) to add Points at a given mouse position and connect them by a line and (2) check if two
-points are on the same position. Using this DataInteractor, different StateMachine patterns/descriptions
-can be given which each cause the DataInteractor to perform different interaction schemes.
+Imagine a mitk::DataInteractor with the functionality (1) to add Points at a given mouse position and connect them by a line and (2) check if two
+points are on the same position. Using this mitk::DataInteractor, different mitk::StateMachine patterns/descriptions
+can be given which each cause the mitk::DataInteractor to perform different interaction schemes.
 
 <b>State machine pattern 1:
 We want the user to draw a line. A simple state machine could express this by three states like this:</b>
@@ -103,8 +105,8 @@ digraph linker_deps {
  With each MousePress event the AddPoint function is called and adds a point at the mouse position, unless two points already exist.
 
 <b>State machine pattern 2:
-The same DataInteractor can also operate after the following state machine, which models the interaction to input a closed contour.
-The DataInteractor can detect an AddPoint event on an already existing point and will trigger a PointsMatch event.</b>
+The same mitk::DataInteractor can also operate after the following state machine, which models the interaction to input a closed contour.
+The mitk::DataInteractor can detect an AddPoint event on an already existing point and will trigger a PointsMatch event.</b>
 
 \dot
 digraph  {
@@ -119,7 +121,7 @@ digraph  {
 In this way state machines provide both, a nice and structured way to represent interaction tasks and description of the interaction which is separated from the code.
 One DataInteractor can be re-used for different tasks by simply exchanging the state machine pattern.  These patterns are described in XML files.
 
-\subsubsection DefinitionStateMachine Definition of a State Machine
+\subsubsection DataInteractionPage_DefinitionStateMachine Definition of a State Machine
 
 The definition is made up out of three components.
 <ul>
@@ -147,34 +149,50 @@ An example of a state machine describing the interaction of example 2 looks like
 \endcode
 <b>Example 1: State machine pattern, that describes adding points to a contour until the PointsMatch event is triggered.</b>
 
-For a more detailed desciption of state machine patterns see here.
+For a more detailed description of state machine patterns see here.
 
-\subsection EventObserverSection EventObserver
+\subsection DataInteractionPage_InteractionEventObserverSection InteractionEventObserver
 
-EventObserver are objects which will receive all user input and are intented for observation only, they should never modify any DataNodes.
-For EventObserver it is optional to use the state machine functionality, the default is without. How to use the state machine functionality
- is described in the documentation of mitk::EventObserver::Notify.
+mitk::InteractionEventObserver instances are objects which will receive all user input and are intended for observation only,
+they should never modify any DataNodes.
+For mitk::InteractionEventObserver it is optional to use the state machine functionality, the default is without. How to use the state machine functionality
+is described in the documentation of mitk::InteractionEventObserver::Notify.
 
-\subsection ConfigurationSection Configuration
-In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that is it possible
-to easily change this. This is achieved through configuration of EventHandlers. This allows to change the behavior at runtime.
-The EventHandler provides an interface to easily modify the user input that triggers an action by loading a different configuration, this allows to implement
-user-specific behavior of the software on an abstract level and to switch in at runtime.
-This is achieved through XML files describing a configuration. These files can be loaded by the EventHandler and will lead to an internal mapping
-from specific user input to an absract description of the event given in the config file.
+\dot
+digraph event_observer {
+  node [shape=record, fontname=Helvetica, fontsize=10];
+  c [ label="{InteractionEventObserver|Notify()}" ];
+  a [ label="InteractionEventHandler" ];
+  b [ label="{EventStateMachine|HandleEvent()}" ];
+  d [ label="{MyCustomObserver|PerformAction()}" ];
+  c -> d;
+  a -> b;
+  b -> d [style="dashed",label="optional"];
+}
+\enddot
 
-In order to do this we distinguish between a spefic event and an event variant. A specific event is described by its event class, which determines the
-category of an event, e.g. the class MousePressEvent, and its parameter which make this event unique, e.g. LeftMouseButton pressed and no modifier keys pressed.
-The event variant is a name that is assigned to a spefific event, and to which an EventHandler listens.
+\subsection DataInteractionPage_ConfigurationSection Configuration
+In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that it is possible
+to easily change this. This is achieved through configuration of \link mitk::InteractioinEventHandler InteractionEventHandlers\endlink.
+This allows to change the behavior at runtime.
+The mitk::InteractionEventHandler class provides an interface to easily modify the user input that triggers an action by loading a different
+configuration. This allows to implement
+user-specific behavior of the software on an abstract level and to switch it at runtime.
+This is achieved through XML files describing a configuration. These files can be loaded by the mitk::InteractionEventHandler and will lead to an internal mapping
+from specific user input to an abstract description of the event given in the config file.
 
-To illustrate this, an example is given here for two different configuration files. We assume an EventHandler that listens to the event variant 'AddPoint',
-two possible config files could then look like this:
+In order to do this we distinguish between a specific event and an event variant. A specific event is described by its event class, which determines the
+category of an event, e.g. the class mitk::MousePressEvent, and its parameter which make this event unique, e.g. LeftMouseButton pressed and no modifier keys pressed.
+The event variant is a name that is assigned to a specific event, and to which an mitk::InteractionEventHandler listens.
+
+To illustrate this, an example is given here for two different configuration files. We assume that a mitk::InteractionEventHandler listens to the
+event variant 'AddPoint', two possible config files could then look like this:
 
 \code
 <config name="one">
- <input event_class="MousePressEvent" event_variant="MousePress">
+ <event_variant name="MousePress" class="MousePressEvent">
   <attribute name="EventButton" value="LeftMouseButton"/>
- </input>
+ </event_variant>
 </config>
 \endcode
 <b>Example 2: Event description of a left click with the mouse</b>
@@ -183,22 +201,24 @@ and
 
 \code
 <config name="two">
- <input event_class="MousePressEvent" event_variant="MousePress">
+ <event_variant name="MousePress" class="MousePressEvent">
   <attribute name="EventButton" value="RightMouseButton"/>
   <attribute name="Modifiers" value="shift"/>
- </input>
+ </event_variant>
 </config>
 \endcode
 <b>Example 3: Event description of a left click with the mouse while pressing the shift-key</b>
 
-If the EventHandler is loaded with the first configuration the event variant 'MousePress' is triggered when the user performs a mouse click,
+If the mitk::InteractionEventHandler is loaded with the first configuration the event variant 'MousePress' is triggered when the user performs a mouse click,
 while when the second configuration is loaded 'MousePress' is triggered when the user performs a right click while pressing the shift button.
-In this way all objects derived by EventHandler can be configured. For a detailed description about how to create the XML file see \ref ConfigurationTechnical .
+In this way all objects derived from mitk::InteractionEventHandler can be configured. For a detailed description about how to create the XML file see the
+\ref DataInteractionTechnicalPage page.
 
 
-\section DispatcherSection Dispatcher
+\section DataInteractionPage_DispatcherSection Dispatcher
 
-This unit receives all events and distributes them to the DataInteractors. This is done by ordering the DataInteractors according to the layer of their
-DataNode in descending order. Then the event is offered to the first DataInteractor, which in turn checks if it can handle the event. This is done
-for each DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all EventObservers are notified.
+Instances of mitk::Dispatcher receive all events and distribute them to their related mitk::DataInteractor instances. This is done by ordering
+the DataInteractors according to the layer of their
+mitk::DataNode in descending order. Then the event is offered to the first mitk::DataInteractor, which in turn checks if it can handle the event. This is done
+for each mitk::DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all InteractionEventObservers are notified.
  */

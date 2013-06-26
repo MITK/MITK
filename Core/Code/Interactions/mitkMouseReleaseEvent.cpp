@@ -17,19 +17,19 @@
 #include "mitkException.h"
 #include "mitkMouseReleaseEvent.h"
 
-mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer = NULL,
-    mitk::Point2D mousePosition = NULL,
-    mitk::MouseButtons buttonStates = NoButton,
-    mitk::ModifierKeys modifiers = NoKey,
-    mitk::MouseButtons eventButton = NoButton)
-: InteractionPositionEvent(baseRenderer, mousePosition, "MouseReleaseEvent")
+mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer,
+    const mitk::Point2D& mousePosition,
+    MouseButtons buttonStates,
+    ModifierKeys modifiers,
+    MouseButtons eventButton)
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_EventButton(eventButton)
-,m_ButtonStates(buttonStates)
+, m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)
 {
 }
 
-mitk::MouseButtons mitk::MouseReleaseEvent::GetEventButton() const
+mitk::InteractionEvent::MouseButtons mitk::MouseReleaseEvent::GetEventButton() const
 {
   return m_EventButton;
 }
@@ -40,12 +40,12 @@ void mitk::MouseReleaseEvent::SetEventButton(MouseButtons buttons)
 }
 
 
-mitk::ModifierKeys mitk::MouseReleaseEvent::GetModifiers() const
+mitk::InteractionEvent::ModifierKeys mitk::MouseReleaseEvent::GetModifiers() const
 {
   return m_Modifiers;
 }
 
-mitk::MouseButtons mitk::MouseReleaseEvent::GetButtonStates() const
+mitk::InteractionEvent::MouseButtons mitk::MouseReleaseEvent::GetButtonStates() const
 {
   return m_ButtonStates;
 }
@@ -64,15 +64,15 @@ mitk::MouseReleaseEvent::~MouseReleaseEvent()
 {
 }
 
-bool mitk::MouseReleaseEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MouseReleaseEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
 {
-  mitk::MouseReleaseEvent* mre = dynamic_cast<mitk::MouseReleaseEvent*>(interactionEvent.GetPointer());
-  if (mre == NULL)
-  {
-    return false;
-  }
-  return (this->GetEventButton() == mre->GetEventButton() && this->GetModifiers() == mre->GetModifiers()
-      && this->GetButtonStates() == mre->GetButtonStates()
+  const mitk::MouseReleaseEvent& mre = static_cast<const mitk::MouseReleaseEvent&>(interactionEvent);
+  return (this->GetEventButton() == mre.GetEventButton() && this->GetModifiers() == mre.GetModifiers()
+          && this->GetButtonStates() == mre.GetButtonStates() &&
+          Superclass::IsEqual(interactionEvent));
+}
 
-  );
+bool mitk::MouseReleaseEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+{
+  return (dynamic_cast<MouseReleaseEvent*>(baseClass.GetPointer()) != NULL) ;
 }

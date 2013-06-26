@@ -33,17 +33,18 @@ StickModel< ScalarType >::~StickModel()
 template< class ScalarType >
 typename StickModel< ScalarType >::PixelType StickModel< ScalarType >::SimulateMeasurement()
 {
+    this->m_FiberDirection.Normalize();
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
 
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        double bVal = g.GetNorm(); bVal *= bVal;
+        ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
         {
-            double dot = this->m_FiberDirection*g;
+            ScalarType dot = this->m_FiberDirection*g;
             signal[i] = exp( -m_BValue * bVal * m_Diffusivity*dot*dot );
         }
         else

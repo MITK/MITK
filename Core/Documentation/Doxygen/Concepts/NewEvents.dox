@@ -17,11 +17,10 @@ via mitk::RenderWindowBase::HandleEvent() so that they are relayed to a Dispatch
 \section EventImplementation Event Implementation
 
 The only prerequisite for a new event to be accepted is that it is derived from the mitk::InteractionEvent class.
-Further it is neccessary to provide a unique string identifier for this event class
-(this string will identify this class/super-class in a state machine pattern by the event_class tag), and it needs to implement at least one function,
-as shown at the example of the MousePressEvent.
+The new event must implement at least two functions,
+as shown in the example of the MousePressEvent.
 
-Implementation of equality for each event class by implementing isEqual.
+Implementation of equality for each event class by implementing IsEqual.
 Equality does \b not mean an exact copy or pointer equality.
 Equality is determined by agreement in all attributes that are necessary to describe
 the event for a state machine transition.
@@ -29,18 +28,30 @@ Here, for example, for the a mouse event press event, it is important which modi
 which mouse button was used to triggered the event, but the mouse position is irrelevant.
 
 \code
-bool mitk::MousePressEvent::MatchesTemplate(mitk::InteractionEvent::Pointer interactionEvent)
+bool mitk::MousePressEvent::IsEqual(const mitk::InteractionEvent& interactionEvent)
 {
-  // cast to your event class here
-  mitk::MousePressEvent* mpe = dynamic_cast<mitk::MousePressEvent*>(interactionEvent.GetPointer());
-  if (mpe == NULL)
-  {
-    return false;
-  }
+  // cast to your event class here (this is guaranteed to work
+  const mitk::MousePressEvent& mpe = static_cast<const mitk::MousePressEvent&>(interactionEvent);
   // Checking relevant attributes, such as EventButton and Modifiers, but omitting the mouse coordinates
   // Replace this to check for your event class' attributes
-  return (this->GetEventButton() == mpe->GetEventButton() && this->GetModifiers() == mpe->GetModifiers()
-      && this->GetButtonStates() == mpe->GetButtonStates());
+  return (this->GetEventButton() == mpe.GetEventButton() && this->GetModifiers() == mpe.GetModifiers()
+      && this->GetButtonStates() == mpe.GetButtonStates()) && Superclass::IsEqual(interactionEvent);
+}
+\endcode
+
+The function IsSuperClassOf() implements an up cast to check if the provided baseClass object is derived from this class.
+This function is used to support polymorphism on state machine pattern (XML) level.
+
+\code
+bool mitk::MousePressEvent::IsSuperClassOf(InteractionEvent::Pointer baseClass)
+{
+  // Replace with your class, or implement some rules which classes are accepted.
+  MousePressEvent* event = dynamic_cast<MousePressEvent*>(baseClass.GetPointer());
+  if (event != NULL)
+  {
+    return true;
+  }
+  return false;
 }
 \endcode
 

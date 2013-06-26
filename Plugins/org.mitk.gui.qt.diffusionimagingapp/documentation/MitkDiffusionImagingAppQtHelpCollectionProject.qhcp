@@ -2,9 +2,9 @@
 <QHelpCollectionProject version="1.0">
      <assistant>
          <title>MITK Diffusion Help</title>
-		 <applicationIcon>assistant-logo.png</applicationIcon>
+         <applicationIcon>assistant-logo.png</applicationIcon>
          <startPage>qthelp://org.mitk.gui.qt.diffusionimagingapp/bundle/index.html</startPage>
-		 <applicationIcon>assistant-icon.png</applicationIcon>
+         <applicationIcon>assistant-icon.png</applicationIcon>
          <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
@@ -12,11 +12,11 @@
          <aboutMenuText>
              <text>About MITK Diffusion Help</text>
          </aboutMenuText>
-         <aboutDialog>		 
-		     <icon>about-logo.png</icon>
-		</aboutDialog>
+         <aboutDialog>
+             <icon>about-logo.png</icon>
+        </aboutDialog>
      </assistant>
      <docFiles>
-         
+
      </docFiles>
 </QHelpCollectionProject>

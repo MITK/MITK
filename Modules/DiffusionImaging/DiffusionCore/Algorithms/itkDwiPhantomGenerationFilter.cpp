@@ -1,4 +1,18 @@
+/*===================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 #ifndef __itkDwiPhantomGenerationFilter_cpp
 #define __itkDwiPhantomGenerationFilter_cpp
 
@@ -54,7 +68,10 @@ DwiPhantomGenerationFilter< TOutputScalarType >
     outImage->SetRequestedRegion( m_ImageRegion );
     outImage->SetVectorLength(QBALL_ODFSIZE);
     outImage->Allocate();
-    outImage->FillBuffer(0);
+    // ITKv4 migration fix : removing OutputImageType::PixelType(0.0)
+    // the conversion is handled internally by the itk::Image
+    typename OutputImageType::PixelType fillValue(0.0);
+    outImage->FillBuffer( fillValue );
 
     this->SetNthOutput (0, outImage);
 

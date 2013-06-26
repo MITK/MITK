@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkBaseProperty.h"
 #include <map>
+#include <utility>
 
 namespace mitk
 {
@@ -43,6 +44,8 @@ namespace mitk
   DataStorageChanged() listens to the DataStorage for new or removed images. Depending on how m_AutoTopMost is set,
   the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
   there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
+
+  Note that this class is not thread safe at the moment!
 */
 
   class MITK_CORE_EXPORT LevelWindowManager : public itk::Object
@@ -55,39 +58,56 @@ namespace mitk
     void SetDataStorage(DataStorage* ds);
     DataStorage* GetDataStorage();  ///< returns the datastorage
 
-    /// if autoTopMost == true: sets the topmost layer image to be affected by changes
-    /// if removedNode != NULL a node was removed from DataStorage
+    /** @brief (Re-)Initializes the LevelWindowManager by setting the topmost image.
+     *         Use the removedNode parameter if a node was removed...
+     *  @param autoTopMost true: sets the topmost layer image to be affected by changes
+     *  @param removedNode != NULL a node was removed from DataStorage */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = NULL);
 
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
-    /**
-    * Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
-    */
+    /** @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+     *  @throw mitk::Exception Throws an exception if the there is no image in the data storage which belongs to this property.*/
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
-    /// sets new Level/Window values and informs all listeners about changes
+    /** @brief Sets new Level/Window values and informs all listeners about changes. */
     void SetLevelWindow(const LevelWindow& levelWindow);
 
-    /// returns Level/Window values for the current image
+    /** @return Returns Level/Window values for the current image.*/
     const LevelWindow& GetLevelWindow();
 
-    /// returns the current mitkLevelWindowProperty object from the image that is affected by changes
+    /** @return Returns the current mitkLevelWindowProperty object from the image that is affected by changes.*/
     LevelWindowProperty::Pointer GetLevelWindowProperty();
 
-    /// true if changes on slider or line-edits will affect always the topmost layer image
+    /** @return true if changes on slider or line-edits will affect always the topmost layer image. */
     bool isAutoTopMost();
 
-    /// Change notifications from DataStorage
-    void DataStorageChanged(const DataNode* n = NULL);
+    /** @brief This method is called when a node is added to the data storage.
+      *        A listener on the data storage is used to call this method automatically after a node was added.
+      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
+      */
+    void DataStorageAddedNode(const DataNode* n = NULL);
 
-    /// Node removal notifications from DataStorage
+    /** @brief This method is called when a node is removed to the data storage.
+      *        A listener on the data storage is used to call this method automatically directly before a node will be removed.
+      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
+      */
     void DataStorageRemovedNode(const DataNode* removedNode = NULL);
 
-    /// change notifications from mitkLevelWindowProperty
+    /** @brief change notifications from mitkLevelWindowProperty */
     void OnPropertyModified(const itk::EventObject& e);
 
     Image* GetCurrentImage(); ///< return the currently active image
+
+    /**
+     * @return Returns the current number of observers which are registered in this object.
+     * @throw mitk::Exception Throws an exception if the number of observers differs from
+     *                        the number of relevant objects
+     *                        which means that something is wrong.
+     *
+     */
+    int GetNumberOfObservers();
+
 
     /**
     *  returns all nodes in the DataStorage that have the following properties:
@@ -101,9 +121,16 @@ namespace mitk
 
     DataStorage::Pointer         m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
-    typedef std::map<unsigned long, BaseProperty::Pointer> ObserverToPropertyMap;
-    ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
+    typedef std::pair<unsigned long, DataNode::Pointer> PropDataPair;
+    typedef std::map<PropDataPair, BaseProperty::Pointer> ObserverToPropertyMap;
+
+    ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
+    void UpdateObservers();                             ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete
+    void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
+    void CreatePropObserverLists();                     ///< internal help method to create both lists/maps.
+    const mitk::DataNode*        m_NodeMarkedToDelete;  ///< this variable holds a data node which will be deleted from the datastorage immedeately (if there is one, NULL otherways)
+
     bool                         m_AutoTopMost;
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;
@@ -113,4 +140,3 @@ namespace mitk
   };
 }
 #endif
-

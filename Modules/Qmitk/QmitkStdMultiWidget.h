@@ -51,6 +51,7 @@ namespace mitk {
 class RenderingManager;
 }
 
+/// \ingroup QmitkModule
 class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
@@ -149,6 +150,8 @@ protected:
   void UpdateAllWidgets();
 
   void HideAllWidgetToolbars();
+
+  mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
 public slots:
 

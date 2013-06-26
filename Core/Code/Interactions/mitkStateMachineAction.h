@@ -19,7 +19,7 @@
 
 #include <MitkExports.h>
 #include "mitkCommon.h"
-#include <itkObject.h>
+#include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
 
@@ -30,11 +30,11 @@ namespace mitk
   //## TODO: implement: Is used to connect the Action-Id in an XML Statemachine description with a functor in the StateMachine
   //## implementation
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT StateMachineAction: public itk::Object
+  class MITK_CORE_EXPORT StateMachineAction: public itk::LightObject
   {
   public:
-    mitkClassMacro(StateMachineAction, itk::Object);
-    mitkNewMacro1Param(Self, std::string);
+    mitkClassMacro(StateMachineAction, itk::Object)
+    mitkNewMacro1Param(Self, const std::string&)
     /**
      * @brief Returns the String-Id of this action.
      **/
@@ -42,7 +42,7 @@ namespace mitk
 
   protected:
 
-    StateMachineAction(std::string);
+    StateMachineAction(const std::string&);
     ~StateMachineAction();
   private:
     /**

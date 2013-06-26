@@ -55,25 +55,13 @@ namespace mitk
       itkWarningMacro("Tree cache is empty!")
     }
 
-    int vecsize = m_OutputCache->GetImage()->GetVectorLength();
 
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetPrimaryOutput())
         ->SetImage(m_OutputCache->GetImage());
-    static_cast<OutputType*>(this->GetOutput(0))
+    static_cast<OutputType*>(this->GetPrimaryOutput())
         ->SetGroupInfo(m_OutputCache->GetGroupInfo());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetMetaInfo(m_OutputCache->GetMetaInfo());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetIsMeta(m_OutputCache->GetIsMeta());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetContainsDistanceMap(m_OutputCache->GetContainsDistanceMap());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetContainsMeanSkeleton(m_OutputCache->GetContainsMeanSkeleton());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetContainsSkeletonMask(m_OutputCache->GetContainsSkeletonMask());
-    static_cast<OutputType*>(this->GetOutput(0))
-        ->SetContainsGradient(m_OutputCache->GetContainsGradient());
-    static_cast<OutputType*>(this->GetOutput(0))
+
+    static_cast<OutputType*>(this->GetPrimaryOutput())
         ->InitializeFromVectorImage();
 
   }
@@ -134,17 +122,9 @@ namespace mitk
           std::string metaString;
 
 
-          //int numberOfGradientImages = 0;
+
           std::string measurementInfo;
-          bool isMeta = false;
-          bool containsSkeleton = false;
-          bool containsSkeletonMask = false;
-          bool containsGradient = false;
-          bool containsDistanceMap = false;
 
-
-
-          std::vector<std::pair<mitk::TbssImage::MetaDataFunction, int > > metaInfo;
 
           std::vector< std::pair<std::string, int> > groups;
 
@@ -185,86 +165,14 @@ namespace mitk
             }
 
 
-            else if(itKey->find("meta") != std::string::npos)
-            {
-              if(metaString == "true")
-              {
-                isMeta = true;
-              }
-            }
 
-            else if(itKey->find("mean fa skeleton mask") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::MEAN_FA_SKELETON_MASK;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsSkeletonMask = true;
-            }
-
-            else if(itKey->find("mean fa skeleton") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::MEAN_FA_SKELETON;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsSkeleton = true;
-            }
-
-            else if(itKey->find("gradient_x") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::GRADIENT_X;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsGradient = true;
-            }
-            else if(itKey->find("gradient_y") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::GRADIENT_Y;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsGradient = true;
-            }
-
-            else if(itKey->find("gradient_z") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::GRADIENT_Z;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsGradient = true;
-            }
-
-
-            else if(itKey->find("tubular structure") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::TUBULAR_STRUCTURE;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-            }
-
-            else if(itKey->find("distance map") != std::string::npos)
-            {
-              std::pair<mitk::TbssImage::MetaDataFunction, int> p;
-              p.first = mitk::TbssImage::DISTANCE_MAP;
-              p.second = atoi(metaString.c_str());
-              metaInfo.push_back(p);
-              containsDistanceMap = true;
-            }
 
           }
 
-          outputForCache->SetIsMeta(isMeta);
-          outputForCache->SetContainsGradient(containsGradient);
-          outputForCache->SetContainsSkeletonMask(containsSkeletonMask);
-          outputForCache->SetContainsMeanSkeleton(containsSkeleton);
-          outputForCache->SetContainsDistanceMap(containsDistanceMap);
+
           outputForCache->SetGroupInfo(groups);
           outputForCache->SetMeasurementInfo(measurementInfo);
-          outputForCache->SetMetaInfo(metaInfo);
+
 
         }
 
@@ -273,10 +181,6 @@ namespace mitk
         // This call updates the output information of the associated VesselTreeData
         outputForCache->SetImage(img);
 
-      //  outputForCache->SetB_Value(m_B_Value);
-        //outputForCache->SetDirections(m_DiffusionVectors);
-       // outputForCache->SetOriginalDirections(m_OriginalDiffusionVectors);
-       // outputForCache->SetMeasurementFrame(m_MeasurementFrame);
 
         // Since we have already read the tree, we can store it in a cache variable
         // so that it can be assigned to the DataObject in GenerateData();
@@ -380,28 +284,6 @@ namespace mitk
         return false;
       }
 
-
-/*
-      typename ImageType::Pointer img = reader->GetOutput();
-      itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();
-      std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();
-      std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-      std::string metaString;
-
-      for (; itKey != imgMetaKeys.end(); itKey ++)
-      {
-        itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
-        if (itKey->find("tbss") != std::string::npos)
-        {
-          if (metaString.find("ROI") != std::string::npos)
-          {
-            return true;
-          }
-        }
-      }
-    }
-*/
- //  return false;
 
       return true;
     }

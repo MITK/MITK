@@ -91,11 +91,19 @@ endif()
 # Create the executable and link libraries
 # -----------------------------------------------------------------------
 
+set(_app_compile_flags )
+if(WIN32)
+  set(_app_compile_flags "${_app_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+endif()
+
 if(_APP_SHOW_CONSOLE)
   add_executable(${_APP_NAME} MACOSX_BUNDLE ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 else()
   add_executable(${_APP_NAME} MACOSX_BUNDLE WIN32 ${_APP_SOURCES} ${WINDOWS_ICON_RESOURCE_FILE})
 endif()
+
+set_target_properties(${_APP_NAME} PROPERTIES
+                      COMPILE_FLAGS "${_app_compile_flags}")
 
 target_link_libraries(${_APP_NAME} org_blueberry_osgi ${_APP_LINK_LIBRARIES})
 if(WIN32)
@@ -106,10 +114,12 @@ endif()
 # Add executable icon (Mac)
 # -----------------------------------------------------------------------
 if(APPLE)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
-    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/icons/icon.icns")
-    file(COPY ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_APP_NAME}.app/Contents/Resources/")
-    file(INSTALL ${MACOSX_BUNDLE_ICON_FILE} DESTINATION "${_APP_NAME}.app/Contents/Resources/")
+  set(icon_name "icon.icns")
+  set(icon_full_path "${CMAKE_CURRENT_SOURCE_DIR}/icons/${icon_name}")
+  if(EXISTS "${icon_full_path}")
+    set_target_properties(${_APP_NAME} PROPERTIES MACOSX_BUNDLE_ICON_FILE "${icon_name}")
+    file(COPY ${icon_full_path} DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_APP_NAME}.app/Contents/Resources/")
+    INSTALL (FILES ${icon_full_path} DESTINATION "${_APP_NAME}.app/Contents/Resources/")
   endif()
 endif()
 
@@ -157,11 +167,14 @@ endif()
 
 # Create batch files for Windows platforms
 if(WIN32)
-  foreach(BUILD_TYPE debug release)
-    mitkFunctionCreateWindowsBatchScript(start${_APP_NAME}.bat.in
-      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat
-      ${BUILD_TYPE})
-  endforeach()
+  set(template_name "start${_APP_NAME}.bat.in")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${template_name}")
+    foreach(BUILD_TYPE debug release)
+      mitkFunctionCreateWindowsBatchScript(${template_name}
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat
+        ${BUILD_TYPE})
+    endforeach()
+  endif()
 endif(WIN32)
 
 # -----------------------------------------------------------------------

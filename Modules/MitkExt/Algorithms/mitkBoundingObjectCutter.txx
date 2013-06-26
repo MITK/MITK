@@ -45,7 +45,7 @@ void CutImageWithOutputTypeSelect
     return;
   }
 
-  // PART 1: convert m_InputRequestedRegion (type mitk::SlicedData::RegionType)
+  // PART 1: convert m_InputRequestedReg ion (type mitk::SlicedData::RegionType)
   // into ITK-image-region (ItkImageType::RegionType)
   // unfortunately, we cannot use input->GetRequestedRegion(), because it
   // has been destroyed by the mitk::CastToItkImage call of PART 1
@@ -95,7 +95,6 @@ void CutImageWithOutputTypeSelect
   {
     outsideValue = (TOutputPixel) cutter->m_OutsideValue;
   }
-
   //shall we use a fixed value for each inside pixel?
   if (cutter->GetUseInsideValue())
   {

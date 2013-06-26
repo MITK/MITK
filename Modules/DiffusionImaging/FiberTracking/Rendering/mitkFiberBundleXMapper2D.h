@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 //#include "FiberTrackingExports.h"
 
-#include <mitkVtkMapper2D.h>
+#include <mitkVtkMapper.h>
 #include <mitkFiberBundleX.h>
 #include <vtkSmartPointer.h>
 
@@ -39,12 +39,13 @@ class vtkPolyData;
 
 namespace mitk {
 
+  struct IShaderRepository;
 
-  class FiberBundleXMapper2D : public VtkMapper2D
+  class FiberBundleXMapper2D : public VtkMapper
   {
 
   public:
-    mitkClassMacro(FiberBundleXMapper2D, VtkMapper2D);
+    mitkClassMacro(FiberBundleXMapper2D, VtkMapper);
     itkNewMacro(Self);
     mitk::FiberBundleX* GetInput();
 
@@ -59,10 +60,6 @@ namespace mitk {
 
     //### methods of MITK-VTK rendering pipeline
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderOverlay(BaseRenderer* renderer);
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
     //### end of methods of MITK-VTK rendering pipeline
 
 
@@ -87,7 +84,7 @@ namespace mitk {
     };
 
     /** \brief This member holds all three LocalStorages for the three 2D render windows. */
-    mitk::Mapper::LocalStorageHandler<FBXLocalStorage> m_LSH;
+    mitk::LocalStorageHandler<FBXLocalStorage> m_LSH;
 
 
 
@@ -99,6 +96,8 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer*);
 
     void UpdateShaderParameter(mitk::BaseRenderer*);
+
+    static IShaderRepository* GetShaderRepository();
 
   private:
     vtkSmartPointer<vtkLookupTable> m_lut;

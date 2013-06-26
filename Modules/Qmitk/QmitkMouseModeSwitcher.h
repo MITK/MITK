@@ -24,13 +24,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtGui>
 
 /**
-  \brief Qt toolbar representing mitk::MouseModeSwitcher.
-
-  Provides buttons for the interaction modes defined in mitk::MouseModeSwitcher
-  and communicates with this non-graphical class.
-
-  Can be used in a GUI to provide a mouse mode selector to the user.
-*/
+ * \ingroup QmitkModule
+ * \brief Qt toolbar representing mitk::MouseModeSwitcher.
+ *
+ * Provides buttons for the interaction modes defined in mitk::MouseModeSwitcher
+ * and communicates with this non-graphical class.
+ *
+ * Can be used in a GUI to provide a mouse mode selector to the user.
+ */
 class QMITK_EXPORT QmitkMouseModeSwitcher : public QToolBar
 {
   Q_OBJECT

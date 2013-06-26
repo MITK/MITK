@@ -1,13 +1,15 @@
 set(CPP_FILES
 
-# DataStructures -> FiberBundleX
+  MiniApps/ctkCommandLineParser.h
+
+  # DataStructures -> FiberBundleX
   IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriter.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXReader.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
+#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
@@ -18,14 +20,12 @@ set(CPP_FILES
   # Rendering
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
-  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
+#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   #Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Interactions
   Interactions/mitkFiberBundleInteractor.cpp
 
-  # Algorithms
-  Algorithms/mitkTractAnalyzer.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp
@@ -33,13 +33,16 @@ set(CPP_FILES
   Algorithms/GibbsTracking/mitkEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkFiberBuilder.cpp
+  Algorithms/GibbsTracking/mitkSphereInterpolator.cpp
 )
 
 set(H_FILES
+  MiniApps/ctkCommandLineParser.h
+
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
-  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
+#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   #Rendering/mitkPlanarFigureMapper3D.h
 
   # DataStructures -> FiberBundleX
@@ -49,7 +52,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
+#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
 
   IODataStructures/mitkFiberTrackingObjectFactory.h
 
@@ -61,6 +64,12 @@ set(H_FILES
   Algorithms/itkFibersFromPlanarFiguresFilter.h
   Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
+  Algorithms/itkKspaceImageFilter.h
+  Algorithms/itkDftImageFilter.h
+  Algorithms/itkAddArtifactsToDwiImageFilter.h
+  Algorithms/itkFieldmapGeneratorFilter.h
+  Algorithms/itkEvaluateDirectionImagesFilter.h
+  Algorithms/itkEvaluateTractogramDirectionsFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h
@@ -79,10 +88,19 @@ set(H_FILES
   SignalModels/mitkDiffusionSignalModel.h
   SignalModels/mitkTensorModel.h
   SignalModels/mitkBallModel.h
+  SignalModels/mitkDotModel.h
+  SignalModels/mitkAstroStickModel.h
   SignalModels/mitkStickModel.h
   SignalModels/mitkDiffusionNoiseModel.h
   SignalModels/mitkRicianNoiseModel.h
   SignalModels/mitkKspaceArtifact.h
-  SignalModels/mitkGibbsRingingArtifact.h
-  SignalModels/mitkT2SmearingArtifact.h
+)
+
+set(RESOURCE_FILES
+  # Binary directory resources
+  FiberTrackingLUTBaryCoords.bin
+  FiberTrackingLUTIndices.bin
+
+  # Shaders
+  Shaders/mitkShaderFiberClipping.xml
 )

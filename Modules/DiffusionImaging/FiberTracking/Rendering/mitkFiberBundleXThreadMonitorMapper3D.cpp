@@ -58,7 +58,7 @@ mitk::FiberBundleXThreadMonitorMapper3D::~FiberBundleXThreadMonitorMapper3D()
 
 const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::GetInput()
 {
-  return static_cast<const mitk::FiberBundleXThreadMonitor * > ( GetData() );
+  return static_cast<const mitk::FiberBundleXThreadMonitor * > ( GetDataNode()->GetData() );
 }
 
 
@@ -66,10 +66,22 @@ const mitk::FiberBundleXThreadMonitor* mitk::FiberBundleXThreadMonitorMapper3D::
  This method is called once the mapper gets new input,
  for UI rotation or changes in colorcoding this method is NOT called
  */
-void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
+void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
 {
-//  MITK_INFO << m_LastUpdateTime;
-  FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetData() );
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible ) return;
+
+  const DataNode *node = this->GetDataNode();
+
+  if (m_lastModifiedMonitorNodeTime >= node->GetMTime())
+    return;
+
+  m_lastModifiedMonitorNodeTime = node->GetMTime();
+
+  //  MITK_INFO << m_LastUpdateTime;
+  FiberBundleXThreadMonitor* monitor = dynamic_cast<FiberBundleXThreadMonitor * > ( GetDataNode()->GetData() );
 
 //  m_TextActor->SetInput( monitor->getTextL1().toStdString().c_str() );
   m_TextActorClose->SetInput( monitor->getBracketClose().toStdString().c_str() );
@@ -90,7 +102,6 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   tpropOpen->SetColor(0.85,0.8,0.8);
   m_TextActorOpen->SetDisplayPosition( monitor->getBracketOpenPosition()[0], monitor->getBracketOpenPosition()[1] );
   //m_TextActorOpen->Modified();
-
 
 
   m_TextActorHeading->SetInput(  monitor->getHeading().toStdString().c_str() );
@@ -144,29 +155,11 @@ void mitk::FiberBundleXThreadMonitorMapper3D::GenerateData()
   //m_TextActorTerminated->Modified();
 
 
-}
-
-
-
-void mitk::FiberBundleXThreadMonitorMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *renderer )
-{
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
-
   // Calculate time step of the input data for the specified renderer (integer value)
   // this method is implemented in mitkMapper
 //  this->CalculateTimeStep( renderer );
 
-  const DataNode *node = this->GetDataNode();
 
-
-  if (m_lastModifiedMonitorNodeTime < node->GetMTime())
-  {
-    this->GenerateData();
-    m_lastModifiedMonitorNodeTime = node->GetMTime();
-  }
 }
 
 

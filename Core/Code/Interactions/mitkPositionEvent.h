@@ -30,6 +30,11 @@ namespace mitk {
   //##
   //## Stores display position of the mouse and 3D world position in mm.
   //## @ingroup Interaction
+
+  /**
+    * \deprecatedSince{2013_03} mitk::PositionEvent is deprecated. Use mitk::InteractionPositionEvent instead.
+    * Refer to \see DataInteractionPage  for general information about the concept of the new implementation.
+    */
   class MITK_CORE_EXPORT PositionEvent : public DisplayPositionEvent
   {
   public:

@@ -44,7 +44,7 @@ namespace itk{
     typename InputImageType::Pointer rgbaImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
     typename OutputImageType::Pointer outputImage =
-        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+        static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     typename InputImageType::RegionType region = rgbaImage->GetLargestPossibleRegion();
     outputImage->SetSpacing( m_ReferenceImage->GetSpacing() );   // Set the image spacing

@@ -1,0 +1,16 @@
+/**
+  \defgroup org_blueberry_ui_qt_log org.blueberry.ui.qt.log
+  \ingroup BlueBerryPlugins
+
+  \brief Provides a Logging View for BlueBerry applications.
+
+*/
+
+/**
+  \defgroup org_blueberry_ui_qt_log_internal Internal
+  \ingroup org_blueberry_ui_qt_log
+
+  \brief This subcategory includes the internal classes of the org.blueberry.ui.qt.log plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

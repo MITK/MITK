@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
-#include "mitkGroupDiffusionHeadersFilter.h"
 #include "mitkDicomDiffusionImageReader.h"
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
@@ -484,16 +483,23 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
         unsigned int nAcquis = values3.size();
 
-        if(nAcquis != 1)
+        if(nAcquis > 1) // More than one element must have this tag (Not != )
         {
           subsorter.SetSortFunction( SortByAcquisitionNumber );
           it = values3.begin();
         }
-        else
+        else if (values4.size() > 1)
         {
           nAcquis = values4.size();
           subsorter.SetSortFunction( SortBySeqName );
           it = values4.begin();
+        }
+        // Hotfix for Bug 14758, better fix by selecting always availible tags.
+        else
+        {
+          Error("Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING");
+          if(m_OutputFolderNameSet) logfile << "Sorting tags (0x0020,0x0012) and (0x0018,0x0024) missing, ABORTING\n";
+          continue;
         }
         nTotalAcquis += nAcquis;
         subsorter.Sort( sub );
@@ -528,6 +534,13 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         ++it2;
       }
 
+      // Hot Fix for Bug 14758, checking if no file is acuired.
+      if (nTotalAcquis < 1) // Test if zero, if true than error because no file was selected
+      {
+        Error("Nno files in acquisitions, ABORTING");
+        if(m_OutputFolderNameSet) logfile << "Nno files in acquisitions, ABORTING \n";
+        continue;
+      }
       if(nfiles % nTotalAcquis != 0)
       {
         Error("Number of files per acquisition differs between series, ABORTING");
@@ -545,15 +558,27 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       if(m_OutputFolderNameSet) logfile << "Reading Headers "<< folderName.toStdString() << "\n";
 
       mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
-      mitk::GroupDiffusionHeadersFilter::InputType inHeaders;
+      typedef short PixelValueType;
+      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+      VolumesReader::HeaderContainer inHeaders;
       unsigned int size2 = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size2 ; ++i )
       {
-        Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
-        headerReader = mitk::DicomDiffusionImageHeaderReader::New();
-        headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
-        headerReader->Update();
-        inHeaders.push_back(headerReader->GetOutput());
+        // Hot Fix for Bug 14459, catching if no valid data in datafile.
+        try
+        {
+          Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
+          headerReader = mitk::DicomDiffusionImageHeaderReader::New();
+          headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
+          headerReader->Update();
+          inHeaders.push_back(headerReader->GetOutput());
+        }
+        catch (mitk::Exception e)
+        {
+          Error("Could not read file header, ABORTING");
+          if(m_OutputFolderNameSet) logfile << e;
+          continue;
+        }
         //Status(std::endl;
       }
       mitk::ProgressBar::GetInstance()->Progress();
@@ -570,8 +595,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       PrintMemoryUsage();
       if(m_OutputFolderNameSet) logfile << "Loading volumes\n";
       Status(QString("Loading Volumes %1").arg(folderName));
-      typedef short PixelValueType;
-      typedef mitk::DicomDiffusionImageReader< PixelValueType, 3 > VolumesReader;
+
       VolumesReader::Pointer vReader = VolumesReader::New();
       VolumesReader::HeaderContainer hc = inHeaders;
 
@@ -621,7 +645,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         diffImage->SetVectorImage(vecImage);
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();
-        diffImage->UpdateBValueList();
+        diffImage->UpdateBValueMap();
         Status(QString("Diffusion Image initialized"));
         if(m_OutputFolderNameSet) logfile << "Diffusion Image initialized\n";
 

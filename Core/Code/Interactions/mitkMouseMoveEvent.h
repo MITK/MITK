@@ -33,18 +33,21 @@ namespace mitk
 
   public:
     mitkClassMacro(MouseMoveEvent,InteractionPositionEvent);
-    mitkNewMacro4Param(Self, BaseRenderer*, Point2D , MouseButtons , ModifierKeys);
+    mitkNewMacro4Param(Self, BaseRenderer*, const Point2D& , MouseButtons , ModifierKeys);
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
 
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    MouseMoveEvent(BaseRenderer*, Point2D, MouseButtons buttonStates, ModifierKeys modifiers);
+    MouseMoveEvent(BaseRenderer*, const Point2D& = Point2D(), MouseButtons buttonStates = NoButton,
+                   ModifierKeys modifiers = NoKey);
     virtual ~MouseMoveEvent();
+
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     MouseButtons m_ButtonStates;

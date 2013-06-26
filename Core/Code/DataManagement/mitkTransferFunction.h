@@ -60,7 +60,6 @@ public:
 
   itkNewMacro(Self);
 
-
   /** \brief Get/Set min/max of transfer function range for initialization. */
   itkSetMacro(Min,int);
 
@@ -157,6 +156,10 @@ public:
 protected:
   TransferFunction();
   virtual ~TransferFunction();
+
+  TransferFunction(const TransferFunction& other);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 
   void PrintSelf(std::ostream &os, itk::Indent indent) const;
 

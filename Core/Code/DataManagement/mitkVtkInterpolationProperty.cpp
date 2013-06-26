@@ -89,3 +89,9 @@ bool mitk::VtkInterpolationProperty::AddEnum( const std::string& name, const IdT
 {
   return Superclass::AddEnum( name, id );
 }
+
+itk::LightObject::Pointer mitk::VtkInterpolationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

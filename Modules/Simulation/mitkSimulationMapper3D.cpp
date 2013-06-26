@@ -223,9 +223,9 @@ void mitk::SimulationMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     SimulationPropAssemblyVisitor propAssemblyVisitor(localStorage->m_VtkProp);
     rootNode->executeVisitor(&propAssemblyVisitor);
 
-    std::vector<vtkActor*> actors = drawTool->GetActors();
+    std::vector<vtkSmartPointer<vtkActor> > actors = drawTool->GetActors();
 
-    for (std::vector<vtkActor*>::const_iterator actor = actors.begin(); actor != actors.end(); ++actor)
+    for (std::vector<vtkSmartPointer<vtkActor> >::const_iterator actor = actors.begin(); actor != actors.end(); ++actor)
       localStorage->m_VtkProp->AddPart(*actor);
 
     if (backupSimulation != NULL)

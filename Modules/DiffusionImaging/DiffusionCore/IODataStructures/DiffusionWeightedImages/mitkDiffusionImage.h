@@ -87,7 +87,7 @@ public:
 
   float GetB_Value(int i);
   bool IsMultiBval();
-  void UpdateBValueList();
+  void UpdateBValueMap();
 
   IndicesVector GetB0Indices();
 
@@ -113,9 +113,6 @@ protected:
   int                                       m_DisplayIndex;
   MeasurementFrameType                      m_MeasurementFrame;
   BValueMap                                 m_B_ValueMap;
-
-
-
   unsigned long    m_DirectionsObserverTag;
 };
 

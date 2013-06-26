@@ -303,8 +303,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (   image->GetPixelType().GetPixelTypeId()==itk::ImageIOBase::SCALAR
-      && image->GetPixelType().GetTypeId() == typeid(int)
+  if (   image->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR
+      && image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT
       && image->GetPixelType().GetBpe() >= 8)
   {
     // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)

@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDevice.h"
-#include "mitkUSImageMetadata.h"
 
 //Microservices
 #include <usGetModuleContext.h>
@@ -28,6 +27,11 @@ const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label
 const std::string mitk::USDevice::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 const std::string mitk::USDevice::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
 
+mitk::USDevice::USImageCropArea mitk::USDevice::GetCropArea()
+{
+  MITK_INFO << "Return Crop Area L:" << m_CropArea.cropLeft << " R:" << m_CropArea.cropRight << " T:" << m_CropArea.cropTop << " B:" << m_CropArea.cropBottom;
+  return m_CropArea;
+}
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::ImageSource()
 {
@@ -36,6 +40,13 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model) : mitk::Im
   m_Metadata->SetDeviceManufacturer(manufacturer);
   m_Metadata->SetDeviceModel(model);
   m_IsActive = false;
+  USImageCropArea empty;
+  empty.cropBottom = 0;
+  empty.cropTop = 0;
+  empty.cropLeft = 0;
+  empty.cropRight = 0;
+  this->m_CropArea = empty;
+  m_IsConnected = false;
 
   //set number of outputs
   this->SetNumberOfOutputs(1);
@@ -49,6 +60,14 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata) : mitk::ImageS
 {
   m_Metadata = metadata;
   m_IsActive = false;
+  m_IsConnected = false;
+
+  USImageCropArea empty;
+  empty.cropBottom = 0;
+  empty.cropTop = 0;
+  empty.cropLeft = 0;
+  empty.cropRight = 0;
+  this->m_CropArea = empty;
 
   //set number of outputs
   this->SetNumberOfOutputs(1);
@@ -106,6 +125,9 @@ bool mitk::USDevice::Connect()
   // Prepare connection, fail if this fails.
   if (! this->OnConnection()) return false;
 
+  // Update state
+  m_IsConnected = true;
+
   // Get Context and Module
   mitk::ModuleContext* context = GetModuleContext();
   ServiceProperties props = ConstructServiceProperties();
@@ -127,6 +149,9 @@ bool mitk::USDevice::Disconnect()
   }
   // Prepare connection, fail if this fails.
   if (! this->OnDisconnection()) return false;
+
+  // Update state
+  m_IsConnected = false;
 
   // Unregister
   m_ServiceRegistration.Unregister();
@@ -191,7 +216,7 @@ mitk::USImage* mitk::USDevice::GetOutput()
   if (this->GetNumberOfOutputs() < 1)
     return NULL;
 
-  return static_cast<USImage*>(this->ProcessObject::GetOutput(0));
+  return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
 
 
@@ -229,13 +254,6 @@ void mitk::USDevice::GraftNthOutput(unsigned int idx, itk::DataObject *graft)
   }
   // Call Graft on USImage to copy member data
   output->Graft( graft );
-}
-
-
-itk::ProcessObject::DataObjectPointer mitk::USDevice::MakeOutput( unsigned int /*idx */)
-{
-  mitk::USImage::Pointer p = mitk::USImage::New();
-  return static_cast<itk::DataObject*>(p.GetPointer());
 }
 
 bool mitk::USDevice::ApplyCalibration(mitk::USImage::Pointer image){

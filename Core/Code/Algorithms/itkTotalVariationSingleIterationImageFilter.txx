@@ -113,7 +113,7 @@ namespace itk
   void
     TotalVariationSingleIterationImageFilter< TInputImage, TOutputImage>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int threadId)
+    ThreadIdType threadId)
   {
 
     typename OutputImageType::Pointer output = this->GetOutput();

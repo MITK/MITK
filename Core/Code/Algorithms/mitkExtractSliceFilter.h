@@ -134,7 +134,7 @@ namespace mitk
       return this->m_Reslicer->GetResliceAxes();
     }
 
-    enum ResliceInterpolation { RESLICE_NEAREST, RESLICE_LINEAR, RESLICE_CUBIC };
+    enum ResliceInterpolation { RESLICE_NEAREST=0, RESLICE_LINEAR=1, RESLICE_CUBIC=3 };
 
     void SetInterpolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->m_InterpolationMode = interpolation; }
 
@@ -145,7 +145,6 @@ namespace mitk
     virtual void GenerateData();
     virtual void GenerateOutputInformation();
     virtual void GenerateInputRequestedRegion();
-
 
     const Geometry2D* m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
@@ -168,18 +167,7 @@ namespace mitk
 
     mitk::ScalarType* m_OutPutSpacing;
 
-
     bool m_VtkOutputRequested;
-
-    /** \brief Internal helper method for intersection testing used only in CalculateClippedPlaneBounds() */
-    bool LineIntersectZero( vtkPoints *points, int p1, int p2,
-      vtkFloatingPointType *bounds );
-
-    /** \brief Calculate the bounding box of the resliced image. This is necessary for
-    * arbitrarily rotated planes in an image volume. A rotated plane (e.g. in swivel mode)
-    * will have a new bounding box, which needs to be calculated. */
-    bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
-      const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
   };
 }
 

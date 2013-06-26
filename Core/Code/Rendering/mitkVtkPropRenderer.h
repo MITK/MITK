@@ -208,7 +208,6 @@ private:
   bool m_InitNeeded;
   bool m_ResizeNeeded;
   bool m_VtkMapperPresent;
-  bool m_NewRenderer;
   MapperSlotId m_CameraInitializedForMapperID;
 
   // Picking

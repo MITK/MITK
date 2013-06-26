@@ -76,7 +76,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(mySource->GetMTime() != modTime, "Testing if UpdateOutputInformation() modifies the object");
 
   //test getOutput()
-  mitk::NavigationData* nd0 = mySource->GetOutput(0);
+  mitk::NavigationData* nd0 = mySource->GetOutput();
   MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [1]");
   nd0 = mySource->GetOutput(nd0->GetName());
   MITK_TEST_CONDITION(nd0!=NULL,"Testing GetOutput() [2]");

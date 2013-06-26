@@ -53,7 +53,7 @@
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
-#include "mitkInformer.h"
+#include "mitkInteractionEventObserver.h"
 
 //##Documentation
 //## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION.
@@ -315,24 +315,12 @@ int main(int argc, char* argv[])
   {
     m_DisplayInteractor = mitk::DisplayInteractor::New();
     m_DisplayInteractor->LoadStateMachine("DisplayInteraction.xml");
-    m_DisplayInteractor->LoadEventConfig("DisplayConfigMITK.xml");
-    // Register as listener
+    m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
+    // Register as listener via micro services
+
     mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    if (context != NULL)
-    {
-      mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::InformerService>();
-      mitk::InformerService* service = dynamic_cast<mitk::InformerService*>(context->GetService(serviceRef));
-      if (serviceRef != NULL)
-      {
-        service->RegisterObserver(m_DisplayInteractor.GetPointer());
-      } else {
-        MITK_ERROR << "Service not registered.";
-      }
-    }
-    else
-    {
-      MITK_ERROR<< "Invalid Module context.";
-    }
+    context->RegisterService<mitk::InteractionEventObserver>(
+        m_DisplayInteractor.GetPointer());
   }
   // Use it as a 2D View
   mitkWidget1->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);

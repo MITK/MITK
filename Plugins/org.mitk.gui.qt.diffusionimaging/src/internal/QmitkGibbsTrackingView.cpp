@@ -554,7 +554,8 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     m_FiberBundleNode = mitk::DataNode::New();
     m_FiberBundleNode->SetData(m_FiberBundle);
 
-    QString name(m_ImageNode->GetName().c_str());
+    QString name("FiberBundle_");
+    name += m_ImageNode->GetName().c_str();
     name += "_Gibbs";
     m_FiberBundleNode->SetName(name.toStdString());
     m_FiberBundleNode->SetVisibility(true);

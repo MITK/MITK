@@ -1,4 +1,4 @@
-# 
+#
 # Variables:
 #  BLUEBERRY_DOCS_OUTPUT_DIR: documentation output directory (optional)
 
@@ -16,9 +16,17 @@ if(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
   set(HAVE_DOT "YES")
 endif()
 
-set(BLUEBERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "BlueBerry output directory for all generated documentation.")
-set(BLUEBERRY_DOXYGEN_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL "BlueBerry doxygen output directory")
-set(BLUEBERRY_XPDOC_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/extension-points)
+if(NOT BLUEBERRY_DOCS_OUTPUT_DIR)
+  set(BLUEBERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH
+      "BlueBerry output directory for all generated documentation.")
+endif()
+if(NOT BLUEBERRY_DOXYGEN_OUTPUT_DIR)
+  set(BLUEBERRY_DOXYGEN_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL
+      "BlueBerry doxygen output directory")
+endif()
+if(NOT BLUEBERRY_XPDOC_OUTPUT_DIR)
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${BLUEBERRY_DOCS_OUTPUT_DIR}/reference/extension-points)
+endif()
 
 set(BLUEBERRY_DOXYGEN_TAGFILE_NAME ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/BlueBerry.tag CACHE INTERNAL "BlueBerry Doxygen tag file")
 
@@ -58,22 +66,19 @@ FunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
 
 configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
-               
-configure_file(reference/extension-points/index.dox.in
-               ${CMAKE_CURRENT_BINARY_DIR}/reference/extension-points/index.dox)
 
 find_package(Doxygen)
 
-add_custom_target(BlueBerryDoc 
+add_custom_target(BlueBerryDoc
                   ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   DEPENDS ${_BlueBerryDoc_depends}
                   )
-                  
+
 # convert the extension points schema files into html
 if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
   file(GLOB_RECURSE _plugin_xmls  ${BLUEBERRY_PLUGINS_SOURCE_DIR}/plugin.xml)
-  MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
+  MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls}
                        OUTPUT_DIR "${BLUEBERRY_XPDOC_OUTPUT_DIR}"
                        TARGET_NAME BlueBerryXPDoc
                        )

@@ -108,7 +108,7 @@ public:
      * This method has no effect for lookup tables, since we do
      * not support the region-mechanism
      */
-    virtual void SetRequestedRegion( itk::DataObject *data );
+    virtual void SetRequestedRegion(const itk::DataObject *data );
 
     LookupTable();
     virtual ~LookupTable();
@@ -121,10 +121,13 @@ protected:
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const;
 
+    LookupTable(const LookupTable& other);
+
     vtkLookupTable* m_LookupTable;
 
 private:
 
+    virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // namespace mitk

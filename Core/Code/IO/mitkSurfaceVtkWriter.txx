@@ -82,7 +82,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     // surfaces do not have to exist in all timeteps; therefor, only write valid surfaces
     if( input->GetVtkPolyData(t) == NULL ) continue;
 
-    ::itk::OStringStream filename;
+    std::ostringstream filename;
     filename.imbue(::std::locale::classic());
     geometry = input->GetGeometry(t);
     if ( timesteps > 1 )

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 #include <sstream>
 #include "mitkRestorePlanePositionOperation.h"
+#include "mitkDataStorage.h"
 
 
 namespace mitk {
@@ -482,6 +483,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
   protected:
     SliceNavigationController(const char * type = NULL);
     virtual ~SliceNavigationController();
+
+    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition);
 /*
     template <class T>
     static void buildstring( mitkIpPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)

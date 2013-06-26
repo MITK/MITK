@@ -33,8 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //Mapper Test
 #include <mitkMapper.h>
-#include <mitkMapper2D.h>
-#include <mitkVtkMapper2D.h>
+#include <mitkVtkMapper.h>
+#include <mitkGLMapper.h>
 #include <mitkMeshMapper2D.h>
 #include <mitkUnstructuredGridMapper2D.h>
 #include <mitkLineMapper2D.h>

@@ -96,6 +96,10 @@ protected:
    * enumeration values.
    */
   virtual void AddRepresentationTypes();
+
+private:
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 } // end of namespace mitk
 #endif // _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_

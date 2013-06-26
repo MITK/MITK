@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+  <Material name='FiberClipping2D'>
+  <Shader
+    scope='Vertex'
+    name='VertexShader'
+    location='Inline'
+    language='GLSL'
+    entry='main'>
+
+  varying vec3 positionWorld;
+  varying vec3 color;
+
+  void main(void)
+  {
+    color = gl_Color.rgb;
+    positionWorld = vec3(gl_Vertex);
+    gl_Position = ftransform();
+  }
+  </Shader>
+  <Shader scope='Fragment' name='FragmentShader' location='Inline'
+  language='GLSL' entry='main'>
+
+  uniform vec4 slicingPlane;
+  uniform float fiberThickness;
+  uniform int fiberFadingON;
+  uniform float fiberOpacity;
+
+  varying vec3 positionWorld;
+  varying vec3 color;
+
+  void main(void)
+  {
+     float r1 = dot(positionWorld, slicingPlane.xyz) - slicingPlane.w;
+
+    if ( abs(r1) &gt; fiberThickness )
+       discard;
+
+     if (fiberFadingON != 0)
+     {
+        float x = (r1+fiberThickness)/(fiberThickness*2.0);
+        x = 1.0 - x;
+        gl_FragColor = vec4(color*x, fiberOpacity);
+     }else{
+       gl_FragColor = vec4(color, fiberOpacity);
+       }
+
+  }
+
+  <Uniform type="vec4" name="slicingPlane" number_of_elements="4" > </Uniform>
+  <Uniform type="float" name="fiberThickness" number_of_elements="1" > </Uniform>
+  <Uniform type="int" name="fiberFadingON" number_of_elements="1" > </Uniform>
+  <Uniform type="float" name="fiberOpacity" number_of_elements="1" > </Uniform>
+
+
+  </Shader>
+</Material>

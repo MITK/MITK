@@ -1,0 +1,35 @@
+body {
+    font: 10px sans-serif;
+    background-color: rgb(240,240,240)
+}
+
+.bar {
+    fill: rgb(0,71,185);
+    shape-rendering: crispEdges;
+}
+
+.line {
+    fill: none;
+    stroke: rgb(0,71,185);
+    stroke-width: 1;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.infobox {
+    background-color: rgba(255, 255, 255, 0.75);
+    padding: 10px;
+    position: absolute;
+    width: auto;
+    display: none;
+}
+
+circle {
+  stroke: rgb(0,71,185);
+  stroke-width: 1;
+  fill-opacity: 0;
+}

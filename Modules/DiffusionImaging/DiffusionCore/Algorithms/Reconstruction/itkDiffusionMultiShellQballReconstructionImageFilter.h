@@ -67,9 +67,9 @@ public:
     // --------------------------------------------------------------------------------------------//
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
     /** Runtime information support. */
-    itkTypeMacro(DiffusionMultiShellQballReconstructionImageFilter, ImageToImageFilter);
+    itkTypeMacro(DiffusionMultiShellQballReconstructionImageFilter, ImageToImageFilter)
 
     /** Get reference image */
     virtual typename Superclass::InputImageType * GetInputImage()
@@ -95,26 +95,23 @@ public:
     /** Threshold on the reference image data. The output ODF will be a null
    * pdf for pixels in the reference image that have a value less than this
    * threshold. */
-    itkSetMacro( Threshold, ReferencePixelType );
-    itkGetMacro( Threshold, ReferencePixelType );
+    itkSetMacro( Threshold, ReferencePixelType )
+    itkGetMacro( Threshold, ReferencePixelType )
 
-    itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer );
+    itkGetMacro( CoefficientImage, typename CoefficientImageType::Pointer )
     /** Return non-diffusion weighted images */
-    itkGetMacro( BZeroImage, typename BZeroImageType::Pointer);
+    itkGetMacro( BZeroImage, typename BZeroImageType::Pointer)
 
     /** Factor for Laplacian-Baltrami smoothing of the SH-coefficients*/
-    itkSetMacro( Lambda, double );
-    itkGetMacro( Lambda, double );
-
-    itkSetMacro( UseWeights, bool);
-    itkGetMacro( UseWeights, bool);
+    itkSetMacro( Lambda, double )
+    itkGetMacro( Lambda, double )
 
 protected:
     DiffusionMultiShellQballReconstructionImageFilter();
-    ~DiffusionMultiShellQballReconstructionImageFilter() { };
+    ~DiffusionMultiShellQballReconstructionImageFilter() { }
     void PrintSelf(std::ostream& os, Indent indent) const;
     void BeforeThreadedGenerateData();
-    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, int NumberOfThreads );
+    void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
 
 
 private:
@@ -166,13 +163,6 @@ private:
     bool m_IsHemisphericalArrangementOfGradientDirections;
 
     bool m_IsArithmeticProgession;
-
-    bool m_UseWeights;
-
-    double m_WeightShell1;
-    double m_WeightShell2;
-    double m_WeightShell3;
-
 
     void ComputeReconstructionMatrix(IndiciesVector const & refVector);
     void ComputeODFSHBasis();

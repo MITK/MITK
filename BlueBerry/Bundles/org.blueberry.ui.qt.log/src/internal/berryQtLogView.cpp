@@ -52,7 +52,6 @@ QtLogView::QtLogView(QWidget *parent)
   prefs->PutBool("ShowCategory", true);
   bool showAdvancedFields = false;
 
-
   ui.setupUi(this);
 
   model = QtLogPlugin::GetInstance()->GetLogModel();
@@ -62,8 +61,12 @@ QtLogView::QtLogView(QWidget *parent)
   filterModel->setSourceModel(model);
   filterModel->setFilterKeyColumn(-1);
 
+#ifdef __APPLE__
+  QFont fnt = ui.tableView->font();
+  fnt.setPointSize(11);
+  ui.tableView->setFont(fnt);
+#endif
   ui.tableView->setModel(filterModel);
-
   ui.tableView->verticalHeader()->setVisible(false);
   ui.tableView->horizontalHeader()->setStretchLastSection(true);
 
@@ -92,6 +95,7 @@ void QtLogView::slotFilterChange( const QString& q )
 
 void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int end )
 {
+  ui.tableView->setVisible(false);
   ui.tableView->resizeRowsToContents();
 
   //only resize columns when first entry is added
@@ -101,20 +105,25 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
     ui.tableView->resizeColumnsToContents();
     first = false;
     }
+  ui.tableView->setVisible(true);
 
   QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
 }
 
 void QtLogView::showEvent( QShowEvent * event )
 {
+    ui.tableView->setVisible(false);
   ui.tableView->resizeColumnsToContents();
   ui.tableView->resizeRowsToContents();
+  ui.tableView->setVisible(true);
 }
 
 void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
 {
+  ui.tableView->setVisible(false);
   QtLogPlugin::GetInstance()->GetLogModel()->SetShowAdvancedFiels( checked );
   ui.tableView->resizeColumnsToContents();
+  ui.tableView->setVisible(true);
 
   berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
@@ -129,8 +138,10 @@ void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
 
 void QtLogView::on_ShowCategory_clicked( bool checked )
 {
+  ui.tableView->setVisible(false);
   QtLogPlugin::GetInstance()->GetLogModel()->SetShowCategory( checked );
   ui.tableView->resizeColumnsToContents();
+  ui.tableView->setVisible(true);
 
   berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()

@@ -61,7 +61,6 @@ namespace mitk
     channel4 = sourceData;
     tempVTKChannelArray->InsertTupleValue(3,channel4);
     vtkChannelArray->DeepCopy(tempVTKChannelArray);
-    tempVTKChannelArray->Delete();
   }
 
   void ToFCameraPMDRawDataCamCubeDevice::SetProperty( const char *propertyKey, BaseProperty* propertyValue )

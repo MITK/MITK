@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkUnstructuredGrid.h>
 
-#include <itkSmartPointerForwardReference.txx>
-
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )
 {
   this->Expand(t);
@@ -201,11 +199,11 @@ bool mitk::UnstructuredGrid::VerifyRequestedRegion()
   return false;
 }
 
-void mitk::UnstructuredGrid::SetRequestedRegion( itk::DataObject *data )
+void mitk::UnstructuredGrid::SetRequestedRegion(const itk::DataObject *data )
 {
-  mitk::UnstructuredGrid *gridData;
+  const mitk::UnstructuredGrid *gridData;
 
-  gridData = dynamic_cast<mitk::UnstructuredGrid*>(data);
+  gridData = dynamic_cast<const mitk::UnstructuredGrid*>(data);
 
   if (gridData)
   {

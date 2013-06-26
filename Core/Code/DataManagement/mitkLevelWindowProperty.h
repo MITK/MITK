@@ -40,6 +40,8 @@ protected:
 
     LevelWindowProperty();
 
+    LevelWindowProperty(const LevelWindowProperty& other);
+
     LevelWindowProperty(const mitk::LevelWindow &levWin);
 
 public:
@@ -65,8 +67,9 @@ public:
 private:
 
     // purposely not implemented
-    LevelWindowProperty(const LevelWindowProperty&);
     LevelWindowProperty& operator=(const LevelWindowProperty&);
+
+    itk::LightObject::Pointer InternalClone() const;
 
     virtual bool IsEqual(const BaseProperty& property) const;
     virtual bool Assign(const BaseProperty& property);

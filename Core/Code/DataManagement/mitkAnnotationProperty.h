@@ -36,7 +36,8 @@ namespace mitk {
 class MITK_CORE_EXPORT AnnotationProperty : public BaseProperty
 {
 public:
-  mitkClassMacro(AnnotationProperty, BaseProperty);
+  mitkClassMacro(AnnotationProperty, BaseProperty)
+
   typedef std::string ValueType;
 
   itkNewMacro( AnnotationProperty );
@@ -58,6 +59,7 @@ public:
   virtual std::string GetValueAsString() const;
   virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 
+  using BaseProperty::operator =;
 
 protected:
 
@@ -70,11 +72,14 @@ protected:
   AnnotationProperty( const char *label, ScalarType x, ScalarType y, ScalarType z );
   AnnotationProperty( const std::string &label, ScalarType x, ScalarType y, ScalarType z );
 
+  AnnotationProperty(const AnnotationProperty& other);
+
 private:
 
   // purposely not implemented
-  AnnotationProperty(const AnnotationProperty&);
   AnnotationProperty& operator=(const AnnotationProperty&);
+
+  itk::LightObject::Pointer InternalClone() const;
 
   virtual bool IsEqual(const BaseProperty& property) const;
   virtual bool Assign(const BaseProperty & property);

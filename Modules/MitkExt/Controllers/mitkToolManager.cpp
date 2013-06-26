@@ -23,6 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <list>
 
+#include "mitkInteractionEventObserver.h"
+#include "mitkDisplayInteractor.h"
+// MicroServices
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+
+
 mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
@@ -128,7 +136,9 @@ bool mitk::ToolManager::ActivateTool(int id)
 
   //If a tool is deactivated set the event notification policy of the global interaction to multiple again
   if (id == -1)
+  {
     GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
+  }
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 

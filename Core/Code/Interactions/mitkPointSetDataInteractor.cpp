@@ -109,7 +109,7 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
 }
 
 mitk::PointSetDataInteractor::PointSetDataInteractor() :
-    m_NumberOfPoints(0), m_MaxNumberOfPoints(0),m_SelectedPointIndex(-1)
+    m_NumberOfPoints(0), m_MaxNumberOfPoints(0),m_SelectedPointIndex(-1),m_SelectionAccuracy(3.5)
 {
 }
 
@@ -301,4 +301,33 @@ bool mitk::PointSetDataInteractor::InitMoveAll(StateMachineAction*, InteractionE
   {
     return false;
   }
+}
+
+void mitk::PointSetDataInteractor::SetAccuracy(float accuracy)
+{
+  m_SelectionAccuracy = accuracy;
+}
+
+int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, int time)
+{
+
+  // iterate over point set and check if it contains a point close enough to the pointer to be selected
+  PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
+  int index = -1;
+  if (points == NULL)
+  {
+    return index;
+  }
+  PointSet::PointsContainer* pointsContainer = points->GetPointSet(time)->GetPoints();
+
+  float minDistance = m_SelectionAccuracy;
+  for (PointSet::PointsIterator it = pointsContainer->Begin(); it != pointsContainer->End(); it++)
+  {
+    float distance = sqrt(position.SquaredEuclideanDistanceTo(points->GetPoint(it->Index(), time)));  // TODO: support time!
+    if (distance < minDistance) // if several points fall within the margin, choose the one with minimal distance to position
+    { // TODO: does this make sense, which unit is it?
+      index = it->Index();
+    }
+  }
+  return index;
 }

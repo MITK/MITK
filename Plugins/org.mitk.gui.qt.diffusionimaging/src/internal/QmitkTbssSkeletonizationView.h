@@ -17,17 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkTbssSkeletonizationView_h
 #define QmitkTbssSkeletonizationView_h
 
-// Blueberry
-#include <berryISelectionListener.h>
-#include <berryIPartListener.h>
-#include <berryIStructuredSelection.h>
-
-// itk
-#include "itkImage.h"
-#include "itkVectorImage.h"
 
 #include <QmitkFunctionality.h>
-
 #include "ui_QmitkTbssSkeletonizationViewControls.h"
 
 
@@ -38,28 +29,16 @@ typedef itk::Image<float, 4> Float4DImageType;
 typedef itk::CovariantVector<int,3> VectorType;
 typedef itk::Image<VectorType, 3> DirectionImageType;
 
-struct TbssSkeletonizationSelListener;
-
-
 
 /*!
-  \brief QmitkTbssSkeletonizationView
-
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
-
-  \sa QmitkFunctionalitymitkTbssWorkspaceManager
-  \ingroup Functionalities
+  * \brief Implementation of the core functionality of TBSS.
+  * This plugin provides the core functionality of TBSS (see Smith et al., 2009. http://dx.doi.org/10.1016/j.neuroimage.2006.02.024)
+  * It can skeletonize a mean FA image and calculate the projection of all individual subjects to this skeleton.
 */
+
 class QmitkTbssSkeletonizationView : public QmitkFunctionality
 {
 
-
-  friend struct TbssSkeletonizationSelListener;
-
-
-
-  // this is needed for all Qt objesetupUicts that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
@@ -71,7 +50,7 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent);
 
-    /// \brief Creation of the connections of main and control widget
+    //Creation of the connections of main and control widget
     virtual void CreateConnections();
 
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
@@ -86,24 +65,18 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
   protected slots:
 
 
+    /* \brief Perform skeletonization only */
     void Skeletonize();
+
+    // Perform skeletonization and Projection of subject data to the skeleton
     void Project();
 
 
 
   protected:
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
+    //brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
-
-    void InitPointsets();
-
-    void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-    berry::ISelectionListener::Pointer m_SelListener;
-    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-    bool m_IsInitialized;
 
     Ui::QmitkTbssSkeletonizationViewControls* m_Controls;
 

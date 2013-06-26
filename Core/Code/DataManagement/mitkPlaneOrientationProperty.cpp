@@ -92,5 +92,10 @@ bool PlaneOrientationProperty::AddEnum( const std::string& name, const IdType& i
   return Superclass::AddEnum( name, id );
 }
 
+itk::LightObject::Pointer PlaneOrientationProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}
 
 } // namespace

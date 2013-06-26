@@ -120,11 +120,11 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd, typee _ar
 /** Creates a Clone() method for "Classname". Returns a smartPtr of a clone of the
 calling object*/
 #define mitkCloneMacro(classname) \
-  virtual Pointer Clone() const \
+  virtual itk::LightObject::Pointer InternalClone() const \
 { \
   Pointer smartPtr = new classname(*this); \
   smartPtr->UnRegister(); \
-  return smartPtr;  \
+  return smartPtr.GetPointer();  \
 }
 
 /** cross-platform deprecation macro
@@ -134,7 +134,7 @@ calling object*/
 #ifdef MITK_NO_DEPRECATED_WARNINGS
   #define DEPRECATED(func) func
 #elif defined(__GNUC__)
-  #define DEPRECATED(...) __VA_ARGS__ __attribute__ ((deprecated))
+  #define DEPRECATED(...) __VA_ARGS__ __attribute__((deprecated))
 #elif defined(_MSC_VER)
   #define DEPRECATED(...) __declspec(deprecated) ##__VA_ARGS__
 #else

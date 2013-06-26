@@ -50,7 +50,7 @@ mitk::SimulationReader::~SimulationReader()
 
 void mitk::SimulationReader::GenerateData()
 {
-  Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(this->GetOutput(0));
+  Simulation::Pointer simulation = dynamic_cast<mitk::Simulation*>(this->GetOutput());
   sofa::simulation::Simulation::SPtr sofaSimulation = simulation->GetSimulation();
 
   sofa::simulation::Simulation::SPtr currentSofaSimulation = sofa::simulation::getSimulation();
@@ -111,4 +111,16 @@ const char* mitk::SimulationReader::GetFilePrefix() const
 void mitk::SimulationReader::SetFilePrefix(const char* aFilePrefix)
 {
   m_FilePrefix = aFilePrefix;
+}
+
+mitk::BaseDataSource::DataObjectPointer mitk::SimulationReader::MakeOutput(DataObjectPointerArraySizeType)
+{
+  return mitk::Simulation::New().GetPointer();
+}
+
+mitk::BaseDataSource::DataObjectPointer mitk::SimulationReader::MakeOutput(const DataObjectIdentifierType& name)
+{
+  return this->IsIndexedOutputName(name)
+    ? this->MakeOutput(this->MakeIndexFromOutputName(name))
+    : mitk::Simulation::New().GetPointer();
 }

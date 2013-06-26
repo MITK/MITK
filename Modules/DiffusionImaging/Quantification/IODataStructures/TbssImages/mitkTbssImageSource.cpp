@@ -33,7 +33,7 @@ mitk::TbssImageSource::TbssImageSource()
 }
 
 
-itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::TbssImageSource::MakeOutput( DataObjectPointerArraySizeType /*idx*/ )
 {
   return static_cast<itk::DataObject*>(mitk::TbssImage::New().GetPointer());
 }

@@ -36,23 +36,23 @@ namespace mitk
    * These events can target a specific DataInteractor, if this DataInteractor is specified in the constructor;
    * else this parameter is set to NULL and the event is treated as a regular event.
    */
-
-  class DataInteracor;
   class MITK_CORE_EXPORT InternalEvent: public InteractionEvent
   {
 
   public:
     mitkClassMacro(InternalEvent,InteractionEvent);
-    mitkNewMacro3Param(Self, BaseRenderer*, DataInteractor*, std::string);
+    mitkNewMacro3Param(Self, BaseRenderer*, DataInteractor*, const std::string&);
 
-    std::string GetSignalName();
-    DataInteractor* GetTargetInteractor();
+    std::string GetSignalName() const;
+    DataInteractor* GetTargetInteractor() const;
 
-    virtual bool MatchesTemplate(InteractionEvent::Pointer);
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
 
   protected:
-    InternalEvent(BaseRenderer*, DataInteractor* destInteractor, std::string signalName);
+    InternalEvent(BaseRenderer*, DataInteractor* destInteractor, const std::string& signalName);
     virtual ~InternalEvent();
+
+    virtual bool IsEqual(const InteractionEvent&) const;
 
   private:
     DataInteractor::Pointer m_DataInteractor;

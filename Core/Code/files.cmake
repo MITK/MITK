@@ -47,6 +47,7 @@ set(H_FILES
   Algorithms/mitkClippedSurfaceBoundsCalculator.h
   Algorithms/mitkExtractSliceFilter.h
   Algorithms/mitkConvert2Dto3DImageFilter.h
+  Algorithms/mitkPlaneClipping.h
 
   Common/mitkExceptionMacro.h
   Common/mitkServiceBaseObject.h
@@ -68,12 +69,13 @@ set(H_FILES
 
   Interfaces/mitkIDataNodeReader.h
 
+  Rendering/mitkLocalStorageHandler.h
+
   IO/mitkPixelTypeTraits.h
 )
 
 set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
-  Algorithms/mitkBaseProcess.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
@@ -198,9 +200,11 @@ set(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
+  DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
+  DataManagement/mitkPointSetShapeProperty.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
@@ -216,15 +220,14 @@ set(CPP_FILES
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventFactory.cpp
-  Interactions/mitkEventHandler.cpp
-  Interactions/mitkEventObserver.cpp
+  Interactions/mitkInteractionEventHandler.cpp
   Interactions/mitkEventMapper.cpp
   Interactions/mitkEventStateMachine.cpp
   Interactions/mitkGlobalInteraction.cpp
-  Interactions/mitkInformer.cpp
   Interactions/mitkInteractor.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkInteractionEvent.cpp
+  Interactions/mitkInteractionEventConst.cpp
   Interactions/mitkInteractionPositionEvent.cpp
   Interactions/mitkInteractionKeyEvent.cpp
   Interactions/mitkMousePressEvent.cpp
@@ -243,7 +246,6 @@ set(CPP_FILES
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp
-#  Interactions/mitkStatedEventObserver.cpp
   Interactions/mitkStateMachineContainer.cpp
   Interactions/mitkStateEvent.cpp
   Interactions/mitkStateMachine.cpp
@@ -254,6 +256,10 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkCrosshairPositionEvent.cpp
+
+  Interfaces/mitkInteractionEventObserver.cpp
+  Interfaces/mitkIShaderRepository.cpp
+
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkCoreDataNodeReader.cpp
   IO/mitkDicomSeriesReader.cpp
@@ -298,18 +304,16 @@ set(CPP_FILES
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
-  Rendering/mitkVtkMapper2D.cpp
-  Rendering/mitkVtkMapper3D.cpp
+  Rendering/mitkVtkMapper.cpp
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
-  Rendering/mitkGLMapper2D.cpp
+  Rendering/mitkGLMapper.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkManufacturerLogo.cpp
-  Rendering/mitkMapper2D.cpp
-  Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkPointSetGLMapper2D.cpp
+  Rendering/mitkPointSetVtkMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
   Rendering/mitkPolyDataGLMapper2D.cpp
   Rendering/mitkSurfaceGLMapper2D.cpp
@@ -325,12 +329,15 @@ set(CPP_FILES
   Rendering/mitkShaderRepository.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp
-  Rendering/vtkMitkApplyLevelWindowToRGBFilter.cpp
+  Rendering/vtkMitkLevelWindowFilter.cpp
+  Rendering/vtkNeverTranslucentTexture.cpp
+  Rendering/mitkRenderingTestHelper.cpp
 
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp
   Common/mitkCoreObjectFactory.cpp
+  Common/mitkCoreServices.cpp
 )
 
 list(APPEND CPP_FILES ${CppMicroServices_SOURCES})
@@ -347,9 +354,10 @@ Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigMITK.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
+Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
-Interactions/Tests/AddAndRemovePoints.xml
-Interactions/Tests/globalConfig.xml
-Interactions/Tests/StatemachineTest.xml
-Interactions/Tests/StatemachineConfigTest.xml
+
+Shaders/mitkShaderLighting.xml
+
+mitkLevelWindowPresets.xml
 )

@@ -59,7 +59,7 @@ namespace itk
 
     // Initialize output image
     typename OutputImageType::Pointer outputImage =
-        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+        static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     outputImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
     outputImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin

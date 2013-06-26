@@ -83,14 +83,6 @@ public:
      */
     itkGetConstMacro(Success, bool);
 
-    /**
-    * Allocates a new dummy output object and returns it.
-    * GenerateData() will overwrite the outputs with specific types,
-    * @param idx the index of the output for which an object should be created
-    * @returns the dummy object
-    */
-    virtual DataObjectPointer MakeOutput ( unsigned int idx );
-
 protected:
 
     typedef std::list< double > DoubleList;

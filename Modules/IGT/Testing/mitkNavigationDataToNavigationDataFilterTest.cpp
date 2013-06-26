@@ -54,7 +54,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   nd0->SetDataValid(initialValid);
   nd0->SetName("testName");
 
-  MITK_TEST_CONDITION(myFilter->GetOutput() == NULL, "testing GetOutput()");
+  MITK_TEST_CONDITION(myFilter->GetOutput() != NULL, "testing GetOutput()");
 
   MITK_TEST_CONDITION(myFilter->GetInput() == NULL, "testing GetInput() without SetInput()");
   MITK_TEST_CONDITION(myFilter->GetInput(0) == NULL, "testing GetInput(0) without SetInput()");
@@ -63,8 +63,8 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_CONDITION(myFilter->GetInput() == nd0, "testing Set-/GetInput()");
   MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0)");
   MITK_TEST_CONDITION(myFilter->GetOutput() != NULL, "testing GetOutput() after SetInput()");
-  MITK_TEST_CONDITION(myFilter->GetOutput(0) != NULL, "testing GetOutput() after SetInput()");
-  MITK_TEST_CONDITION(myFilter->GetOutput(0) != nd0, "testing GetOutput() different object than input");
+  MITK_TEST_CONDITION(myFilter->GetOutput() != NULL, "testing GetOutput() after SetInput()");
+  MITK_TEST_CONDITION(myFilter->GetOutput() != nd0, "testing GetOutput() different object than input");
 
   // check getInput() string input
   MITK_TEST_CONDITION(myFilter->GetInput("invalidName") == NULL, "testing GetInput(string) invalid string");
@@ -90,17 +90,17 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_CONDITION(myFilter->GetInput(1) == nd1, "testing Set-/GetInput(1)");
   MITK_TEST_CONDITION(myFilter->GetInput(0) == nd0, "testing Set-/GetInput(0) again");
   MITK_TEST_CONDITION(myFilter->GetOutput(1) != NULL, "testing GetOutput() after SetInput()");
-  MITK_TEST_CONDITION(myFilter->GetOutput(0) != myFilter->GetOutput(1), "testing GetOutput(0) different object than GetOutput(1)");
+  MITK_TEST_CONDITION(myFilter->GetOutput() != myFilter->GetOutput(1), "testing GetOutput() different object than GetOutput(1)");
 
   myFilter->SetInput(10, nd1);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 11, "testing SetInput(10) produces 11 outputs");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 11, "testing SetInput(10) produces 11 outputs");
   MITK_TEST_CONDITION(myFilter->GetInput(10) == nd1, "testing Set-/GetInput(10)");
 
   myFilter->SetInput(10, NULL);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 10, "testing SetInput(10, NULL) removes output with index 10");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 10, "testing SetInput(10, NULL) removes output with index 10");
 
   myFilter->SetInput(1, NULL);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 10, "testing SetInput(1, NULL) does not change number of outputs");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfIndexedInputs() == 10, "testing SetInput(1, NULL) does not change number of outputs");
 
   // always end with this!
   MITK_TEST_END();

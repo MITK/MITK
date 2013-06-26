@@ -37,6 +37,7 @@ set(CPP_FILES
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
+  Controllers/mitkIPythonService.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
   Controllers/mitkToolManager.cpp
@@ -84,6 +85,8 @@ set(CPP_FILES
   IO/mitkPACSPlugin.cpp
   IO/mitkParRecFileIOFactory.cpp
   IO/mitkParRecFileReader.cpp
+  IO/mitkPropertyListExportToXmlFile.cpp
+  IO/mitkPropertyListImportFromXmlFile.cpp
   IO/mitkStlVolumeTimeSeriesIOFactory.cpp
   IO/mitkStlVolumeTimeSeriesReader.cpp
   IO/mitkUnstructuredGridVtkWriter.cpp

@@ -59,12 +59,38 @@ mitk::VectorImageVtkGlyphMapper3D::~VectorImageVtkGlyphMapper3D()
     m_Glyph3DGenerator->Delete();
 }
 
-
 /*
 * Generate a vtkPolyData by creating vectors as glyphs
+* This method is called, each time a specific renderer is updated.
 */
-void mitk::VectorImageVtkGlyphMapper3D::GenerateData()
+void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
 {
+
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if ( !visible )
+  {
+    if ( m_Glyph3DActor != NULL )
+      m_Glyph3DActor->VisibilityOff();
+    return ;
+  }
+  else
+  {
+    if ( m_Glyph3DActor != NULL )
+      m_Glyph3DActor->VisibilityOn();
+  }
+
+  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  bool needGenerateData = ls->IsGenerateDataRequired( renderer, this, GetDataNode() );
+
+  if(!needGenerateData)
+  {
+    return;
+  }
+
+  ls->UpdateGenerateDataTime();
+
   //
   // get the input image...
   //
@@ -72,7 +98,7 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateData()
   if ( mitkImage.GetPointer() == NULL )
   {
     itkWarningMacro( << "VectorImage is null !" );
-    return ;
+    return;
   }
 
   //
@@ -178,25 +204,7 @@ m_MaximumNumberOfPoints = 80*80*80;
     //writer->SetFileName( "out.vtk" );
     //writer->Update();
   }
-}
 
-
-/*
-* This method is called, each time a specific renderer is updated.
-*/
-void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRenderer* renderer )
-{
-  if ( IsVisible( renderer ) == false )
-  {
-    if ( m_Glyph3DActor != NULL )
-      m_Glyph3DActor->VisibilityOff();
-    return ;
-  }
-  else
-  {
-    if ( m_Glyph3DActor != NULL )
-      m_Glyph3DActor->VisibilityOn();
-  }
 }
 
 
@@ -206,6 +214,6 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
 */
 mitk::Image* mitk::VectorImageVtkGlyphMapper3D::GetInput()
 {
-  return const_cast<mitk::Image*>( dynamic_cast<mitk::Image*>( this->GetData() ) );
+  return const_cast<mitk::Image*>( dynamic_cast<mitk::Image*>( GetDataNode()->GetData() ) );
 }
 

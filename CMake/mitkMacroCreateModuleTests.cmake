@@ -7,7 +7,7 @@
 #
 macro(MITK_CREATE_MODULE_TESTS)
   MACRO_PARSE_ARGUMENTS(MODULE_TEST
-                        "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "" ${ARGN})
+                        "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE;EXTRA_DEPENDS" "" ${ARGN})
 
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
     set(OLD_MOC_H_FILES ${MOC_H_FILES})
@@ -19,6 +19,11 @@ macro(MITK_CREATE_MODULE_TESTS)
       QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES})
     endif(DEFINED MOC_H_FILES)
 
+    if (MODULE_TEST_EXTRA_DEPENDS)
+      MITK_USE_MODULE("${MODULE_TEST_EXTRA_DEPENDS}")
+      include_directories(${ALL_INCLUDE_DIRECTORIES})
+    endif()
+
     set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "mitk::LoggingBackend::Register(); ${MODULE_TEST_EXTRA_DRIVER_INIT};")
     set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LoggingBackend::Unregister();")
     if(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
@@ -27,7 +32,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     endif(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
 
     create_test_sourcelist(MODULETEST_SOURCE ${MODULE_NAME}TestDriver.cpp
-      ${MODULE_TESTS} ${MODULE_IMAGE_TESTS} ${MODULE_CUSTOM_TESTS}
+      ${MODULE_TESTS} ${MODULE_IMAGE_TESTS} ${MODULE_SURFACE_TESTS} ${MODULE_CUSTOM_TESTS}
       EXTRA_INCLUDE ${MODULE_TEST_EXTRA_DRIVER_INCLUDE}
     )
 
@@ -78,6 +83,30 @@ macro(MITK_CREATE_MODULE_TESTS)
         message("!!!!! No such file: ${IMAGE_FULL_PATH} !!!!!")
       endif(EXISTS ${IMAGE_FULL_PATH})
     endforeach( image )
+
+    foreach(surface ${MODULE_TESTSURFACES} ${ADDITIONAL_TEST_SURFACES} )
+      if(EXISTS ${surface})
+        set(SURFACE_FULL_PATH ${surface})
+      else(EXISTS ${surface})
+        # todo: maybe search other paths as well
+        # yes, please in mitk/Testing/Data, too
+        set(SURFACE_FULL_PATH ${MITK_DATA_DIR}/${surface})
+      endif(EXISTS ${surface})
+
+      if(EXISTS ${SURFACE_FULL_PATH})
+        foreach( test ${MODULE_SURFACE_TESTS} )
+          get_filename_component(TName ${test} NAME_WE)
+          get_filename_component(SurfaceName ${SURFACE_FULL_PATH} NAME)
+          add_test(${TName}_${SurfaceName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName} ${SURFACE_FULL_PATH})
+          # Add labels for CDash subproject support
+          if(MODULE_SUBPROJECTS)
+            set_property(TEST ${TName}_${SurfaceName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+          endif()
+        endforeach( test )
+      else(EXISTS ${SURFACE_FULL_PATH})
+        message("!!!!! No such surface file: ${SURFACE_FULL_PATH} !!!!!")
+      endif(EXISTS ${SURFACE_FULL_PATH})
+    endforeach( surface )
 
     set(MOC_H_FILES ${OLD_MOC_H_FILES})
   endif(BUILD_TESTING AND MODULE_IS_ENABLED)

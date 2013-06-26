@@ -28,7 +28,7 @@ mitk::DisplayPositionEvent::DisplayPositionEvent(
 {
 }
 
-const mitk::Point3D& mitk::DisplayPositionEvent::GetWorldPosition() const
+mitk::Point3D &mitk::DisplayPositionEvent::GetWorldPosition() const
 {
   // Method performs position picking and sets world position
   if ( m_WorldPositionIsSet )

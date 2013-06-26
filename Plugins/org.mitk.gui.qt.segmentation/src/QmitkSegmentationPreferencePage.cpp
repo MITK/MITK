@@ -101,6 +101,10 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_ClosingSpinBox->setToolTip("Valid range is [0, 1]. Higher values increase closing. A value of 0 disables closing.");
   surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
 
+  m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
+  m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
+  formLayout->addRow("Data node selection mode",m_SelectionModeCheckBox);
+
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
 
   m_MainControl->setLayout(formLayout);
@@ -121,6 +125,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("closing ratio", m_ClosingSpinBox->value());
+  m_SegmentationPreferencesNode->PutBool("auto selection", m_SelectionModeCheckBox->isChecked());
   return true;
 }
 
@@ -150,9 +155,11 @@ void QmitkSegmentationPreferencePage::Update()
   }
   else
   {
-    m_SmoothingCheckBox->setChecked(false);
-    m_SmoothingSpinBox->setEnabled(true);
+      m_SmoothingCheckBox->setChecked(false);
+      m_SmoothingSpinBox->setEnabled(true);
   }
+
+  m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", true) );
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));

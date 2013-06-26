@@ -166,7 +166,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
                           //correct time as they were recorded
 
   //this connects the outputs of the player to the NavigationData objects
-  mitk::NavigationData::Pointer nd = player->GetOutput(0);
+  mitk::NavigationData::Pointer nd = player->GetOutput();
   mitk::NavigationData::Pointer nd2 = player->GetOutput(1);
   for (unsigned int x=0; x<100; x++)
   {

@@ -48,12 +48,13 @@ mitk::PointSetGLMapper2D::~PointSetGLMapper2D()
 
 const mitk::PointSet *mitk::PointSetGLMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::PointSet * > ( GetData() );
+  return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
 }
 
-void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+
+void mitk::PointSetGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
 {
-  GLMapper2D::ApplyProperties( renderer );
+  GLMapper::ApplyColorAndOpacityProperties( renderer );
 
   const mitk::DataNode* node=GetDataNode();
   if( node == NULL )
@@ -104,7 +105,9 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   const int text2dDistance = 10;
 
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+  if ( !visible) return;
 
   // @FIXME: Logik fuer update
   bool updateNeccesary=true;
@@ -153,7 +156,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    this->ApplyAllProperties(renderer);
 
     vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
@@ -475,7 +478,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
            {
               std::stringstream buffer;
               //buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << "�";
-              buffer << angle(vec.Get_vnl_vector(), -lastVec.Get_vnl_vector())*180/vnl_math::pi << (char)176;
+              buffer << angle(vec.GetVnlVector(), -lastVec.GetVnlVector())*180/vnl_math::pi << (char)176;
 
               Vector2D vec2d = pt2d-lastPt2d;
               vec2d.Normalize();

@@ -115,8 +115,9 @@ protected:
 private:
 
   // purposely not implemented
-  PlaneOrientationProperty(const PlaneOrientationProperty&);
   PlaneOrientationProperty& operator=(const PlaneOrientationProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

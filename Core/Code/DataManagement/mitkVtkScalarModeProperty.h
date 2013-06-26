@@ -102,8 +102,9 @@ protected:
 private:
 
   // purposely not implemented
-  VtkScalarModeProperty(const VtkScalarModeProperty&);
   VtkScalarModeProperty& operator=(const VtkScalarModeProperty&);
+
+  virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 #ifdef _MSC_VER

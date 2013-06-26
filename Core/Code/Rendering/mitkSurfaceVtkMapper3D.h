@@ -19,9 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
 
 #include <MitkExports.h>
-#include "mitkVtkMapper3D.h"
+#include "mitkVtkMapper.h"
 #include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
+#include "mitkLocalStorageHandler.h"
 
 #include <vtkActor.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCollection.h>
+
 
 namespace mitk {
 
@@ -75,11 +77,11 @@ namespace mitk {
   * @ingroup Mapper
   */
 
-class MITK_CORE_EXPORT SurfaceVtkMapper3D : public VtkMapper3D
+class MITK_CORE_EXPORT SurfaceVtkMapper3D : public VtkMapper
 {
 public:
 
-  mitkClassMacro(SurfaceVtkMapper3D, VtkMapper3D);
+  mitkClassMacro(SurfaceVtkMapper3D, VtkMapper);
 
   itkNewMacro(Self);
 
@@ -97,7 +99,7 @@ public:
 
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
 
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+  virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
@@ -151,7 +153,7 @@ public:
       }
   };
 
-  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+  mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
   static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
   static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);

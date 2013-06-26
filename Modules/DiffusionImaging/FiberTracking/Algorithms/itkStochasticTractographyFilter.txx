@@ -46,11 +46,11 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
   this->m_SeedIndex[1]=0;
   this->m_SeedIndex[2]=0;
   this->m_MeasurementFrame.set_identity();
-  this->SetNumberOfRequiredInputs(2); //Filter needs a DWI image and a Mask Image
+  this->SetNumberOfRequiredInputs(1); //Filter needs a DWI image and a Mask Image, but check will be outside itkProcessObject and inside GenerateData()
 
 
   m_ClockPtr = RealTimeClock::New();
-  this->m_RandomGenerator.reseed( ((unsigned long) this->m_ClockPtr->GetTimeStamp()) );
+  this->m_RandomGenerator.reseed( ((unsigned long) this->m_ClockPtr->GetTimeInSeconds()) );
   //load in default sample directions
   this->LoadDefaultSampleDirections();
 }
@@ -523,7 +523,7 @@ StochasticTractographyFilter< TInputDWIImage, TInputWhiteMatterProbabilityImage,
 
   typename InputDWIImageType::ConstPointer inputDWIImagePtr = str->Filter->GetInput();
   typename InputWhiteMatterProbabilityImageType::ConstPointer inputWMPImage =
-    str->Filter->GetWhiteMatterProbabilityImageInput();
+    str->Filter->GetWhiteMatterProbabilityImage();
 
   unsigned long randomseed=0;
 

@@ -44,3 +44,8 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
   AddEnum( "weighted", (IdType) 3 );
 }
 
+itk::LightObject::Pointer mitk::ResliceMethodProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}

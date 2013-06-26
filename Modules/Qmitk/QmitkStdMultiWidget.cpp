@@ -48,6 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLayerController.h"
 
+#include <iomanip>
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager)
 : QWidget(parent, f),
 mitkWidget1(NULL),
@@ -1605,24 +1607,18 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEvent()
   }
 }
 
-void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
+mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
 {
-  m_PendingCrosshairPositionEvent = false;
-
-  // find image with highest layer
   mitk::Point3D crosshairPos = this->GetCrossPosition();
-
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
-  std::string statusText;
-  mitk::Image::Pointer image;
+  mitk::DataNode::Pointer node;
   int  maxlayer = -32768;
 
-  mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
-  // find image with largest layer, that is the image shown on top in the render window
-  for (unsigned int x = 0; x < nodes->size(); x++)
+  if(nodes.IsNotNull())
   {
+    mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
+    // find node with largest layer, that is the node shown on top in the render window
+    for (unsigned int x = 0; x < nodes->size(); x++)
+    {
     if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
          nodes->at(x)->GetData()->GetGeometry()->IsInside(crosshairPos) )
     {
@@ -1632,16 +1628,60 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       {
         if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
         {
-          image = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+          node = nodes->at(x);
           maxlayer = layer;
         }
       }
     }
+    }
+  }
+  return node;
+}
+
+void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
+{
+  m_PendingCrosshairPositionEvent = false;
+
+  // find image with highest layer
+
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->m_DataStorage->GetSubset(isImageData).GetPointer();
+
+  mitk::DataNode::Pointer node;
+  mitk::DataNode::Pointer topSourceNode;
+  mitk::Image::Pointer image;
+  bool isBinary = false;
+  node = this->GetTopLayerNode(nodes);
+  if(node.IsNotNull())
+  {
+    node->GetBoolProperty("binary",isBinary);
+    if(isBinary)
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
+      if(!sourcenodes->empty())
+      {
+        topSourceNode = this->GetTopLayerNode(sourcenodes);
+      }
+      if(topSourceNode.IsNotNull())
+      {
+        image = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+      }
+      else
+      {
+        image = dynamic_cast<mitk::Image*>(node->GetData());
+      }
+    }
+    else
+    {
+      image = dynamic_cast<mitk::Image*>(node->GetData());
+    }
   }
 
+  mitk::Point3D crosshairPos = this->GetCrossPosition();
+  std::string statusText;
   std::stringstream stream;
-
   mitk::Index3D p;
+  mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   int timestep = baseRenderer->GetTimeStep();
 
   if(image.IsNotNull() && (image->GetTimeSteps() > timestep ))
@@ -1651,13 +1691,13 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
     mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep);
-    if (fabs(pixelValue)>1000000)
+    if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<std::scientific<<image->GetPixelValueByIndex(p, timestep)<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< std::scientific<< pixelValue <<"  ";
     }
     else
     {
-      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image->GetPixelValueByIndex(p, timestep)<<"  ";
+      stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
     }
   }
   else
@@ -1667,8 +1707,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   statusText = stream.str();
   mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-
-
 }
 
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()

@@ -14,55 +14,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkBaseDataSource.h"
-
+#include "mitkBaseData.h"
 
 mitk::BaseDataSource::BaseDataSource()
 {
-    // Pure virtual functions may not be called in the constructor...
-    // see ( see Bjarne Stroustrup's C++ PL 3rd ed section 15.4.3 )
-    //OutputType::Pointer output = static_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
-    //Superclass::SetNumberOfRequiredOutputs( 1 );
-    //Superclass::SetNthOutput( 0, output.GetPointer() );
 }
-
-
 
 mitk::BaseDataSource::~BaseDataSource()
 {
 }
 
-
-
-void mitk::BaseDataSource::SetOutput( OutputType* output )
+void mitk::BaseDataSource::GraftOutput(OutputType* graft)
 {
-    this->SetNthOutput( 0, output );
+  this->GraftNthOutput(0, graft);
 }
 
-
-
-void mitk::BaseDataSource::SetOutput( unsigned int idx, OutputType* output )
+void mitk::BaseDataSource::GraftOutput(const DataObjectIdentifierType& key, OutputType* graft)
 {
-    this->SetNthOutput(idx, output);
+  if ( !graft )
+  {
+    itkExceptionMacro(<< "Requested to graft output that is a NULL pointer");
+  }
+
+  // we use the process object method since all our output may not be
+  // of the same type
+  itk::DataObject *output = this->ProcessObject::GetOutput(key);
+
+  // Call GraftImage to copy meta-information, regions, and the pixel container
+  output->Graft(graft);
 }
 
-
-
-mitk::BaseDataSource::OutputType* mitk::BaseDataSource::GetOutput()
+void mitk::BaseDataSource::GraftNthOutput(unsigned int idx, OutputType* graft)
 {
-    if ( this->GetNumberOfOutputs() < 1 )
-    {
-        return 0;
-    }
-    return static_cast<OutputType*> ( Superclass::GetOutput( 0 ) );
+  if ( idx >= this->GetNumberOfIndexedOutputs() )
+  {
+    itkExceptionMacro(<< "Requested to graft output " << idx
+                      << " but this filter only has " << this->GetNumberOfIndexedOutputs() << " indexed Outputs.");
+  }
+  this->GraftOutput( this->MakeNameFromOutputIndex(idx), graft );
 }
 
-
-
-mitk::BaseDataSource::OutputType* mitk::BaseDataSource::GetOutput ( unsigned int idx )
+bool mitk::BaseDataSource::Updating() const
 {
-    return static_cast<OutputType*> ( Superclass::GetOutput( idx ) );
+  return this->m_Updating;
 }
 
-
+mitkBaseDataSourceGetOutputDefinitions(mitk::BaseDataSource)

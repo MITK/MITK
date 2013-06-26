@@ -35,19 +35,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkStdMultiWidget;
 
 /**
-* \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow.
-* The Menu Widget is located in the right top corner of each RenderWindow. It includes different settings. For example
-* the layout design can be changed with the setting button. Switching between full-screen mode and layout design can be done
-* with the full-screen button. Splitting the Widget horizontal or vertical as well closing the Widget is not implemented yet.
-* The popup Widget can be deactivated with ActivateMenuWidget(false) in QmitkRenderWindow.
-*
-* \ingroup Renderer
-*
-* \sa QmitkRenderWindow
-* \sa QmitkStdMultiWidget
-*
-*/
-
+ * \ingroup QmitkModule
+ * \brief The QmitkRenderWindowMenu is a popup Widget which shows
+ * up when the mouse curser enter a QmitkRenderWindow.
+ * The Menu Widget is located in the right top corner of each
+ * RenderWindow. It includes different settings. For example
+ * the layout design can be changed with the setting button. Switching
+ * between full-screen mode and layout design can be done
+ * with the full-screen button. Splitting the Widget horizontal or
+ * vertical as well closing the Widget is not implemented yet.
+ * The popup Widget can be deactivated with ActivateMenuWidget(false) in
+ * QmitkRenderWindow.
+ *
+ * \sa QmitkRenderWindow
+ * \sa QmitkStdMultiWidget
+ *
+ */
 class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
 {
   Q_OBJECT

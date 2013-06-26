@@ -17,8 +17,6 @@
 #ifndef mitkBindDispatcherInteractor_h
 #define mitkBindDispatcherInteractor_h
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
 
@@ -29,22 +27,22 @@
 
 namespace mitk
 {
-  class InformerService;
 /**
  * \class BindDispatcherInteractor
  * \brief This Class is used to connect a DataStorage with the Dispatcher.
+ *
  * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
  * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
- * Also this class registers the MicroService at which EventObservers can register to receive events.
+ * Also this class registers the MicroService at which InteractionEventObservers can register to receive events.
  *
  * \ingroup Interaction
  */
-  class MITK_CORE_EXPORT BindDispatcherInteractor: public itk::Object
+  class MITK_CORE_EXPORT BindDispatcherInteractor
   {
 
   public:
-    mitkClassMacro(BindDispatcherInteractor, itk::Object);
-    itkNewMacro(Self);
+    BindDispatcherInteractor();
+    ~BindDispatcherInteractor();
 
     /**
      * Sets the DataStorage to which Events the class subscribes.
@@ -60,12 +58,8 @@ namespace mitk
     /**
      * Return currently active Dispatcher.
      */
-    Dispatcher::Pointer GetDispatcher();
+    Dispatcher::Pointer GetDispatcher() const;
 
-  protected:
-
-    BindDispatcherInteractor();
-    virtual ~BindDispatcherInteractor();
 
   private:
     /** @brief Registers for events from DataStorage.
@@ -80,7 +74,6 @@ namespace mitk
 
     Dispatcher::Pointer m_Dispatcher;
     DataStorage::Pointer m_DataStorage;
-    InformerService* m_InformerService; // holds reference to MicroService that notifies listeners
   };
 
 }

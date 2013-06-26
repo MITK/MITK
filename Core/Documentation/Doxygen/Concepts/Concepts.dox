@@ -21,9 +21,6 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage InteractionPage
 -# \subpage LoggingPage
 -# \subpage ExceptionPage
--# Testing Concept
- -# \subpage GeneralTests
- -# \subpage RenderingTests
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
  -# \ref ModularizationPageHowTo

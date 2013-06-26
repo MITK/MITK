@@ -26,6 +26,13 @@ ClippingProperty::ClippingProperty()
 {
 }
 
+ClippingProperty::ClippingProperty(const ClippingProperty& other)
+  : BaseProperty(other)
+  , m_ClippingEnabled(other.m_ClippingEnabled)
+  , m_Origin(other.m_Origin)
+  , m_Normal(other.m_Normal)
+{
+}
 
 ClippingProperty::ClippingProperty(
   const Point3D &origin, const Vector3D &normal )
@@ -99,7 +106,6 @@ bool ClippingProperty::Assign( const BaseProperty &property )
   return true;
 }
 
-
 std::string ClippingProperty::GetValueAsString() const
 {
   std::stringstream myStr;
@@ -107,5 +113,13 @@ std::string ClippingProperty::GetValueAsString() const
   myStr << this->GetClippingEnabled() << this->GetOrigin() << this->GetNormal();
   return myStr.str();
 }
+
+itk::LightObject::Pointer ClippingProperty::InternalClone() const
+{
+  itk::LightObject::Pointer result(new Self(*this));
+  return result;
+}
+
+
 } // namespace
 

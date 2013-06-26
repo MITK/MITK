@@ -63,24 +63,17 @@ public:
   virtual vtkRenderWindow* GetVtkRenderWindow() = 0;
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() = 0;
 
-
-  void SetProcessWheelEvents( bool state );
-
-  bool GetProcessWheelEvents();
-
-  void SetInvertScrollingDirection( bool );
-
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mousePressMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void mouseMoveMitkEvent(mitk::MouseEvent *me);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void wheelMitkEvent(mitk::WheelEvent *we);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
-  virtual void keyPressMitkEvent(mitk::KeyEvent* mke);
-  /** \deprecated{Use InteractionEvents instead and pass them to HandleEvent()} */
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mousePressMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mouseReleaseMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void mouseMoveMitkEvent(mitk::MouseEvent *me));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void wheelMitkEvent(mitk::WheelEvent *we));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
+  DEPRECATED(virtual void keyPressMitkEvent(mitk::KeyEvent* mke));
+  /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
   virtual void resizeMitkEvent(int width, int height);
 
   virtual bool HandleEvent(InteractionEvent* interactionEvent);
@@ -97,10 +90,6 @@ protected:
   vtkMitkRenderProp*             m_RenderProp;
 
   bool                           m_InResize;
-
-  bool                           m_ProcessWheelEvents;
-
-  bool                           m_InvertScrollingDirection;
 
   private:
 

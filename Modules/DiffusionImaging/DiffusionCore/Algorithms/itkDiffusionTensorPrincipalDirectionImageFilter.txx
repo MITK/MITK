@@ -60,7 +60,7 @@ TPDPixelType>
 ::BeforeThreadedGenerateData()
 {
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
-    mitk::Vector3D spacing = inputImagePointer->GetSpacing();
+    Vector<double,3> spacing = inputImagePointer->GetSpacing();
     mitk::Point3D origin = inputImagePointer->GetOrigin();
     itk::Matrix<double, 3, 3> direction = inputImagePointer->GetDirection();
     ImageRegion<3> imageRegion = inputImagePointer->GetLargestPossibleRegion();
@@ -103,7 +103,7 @@ TPDPixelType>
     vtkSmartPointer<vtkCellArray> m_VtkCellArray = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints>    m_VtkPoints = vtkSmartPointer<vtkPoints>::New();
 
-    typename OutputImageType::Pointer directionImage = static_cast< OutputImageType* >( this->ProcessObject::GetOutput(0) );
+    typename OutputImageType::Pointer directionImage = static_cast< OutputImageType* >( this->ProcessObject::GetPrimaryOutput() );
     ImageRegionConstIterator< OutputImageType > it(directionImage, directionImage->GetLargestPossibleRegion() );
 
     mitk::Vector3D spacing = directionImage->GetSpacing();
@@ -163,14 +163,14 @@ template< class TTensorPixelType,
           class TPDPixelType>
 void DiffusionTensorPrincipalDirectionImageFilter< TTensorPixelType,
 TPDPixelType>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, int )
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType )
 {
 
     typedef itk::DiffusionTensor3D<TTensorPixelType>    TensorType;
     typedef ImageRegionConstIterator< InputImageType >  InputIteratorType;
     typename InputImageType::Pointer inputImagePointer = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
 
-    typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+    typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
 
     ImageRegionIterator< OutputImageType > outIt(outputImage, outputRegionForThread);
     InputIteratorType inIt(inputImagePointer, outputRegionForThread );

@@ -18,54 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template< class ScalarType >
 TensorModel< ScalarType >::TensorModel()
-    : m_KernelFA(0.6)
-    , m_KernelADC(0.001)
-    , m_BValue(1000)
+    : m_BValue(1000)
 {
     m_KernelDirection[0]=1; m_KernelDirection[1]=0; m_KernelDirection[2]=0;
-    UpdateKernelTensor();
+    m_KernelTensorMatrix.fill(0.0);
+    m_KernelTensorMatrix[0][0] = 0.002;
+    m_KernelTensorMatrix[1][1] = 0.0005;
+    m_KernelTensorMatrix[2][2] = 0.0005;
 }
 
 template< class ScalarType >
 TensorModel< ScalarType >::~TensorModel()
 {
 
-}
-
-template< class ScalarType >
-void TensorModel< ScalarType >::UpdateKernelTensor()
-{
-    ItkTensorType tensor; tensor.Fill(0.0);
-    float e1 = m_KernelADC*(1+2*m_KernelFA/sqrt(3-2*m_KernelFA*m_KernelFA));
-    float e2 = m_KernelADC*(1-m_KernelFA/sqrt(3-2*m_KernelFA*m_KernelFA));
-    tensor.SetElement(0, e1);
-    tensor.SetElement(3, e2);
-    tensor.SetElement(5, e2);
-
-    m_KernelTensorMatrix.fill(0.0);
-    m_KernelTensorMatrix[0][0] = e1; m_KernelTensorMatrix[1][1] = e2; m_KernelTensorMatrix[2][2] = e2;
-}
-
-template< class ScalarType >
-void TensorModel< ScalarType >::SetKernelFA(float FA)
-{
-    m_KernelFA = FA;
-    UpdateKernelTensor();
-}
-
-template< class ScalarType >
-void TensorModel< ScalarType >::SetKernelADC(float ADC)
-{
-    m_KernelADC = ADC;
-    UpdateKernelTensor();
-}
-
-template< class ScalarType >
-void TensorModel< ScalarType >::SetKernelTensor(ItkTensorType& tensor)
-{
-    m_KernelTensorMatrix[0][0] = tensor[0]; m_KernelTensorMatrix[0][1] = tensor[1]; m_KernelTensorMatrix[0][2] = tensor[2];
-    m_KernelTensorMatrix[1][0] = tensor[1]; m_KernelTensorMatrix[1][1] = tensor[3]; m_KernelTensorMatrix[1][2] = tensor[4];
-    m_KernelTensorMatrix[2][0] = tensor[2]; m_KernelTensorMatrix[2][1] = tensor[4]; m_KernelTensorMatrix[2][2] = tensor[5];
 }
 
 template< class ScalarType >
@@ -87,11 +52,11 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        double bVal = g.GetNorm(); bVal *= bVal;
+        ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
         {
-            itk::DiffusionTensor3D<float> S;
+            itk::DiffusionTensor3D< ScalarType > S;
             S[0] = g[0]*g[0];
             S[1] = g[1]*g[0];
             S[2] = g[2]*g[0];
@@ -99,9 +64,9 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
             S[4] = g[2]*g[1];
             S[5] = g[2]*g[2];
 
-            double D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
-                       tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
-                       tensor[2]*S[2] + tensor[4]*S[4] + tensor[5]*S[5];
+            ScalarType D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
+                           tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
+                           tensor[2]*S[2] + tensor[4]*S[4] + tensor[5]*S[5];
 
             // check for corrupted tensor and generate signal
             if (D>=0)

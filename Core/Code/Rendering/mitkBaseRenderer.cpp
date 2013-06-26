@@ -17,6 +17,7 @@
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"
 #include "mitkResliceMethodProperty.h"
+#include "mitkKeyEvent.h"
 
 // Geometries
 #include "mitkPlaneGeometry.h"
@@ -150,7 +151,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   // TODO: INTERACTION_LEGACY
   m_RenderingManager->GetGlobalInteraction()->AddFocusElement(this);
 
-  m_BindDispatcherInteractor = mitk::BindDispatcherInteractor::New();
+  m_BindDispatcherInteractor = new mitk::BindDispatcherInteractor();
 
   WeakPointerProperty::Pointer rendererProp = WeakPointerProperty::New((itk::Object*) this);
 
@@ -225,6 +226,11 @@ mitk::BaseRenderer::~BaseRenderer()
 
   m_DataStorage = NULL;
 
+  if (m_BindDispatcherInteractor != NULL)
+  {
+    delete m_BindDispatcherInteractor;
+  }
+
   if (m_RenderWindow != NULL)
   {
     m_RenderWindow->Delete();
@@ -248,7 +254,7 @@ void mitk::BaseRenderer::RegisterLocalStorageHandler(mitk::BaseLocalStorageHandl
 
 }
 
-mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher()
+mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
 {
   return m_BindDispatcherInteractor->GetDispatcher();
 }

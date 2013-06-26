@@ -45,7 +45,7 @@ namespace itk{
 
 FibersFromPlanarFiguresFilter::FibersFromPlanarFiguresFilter()
     : m_Density(1000)
-    , m_FiberSampling(5)
+    , m_FiberSampling(1)
     , m_Tension(0)
     , m_Continuity(0)
     , m_Bias(0)
@@ -94,8 +94,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
 {
     // check if enough fiducials are available
     for (int i=0; i<m_Fiducials.size(); i++)
-        if (m_Fiducials.at(i).size()<3)
-            itkExceptionMacro("At least 3 fiducials needed per fiber bundle!");
+        if (m_Fiducials.at(i).size()<2)
+            itkExceptionMacro("At least 2 fiducials needed per fiber bundle!");
 
     for (int i=0; i<m_Fiducials.size(); i++)
     {
@@ -197,18 +197,8 @@ void FibersFromPlanarFiguresFilter::GenerateData()
                 // apply new ellipse shape
                 newP[0] = m_2DPoints.at(j)[0];
                 newP[1] = m_2DPoints.at(j)[1];
-                alpha = acos(eDir[0]);
-                if (eDir[1]>0)
-                    alpha = 2*M_PI-alpha;
-                eRot[0][0] = cos(alpha);
-                eRot[1][1] = eRot[0][0];
-                eRot[1][0] = sin(alpha);
-                eRot[0][1] = -eRot[1][0];
-                newP = eRot*newP;
-                newP[0] *= r1;
-                newP[1] *= r2;
-                newP = eRot.transpose()*newP;
 
+                // calculate normal
                 mitk::Geometry2D* pfgeometry = const_cast<mitk::Geometry2D*>(figure->GetGeometry2D());
                 mitk::PlaneGeometry* planeGeo = dynamic_cast<mitk::PlaneGeometry*>(pfgeometry);
                 mitk::Vector3D perp = wc-planeGeo->ProjectPointOntoPlane(wc); perp.Normalize();
@@ -221,6 +211,18 @@ void FibersFromPlanarFiguresFilter::GenerateData()
                 if (fliplist.at(k)>0)
                     newP[0] *= -1;
                 n = n2;
+
+                alpha = acos(eDir[0]);
+                if (eDir[1]>0)
+                    alpha = 2*M_PI-alpha;
+                eRot[0][0] = cos(alpha);
+                eRot[1][1] = eRot[0][0];
+                eRot[1][0] = sin(alpha);
+                eRot[0][1] = -eRot[1][0];
+                newP = eRot*newP;
+                newP[0] *= r1;
+                newP[1] *= r2;
+                newP = eRot.transpose()*newP;
 
                 p0[0] += newP[0];
                 p0[1] += newP[1];

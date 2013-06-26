@@ -1,0 +1,139 @@
+/**
+\defgroup Adaptor Adaptor Classes
+\ingroup ProcessAdaptor
+
+\brief This subcategory includes adaptor classes for the integration of algorithms from
+other toolkits, especially ITK.
+
+The task of most of the classes in this category is to deal with the conversion between
+the (templated) itk::Image and the (not-templated) mitk::Image.
+Methods for conversion are provided for both directions:
+\li \ref MitkToItk
+\li \ref ItkToMitk
+
+Care has to be taken regarding the involved coordinate systems, see \ref ItkToMitkCoordinateSystems.
+
+For limitations on ITK-type conversion see the section \ref ModuleAdaptorLimitations.
+
+VTK-based access to MITK images is straightforward: simply ask your mitk::Image for a
+\a vtkImageData by calling Image:GetVtkImageData. Similarily, to get a \a vtkPolyData
+from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
+
+\section MitkToItk MITK to ITK adaptors
+Pixel type and dimension of MITK images can be specified at run time whereas ITK images
+are templated over the pixel type and the dimension, thus in ITK both need to be specified
+at compile time.
+
+There two different situations, which are covered in the following sub-sections:
+\li Either you know the pixel type/dimension the ITK image should have at compile time for
+    some reason (e.g., you always create MITK images of a specific pixel type/dimension)
+\li or the pixel type/dimension of an MITK image is really unkown and the ITK image should
+    have the same (unkown) type.
+
+\subsection MitkToFixedItk Converting MITK images to ITK images with known type
+If you know the type (pixel type and dimension) of the MITK image you have two options:
+\li mitk::ImageToItk<TOutputImage>: is a process class that takes an mitk::Image as input
+    and produces an itk::Image of the given type \a TOutputImage as output (to be accessed
+    using \a GetOutput()). In case the MITK image does not have the same type as
+    \a TOutputImage an exception will be thrown.
+\li mitk::CastToItkImage: this function has two parameters, the mitk::Image (input) and a
+    smartpointer to an itk::Image (output, does not need to be initialized). In case the
+    MITK image does not have the same type as the ITK image it will be casted
+    (if possible; done via itk::CastImageFilter).
+
+Thus, mitk::CastToItkImage is the more powerful variant: here it is sufficient that you know
+what you want to have (the ITK data type), to which the MITK image will be casted, if needed.
+
+\subsection MitkToUnkownItk Accessing an MITK image as an ITK image (type unkown)
+If you do not know the pixel type/dimension of an MITK image in advance and the ITK image should
+have the same (unkown) type, e.g., to run a filter on the MITK image data, we cannot really convert
+to one ITK image. This is simply, because we cannot instantiate an itk::Image object with unkown
+pixel type/dimension.
+
+Nevertheless, MITK provides a way to access an MITK image as if it was an ITK image of unkown type.
+To do so, first define an access method, which is templated as an ITK image is:
+
+\code
+template<typename TPixel, unsigned int VImageDimension>
+MyAccessMethod(itk::Image<TPixel, VImageDimension>* itkImage)
+{
+...
+}
+\endcode
+
+If you don't understand this template syntax, we need to refer you to an C++ text book. Understanding
+template syntax is crucial to successfully using ITK.
+
+To call this templated method with an (untemplated) mitk::Image, you can use the #AccessByItk macro
+(or one of its variants) from mitkImageAccessByItk.h. This macro checks for the actual image type of
+the mitk::Image and does any neccessary conversions. This works for all configured pixel types (default
+is char, unsigned char, short, unsigned short, int, unsigned int, float, and double) and dimensions
+(default is 2 and 3). You can change the considered default pixel types and dimensions by modifying
+the CMake variables MITK_ACCESSBYITK_*.
+
+\code
+AccessByItk(mitkImage, MyAccessMethod)
+\endcode
+
+An example is given in \ref Step6Page.
+
+The AccessBy... macros create quite a lot of code: the user defined access method has to be compiled for
+all considered pixel types \em times the supported dimensions (default is 2 and 3). Therefore, depending
+on the complexity of the access method, some compilers may run into problems with memory.
+One workaround is to use explicit instantiation and distribute it on multiple files. The macro
+#InstantiateAccessFunction and its variants are for this purpose. An example is again given in \ref Step6Page.
+Another workaround is to reduce the created code by fixing either the type (#AccessFixedTypeByItk) or
+dimension (#AccessFixedDimensionByItk).
+
+There is one variant of AccessByItk... for passing additional parameters
+to the access-function, called #AccessFixedTypeByItk_n.
+
+
+\link mitkImage.h \endlink
+
+\link mitkImageCast.h \endlink
+
+\link mitkImageToItk.h \endlink
+
+\link mitkITKImageImport.h \endlink
+
+
+\section ItkToMitk ITK to MITK adaptors
+Converting ITK images to MITK is easier than the other way round. Basically, you have three options:
+\li mitk::ITKImageImport<TInputImage>: is a process class that takes an itk::Image of the given type
+    \a TOutputImage as input and produces an mitk::Image as output (to be accessed using \a GetOutput()).
+    The image data contained in the itk::Image is referenced, not copied.
+\li mitk::ImportItkImage: this function takes the itk::Image as input and returns an mitk::Image. Internally,
+    it uses the class just described. So again, the image data contained in the itk::Image is referenced, not
+    copied.
+\li mitk::CastToMitkImage: this function has two parameters, the itk::Image (input) and a smartpointer to an
+    mitk::Image (output, does not need to be initialized). In contrast to the other described methods,
+    this function copies the image data!
+
+\section ItkToMitkCoordinateSystems ITK image vs MITK coordinate systems
+Converting coordinates from the ITK physical coordinate system (which does not support rotated images) to the
+MITK world coordinate system should be performed via the Geometry3D of the Image,
+see mitk::Geometry3D::WorldToItkPhysicalPoint.
+
+\section ModuleAdaptorLimitations Limitations
+The \ref MitkToItk for unspecified types have to do type multiplexing at compile time. This is done for a
+limited number of pixel types and dimensions, defined during the CMake configuration process.
+
+Especially, color image types are not multiplexed. This is because many algorithms do not support color images
+(e.g. with data type itk::RGBPixel) because they do not have a scalar data type. If your algorithm do support
+color and you want to multiplex over all scalar as well as the color data type, try the following:
+\code
+try
+{
+  AccessFixedPixelTypeByItk(myMitkImageThatMaybeColor,         // The MITK image which may be a color image
+                            myAlgorithmFunction,               // The template method being able to handle color
+                            MITK_ACCESSBYITK_PIXEL_TYPES_SEQ   // The default pixel type sequence
+                            (itk::RGBPixel<unsigned char>)     // The additional type sequence
+                           )
+}
+catch(const mitk::AccessByItkException& e)
+{
+  // add error handling here
+}
+\endcode
+*/

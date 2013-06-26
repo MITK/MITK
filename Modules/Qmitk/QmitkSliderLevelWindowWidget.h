@@ -25,47 +25,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkLevelWindowWidgetContextMenu;
 
 /**
-  \class QmitkSliderLevelWindowWidget QmitkSliderLevelWindowWidget.h QmitkSliderLevelWindowWidget.h
-  \ingroup Widgets
-
-  \brief Provides a widget with a slider to change the level and window value of the current image.
-
-  This documentation actually refers to the QmitkLevelWindowWidget and is only put in this class due to technical issues (should be moved later).
-
-  The QmitkLevelWindowWidget is a kind of container for a
-  QmitkSliderLevelWindowWidget (this is the cyan bar above the text input
-  fields) and a QmitkLineEditLevelWindowWidget (with two text input fields). It holds a reference to a
-  mitk::LevelWindowManager variable, which keeps the LevelWindowProperty of the currently selected image.
-  Level/Window is manipulated by the text inputs and the Slider to adjust brightness/contrast of a single image.
-  All changes on the slider or in the text input fields affect the current image by giving new values to LevelWindowManager.
-  LevelWindowManager then sends a signal to tell other listeners about changes.
-
-  Which image is changed is determined by mitkLevelWindowManager. If m_AutoTopMost is true, always the topmost image
-  in data tree (layer property) is affected by changes.
-  The image which is affected by changes can also be changed by QmitkLevelWindowWidgetContextMenu, the context menu
-  for QmitkSliderLevelWindowWidget and QmitkLineEditLevelWindowWidget. There you have the possibility to set
-  a certain image or always the topmost image in the data tree (layer property) to be affected by changes.
-
-  The internal mitk::LevelWindow variable contains a range that is valid for
-  a given image. It should not be possible to move the level/window
-  parameters outside this range. The range can be changed and reset to its default values
-  by QmitkLevelWindowWidgetContextMenu, the context menu for QmitkSliderLevelWindowWidget and
-  QmitkLineEditLevelWindowWidget.
-
-  Now for the behaviour of the text inputs: The upper one contains the
-  value of the level (brightness), the lower one shows the window (contrast).
-
-  The behaviour of the cyan bar is more obvious: the scale in the background shows the valid range.
-  The cyan bar in front displays the currently selected level/window setting.
-  You can change the level by dragging the bar with the left mouse button or clicking somewhere inside the scalerange with the left mouse button.
-  The window is changed by moving the mouse on the upper or lower bound of the bar until the cursor becomes an vertical double-arrowed symbol.
-  Then you can change the windowsize by clicking the left mouse button and move the mouse upwards or downwards.
-  The bar becomes greater upwards as well as downwards. If you want to change the size of the window in only one
-  direction you have to press the CTRL-key while doing the same as mentioned above.
-  This information is also presented by a tooltip text when moving the mouse on the upper or lower bound of the bar.
-
-  */
-
+ * \ingroup QmitkModule
+ *
+ * \brief Provides a widget with a slider to change the level and
+ * window value of the current image.
+ *
+ * This documentation actually refers to the QmitkLevelWindowWidget
+ * and is only put in this class due to technical issues (should be
+ * moved later).
+ *
+ * The QmitkLevelWindowWidget is a kind of container for a
+ * QmitkSliderLevelWindowWidget (this is the cyan bar above the text
+ * input fields) and a QmitkLineEditLevelWindowWidget (with two text
+ * input fields). It holds a reference to a mitk::LevelWindowManager
+ * variable, which keeps the LevelWindowProperty of the currently
+ * selected image. Level/Window is manipulated by the text inputs and
+ * the Slider to adjust brightness/contrast of a single image. All
+ * changes on the slider or in the text input fields affect the current
+ * image by giving new values to LevelWindowManager. LevelWindowManager
+ * then sends a signal to tell other listeners about changes.
+ *
+ * Which image is changed is determined by mitkLevelWindowManager. If
+ * m_AutoTopMost is true, always the topmost image in data tree (layer
+ * property) is affected by changes. The image which is affected by
+ * changes can also be changed by QmitkLevelWindowWidgetContextMenu,
+ * the context menu for QmitkSliderLevelWindowWidget and
+ * QmitkLineEditLevelWindowWidget. There you have the possibility to
+ * set a certain image or always the topmost image in the data tree
+ * (layer property) to be affected by changes.
+ *
+ * The internal mitk::LevelWindow variable contains a range that is
+ * valid for a given image. It should not be possible to move the
+ * level/window parameters outside this range. The range can be changed
+ * and reset to its default values by QmitkLevelWindowWidgetContextMenu,
+ * the context menu for QmitkSliderLevelWindowWidget and
+ * QmitkLineEditLevelWindowWidget.
+ *
+ * Now for the behaviour of the text inputs: The upper one contains the
+ * value of the level (brightness), the lower one shows the window (contrast).
+ *
+ * The behaviour of the cyan bar is more obvious: the scale in the
+ * background shows the valid range. The cyan bar in front displays the
+ * currently selected level/window setting. You can change the level by
+ * dragging the bar with the left mouse button or clicking somewhere inside
+ * the scalerange with the left mouse button. The window is changed by
+ * moving the mouse on the upper or lower bound of the bar until the cursor
+ * becomes an vertical double-arrowed symbol. Then you can change the
+ * windowsize by clicking the left mouse button and move the mouse upwards
+ * or downwards. The bar becomes greater upwards as well as downwards. If
+ * you want to change the size of the window in only one direction you
+ * have to press the CTRL-key while doing the same as mentioned above.
+ * This information is also presented by a tooltip text when moving the
+ * mouse on the upper or lower bound of the bar.
+ */
 class QMITK_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
 
   Q_OBJECT

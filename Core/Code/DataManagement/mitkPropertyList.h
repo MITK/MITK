@@ -66,12 +66,12 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
   public:
 
-    mitkClassMacro(PropertyList, itk::Object);
+    mitkClassMacro(PropertyList, itk::Object)
 
     /**
      * Method for creation through the object factory.
      */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
 
     /**
      * Map structure to hold the properties: the map key is a string,
@@ -181,14 +181,13 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
 
     bool IsEmpty() const { return m_Properties.empty(); }
 
-    virtual Pointer Clone();
-
     virtual void Clear();
 
 
   protected:
 
     PropertyList();
+    PropertyList(const PropertyList& other);
 
 
     virtual ~PropertyList();
@@ -197,6 +196,10 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
      * @brief Map of properties.
      */
     PropertyMap m_Properties;
+
+  private:
+
+    virtual itk::LightObject::Pointer InternalClone() const;
 
 };
 

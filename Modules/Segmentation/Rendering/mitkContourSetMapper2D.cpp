@@ -36,7 +36,10 @@ mitk::ContourSetMapper2D::~ContourSetMapper2D()
 
 void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
-  if(IsVisible(renderer)==false) return;
+  bool visible = true;
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
+
+  if(!visible) return;
 
   ////  @FIXME: Logik fuer update
   bool updateNeccesary=true;
@@ -48,7 +51,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
-    ApplyProperties(renderer);
+    ApplyColorAndOpacityProperties(renderer);
 
     mitk::ContourSet::Pointer input =  const_cast<mitk::ContourSet*>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
@@ -123,5 +126,5 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
 const mitk::ContourSet* mitk::ContourSetMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::ContourSet * > ( GetData() );
+  return static_cast<const mitk::ContourSet * > ( GetDataNode()->GetData() );
 }

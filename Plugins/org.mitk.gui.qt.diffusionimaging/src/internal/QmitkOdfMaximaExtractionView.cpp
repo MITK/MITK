@@ -166,6 +166,7 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
         DataNode::Pointer node = DataNode::New();
         node->SetData(img);
         node->SetName("_ShCoefficientImage");
+        node->SetVisibility(false);
         GetDataStorage()->Add(node);
     }
 
@@ -269,7 +270,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        // directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         node->SetName("_VectorField");
@@ -291,6 +292,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
         break;
@@ -323,7 +325,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             maxSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geom);
+        //directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -332,6 +334,19 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(maxSpacing));
         node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         GetDataStorage()->Add(node);
+
+        {
+            ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
+            mitk::Image::Pointer image2 = mitk::Image::New();
+            image2->InitializeByItk( numDirImage.GetPointer() );
+            image2->SetVolume( numDirImage->GetBufferPointer() );
+            DataNode::Pointer node2 = DataNode::New();
+            node2->SetData(image2);
+            QString name(m_ImageNodes.at(0)->GetName().c_str());
+            name += "_NumDirections";
+            node2->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node2);
+        }
 
         typedef FilterType::DirectionImageContainerType DirectionImageContainerType;
         DirectionImageContainerType::Pointer container = filter->GetDirectionImageContainer();
@@ -347,6 +362,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
         break;
@@ -435,7 +451,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_TensorImageNodes.at(0)->GetName().c_str());
@@ -526,6 +542,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             name += "_Direction";
             name += QString::number(i+1);
             node->SetName(name.toStdString().c_str());
+            node->SetVisibility(false);
             GetDataStorage()->Add(node);
         }
     }
@@ -556,7 +573,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());
@@ -695,7 +712,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
             minSpacing = outImageSpacing[2];
 
         mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
-        directions->SetGeometry(geometry);
+        // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
         QString name(m_ImageNodes.at(0)->GetName().c_str());

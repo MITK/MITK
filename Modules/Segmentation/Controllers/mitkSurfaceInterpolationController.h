@@ -126,8 +126,6 @@ namespace mitk
 
    ~SurfaceInterpolationController();
 
-   void OnSegmentationDeleted (const itk::Object *caller, const itk::EventObject &event);
-
  private:
 
    void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);

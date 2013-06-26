@@ -218,8 +218,6 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void SetCurrentContourListID();
 
-    void Show3DInterpolationResult(bool);
-
 private:
 
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;

@@ -2,7 +2,7 @@
  
  \page Step03Page MITK Tutorial - Step 3: Create 3D view
  
-As in the previous step one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
+As in the previous step, one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
 The QmitkRenderWindow is now used for displaying a 3D view, by setting the used mapper-slot to Standard3D. 
 Since volume-rendering is a (rather) slow procedure, the default is that images are not displayed in the 3D view.
 
@@ -38,7 +38,7 @@ As volume rendering is off the image is not visible.
 Volume Rendering is now turned on as shown in the picture above.
 
 \dontinclude Step3.cpp 
-The property "volumerendering" has to be turned on on the node containing the image.
+The property "volumerendering" has to be enabled on the node containing the image.
  
 \skipline Check
 \until node->SetProperty

@@ -58,6 +58,14 @@ mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2DTe
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3d640x480REF.png #corresponding reference screenshot
 )
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_tiltedHead640x480 mitkImageVtkMapper2DTest #test for tilted MRI axial slice
+                        ${MITK_DATA_DIR}/TiltHead/040 #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/tiltHead-Axial640x480.png #corresponding reference screenshot
+)
+mitkAddCustomModuleTest(mitkImageVtkMapper2D_tiltedHeadREINIT640x480 mitkImageVtkMapper2DReinitTest #test for tilted MRI - with REINIT
+                        ${MITK_DATA_DIR}/TiltHead/040 #input image to load in data storage
+                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/tiltHead-Axial-REINIT640x480.png #corresponding reference screenshot
+)
 mitkAddCustomModuleTest(mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2DColorTest #test for color property (=blue) Pic3D sagittal slice
                         ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
                         -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dColorBlue640x480REF.png #corresponding reference screenshot

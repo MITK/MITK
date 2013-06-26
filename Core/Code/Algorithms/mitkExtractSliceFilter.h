@@ -37,24 +37,23 @@ namespace mitk
   The filter can reslice in all orthogonal planes such as sagittal, coronal and axial,
   and is also able to reslice a abitrary oriented oblique plane.
   Curved planes are specified via an AbstractTransformGeometry as the input worldgeometry.
+  Both image geometries (with center based coordinates) and bounding/world geomtries can be used.
+  Also make sure to define the plane in the output coordinate system. That is important if the image itself is rotated.
 
   The convinient workflow is:
   1. Set an image as input.
-  2. Set the worldGeometry2D. This defines a grid where the slice is being extracted
+  2. Set the worldGeometry2D. This defines a grid where the slice is being extracted.
   3. And then start the pipeline.
 
   There are a few more properties that can be set to modify the behavior of the slicing.
   The properties are:
   - interpolation mode either Nearestneighbor, Linear or Cubic.
-  - a transform this is a convinient way to adapt the reslice axis for the case
-  that the image is transformed e.g. rotated.
   - time step the time step in a timesliced volume.
   - resample by geometry wether the resampling grid corresponds to the specs of the
-  worldgeometry or is directly derived from the input image
+  worldgeometry or is directly derived from the input image.
 
   By default the properties are set to:
   - interpolation mode Nearestneighbor.
-  - a transform NULL (No transform is set).
   - time step 0.
   - resample by geometry false (Corresponds to input image).
   */
@@ -67,19 +66,21 @@ namespace mitk
 
     mitkNewMacro1Param(Self, vtkImageReslice*);
 
-    /** \brief Set the axis where to reslice at.*/
+    /** \brief Set the plane where reslice at.
+    Note: Both image geometries (with center based coordinates) and bounding/world geomtries can be used.
+    Also make sure to define the plane in the output coordinate system. That is important if the image is rotated.
+    */
     void SetWorldGeometry(const Geometry2D* geometry ){
        this->m_WorldGeometry = geometry;
        this->Modified(); }
 
+    /** \deprecated No longer necessary - transformation of the resampling grid is done automatically
+-    */
+    DEPRECATED(void SetResliceTransformByGeometry(const Geometry3D* transform){});
+
     /** \brief Set the time step in the 4D volume */
     void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
     unsigned int GetTimeStep(){ return this->m_TimeStep; }
-
-    /** \brief Set a transform for the reslice axes.
-    * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
-    */
-    void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
 
     /** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
     void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
@@ -161,7 +162,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    Geometry3D::ConstPointer m_ResliceTransform;
+    Geometry3D::ConstPointer m_InputImageGeometry;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

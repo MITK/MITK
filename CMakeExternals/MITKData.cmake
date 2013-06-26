@@ -15,7 +15,6 @@ if(BUILD_TESTING)
 
   set(revision_tag cc0840db)
 
-
   ExternalProject_Add(${proj}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz
     UPDATE_COMMAND ""

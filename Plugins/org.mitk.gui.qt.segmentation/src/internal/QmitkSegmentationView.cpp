@@ -193,8 +193,12 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   if (m_Controls && m_MultiWidget)
   {
     mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
-    m_Controls->m_SlicesInterpolator->SetDataStorage( *(this->GetDefaultDataStorage()));
-    m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
+    m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
+    QList<mitk::SliceNavigationController*> controllers;
+    controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
+    controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
+    controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
+    m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
   }
 }
 

@@ -178,9 +178,9 @@ mitk::Surface* mitk::SurfaceInterpolationController::GetContoursAsSurface()
   return m_Contours;
 }
 
-void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage &ds)
+void mitk::SurfaceInterpolationController::SetDataStorage(DataStorage::Pointer ds)
 {
-  m_DataStorage = &ds;
+  m_DataStorage = ds;
 }
 
 void mitk::SurfaceInterpolationController::SetMinSpacing(double minSpacing)

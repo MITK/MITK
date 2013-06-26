@@ -100,6 +100,8 @@ public:
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
     mitk::PointSpecificationType pointSpec;  //specifies the type of the point
+
+    bool operator==(const PointDataType& other) const;
   };
 
   /**
@@ -135,7 +137,7 @@ public:
   typedef DataType::PointsContainer::ConstIterator PointsConstIterator;
   typedef DataType::PointDataContainer PointDataContainer;
   typedef DataType::PointDataContainerIterator PointDataIterator;
-
+  typedef DataType::PointDataContainerIterator PointDataConstIterator;
 
   virtual void Expand( unsigned int timeSteps );
 
@@ -149,6 +151,14 @@ public:
 
   /** \brief returns the pointset */
   virtual DataType::Pointer GetPointSet( int t = 0 ) const;
+
+  PointsIterator Begin( int t = 0 );
+
+  PointsConstIterator Begin( int t = 0 ) const;
+
+  PointsIterator End( int t = 0 );
+
+  PointsConstIterator End( int t = 0 ) const;
 
   /**
    * \brief Get the point with ID id in world coordinates

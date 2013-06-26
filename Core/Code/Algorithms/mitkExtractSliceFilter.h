@@ -76,7 +76,7 @@ namespace mitk
 
     /** \deprecated No longer necessary - transformation of the resampling grid is done automatically
 -    */
-    DEPRECATED(void SetResliceTransformByGeometry(const Geometry3D* transform){});
+    DEPRECATED(void SetResliceTransformByGeometry(const Geometry3D* transform)){};
 
     /** \brief Set the time step in the 4D volume */
     void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }

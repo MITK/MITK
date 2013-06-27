@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFastMarchingTool3D.h"
 
 class ctkSliderWidget;
+class ctkRangeWidget;
 class QPushButton;
 
 #include "QmitkStepperAdapter.h"
@@ -46,8 +47,7 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnUpperThresholdChanged(double);
-    void OnLowerThresholdChanged(double);
+    void OnThresholdChanged(double, double);
     void OnAlphaChanged(double);
     void OnBetaChanged(double);
     void OnStoppingValueChanged(double);
@@ -60,8 +60,11 @@ protected:
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  ctkSliderWidget* m_slUpperThreshold;
-  ctkSliderWidget* m_slLowerThreshold;
+  void OnToolErrorMessage(std::string s);
+
+  void BusyStateChanged(bool);
+
+  ctkRangeWidget*  m_slwThreshold;
   ctkSliderWidget* m_slStoppingValue;
   ctkSliderWidget* m_slAlpha;
   ctkSliderWidget* m_slBeta;

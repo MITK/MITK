@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
+#include "mitkToolCommand.h"
 
 #include "itkImage.h"
 
@@ -39,8 +40,8 @@ namespace mitk
 /**
   \brief FastMarching semgentation tool.
 
-  The segmentation is done by setting one or more seed point within the image and adapting
-  time range plus threshold. The pipeline is:
+  The segmentation is done by setting one or more seed points on the image
+  and adapting the time range and threshold. The pipeline is:
     Smoothing->GradientMagnitude->SigmoidFunction->FastMarching->Threshold
   The resulting binary image is seen as a segmentation of an object.
 
@@ -52,7 +53,6 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
 
     mitkClassMacro(FastMarchingTool3D, FeedbackContourTool);
     itkNewMacro(FastMarchingTool3D);
-
 
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;
@@ -81,12 +81,14 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     void SetAlpha(double);
 
     virtual void ConfirmSegmentation();
-    virtual void SetLivePreviewEnabled(bool enabled);
 
     virtual void SetCurrentTimeStep(int t);
 
-        /// \brief Clear all seed point.
+    /// \brief Clear all seed point.
     void ClearSeeds();
+
+    /// \brief Updates the itk pipeline and shows the result of FastMarching.
+    void Update();
 
   protected:
 
@@ -97,20 +99,16 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
 
     virtual void Activated();
     virtual void Deactivated();
+    virtual void Initialize();
 
     /*Actions of StateMachine pattern*/
     virtual bool OnAddPoint     (Action*, const StateEvent*);
     virtual bool OnDelete       (Action*, const StateEvent*);
 
-
-    /// \brief Updates the itk pipeline and shows the result of FastMarching.
-    void UpdatePreviewImage();
-
     /// \brief Reset all relevant inputs of the itk pipeline.
-    void ResetFastMarching();
-    /// \brief Reinit filters.
-    void ResetToInitialState();
+    void Reset();
 
+    mitk::ToolCommand::Pointer m_ProgressCommand;
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;
@@ -122,28 +120,28 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     ScalarType m_InitialStoppingValue;
     ScalarType m_StoppingValue;
 
-    bool m_IsLivePreviewEnabled;
+    bool m_NeedUpdate;
 
     int m_CurrentTimeStep;
 
-    float sigma;//used for GradientFilter
-    float alpha;//used for SigmoidFilter
-    float beta;//used for SigmoidFilter
+    float m_Sigma;//used in GradientFilter
+    float m_Alpha;//used in SigmoidFilter
+    float m_Beta;//used in SigmoidFilter
 
-    NodeContainer::Pointer seeds;//seed point for FastMarching
+    NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
 
-    InternalImageType::Pointer m_SliceInITK;//the reference slice as itk::Image
+    InternalImageType::Pointer m_ReferenceImageAsITK; //the reference image as itk::Image
 
     mitk::DataNode::Pointer m_ResultImageNode;//holds the result as a preview image
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
 
-    ThresholdingFilterType::Pointer thresholder;
-    SmoothingFilterType::Pointer smoothing;
-    GradientFilterType::Pointer gradientMagnitude;
-    SigmoidFilterType::Pointer sigmoid;
-    FastMarchingFilterType::Pointer fastMarching;
+    ThresholdingFilterType::Pointer m_ThresholdFilter;
+    SmoothingFilterType::Pointer m_SmoothFilter;
+    GradientFilterType::Pointer m_GradientMagnitudeFilter;
+    SigmoidFilterType::Pointer m_SigmoidFilter;
+    FastMarchingFilterType::Pointer m_FastMarchingFilter;
 
 };
 

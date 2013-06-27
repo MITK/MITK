@@ -559,6 +559,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
         {
 
             typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageType;
+          typedef DiffusionImageType::GradientDirectionContainerType GradientDirectionContainerType;
 
             DiffusionImageType* vols = static_cast<DiffusionImageType*>((*itemiter)->GetData());
 
@@ -575,8 +576,15 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
 
             float b0Threshold = m_Controls->m_TensorReconstructionThreshold->value();
 
+            GradientDirectionContainerType::Pointer gradientContainerCopy = GradientDirectionContainerType::New();
+            for(GradientDirectionContainerType::ConstIterator it = vols->GetDirections()->Begin();
+              it != vols->GetDirections()->End(); it++)
+            {
+              gradientContainerCopy->push_back(it.Value());
+            }
+
             ReconstructionFilter::Pointer reconFilter = ReconstructionFilter::New();
-            reconFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
+            reconFilter->SetGradientImage( gradientContainerCopy, vols->GetVectorImage() );
             reconFilter->SetBValue(vols->GetB_Value());
             reconFilter->SetB0Threshold(b0Threshold);
             reconFilter->Update();

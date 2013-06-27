@@ -559,7 +559,7 @@ void QmitkTensorReconstructionView::TensorReconstructionWithCorr
         {
 
             typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageType;
-          typedef DiffusionImageType::GradientDirectionContainerType GradientDirectionContainerType;
+            typedef DiffusionImageType::GradientDirectionContainerType GradientDirectionContainerType;
 
             DiffusionImageType* vols = static_cast<DiffusionImageType*>((*itemiter)->GetData());
 
@@ -700,7 +700,18 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction(mitk::DataStorage::S
                     DiffusionPixelType, DiffusionPixelType, TTensorPixelType > TensorReconstructionImageFilterType;
             TensorReconstructionImageFilterType::Pointer tensorReconstructionFilter =
                     TensorReconstructionImageFilterType::New();
-            tensorReconstructionFilter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
+
+            typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageType;
+            typedef DiffusionImageType::GradientDirectionContainerType GradientDirectionContainerType;
+
+            GradientDirectionContainerType::Pointer gradientContainerCopy = GradientDirectionContainerType::New();
+            for(GradientDirectionContainerType::ConstIterator it = vols->GetDirections()->Begin();
+              it != vols->GetDirections()->End(); it++)
+            {
+              gradientContainerCopy->push_back(it.Value());
+            }
+
+            tensorReconstructionFilter->SetGradientImage( gradientContainerCopy, vols->GetVectorImage() );
             tensorReconstructionFilter->SetBValue(vols->GetB_Value());
             tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreshold->value() );
             tensorReconstructionFilter->Update();

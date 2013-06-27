@@ -76,9 +76,10 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
 
     void SetUpperThreshold(double);
     void SetLowerThreshold(double);
-    void SetBeta(double);
     void SetStoppingValue(double);
+    void SetSigma(double);
     void SetAlpha(double);
+    void SetBeta(double);
 
     virtual void ConfirmSegmentation();
 

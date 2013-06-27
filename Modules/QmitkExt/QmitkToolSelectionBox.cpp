@@ -586,12 +586,12 @@ void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
 
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)
 {
-  QMessageBox::critical(NULL, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+  QMessageBox::critical(this, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
 {
-  QMessageBox::information(NULL, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+  QMessageBox::information(this, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups)

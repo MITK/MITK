@@ -50,9 +50,10 @@ public:
     void OnThresholdChanged(double, double);
     void OnAlphaChanged(double);
     void OnBetaChanged(double);
+    void OnSigmaChanged(double);
     void OnStoppingValueChanged(double);
     void OnConfirmSegmentation();
-    void OnStepperRefetch();
+    void Refetch();
     void OnClearSeeds();
 
 protected:
@@ -60,12 +61,11 @@ protected:
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  void OnToolErrorMessage(std::string s);
-
   void BusyStateChanged(bool);
 
   ctkRangeWidget*  m_slwThreshold;
   ctkSliderWidget* m_slStoppingValue;
+  ctkSliderWidget* m_slSigma;
   ctkSliderWidget* m_slAlpha;
   ctkSliderWidget* m_slBeta;
 

@@ -46,7 +46,7 @@ m_TimeIsConnected(false)
   fntHelp.setBold(true);
 
   QLabel *lblHelp = new QLabel(this);
-  lblHelp->setText("Press shift-click to add landmarks");
+  lblHelp->setText("Press shift-click to add seeds repeatedly.");
   lblHelp->setFont(fntHelp);
 
   widgetLayout->addWidget(lblHelp);
@@ -59,13 +59,40 @@ m_TimeIsConnected(false)
   QVBoxLayout *vlayout = new QVBoxLayout(gbControls);
   vlayout->setContentsMargins(5, 5, 5, 5);
 
+  // Sigma controls
+  {
+   QHBoxLayout *hlayout = new QHBoxLayout();
+   hlayout->setSpacing(2);
+
+   QLabel *lbl = new QLabel(gbControls);
+   lbl->setText("Sigma: ");
+   hlayout->addWidget(lbl);
+
+   QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+   hlayout->addItem(sp2);
+
+   vlayout->addItem(hlayout);
+  }
+
+  m_slSigma = new ctkSliderWidget(gbControls);
+  m_slSigma->setMinimum(0.1);
+  m_slSigma->setMaximum(5.0);
+  m_slSigma->setPageStep(0.1);
+  m_slSigma->setSingleStep(0.01);
+  m_slSigma->setValue(1.2);
+  m_slSigma->setDecimals(2);
+  m_slSigma->setTracking(false);
+  m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
+  connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
+  vlayout->addWidget( m_slSigma );
+
   // Alpha controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(gbControls);
-   lbl->setText("Sigmoid Alpha: ");
+   lbl->setText("Alpha: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -75,13 +102,14 @@ m_TimeIsConnected(false)
   }
 
   m_slAlpha = new ctkSliderWidget(gbControls);
-  m_slAlpha->setMinimum(-100);
+  m_slAlpha->setMinimum(-10);
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
-  m_slAlpha->setValue(-0.5);
-  m_slAlpha->setDecimals(1);
+  m_slAlpha->setSingleStep(0.01);
+  m_slAlpha->setValue(-2.5);
+  m_slAlpha->setDecimals(2);
   m_slAlpha->setTracking(false);
-  m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping algorithm.");
+  m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
   vlayout->addWidget( m_slAlpha );
 
@@ -91,7 +119,7 @@ m_TimeIsConnected(false)
    hlayout->setSpacing(2);
 
    QLabel *lbl = new QLabel(gbControls);
-   lbl->setText("Sigmoid Beta: ");
+   lbl->setText("Beta: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -102,12 +130,13 @@ m_TimeIsConnected(false)
 
   m_slBeta = new ctkSliderWidget(gbControls);
   m_slBeta->setMinimum(0);
-  m_slBeta->setMaximum(1000);
+  m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
-  m_slBeta->setValue(3.0);
-  m_slBeta->setDecimals(1);
+  m_slBeta->setSingleStep(0.01);
+  m_slBeta->setValue(3.5);
+  m_slBeta->setDecimals(2);
   m_slBeta->setTracking(false);
-  m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping algorithm.");
+  m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
   vlayout->addWidget( m_slBeta );
 
@@ -129,8 +158,9 @@ m_TimeIsConnected(false)
   m_slStoppingValue = new ctkSliderWidget(gbControls);
   m_slStoppingValue->setMinimum(0);
   m_slStoppingValue->setMaximum(10000);
-  m_slStoppingValue->setPageStep(1);
-  m_slStoppingValue->setValue(100);
+  m_slStoppingValue->setPageStep(10);
+  m_slStoppingValue->setSingleStep(1);
+  m_slStoppingValue->setValue(2000);
   m_slStoppingValue->setDecimals(0);
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
@@ -155,8 +185,8 @@ m_TimeIsConnected(false)
   m_slwThreshold = new ctkRangeWidget(gbControls);
   m_slwThreshold->setMinimum(-100);
   m_slwThreshold->setMaximum(5000);
-  m_slwThreshold->setMinimumValue(0);
-  m_slwThreshold->setMaximumValue(200);
+  m_slwThreshold->setMinimumValue(-100);
+  m_slwThreshold->setMaximumValue(2000);
   m_slwThreshold->setDecimals(0);
   m_slwThreshold->setTracking(false);
   m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
@@ -216,7 +246,7 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
     mitk::Stepper * stepper = renderer->GetSliceNavigationController()->GetTime();
     m_TimeStepper = new QmitkStepperAdapter(this, stepper, "exampleStepper");
 
-    connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(OnStepperRefetch()));
+    connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
 
     m_TimeIsConnected = true;
   }
@@ -237,6 +267,15 @@ void QmitkFastMarchingTool3DGUI::OnBetaChanged(double value)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetBeta( value );
+    m_FastMarchingTool->Update();
+  }
+}
+
+void QmitkFastMarchingTool3DGUI::OnSigmaChanged(double value)
+{
+  if (m_FastMarchingTool.IsNotNull())
+  {
+    m_FastMarchingTool->SetSigma( value );
     m_FastMarchingTool->Update();
   }
 }
@@ -267,7 +306,7 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   }
 }
 
-void QmitkFastMarchingTool3DGUI::OnStepperRefetch()
+void QmitkFastMarchingTool3DGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
    m_FastMarchingTool->SetCurrentTimeStep(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep());
@@ -279,12 +318,6 @@ void QmitkFastMarchingTool3DGUI::OnClearSeeds()
    m_FastMarchingTool->ClearSeeds();
    m_FastMarchingTool->Update();
 }
-
-void QmitkFastMarchingTool3DGUI::OnToolErrorMessage(std::string s)
-{
-  QMessageBox::warning(NULL, "Fast Marching 3D Tool", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton);
-}
-
 
 void QmitkFastMarchingTool3DGUI::BusyStateChanged(bool value)
 {

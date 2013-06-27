@@ -148,23 +148,42 @@ void mitk::FastMarchingTool3D::SetLowerThreshold(double value)
 
 void mitk::FastMarchingTool3D::SetBeta(double value)
 {
-  m_Beta = value / 10.0;
-  m_SigmoidFilter->SetBeta( m_Beta );
-  m_NeedUpdate = true;
+  if (m_Beta != value)
+  {
+      m_Beta = value;
+      m_SigmoidFilter->SetBeta( m_Beta );
+      m_NeedUpdate = true;
+  }
+}
+
+void mitk::FastMarchingTool3D::SetSigma(double value)
+{
+  if (m_Sigma != value)
+  {
+      m_Sigma = value;
+      m_GradientMagnitudeFilter->SetSigma( m_Sigma );
+      m_NeedUpdate = true;
+  }
 }
 
 void mitk::FastMarchingTool3D::SetAlpha(double value)
 {
-  m_Alpha = value / 10.0;
-  m_SigmoidFilter->SetAlpha( m_Alpha );
-  m_NeedUpdate = true;
+  if (m_Alpha != value)
+  {
+      m_Alpha = value;
+      m_SigmoidFilter->SetAlpha( m_Alpha );
+      m_NeedUpdate = true;
+  }
 }
 
 void mitk::FastMarchingTool3D::SetStoppingValue(double value)
 {
-  m_StoppingValue = value / 10.0;
-  m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
-  m_NeedUpdate = true;
+  if (m_StoppingValue != value)
+  {
+      m_StoppingValue = value;
+      m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
+      m_NeedUpdate = true;
+  }
 }
 
 void mitk::FastMarchingTool3D::Activated()
@@ -321,17 +340,23 @@ void mitk::FastMarchingTool3D::Update()
     CurrentlyBusy.Send(true);
     try
     {
-      m_ThresholdFilter->UpdateLargestPossibleRegion();
+      m_ThresholdFilter->Update();
     }
     catch( itk::ExceptionObject & excep )
     {
      MITK_ERROR << "Exception caught: " << excep.GetDescription();
+
      m_ProgressCommand->SetRemainingProgress(100);
      CurrentlyBusy.Send(false);
+
+     std::string msg = excep.GetDescription();
+     ErrorMessage.Send(msg);
+
      return;
     }
     m_ProgressCommand->SetRemainingProgress(100);
     CurrentlyBusy.Send(false);
+
     //make output visible
     mitk::Image::Pointer result = mitk::Image::New();
     CastToMitkImage( m_ThresholdFilter->GetOutput(), result);

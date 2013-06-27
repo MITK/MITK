@@ -54,6 +54,7 @@ public:
     void OnStoppingValueChanged(double);
     void OnConfirmSegmentation();
     void Refetch();
+    void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
 
 protected:
@@ -75,7 +76,7 @@ protected:
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 
   bool m_TimeIsConnected;
-  QmitkStepperAdapter* m_TimeStepper;
+  mitk::Stepper::Pointer m_TimeStepper;
 };
 
 #endif

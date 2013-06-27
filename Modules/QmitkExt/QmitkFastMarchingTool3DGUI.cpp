@@ -236,19 +236,16 @@ void QmitkFastMarchingTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
     m_FastMarchingTool->SetSigma( this->m_slSigma->value());
     m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
     m_FastMarchingTool->SetBeta( this->m_slBeta->value());
-  }
 
-  //listen to timestep change events
-  mitk::BaseRenderer::Pointer renderer;
-  renderer = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") );
-  if (renderer.IsNotNull() && !m_TimeIsConnected)
-  {
-    mitk::Stepper * stepper = renderer->GetSliceNavigationController()->GetTime();
-    m_TimeStepper = new QmitkStepperAdapter(this, stepper, "exampleStepper");
-
-    connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
-
-    m_TimeIsConnected = true;
+    //listen to timestep change events
+    mitk::BaseRenderer::Pointer renderer;
+    renderer = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") );
+    if (renderer.IsNotNull() && !m_TimeIsConnected)
+    {
+        new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");
+      //  connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
+        m_TimeIsConnected = true;
+    }
   }
 }
 
@@ -306,10 +303,15 @@ void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
   }
 }
 
+void QmitkFastMarchingTool3DGUI::SetStepper(mitk::Stepper *stepper)
+{
+    this->m_TimeStepper = stepper;
+}
+
 void QmitkFastMarchingTool3DGUI::Refetch()
 {
   //event from image navigator recieved - timestep has changed
-   m_FastMarchingTool->SetCurrentTimeStep(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep());
+    m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingTool3DGUI::OnClearSeeds()

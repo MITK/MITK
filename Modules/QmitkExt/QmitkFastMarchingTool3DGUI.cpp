@@ -79,7 +79,7 @@ m_TimeIsConnected(false)
   m_slSigma->setMaximum(5.0);
   m_slSigma->setPageStep(0.1);
   m_slSigma->setSingleStep(0.01);
-  m_slSigma->setValue(1.2);
+  m_slSigma->setValue(1.0);
   m_slSigma->setDecimals(2);
   m_slSigma->setTracking(false);
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");

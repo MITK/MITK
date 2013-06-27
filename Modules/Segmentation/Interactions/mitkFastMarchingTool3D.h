@@ -74,18 +74,31 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual const char* GetName() const;
     virtual std::string GetIconPath() const;
 
+    /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
+
+    /// \brief Set parameter used in Threshold filter.
     void SetLowerThreshold(double);
+
+    /// \brief Set parameter used in Fast Marching filter.
     void SetStoppingValue(double);
+
+    /// \brief Set parameter used in Gradient Magnitude filter.
     void SetSigma(double);
+
+    /// \brief Set parameter used in Fast Marching filter.
     void SetAlpha(double);
+
+    /// \brief Set parameter used in Fast Marching filter.
     void SetBeta(double);
 
+    /// \brief Adds the feedback image to the current working image.
     virtual void ConfirmSegmentation();
 
+    /// \brief Set the working time step.
     virtual void SetCurrentTimeStep(int t);
 
-    /// \brief Clear all seed point.
+    /// \brief Clear all seed points.
     void ClearSeeds();
 
     /// \brief Updates the itk pipeline and shows the result of FastMarching.
@@ -102,32 +115,29 @@ class Segmentation_EXPORT FastMarchingTool3D : public FeedbackContourTool
     virtual void Deactivated();
     virtual void Initialize();
 
-    /*Actions of StateMachine pattern*/
-    virtual bool OnAddPoint     (Action*, const StateEvent*);
-    virtual bool OnDelete       (Action*, const StateEvent*);
+    /// \brief Add point action of StateMachine pattern
+    virtual bool OnAddPoint (Action*, const StateEvent*);
+
+    /// \brief Delete action of StateMachine pattern
+    virtual bool OnDelete (Action*, const StateEvent*);
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();
 
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
-    Image::Pointer m_ReferenceSlice;
-    Image::Pointer m_WorkingSlice;
-
-    ScalarType m_LowerThreshold;
-    ScalarType m_UpperThreshold;
-    ScalarType m_InitialLowerThreshold;
-    ScalarType m_InitialUpperThreshold;
-    ScalarType m_InitialStoppingValue;
-    ScalarType m_StoppingValue;
+    Image::Pointer m_ReferenceImage;
 
     bool m_NeedUpdate;
 
     int m_CurrentTimeStep;
 
-    float m_Sigma;//used in GradientFilter
-    float m_Alpha;//used in SigmoidFilter
-    float m_Beta;//used in SigmoidFilter
+    float m_LowerThreshold; //used in Threshold filter
+    float m_UpperThreshold; //used in Threshold filter
+    float m_StoppingValue; //used in Fast Marching filter
+    float m_Sigma; //used in GradientMagnitude filter
+    float m_Alpha; //used in Sigmoid filter
+    float m_Beta; //used in Sigmoid filter
 
     NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
 

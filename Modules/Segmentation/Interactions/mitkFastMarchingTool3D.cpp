@@ -41,9 +41,6 @@ m_NeedUpdate(true),
 m_CurrentTimeStep(0),
 m_LowerThreshold(0),
 m_UpperThreshold(200),
-m_InitialLowerThreshold(0.0),
-m_InitialUpperThreshold(100.0),
-m_InitialStoppingValue(100),
 m_StoppingValue(100),
 m_Sigma(1.0),
 m_Alpha(-0.5),
@@ -58,8 +55,8 @@ m_Beta(3.0)
   m_ProgressCommand = mitk::ToolCommand::New();
 
   m_ThresholdFilter = ThresholdingFilterType::New();
-  m_ThresholdFilter->SetLowerThreshold( m_InitialLowerThreshold );
-  m_ThresholdFilter->SetUpperThreshold( m_InitialUpperThreshold );
+  m_ThresholdFilter->SetLowerThreshold( m_LowerThreshold );
+  m_ThresholdFilter->SetUpperThreshold( m_UpperThreshold );
   m_ThresholdFilter->SetOutsideValue( 0 );
   m_ThresholdFilter->SetInsideValue( 1.0 );
 
@@ -82,7 +79,7 @@ m_Beta(3.0)
 
   m_FastMarchingFilter = FastMarchingFilterType::New();
   m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
-  m_FastMarchingFilter->SetStoppingValue( m_InitialStoppingValue );
+  m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
 
   m_SeedContainer = NodeContainer::New();
   m_SeedContainer->Initialize();
@@ -98,8 +95,6 @@ m_Beta(3.0)
 
 mitk::FastMarchingTool3D::~FastMarchingTool3D()
 {
-  m_ReferenceSlice = NULL;
-  m_WorkingSlice = NULL;
 }
 
 
@@ -224,16 +219,16 @@ void mitk::FastMarchingTool3D::Deactivated()
 
 void mitk::FastMarchingTool3D::Initialize()
 {
-  m_ReferenceSlice = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
-  if(m_ReferenceSlice->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-    timeSelector->SetInput( m_ReferenceSlice );
+    timeSelector->SetInput( m_ReferenceImage );
     timeSelector->SetTimeNr( m_CurrentTimeStep );
     timeSelector->UpdateLargestPossibleRegion();
-    m_ReferenceSlice = timeSelector->GetOutput();
+    m_ReferenceImage = timeSelector->GetOutput();
   }
-  CastToItkImage(m_ReferenceSlice, m_ReferenceImageAsITK);
+  CastToItkImage(m_ReferenceImage, m_ReferenceImageAsITK);
   m_SmoothFilter->SetInput( m_ReferenceImageAsITK );
   m_NeedUpdate = true;
 }
@@ -286,7 +281,7 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
 
   mitk::Point3D clickInIndex;
 
-  m_ReferenceSlice->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
+  m_ReferenceImage->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
   itk::Index<3> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
@@ -326,6 +321,8 @@ bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateE
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     m_NeedUpdate = true;
+
+    this->Update();
   }
   return true;
 }
@@ -360,8 +357,8 @@ void mitk::FastMarchingTool3D::Update()
     //make output visible
     mitk::Image::Pointer result = mitk::Image::New();
     CastToMitkImage( m_ThresholdFilter->GetOutput(), result);
-    result->GetGeometry()->SetOrigin(m_ReferenceSlice->GetGeometry()->GetOrigin() );
-    result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceSlice->GetGeometry()->GetIndexToWorldTransform() );
+    result->GetGeometry()->SetOrigin(m_ReferenceImage->GetGeometry()->GetOrigin() );
+    result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceImage->GetGeometry()->GetIndexToWorldTransform() );
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -378,10 +375,6 @@ void mitk::FastMarchingTool3D::ClearSeeds()
   m_FastMarchingFilter->Modified();
 
   this->m_NeedUpdate = true;
-
-  m_ResultImageNode->SetVisibility(false);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
@@ -391,6 +384,8 @@ void mitk::FastMarchingTool3D::Reset()
   this->ClearSeeds();
 
   m_ResultImageNode->SetVisibility(false);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::FastMarchingTool3D::SetCurrentTimeStep(int t)

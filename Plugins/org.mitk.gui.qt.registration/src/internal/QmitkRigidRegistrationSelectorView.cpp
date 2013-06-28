@@ -420,7 +420,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
 
     // now adapt all children geometries accordingly if children exist
     std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
-    std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer>::iterator iter2;
     mitk::DataNode::Pointer childNode;
     for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ )
     {

@@ -42,6 +42,11 @@ std::string mitk::EraseRegionTool::GetIconPath() const
   return ":/Segmentation/Erase_48x48.png";
 }
 
+std::string mitk::EraseRegionTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/Erase_Cursor_48x48.png";
+}
+
 const char* mitk::EraseRegionTool::GetName() const
 {
   return "Erase";

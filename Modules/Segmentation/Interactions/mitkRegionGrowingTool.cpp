@@ -72,6 +72,11 @@ std::string mitk::RegionGrowingTool::GetIconPath() const
   return ":/Segmentation/RegionGrowing_48x48.png";
 }
 
+std::string mitk::RegionGrowingTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/RegionGrowing_Cursor_48x48.png";
+}
+
 const char* mitk::RegionGrowingTool::GetName() const
 {
   return "Region Growing";

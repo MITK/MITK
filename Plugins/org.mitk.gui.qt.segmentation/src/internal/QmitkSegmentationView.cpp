@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
+#include "mitkStatusBar.h"
+#include "mitkApplicationCursor.h"
 
 #include "mitkSegmentationObjectFactory.h"
 
@@ -47,6 +49,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
 ,m_DataSelectionChanged(false)
+,m_MouseCursorSet(false)
 {
   RegisterSegmentationObjectFactory();
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -1028,6 +1031,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'Fast Marching'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
   //setup 3D Tools
   m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
@@ -1082,4 +1086,50 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
 //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 }
+
+void QmitkSegmentationView::OnManualTool2DSelected(int id)
+{
+    if (id >= 0)
+    {
+        std::string text = "Active Tool: \"";
+        mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
+        text += toolManager->GetToolById(id)->GetName();
+        text += "\"";
+        mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
+
+        std::string iconPath = toolManager->GetToolById(id)->GetCursorIconPath();
+
+        if (iconPath.empty())
+           this->ResetMouseCursor();
+        else
+           this->SetMouseCursor( iconPath, 0, 0 );
+    }
+    else
+    {
+        this->ResetMouseCursor();
+        mitk::StatusBar::GetInstance()->DisplayText("");
+    }
+}
+
+void QmitkSegmentationView::ResetMouseCursor()
+{
+  if ( m_MouseCursorSet )
+  {
+    mitk::ApplicationCursor::GetInstance()->PopCursor();
+    m_MouseCursorSet = false;
+  }
+}
+
+void QmitkSegmentationView::SetMouseCursor( const std::string& path, int hotspotX, int hotspotY )
+{
+  // Remove previously set mouse cursor
+  if ( m_MouseCursorSet )
+  {
+    mitk::ApplicationCursor::GetInstance()->PopCursor();
+  }
+
+  mitk::ApplicationCursor::GetInstance()->PushCursor( path, hotspotX, hotspotY );
+  m_MouseCursorSet = true;
+}
+
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

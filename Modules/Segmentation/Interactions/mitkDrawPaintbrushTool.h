@@ -49,6 +49,7 @@ class Segmentation_EXPORT DrawPaintbrushTool : public PaintbrushTool
 
     virtual const char** GetXPM() const;
     virtual std::string GetIconPath() const;
+    virtual std::string GetCursorIconPath() const;
     virtual const char* GetName() const;
 
   protected:

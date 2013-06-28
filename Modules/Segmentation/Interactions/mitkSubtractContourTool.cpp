@@ -42,6 +42,11 @@ std::string mitk::SubtractContourTool::GetIconPath() const
   return ":/Segmentation/Subtract_48x48.png";
 }
 
+std::string mitk::SubtractContourTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/Subtract_Cursor_48x48.png";
+}
+
 const char* mitk::SubtractContourTool::GetName() const
 {
   return "Subtract";

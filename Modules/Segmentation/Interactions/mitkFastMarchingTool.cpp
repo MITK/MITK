@@ -120,6 +120,10 @@ std::string mitk::FastMarchingTool::GetIconPath() const
   return ":/Segmentation/FastMarching_48x48.png";
 }
 
+std::string mitk::FastMarchingTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/FastMarching_Cursor_48x48.png";
+}
 
 const char* mitk::FastMarchingTool::GetName() const
 {

@@ -42,6 +42,11 @@ std::string mitk::ErasePaintbrushTool::GetIconPath() const
   return ":/Segmentation/Wipe_48x48.png";
 }
 
+std::string mitk::ErasePaintbrushTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/Wipe_Cursor_48x48.png";
+}
+
 const char* mitk::ErasePaintbrushTool::GetName() const
 {
   return "Wipe";

@@ -33,7 +33,7 @@ int mitkImageVtkMapper2DReinitTest(int argc, char* argv[])
   // compare rendering to reference image
   MITK_TEST_BEGIN("mitkImageVtkMapper2DReinitTest")
 
-  mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
+  mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   //perform reinit on first image in datastorage
   mitk::DataStorage::Pointer dataStorage = renderingHelper.GetDataStorage();

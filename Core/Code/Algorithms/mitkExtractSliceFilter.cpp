@@ -35,6 +35,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   m_TimeStep = 0;
   m_Reslicer->ReleaseDataFlagOn();
   m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
+  m_ResliceTransform = NULL;
   m_InPlaneResampleExtentByGeometry = false;
   m_OutPutSpacing = new mitk::ScalarType[2];
   m_OutputDimension = 2;
@@ -46,6 +47,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
+  m_ResliceTransform = NULL;
   m_WorldGeometry = NULL;
   delete [] m_OutPutSpacing;
 }
@@ -89,15 +91,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     return;
   }
 
-
-  /*Set the transform of the image to be applied to the resampling grid.
-  Note (taken from vtkImageReslice documentation):
-  Applying a transform to the resampling grid (which lies in the output coordinate system)
-  is equivalent to applying the inverse of that transform to the input volume.*/
   this->m_InputImageGeometry = input->GetTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
-  if(m_InputImageGeometry.IsNotNull())
-    m_Reslicer->SetResliceTransform(m_InputImageGeometry->GetVtkTransform()->GetLinearInverse());
-
 
   if(!m_WorldGeometry)
   {
@@ -198,6 +192,12 @@ void mitk::ExtractSliceFilter::GenerateData(){
       origin += right * ( m_OutPutSpacing[0] * 0.5 );
       origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
     }
+
+     /*Set a transform to be applied to the resampling grid from given geometry.
+     Note: Applying a transform to the resampling grid (which lies in the output coordinate system)
+     is equivalent to applying the inverse of that transform to the input volume.*/
+    if(m_InputImageGeometry.IsNotNull())
+      m_Reslicer->SetResliceTransform(m_InputImageGeometry->GetVtkTransform()->GetLinearInverse());
 
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D),

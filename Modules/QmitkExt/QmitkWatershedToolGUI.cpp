@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpainter.h>
+#include <qapplication.h>
 
 
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkWatershedToolGUI, "")
@@ -92,7 +93,6 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
 
 QmitkWatershedToolGUI::~QmitkWatershedToolGUI()
 {
-  // !!!
   if (m_WatershedTool.IsNotNull())
   {
     //m_WatershedTool->SizeChanged -= mitk::MessageDelegate1<QmitkWatershedToolGUI, int>( this, &QmitkWatershedToolGUI::OnSizeChanged );
@@ -137,7 +137,9 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
-  m_InformationLabel->setText("Please wait some time for Computation...");
+  m_InformationLabel->setText(QString("Please wait some time for computation..."));
+  m_InformationLabel->repaint();
+  QApplication::processEvents();
+
   m_WatershedTool->DoIt();
-  m_InformationLabel->setText("");
 }

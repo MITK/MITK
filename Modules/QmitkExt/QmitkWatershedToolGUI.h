@@ -30,9 +30,8 @@ class QFrame;
   \brief GUI for mitk::WatershedTool.
   \sa mitk::WatershedTool
 
-  This GUI shows two sliders to change the watershed parameters.
+  This GUI shows two sliders to change the watershed parameters. It executes the watershed algorithm by clicking on the button.
 
-  Last contributor: $Author$
 */
 class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 {
@@ -46,8 +45,11 @@ class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 
     void OnNewToolAssociated(mitk::Tool*);
 
+    /** \brief Passes the chosen threshold value directly to the watershed tool */
     void OnSliderValueThresholdChanged(int value);
+    /** \brief Passes the chosen level value directly to the watershed tool */
     void OnSliderValueLevelChanged(int value);
+    /** \brief Starts segmentation algorithm in the watershed tool */
     void OnCreateSegmentation();
 
   protected:
@@ -58,8 +60,11 @@ class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
     QSlider* m_SliderThreshold;
     QSlider* m_SliderLevel;
 
+    /** \brief Label showing the current threshold value. */
     QLabel* m_ThresholdLabel;
+    /** \brief Label showing the current level value. */
     QLabel* m_LevelLabel;
+    /** \brief Label showing additional informations. */
     QLabel* m_InformationLabel;
 
     QFrame* m_Frame;

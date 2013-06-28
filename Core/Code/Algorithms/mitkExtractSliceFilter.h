@@ -76,6 +76,11 @@ namespace mitk
     void SetTimeStep( unsigned int timestep){ this->m_TimeStep = timestep; }
     unsigned int GetTimeStep(){ return this->m_TimeStep; }
 
+    /** \brief Set a transform for the reslice axes.
+    * This transform is needed if the image volume itself is transformed. (Effects the reslice axis)
+    */
+    void SetResliceTransformByGeometry(const Geometry3D* transform){ this->m_ResliceTransform = transform; }
+
     /** \brief Resampling grid corresponds to: false->image    true->worldgeometry*/
     void SetInPlaneResampleExtentByGeometry(bool inPlaneResampleExtentByGeometry){ this->m_InPlaneResampleExtentByGeometry = inPlaneResampleExtentByGeometry; }
 
@@ -156,7 +161,7 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    Geometry3D::ConstPointer m_InputImageGeometry;
+    Geometry3D::ConstPointer m_ResliceTransform;
 
     bool m_InPlaneResampleExtentByGeometry;//Resampling grid corresponds to:  false->image    true->worldgeometry
 

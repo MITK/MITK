@@ -91,8 +91,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
     return;
   }
 
-    this->SetResliceTransformByGeometry( input->GetTimeSlicedGeometry()->GetGeometry3D( m_TimeStep ) );
-
   if(!m_WorldGeometry)
   {
     MITK_ERROR << "mitk::ExtractSliceFilter: No Geometry for reslicing available." << std::endl;

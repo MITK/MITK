@@ -266,7 +266,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
         for( gdcit = m_DiffusionImage->GetDirections()->Begin(); gdcit != m_DiffusionImage->GetDirections()->End(); ++gdcit)
         {
             float currentBvalue = std::floor(m_DiffusionImage->GetB_Value(gdcit.Index()));
-            double rounded = int((currentBvalue + 0.5 * i)/i)*i;
+            unsigned int rounded = int((currentBvalue + 0.5 * i)/i)*i;
             roundedBValueMap[rounded].push_back(gdcit.Index());
         }
 

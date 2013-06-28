@@ -190,7 +190,7 @@ public:
    * corresponds to the gradient direction of the ith component image the
    * VectorImage.  For the baseline image, a vector of all zeros
    * should be set.*/
-  void SetGradientImage( GradientDirectionContainerType *,
+  void SetGradientImage( const GradientDirectionContainerType *,
                                              const GradientImagesType *image);
 
   /** Set method to set the reference image. */

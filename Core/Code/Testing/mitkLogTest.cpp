@@ -166,15 +166,18 @@ static void TestObjectInfoLogging()
 
 
 
-static void TestThreadSaveLog()
+static void TestThreadSaveLog(bool toFile)
     {
     bool testSucceded = true;
 
 
     try
       {
-        std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
-        mitk::LoggingBackend::SetLogFile(filename.c_str());
+        if (toFile)
+        {
+          std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
+          mitk::LoggingBackend::SetLogFile(filename.c_str());
+        }
 
         unsigned int numberOfThreads = 20;
         unsigned int threadRuntimeInMilliseconds = 2000;
@@ -273,7 +276,9 @@ int mitkLogTest(int /* argc */, char* /*argv*/[])
 
   mitkLogTestClass::TestLoggingToFile();
   mitkLogTestClass::TestAddAndRemoveBackends();
-  mitkLogTestClass::TestThreadSaveLog();
+  mitkLogTestClass::TestThreadSaveLog( false ); // false = to console
+  mitkLogTestClass::TestThreadSaveLog( true );  // true = to file
+  // TODO actually test file somehow?
 
   // always end with this!
   MITK_TEST_END()

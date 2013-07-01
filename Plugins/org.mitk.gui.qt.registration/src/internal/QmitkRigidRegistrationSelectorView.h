@@ -104,7 +104,7 @@ protected:
   mitk::RigidRegistrationObserver::Pointer m_Observer;
   mitk::DataStorage::SetOfObjects::ConstPointer m_MovingNodeChildren;
   std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
-  std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer> m_ChildNodes2;
+  std::map<mitk::DataNode::Pointer, mitk::Geometry3D::Pointer> m_ChildNodes2;
 };
 
 #endif

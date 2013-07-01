@@ -102,11 +102,45 @@ you have to call the UpdateOverlay yourself. it must only be called if the Prope
 
 \section CustomOverlaySection Implement a Custom Overlay
 
+A new custom Overlay should derive from mitkOverlay or one of the later mentioned subclasses VtkOverlay2D oder VtkOverlay3D. There should always be an implementation for the methods
+AddOverlay, RemoveOverlay and Update Overlay.
+UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by vtk, this method only applies the properties to the representation.
+If the custom Overlay requires additional properties, they should be made accessible by getters and setters for a better usability:
+\code
+void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+{
+  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
+  SetProperty("Position3D", position3dProperty,renderer);
+}
+
+mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
+{
+  mitk::Point3D position3D;
+  GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
+  return position3D;
+}
+\endcode
+
 \subsection CustomVTK2DOverlay VTK 2D Overlay
+
+The mitkVtkOverlay2D is a subclass of VtkOverlay, that uses VTK to render the overlay. This class creates the Overlay representation as a vtkActor2D, and is very easy to implement
+because only UpdateVtkOverlay2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
+UpdateVtkOverlay2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
 
 \subsection CustomVTK3DOverlay VTK 3D Overlay
 
+The mitkVtkOverlay3D works just like mitkVtkOverlay2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
+
 \section CustomLayouterSection Implement a Custom Layouter
 
+A Layouter is used for an automatic positioning of a group of Overlays and is derived from mitkBaseLayouter. Every Layouter that manages a group of Layouts should have a unique identifier
+which is used to register the Layouter in the OverlayManager. A Layouter is always uniquely defined by the identifier and one BaseRenderer. Before a Layouter can be used by the
+OverlayManager it has to be added, using the AddLayouter Method. An Overlay can then be added to a Layout as follows:
+
+\code
+overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM,axialRenderer);
+\endcode
+
+A new Layouter has to implement PrepareLayout which should parse the internal Overlay list and set their position as required.
 
 */

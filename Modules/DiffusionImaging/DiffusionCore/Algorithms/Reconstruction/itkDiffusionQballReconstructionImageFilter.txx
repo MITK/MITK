@@ -754,7 +754,7 @@ namespace itk {
     void DiffusionQballReconstructionImageFilter< TReferenceImagePixelType,
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
-    ::SetGradientImage( GradientDirectionContainerType *gradientDirection,
+    ::SetGradientImage(const GradientDirectionContainerType *gradientDirection,
     const GradientImagesType *gradientImage )
   {
     // Make sure crazy users did not call both AddGradientImage and
@@ -765,7 +765,12 @@ namespace itk {
         << "AddGradientImage and SetGradientImage. Please call only one of them.");
     }
 
-    this->m_GradientDirectionContainer = gradientDirection;
+    this->m_GradientDirectionContainer = GradientDirectionContainerType::New();
+    for(GradientDirectionContainerType::ConstIterator it = gradientDirection->Begin();
+      it != gradientDirection->End(); it++)
+    {
+      this->m_GradientDirectionContainer->push_back(it.Value());
+    }
 
     unsigned int numImages = gradientDirection->Size();
     this->m_NumberOfBaselineImages = 0;

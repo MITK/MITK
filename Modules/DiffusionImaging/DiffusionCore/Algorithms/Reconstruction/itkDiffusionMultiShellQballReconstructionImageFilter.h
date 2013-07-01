@@ -81,7 +81,7 @@ public:
       * GradientDirectionContainerType-Input gradientDirectionContainer (e.g. vols->GetDirections)
       * GradientImagesType-Input gradientImage (e.g. vols->GetVectorImage)
       * float-Input bvalue (e.g. vols->GetB_Value) */
-    void SetGradientImage( GradientDirectionContainerType * gradientDirectionContainer, const GradientImagesType *gradientImage , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
+    void SetGradientImage( const GradientDirectionContainerType * gradientDirectionContainer, const GradientImagesType *gradientImage , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
 
    /** Set a BValue Map (key = bvalue, value = indicies splittet for each shell)
      * If the input image containes more than three q-shells

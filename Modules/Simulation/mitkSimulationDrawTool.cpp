@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::SimulationDrawTool::SimulationDrawTool()
   : m_PolygonMode(0),
     m_Wireframe(false),
+    m_Lighting(true),
     m_Update(true)
 {
 }
@@ -56,6 +57,8 @@ void mitk::SimulationDrawTool::InitProperty(vtkProperty* property) const
     property->SetRepresentationToWireframe();
   else
     property->SetRepresentationToSurface();
+
+  property->SetLighting(m_Lighting);
 }
 
 void mitk::SimulationDrawTool::Reset()
@@ -318,8 +321,71 @@ void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points,
   m_Actors.push_back(actor);
 }
 
-void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>&, const std::vector<Vector3>&, const std::vector<Vec4f>&)
+void mitk::SimulationDrawTool::drawTriangles(const std::vector<Vector3>& points, const std::vector<Vector3>& normals, const std::vector<Vec4f>& colors)
 {
+  if (!m_Update || points.empty())
+    return;
+
+  unsigned int numPoints = points.size();
+  unsigned int numNormals = numPoints / 3;
+  bool computeNormals = numNormals != normals.size();
+
+  vtkSmartPointer<vtkPoints> vtkPoints = vtkSmartPointer< ::vtkPoints>::New();
+  vtkPoints->SetNumberOfPoints(numPoints);
+
+  for (unsigned int i = 0; i < numPoints; ++i)
+    vtkPoints->SetPoint(i, points[i].elems);
+
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+  polyData->SetPoints(vtkPoints);
+
+  vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
+
+  for (unsigned int i = 0; i < points.size(); i += 3)
+  {
+    triangles->InsertNextCell(3);
+    triangles->InsertCellPoint(i);
+    triangles->InsertCellPoint(i + 1);
+    triangles->InsertCellPoint(i + 2);
+  }
+
+  polyData->SetPolys(triangles);
+
+  vtkSmartPointer<vtkPolyDataMapper> polyDataMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+
+  if (!computeNormals)
+  {
+    vtkSmartPointer<vtkFloatArray> vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
+    vtkNormals->SetNumberOfComponents(3);
+    vtkNormals->SetNumberOfTuples(numNormals);
+    vtkNormals->SetName("Normals");
+
+    for (unsigned int i = 0; i < numNormals; ++i)
+      vtkNormals->SetTuple(i, normals[i].elems);
+
+    polyData->GetCellData()->SetNormals(vtkNormals);
+
+    polyDataMapper->SetInput(polyData);
+  }
+  else
+  {
+    vtkSmartPointer<vtkPolyDataNormals> polyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
+    polyDataNormals->ComputeCellNormalsOff();
+    polyDataNormals->SetInput(polyData);
+    polyDataNormals->SplittingOff();
+
+    polyDataMapper->SetInput(polyDataNormals->GetOutput());
+  }
+
+  vtkSmartPointer<vtkActor> actor = vtkSmartPointer<vtkActor>::New();
+  actor->SetMapper(polyDataMapper);
+  actor->SetScale(Simulation::ScaleFactor);
+
+  vtkProperty* property = actor->GetProperty();
+  this->InitProperty(property);
+  property->SetColor(colors[0].x(), colors[0].y(), colors[0].z());
+
+  m_Actors.push_back(actor);
 }
 
 void mitk::SimulationDrawTool::drawTriangleStrip(const std::vector<Vector3>&, const std::vector<Vector3>&, const Vec4f)
@@ -580,8 +646,9 @@ void mitk::SimulationDrawTool::setPolygonMode(int mode, bool wireframe)
   m_Wireframe = wireframe;
 }
 
-void mitk::SimulationDrawTool::setLightingEnabled(bool)
+void mitk::SimulationDrawTool::setLightingEnabled(bool isEnabled)
 {
+  m_Lighting = isEnabled;
 }
 
 void mitk::SimulationDrawTool::writeOverlayText(int, int, unsigned int, const Vec4f&, const char*)

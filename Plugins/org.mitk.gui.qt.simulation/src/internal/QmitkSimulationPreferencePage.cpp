@@ -120,18 +120,20 @@ void QmitkSimulationPreferencePage::OnPluginTreeWidgetItemSelectionChanged()
 {
   QList<QTreeWidgetItem*> selectedItems = m_Controls.pluginsTreeWidget->selectedItems();
 
+  m_Controls.componentsListWidget->clear();
+
   if (!selectedItems.isEmpty())
   {
     PluginMap& pluginMap = sofa::helper::system::PluginManager::getInstance().getPluginMap();
     std::string path = selectedItems[0]->text(3).toStdString();
 
     m_Controls.descriptionPlainTextEdit->setPlainText(pluginMap[path].getModuleDescription());
+    m_Controls.componentsListWidget->addItems(QString(pluginMap[path].getModuleComponentList()).split(' ', QString::SkipEmptyParts));
     m_Controls.removeButton->setEnabled(true);
   }
   else
   {
     m_Controls.descriptionPlainTextEdit->clear();
-    m_Controls.componentsListWidget->clear();
     m_Controls.removeButton->setEnabled(false);
   }
 }

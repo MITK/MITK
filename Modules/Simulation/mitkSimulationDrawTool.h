@@ -103,6 +103,7 @@ namespace mitk
     std::vector<vtkSmartPointer<vtkActor> > m_Actors;
     int m_PolygonMode;
     bool m_Wireframe;
+    bool m_Lighting;
     bool m_Update;
   };
 }

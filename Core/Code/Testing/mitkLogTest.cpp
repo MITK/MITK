@@ -173,49 +173,49 @@ static void TestThreadSaveLog()
 
     try
       {
-    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
-    mitk::LoggingBackend::SetLogFile(filename.c_str());
+        std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
+        mitk::LoggingBackend::SetLogFile(filename.c_str());
 
-    unsigned int numberOfThreads = 20;
-    unsigned int threadRuntimeInMilliseconds = 2000;
+        unsigned int numberOfThreads = 20;
+        unsigned int threadRuntimeInMilliseconds = 2000;
 
-    std::vector<unsigned int> threadIDs;
-    std::vector<mitkTestLoggingThread::Pointer> threads;
+        std::vector<unsigned int> threadIDs;
+        std::vector<mitkTestLoggingThread::Pointer> threads;
 
-    itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
-    {
-      //initialize threads...
-      mitkTestLoggingThread::Pointer newThread = mitkTestLoggingThread::New(multiThreader);
-      threads.push_back(newThread);
-      std::cout << "Created " << threadIdx << ". thread." << std::endl;
-    }
+        itk::MultiThreader::Pointer multiThreader = itk::MultiThreader::New();
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //initialize threads...
+          mitkTestLoggingThread::Pointer newThread = mitkTestLoggingThread::New(multiThreader);
+          threads.push_back(newThread);
+          std::cout << "Created " << threadIdx << ". thread." << std::endl;
+        }
 
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
-    {
-      //start them
-      std::cout << "Start " << threadIdx << ". thread." << std::endl;
-      threadIDs.push_back( threads[threadIdx]->Start() );
-      std::cout << threadIdx << ". thread has ID " << threadIDs[threadIdx] << std::endl;
-    }
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //start them
+          std::cout << "Start " << threadIdx << ". thread." << std::endl;
+          threadIDs.push_back( threads[threadIdx]->Start() );
+          std::cout << threadIdx << ". thread has ID " << threadIDs[threadIdx] << std::endl;
+        }
 
-    //wait for some time (milliseconds)
-    itksys::SystemTools::Delay( threadRuntimeInMilliseconds );
+        //wait for some time (milliseconds)
+        itksys::SystemTools::Delay( threadRuntimeInMilliseconds );
 
 
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
-    {
-      //stop them
-      std::cout << "Stop " << threadIdx << ". thread." << std::endl;
-      threads[threadIdx]->Stop();
-    }
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //stop them
+          std::cout << "Stop " << threadIdx << ". thread." << std::endl;
+          threads[threadIdx]->Stop();
+        }
 
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
-    {
-      //Wait for all threads to end
-      multiThreader->TerminateThread(threadIDs[threadIdx]);
-      std::cout << "Terminated " << threadIdx << ". thread (" << threads[threadIdx]->NumberOfMessages << " messages)." << std::endl;
-    }
+        for (unsigned int threadIdx = 0; threadIdx < numberOfThreads; ++threadIdx)
+        {
+          //Wait for all threads to end
+          multiThreader->TerminateThread(threadIDs[threadIdx]);
+          std::cout << "Terminated " << threadIdx << ". thread (" << threads[threadIdx]->NumberOfMessages << " messages)." << std::endl;
+        }
 
       }
     catch(std::exception e)

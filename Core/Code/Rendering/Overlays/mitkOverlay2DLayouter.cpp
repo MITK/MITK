@@ -28,9 +28,8 @@ const std::string mitk::Overlay2DLayouter::STANDARD_2D_BOTTOMRIGHT = "STANDARD_2
 
 mitk::Overlay2DLayouter::Overlay2DLayouter()
 {
-
+  m_Margin = 5;
 }
-
 
 mitk::Overlay2DLayouter::~Overlay2DLayouter()
 {
@@ -38,16 +37,113 @@ mitk::Overlay2DLayouter::~Overlay2DLayouter()
 
 void mitk::Overlay2DLayouter::PrepareLayout()
 {
-  int i = 0;
   std::list<mitk::Overlay*> managedOverlays = GetManagedOverlays();
   std::list<mitk::Overlay*>::iterator it;
-  for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
-  {
-    mitk::Overlay* overlay = *it;
-    mitk::Overlay::Bounds bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
-    bounds.Position[0] = i++;
-    bounds.Position[1] = i++;
-    i+=50;
-    overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+  mitk::Overlay::Bounds bounds;
+  double posX,posY;
+  int* size = GetBaseRenderer()->GetVtkRenderer()->GetSize();
+
+  switch (m_Alignment) {
+  case TopLeft:
+    posX = m_Margin;
+    posY = size[1]-m_Margin;
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+      posY -= 25;
+      bounds.Position[0] = posX;
+      bounds.Position[1] = posY;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+      posY -= m_Margin;
+    }
+    break;
+  default: break;
+/*  case Top:
+    posX = 0;
+    posY = size[1]-m_Margin;
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+      bounds.Position[0] = (size[0]/2.0) - (bounds.Size[1]/2.0);
+      bounds.Position[1] = posY;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+      posY += (bounds.Size[1]+m_Margin);
+    }
+    break;
+  case TopRight:
+    posX = size[0]-m_Margin;
+    posY = size[1]-m_Margin;
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+      bounds.Position[0] = posX;
+      bounds.Position[1] = posY;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+      posY += (bounds.Size[1]+m_Margin);
+    }
+    break;
+  case Left:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;
+  case Middle:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;
+  case Right:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;
+  case BottomLeft:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;
+  case Bottom:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;
+  case BottomRight:
+    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
+    {
+      mitk::Overlay* overlay = *it;
+      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
+//      bounds.Position[0] = i++;
+//      bounds.Position[1] = i++;
+      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
+    }
+    break;*/
   }
 }

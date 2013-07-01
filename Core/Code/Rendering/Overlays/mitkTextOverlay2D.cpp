@@ -36,13 +36,11 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
   m_textActor = vtkSmartPointer<vtkTextActor>::New();
 }
 
-
 void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 {
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   ls->m_textActor->GetTextProperty()->SetFontSize ( 24 );
-  ls->m_textActor->SetPosition ( GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0], GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1] );
-  MITK_INFO<< GetPosition2D(renderer);
+  ls->m_textActor->SetDisplayPosition( GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0], GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1] );
   ls->m_textActor->SetInput ( GetText().c_str());
   float color[3] = {1,1,1};
   float opacity = 1.0;

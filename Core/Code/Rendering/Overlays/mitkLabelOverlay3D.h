@@ -32,17 +32,12 @@
 
 namespace mitk {
 
-/** \brief Internal class holding the vtkActor, etc. for each of the 3 2D render windows */
-/** To render transveral, coronal, and sagittal, the mapper is called three times.
- *For performance reasons, the corresponding data for each view is saved in the
- *internal helper class LocalStorage.*/
+/** \brief Displays a high amount of 3D labels to a PointSet */
+/** */
 class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
-  /** \brief Internal class holding the vtkActor, etc. for each of the 3 2D render windows */
-  /** To render transveral, coronal, and sagittal, the mapper is called three times.
-   *For performance reasons, the corresponding data for each view is saved in the
-   *internal helper class LocalStorage.*/
+  /** \brief Internal class holding the vtkActor, etc. for each of the render windows */
   class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
@@ -69,8 +64,13 @@ public:
   mitkClassMacro(LabelOverlay3D, mitk::VtkOverlay3D);
   itkNewMacro(LabelOverlay3D);
 
+  /** \brief Set the vector of labels that are shown to each corresponding point3D. The size has to be equal to the provided LabelCoordinates. */
   void SetLabelVector(std::vector<const char *> LabelVector);
+
+  /** \brief Optional: Provide a vector of priorities. The labels with higher priorities will be visible in lower LOD */
   void SetPriorityVector(std::vector<int> PriorityVector);
+
+  /** \brief Coordinates of the labels */
   void SetLabelCoordinates(mitk::PointSet::Pointer LabelCoordinates);
 
 protected:

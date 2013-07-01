@@ -128,6 +128,8 @@ protected:
 
   Alignment m_Alignment;
 
+  double m_Margin;
+
 private:
 
   /** \brief copy constructor */

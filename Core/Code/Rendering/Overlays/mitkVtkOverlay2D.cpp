@@ -39,8 +39,9 @@ mitk::Overlay::Bounds mitk::VtkOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer 
 void mitk::VtkOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, mitk::Overlay::Bounds bounds)
 {
   vtkSmartPointer<vtkActor2D> actor = GetVtkActor2D(renderer);
-  actor->SetPosition(bounds.Position[0],bounds.Position[1]);
-  actor->SetPosition2(bounds.Size[0],bounds.Size[1]);
+  actor->SetDisplayPosition(bounds.Position[0],bounds.Position[1]);
+  actor->SetWidth(bounds.Size[0]);
+  actor->SetHeight(bounds.Size[1]);
 }
 
 void mitk::VtkOverlay2D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)

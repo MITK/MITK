@@ -26,6 +26,12 @@ namespace mitk {
 
 class BaseLayouter;
 
+
+/** \brief Base class for all overlays */
+/** This class is to be implemented in order to create overlays which are managed by the OverlayManager and can be placed by a BaseLayouter.
+This class contains an internal Propertylist, and another PropertyList for each BaseRenderer.
+A property that is specified for a specific renderer always overrides the general internal property of the same name.
+AddOverlay, RemoveOverlay and UpdateOverlay methods have to be implemented.*/
 class MITK_CORE_EXPORT Overlay : public itk::Object {
   friend class BaseLayouter;
 public:
@@ -360,8 +366,13 @@ public:
   //## @param propertykey Can be used to specify a user defined name of the visibility propery.
   void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
+  /** \brief Adds the overlay to the specified renderer. Update Overlay should be called soon in order to apply all properties*/
   virtual void AddOverlay(BaseRenderer *renderer) = 0;
+
+  /** \brief Removes the overlay from the specified renderer. It is not visible anymore then.*/
   virtual void RemoveOverlay(BaseRenderer *renderer) = 0;
+
+  /** \brief Applies all properties and should be called before the rendering procedure.*/
   virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
 
   virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;

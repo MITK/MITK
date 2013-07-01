@@ -68,7 +68,10 @@ protected:
 
 private:
 
+  /** \brief The baserenderer on which this layouter is active. */
   mitk::BaseRenderer* m_BaseRenderer;
+
+  /** \brief List of the overlays managed by this layouter. */
   std::list<mitk::Overlay*> m_ManagedOverlays;
 
   /** \brief copy constructor */

@@ -33,6 +33,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/** \brief Microservice to update and manage Overlays and the respective Layouters. */
+/** This microservice can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
+*/
 class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
   typedef std::list<BaseRenderer*> BaseRendererList;

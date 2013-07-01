@@ -36,6 +36,7 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
+    Remeshing
     Python
 )
 

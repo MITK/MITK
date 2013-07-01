@@ -14,6 +14,7 @@ if(MITK_USE_ACVD)
 
   set(additional_cmake_args
     -DUSE_MULTITHREADING:BOOL=ON
+    -DVTK_DIR:PATH=${VTK_DIR}
   )
 
   set(ACVD_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchACVD.cmake)

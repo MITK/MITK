@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
 
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class QmitkExt_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

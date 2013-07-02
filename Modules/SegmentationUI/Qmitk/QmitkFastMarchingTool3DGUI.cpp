@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 
-MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkFastMarchingTool3DGUI, "")
+MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingTool3DGUI, "")
 
 QmitkFastMarchingTool3DGUI::QmitkFastMarchingTool3DGUI()
 :QmitkToolGUI(),

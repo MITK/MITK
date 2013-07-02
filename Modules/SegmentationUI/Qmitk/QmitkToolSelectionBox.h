@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkToolSelectionBox_h_Included
 
 #include "QmitkToolGUIArea.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include "mitkToolManager.h"
 
@@ -53,7 +53,7 @@ class QmitkToolGUI;
 
   Last contributor: $Author: maleike $
 */
-class QmitkExt_EXPORT QmitkToolSelectionBox : public QWidget
+class SegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
 //!
 {
   Q_OBJECT

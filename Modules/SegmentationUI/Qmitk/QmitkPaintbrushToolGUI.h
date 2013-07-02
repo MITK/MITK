@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPaintbrushToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkPaintbrushTool.h"
 
 class QSlider;
@@ -34,7 +34,7 @@ class QFrame;
 
   Last contributor: $Author$
 */
-class QmitkExt_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

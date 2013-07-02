@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkFastMarchingTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkFastMarchingTool3D.h"
 
 class QSlider;
@@ -35,7 +35,7 @@ class QPushButton;
 \brief GUI for mitk::FastMarchingTool.
 \sa mitk::FastMarchingTool
 */
-class QmitkExt_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

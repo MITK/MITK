@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "qwidget.h"
 #include "ui_QmitkAdaptiveRegionGrowingToolGUIControls.h"
 
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include "QmitkToolGUI.h"
 
@@ -44,7 +44,7 @@ class QmitkAdaptiveRegionGrowingToolGUIControls;
 *
 */
 
-class QmitkExt_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkAdaptiveRegionGrowingToolGUI : public QmitkToolGUI
 {
 
   Q_OBJECT

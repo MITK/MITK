@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_TOOLROIDATASELECTIONBOX_H
 #define QMITK_TOOLROIDATASELECTIONBOX_H
 
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkToolManager.h"
 #include "QmitkBoundingObjectWidget.h"
 #include <QComboBox>
@@ -32,7 +32,7 @@ Selection is possible via a combobox, listing all available segmentations.
 Item "bounding objects" activates the \ref QmitkBoundingObjectWidget.
 
 */
-class QmitkExt_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
+class SegmentationUI_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
 {
   Q_OBJECT
 

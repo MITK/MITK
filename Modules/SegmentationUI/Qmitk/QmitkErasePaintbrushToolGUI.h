@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkErasePaintbrushToolGUI_h_Included
 
 #include "QmitkPaintbrushToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   Last contributor: $Author$
 */
 
-class QmitkExt_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class SegmentationUI_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 

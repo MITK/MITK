@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkWatershedToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkWatershedTool.h"
 
 class QSlider;
@@ -34,7 +34,7 @@ class QFrame;
 
   Last contributor: $Author$
 */
-class QmitkExt_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

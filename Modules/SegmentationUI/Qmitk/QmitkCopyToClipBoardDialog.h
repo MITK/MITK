@@ -18,14 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkCopyToClipBoardDialog_h_Included
 
 #include <qdialog.h>
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include <mitkCommon.h>
 /**
   \brief Displays read-only QTextEdit.
 
   For output of any kind of information that might be copied into other applications.
 */
-class QmitkExt_EXPORT QmitkCopyToClipBoardDialog : public QDialog
+class SegmentationUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 

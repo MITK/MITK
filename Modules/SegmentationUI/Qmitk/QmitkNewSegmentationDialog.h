@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkNewSegmentationDialog_h_Included
 
 #include "mitkColorProperty.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include <qdialog.h>
 
@@ -43,7 +43,7 @@ class QPushButton;
 
   Last contribution by $Author: maleike $.
 */
-class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
+class SegmentationUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 

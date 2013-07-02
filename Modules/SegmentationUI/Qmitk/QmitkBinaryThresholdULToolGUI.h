@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkBinaryThresholdULToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkBinaryThresholdULTool.h"
 #include <qxtspanslider.h>
 
@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class QmitkExt_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

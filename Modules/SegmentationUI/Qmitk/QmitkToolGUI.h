@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkToolGUI_h_Included
 
 #include <qwidget.h>
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   Last contributor: $Author$
 */
 
-class QmitkExt_EXPORT QmitkToolGUI : public QWidget, public itk::Object
+class SegmentationUI_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 {
   Q_OBJECT
 

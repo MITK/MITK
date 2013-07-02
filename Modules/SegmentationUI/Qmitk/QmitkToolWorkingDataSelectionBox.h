@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mmueller
 #include <QListWidget>
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 
 #include "mitkToolManager.h"
 #include "mitkProperties.h"
@@ -42,7 +42,7 @@ of a single segmentation. One or several segmentations can be selected to be the
 $Author: maleike $
 */
 
-class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public QListWidget
+class SegmentationUI_EXPORT QmitkToolWorkingDataSelectionBox : public QListWidget
 {
   Q_OBJECT
 

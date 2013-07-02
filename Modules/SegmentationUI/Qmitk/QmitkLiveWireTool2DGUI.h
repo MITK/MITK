@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkLiveWireTool2DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include "QmitkExtExports.h"
+#include "SegmentationUIExports.h"
 #include "mitkLiveWireTool2D.h"
 
 class QSlider;
@@ -35,7 +35,7 @@ class QPushButton;
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::LiveWireTool2D
 */
-class QmitkExt_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
+class SegmentationUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

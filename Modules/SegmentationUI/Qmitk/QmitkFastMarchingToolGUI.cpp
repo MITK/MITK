@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qlayout.h>
 #include <qpainter.h>
 
-MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkFastMarchingToolGUI, "")
+MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
 QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI()
 :QmitkToolGUI()

@@ -369,7 +369,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
   if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
   {
-    MITK_WARN << "Unknown number of components!";
+    MITK_WARN << "Unknown number of components! " << numberOfComponents << " components per Voxel. Image can not be rendered";
+    datanode->SetBoolProperty("visible", mitk::BoolProperty::New(false));
+    return;
   }
 
   this->ApplyOpacity( renderer );

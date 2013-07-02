@@ -27,12 +27,12 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   QString mitkRevision(MITK_REVISION);
   QString mitkRevisionDescription(MITK_REVISION_DESC);
 
-  m_GUI.m_RevisionLabel->setText(m_GUI.m_RevisionLabel->text().arg(mitkRevision).arg(mitkRevisionDescription));
+  QString mitkDiffusionVersion("MITK Diffusion 2013.03\n based on MITK 2013.03.00");
+  QString mitkDiffusionCaption("MITK Diffusion");
 
-  QPushButton* btnModules = new QPushButton(QIcon(":/qmitk/ModuleView.png"), "Modules");
-  m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
+  m_GUI.m_CaptionLabel->setText(mitkDiffusionCaption);
+  m_GUI.m_RevisionLabel->setText(mitkDiffusionVersion);
 
-  connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
   connect(m_GUI.m_ButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 

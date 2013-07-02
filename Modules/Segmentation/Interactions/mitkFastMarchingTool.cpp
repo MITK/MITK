@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkOrImageFilter.h"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching tool");
@@ -115,11 +119,12 @@ const char** mitk::FastMarchingTool::GetXPM() const
   return NULL;// mitkFastMarchingTool_xpm;
 }
 
-std::string mitk::FastMarchingTool::GetIconPath() const
+mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
 {
-  return ":/Segmentation/FastMarching_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("FastMarching_48x48.png");
+  return resource;
 }
-
 
 const char* mitk::FastMarchingTool::GetName() const
 {

@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPaintbrushTool.h"
 #include "SegmentationExports.h"
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -48,7 +50,7 @@ class Segmentation_EXPORT ErasePaintbrushTool : public PaintbrushTool
     itkNewMacro(ErasePaintbrushTool);
 
     virtual const char** GetXPM() const;
-    virtual std::string GetIconPath() const;
+    ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
   protected:

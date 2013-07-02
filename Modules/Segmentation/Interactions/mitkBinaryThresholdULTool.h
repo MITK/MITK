@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkBinaryThresholdImageFilter.h>
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -48,7 +50,7 @@ namespace mitk
     itkNewMacro(BinaryThresholdULTool);
 
     virtual const char** GetXPM() const;
-    virtual std::string GetIconPath() const;
+    ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
     virtual void Activated();

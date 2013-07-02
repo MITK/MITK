@@ -98,6 +98,3 @@ RegionGrowing_48x48.png
 Subtract_48x48.png
 TwoThresholds_48x48.png
 )
-#set(QRC_FILES
-#  resources/Segmentation.qrc
-#)

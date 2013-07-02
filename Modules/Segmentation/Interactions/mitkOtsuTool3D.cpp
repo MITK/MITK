@@ -34,6 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRegionGrow3DTool.xpm"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+#include <mitkModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
 }
@@ -86,9 +92,11 @@ const char** mitk::OtsuTool3D::GetXPM() const
   return NULL;
 }
 
-std::string mitk::OtsuTool3D::GetIconPath() const
+mitk::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
-  return ":/Segmentation/Otsu_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Otsu_48x48.png");
+  return resource;
 }
 
 void mitk::OtsuTool3D::RunSegmentation(int regions)

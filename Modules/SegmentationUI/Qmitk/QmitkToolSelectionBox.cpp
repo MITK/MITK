@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <queue>
 
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
  m_SelfCall(false),
@@ -526,16 +529,27 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setFont( currentFont );
     }
 
-    std::string iconPath = tool->GetIconPath();
+    mitk::ModuleResource iconResource = tool->GetIconResource();
 
-    if (iconPath.empty())
+    if (!iconResource.IsValid())
     {
       button->setIcon(QIcon(QPixmap(tool->GetXPM())));
     }
     else
     {
-      MITK_INFO<<"****************iconpath: "<<iconPath;
-      button->setIcon(QIcon(iconPath.c_str()));
+      mitk::ModuleResourceStream resourceStream(iconResource);
+      resourceStream.seekg(0, std::ios::end);
+      std::ios::pos_type length = resourceStream.tellg();
+      resourceStream.seekg(0, std::ios::beg);
+
+      char* data = new char[length];
+      resourceStream.read(data, length);
+      QPixmap pixmap;
+      pixmap.loadFromData(QByteArray::fromRawData(data, length));
+      QIcon* icon = new QIcon(pixmap);
+      delete[] data;
+
+      button->setIcon(*icon);
 
       if (m_ShowNames)
       {

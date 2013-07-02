@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkStandardFileLocations.h>
 
+#include <string>
+
 #include <QtConcurrentRun>
 
 
@@ -51,7 +53,7 @@ static void TestThreadSaveLog(bool toFile)
   {
     if (toFile)
     {
-      std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() "/qtestthreadlog.log";
+      std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/qtestthreadlog.log";
       mitk::LoggingBackend::SetLogFile(filename.c_str());
     }
 

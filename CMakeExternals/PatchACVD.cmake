@@ -1,7 +1,8 @@
 file(WRITE "ACVDConfig.cmake.in"
 "set(ACVD_INCLUDE_DIRS \"@VTKSURFACE_INCLUDE_DIR@;@VTKDISCRETEREMESHING_INCLUDE_DIR@;@VTKVOLUMEPROCESSING_INCLUDE_DIR@\")
 set(ACVD_LIBRARY_DIRS \"@VTKSURFACE_BINARY_DIR@/bin\")
-set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)")
+set(ACVD_LIBRARIES vtkSurface vtkDiscreteRemeshing vtkVolumeProcessing)
+add_definitions(-DDOmultithread)")
 
 file(APPEND "CMakeLists.txt" "CONFIGURE_FILE(ACVDConfig.cmake.in ACVDConfig.cmake @ONLY)")
 

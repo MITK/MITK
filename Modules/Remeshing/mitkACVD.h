@@ -17,20 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkACVD_h
 #define mitkACVD_h
 
+#include <mitkSurface.h>
 #include <RemeshingExports.h>
 
 namespace mitk
 {
-  class Remeshing_EXPORT ACVD
+  namespace ACVD
   {
-  public:
-    ACVD();
-    ~ACVD();
-
-  private:
-    ACVD(const ACVD&);
-    ACVD& operator=(const ACVD&);
-  };
+    Remeshing_EXPORT Surface::Pointer Remesh(Surface::Pointer surface, int numVertices, double gradation, bool boundaryFixing);
+  }
 }
 
 #endif

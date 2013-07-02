@@ -61,7 +61,7 @@ set(MODULE_TESTS
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   mitkExceptionTest.cpp
   mitkExtractSliceFilterTest.cpp
-  mitkLogTest.cpp
+  #mitkLogTest.cpp
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkUIDGeneratorTest.cpp

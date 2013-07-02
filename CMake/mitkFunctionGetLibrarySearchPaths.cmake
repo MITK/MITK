@@ -1,8 +1,7 @@
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   set(_dir_candidates ${MITK_VTK_LIBRARY_DIRS} ${MITK_ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR}
-                      ${QT_LIBRARY_DIR}/../bin ${MITK_BINARY_DIR}/bin ${MITK_BINARY_DIR}/bin/plugins
-                      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins)
+                      ${QT_LIBRARY_DIR}/../bin ${MITK_BINARY_DIR}/bin ${MITK_BINARY_DIR}/bin/plugins)
 
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
   if(_additional_paths)
@@ -59,6 +58,19 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
       list(APPEND _search_dirs ${_dir})
     endif()
   endforeach()
+
+  # Special handling for "internal" search dirs. The intermediate directory
+  # might not have been created yet, so we can't check for its existence.
+  # Hence we just add it for Windows without checking.
+  set(_internal_search_dirs ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins)
+  if(WIN32)
+    foreach(_dir ${_internal_search_dirs})
+      set(_search_dirs ${_dir}/${intermediate_dir} ${_search_dirs})
+    endforeach()
+  else()
+    set(_search_dirs ${_internal_search_dirs} ${_search_dirs})
+  endif()
+  list(REMOVE_DUPLICATES _search_dirs)
 
   set(${search_path} ${_search_dirs} PARENT_SCOPE)
 endfunction()

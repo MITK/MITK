@@ -189,12 +189,16 @@ void mitk::OclFilter::SetWorkingSize(unsigned int locx, unsigned int dimx, unsig
   this->m_LocalWorkSize[1] = locy;
   this->m_LocalWorkSize[2] = locz;
 
+  this->m_GlobalWorkSize[0] = dimx;
+  this->m_GlobalWorkSize[1] = dimy;
+  this->m_GlobalWorkSize[2] = dimz;
+
   // estimate the global work size
-  this->m_GlobalWorkSize[0] = iDivUp( dimx, this->m_LocalWorkSize[0]) *this->m_LocalWorkSize[0];
-  this->m_GlobalWorkSize[1] = iDivUp( dimy, this->m_LocalWorkSize[1]) * this->m_LocalWorkSize[1];
-  if( dimz <= 1 )
-    this->m_GlobalWorkSize[2] = 1;
-  else
+  this->m_GlobalWorkSize[0] = iDivUp( dimx, this->m_LocalWorkSize[0]) * this->m_LocalWorkSize[0];
+
+  if ( dimy > 1)
+    this->m_GlobalWorkSize[1] = iDivUp( dimy, this->m_LocalWorkSize[1]) * this->m_LocalWorkSize[1];
+  if( dimz > 1 )
     this->m_GlobalWorkSize[2] = iDivUp( dimz, this->m_LocalWorkSize[2]) * this->m_LocalWorkSize[2];
 }
 

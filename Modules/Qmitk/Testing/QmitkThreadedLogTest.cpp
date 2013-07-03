@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtConcurrentRun>
 
 
-void LogMessages(unsigned int threadID, unsigned int numberOfTimes = 5000)
+void LogMessages(unsigned int threadID, unsigned int numberOfTimes)
 {
   unsigned int times = 0;
 
@@ -38,7 +38,7 @@ void LogMessages(unsigned int threadID, unsigned int numberOfTimes = 5000)
     MITK_ERROR << "Test error stream in thread " << threadID;
     MITK_FATAL << "Test fatal stream in thread " << threadID;
 
-    times= 5;
+    times += 5;
   }
 }
 
@@ -62,9 +62,9 @@ static void TestThreadSaveLog(bool toFile)
     QVector< QFuture<void> > threads;
 
     // Spawn some threads
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads;+threadIdx)
+    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads;++threadIdx)
     {
-      threads.push_back( QtConcurrent::run( LogMessages, threadIdx, 1000 ) );
+      threads.push_back( QtConcurrent::run( LogMessages, threadIdx, 100 ) );
       std::cout << "Created " << threadIdx << ". thread." << std::endl;
     }
 
@@ -72,7 +72,7 @@ static void TestThreadSaveLog(bool toFile)
     itksys::SystemTools::Delay( threadRuntimeInMilliseconds );
 
     // Wait for all to finish
-    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads;+threadIdx)
+    for (unsigned int threadIdx = 0; threadIdx < numberOfThreads;++threadIdx)
     {
       threads[threadIdx].waitForFinished();
       std::cout << threadIdx << ". thread has finished" << std::endl;

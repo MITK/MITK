@@ -60,12 +60,14 @@ Also, only add you .cpp files here, not the header files!
 
 \subsection CreateTEstingEnvironment 4) Set up the Test environment 
 
+We also need to set up a testing environment where you can add your tests.
 Inside your "Testing" Folder, create a new files.cmake containing the following:
 
 \code
 SET(MODULE_TESTS
    mitkNewModuleTest.cpp
 )
+\endcode
 
 Also, create a new CMakeLists.text:
 
@@ -73,8 +75,8 @@ Also, create a new CMakeLists.text:
 MITK_CREATE_MODULE_TESTS()
 \endcode
 
-*/
-
 That's it! Enjoy your new module! After following these steps, it should look something like this:
 
 \image html NewModule.png "Your shiny new module!"
+
+*/

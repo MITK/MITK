@@ -301,6 +301,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
       MITK_ERROR << "No camera intrinsics were found!";
     }
 
+    // set camera intrinsics
     if ( m_CameraIntrinsics.IsNotNull() )
     {
       this->m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);

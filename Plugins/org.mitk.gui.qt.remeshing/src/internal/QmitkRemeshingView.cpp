@@ -56,10 +56,12 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.gradationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnGradationChanged(double)));
   connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
   connect(m_Controls.maxNumVerticesLineEdit, SIGNAL(editingFinished()), this, SLOT(OnMaxNumVerticesLineEditEditingFinished()));
-  connect(m_Controls.subsamplingSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
-  connect(m_Controls.subsamplingSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
   connect(m_Controls.edgeSplittingSlider, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeSplittingChanged(double)));
   connect(m_Controls.edgeSplittingSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeSplittingChanged(double)));
+  connect(m_Controls.subsamplingSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
+  connect(m_Controls.subsamplingSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
+  connect(m_Controls.optimizationLevelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnOptimizationLevelChanged(int)));
+  connect(m_Controls.optimizationLevelSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnOptimizationLevelChanged(int)));
   connect(m_Controls.remeshPushButton, SIGNAL(clicked()), this, SLOT(OnRemeshButtonClicked()));
 }
 
@@ -71,10 +73,12 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
   m_Controls.gradationSlider->setEnabled(enable);
   m_Controls.gradationSpinBox->setEnabled(enable);
   m_Controls.maxNumVerticesLineEdit->setEnabled(enable);
-  m_Controls.subsamplingSlider->setEnabled(enable);
-  m_Controls.subsamplingSpinBox->setEnabled(enable);
   m_Controls.edgeSplittingSlider->setEnabled(enable);
   m_Controls.edgeSplittingSpinBox->setEnabled(enable);
+  m_Controls.subsamplingSlider->setEnabled(enable);
+  m_Controls.subsamplingSpinBox->setEnabled(enable);
+  m_Controls.optimizationLevelSlider->setEnabled(enable);
+  m_Controls.optimizationLevelSpinBox->setEnabled(enable);
   m_Controls.forceManifoldCheckBox->setEnabled(enable);
   m_Controls.boundaryFixingCheckBox->setEnabled(enable);
   m_Controls.remeshPushButton->setEnabled(enable);
@@ -84,12 +88,15 @@ void QmitkRemeshingView::OnAdvancedSettingsButtonToggled(bool toggled)
 {
   m_Controls.maxNumVerticesLabel->setVisible(toggled);
   m_Controls.maxNumVerticesLineEdit->setVisible(toggled);
-  m_Controls.subsamplingLabel->setVisible(toggled);
-  m_Controls.subsamplingSlider->setVisible(toggled);
-  m_Controls.subsamplingSpinBox->setVisible(toggled);
   m_Controls.edgeSplittingLabel->setVisible(toggled);
   m_Controls.edgeSplittingSlider->setVisible(toggled);
   m_Controls.edgeSplittingSpinBox->setVisible(toggled);
+  m_Controls.subsamplingLabel->setVisible(toggled);
+  m_Controls.subsamplingSlider->setVisible(toggled);
+  m_Controls.subsamplingSpinBox->setVisible(toggled);
+  m_Controls.optimizationLevelLabel->setVisible(toggled);
+  m_Controls.optimizationLevelSlider->setVisible(toggled);
+  m_Controls.optimizationLevelSpinBox->setVisible(toggled);
   m_Controls.forceManifoldCheckBox->setVisible(toggled);
   m_Controls.boundaryFixingCheckBox->setVisible(toggled);
 }
@@ -132,6 +139,15 @@ void QmitkRemeshingView::OnNumberOfVerticesChanged(int numVertices)
     m_Controls.numVerticesSpinBox->setValue(numVertices);
 }
 
+void QmitkRemeshingView::OnOptimizationLevelChanged(int optimizationLevel)
+{
+  if (optimizationLevel != m_Controls.optimizationLevelSlider->value())
+    m_Controls.optimizationLevelSlider->setValue(optimizationLevel);
+
+  if (optimizationLevel != m_Controls.optimizationLevelSpinBox->value())
+    m_Controls.optimizationLevelSpinBox->setValue(optimizationLevel);
+}
+
 void QmitkRemeshingView::OnRemeshButtonClicked()
 {
   mitk::DataNode::Pointer selectedNode = m_Controls.surfaceComboBox->GetSelectedNode();
@@ -140,10 +156,11 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   double gradation = m_Controls.gradationSpinBox->value();
   int subsampling = m_Controls.subsamplingSpinBox->value();
   double edgeSplitting = m_Controls.edgeSplittingSpinBox->value();
+  int optimizationLevel = m_Controls.optimizationLevelSpinBox->value();
   bool forceManifold = m_Controls.forceManifoldCheckBox->isChecked();
   bool boundaryFixing = m_Controls.boundaryFixingCheckBox->isChecked();
 
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, numVertices, gradation, subsampling, edgeSplitting, forceManifold, boundaryFixing);
+  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());

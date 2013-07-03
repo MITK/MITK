@@ -38,6 +38,7 @@ private slots:
   void OnGradationChanged(double gradation);
   void OnMaxNumVerticesLineEditEditingFinished();
   void OnNumberOfVerticesChanged(int numVertices);
+  void OnOptimizationLevelChanged(int optimizationLevel);
   void OnRemeshButtonClicked();
   void OnSelectedSurfaceChanged(const mitk::DataNode *node);
   void OnSubsamplingChanged(int subsampling);

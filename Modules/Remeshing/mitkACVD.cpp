@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
 
-mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int numVertices, double gradation, int subsampling, double edgeSplitting, bool forceManifold, bool boundaryFixing)
+mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
 {
   MITK_INFO << "Start remeshing...";
 

@@ -199,7 +199,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="subsamplingLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -212,7 +212,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <widget class="QSlider" name="subsamplingSlider">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -234,7 +234,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="2" column="2">
       <widget class="QSpinBox" name="subsamplingSpinBox">
        <property name="minimum">
         <number>0</number>
@@ -250,7 +250,72 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="4" column="1" colspan="2">
+      <widget class="QCheckBox" name="forceManifoldCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Force manifold</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1" colspan="2">
+      <widget class="QCheckBox" name="boundaryFixingCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Boundary fixing</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QSpinBox" name="optimizationLevelSpinBox">
+       <property name="maximum">
+        <number>10</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="optimizationLevelLabel">
+       <property name="text">
+        <string>Optimization Level</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSlider" name="optimizationLevelSlider">
+       <property name="maximum">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
       <widget class="QLabel" name="edgeSplittingLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -263,7 +328,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="1">
       <widget class="ctkDoubleSlider" name="edgeSplittingSlider">
        <property name="value">
         <double>0.000000000000000</double>
@@ -282,7 +347,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
+     <item row="1" column="2">
       <widget class="QDoubleSpinBox" name="edgeSplittingSpinBox">
        <property name="decimals">
         <number>2</number>
@@ -295,38 +360,6 @@
        </property>
        <property name="value">
         <double>0.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QCheckBox" name="forceManifoldCheckBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Force manifold</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1" colspan="2">
-      <widget class="QCheckBox" name="boundaryFixingCheckBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Boundary fixing</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -390,8 +423,9 @@
   <tabstop>gradationSpinBox</tabstop>
   <tabstop>advancedSettingsButton</tabstop>
   <tabstop>maxNumVerticesLineEdit</tabstop>
-  <tabstop>subsamplingSpinBox</tabstop>
   <tabstop>edgeSplittingSpinBox</tabstop>
+  <tabstop>subsamplingSpinBox</tabstop>
+  <tabstop>optimizationLevelSpinBox</tabstop>
   <tabstop>forceManifoldCheckBox</tabstop>
   <tabstop>boundaryFixingCheckBox</tabstop>
   <tabstop>remeshPushButton</tabstop>

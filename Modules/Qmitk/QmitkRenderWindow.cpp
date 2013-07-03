@@ -27,6 +27,7 @@
 #include "QmitkEventAdapter.h" // TODO: INTERACTION_LEGACY
 #include "mitkMousePressEvent.h"
 #include "mitkMouseMoveEvent.h"
+#include "mitkMouseDoubleClickEvent.h"
 #include "mitkMouseReleaseEvent.h"
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMouseWheelEvent.h"
@@ -94,6 +95,23 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 
   if (m_ResendQtEvents)
     me->ignore();
+}
+
+void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
+{
+  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me),
+    GetModifiers(me), GetEventButton(me));
+
+  if (!this->HandleEvent(mPressEvent.GetPointer()))
+  { // TODO: INTERACTION_LEGACY
+    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
+    this->mousePressMitkEvent(&myevent);
+  }
+  QVTKWidget::mousePressEvent(me);
+
+  if (m_ResendQtEvents)
+    me->ignore();
+
 }
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)

@@ -105,6 +105,8 @@ protected:
   virtual void paintEvent(QPaintEvent* event);
   // overloaded mouse press handler
   virtual void mousePressEvent(QMouseEvent* event);
+  // overloaded mouse double-click handler
+  virtual void mouseDoubleClickEvent( QMouseEvent *event );
   // overloaded mouse move handler
   virtual void mouseMoveEvent(QMouseEvent* event);
   // overloaded mouse release handler
@@ -166,7 +168,6 @@ private:
   mitk::InteractionEvent::ModifierKeys GetModifiers(QKeyEvent* ke) const;
   std::string GetKeyLetter(QKeyEvent* ke) const;
   int GetDelta(QWheelEvent* we) const;
-
   bool m_ResendQtEvents;
 
   QmitkRenderWindowMenu* m_MenuWidget;

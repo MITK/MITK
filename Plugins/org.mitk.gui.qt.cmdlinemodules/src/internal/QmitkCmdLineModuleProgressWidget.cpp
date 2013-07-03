@@ -549,13 +549,12 @@ void QmitkCmdLineModuleProgressWidget::Run()
         message = "Saving " + fileName;
         this->PublishMessage(message);
 
-        std::string tmpFN = mitk::IOUtil::SaveImage(image, fileName.toStdString().c_str());
-        QString temporaryStorageFileName = QString::fromStdString(tmpFN);
+        mitk::IOUtil::SaveImage(image, fileName.toStdString().c_str());
 
-        m_TemporaryFileNames.push_back(temporaryStorageFileName);
-        m_ModuleFrontEnd->setValue(parameterName, temporaryStorageFileName);
+        m_TemporaryFileNames.push_back(fileName);
+        m_ModuleFrontEnd->setValue(parameterName, fileName);
 
-        message = "Saved " + temporaryStorageFileName;
+        message = "Saved " + fileName;
         this->PublishMessage(message);
       } // end if image
     } // end if node

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSimpleUnstructuredGridHistogram.h"
 #include "mitkUnstructuredGrid.h"
+#include "mitkImageReadAccessor.h"
 
 namespace mitk {
 
@@ -74,7 +75,8 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
 
    // MITK_INFO << "building histogramm of integer image: 0=" << source->GetDimension(0) << " 1=" << source->GetDimension(1) << " 2=" << source->GetDimension(2) << " 3=" <<  source->GetDimension(3);
 
-    void *src=source->GetData();
+    ImageReadAccessor sourceAcc(source);
+    const void *src = sourceAcc.GetData();
 
     do
     {

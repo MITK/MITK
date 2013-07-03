@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceToImageFilter.h"
 #include "mitkTimeHelper.h"
+#include "mitkImageReadAccessor.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataToImageStencil.h>
@@ -154,7 +155,8 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i)
       size *= binaryImage->GetDimension(i);
 
-    memset(binaryImage->GetData(), 1, size);
+    mitk::ImageReadAccessor binImgAcc(binaryImage);
+    memset(const_cast<void*>(binImgAcc.GetData()), 1, size);
   }
 
   vtkImageData *image = m_MakeOutputBinary

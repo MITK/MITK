@@ -452,6 +452,12 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
+
+    # the following two lines should be removed after ITK-3097 has
+    # been resolved, see also MITK bug 15279
+    -Wno-unused-local-typedefs
+    -Wno-array-bounds
+
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)

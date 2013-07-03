@@ -22,7 +22,7 @@ Finally, generated API-Documentation can be found \link DevelopmentAPI here\endl
     <li> \ref AboutTestingPage </li>
   </ul>
   <li> \subpage Concepts </li>
-  <li> \subpage MITKModuleManualsListPage </li
+  <li> \subpage MITKModuleManualsListPage </li>
   <li> \subpage DevelopmentApplication </li>
   <ul>
     <li> \ref mitkExtPointsIndex </li>

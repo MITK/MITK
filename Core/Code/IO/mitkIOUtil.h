@@ -115,6 +115,16 @@ public:
   static bool SaveImage(mitk::Image::Pointer image, const std::string path);
 
   /**
+   * @brief SaveBaseData Convenience method to save arbitrary baseData.
+   * @param path The path to the image including file name and file extension.
+   * If not extention is set, the default value (defined in DEFAULTIMAGEEXTENSION) is used.
+   * @param data The data to save.
+   * @throws mitk::Exception This exception is thrown when the writer is not able to write the image.
+   * @return Returns true for success else false.
+   */
+  static bool SaveBaseData(mitk::BaseData* data, const std::string& path);
+
+  /**
    * @brief SaveSurface Convenience method to save an arbitrary mitkSurface.
    * @param path The path to the surface including file name and file extension.
    * If not extention is set, the default value (defined in DEFAULTSURFACEEXTENSION) is used.

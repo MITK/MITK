@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
 
+#include <mitkCoreObjectFactory.h>
+
 //ITK
 #include <itksys/SystemTools.hxx>
 
@@ -314,4 +316,58 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     }
     return true;
 }
+
+bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
+{
+  if (data == NULL || path.empty()) return false;
+
+  std::string dir = itksys::SystemTools::GetFilenamePath( path );
+  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
+  std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+  std::string finalFileName = dir + "/" + baseFilename;
+
+  mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+
+  for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+  {
+    if ( (*it)->CanWriteBaseDataType(data) )
+    {
+      // Ensure a valid filename
+      if(baseFilename=="")
+      {
+        baseFilename = (*it)->GetDefaultFilename();
+      }
+      // Check if an extension exists already and if not, append the default extension
+      if (extension=="" )
+      {
+        extension=(*it)->GetDefaultExtension();
+      }
+      else
+      {
+        if (!(*it)->IsExtensionValid(extension))
+        {
+          MITK_WARN << extension << " extension is unknown";
+          continue;
+        }
+      }
+
+      finalFileName = dir + "/" + baseFilename + extension;
+      try
+      {
+        (*it)->SetFileName( finalFileName.c_str() );
+        (*it)->DoWrite( data );
+        return true;
+      }
+      catch( const std::exception& e )
+      {
+        MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
+        MITK_ERROR << e.what();
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
+      }
+    }
+  }
+
+  return false;
+}
+
 }

@@ -15,14 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkRemeshingView.h"
-#include <QIntValidator>
+
+// MITK
+#include <mitkACVD.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkACVD.h>
 #include <mitkSurface.h>
+#include <mitkVtkRepresentationProperty.h>
+
+// Qt
+#include <QIntValidator>
+
+// VTK
 #include <vtkPolyData.h>
+#include <vtkProperty.h>
+
+// C++ Standard Library
 #include <algorithm>
 #include <limits>
 
@@ -164,7 +174,8 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());
-  newNode->SetFloatProperty("material.specularCoefficient", 0.0f);
+  newNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+  newNode->SetProperty("material.specularCoefficient", mitk::FloatProperty::New(0.0f));
   newNode->SetData(remeshedSurface);
 
   this->GetDataStorage()->Add(newNode, selectedNode);
@@ -176,9 +187,10 @@ void QmitkRemeshingView::OnSelectedSurfaceChanged(const mitk::DataNode *node)
   {
     int numVertices = static_cast<int>(static_cast<mitk::Surface*>(node->GetData())->GetVtkPolyData()->GetNumberOfPoints());
     int minimum = numVertices < 100 ? numVertices : 100;
-    int maximum = std::max(1, numVertices / 10);
+    int maximum = numVertices == minimum ? numVertices * 10 : numVertices;
+    int step = std::max(1, maximum / 10);
 
-    this->SetNumberOfVertices(minimum, numVertices, maximum, numVertices);
+    this->SetNumberOfVertices(minimum, maximum, step, numVertices);
     this->EnableWidgets(true);
   }
   else

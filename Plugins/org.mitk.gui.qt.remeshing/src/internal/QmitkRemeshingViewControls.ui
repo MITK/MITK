@@ -221,13 +221,16 @@
         </sizepolicy>
        </property>
        <property name="maximum">
-        <number>100</number>
+        <number>500</number>
+       </property>
+       <property name="singleStep">
+        <number>10</number>
        </property>
        <property name="pageStep">
-        <number>10</number>
+        <number>50</number>
        </property>
        <property name="value">
-        <number>10</number>
+        <number>50</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -240,13 +243,13 @@
         <number>0</number>
        </property>
        <property name="maximum">
-        <number>100</number>
+        <number>500</number>
        </property>
        <property name="singleStep">
-        <number>1</number>
+        <number>10</number>
        </property>
        <property name="value">
-        <number>10</number>
+        <number>50</number>
        </property>
       </widget>
      </item>

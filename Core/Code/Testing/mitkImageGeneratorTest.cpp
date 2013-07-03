@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkImageGenerator.h"
+#include "mitkImageReadAccessor.h"
 
 int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
 {
@@ -88,7 +89,8 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMin() >= 0, "Testing if min value holds");
 
 
-    unsigned int* image3DcBuffer = (unsigned int*)image3Dc->GetData();
+    mitk::ImageReadAccessor readAccess( image3Dc, image3Dc->GetVolumeData(0) );
+    const unsigned int* image3DcBuffer = static_cast<const unsigned int*>( readAccess.GetData() );
     for(unsigned int i = 0; i < 2*3; i++)
     {
         MITK_TEST_CONDITION_REQUIRED(image3DcBuffer[i]==i, "Testing if gradient image values are set correctly");

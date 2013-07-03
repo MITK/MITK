@@ -176,6 +176,7 @@ static void TestThreadSaveLog(bool toFile)
         if (toFile)
         {
           std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
+          itksys::SystemTools::RemoveFile(filename.c_str()); // remove old file, we do not want to append to large files
           mitk::LoggingBackend::SetLogFile(filename.c_str());
         }
 

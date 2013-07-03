@@ -54,10 +54,11 @@ static void TestThreadSaveLog(bool toFile)
     if (toFile)
     {
       std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/qtestthreadlog.log";
+      itksys::SystemTools::RemoveFile(filename.c_str()); // remove old file, we do not want to append to large files
       mitk::LoggingBackend::SetLogFile(filename.c_str());
     }
 
-    unsigned int numberOfThreads = 20;
+    unsigned int numberOfThreads = 10;
     unsigned int threadRuntimeInMilliseconds = 4000;
     QVector< QFuture<void> > threads;
 

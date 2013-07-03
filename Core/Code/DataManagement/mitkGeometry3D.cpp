@@ -739,7 +739,6 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
   this->SetImageGeometry(isAnImageGeometry);
 }
 
-
 bool mitk::Geometry3D::Is2DConvertable()
 {
    bool isConvertableWithoutLoss = true;
@@ -768,4 +767,56 @@ bool mitk::Geometry3D::Is2DConvertable()
    } while (0);
 
    return isConvertableWithoutLoss;
+}
+
+bool mitk::compare::IsEqual(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs)
+{
+  // check the validity of input
+  if( rhs == NULL || lhs == NULL )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Input null.";
+    return false;
+  }
+
+  // spacing
+  if( !Equal( rhs->GetSpacing(), lhs->GetSpacing() ))
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Spacing differs.";
+    return false;
+  }
+
+  // origin
+  if( !Equal( rhs->GetOrigin(), lhs->GetOrigin() ))
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Origin differs.";
+    return false;
+  }
+
+  // compare each view axis and extent
+  bool viewAxisIdentical = true;
+  bool extentsIdentical = true;
+  for( unsigned int i=0; i< 3; i++)
+  {
+    if( !mitk::Equal( rhs->GetAxisVector(i), lhs->GetAxisVector(i)) )
+      viewAxisIdentical = false;
+
+    if( !mitk::Equal( rhs->GetExtent(i), lhs->GetExtent(i)) )
+      extentsIdentical = false;
+  }
+  if( !viewAxisIdentical || !extentsIdentical )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] Axis AND/OR Extent differ";
+    return false;
+  }
+
+
+  // index to world transform
+  if( !mitk::MatrixEqualElementWise( rhs->GetIndexToWorldTransform()->GetMatrix(),
+                                     lhs->GetIndexToWorldTransform()->GetMatrix()) )
+  {
+    MITK_INFO << "[AreIdentical( Geometry3D )] I2W Transformation matrix differs.";
+    return false;
+  }
+
+  return true;
 }

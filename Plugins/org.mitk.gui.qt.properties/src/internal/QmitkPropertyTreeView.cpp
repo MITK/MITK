@@ -33,7 +33,8 @@ QmitkPropertyTreeView::QmitkPropertyTreeView()
     m_PropertyDescriptions(NULL),
     m_ShowGenuineNames(false),
     m_ProxyModel(NULL),
-    m_Model(NULL)
+    m_Model(NULL),
+    m_Delegate(NULL)
 {
 }
 
@@ -57,7 +58,9 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_ProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
   m_ProxyModel->setDynamicSortFilter(true);
 
-  m_Controls.treeView->setItemDelegateForColumn(1, new QmitkPropertyItemDelegate(m_Controls.treeView));
+  m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
+
+  m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
   m_Controls.treeView->setColumnWidth(0, 150);
   m_Controls.treeView->sortByColumn(0, Qt::AscendingOrder);
@@ -239,6 +242,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
   {
     this->SetPartName("Properties");
     m_Model->SetPropertyList(NULL);
+    m_Delegate->SetPropertyList(NULL);
   }
   else
   {
@@ -247,6 +251,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
       : "";
 
     m_Model->SetPropertyList(nodes.front()->GetPropertyList(), selectionClassName);
+    m_Delegate->SetPropertyList(nodes.front()->GetPropertyList());
     OnPropertyNameChanged(itk::ModifiedEvent());
 
     mitk::BaseProperty* nameProperty = nodes.front()->GetProperty("name");

@@ -32,6 +32,11 @@ namespace mitk
 {
   class PropertyAliases;
   class PropertyFilters;
+
+  enum
+  {
+    PropertyRole = Qt::UserRole + 1
+  };
 }
 
 class QmitkPropertyItemModel : public QAbstractItemModel

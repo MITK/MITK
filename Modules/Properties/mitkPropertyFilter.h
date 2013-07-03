@@ -33,6 +33,7 @@ namespace mitk
 
     PropertyFilter();
     ~PropertyFilter();
+
     PropertyFilter(const PropertyFilter& other);
     PropertyFilter& operator=(PropertyFilter other);
 

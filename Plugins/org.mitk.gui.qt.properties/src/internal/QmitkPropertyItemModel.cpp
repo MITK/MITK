@@ -160,6 +160,10 @@ QVariant QmitkPropertyItemModel::data(const QModelIndex& index, int role) const
         return MitkToQt(colorProperty->GetValue());
       }
     }
+    else if (role == mitk::PropertyRole)
+    {
+      return QVariant::fromValue<void*>(property);
+    }
   }
 
   return QVariant();

@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyAliases.h"
 #include "mitkPropertyDescriptions.h"
+#include "mitkPropertyExtension.h"
+#include "mitkPropertyExtensions.h"
 #include "mitkPropertyFilters.h"
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
@@ -30,13 +32,22 @@ public:
   {
   }
 
-  bool operator()(std::pair<std::string, std::string> element)
+  bool operator()(const std::pair<std::string, std::string>& element)
   {
     return element.second == m_Alias;
   }
 
 private:
   std::string m_Alias;
+};
+
+class DeleteExtension
+{
+public:
+  void operator()(const std::pair<std::string, mitk::PropertyExtension*>& element)
+  {
+    delete element.second;
+  }
 };
 
 namespace mitk
@@ -51,6 +62,9 @@ namespace mitk
 
       m_PropertyDescriptions = PropertyDescriptionsImpl::New();
       context->RegisterService<PropertyDescriptions>(m_PropertyDescriptions);
+
+      m_PropertyExtensions = PropertyExtensionsImpl::New();
+      context->RegisterService<PropertyExtensions>(m_PropertyExtensions);
 
       m_PropertyFilters = PropertyFiltersImpl::New();
       context->RegisterService<PropertyFilters>(m_PropertyFilters);
@@ -94,6 +108,22 @@ namespace mitk
       std::map<std::string, std::string> m_Descriptions;
     };
 
+    class PropertyExtensionsImpl : public itk::LightObject, public PropertyExtensions
+    {
+    public:
+      mitkClassMacro(PropertyExtensionsImpl, itk::LightObject);
+      itkNewMacro(Self);
+
+      bool AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite);
+      PropertyExtension* GetExtension(const std::string& propertyName) const;
+      bool HasExtension(const std::string& propertyName) const;
+      void RemoveAllExtensions();
+      void RemoveExtension(const std::string& propertyName);
+
+    private:
+      std::map<std::string, PropertyExtension*> m_Extensions;
+    };
+
     class PropertyFiltersImpl : public itk::LightObject, public PropertyFilters
     {
     public:
@@ -115,6 +145,7 @@ namespace mitk
 
     PropertyAliasesImpl::Pointer m_PropertyAliases;
     PropertyDescriptionsImpl::Pointer m_PropertyDescriptions;
+    PropertyExtensionsImpl::Pointer m_PropertyExtensions;
     PropertyFiltersImpl::Pointer m_PropertyFilters;
   };
 
@@ -225,6 +256,59 @@ namespace mitk
   {
     if (!propertyName.empty())
       m_Descriptions.erase(propertyName);
+  }
+
+  bool PropertiesActivator::PropertyExtensionsImpl::AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite)
+  {
+    if (!propertyName.empty())
+    {
+      std::pair<std::map<std::string, PropertyExtension*>::iterator, bool> ret = m_Extensions.insert(std::make_pair(propertyName, extension));
+
+      if (!ret.second && overwrite)
+      {
+        ret.first->second = extension;
+        ret.second = true;
+      }
+
+      return ret.second;
+    }
+
+    return false;
+  }
+
+  PropertyExtension* PropertiesActivator::PropertyExtensionsImpl::GetExtension(const std::string& propertyName) const
+  {
+    if (!propertyName.empty())
+    {
+      std::map<std::string, PropertyExtension*>::const_iterator iter = m_Extensions.find(propertyName);
+
+      if (iter != m_Extensions.end())
+        return iter->second;
+    }
+
+    return NULL;
+  }
+
+  bool PropertiesActivator::PropertyExtensionsImpl::HasExtension(const std::string& propertyName) const
+  {
+    return !propertyName.empty()
+      ? m_Extensions.find(propertyName) != m_Extensions.end()
+      : false;
+  }
+
+  void PropertiesActivator::PropertyExtensionsImpl::RemoveAllExtensions()
+  {
+    std::for_each(m_Extensions.begin(), m_Extensions.end(), DeleteExtension());
+    m_Extensions.clear();
+  }
+
+  void PropertiesActivator::PropertyExtensionsImpl::RemoveExtension(const std::string& propertyName)
+  {
+    if (!propertyName.empty())
+    {
+      delete m_Extensions[propertyName];
+      m_Extensions.erase(propertyName);
+    }
   }
 
   bool PropertiesActivator::PropertyFiltersImpl::AddFilter(const PropertyFilter& filter, bool overwrite)

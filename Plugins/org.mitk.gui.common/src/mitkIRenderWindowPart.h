@@ -85,18 +85,6 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   }
 
   /**
-   * Get all render windows with their ids.
-   *
-   * \return A hash map mapping the render window id to the QmitkRenderWindow instance.
-   *
-   * \deprecatedSince{2012_09} The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindows() instead
-   */
-  DEPRECATED( virtual QHash<QString,QmitkRenderWindow*> GetRenderWindows() const )
-  {
-    return GetQmitkRenderWindows();
-  }
-
-  /**
    * Get a render window with a specific id.
    *
    * \param id The render window id.

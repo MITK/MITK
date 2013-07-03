@@ -1216,6 +1216,56 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
+bool mitk::compare::IsEqual(const mitk::Image* rhs, const mitk::Image* lhs)
+{
+  // check the validity of input
+  if( rhs == NULL || lhs == NULL )
+  {
+    MITK_INFO << "[AreIdentical( Image )] Input null. ";
+    return false;
+  }
+
+  // dimensionality
+  const unsigned int rhsDimension = rhs->GetDimension();
+  if( rhsDimension != lhs->GetDimension() )
+  {
+    MITK_INFO << "[AreIdentical( Image )] Dimensionality differs.";
+    return false;
+  }
+
+  // compare each dimension
+  bool dimensionsIdentical = true;
+  for( unsigned int i=0; i< rhsDimension; i++)
+  {
+    if( rhs->GetDimension(i) != lhs->GetDimension(i) )
+      dimensionsIdentical = false;
+  }
+  if(!dimensionsIdentical)
+  {
+    MITK_INFO << "[AreIdentical( Image )] Some dimension differs.";
+    return false;
+  }
+
+  // compare geometry
+  if( !IsEqual(rhs->GetGeometry(), lhs->GetGeometry()) )
+  {
+    MITK_INFO << "[AreIdentical( Image )] --> Geometry3D differs.";
+    return false;
+  }
+
+  // pixel type
+  if( !(rhs->GetPixelType() == lhs->GetPixelType()) )
+  {
+    MITK_INFO << "[AreIdentical( Image )] PixelType differs.";
+    return false;
+  }
+
+  // compare pixel values
+
+
+  return true;
+}
+
 #include "mitkImageStatisticsHolder.h"
 
 //##Documentation

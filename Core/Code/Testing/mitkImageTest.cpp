@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageStatisticsHolder.h>
 #include "mitkImageGenerator.h"
 
+#include "mitkImageSliceSelector.h"
+
 // itk includes
 #include <itkImage.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
@@ -223,7 +225,7 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(  mitk::Equal(imgMem->GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(), origin),  "Testing correctness of changed origin via GetSlicedGeometry()->GetGeometry2D(0)->GetOrigin(): ");
 
   //-----------------
-  // testing spacing information and methods
+  // testing spacing information and methodsunsigned int dim[]={100,100,20};
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetGeometry()->GetSpacing(), spacing), "Testing correct spacing from Geometry3D!");
    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(imgMem->GetTimeSlicedGeometry()->GetSpacing(), spacing), "Testing correctspacing from TimeSlicedGeometry!");
 
@@ -359,10 +361,48 @@ int mitkImageTest(int argc, char* argv[])
   // After cloning an image the geometry of both images should be equal too
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetOrigin() == image->GetGeometry()->GetOrigin(), "Clone (testing origin)");
   MITK_TEST_CONDITION_REQUIRED(cloneImage->GetGeometry()->GetSpacing() == image->GetGeometry()->GetSpacing(), "Clone (testing spacing)");
-  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()),
-                               "Clone (testing transformation matrix)");
-  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),
-    cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetGeometry()->GetIndexToWorldTransform()->GetMatrix(), image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix()), "Clone (testing transformation matrix)");
+
+  MITK_TEST_CONDITION_REQUIRED(mitk::MatrixEqualElementWise(cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(cloneImage->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix(),    cloneImage->GetTimeSlicedGeometry()->GetGeometry3D(image->GetDimension(3)-1)->GetIndexToWorldTransform()->GetMatrix()), "Clone(testing time sliced geometry)");
+
+
+/////////////////////////
+//
+//    IsEqual() test
+//
+///////////////////////////////
+
+  MITK_TEST_CONDITION( mitk::compare::IsEqual( cloneImage, image ), "Comparing images by IsEqual( cloneImage, image) " );
+  MITK_TEST_CONDITION( mitk::compare::IsEqual( cloneImage->GetGeometry(), image->GetGeometry()), "Comparing geometries by IsEqual( geometry )");
+
+  // altering origin to test if the IsEqual failes
+  cloneImage->GetGeometry()->SetOrigin(point);
+  MITK_TEST_CONDITION( !mitk::compare::IsEqual( cloneImage, image ), "Comparing geometries with different origin. " );
+
+  // comparing
+  mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+  sliceSelector->SetInput( image );
+  sliceSelector->SetSliceNr( 0 );
+  mitk::Image::Pointer singleSliceImage = sliceSelector->GetOutput();
+  MITK_TEST_CONDITION( !mitk::compare::IsEqual( singleSliceImage, image ), "Comparing 2D and 3D image by IsEqual() ");
+
+  mitk::PixelType fPType = mitk::MakeScalarPixelType<float>();
+  mitk::PixelType sPType = mitk::MakeScalarPixelType<short>();
+
+  mitk::Image::Pointer floatImage = mitk::Image::New();
+  floatImage->Initialize(fPType, 3, dim);
+
+  mitk::Image::Pointer shortImage = mitk::Image::New();
+  shortImage->Initialize(sPType, 3, dim);
+
+  MITK_TEST_CONDITION( !mitk::compare::IsEqual( floatImage, shortImage ), "Comparing images with different PixelTypes by IsEqual() ");
+
+  mitk::Image::Pointer floatImage2 = mitk::Image::New();
+  unsigned int alteredDim[]={100,100,30};
+  floatImage2->Initialize(fPType, 3, alteredDim);
+  MITK_TEST_CONDITION( !mitk::compare::IsEqual( floatImage, floatImage2), "Comparing images with different dimension size by IsEqual() ")
+
+/////////////////////
 
   for (unsigned int i = 0u; i < cloneImage->GetDimension(); ++i)
   {

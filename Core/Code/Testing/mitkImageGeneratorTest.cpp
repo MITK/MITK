@@ -88,9 +88,16 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMax() <= 1000, "Testing if max value holds");
     MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMin() >= 0, "Testing if min value holds");
 
-
-    mitk::ImageReadAccessor readAccess( image3Dc, image3Dc->GetVolumeData(0) );
-    const unsigned int* image3DcBuffer = static_cast<const unsigned int*>( readAccess.GetData() );
+    const unsigned int* image3DcBuffer;
+    try
+    {
+      mitk::ImageReadAccessor readAccess( image3Dc );
+      image3DcBuffer = static_cast<const unsigned int*>( readAccess.GetData() );
+    }
+    catch(...)
+    {
+      MITK_ERROR << "Read access not granted on mitk::Image.";
+    }
     for(unsigned int i = 0; i < 2*3; i++)
     {
         MITK_TEST_CONDITION_REQUIRED(image3DcBuffer[i]==i, "Testing if gradient image values are set correctly");

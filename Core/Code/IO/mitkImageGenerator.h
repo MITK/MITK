@@ -143,8 +143,16 @@ public:
         output->SetSpacing(spacing);
 
         //get a pointer to the image buffer to write into
-        mitk::ImageWriteAccessor writeAccess( output, output->GetVolumeData(0) );
-        TPixelType* imageBuffer = static_cast<typename TPixelType*>( writeAccess.GetData() );
+        TPixelType* imageBuffer;
+        try
+        {
+          mitk::ImageWriteAccessor writeAccess( output );
+          imageBuffer = static_cast<typename TPixelType*>( writeAccess.GetData() );
+        }
+        catch(...)
+        {
+          MITK_ERROR << "Write access not granted on mitk::Image.";
+        }
 
         //initialize the random generator
         itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();

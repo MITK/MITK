@@ -476,6 +476,15 @@ namespace mitk
             // perform update of imagemapper if needed (maybe the respective 2D renderwindow is not rendered/update before)
             imageMapper->Update(planeRenderer);
 
+            if(localStorage->m_ReslicedImage != NULL){
+              int numberOfComponents = localStorage->m_ReslicedImage->GetNumberOfScalarComponents();
+              if (!(numberOfComponents == 1 || numberOfComponents == 3 || numberOfComponents == 4))
+              {
+                //MITK_WARN << "Unknown number of components!";
+                return;
+              }
+            }
+
             // If it has not been initialized already in a previous pass,
             // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.

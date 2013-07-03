@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkDeformableRegistrationViewControls.h"
 
 #include "QmitkStdMultiWidget.h"
-#include "QmitkCommonFunctionality.h"
 #include "qinputdialog.h"
 #include "qmessagebox.h"
 #include "qcursor.h"
@@ -33,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkVectorImageMapper2D.h"
+#include <mitkImageCast.h>
 
 #include "itkImageFileReader.h"
 #include "itkWarpImageFilter.h"

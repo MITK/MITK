@@ -38,11 +38,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIRenderingManager.h>
+#include <mitkImageCast.h>
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
-#include <QmitkCommonFunctionality.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>

@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // #include "QmitkMessageBoxHelper.h"
 // #include "QmitkTreeNodeSelector.h"
 // #include <QmitkStdMultiWidget.h>
-// #include "QmitkCommonFunctionality.h"
 // #include "qradiobutton.h"
 // #include "qpushbutton.h"
 // #include "qslider.h"

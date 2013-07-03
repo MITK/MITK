@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_IMAGE_WRITER__H_
 #define _MITK_IMAGE_WRITER__H_
 
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Image;
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
  * @ingroup IO
  */
-class MITK_CORE_EXPORT ImageWriter :  public mitk::FileWriter
+class MITK_CORE_EXPORT ImageWriter :  public mitk::FileWriterWithInformation
 {
 public:
 
@@ -126,6 +126,13 @@ public:
      * @returns the 0'th input object of the filter.
      */
     const mitk::Image* GetInput();
+
+    // FileWriterWithInformation methods
+    virtual const char* GetDefaultFilename();
+    virtual const char *GetFileDialogPattern();
+    virtual const char *GetDefaultExtension();
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
+    virtual void DoWrite(BaseData::Pointer data);
 
 protected:
 

@@ -27,7 +27,7 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   QString mitkRevision(MITK_REVISION);
   QString mitkRevisionDescription(MITK_REVISION_DESC);
 
-  QString mitkDiffusionVersion("MITK Diffusion 2013.03\n based on MITK 2013.03.00");
+  QString mitkDiffusionVersion("MITK Diffusion 2013.06\n based on MITK 2013.06.00");
   QString mitkDiffusionCaption("MITK Diffusion");
 
   m_GUI.m_CaptionLabel->setText(mitkDiffusionCaption);

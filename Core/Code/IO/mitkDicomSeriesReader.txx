@@ -488,10 +488,7 @@ DicomSeriesReader::InPlaceFixUpTiltedGeometry( ImageType* input, const GantryTil
   */
 
   // TODO use (0028,0120) Pixel Padding Value if present
-  /*
-  TODO what to do with RGB pixels?
-  resampler->SetDefaultPixelValue( std::numeric_limits<typename ImageType::PixelType>::min() );
-  */
+  resampler->SetDefaultPixelValue( itk::NumericTraits< typename ImageType::PixelType >::min() );
 
   // adjust size in Y direction! (maybe just transform the outer last pixel to see how much space we would need
 

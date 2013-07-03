@@ -58,11 +58,6 @@ public:
   // -------------------  mitk::IRenderWindowPart  ----------------------
 
   /**
-   * \see mitk::IRenderWindowPart::GetActiveRenderWindow()
-   */
-  QmitkRenderWindow* GetActiveRenderWindow() const;
-
-  /**
    * \see mitk::IRenderWindowPart::GetActiveQmitkRenderWindow()
    */
   QmitkRenderWindow* GetActiveQmitkRenderWindow() const;

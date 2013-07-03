@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkIterativeClosestPointTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMath.h>
+#include "vtkPolyData.h"
 
 #include <vtkLandmarkTransform.h>
 #include <QmitkStdMultiWidget.h>
-#include "QmitkCommonFunctionality.h"
 #include "qradiobutton.h"
 #include "qapplication.h"
 #include <qcursor.h>
@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateNot.h"
 #include <mitkMessage.h>
+#include <mitkImageCast.h>
 
 #include <itkCommand.h>
 

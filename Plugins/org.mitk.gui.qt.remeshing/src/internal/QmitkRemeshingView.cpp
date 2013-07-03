@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkRemeshingView.h"
+#include <QIntValidator>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
@@ -23,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <vtkPolyData.h>
 #include <algorithm>
+#include <limits>
 
 QmitkRemeshingView::QmitkRemeshingView()
 {
@@ -41,13 +43,23 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
     mitk::TNodePredicateDataType<mitk::Surface>::New(),
     mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
 
+  QIntValidator* posIntValidator = new QIntValidator(0, std::numeric_limits<int>::max(), parent);
+  m_Controls.maxNumVerticesLineEdit->setValidator(posIntValidator);
+
   this->EnableWidgets(m_Controls.surfaceComboBox->GetSelectedNode().IsNotNull());
+  this->OnAdvancedSettingsButtonToggled(false);
 
   connect(m_Controls.surfaceComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSelectedSurfaceChanged(const mitk::DataNode *)));
   connect(m_Controls.numVerticesSlider, SIGNAL(valueChanged(int)), this, SLOT(OnNumberOfVerticesChanged(int)));
   connect(m_Controls.numVerticesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnNumberOfVerticesChanged(int)));
   connect(m_Controls.gradationSlider, SIGNAL(valueChanged(double)), this, SLOT(OnGradationChanged(double)));
   connect(m_Controls.gradationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnGradationChanged(double)));
+  connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
+  connect(m_Controls.maxNumVerticesLineEdit, SIGNAL(editingFinished()), this, SLOT(OnMaxNumVerticesLineEditEditingFinished()));
+  connect(m_Controls.subsamplingSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
+  connect(m_Controls.subsamplingSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSubsamplingChanged(int)));
+  connect(m_Controls.edgeSplittingSlider, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeSplittingChanged(double)));
+  connect(m_Controls.edgeSplittingSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnEdgeSplittingChanged(double)));
   connect(m_Controls.remeshPushButton, SIGNAL(clicked()), this, SLOT(OnRemeshButtonClicked()));
 }
 
@@ -58,8 +70,37 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
   m_Controls.numVerticesSpinBox->setEnabled(enable);
   m_Controls.gradationSlider->setEnabled(enable);
   m_Controls.gradationSpinBox->setEnabled(enable);
+  m_Controls.maxNumVerticesLineEdit->setEnabled(enable);
+  m_Controls.subsamplingSlider->setEnabled(enable);
+  m_Controls.subsamplingSpinBox->setEnabled(enable);
+  m_Controls.edgeSplittingSlider->setEnabled(enable);
+  m_Controls.edgeSplittingSpinBox->setEnabled(enable);
+  m_Controls.forceManifoldCheckBox->setEnabled(enable);
   m_Controls.boundaryFixingCheckBox->setEnabled(enable);
   m_Controls.remeshPushButton->setEnabled(enable);
+}
+
+void QmitkRemeshingView::OnAdvancedSettingsButtonToggled(bool toggled)
+{
+  m_Controls.maxNumVerticesLabel->setVisible(toggled);
+  m_Controls.maxNumVerticesLineEdit->setVisible(toggled);
+  m_Controls.subsamplingLabel->setVisible(toggled);
+  m_Controls.subsamplingSlider->setVisible(toggled);
+  m_Controls.subsamplingSpinBox->setVisible(toggled);
+  m_Controls.edgeSplittingLabel->setVisible(toggled);
+  m_Controls.edgeSplittingSlider->setVisible(toggled);
+  m_Controls.edgeSplittingSpinBox->setVisible(toggled);
+  m_Controls.forceManifoldCheckBox->setVisible(toggled);
+  m_Controls.boundaryFixingCheckBox->setVisible(toggled);
+}
+
+void QmitkRemeshingView::OnEdgeSplittingChanged(double edgeSplitting)
+{
+  if (edgeSplitting != m_Controls.edgeSplittingSlider->value())
+    m_Controls.edgeSplittingSlider->setValue(edgeSplitting);
+
+  if (edgeSplitting != m_Controls.edgeSplittingSpinBox->value())
+    m_Controls.edgeSplittingSpinBox->setValue(edgeSplitting);
 }
 
 void QmitkRemeshingView::OnGradationChanged(double gradation)
@@ -69,6 +110,17 @@ void QmitkRemeshingView::OnGradationChanged(double gradation)
 
   if (gradation != m_Controls.gradationSpinBox->value())
     m_Controls.gradationSpinBox->setValue(gradation);
+}
+
+void QmitkRemeshingView::OnMaxNumVerticesLineEditEditingFinished()
+{
+  int maximum = m_Controls.maxNumVerticesLineEdit->text().toInt();
+
+  if (m_Controls.numVerticesSpinBox->maximum() != maximum)
+  {
+    m_Controls.numVerticesSlider->setMaximum(maximum);
+    m_Controls.numVerticesSpinBox->setMaximum(maximum);
+  }
 }
 
 void QmitkRemeshingView::OnNumberOfVerticesChanged(int numVertices)
@@ -86,9 +138,12 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   mitk::Surface::Pointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
   int numVertices = m_Controls.numVerticesSpinBox->value();
   double gradation = m_Controls.gradationSpinBox->value();
+  int subsampling = m_Controls.subsamplingSpinBox->value();
+  double edgeSplitting = m_Controls.edgeSplittingSpinBox->value();
+  bool forceManifold = m_Controls.forceManifoldCheckBox->isChecked();
   bool boundaryFixing = m_Controls.boundaryFixingCheckBox->isChecked();
 
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, numVertices, gradation, boundaryFixing);
+  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, numVertices, gradation, subsampling, edgeSplitting, forceManifold, boundaryFixing);
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());
@@ -103,7 +158,10 @@ void QmitkRemeshingView::OnSelectedSurfaceChanged(const mitk::DataNode *node)
   if (node != NULL)
   {
     int numVertices = static_cast<int>(static_cast<mitk::Surface*>(node->GetData())->GetVtkPolyData()->GetNumberOfPoints());
-    this->SetNumberOfVertices(10, 2 * numVertices, std::max(1, numVertices / 10), numVertices);
+    int minimum = numVertices < 100 ? numVertices : 100;
+    int maximum = std::max(1, numVertices / 10);
+
+    this->SetNumberOfVertices(minimum, numVertices, maximum, numVertices);
     this->EnableWidgets(true);
   }
   else
@@ -111,6 +169,15 @@ void QmitkRemeshingView::OnSelectedSurfaceChanged(const mitk::DataNode *node)
     this->EnableWidgets(false);
     this->SetNumberOfVertices(0, 0, 0, 0);
   }
+}
+
+void QmitkRemeshingView::OnSubsamplingChanged(int subsampling)
+{
+  if (subsampling != m_Controls.subsamplingSlider->value())
+    m_Controls.subsamplingSlider->setValue(subsampling);
+
+  if (subsampling != m_Controls.subsamplingSpinBox->value())
+    m_Controls.subsamplingSpinBox->setValue(subsampling);
 }
 
 void QmitkRemeshingView::SetFocus()
@@ -129,4 +196,6 @@ void QmitkRemeshingView::SetNumberOfVertices(int minimum, int maximum, int step,
   m_Controls.numVerticesSpinBox->setMaximum(maximum);
   m_Controls.numVerticesSpinBox->setSingleStep(step);
   m_Controls.numVerticesSpinBox->setValue(value);
+
+  m_Controls.maxNumVerticesLineEdit->setText(QString("%1").arg(maximum));
 }

@@ -24,7 +24,7 @@ namespace mitk
 {
   namespace ACVD
   {
-    Remeshing_EXPORT Surface::Pointer Remesh(Surface::Pointer surface, int numVertices, double gradation, bool boundaryFixing);
+    Remeshing_EXPORT Surface::Pointer Remesh(Surface::Pointer surface, int numVertices, double gradation, int subsampling = 10, double edgeSplitting = 0.0, bool forceManifold = false, bool boundaryFixing = false);
   }
 }
 

@@ -17,30 +17,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkACVD.h"
 #include <vtkIsotropicDiscreteRemeshing.h>
 #include <vtkMultiThreader.h>
+#include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
 
-mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int numVertices, double gradation, bool boundaryFixing)
+mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int numVertices, double gradation, int subsampling, double edgeSplitting, bool forceManifold, bool boundaryFixing)
 {
   MITK_INFO << "Start remeshing...";
 
+  vtkSmartPointer<vtkPolyData> surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
+  surfacePolyData->DeepCopy(surface->GetVtkPolyData());
+
   vtkSmartPointer<vtkSurface> mesh = vtkSmartPointer<vtkSurface>::New();
 
-  mesh->CreateFromPolyData(surface->GetVtkPolyData());
+  mesh->CreateFromPolyData(surfacePolyData);
   mesh->GetCellData()->Initialize();
   mesh->GetPointData()->Initialize();
 
   mesh->DisplayMeshProperties();
+
+  if (edgeSplitting != 0.0)
+    mesh->SplitLongEdges(edgeSplitting);
 
   vtkSmartPointer<vtkIsotropicDiscreteRemeshing> remesher = vtkSmartPointer<vtkIsotropicDiscreteRemeshing>::New();
 
   remesher->GetMetric()->SetGradation(gradation);
   remesher->SetBoundaryFixing(boundaryFixing);
   remesher->SetConsoleOutput(1);
+  remesher->SetForceManifold(forceManifold);
   remesher->SetInput(mesh);
   remesher->SetNumberOfClusters(numVertices);
   remesher->SetNumberOfThreads(vtkMultiThreader::GetGlobalDefaultNumberOfThreads());
+  remesher->SetSubsamplingThreshold(subsampling);
 
   remesher->Remesh();
 

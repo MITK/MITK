@@ -33,10 +33,14 @@ public:
   void SetFocus();
 
 private slots:
+  void OnAdvancedSettingsButtonToggled(bool toggled);
+  void OnEdgeSplittingChanged(double edgeSplitting);
   void OnGradationChanged(double gradation);
+  void OnMaxNumVerticesLineEditEditingFinished();
   void OnNumberOfVerticesChanged(int numVertices);
   void OnRemeshButtonClicked();
   void OnSelectedSurfaceChanged(const mitk::DataNode *node);
+  void OnSubsamplingChanged(int subsampling);
 
 private:
   void EnableWidgets(bool enable);

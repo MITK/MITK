@@ -46,9 +46,7 @@ MITK_CREATE_MODULE( Mitk
 )
 
 # this is needed for libraries which link to Mitk and need
-# symbols from explicitly instantiated templates like
-# mitk::SurfaceVtkWriter<vtkSTLWriter> which is referenced in
-# QmitkCommonFunctionality in the QmitkExt library.
+# symbols from explicitly instantiated templates
 if(MINGW)
   get_target_property(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
   if(NOT _mitkCore_MINGW_linkflags)

@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 
 //Qmitk headers
-#include <QmitkCommonFunctionality.h>
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkStdMultiWidget.h>
 
@@ -130,16 +129,6 @@ void QmitkIsoSurface::CreateSurface()
 
     //ImageToSurface Instance
     mitk::DataNode::Pointer node = m_Controls->m_ImageSelector->GetSelectedNode();
-
-    /*
-    mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
-
-    iteratorOnImageToBeSkinExtracted = m_Controls->m_ImageSelector->GetFilter()->GetIteratorToSelectedItem();
-    if(iteratorOnImageToBeSkinExtracted.IsNull())
-    {
-      iteratorOnImageToBeSkinExtracted = CommonFunctionality::GetIteratorToFirstImage(m_DataTreeIterator.GetPointer());
-    }
-    */
 
     mitk::ManualSegmentationToSurfaceFilter::Pointer filter = mitk::ManualSegmentationToSurfaceFilter::New();
     if (filter.IsNull())

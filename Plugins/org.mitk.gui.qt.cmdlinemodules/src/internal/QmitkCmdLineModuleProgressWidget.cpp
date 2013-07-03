@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
-#include <QmitkCommonFunctionality.h>
 #include <QmitkCustomVariants.h>
 #include "QmitkCmdLineModuleGui.h"
 
@@ -550,7 +549,7 @@ void QmitkCmdLineModuleProgressWidget::Run()
         message = "Saving " + fileName;
         this->PublishMessage(message);
 
-        std::string tmpFN = CommonFunctionality::SaveImage(image, fileName.toStdString().c_str());
+        std::string tmpFN = mitk::IOUtil::SaveImage(image, fileName.toStdString().c_str());
         QString temporaryStorageFileName = QString::fromStdString(tmpFN);
 
         m_TemporaryFileNames.push_back(temporaryStorageFileName);

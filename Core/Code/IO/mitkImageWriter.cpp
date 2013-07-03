@@ -300,17 +300,7 @@ bool mitk::ImageWriter::CanWriteDataType( DataNode* input )
 {
   if ( input )
   {
-    mitk::BaseData* data = input->GetData();
-    if ( data )
-    {
-       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( data );
-       if( image.IsNotNull() )
-       {
-         //"SetDefaultExtension()" set m_Extension to ".mhd" ?????
-         m_Extension = ".pic";
-         return true;
-       }
-    }
+    return this->CanWriteBaseDataType(input->GetData());
   }
   return false;
 }
@@ -373,5 +363,36 @@ const mitk::Image* mitk::ImageWriter::GetInput()
   else
   {
     return static_cast< const mitk::Image * >( this->ProcessObject::GetInput( 0 ) );
+  }
+}
+
+const char* mitk::ImageWriter::GetDefaultFilename()
+{
+  return "Image.nrrd";
+}
+
+const char* mitk::ImageWriter::GetFileDialogPattern()
+{
+  return "Image (*.pic, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
+      "*.nii, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
+      "*.tif, *.jpg)";
+}
+
+const char *mitk::ImageWriter::GetDefaultExtension()
+{
+  return ".nrrd";
+}
+
+bool mitk::ImageWriter::CanWriteBaseDataType(BaseData::Pointer data)
+{
+  return dynamic_cast<mitk::Image*>( data.GetPointer() );
+}
+
+void mitk::ImageWriter::DoWrite(BaseData::Pointer data)
+{
+  if (this->CanWriteBaseDataType(data))
+  {
+    this->SetInput(dynamic_cast<mitk::Image *>(data.GetPointer()));
+    this->Update();
   }
 }

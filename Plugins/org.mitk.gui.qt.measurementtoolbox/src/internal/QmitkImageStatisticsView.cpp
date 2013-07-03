@@ -108,9 +108,9 @@ void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
     mitk::IRenderWindowPart* part = this->GetRenderWindowPart();
     if (part)
     {
-        part->GetRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
     }
 }
 

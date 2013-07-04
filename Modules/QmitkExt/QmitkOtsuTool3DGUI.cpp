@@ -30,7 +30,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
 {
   m_Controls.setupUi(this);
 
-  connect( m_Controls.okButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
+  connect( m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
   connect( m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnItemSelectionChanged()));
   connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );

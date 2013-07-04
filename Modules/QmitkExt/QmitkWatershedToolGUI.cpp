@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpainter.h>
+#include <qapplication.h>
 
 
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkWatershedToolGUI, "")
@@ -81,21 +82,17 @@ QmitkWatershedToolGUI::QmitkWatershedToolGUI()
   okButton->setFont( f );
   layout->addWidget( okButton, 4, 0, 1, 2 );
 
-
-  /*
-  m_Frame = new QFrame( this );
-  m_Frame->setMinimumSize( QSize(50, 50) );
-  m_Frame->setFrameStyle( QFrame::Box || QFrame::Plain );
-  m_Frame->show();
-  layout->addWidget( m_Frame );
-  */
+  m_InformationLabel = new QLabel("", this);
+  f = m_InformationLabel->font();
+  f.setBold(false);
+  m_InformationLabel->setFont( f );
+  layout->addWidget( m_InformationLabel, 5,0,1,2);
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
 QmitkWatershedToolGUI::~QmitkWatershedToolGUI()
 {
-  // !!!
   if (m_WatershedTool.IsNotNull())
   {
     //m_WatershedTool->SizeChanged -= mitk::MessageDelegate1<QmitkWatershedToolGUI, int>( this, &QmitkWatershedToolGUI::OnSizeChanged );
@@ -140,5 +137,9 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
+  m_InformationLabel->setText(QString("Please wait some time for computation..."));
+  m_InformationLabel->repaint();
+  QApplication::processEvents();
+
   m_WatershedTool->DoIt();
 }

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 
 // Qt
-#include "QMessageBox.h"
+#include <QMessageBox>
 
 #include "mitkRegionGrow3DTool.xpm"
 
@@ -83,7 +83,12 @@ void mitk::OtsuTool3D::Deactivated()
 
 const char** mitk::OtsuTool3D::GetXPM() const
 {
-  return mitkRegionGrow3DTool_xpm;
+  return NULL;
+}
+
+std::string mitk::OtsuTool3D::GetIconPath() const
+{
+  return ":/Segmentation/Otsu_48x48.png";
 }
 
 void mitk::OtsuTool3D::RunSegmentation(int regions)
@@ -182,7 +187,7 @@ void mitk::OtsuTool3D::UpdateBinaryPreview(int regionID)
 
 const char* mitk::OtsuTool3D::GetName() const
 {
-  return "Otsu Segmentation";
+  return "Otsu";
 }
 
 void mitk::OtsuTool3D::UpdateVolumePreview(bool volumeRendering)

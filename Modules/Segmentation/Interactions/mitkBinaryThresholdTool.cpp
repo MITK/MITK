@@ -68,7 +68,12 @@ mitk::BinaryThresholdTool::~BinaryThresholdTool()
 
 const char** mitk::BinaryThresholdTool::GetXPM() const
 {
-  return mitkBinaryThresholdTool_xpm;
+  return NULL;
+}
+
+std::string mitk::BinaryThresholdTool::GetIconPath() const
+{
+  return ":/Segmentation/Threshold_48x48.png";
 }
 
 const char* mitk::BinaryThresholdTool::GetName() const

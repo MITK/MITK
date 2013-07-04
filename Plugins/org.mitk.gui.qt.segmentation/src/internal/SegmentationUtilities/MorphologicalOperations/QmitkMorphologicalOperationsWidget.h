@@ -45,8 +45,7 @@ public:
   void OnRadioButtonsClicked();
 
 protected:
-   void enableButtons();
-   void disableButtons();
+   void EnableButtons(bool enable);
 
 private:
   Ui::QmitkMorphologicalOperationsWidgetControls m_Controls;

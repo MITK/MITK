@@ -75,22 +75,27 @@ const char* mitk::WatershedTool::GetName() const
 void mitk::WatershedTool::DoIt()
 {
 
+  // get image from tool manager
   mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
 
   mitk::Image::Pointer output;
 
   try {
-    AccessFixedDimensionByItk_2(input.GetPointer(),ITKWatershed,3,output,0);
+    // create and run itk filter pipeline
+    AccessFixedDimensionByItk_1(input.GetPointer(),ITKWatershed,3,output);
 
-    //  m_ToolManager->GetWorkingData(0)->SetData(output);
+    // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
     dataNode->SetData(output);
 
+    // set properties of datanode
     dataNode->SetProperty("binary", mitk::BoolProperty::New(false));
     dataNode->SetProperty("name", mitk::StringProperty::New("Watershed Result"));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
     renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
     dataNode->SetProperty("Image Rendering.Mode", renderingMode);
+
+    // since we create a multi label image, define a vtk lookup table
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
     mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
     vtkLookupTable *lookupTable = vtkLookupTable::New();
@@ -100,10 +105,11 @@ void mitk::WatershedTool::DoIt()
     lookupTable->SetTableRange(-1.0, 1.0);
     lookupTable->Build();
     lookupTable->SetTableValue(1,0,0,0);
-
     lut->SetVtkLookupTable(lookupTable);
     prop->SetLookupTable(lut);
     dataNode->SetProperty("LookupTable",prop);
+
+    // make the levelwindow fit to right values
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
     levelwindow.SetRangeMinMax(0, output->GetStatistics()->GetScalarValueMax());
@@ -111,6 +117,7 @@ void mitk::WatershedTool::DoIt()
     dataNode->SetProperty( "levelwindow", levWinProp );
     dataNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5));
 
+    // add output to the data storage
     m_ToolManager->GetDataStorage()->Add(dataNode);
   }
   catch(itk::ExceptionObject& e)
@@ -124,27 +131,32 @@ void mitk::WatershedTool::DoIt()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation, unsigned int timeStep )
+void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation )
 {
   typedef itk::WatershedImageFilter< itk::Image<float, VImageDimension> > WatershedFilter;
   typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< itk::Image<TPixel, VImageDimension >, itk::Image<float, VImageDimension> > MagnitudeFilter;
 
+  // at first add a gradient magnitude filter
   typename MagnitudeFilter::Pointer magnitude = MagnitudeFilter::New();
   magnitude->SetInput(originalImage);
   magnitude->SetSigma(1.0);
-  //magnitude->Update();
 
+  // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();
   watershed->SetInput(magnitude->GetOutput());
   watershed->SetThreshold(m_Threshold);
   watershed->SetLevel(m_Level);
-  //watershed->Update();
 
+  // then make sure, that the output has the desired pixel type
   typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,3> > CastFilter;
   typename CastFilter::Pointer cast = CastFilter::New();
   cast->SetInput(watershed->GetOutput());
+
+  // start the whole pipeline
   cast->Update();
 
+  // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
+  // is responsible for the memory management of the output image
   segmentation = mitk::GrabItkImageMemory(cast->GetOutput());
 
 }

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
-#include "MorphologicalOperations/QmitkMorphologicalOPerationsWidget.h"
+#include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
 #include "CTKWidgets/QmitkCTKWidgetsWidget.h"
 

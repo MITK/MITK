@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "MitkSBExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImage.h"
-#include "mitkItkImageImport.h"
+#include "mitkITKImageImport.h"
 
 #include "itkImage.h"
 

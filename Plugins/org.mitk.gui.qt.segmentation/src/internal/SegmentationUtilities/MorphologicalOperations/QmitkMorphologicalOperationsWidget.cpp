@@ -19,13 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMorphologicalOperations.h>
 #include "mitkProgressBar.h"
 
+static const char* const HelpText = "Select a segmentation above";
 
 QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls.setupUi(this);
+
   m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls.dataSelectionWidget->SetHelpText("Select a segmentation above");
+  m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
   connect(m_Controls.btnClosing, SIGNAL(clicked()), this, SLOT(OnbtnClosingClicked()) );
   connect(m_Controls.btnOpening, SIGNAL(clicked()), this, SLOT(OnbtnOpeningClicked()) );
@@ -46,160 +48,160 @@ QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()
 
 void QmitkMorphologicalOperationsWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
 {
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
 
-   if (node.IsNotNull())
-      enableButtons();
-   else
-      disableButtons();
+  if (node.IsNotNull())
+  {
+    m_Controls.dataSelectionWidget->SetHelpText("");
+    this->EnableButtons(true);
+  }
+  else
+  {
+    m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+    this->EnableButtons(false);
+  }
 }
 
 
-void QmitkMorphologicalOperationsWidget::enableButtons()
+void QmitkMorphologicalOperationsWidget::EnableButtons(bool enable)
 {
-   m_Controls.btnClosing->setEnabled(true);
-   m_Controls.btnDilatation->setEnabled(true);
-   m_Controls.btnErosion->setEnabled(true);
-   m_Controls.btnFillHoles->setEnabled(true);
-   m_Controls.btnOpening->setEnabled(true);
-}
-
-void QmitkMorphologicalOperationsWidget::disableButtons()
-{
-   m_Controls.btnClosing->setEnabled(false);
-   m_Controls.btnDilatation->setEnabled(false);
-   m_Controls.btnErosion->setEnabled(false);
-   m_Controls.btnFillHoles->setEnabled(false);
-   m_Controls.btnOpening->setEnabled(false);
+  m_Controls.btnClosing->setEnabled(enable);
+  m_Controls.btnDilatation->setEnabled(enable);
+  m_Controls.btnErosion->setEnabled(enable);
+  m_Controls.btnFillHoles->setEnabled(enable);
+  m_Controls.btnOpening->setEnabled(enable);
 }
 
 void QmitkMorphologicalOperationsWidget::OnRadioButtonsClicked()
 {
-   m_Controls.sliderMorphFactor->setEnabled(
-      m_Controls.radioButtonMorphoBall->isChecked());
+  m_Controls.sliderMorphFactor->setEnabled(
+    m_Controls.radioButtonMorphoBall->isChecked());
 
-   m_Controls.spinBoxMorphFactor->setEnabled(
-      m_Controls.radioButtonMorphoBall->isChecked());
-
+  m_Controls.spinBoxMorphFactor->setEnabled(
+    m_Controls.radioButtonMorphoBall->isChecked());
 }
 
 void QmitkMorphologicalOperationsWidget::OnbtnClosingClicked()
 {
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-   mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
-   mitk::MorphologicalOperations::StructuralElementType structuralElement;
-   if (m_Controls.radioButtonMorphoBall->isChecked())
-      structuralElement = mitk::MorphologicalOperations::BALL;
-   else
-      structuralElement = mitk::MorphologicalOperations::CUBE;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
+  mitk::MorphologicalOperations::StructuralElementType structuralElement;
 
-   try
-   {
-      mitk::MorphologicalOperations::Closing(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
-   }
-   catch ( itk::ExceptionObject* itkObj)
-   {
-      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
-   }
+  if (m_Controls.radioButtonMorphoBall->isChecked())
+    structuralElement = mitk::MorphologicalOperations::BALL;
+  else
+    structuralElement = mitk::MorphologicalOperations::CUBE;
 
-   node->SetData(image);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  try
+  {
+    mitk::MorphologicalOperations::Closing(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+  }
+  catch ( itk::ExceptionObject* itkObj)
+  {
+    MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+  }
+
+  node->SetData(image);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMorphologicalOperationsWidget::OnbtnOpeningClicked()
 {
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-   mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
-   mitk::MorphologicalOperations::StructuralElementType structuralElement;
-   if (m_Controls.radioButtonMorphoBall->isChecked())
-      structuralElement = mitk::MorphologicalOperations::BALL;
-   else
-      structuralElement = mitk::MorphologicalOperations::CUBE;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
+  mitk::MorphologicalOperations::StructuralElementType structuralElement;
 
-   try
-   {
-      mitk::MorphologicalOperations::Opening(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
-   }
-   catch ( itk::ExceptionObject* itkObj)
-   {
-      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
-   }
+  if (m_Controls.radioButtonMorphoBall->isChecked())
+    structuralElement = mitk::MorphologicalOperations::BALL;
+  else
+    structuralElement = mitk::MorphologicalOperations::CUBE;
 
-   node->SetData(image);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  try
+  {
+    mitk::MorphologicalOperations::Opening(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+  }
+  catch ( itk::ExceptionObject* itkObj)
+  {
+    MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+  }
+
+  node->SetData(image);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMorphologicalOperationsWidget::OnbtnDilatationClicked()
 {
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-   mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
-   mitk::MorphologicalOperations::StructuralElementType structuralElement;
-   if (m_Controls.radioButtonMorphoBall->isChecked())
-      structuralElement = mitk::MorphologicalOperations::BALL;
-   else
-      structuralElement = mitk::MorphologicalOperations::CUBE;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
+  mitk::MorphologicalOperations::StructuralElementType structuralElement;
 
-   try
-   {
-      mitk::MorphologicalOperations::Dilate(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
-   }
-   catch ( itk::ExceptionObject* itkObj)
-   {
-      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
-   }
+  if (m_Controls.radioButtonMorphoBall->isChecked())
+    structuralElement = mitk::MorphologicalOperations::BALL;
+  else
+    structuralElement = mitk::MorphologicalOperations::CUBE;
 
-   node->SetData(image);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  try
+  {
+    mitk::MorphologicalOperations::Dilate(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+  }
+  catch ( itk::ExceptionObject* itkObj)
+  {
+    MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+  }
+
+  node->SetData(image);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMorphologicalOperationsWidget::OnbtnErosionClicked()
 {
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-   mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
-   mitk::MorphologicalOperations::StructuralElementType structuralElement;
-   if (m_Controls.radioButtonMorphoBall->isChecked())
-      structuralElement = mitk::MorphologicalOperations::BALL;
-   else
-      structuralElement = mitk::MorphologicalOperations::CUBE;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
+  mitk::MorphologicalOperations::StructuralElementType structuralElement;
 
-   try
-   {
-      mitk::MorphologicalOperations::Erode(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
-   }
-   catch ( itk::ExceptionObject* itkObj)
-   {
-      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
-   }
+  if (m_Controls.radioButtonMorphoBall->isChecked())
+    structuralElement = mitk::MorphologicalOperations::BALL;
+  else
+    structuralElement = mitk::MorphologicalOperations::CUBE;
 
-   node->SetData(image);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  try
+  {
+    mitk::MorphologicalOperations::Erode(image, m_Controls.spinBoxMorphFactor->value(), structuralElement);
+  }
+  catch ( itk::ExceptionObject* itkObj)
+  {
+    MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+  }
+
+  node->SetData(image);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMorphologicalOperationsWidget::OnbtnFillHolesClicked()
 {
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
-   mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(0);
+  mitk::Image::Pointer image = dynamic_cast< mitk::Image* >(node->GetData());
 
-   try
-   {
-      mitk::MorphologicalOperations::Fillhole(image);
-   }
-   catch ( itk::ExceptionObject* itkObj)
-   {
-      MITK_WARN << "Exception caught: " << itkObj->GetDescription();
-   }
+  try
+  {
+    mitk::MorphologicalOperations::Fillhole(image);
+  }
+  catch ( itk::ExceptionObject* itkObj)
+  {
+    MITK_WARN << "Exception caught: " << itkObj->GetDescription();
+  }
 
-   node->SetData(image);
-   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  node->SetData(image);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

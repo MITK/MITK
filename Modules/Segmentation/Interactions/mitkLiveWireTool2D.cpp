@@ -136,7 +136,7 @@ std::string mitk::LiveWireTool2D::GetIconPath() const
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
-  return "LiveWire";
+  return "Live Wire";
 }
 
 

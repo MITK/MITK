@@ -29,6 +29,7 @@ namespace mitk{
 
       virtual const char* GetName() const;
       virtual const char** GetXPM() const;
+      virtual std::string GetIconPath() const;
 
       virtual void Activated();
       virtual void Deactivated();

@@ -123,7 +123,7 @@ std::string mitk::FastMarchingTool::GetIconPath() const
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "FastMarching";
+  return "Fast Marching";
 }
 
 void mitk::FastMarchingTool::SetUpperThreshold(float value)

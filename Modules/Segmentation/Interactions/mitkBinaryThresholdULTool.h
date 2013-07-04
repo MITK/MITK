@@ -48,6 +48,7 @@ namespace mitk
     itkNewMacro(BinaryThresholdULTool);
 
     virtual const char** GetXPM() const;
+    virtual std::string GetIconPath() const;
     virtual const char* GetName() const;
 
     virtual void Activated();

@@ -331,6 +331,17 @@ namespace mitk {
       return ComputeTimeBounds( "visible", renderer, boolPropertyKey);
     }
 
+    //##Documentation
+    //## @brief Defines whether or not NodeChangedEvent is invoked .
+    //##
+    //## This method can be used to set m_BlockNodeModifiedEvents.
+    //##
+    //## If this flag is true, NodeChangedEvent is not invoked when a
+    //## DataNode is modified. This might be undesired when setting
+    //## many properties on a datanode and you do not want anyone to
+    //## react.
+    void BlockNodeModifiedEvents( bool block );
+
   protected:
     //##Documentation
     //## @brief  EmitAddNodeEvent emits the AddNodeEvent

@@ -510,3 +510,8 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
   }
   return timeBounds;
 }
+
+void mitk::DataStorage::BlockNodeModifiedEvents( bool block )
+{
+  m_BlockNodeModifiedEvents = block;
+}

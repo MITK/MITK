@@ -71,9 +71,11 @@ void mitk::BindDispatcherInteractor::RegisterDataStorageEvents()
   {
     m_DataStorage->AddNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+
     m_DataStorage->RemoveNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
-    m_DataStorage->ChangedNodeEvent.AddListener(
+
+    m_DataStorage->InteractorChangedNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
   }
 }

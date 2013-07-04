@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImage.h"
 #include <mitkStringProperty.h>
 #include <mitkProperties.h>
+#include <mitkImageReadAccessor.h>
 
 
 mitk::USImage::USImage() : mitk::Image()
@@ -26,8 +27,16 @@ mitk::USImage::USImage() : mitk::Image()
 
 mitk::USImage::USImage(mitk::Image::Pointer image) : mitk::Image()
 {
+  try
+  {
   this->Initialize(image);
-  this->SetVolume(image->GetData());
+  mitk::ImageReadAccessor imgA(image, image->GetVolumeData(0));
+  this->SetVolume(imgA.GetData());
+  }
+  catch(mitk::Exception e)
+  {
+  mitkReThrow(e) << "Cannot access image data while constructing US image";
+  }
 }
 
 mitk::USImage::~USImage()

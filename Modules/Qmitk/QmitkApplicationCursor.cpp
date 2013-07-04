@@ -27,6 +27,13 @@ QmitkApplicationCursor::QmitkApplicationCursor()
   mitk::ApplicationCursor::RegisterImplementation(this);
 }
 
+void QmitkApplicationCursor::PushCursor(const std::string& path, int hotspotX, int hotspotY)
+{
+  QPixmap pixmap( path.c_str() );
+  QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
+  QApplication::setOverrideCursor( cursor );
+}
+
 void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)
 {
   QPixmap pixmap( XPM );

@@ -82,6 +82,7 @@ protected slots:
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();
 
+  void OnManualTool2DSelected(int id);
   // reaction to the button "New segmentation"
 //  void CreateSegmentationFromSurface();
 
@@ -129,6 +130,12 @@ protected:
 
   // GUI setup
   void CreateQtPartControl(QWidget* parent);
+
+  void ResetMouseCursor( );
+
+  void SetMouseCursor( const std::string&, int hotspotX, int hotspotY );
+
+  bool m_MouseCursorSet;
 
   // handling of a list of known (organ name, organ color) combination
   // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp

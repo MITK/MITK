@@ -37,6 +37,9 @@ class MITK_CORE_EXPORT ApplicationCursorImplementation
     /// Change the current application cursor
     virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY) = 0;
 
+    /// Change the current application cursor
+    virtual void PushCursor(const std::string& path, int hotspotX, int hotspotY) = 0;
+
     /// Restore the previous cursor
     virtual void PopCursor() = 0;
 
@@ -74,6 +77,9 @@ class MITK_CORE_EXPORT ApplicationCursor
 
     /// Change the current application cursor
     void PushCursor(const char* XPM[], int hotspotX = -1, int hotspotY = -1);
+
+    /// Change the current application cursor
+    void PushCursor(const std::string& path, int hotspotX = -1, int hotspotY = -1);
 
     /// Restore the previous cursor
     void PopCursor();

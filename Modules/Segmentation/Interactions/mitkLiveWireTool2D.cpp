@@ -131,7 +131,10 @@ std::string mitk::LiveWireTool2D::GetIconPath() const
   return ":/Segmentation/LiveWire_48x48.png";
 }
 
-
+std::string mitk::LiveWireTool2D::GetCursorIconPath() const
+{
+  return ":/Segmentation/LiveWire_Cursor_48x48.png";
+}
 
 
 const char* mitk::LiveWireTool2D::GetName() const

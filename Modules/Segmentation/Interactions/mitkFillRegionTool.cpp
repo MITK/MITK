@@ -41,6 +41,11 @@ std::string mitk::FillRegionTool::GetIconPath() const
   return ":/Segmentation/Fill_48x48.png";
 }
 
+std::string mitk::FillRegionTool::GetCursorIconPath() const
+{
+  return ":/Segmentation/Fill_Cursor_48x48.png";
+}
+
 const char* mitk::FillRegionTool::GetName() const
 {
   return "Fill";

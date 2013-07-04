@@ -51,6 +51,7 @@ class Segmentation_EXPORT AddContourTool : public ContourTool
 
     virtual const char** GetXPM() const;
     virtual std::string GetIconPath() const;
+    virtual std::string GetCursorIconPath() const;
     virtual const char* GetName() const;
 
   protected:

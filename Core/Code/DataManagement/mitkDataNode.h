@@ -18,9 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef DATATREENODE_H_HEADER_INCLUDED_C1E14338
 #define DATATREENODE_H_HEADER_INCLUDED_C1E14338
 
-#include "mitkImageSource.h"
 #include "mitkBaseData.h"
-//#include "mitkMapper.h"
 #include "mitkInteractor.h"
 #include "mitkDataInteractor.h"
 
@@ -37,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
-//#include "mitkMapper.h"
 
 #include <map>
 #include <set>

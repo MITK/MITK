@@ -26,41 +26,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkOtsuTool3DGUI, "")
 
 QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
-:QmitkToolGUI(),
- m_Spinbox(NULL),
- m_selectionListWidget(NULL)
+:QmitkToolGUI()
 {
-  // create the visible widgets
-  QGridLayout* mainLayout = new QGridLayout( this );
+  m_Controls.setupUi(this);
 
-  QLabel* label = new QLabel( "Select number of Regions of Interest: ", this );
-  QFont f = label->font();
-  f.setBold(false);
-  label->setFont( f );
-  mainLayout->addWidget(label,0,0);
-
-  m_Spinbox = new QSpinBox( this );
-  m_Spinbox->setRange(2, 32);
-  m_Spinbox->setValue(2);
-  mainLayout->addWidget( m_Spinbox,0,1 );
-
-  //Button for confirming the selected number of regions for input of otsu algorithm
-  QPushButton* okButton = new QPushButton("Accept", this);
-  connect( okButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
-  okButton->setFont( f );
-  mainLayout->addWidget( okButton,0,3 );
-
-  //QListWidget for User selection of desired result region
-  m_selectionListWidget = new QListWidget(this);
-  connect( m_selectionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnItemSelectionChanged()));
-  mainLayout->addWidget( m_selectionListWidget,1,0 );
-
-  //Button for confirming the selected region of the QListWidget as segmentation result
-  QPushButton* confirmButton = new QPushButton("Confirm Segmentation", this);
-  connect( confirmButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
-  confirmButton->setFont( f );
-  mainLayout->addWidget( confirmButton,1,1 );
-
+  connect( m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
+  connect( m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnItemSelectionChanged()));
+  connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
 
@@ -74,7 +46,15 @@ void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
   if (m_OtsuTool3DTool.IsNotNull())
   {
     // TODO update preview of region
-    m_OtsuTool3DTool->UpdateBinaryPreview(m_selectionListWidget->currentItem()->text().toInt());
+    m_OtsuTool3DTool->UpdateBinaryPreview(m_Controls.m_selectionListWidget->currentItem()->text().toInt());
+    if ( !m_Controls.m_selectionListWidget->selectedItems().empty() )
+    {
+      m_Controls.m_ConfSegButton->setEnabled( true );
+    }
+    else
+    {
+      m_Controls.m_ConfSegButton->setEnabled( false );
+    }
   }
 }
 
@@ -85,10 +65,10 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 {
-  if (m_OtsuTool3DTool.IsNotNull() && this->m_selectionListWidget->currentItem() != NULL)
+  if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != NULL)
   {
     m_OtsuTool3DTool->ConfirmSegmentation();
-    // TODO deactivate otsu
+    m_OtsuTool3DTool->Deactivated();
   }
 }
 
@@ -98,20 +78,23 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
   {
     try
     {
-      m_OtsuTool3DTool->RunSegmentation( m_Spinbox->value() );
+      this->setCursor(Qt::WaitCursor);
+      m_OtsuTool3DTool->RunSegmentation( m_Controls.m_Spinbox->value() );
+      this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )
     {
+      this->setCursor(Qt::ArrowCursor);
       return;
     }
     //insert regions into widget
     QString itemName;
     QListWidgetItem* item;
-    this->m_selectionListWidget->clear();
-    for(int i=0; i<m_Spinbox->value(); ++i) {
+    m_Controls.m_selectionListWidget->clear();
+    for(int i=0; i<m_Controls.m_Spinbox->value(); ++i) {
       itemName = QString::number(i);
       item = new QListWidgetItem(itemName);
-      this->m_selectionListWidget->addItem(item);
+      m_Controls.m_selectionListWidget->addItem(item);
     }
   }
 }

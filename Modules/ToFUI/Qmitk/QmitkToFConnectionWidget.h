@@ -57,6 +57,14 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     */
     mitk::ToFImageGrabber::Pointer GetToFImageGrabber();
 
+    /*!
+    \brief return the name of the currently selected camera
+    */
+    QString GetSelectedCameraName()
+    {
+      return m_SelectedCameraName;
+    }
+
   signals:
 
     /*!
@@ -98,6 +106,7 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
 
     int m_IntegrationTime; ///< member for the current integration time of the ToF device
     int m_ModulationFrequency; ///< member for the current modulation frequency of the ToF device
+    QString m_SelectedCameraName; ///< member holding the name of the currently selected camera
 
   private:
 

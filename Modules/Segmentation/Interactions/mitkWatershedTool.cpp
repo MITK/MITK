@@ -126,7 +126,6 @@ void mitk::WatershedTool::DoIt()
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
-  m_ToolManager->ActivateTool(-1);
 
 }
 

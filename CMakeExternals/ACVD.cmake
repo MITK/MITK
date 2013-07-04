@@ -24,7 +24,7 @@ if(MITK_USE_ACVD)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL http://dl.dropboxusercontent.com/u/5822501/ACVD.tar.gz
+      URL http://mitk.org/download/thirdparty/ACVD_8bbb6da1.tar.gz
       URL_MD5 9cbce5e05e288982e05a95cda780fe64
       PATCH_COMMAND ${ACVD_PATCH_COMMAND}
       INSTALL_COMMAND ""

@@ -1,6 +1,9 @@
+include_directories(${CTK_INCLUDE_DIRS})
+
 MITK_CREATE_MODULE( QmitkExt
   INCLUDE_DIRS QmitkApplicationBase QmitkPropertyObservers QmitkFunctionalityComponents
   DEPENDS MitkExt IpPicSupport Qmitk qwt qxt PlanarFigure SceneSerialization Segmentation
-  QT_MODULE 
+  PACKAGE_DEPENDS CTK
+  QT_MODULE
 )
 

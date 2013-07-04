@@ -60,6 +60,8 @@ class QmitkExt_EXPORT QmitkToolGUI : public QWidget, public itk::Object
   protected:
 
     mitk::Tool::Pointer m_Tool;
+
+    virtual void BusyStateChanged(bool) {};
 };
 
 #endif

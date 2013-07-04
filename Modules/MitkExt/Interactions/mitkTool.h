@@ -89,6 +89,11 @@ namespace mitk
     Message1<std::string> ErrorMessage;
 
     /**
+    * \brief To send whether the tool is busy (to be shown by some GUI)
+    */
+    Message1<bool> CurrentlyBusy;
+
+    /**
     * \brief To send general messages (to be shown by some GUI)
     */
     Message1<std::string> GeneralMessage;

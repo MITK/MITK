@@ -26,7 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkOtsuTool3DGUI, "")
 
 QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI()
-:QmitkToolGUI()
+:QmitkToolGUI(),
+m_NumberOfRegions(0)
 {
   m_Controls.setupUi(this);
 
@@ -74,12 +75,16 @@ void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 
 void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
 {
+  if( m_NumberOfRegions == m_Controls.m_Spinbox->value() )
+    return;
+
   if (m_OtsuTool3DTool.IsNotNull())
   {
     try
     {
       this->setCursor(Qt::WaitCursor);
-      m_OtsuTool3DTool->RunSegmentation( m_Controls.m_Spinbox->value() );
+      m_NumberOfRegions = m_Controls.m_Spinbox->value();
+      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions );
       this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )
@@ -91,7 +96,8 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
     QString itemName;
     QListWidgetItem* item;
     m_Controls.m_selectionListWidget->clear();
-    for(int i=0; i<m_Controls.m_Spinbox->value(); ++i) {
+    for(int i=0; i<m_Controls.m_Spinbox->value(); ++i)
+    {
       itemName = QString::number(i);
       item = new QListWidgetItem(itemName);
       m_Controls.m_selectionListWidget->addItem(item);

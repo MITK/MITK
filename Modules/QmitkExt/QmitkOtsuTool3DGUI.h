@@ -68,6 +68,8 @@ class QmitkExt_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 
     Ui_QmitkOtsuToolWidgetControls m_Controls;
+
+    int m_NumberOfRegions;
 };
 
 #endif

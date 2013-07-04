@@ -68,7 +68,7 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     this->m_IRenderWindowPart = renderWindowPart;
     this->m_Parent->setEnabled(true);
 
-    QmitkRenderWindow* renderWindow = renderWindowPart->GetRenderWindow("axial");
+    QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("axial");
     if (renderWindow)
     {
       if (m_AxialStepper) m_AxialStepper->deleteLater();
@@ -87,7 +87,7 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(false);
     }
 
-    renderWindow = renderWindowPart->GetRenderWindow("sagittal");
+    renderWindow = renderWindowPart->GetQmitkRenderWindow("sagittal");
     if (renderWindow)
     {
       if (m_SagittalStepper) m_SagittalStepper->deleteLater();
@@ -106,7 +106,7 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_YWorldCoordinateSpinBox->setEnabled(false);
     }
 
-    renderWindow = renderWindowPart->GetRenderWindow("coronal");
+    renderWindow = renderWindowPart->GetQmitkRenderWindow("coronal");
     if (renderWindow)
     {
       if (m_FrontalStepper) m_FrontalStepper->deleteLater();
@@ -203,7 +203,7 @@ void QmitkImageNavigatorView::SetBorderColors()
 {
   if (m_IRenderWindowPart)
   {
-    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetRenderWindow("axial");
+    QmitkRenderWindow* renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("axial");
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -215,7 +215,7 @@ void QmitkImageNavigatorView::SetBorderColors()
       }
     }
 
-    renderWindow = m_IRenderWindowPart->GetRenderWindow("sagittal");
+    renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("sagittal");
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
@@ -227,7 +227,7 @@ void QmitkImageNavigatorView::SetBorderColors()
       }
     }
 
-    renderWindow = m_IRenderWindowPart->GetRenderWindow("coronal");
+    renderWindow = m_IRenderWindowPart->GetQmitkRenderWindow("coronal");
     if (renderWindow)
     {
       mitk::PlaneGeometry::ConstPointer geometry = renderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();

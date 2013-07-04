@@ -664,7 +664,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     if(RGBImageHasDifferentResolution)
     {
       //update the display geometry by using the RBG image node. Only for renderwindow coronal
-      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
+      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
     }
   }
 }

@@ -97,19 +97,6 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   }
 
   /**
-   * Get a render window with a specific id.
-   *
-   * \param id The render window id.
-   * \return The QmitkRenderWindow instance for <code>id</code>
-   *
-   * \deprecatedSince{2012_09} The method is deprecated, use the IRenderWindowPart::GetQmitkRenderWindow(const QString& id) instead
-   */
-  DEPRECATED( virtual QmitkRenderWindow* GetRenderWindow(const QString& id) const )
-  {
-    return GetQmitkRenderWindow( id );
-  }
-
-  /**
    * Get the currently active (focused) render window.
    * Focus handling is implementation specific.
    *

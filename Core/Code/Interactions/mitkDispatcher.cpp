@@ -75,6 +75,8 @@ mitk::Dispatcher::~Dispatcher()
 {
   m_EventObserverTracker->Close();
   delete m_EventObserverTracker;
+
+  m_Interactors.clear();
 }
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)

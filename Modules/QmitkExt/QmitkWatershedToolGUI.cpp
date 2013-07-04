@@ -142,4 +142,5 @@ void QmitkWatershedToolGUI::OnCreateSegmentation()
   QApplication::processEvents();
 
   m_WatershedTool->DoIt();
+  m_InformationLabel->setText(QString(""));
 }

@@ -48,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
       try
       {
-        mitk::Image::Pointer image = ni;
+        mitk::Image::Pointer image = ni.GetPointer();
         mitk::ImageWriteAccessor imgA(image, image->GetVolumeData(0));
         result->Initialize(image);
         result->SetImportVolume(imgA.GetData());

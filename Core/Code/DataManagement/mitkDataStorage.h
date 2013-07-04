@@ -247,6 +247,9 @@ namespace mitk {
     // a Message1 object which is thread safe
     DataStorageEvent DeleteNodeEvent;
 
+    DataStorageEvent InteractorChangedNodeEvent;
+
+
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the input objects
     //##
@@ -355,6 +358,9 @@ namespace mitk {
     //## This method should be called by subclasses to emit the RemoveNodeEvent
     void EmitRemoveNodeEvent(const mitk::DataNode* node);
 
+    void OnNodeInteractorChanged( itk::Object *caller, const itk::EventObject &event );
+
+
     //##Documentation
     //## @brief  OnNodeModified listens to modified events of DataNodes.
     //##
@@ -375,6 +381,9 @@ namespace mitk {
     //##Documentation
     //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
     std::map<const mitk::DataNode*, unsigned long> m_NodeModifiedObserverTags;
+
+    std::map<const mitk::DataNode*, unsigned long> m_NodeInteractorChangedObserverTags;
+
 
     //##Documentation
     //## @brief  Saves Delete-Observer Tags for each node in order to remove the event listeners again.

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkCreateDistanceImageFromSurfaceFilter_h_Included
 #define mitkCreateDistanceImageFromSurfaceFilter_h_Included
 
-#include "SegmentationExports.h"
+#include "SurfaceInterpolationExports.h"
 
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
@@ -70,7 +70,7 @@ namespace mitk {
 
   $Author: fetzer$
   */
-  class Segmentation_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
+  class SurfaceInterpolation_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
 
   public:

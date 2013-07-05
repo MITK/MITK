@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKIMAGETOSURFACEFILTER_h__
 
 #include <vtkPolyData.h>
-#include "MitkExtExports.h"
+#include "MitkExports.h"
 #include <mitkCommon.h>
 #include <mitkSurfaceSource.h>
 #include <mitkSurface.h>
@@ -49,7 +49,7 @@ namespace mitk {
   * @ingroup Process
   */
 
-  class MitkExt_EXPORT ImageToSurfaceFilter : public SurfaceSource
+  class MITK_CORE_EXPORT ImageToSurfaceFilter : public SurfaceSource
   {
     public:
 

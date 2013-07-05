@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkAutoCropImageFilter_h_
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "ImageExtractionExports.h"
 #include "mitkSubImageSelector.h"
 #include "mitkImageTimeSelector.h"
 
@@ -55,7 +55,7 @@ namespace mitk {
  *
  */
 
-class MitkExt_EXPORT AutoCropImageFilter : public SubImageSelector
+class ImageExtraction_EXPORT AutoCropImageFilter : public SubImageSelector
 {
 public:
 

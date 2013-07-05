@@ -84,11 +84,13 @@ set(CPP_FILES
   Algorithms/mitkImageSource.cpp
   Algorithms/mitkImageTimeSelector.cpp
   Algorithms/mitkImageToImageFilter.cpp
+  Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkPointSetSource.cpp
   Algorithms/mitkPointSetToPointSetFilter.cpp
   Algorithms/mitkRGBToRGBACastImageFilter.cpp
   Algorithms/mitkSubImageSelector.cpp
   Algorithms/mitkSurfaceSource.cpp
+  Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp

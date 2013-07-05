@@ -4,7 +4,6 @@ set(CPP_FILES
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
   Algorithms/mitkAngleCorrectByPointFilter.cpp
-  Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
@@ -12,7 +11,6 @@ set(CPP_FILES
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
-  Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
   Algorithms/mitkLabeledImageToSurfaceFilter.cpp
   Algorithms/mitkLabeledImageVolumeCalculator.cpp
@@ -33,7 +31,6 @@ set(CPP_FILES
   Algorithms/mitkProbeFilter.cpp
   Algorithms/mitkSimpleHistogram.cpp
   Algorithms/mitkSimpleUnstructuredGridHistogram.cpp
-  Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp

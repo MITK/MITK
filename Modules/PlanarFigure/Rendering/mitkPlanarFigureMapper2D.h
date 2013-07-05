@@ -251,7 +251,14 @@ protected:
     property[mode] = value;
   }
 
-
+  /**
+  * \brief Callback that sets m_NodeModified to true.
+  *
+  * This method set the bool flag m_NodeModified to true. It's a callback
+  * that is executed when a itk::ModifiedEvet is invoked on our
+  * DataNode.
+  */
+  void OnNodeModified();
 
 private:
   bool m_IsSelected;
@@ -283,6 +290,11 @@ private:
   float m_MarkerColor[3][3];
   float m_MarkerOpacity[3];
 
+  // Bool flag that represents whether or not the DataNode has been modified.
+  bool m_NodeModified;
+
+  // Observer-tag for listening to itk::ModifiedEvents on the DataNode
+  unsigned long m_NodeModifiedObserverTag;
 };
 
 } // namespace mitk

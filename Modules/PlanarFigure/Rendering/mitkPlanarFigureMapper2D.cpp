@@ -33,12 +33,19 @@ static const float PLANAR_OFFSET = 0.5f;
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
 {
+  m_NodeModifiedObserverTag = -1;
+  m_NodeModified = true;
   this->InitializeDefaultPlanarFigureProperties();
 }
 
 
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
+  if ( m_NodeModifiedObserverTag != -1
+    && GetDataNode() != NULL )
+  {
+    GetDataNode()->RemoveObserver( m_NodeModifiedObserverTag );
+  }
 }
 
 
@@ -183,12 +190,6 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
     pointlist.push_back(displayPoint);
-
-    // complete line loop to the first point again
-    if(closed)
-    {
-      pointlist.push_back( (*pointlist.begin()) );
-    }
   }
 
   // now paint all the points in one run
@@ -220,10 +221,8 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
-
-
-
-  for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
+  unsigned short numberOfPolyLines = figure->GetPolyLinesSize();
+  for ( unsigned short loop=0; loop<numberOfPolyLines ; ++loop )
   {
     PlanarFigure::PolyLineType polyline = figure->GetPolyLine(loop);
 
@@ -232,7 +231,6 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       firstPoint, planarFigureGeometry2D,
       rendererGeometry2D, displayGeometry );
   }
-
 }
 
 void mitk::PlanarFigureMapper2D::DrawHelperLines(
@@ -242,9 +240,10 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
+  unsigned short numberOfHelperPolyLines = figure->GetHelperPolyLinesSize();
 
   // Draw helper objects
-  for ( unsigned int loop = 0; loop < figure->GetHelperPolyLinesSize(); ++loop )
+  for ( unsigned int loop=0; loop<numberOfHelperPolyLines; ++loop )
   {
     const mitk::PlanarFigure::PolyLineType helperPolyLine = figure->GetHelperPolyLine(loop,
       displayGeometry->GetScaleFactorMMPerDisplayUnit(),
@@ -429,6 +428,23 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     return;
   }
 
+  // if we have not added an observer for ModifiedEvents on teh DataNode,
+  // we add one now.
+  if ( m_NodeModifiedObserverTag == -1 )
+  {
+    itk::SimpleMemberCommand<mitk::PlanarFigureMapper2D>::Pointer nodeModifiedCommand = itk::SimpleMemberCommand<mitk::PlanarFigureMapper2D>::New();
+    nodeModifiedCommand->SetCallbackFunction(this, &mitk::PlanarFigureMapper2D::OnNodeModified);
+    m_NodeModifiedObserverTag = node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+  }
+
+  // If the DataNode has not been modified since the last execution of
+  // this method, we do not run it now.
+  if ( !m_NodeModified )
+    return;
+
+  // Mark the current properties as unmodified
+  m_NodeModified = false;
+
   //Get Global Opacity
   float globalOpacity = 1.0;
   node->GetFloatProperty("opacity", globalOpacity);
@@ -442,7 +458,6 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
 
   node->GetBoolProperty( "planarfigure.drawdashed", m_DrawDashed );
-
 
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
@@ -514,8 +529,13 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
     m_MarkerlineOpacity[i] *= globalOpacity;
     m_MarkerOpacity[i] *= globalOpacity;
   }
+
 }
 
+void mitk::PlanarFigureMapper2D::OnNodeModified()
+{
+  m_NodeModified = true;
+}
 
 void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite )
 {
@@ -524,7 +544,7 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   //node->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
   //node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
   //node->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
-  node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(false) );
   //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
@@ -667,6 +687,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
       0,
       0,
       globalOpacity ); //this is a shadow
+
     openGLrenderer->WriteSimpleText( name,
       firstPoint[0] + 5.0, firstPoint[1] + 5.0,
       m_LineColor[lineDisplayMode][0],

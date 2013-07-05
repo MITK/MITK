@@ -5,6 +5,10 @@ SET(CPP_FILES
   QmitkScalarBar.cpp
   QmitkScalarBarOverlay.cpp
   QmitkTextOverlay.cpp
+  mitkTextOverlay2D.cpp
+  mitkTextOverlay3D.cpp
+  mitkLabelOverlay3D.cpp
+  mitkOverlay2DLayouter.cpp
 )
 
 

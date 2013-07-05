@@ -16,6 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkMemoryUtilities.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
+
+#include "mitkImageToSurfaceFilter.h"
 
 mitk::SurfaceInterpolationController::SurfaceInterpolationController()
   :m_SelectedSegmentation(0)
@@ -145,19 +149,17 @@ void mitk::SurfaceInterpolationController::Interpolate()
     */
   //mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
 
+  // update the filter and get teh resulting distance-image
   m_InterpolateSurfaceFilter->Update();
-
   Image::Pointer distanceImage = m_InterpolateSurfaceFilter->GetOutput();
 
-  vtkSmartPointer<vtkMarchingCubes> mcFilter = vtkSmartPointer<vtkMarchingCubes>::New();
-  mcFilter->SetInput(distanceImage->GetVtkImageData());
-  mcFilter->SetValue(0,0);
-  mcFilter->Update();
+  // create a surface from the distance-image
+  mitk::ImageToSurfaceFilter::Pointer imageToSurfaceFilter = mitk::ImageToSurfaceFilter::New();
+  imageToSurfaceFilter->SetInput( distanceImage );
+  imageToSurfaceFilter->SetThreshold( 0 );
+  imageToSurfaceFilter->Update();
+  m_InterpolationResult = imageToSurfaceFilter->GetOutput();
 
-  m_InterpolationResult = 0;
-  m_InterpolationResult = mitk::Surface::New();
-  m_InterpolationResult->SetVtkPolyData(mcFilter->GetOutput());
-  m_InterpolationResult->GetGeometry()->SetOrigin(distanceImage->GetGeometry()->GetOrigin());
 
   vtkSmartPointer<vtkAppendPolyData> polyDataAppender = vtkSmartPointer<vtkAppendPolyData>::New();
   for (unsigned int i = 0; i < m_ReduceFilter->GetNumberOfOutputs(); i++)
@@ -226,6 +228,12 @@ double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
   return percentage;
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::SurfaceInterpolationController::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
+{
+  result = input;
+}
+
 void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationList(mitk::Image* segmentation)
 {
   if (segmentation == m_SelectedSegmentation)
@@ -244,6 +252,10 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
 
   m_SelectedSegmentation = segmentation;
 
+
+  itk::ImageBase<3>::Pointer itkImage;
+  AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
+  m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
 
   if (it == m_MapOfContourLists.end())
   {

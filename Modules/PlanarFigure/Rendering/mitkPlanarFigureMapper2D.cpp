@@ -44,11 +44,11 @@ mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
-
   bool visible = true;
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if ( !visible ) return;
+
 
   // Get PlanarFigure from input
   mitk::PlanarFigure *planarFigure = const_cast< mitk::PlanarFigure * >(
@@ -338,7 +338,15 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   glColor4f( color[0], color[1], color[2], opacity );
   glLineWidth(lineWidth);
 
-  glBegin( GL_LINE_STRIP );
+
+  if ( closed )
+  {
+    glBegin( GL_LINE_LOOP );
+  }
+  else
+  {
+    glBegin( GL_LINE_STRIP );
+  }
 
   for ( PlanarFigure::PolyLineType::iterator iter = vertices.begin(); iter!=vertices.end(); iter++ )
   {
@@ -377,6 +385,13 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   const Geometry2D* rendererGeometry2D,
   const DisplayGeometry* displayGeometry)
 {
+
+  if ( m_DrawDashed )
+  {
+    glLineStipple(1, 0x00FF);
+    glEnable(GL_LINE_STIPPLE);
+  }
+
   for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
   {
     PlanarFigure::PolyLineType polyline = figure->GetPolyLine(loop);
@@ -406,6 +421,12 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       color, opacity, lineWidth, firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
+
+  if ( m_DrawDashed )
+  {
+    glDisable(GL_LINE_STIPPLE);
+  }
+
 }
 
 void mitk::PlanarFigureMapper2D::DrawHelperLines(
@@ -569,6 +590,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawShadow = false;
   m_DrawControlPoints = false;
   m_DrawName = true;
+  m_DrawDashed = true;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -630,6 +652,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawcontrolpoints", m_DrawControlPoints );
   node->GetBoolProperty( "planarfigure.drawname", m_DrawName );
+
+  node->GetBoolProperty( "planarfigure.drawdashed", m_DrawDashed );
+
 
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
@@ -716,6 +741,8 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "planarfigure.drawshadow", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawcontrolpoints", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawname", mitk::BoolProperty::New(true) );
+  node->AddProperty( "planarfigure.drawdashed", mitk::BoolProperty::New(false) );
+
 
   node->AddProperty("planarfigure.line.width", mitk::FloatProperty::New(2.0) );
   node->AddProperty("planarfigure.shadow.widthmodifier", mitk::FloatProperty::New(2.0) );

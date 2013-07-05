@@ -214,6 +214,7 @@ private:
   bool m_DrawShadow;
   bool m_DrawControlPoints;
   bool m_DrawName;
+  bool m_DrawDashed;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;

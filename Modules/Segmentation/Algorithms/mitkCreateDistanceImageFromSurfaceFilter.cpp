@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 
-
 mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImageFromSurfaceFilter()
 {
   m_DistanceImageVolume = 50000;
@@ -196,87 +195,72 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 {
   DistanceImageType::Pointer distanceImg = DistanceImageType::New();
 
-  //Determin the bounding box of the delineated contours
-  double xmin = m_Centers.at(0)[0];
-  double ymin = m_Centers.at(0)[1];
-  double zmin = m_Centers.at(0)[2];
-  double xmax = m_Centers.at(0)[0];
-  double ymax = m_Centers.at(0)[1];
-  double zmax = m_Centers.at(0)[2];
+  // Determine the bounds of the input points in index- and world-coordinates
+  DistanceImageType::PointType minPointInWorldCoordinates, maxPointInWorldCoordinates;
+  DistanceImageType::IndexType minPointInIndexCoordinates, maxPointInIndexCoordinates;
 
-  for (unsigned int i = 1; i < m_Centers.size(); i++)
+  DetermineBounds( minPointInWorldCoordinates, maxPointInWorldCoordinates,
+                   minPointInIndexCoordinates, maxPointInIndexCoordinates );
+
+
+  // Calculate the extent of the region that contains all given points in MM.
+  // To do this, we take the difference between the maximal and minimal
+  // index-coordinates (must not be less than 1) and multiply it with the
+  // spacing of the reference-image.
+  Vector3D extentMM;
+  for (unsigned int dim = 0; dim < 3; ++dim)
   {
-    if (xmin > m_Centers.at(i)[0])
-    {
-      xmin = m_Centers.at(i)[0];
-    }
-    if (ymin > m_Centers.at(i)[1])
-    {
-      ymin = m_Centers.at(i)[1];
-    }
-    if (zmin > m_Centers.at(i)[2])
-    {
-      zmin = m_Centers.at(i)[2];
-    }
-    if (xmax < m_Centers.at(i)[0])
-    {
-      xmax = m_Centers.at(i)[0];
-    }
-    if (ymax < m_Centers.at(i)[1])
-    {
-      ymax = m_Centers.at(i)[1];
-    }
-    if (zmax < m_Centers.at(i)[2])
-    {
-      zmax = m_Centers.at(i)[2];
-    }
+    extentMM[dim] = (int)
+      (
+                    (std::max( std::abs(maxPointInIndexCoordinates[dim] - minPointInIndexCoordinates[dim]),
+                              (DistanceImageType::IndexType::IndexValueType) 1
+                            ) + 1.0) // (max-index - min-index)+1 because the pixels between index 3 and 5 cover 2+1=3 pixels (pixel 3,4, and 5)
+                    * m_ReferenceImage->GetSpacing()[dim]
+      ) + 1; // (int) ((...) + 1) -> we round up to the next BIGGER int value
   }
 
-  Vector3D extentMM;
-  extentMM[0] = xmax - xmin + 5;
-  extentMM[1] = ymax - ymin + 5;
-  extentMM[2] = zmax - zmin + 5;
-
-  //Shifting the distance image's offest to achieve an exact distance calculation
-  xmin = xmin - 5;
-  ymin = ymin - 5;
-  zmin = zmin - 5;
-
   /*
-    Now create an empty distance image. The create image will always have the same size, independent from
-    the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
-    The spacing is calculated like the following:
-    The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
-    So the spacing is: spacing = ( 500000 / extentX*extentY*extentZ )^(1/3)
+  * Now create an empty distance image. The create image will always have the same sizeOfRegion, independent from
+  * the original image (e.g. always consists of 500000 pixels) and will have an isotropic spacing.
+  * The spacing is calculated like the following:
+  * The image's volume = 500000 Pixels = extentX*spacing*extentY*spacing*extentZ*spacing
+  * So the spacing is: spacing = ( 500000 / extentX*extentY*extentZ )^(1/3)
   */
-
   double basis = (extentMM[0]*extentMM[1]*extentMM[2]) / m_DistanceImageVolume;
   double exponent = 1.0/3.0;
   double distImgSpacing = pow(basis, exponent);
   int tempSpacing = (distImgSpacing+0.05)*10;
   m_DistanceImageSpacing = (double)tempSpacing/10.0;
 
+  // calculate the number of pixels of the distance image for each direction
   unsigned int numberOfXPixel = extentMM[0] / m_DistanceImageSpacing;
   unsigned int numberOfYPixel = extentMM[1] / m_DistanceImageSpacing;
   unsigned int numberOfZPixel = extentMM[2] / m_DistanceImageSpacing;
 
-  DistanceImageType::SizeType size;
+  // We increase the sizeOfRegion by 4 as we decrease the origin by 2 later.
+  // This expansion of the region is necessary to achieve a complete
+  // interpolation.
+  DistanceImageType::SizeType sizeOfRegion;
+  sizeOfRegion[0] = numberOfXPixel + 4;
+  sizeOfRegion[1] = numberOfYPixel + 4;
+  sizeOfRegion[2] = numberOfZPixel + 4;
 
-  //Increase the distance image's size a little bit to achieve an exact distance calculation
-  size[0] = numberOfXPixel + 5;
-  size[1] = numberOfYPixel + 5;
-  size[2] = numberOfZPixel + 5;
+  // The region starts at index 0,0,0
+  DistanceImageType::IndexType initialOriginAsIndex;
+  initialOriginAsIndex.Fill(0);
 
-  DistanceImageType::IndexType start;
-  start[0] = 0;
-  start[1] = 0;
-  start[2] = 0;
+  DistanceImageType::PointType originAsWorld = minPointInWorldCoordinates;
 
   DistanceImageType::RegionType lpRegion;
+  lpRegion.SetSize(sizeOfRegion);
+  lpRegion.SetIndex(initialOriginAsIndex);
 
-  lpRegion.SetSize(size);
-  lpRegion.SetIndex(start);
-
+  // We initialize the itk::Image with
+  //  * origin and direction to have it correctly placed and rotated in the world
+  //  * the largest possible region to set the extent to be calculated
+  //  * the isotropic spacing that we have calculated above
+  distanceImg->SetOrigin( originAsWorld );
+  distanceImg->SetDirection( m_ReferenceImage->GetDirection() );
   distanceImg->SetRegions( lpRegion );
   distanceImg->SetSpacing( m_DistanceImageSpacing );
   distanceImg->Allocate();
@@ -284,24 +268,41 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   //First of all the image is initialized with the value 10 for each pixel
   distanceImg->FillBuffer(10);
 
+  // Now we move the origin of the distanceImage 2 index-Coordinates
+  // in all directions
+  DistanceImageType::IndexType originAsIndex;
+  distanceImg->TransformPhysicalPointToIndex( originAsWorld, originAsIndex );
+  originAsIndex[0] -= 2;
+  originAsIndex[1] -= 2;
+  originAsIndex[2] -= 2;
+  distanceImg->TransformIndexToPhysicalPoint( originAsIndex, originAsWorld );
+  distanceImg->SetOrigin( originAsWorld );
+
   /*
-    Now we must caculate the distance for each pixel. But instead of calculating the distance value
-    for all of the image's pixels we proceed similar to the region growing algorithm:
-
-    1. Take the first pixel from the narrowband_point_list and calculate the distance for each neighbor (6er)
-    2. If the current index's distance value is below a certain threshold push it into the list
-    3. Next iteration take the next index from the list and start with 1. again
-
-    This is done until the narrowband_point_list is empty.
+  * Now we must calculate the distance for each pixel. But instead of calculating the distance value
+  * for all of the image's pixels we proceed similar to the region growing algorithm:
+  *
+  * 1. Take the first pixel from the narrowband_point_list and calculate the distance for each neighbor (6er)
+  * 2. If the current index's distance value is below a certain threshold push it into the list
+  * 3. Next iteration take the next index from the list and originAsIndex with 1. again
+  *
+  * This is done until the narrowband_point_list is empty.
   */
   std::queue<DistanceImageType::IndexType> narrowbandPoints;
   PointType currentPoint = m_Centers.at(0);
   double distance = this->CalculateDistanceValue(currentPoint);
 
+  // create itk::Point from vnl_vector
+  DistanceImageType::PointType currentPointAsPoint;
+  currentPointAsPoint[0] = currentPoint[0];
+  currentPointAsPoint[1] = currentPoint[1];
+  currentPointAsPoint[2] = currentPoint[2];
+
+  // Transform the input point in world-coordinates to index-coordinates
   DistanceImageType::IndexType currentIndex;
-  currentIndex[0] = ( currentPoint[0]-xmin ) / m_DistanceImageSpacing;
-  currentIndex[1] = ( currentPoint[1]-ymin ) / m_DistanceImageSpacing;
-  currentIndex[2] = ( currentPoint[2]-zmin ) / m_DistanceImageSpacing;
+  distanceImg->TransformPhysicalPointToIndex( currentPointAsPoint, currentIndex );
+
+  assert( lpRegion.IsInside(currentIndex) ); // we are quite certain this should hold
 
   narrowbandPoints.push(currentIndex);
   distanceImg->SetPixel(currentIndex, distance);
@@ -312,31 +313,38 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
   unsigned int relativeNbIdx[] = {4, 10, 12, 14, 16, 22};
 
   bool isInBounds = false;
-
   while ( !narrowbandPoints.empty() )
   {
 
     nIt.SetLocation(narrowbandPoints.front());
     narrowbandPoints.pop();
 
+    unsigned int* relativeNb = &relativeNbIdx[0];
     for (int i = 0; i < 6; i++)
     {
-      nIt.GetPixel(relativeNbIdx[i], isInBounds);
-      if( isInBounds && nIt.GetPixel(relativeNbIdx[i]) == 10)
+      nIt.GetPixel(*relativeNb, isInBounds);
+      if( isInBounds && nIt.GetPixel(*relativeNb) == 10)
       {
-        currentIndex = nIt.GetIndex(relativeNbIdx[i]);
+        currentIndex = nIt.GetIndex(*relativeNb);
 
-        currentPoint[0] = currentIndex[0]*m_DistanceImageSpacing + xmin;
-        currentPoint[1] = currentIndex[1]*m_DistanceImageSpacing + ymin;
-        currentPoint[2] = currentIndex[2]*m_DistanceImageSpacing + zmin;
+        // Transform the currently checked point from index-coordinates to
+        // world-coordinates
+        distanceImg->TransformIndexToPhysicalPoint( currentIndex, currentPointAsPoint );
 
+        // create a vnl_vector
+        currentPoint[0] = currentPointAsPoint[0];
+        currentPoint[1] = currentPointAsPoint[1];
+        currentPoint[2] = currentPointAsPoint[2];
+
+        // and check the distance
         distance = this->CalculateDistanceValue(currentPoint);
         if ( abs(distance) <= m_DistanceImageSpacing )
         {
-          nIt.SetPixel(relativeNbIdx[i], distance);
+          nIt.SetPixel(*relativeNb, distance);
           narrowbandPoints.push(currentIndex);
         }
       }
+      relativeNb++;
     }
   }
 
@@ -441,13 +449,9 @@ void mitk::CreateDistanceImageFromSurfaceFilter::CreateDistanceImage()
 
   Image::Pointer resultImage = this->GetOutput();
 
-  Point3D origin;
-  origin[0] = xmin;
-  origin[1] = ymin;
-  origin[2] = zmin;
-
+  // Cast the created distance-Image from itk::Image to the mitk::Image
+  // that is our output.
   CastToMitkImage(distanceImg, resultImage);
-  resultImage->GetGeometry()->SetOrigin(origin);
 }
 
 void mitk::CreateDistanceImageFromSurfaceFilter::FillImageRegion(DistanceImageType::RegionType reqRegion,
@@ -471,12 +475,17 @@ double mitk::CreateDistanceImageFromSurfaceFilter::CalculateDistanceValue(PointT
   PointType p2;
   double norm;
 
-  for (unsigned int i = 0; i < m_Centers.size(); i++)
+  CenterList::iterator centerIter;
+  InterpolationWeights::iterator weightsIter;
+
+  for ( centerIter=m_Centers.begin(), weightsIter=m_Weights.begin();
+    centerIter!=m_Centers.end(), weightsIter!=m_Weights.end();
+    centerIter++, weightsIter++ )
   {
-    p1 = m_Centers.at(i);
+    p1 = *centerIter;
     p2 = p-p1;
     norm = p2.two_norm();
-    distanceValue = distanceValue + norm*m_Weights.get(i);
+    distanceValue = distanceValue + norm* (*weightsIter);
   }
   return distanceValue;
 }
@@ -583,3 +592,85 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetProgressStepSize(unsigned in
 {
   this->m_ProgressStepSize = stepSize;
 }
+
+void mitk::CreateDistanceImageFromSurfaceFilter::SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage )
+{
+ m_ReferenceImage = referenceImage;
+}
+
+void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageType::PointType &minPointInWorldCoordinates,
+                                                                  DistanceImageType::PointType &maxPointInWorldCoordinates,
+                                                                  DistanceImageType::IndexType &minPointInIndexCoordinates,
+                                                                  DistanceImageType::IndexType &maxPointInIndexCoordinates )
+{
+  PointType firstCenter = m_Centers.at(0);
+  DistanceImageType::PointType tmpPoint;
+  tmpPoint[0] = firstCenter[0];
+  tmpPoint[1] = firstCenter[1];
+  tmpPoint[2] = firstCenter[2];
+
+  // transform the first point from world-coordinates to index-coordinates
+  DistanceImageType::IndexType tmpIndex;
+  m_ReferenceImage->TransformPhysicalPointToIndex( tmpPoint, tmpIndex );
+
+  // initialize the variables with this first point
+  int xmin = tmpIndex[0];
+  int ymin = tmpIndex[1];
+  int zmin = tmpIndex[2];
+  int xmax = tmpIndex[0];
+  int ymax = tmpIndex[1];
+  int zmax = tmpIndex[2];
+
+  // iterate over the rest of the points
+  CenterList::iterator centerIter = m_Centers.begin();
+  for ( ++centerIter; centerIter!=m_Centers.end(); centerIter++)
+  {
+    tmpPoint[0] = (*centerIter)[0];
+    tmpPoint[1] = (*centerIter)[1];
+    tmpPoint[2] = (*centerIter)[2];
+
+    // transform each point from world-coordinates to index-coordinates
+    m_ReferenceImage->TransformPhysicalPointToIndex( tmpPoint, tmpIndex );
+
+    // and set the variables accordingly to find the minimum
+    // and maximum in all directions in index-coordinates
+    if (xmin > tmpIndex[0])
+    {
+      xmin = tmpIndex[0];
+    }
+    if (ymin > tmpIndex[1])
+    {
+      ymin = tmpIndex[1];
+    }
+    if (zmin > tmpIndex[2])
+    {
+      zmin = tmpIndex[2];
+    }
+    if (xmax < tmpIndex[0])
+    {
+      xmax = tmpIndex[0];
+    }
+    if (ymax < tmpIndex[1])
+    {
+      ymax = tmpIndex[1];
+    }
+    if (zmax < tmpIndex[2])
+    {
+      zmax = tmpIndex[2];
+    }
+  }
+
+  // put the found coordinates into Index-Points
+  minPointInIndexCoordinates[0] = xmin;
+  minPointInIndexCoordinates[1] = ymin;
+  minPointInIndexCoordinates[2] = zmin;
+
+  maxPointInIndexCoordinates[0] = xmax;
+  maxPointInIndexCoordinates[1] = ymax;
+  maxPointInIndexCoordinates[2] = zmax;
+
+  // and transform them into world-coordinates
+  m_ReferenceImage->TransformIndexToPhysicalPoint( minPointInIndexCoordinates, minPointInWorldCoordinates );
+  m_ReferenceImage->TransformIndexToPhysicalPoint( maxPointInIndexCoordinates, maxPointInWorldCoordinates );
+}
+

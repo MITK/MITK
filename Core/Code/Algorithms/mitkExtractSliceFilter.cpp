@@ -35,6 +35,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   m_TimeStep = 0;
   m_Reslicer->ReleaseDataFlagOn();
   m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
+  m_ResliceTransform = NULL;
   m_InPlaneResampleExtentByGeometry = false;
   m_OutPutSpacing = new mitk::ScalarType[2];
   m_OutputDimension = 2;
@@ -46,6 +47,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
+  m_ResliceTransform = NULL;
   m_WorldGeometry = NULL;
   delete [] m_OutPutSpacing;
 }
@@ -88,16 +90,6 @@ void mitk::ExtractSliceFilter::GenerateData(){
     itkExceptionMacro("mitk::ExtractSliceFilter: No input image available. Please set the input!");
     return;
   }
-
-
-  /*Set the transform of the image to be applied to the resampling grid.
-  Note (taken from vtkImageReslice documentation):
-  Applying a transform to the resampling grid (which lies in the output coordinate system)
-  is equivalent to applying the inverse of that transform to the input volume.*/
-  this->m_InputImageGeometry = input->GetTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
-  if(m_InputImageGeometry.IsNotNull())
-    m_Reslicer->SetResliceTransform(m_InputImageGeometry->GetVtkTransform()->GetLinearInverse());
-
 
   if(!m_WorldGeometry)
   {
@@ -190,14 +182,20 @@ void mitk::ExtractSliceFilter::GenerateData(){
     /*
     * Transform the origin to center based coordinates.
     * Note:
-    * The worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
+    * This is needed besause vtk's origin is center based too (!!!) ( see 'The VTK book' page 88 )
+    * and the worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
     * has its origin at the corner of the voxel and needs to be transformed.
     */
-    if( !(m_WorldGeometry->GetImageGeometry()))
-    {
-      origin += right * ( m_OutPutSpacing[0] * 0.5 );
-      origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
-    }
+    origin += right * ( m_OutPutSpacing[0] * 0.5 );
+    origin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+
+
+
+    //set the tranform for reslicing.
+    // Use inverse transform of the input geometry for reslicing the 3D image.
+    // This is needed if the image volume already transformed
+    if(m_ResliceTransform.IsNotNull())
+      m_Reslicer->SetResliceTransform(m_ResliceTransform->GetVtkTransform()->GetLinearInverse());
 
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D),
@@ -214,6 +212,8 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     if(abstractGeometry != NULL)
     {
+      m_ResliceTransform = abstractGeometry;
+
       extent[0] = abstractGeometry->GetParametricExtent(0);
       extent[1] = abstractGeometry->GetParametricExtent(1);
 
@@ -258,7 +258,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
   }
 
-  if(m_InputImageGeometry.IsNotNull()){
+  if(m_ResliceTransform.IsNotNull()){
     //if the resliceTransform is set the reslice axis are recalculated.
     //Thus the geometry information is not fitting. Therefor a unitSpacingFilter
     //is used to set up a global spacing of 1 and compensate the transform.
@@ -418,14 +418,15 @@ void mitk::ExtractSliceFilter::GenerateData(){
 
     originalGeometry->GetIndexToWorldTransform()->SetMatrix(m_WorldGeometry->GetIndexToWorldTransform()->GetMatrix());
 
-
+    //the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
     Point3D sliceOrigin = originalGeometry->GetOrigin();
 
-    if( !(m_WorldGeometry->GetImageGeometry()))
-    {
-      //the origin of the worldGeometry is transformed to center based coordinates to be an imageGeometry
-      originalGeometry->ChangeImageGeometryConsideringOriginOffset(true);
-    }
+    sliceOrigin += right * ( m_OutPutSpacing[0] * 0.5 );
+    sliceOrigin += bottom * ( m_OutPutSpacing[1] * 0.5 );
+
+    //a worldGeometry is no imageGeometry, thus it is manually set to true
+    originalGeometry->ImageGeometryOn();
+
 
     /*At this point we have to adjust the geometry because the origin isn't correct.
     The wrong origin is related to the rotation of the current world geometry plane.

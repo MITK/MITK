@@ -24,7 +24,7 @@ namespace mitk
 //## @brief convert the start- and end-index-time of output-region in
 //## start- and end-index-time of input-region via millisecond-time
 template <class TOutputRegion, class TInputRegion>
-void ITK_EXPORT GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeSlicedGeometry *inputTimeGeometry, TInputRegion& inputRegion)
+void GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeSlicedGeometry *inputTimeGeometry, TInputRegion& inputRegion)
 {
   assert(outputTimeGeometry!=NULL);
   assert(inputTimeGeometry!=NULL);
@@ -49,7 +49,7 @@ void ITK_EXPORT GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *output
 //## @brief convert the start- and end-index-time of output in
 //## start- and end-index-time of input1 and input2 via millisecond-time
 template <class TOutputData, class TInputData>
-void ITK_EXPORT GenerateTimeInInputRegion(const TOutputData* output, TInputData* input)
+void GenerateTimeInInputRegion(const TOutputData* output, TInputData* input)
 {
   assert(output!=NULL);
   assert(input!=NULL);
@@ -72,10 +72,5 @@ void ITK_EXPORT GenerateTimeInInputRegion(const TOutputData* output, TInputData*
 }
 
 } // end namespace mitk
-
-//#ifndef ITK_MANUAL_INSTANTIATION
-//#include "mitkTimeHelper.txx"
-#include "MitkExtExports.h"
-//#endif
 
 #endif // MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2

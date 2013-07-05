@@ -172,8 +172,8 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
 {
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+    std::string extension = itksys::SystemTools::GetFilenameExtension( path );
     std::string finalFileName = dir + "/" + baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -322,9 +322,9 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
   if (data == NULL || path.empty()) return false;
 
   std::string dir = itksys::SystemTools::GetFilenamePath( path );
-  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
-  std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
-  std::string finalFileName = dir + "/" + baseFilename;
+  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+  std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+  std::string fileNameWithoutExtension = dir + "/" + baseFilename;
 
   mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
 
@@ -351,7 +351,7 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
         }
       }
 
-      finalFileName = dir + "/" + baseFilename + extension;
+      std::string finalFileName = fileNameWithoutExtension + extension;
       try
       {
         (*it)->SetFileName( finalFileName.c_str() );

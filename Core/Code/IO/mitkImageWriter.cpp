@@ -37,9 +37,71 @@ mitk::ImageWriter::~ImageWriter()
 {
 }
 
+void mitk::ImageWriter::SetFileName(const char* fileName)
+{
+  if ( fileName && ( fileName == this->m_FileName ) )
+  {
+    return;
+  }
+  if ( fileName )
+  {
+    this->m_FileName = fileName;
+    this->m_FileNameWithoutExtension = this->m_FileName;
+    this->m_Extension.clear();
+    std::size_t pos = this->m_FileName.find_last_of("/\\");
+    if (pos != std::string::npos)
+    {
+      std::size_t ppos = this->m_FileName.find_first_of('.', pos);
+      if (ppos != std::string::npos)
+      {
+        this->m_FileNameWithoutExtension = this->m_FileName.substr(0, ppos);
+        this->m_Extension = this->m_FileName.substr(ppos);
+      }
+    }
+  }
+  else
+  {
+    this->m_FileName.clear();
+    this->m_FileNameWithoutExtension.clear();
+    this->m_Extension.clear();
+  }
+  this->Modified();
+}
+
+void mitk::ImageWriter::SetFileName(const std::string & fileName)
+{
+  this->SetFileName( fileName.c_str() );
+}
+
+void mitk::ImageWriter::SetExtension(const char* extension)
+{
+  if ( extension && ( extension == this->m_Extension ) )
+  {
+    return;
+  }
+  if ( extension )
+  {
+    this->m_Extension = extension;
+    this->m_FileName = this->m_FileNameWithoutExtension + this->m_Extension;
+  }
+  else
+  {
+    this->m_Extension.clear();
+    this->m_FileName = this->m_FileNameWithoutExtension;
+  }
+  this->Modified();
+}
+
+void mitk::ImageWriter::SetExtension(const std::string & extension)
+{
+  this->SetFileName( extension.c_str() );
+}
+
 void mitk::ImageWriter::SetDefaultExtension()
 {
-  m_Extension = ".mhd";
+  this->m_Extension = ".mhd";
+  this->m_FileName = this->m_FileNameWithoutExtension + this->m_Extension;
+  this->Modified();
 }
 
 #include <vtkConfigure.h>
@@ -58,6 +120,7 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 
 void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileName)
 {
+  MITK_INFO << "Writing image: " << fileName << std::endl;
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
   if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
@@ -220,12 +283,12 @@ void mitk::ImageWriter::GenerateData()
         if(input->GetTimeSlicedGeometry()->IsValidTime(t))
         {
           const mitk::TimeBounds& timebounds = input->GetTimeSlicedGeometry()->GetGeometry3D(t)->GetTimeBounds();
-          filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
+          filename <<  m_FileNameWithoutExtension << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }
         else
         {
           itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of image " << filename << ".");
-          filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
+          filename <<  m_FileNameWithoutExtension << "_T" << t << m_Extension;
         }
         if ( vti )
         {
@@ -239,15 +302,11 @@ void mitk::ImageWriter::GenerateData()
     }
     else if ( vti )
     {
-      std::ostringstream filename;
-      filename <<  m_FileName.c_str() << m_Extension;
-      writeVti(filename.str().c_str(), input);
+      writeVti(m_FileName.c_str(), input);
     }
     else
     {
-      std::ostringstream filename;
-      filename <<  m_FileName.c_str() << m_Extension;
-      WriteByITK(input, filename.str());
+      WriteByITK(input, m_FileName);
     }
   }
   else
@@ -279,9 +338,7 @@ void mitk::ImageWriter::GenerateData()
         || m_Extension.find(".nii.gz") != std::string::npos
         )
     {
-        std::ostringstream filename;
-        filename <<  this->m_FileName.c_str() << this->m_Extension;
-        WriteByITK(input, filename.str());
+        WriteByITK(input, this->m_FileName);
     }
   }
   m_MimeType = "application/MITK.Pic";
@@ -320,6 +377,7 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".pic");
+  possibleFileExtensions.push_back(".pic.gz");
   possibleFileExtensions.push_back(".bmp");
   possibleFileExtensions.push_back(".dcm");
   possibleFileExtensions.push_back(".DCM");
@@ -329,6 +387,7 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
   possibleFileExtensions.push_back(".gipl.gz");
   possibleFileExtensions.push_back(".mha");
   possibleFileExtensions.push_back(".nii");
+  possibleFileExtensions.push_back(".nii.gz");
   possibleFileExtensions.push_back(".nrrd");
   possibleFileExtensions.push_back(".nhdr");
   possibleFileExtensions.push_back(".png");
@@ -373,8 +432,8 @@ const char* mitk::ImageWriter::GetDefaultFilename()
 
 const char* mitk::ImageWriter::GetFileDialogPattern()
 {
-  return "Image (*.pic, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
-      "*.nii, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
+  return "Image (*.pic, *.pic.gz, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
+      "*.nii, *.nii.gz, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
       "*.tif, *.jpg)";
 }
 

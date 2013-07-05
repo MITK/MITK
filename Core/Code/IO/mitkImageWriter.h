@@ -45,7 +45,8 @@ public:
      * Sets the filename of the file to write.
      * @param _arg the name of the file to write.
      */
-    itkSetStringMacro( FileName );
+    virtual void SetFileName (const char* fileName);
+    virtual void SetFileName (const std::string& fileName);
 
     /**
      * @returns the name of the file to be written to disk.
@@ -57,7 +58,8 @@ public:
      * @param _arg to be added to the filename, including a "."
      * (e.g., ".mhd").
      */
-    itkSetStringMacro( Extension );
+    virtual void SetExtension (const char* extension);
+    virtual void SetExtension (const std::string& extension);
 
     /**
      * \brief Get the extension to be added to the filename.
@@ -151,6 +153,8 @@ protected:
     virtual void WriteByITK(mitk::Image* image, const std::string& fileName);
 
     std::string m_FileName;
+
+    std::string m_FileNameWithoutExtension;
 
     std::string m_FilePrefix;
 

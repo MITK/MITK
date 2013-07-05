@@ -19,6 +19,7 @@
 #include <sstream>
 #include <string>
 #include <mitkMousePressEvent.h>
+#include <mitkMouseDoubleClickEvent.h>
 #include <mitkMouseMoveEvent.h>
 #include <mitkMouseReleaseEvent.h>
 #include <mitkMouseWheelEvent.h>
@@ -186,6 +187,11 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
     event = MousePressEvent::New(NULL, pos, buttonState, modifiers, eventButton);
+  }
+  else if (eventClass == "MOUSEDOUBLECLICKEVENT")
+  {
+    buttonState = buttonState | eventButton;
+    event = MouseDoubleClickEvent::New(NULL, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEMOVEEVENT")
   {

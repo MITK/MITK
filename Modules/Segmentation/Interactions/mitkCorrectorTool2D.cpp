@@ -58,7 +58,7 @@ std::string mitk::CorrectorTool2D::GetIconPath() const
 
 std::string mitk::CorrectorTool2D::GetCursorIconPath() const
 {
-  return ":/Segmentation/Correction_Cursor_48x48.png";
+  return ":/Segmentation/Correction_Cursor_32x32.png";
 }
 
 const char* mitk::CorrectorTool2D::GetName() const

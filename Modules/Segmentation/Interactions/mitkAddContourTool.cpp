@@ -43,7 +43,7 @@ std::string mitk::AddContourTool::GetIconPath() const
 
 std::string mitk::AddContourTool::GetCursorIconPath() const
 {
-  return ":/Segmentation/Add_Cursor_48x48.png";
+  return ":/Segmentation/Add_Cursor_32x32.png";
 }
 
 const char* mitk::AddContourTool::GetName() const

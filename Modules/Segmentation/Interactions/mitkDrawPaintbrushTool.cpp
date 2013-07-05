@@ -43,7 +43,7 @@ std::string mitk::DrawPaintbrushTool::GetIconPath() const
 
 std::string mitk::DrawPaintbrushTool::GetCursorIconPath() const
 {
-  return ":/Segmentation/Paint_Cursor_48x48.png";
+  return ":/Segmentation/Paint_Cursor_32x32.png";
 }
 
 const char* mitk::DrawPaintbrushTool::GetName() const

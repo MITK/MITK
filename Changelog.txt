@@ -12,6 +12,7 @@ of release notes for the next release.
 
 ======== Changes in release 1.0 (2010-TBD) ========
 
+
 ======== Changes in release 0.12.2 (2009-Jun-12) ========
 
 0.12.2 is a bugfix release for 0.12. Issues fixed:
@@ -39,7 +40,7 @@ of release notes for the next release.
 - VTK 5.2 and VTK 5.4 compatibility
 - ITK 3.10 and ITK 3.12 compatibility
 - Windows Vista 64 Bit compatibility
-- new framework MITK-IGT: image guided therapy with MITK, support for tracking devices etc., 
+- new framework MITK-IGT: image guided therapy with MITK, support for tracking devices etc.,
   see http://mitk.org/wiki/IGT for details
 
 ======== Changes in release 0.10 (2008-Nov-21) ========
@@ -52,9 +53,9 @@ Application changes:
 - interactive segmentation tool set now easily extensible by plugins
   (see http://docs.mitk.org/nightly/toolextensions.html)
 - Rendering changes:
-  - Improved Volume-Rendering: Level-of-Detail Mechanism now works 
+  - Improved Volume-Rendering: Level-of-Detail Mechanism now works
     for multiple simultaneous 3D RenderWindows and datasets
-  - Experimental: user interaction during volume rendering 
+  - Experimental: user interaction during volume rendering
     (enable by setting flag "LOD abort mechanism" in Global Options)
 
 Under-the-hood changes:
@@ -82,9 +83,9 @@ Under-the-hood changes:
 ======== Changes in release 0.8 (2007-Dec-19) ========
 
 - Subversion!
-- functionality for slice-by-slice segmentation including interpolation between segmented slices (QmitkInteractiveSegmentation). 
+- functionality for slice-by-slice segmentation including interpolation between segmented slices (QmitkInteractiveSegmentation).
   For more information see http://www.mitk.org/slicebasedsegmentation.html
-  - example code for 
+  - example code for
     - use of zlib for image compression ( mitk::CompressedImageContainer )
     - observe changes in the slicer/MPR ( QmitkSlicesInterpolator )
     - how to safely implement undo
@@ -105,9 +106,8 @@ Under-the-hood changes:
 - support for "Connexion 3D SpaceNavigator (TM) Mouse": Activate option MITK_USE_TD_MOUSE in cmake to enable interaction with a connexion 3D mouse in 3D widget.
 
 Minor interface changes to lower command complexibility (-classes::method):
-- mitkDataNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
-- mitkDataNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkDataNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer.
+- mitkDataNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer.
 - mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer.
 
 
- 

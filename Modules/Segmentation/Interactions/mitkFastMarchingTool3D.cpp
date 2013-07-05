@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool3D, "FastMarching tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool3D, "FastMarching3D tool");
 }
 
 
@@ -215,6 +215,7 @@ void mitk::FastMarchingTool3D::Deactivated()
   this->m_GradientMagnitudeFilter->RemoveAllObservers();
   this->m_FastMarchingFilter->RemoveAllObservers();
   m_ResultImageNode = NULL;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::FastMarchingTool3D::Initialize()

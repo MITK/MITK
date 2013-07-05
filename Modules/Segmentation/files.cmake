@@ -1,16 +1,13 @@
 set(CPP_FILES
 Algorithms/mitkCalculateSegmentationVolume.cpp
-Algorithms/mitkComputeContourSetNormalsFilter.cpp
 Algorithms/mitkContourSetToPointSetFilter.cpp
 Algorithms/mitkContourUtils.cpp
 Algorithms/mitkCorrectorAlgorithm.cpp
-Algorithms/mitkCreateDistanceImageFromSurfaceFilter.cpp
 Algorithms/mitkDiffImageApplier.cpp
 Algorithms/mitkImageToContourFilter.cpp
 Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
 Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
 Algorithms/mitkOverwriteSliceImageFilter.cpp
-Algorithms/mitkReduceContourSetFilter.cpp
 Algorithms/mitkSegmentationObjectFactory.cpp
 Algorithms/mitkSegmentationSink.cpp
 Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
@@ -27,7 +24,6 @@ Algorithms/mitkImageToContourModelFilter.cpp
 Algorithms/mitkImageToLiveWireContourFilter.cpp
 Algorithms/mitkImageLiveWireContourModelFilter.cpp
 Controllers/mitkSegmentationInterpolationController.cpp
-Controllers/mitkSurfaceInterpolationController.cpp
 # DataManagement/mitkApplyDiffImageOperation.cpp
 DataManagement/mitkContour.cpp
 DataManagement/mitkContourSet.cpp

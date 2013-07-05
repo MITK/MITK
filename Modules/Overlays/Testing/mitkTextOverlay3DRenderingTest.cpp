@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //VTK
 #include <vtkRegressionTestImage.h>
-#include <Overlays/mitkTextOverlay2D.h>
-#include <Overlays/mitkOverlay2DLayouter.h>
+#include "mitkTextOverlay2D.h"
+#include "mitkOverlay2DLayouter.h"
 
 
 int mitkTextOverlay3DRenderingTest(int argc, char* argv[])
@@ -36,12 +36,8 @@ int mitkTextOverlay3DRenderingTest(int argc, char* argv[])
   mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
-  mitk::OverlayManager::Pointer OverlayManagerCreated = mitk::OverlayManager::New();
-  renderer->SetOverlayManager(OverlayManagerCreated);
-
-  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::GetServiceInstance();
-  MITK_TEST_CONDITION_REQUIRED( OverlayManager.IsNotNull(), "Microservice created and retrievable" );
-  MITK_TEST_CONDITION_REQUIRED( OverlayManager.GetPointer() == OverlayManagerCreated.GetPointer(), "Correct OverlayManager Microservice" );
+  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
+  renderer->SetOverlayManager(OverlayManager);
 
 
   //This fetches an instance of the OverlayManager microservice

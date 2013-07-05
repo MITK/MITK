@@ -86,6 +86,7 @@ namespace mitk {
        * Set the source image to create a surface for this filter class. As input every mitk
        * 3D or 3D+t image can be used.
        */
+      using itk::ProcessObject::SetInput;
       virtual void SetInput(const mitk::Image *image);
 
       /**

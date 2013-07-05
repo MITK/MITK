@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk::PropertyList* otherList)
 {
-  MITK_TEST_CONDITION_REQUIRED(list and otherList, "Comparison is passed two non-empty property lists")
+  MITK_TEST_CONDITION_REQUIRED(list && otherList, "Comparison is passed two non-empty property lists")
 
   const mitk::PropertyList::PropertyMap* listM = list->GetMap();
   const mitk::PropertyList::PropertyMap* otherListM = otherList->GetMap();

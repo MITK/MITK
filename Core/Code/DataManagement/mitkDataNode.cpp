@@ -20,12 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 
 #include "mitkProperties.h"
+#include "mitkStringProperty.h"
 #include "mitkGroupTagProperty.h"
 #include "mitkSmartPointerProperty.h"
+//#include "mitkMaterialProperty.h"
+#include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
+#include "mitkRenderingManager.h"
 #include "mitkGlobalInteraction.h"
+#include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
+
+#include "mitkCoreObjectFactory.h"
+
 
 
 mitk::Mapper* mitk::DataNode::GetMapper(MapperSlotId id) const

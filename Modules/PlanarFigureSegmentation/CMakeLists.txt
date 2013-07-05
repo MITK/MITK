@@ -1,4 +1,4 @@
 
 MITK_CREATE_MODULE( PlanarFigureSegmentation
-               DEPENDS PlanarFigure Segmentation
+               DEPENDS SurfaceInterpolation PlanarFigure Segmentation
 )

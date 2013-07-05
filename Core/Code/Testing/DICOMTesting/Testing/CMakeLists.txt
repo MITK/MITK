@@ -13,6 +13,9 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_NoImagePositionPatient mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc-no2032.dcm)
 
+# verifies that the loader can also be used to just scan for tags and provide them in mitk::Properties (parameter preLoadedVolume)
+mitkAddCustomModuleTest(mitkDICOMPreloadedVolumeTest_Slice mitkDICOMPreloadedVolumeTest ${MITK_DATA_DIR}/spacing-ok-ct.dcm)
+
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
@@ -77,5 +80,9 @@ AddDicomTestsFromDataRepository(${CT_TILT_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${
 AddDicomTestsFromDataRepository(${MR_HEART_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
 
 AddDicomTestsFromDataRepository(${SOP_CLASSES_DIR} ${TESTS_DIR} ${INPUT_LISTNAME} ${EXPECTED_DUMP})
+
+# use one more realistic series for testing property lists
+file(GLOB_RECURSE abdomenImages ${CT_ABDOMEN_DIR}/14?) # this is just one small volume
+mitkAddCustomModuleTest(mitkDICOMPreloadedVolumeTest_Abdomen mitkDICOMPreloadedVolumeTest ${abdomenImages})
 
 

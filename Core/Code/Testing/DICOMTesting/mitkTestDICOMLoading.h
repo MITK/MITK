@@ -34,7 +34,7 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
     TestDICOMLoading();
 
     ImageList
-    LoadFiles( const StringContainer& files );
+    LoadFiles( const StringContainer& files, Image::Pointer preLoadedVolume = NULL );
 
     /**
       \brief Dump relevant image information for later comparison.

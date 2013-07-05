@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkApplicationCursor.h"
-
-//#include "mitkFastMarchingTool.xpm"
 #include "mitkInteractionConst.h"
 
 #include "itkOrImageFilter.h"
@@ -298,18 +295,14 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
 
   m_PositionEvent = new PositionEvent(p->GetSender(), p->GetType(), p->GetButton(), p->GetButtonState(), p->GetKey(), p->GetDisplayPosition(), p->GetWorldPosition());
 
-  m_ReferenceImageSlice = GetAffectedReferenceSlice( m_PositionEvent );
-
-  CastToItkImage(m_ReferenceImageSlice, m_ReferenceImageSliceAsITK);
-  m_SmoothFilter->SetInput( m_ReferenceImageSliceAsITK );
-/*
   //if click happpened in another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
   {
-//    this->ResetFastMarching(m_PositionEvent);
-      this->Reset
+      m_ReferenceImageSlice = GetAffectedReferenceSlice( m_PositionEvent );
+      CastToItkImage(m_ReferenceImageSlice, m_ReferenceImageSliceAsITK);
+      m_SmoothFilter->SetInput( m_ReferenceImageSliceAsITK );
   }
-*/
+
   m_LastEventSender = m_PositionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
@@ -319,7 +312,6 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   itk::Index<2> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
-//  seedPosition[2] = clickInIndex[2];
 
   NodeType node;
   const double seedValue = 0.0;

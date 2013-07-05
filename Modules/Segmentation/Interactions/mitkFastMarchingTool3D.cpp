@@ -20,9 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkApplicationCursor.h"
-
-//#include "mitkFastMarchingTool3D.xpm"
 #include "mitkInteractionConst.h"
 
 #include "itkOrImageFilter.h"

@@ -170,6 +170,18 @@ std::string mitk::Overlay::GetText()
   return text;
 }
 
+void mitk::Overlay::SetFontSize(int fontSize)
+{
+  SetIntProperty("fontSize",fontSize);
+}
+
+int mitk::Overlay::GetFontSize()
+{
+  int fontSize;
+  GetPropertyList()->GetIntProperty("fontSize", fontSize);
+  return fontSize;
+}
+
 bool mitk::Overlay::GetColor(float rgb[], mitk::BaseRenderer* renderer, const char* propertyKey) const
 {
   mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetProperty(propertyKey, renderer));

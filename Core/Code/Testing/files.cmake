@@ -66,6 +66,7 @@ set(MODULE_TESTS
   mitkLoggingAdapterTest.cpp
   mitkUIDGeneratorTest.cpp
   mitkShaderRepositoryTest.cpp
+  mitkOverlayManagerTest.cpp
 )
 
 # test with image filename as an extra command line parameter

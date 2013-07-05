@@ -333,6 +333,10 @@ public:
 
   std::string GetText();
 
+  void SetFontSize(int fontSize);
+
+  int GetFontSize();
+
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances
   //## of BoolProperty with property-key "visible")

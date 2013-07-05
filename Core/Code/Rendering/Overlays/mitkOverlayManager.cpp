@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOverlayManager.h"
 #include "usGetModuleContext.h"
-#include "mitkOverlay2DLayouter.h"
 
 const std::string mitk::OverlayManager::PROP_ID = "org.mitk.services.OverlayManager.ID";
 
@@ -141,11 +140,11 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
 }
 
 
-mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(int ID)
+mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(std::string ID)
 {
-  std::string id_str = static_cast<std::ostringstream*>( &(std::ostringstream() << ID) )->str();
+//  std::string id_str = static_cast<std::ostringstream*>( &(std::ostringstream() << ID) )->str();
   mitk::ModuleContext* moduleContext = mitk::GetModuleContext();
-  std::string filter = "("+PROP_ID + "="+id_str+")";
+  std::string filter = "("+PROP_ID + "="+ID+")";
   std::list<mitk::ServiceReference> serref = moduleContext->GetServiceReferences("org.mitk.services.OverlayManager",filter);
   if(serref.size()==0)
   {
@@ -158,14 +157,14 @@ mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(int ID)
   }
 }
 
+std::string mitk::OverlayManager::GetID()
+{
+  return m_id;
+}
+
 mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer *renderer, const std::string identifier)
 {
   BaseLayouter::Pointer layouter = m_LayouterMap[renderer][identifier];
-  if(layouter.IsNull())
-  {
-    layouter = mitk::Overlay2DLayouter::CreateLayouter(identifier, renderer);
-    AddLayouter(renderer,layouter);
-  }
   return layouter;
 }
 

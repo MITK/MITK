@@ -39,6 +39,11 @@ It also manages the respective Layouters which are used to manage the placement 
 \section UsageSection Usage of Predefined Overlays
 
 \subsection TextWidget2DUsageSection mitkTextOverlay2D
+
+\dontinclude mitkInteractionEvent.h
+\skipline  // Special Keys
+\until // End special keys
+
 \code
 //The BaseRenderer is only needed to set a layouter
 mitk::BaseRenderer* axialRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow());

@@ -22,11 +22,12 @@
 #include <vtkSmartPointer.h>
 #include <vtkTextActor.h>
 #include <vtkImageMapper.h>
+#include "OverlaysExports.h"
 
 
 namespace mitk {
 
-class MITK_CORE_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
+class Overlays_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
 public:
 
   /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
@@ -36,7 +37,7 @@ public:
      * internal helper class LocalStorage. This allows rendering n views with just
      * 1 mitkMapper using n vtkMapper.
      * */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
+  class Overlays_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     /** \brief Actor of a 2D render window. */

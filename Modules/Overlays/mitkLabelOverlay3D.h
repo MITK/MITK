@@ -17,7 +17,7 @@
 #ifndef LabelOverlay3D_H
 #define LabelOverlay3D_H
 
-#include "mitkVtkOverlay3D.h"
+#include <Overlays/mitkVtkOverlay3D.h>
 #include <mitkLocalStorageHandler.h>
 #include <vtkStringArray.h>
 #include <vtkPolyDataMapper.h>
@@ -28,17 +28,18 @@
 #include <vtkPointSetToLabelHierarchy.h>
 #include <vtkLabelPlacementMapper.h>
 #include <vtkIntArray.h>
+#include "OverlaysExports.h"
 
 
 namespace mitk {
 
 /** \brief Displays a high amount of 3D labels to a PointSet */
 /** */
-class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
+class Overlays_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the vtkActor, etc. for each of the render windows */
-  class MITK_CORE_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
+  class Overlays_EXPORT LocalStorage : public mitk::Overlay::BaseLocalStorage
   {
   public:
     vtkSmartPointer<vtkPolyData> m_Points;

@@ -19,11 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <itkObject.h>
-#include "mitkBaseLayouter.h"
+#include <Overlays/mitkBaseLayouter.h>
+#include "OverlaysExports.h"
 
 namespace mitk {
 
-class MITK_CORE_EXPORT Overlay2DLayouter : public mitk::BaseLayouter {
+class Overlays_EXPORT Overlay2DLayouter : public mitk::BaseLayouter {
 public:
   enum Alignment{TopLeft, Top, TopRight, /*Left, Middle, Right, */BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::BaseLayouter);

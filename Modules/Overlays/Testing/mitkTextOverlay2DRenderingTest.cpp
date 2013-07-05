@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //VTK
 #include <vtkRegressionTestImage.h>
-#include <Overlays/mitkTextOverlay2D.h>
-#include <Overlays/mitkOverlay2DLayouter.h>
+#include "mitkTextOverlay2D.h"
+#include "mitkOverlay2DLayouter.h"
 
 
 int mitkTextOverlay2DRenderingTest(int argc, char* argv[])

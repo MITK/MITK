@@ -24,43 +24,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTextOverlay2D.h"
 #include "mitkOverlay2DLayouter.h"
 
+mitk::TextOverlay2D::Pointer createTextOverlaySymbols(int fontsize, float red, float green, float blue, int posX, int posY, std::string text)
+{
+  //Create a textOverlay2D
+  mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
 
-int mitkLabelOverlay3DRenderingTest(int argc, char* argv[])
+  textOverlay->SetText(text);
+  textOverlay->SetFontSize(fontsize);
+  textOverlay->SetColor(red,green,blue);
+  textOverlay->SetOpacity(1);
+
+  //Position is committed as a Point2D Property
+  mitk::Point2D pos;
+  pos[0] = posX,pos[1] = posY;
+  textOverlay->SetPosition2D(pos);
+  return textOverlay;
+}
+
+int mitkTextOverlay2DSymbolsRenderingTest(int argc, char* argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
   // render the datastorage
   // compare rendering to reference image
-  MITK_TEST_BEGIN("mitkLabelOverlay3DRenderingTest")
+  MITK_TEST_BEGIN("mitkTextOverlay2DSymbolsRenderingTest")
 
   mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
+  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   renderer->SetOverlayManager(OverlayManager);
 
-  //This fetches an instance of the OverlayManager microservice
-  mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance();
-
-  mitk::TextOverlay2D::Pointer textOverlay;
-
-  //Create a textOverlay2D
-  textOverlay = mitk::TextOverlay2D::New();
-
-  textOverlay->SetText("Test!");
-
-  //Position is committed as a Point2D Property
-  mitk::Point2D pos;
-  pos[0] = 10,pos[1] = 20;
-  textOverlay->SetPosition2D(pos);
-
   //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
-  overlayManager->AddOverlay(textOverlay.GetPointer());
+  OverlayManager->AddOverlay(createTextOverlaySymbols(30,1,0,0,100,400,"ä ö ü ß Ö Ä Ü").GetPointer());
+  OverlayManager->AddOverlay(createTextOverlaySymbols(30,0,1,0,400,400,"Ç æ Œ Æ").GetPointer());
+  OverlayManager->AddOverlay(createTextOverlaySymbols(30,0,0,1,400,200,"¼ ₧ ø £ Ø").GetPointer());
+  OverlayManager->AddOverlay(createTextOverlaySymbols(30,1,0,0,100,200,"Δ ξ Ψ Ω").GetPointer());
 
-  //Set a Layouter to the overlay. If the Layouter is custom it has to be added to the OverlayManager first.
-  overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM,renderer);
-
-  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
+  renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;

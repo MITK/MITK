@@ -18,20 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkRenderingTestHelper.h"
 #include <Overlays/mitkOverlayManager.h>
+#include <mitkPointSet.h>
 
 //VTK
 #include <vtkRegressionTestImage.h>
 #include "mitkTextOverlay2D.h"
 #include "mitkOverlay2DLayouter.h"
+#include <mitkLabelOverlay3D.h>
 
 
-int mitkTextOverlay3DRenderingTest(int argc, char* argv[])
+int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
   // render the datastorage
   // compare rendering to reference image
-  MITK_TEST_BEGIN("mitkTextOverlay3DRenderingTest")
+  MITK_TEST_BEGIN("mitkLabelOverlay3DRendering2DTest")
 
   mitkRenderingTestHelper renderingHelper(640, 480, argc, argv);
 
@@ -39,35 +41,42 @@ int mitkTextOverlay3DRenderingTest(int argc, char* argv[])
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   renderer->SetOverlayManager(OverlayManager);
 
+  mitk::PointSet::Pointer pointset = mitk::PointSet::New();
+  mitk::LabelOverlay3D::Pointer label3d = mitk::LabelOverlay3D::New();
+  mitk::Point3D offset;
+  offset[0] = .5;
+  offset[1] = .5;
+  offset[2] = .5;
 
-  //This fetches an instance of the OverlayManager microservice
-  mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance();
+  std::vector<const char*> labels;
+  int idx = 0;
+  for(int i=-10 ; i < 10 ; i+=2){
+    for(int j=-10 ; j < 10 ; j+=2){
+      mitk::Point3D point;
+      point[0] = i;
+      point[1] = j;
+      point[2] = (i*j)/10;
+      pointset->InsertPoint(idx++, point);
+      labels.push_back("test");
+    }
+  }
 
-  mitk::TextOverlay2D::Pointer textOverlay;
+  label3d->SetLabelCoordinates(pointset);
+  label3d->SetLabelVector(labels);
+  label3d->SetOffsetVector(offset);
+  OverlayManager->AddOverlay(label3d.GetPointer());
 
-  //Create a textOverlay2D
-  textOverlay = mitk::TextOverlay2D::New();
-
-  textOverlay->SetText("Test!ä");
-
-  //Position is committed as a Point2D Property
-  mitk::Point2D pos;
-  pos[0] = 10,pos[1] = 20;
-  textOverlay->SetPosition2D(pos);
-
-  //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
-  overlayManager->AddOverlay(textOverlay.GetPointer());
-
-  //Set a Layouter to the overlay. If the Layouter is custom it has to be added to the OverlayManager first.
-  overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM,renderer);
-
-  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
+  mitk::DataNode::Pointer datanode = mitk::DataNode::New();
+  datanode->SetData(pointset);
+  datanode->SetName("pointSet");
+  renderingHelper.AddNodeToStorage(datanode);
+  renderingHelper.Render();
 
   //use this to generate a reference screenshot or save the file:
-  bool generateReferenceScreenshot = false;
+  bool generateReferenceScreenshot = true;
   if(generateReferenceScreenshot)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/output.png");
+    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkLabelOverlay3DRendering2DTest.png");
   }
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper

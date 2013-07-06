@@ -168,18 +168,18 @@ mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer
   return layouter;
 }
 
-void mitk::OverlayManager::AddLayouter(mitk::BaseRenderer *renderer, BaseLayouter::Pointer layouter)
+void mitk::OverlayManager::AddLayouter(BaseLayouter::Pointer layouter)
 {
   if(layouter.IsNotNull())
   {
-    BaseLayouter::Pointer oldLayouter = m_LayouterMap[renderer][layouter->GetIdentifier()];
+    BaseLayouter::Pointer oldLayouter = m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()];
     if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter.GetPointer())
     {
       MITK_WARN << "Layouter " << layouter->GetIdentifier() << " does already exist!";
     }
     else if(oldLayouter.IsNull())
     {
-      m_LayouterMap[renderer][layouter->GetIdentifier()] = layouter;
+      m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()] = layouter;
     }
   }
 }

@@ -54,7 +54,7 @@ public:
   void SetLayouter(Overlay::Pointer overlay, const std::string identifier, BaseRenderer* renderer);
   void UpdateLayouts(BaseRenderer* renderer);
   BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string identifier);
-  void AddLayouter(BaseRenderer* renderer, BaseLayouter::Pointer layouter);
+  void AddLayouter(BaseLayouter::Pointer layouter);
   static OverlayManager::Pointer GetServiceInstance(std::string ID = "0");
   std::string GetID();
 

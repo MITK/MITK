@@ -60,9 +60,10 @@ int mitkOverlayManagerTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("mitkOverlayManagerTest");
 
+  mitkOverlayManagerTestClass::TestNotInstatiatedOverlayManager();
   mitkOverlayManagerTestClass::TestSingleOverlayManager();
   mitkOverlayManagerTestClass::TestSeveralOverlayManagers();
-  mitkOverlayManagerTestClass::TestNotInstatiatedOverlayManager();
+
 
   MITK_TEST_END();
 }

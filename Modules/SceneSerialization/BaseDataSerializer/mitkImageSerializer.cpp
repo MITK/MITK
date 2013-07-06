@@ -57,7 +57,6 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
     writer->SetInput( const_cast<Image*>(image) ); // bad writer design??
     writer->Write();
     fullname = writer->GetFileName();
-    fullname.append(writer->GetFileExtension());
   }
   catch (std::exception& e)
   {

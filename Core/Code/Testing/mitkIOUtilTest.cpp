@@ -37,22 +37,20 @@ int mitkIOUtilTest(int  argc , char* argv[])
 
     std::string outDir = MITK_TEST_OUTPUT_DIR;
     std::string imagePath = outDir+"/diffpic3d.nrrd";
+    std::string imagePath2 = outDir+"/diffpic3d.nii.gz";
     std::string pointSetPath = outDir + "/diffpointset.mps";
     std::string surfacePath = outDir + "/diffsurface.stl";
     std::string pointSetPathWithDefaultExtension = outDir + "/diffpointset2.mps";
     std::string pointSetPathWithoutDefaultExtension = outDir + "/diffpointset2.xXx";
 
-    // the cases where no exception is thrown
-    try{
-        MITK_TEST_CONDITION(mitk::IOUtil::SaveImage(img1, imagePath.c_str()), "Testing if the image could be saved");
-        MITK_TEST_CONDITION(mitk::IOUtil::SavePointSet(pointset, pointSetPath.c_str()), "Testing if the pointset could be saved");
-        MITK_TEST_CONDITION(mitk::IOUtil::SaveSurface(surface, surfacePath.c_str()), "Testing if the surface could be saved");
+    // the cases where no exception should be thrown
+    MITK_TEST_CONDITION(mitk::IOUtil::SaveImage(img1, imagePath), "Testing if the image could be saved");
+    MITK_TEST_CONDITION(mitk::IOUtil::SaveBaseData(img1.GetPointer(), imagePath2), "Testing if the image could be saved");
+    MITK_TEST_CONDITION(mitk::IOUtil::SavePointSet(pointset, pointSetPath), "Testing if the pointset could be saved");
+    MITK_TEST_CONDITION(mitk::IOUtil::SaveSurface(surface, surfacePath), "Testing if the surface could be saved");
 
-        // test if defaultextension is inserted if no extension is present
-        MITK_TEST_CONDITION(mitk::IOUtil::SavePointSet(pointset, pointSetPathWithoutDefaultExtension.c_str()), "Testing if the pointset could be saved");
-    }catch ( mitk::Exception e){
-            MITK_INFO << "Exception is thrown during writeing";
-    }
+    // test if defaultextension is inserted if no extension is present
+    MITK_TEST_CONDITION(mitk::IOUtil::SavePointSet(pointset, pointSetPathWithoutDefaultExtension.c_str()), "Testing if the pointset could be saved");
 
     // test if exception is thrown as expected on unknown extsension
     MITK_TEST_FOR_EXCEPTION(mitk::Exception, mitk::IOUtil::SaveSurface(surface,"testSurface.xXx"));

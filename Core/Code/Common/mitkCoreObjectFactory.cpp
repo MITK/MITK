@@ -62,6 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkPicVolumeTimeSeriesIOFactory.h"
 
 #include "mitkImageWriterFactory.h"
+#include "mitkImageWriter.h"
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
@@ -147,6 +148,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
     mitk::PointSetWriterFactory::RegisterOneFactory();
     mitk::ImageWriterFactory::RegisterOneFactory();
+    m_FileWriters.push_back(mitk::ImageWriter::New().GetPointer());
 
     CreateFileExtensionsMap();
 

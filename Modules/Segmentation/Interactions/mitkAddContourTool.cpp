@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAddContourTool.xpm"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, AddContourTool, "Add tool");
 }
@@ -36,9 +41,11 @@ const char** mitk::AddContourTool::GetXPM() const
   return mitkAddContourTool_xpm;
 }
 
-std::string mitk::AddContourTool::GetIconPath() const
+mitk::ModuleResource mitk::AddContourTool::GetIconResource() const
 {
-  return ":/Segmentation/Add_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Add_48x48.png");
+  return resource;
 }
 
 std::string mitk::AddContourTool::GetCursorIconPath() const

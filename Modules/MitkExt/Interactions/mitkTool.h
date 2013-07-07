@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+  class ModuleResource;
   class ToolManager;
 
   /**
@@ -123,6 +124,13 @@ namespace mitk
      *
      */
     virtual std::string GetCursorIconPath() const { return ""; }
+
+    /**
+     * @brief Returns the tool button icon of the tool wrapped by a usModuleResource
+     * @return a valid ModuleResource or an invalid if this function
+     *         is not reimplemented
+     */
+    virtual ModuleResource GetIconResource() const;
 
     /**
     \brief Returns the name of this tool. Make it short!

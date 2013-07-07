@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDrawPaintbrushTool.xpm"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, DrawPaintbrushTool, "Paintbrush drawing tool");
 }
@@ -36,9 +41,11 @@ const char** mitk::DrawPaintbrushTool::GetXPM() const
   return mitkDrawPaintbrushTool_xpm;
 }
 
-std::string mitk::DrawPaintbrushTool::GetIconPath() const
+mitk::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const
 {
-  return ":/Segmentation/Paint_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Paint_48x48.png");
+  return resource;
 }
 
 std::string mitk::DrawPaintbrushTool::GetCursorIconPath() const

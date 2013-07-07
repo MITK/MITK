@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkSigmoidImageFilter.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -72,8 +74,9 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
-    virtual std::string GetIconPath() const;
+
     virtual std::string GetCursorIconPath() const;
+    ModuleResource GetIconResource() const;
 
     /* parameters of itk filters */
     void SetUpperThreshold(float value);

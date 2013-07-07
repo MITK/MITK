@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
 
+//TODO use usResourceSystem instead of xpm. See other tool icons
+//class ModuleResource;
+
 namespace mitk
 {
 
@@ -68,6 +71,7 @@ class Segmentation_EXPORT WatershedTool : public AutoSegmentationTool
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
+//    ModuleResource GetIconResource() const;
 
 
   protected:

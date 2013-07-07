@@ -18,6 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkErasePaintbrushTool.xpm"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, ErasePaintbrushTool, "Paintbrush erasing tool");
 }
@@ -37,9 +42,11 @@ const char** mitk::ErasePaintbrushTool::GetXPM() const
   return mitkErasePaintbrushTool_xpm;
 }
 
-std::string mitk::ErasePaintbrushTool::GetIconPath() const
+mitk::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const
 {
-  return ":/Segmentation/Wipe_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Wipe_48x48.png");
+  return resource;
 }
 
 std::string mitk::ErasePaintbrushTool::GetCursorIconPath() const

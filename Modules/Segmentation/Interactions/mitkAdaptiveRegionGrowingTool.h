@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataStorage.h"
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -43,7 +45,8 @@ namespace mitk
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
-    virtual std::string GetIconPath() const;
+    ModuleResource GetIconResource() const;
+
 
     virtual void Activated();
     virtual void Deactivated();

@@ -212,7 +212,6 @@ set(UI_FILES
   QmitkTransferFunctionWidget.ui
   QmitkTransferFunctionGeneratorWidget.ui
   QmitkSelectableGLWidget.ui
-  QmitkOtsuToolWidgetControls.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui

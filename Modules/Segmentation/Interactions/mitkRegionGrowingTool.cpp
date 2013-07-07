@@ -79,9 +79,11 @@ mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::RegionGrowingTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/RegionGrowing_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::RegionGrowingTool::GetName() const

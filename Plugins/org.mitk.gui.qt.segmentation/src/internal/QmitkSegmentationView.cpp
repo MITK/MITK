@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
+#include "mitkModuleResource.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 
@@ -1097,12 +1098,8 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
         text += "\"";
         mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
-        std::string iconPath = toolManager->GetToolById(id)->GetCursorIconPath();
-
-        if (iconPath.empty())
-           this->ResetMouseCursor();
-        else
-           this->SetMouseCursor( iconPath, 0, 0 );
+        mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
+        this->SetMouseCursor(resource, 0, 0);
     }
     else
     {
@@ -1120,7 +1117,7 @@ void QmitkSegmentationView::ResetMouseCursor()
   }
 }
 
-void QmitkSegmentationView::SetMouseCursor( const std::string& path, int hotspotX, int hotspotY )
+void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource, int hotspotX, int hotspotY )
 {
   // Remove previously set mouse cursor
   if ( m_MouseCursorSet )
@@ -1128,7 +1125,7 @@ void QmitkSegmentationView::SetMouseCursor( const std::string& path, int hotspot
     mitk::ApplicationCursor::GetInstance()->PopCursor();
   }
 
-  mitk::ApplicationCursor::GetInstance()->PushCursor( path, hotspotX, hotspotY );
+  mitk::ApplicationCursor::GetInstance()->PushCursor( resource, hotspotX, hotspotY );
   m_MouseCursorSet = true;
 }
 

@@ -133,7 +133,7 @@ protected:
 
   void ResetMouseCursor( );
 
-  void SetMouseCursor( const std::string&, int hotspotX, int hotspotY );
+  void SetMouseCursor(const mitk::ModuleResource, int hotspotX, int hotspotY );
 
   bool m_MouseCursorSet;
 

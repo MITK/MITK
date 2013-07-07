@@ -56,7 +56,7 @@ class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
     itkNewMacro(CorrectorTool2D);
 
     virtual const char** GetXPM() const;
-    virtual std::string GetCursorIconPath() const;
+    virtual ModuleResource GetCursorIconResource() const;
     ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;

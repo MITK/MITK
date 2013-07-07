@@ -48,9 +48,11 @@ mitk::ModuleResource mitk::FillRegionTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::FillRegionTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::FillRegionTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/Fill_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Fill_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::FillRegionTool::GetName() const

@@ -48,9 +48,11 @@ mitk::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::DrawPaintbrushTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::DrawPaintbrushTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/Paint_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Paint_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::DrawPaintbrushTool::GetName() const

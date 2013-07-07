@@ -48,9 +48,11 @@ mitk::ModuleResource mitk::AddContourTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::AddContourTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::AddContourTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/Add_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Add_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::AddContourTool::GetName() const

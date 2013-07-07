@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
+//us
+#include "mitkModuleResource.h"
+
 mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = NULL;
 
 namespace mitk {
@@ -43,11 +46,11 @@ void ApplicationCursor::RegisterImplementation(ApplicationCursorImplementation* 
   m_Implementation = implementation;
 }
 
-void ApplicationCursor::PushCursor(const std::string& path, int hotspotX, int hotspotY)
+void ApplicationCursor::PushCursor(const ModuleResource resource, int hotspotX, int hotspotY)
 {
   if (m_Implementation)
   {
-    m_Implementation->PushCursor(path, hotspotX, hotspotY);
+    m_Implementation->PushCursor(resource, hotspotX, hotspotY);
   }
   else
   {

@@ -49,9 +49,11 @@ mitk::ModuleResource mitk::SubtractContourTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::SubtractContourTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::SubtractContourTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/Subtract_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Subtract_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::SubtractContourTool::GetName() const

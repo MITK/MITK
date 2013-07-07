@@ -49,9 +49,11 @@ mitk::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::ErasePaintbrushTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::ErasePaintbrushTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/Wipe_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Wipe_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::ErasePaintbrushTool::GetName() const

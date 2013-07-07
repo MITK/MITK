@@ -123,7 +123,7 @@ namespace mitk
      * \brief Returns the path of a cursor icon.
      *
      */
-    virtual std::string GetCursorIconPath() const { return ""; }
+    virtual ModuleResource GetCursorIconResource() const;
 
     /**
      * @brief Returns the tool button icon of the tool wrapped by a usModuleResource

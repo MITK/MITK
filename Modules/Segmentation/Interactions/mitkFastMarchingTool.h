@@ -75,7 +75,7 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
 
-    virtual std::string GetCursorIconPath() const;
+    virtual ModuleResource GetCursorIconResource() const;
     ModuleResource GetIconResource() const;
 
     /* parameters of itk filters */

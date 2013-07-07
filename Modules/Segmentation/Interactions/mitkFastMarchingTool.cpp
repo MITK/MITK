@@ -126,9 +126,11 @@ mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
   return resource;
 }
 
-std::string mitk::FastMarchingTool::GetCursorIconPath() const
+mitk::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 {
-  return ":/Segmentation/FastMarching_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("FastMarching_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::FastMarchingTool::GetName() const

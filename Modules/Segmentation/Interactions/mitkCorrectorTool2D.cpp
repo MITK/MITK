@@ -60,9 +60,11 @@ mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
   return resource;
 }
 
-std::string mitk::CorrectorTool2D::GetCursorIconPath() const
+mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
 {
-  return ":/Segmentation/Correction_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Correction_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::CorrectorTool2D::GetName() const

@@ -191,3 +191,11 @@ mitk::ModuleResource mitk::Tool::GetIconResource() const
   ModuleResource resource = module->GetResource("dummy.resource");
   return resource;
 }
+
+mitk::ModuleResource mitk::Tool::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  // Each specific tool should load its own resource. This one will be invalid
+  ModuleResource resource = module->GetResource("dummy.resource");
+  return resource;
+}

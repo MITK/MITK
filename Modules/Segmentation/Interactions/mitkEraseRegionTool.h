@@ -48,7 +48,7 @@ class Segmentation_EXPORT EraseRegionTool : public SetRegionTool
     itkNewMacro(EraseRegionTool);
 
     virtual const char** GetXPM() const;
-    virtual std::string GetCursorIconPath() const;
+    virtual ModuleResource GetCursorIconResource() const;
     ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;

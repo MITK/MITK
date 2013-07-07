@@ -131,9 +131,11 @@ mitk::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
   return resource;
 }
 
-std::string mitk::LiveWireTool2D::GetCursorIconPath() const
+mitk::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
 {
-  return ":/Segmentation/LiveWire_Cursor_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("LiveWire_Cursor_48x48.png");
+  return resource;
 }
 
 const char* mitk::LiveWireTool2D::GetName() const

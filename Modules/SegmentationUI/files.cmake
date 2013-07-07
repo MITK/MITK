@@ -52,4 +52,5 @@ Qmitk/QmitkWatershedToolGUI.h
 
 set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
+Qmitk/QmitkOtsuToolWidgetControls.ui
 )

@@ -22,16 +22,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
+// us
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+
 QmitkApplicationCursor::QmitkApplicationCursor()
 {
   mitk::ApplicationCursor::RegisterImplementation(this);
 }
 
-void QmitkApplicationCursor::PushCursor(const std::string& path, int hotspotX, int hotspotY)
+void QmitkApplicationCursor::PushCursor(const mitk::ModuleResource resource, int hotspotX, int hotspotY)
 {
-  QPixmap pixmap( path.c_str() );
-  QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
-  QApplication::setOverrideCursor( cursor );
+  if (resource.IsValid())
+  {
+    mitk::ModuleResourceStream resourceStream(resource);
+    resourceStream.seekg(0, std::ios::end);
+    std::ios::pos_type length = resourceStream.tellg();
+    resourceStream.seekg(0, std::ios::beg);
+
+    char* data = new char[length];
+    resourceStream.read(data, length);
+    QPixmap pixmap;
+    pixmap.loadFromData(QByteArray::fromRawData(data, length));
+    QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
+    QApplication::setOverrideCursor( cursor );
+    delete[] data;
+
+  }
 }
 
 void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)

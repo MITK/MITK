@@ -82,6 +82,22 @@ set(CPP_FILES
   SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.cpp
 )
 
-set(QRC_FILES
-  resources/Segmentation.qrc
+set(RESOURCE_FILES
+Add_48x48.png
+Erase_48x48.png
+Fill_48x48.png
+LiveWire_48x48.png
+Paint_48x48.png
+Threshold_48x48.png
+Wipe_48x48.png
+Correction_48x48.png
+FastMarching_48x48.png
+#Icons.svg
+Otsu_48x48.png
+RegionGrowing_48x48.png
+Subtract_48x48.png
+TwoThresholds_48x48.png
 )
+#set(QRC_FILES
+#  resources/Segmentation.qrc
+#)

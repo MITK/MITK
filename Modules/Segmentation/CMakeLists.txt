@@ -4,9 +4,9 @@
 
 MITK_CREATE_MODULE(Segmentation
   INCLUDE_DIRS Algorithms Controllers DataManagement Interactions IO Rendering SegmentationUtilities/BooleanOperations SegmentationUtilities/MorphologicalOperations
-  DEPENDS Mitk ipSegmentation mitkIpFunc MitkExt MitkGraphAlgorithms
-  PACKAGE_DEPENDS QT
-  QT_MODULE
+  DEPENDS Mitk ipSegmentation mitkIpFunc MitkExt MitkGraphAlgorithms #CppMicroServices
+  #PACKAGE_DEPENDS QT
+  #QT_MODULE
 )
 
 add_subdirectory(Testing)

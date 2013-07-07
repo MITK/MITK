@@ -18,6 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkModuleResourceStream.h"
+//#include "mitkModuleRegistry.h"
+#include <mitkGetModuleContext.h>
+#include <mitkModuleContext.h>
+
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
@@ -44,7 +52,23 @@ const char* mitk::AdaptiveRegionGrowingTool::GetName() const
 
 std::string mitk::AdaptiveRegionGrowingTool::GetIconPath() const
 {
-  return ":/Segmentation/RegionGrowing_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  MITK_INFO<<"######### Resource path: "<<resource.GetResourcePath();
+  if (resource.IsValid())
+  {
+    ModuleResourceStream resourceStream(resource);
+//    resourceStream.
+//    QIcon icon;
+
+//    resourceStream>>icon;
+    MITK_INFO<<"######### Resource path: "<<resource.GetResourcePath();
+    return resource.GetResourcePath();
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 void mitk::AdaptiveRegionGrowingTool::Activated()

@@ -83,19 +83,18 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
   {
     try
     {
-      this->setCursor(Qt::WaitCursor);
       m_NumberOfRegions = m_Controls.m_Spinbox->value();
-      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions );
-      this->setCursor(Qt::ArrowCursor);
       int proceed;
 
       QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
-      if (m_Spinbox->value() >= 5)
+      if (m_NumberOfRegions >= 5)
       {
         proceed = messageBox->exec();
         if (proceed != QMessageBox::Ok) return;
       }
-      m_OtsuTool3DTool->RunSegmentation( m_Spinbox->value() );
+      this->setCursor(Qt::WaitCursor);
+      m_OtsuTool3DTool->RunSegmentation( m_NumberOfRegions );
+      this->setCursor(Qt::ArrowCursor);
     }
     catch( ... )
     {

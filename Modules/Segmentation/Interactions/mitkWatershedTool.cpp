@@ -35,8 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkExceptionObject.h>
 
-//#include <QMessageBox>
-
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, WatershedTool, "Watershed tool");
 }
@@ -115,7 +113,6 @@ void mitk::WatershedTool::DoIt()
   }
   catch(itk::ExceptionObject& e)
   {
-//    QMessageBox::warning(NULL,QString::fromAscii("Watershed Filter Error"), QString::fromAscii(e.GetDescription()));
     MITK_ERROR<<"Watershed Filter Error";
   }
 

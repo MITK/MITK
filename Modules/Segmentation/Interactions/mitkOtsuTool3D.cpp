@@ -29,9 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOtsuMultipleThresholdsImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
 
-// Qt
-//#include <QMessageBox>
-
 #include "mitkRegionGrow3DTool.xpm"
 
 // us
@@ -104,14 +101,6 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   //this->m_OtsuSegmentationDialog->setCursor(Qt::WaitCursor);
 
   int numberOfThresholds = regions - 1;
-//  int proceed;
-
-//  QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
-//  if (numberOfThresholds >= 5)
-//  {
-//    proceed = messageBox->exec();
-//    if (proceed != QMessageBox::Ok) return;
-//  }
 
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
@@ -123,9 +112,6 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   }
   catch( ... )
   {
-//    QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
-//    messageBox->exec();
-//    delete messageBox;
     mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
 

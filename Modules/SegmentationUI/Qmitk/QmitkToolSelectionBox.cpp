@@ -534,6 +534,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     else
     {
+      MITK_INFO<<"****************iconpath: "<<iconPath;
       button->setIcon(QIcon(iconPath.c_str()));
 
       if (m_ShowNames)

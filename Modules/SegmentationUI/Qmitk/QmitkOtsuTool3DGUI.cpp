@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qlistwidget.h>
+#include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkOtsuTool3DGUI, "")
 
@@ -98,10 +99,21 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
   {
     try
     {
+      int proceed;
+
+      QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
+      if (m_Spinbox->value() >= 5)
+      {
+        proceed = messageBox->exec();
+        if (proceed != QMessageBox::Ok) return;
+      }
       m_OtsuTool3DTool->RunSegmentation( m_Spinbox->value() );
     }
     catch( ... )
     {
+      QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
+      messageBox->exec();
+      delete messageBox;
       return;
     }
     //insert regions into widget

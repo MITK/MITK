@@ -38,7 +38,14 @@ QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationContro
   this->EnableButtons(false);
 
   connect (m_Controls.btnSurface2Image, SIGNAL(pressed()), this, SLOT(OnSurface2ImagePressed()));
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+    this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+
+  if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
+    m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
+  {
+    this->OnSelectionChanged( 0, m_Controls.dataSelectionWidget->GetSelection(0));
+  }
 }
 
 QmitkSurfaceToImageWidget::~QmitkSurfaceToImageWidget()

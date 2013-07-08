@@ -44,8 +44,14 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
   connect (m_Controls.rbMaskSurface, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceMaskingToggled(bool)));
   connect (m_Controls.btnMaskImage, SIGNAL(pressed()), this, SLOT(OnMaskImagePressed()));
 
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+    this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
+  if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
+    m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
+  {
+    this->OnSelectionChanged( 0, m_Controls.dataSelectionWidget->GetSelection(0));
+  }
 }
 
 QmitkImageMaskingWidget::~QmitkImageMaskingWidget()

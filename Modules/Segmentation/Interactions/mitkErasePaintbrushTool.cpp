@@ -52,7 +52,7 @@ mitk::ModuleResource mitk::ErasePaintbrushTool::GetIconResource() const
 mitk::ModuleResource mitk::ErasePaintbrushTool::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Wipe_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("Wipe_Cursor_32x32.png");
   return resource;
 }
 

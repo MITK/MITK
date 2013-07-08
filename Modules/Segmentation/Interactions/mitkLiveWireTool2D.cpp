@@ -134,7 +134,7 @@ mitk::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
 mitk::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("LiveWire_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
   return resource;
 }
 

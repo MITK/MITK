@@ -51,7 +51,7 @@ mitk::ModuleResource mitk::FillRegionTool::GetIconResource() const
 mitk::ModuleResource mitk::FillRegionTool::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Fill_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("Fill_Cursor_32x32.png");
   return resource;
 }
 

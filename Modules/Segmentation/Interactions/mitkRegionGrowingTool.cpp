@@ -82,7 +82,7 @@ mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
 mitk::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
   return resource;
 }
 

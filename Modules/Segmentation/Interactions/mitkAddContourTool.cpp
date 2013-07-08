@@ -51,7 +51,7 @@ mitk::ModuleResource mitk::AddContourTool::GetIconResource() const
 mitk::ModuleResource mitk::AddContourTool::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Add_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("Add_Cursor_32x32.png");
   return resource;
 }
 

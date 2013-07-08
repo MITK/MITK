@@ -128,7 +128,7 @@ mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
 mitk::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("FastMarching_Cursor_32x32.png");
   return resource;
 }
 

@@ -63,7 +63,7 @@ mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
 mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
 {
   Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_Cursor_48x48.png");
+  ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
   return resource;
 }
 

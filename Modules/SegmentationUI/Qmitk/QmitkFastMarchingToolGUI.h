@@ -61,6 +61,8 @@ protected:
   QmitkFastMarchingToolGUI();
   virtual ~QmitkFastMarchingToolGUI();
 
+  void Update();
+
   void BusyStateChanged(bool);
 
   ctkRangeWidget*  m_slwThreshold;

@@ -119,6 +119,8 @@ class Segmentation_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual void Deactivated();
     virtual void Initialize();
 
+    virtual void BuildITKPipeline();
+
     /// \brief Add point action of StateMachine pattern
     virtual bool OnAddPoint (Action*, const StateEvent*);
 

@@ -219,14 +219,6 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   {
     m_FastMarchingTool->CurrentlyBusy += mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>( this, &QmitkFastMarchingToolGUI::BusyStateChanged );
 
-    // set tool´s default values
-    m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
-    m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
-    m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
-    m_FastMarchingTool->SetSigma( this->m_slSigma->value());
-    m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
-    m_FastMarchingTool->SetBeta( this->m_slBeta->value());
-
     //listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
     renderer = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") );
@@ -239,13 +231,24 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   }
 }
 
+void QmitkFastMarchingToolGUI::Update()
+{
+    m_FastMarchingTool->SetLowerThreshold( this->m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold( this->m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue( this->m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma( this->m_slSigma->value());
+    m_FastMarchingTool->SetAlpha( this->m_slAlpha->value());
+    m_FastMarchingTool->SetBeta( this->m_slBeta->value());
+    m_FastMarchingTool->Update();
+}
+
 void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
 {
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetLowerThreshold( lower );
     m_FastMarchingTool->SetUpperThreshold( upper );
-    m_FastMarchingTool->Update();
+    this->Update();
   }
 }
 
@@ -254,7 +257,7 @@ void QmitkFastMarchingToolGUI::OnBetaChanged(double value)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetBeta( value );
-    m_FastMarchingTool->Update();
+    this->Update();
   }
 }
 
@@ -263,7 +266,7 @@ void QmitkFastMarchingToolGUI::OnSigmaChanged(double value)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetSigma( value );
-    m_FastMarchingTool->Update();
+    this->Update();
   }
 }
 
@@ -272,7 +275,7 @@ void QmitkFastMarchingToolGUI::OnAlphaChanged(double value)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetAlpha( value );
-    m_FastMarchingTool->Update();
+    this->Update();
   }
 }
 
@@ -281,7 +284,7 @@ void QmitkFastMarchingToolGUI::OnStoppingValueChanged(double value)
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->SetStoppingValue( value );
-    m_FastMarchingTool->Update();
+    this->Update();
   }
 }
 
@@ -308,7 +311,7 @@ void QmitkFastMarchingToolGUI::OnClearSeeds()
 {
   //event from image navigator recieved - timestep has changed
    m_FastMarchingTool->ClearSeeds();
-   m_FastMarchingTool->Update();
+   this->Update();
 }
 
 void QmitkFastMarchingToolGUI::BusyStateChanged(bool value)

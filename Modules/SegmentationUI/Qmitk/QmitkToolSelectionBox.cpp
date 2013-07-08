@@ -475,7 +475,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
 
     button = new QToolButton;
-    button->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    button->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum));
     // add new button to the group
     MITK_DEBUG << "Adding button with ID " << currentToolID;
     m_ToolButtonGroup->addButton(button, currentButtonID);
@@ -563,8 +563,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       else
       {
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        button->setIconSize(QSize(32, 32));
-        button->setStyleSheet("padding: 4px");
+        button->setIconSize(QSize(32,32));
         button->setToolTip(tooltip);
       }
     }

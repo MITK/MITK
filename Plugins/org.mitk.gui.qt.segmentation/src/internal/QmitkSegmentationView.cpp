@@ -104,8 +104,9 @@ void QmitkSegmentationView::Activated()
   if( m_Controls )
   {
     m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox2D->minimumSizeHint().width()+1);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
-    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox3D->minimumSizeHint().width()+1);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );
@@ -893,9 +894,21 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   //3D Tab ID = 1
   if (id == 0)
   {
+    //Hide 3D selection box, show 2D selection box
+    m_Controls->m_ManualToolSelectionBox3D->hide();
+    m_Controls->m_ManualToolSelectionBox2D->show();
+    //Deactivate possible active tool
+    m_Controls->m_ManualToolSelectionBox3D->GetToolManager()->ActivateTool(-1);
+
+    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
+  }
+  else
+  {
+    //Hide 3D selection box, show 2D selection box
+    m_Controls->m_ManualToolSelectionBox2D->hide();
+    m_Controls->m_ManualToolSelectionBox3D->show();
     //Deactivate possible active tool
     m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
-    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
   }
 }
 
@@ -1039,7 +1052,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershedding");
-  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(2);
+  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
   // available only in the 3M application

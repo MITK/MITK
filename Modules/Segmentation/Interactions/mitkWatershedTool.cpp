@@ -143,7 +143,7 @@ void mitk::WatershedTool::DoIt()
   }
   catch(itk::ExceptionObject& e)
   {
-    MITK_ERROR<<"Watershed Filter Error";
+      MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();

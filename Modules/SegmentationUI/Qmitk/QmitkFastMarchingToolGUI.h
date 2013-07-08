@@ -21,12 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationUIExports.h"
 #include "mitkFastMarchingTool.h"
 
-class QSlider;
-class QLabel;
-class QFrame;
+class ctkSliderWidget;
+class ctkRangeWidget;
 class QPushButton;
-#include <QCheckBox>;
 
+#include "QmitkStepperAdapter.h"
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -48,14 +47,14 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnUpperThresholdChanged(int value);
-    void OnLowerThresholdChanged(int value);
-    void OnMuChanged(int value);
-    void OnStoppingValueChanged(int value);
-    void OnStandardDeviationChanged(int value);
+    void OnThresholdChanged(double, double);
+    void OnAlphaChanged(double);
+    void OnBetaChanged(double);
+    void OnSigmaChanged(double);
+    void OnStoppingValueChanged(double);
     void OnConfirmSegmentation();
-    void OnLivePreviewCheckBoxChanged(int value);
-
+    void Refetch();
+    void SetStepper(mitk::Stepper *);
     void OnClearSeeds();
 
 protected:
@@ -63,27 +62,21 @@ protected:
   QmitkFastMarchingToolGUI();
   virtual ~QmitkFastMarchingToolGUI();
 
-  QSlider* m_UpperThresholdSlider;
-  QLabel* m_UpperThresholdLabel;
+  void BusyStateChanged(bool);
 
-  QSlider* m_LowerThresholdSlider;
-  QLabel* m_LowerThresholdLabel;
+  ctkRangeWidget*  m_slwThreshold;
+  ctkSliderWidget* m_slStoppingValue;
+  ctkSliderWidget* m_slSigma;
+  ctkSliderWidget* m_slAlpha;
+  ctkSliderWidget* m_slBeta;
 
-  QSlider* m_StoppingValueSlider;
-  QLabel* m_StoppingValueLabel;
-
-  QSlider* m_MuSlider;
-  QLabel* m_MuLabel;
-
-  QSlider* m_StandardDeviationSlider;
-  QLabel* m_StandardDeviationLabel;
-
-  QPushButton* m_ConfirmButton;
-  QPushButton* m_ClearSeedsButton;
-  QCheckBox* m_LivePreviewCheckBox;
+  QPushButton* m_btConfirm;
+  QPushButton* m_btClearSeeds;
 
   mitk::FastMarchingTool::Pointer m_FastMarchingTool;
 
+  bool m_TimeIsConnected;
+  mitk::Stepper::Pointer m_TimeStepper;
 };
 
 #endif

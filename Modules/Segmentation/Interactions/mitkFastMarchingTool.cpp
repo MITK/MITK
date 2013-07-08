@@ -20,13 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-#include "mitkApplicationCursor.h"
-
-#include "mitkFastMarchingTool.xpm"
-
 #include "mitkInteractionConst.h"
 
 #include "itkOrImageFilter.h"
+#include "mitkImageTimeSelector.h"
+
 
 // us
 #include "mitkModule.h"
@@ -34,69 +32,70 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGetModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching tool");
+  MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool, "FastMarching2D tool");
 }
 
 
 mitk::FastMarchingTool::FastMarchingTool()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
-m_IsLivePreviewEnabled(false),
-m_LowerThreshold(0.0),
-m_UpperThreshold(200.0),
+m_NeedUpdate(true),
+m_CurrentTimeStep(0),
+m_LowerThreshold(0),
+m_UpperThreshold(200),
 m_StoppingValue(100),
-sigma(1.0),
-alpha(-0.5),
-beta(3.0)
+m_Sigma(1.0),
+m_Alpha(-0.5),
+m_Beta(3.0)
 {
-  /* Connect UI events */
   CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 
-  /*setup ITK filters */
-  m_SliceInITK = InternalImageType::New();
+  m_ReferenceImageSliceAsITK = InternalImageType::New();
 
-  thresholder = ThresholdingFilterType::New();
-  thresholder->SetLowerThreshold( m_LowerThreshold );
-  thresholder->SetUpperThreshold( m_UpperThreshold );
-  thresholder->SetOutsideValue( 0 );
-  thresholder->SetInsideValue( 1.0 );
+  m_ProgressCommand = mitk::ToolCommand::New();
 
-  smoothing = SmoothingFilterType::New();
-  smoothing->SetTimeStep( 0.125 );
-  smoothing->SetNumberOfIterations( 5 );
-  smoothing->SetConductanceParameter( 9.0 );
+  m_ThresholdFilter = ThresholdingFilterType::New();
+  m_ThresholdFilter->SetLowerThreshold( m_LowerThreshold );
+  m_ThresholdFilter->SetUpperThreshold( m_UpperThreshold );
+  m_ThresholdFilter->SetOutsideValue( 0 );
+  m_ThresholdFilter->SetInsideValue( 1.0 );
 
-  gradientMagnitude = GradientFilterType::New();
-  gradientMagnitude->SetSigma( sigma );
+  m_SmoothFilter = SmoothingFilterType::New();
+  m_SmoothFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_SmoothFilter->SetTimeStep( 0.05 );
+  m_SmoothFilter->SetNumberOfIterations( 2 );
+  m_SmoothFilter->SetConductanceParameter( 9.0 );
 
-  sigmoid = SigmoidFilterType::New();
-  sigmoid->SetAlpha( alpha );
-  sigmoid->SetBeta( beta );
-  sigmoid->SetOutputMinimum( 0.0 );
-  sigmoid->SetOutputMaximum( 1.0 );
+  m_GradientMagnitudeFilter = GradientFilterType::New();
+  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_GradientMagnitudeFilter->SetSigma( m_Sigma );
 
-  fastMarching = FastMarchingFilterType::New();
-  fastMarching->SetStoppingValue( m_StoppingValue );
+  m_SigmoidFilter = SigmoidFilterType::New();
+  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_SigmoidFilter->SetAlpha( m_Alpha );
+  m_SigmoidFilter->SetBeta( m_Beta );
+  m_SigmoidFilter->SetOutputMinimum( 0.0 );
+  m_SigmoidFilter->SetOutputMaximum( 1.0 );
 
-  seeds = NodeContainer::New();
-  seeds->Initialize();
-  fastMarching->SetTrialPoints( seeds );
+  m_FastMarchingFilter = FastMarchingFilterType::New();
+  m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
 
+  m_SeedContainer = NodeContainer::New();
+  m_SeedContainer->Initialize();
+  m_FastMarchingFilter->SetTrialPoints( m_SeedContainer );
 
   //set up pipeline
-  smoothing->SetInput( m_SliceInITK );
-  gradientMagnitude->SetInput( smoothing->GetOutput() );
-  sigmoid->SetInput( gradientMagnitude->GetOutput() );
-  fastMarching->SetInput( sigmoid->GetOutput() );
-  thresholder->SetInput( fastMarching->GetOutput() );
+  m_SmoothFilter->SetInput( m_ReferenceImageSliceAsITK );
+  m_GradientMagnitudeFilter->SetInput( m_SmoothFilter->GetOutput() );
+  m_SigmoidFilter->SetInput( m_GradientMagnitudeFilter->GetOutput() );
+  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
+  m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
 }
 
 mitk::FastMarchingTool::~FastMarchingTool()
 {
-  m_ReferenceSlice = NULL;
-  m_WorkingSlice = NULL;
-  m_PositionEvent = NULL;
 }
 
 
@@ -116,7 +115,7 @@ float mitk::FastMarchingTool::CanHandleEvent( StateEvent const *stateEvent) cons
 
 const char** mitk::FastMarchingTool::GetXPM() const
 {
-  return NULL;// mitkFastMarchingTool_xpm;
+  return NULL;//mitkFastMarchingTool_xpm;
 }
 
 mitk::ModuleResource mitk::FastMarchingTool::GetIconResource() const
@@ -135,55 +134,61 @@ mitk::ModuleResource mitk::FastMarchingTool::GetCursorIconResource() const
 
 const char* mitk::FastMarchingTool::GetName() const
 {
-  return "Fast Marching";
+  return "FastMarching2D";
 }
 
-void mitk::FastMarchingTool::SetUpperThreshold(float value)
+void mitk::FastMarchingTool::SetUpperThreshold(double value)
 {
-  m_UpperThreshold = value;
-  thresholder->SetUpperThreshold( m_UpperThreshold );
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  m_UpperThreshold = value / 10.0;
+  m_ThresholdFilter->SetUpperThreshold( m_UpperThreshold );
+  m_NeedUpdate = true;
 }
 
-void mitk::FastMarchingTool::SetLowerThreshold(float value)
+void mitk::FastMarchingTool::SetLowerThreshold(double value)
 {
-  m_LowerThreshold = value;
-  thresholder->SetLowerThreshold( m_LowerThreshold );
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  m_LowerThreshold = value / 10.0;
+  m_ThresholdFilter->SetLowerThreshold( m_LowerThreshold );
+  m_NeedUpdate = true;
 }
 
-void mitk::FastMarchingTool::SetMu(float value)
+void mitk::FastMarchingTool::SetBeta(double value)
 {
-  beta = value;
-  sigmoid->SetBeta( beta );
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  if (m_Beta != value)
+  {
+      m_Beta = value;
+      m_SigmoidFilter->SetBeta( m_Beta );
+      m_NeedUpdate = true;
+  }
 }
 
-void mitk::FastMarchingTool::SetStandardDeviation(float value)
+void mitk::FastMarchingTool::SetSigma(double value)
 {
-  alpha = value;
-  sigmoid->SetAlpha( alpha );
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  if (m_Sigma != value)
+  {
+      m_Sigma = value;
+      m_GradientMagnitudeFilter->SetSigma( m_Sigma );
+      m_NeedUpdate = true;
+  }
 }
 
-void mitk::FastMarchingTool::SetStoppingValue(float value)
+void mitk::FastMarchingTool::SetAlpha(double value)
 {
-  m_StoppingValue = value;
-  fastMarching->SetStoppingValue( m_StoppingValue );
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  if (m_Alpha != value)
+  {
+      m_Alpha = value;
+      m_SigmoidFilter->SetAlpha( m_Alpha );
+      m_NeedUpdate = true;
+  }
 }
 
-void mitk::FastMarchingTool::SetLivePreviewEnabled(bool enabled)
+void mitk::FastMarchingTool::SetStoppingValue(double value)
 {
-  m_IsLivePreviewEnabled = enabled;
-
-  if(enabled)//an update may be needed
-    this->UpdatePreviewImage();
+  if (m_StoppingValue != value)
+  {
+      m_StoppingValue = value;
+      m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
+      m_NeedUpdate = true;
+  }
 }
 
 void mitk::FastMarchingTool::Activated()
@@ -195,7 +200,7 @@ void mitk::FastMarchingTool::Activated()
   m_ResultImageNode->SetBoolProperty("helper object", true);
   m_ResultImageNode->SetColor(0.0, 1.0, 0.0);
   m_ResultImageNode->SetVisibility(true);
-  m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode);
+  m_ToolManager->GetDataStorage()->Add( this->m_ResultImageNode, m_ToolManager->GetReferenceData(0));
 
   m_SeedsAsPointSet = mitk::PointSet::New();
   m_SeedsAsPointSetNode = mitk::DataNode::New();
@@ -204,7 +209,9 @@ void mitk::FastMarchingTool::Activated()
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
-  m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode);
+  m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode, m_ToolManager->GetReferenceData(0));
+
+  this->Initialize();
 }
 
 void mitk::FastMarchingTool::Deactivated()
@@ -212,54 +219,86 @@ void mitk::FastMarchingTool::Deactivated()
   Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
+  this->ClearSeeds();
+  this->m_SmoothFilter->RemoveAllObservers();
+  this->m_SigmoidFilter->RemoveAllObservers();
+  this->m_GradientMagnitudeFilter->RemoveAllObservers();
+  this->m_FastMarchingFilter->RemoveAllObservers();
   m_ResultImageNode = NULL;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-
-
-
+void mitk::FastMarchingTool::Initialize()
+{
+  m_ReferenceImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  if(m_ReferenceImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput( m_ReferenceImage );
+    timeSelector->SetTimeNr( m_CurrentTimeStep );
+    timeSelector->UpdateLargestPossibleRegion();
+    m_ReferenceImage = timeSelector->GetOutput();
+  }
+//  CastToItkImage(m_ReferenceImage, m_ReferenceImageAsITK);
+//  m_SmoothFilter->SetInput( m_ReferenceImageAsITK );
+  m_NeedUpdate = true;
+}
 
 void mitk::FastMarchingTool::ConfirmSegmentation()
 {
-  /*+++++++combine preview image with already performed segmentation++++++*/
-  if (m_PositionEvent)
+  // combine preview image with current working segmentation
+  if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
   {
-    // remember parameters for next time
-    if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
+    //logical or combination of preview and segmentation slice
+    OutputImageType::Pointer workingImageSliceInITK = OutputImageType::New();
+
+    mitk::Image::Pointer workingImageSlice;
+    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
-      //logical or combination of preview and segmentation slice
-      OutputImageType::Pointer segmentationSlice = OutputImageType::New();
-
-      mitk::Image::Pointer workingSlice = GetAffectedWorkingSlice( m_PositionEvent );
-      CastToItkImage( workingSlice, segmentationSlice );
-
-      typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
-      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
-
-      orFilter->SetInput(0, thresholder->GetOutput());
-      orFilter->SetInput(1, segmentationSlice);
-      orFilter->Update();
-
-      mitk::Image::Pointer segmentationResult = mitk::Image::New();
-
-      mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
-      segmentationResult->GetGeometry()->SetOrigin(workingSlice->GetGeometry()->GetOrigin());
-      segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingSlice->GetGeometry()->GetIndexToWorldTransform());
-
-      //write to segmentation volume and hide preview image
-      this->WriteBackSegmentationResult(m_PositionEvent, segmentationResult );
-      this->m_ResultImageNode->SetVisibility(false);
-      this->ClearSeeds();
+      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeSelector->SetInput( workingImage );
+      timeSelector->SetTimeNr( m_CurrentTimeStep );
+      timeSelector->UpdateLargestPossibleRegion();
+      // todo: make GetAffectedWorkingSlice dependant of current time step
+      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
+      CastToItkImage( workingImageSlice, workingImageSliceInITK );
     }
-    mitk::RenderingManager::GetInstance()->RequestUpdate( m_PositionEvent->GetSender()->GetRenderWindow() );
+    else
+    {
+      workingImageSlice = GetAffectedWorkingSlice( m_PositionEvent );
+      CastToItkImage( workingImageSlice, workingImageSliceInITK );
+    }
+
+    typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
+    OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+    orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
+    orFilter->SetInput(1, workingImageSliceInITK);
+    orFilter->Update();
+
+    mitk::Image::Pointer segmentationResult = mitk::Image::New();
+
+    mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+    segmentationResult->GetGeometry()->SetOrigin(workingImageSlice->GetGeometry()->GetOrigin());
+    segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingImageSlice->GetGeometry()->GetIndexToWorldTransform());
+
+    //write to segmentation volume and hide preview image
+    // again, current time step is not considered
+    this->WriteBackSegmentationResult(m_PositionEvent, segmentationResult );
+    this->m_ResultImageNode->SetVisibility(false);
+    this->ClearSeeds();
+//    workingImage->Modified();
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateEvent)
 {
-  /*++++++++++++Add a new seed point for FastMarching algorithm+++++++++++*/
-  const mitk::PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  // Add a new seed point for FastMarching algorithm
+  const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!p) return false;
 
   m_PositionEvent = new PositionEvent(p->GetSender(), p->GetType(), p->GetButton(), p->GetButtonState(), p->GetKey(), p->GetDisplayPosition(), p->GetWorldPosition());
@@ -267,16 +306,17 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   //if click happpened in another renderwindow or slice then reset pipeline and preview
   if( (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
   {
-    this->ResetFastMarching(m_PositionEvent);
+      m_ReferenceImageSlice = GetAffectedReferenceSlice( m_PositionEvent );
+      CastToItkImage(m_ReferenceImageSlice, m_ReferenceImageSliceAsITK);
+      m_SmoothFilter->SetInput( m_ReferenceImageSliceAsITK );
   }
+
   m_LastEventSender = m_PositionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-
   mitk::Point3D clickInIndex;
 
-  m_ReferenceSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetWorldPosition(), clickInIndex);
-
+  m_ReferenceImageSlice->GetGeometry()->WorldToIndex(m_PositionEvent->GetWorldPosition(), clickInIndex);
   itk::Index<2> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
@@ -285,68 +325,76 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   const double seedValue = 0.0;
   node.SetValue( seedValue );
   node.SetIndex( seedPosition );
-
-  this->seeds->InsertElement(this->seeds->Size(), node);
-  fastMarching->Modified();
+  this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
+  m_FastMarchingFilter->Modified();
 
   m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), m_PositionEvent->GetWorldPosition());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  //preview result by updating the pipeline - this is not done automatically for changing seeds
-  if(m_IsLivePreviewEnabled)
-    this->UpdatePreviewImage();
+  m_NeedUpdate = true;
+
+  this->Update();
+
   return true;
 }
 
 
 bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEvent)
 {
-  /*++++++++++delete last seed point++++++++*/
-  if(!(this->seeds->empty()))
+  // delete last seed point
+  if(!(this->m_SeedContainer->empty()))
   {
     //delete last element of seeds container
-    this->seeds->pop_back();
-    fastMarching->Modified();
+    this->m_SeedContainer->pop_back();
+    m_FastMarchingFilter->Modified();
 
     //delete last point in pointset - somehow ugly
     m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-    //preview result by updating the pipeline - this is not done automatically for changing seeds
-    if(m_IsLivePreviewEnabled)
-      this->UpdatePreviewImage();
+    m_NeedUpdate = true;
+
+    this->Update();
   }
   return true;
 }
 
 
-void mitk::FastMarchingTool::UpdatePreviewImage()
+void mitk::FastMarchingTool::Update()
 {
-  /*++++++++update FastMarching pipeline and show result++++++++*/
-  if(m_ReferenceSlice.IsNotNull())
+  // update FastMarching pipeline and show result
+  if (m_NeedUpdate)
   {
-    try{
-      thresholder->UpdateLargestPossibleRegion();
+    m_ProgressCommand->AddStepsToDo(20);
+    CurrentlyBusy.Send(true);
+    try
+    {
+      m_ThresholdFilter->Update();
     }
     catch( itk::ExceptionObject & excep )
     {
-      std::cerr << "Exception caught !" << std::endl;
-      std::cerr << excep << std::endl;
-      std::cerr << "Reseting step." << std::endl;
-      this->ResetToInitialState();
-      return;
+     MITK_ERROR << "Exception caught: " << excep.GetDescription();
+
+     m_ProgressCommand->SetRemainingProgress(100);
+     CurrentlyBusy.Send(false);
+
+     std::string msg = excep.GetDescription();
+     ErrorMessage.Send(msg);
+
+     return;
     }
+    m_ProgressCommand->SetRemainingProgress(100);
+    CurrentlyBusy.Send(false);
 
     //make output visible
     mitk::Image::Pointer result = mitk::Image::New();
-    CastToMitkImage( thresholder->GetOutput(), result);
-    result->GetGeometry()->SetOrigin(m_ReferenceSlice->GetGeometry()->GetOrigin() );
-    result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceSlice->GetGeometry()->GetIndexToWorldTransform() );
+    CastToMitkImage( m_ThresholdFilter->GetOutput(), result);
+    result->GetGeometry()->SetOrigin(m_ReferenceImageSlice->GetGeometry()->GetOrigin() );
+    result->GetGeometry()->SetIndexToWorldTransform(m_ReferenceImageSlice->GetGeometry()->GetIndexToWorldTransform() );
     m_ResultImageNode->SetData(result);
     m_ResultImageNode->SetVisibility(true);
-
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -354,73 +402,32 @@ void mitk::FastMarchingTool::UpdatePreviewImage()
 
 void mitk::FastMarchingTool::ClearSeeds()
 {
-  /*++++++++clear seeds for FastMarching as well as the PointSet for visualization++++++++*/
-  this->seeds->clear();
-  fastMarching->Modified();
+  // clear seeds for FastMarching as well as the PointSet for visualization
+  this->m_SeedContainer->Initialize();
+  this->m_SeedsAsPointSet->Clear();
 
-  m_SeedsAsPointSet->Clear();
+  m_FastMarchingFilter->Modified();
+
+  this->m_NeedUpdate = true;
+}
+
+
+void mitk::FastMarchingTool::Reset()
+{
+  //clear all seeds and preview empty result
+  this->ClearSeeds();
 
   m_ResultImageNode->SetVisibility(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-
-void mitk::FastMarchingTool::ResetFastMarching(const PositionEvent* positionEvent)
+void mitk::FastMarchingTool::SetCurrentTimeStep(int t)
 {
-  /*++++++++reset all relevant inputs for FastMarching++++++++*/
-  //reset reference slice according to the plane where the click happened
-  m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
+  if( m_CurrentTimeStep != t )
+  {
+    m_CurrentTimeStep = t;
 
-  //reset input of FastMarching pipeline
-  CastToItkImage(m_ReferenceSlice, m_SliceInITK);
-  smoothing->SetInput( m_SliceInITK );
-
-  //clear all seeds and preview empty result
-  this->ClearSeeds();
-  this->UpdatePreviewImage();
-}
-
-
-void mitk::FastMarchingTool::ResetToInitialState()
-{
-  m_SeedsAsPointSet->Clear();
-  m_ResultImageNode->SetVisibility(false);
-
-  m_SliceInITK = InternalImageType::New();
-
-  thresholder = ThresholdingFilterType::New();
-  thresholder->SetLowerThreshold( m_LowerThreshold );
-  thresholder->SetUpperThreshold( m_UpperThreshold );
-  thresholder->SetOutsideValue( 0 );
-  thresholder->SetInsideValue( 1.0 );
-
-  smoothing = SmoothingFilterType::New();
-  smoothing->SetTimeStep( 0.125 );
-  smoothing->SetNumberOfIterations( 5 );
-  smoothing->SetConductanceParameter( 9.0 );
-
-  gradientMagnitude = GradientFilterType::New();
-  gradientMagnitude->SetSigma( sigma );
-
-  sigmoid = SigmoidFilterType::New();
-  sigmoid->SetAlpha( alpha );
-  sigmoid->SetBeta( beta );
-  sigmoid->SetOutputMinimum( 0.0 );
-  sigmoid->SetOutputMaximum( 1.0 );
-
-  fastMarching = FastMarchingFilterType::New();
-  fastMarching->SetStoppingValue( m_StoppingValue );
-
-  seeds = NodeContainer::New();
-  seeds->Initialize();
-  fastMarching->SetTrialPoints( seeds );
-
-
-  //set up pipeline
-  smoothing->SetInput( m_SliceInITK );
-  gradientMagnitude->SetInput( smoothing->GetOutput() );
-  sigmoid->SetInput( gradientMagnitude->GetOutput() );
-  fastMarching->SetInput( sigmoid->GetOutput() );
-  thresholder->SetInput( fastMarching->GetOutput() );
+    this->Initialize();
+  }
 }

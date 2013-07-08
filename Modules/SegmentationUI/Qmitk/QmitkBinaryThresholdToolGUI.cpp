@@ -63,12 +63,12 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
   layout->addWidget( m_Slider );
 
+  mainLayout->addLayout(layout);
+
   QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
-  layout->addWidget( okButton );
-
-  mainLayout->addLayout(layout);
+  mainLayout->addWidget( okButton );
 
  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }

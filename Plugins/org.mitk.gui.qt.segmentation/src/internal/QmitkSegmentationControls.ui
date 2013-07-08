@@ -259,7 +259,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">QTabWidget::tab-bar { alignment: left; }</string>
+      <string notr="true">QTabWidget::tab-bar { alignment: middle; }</string>
      </property>
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>

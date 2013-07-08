@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTool.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkImageWriteAccessor.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
@@ -138,10 +138,9 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
     byteSize *= segmentation->GetDimension(dim);
   }
 
-   mitk::ImageReadAccessor readAccess(segmentation, segmentation->GetVolumeData(0));
-   void* cPointer = const_cast<void*>( readAccess.GetData() );
+  mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(0));
 
-   memset( cPointer, 0, byteSize );
+  memset( writeAccess.GetData(), 0, byteSize );
 
   if (original->GetTimeSlicedGeometry() )
   {

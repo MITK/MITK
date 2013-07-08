@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include "mitkLevelWindowManager.h"
 #include "mitkImageStatisticsHolder.h"
+#include "mitkToolCommand.h"
+#include "mitkProgressBar.h"
 
 #include <vtkLookupTable.h>
 
@@ -159,11 +161,17 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   magnitude->SetInput(originalImage);
   magnitude->SetSigma(1.0);
 
+  // use the progress bar
+  mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
+  command->AddStepsToDo(15);
+
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();
   watershed->SetInput(magnitude->GetOutput());
   watershed->SetThreshold(m_Threshold);
   watershed->SetLevel(m_Level);
+  watershed->AddObserver(itk::ProgressEvent(),command);
+  watershed->Update();
 
   // then make sure, that the output has the desired pixel type
   typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,3> > CastFilter;

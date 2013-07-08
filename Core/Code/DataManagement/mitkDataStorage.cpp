@@ -188,7 +188,7 @@ void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataNode* node)
   RemoveNodeEvent.Send(node);
 }
 
-void mitk::DataStorage::OnNodeInteractorChanged( itk::Object *caller, const itk::EventObject &event )
+void mitk::DataStorage::OnNodeInteractorChanged( itk::Object *caller, const itk::EventObject& )
 {
   const mitk::DataNode* _Node = dynamic_cast<const mitk::DataNode*>(caller);
   if(_Node)

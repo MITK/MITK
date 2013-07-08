@@ -26,6 +26,9 @@ IF(BUILD_DiffusionCoreMiniApps)
   SET(DIFFUSIONCORE_ADDITIONAL_FILES
     MiniAppManager.cpp
     ImageFormatConverter.cpp
+    TensorReconstruction.cpp
+    QballReconstruction.cpp
+    DiffusionIndices.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

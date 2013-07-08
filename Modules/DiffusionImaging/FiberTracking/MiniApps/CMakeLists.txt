@@ -28,11 +28,10 @@ IF(BUILD_FiberTrackingMiniApps)
     GibbsTracking.cpp
     StreamlineTracking.cpp
     FiberProcessing.cpp
-    PeakExtraction.cpp
     TractometerAngularErrorTool.cpp
     TractogramAngularError.cpp
     FiberDirectionExtraction.cpp
-    ImageFormatConverter.cpp
+    PeakExtraction.cpp
   )
 
   # create an executable foreach tool (only one at the moment)

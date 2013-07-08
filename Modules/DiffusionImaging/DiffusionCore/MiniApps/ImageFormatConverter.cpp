@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
+#include "ctkCommandLineParser.h"
+#include "ctkCommandLineParser.cpp"
 
 using namespace mitk;
 #include "ctkCommandLineParser.h"
@@ -81,4 +83,4 @@ int ImageFormatConverter(int argc, char* argv[])
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(ImageFormatConverter);
+RegisterDiffusionCoreMiniApp(ImageFormatConverter);

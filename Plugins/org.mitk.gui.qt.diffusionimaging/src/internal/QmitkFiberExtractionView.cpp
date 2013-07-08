@@ -62,7 +62,7 @@ QmitkFiberExtractionView::QmitkFiberExtractionView()
     , m_MultiWidget( NULL )
     , m_CircleCounter(0)
     , m_PolygonCounter(0)
-    , m_UpsamplingFactor(5)
+    , m_UpsamplingFactor(1)
 {
 
 }
@@ -230,6 +230,8 @@ void QmitkFiberExtractionView::GenerateRoiImage(){
         mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedFB.front()->GetData());
         geometry = fib->GetGeometry();
     }
+    else if (m_SelectedImage)
+        geometry = m_SelectedImage->GetGeometry();
     else
         return;
 
@@ -758,7 +760,7 @@ void QmitkFiberExtractionView::UpdateGui()
     }
     else
     {
-        if ( !m_SelectedFB.empty() )
+        if ( !m_SelectedFB.empty() || m_SelectedImage.IsNotNull())
             m_Controls->m_GenerateRoiImage->setEnabled(true);
         else
             m_Controls->m_GenerateRoiImage->setEnabled(false);

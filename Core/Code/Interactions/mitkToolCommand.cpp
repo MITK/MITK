@@ -64,7 +64,6 @@ void mitk::ToolCommand::Execute(itk::Object *caller, const itk::EventObject & ev
   // MITK_INFO << "FunctionAndGradientEvaluationIterationEvent";
   }
 
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(1);
   mitk::ProgressBar::GetInstance()->Progress();
 }
 

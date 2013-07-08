@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include "mitkLevelWindowManager.h"
 #include "mitkImageStatisticsHolder.h"
+#include "mitkToolCommand.h"
+#include "mitkProgressBar.h"
 
 #include <vtkLookupTable.h>
 
@@ -74,7 +76,8 @@ void mitk::WatershedTool::DoIt()
 {
 
   // get image from tool manager
-  mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
+  mitk::DataNode::Pointer referenceData = m_ToolManager->GetReferenceData(0);
+  mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(referenceData->GetData());
 
   mitk::Image::Pointer output;
 
@@ -115,8 +118,28 @@ void mitk::WatershedTool::DoIt()
     dataNode->SetProperty( "levelwindow", levWinProp );
     dataNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5));
 
+    // set name of data node
+    std::string name = referenceData->GetName() + "_Watershed";
+    dataNode->SetName( name );
+
+    // look, if there is already a node with this name
+    mitk::DataStorage::SetOfObjects::ConstPointer children = m_ToolManager->GetDataStorage()->GetDerivations(referenceData);
+    mitk::DataStorage::SetOfObjects::ConstIterator currentNode = children->Begin();
+    mitk::DataNode::Pointer removeNode;
+    while(currentNode != children->End())
+    {
+      if(dataNode->GetName().compare(currentNode->Value()->GetName()) == 0)
+      {
+        removeNode = currentNode->Value();
+      }
+      currentNode++;
+    }
+    // remove node with same name
+    if(removeNode.IsNotNull())
+      m_ToolManager->GetDataStorage()->Remove(removeNode);
+
     // add output to the data storage
-    m_ToolManager->GetDataStorage()->Add(dataNode);
+    m_ToolManager->GetDataStorage()->Add(dataNode,referenceData);
   }
   catch(itk::ExceptionObject& e)
   {
@@ -138,11 +161,17 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   magnitude->SetInput(originalImage);
   magnitude->SetSigma(1.0);
 
+  // use the progress bar
+  mitk::ToolCommand::Pointer command = mitk::ToolCommand::New();
+  command->AddStepsToDo(15);
+
   // then add the watershed filter to the pipeline
   typename WatershedFilter::Pointer watershed = WatershedFilter::New();
   watershed->SetInput(magnitude->GetOutput());
   watershed->SetThreshold(m_Threshold);
   watershed->SetLevel(m_Level);
+  watershed->AddObserver(itk::ProgressEvent(),command);
+  watershed->Update();
 
   // then make sure, that the output has the desired pixel type
   typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,3> > CastFilter;

@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
-#include <mitkShowSegmentationAsSurface.h>
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include <mitkSegmentationSink.h>
 

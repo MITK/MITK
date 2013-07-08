@@ -75,6 +75,8 @@ mitk::Dispatcher::~Dispatcher()
 {
   m_EventObserverTracker->Close();
   delete m_EventObserverTracker;
+
+  m_Interactors.clear();
 }
 
 bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
@@ -128,14 +130,16 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   // Standard behavior. Is executed in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
-
     m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
-    for (std::list<DataInteractor::Pointer>::iterator it = m_Interactors.begin(); it != m_Interactors.end(); ++it)
+
+    // copy the list to prevent iterator invalidation as executing actions
+    // in HandleEvent() can cause the m_Interactors list to be updated
+    std::list<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
+    std::list<DataInteractor::Pointer>::iterator it;
+    for ( it=tmpInteractorList.begin(); it!=tmpInteractorList.end(); it++ )
     {
-      // explicit copy of pointer because HandleEvent function causes the m_Interactors list to be updated,
-      // which in turn invalidates the iterator.
       DataInteractor::Pointer dataInteractor = *it;
-      if (dataInteractor->HandleEvent(event, dataInteractor->GetDataNode()))
+      if ( (*it)->HandleEvent(event, dataInteractor->GetDataNode()) )
       { // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
         SetEventProcessingMode(dataInteractor);
         if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0 && m_ProcessingMode == REGULAR)

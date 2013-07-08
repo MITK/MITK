@@ -98,8 +98,6 @@ protected slots:
 
     void UseVolumeRendering(bool on);
 
-    void OnDefineThresholdBoundaries(bool);
-
     void SetLowerThresholdValue(double lowerThreshold);
 
     void SetUpperThresholdValue(double upperThreshold);

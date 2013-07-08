@@ -48,12 +48,9 @@ QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSugges
 
   m_Controls.setupUi(this);
 
-  // muellerm, 8.8.12.: assure no limits for thresholding (there can be images with pixel values above 4000!!!)
-  m_Controls.m_LowerThresholdSpinBox->setMinimum( std::numeric_limits<int>::min() );
-  m_Controls.m_UpperThresholdSpinBox->setMinimum( std::numeric_limits<int>::min() );
+  m_Controls.m_ThresholdSlider->setDecimals(2);
+  m_Controls.m_ThresholdSlider->setSpinBoxAlignment(Qt::AlignTop);
 
-  m_Controls.m_LowerThresholdSpinBox->setMaximum( std::numeric_limits<int>::max() );
-  m_Controls.m_UpperThresholdSpinBox->setMaximum( std::numeric_limits<int>::max() );
 
   m_NAMEFORSEEDPOINT = "Seed Point";
   this->CreateConnections();
@@ -83,7 +80,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
   m_RegionGrow3DTool = dynamic_cast<mitk::AdaptiveRegionGrowingTool*> (tool);
   if(m_RegionGrow3DTool.IsNotNull())
   {
-    this->m_InputImageNode = this->m_RegionGrow3DTool->GetReferenceData();
+    SetInputImageNode( this->m_RegionGrow3DTool->GetReferenceData() );
     this->m_DataStorage = this->m_RegionGrow3DTool->GetDataStorage();
     this->EnableControls(true);
   }
@@ -119,9 +116,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
     connect( (QObject*) (m_Controls.m_IncreaseTH), SIGNAL(clicked()), this,SLOT(IncreaseSlider()));
     connect( (QObject*) (m_Controls.m_pbConfirmSegementation), SIGNAL(clicked()), this, SLOT(ConfirmSegmentation()));
     connect( (QObject*) (m_Controls.m_cbVolumeRendering), SIGNAL(toggled(bool)), this, SLOT(UseVolumeRendering(bool) ));
-
-    connect( m_Controls.m_LowerThresholdSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetLowerThresholdValue(double)));
-    connect( m_Controls.m_UpperThresholdSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetUpperThresholdValue(double)));
+    connect( m_Controls.m_ThresholdSlider, SIGNAL(maximumValueChanged(double)), this, SLOT(SetUpperThresholdValue(double)));
+    connect( m_Controls.m_ThresholdSlider, SIGNAL(minimumValueChanged(double)), this, SLOT(SetLowerThresholdValue(double)));
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface, std::string seedPoint)
@@ -145,6 +141,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetMultiWidget(QmitkStdMultiWidget* mult
 void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 {
   m_InputImageNode = node;
+  mitk::Image* inputImage = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
+  if (inputImage)
+  {
+    m_Controls.m_ThresholdSlider->setMaximum(inputImage->GetStatistics()->GetScalarValueMax());
+    m_Controls.m_ThresholdSlider->setMinimum(inputImage->GetStatistics()->GetScalarValueMin());
+  }
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetSeedPointToggled(bool toggled)
@@ -318,8 +320,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
         m_LOWERTHRESHOLD = m_SeedpointValue - windowSize;
       }
 
-      this->m_Controls.m_LowerThresholdSpinBox->setValue(m_LOWERTHRESHOLD);
-      this->m_Controls.m_UpperThresholdSpinBox->setValue(m_UPPERTHRESHOLD);
+      m_Controls.m_ThresholdSlider->setValues(m_LOWERTHRESHOLD, m_UPPERTHRESHOLD);
   }
 }
 
@@ -855,14 +856,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)
   m_UseVolumeRendering = on;
 
   this->EnableVolumeRendering(on);
-}
-
-void QmitkAdaptiveRegionGrowingToolGUI::OnDefineThresholdBoundaries(bool status)
-{
-    m_Controls.m_LowerThresholdSpinBox->setEnabled(status);
-    m_Controls.m_UpperThresholdSpinBox->setEnabled(status);
-    m_Controls.lb_LowerTh->setEnabled(status);
-    m_Controls.lb_UpperTh->setEnabled(status);
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetLowerThresholdValue( double lowerThreshold )

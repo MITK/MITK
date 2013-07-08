@@ -42,7 +42,6 @@ public:
 
   void OnThresholdChanged(int current);
 
-
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);

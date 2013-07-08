@@ -51,30 +51,22 @@ m_TimeIsConnected(false)
 
   widgetLayout->addWidget(lblHelp);
 
-  QGroupBox *gbControls = new QGroupBox(this);
-  gbControls->setCheckable(false);
-  gbControls->setTitle(" Tool Controls ");
-
-  // create the visible widgets
-  QVBoxLayout *vlayout = new QVBoxLayout(gbControls);
-  vlayout->setContentsMargins(5, 5, 5, 5);
-
   // Sigma controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
-   QLabel *lbl = new QLabel(gbControls);
+   QLabel *lbl = new QLabel(this);
    lbl->setText("Sigma: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   vlayout->addItem(hlayout);
+   widgetLayout->addItem(hlayout);
   }
 
-  m_slSigma = new ctkSliderWidget(gbControls);
+  m_slSigma = new ctkSliderWidget(this);
   m_slSigma->setMinimum(0.1);
   m_slSigma->setMaximum(5.0);
   m_slSigma->setPageStep(0.1);
@@ -84,24 +76,24 @@ m_TimeIsConnected(false)
   m_slSigma->setTracking(false);
   m_slSigma->setToolTip("The \"sigma\" parameter in the Gradient Magnitude filter.");
   connect( m_slSigma, SIGNAL(valueChanged(double)), this, SLOT(OnSigmaChanged(double)));
-  vlayout->addWidget( m_slSigma );
+  widgetLayout->addWidget( m_slSigma );
 
   // Alpha controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
-   QLabel *lbl = new QLabel(gbControls);
+   QLabel *lbl = new QLabel(this);
    lbl->setText("Alpha: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   vlayout->addItem(hlayout);
+   widgetLayout->addItem(hlayout);
   }
 
-  m_slAlpha = new ctkSliderWidget(gbControls);
+  m_slAlpha = new ctkSliderWidget(this);
   m_slAlpha->setMinimum(-10);
   m_slAlpha->setMaximum(0);
   m_slAlpha->setPageStep(0.1);
@@ -111,24 +103,24 @@ m_TimeIsConnected(false)
   m_slAlpha->setTracking(false);
   m_slAlpha->setToolTip("The \"alpha\" parameter in the Sigmoid mapping filter.");
   connect( m_slAlpha, SIGNAL(valueChanged(double)), this, SLOT(OnAlphaChanged(double)));
-  vlayout->addWidget( m_slAlpha );
+  widgetLayout->addWidget( m_slAlpha );
 
   // Beta controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
-   QLabel *lbl = new QLabel(gbControls);
+   QLabel *lbl = new QLabel(this);
    lbl->setText("Beta: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   vlayout->addLayout(hlayout);
+   widgetLayout->addLayout(hlayout);
   }
 
-  m_slBeta = new ctkSliderWidget(gbControls);
+  m_slBeta = new ctkSliderWidget(this);
   m_slBeta->setMinimum(0);
   m_slBeta->setMaximum(100);
   m_slBeta->setPageStep(0.1);
@@ -138,24 +130,24 @@ m_TimeIsConnected(false)
   m_slBeta->setTracking(false);
   m_slBeta->setToolTip("The \"beta\" parameter in the Sigmoid mapping filter.");
   connect( m_slBeta, SIGNAL(valueChanged(double)), this, SLOT(OnBetaChanged(double)));
-  vlayout->addWidget( m_slBeta );
+  widgetLayout->addWidget( m_slBeta );
 
   // stopping value controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
-   QLabel *lbl = new QLabel(gbControls);
+   QLabel *lbl = new QLabel(this);
    lbl->setText("Stopping value: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   vlayout->addLayout(hlayout);
+   widgetLayout->addLayout(hlayout);
   }
 
-  m_slStoppingValue = new ctkSliderWidget(gbControls);
+  m_slStoppingValue = new ctkSliderWidget(this);
   m_slStoppingValue->setMinimum(0);
   m_slStoppingValue->setMaximum(10000);
   m_slStoppingValue->setPageStep(10);
@@ -165,24 +157,24 @@ m_TimeIsConnected(false)
   m_slStoppingValue->setTracking(false);
   m_slStoppingValue->setToolTip("The \"stopping value\" parameter in the fast marching 3D algorithm");
   connect( m_slStoppingValue, SIGNAL(valueChanged(double)), this, SLOT(OnStoppingValueChanged(double)));
-  vlayout->addWidget( m_slStoppingValue );
+  widgetLayout->addWidget( m_slStoppingValue );
 
   // threshold controls
   {
    QHBoxLayout *hlayout = new QHBoxLayout();
    hlayout->setSpacing(2);
 
-   QLabel *lbl = new QLabel(gbControls);
+   QLabel *lbl = new QLabel(this);
    lbl->setText("Threshold: ");
    hlayout->addWidget(lbl);
 
    QSpacerItem* sp2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
    hlayout->addItem(sp2);
 
-   vlayout->addLayout(hlayout);
+   widgetLayout->addLayout(hlayout);
   }
 
-  m_slwThreshold = new ctkRangeWidget(gbControls);
+  m_slwThreshold = new ctkRangeWidget(this);
   m_slwThreshold->setMinimum(-100);
   m_slwThreshold->setMaximum(5000);
   m_slwThreshold->setMinimumValue(-100);
@@ -191,9 +183,7 @@ m_TimeIsConnected(false)
   m_slwThreshold->setTracking(false);
   m_slwThreshold->setToolTip("The lower and upper thresholds for the final thresholding");
   connect( m_slwThreshold, SIGNAL(valuesChanged(double, double)), this, SLOT(OnThresholdChanged(double, double)));
-  vlayout->addWidget( m_slwThreshold );
-
-  widgetLayout->addWidget(gbControls);
+  widgetLayout->addWidget( m_slwThreshold );
 
   m_btClearSeeds = new QPushButton("Clear");
   m_btClearSeeds->setToolTip("Clear current result and start over again");

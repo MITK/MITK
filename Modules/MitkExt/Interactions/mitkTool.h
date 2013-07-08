@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+  class ModuleResource;
   class ToolManager;
 
   /**
@@ -89,6 +90,11 @@ namespace mitk
     Message1<std::string> ErrorMessage;
 
     /**
+    * \brief To send whether the tool is busy (to be shown by some GUI)
+    */
+    Message1<bool> CurrentlyBusy;
+
+    /**
     * \brief To send general messages (to be shown by some GUI)
     */
     Message1<std::string> GeneralMessage;
@@ -112,6 +118,19 @@ namespace mitk
      * This icon is preferred to the XPM icon.
      */
     virtual std::string GetIconPath() const { return ""; }
+
+    /**
+     * \brief Returns the path of a cursor icon.
+     *
+     */
+    virtual ModuleResource GetCursorIconResource() const;
+
+    /**
+     * @brief Returns the tool button icon of the tool wrapped by a usModuleResource
+     * @return a valid ModuleResource or an invalid if this function
+     *         is not reimplemented
+     */
+    virtual ModuleResource GetIconResource() const;
 
     /**
     \brief Returns the name of this tool. Make it short!

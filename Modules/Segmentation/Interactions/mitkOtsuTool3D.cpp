@@ -29,10 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOtsuMultipleThresholdsImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
 
-// Qt
-#include <QMessageBox>
-
 #include "mitkRegionGrow3DTool.xpm"
+
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+#include <mitkModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, OtsuTool3D, "Otsu Segmentation");
@@ -79,6 +82,7 @@ void mitk::OtsuTool3D::Deactivated()
   m_MultiLabelResultNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_BinaryPreviewNode );
   m_BinaryPreviewNode = NULL;
+  m_ToolManager->ActivateTool(-1);
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const
@@ -86,9 +90,11 @@ const char** mitk::OtsuTool3D::GetXPM() const
   return NULL;
 }
 
-std::string mitk::OtsuTool3D::GetIconPath() const
+mitk::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
-  return ":/Segmentation/Otsu_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Otsu_48x48.png");
+  return resource;
 }
 
 void mitk::OtsuTool3D::RunSegmentation(int regions)
@@ -96,14 +102,6 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   //this->m_OtsuSegmentationDialog->setCursor(Qt::WaitCursor);
 
   int numberOfThresholds = regions - 1;
-  int proceed;
-
-  QMessageBox* messageBox = new QMessageBox(QMessageBox::Question, NULL, "The otsu segmentation computation may take several minutes depending on the number of Regions you selected. Proceed anyway?", QMessageBox::Ok | QMessageBox::Cancel);
-  if (numberOfThresholds >= 5)
-  {
-    proceed = messageBox->exec();
-    if (proceed != QMessageBox::Ok) return;
-  }
 
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
   otsuFilter->SetNumberOfThresholds( numberOfThresholds );
@@ -115,11 +113,16 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   }
   catch( ... )
   {
-    QMessageBox* messageBox = new QMessageBox(QMessageBox::Critical, NULL, "itkOtsuFilter error: image dimension must be in {2, 3} and no RGB images can be handled.");
-    messageBox->exec();
-    delete messageBox;
     mitkThrow() << "itkOtsuFilter error (image dimension must be in {2, 3} and image must not be RGB)";
   }
+
+  m_ToolManager->GetDataStorage()->Remove( this->m_MultiLabelResultNode );
+  m_MultiLabelResultNode = NULL;
+  m_MultiLabelResultNode = mitk::DataNode::New();
+  m_MultiLabelResultNode->SetName("Otsu_Preview");
+  m_MultiLabelResultNode->SetVisibility(true);
+  m_ToolManager->GetDataStorage()->Add( this->m_MultiLabelResultNode );
+  m_MultiLabelResultNode->SetOpacity(1.0);
 
   this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
   m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
@@ -143,6 +146,8 @@ void mitk::OtsuTool3D::RunSegmentation(int regions)
   levWinProp->SetLevelWindow( levelwindow );
   m_MultiLabelResultNode->SetProperty( "levelwindow", levWinProp );
 
+  //m_BinaryPreviewNode->SetVisibility(false);
+//  m_MultiLabelResultNode->SetVisibility(true);
   //this->m_OtsuSegmentationDialog->setCursor(Qt::ArrowCursor);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

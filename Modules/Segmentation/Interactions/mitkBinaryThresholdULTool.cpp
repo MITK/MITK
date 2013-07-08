@@ -34,6 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include "mitkGetModuleContext.h"
+#include "mitkModuleContext.h"
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
 }
@@ -63,9 +69,11 @@ const char** mitk::BinaryThresholdULTool::GetXPM() const
   return NULL;
 }
 
-std::string mitk::BinaryThresholdULTool::GetIconPath() const
+mitk::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
 {
-  return ":/Segmentation/TwoThresholds_48x48.png";
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("TwoThresholds_48x48.png");
+  return resource;
 }
 
 const char* mitk::BinaryThresholdULTool::GetName() const

@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
+#include "mitkModuleResource.h"
+#include "mitkStatusBar.h"
+#include "mitkApplicationCursor.h"
 
 #include "mitkSegmentationObjectFactory.h"
 
@@ -47,6 +50,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
 ,m_DataSelectionChanged(false)
+,m_MouseCursorSet(false)
 {
   RegisterSegmentationObjectFactory();
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -100,8 +104,9 @@ void QmitkSegmentationView::Activated()
   if( m_Controls )
   {
     m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox2D->minimumSizeHint().width()+1);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
-    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(250);
+    m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(m_Controls->m_ManualToolSelectionBox3D->minimumSizeHint().width()+1);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 //    m_Controls->m_OrganToolSelectionBox->setEnabled( true );
 //    m_Controls->m_LesionToolSelectionBox->setEnabled( true );
@@ -889,9 +894,21 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
   //3D Tab ID = 1
   if (id == 0)
   {
+    //Hide 3D selection box, show 2D selection box
+    m_Controls->m_ManualToolSelectionBox3D->hide();
+    m_Controls->m_ManualToolSelectionBox2D->show();
+    //Deactivate possible active tool
+    m_Controls->m_ManualToolSelectionBox3D->GetToolManager()->ActivateTool(-1);
+
+    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
+  }
+  else
+  {
+    //Hide 3D selection box, show 2D selection box
+    m_Controls->m_ManualToolSelectionBox2D->hide();
+    m_Controls->m_ManualToolSelectionBox3D->show();
     //Deactivate possible active tool
     m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
-    //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
   }
 }
 
@@ -1025,16 +1042,17 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'Fast Marching'");
+  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
+  connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
 
   //setup 3D Tools
   m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
   //specify tools to be added to 3D Tool area
   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups("Threshold 'Two Thresholds' Otsu FastMarching3D RegionGrowing Watershedding");
-  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(2);
+  m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
   // available only in the 3M application
@@ -1082,4 +1100,46 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
 //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 }
+
+void QmitkSegmentationView::OnManualTool2DSelected(int id)
+{
+    if (id >= 0)
+    {
+        std::string text = "Active Tool: \"";
+        mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
+        text += toolManager->GetToolById(id)->GetName();
+        text += "\"";
+        mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
+
+        mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
+        this->SetMouseCursor(resource, 0, 0);
+    }
+    else
+    {
+        this->ResetMouseCursor();
+        mitk::StatusBar::GetInstance()->DisplayText("");
+    }
+}
+
+void QmitkSegmentationView::ResetMouseCursor()
+{
+  if ( m_MouseCursorSet )
+  {
+    mitk::ApplicationCursor::GetInstance()->PopCursor();
+    m_MouseCursorSet = false;
+  }
+}
+
+void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource, int hotspotX, int hotspotY )
+{
+  // Remove previously set mouse cursor
+  if ( m_MouseCursorSet )
+  {
+    mitk::ApplicationCursor::GetInstance()->PopCursor();
+  }
+
+  mitk::ApplicationCursor::GetInstance()->PushCursor( resource, hotspotX, hotspotY );
+  m_MouseCursorSet = true;
+}
+
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

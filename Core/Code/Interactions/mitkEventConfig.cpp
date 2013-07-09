@@ -341,7 +341,7 @@ mitk::EventConfig::~EventConfig()
 
 bool mitk::EventConfig::IsValid() const
 {
-  return !d->m_EventList.empty();
+  return !( d->m_EventList.empty() && d->m_PropertyList->IsEmpty() );
 }
 
 bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* module)

@@ -396,10 +396,6 @@ bool mitk::FastMarchingTool::OnDelete(Action* action, const StateEvent* stateEve
 
 void mitk::FastMarchingTool::Update()
 {
-  // check if we have any seed point
-  if (this->m_SeedContainer->Size() < 1)
-        return;
-
   // update FastMarching pipeline and show result
   if (m_NeedUpdate)
   {

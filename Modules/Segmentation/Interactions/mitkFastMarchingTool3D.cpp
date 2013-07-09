@@ -333,10 +333,6 @@ bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateE
 
 void mitk::FastMarchingTool3D::Update()
 {
-  // check if we have any seed point
-  if (this->m_SeedContainer->Size() < 1)
-        return;
-
   if (m_NeedUpdate)
   {
     m_ProgressCommand->AddStepsToDo(20);

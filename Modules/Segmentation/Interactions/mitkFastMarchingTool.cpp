@@ -49,8 +49,6 @@ m_PositionEvent(0)
   CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
-
-  //this->BuildITKPipeline();
 }
 
 mitk::FastMarchingTool::~FastMarchingTool()
@@ -341,6 +339,7 @@ bool mitk::FastMarchingTool::OnAddPoint(Action* action, const StateEvent* stateE
   if( (m_LastEventSender != m_PositionEvent->GetSender()) || (m_LastEventSlice != m_PositionEvent->GetSender()->GetSlice()) )
   {
       this->BuildITKPipeline();
+      this->ClearSeeds();
   }
 
   m_LastEventSender = m_PositionEvent->GetSender();

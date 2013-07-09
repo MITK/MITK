@@ -74,11 +74,16 @@ struct EventConfigPrivate : public SharedData
     InteractionEvent::ConstPointer interactionEvent;
   };
 
+  typedef std::list<EventMapping> EventListType;
+
   /**
    * Checks if mapping with the same parameters already exists, if so, it is replaced,
    * else the new mapping added
    */
   void InsertMapping(const EventMapping& mapping);
+
+
+  void CopyMapping( const EventListType );
 
   /**
    * @brief List of all global properties of the config object.
@@ -93,7 +98,6 @@ struct EventConfigPrivate : public SharedData
 
   EventMapping m_CurrEventMapping;
 
-  typedef std::list<EventMapping> EventListType;
 
   /**
    * Stores InteractionEvents and their corresponding VariantName
@@ -143,6 +147,16 @@ void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
   }
   m_EventList.push_back(mapping);
 }
+
+void mitk::EventConfigPrivate::CopyMapping( const EventListType eventList )
+{
+  EventListType::const_iterator iter;
+  for( iter=eventList.begin(); iter!=eventList.end(); iter++ )
+  {
+    InsertMapping( *(iter) );
+  }
+}
+
 
 mitk::EventConfigXMLParser::EventConfigXMLParser(EventConfigPrivate *d)
   : d(d)
@@ -345,7 +359,8 @@ bool mitk::EventConfig::AddConfig(const EventConfig& config)
   d->m_PropertyList->ConcatenatePropertyList(config.d->m_PropertyList->Clone(), true);
   d->m_EventPropertyList = config.d->m_EventPropertyList->Clone();
   d->m_CurrEventMapping = config.d->m_CurrEventMapping;
-  d->InsertMapping(config.d->m_CurrEventMapping);
+  d->CopyMapping( config.d->m_EventList );
+
   return true;
 }
 

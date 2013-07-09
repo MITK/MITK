@@ -114,6 +114,7 @@ struct EventConfigPrivate : public SharedData
 
 mitk::EventConfigPrivate::EventConfigPrivate()
   : m_PropertyList(PropertyList::New())
+  , m_EventPropertyList( PropertyList::New() )
   , m_Errors(false)
   , m_XmlParser(this)
 {
@@ -293,21 +294,37 @@ mitk::EventConfig::EventConfig(const std::vector<PropertyList::Pointer> &configD
 : d(new EventConfigPrivate)
 {
   std::vector<PropertyList::Pointer>::const_iterator it_end = configDescription.end();
-  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it) {
-
-    InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
-    if (event.IsNotNull())
+  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it)
+  {
+    std::string typeVariant;
+    (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), typeVariant);
+    if ( typeVariant != "" )
     {
+      InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
+      if (event.IsNotNull())
+      {
 
-      d->m_CurrEventMapping.interactionEvent = event;
-      std::string eventVariant;
-      (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), eventVariant);
-      d->m_CurrEventMapping.variantName = eventVariant;
-      d->InsertMapping(d->m_CurrEventMapping);
+        d->m_CurrEventMapping.interactionEvent = event;
+        std::string eventVariant;
+        (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), eventVariant);
+        d->m_CurrEventMapping.variantName = eventVariant;
+        d->InsertMapping(d->m_CurrEventMapping);
+      }
+      else
+      {
+        MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+      }
     }
     else
     {
-      MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+      (*it)->GetStringProperty(InteractionEventConst::xmlTagParam().c_str(), typeVariant);
+      if ( typeVariant != "" )
+      {
+        std::string name, value;
+        (*it)->GetStringProperty(InteractionEventConst::xmlParameterName().c_str(), name);
+        (*it)->GetStringProperty(InteractionEventConst::xmlParameterValue().c_str(), value);
+        d->m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
+      }
     }
   }
 }

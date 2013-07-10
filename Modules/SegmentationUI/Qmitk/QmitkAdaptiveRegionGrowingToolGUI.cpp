@@ -313,6 +313,10 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
         if (m_SeedpointValue < m_SeedPointValueMean)
           m_LOWERTHRESHOLD = m_SeedpointValue;
         m_UPPERTHRESHOLD = m_SeedpointValue + windowSize;
+        if (m_UPPERTHRESHOLD > max)
+          m_UPPERTHRESHOLD = max;
+        m_Controls.m_ThresholdSlider->setMaximumValue(m_UPPERTHRESHOLD);
+        m_Controls.m_ThresholdSlider->setMinimumValue(m_LOWERTHRESHOLD);
       }
       else
       {
@@ -320,9 +324,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
         if (m_SeedpointValue > m_SeedPointValueMean)
           m_UPPERTHRESHOLD = m_SeedpointValue;
         m_LOWERTHRESHOLD = m_SeedpointValue - windowSize;
+        if (m_LOWERTHRESHOLD < min)
+          m_LOWERTHRESHOLD = min;
+        m_Controls.m_ThresholdSlider->setMinimumValue(m_LOWERTHRESHOLD);
+        m_Controls.m_ThresholdSlider->setMaximumValue(m_UPPERTHRESHOLD);
       }
-
-      m_Controls.m_ThresholdSlider->setValues(m_LOWERTHRESHOLD, m_UPPERTHRESHOLD);
   }
 }
 
@@ -458,8 +464,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   //initialize slider
   if(m_CurrentRGDirectionIsUpwards)
   {
-    this->m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
     this->m_Controls.m_PreviewSlider->setMaximum(m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax());
+    this->m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
   }
   else
   {

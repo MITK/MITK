@@ -113,7 +113,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::RemoveHelperNodes()
 void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
 {
     //Connecting GUI components
-    connect( (QObject*) (m_Controls.m_pbDefineSeedPoint), SIGNAL( toggled(bool) ), this, SLOT( SetSeedPointToggled(bool)) );
     connect( (QObject*) (m_Controls.m_pbRunSegmentation), SIGNAL(clicked()), this, SLOT(RunSegmentation()));
     connect( m_Controls.m_PreviewSlider, SIGNAL(valueChanged(double)), this, SLOT(ChangeLevelWindow(double)));
     connect( (QObject*) (m_Controls.m_pbConfirmSegementation), SIGNAL(clicked()), this, SLOT(ConfirmSegmentation()));
@@ -153,16 +152,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetSeedPointToggled(bool toggled)
 {
-  if (m_InputImageNode.IsNull())
-  {
-    if (m_Controls.m_pbDefineSeedPoint->isChecked())
-    {
-      QMessageBox::information( NULL, "Adaptive Region Growing functionality", "Please specify the image in Datamanager!");
-      m_Controls.m_pbDefineSeedPoint->toggle();
-    }
-    return;
-  }
-
   //check that a pointset node with the given name exists in data storage
   mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
   if (node == NULL) //no pointSet present
@@ -338,10 +327,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
-  //release the "define seed point"-button if it is still pressed
-  if (m_Controls.m_pbDefineSeedPoint->isChecked())
-    m_Controls.m_pbDefineSeedPoint->toggle();
-
 
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
 
@@ -365,7 +350,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
   if (!(seedPointSet->GetSize(timeStep)))
   {
     m_Controls.m_pbRunSegmentation->setEnabled(true);
-    m_Controls.m_pbDefineSeedPoint->setHidden(false);
     QMessageBox::information( NULL, "Adaptive Region Growing functionality", "The seed point is empty! Please choose a new seed point.");
     return;
   }
@@ -735,7 +719,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
 {
-  this->m_Controls.m_pbDefineSeedPoint->setEnabled(enable);
 
   // Check if seed point is already set, if not leave RunSegmentation disabled
   //if even m_DataStorage is NULL leave node NULL

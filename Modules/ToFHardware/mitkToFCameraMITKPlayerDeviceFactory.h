@@ -69,7 +69,7 @@ private:
    /*!
    \brief Create an instance of a ToFPlayerDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraMITKPlayerDevice::Pointer device = ToFCameraMITKPlayerDevice::New();
 

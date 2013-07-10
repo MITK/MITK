@@ -36,13 +36,7 @@ namespace mitk
 
     virtual std::string GetCurrentDeviceName() = 0;
 
-    virtual ToFCameraDevice::Pointer createToFCameraDevice() = 0;
-
-    /**
-      \brief get the intrinsic parameters of the current device
-      */
-    virtual CameraIntrinsics::Pointer getCameraIntrinsics() = 0;
-
+    virtual ToFCameraDevice::Pointer CreateToFCameraDevice() = 0;
 
   };
 }

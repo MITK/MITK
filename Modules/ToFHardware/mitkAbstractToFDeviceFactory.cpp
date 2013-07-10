@@ -79,4 +79,5 @@ mitk::ModuleResource mitk::AbstractToFDeviceFactory::GetIntrinsicsResource()
 {
   mitk::Module* module = mitk::GetModuleContext()->GetModule();
   return module->GetResource("CalibrationFiles/Default_Parameters.xml");
+  MITK_WARN << "Loaded Default CameraIntrinsics. Overwrite AbstractToFDeviceFactory::GetIntrinsicsResource() if you want to define your own.";
 }

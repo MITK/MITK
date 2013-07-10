@@ -372,19 +372,19 @@ int mitkImageTest(int argc, char* argv[])
 //
 ///////////////////////////////
 
-  MITK_TEST_CONDITION( mitk::compare::IsEqual( cloneImage, image ), "Comparing images by IsEqual( cloneImage, image) " );
-  MITK_TEST_CONDITION( mitk::compare::IsEqual( cloneImage->GetGeometry(), image->GetGeometry()), "Comparing geometries by IsEqual( geometry )");
+  MITK_TEST_CONDITION( mitk::Image::AreEqual( cloneImage, image ), "Comparing images by IsEqual( cloneImage, image) " );
+  MITK_TEST_CONDITION( mitk::Geometry3D::AreEqual( cloneImage->GetGeometry(), image->GetGeometry()), "Comparing geometries by IsEqual( geometry )");
 
   // altering origin to test if the IsEqual failes
   cloneImage->GetGeometry()->SetOrigin(point);
-  MITK_TEST_CONDITION( !mitk::compare::IsEqual( cloneImage, image ), "Comparing geometries with different origin. " );
+  MITK_TEST_CONDITION( !mitk::Image::AreEqual( cloneImage, image ), "Comparing geometries with different origin. " );
 
   // comparing
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   sliceSelector->SetInput( image );
   sliceSelector->SetSliceNr( 0 );
   mitk::Image::Pointer singleSliceImage = sliceSelector->GetOutput();
-  MITK_TEST_CONDITION( !mitk::compare::IsEqual( singleSliceImage, image ), "Comparing 2D and 3D image by IsEqual() ");
+  MITK_TEST_CONDITION( !mitk::Image::AreEqual( singleSliceImage, image ), "Comparing 2D and 3D image by IsEqual() ");
 
   mitk::PixelType fPType = mitk::MakeScalarPixelType<float>();
   mitk::PixelType sPType = mitk::MakeScalarPixelType<short>();
@@ -395,12 +395,12 @@ int mitkImageTest(int argc, char* argv[])
   mitk::Image::Pointer shortImage = mitk::Image::New();
   shortImage->Initialize(sPType, 3, dim);
 
-  MITK_TEST_CONDITION( !mitk::compare::IsEqual( floatImage, shortImage ), "Comparing images with different PixelTypes by IsEqual() ");
+  MITK_TEST_CONDITION( !mitk::Image::AreEqual( floatImage, shortImage ), "Comparing images with different PixelTypes by IsEqual() ");
 
   mitk::Image::Pointer floatImage2 = mitk::Image::New();
   unsigned int alteredDim[]={100,100,30};
   floatImage2->Initialize(fPType, 3, alteredDim);
-  MITK_TEST_CONDITION( !mitk::compare::IsEqual( floatImage, floatImage2), "Comparing images with different dimension size by IsEqual() ")
+  MITK_TEST_CONDITION( !mitk::Image::AreEqual( floatImage, floatImage2), "Comparing images with different dimension size by IsEqual() ")
 
 /////////////////////
 

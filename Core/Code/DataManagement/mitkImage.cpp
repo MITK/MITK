@@ -1216,20 +1216,20 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
-bool mitk::compare::IsEqual(const mitk::Image* rhs, const mitk::Image* lhs)
+bool mitk::Image::AreEqual(const mitk::Image* rightHandSide, const mitk::Image* leftHandSide)
 {
   // check the validity of input
-  if( rhs == NULL || lhs == NULL )
+  if( rightHandSide == NULL || leftHandSide == NULL )
   {
-    MITK_INFO << "[AreIdentical( Image )] Input null. ";
+    MITK_INFO << "[AreEqual( Image )] Input null. ";
     return false;
   }
 
   // dimensionality
-  const unsigned int rhsDimension = rhs->GetDimension();
-  if( rhsDimension != lhs->GetDimension() )
+  const unsigned int rhsDimension = rightHandSide->GetDimension();
+  if( rhsDimension != leftHandSide->GetDimension() )
   {
-    MITK_INFO << "[AreIdentical( Image )] Dimensionality differs.";
+    MITK_INFO << "[AreEqual( Image )] Dimensionality differs.";
     return false;
   }
 
@@ -1237,26 +1237,26 @@ bool mitk::compare::IsEqual(const mitk::Image* rhs, const mitk::Image* lhs)
   bool dimensionsIdentical = true;
   for( unsigned int i=0; i< rhsDimension; i++)
   {
-    if( rhs->GetDimension(i) != lhs->GetDimension(i) )
+    if( rightHandSide->GetDimension(i) != leftHandSide->GetDimension(i) )
       dimensionsIdentical = false;
   }
   if(!dimensionsIdentical)
   {
-    MITK_INFO << "[AreIdentical( Image )] Some dimension differs.";
+    MITK_INFO << "[AreEqual( Image )] Some dimension differs.";
     return false;
   }
 
   // compare geometry
-  if( !IsEqual(rhs->GetGeometry(), lhs->GetGeometry()) )
+  if( !mitk::Geometry3D::AreEqual(rightHandSide->GetGeometry(), leftHandSide->GetGeometry()) )
   {
-    MITK_INFO << "[AreIdentical( Image )] --> Geometry3D differs.";
+    MITK_INFO << "[AreEqual( Image )] --> Geometry3D differs.";
     return false;
   }
 
   // pixel type
-  if( !(rhs->GetPixelType() == lhs->GetPixelType()) )
+  if( !(rightHandSide->GetPixelType() == leftHandSide->GetPixelType()) )
   {
-    MITK_INFO << "[AreIdentical( Image )] PixelType differs.";
+    MITK_INFO << "[AreEqual( Image )] PixelType differs.";
     return false;
   }
 

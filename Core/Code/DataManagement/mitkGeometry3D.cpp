@@ -700,6 +700,73 @@ mitk::Geometry3D::ResetSubTransforms()
 {
 }
 
+//Todo List:
+//Allow the user to pass eps values for various comparisons: Spacing, Origin, Extent, Axis, Index2WorldTransform, etc.
+
+//Todo: List of parameters which are copied inside the copy constructor and NOT compared yet
+//m_ParametricBoundingBox(other.m_ParametricBoundingBox),
+//m_TimeBounds(other.m_TimeBounds),
+//m_ImageGeometry(other.m_ImageGeometry),
+//m_Valid(other.m_Valid),
+//m_FrameOfReferenceID(other.m_FrameOfReferenceID),
+//m_RotationQuaternion( other.m_RotationQuaternion),
+//SetBounds(other.GetBounds());
+//m_VtkMatrix = vtkMatrix4x4::New();
+
+bool mitk::Geometry3D::AreEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide)
+{
+  // check the validity of input
+  if( rightHandSide == NULL || leftHandSide == NULL )
+  {
+    MITK_INFO << "[AreEqual( Geometry3D )] Input null.";
+    return false;
+  }
+
+  // spacing
+  if( !mitk::Equal( rightHandSide->GetSpacing(), leftHandSide->GetSpacing() ))
+  {
+    MITK_INFO << "[AreEqual( Geometry3D )] Spacing differs.";
+    MITK_INFO << "rightHandSide is " << rightHandSide->GetSpacing() << " : leftHandSide is " << leftHandSide->GetSpacing();
+    return false;
+  }
+
+  // origin
+  if( !mitk::Equal( rightHandSide->GetOrigin(), leftHandSide->GetOrigin() ))
+  {
+    MITK_INFO << "[AreEqual( Geometry3D )] Origin differs.";
+    MITK_INFO << "rightHandSide is " << rightHandSide->GetOrigin() << " : leftHandSide is " << leftHandSide->GetOrigin();
+    return false;
+  }
+
+  // compare each view axis and extent
+  for( unsigned int i=0; i< 3; i++)
+  {
+    if( !mitk::Equal( rightHandSide->GetAxisVector(i), leftHandSide->GetAxisVector(i)) )
+    {
+      MITK_INFO << "[AreEqual( Geometry3D )] AxisVector #" << i << " differ";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetAxisVector(i) << " : leftHandSide is " << leftHandSide->GetAxisVector(i);
+      return false;
+    }
+
+    if( !mitk::Equal( rightHandSide->GetExtent(i), leftHandSide->GetExtent(i)) )
+    {
+      MITK_INFO << "[AreEqual( Geometry3D )] Extent #" << i << " differ";
+      MITK_INFO << "rightHandSide is " << rightHandSide->GetExtent(i) << " : leftHandSide is " << leftHandSide->GetExtent(i);
+      return false;
+    }
+  }
+
+  // index to world transform
+  if( !mitk::MatrixEqualElementWise( rightHandSide->GetIndexToWorldTransform()->GetMatrix(),
+                                     leftHandSide->GetIndexToWorldTransform()->GetMatrix()) )
+  {
+    MITK_INFO << "[AreEqual( Geometry3D )] Index to World Transformation matrix differs.";
+    MITK_INFO << "rightHandSide is " << rightHandSide->GetIndexToWorldTransform()->GetMatrix() << " : leftHandSide is " << leftHandSide->GetIndexToWorldTransform()->GetMatrix();
+    return false;
+  }
+  return true;
+}
+
 void
 mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
 {
@@ -767,56 +834,4 @@ bool mitk::Geometry3D::Is2DConvertable()
    } while (0);
 
    return isConvertableWithoutLoss;
-}
-
-bool mitk::compare::IsEqual(const mitk::Geometry3D *rhs, const mitk::Geometry3D *lhs)
-{
-  // check the validity of input
-  if( rhs == NULL || lhs == NULL )
-  {
-    MITK_INFO << "[AreIdentical( Geometry3D )] Input null.";
-    return false;
-  }
-
-  // spacing
-  if( !Equal( rhs->GetSpacing(), lhs->GetSpacing() ))
-  {
-    MITK_INFO << "[AreIdentical( Geometry3D )] Spacing differs.";
-    return false;
-  }
-
-  // origin
-  if( !Equal( rhs->GetOrigin(), lhs->GetOrigin() ))
-  {
-    MITK_INFO << "[AreIdentical( Geometry3D )] Origin differs.";
-    return false;
-  }
-
-  // compare each view axis and extent
-  bool viewAxisIdentical = true;
-  bool extentsIdentical = true;
-  for( unsigned int i=0; i< 3; i++)
-  {
-    if( !mitk::Equal( rhs->GetAxisVector(i), lhs->GetAxisVector(i)) )
-      viewAxisIdentical = false;
-
-    if( !mitk::Equal( rhs->GetExtent(i), lhs->GetExtent(i)) )
-      extentsIdentical = false;
-  }
-  if( !viewAxisIdentical || !extentsIdentical )
-  {
-    MITK_INFO << "[AreIdentical( Geometry3D )] Axis AND/OR Extent differ";
-    return false;
-  }
-
-
-  // index to world transform
-  if( !mitk::MatrixEqualElementWise( rhs->GetIndexToWorldTransform()->GetMatrix(),
-                                     lhs->GetIndexToWorldTransform()->GetMatrix()) )
-  {
-    MITK_INFO << "[AreIdentical( Geometry3D )] I2W Transformation matrix differs.";
-    return false;
-  }
-
-  return true;
 }

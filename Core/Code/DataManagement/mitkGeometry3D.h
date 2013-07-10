@@ -596,6 +596,17 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##@brief executes affine operations (translate, rotate, scale)
   virtual void ExecuteOperation(Operation* operation);
 
+  //
+  // Static Functions
+  //
+  /**
+    \brief A function comparing two geometries for beeing identical
+
+    The function compares the spacing, origin, axisvectors, extents and the matrix of the
+    IndexToWorldTransform (elementwise)
+    */
+  static bool MITK_CORE_EXPORT AreEqual(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide);
+
 protected:
   Geometry3D();
   Geometry3D(const Geometry3D& other);
@@ -663,19 +674,6 @@ private:
   //##
   Point3D m_Origin;
 };
-
-namespace compare
-{
-
-/**
-  \brief A function comparing two geometries for beeing identical
-
-  The function compares the spacing, origin, axisvectors, extents and the matrix of the
-  IndexToWorldTransform (elementwise)
-  */
-bool MITK_CORE_EXPORT IsEqual( const mitk::Geometry3D* rhs, const mitk::Geometry3D* lhs);
-}
-
 } // namespace mitk
 
 #endif /* GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */

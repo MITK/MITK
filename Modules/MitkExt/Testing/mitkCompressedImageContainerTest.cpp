@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactory.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkImageDataItem.h"
+#include "mitkImageReadAccessor.h"
 
 class mitkCompressedImageContainerTestClass
 {
@@ -84,8 +85,11 @@ static void Test( mitk::CompressedImageContainer* container, mitk::Image* image,
 
   for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; ++timeStep)
   {
-    unsigned char* originalData( static_cast<unsigned char*>(image->GetVolumeData(timeStep)->GetData()) );
-    unsigned char* uncompressedData( static_cast<unsigned char*>(uncompressedImage->GetVolumeData(timeStep)->GetData()) );
+    mitk::ImageReadAccessor origImgAcc(image, image->GetVolumeData(timeStep));
+    mitk::ImageReadAccessor unCompImgAcc(uncompressedImage, uncompressedImage->GetVolumeData(timeStep));
+
+    unsigned char* originalData( (unsigned char*) origImgAcc.GetData() );
+    unsigned char* uncompressedData( (unsigned char*) unCompImgAcc.GetData() );
 
     unsigned long difference(0);
     for (unsigned long byte = 0; byte < oneTimeStepSizeInBytes; ++byte)

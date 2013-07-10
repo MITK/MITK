@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageWriteAccessor.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
-
+#include "mitkImageReadAccessor.h"
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)

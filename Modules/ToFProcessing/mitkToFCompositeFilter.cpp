@@ -53,8 +53,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
   {
     if (idx==0) //create IPL image holding distance data
     {
-      ImageReadAccessor distImgAcc(distanceImage, distanceImage->GetSliceData(0,0,0));
-      if (distImgAcc.GetData())
+      if (!distanceImage->IsEmpty())
       {
         this->m_ImageWidth = distanceImage->GetDimension(0);
         this->m_ImageHeight = distanceImage->GetDimension(1);
@@ -64,6 +63,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
         {
           cvReleaseImage(&(this->m_IplDistanceImage));
         }
+        ImageReadAccessor distImgAcc(distanceImage, distanceImage->GetSliceData(0,0,0));
         float* distanceFloatData = (float*) distImgAcc.GetData();
         this->m_IplDistanceImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
         memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);

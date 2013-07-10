@@ -281,8 +281,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
 
   int count = 0;
 
-  double diffTolerance = 0.01; //cause roundoff error
-
   for (pointsIter=itkPointSet->GetPoints()->Begin();
     pointsIter!=itkPointSet->GetPoints()->End();
     pointsIter++)

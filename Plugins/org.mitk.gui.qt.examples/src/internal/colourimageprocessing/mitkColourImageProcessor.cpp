@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkImage.h>
 #include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
 
 
 
@@ -873,7 +874,7 @@ static  inline int clamp(int x)
   }
 
 
-mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* input  ,unsigned char* input2, int sizeX,int sizeY,int sizeZ )
+mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( const unsigned char* input  , const unsigned char* input2, int sizeX,int sizeY,int sizeZ )
 {
   int voxel= sizeX*sizeY*sizeZ;
 
@@ -966,9 +967,9 @@ mitk::Image::Pointer mitkColourImageProcessor::combineRGBAImage( mitk::Image::Po
   try
   {
     mitk::ImageReadAccessor img1(input1);
-    const void* data1 = img1.GetData();
+    const unsigned char* data1 = (const unsigned char*) img1.GetData();
     mitk::ImageReadAccessor img2(input2);
-    const void* data2 = img2.GetData();
+    const unsigned char* data2 = (const unsigned char*) img2.GetData();
 
     unsigned int *dim = input1->GetDimensions();
 

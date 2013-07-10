@@ -166,7 +166,6 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
   }
 }
 
-
 void QmitkVolumetryView::OnCalculateVolume()
 {
   if (m_SelectedDataNode.IsNotNull() )

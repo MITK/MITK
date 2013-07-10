@@ -87,6 +87,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
     SetInputImageNode( this->m_RegionGrow3DTool->GetReferenceData() );
     this->m_DataStorage = this->m_RegionGrow3DTool->GetDataStorage();
     this->EnableControls(true);
+
+    //Watch for point added or modified
+    itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::New();
+    pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded);
+    m_PointSetAddObserverTag = m_RegionGrow3DTool->GetPointSetNode()->GetData()->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
   }
   else
   {
@@ -211,9 +216,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetSeedPointToggled(bool toggled)
 
 void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 {
-  mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
+  mitk::DataNode* node = m_RegionGrow3DTool->GetPointSetNode();
 
-  if (node != NULL) //no pointSet present
+  if (node != NULL)
   {
       mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
 
@@ -327,8 +332,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::RunSegmentation()
     return;
   }
 
-
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
+  mitk::DataNode::Pointer node = m_RegionGrow3DTool->GetPointSetNode();
 
   if (node.IsNull())
   {
@@ -719,10 +723,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
 {
+  if (m_RegionGrow3DTool.IsNull())
+    return;
 
   // Check if seed point is already set, if not leave RunSegmentation disabled
   //if even m_DataStorage is NULL leave node NULL
-  mitk::DataNode::Pointer node = m_DataStorage?m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT):NULL;
+  mitk::DataNode::Pointer node = m_RegionGrow3DTool->GetPointSetNode();
   if (node.IsNull()) {
     this->m_Controls.m_pbRunSegmentation->setEnabled(false);
   }

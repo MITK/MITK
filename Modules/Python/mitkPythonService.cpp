@@ -151,7 +151,7 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
     if(commandIssued)
     {
         this->NotifyObserver(pythonCommand.toStdString());
-        m_ErrorOccured = PythonQt::self()->errorOccured();
+        m_ErrorOccured = PythonQt::self()->hadError();
     }
 
     return result.toString().toStdString();

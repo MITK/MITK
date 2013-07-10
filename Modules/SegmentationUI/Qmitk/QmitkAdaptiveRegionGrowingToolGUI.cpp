@@ -48,11 +48,11 @@ QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSugges
 
   m_Controls.setupUi(this);
 
-  m_Controls.m_ThresholdSlider->setDecimals(2);
-  m_Controls.m_ThresholdSlider->setSpinBoxAlignment(Qt::AlignTop);
+  m_Controls.m_ThresholdSlider->setDecimals(1);
+  m_Controls.m_ThresholdSlider->setSpinBoxAlignment(Qt::AlignVCenter);
 
   m_Controls.m_PreviewSlider->setEnabled(false);
-  m_Controls.m_PreviewSlider->setSingleStep(0.1);
+  m_Controls.m_PreviewSlider->setSingleStep(0.5);
   //Not yet available
   //m_Controls.m_PreviewSlider->InvertedAppearance(true);
 
@@ -150,8 +150,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
   mitk::Image* inputImage = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
   if (inputImage)
   {
-    m_Controls.m_ThresholdSlider->setMaximum(inputImage->GetStatistics()->GetScalarValueMax());
-    m_Controls.m_ThresholdSlider->setMinimum(inputImage->GetStatistics()->GetScalarValueMin());
+    mitk::ScalarType max = inputImage->GetStatistics()->GetScalarValueMax();
+    mitk::ScalarType min = inputImage->GetStatistics()->GetScalarValueMin();
+    m_Controls.m_ThresholdSlider->setMaximum(max);
+    m_Controls.m_ThresholdSlider->setMinimum(min);
+    // Just for initialization
+    m_Controls.m_ThresholdSlider->setMaximumValue(max);
+    m_Controls.m_ThresholdSlider->setMinimumValue(min);
   }
 }
 
@@ -449,24 +454,21 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
     return;
   }
 
-
-  this->m_SeedpointValue = regionGrower->GetSeedpointValue();
-
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
   //initialize slider
   if(m_CurrentRGDirectionIsUpwards)
   {
     this->m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
-    this->m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
+    this->m_Controls.m_PreviewSlider->setMaximum(m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax());
   }
   else
   {
-    m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
-    m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
+    m_Controls.m_PreviewSlider->setMinimum(m_UPPERTHRESHOLD-resultImage->GetStatistics()->GetScalarValueMax());
+    this->m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
   }
   this->m_SliderInitialized = true;
   this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
 
-  mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
 
   //create new node and then delete the old one if there is one
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();

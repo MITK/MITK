@@ -37,6 +37,10 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
 
    void DisconnectToFDevice(const ToFCameraDevice::Pointer& device);
 
+   /**
+     \brief get the default intrinsic parameters
+     */
+   virtual CameraIntrinsics::Pointer getCameraIntrinsics();
 private:
 
    std::vector<ToFCameraDevice::Pointer> m_Devices;

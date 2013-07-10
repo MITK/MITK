@@ -14,8 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkAbstractToFDeviceFactory.h"
-#include <usGetModuleContext.h>
+#include <mitkCameraIntrinsics.h>
+//Microservices
 #include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <mitkModule.h>
+#include <mitkModuleResource.h>
+#include <mitkModuleResourceStream.h>
+
+//TinyXML
+#include <tinyxml.h>
 
 mitk::ToFCameraDevice::Pointer mitk::AbstractToFDeviceFactory::ConnectToFDevice()
 {
@@ -39,4 +47,18 @@ void mitk::AbstractToFDeviceFactory::DisconnectToFDevice(const ToFCameraDevice::
    m_DeviceRegistrations.erase(i);
 
    m_Devices.erase(std::remove(m_Devices.begin(), m_Devices.end(), device), m_Devices.end());
+}
+
+mitk::CameraIntrinsics::Pointer mitk::AbstractToFDeviceFactory::getCameraIntrinsics()
+{
+  mitk::Module* module = mitk::GetModuleContext()->GetModule();
+  mitk::ModuleResource resource = module->GetResource("CalibrationFiles/DefaultParameters.xml");
+  mitk::ModuleResourceStream resStream(resource);
+
+  TiXmlNode* xmlDocument;
+  resStream>>&xmlDocument;
+
+//  resource->GetData();
+//  cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
+//  device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 }

@@ -55,10 +55,12 @@ mitk::CameraIntrinsics::Pointer mitk::AbstractToFDeviceFactory::getCameraIntrins
   mitk::ModuleResource resource = module->GetResource("CalibrationFiles/DefaultParameters.xml");
   mitk::ModuleResourceStream resStream(resource);
 
-  TiXmlNode* xmlDocument;
-  resStream>>&xmlDocument;
+  TiXmlDocument xmlDocument;
+  //xmlDocument->
+  resStream >> xmlDocument;
 
-//  resource->GetData();
-//  cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-//  device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+  TiXmlElement* element = xmlDocument.FirstChildElement();
+  mitk::CameraIntrinsics::Pointer intrinsics = mitk::CameraIntrinsics::New();
+  intrinsics->FromXML(element);
+  return intrinsics;
 }

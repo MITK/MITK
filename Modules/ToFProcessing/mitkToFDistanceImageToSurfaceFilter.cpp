@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 #include <mitkInstantiateAccessFunctions.h>
 #include <mitkSurface.h>
+#include "mitkImageReadAccessor.h"
 
 #include <itkImage.h>
 
@@ -126,10 +127,12 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   }
   else if (this->GetInput(m_TextureIndex)) // otherwise use intensity image (input(2))
   {
-    scalarFloatData = (float*)this->GetInput(m_TextureIndex)->GetData();
+    ImageReadAccessor inputAcc(this->GetInput(m_TextureIndex));
+    scalarFloatData = (float*)inputAcc.GetData();
   }
 
-  float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
+  ImageReadAccessor inputAcc(input, input->GetSliceData(0,0,0));
+  float* inputFloatData = (float*)inputAcc.GetData();
   //calculate world coordinates
   mitk::ToFProcessingCommon::ToFPoint2D focalLengthInPixelUnits;
   mitk::ToFProcessingCommon::ToFScalarType focalLengthInMm;

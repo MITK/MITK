@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkToFImageCsvWriter.h>
 #include <mitkImageGenerator.h>
 #include <mitkImageSliceSelector.h>
+#include "mitkImageReadAccessor.h"
 
 void CloseCsvFile(FILE* outfile)
 {
@@ -95,18 +96,18 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   { //write values to file/stream
     distanceSelector->SetSliceNr(i);
     distanceSelector->Update();
-    tmpDistance = distanceSelector->GetOutput();
-    distanceArray = (float*)tmpDistance->GetData();
+    mitk::ImageReadAccessor tmpDistAcc(distanceSelector->GetOutput());
+    distanceArray = (float*) tmpDistAcc.GetData();
 
     amplitudeSelector->SetSliceNr(i);
     amplitudeSelector->Update();
-    tmpAmplitude = amplitudeSelector->GetOutput();
-    amplitudeArray = (float*)tmpAmplitude->GetData();
+    mitk::ImageReadAccessor tmpAmplAcc(amplitudeSelector->GetOutput());
+    amplitudeArray = (float*)tmpAmplAcc.GetData();
 
     intensitySelector->SetSliceNr(i);
     intensitySelector->Update();
-    tmpIntensity = intensitySelector->GetOutput();
-    intensityArray = (float*)tmpIntensity->GetData();
+    mitk::ImageReadAccessor tmpIntenAcc(intensitySelector->GetOutput());
+    intensityArray = (float*)tmpIntenAcc.GetData();
 
     csvWriter->Add(distanceArray, amplitudeArray, intensityArray);
   }
@@ -130,18 +131,18 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   {
     distanceSelector->SetSliceNr(j);
     distanceSelector->Update();
-    tmpDistance = distanceSelector->GetOutput();
-    distanceArray = (float*)tmpDistance->GetData();
+    mitk::ImageReadAccessor tmpDistAcc(distanceSelector->GetOutput());
+    distanceArray = (float*) tmpDistAcc.GetData();
 
     amplitudeSelector->SetSliceNr(j);
     amplitudeSelector->Update();
-    tmpAmplitude = amplitudeSelector->GetOutput();
-    amplitudeArray = (float*)tmpAmplitude->GetData();
+    mitk::ImageReadAccessor tmpAmplAcc(amplitudeSelector->GetOutput());
+    amplitudeArray = (float*)tmpAmplAcc.GetData();
 
     intensitySelector->SetSliceNr(j);
     intensitySelector->Update();
-    tmpIntensity = intensitySelector->GetOutput();
-    intensityArray = (float*)tmpIntensity->GetData();
+    mitk::ImageReadAccessor tmpIntenAcc(intensitySelector->GetOutput());
+    intensityArray = (float*)tmpIntenAcc.GetData();
 
     //for all pixels
     for(unsigned int i=0; i<pixelNumber; i++)

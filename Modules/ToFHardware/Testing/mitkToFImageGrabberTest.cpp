@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPicFileReader.h>
 #include <mitkToFCameraMITKPlayerDevice.h>
 #include <mitkToFConfig.h>
+#include "mitkImageReadAccessor.h"
 
 static bool CompareImages(mitk::Image::Pointer image1, mitk::Image::Pointer image2)
 {
@@ -28,8 +29,12 @@ static bool CompareImages(mitk::Image::Pointer image1, mitk::Image::Pointer imag
   unsigned int sliceDimension = image1->GetDimension(0)*image1->GetDimension(1);
   bool picturesEqual = true;
 
-  float* floatArray1 = (float*)image1->GetSliceData(0, 0, 0)->GetData();
-  float* floatArray2 = (float*)image2->GetSliceData(0, 0, 0)->GetData();
+  mitk::ImageReadAccessor image1Acc(image1, image1->GetSliceData(0,0,0));
+  mitk::ImageReadAccessor image2Acc(image2, image2->GetSliceData(0,0,0));
+
+  float* floatArray1 = (float*)image1Acc.GetData();
+  float* floatArray2 = (float*)image2Acc.GetData();
+
   for(unsigned int i = 0; i < sliceDimension; i++)
   {
     if(!(mitk::Equal(floatArray1[i], floatArray2[i])))

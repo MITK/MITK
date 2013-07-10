@@ -41,7 +41,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Click to place a seedpoint</string>
+      <string>Shift+Click to place a seedpoint</string>
      </property>
     </widget>
    </item>

@@ -39,7 +39,7 @@ mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
   m_PointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_SeedPointInteractor = mitk::PointSetInteractor::New("singlepointinteractorwithoutshiftclick", m_PointSetNode);
+  m_SeedPointInteractor = mitk::PointSetInteractor::New("singlepointinteractor", m_PointSetNode);
 }
 
 mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()

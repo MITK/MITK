@@ -511,19 +511,6 @@ namespace itk
     m_Voxdim = vox_dim;
 
 
-
-
-    data_vec = m_GradientImagePointer->GetPixel(testIx);
-
-    short data_vec1 = data_vec[0];
-    short data_vec2 = data_vec[1];
-    short data_vec3 = data_vec[2];
-    short data_vec4 = data_vec[3];
-    short data_vec5 = data_vec[4];
-    short data_vec6 = data_vec[5];
-    short data_vec7 = data_vec[6];
-
-
   }
 
 

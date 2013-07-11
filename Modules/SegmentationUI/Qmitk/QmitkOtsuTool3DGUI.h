@@ -56,7 +56,7 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
     void OnSegmentationRegionAccept();
 
-    void OnItemSelectionChanged();
+    void OnItemSelectionChanged(QListWidgetItem *item);
 
     void OnVolumePreviewChecked(int);
 
@@ -70,6 +70,8 @@ class SegmentationUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
     Ui_QmitkOtsuToolWidgetControls m_Controls;
 
     int m_NumberOfRegions;
+
+    QListWidgetItem* m_SelectedItem;
 };
 
 #endif

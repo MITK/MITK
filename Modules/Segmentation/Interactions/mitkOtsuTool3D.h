@@ -40,6 +40,7 @@ namespace mitk{
       void ConfirmSegmentation();
       void UpdateBinaryPreview(int regionID);
       void UpdateVolumePreview(bool volumeRendering);
+      void ShowMultiLabelResultNode(bool);
 
     protected:
       OtsuTool3D();

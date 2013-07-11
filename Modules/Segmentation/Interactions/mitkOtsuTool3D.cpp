@@ -208,3 +208,10 @@ void mitk::OtsuTool3D::UpdateVolumePreview(bool volumeRendering)
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+void mitk::OtsuTool3D::ShowMultiLabelResultNode(bool show)
+{
+  m_MultiLabelResultNode->SetVisibility(show);
+  m_BinaryPreviewNode->SetVisibility(!show);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}

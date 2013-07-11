@@ -33,7 +33,8 @@ m_NumberOfRegions(0)
   m_Controls.setupUi(this);
 
   connect( m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
-  connect( m_Controls.m_selectionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(OnItemSelectionChanged()));
+  connect(m_Controls.m_selectionListWidget, SIGNAL(itemClicked(QListWidgetItem*)),
+          this, SLOT(OnItemSelectionChanged(QListWidgetItem*)));
   connect( m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -43,12 +44,21 @@ QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
 
 }
 
-void QmitkOtsuTool3DGUI::OnItemSelectionChanged()
+void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
 {
+  if (m_SelectedItem == item)
+  {
+    m_Controls.m_selectionListWidget->clearSelection();
+    m_OtsuTool3DTool->ShowMultiLabelResultNode(true);
+    return;
+  }
+
+  m_SelectedItem = item;
+
   if (m_OtsuTool3DTool.IsNotNull())
   {
     // TODO update preview of region
-    m_OtsuTool3DTool->UpdateBinaryPreview(m_Controls.m_selectionListWidget->currentItem()->text().toInt());
+    m_OtsuTool3DTool->UpdateBinaryPreview(m_SelectedItem->text().toInt());
     if ( !m_Controls.m_selectionListWidget->selectedItems().empty() )
     {
       m_Controls.m_ConfSegButton->setEnabled( true );

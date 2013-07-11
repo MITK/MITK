@@ -50,47 +50,7 @@ m_Beta(3.0)
   CONNECT_ACTION( AcADDPOINT, OnAddPoint );
   CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
 
-  m_ReferenceImageAsITK = InternalImageType::New();
 
-  m_ProgressCommand = mitk::ToolCommand::New();
-
-  m_ThresholdFilter = ThresholdingFilterType::New();
-  m_ThresholdFilter->SetLowerThreshold( m_LowerThreshold );
-  m_ThresholdFilter->SetUpperThreshold( m_UpperThreshold );
-  m_ThresholdFilter->SetOutsideValue( 0 );
-  m_ThresholdFilter->SetInsideValue( 1.0 );
-
-  m_SmoothFilter = SmoothingFilterType::New();
-  m_SmoothFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
-  m_SmoothFilter->SetTimeStep( 0.05 );
-  m_SmoothFilter->SetNumberOfIterations( 2 );
-  m_SmoothFilter->SetConductanceParameter( 9.0 );
-
-  m_GradientMagnitudeFilter = GradientFilterType::New();
-  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
-  m_GradientMagnitudeFilter->SetSigma( m_Sigma );
-
-  m_SigmoidFilter = SigmoidFilterType::New();
-  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
-  m_SigmoidFilter->SetAlpha( m_Alpha );
-  m_SigmoidFilter->SetBeta( m_Beta );
-  m_SigmoidFilter->SetOutputMinimum( 0.0 );
-  m_SigmoidFilter->SetOutputMaximum( 1.0 );
-
-  m_FastMarchingFilter = FastMarchingFilterType::New();
-  m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
-  m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
-
-  m_SeedContainer = NodeContainer::New();
-  m_SeedContainer->Initialize();
-  m_FastMarchingFilter->SetTrialPoints( m_SeedContainer );
-
-  //set up pipeline
-  m_SmoothFilter->SetInput( m_ReferenceImageAsITK );
-  m_GradientMagnitudeFilter->SetInput( m_SmoothFilter->GetOutput() );
-  m_SigmoidFilter->SetInput( m_GradientMagnitudeFilter->GetOutput() );
-  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
-  m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
 }
 
 mitk::FastMarchingTool3D::~FastMarchingTool3D()
@@ -202,6 +162,48 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
   m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode, m_ToolManager->GetReferenceData(0));
+
+  m_ReferenceImageAsITK = InternalImageType::New();
+
+  m_ProgressCommand = mitk::ToolCommand::New();
+
+  m_ThresholdFilter = ThresholdingFilterType::New();
+  m_ThresholdFilter->SetLowerThreshold( m_LowerThreshold );
+  m_ThresholdFilter->SetUpperThreshold( m_UpperThreshold );
+  m_ThresholdFilter->SetOutsideValue( 0 );
+  m_ThresholdFilter->SetInsideValue( 1.0 );
+
+  m_SmoothFilter = SmoothingFilterType::New();
+  m_SmoothFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_SmoothFilter->SetTimeStep( 0.05 );
+  m_SmoothFilter->SetNumberOfIterations( 2 );
+  m_SmoothFilter->SetConductanceParameter( 9.0 );
+
+  m_GradientMagnitudeFilter = GradientFilterType::New();
+  m_GradientMagnitudeFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_GradientMagnitudeFilter->SetSigma( m_Sigma );
+
+  m_SigmoidFilter = SigmoidFilterType::New();
+  m_SigmoidFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_SigmoidFilter->SetAlpha( m_Alpha );
+  m_SigmoidFilter->SetBeta( m_Beta );
+  m_SigmoidFilter->SetOutputMinimum( 0.0 );
+  m_SigmoidFilter->SetOutputMaximum( 1.0 );
+
+  m_FastMarchingFilter = FastMarchingFilterType::New();
+  m_FastMarchingFilter->AddObserver( itk::ProgressEvent(), m_ProgressCommand);
+  m_FastMarchingFilter->SetStoppingValue( m_StoppingValue );
+
+  m_SeedContainer = NodeContainer::New();
+  m_SeedContainer->Initialize();
+  m_FastMarchingFilter->SetTrialPoints( m_SeedContainer );
+
+  //set up pipeline
+  m_SmoothFilter->SetInput( m_ReferenceImageAsITK );
+  m_GradientMagnitudeFilter->SetInput( m_SmoothFilter->GetOutput() );
+  m_SigmoidFilter->SetInput( m_GradientMagnitudeFilter->GetOutput() );
+  m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
+  m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
 
   this->Initialize();
 }
@@ -335,7 +337,7 @@ void mitk::FastMarchingTool3D::Update()
 {
   if (m_NeedUpdate)
   {
-    m_ProgressCommand->AddStepsToDo(20);
+    m_ProgressCommand->AddStepsToDo(200);
     CurrentlyBusy.Send(true);
     try
     {

@@ -525,7 +525,7 @@ namespace itk
     data_vec6 = data_vec[5];
     data_vec7 = data_vec[6];
 
-    std::cout << "break";
+    std::cout << "break"<<std::endl;
 
 
 

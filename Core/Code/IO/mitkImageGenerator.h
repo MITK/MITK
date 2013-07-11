@@ -147,7 +147,7 @@ public:
         try
         {
           mitk::ImageWriteAccessor writeAccess( output );
-          imageBuffer = static_cast<typename TPixelType*>( writeAccess.GetData() );
+          imageBuffer = static_cast<TPixelType*>( writeAccess.GetData() );
         }
         catch(...)
         {

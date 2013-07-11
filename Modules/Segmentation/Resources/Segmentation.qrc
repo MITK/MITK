@@ -24,5 +24,7 @@
     <file>Threshold_48x48.png</file>
     <file>TwoThresholds_48x48.png</file>
     <file>Otsu_48x48.png</file>
+    <file>Watershed_48x48.png</file>
+    <file>Watershed_Cursor_32x32</file>
   </qresource>
 </RCC>

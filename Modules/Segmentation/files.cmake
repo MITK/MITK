@@ -107,4 +107,6 @@ Paint_Cursor_32x32.png
 RegionGrowing_Cursor_32x32.png
 Subtract_Cursor_32x32.png
 Wipe_Cursor_32x32.png
+Watershed_48x48.png
+Watershed_Cursor_32x32.png
 )

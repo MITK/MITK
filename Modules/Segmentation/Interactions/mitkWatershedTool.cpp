@@ -30,6 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
+#include <mitkModule.h>
+#include <mitkModuleContext.h>
+#include <mitkModuleResource.h>
+#include <mitkGetModuleContext.h>
 
 #include <vtkLookupTable.h>
 
@@ -62,14 +66,28 @@ void mitk::WatershedTool::Deactivated()
   Superclass::Deactivated();
 }
 
+mitk::ModuleResource mitk::WatershedTool::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Watershed_48x48.png");
+  return resource;
+}
+
+mitk::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
+  return resource;
+}
+
 const char** mitk::WatershedTool::GetXPM() const
 {
-  return mitkBinaryThresholdTool_xpm;
+  return NULL;
 }
 
 const char* mitk::WatershedTool::GetName() const
 {
-  return "Watershedding";
+  return "Watershed";
 }
 
 void mitk::WatershedTool::DoIt()

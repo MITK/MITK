@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDiffusionImage.h>
 
 
+
+
 typedef itk::VectorImage<short, 3>  ImageType;
 
 
@@ -196,12 +198,25 @@ namespace itk
 
   private:
 
-    short CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size);
+    double CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3> ::Pointer mask);
 
     void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
 
 
-    void CalculateTensor(vnl_matrix<double> pseudoInverse,vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
+    void CalculateTensor(vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
+
+    void CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min);
+
+    void GenerateTensorImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,double what_mask,itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+
+    void DeepCopyTensorImage(itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer temp_tensorImg);
+
+    void DeepCopyDiffusionImage(itk::VectorImage<short, 3>::Pointer corrected_diffusion, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp,int nof);
+
+    void TurnMask( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, double previous_mask, double set_mask);
+
+    double CheckNegatives ( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::Image< itk::DiffusionTensor3D<float>, 3 >::Pointer tensorImg );
+
 
     /** Gradient image was specified in a single image or in multiple images */
     GradientImageTypeEnumeration                      m_GradientImageTypeEnumeration;

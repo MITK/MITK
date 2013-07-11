@@ -71,7 +71,6 @@ QmitkAdaptiveRegionGrowingToolGUI::~QmitkAdaptiveRegionGrowingToolGUI()
     mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
     if (node != NULL)
     {
-        this->DeactivateSeedPointMode();
         dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
     }
 
@@ -160,67 +159,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
   }
 }
 
-void QmitkAdaptiveRegionGrowingToolGUI::SetSeedPointToggled(bool toggled)
-{
-  //check that a pointset node with the given name exists in data storage
-  mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-  if (node == NULL) //no pointSet present
-  {
-    // new node and data item
-    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-    pointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New(m_NAMEFORSEEDPOINT));
-    pointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
-    pointSetNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(2));
-
-    mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-    pointSetNode->SetData(pointSet);
-
-    //Watch for point added or modified
-    itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::Pointer pointAddedCommand = itk::SimpleMemberCommand<QmitkAdaptiveRegionGrowingToolGUI>::New();
-    pointAddedCommand->SetCallbackFunction(this, &QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded);
-    m_PointSetAddObserverTag = pointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
-
-    //add to DataStorage
-    m_DataStorage->Add(pointSetNode, m_InputImageNode);
-  }
-
-  mitk::NodePredicateDataType::Pointer imagePred = mitk::NodePredicateDataType::New("Image");
-  mitk::DataStorage::SetOfObjects::ConstPointer setOfImages = m_DataStorage->GetSubset(imagePred);
-
-  //no image node found
-  if (setOfImages->Size() < 1)
-  {
-    QMessageBox::information(NULL, "Segmentation functionality", "Please load an image before setting a seed point.");
-    return;
-  }
-  else
-  {
-    //get PointSet node from DataStorage
-    mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-    if (node == NULL)
-    {
-      QMessageBox::critical(NULL, "QmitkAdaptiveRegionGrowingToolGUI", "No seed point node found!");
-      return;
-    }
-
-
-    if (toggled == true) // button is down
-    {
-      this->ActivateSeedPointMode();  //add pointSet Interactor if there is none
-    }
-    else
-    {
-      this->DeactivateSeedPointMode();  //disable pointSet Interactor
-    }
-
-    //enable the Run Segmentation button once the set seed point button is pressed
-    m_Controls.m_pbRunSegmentation->setEnabled(true);
-
-  }
-}
-
 void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 {
+  if (m_RegionGrow3DTool.IsNull())
+    return;
+
   mitk::DataNode* node = m_RegionGrow3DTool->GetPointSetNode();
 
   if (node != NULL)
@@ -857,8 +800,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetUpperThresholdValue( double upperThre
 
 void QmitkAdaptiveRegionGrowingToolGUI::Deactivated()
 {
-  this->DeactivateSeedPointMode();
-
   // make the segmentation preview node invisible
   mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
   if( node.IsNotNull() )
@@ -874,39 +815,4 @@ void QmitkAdaptiveRegionGrowingToolGUI::Deactivated()
 void QmitkAdaptiveRegionGrowingToolGUI::Activated()
 {
 
-}
-
-void QmitkAdaptiveRegionGrowingToolGUI::ActivateSeedPointMode()
-{
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-  if(node.IsNotNull())
-  {
-    //set the cursor to cross
-    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-
-    mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*> (node->GetInteractor());
-    if (interactor.IsNull())
-    {
-      //create a new interactor and add it to node
-      interactor = mitk::PointSetInteractor::New("singlepointinteractorwithoutshiftclick", node, 1);
-    }
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(interactor);
-  }
-}
-
-void QmitkAdaptiveRegionGrowingToolGUI::DeactivateSeedPointMode()
-{
-  //set the cursor to default again
-  QApplication::restoreOverrideCursor();
-
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-  if(node.IsNotNull())
-  {
-    mitk::PointSetInteractor::Pointer
-      interactor = dynamic_cast<mitk::PointSetInteractor*> (node->GetInteractor());
-    if (interactor.IsNotNull())
-    {
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(interactor);
-    }
-  }
 }

@@ -101,6 +101,7 @@ public:
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0, float opacity = 1.0);
+
   vtkTextProperty * GetTextLabelProperty(int text_id);
 
   // Initialization / geometry handling
@@ -145,6 +146,16 @@ protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
   virtual ~VtkPropRenderer();
   virtual void Update();
+
+  /**
+    \brief Convert display geometry coordinates to VTK coordinates.
+
+    For use within WriteSimpleText: the input is display geometry coordinates
+    but the text actor needs positions that fit in a specified viewport.
+    Conversion is done in this method.
+  */
+  mitk::Point2D TransformOpenGLPointToViewport( mitk::Point2D point );
+
 
 private:
 

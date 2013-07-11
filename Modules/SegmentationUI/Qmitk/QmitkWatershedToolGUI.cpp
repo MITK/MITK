@@ -137,10 +137,12 @@ void QmitkWatershedToolGUI::OnSliderValueLevelChanged(int value)
 
 void QmitkWatershedToolGUI::OnCreateSegmentation()
 {
+  QApplication::setOverrideCursor(Qt::BusyCursor);
   m_InformationLabel->setText(QString("Please wait some time for computation..."));
   m_InformationLabel->repaint();
   QApplication::processEvents();
 
   m_WatershedTool->DoIt();
   m_InformationLabel->setText(QString(""));
+  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }

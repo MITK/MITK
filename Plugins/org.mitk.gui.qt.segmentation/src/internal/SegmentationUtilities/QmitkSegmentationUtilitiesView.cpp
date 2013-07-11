@@ -54,7 +54,7 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/SegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
   this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/SegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
-  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/utilities_surface2image.png"), "Surface To Image");
+  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/SegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
 
 #ifdef ENABLE_CTK_WIDGETS_WIDGET
   m_CTKWidgetsWidget = new QmitkCTKWidgetsWidget(timeNavigationController, parent);

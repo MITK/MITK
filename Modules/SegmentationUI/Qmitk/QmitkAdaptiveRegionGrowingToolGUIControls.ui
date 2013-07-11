@@ -33,6 +33,19 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Shift+Click to place a seedpoint</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="ctkRangeWidget" name="m_ThresholdSlider" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -62,6 +75,12 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="font">
         <font/>
        </property>
@@ -69,7 +88,7 @@
         <string>Press to start the segmentation of the tubular structure.</string>
        </property>
        <property name="text">
-        <string>Show Preview</string>
+        <string>Run Segmentation</string>
        </property>
        <property name="shortcut">
         <string>Alt+R</string>
@@ -146,20 +165,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="shortcut">
       <string>Alt+C</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="m_tlDesciptionARG_2">
-     <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Use the point-tool to define a seed point for the segmentation. Run segmentation. Use the slider to adapt the segmentation preview. Confirm Segmentation.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

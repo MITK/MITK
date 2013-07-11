@@ -82,8 +82,6 @@ public:
 
 protected slots:
 
-    void SetSeedPointToggled(bool toggled);
-
     void RunSegmentation();
 
     void ChangeLevelWindow(double newValue);//called, when the Level Window is changed via the slider in the ControlWidget
@@ -118,8 +116,6 @@ protected:
 
   mitk::DataNode::Pointer m_InputImageNode;
 
-  void DeactivateSeedPointMode();
-  void ActivateSeedPointMode();
   void OnPointAdded();
 
 private:

@@ -557,7 +557,8 @@ typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
   //## See AbstractTransformGeometry for an example usage of this.
   mitk::ScalarType GetParametricExtent(int direction) const
   {
-    assert(direction>=0 && direction<3);
+    if (direction < 0 || direction>=3)
+      mitkThrow() << "Invalid direction. Must be between either 0, 1 or 2. ";
     assert(m_ParametricBoundingBox.IsNotNull());
 
     BoundingBoxType::BoundsArrayType bounds = m_ParametricBoundingBox->GetBounds();
@@ -621,8 +622,9 @@ typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
   /** Get the extent of the bounding box */
   ScalarType GetExtent(unsigned int direction) const
     {
-    assert(direction<NDimensions);
     assert(m_BoundingBox.IsNotNull());
+    if (direction>=NDimensions)
+      mitkThrow() << "Direction is too big. This geometry is for " << NDimensions << " Data";
     BoundsArrayType bounds = m_BoundingBox->GetBounds();
     return bounds[direction*2+1]-bounds[direction*2];
     }
@@ -632,9 +634,6 @@ protected:
 
 
   virtual void InitializeGeometry(Self * newGeometry) const;
-  void SetBoundsArray(const BoundsArrayType& bounds,
-                      BoundingBoxPointer& boundingBox);
-
 
   static const std::string GetTransformAsString( TransformType* transformType );
   static const unsigned int NDimensions = 3;

@@ -228,25 +228,42 @@ public:
   //## and get the necessary information from the parameter operation.
   void ExecuteOperation(Operation* operation);
 
-  //##Documentation
-  //## @brief Set the Geometry3D of the data, which will be referenced (not copied!).
-  //## Assumes the data object has only 1 time step ( is a 3D object ).
-  //##
-  //## For convenience (and historic) reasons, it is also possible to set a complete
-  //## mitk::TimeGeometry*, which will be referenced (not copied!).
-  //##
-  //## @warning This method will normally be called internally by the sub-class of BaseData
-  //## during initialization.
-  //## \sa SetClonedGeometry
+  /**
+  * \brief Set the Geometry3D of the data, which will be referenced (not copied!).
+  * Assumes the data object has only 1 time step ( is a 3D object ) and creates a
+  * new TimeGeometry which saves the given Geometry3D. If an TimeGeometry has already
+  * been set for the object, it will be replaced after calling this function.
+  *
+  * @warning This method will normally be called internally by the sub-class of BaseData
+  * during initialization.
+  * \sa SetClonedGeometry
+  */
   virtual void SetGeometry(Geometry3D* aGeometry3D);
+
+  /**
+  * \brief Set the TimeGeometry of the data, which will be referenced (not copied!).
+  *
+  * @warning This method will normally be called internally by the sub-class of BaseData
+  * during initialization.
+  * \sa SetClonedTimeGeometry
+  */
   virtual void SetTimeGeometry (TimeGeometry* geometry);
 
-  //##Documentation
-  //## @brief Set a clone of the provided geometry as Geometry3D of the data.
-  //## Assumes the data object has only 1 time step ( is a 3D object )
-  //##
-  //## \sa SetGeometry
+  /**
+  * \brief Set a clone of the provided TimeGeometry as TimeGeometry of the data.
+  * Assumes the data object has only 1 time step ( is a 3D object ) and
+  * creates a new TimeGeometry. If an TimeGeometry has already
+  * been set for the object, it will be replaced after calling this function.
+  *
+  * \sa SetGeometry
+  */
   virtual void SetClonedGeometry(const Geometry3D* aGeometry3D);
+
+    /**
+  * \brief Set a clone of the provided TimeGeometry as TimeGeometry of the data.
+  *
+  * \sa SetGeometry
+  */
   virtual void SetClonedTimeGeometry (const TimeGeometry* geometry);
 
   //##Documentation

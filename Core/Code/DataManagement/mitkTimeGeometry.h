@@ -18,20 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define TimeGeometry_h
 
 //ITK
-#include <itkBoundingBox.h>
-#include <itkFixedArray.h>
 #include <itkObject.h>
 //MITK
 #include <mitkCommon.h>
 #include <MitkExports.h>
 #include "mitkOperationActor.h"
-#include "mitkVector.h"
-
-// To be replaced
 #include <mitkGeometry3D.h>
-
-// STL
-#include <vector>
 
 
 namespace mitk {
@@ -69,11 +61,16 @@ namespace mitk {
     */
     BoundingBox::Pointer m_BoundingBox;
 
+    /**
+    * \brief Makes a deep copy of the current object
+    */
+    virtual LightObject::Pointer InternalClone() const;
+
 
   public:
     mitkClassMacro(TimeGeometry, itk::Object);
     itkCloneMacro(Self);
-
+    itkCreateAnotherMacro(Self);
     /**
     * \brief Returns the number of time steps.
     *
@@ -258,11 +255,6 @@ namespace mitk {
     * \brief Returns the Extend of the bounding in the given direction
     */
     ScalarType GetExtentInWorld (unsigned int direction) const;
-
-    /**
-    * \brief Makes a deep copy of the current object
-    */
-    virtual itk::LightObject::Pointer InternalClone () const = 0 ;
 
     /**
     * \brief Initializes the TimeGeometry

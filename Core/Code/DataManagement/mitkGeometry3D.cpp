@@ -142,7 +142,7 @@ void mitk::Geometry3D::SetFloatBounds(const float bounds[6])
   const float *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
@@ -151,12 +151,31 @@ void mitk::Geometry3D::SetFloatBounds(const double bounds[6])
   const double *input = bounds;
   int i=0;
   for(mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6 ;++i) *it++ = (mitk::ScalarType)*input++;
-  SetBoundsArray(b, m_BoundingBox);
+  SetBounds(b);
 }
 
 void mitk::Geometry3D::SetParametricBounds(const BoundingBox::BoundsArrayType& bounds)
 {
-  SetBoundsArray(bounds, m_ParametricBoundingBox);
+  m_ParametricBoundingBox = BoundingBoxType::New();
+
+  BoundingBoxType::PointsContainer::Pointer pointscontainer =
+           BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointType p;
+  BoundingBoxType::PointIdentifier pointid;
+
+  for(pointid=0; pointid<2;++pointid)
+    {
+    unsigned int i;
+    for(i=0; i<NDimensions; ++i)
+      {
+      p[i] = bounds[2*i+pointid];
+      }
+    pointscontainer->InsertElement(pointid, p);
+    }
+
+  m_ParametricBoundingBox->SetPoints(pointscontainer);
+  m_ParametricBoundingBox->ComputeBoundingBox();
+  this->Modified();
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
@@ -784,9 +803,10 @@ mitk::Geometry3D::InitializeGeometry(Geometry3D* newGeometry) const
   }
 }
 
-void mitk::Geometry3D::SetBoundsArray(const BoundsArrayType& bounds, BoundingBoxPointer& boundingBox)
+/** Set the bounds */
+void mitk::Geometry3D::SetBounds(const BoundsArrayType& bounds)
 {
-  boundingBox = BoundingBoxType::New();
+  m_BoundingBox = BoundingBoxType::New();
 
   BoundingBoxType::PointsContainer::Pointer pointscontainer =
            BoundingBoxType::PointsContainer::New();
@@ -803,14 +823,7 @@ void mitk::Geometry3D::SetBoundsArray(const BoundsArrayType& bounds, BoundingBox
     pointscontainer->InsertElement(pointid, p);
     }
 
-  boundingBox->SetPoints(pointscontainer);
-  boundingBox->ComputeBoundingBox();
+  m_BoundingBox->SetPoints(pointscontainer);
+  m_BoundingBox->ComputeBoundingBox();
   this->Modified();
-}
-
-
-/** Set the bounds */
-void mitk::Geometry3D::SetBounds(const BoundsArrayType& bounds)
-{
-  SetBoundsArray(bounds, m_BoundingBox);
 }

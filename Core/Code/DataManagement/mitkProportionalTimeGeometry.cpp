@@ -162,8 +162,9 @@ void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(Geometry3D* geometry, T
 
 itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
 {
-  ProportionalTimeGeometry::Pointer newTimeGeometry = ProportionalTimeGeometry::New();
-  newTimeGeometry->m_BoundingBox = m_BoundingBox->DeepCopy();
+  itk::LightObject::Pointer parent = Superclass::InternalClone();
+  ProportionalTimeGeometry::Pointer newTimeGeometry =
+    dynamic_cast<ProportionalTimeGeometry * > (parent.GetPointer());
   newTimeGeometry->m_FirstTimePoint = this->m_FirstTimePoint;
   newTimeGeometry->m_StepDuration = this->m_StepDuration;
   newTimeGeometry->m_GeometryVector.clear();
@@ -173,8 +174,7 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
     Geometry3D::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
     newTimeGeometry->SetTimeStepGeometry(tempGeometry.GetPointer(),i);
   }
-  itk::LightObject::Pointer finalPointer = dynamic_cast<itk::LightObject*>(newTimeGeometry.GetPointer());
-  return finalPointer;
+  return parent;
 }
 
 void mitk::ProportionalTimeGeometry::Initialize (Geometry3D* geometry, TimeStepType timeSteps)

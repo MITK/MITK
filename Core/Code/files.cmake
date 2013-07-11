@@ -55,7 +55,6 @@ set(H_FILES
 
   DataManagement/mitkProportionalTimeGeometry.h
   DataManagement/mitkTimeGeometry.h
-  DataManagement/mitkBaseGeometry.h
   DataManagement/mitkImageAccessByItk.h
   DataManagement/mitkImageCast.h
   DataManagement/mitkImagePixelAccessor.h
@@ -122,7 +121,6 @@ set(CPP_FILES
   Controllers/mitkVtkLayerController.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
-  DataManagement/mitkBaseGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
   DataManagement/mitkApplicationCursor.cpp

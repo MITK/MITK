@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include <mitkTimeGeometry.h>
 
+#include <mitkGeometry3D.h>
+#include <mitkExceptionMacro.h>
+
 mitk::TimeGeometry::TimeGeometry() :
   m_BoundingBox(BoundingBox::New())
 {
@@ -163,4 +166,16 @@ void mitk::TimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << "NULL" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
+}
+
+itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
+{
+  itk::LightObject::Pointer parent = Superclass::InternalClone();
+  Self::Pointer rval = dynamic_cast<Self *> (parent.GetPointer());
+  if (rval.IsNull())
+  {
+    mitkThrow() << " Downcast to type " << this->GetNameOfClass() << " failed.";
+  }
+  rval->m_BoundingBox = m_BoundingBox->Clone();
+  return parent;
 }

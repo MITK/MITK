@@ -17,22 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ProportionalTimeGeometry_h
 #define ProportionalTimeGeometry_h
 
-//ITK
-#include <itkBoundingBox.h>
-#include <itkFixedArray.h>
-#include <itkObject.h>
 //MITK
 #include <mitkTimeGeometry.h>
 #include <mitkCommon.h>
 #include <MitkExports.h>
-#include "mitkOperationActor.h"
-#include "mitkVector.h"
-
-// To be replaced
-#include <mitkSlicedGeometry3D.h>
-
-// STL
-#include <vector>
 
 namespace mitk {
 

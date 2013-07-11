@@ -11,7 +11,6 @@ set(INTERNAL_CPP_FILES
   QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
   QmitkDeformableClippingPlaneView.cpp
-  regiongrowing/QmitkRegionGrowingView.cpp
   QmitkOtsuAction.cpp
   Common/QmitkDataSelectionWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
@@ -26,7 +25,6 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkSegmentationControls.ui
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
-  src/internal/regiongrowing/QmitkRegionGrowingViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
@@ -45,7 +43,6 @@ set(MOC_H_FILES
   src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkDeformableClippingPlaneView.h
-  src/internal/regiongrowing/QmitkRegionGrowingView.h
   src/internal/QmitkOtsuAction.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
@@ -60,14 +57,12 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   resources/segmentation.png
   resources/deformablePlane.png
-  resources/regiongrowing.xpm
   resources/SegmentationUtilities_48x48.png
   plugin.xml
 )
 
 set(QRC_FILES
   resources/segmentation.qrc
-  resources/regiongrowing.qrc
   resources/SegmentationUtilities.qrc
   resources/BooleanOperationsWidget.qrc
   resources/MorphologicalOperationsWidget.qrc

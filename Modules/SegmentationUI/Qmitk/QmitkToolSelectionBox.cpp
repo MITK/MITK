@@ -537,7 +537,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     else
     {
-      mitk::ModuleResourceStream resourceStream(iconResource);
+      mitk::ModuleResourceStream resourceStream(iconResource, std::ios::binary);
       resourceStream.seekg(0, std::ios::end);
       std::ios::pos_type length = resourceStream.tellg();
       resourceStream.seekg(0, std::ios::beg);

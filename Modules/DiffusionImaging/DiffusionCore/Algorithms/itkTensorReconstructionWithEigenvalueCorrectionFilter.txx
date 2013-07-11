@@ -78,10 +78,6 @@ namespace itk
     short data_vec6 = data_vec[5];
     short data_vec7 = data_vec[6];
 
-    for (int i=0;i<nof;i++)
-    {
-      org_data[i]=data_vec[i];
-    }
 
 
 

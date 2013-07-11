@@ -65,8 +65,8 @@ namespace itk
 
     itk::Index<3> testIx;
     testIx[0] = 48;
-    testIx[0] = 41;
-    testIx[0] = 31;
+    testIx[1] = 41;
+    testIx[2] = 31;
 
     GradientVectorType data_vec = m_GradientImagePointer->GetPixel(testIx);
 
@@ -451,6 +451,8 @@ namespace itk
 
     //this->SetNthOutput(0, tensorImg);
 
+    corrected_diffusion_temp=corrected_diffusion;
+
     old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);// checking how many tensors has problems, this is working only for mask =2
 
     std::cout << "good now how many bads there are"<< std::endl;
@@ -460,9 +462,9 @@ namespace itk
 
     std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
 
-    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion,mask,pixel_max,pixel_min);
+    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion,corrected_diffusion,mask,pixel_max,pixel_min);
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,temp_tensorImg);
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,temp_tensorImg);
 
     new_number_negative_eigs = CheckNegatives (size,mask, temp_tensorImg);
 
@@ -479,7 +481,7 @@ namespace itk
 
         tensorImg=temp_tensorImg;
 
-        corrected_diffusion=corrected_diffusion_temp;
+        //corrected_diffusion=corrected_diffusion_temp;
     }
     else
     {
@@ -513,15 +515,18 @@ namespace itk
 
 
 
-    data_vec = m_GradientImagePointer->GetPixel(testIx);
+    data_vec = corrected_diffusion->GetPixel(testIx);
 
-    short data_vec1 = data_vec[0];
-    short data_vec2 = data_vec[1];
-    short data_vec3 = data_vec[2];
-    short data_vec4 = data_vec[3];
-    short data_vec5 = data_vec[4];
-    short data_vec6 = data_vec[5];
-    short data_vec7 = data_vec[6];
+    data_vec1 = data_vec[0];
+    data_vec2 = data_vec[1];
+    data_vec3 = data_vec[2];
+    data_vec4 = data_vec[3];
+    data_vec5 = data_vec[4];
+    data_vec6 = data_vec[5];
+    data_vec7 = data_vec[6];
+
+    std::cout << "break";
+
 
 
   }
@@ -598,8 +603,8 @@ namespace itk
 
           temp_mask=mask->GetPixel(ix);
 
-          if(temp_mask > 0 && temp_mask < 2 )
-          {
+          //if(temp_mask > 0 && temp_mask < 2 )
+          //{
               GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
 
               double test= p[f];
@@ -612,7 +617,7 @@ namespace itk
 
 
             }//end of pf>0
-          }//end of mask condition
+          //}//end of mask condition
 
         }
       }
@@ -623,6 +628,9 @@ namespace itk
 
     if (temp_number <= 0.0)
     {
+      //ix[0] = x;ix[1] = y;ix[2] = z;
+      //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
+      //tempsum=p[f];
       tempsum=0;
       mask->SetPixel(ix,0);
     }
@@ -836,16 +844,25 @@ namespace itk
 
 
                   cnt_atten=0;
+                  double flag_wrong=0;
+
+                  if (x==48 && y==41 && z==31)
+                  {
+                      std::cout<<"is correction happening"<<flag_wrong<<std::endl;
+                  }
+
 
                   for (int f=0;f<nof;f++)
                   {
                     if(m_B0Mask[f]==0)
                     {
 
-                    //if(atten[cnt_atten]<0.0067 || atten[cnt_atten]> 0.99)
-                    //{
-                       org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
-                    //}
+                    if(atten[cnt_atten]<0.0067 || atten[cnt_atten]> 0.99)
+                    {
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
+
+                    }
+
 
 
                     cnt_atten++;
@@ -853,6 +870,20 @@ namespace itk
                    }
 
                   }//end for
+
+
+
+
+                      for (int f=0;f<nof;f++)
+                      {
+                        if(m_B0Mask[f]==1)
+                        {
+                            org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
+                        }
+                       }
+
+
+
 
                   for (int i=0;i<nof;i++)
                   {

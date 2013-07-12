@@ -148,7 +148,7 @@ mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(std::stri
   std::list<mitk::ServiceReference> serref = moduleContext->GetServiceReferences("org.mitk.services.OverlayManager",filter);
   if(serref.size()==0)
   {
-    return mitk::OverlayManager::New();
+    return NULL;
   }
   else
   {

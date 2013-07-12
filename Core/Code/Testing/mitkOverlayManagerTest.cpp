@@ -52,7 +52,7 @@ public:
   static void TestNotInstatiatedOverlayManager()
   {
     mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::GetServiceInstance();
-    MITK_TEST_CONDITION_REQUIRED( OverlayManager.IsNotNull(), "Microservice created and retrievable" );
+    MITK_TEST_CONDITION_REQUIRED( OverlayManager.IsNull(), "No OverlayManager was instanciated, so there is none" );
   }
 };
 

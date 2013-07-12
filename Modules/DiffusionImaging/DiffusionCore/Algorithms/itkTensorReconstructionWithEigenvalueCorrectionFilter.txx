@@ -266,7 +266,7 @@ namespace itk
     corrected_diffusion_temp->SetVectorLength(nof);
     corrected_diffusion_temp->Allocate();*/
 
-    DeepCopyDiffusionImage(corrected_diffusion,corrected_diffusion_temp,nof);
+
 
 
     typedef itk::VariableLengthVector<short> VariableVectorType;
@@ -451,7 +451,7 @@ namespace itk
 
     //this->SetNthOutput(0, tensorImg);
 
-    corrected_diffusion_temp=corrected_diffusion;
+    DeepCopyDiffusionImage(corrected_diffusion,corrected_diffusion_temp,nof);
 
     old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);// checking how many tensors has problems, this is working only for mask =2
 
@@ -462,26 +462,33 @@ namespace itk
 
     std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
 
-    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion,corrected_diffusion,mask,pixel_max,pixel_min);
+    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,temp_tensorImg);
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,temp_tensorImg);
 
     new_number_negative_eigs = CheckNegatives (size,mask, temp_tensorImg);
 
-    /*typedef  itk::ImageFileWriter< MaskImageType  > WriterType;
-    WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName("/Users/macbook_fb/Desktop/franksecondfound.nrrd");
-    writer->SetInput(mask);
-    writer->Update();*/
+
+    if(new_number_negative_eigs == 176)
+    {
+        TurnMask(size, mask,1,0);
+        typedef  itk::ImageFileWriter< MaskImageType  > WriterType;
+        WriterType::Pointer writer = WriterType::New();
+        writer->SetFileName("/home/mbiuser/Desktop/newmask.nrrd");
+        writer->SetInput(mask);
+        writer->Update();
+
+    }
+
 
     if(new_number_negative_eigs<old_number_negative_eigs)
     {
         stil_correcting=true;
         old_number_negative_eigs=new_number_negative_eigs;
 
-        tensorImg=temp_tensorImg;
+        DeepCopyTensorImage(temp_tensorImg,tensorImg);
 
-        //corrected_diffusion=corrected_diffusion_temp;
+        DeepCopyDiffusionImage(corrected_diffusion_temp,corrected_diffusion,nof);
     }
     else
     {
@@ -492,8 +499,12 @@ namespace itk
 
     }//end of while
 
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,tensorImg);
+    new_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
+
 
     TurnMask(size, mask,1,0);
+
 
     tensorImg=temp_tensorImg;
 
@@ -592,6 +603,7 @@ namespace itk
     double temp_mask=0;// declaration of variables
     double one =1.0;
 
+
     for(int i=back_x; i<forth_x+1; i++)
     {
       for (int j=back_y; j<forth_y+1; j++)
@@ -616,12 +628,19 @@ namespace itk
                 temp_number++;// number for calculation of mean
 
 
-            }//end of pf>0
+            }
+            else
+            {
+              std::cout<<"i am negative"<<std::endl;
+             }//end of pf>0
           //}//end of mask condition
+
+
 
         }
       }
     }// end of size
+
 
 
     ix[0] = x;ix[1] = y;ix[2] = z;
@@ -637,6 +656,7 @@ namespace itk
     else
     {
       tempsum=tempsum/temp_number;
+      std::cout<<tempsum<<std::endl;
     }
 
 
@@ -795,13 +815,13 @@ namespace itk
       vnl_vector<double> atten(nof-numberb0);
       double cnt_atten=0;// declaration of important variables
 
-      for (int x=0;x<size[0];x++)
+      for (int z=0;z<size[2];z++)
       {
 
         for (int y=0;y<size[1];y++)
         {
 
-          for (int z=0;z<size[2];z++)
+          for (int x=0;x<size[0];x++)
           {
               // for every pixel
 
@@ -857,7 +877,7 @@ namespace itk
                     if(m_B0Mask[f]==0)
                     {
 
-                    if(atten[cnt_atten]<0.0067 || atten[cnt_atten]> 0.99)
+                    if(atten[cnt_atten]<0.006737946999085 | atten[cnt_atten]> 0.990049833749168)
                     {
                         org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
 
@@ -865,22 +885,25 @@ namespace itk
 
 
 
+
+
                     cnt_atten++;
 
                    }
+                    if(m_B0Mask[f]==1)
+                    {
+
+
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
+
+
+                    }
+
 
                   }//end for
 
 
 
-
-                      for (int f=0;f<nof;f++)
-                      {
-                        if(m_B0Mask[f]==1)
-                        {
-                            org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
-                        }
-                       }
 
 
 
@@ -1066,8 +1089,8 @@ namespace itk
     itk::ImageRegionConstIterator<ImageType> inputIterator(corrected_diffusion, corrected_diffusion->GetLargestPossibleRegion());
     itk::ImageRegionIterator<ImageType> outputIterator(corrected_diffusion_temp, corrected_diffusion_temp->GetLargestPossibleRegion());
 
-    //inputIterator.begin();
-    //outputIterator.begin();
+    inputIterator.GoToBegin();
+    outputIterator.GoToBegin();
 
     while(!inputIterator.IsAtEnd())
       {
@@ -1091,8 +1114,8 @@ namespace itk
     itk::ImageRegionConstIterator<TensorImageType> inputIterator(tensorImg, tensorImg->GetLargestPossibleRegion());
     itk::ImageRegionIterator<TensorImageType> outputIterator(temp_tensorImg, temp_tensorImg->GetLargestPossibleRegion());
 
-    //inputIterator.begin();
-    //outputIterator.begin();
+    inputIterator.GoToBegin();
+    outputIterator.GoToBegin();
 
     while(!inputIterator.IsAtEnd())
       {

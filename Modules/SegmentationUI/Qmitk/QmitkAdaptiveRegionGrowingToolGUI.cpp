@@ -405,20 +405,24 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
 
   mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
   //initialize slider
+  m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
+  mitk::ScalarType max = m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax();
+  if (max < m_UPPERTHRESHOLD)
+    m_Controls.m_PreviewSlider->setMaximum(max);
+  else
+    m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
+
+  this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
+
   if(m_CurrentRGDirectionIsUpwards)
   {
-    this->m_Controls.m_PreviewSlider->setMaximum(m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax());
-    this->m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
+    m_Controls.m_PreviewSlider->setValue(m_SeedPointValueMean-1);
   }
   else
   {
-    m_Controls.m_PreviewSlider->setMinimum(m_UPPERTHRESHOLD-resultImage->GetStatistics()->GetScalarValueMax());
-    this->m_Controls.m_PreviewSlider->setMaximum(m_UPPERTHRESHOLD);
+    m_Controls.m_PreviewSlider->setValue(m_SeedPointValueMean+1);
   }
   this->m_SliderInitialized = true;
-  this->m_DetectedLeakagePoint = regionGrower->GetLeakagePoint();
-  MITK_INFO<<"Detected Leakage Point: "<<m_DetectedLeakagePoint;
-
 
   //create new node and then delete the old one if there is one
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
@@ -446,6 +450,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   m_UpdateSuggestedThreshold = true;// reset first stored threshold value
   //Setting progress to finished
   mitk::ProgressBar::GetInstance()->Progress(357);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
@@ -475,13 +480,13 @@ void QmitkAdaptiveRegionGrowingToolGUI::InitializeLevelWindow()
 
   if (m_CurrentRGDirectionIsUpwards)
   {
-    this->m_Controls.m_PreviewSlider->setValue(this->m_SeedpointValue + this->m_DetectedLeakagePoint -1);
-    *level = m_UPPERTHRESHOLD - (this->m_SeedpointValue + this->m_DetectedLeakagePoint -1) + 0.5;
+    this->m_Controls.m_PreviewSlider->setValue(m_SeedpointValue);
+    *level = m_UPPERTHRESHOLD - (m_SeedpointValue) + 0.5;
   }
   else
   {
-    this->m_Controls.m_PreviewSlider->setValue(this->m_SeedpointValue - this->m_DetectedLeakagePoint +1);
-    *level = (this->m_SeedpointValue + this->m_DetectedLeakagePoint +1) - m_LOWERTHRESHOLD + 0.5;
+    this->m_Controls.m_PreviewSlider->setValue(m_SeedpointValue);
+    *level = (m_SeedpointValue) - m_LOWERTHRESHOLD + 0.5;
   }
 
   tempLevelWindow.SetLevelWindow(*level, *window);
@@ -792,13 +797,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetLowerThresholdValue( double lowerThreshold )
 {
-  MITK_INFO<<"Lower Threshold";
   m_LOWERTHRESHOLD = lowerThreshold;
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetUpperThresholdValue( double upperThreshold)
 {
-  MITK_INFO<<"Upper Threshold";
   m_UPPERTHRESHOLD = upperThreshold;
 }
 

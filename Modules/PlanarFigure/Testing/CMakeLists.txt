@@ -38,6 +38,8 @@ function(viewportTest
       ${data}
       -V ${MITK_DATA_DIR}/RenderingTestData/viewport/mitkViewportRenderingTest_${testPostfix}.png #corresponding reference screenshot
       )
+  set_property(TEST mitkViewportRenderingTest_${testPostfix}
+               PROPERTY RUN_SERIAL TRUE)
 endfunction()
 
 function(getFirstCharacter string charVar)

@@ -31,8 +31,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
 
+//DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
 
 namespace mitk {
+
+#define mitkTimeSlicedGeometryEventMacro( classname , super ) \
+ class MITK_CORE_EXPORT DEPRECATED(classname) : public super { \
+   public: \
+     typedef classname Self; \
+     typedef super Superclass; \
+     classname(TimeGeometry* aTimeGeometry, unsigned int aPos) \
+     : Superclass(aTimeGeometry, aPos) {} \
+     virtual ~classname() {} \
+     virtual const char * GetEventName() const { return #classname; } \
+     virtual bool CheckEvent(const ::itk::EventObject* e) const \
+       { return dynamic_cast<const Self*>(e); } \
+     virtual ::itk::EventObject* MakeObject() const \
+       { return new Self(GetTimeGeometry(), GetPos()); } \
+   private: \
+     void operator=(const Self&); \
+ }
 
 #define mitkTimeGeometryEventMacro( classname , super ) \
  class MITK_CORE_EXPORT classname : public super { \
@@ -179,6 +198,21 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     itkGetConstObjectMacro(InputWorldGeometry3D, mitk::Geometry3D);
 
 
+    /**
+     * \brief Set the input world geometry3D out of which the
+     * geometries for slicing will be created.
+     *
+     * Any previous previous set input geometry (3D or Time) will
+     * be ignored in future.
+     * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+     */
+    DEPRECATED(void SetInputWorldGeometry(const mitk::TimeSlicedGeometry* geometry));
+    /**
+     * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+     */
+    DEPRECATED(TimeSlicedGeometry* GetInputWorldGeometry());
+
+
     void SetInputWorldTimeGeometry(const mitk::TimeGeometry* geometry);
     itkGetConstObjectMacro(InputWorldTimeGeometry, mitk::TimeGeometry);
 
@@ -305,6 +339,11 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
         // TimeGeometryEvent(const Self&);
         void operator=(const Self&); //just hide
     };
+
+   /**
+   * \deprecatedSince{2013_06} Please use TimeGeometryEvent instead: For additional information see  @TimeGeometryGuide@
+   */
+   DEPRECATED(typedef TimeGeometryEvent TimeSlicedGeometryEvent);
 
     mitkTimeGeometryEventMacro(
       GeometrySendEvent,TimeGeometryEvent );

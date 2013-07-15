@@ -43,7 +43,7 @@ public:
   mitkClassMacro(BaseData,itk::DataObject)
 
   /**
-  * \brief Return the TimeGeo of the data as const pointer.
+  * \brief Return the TimeGeometry of the data as const pointer.
   *
   * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
   * be sure that the geometry is up-to-date.
@@ -53,6 +53,20 @@ public:
   const mitk::TimeGeometry* GetTimeGeometry() const
   {
     return m_TimeGeometry.GetPointer();
+  }
+
+  /**
+  * \brief Return the TimeGeometry of the data as const pointer.
+  *
+  * \warning No update will be called. Use GetUpdatedGeometry() if you cannot
+  * be sure that the geometry is up-to-date.
+  *
+  * Normally used in GenerateOutputInformation of subclasses of BaseProcess.
+   * \deprecatedSince{2013_06} Please use GetTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+  */
+  DEPRECATED(const mitk::TimeGeometry* GetTimeSlicedGeometry() const)
+  {
+    return GetTimeGeometry();
   }
 
   /**
@@ -77,6 +91,20 @@ public:
   * calling UpdateOutputInformation).
   */
   const mitk::TimeGeometry* GetUpdatedTimeGeometry();
+
+  /**
+  * @brief Return the Geometry3D of the data.
+  *
+  * The method does not simply return the value of the m_TimeGeometry
+  * member. Before doing this, it makes sure that the TimeGeometry
+  * is up-to-date (by setting the update extent to largest possible and
+  * calling UpdateOutputInformation).
+  * \deprecatedSince{2013_06} Please use GetUpdatedTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+  */
+  DEPRECATED(const mitk::TimeGeometry* GetUpdatedTimeSliceGeometry())
+  {
+    return GetUpdatedTimeGeometry();
+  }
 
   /**
   * \brief Expands the TimeGeometry to a number of TimeSteps.
@@ -352,6 +380,17 @@ protected:
   //## The TimeGeometry is initialized empty and evenly timed.
   //## In many cases it will be necessary to overwrite this in sub-classes.
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
+
+  /**
+  * \brief Initialize the TimeGeometry for a number of time steps.
+  * The TimeGeometry is initialized empty and evenly timed.
+  * In many cases it will be necessary to overwrite this in sub-classes.
+  * \deprecatedSince{2013_06} Please use GetUpdatedTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+  */
+  DEPRECATED(virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 ))
+  {
+    InitializeTimeGeometry(timeSteps);
+  }
 
   //##Documentation
   //## @brief reset to non-initialized state, release memory

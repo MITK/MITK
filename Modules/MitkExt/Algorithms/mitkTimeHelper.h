@@ -20,6 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+/**
+* \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+*/
+template <class TOutputRegion, class TInputRegion>
+DEPRECATED(void ITK_EXPORT GenerateTimeInInputRegion(const mitk::TimeSlicedGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeSlicedGeometry *inputTimeGeometry, TInputRegion& inputRegion);)
 
 //## @brief convert the start- and end-index-time of output-region in
 //## start- and end-index-time of input-region via millisecond-time

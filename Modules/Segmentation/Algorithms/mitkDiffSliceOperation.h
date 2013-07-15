@@ -26,6 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 
+//DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
+
 
 namespace mitk
 {
@@ -60,6 +63,12 @@ namespace mitk
     /** \brief */
     DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, Geometry3D* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry);
 
+    /** \brief
+    *
+    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    */
+    DEPRECATED(DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, TimeSlicedGeometry* sliceGeometry, unsigned int timestep, Geometry3D* currentWorldGeometry));
+
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
 
@@ -83,11 +92,22 @@ namespace mitk
     /** \brief Get the axis where the slice has to be applied in the volume.*/
     Geometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
 
+
+    /** \brief Set the axis where the slice has to be applied in the volume.
+    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    */
+    void SetSliceGeometry(TimeSlicedGeometry* sliceGeometry);
+
     /** \brief Set the axis where the slice has to be applied in the volume.*/
     void SetCurrentWorldGeometry(Geometry3D* worldGeometry){this->m_WorldGeometry = worldGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
     Geometry3D* GetWorldGeometry(){return this->m_WorldGeometry;}
 
+
+    /** \brief Set the axis where the slice has to be applied in the volume.
+    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    */
+    void SetCurrentWorldGeometry(TimeSlicedGeometry* worldGeometry);
 
   protected:
 

@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessorBase.h"
 #include "mitkImageVtkAccessor.h"
 
+//DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
+
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
@@ -237,6 +240,14 @@ public:
   //##
   //## @param tDim defines the number of time steps for which the Image should be initialized
   virtual void Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int channels = 1, int tDim=1);
+
+  /**
+  * initialize new (or re-initialize) image information by a Geometry3D
+  *
+  * @param tDim defines the number of time steps for which the Image should be initialized
+  * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+  */
+  DEPRECATED(virtual void Initialize(const mitk::PixelType& type, const mitk::TimeSlicedGeometry* geometry, unsigned int channels = 1, int tDim=1)){};
 
   /**
   * \brief Initialize new (or re-initialize) image information by a TimeGeometry

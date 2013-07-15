@@ -320,7 +320,15 @@ protected:
   virtual void EvaluateFeaturesInternal() = 0;
 
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
-   * geometry of this figure. Note that each time step holds one Geometry2D. */
+   * geometry of this figure. Note that each time step holds one Geometry2D.
+   *
+   * \deprecatedSince{2013_06} Please use InitializeTimeGeometry instead: For additional information see  @TimeGeometryGuide@
+   */
+   DEPRECATED(virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 ));
+
+  /** \brief Initializes the TimeGeometry describing the (time-resolved)
+   * geometry of this figure. Note that each time step holds one Geometry2D.
+   */
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
 
   /** \brief defines the number of PolyLines that will be available */

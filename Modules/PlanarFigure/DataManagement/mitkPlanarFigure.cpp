@@ -536,6 +536,10 @@ void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
   }
 }
 
+void mitk::PlanarFigure::InitializeTimeSlicedGeometry( unsigned int timeSteps )
+{
+  InitializeTimeGeometry(timeSteps);
+}
 
 void mitk::PlanarFigure::InitializeTimeGeometry( unsigned int timeSteps )
 {

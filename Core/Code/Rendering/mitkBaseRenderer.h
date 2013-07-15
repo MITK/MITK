@@ -41,6 +41,9 @@
 #include <map>
 #include <set>
 
+// DEPRECATED
+#include <mitkTimeSlicedGeometry.h>
+
 namespace mitk
 {
 
@@ -175,10 +178,14 @@ namespace mitk
     //## \sa m_WorldGeometry
     //## \sa m_TimeWorldGeometry
     //## \sa m_CurrentWorldGeometry2D
-
-    //TODO_GOETZ Comment on both methods what they actually doing and rename them to the same again
     virtual void SetWorldGeometry3D(Geometry3D* geometry);
     virtual void SetWorldTimeGeometry(mitk::TimeGeometry* geometry);
+
+
+    /**
+    * \deprecatedSince{2013_06} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see @TimeGeometryGuide@
+    */
+    DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
 
     itkGetConstObjectMacro(WorldGeometry, Geometry3D);

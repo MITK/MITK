@@ -66,7 +66,8 @@ set(H_FILES
   DataManagement/mitkITKImageImport.txx
   DataManagement/mitkImageToItk.h
   DataManagement/mitkImageToItk.txx
-
+  DataManagement/mitkTimeSlicedGeometry.h # Deprecated, empty for compatibilty reasons.
+  
   Interactions/mitkEventMapperAddOn.h
 
   Interfaces/mitkIDataNodeReader.h

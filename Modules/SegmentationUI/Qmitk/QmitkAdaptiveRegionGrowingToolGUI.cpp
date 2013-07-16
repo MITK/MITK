@@ -176,6 +176,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
           return;
       }
 
+      m_Controls.m_lblSetSeedpoint->setText("");
+
       mitk::Image* image = dynamic_cast<mitk::Image*>(m_InputImageNode->GetData());
 
       mitk::Point3D seedPoint = pointSet->GetPointSet(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep())->GetPoints()->ElementAt(0);

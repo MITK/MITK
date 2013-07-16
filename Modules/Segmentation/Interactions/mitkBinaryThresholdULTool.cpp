@@ -187,7 +187,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
     if (image.IsNotNull())
     {
       // create a new image of the same dimensions and smallest possible pixel type
-      DataNode::Pointer emptySegmentation = m_ToolManager->GetWorkingData(0);
+      DataNode::Pointer emptySegmentation = GetTargetSegmentationNode();
 
       if (emptySegmentation)
       {

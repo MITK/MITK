@@ -208,7 +208,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
     Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNotNull())
     {
-      DataNode::Pointer emptySegmentation = m_ToolManager->GetWorkingData(0);
+      DataNode::Pointer emptySegmentation = GetTargetSegmentationNode();
 
       if (emptySegmentation)
       {

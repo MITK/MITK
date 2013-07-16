@@ -18,7 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 
 mitk::AutoSegmentationTool::AutoSegmentationTool()
-:Tool("dummy")
+:Tool("dummy"),
+m_OverwriteExistingSegmentation (false)
 {
 }
 

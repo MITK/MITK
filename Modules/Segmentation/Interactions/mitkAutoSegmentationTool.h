@@ -35,12 +35,18 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     mitkClassMacro(AutoSegmentationTool, Tool);
 
+    void SetOverwriteExistingSegmentation(bool overwrite);
+
+    std::string GetCurrentSegmentationName();
+
   protected:
 
     AutoSegmentationTool(); // purposely hidden
     virtual ~AutoSegmentationTool();
 
     virtual const char* GetGroup() const;
+
+    bool m_OverwriteExistingSegmentation;
  };
 
 } // namespace

@@ -44,3 +44,31 @@ std::string mitk::AutoSegmentationTool::GetCurrentSegmentationName()
     return "";
 }
 
+mitk::DataNode* mitk::AutoSegmentationTool::GetTargetSegmentationNode()
+{
+  mitk::DataNode::Pointer emptySegmentation;
+  if (m_OverwriteExistingSegmentation)
+  {
+    emptySegmentation = m_ToolManager->GetWorkingData(0);
+  }
+  else
+  {
+    mitk::DataNode::Pointer refNode = m_ToolManager->GetReferenceData(0);
+    if (refNode.IsNull())
+    {
+      //TODO create and use segmentation exceptions instead!!
+      MITK_ERROR<<"No valid reference data!";
+      return NULL;
+    }
+    std::string nodename = m_ToolManager->GetReferenceData(0)->GetName()+"_"+this->GetName();
+    mitk::Color color;
+    color.SetRed(1);
+    color.SetBlue(0);
+    color.SetGreen(0);
+    emptySegmentation = CreateEmptySegmentationNode(dynamic_cast<mitk::Image*>(refNode->GetData()), nodename, color);
+    m_ToolManager->GetDataStorage()->Add(emptySegmentation, refNode);
+
+  }
+  return emptySegmentation;
+}
+

@@ -46,6 +46,14 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     virtual const char* GetGroup() const;
 
+    /**
+     * @brief Depending on the selected mode either returns the currently selected segmentation
+     *        or creates a new one from the selected reference data and adds the new segmentation
+     *        to the datastorage
+     * @return a mitk::DataNode which contains a segmentation image
+     */
+    virtual mitk::DataNode* GetTargetSegmentationNode();
+
     bool m_OverwriteExistingSegmentation;
  };
 

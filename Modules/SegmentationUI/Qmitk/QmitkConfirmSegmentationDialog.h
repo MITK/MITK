@@ -15,8 +15,24 @@ public:
   explicit QmitkConfirmSegmentationDialog(QWidget *parent = 0);
   ~QmitkConfirmSegmentationDialog();
 
+  void SetSegmentationName(QString name);
+
+  enum
+  {
+    OVERWRITE_SEGMENTATION, CREATE_NEW_SEGMENTATION, CANCEL_SEGMENTATION
+  };
+
+protected slots:
+
+  void OnOverwriteExistingSegmentation();
+
+  void OnCreateNewSegmentation();
+
+  void OnCancelSegmentation();
+
 private:
-  Ui::QmitkConfirmSegmentationDialog *ui;
+
+  Ui::QmitkConfirmSegmentationDialog *m_Controls;
 };
 
 #endif // QMITKCONFIRMSEGMENTATIONDIALOG_H

@@ -35,12 +35,31 @@ class Segmentation_EXPORT AutoSegmentationTool : public Tool
 
     mitkClassMacro(AutoSegmentationTool, Tool);
 
+    void SetOverwriteExistingSegmentation(bool overwrite);
+
+    /**
+     * @brief Gets the name of the currently selected segmentation node
+     * @return the name of the segmentation node or an empty string if
+     *         none is selected
+     */
+    std::string GetCurrentSegmentationName();
+
+    /**
+     * @brief Depending on the selected mode either returns the currently selected segmentation
+     *        or creates a new one from the selected reference data and adds the new segmentation
+     *        to the datastorage
+     * @return a mitk::DataNode which contains a segmentation image
+     */
+    virtual mitk::DataNode* GetTargetSegmentationNode();
+
   protected:
 
     AutoSegmentationTool(); // purposely hidden
     virtual ~AutoSegmentationTool();
 
     virtual const char* GetGroup() const;
+
+    bool m_OverwriteExistingSegmentation;
  };
 
 } // namespace

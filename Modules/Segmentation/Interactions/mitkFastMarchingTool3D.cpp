@@ -21,9 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
+#include "mitkGlobalInteraction.h"
 
 #include "itkOrImageFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkImageCast.h"
 
 // us
 #include "mitkModule.h"
@@ -36,7 +38,7 @@ namespace mitk {
 
 
 mitk::FastMarchingTool3D::FastMarchingTool3D()
-:FeedbackContourTool("PressMoveReleaseAndPointSetting"),
+:/*FeedbackContourTool*/AutoSegmentationTool(),
 m_NeedUpdate(true),
 m_CurrentTimeStep(0),
 m_LowerThreshold(0),
@@ -46,31 +48,11 @@ m_Sigma(1.0),
 m_Alpha(-0.5),
 m_Beta(3.0)
 {
-  CONNECT_ACTION( AcADDPOINTRMB, OnAddPoint );
-  CONNECT_ACTION( AcADDPOINT, OnAddPoint );
-  CONNECT_ACTION( AcREMOVEPOINT, OnDelete );
-
-
 }
 
 mitk::FastMarchingTool3D::~FastMarchingTool3D()
 {
 }
-
-
-float mitk::FastMarchingTool3D::CanHandleEvent( StateEvent const *stateEvent) const
-{
-  float returnValue = Superclass::CanHandleEvent(stateEvent);
-
-  //we can handle delete
-  if(stateEvent->GetId() == 12 )
-  {
-    returnValue = 1.0;
-  }
-
-  return returnValue;
-}
-
 
 const char** mitk::FastMarchingTool3D::GetXPM() const
 {
@@ -157,11 +139,11 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSet = mitk::PointSet::New();
   m_SeedsAsPointSetNode = mitk::DataNode::New();
   m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
-  m_SeedsAsPointSetNode->SetName("Seeds_Preview");
+  m_SeedsAsPointSetNode->SetName("3D_FastMarching_PointSet");
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
-  m_ToolManager->GetDataStorage()->Add( this->m_SeedsAsPointSetNode, m_ToolManager->GetReferenceData(0));
+  m_SeedPointInteractor = mitk::PointSetInteractor::New("PressMoveReleaseAndPointSetting", m_SeedsAsPointSetNode);
 
   m_ReferenceImageAsITK = InternalImageType::New();
 
@@ -205,6 +187,17 @@ void mitk::FastMarchingTool3D::Activated()
   m_FastMarchingFilter->SetInput( m_SigmoidFilter->GetOutput() );
   m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
 
+  m_ToolManager->GetDataStorage()->Add(m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0));
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
+
+  itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointAddedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+  pointAddedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnAddPoint);
+  m_PointSetAddObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetAddEvent(), pointAddedCommand);
+
+  itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointRemovedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
+  pointRemovedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnDelete);
+  m_PointSetRemoveObserverTag = m_SeedsAsPointSet->AddObserver( mitk::PointSetRemoveEvent(), pointRemovedCommand);
+
   this->Initialize();
 }
 
@@ -220,6 +213,18 @@ void mitk::FastMarchingTool3D::Deactivated()
   this->m_FastMarchingFilter->RemoveAllObservers();
   m_ResultImageNode = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  unsigned int numberOfPoints = m_SeedsAsPointSet->GetSize();
+  for (unsigned int i = 0; i < numberOfPoints; ++i)
+  {
+    mitk::Point3D point = m_SeedsAsPointSet->GetPoint(i);
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
+    m_SeedsAsPointSet->ExecuteOperation(doOp);
+  }
+  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
+  m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
+  m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
+  m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
 }
 
 void mitk::FastMarchingTool3D::Initialize()
@@ -246,7 +251,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     //logical or combination of preview and segmentation slice
     OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
 
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
     if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
@@ -278,15 +283,13 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
 }
 
 
-bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stateEvent)
+void mitk::FastMarchingTool3D::OnAddPoint()
 {
   // Add a new seed point for FastMarching algorithm
-  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
-
   mitk::Point3D clickInIndex;
 
-  m_ReferenceImage->GetGeometry()->WorldToIndex(positionEvent->GetWorldPosition(), clickInIndex);
+  m_ReferenceImage->GetGeometry()->WorldToIndex(m_SeedsAsPointSet->GetPoint(m_SeedsAsPointSet->GetSize()-1),
+                                                clickInIndex);
   itk::Index<3> seedPosition;
   seedPosition[0] = clickInIndex[0];
   seedPosition[1] = clickInIndex[1];
@@ -299,19 +302,15 @@ bool mitk::FastMarchingTool3D::OnAddPoint(Action* action, const StateEvent* stat
   this->m_SeedContainer->InsertElement(this->m_SeedContainer->Size(), node);
   m_FastMarchingFilter->Modified();
 
-  m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetWorldPosition());
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   m_NeedUpdate = true;
 
   this->Update();
-
-  return true;
 }
 
 
-bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateEvent)
+void mitk::FastMarchingTool3D::OnDelete()
 {
   // delete last seed point
   if(!(this->m_SeedContainer->empty()))
@@ -320,16 +319,12 @@ bool mitk::FastMarchingTool3D::OnDelete(Action* action, const StateEvent* stateE
     this->m_SeedContainer->pop_back();
     m_FastMarchingFilter->Modified();
 
-    //delete last point in pointset - somehow ugly
-    m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
-
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     m_NeedUpdate = true;
 
     this->Update();
   }
-  return true;
 }
 
 

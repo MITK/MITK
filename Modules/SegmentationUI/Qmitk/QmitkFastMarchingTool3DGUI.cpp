@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFastMarchingTool3DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
+#include "QmitkConfirmSegmentationDialog.h"
 
 #include <qlabel.h>
 #include <ctkSliderWidget.h>
@@ -293,6 +293,23 @@ void QmitkFastMarchingTool3DGUI::OnStoppingValueChanged(double value)
 
 void QmitkFastMarchingTool3DGUI::OnConfirmSegmentation()
 {
+  QmitkConfirmSegmentationDialog dialog;
+  QString segName = QString::fromStdString(m_FastMarchingTool->GetCurrentSegmentationName());
+
+  dialog.SetSegmentationName(segName);
+  int result = dialog.exec();
+
+  switch(result)
+  {
+  case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
+    m_FastMarchingTool->SetOverwriteExistingSegmentation(false);
+    break;
+  case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
+    m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
+    break;
+  case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
+    return;
+  }
   if (m_FastMarchingTool.IsNotNull())
   {
     m_FastMarchingTool->ConfirmSegmentation();

@@ -3,6 +3,7 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUI.cpp
 Qmitk/QmitkBinaryThresholdToolGUI.cpp
 Qmitk/QmitkBinaryThresholdULToolGUI.cpp
 Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.cpp
+Qmitk/QmitkConfirmSegmentationDialog.cpp
 Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
@@ -29,6 +30,7 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUI.h
 Qmitk/QmitkBinaryThresholdToolGUI.h
 Qmitk/QmitkBinaryThresholdULToolGUI.h
 Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.h
+Qmitk/QmitkConfirmSegmentationDialog.h
 Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
@@ -52,5 +54,6 @@ Qmitk/QmitkWatershedToolGUI.h
 
 set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
+Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 )

@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkOtsuTool3DGUI.h"
-#include "QmitkNewSegmentationDialog.h"
+#include "QmitkConfirmSegmentationDialog.h"
 
 #include <qlabel.h>
 #include <qspinbox.h>
@@ -77,6 +77,24 @@ void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
 {
+  QmitkConfirmSegmentationDialog dialog;
+  QString segName = QString::fromStdString(m_OtsuTool3DTool->GetCurrentSegmentationName());
+
+  dialog.SetSegmentationName(segName);
+  int result = dialog.exec();
+
+  switch(result)
+  {
+  case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
+    m_OtsuTool3DTool->SetOverwriteExistingSegmentation(false);
+    break;
+  case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
+    m_OtsuTool3DTool->SetOverwriteExistingSegmentation(true);
+    break;
+  case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
+    return;
+  }
+
   if (m_OtsuTool3DTool.IsNotNull() && m_Controls.m_selectionListWidget->currentItem() != NULL)
   {
     m_OtsuTool3DTool->ConfirmSegmentation();

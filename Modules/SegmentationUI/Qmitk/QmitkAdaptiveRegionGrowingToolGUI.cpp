@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkOrImageFilter.h"
 #include "mitkImageCast.h"
+#include "QmitkConfirmSegmentationDialog.h"
 
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
@@ -603,6 +604,25 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   if (newNode.IsNull())
     return;
 
+  QmitkConfirmSegmentationDialog dialog;
+  QString segName = QString::fromStdString(m_RegionGrow3DTool->GetCurrentSegmentationName());
+
+  dialog.SetSegmentationName(segName);
+  int result = dialog.exec();
+
+  switch(result)
+  {
+  case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
+    m_RegionGrow3DTool->SetOverwriteExistingSegmentation(false);
+    break;
+  case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
+    m_RegionGrow3DTool->SetOverwriteExistingSegmentation(true);
+    break;
+  case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
+    return;
+  }
+
+
   mitk::Image* img = dynamic_cast<mitk::Image*>(newNode->GetData());
   AccessByItk(img, ITKThresholding);
 
@@ -617,7 +637,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
 template<typename TPixel, unsigned int VImageDimension>
 void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImageDimension>* itkImage)
 {
-  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->GetWorkingData()->GetData());
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image*>(this->m_RegionGrow3DTool->
+                                                                         GetTargetSegmentationNode()->GetData());
 
   int timeStep = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1") )->GetTimeStep();
 

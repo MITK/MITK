@@ -29,6 +29,7 @@ set(CPP_FILES
   Algorithms/mitkOtsuSegmentationFilter.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkSurfaceInterpolationController.cpp
+  Controllers/mitkToolManager.cpp
   # DataManagement/mitkApplyDiffImageOperation.cpp
   DataManagement/mitkContour.cpp
   DataManagement/mitkContourSet.cpp
@@ -67,6 +68,7 @@ set(CPP_FILES
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
+  Interactions/mitkPixelManipulationTool.cpp
   IO/mitkContourModelIOFactory.cpp
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp

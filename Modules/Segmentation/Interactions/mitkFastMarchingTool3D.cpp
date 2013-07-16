@@ -251,7 +251,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     //logical or combination of preview and segmentation slice
     OutputImageType::Pointer segmentationImageInITK = OutputImageType::New();
 
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(GetTargetSegmentationNode()->GetData());
     if(workingImage->GetTimeSlicedGeometry()->GetTimeSteps() > 1)
     {
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();

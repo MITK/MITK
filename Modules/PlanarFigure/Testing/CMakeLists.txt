@@ -1,3 +1,5 @@
+if (BUILD_TESTING)
+
 MITK_CREATE_MODULE_TESTS()
 
 set(testcaseBasename mitkViewportRenderingTest)
@@ -150,3 +152,5 @@ foreach(renderWindowAspect Square Landscape Portrait)
   endforeach()
 endforeach()
 endif() # endif MITK_ENABLE_GUI_TESTING
+
+endif() # BUILD_TESTING

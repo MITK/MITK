@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataStorage.h"
+#include "mitkPointSetInteractor.h"
+#include "mitkPointSet.h"
 
 class ModuleResource;
 
@@ -51,6 +53,8 @@ namespace mitk
     virtual void Activated();
     virtual void Deactivated();
 
+    virtual DataNode::Pointer GetPointSetNode();
+
     mitk::DataNode* GetReferenceData();
     mitk::DataNode* GetWorkingData();
     mitk::DataStorage* GetDataStorage();
@@ -60,6 +64,12 @@ namespace mitk
 
     AdaptiveRegionGrowingTool(); // purposely hidden
     virtual ~AdaptiveRegionGrowingTool();
+
+  private:
+    PointSet::Pointer m_PointSet;
+    PointSetInteractor::Pointer m_SeedPointInteractor;
+    DataNode::Pointer m_PointSetNode;
+
 
   };
 

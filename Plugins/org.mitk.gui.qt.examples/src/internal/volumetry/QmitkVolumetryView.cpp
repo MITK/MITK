@@ -142,6 +142,11 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
   if (m_SelectedDataNode.IsNotNull() )
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
+    if (image == NULL)
+    {
+      MITK_INFO << "QmitkVolumetryView::OnImageSelected no image selected.";
+      return;
+    }
     image->Update();
     if (image && image->IsInitialized())
     {

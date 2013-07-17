@@ -53,7 +53,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
     this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
 
     /* update outputs with tracking data from tools */
-    for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+    for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
     {
       mitk::NavigationData* output = this->GetOutput(i);
       assert(output);
@@ -96,7 +96,6 @@ void mitk::NavigationDataTransformFilter::GenerateData()
       m_QuatOrgRigidTransform->SetRotation(vnlQ);
       m_QuatTmpTransform->SetRotation(vnlQuatIn);
       m_QuatTmpTransform->Compose(m_QuatOrgRigidTransform,false);
-
       vnl_quaternion<double> vnlQuatOut = m_QuatTmpTransform->GetRotation();
       NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
 

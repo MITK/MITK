@@ -222,9 +222,8 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
     vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());  // convert orientation into vnl quaternion
     m_QuatTransform->SetRotation(vnlQuatIn);  // convert orientation into transform
 
-    vnl_quaternion<double> const vnlQLTrans = vnl_quaternion<double>(m_LandmarkTransform->GetMatrix().GetVnlMatrix());
+    m_QuatLandmarkTransform->SetMatrix(m_LandmarkTransform->GetMatrix());
 
-    m_QuatLandmarkTransform->SetRotation(vnlQLTrans);  // set rotation from landmark transform
     m_QuatLandmarkTransform->Compose(m_QuatTransform, true); // compose navigation data transform and landmark transform
 
     vnl_quaternion<double> vnlQuatOut = m_QuatLandmarkTransform->GetRotation();  // convert composed transform back into a quaternion

@@ -231,7 +231,7 @@ double mitk::SurfaceInterpolationController::EstimatePortionOfNeededMemory()
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::SurfaceInterpolationController::GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result)
 {
-  result = input;
+  result->Graft(input);
 }
 
 void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationList(mitk::Image* segmentation)
@@ -253,7 +253,7 @@ void mitk::SurfaceInterpolationController::SetCurrentSegmentationInterpolationLi
   m_SelectedSegmentation = segmentation;
 
 
-  itk::ImageBase<3>::Pointer itkImage;
+  itk::ImageBase<3>::Pointer itkImage = itk::ImageBase<3>::New();
   AccessFixedDimensionByItk_1( m_SelectedSegmentation, GetImageBase, 3, itkImage );
   m_InterpolateSurfaceFilter->SetReferenceImage( itkImage.GetPointer() );
 

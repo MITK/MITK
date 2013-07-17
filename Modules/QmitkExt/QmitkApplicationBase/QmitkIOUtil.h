@@ -97,8 +97,9 @@ protected:
    * @param data The data to save in a specific format.
    * @param aFileName The filename.
    * @param propFileName Proposed file name?
+   * @return false if writing attempt  failed, true otherwise
    */
-    static void SaveToFileWriter(mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const std::string fileName);
+    static bool SaveToFileWriter(mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const std::string fileName);
 
 };
 } //end namespace mitk

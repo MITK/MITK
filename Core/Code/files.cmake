@@ -338,6 +338,11 @@ set(CPP_FILES
   Rendering/Overlays/mitkOverlayManager.cpp
   Rendering/Overlays/mitkBaseLayouter.cpp
 
+  Rendering/Overlays/mitkTextOverlay2D.cpp
+  Rendering/Overlays/mitkTextOverlay3D.cpp
+  Rendering/Overlays/mitkLabelOverlay3D.cpp
+  Rendering/Overlays/mitkOverlay2DLayouter.cpp
+
   Common/mitkException.cpp
   Common/mitkCommon.h
   Common/mitkCoreObjectFactoryBase.cpp

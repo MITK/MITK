@@ -52,7 +52,7 @@ void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
   }
 }
 
-void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
+void mitk::OverlayManager::AddOverlay(Overlay *overlay)
 {
   m_OverlayList.push_back(overlay);
   BaseRendererList::iterator it;
@@ -62,7 +62,7 @@ void mitk::OverlayManager::AddOverlay(mitk::Overlay::Pointer overlay)
   }
 }
 
-void mitk::OverlayManager::RemoveOverlay(mitk::Overlay::Pointer overlay)
+void mitk::OverlayManager::RemoveOverlay(Overlay *overlay)
 {
   m_OverlayList.remove(overlay);
   BaseRendererList::iterator it;
@@ -112,7 +112,7 @@ void mitk::OverlayManager::UnregisterMicroservice()
   }
 }
 
-void mitk::OverlayManager::SetLayouter(mitk::Overlay::Pointer overlay, const std::string identifier, mitk::BaseRenderer *renderer)
+void mitk::OverlayManager::SetLayouter(Overlay *overlay, const char *identifier, mitk::BaseRenderer *renderer)
 {
   if(renderer)
   {
@@ -168,12 +168,12 @@ mitk::BaseLayouter::Pointer mitk::OverlayManager::GetLayouter(mitk::BaseRenderer
   return layouter;
 }
 
-void mitk::OverlayManager::AddLayouter(BaseLayouter::Pointer layouter)
+void mitk::OverlayManager::AddLayouter(BaseLayouter *layouter)
 {
-  if(layouter.IsNotNull())
+  if(layouter)
   {
     BaseLayouter::Pointer oldLayouter = m_LayouterMap[layouter->GetBaseRenderer()][layouter->GetIdentifier()];
-    if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter.GetPointer())
+    if(oldLayouter.IsNotNull() && oldLayouter.GetPointer() != layouter)
     {
       MITK_WARN << "Layouter " << layouter->GetIdentifier() << " does already exist!";
     }

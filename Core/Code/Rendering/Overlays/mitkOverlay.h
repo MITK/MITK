@@ -68,8 +68,6 @@ public:
     /** \brief timestamp of last update of stored data */
     itk::TimeStamp m_LastGenerateDataTime;
 
-    PropertyList::Pointer m_PropertyList;
-
   };
 
   //##Documentation

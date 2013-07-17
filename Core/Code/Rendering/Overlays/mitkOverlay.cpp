@@ -24,6 +24,7 @@ mitk::Overlay::Overlay() : m_LayoutedBy(NULL)
 
 mitk::Overlay::~Overlay()
 {
+
 }
 
 void mitk::Overlay::SetProperty(const char *propertyKey,
@@ -31,6 +32,7 @@ void mitk::Overlay::SetProperty(const char *propertyKey,
                                      const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
+  this->Modified();
 }
 
 void mitk::Overlay::ReplaceProperty(const char *propertyKey,
@@ -286,11 +288,4 @@ bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer 
     return true;
 
   return false;
-}
-
-mitk::PropertyList::Pointer mitk::Overlay::BaseLocalStorage::GetPropertyList()
-{
-  if (m_PropertyList.IsNull())
-    m_PropertyList = mitk::PropertyList::New();
-  return m_PropertyList;
 }

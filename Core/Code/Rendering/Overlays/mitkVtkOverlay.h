@@ -38,7 +38,7 @@ public:
 
 protected:
 
-  virtual vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer) = 0;
+  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) = 0;
   virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */

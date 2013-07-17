@@ -46,15 +46,15 @@ public:
   mitkClassMacro(OverlayManager, itk::LightObject);
   itkNewMacro(OverlayManager);
 
-  void AddOverlay(Overlay::Pointer overlay);
-  void RemoveOverlay(Overlay::Pointer overlay);
+  void AddOverlay(Overlay* overlay);
+  void RemoveOverlay(Overlay* overlay);
   void RemoveAllOverlays();
   void UnregisterMicroservice();
   static const std::string PROP_ID;
-  void SetLayouter(Overlay::Pointer overlay, const std::string identifier, BaseRenderer* renderer);
+  void SetLayouter(Overlay* overlay, const char* identifier, BaseRenderer* renderer);
   void UpdateLayouts(BaseRenderer* renderer);
   BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string identifier);
-  void AddLayouter(BaseLayouter::Pointer layouter);
+  void AddLayouter(BaseLayouter* layouter);
   static OverlayManager::Pointer GetServiceInstance(std::string ID = "0");
   std::string GetID();
 

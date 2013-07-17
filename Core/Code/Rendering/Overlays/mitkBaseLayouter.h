@@ -45,10 +45,10 @@ public:
 
   /** \brief Adds an Overlay to the internal list of managed Overlays.*/
   /** By calling this, the previous Layouter of the passed Overlays is called to remove this overlay from its internal list.*/
-  void AddOverlay(mitk::Overlay::Pointer Overlay);
+  void AddOverlay(Overlay *Overlay);
 
   /** \brief Removes the passed Overlay from the m_ManagedOverlays List */
-  void RemoveOverlay(mitk::Overlay::Pointer Overlay);
+  void RemoveOverlay(Overlay *Overlay);
 
   /** \brief explicit constructor which disallows implicit conversions */
   std::string GetIdentifier();

@@ -46,10 +46,10 @@ public:
 
 protected:
 
-  vtkSmartPointer<vtkProp> GetVtkProp(BaseRenderer *renderer);
+  vtkProp* GetVtkProp(BaseRenderer *renderer);
   virtual void UpdateVtkOverlay(BaseRenderer *renderer);
   virtual void UpdateVtkOverlay2D(BaseRenderer *renderer) = 0;
-  virtual vtkSmartPointer<vtkActor2D> GetVtkActor2D(BaseRenderer *renderer) = 0;
+  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay2D();

@@ -49,6 +49,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QIcon>
 
+// vtk
+#include <mitkVtkResliceInterpolationProperty.h>
+
 
 const std::string QmitkIGTTrackingLabView::VIEW_ID = "org.mitk.views.igttrackinglab";
 
@@ -673,18 +676,18 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
 
 bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB)
 {
-  double euclideanDistanceThreshold = 2;
-  double angularDifferenceThreshold = 2;
+  double euclideanDistanceThreshold = .8;
+  double angularDifferenceThreshold = .8;
 
   if(transformA.IsNull() || transformA.IsNull())
-    return false;
+    {return false;}
   mitk::Point3D posA,posB;
   posA = transformA->GetPosition();
   posB = transformB->GetPosition();
 
 
   if(posA.EuclideanDistanceTo(posB) > euclideanDistanceThreshold)
-    return true;
+    {return true;}
 
   double returnValue;
   mitk::Quaternion rotA,rotB;
@@ -711,8 +714,7 @@ bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::Transform::Pointer
   returnValue = (pt1[0]*pt2[0]+pt1[1]*pt2[1]+pt1[2]*pt2[2]) / ( sqrt(pow(pt1[0],2.0)+pow(pt1[1],2.0)+pow(pt1[2],2.0)) * sqrt(pow(pt2[0],2.0)+pow(pt2[1],2.0)+pow(pt2[2],2.0)));
   returnValue = acos(returnValue);
 
-  if(returnValue*57.3 > angularDifferenceThreshold)
-    return true;
+  if(returnValue*57.3 > angularDifferenceThreshold){return true;}
 
   return false;
 }
@@ -748,8 +750,6 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //set representation object
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
 
-    //TODO: add image when bug is fixed
-
     //get the marker transform out of the navigation data
     mitk::Transform::Pointer T_Marker = mitk::Transform::New(this->m_ObjectmarkerNavigationData);
 
@@ -764,6 +764,9 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     m_PermanentRegistration = true;
     m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New();
+
+    //set interpolation mode
+    this->m_Controls.m_ImageComboBox->GetSelectedNode()->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
     }
   else
     {

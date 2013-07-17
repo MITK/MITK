@@ -18,13 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorAlgorithm.h"
 
 #include "mitkToolManager.h"
-#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
@@ -49,6 +51,20 @@ mitk::CorrectorTool2D::~CorrectorTool2D()
 const char** mitk::CorrectorTool2D::GetXPM() const
 {
   return mitkCorrectorTool2D_xpm;
+}
+
+mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Correction_48x48.png");
+  return resource;
+}
+
+mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
+  return resource;
 }
 
 const char* mitk::CorrectorTool2D::GetName() const

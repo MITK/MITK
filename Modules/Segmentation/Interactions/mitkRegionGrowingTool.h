@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 struct mitkIpPicDescriptor;
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -60,6 +62,9 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     itkNewMacro(RegionGrowingTool);
 
     virtual const char** GetXPM() const;
+    virtual ModuleResource GetCursorIconResource() const;
+    ModuleResource GetIconResource() const;
+
     virtual const char* GetName() const;
 
   protected:

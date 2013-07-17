@@ -16,6 +16,7 @@ set(module_dirs
     PlanarFigureSegmentation
     Qmitk
     QmitkExt
+    SegmentationUI
     Properties
     DiffusionImaging
     GPGPU

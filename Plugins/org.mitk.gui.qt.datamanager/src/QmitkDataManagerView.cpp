@@ -382,11 +382,8 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
   std::string smoothed;
   confElem->GetAttribute("class", className);
   confElem->GetAttribute("smoothed", smoothed);
-  if(className == "QmitkThresholdAction")
-  {
-    contextMenuAction->SetDataStorage(this->GetDataStorage());
-  }
-  else if(className == "QmitkOtsuAction")
+
+  if(className == "QmitkOtsuAction")
   {
     contextMenuAction->SetDataStorage(this->GetDataStorage());
   }

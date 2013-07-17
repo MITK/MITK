@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -47,13 +49,14 @@ namespace mitk
     itkNewMacro(BinaryThresholdTool);
 
     virtual const char** GetXPM() const;
+    ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
     virtual void Activated();
     virtual void Deactivated();
 
     virtual void SetThresholdValue(double value);
-    virtual void AcceptCurrentThresholdValue(const std::string& organName, const Color& color);
+    virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
 
@@ -64,7 +67,7 @@ namespace mitk
 
     void SetupPreviewNodeFor( DataNode* nodeForThresholding );
 
-    void CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organType, const Color& color);
+    void CreateNewSegmentationFromThreshold(DataNode* node);
 
     void OnRoiDataChanged();
 

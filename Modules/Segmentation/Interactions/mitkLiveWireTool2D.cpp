@@ -31,6 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGradientMagnitudeImageFilter.h>
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -115,37 +119,45 @@ float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
 }
 
-
-
-
 const char** mitk::LiveWireTool2D::GetXPM() const
 {
   return mitkLiveWireTool2D_xpm;
 }
 
+mitk::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("LiveWire_48x48.png");
+  return resource;
+}
 
-
+mitk::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
+  return resource;
+}
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
-  return "LiveWire";
+  return "Live Wire";
 }
-
-
-
 
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();
 }
 
-
-
-
 void mitk::LiveWireTool2D::Deactivated()
 {
   this->FinishTool();
 
+  Superclass::Deactivated();
+}
+
+
+void mitk::LiveWireTool2D::ConfirmSegmentation()
+{
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if ( !workingNode ) return;
 
@@ -202,8 +214,6 @@ void mitk::LiveWireTool2D::Deactivated()
   }
 
   m_Contours.clear();
-
-  Superclass::Deactivated();
 }
 
 

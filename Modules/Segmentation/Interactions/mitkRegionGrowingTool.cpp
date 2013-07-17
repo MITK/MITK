@@ -30,6 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrowingTool, "Region growing tool");
 }
@@ -65,6 +70,20 @@ mitk::RegionGrowingTool::~RegionGrowingTool()
 const char** mitk::RegionGrowingTool::GetXPM() const
 {
   return mitkRegionGrowingTool_xpm;
+}
+
+mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  return resource;
+}
+
+mitk::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
+  return resource;
 }
 
 const char* mitk::RegionGrowingTool::GetName() const

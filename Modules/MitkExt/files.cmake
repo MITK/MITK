@@ -37,7 +37,6 @@ set(CPP_FILES
   Controllers/mitkIPythonService.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
-  Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp
   DataManagement/mitkBoundingObject.cpp
@@ -109,14 +108,7 @@ set(CPP_FILES
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
-  Interactions/mitkTool.cpp
 #  Interactions/mitkCreateSurfaceTool.cpp
-  Interactions/mitkMorphologicTool.cpp
-  Interactions/mitkErodeTool.cpp
-  Interactions/mitkDilateTool.cpp
-  Interactions/mitkOpeningTool.cpp
-  Interactions/mitkClosingTool.cpp
-  Interactions/mitkPixelManipulationTool.cpp
   Rendering/mitkEnhancedPointSetVtkMapper3D.cpp
   Rendering/mitkImageBackground2D.cpp
   Rendering/mitkLineMapper2D.cpp

@@ -354,13 +354,18 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
 void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 {
-  m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
-  if (!m_Controls->m_ManualToolSelectionBox2D->isEnabled())
+  mitk::DataNode* selectedNode = m_Controls->segImageSelector->GetSelectedNode();
+  bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
+                                                         mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+
+  if (m_Controls->tab2DTools->isVisible() && !selectedNodeIsVisible)
   {
+    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
   }
   else
   {
+      m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
     this->UpdateWarningLabel("");
   }
 }

@@ -22,8 +22,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyExtensions.h>
 #include <QComboBox>
 #include <QPainter>
+#include <QPaintEvent>
 #include <QSpinBox>
 #include <algorithm>
+
+QmitkComboBoxListView::QmitkComboBoxListView(QComboBox* comboBox)
+  : m_ComboBox(comboBox)
+{
+}
+
+QmitkComboBoxListView::~QmitkComboBoxListView()
+{
+}
+
+void QmitkComboBoxListView::paintEvent(QPaintEvent* event)
+{
+  if (m_ComboBox != NULL)
+  {
+    QStyleOptionComboBox option;
+
+    option.initFrom(m_ComboBox);
+    option.editable = m_ComboBox->isEditable();
+
+    if (m_ComboBox->style()->styleHint(QStyle::SH_ComboBox_Popup, &option, m_ComboBox))
+    {
+      QStyleOptionMenuItem menuOption;
+      menuOption.initFrom(this);
+      menuOption.palette = this->palette();
+      menuOption.state = QStyle::State_None;
+      menuOption.checkType = QStyleOptionMenuItem::NotCheckable;
+      menuOption.menuRect = event->rect();
+      menuOption.maxIconWidth = 0;
+      menuOption.tabWidth = 0;
+
+      QPainter painter(this->viewport());
+      m_ComboBox->style()->drawControl(QStyle::CE_MenuEmptyArea, &menuOption, &painter, this);
+    }
+  }
+
+  QListView::paintEvent(event);
+}
+
+void QmitkComboBoxListView::resizeEvent(QResizeEvent* event)
+{
+  int width = this->viewport()->width();
+  int height = this->contentsSize().height();
+
+  this->resizeContents(width, height);
+
+  QListView::resizeEvent(event);
+}
+
+QStyleOptionViewItem QmitkComboBoxListView::viewOptions() const
+{
+  QStyleOptionViewItem option = QListView::viewOptions();
+  option.showDecorationSelected = true;
+
+  if (m_ComboBox != NULL)
+      option.font = m_ComboBox->font();
+
+  return option;
+}
 
 class PropertyEqualTo
 {
@@ -102,6 +161,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     if (data.type() == QVariant::StringList)
     {
       QComboBox* comboBox = new QComboBox(parent);
+      comboBox->setView(new QmitkComboBoxListView(comboBox));
 
       comboBox->addItems(data.toStringList());
 

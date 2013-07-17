@@ -201,7 +201,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   // tell the interpolation about toolmanager and multiwidget (and data storage)
   if (m_Controls && m_MultiWidget)
   {
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
     m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
@@ -366,7 +366,7 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
     m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
     m_Controls->m_SlicesInterpolator->Show3DInterpolationResult(false);
-    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
+    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
   }
   else
   {

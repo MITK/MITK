@@ -48,6 +48,7 @@ void QmitkOtsuTool3DGUI::OnItemSelectionChanged(QListWidgetItem* item)
 {
   if (m_SelectedItem == item)
   {
+    m_SelectedItem = 0;
     m_Controls.m_selectionListWidget->clearSelection();
     m_OtsuTool3DTool->ShowMultiLabelResultNode(true);
     return;

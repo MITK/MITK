@@ -174,6 +174,8 @@ bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -215,6 +217,8 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been set we use the default extension
@@ -285,6 +289,8 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been entered manually into the filename
@@ -324,6 +330,8 @@ bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
   std::string dir = itksys::SystemTools::GetFilenamePath( path );
   std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
   std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+  if (dir == "")
+    dir = ".";
   std::string fileNameWithoutExtension = dir + "/" + baseFilename;
 
   mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();

@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkTransform.h>
+#include <itkVector.h>
 
 #include <vtkConeSource.h>
 #include <vtkTransform.h>
@@ -129,19 +130,22 @@ void QmitkIGTTrackingLabView::CreateConnections()
 }
 
 void QmitkIGTTrackingLabView::UpdateTimer()
-  {
+{
   if (m_PermanentRegistration && m_PermanentRegistrationFilter.IsNotNull())
+  {
+    mitk::Transform::Pointer ObjectMarkerCurrentTransform = mitk::Transform::New(m_ObjectmarkerNavigationData);
+    if(IsTransformDifferenceHigh(ObjectMarkerCurrentTransform, m_ObjectmarkerNavigationDataLastUpdate))
     {
-
+      m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New(m_ObjectmarkerNavigationData);
       if(m_Controls.m_SurfaceActive->isChecked())
-        {
+      {
         mitk::Transform::Pointer newTransform = mitk::Transform::New();
         newTransform->Concatenate(m_T_MarkerRel);
-        newTransform->Concatenate(mitk::Transform::New(m_ObjectmarkerNavigationData));
+        newTransform->Concatenate(ObjectMarkerCurrentTransform);
         this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
-        }
+      }
       if(m_Controls.m_ImageActive->isChecked())
-        {
+      {
         /*
         mitk::AffineTransform3D::Pointer imageTransform = m_T_ImageGeo;
         imageTransform->Compose(newTransform->GetAffineTransform3D());
@@ -157,11 +161,12 @@ void QmitkIGTTrackingLabView::UpdateTimer()
         newTransform->SetIdentity();
         newTransform->Compose(m_T_ImageGeo);
         newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
-        newTransform->Compose(mitk::Transform::New(m_ObjectmarkerNavigationData)->GetAffineTransform3D());
+        newTransform->Compose(ObjectMarkerCurrentTransform->GetAffineTransform3D());
         this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
 
-        }
+      }
     }
+  }
 
   if (m_CameraView && m_VirtualView.IsNotNull()) {m_VirtualView->Update();}
 
@@ -666,6 +671,52 @@ bool QmitkIGTTrackingLabView::CheckRegistrationInitialization()
   return true;
 }
 
+bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB)
+{
+  double euclideanDistanceThreshold = 2;
+  double angularDifferenceThreshold = 2;
+
+  if(transformA.IsNull() || transformA.IsNull())
+    return false;
+  mitk::Point3D posA,posB;
+  posA = transformA->GetPosition();
+  posB = transformB->GetPosition();
+
+
+  if(posA.EuclideanDistanceTo(posB) > euclideanDistanceThreshold)
+    return true;
+
+  double returnValue;
+  mitk::Quaternion rotA,rotB;
+  rotA = transformA->GetOrientation();
+  rotB = transformB->GetOrientation();
+
+  itk::Vector<double,3> point; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
+  point[0] = 0.0;
+  point[1] = 0.0;
+  point[2] = 100000.0;
+
+  rotA.normalize();
+  rotB.normalize();
+
+  itk::Matrix<double,3,3> rotMatrixA;
+  for(int i=0; i<3; i++) for(int j=0; j<3; j++) rotMatrixA[i][j] = rotA.rotation_matrix_transpose().transpose()[i][j];
+
+  itk::Matrix<double,3,3> rotMatrixB;
+  for(int i=0; i<3; i++) for(int j=0; j<3; j++) rotMatrixB[i][j] = rotB.rotation_matrix_transpose().transpose()[i][j];
+
+  itk::Vector<double,3> pt1 = rotMatrixA * point;
+  itk::Vector<double,3> pt2 = rotMatrixB * point;
+
+  returnValue = (pt1[0]*pt2[0]+pt1[1]*pt2[1]+pt1[2]*pt2[2]) / ( sqrt(pow(pt1[0],2.0)+pow(pt1[1],2.0)+pow(pt1[2],2.0)) * sqrt(pow(pt2[0],2.0)+pow(pt2[1],2.0)+pow(pt2[2],2.0)));
+  returnValue = acos(returnValue);
+
+  if(returnValue*57.3 > angularDifferenceThreshold)
+    return true;
+
+  return false;
+}
+
 
 void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 {
@@ -712,6 +763,7 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     m_T_MarkerRel = T_MarkerRel;
 
     m_PermanentRegistration = true;
+    m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New();
     }
   else
     {

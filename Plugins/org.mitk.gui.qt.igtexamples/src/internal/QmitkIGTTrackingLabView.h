@@ -219,10 +219,13 @@ private:
   mitk::NavigationData::Pointer m_ObjectmarkerNavigationData;
   mitk::NavigationData::Pointer m_PointSetRecordingNavigationData;
 
+  mitk::Transform::Pointer m_ObjectmarkerNavigationDataLastUpdate;
   mitk::Transform::Pointer m_T_MarkerRel;
   mitk::Transform::Pointer m_T_ObjectReg;
   mitk::AffineTransform3D::Pointer m_T_ImageReg;
   mitk::AffineTransform3D::Pointer m_T_ImageGeo;
+
+  bool IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB);
 
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.

@@ -312,7 +312,6 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       mitk::Equal(output1->GetPosition(), resultPos1),
       "Testing ND1 position correctly transformed ");
 
-    /* COMMENTED OUT BECAUSE OF BUG 15021*/
     MITK_TEST_CONDITION(
       mitk::Equal(output1->GetOrientation(), resultQuat),
       "Testing ND1 orientation correctly transformed ");
@@ -328,7 +327,7 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
     MITK_TEST_OUTPUT(<<output1->GetOrientation().r());
     MITK_TEST_OUTPUT(<<"angle:");
     //MITK_TEST_OUTPUT(<<output1->angle());
-    //TODO: something was modified on vnl_quaternion, check what.
+    //TODO: something was modified on vnl_quaternion, check what. DONE
     MITK_TEST_OUTPUT(<<"Orientation2");
     MITK_TEST_OUTPUT(<<resultQuat);
     MITK_TEST_OUTPUT(<<"qX:");

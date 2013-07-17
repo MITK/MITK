@@ -600,12 +600,39 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   // Static Functions
   //
   /**
-    \brief A function comparing two geometries for beeing identical
+   * @brief AreEqual A function comparing two geometries for beeing identical.
+   *
+   * The function compares the spacing, origin, axisvectors, extents, the matrix of the
+   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
+   *
+   * The parameter eps is an optional (default: mitk::eps) tolarence value for all methods which are internally used for comparion.
+   * If you want to use different tolarance values for different parts of the geometry, feel free to use
+   * the other comparison methods and write your own implementation.
+   * @param rightHandSide Compare this against leftHandSide.
+   * @param leftHandSide Compare this against rightHandSide.
+   * @param eps Optional (default: mitk::eps) tolarence.
+   * @return True, if all comparison are true. False in any other case.
+   */
+  static bool AreEqual(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide, ScalarType eps = mitk::eps);
 
-    The function compares the spacing, origin, axisvectors, extents and the matrix of the
-    IndexToWorldTransform (elementwise)
-    */
-  static bool MITK_CORE_EXPORT AreEqual(const mitk::Geometry3D* rightHandSide, const mitk::Geometry3D* leftHandSide);
+  /**
+   * @brief AreOriginsEqual Compares the origin of two Geometry3D objects for equality.
+   *
+   * All comparison methods are more or less self-explanatory and called via mitk::Geometry3D::AreEqual. They all use the
+   * same scheme and compare what is mentioned in the function name. If the comparison fails, a detailed output is send
+   * to console.
+   * @param rightHandSide Compare this against leftHandSide.
+   * @param leftHandSide Compare this against rightHandSide.
+   * @param eps Optional (default: mitk::eps) tolarence.
+   * @return True, if comparison is true. False in any other case.
+   */
+  static bool AreOriginsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps =mitk::eps);
+  static bool AreSpacingsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps );
+  static bool AreExtendsAndAxisEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);
+  static bool AreIndexToWorldTransformsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);
+  static bool AreImageGeometrysEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide);
+  static bool AreNotNull(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide);
+  static bool AreBoundingBoxesEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);
 
 protected:
   Geometry3D();

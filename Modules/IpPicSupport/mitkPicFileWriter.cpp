@@ -64,7 +64,8 @@ void mitk::PicFileWriter::GenerateData()
   }
 
   mitkIpPicDescriptor * picImage = mitkIpPicNew();
-  picImage = CastToIpPicDescriptor(input, picImage);
+  mitk::ImageWriteAccessor imageAccess(input);
+  picImage = CastToIpPicDescriptor(input, &imageAccess, picImage);
 
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)

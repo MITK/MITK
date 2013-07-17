@@ -153,7 +153,8 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       slice = mitk::Image::New();
       slice-> Initialize(mitk::MakeScalarPixelType<signed int>() , 2, dim);
       unsigned int i;
-      signed int *p = (signed int*)slice->GetData();
+      mitk::ImageWriteAccessor accessor(slice);
+      signed int *p = (signed int*)accessor.GetData();
       unsigned int size = dim[0]*dim[1];
       for(i=0; i<size; ++i, ++p)
         *p= (signed int)i;
@@ -189,7 +190,8 @@ static void Test3D( mitk::OverwriteSliceImageFilter* filter, mitk::Image* image,
       slice = mitk::Image::New();
       slice-> Initialize(mitk::MakeScalarPixelType<signed int>(), 2, dim);
       unsigned int i;
-      signed int *p = (signed int*)slice->GetData();
+      mitk::ImageWriteAccessor accessor(slice);
+      signed int *p = (signed int*)accessor.GetData();
       unsigned int size = dim[0]*dim[1];
       for(i=0; i<size; ++i, ++p)
         *p= (signed int)i;

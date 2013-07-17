@@ -55,12 +55,14 @@ set(CPP_FILES
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
+  Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrow3DTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSubtractContourTool.cpp
+  Interactions/mitkTool.cpp
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp

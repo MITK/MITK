@@ -44,10 +44,8 @@ void mitk::CorrectorAlgorithm::GenerateData()
     itkExceptionMacro("CorrectorAlgorithm needs a Contour object as input.");
   }
 
-   // copy the input (since m_WorkingImage will be changed later)
-  m_WorkingImage = Image::New();
-  m_WorkingImage->Initialize( inputImage );
-  m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
+  // copy the input (since m_WorkingImage will be changed later)
+  m_WorkingImage = inputImage;
 
   TimeSlicedGeometry::Pointer originalGeometry;
 

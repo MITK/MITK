@@ -17,9 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyItemDelegate_h
 #define QmitkPropertyItemDelegate_h
 
+#include <QListView>
 #include <QStyledItemDelegate>
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
+
+class QComboBox;
+class QResizeEvent;
+
+class QmitkComboBoxListView : public QListView
+{
+  Q_OBJECT
+
+public:
+  explicit QmitkComboBoxListView(QComboBox* comboBox = NULL);
+  ~QmitkComboBoxListView();
+
+protected:
+  void paintEvent(QPaintEvent* event);
+  void resizeEvent(QResizeEvent* event);
+  QStyleOptionViewItem viewOptions() const;
+
+private:
+  QComboBox* m_ComboBox;
+};
 
 class QmitkPropertyItemDelegate : public QStyledItemDelegate
 {

@@ -3,7 +3,3 @@ MITK_CREATE_MODULE( Overlays
                     PACKAGE_DEPENDS QT QVTK
                     QT_MODULE
 )
-
-  if(BUILD_TESTING)
-    add_subdirectory(Testing)
-  endif(BUILD_TESTING)

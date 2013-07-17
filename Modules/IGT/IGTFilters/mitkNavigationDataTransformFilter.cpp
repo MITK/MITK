@@ -91,9 +91,6 @@ void mitk::NavigationDataTransformFilter::GenerateData()
 
       TransformType::MatrixType rotMatrixD = m_Transform->GetMatrix();
 
-      //vnl_quaternion<double> vnlQ = vnl_quaternion<double>(rotMatrixD.GetVnlMatrix());
-
-      //m_QuatOrgRigidTransform->SetRotation(vnlQ);
       m_QuatOrgRigidTransform->SetMatrix(rotMatrixD);//SetRotation(vnlQ);
       m_QuatTmpTransform->SetRotation(vnlQuatIn);
       m_QuatTmpTransform->Compose(m_QuatOrgRigidTransform,false);

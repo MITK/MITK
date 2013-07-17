@@ -224,7 +224,6 @@ private:
   mitk::AffineTransform3D::Pointer m_T_ImageReg;
   mitk::AffineTransform3D::Pointer m_T_ImageGeo;
   mitk::Transform::Pointer m_ObjectmarkerNavigationDataLastUpdate;
-  int m_ObjectmarkerThresholdCounter;
 
   bool IsTransformDifferenceHigh(mitk::Transform::Pointer transformA, mitk::Transform::Pointer transformB);
 

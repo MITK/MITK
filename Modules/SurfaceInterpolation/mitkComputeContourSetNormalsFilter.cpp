@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkComputeContourSetNormalsFilter.h"
 
+#include "mitkImagePixelReadAccessor.h"
+
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
 {
@@ -117,6 +119,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       vtkMath::Normalize(vertexNormalTemp);
 
       double vertexNormal[3];
+
       for (unsigned j = 0; j < cellSize-2; j++)
       {
         existingPoints->GetPoint(cell[j+1], p1);
@@ -144,7 +147,10 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           worldCoord[1] = p1[1]+finalNormal[1]*m_MaxSpacing;
           worldCoord[2] = p1[2]+finalNormal[2]*m_MaxSpacing;
 
-          double val = m_SegmentationBinaryImage->GetPixelValueByWorldCoordinate(worldCoord);
+          double val = 0.0;
+          mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
+          val = readAccess.GetPixelByWorldCoordinates(worldCoord);
+
           if (val == 1.0)
           {
               ++m_PositiveNormalCounter;

@@ -25,8 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkBinaryThresholdULToolGUI, "")
 
 QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI()
-:QmitkToolGUI(),
-m_RangeSlider(NULL)
+:QmitkToolGUI()
 {
   // create the visible widgets
   QBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -39,29 +38,9 @@ m_RangeSlider(NULL)
 
   QBoxLayout* layout = new QHBoxLayout();
 
-  m_LowerSpinner = new QSpinBox();
-  m_LowerSpinner->setMinimum(-2048);
-  m_LowerSpinner->setMaximum(0);
-  m_LowerSpinner->setValue(-2048);
-  connect(m_LowerSpinner, SIGNAL(editingFinished()), this, SLOT(OnOneSpinnerChanged()) );
-
-  m_RangeSlider = new QxtSpanSlider(Qt::Horizontal, this );
-  m_RangeSlider->setMaximum(2048);
-  m_RangeSlider->setMinimum(-2048);
-  m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-
-  m_UpperSpinner = new QSpinBox();
-  m_UpperSpinner->setMinimum(0);
-  m_UpperSpinner->setMaximum(2048);
-  m_UpperSpinner->setValue(2048);
-
-  connect(m_UpperSpinner, SIGNAL(editingFinished()), this, SLOT(OnOneSpinnerChanged()) );
-  connect(m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
-
-  layout->addWidget(m_LowerSpinner);
-  layout->addWidget(m_RangeSlider);
-  layout->addWidget(m_UpperSpinner);
-
+  m_DoubleThresholdSlider = new ctkRangeWidget();
+  connect(m_DoubleThresholdSlider, SIGNAL(valuesChanged(double,double)), this, SLOT(OnThresholdsChanged(double,double)));
+  layout->addWidget(m_DoubleThresholdSlider);
   mainLayout->addLayout(layout);
 
   QPushButton* okButton = new QPushButton("Confirm Segmentation", this);
@@ -77,8 +56,8 @@ QmitkBinaryThresholdULToolGUI::~QmitkBinaryThresholdULToolGUI()
   // !!!
   if (m_BinaryThresholdULTool.IsNotNull())
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
   }
 
 }
@@ -87,16 +66,16 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   if (m_BinaryThresholdULTool.IsNotNull())
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
   }
 
   m_BinaryThresholdULTool = dynamic_cast<mitk::BinaryThresholdULTool*>( tool );
 
   if (m_BinaryThresholdULTool.IsNotNull())
   {
-    m_BinaryThresholdULTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdULTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, int, int>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
+    m_BinaryThresholdULTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdULTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>( this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged );
   }
 }
 
@@ -126,44 +105,18 @@ void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
   }
 }
 
-void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(int lower, int upper)
+void QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper)
 {
-  m_RangeSlider->setMaximum(upper);
-  m_RangeSlider->setMinimum(lower);
-  m_LowerSpinner->setMaximum(upper);
-  m_LowerSpinner->setMinimum(lower);
-  m_UpperSpinner->setMaximum(upper);
-  m_UpperSpinner->setMinimum(lower);
+  m_DoubleThresholdSlider->setMinimum(lower);
+  m_DoubleThresholdSlider->setMaximum(upper);
 }
 
-void QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged(int lower, int upper)
+void QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper)
 {
-  m_RangeSlider->setSpan(lower, upper);
-  m_LowerSpinner->setValue(lower);
-  m_UpperSpinner->setValue(upper);
+  m_DoubleThresholdSlider->setValues(lower, upper);
 }
 
-void QmitkBinaryThresholdULToolGUI::OnSpanChanged(int lower, int upper)
+void QmitkBinaryThresholdULToolGUI::OnThresholdsChanged(double min, double max)
 {
-  if (upper < lower)
-  {
-    int tmp = upper;
-    upper = lower;
-    lower = tmp;
-  }
-
-  if (m_BinaryThresholdULTool.IsNotNull())
-  {
-    m_BinaryThresholdULTool->SetThresholdValues(lower, upper);
-  }
-  if (m_LowerSpinner->value() != lower)
-    m_LowerSpinner->setValue(lower);
-  if (m_UpperSpinner->value() != upper)
-    m_UpperSpinner->setValue(upper);
-}
-
-void QmitkBinaryThresholdULToolGUI::OnOneSpinnerChanged()
-{
-  m_RangeSlider->setLowerValue(m_LowerSpinner->value());
-  m_RangeSlider->setUpperValue(m_UpperSpinner->value());
+  m_BinaryThresholdULTool->SetThresholdValues(min, max);
 }

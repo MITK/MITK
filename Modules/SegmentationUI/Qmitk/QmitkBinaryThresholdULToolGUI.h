@@ -20,9 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkBinaryThresholdULTool.h"
-#include <qxtspanslider.h>
+#include "ctkRangeWidget.h"
 
-#include <QSpinBox>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -41,8 +40,8 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
     mitkClassMacro(QmitkBinaryThresholdULToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdULToolGUI);
 
-    void OnThresholdingIntervalBordersChanged(int lower, int upper);
-    void OnThresholdingValuesChanged(int lower, int upper);
+    void OnThresholdingIntervalBordersChanged(mitk::ScalarType lower, mitk::ScalarType upper);
+    void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
   signals:
 
@@ -52,17 +51,15 @@ class SegmentationUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
 
     void OnNewToolAssociated(mitk::Tool*);
 
-    void OnSpanChanged(int lower, int upper);
     void OnAcceptThresholdPreview();
-    void OnOneSpinnerChanged();
+
+    void OnThresholdsChanged(double min, double max);
 
   protected:
     QmitkBinaryThresholdULToolGUI();
     virtual ~QmitkBinaryThresholdULToolGUI();
 
-    QxtSpanSlider *m_RangeSlider;
-    QSpinBox* m_LowerSpinner;
-    QSpinBox* m_UpperSpinner;
+    ctkRangeWidget* m_DoubleThresholdSlider;
 
     mitk::BinaryThresholdULTool::Pointer m_BinaryThresholdULTool;
 };

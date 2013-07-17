@@ -43,8 +43,8 @@ namespace mitk
   {
   public:
 
-    Message2<int,int> IntervalBordersChanged;
-    Message2<int, int>     ThresholdingValuesChanged;
+    Message2<mitk::ScalarType,mitk::ScalarType> IntervalBordersChanged;
+    Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdULTool);
@@ -80,10 +80,10 @@ namespace mitk
     DataNode::Pointer m_OriginalImageNode;
     DataNode::Pointer m_NodeForThresholding;
 
-    int m_SensibleMinimumThresholdValue;
-    int m_SensibleMaximumThresholdValue;
-    int m_CurrentLowerThresholdValue;
-    int m_CurrentUpperThresholdValue;
+    mitk::ScalarType m_SensibleMinimumThresholdValue;
+    mitk::ScalarType m_SensibleMaximumThresholdValue;
+    mitk::ScalarType m_CurrentLowerThresholdValue;
+    mitk::ScalarType m_CurrentUpperThresholdValue;
 
     typedef itk::Image<int, 3> ImageType;
     typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations

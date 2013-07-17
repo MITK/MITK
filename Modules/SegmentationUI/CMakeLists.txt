@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE ( SegmentationUI
 INCLUDE_DIRS Qmitk
-DEPENDS Qmitk Segmentation qxt QmitkExt
+DEPENDS Qmitk Segmentation QmitkExt
 PACKAGE_DEPENDS QT CTK
 QT_MODULE
 )

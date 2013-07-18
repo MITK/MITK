@@ -59,7 +59,7 @@ private slots:
 private:
 
   /** @brief Check if selections is valid. */
-  void SelectionControll( unsigned int index, const mitk::DataNode* selection);
+  void SelectionControl( unsigned int index, const mitk::DataNode* selection);
 
   /** @brief Enable buttons if data selction is valid. */
   void EnableButtons(bool enable = true);

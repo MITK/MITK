@@ -78,11 +78,11 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
   }
   else
   {
-    this->SelectionControll(index, selection);
+    this->SelectionControl(index, selection);
   }
 }
 
-void QmitkImageMaskingWidget::SelectionControll(unsigned int index, const mitk::DataNode* selection)
+void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::DataNode* selection)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);

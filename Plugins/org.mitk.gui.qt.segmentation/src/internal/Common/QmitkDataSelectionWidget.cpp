@@ -36,7 +36,8 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
   {
     case QmitkDataSelectionWidget::ImagePredicate:
       return mitk::NodePredicateAnd::New(
-        mitk::TNodePredicateDataType<mitk::Image>::New(),
+        mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
+                               mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)))),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
 
     case QmitkDataSelectionWidget::SegmentationPredicate:

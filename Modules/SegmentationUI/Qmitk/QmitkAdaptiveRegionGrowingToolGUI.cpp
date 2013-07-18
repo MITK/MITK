@@ -57,9 +57,8 @@ QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSugges
   //Not yet available
   //m_Controls.m_PreviewSlider->InvertedAppearance(true);
 
-  m_NAMEFORSEEDPOINT = "Seed Point";
   this->CreateConnections();
-  this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface","RGSeedpoint");
+  this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface");
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -69,12 +68,10 @@ QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSugges
 QmitkAdaptiveRegionGrowingToolGUI::~QmitkAdaptiveRegionGrowingToolGUI()
 {
     //Removing the observer of the PointSet node
-    mitk::DataNode* node = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-    if (node != NULL)
+    if (m_RegionGrow3DTool->GetPointSetNode().IsNotNull())
     {
-        dynamic_cast<mitk::PointSet*>(node->GetData())->RemoveObserver(m_PointSetAddObserverTag);
+        m_RegionGrow3DTool->GetPointSetNode()->GetData()->RemoveObserver(m_PointSetAddObserverTag);
     }
-
     this->RemoveHelperNodes();
 }
 
@@ -102,12 +99,6 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 
 void QmitkAdaptiveRegionGrowingToolGUI::RemoveHelperNodes()
 {
-  mitk::DataNode::Pointer seedNode = m_DataStorage->GetNamedNode(m_NAMEFORSEEDPOINT);
-  if( seedNode.IsNotNull() )
-  {
-    m_DataStorage->Remove(seedNode);
-  }
-
   mitk::DataNode::Pointer imageNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
   if( imageNode.IsNotNull() )
   {
@@ -126,12 +117,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
     connect( m_Controls.m_ThresholdSlider, SIGNAL(minimumValueChanged(double)), this, SLOT(SetLowerThresholdValue(double)));
 }
 
-void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface, std::string seedPoint)
+void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface)
 {
   m_NAMEFORLABLEDSEGMENTATIONIMAGE = labledSegmentation;
   m_NAMEFORBINARYIMAGE = binaryImage;
   m_NAMEFORSURFACE = surface;
-  m_NAMEFORSEEDPOINT = seedPoint;
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetDataStorage(mitk::DataStorage* dataStorage)

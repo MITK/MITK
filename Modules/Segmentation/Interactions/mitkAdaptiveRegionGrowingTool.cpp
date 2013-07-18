@@ -65,15 +65,19 @@ mitk::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
 
 void mitk::AdaptiveRegionGrowingTool::Activated()
 {
-  GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
+  if (!GetDataStorage()->Exists(m_PointSetNode))
+    GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
 }
 
 void mitk::AdaptiveRegionGrowingTool::Deactivated()
 {
-  mitk::Point3D point = m_PointSet->GetPoint(0);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
-  m_PointSet->ExecuteOperation(doOp);
+  if (m_PointSet->GetPointSet()->GetNumberOfPoints() != 0)
+  {
+    mitk::Point3D point = m_PointSet->GetPoint(0);
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
+    m_PointSet->ExecuteOperation(doOp);
+  }
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
   GetDataStorage()->Remove(m_PointSetNode);
 }

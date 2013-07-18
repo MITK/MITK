@@ -65,7 +65,7 @@ public:
 
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
-  void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface, std::string seedPoint);
+  void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface);
 
   void EnableControls(bool enable);
 
@@ -121,7 +121,6 @@ protected:
 private:
 
   std::string m_NAMEFORORGIMAGE;
-  std::string m_NAMEFORSEEDPOINT;
   std::string m_NAMEFORLABLEDSEGMENTATIONIMAGE;
   std::string m_NAMEFORBINARYIMAGE;
   std::string m_NAMEFORSURFACE;

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkTool_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkStateMachine.h"
 #include "mitkToolEvents.h"
 #include "itkObjectFactoryBase.h"
@@ -73,7 +73,7 @@ namespace mitk
 
   $Author$
   */
-  class MitkExt_EXPORT Tool : public StateMachine
+  class Segmentation_EXPORT Tool : public StateMachine
   {
   public:
 

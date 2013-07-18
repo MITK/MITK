@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkToolManager_h_Included
 
 #include "mitkTool.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
@@ -84,7 +84,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class MitkExt_EXPORT ToolManager : public itk::Object
+class Segmentation_EXPORT ToolManager : public itk::Object
 {
   public:
 

@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPIXELMANIPULATIONTOOL_H
 
 #include "mitkTool.h"
-#include "MitkExtExports.h"
+#include "SegmentationExports.h"
 
 #include "itkImage.h"
 
 namespace mitk
 {
-  class MitkExt_EXPORT PixelManipulationTool : public Tool
+  class Segmentation_EXPORT PixelManipulationTool : public Tool
   {
   public:
     mitkClassMacro(PixelManipulationTool, Tool);

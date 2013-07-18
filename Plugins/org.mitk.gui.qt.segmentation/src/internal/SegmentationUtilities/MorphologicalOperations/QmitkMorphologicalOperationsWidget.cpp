@@ -38,7 +38,13 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
    connect(m_Controls.radioButtonMorphoCross, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()) );
    connect(m_Controls.radioButtonMorphoBall, SIGNAL(clicked()), this, SLOT(OnRadioButtonsClicked()) );
 
-   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)), this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+           this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
+
+   if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull())
+   {
+     this->OnSelectionChanged( 0, m_Controls.dataSelectionWidget->GetSelection(0));
+   }
 }
 
 QmitkMorphologicalOperationsWidget::~QmitkMorphologicalOperationsWidget()

@@ -409,11 +409,11 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEve
 
   if (we->buttons() & Qt::LeftButton)
   {
-    buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
   }
   if (we->buttons() & Qt::RightButton)
   {
-    buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
+    buttonState = buttonState | mitk::InteractionEvent::RightMouseButton;
   }
   if (we->buttons() & Qt::MidButton)
   {

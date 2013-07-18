@@ -384,7 +384,7 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QMouseEve
   return buttonState;
 }
 
-mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QMouseEvent* me) const
+mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QInputEvent* me) const
 {
   mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
 
@@ -420,40 +420,6 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetButtonState(QWheelEve
     buttonState = buttonState | mitk::InteractionEvent::MiddleMouseButton;
   }
   return buttonState;
-}
-
-mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QWheelEvent* we) const
-{
-  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
-
-  if (we->modifiers() & Qt::ALT)
-  {
-    modifiers = modifiers | mitk::InteractionEvent::AltKey;
-  }
-  if (we->modifiers() & Qt::CTRL)
-  {
-    modifiers = modifiers | mitk::InteractionEvent::ControlKey;
-  }
-  if (we->modifiers() & Qt::SHIFT)
-  {
-    modifiers = modifiers | mitk::InteractionEvent::ShiftKey;
-  }
-
-  return modifiers;
-}
-
-mitk::InteractionEvent::ModifierKeys QmitkRenderWindow::GetModifiers(QKeyEvent* ke) const
-{
-  mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
-
-  if (ke->modifiers() & Qt::ShiftModifier)
-    modifiers = modifiers | mitk::InteractionEvent::ShiftKey;
-  if (ke->modifiers() & Qt::CTRL)
-    modifiers = modifiers | mitk::InteractionEvent::ControlKey;
-  if (ke->modifiers() & Qt::ALT)
-    modifiers = modifiers | mitk::InteractionEvent::AltKey;
-
-  return modifiers;
 }
 
 std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const

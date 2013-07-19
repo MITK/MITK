@@ -434,10 +434,14 @@ void mitk::FastMarchingTool::Update()
 void mitk::FastMarchingTool::ClearSeeds()
 {
   // clear seeds for FastMarching as well as the PointSet for visualization
-  this->m_SeedContainer->Initialize();
-  this->m_SeedsAsPointSet->Clear();
+  if(this->m_SeedContainer.IsNotNull())
+    this->m_SeedContainer->Initialize();
 
-  m_FastMarchingFilter->Modified();
+  if(this->m_SeedsAsPointSet.IsNotNull())
+    this->m_SeedsAsPointSet->Clear();
+
+  if(this->m_FastMarchingFilter.IsNotNull())
+    m_FastMarchingFilter->Modified();
 
   this->m_NeedUpdate = true;
 }

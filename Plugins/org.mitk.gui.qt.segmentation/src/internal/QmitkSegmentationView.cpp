@@ -1070,25 +1070,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
-  // available only in the 3M application
-//  if ( !m_Controls->m_OrganToolSelectionBox->children().count() )
-//  {
-//    m_Controls->widgetStack->setItemEnabled( 1, false );
-//  }
-//  m_Controls->m_OrganToolSelectionBox->SetToolManager( *toolManager );
-//  m_Controls->m_OrganToolSelectionBox->SetToolGUIArea( m_Controls->m_OrganToolGUIContainer );
-//  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("'Hippocampus left' 'Hippocampus right' 'Lung left' 'Lung right' 'Liver' 'Heart LV' 'Endocard LV' 'Epicard LV' 'Prostate'");
-//  m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
-
-  // available only in the 3M application
-//  if ( !m_Controls->m_LesionToolSelectionBox->children().count() )
-//  {
-//    m_Controls->widgetStack->setItemEnabled( 2, false );
-//  }
-//  m_Controls->m_LesionToolSelectionBox->SetToolManager( *toolManager );
-//  m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
-//  m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node'");
-//  m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
   toolManager->NewNodesGenerated +=
       mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::NewNodesGenerated );      // update the list of segmentations

@@ -87,7 +87,7 @@ class Segmentation_EXPORT PaintbrushTool : public FeedbackContourTool
     int m_PaintingPixelValue;
     static int m_Size;
 
-    Contour::Pointer m_MasterContour;
+    ContourModel::Pointer m_MasterContour;
 
     int m_LastContourSize;
 

@@ -56,7 +56,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     /**
      * \brief User drawn contour
      */
-    itkSetMacro(Contour, Contour*);
+    void SetContour( ContourModel* contour){this->m_Contour = contour;}
 
     /**
      * \brief Calculated difference image.
@@ -88,7 +88,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     void ItkCalculateDifferenceImage( itk::Image<TPixel, VImageDimension>* originalImage, Image* modifiedMITKImage );
 
     Image::Pointer m_WorkingImage;
-    Contour::ConstPointer m_Contour;
+    ContourModel::Pointer m_Contour;
     Image::Pointer m_DifferenceImage;
 };
 

@@ -192,7 +192,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   if (m_FillContour)
   {
     // copy point from float* to mitk::Contour
-    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
@@ -216,7 +216,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   // always generate a second contour, containing the whole image (used when CTRL is pressed)
   {
     // copy point from float* to mitk::Contour
-    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0.0;
@@ -273,8 +273,8 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
       return false;
   }
 
-  Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-  Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
+  ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return false;
 

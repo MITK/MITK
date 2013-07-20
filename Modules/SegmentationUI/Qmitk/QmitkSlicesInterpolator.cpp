@@ -991,10 +991,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
         m_SurfaceInterpolator->SetCurrentSegmentationInterpolationList(dynamic_cast<mitk::Image*>(workingNode->GetData()));
 
-        if (m_Watcher.isRunning())
-          m_Watcher.waitForFinished();
-        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-        m_Watcher.setFuture(m_Future);
+        if (m_3DInterpolationEnabled)
+        {
+          if (m_Watcher.isRunning())
+            m_Watcher.waitForFinished();
+          m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+          m_Watcher.setFuture(m_Future);
+        }
       }
     }
     else

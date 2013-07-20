@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkDisplayInteractor.h"
+#include "mitkSegTool2D.h"
 // MicroServices
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
@@ -175,7 +176,8 @@ bool mitk::ToolManager::ActivateTool(int id)
         m_ActiveTool->Activated();
         GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         //If a tool is activated set event notification policy to one
-        GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
+        if (dynamic_cast<mitk::SegTool2D*>(m_ActiveTool))
+          GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
       }
     }
   }

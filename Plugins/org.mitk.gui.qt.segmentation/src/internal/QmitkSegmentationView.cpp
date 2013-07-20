@@ -1070,6 +1070,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 
+  //Hide 3D selection box, show 2D selection box
+  m_Controls->m_ManualToolSelectionBox3D->hide();
+  m_Controls->m_ManualToolSelectionBox2D->show();
 
   toolManager->NewNodesGenerated +=
       mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::NewNodesGenerated );      // update the list of segmentations

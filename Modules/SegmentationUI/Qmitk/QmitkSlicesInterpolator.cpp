@@ -241,7 +241,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, const Q
 
 void QmitkSlicesInterpolator::Uninitialize()
 {
-  if (m_ToolManager)
+  if (m_ToolManager.IsNotNull())
   {
     m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified);
     m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);

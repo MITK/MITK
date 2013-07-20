@@ -58,7 +58,7 @@ m_IsFloatImage(false)
   m_ThresholdFeedbackNode = DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
 
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
+  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   m_ThresholdFeedbackNode->SetProperty( "layer", IntProperty::New( 100 ) );
   m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );

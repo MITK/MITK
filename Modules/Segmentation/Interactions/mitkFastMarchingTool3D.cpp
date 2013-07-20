@@ -273,7 +273,7 @@ void mitk::FastMarchingTool3D::ConfirmSegmentation()
     orFilter->Update();
 
     //set image volume in current time step from itk image
-    workingImage->SetVolume( (void*)(orFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), m_CurrentTimeStep);
+    workingImage->SetVolume( (void*)(m_ThresholdFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), m_CurrentTimeStep);
     this->m_ResultImageNode->SetVisibility(false);
     this->ClearSeeds();
     workingImage->Modified();

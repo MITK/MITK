@@ -30,7 +30,7 @@ namespace mitk {
 mitk::EraseRegionTool::EraseRegionTool()
 :SetRegionTool(0)
 {
-  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  FeedbackContourTool::SetFeedbackContourColor( 1.0, 1.0, 0.0 );
 }
 
 mitk::EraseRegionTool::~EraseRegionTool()

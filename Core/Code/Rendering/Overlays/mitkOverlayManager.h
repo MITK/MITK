@@ -34,7 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /** \brief Microservice to update and manage Overlays and the respective Layouters. */
-/** This microservice can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
+/** This microservice can be registered to several BaseRenderer instances in order to
+ * call the update method of each Overlay during the rendering phase of the renderer.
 */
 class MITK_CORE_EXPORT OverlayManager : public itk::LightObject {
 public:
@@ -48,17 +49,23 @@ public:
 
   void AddOverlay(Overlay* overlay);
   void RemoveOverlay(Overlay* overlay);
+
+  /** \brief Clears the manager of all Overlays.*/
   void RemoveAllOverlays();
   void UnregisterMicroservice();
   static const std::string PROP_ID;
+  /** \brief Adds the overlay to the layouter specified by identifier and renderer*/
   void SetLayouter(Overlay* overlay, const char* identifier, BaseRenderer* renderer);
   void UpdateLayouts(BaseRenderer* renderer);
+  /** \brief Returns the Layouter specified by renderer and the identifier*/
   BaseLayouter::Pointer GetLayouter(BaseRenderer* renderer, const std::string identifier);
+  /** \brief Add a layouter to provide it with the use of the SetLayouter method*/
   void AddLayouter(BaseLayouter* layouter);
   static OverlayManager::Pointer GetServiceInstance(std::string ID = "0");
   std::string GetID();
 
   void AddBaseRenderer(BaseRenderer* renderer);
+  /** \brief The layout of each Overlay will be prepared and the properties of each Overlay is updated.*/
   void UpdateOverlays(BaseRenderer *baseRenderer);
 
 protected:

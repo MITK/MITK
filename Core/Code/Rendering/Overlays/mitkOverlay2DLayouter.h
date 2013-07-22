@@ -23,17 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+/** @brief A simple implementation of a layouter for 2D Overlays
+ *
+ *  @ingroup Overlays
+ */
 class MITK_CORE_EXPORT Overlay2DLayouter : public mitk::BaseLayouter {
 public:
-  enum Alignment{TopLeft, Top, TopRight, /*Left, Middle, Right, */BottomLeft, Bottom, BottomRight};
+  enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::BaseLayouter);
   itkNewMacro(Overlay2DLayouter);
   static const char* STANDARD_2D_TOPLEFT;
   static const char* STANDARD_2D_TOP;
   static const char* STANDARD_2D_TOPRIGHT;
-//  static const char* STANDARD_2D_LEFT;
-//  static const char* STANDARD_2D_MIDDLE;
-//  static const char* STANDARD_2D_RIGHT;
   static const char* STANDARD_2D_BOTTOMLEFT;
   static const char* STANDARD_2D_BOTTOM;
   static const char* STANDARD_2D_BOTTOMRIGHT;
@@ -53,15 +54,6 @@ public:
     case TopRight:
       identifier = STANDARD_2D_TOPRIGHT;
       break;
-//    case Left:
-//      identifier = STANDARD_2D_LEFT;
-//      break;
-//    case Middle:
-//      identifier = STANDARD_2D_MIDDLE;
-//      break;
-//    case Right:
-//      identifier = STANDARD_2D_RIGHT;
-//      break;
     case BottomLeft:
       identifier = STANDARD_2D_BOTTOMLEFT;
       break;
@@ -96,12 +88,6 @@ public:
       alignment = Top;
     else if(identifier.compare(STANDARD_2D_TOPRIGHT) == 0)
       alignment = TopRight;
-//    else if(identifier.compare(STANDARD_2D_LEFT) == 0)
-//      alignment = Left;
-//    else if(identifier.compare(STANDARD_2D_MIDDLE) == 0)
-//      alignment = Middle;
-//    else if(identifier.compare(STANDARD_2D_RIGHT) == 0)
-//      alignment = Right;
     else if(identifier.compare(STANDARD_2D_BOTTOMLEFT) == 0)
       alignment = BottomLeft;
     else if(identifier.compare(STANDARD_2D_BOTTOM) == 0)

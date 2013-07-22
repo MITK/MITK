@@ -27,6 +27,7 @@
 
 namespace mitk {
 
+/** \brief Displays at 3D position, always facing the camera */
 class MITK_CORE_EXPORT TextOverlay3D : public mitk::VtkOverlay3D {
 public:
 

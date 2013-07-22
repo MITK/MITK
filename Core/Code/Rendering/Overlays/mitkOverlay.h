@@ -87,7 +87,7 @@ public:
   //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
   //##
   //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent
-  //## PropertyList of this DataNode.
+  //## PropertyList of this Overlay.
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -112,7 +112,7 @@ public:
 
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
-  //## NULL, the BaseRenderer-independent PropertyList of this DataNode
+  //## NULL, the BaseRenderer-independent PropertyList of this Overlay
   //## is returned.
   //## @sa GetProperty
   //## @sa m_PropertyList
@@ -139,7 +139,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataNode is queried.
+  //## PropertyList of this Overlay is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -151,7 +151,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataNode is queried.
+  //## PropertyList of this Overlay is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -168,7 +168,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataNode is queried.
+  //## PropertyList of this Overlay is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists

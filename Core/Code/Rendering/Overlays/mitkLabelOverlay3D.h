@@ -33,7 +33,7 @@
 
 namespace mitk {
 
-/** \brief Displays a high amount of 3D labels to a PointSet */
+/** \brief Can display a high amount of 3D labels to a PointSet */
 /** */
 class MITK_CORE_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
@@ -87,8 +87,13 @@ protected:
 
 private:
 
+  /** \brief The char arrays in this vector are displayed at the corresponding coordinates.*/
   std::vector<const char*> m_LabelVector;
+
+  /** \brief values in this array set a priority to each label. Higher priority labels are not covert by labels with lower priority.*/
   std::vector<int> m_PriorityVector;
+
+  /** \brief The coordinates of the labels. Indices must match the labelVector and the priorityVector.*/
   mitk::PointSet::Pointer m_LabelCoordinates;
 
   /** \brief copy constructor */

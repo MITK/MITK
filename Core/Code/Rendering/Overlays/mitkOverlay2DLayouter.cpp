@@ -19,9 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 const char* mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT = "STANDARD_2D_TOPLEFT";
 const char* mitk::Overlay2DLayouter::STANDARD_2D_TOP = "STANDARD_2D_TOP";
 const char* mitk::Overlay2DLayouter::STANDARD_2D_TOPRIGHT = "STANDARD_2D_TOPRIGHT";
-//const char* mitk::Overlay2DLayouter::STANDARD_2D_LEFT = "STANDARD_2D_LEFT";
-//const char* mitk::Overlay2DLayouter::STANDARD_2D_MIDDLE = "STANDARD_2D_MIDDLE";
-//const char* mitk::Overlay2DLayouter::STANDARD_2D_RIGHT = "STANDARD_2D_RIGHT";
 const char* mitk::Overlay2DLayouter::STANDARD_2D_BOTTOMLEFT = "STANDARD_2D_BOTTOMLEFT";
 const char* mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM = "STANDARD_2D_BOTTOM";
 const char* mitk::Overlay2DLayouter::STANDARD_2D_BOTTOMRIGHT = "STANDARD_2D_BOTTOMRIGHT";
@@ -88,36 +85,6 @@ void mitk::Overlay2DLayouter::PrepareLayout()
       overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
       posY -= m_Margin;
     }
-    break;
-/*  case Left:
-    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
-    {
-      mitk::Overlay* overlay = *it;
-      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
-//      bounds.Position[0] = i++;
-//      bounds.Position[1] = i++;
-      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
-    }
-    break;
-  case Middle:
-    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
-    {
-      mitk::Overlay* overlay = *it;
-      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
-//      bounds.Position[0] = i++;
-//      bounds.Position[1] = i++;
-      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
-    }
-    break;
-  case Right:
-    for ( it=managedOverlays.begin() ; it != managedOverlays.end(); it++ )
-    {
-      mitk::Overlay* overlay = *it;
-      bounds = overlay->GetBoundsOnDisplay(this->GetBaseRenderer());
-//      bounds.Position[0] = i++;
-//      bounds.Position[1] = i++;
-      overlay->SetBoundsOnDisplay(this->GetBaseRenderer(), bounds);
-    }*/
     break;
   case BottomLeft:
     posX = m_Margin;

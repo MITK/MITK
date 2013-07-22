@@ -39,8 +39,8 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
-  m_FeedbackContourNode->SetProperty("project", BoolProperty::New(true));
-  m_FeedbackContourNode->SetProperty("Width", FloatProperty::New(1)); // uppercase! Slim line looks very accurate :-)
+  m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(false));
+  m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(1.0));
 
   this->Disable3dRendering();
 
@@ -53,7 +53,7 @@ mitk::FeedbackContourTool::~FeedbackContourTool()
 
 void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float b )
 {
-  m_FeedbackContourNode->SetProperty("color", ColorProperty::New(r, g, b));
+  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(r, g, b));
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()

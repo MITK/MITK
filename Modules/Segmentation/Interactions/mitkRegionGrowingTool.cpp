@@ -242,11 +242,11 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
-        newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ];
-        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
+        newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ] - 0.5;//correction is needed because the output of the algorithm is center based
+        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ] - 0.5;//and we want our contour displayed corner based.
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint - mitk::Point3D::VectorType(0.5) );
+        contourInImageIndexCoordinates->AddVertex( newPoint );
       }
 
       free(cutContour.traceline);
@@ -526,11 +526,11 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
-      newPoint[0] = contourPoints[ 2 * index + 0 ];
-      newPoint[1] = contourPoints[ 2 * index + 1 ];
+      newPoint[0] = contourPoints[ 2 * index + 0 ] - 0.5;//correction is needed because the output of the algorithm is center based
+      newPoint[1] = contourPoints[ 2 * index + 1 ] - 0.5;//and we want our contour displayed corner based.
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint - mitk::Point3D::VectorType(0.5));
+      contourInImageIndexCoordinates->AddVertex( newPoint );
     }
 
     free(contourPoints);

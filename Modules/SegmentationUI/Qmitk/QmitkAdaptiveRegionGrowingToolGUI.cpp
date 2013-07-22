@@ -424,7 +424,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   // set some properties
   newNode->SetProperty("name", mitk::StringProperty::New(m_NAMEFORLABLEDSEGMENTATIONIMAGE));
   newNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+  newNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.7));
 
@@ -654,6 +654,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     }
 
     //Fill current preiview image in segmentation image
+    originalSegmentationInITK->FillBuffer(0);
     itk::ImageRegionIterator<SegmentationType> itOutput( originalSegmentationInITK, originalSegmentationInITK->GetLargestPossibleRegion() );
     itk::ImageRegionIterator<InputImageType> itInput( itkImage, itkImage->GetLargestPossibleRegion() );
     itOutput.GoToBegin();

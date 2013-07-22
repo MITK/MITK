@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
+    <width>238</width>
     <height>80</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
      <item>
       <widget class="QPushButton" name="m_btnNewSegmentation">
        <property name="text">
-        <string>Create New Segmentation</string>
+        <string>New...</string>
        </property>
       </widget>
      </item>

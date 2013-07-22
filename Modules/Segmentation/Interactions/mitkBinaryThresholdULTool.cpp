@@ -53,7 +53,7 @@ mitk::BinaryThresholdULTool::BinaryThresholdULTool()
   this->SupportRoiOn();
 
   m_ThresholdFeedbackNode = DataNode::New();
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
+  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
   m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
   m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 #include "mitkSurfaceInterpolationController.h"
+#include "mitkToolManager.h"
 
 #include <QWidget>
 #include <map>
@@ -46,7 +47,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class ToolManager;
   class PlaneGeometry;
   class SliceNavigationController;
 }
@@ -232,7 +232,7 @@ private:
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
-    mitk::ToolManager* m_ToolManager;
+    mitk::ToolManager::Pointer m_ToolManager;
     bool m_Initialized;
 
     QHash<mitk::SliceNavigationController*, int> m_ControllerToTimeObserverTag;

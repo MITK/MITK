@@ -35,7 +35,7 @@ void QmitkApplicationCursor::PushCursor(const mitk::ModuleResource resource, int
 {
   if (resource.IsValid())
   {
-    mitk::ModuleResourceStream resourceStream(resource);
+    mitk::ModuleResourceStream resourceStream(resource, std::ios::binary);
     resourceStream.seekg(0, std::ios::end);
     std::ios::pos_type length = resourceStream.tellg();
     resourceStream.seekg(0, std::ios::beg);

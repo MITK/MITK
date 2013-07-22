@@ -164,6 +164,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[0] + 0.5 );
     _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[1] + 0.5 );
     ++index;
+    iter++;
   }
 
   // store ofsets of the drawn line in array

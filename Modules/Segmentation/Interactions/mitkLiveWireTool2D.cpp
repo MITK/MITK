@@ -187,18 +187,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(it->second, workingImage, currentTimestep);
 
-          /*++++++++++++++++++++++ transfer to plain old contour to use contour util functionality +++++++++++++++++++++++*/
-          mitk::Contour::Pointer plainOldContour = mitk::Contour::New();
-          mitk::ContourModel::VertexIterator iter = contourModel->IteratorBegin(currentTimestep);
-          while(iter != contourModel->IteratorEnd(currentTimestep) )
-          {
-            plainOldContour->AddVertex( (*iter)->Coordinates );
-            iter++;
-          }
-          /*-------------------------------------------------------------------------------*/
-
-
-          mitk::Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, plainOldContour, true, false);
+          mitk::ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
           contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
 
           //write back to image volume

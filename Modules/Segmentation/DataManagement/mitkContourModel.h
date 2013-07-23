@@ -207,7 +207,22 @@ namespace mitk
     /** \brief Returns a const VertexIterator at the start element of the contour.
     @throw mitk::Exception if the timestep is invalid.
     */
+    VertexIterator Begin( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the start element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
     VertexIterator IteratorBegin( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator End( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator IteratorEnd( int timestep=0);
 
     /** \brief Close the contour.
     The last control point will be linked with the first point.
@@ -225,11 +240,6 @@ namespace mitk
     true - The last control point will be linked with the first point.
     */
     virtual void SetIsClosed(bool isClosed, int timestep=0);
-
-    /** \brief Returns a const VertexIterator at the end element of the contour.
-    @throw mitk::Exception if the timestep is invalid.
-    */
-    VertexIterator IteratorEnd( int timestep=0);
 
     /** \brief Returns the number of vertices at a given timestep.
 
@@ -300,6 +310,10 @@ namespace mitk
     timestep.
     */
     virtual void Clear(int timestep);
+
+    /** \brief Initialize all data objects
+    */
+    virtual void Initialize();
 
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/

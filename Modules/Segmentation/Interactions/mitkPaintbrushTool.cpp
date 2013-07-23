@@ -40,7 +40,7 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
   CONNECT_ACTION( 49014, OnInvertLogic );
 
 
-  m_MasterContour = Contour::New();
+  m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
   m_CurrentPlane = NULL;
 
@@ -99,7 +99,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   int radius = (m_Size)/2;
   float fradius = static_cast<float>(m_Size) / 2.0f;
 
-  Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+  ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
   contourInImageIndexCoordinates->Initialize();
 
   // estimate center point of the brush ( relative to the pixel the mouse points on )
@@ -346,16 +346,21 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
-  Contour::Pointer contour = Contour::New();
+  ContourModel::Pointer contour = ContourModel::New();
   contour->Initialize();
+  contour->SetIsClosed(true);
 
-  for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
+  ContourModel::VertexIterator it = m_MasterContour->Begin();
+  ContourModel::VertexIterator end = m_MasterContour->End();
+
+  while(it != end)
   {
-    Point3D point = m_MasterContour->GetPoints()->ElementAt(index);
+    Point3D point = (*it)->Coordinates;
     point[0] += indexCoordinates[ 0 ];
     point[1] += indexCoordinates[ 1 ];
 
     contour->AddVertex( point );
+    it++;
   }
 
 
@@ -367,7 +372,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   }
 
   // visualize contour
-  Contour::Pointer displayContour = Contour::New();
+  ContourModel::Pointer displayContour = ContourModel::New();
   displayContour->Initialize();
 
   //for (unsigned int index = 0; index < contour->GetNumberOfPoints(); ++index)

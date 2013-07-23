@@ -65,8 +65,10 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
+  contour->SetIsClosed(true);
   contour->Initialize();
+  contour->SetIsClosed(true);
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -86,7 +88,7 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -127,8 +129,8 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
       return false;
     }
 
-    Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-    Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
+    ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
+    ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
 
     if (projectedContour.IsNull()) return false;
 

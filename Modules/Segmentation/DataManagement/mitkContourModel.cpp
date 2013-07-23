@@ -201,6 +201,13 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep)
 
 
 
+mitk::ContourModel::VertexIterator mitk::ContourModel::Begin( int timestep)
+{
+  return this->IteratorBegin(timestep);
+}
+
+
+
 mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
@@ -211,6 +218,13 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timest
   {
     mitkThrow() << "No iterator at invalid timestep " << timestep << ". There are only " << this->GetTimeSteps() << " timesteps available.";
   }
+}
+
+
+
+mitk::ContourModel::VertexIterator mitk::ContourModel::End( int timestep)
+{
+  return this->IteratorEnd(timestep);
 }
 
 
@@ -445,6 +459,13 @@ void mitk::ContourModel::ClearData()
 
   //clear out the time resolved contours
   this->m_ContourSeries.clear();
+}
+
+
+
+void mitk::ContourModel::Initialize()
+{
+  this->InitializeEmpty();
 }
 
 

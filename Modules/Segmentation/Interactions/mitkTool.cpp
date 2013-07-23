@@ -140,14 +140,32 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   }
 
   unsigned int byteSize = sizeof(DefaultSegmentationDataType);
-  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim)
+
+  if(segmentation->GetDimension() < 4)
   {
-    byteSize *= segmentation->GetDimension(dim);
+    for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim)
+    {
+      byteSize *= segmentation->GetDimension(dim);
+    }
+
+    mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(0));
+
+    memset( writeAccess.GetData(), 0, byteSize );
   }
+  else
+  {//if we have a time-resolved image we need to set memory to 0 for each time step
+    for (unsigned int dim = 0; dim < 3; ++dim)
+    {
+      byteSize *= segmentation->GetDimension(dim);
+    }
 
-  mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(0));
+    for( unsigned int volumeNumber = 0; volumeNumber < segmentation->GetDimension(3); volumeNumber++)
+    {
+      mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(volumeNumber));
 
-  memset( writeAccess.GetData(), 0, byteSize );
+      memset( writeAccess.GetData(), 0, byteSize );
+    }
+  }
 
   if (original->GetTimeSlicedGeometry() )
   {

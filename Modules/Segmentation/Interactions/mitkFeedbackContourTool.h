@@ -35,7 +35,7 @@ namespace mitk
   \brief Base class for tools that use a contour for feedback
 
   \sa Tool
-  \sa Contour
+  \sa ContourModel
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl

@@ -64,12 +64,17 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
 
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->SetIsClosed(true);
+  //Clear feedback contour
   contour->Initialize();
-  contour->SetIsClosed(true);
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  //expand time bounds because our contour was initialized
+  contour->Expand( timestep + 1 );
+  //draw as a closed contour
+  contour->SetIsClosed(true,timestep);
+  //add first mouse position
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -88,8 +93,10 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );

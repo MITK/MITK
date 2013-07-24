@@ -163,7 +163,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
 
   // convert the projected contour into a ipSegmentation format
-  mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices()];
+  mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices(timeStep)];
   unsigned int index(0);
   ContourModel::VertexIterator iter = projectedContour->Begin(timeStep);
   ContourModel::VertexIterator end = projectedContour->End(timeStep);
@@ -186,7 +186,7 @@ void mitk::ContourUtils::FillContourInSlice( ContourModel* projectedContour, uns
   assert( originalPicSlice && picSlice );
 
   // here comes the actual contour filling algorithm (from ipSegmentation/Graphics Gems)
-  ipMITKSegmentationCombineRegion ( picSlice, picContour, projectedContour->GetNumberOfVertices(), NULL, IPSEGMENTATION_OR,  1); // set to 1
+  ipMITKSegmentationCombineRegion ( picSlice, picContour, projectedContour->GetNumberOfVertices(timeStep), NULL, IPSEGMENTATION_OR,  1); // set to 1
 
   delete[] picContour;
 

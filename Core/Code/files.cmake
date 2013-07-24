@@ -246,6 +246,7 @@ set(CPP_FILES
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp
   Interactions/mitkStateMachineAction.cpp
+  Interactions/mitkStateMachineCondition.cpp
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp

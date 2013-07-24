@@ -18,6 +18,7 @@
 #include "mitkStateMachineContainer.h"
 #include "mitkInteractionEvent.h"
 #include "mitkStateMachineAction.h"
+#include "mitkStateMachineCondition.h"
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineState.h"
 // us
@@ -42,6 +43,14 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string& filename, cons
   if (m_StateMachineContainer->LoadBehavior(filename, module))
   {
     m_CurrentState = m_StateMachineContainer->GetStartState();
+
+    for(ConditionDelegatesMapType::iterator i = m_ConditionDelegatesMap.begin();
+        i != m_ConditionDelegatesMap.end(); ++i)
+    {
+      delete i->second;
+    }
+    m_ConditionDelegatesMap.clear();
+
 
     // clear actions map ,and connect all actions as declared in sub-class
     for(std::map<std::string, TActionFunctor*>::iterator i = m_ActionFunctionsMap.begin();
@@ -103,6 +112,12 @@ void mitk::EventStateMachine::AddActionFunction(const std::string& action, const
   m_ActionDelegatesMap[action] = delegate.Clone();
 }
 
+
+void mitk::EventStateMachine::AddConditionFunction(const std::string& condition, const ConditionFunctionDelegate& delegate)
+{
+  m_ConditionDelegatesMap[condition] = delegate.Clone();
+}
+
 bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dataNode)
 {
   if (!FilterEvents(event, dataNode))
@@ -110,35 +125,75 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     return false;
   }
   // check if the current state holds a transition that works with the given event.
-  StateMachineTransition::Pointer transition = m_CurrentState->GetTransition(event->GetNameOfClass(), MapToEventVariant(event));
+  mitk::StateMachineState::TransitionVector transitionList = m_CurrentState->GetTransitionList(event->GetNameOfClass(), MapToEventVariant(event));
 
-  if (transition.IsNotNull())
+  if ( !transitionList.empty() )
   {
-    // iterate over all actions in this transition and execute them
-    ActionVectorType actions = transition->GetActions();
-    bool success = false;
-    for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
+    StateMachineState::TransitionVector::iterator transitionIter;
+    for( transitionIter=transitionList.begin(); transitionIter!=transitionList.end(); transitionIter++ )
     {
+      bool conditionMet(true);
+      ConditionVectorType conditions = (*transitionIter)->GetConditions();
+      for (ConditionVectorType::iterator it = conditions.begin(); it != conditions.end(); ++it)
+      {
+        // sequentially check all conditions
+        if ( CheckCondition( *it, event ) == (*it)->IsInverted() )
+        {
+          // if a condition is not fulfilled we can stop here
+          conditionMet = false;
+          break;
+        }
+      }
 
-      success |= ExecuteAction(*it, event); // treat an event as handled if at least one of the actions is executed successfully
+      // if a condition was not fulfilled we continue with the next transition
+      if ( !conditionMet )
+        continue;
+
+      // all conditions are fulfilled so we can continue with the actions
+      m_CurrentState = (*transitionIter)->GetNextState();
+
+      // iterate over all actions in this transition and execute them
+      ActionVectorType actions = (*transitionIter)->GetActions();
+      for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
+      {
+       ExecuteAction(*it, event);
+      }
+
+      return true;
     }
-    if (success || actions.empty())  // an empty action list is always successful
-    {
-      // perform state change
-      m_CurrentState = transition->GetNextState();
-      //MITK_INFO<< "StateChange: " << m_CurrentState->GetName();
-    }
-    return success;
   }
   else
   {
     return false; // no transition found that matches event
   }
+
+  return false;
 }
 
 void mitk::EventStateMachine::ConnectActionsAndFunctions()
 {
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
+}
+
+bool mitk::EventStateMachine::CheckCondition(StateMachineCondition* condition, InteractionEvent* event)
+{
+  if (condition == NULL)
+  {
+    return false;
+  }
+
+  bool retVal = false;
+  ConditionDelegatesMapType::iterator delegateIter = m_ConditionDelegatesMap.find(condition->GetConditionName());
+  if (delegateIter != m_ConditionDelegatesMap.end())
+  {
+    retVal = delegateIter->second->Execute(event);
+  }
+  else
+  {
+    MITK_WARN << "No implementation of condition '" << condition->GetConditionName() << "' has been found.";
+  }
+
+  return retVal;
 }
 
 bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, InteractionEvent* event)
@@ -164,6 +219,11 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
     {
       retVal = functionIter->second->DoAction(action, event);
     }
+    else
+    {
+      MITK_WARN << "No implementation of action '" << action->GetActionName() << "' has been found.";
+    }
+
   }
   return retVal;
 }

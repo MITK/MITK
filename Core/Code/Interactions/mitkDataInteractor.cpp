@@ -15,8 +15,6 @@
  ===================================================================*/
 
 #include "mitkDataInteractor.h"
-#include "mitkInteractor.h"
-#include "mitkPointSet.h"
 #include "mitkDataNode.h"
 #include "mitkStateMachineState.h"
 

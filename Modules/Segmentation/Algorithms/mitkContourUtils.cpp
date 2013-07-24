@@ -45,6 +45,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* s
   while(it!=end)
   {
     contour->AddVertex(it.Value());
+    it++;
   }
   return this->ProjectContourTo2DSlice(slice, contour, false/*not used*/, constrainToInside );
 }
@@ -98,6 +99,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(co
   while(it!=end)
   {
     contour->AddVertex(it.Value());
+    it++;
   }
   return this->BackProjectContourFrom2DSlice(sliceGeometry, contour, false/*not used*/);
 }
@@ -146,6 +148,7 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   while(it!=end)
   {
     contour->AddVertex(it.Value());
+    it++;
   }
   this->FillContourInSlice(contour, sliceImage, paintingPixelValue);
 }

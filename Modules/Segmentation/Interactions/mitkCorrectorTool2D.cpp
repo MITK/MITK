@@ -95,7 +95,7 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
   contour->Clear();
-  contour->Expand(timestep);
+  contour->Expand(timestep + 1);
   contour->SetIsClosed(false, timestep);
   contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
@@ -150,14 +150,16 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
       return false;
   }
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
   mitk::ContourModel::Pointer singleTimestepContour = mitk::ContourModel::New();
 
-  mitk::ContourModel::VertexIterator it = FeedbackContourTool::GetFeedbackContour()->Begin();
-  mitk::ContourModel::VertexIterator end = FeedbackContourTool::GetFeedbackContour()->End();
+  mitk::ContourModel::VertexIterator it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
+  mitk::ContourModel::VertexIterator end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
 
   while(it!=end)
   {
     singleTimestepContour->AddVertex((*it)->Coordinates);
+    it++;
   }
 
   CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();

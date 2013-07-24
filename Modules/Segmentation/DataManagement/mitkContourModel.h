@@ -315,6 +315,11 @@ namespace mitk
     */
     virtual void Initialize();
 
+    /** \brief Initialize object with specs of other contour.
+    Note: No data will be copied.
+    */
+    void Initialize(mitk::ContourModel &other);
+
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     /**

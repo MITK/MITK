@@ -81,7 +81,7 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
 
-    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour();
+    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;

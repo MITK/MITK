@@ -466,6 +466,25 @@ void mitk::ContourModel::ClearData()
 void mitk::ContourModel::Initialize()
 {
   this->InitializeEmpty();
+  this->Modified();
+}
+
+
+
+void mitk::ContourModel::Initialize(mitk::ContourModel &other)
+{
+  unsigned int numberOfTimesteps = other.GetTimeSlicedGeometry()->GetTimeSteps();
+  this->InitializeTimeSlicedGeometry(numberOfTimesteps);
+
+  for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
+  {
+    this->m_ContourSeries.push_back(mitk::ContourElement::New());
+    this->SetIsClosed(other.IsClosed(currentTimestep),currentTimestep);
+  }
+
+  m_SelectedVertex = NULL;
+  this->m_lineInterpolation = other.m_lineInterpolation;
+  this->Modified();
 }
 
 

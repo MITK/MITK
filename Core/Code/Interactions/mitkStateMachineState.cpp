@@ -43,16 +43,17 @@ bool mitk::StateMachineState::AddTransition(StateMachineTransition::Pointer tran
   return true;
 }
 
-mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(const std::string& eventClass,
+mitk::StateMachineState::TransitionVector mitk::StateMachineState::GetTransitionList(const std::string& eventClass,
                                                                              const std::string& eventVariant)
 {
+  TransitionVector transitions;
   mitk::StateMachineTransition::Pointer t = mitk::StateMachineTransition::New("", eventClass, eventVariant);
   for (TransitionVector::iterator it = m_Transitions.begin(); it != m_Transitions.end(); ++it)
   {
     if (**it == *t) // do not switch it and t, order matters, see  mitk::StateMachineTransition == operator
-      return *it;
+      transitions.push_back( *it );
   }
-  return NULL;
+  return transitions;
 }
 
 std::string mitk::StateMachineState::GetName() const

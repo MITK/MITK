@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <string>
 #include <itkLightObject.h>
-#include <itkObjectFactory.h>
 #include "mitkStateMachineTransition.h"
 
 namespace mitk {
@@ -45,9 +44,9 @@ namespace mitk {
     bool AddTransition( StateMachineTransition::Pointer transition );
 
     /**
-    * @brief Return Transition which matches given event description.
+    * @brief Return Transitions that match given event description.
     **/
-    StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant);
+    TransitionVector GetTransitionList(const std::string& eventClass,const std::string& eventVariant);
 
     /**
     * @brief Returns the name.

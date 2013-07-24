@@ -74,9 +74,14 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
     void FillContourInSlice( Contour* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
 
     /**
-    \brief Fill a contour in a 2D slice with a specified pixel value.
+    \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
     */
     void FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
+
+    /**
+    \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
+    */
+    void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
 protected:
 

@@ -112,7 +112,12 @@ mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DS
 
 void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue )
 {
-  m_ContourUtils->FillContourInSlice(projectedContour, sliceImage, paintingPixelValue);
+  this->FillContourInSlice(projectedContour, 0, sliceImage, paintingPixelValue);
+}
+
+void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
+{
+  m_ContourUtils->FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
 }
 
 void mitk::FeedbackContourTool::Disable3dRendering()

@@ -141,7 +141,9 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
     if (projectedContour.IsNull()) return false;
 
-    FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+    int timestep = positionEvent->GetSender()->GetTimeStep();
+
+    FeedbackContourTool::FillContourInSlice( projectedContour, timestep, slice, m_PaintingPixelValue );
 
     this->WriteBackSegmentationResult(positionEvent, slice);
 

@@ -99,10 +99,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   int radius = (m_Size)/2;
   float fradius = static_cast<float>(m_Size) / 2.0f;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-  contourInImageIndexCoordinates->Expand(timestep + 1);
-  contourInImageIndexCoordinates->SetIsClosed(true, timestep);
 
 
   // estimate center point of the brush ( relative to the pixel the mouse points on )
@@ -244,7 +241,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleUpperRight[i][0];
      tempPoint[1] = quarterCycleUpperRight[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint, timestep );
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
   // the lower right has to be parsed in reverse order
   for (int i=quarterCycleLowerRight.size()-1; i>=0; i--)
@@ -252,14 +249,14 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleLowerRight[i][0];
      tempPoint[1] = quarterCycleLowerRight[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint, timestep );
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
   for (unsigned int i=0; i<quarterCycleLowerLeft.size(); i++)
   {
      tempPoint[0] = quarterCycleLowerLeft[i][0];
      tempPoint[1] = quarterCycleLowerLeft[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint, timestep );
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
   // the upper left also has to be parsed in reverse order
   for (int i=quarterCycleUpperLeft.size()-1; i>=0; i--)
@@ -267,7 +264,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
      tempPoint[0] = quarterCycleUpperLeft[i][0];
      tempPoint[1] = quarterCycleUpperLeft[i][1];
      tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint, timestep );
+     contourInImageIndexCoordinates->AddVertex( tempPoint );
   }
 
   m_MasterContour = contourInImageIndexCoordinates;
@@ -286,9 +283,7 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  m_MasterContour->Expand(timestep + 1);
-  m_MasterContour->SetIsClosed(true, timestep);
+  m_MasterContour->SetIsClosed(true);
 
   return this->OnMouseMoved(action, stateEvent);
 }
@@ -359,8 +354,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   contour->Expand(timestep + 1);
   contour->SetIsClosed(true, timestep);
 
-  ContourModel::VertexIterator it = m_MasterContour->Begin(timestep);
-  ContourModel::VertexIterator end = m_MasterContour->End(timestep);
+  ContourModel::VertexIterator it = m_MasterContour->Begin();
+  ContourModel::VertexIterator end = m_MasterContour->End();
 
   while(it != end)
   {

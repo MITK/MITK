@@ -20,26 +20,31 @@
 #include <MitkExports.h>
 #include "mitkCommon.h"
 #include <itkLightObject.h>
-#include <itkObjectFactory.h>
 #include <string>
 #include "mitkStateMachineAction.h"
+#include "mitkStateMachineCondition.h"
 #include "mitkInteractionEvent.h"
 
 namespace mitk
 {
   class StateMachineState;
 
-    typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
-    typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
+  typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
+  typedef std::vector<mitk::StateMachineCondition::Pointer> ConditionVectorType;
+  typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
-    /**
-     * \class StateMachineTransition
-   * @brief Connects two states, and holds references to actions that are executed on transition.
-   *
-   * @ingroup Interaction
-   **/
+  /**
+  * \class StateMachineTransition
+  * \brief Connects two states, and holds references to corresponding actions and conditions.
+  *
+  * This class represents a transition between two states of a statemachine. It holds a
+  * list of conditions that have to be fulfilled in order to be executed correctly.
+  * It also holds a list of actions that will be executed if all conditions are fulfilled.
+  *
+  * \ingroup Interaction
+  **/
 
-    class MITK_CORE_EXPORT StateMachineTransition: public itk::LightObject
+  class MITK_CORE_EXPORT StateMachineTransition: public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineTransition, itk::LightObject);
@@ -47,6 +52,9 @@ namespace mitk
 
 
     void AddAction(const StateMachineAction::Pointer& action);
+
+    void AddCondition(const StateMachineCondition::Pointer& condition);
+
     SpStateMachineState GetNextState() const;
     std::string GetNextStateName() const;
     /**
@@ -61,6 +69,8 @@ namespace mitk
      * @brief Get an iterator on the first action in list.
      **/
     ActionVectorType GetActions() const;
+
+    ConditionVectorType GetConditions() const;
 
     /**
      * @brief Set the next state of this object.
@@ -87,6 +97,8 @@ namespace mitk
      * @brief The list of actions, that are executed if this transition is done.
      **/
     std::vector<StateMachineAction::Pointer> m_Actions;
+
+    std::vector<StateMachineCondition::Pointer> m_Conditions;
   };
 
 } // namespace mitk

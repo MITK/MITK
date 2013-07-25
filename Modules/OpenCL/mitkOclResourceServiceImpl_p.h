@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOclUtils.h"
 #include "mitkOclImageFormats.h"
 
+#include <itkFastMutexLock.h>
+
 //todo add docu!
 
 /** @struct OclContextCollection
@@ -137,7 +139,7 @@ private:
   {
     int counter;
     cl_program program;
-    itk::SimpleFastMutexLock mutex;
+    itk::FastMutexLock::Pointer mutex;
     ProgramData() :counter(1), program(NULL)
     {}
   };
@@ -150,7 +152,7 @@ private:
   /** Map containing all available (allready compiled) OpenCL Programs */
   ProgramMapType m_ProgramStorage;
   /** mutex for manipulating the program storage */
-  itk::SimpleFastMutexLock m_ProgramStorageMutex;
+  itk::FastMutexLock::Pointer m_ProgramStorageMutex;
 
 public:
 

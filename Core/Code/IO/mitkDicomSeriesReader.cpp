@@ -1642,21 +1642,21 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
      - slice thickness
      - number of rows/columns
   */
-  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
-  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  static const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   // see if we have Image Position and Orientation
   if ( ds1.FindDataElement(tagImagePositionPatient) && ds1.FindDataElement(tagImageOrientation) &&
        ds2.FindDataElement(tagImagePositionPatient) && ds2.FindDataElement(tagImageOrientation) )
   {
-    gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
-    gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
+    static gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
+    static gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
 
     image_pos1.Set(ds1);
     image_orientation1.Set(ds1);
 
-    gdcm::Attribute<0x0020,0x0032> image_pos2;
-    gdcm::Attribute<0x0020,0x0037> image_orientation2;
+    static gdcm::Attribute<0x0020,0x0032> image_pos2;
+    static gdcm::Attribute<0x0020,0x0037> image_orientation2;
 
     image_pos2.Set(ds2);
     image_orientation2.Set(ds2);
@@ -1703,11 +1703,11 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     else // we need to check more properties to distinguish slices
     {
       // try to sort by Acquisition Number
-      const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+      static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
       if (ds1.FindDataElement(tagAcquisitionNumber) && ds2.FindDataElement(tagAcquisitionNumber))
       {
-        gdcm::Attribute<0x0020,0x0012> acquisition_number1; // Acquisition number
-        gdcm::Attribute<0x0020,0x0012> acquisition_number2;
+        static gdcm::Attribute<0x0020,0x0012> acquisition_number1; // Acquisition number
+        static gdcm::Attribute<0x0020,0x0012> acquisition_number2;
 
         acquisition_number1.Set(ds1);
         acquisition_number2.Set(ds2);
@@ -1719,11 +1719,11 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
         else // neither position nor acquisition number are good for sorting, so check more
         {
           // try to sort by Acquisition Time
-          const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
+          static const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
           if (ds1.FindDataElement(tagAcquisitionTime) && ds2.FindDataElement(tagAcquisitionTime))
           {
-            gdcm::Attribute<0x0008,0x0032> acquisition_time1; // Acquisition time
-            gdcm::Attribute<0x0008,0x0032> acquisition_time2;
+            static gdcm::Attribute<0x0008,0x0032> acquisition_time1; // Acquisition time
+            static gdcm::Attribute<0x0008,0x0032> acquisition_time2;
 
             acquisition_time1.Set(ds1);
             acquisition_time2.Set(ds2);
@@ -1735,11 +1735,11 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
             else // we gave up on image position, acquisition number and acquisition time now
             {
               // let's try trigger time
-              const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
+              static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
               if (ds1.FindDataElement(tagTriggerTime) && ds2.FindDataElement(tagTriggerTime))
               {
-                gdcm::Attribute<0x0018,0x1060> trigger_time1; // Trigger time
-                gdcm::Attribute<0x0018,0x1060> trigger_time2;
+                static gdcm::Attribute<0x0018,0x1060> trigger_time1; // Trigger time
+                static gdcm::Attribute<0x0018,0x1060> trigger_time2;
 
                 trigger_time1.Set(ds1);
                 trigger_time2.Set(ds2);
@@ -1760,12 +1760,12 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   // LAST RESORT: all valuable information for sorting is missing.
   // Sort by some meaningless but unique identifiers to satisfy the sort function
-  const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
+  static const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
   if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
   {
     MITK_DEBUG << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";
-    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID1;   // SOP instance UID is mandatory and unique
-    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID2;
+    static gdcm::Attribute<0x0008,0x0018> SOPInstanceUID1;   // SOP instance UID is mandatory and unique
+    static gdcm::Attribute<0x0008,0x0018> SOPInstanceUID2;
 
     SOPInstanceUID1.Set(ds1);
     SOPInstanceUID2.Set(ds2);

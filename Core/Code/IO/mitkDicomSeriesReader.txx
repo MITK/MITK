@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkAffineTransform.h>
 #include <itkLinearInterpolateImageFunction.h>
+#include <itkTimeProbesCollectorBase.h>
 
 #include <limits>
 
@@ -355,7 +356,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
 
-  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
+  static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
 
   // loop files to determine number of image blocks
   for (StringContainer::const_iterator fileIter = sorted_filenames.begin();

@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclResourceServiceImpl_p.h"
 
-
 OclResourceService::~OclResourceService()
 {
 }
@@ -24,6 +23,7 @@ OclResourceService::~OclResourceService()
 OclResourceServiceImpl::OclResourceServiceImpl()
   : m_ContextCollection(NULL), m_ProgramStorage()
 {
+  m_ProgramStorageMutex = itk::FastMutexLock::New();
 }
 
 OclResourceServiceImpl::~OclResourceServiceImpl()
@@ -110,11 +110,12 @@ void OclResourceServiceImpl::InsertProgram(cl_program _program_in, std::string n
   ProgramData data;
   data.counter = 1;
   data.program = _program_in;
+  data.mutex = itk::FastMutexLock::New();
 
   // program is not stored, insert first instance (count = 1)
-  m_ProgramStorageMutex.Lock();
+  m_ProgramStorageMutex->Lock();
   retValue = m_ProgramStorage.insert( MapElemPair(name, data) );
-  m_ProgramStorageMutex.Unlock();
+  m_ProgramStorageMutex->Unlock();
 
   // insertion failed, i.e. a program with same name exists
   if( !retValue.second )
@@ -137,7 +138,7 @@ cl_program OclResourceServiceImpl::GetProgram(const std::string &name)
 
   if( it != m_ProgramStorage.end() )
   {
-    it->second.mutex.Lock();
+    it->second.mutex->Lock();
     // first check if the program was deleted
     // while waiting on the mutex
     if ( it->second.counter == 0 )
@@ -146,7 +147,7 @@ cl_program OclResourceServiceImpl::GetProgram(const std::string &name)
     // increase the reference counter
     // by one if the program is requestet
     it->second.counter += 1;
-    it->second.mutex.Unlock();
+    it->second.mutex->Unlock();
 
     // return the cl_program
     return it->second.program;
@@ -195,19 +196,19 @@ void OclResourceServiceImpl::RemoveProgram(const std::string& name)
 
   if( it != m_ProgramStorage.end() )
   {
-    it->second.mutex.Lock();
+    it->second.mutex->Lock();
     // decrease reference by one
     it->second.counter -= 1;
-    it->second.mutex.Unlock();
+    it->second.mutex->Unlock();
 
     // remove from the storage
     if( it->second.counter == 0 )
     {
       program = it->second.program;
 
-      m_ProgramStorageMutex.Lock();
+      m_ProgramStorageMutex->Lock();
       m_ProgramStorage.erase(it);
-      m_ProgramStorageMutex.Unlock();
+      m_ProgramStorageMutex->Unlock();
     }
 
     // delete the program

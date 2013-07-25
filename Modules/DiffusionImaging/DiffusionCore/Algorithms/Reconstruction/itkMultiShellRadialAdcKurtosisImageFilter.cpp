@@ -143,7 +143,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
   unsigned int shellIndex = 0;
 
-  for(;it != m_B_ValueMap.end();it++)
+  for(;it != m_B_ValueMap.end();++it)
   {
     //- calculate maxShOrder
     const IndicesVector currentShell = it->second;

@@ -135,7 +135,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
   m_ShellInterpolationMatrixVector.reserve(m_B_ValueMap.size()-1);
 
-  m_bValueVector = vnl_vector<double>(2);
+  m_bValueVector = vnl_vector<double>(m_B_ValueMap.size()-1);
 
   // for each shell
   BValueMap::const_iterator it = m_B_ValueMap.begin();

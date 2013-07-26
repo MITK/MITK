@@ -59,6 +59,7 @@ set(CPP_FILES
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
+  Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp

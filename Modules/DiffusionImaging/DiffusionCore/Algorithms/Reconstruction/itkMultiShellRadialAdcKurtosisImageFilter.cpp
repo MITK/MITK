@@ -99,7 +99,7 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::MultiShellRadialAdcKurtosisImageFilter()
 {
   this->SetNumberOfRequiredInputs( 1 );
-  this->SetNumberOfThreads(1);
+  //this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -334,7 +334,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   lestSquaresFunction model(bValueVector.size());
   // initialize Levenberg Marquardt
   vnl_levenberg_marquardt minimizer(model);
-  minimizer.set_max_function_evals(10000); // Iterations
+  minimizer.set_max_function_evals(50000); // Iterations
   minimizer.set_f_tolerance(1e-10);        // Function tolerance
   minimizer.set_epsilon_function(1e-10);   // Epsilon
 
@@ -364,12 +364,15 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       MITK_INFO<< "Minimizer Iterations: " << minimizer.get_num_iterations();
       MITK_INFO<< "______________________________";
     }else{
-      std::cout << SignalMatrix.get_row(i)[0] << ";"  // VALVEC
-                << SignalMatrix.get_row(i)[1] << ";"
-                << SignalMatrix.get_row(i)[2] << ";"
-                << reference_b_value << ";"//REFVAL
-                << initalGuess[0] << ";" // ADC
-                << initalGuess[1] << std::endl;    // AKC
+
+      std::cout << std::scientific << std::setprecision(5)
+                << reference_b_value << ";"   // BZero
+                << initalGuess[0] << ";"      // ADC
+                << initalGuess[1] << ";";     // AKC
+      for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
+       std::cout << std::scientific << std::setprecision(5)
+                 << SignalMatrix.get_row(i)[j] << ";";
+      std::cout << std::endl;
     }
     // Set Coeffs for each gradient direction
     lsfCoeffs.set_row(i, initalGuess);
@@ -388,7 +391,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
     vec[i] = referenceSignal * exp( -bValue * D + 1./6.* bValue * bValue * D * D * K);
 
-    std::cout << "OUTVAL = " << i << std::endl;
+    //    std::cout << "OUTVAL = " << i << std::endl;
   }
 }
 

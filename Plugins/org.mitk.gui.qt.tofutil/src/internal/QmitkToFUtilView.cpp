@@ -455,15 +455,21 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
           this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
 
-    //the default camera position is rather unfortunate,
-    //that's why we set our own position according to the surface center
-    mitk::Point3D surfaceCenter= this->m_Surface->GetGeometry()->GetCenter();
+    // correctly place the vtk camera for appropriate surface rendering
     vtkCamera* camera3d = GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer()->GetActiveCamera();
     //1m distance to camera should be a nice default value for most cameras
-    camera3d->SetPosition(0,0,-1000);
+    camera3d->SetPosition(0,0,0);
     camera3d->SetViewUp(0,-1,0);
-    camera3d->SetFocalPoint(0,0,surfaceCenter[2]);
-    camera3d->SetViewAngle(40);
+    camera3d->SetFocalPoint(0,0,1);
+    if (this->m_CameraIntrinsics.IsNotNull())
+    {
+      // compute view angle from camera intrinsics
+      camera3d->SetViewAngle(mitk::ToFProcessingCommon::CalculateViewAngle(m_CameraIntrinsics,m_ToFImageGrabber->GetCaptureWidth()));
+    }
+    else
+    {
+      camera3d->SetViewAngle(45);
+    }
     camera3d->SetClippingRange(1, 10000);
   }
 }

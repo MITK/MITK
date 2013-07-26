@@ -36,9 +36,9 @@ mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
-  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
-  m_CameraIntrinsics->SetPrincipalPoint(3.3930780975300314e+02,2.4273913761751615e+02);
-  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+  m_CameraIntrinsics->SetFocalLength(273.138946533,273.485900879);
+  m_CameraIntrinsics->SetPrincipalPoint(107.867935181,98.3807373047);
+  m_CameraIntrinsics->SetDistorsionCoeffs(-0.486690014601f,0.553943634033f,0.00222016777843f,-0.00300851115026f);
   m_ReconstructionMode = WithInterPixelDistance;
 }
 

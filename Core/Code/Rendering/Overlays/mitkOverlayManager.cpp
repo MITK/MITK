@@ -142,7 +142,6 @@ void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
 
 mitk::OverlayManager::Pointer mitk::OverlayManager::GetServiceInstance(std::string ID)
 {
-//  std::string id_str = static_cast<std::ostringstream*>( &(std::ostringstream() << ID) )->str();
   mitk::ModuleContext* moduleContext = mitk::GetModuleContext();
   std::string filter = "("+PROP_ID + "="+ID+")";
   std::list<mitk::ServiceReference> serref = moduleContext->GetServiceReferences("org.mitk.services.OverlayManager",filter);

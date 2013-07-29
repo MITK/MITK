@@ -162,25 +162,25 @@ void mitk::Overlay::SetStringProperty( const char* propertyKey, const char* stri
 
 void mitk::Overlay::SetText(std::string text)
 {
-  SetStringProperty("text", text.c_str());
+  SetStringProperty("Overlay.Text", text.c_str());
 }
 
 std::string mitk::Overlay::GetText()
 {
   std::string text;
-  GetPropertyList()->GetStringProperty("text", text);
+  GetPropertyList()->GetStringProperty("Overlay.Text", text);
   return text;
 }
 
 void mitk::Overlay::SetFontSize(int fontSize)
 {
-  SetIntProperty("fontSize",fontSize);
+  SetIntProperty("Overlay.FontSize",fontSize);
 }
 
 int mitk::Overlay::GetFontSize()
 {
   int fontSize;
-  GetPropertyList()->GetIntProperty("fontSize", fontSize);
+  GetPropertyList()->GetIntProperty("Overlay.FontSize", fontSize);
   return fontSize;
 }
 
@@ -233,29 +233,6 @@ void mitk::Overlay::SetOpacity(float opacity, mitk::BaseRenderer* renderer, cons
   prop = mitk::FloatProperty::New(opacity);
   GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
-
-//void mitk::Overlay::SetLayout(mitk::BaseLayouter::Pointer layout, mitk::BaseRenderer* renderer)
-//{
-//  if(renderer==NULL || layout.IsNull())
-//    return;
-
-//  mitk::BaseLayouter::Pointer & OldLayout = m_MapOfLayouters[renderer];
-
-//  if(OldLayout.IsNotNull())
-//    OldLayout->RemoveOverlay(this);
-
-//  m_MapOfLayouters[renderer] = layout;
-//}
-
-//mitk::BaseLayouter::Pointer mitk::Overlay::GetLayout(mitk::BaseRenderer *renderer)
-//{
-//  if(renderer==NULL)
-//    return NULL;
-
-//  mitk::BaseLayouter::Pointer & layout = m_MapOfLayouters[renderer];
-
-//  return layout;
-//}
 
 void mitk::Overlay::SetVisibility(bool visible, mitk::BaseRenderer *renderer, const char *propertyKey)
 {

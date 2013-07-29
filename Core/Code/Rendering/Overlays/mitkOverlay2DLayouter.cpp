@@ -40,6 +40,7 @@ void mitk::Overlay2DLayouter::PrepareLayout()
   double posX,posY;
   int* size = GetBaseRenderer()->GetVtkRenderer()->GetSize();
 
+  //The alignment enum defines the type of this layouter
   switch (m_Alignment) {
   case TopLeft:
     posX = m_Margin;

@@ -36,11 +36,13 @@ class MITK_CORE_EXPORT Overlay : public itk::Object {
   friend class BaseLayouter;
 public:
 
+  /** \brief Container for position and size on the display.*/
   struct Bounds
   {
     itk::Point<double,2> Position;
     itk::Point<double,2> Size;
   };
+
   typedef std::map<const BaseRenderer*,PropertyList::Pointer> MapOfPropertyLists;
 
   /** \brief Base class for mapper specific rendering ressources.
@@ -377,7 +379,10 @@ public:
   /** \brief Applies all properties and should be called before the rendering procedure.*/
   virtual void UpdateOverlay(BaseRenderer *renderer) = 0;
 
+  /** \brief Returns position and size of the overlay on the display.*/
   virtual Bounds GetBoundsOnDisplay(BaseRenderer *renderer) = 0;
+
+  /** \brief Sets position and size of the overlay on the display.*/
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, Bounds) = 0;
 
   mitkClassMacro(Overlay, itk::Object);
@@ -415,6 +420,7 @@ private:
   /** \brief assignment operator */
   Overlay &operator=(const Overlay &);
 
+  /** \brief Reference to the layouter in which this overlay is managed. */
   BaseLayouter* m_LayoutedBy;
 
 };

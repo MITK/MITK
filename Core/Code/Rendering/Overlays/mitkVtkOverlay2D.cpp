@@ -60,26 +60,26 @@ void mitk::VtkOverlay2D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 void mitk::VtkOverlay2D::SetPosition2D(Point2D position2D, mitk::BaseRenderer *renderer)
 {
   mitk::Point2dProperty::Pointer position2dProperty = mitk::Point2dProperty::New(position2D);
-  SetProperty("Position2D", position2dProperty,renderer);
+  SetProperty("VtkOverlay2D.Position2D", position2dProperty,renderer);
 }
 
 mitk::Point2D mitk::VtkOverlay2D::GetPosition2D(mitk::BaseRenderer *renderer)
 {
   mitk::Point2D position2D;
-  GetPropertyValue<mitk::Point2D>("Position2D", position2D, renderer);
+  GetPropertyValue<mitk::Point2D>("VtkOverlay2D.Position2D", position2D, renderer);
   return position2D;
 }
 
 void mitk::VtkOverlay2D::SetOffsetVector(Point2D OffsetVector, mitk::BaseRenderer *renderer)
 {
   mitk::Point2dProperty::Pointer OffsetVectorProperty = mitk::Point2dProperty::New(OffsetVector);
-  SetProperty("OffsetVector", OffsetVectorProperty,renderer);
+  SetProperty("VtkOverlay2D.OffsetVector", OffsetVectorProperty,renderer);
 }
 
 mitk::Point2D mitk::VtkOverlay2D::GetOffsetVector(mitk::BaseRenderer *renderer)
 {
   mitk::Point2D OffsetVector;
-  GetPropertyValue<mitk::Point2D>("OffsetVector", OffsetVector, renderer);
+  GetPropertyValue<mitk::Point2D>("VtkOverlay2D.OffsetVector", OffsetVector, renderer);
   return OffsetVector;
 }
 

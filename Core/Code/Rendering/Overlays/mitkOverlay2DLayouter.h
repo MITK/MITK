@@ -39,6 +39,8 @@ public:
   static const char* STANDARD_2D_BOTTOM;
   static const char* STANDARD_2D_BOTTOMRIGHT;
 
+  /** \brief Factory method for the different kinds of Layouters */
+  /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
   static Overlay2DLayouter::Pointer CreateLayouter(Alignment alignment, BaseRenderer* renderer)
   {
     if(renderer == NULL)
@@ -75,6 +77,8 @@ public:
 
   }
 
+  /** \brief Factory method for the different kinds of Layouters */
+  /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
   static Overlay2DLayouter::Pointer CreateLayouter(std::string identifier, BaseRenderer* renderer)
   {
     if(renderer == NULL)

@@ -85,8 +85,11 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     freetype->RenderString(prop,vtkUnicodeString::from_utf8(GetText().c_str()),ls->m_textImage);
 
     ls->m_textImage->Modified();
+
+    //Levelwindow has to be set to full range, that the colors are displayed properly.
     ls->m_imageMapper->SetColorWindow(255);
     ls->m_imageMapper->SetColorLevel(127.5);
+
     ls->m_imageMapper->Update();
     ls->m_textActor->SetPosition(GetPosition2D(renderer)[0]+GetOffsetVector(renderer)[0], GetPosition2D(renderer)[1]+GetOffsetVector(renderer)[1]);
     ls->UpdateGenerateDataTime();

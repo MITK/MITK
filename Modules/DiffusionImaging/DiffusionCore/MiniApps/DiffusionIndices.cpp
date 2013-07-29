@@ -15,174 +15,123 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "MiniAppManager.h"
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <string>
 
-#include <itkImage.h>
-#include <itkImageFileReader.h>
-
+#include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
-
-#include <itkMetaDataObject.h>
-
-#include "itkVectorContainer.h"
-#include "vnl/vnl_vector_fixed.h"
-#include "itkVectorImage.h"
-
-#include "mitkBaseDataIOFactory.h"
-#include "mitkDiffusionImage.h"
-#include "mitkBaseData.h"
+#include <mitkBaseDataIOFactory.h>
+#include <mitkQBallImage.h>
 #include <mitkDiffusionCoreObjectFactory.h>
-#include "mitkCoreObjectFactory.h"
-#include "mitkCoreExtObjectFactory.h"
-#include "mitkImageWriter.h"
-
-#include "itkTensorDerivedMeasurementsFilter.h"
-#include "mitkTensorImage.h"
-
-#include "itkImageFileWriter.h"
-
+#include <itkTensorDerivedMeasurementsFilter.h>
+#include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <mitkTensorImage.h>
+#include "ctkCommandLineParser.h"
+#include <boost/algorithm/string.hpp>
 
 /**
- * Convert files from one ending to the other
+ * Calculate indices derived from Qball or tensor images
  */
 int DiffusionIndices(int argc, char* argv[])
 {
+    ctkCommandLineParser parser;
+    parser.setArgumentPrefix("--", "-");
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", mitk::Any(), false);
+    parser.addArgument("index", "idx", ctkCommandLineParser::String, "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", mitk::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", mitk::Any(), false);
 
-  if ( argc!=4 )
-  {
-    std::cout << std::endl;
-    std::cout << "Perform Tensor estimation on an dwi file" << std::endl;
-    std::cout << std::endl;
-    std::cout << "usage: " << argv[0] << "<in-filename> <out-filename> <diffusion-index>" << std::endl;
-    std::cout << std::endl;
-    return EXIT_FAILURE;
-  }
+    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    if (parsedArgs.size()==0)
+        return EXIT_FAILURE;
 
-  mitk::BaseData::Pointer baseData = 0;
+    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
+    string index = mitk::any_cast<string>(parsedArgs["index"]);
+    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
 
-  try
-  {
-    mitk::CoreObjectFactory::GetInstance();
-
-    RegisterDiffusionCoreObjectFactory();
-    RegisterCoreExtObjectFactory() ;
-
-    std::string filename = argv[1];
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
-    if( infile.empty() )
+    try
     {
-      MITK_INFO << "File could not be read" ;
+        RegisterDiffusionCoreObjectFactory();
+
+        // load input image
+        const std::string s1="", s2="";
+        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
+
+        if( boost::algorithm::ends_with(inFileName, ".qbi") && index=="gfa" )
+        {
+            typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
+            typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
+            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
+            ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
+            mitk::CastToItkImage<ItkQballImageType>(mitkQballImage, itk_qbi);
+
+
+            typedef itk::DiffusionQballGeneralizedFaImageFilter<float,float,QBALL_ODFSIZE> GfaFilterType;
+            GfaFilterType::Pointer gfaFilter = GfaFilterType::New();
+            gfaFilter->SetInput(itk_qbi);
+            gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
+            gfaFilter->Update();
+
+            itk::ImageFileWriter< itk::Image<float,3> >::Pointer fileWriter = itk::ImageFileWriter< itk::Image<float,3> >::New();
+            fileWriter->SetInput(gfaFilter->GetOutput());
+            fileWriter->SetFileName(outFileName);
+            fileWriter->Update();
+        }
+        else if( boost::algorithm::ends_with(inFileName, ".dti") )
+        {
+            typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
+            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
+            ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
+            mitk::CastToItkImage<ItkTensorImage>(mitkTensorImage, itk_dti);
+
+            typedef itk::TensorDerivedMeasurementsFilter<float> MeasurementsType;
+            MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+            measurementsCalculator->SetInput(itk_dti.GetPointer() );
+
+            if(index=="fa")
+                measurementsCalculator->SetMeasure(MeasurementsType::FA);
+            else if(index=="ra")
+                measurementsCalculator->SetMeasure(MeasurementsType::RA);
+            else if(index=="ad")
+                measurementsCalculator->SetMeasure(MeasurementsType::AD);
+            else if(index=="rd")
+                measurementsCalculator->SetMeasure(MeasurementsType::RD);
+            else if(index=="ca")
+                measurementsCalculator->SetMeasure(MeasurementsType::CA);
+            else if(index=="l2")
+                measurementsCalculator->SetMeasure(MeasurementsType::L2);
+            else if(index=="l3")
+                measurementsCalculator->SetMeasure(MeasurementsType::L3);
+            else if(index=="md")
+                measurementsCalculator->SetMeasure(MeasurementsType::MD);
+            else
+            {
+                MITK_WARN << "No valid diffusion index for input image (tensor image) defined";
+                return EXIT_FAILURE;
+            }
+
+            measurementsCalculator->Update();
+
+            itk::ImageFileWriter< itk::Image<float,3> >::Pointer fileWriter = itk::ImageFileWriter< itk::Image<float,3> >::New();
+            fileWriter->SetInput(measurementsCalculator->GetOutput());
+            fileWriter->SetFileName(outFileName);
+            fileWriter->Update();
+        }
     }
-    baseData = infile.at(0);
-  }
-  catch ( itk::ExceptionObject &err)
-  {
-    MITK_INFO << "Exception during read: " << err;
-  }
-  catch ( std::exception err)
-  {
-    MITK_INFO << "Exception during read: " << err.what();
-  }
-  catch ( ... )
-  {
-    MITK_INFO << "Exception during read!";
-  }
-
-
-  MITK_INFO << "read file";
-
-
-  typedef mitk::TensorImage TensorImageType;
-
-  std::string outfilename = argv[2];
-
-  TensorImageType::Pointer vol;
-
-  try
-  {
-    vol = dynamic_cast<TensorImageType*>(baseData.GetPointer());
-  }
-  catch ( itk::ExceptionObject &err)
-  {
-    MITK_INFO << "Exception during Image write: " << err;
-  }
-  catch ( std::exception err)
-  {
-    MITK_INFO << "Exception during Image write: " << err.what();
-  }
-  catch ( ... )
-  {
-    MITK_INFO << "Exception during Image write";
-  }
-
-  if(vol.IsNull())
-  {
-    return EXIT_FAILURE;
-  }
-
-
-
-  typedef float TTensorPixelType;
-
-
-  typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
-  typedef itk::Image< TensorPixelType, 3 >            ItkTensorImageType;
-
-  ItkTensorImageType::Pointer itkvol = ItkTensorImageType::New();
-  mitk::CastToItkImage<ItkTensorImageType>(vol, itkvol);
-
-  std::string measurementType = argv[3];
-
-  typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
-  MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
-  measurementsCalculator->SetInput(itkvol.GetPointer() );
-
-  if(measurementType=="fa")
-    measurementsCalculator->SetMeasure(MeasurementsType::FA);
-  else if(measurementType=="ra")
-    measurementsCalculator->SetMeasure(MeasurementsType::RA);
-  else if(measurementType=="da")
-    measurementsCalculator->SetMeasure(MeasurementsType::AD);
-  else if(measurementType=="dr")
-    measurementsCalculator->SetMeasure(MeasurementsType::RD);
-  else if(measurementType=="ca")
-    measurementsCalculator->SetMeasure(MeasurementsType::CA);
-  else if(measurementType=="l2")
-    measurementsCalculator->SetMeasure(MeasurementsType::L2);
-  else if(measurementType=="l3")
-    measurementsCalculator->SetMeasure(MeasurementsType::L3);
-  else if(measurementType=="md")
-    measurementsCalculator->SetMeasure(MeasurementsType::MD);
-  else
-    measurementsCalculator->SetMeasure(MeasurementsType::FA);
-
-  measurementsCalculator->Update();
-
-  MITK_INFO << "fa calculated";
-
-  itk::Image<float, 3>::Pointer outputImage = measurementsCalculator->GetOutput();
-
-
-  // Save tensor image
-  MITK_INFO << "writing image";
-
-  std::string tensorName = outfilename + ".nii.gz";
-
-
-  MITK_INFO << "use itk filewriter";
-
-  itk::ImageFileWriter< itk::Image<float,3> >::Pointer fileWriter = itk::ImageFileWriter< itk::Image<float,3> >::New();
-  fileWriter->SetInput(outputImage);
-  fileWriter->SetFileName(tensorName);
-  fileWriter->Update();
-
-  return EXIT_SUCCESS;
+    catch (itk::ExceptionObject e)
+    {
+        MITK_INFO << e;
+        return EXIT_FAILURE;
+    }
+    catch (std::exception e)
+    {
+        MITK_INFO << e.what();
+        return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+        MITK_INFO << "ERROR!?!";
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
 
 RegisterDiffusionCoreMiniApp(DiffusionIndices);

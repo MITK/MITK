@@ -73,6 +73,8 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.optimizationLevelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnOptimizationLevelChanged(int)));
   connect(m_Controls.optimizationLevelSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnOptimizationLevelChanged(int)));
   connect(m_Controls.remeshPushButton, SIGNAL(clicked()), this, SLOT(OnRemeshButtonClicked()));
+
+  this->OnSelectedSurfaceChanged(m_Controls.surfaceComboBox->GetSelectedNode());
 }
 
 void QmitkRemeshingView::EnableWidgets(bool enable)
@@ -170,7 +172,7 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   bool forceManifold = m_Controls.forceManifoldCheckBox->isChecked();
   bool boundaryFixing = m_Controls.boundaryFixingCheckBox->isChecked();
 
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
+  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());

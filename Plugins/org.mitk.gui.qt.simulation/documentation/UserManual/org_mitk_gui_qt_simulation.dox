@@ -3,12 +3,7 @@
 
 \image html org_mitk_gui_qt_simulation.png "Icon of the Simulation Plugin."
 
-Available sections:
-  - \ref org_mitk_gui_qt_simulationOverview
-  - \ref org_mitk_gui_qt_simulationUsage
-  - \ref org_mitk_gui_qt_simulationAdvancedUsage
-    - \ref org_mitk_gui_qt_simulationSOFAPlugins
-    - \ref org_mitk_gui_qt_simulationSimulationTemplates
+\tableofcontents
 
 \section org_mitk_gui_qt_simulationOverview Overview
 

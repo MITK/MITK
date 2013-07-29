@@ -84,7 +84,7 @@ namespace itk
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType NumberOfThreads );
     void logarithm( vnl_vector<double> & vec);
     void calculateCoeffs( vnl_matrix<double> & lsfCoeffs, const vnl_matrix<double> & SignalMatrix, const double & S0);
-    void calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & b);
+    void calculateSignalFromLsfCoeffs( vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & S0, const double & b);
 
     GradientDirectionContainerType::Pointer m_TargetGradientDirections;   ///< container for the subsampled output gradient directions
     GradientDirectionContainerType::Pointer m_OriginalGradientDirections;   ///< input gradient directions

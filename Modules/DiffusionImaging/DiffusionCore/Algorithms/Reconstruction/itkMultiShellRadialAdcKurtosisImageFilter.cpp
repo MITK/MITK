@@ -62,12 +62,18 @@ struct lestSquaresFunction: public vnl_least_squares_function
     bValueVector.copy_in(x.data_block());
   }
 
+  void set_reference_measurement(const double & x)
+  {
+    S0 = x;
+  }
+
   vnl_vector<double> measurements;
   vnl_vector<double> bValueVector;
+  double S0;
   int N;
 
   lestSquaresFunction(unsigned int number_of_measurements) :
-    vnl_least_squares_function(3 /*number of unknowns*/, number_of_measurements, no_gradient)
+    vnl_least_squares_function(2 /*number of unknowns [ADC AKC]*/, number_of_measurements, no_gradient)
   {
     N = get_number_of_residuals();
   }
@@ -76,7 +82,6 @@ struct lestSquaresFunction: public vnl_least_squares_function
 
     const double & D = x[0];
     const double & K = x[1];
-    const double & S0= x[2];
     const vnl_vector<double> & b = bValueVector;
 
     for(int s=0; s<N; s++)
@@ -296,9 +301,9 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       shellIndex++;
     }
 
-    lsfCoeffs.set_size(m_allDirectionsSize , 3 /*Number of unknowns [ADC AKC S0]*/);
+    lsfCoeffs.set_size(m_allDirectionsSize , 2 /*Number of unknowns [ADC AKC]*/);
     calculateCoeffs(lsfCoeffs, SignalMatrix, BZeroAverage);
-    calculateSignalFromLsfCoeffs(SignalVector,lsfCoeffs,m_TargetB_Value);
+    calculateSignalFromLsfCoeffs(SignalVector,lsfCoeffs, BZeroAverage, m_TargetB_Value);
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));
@@ -324,10 +329,11 @@ template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::calculateCoeffs(vnl_matrix<double> &lsfCoeffs, const vnl_matrix<double> & SignalMatrix, const double & S0)
 {
-  vnl_vector<double> initalGuess(3);
+  vnl_vector<double> initalGuess(2);
   // initialize Least Squres Function
   // SignalMatrix.cols() defines the number of shells/measurement points
   lestSquaresFunction model(SignalMatrix.cols());
+
 
   // initialize Levenberg Marquardt
   vnl_levenberg_marquardt minimizer(model);
@@ -341,14 +347,16 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     model.set_measurements(SignalMatrix.get_row(i));
     // set BValue Vector e.g.: [1000, 2000, 3000] <- shell b Values
     model.set_bvalues(m_bValueVector);
+    model.set_reference_measurement(S0);
 
     // Start Vector [ADC, AKC, S0]
     initalGuess.put(0, 0.f);
     initalGuess.put(1, 0.f);
-    initalGuess.put(2, S0); // user B=0 Signal of processing Voxel
+    //initalGuess.put(2, S0); // user B=0 Signal of processing Voxel
 
     // start Levenberg-Marquardt
-    bool status = minimizer.minimize_without_gradient(initalGuess);
+    bool status =
+    minimizer.minimize_without_gradient(initalGuess);
 
     if(!status)
     {
@@ -363,7 +371,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       std::cout << std::scientific << std::setprecision(5)
                 << initalGuess[0] << ";"                  // fitted ADC
                 << initalGuess[1] << ";"                  // fitted AKC
-                << initalGuess[2] << ";"                  // fitted S0 value
+                << S0 << ";"                              // S0 value
                 << minimizer.get_end_error() << ";";      // End error
       for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
        std::cout << std::scientific << std::setprecision(5)
@@ -379,13 +387,13 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
-::calculateSignalFromLsfCoeffs(vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double &b /*target bValue*/)
+::calculateSignalFromLsfCoeffs(vnl_vector<double> & vec, const vnl_matrix<double> & lsfCoeffs, const double & S0, const double &b /*target bValue*/)
 {
   // For each Direction
   for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++){
     const double & D = lsfCoeffs(i,0);
     const double & K = lsfCoeffs(i,1);
-    const double & S0 = lsfCoeffs(i,2);
+    //const double & S0 = lsfCoeffs(i,2);
 
     vec[i] = S0 * exp( -b * D + 1./6.* b * b * D * D * K);
 

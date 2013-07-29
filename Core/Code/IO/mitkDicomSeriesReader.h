@@ -427,7 +427,7 @@ public:
 
       void SetHasMultipleTimePoints(bool);
 
-      void GetDesiredMITKImagePixelSpacing( float& spacingX, float& spacingY) const;
+      void GetDesiredMITKImagePixelSpacing(ScalarType& spacingX, ScalarType& spacingY) const;
 
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
@@ -749,7 +749,7 @@ protected:
   */
   static
   bool
-  DICOMStringToSpacing(const std::string& s, float& spacingX, float& spacingY);
+  DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY);
 
   /**
     \brief Convert DICOM string describing a point to Point3D.

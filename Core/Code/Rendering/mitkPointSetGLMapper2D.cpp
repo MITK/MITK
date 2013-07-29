@@ -319,7 +319,7 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
         glPointSize(p_size);
         //glShadeModel(GL_FLAT);
         glBegin (GL_POINTS);
-          glVertex2fv(&pt2d[0]);
+          glVertex2dv(&pt2d[0]);
         glEnd ();
       }
 
@@ -384,17 +384,17 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               glLineWidth(m_PointLineWidth);
               //a diamond around the point with the selected color
               glBegin (GL_LINE_LOOP);
-               tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-               tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-               tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-               tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+               tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+               tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
+               tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+               tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
               glEnd ();
               glLineWidth(1);
               //the actual point in the specified color to see the usual color of the point
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
               glPointSize(1);
               glBegin (GL_POINTS);
-              tmp=pt2d;             glVertex2fv(&tmp[0]);
+              tmp=pt2d;             glVertex2dv(&tmp[0]);
               glEnd ();
             }
             else //if not selected
@@ -403,10 +403,10 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
               glLineWidth(m_PointLineWidth);
               //drawing crosses
               glBegin (GL_LINES);
-              tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-              tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-              tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+              tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+              tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+              tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
+              tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
               glEnd ();
               glLineWidth(1);
             }
@@ -454,8 +454,8 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 
            glLineWidth( m_LineWidth );
            glBegin (GL_LINES);
-           glVertex2fv(&pt2d[0]);
-           glVertex2fv(&lastPt2d[0]);
+           glVertex2dv(&pt2d[0]);
+           glVertex2dv(&lastPt2d[0]);
            glEnd ();
            glLineWidth(1.0);
            if(m_ShowDistances) // calculate and print a distance

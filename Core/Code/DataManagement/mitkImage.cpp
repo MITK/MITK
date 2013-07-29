@@ -1195,7 +1195,7 @@ bool mitk::Image::IsRotated() const
 
   if(geo)
   {
-    const vnl_matrix_fixed<float, 3, 3> & mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+    const vnl_matrix_fixed<ScalarType, 3, 3> & mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
     float ref = 0;
     for(short k = 0; k < 3; ++k)
       ref += mx[k][k];

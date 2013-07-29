@@ -62,27 +62,27 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayerBase::ReadNavigationData
     return NULL;  //the calling method should check the return value if it is valid/not NULL
   }
 
-  elem->QueryFloatAttribute("X", &position[0]);
-  elem->QueryFloatAttribute("Y", &position[1]);
-  elem->QueryFloatAttribute("Z", &position[2]);
+  elem->QueryDoubleAttribute("X", &position[0]);
+  elem->QueryDoubleAttribute("Y", &position[1]);
+  elem->QueryDoubleAttribute("Z", &position[2]);
 
-  elem->QueryFloatAttribute("QX", &orientation[0]);
-  elem->QueryFloatAttribute("QY", &orientation[1]);
-  elem->QueryFloatAttribute("QZ", &orientation[2]);
-  elem->QueryFloatAttribute("QR", &orientation[3]);
+  elem->QueryDoubleAttribute("QX", &orientation[0]);
+  elem->QueryDoubleAttribute("QY", &orientation[1]);
+  elem->QueryDoubleAttribute("QZ", &orientation[2]);
+  elem->QueryDoubleAttribute("QR", &orientation[3]);
 
-  elem->QueryFloatAttribute("C00", &matrix[0][0]);
-  elem->QueryFloatAttribute("C01", &matrix[0][1]);
-  elem->QueryFloatAttribute("C02", &matrix[0][2]);
-  elem->QueryFloatAttribute("C03", &matrix[0][3]);
-  elem->QueryFloatAttribute("C04", &matrix[0][4]);
-  elem->QueryFloatAttribute("C05", &matrix[0][5]);
-  elem->QueryFloatAttribute("C10", &matrix[1][0]);
-  elem->QueryFloatAttribute("C11", &matrix[1][1]);
-  elem->QueryFloatAttribute("C12", &matrix[1][2]);
-  elem->QueryFloatAttribute("C13", &matrix[1][3]);
-  elem->QueryFloatAttribute("C14", &matrix[1][4]);
-  elem->QueryFloatAttribute("C15", &matrix[1][5]);
+  elem->QueryDoubleAttribute("C00", &matrix[0][0]);
+  elem->QueryDoubleAttribute("C01", &matrix[0][1]);
+  elem->QueryDoubleAttribute("C02", &matrix[0][2]);
+  elem->QueryDoubleAttribute("C03", &matrix[0][3]);
+  elem->QueryDoubleAttribute("C04", &matrix[0][4]);
+  elem->QueryDoubleAttribute("C05", &matrix[0][5]);
+  elem->QueryDoubleAttribute("C10", &matrix[1][0]);
+  elem->QueryDoubleAttribute("C11", &matrix[1][1]);
+  elem->QueryDoubleAttribute("C12", &matrix[1][2]);
+  elem->QueryDoubleAttribute("C13", &matrix[1][3]);
+  elem->QueryDoubleAttribute("C14", &matrix[1][4]);
+  elem->QueryDoubleAttribute("C15", &matrix[1][5]);
 
   int tmpval = 0;
   elem->QueryIntAttribute("Valid", &tmpval);

@@ -162,10 +162,10 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
             {
               //a quad
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz-vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d-horz-vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d-horz+vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+horz+vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+horz-vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d-horz-vert;      glVertex2dv(&tmp[0]);
               glEnd ();
             }
             break;
@@ -173,10 +173,10 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
             {
               //a diamond around the point
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-                tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+                tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
               glEnd ();
             }
             break;
@@ -186,7 +186,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 
           //the actual point
           glBegin (GL_POINTS);
-            tmp=pt2d;             glVertex2fv(&tmp[0]);
+            tmp=pt2d;             glVertex2dv(&tmp[0]);
           glEnd ();
         }
         else //if not selected
@@ -198,20 +198,20 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
             {
               //a quad
               glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz-vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d-horz-vert;      glVertex2fv(&tmp[0]);
+                tmp=pt2d-horz+vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+horz+vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d+horz-vert;      glVertex2dv(&tmp[0]);
+                tmp=pt2d-horz-vert;      glVertex2dv(&tmp[0]);
               glEnd ();
             }
           case PTUNDEFINED:
             {
               //drawing crosses
               glBegin (GL_LINES);
-                  tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
-                  tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
-                  tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
-                  tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
+                  tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
+                  tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
+                  tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
+                  tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
               glEnd ();
             }
     default:
@@ -311,8 +311,8 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
                 glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
                 //a line from lastPoint to thisPoint
                 glBegin (GL_LINES);
-                  glVertex2fv(&(*lastPoint)[0]);
-                  glVertex2fv(&pt2d[0]);
+                  glVertex2dv(&(*lastPoint)[0]);
+                  glVertex2dv(&pt2d[0]);
                 glEnd ();
               }
               else //if not selected
@@ -320,8 +320,8 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
                 glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
                 //drawing crosses
                 glBegin (GL_LINES);
-                  glVertex2fv(&(*lastPoint)[0]);
-                  glVertex2fv(&pt2d[0]);
+                  glVertex2dv(&(*lastPoint)[0]);
+                  glVertex2dv(&pt2d[0]);
                 glEnd ();
               }
               //to draw the line to the next in iteration step
@@ -360,16 +360,16 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
               glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
               //a line from lastPoint to firstPoint
               glBegin (GL_LINES);
-                glVertex2fv(&(*lastPoint)[0]);
-                glVertex2fv(&(*firstOfCell)[0]);
+                glVertex2dv(&(*lastPoint)[0]);
+                glVertex2dv(&(*firstOfCell)[0]);
               glEnd ();
             }
             else
             {
               glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
               glBegin (GL_LINES);
-                glVertex2fv(&(*lastPoint)[0]);
-                glVertex2fv(&(*firstOfCell)[0]);
+                glVertex2dv(&(*lastPoint)[0]);
+                glVertex2dv(&(*firstOfCell)[0]);
               glEnd ();
             }
           }
@@ -446,25 +446,25 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           {
             --end; //ensure even number of intersection-points
           }
-          float p[2];
+          double p[2];
           Point3D pt3d;
           Point2D pt2d;
           for ( it = intersectionPoints.begin( ); it != end; ++it )
           {
             glBegin (GL_LINES);
               displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
               ++it;
               displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
             glEnd ();
           }
           if(it!=intersectionPoints.end())
           {
             glBegin (GL_LINES);
               displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2fv(p);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
+              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
             glEnd ();
           }
         }//fill off-plane polygon part 2

@@ -17,7 +17,6 @@
 #ifndef SMTRANSITION_H_HEADER_INCLUDED
 #define SMTRANSITION_H_HEADER_INCLUDED
 
-#include <MitkExports.h>
 #include "mitkCommon.h"
 #include <itkLightObject.h>
 #include <string>
@@ -44,7 +43,7 @@ namespace mitk
   * \ingroup Interaction
   **/
 
-  class MITK_CORE_EXPORT StateMachineTransition: public itk::LightObject
+  class StateMachineTransition: public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineTransition, itk::LightObject);

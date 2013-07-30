@@ -18,10 +18,12 @@ TODO Std move to abort interaction of scroll/pan/zoom
 <statemachine>
     <state name="start" startstate="true" >
         <transition event_class="InteractionPositionEvent" event_variant="StartMove" target="move">
-            <action name="init"/>
+          <condition name="check_position_event"/>
+          <action name="init"/>
         </transition>
         <transition event_class="InteractionPositionEvent" event_variant="StartZoom" target="zoom">
-            <action name="init"/>
+          <condition name="check_position_event"/>
+          <action name="init"/>
         </transition>
         <!-- mitkDispplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
@@ -39,26 +41,30 @@ TODO Std move to abort interaction of scroll/pan/zoom
     </state>
     <state name="move">
       <transition event_class="InteractionPositionEvent" event_variant="Moving" target="move">
-            <action name="move"/>
+        <condition name="check_position_event"/>
+        <action name="move"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
     </state>
     <state name="zoom">
       <transition event_class="InteractionPositionEvent" event_variant="Zooming" target="zoom">
-            <action name="zoom"/>
+        <condition name="check_position_event"/>
+        <action name="zoom"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndZooming" target="start"/>
     </state>
     <state name="scroll">
       <transition event_class="InteractionPositionEvent" event_variant="Scrolling" target="scroll">
-            <action name="scroll"/>
+        <condition name="check_position_event"/>
+        <action name="scroll"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrollingVar" target="start"/>
     </state>
     <state name="adjustlevelwindow">
       <transition event_class="InteractionPositionEvent" event_variant="adjustlevelwindow" target="adjustlevelwindow">
-            <action name="levelWindow"/>
+        <condition name="check_position_event"/>
+        <action name="levelWindow"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
     </state>

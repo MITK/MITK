@@ -99,14 +99,12 @@ MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::MultiShellRadialAdcKurtosisImageFilter()
 {
   this->SetNumberOfRequiredInputs( 1 );
-  //this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::BeforeThreadedGenerateData()
 {
-
   // test whether BvalueMap contains all necessary information
   if(m_B_ValueMap.size() == 0)
   {
@@ -142,29 +140,24 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   it++; //skip bZeroIndices
 
   unsigned int shellIndex = 0;
-
   for(;it != m_B_ValueMap.end();++it)
   {
     //- calculate maxShOrder
     const IndicesVector currentShell = it->second;
     unsigned int SHMaxOrder = 12;
     while( ((SHMaxOrder+1)*(SHMaxOrder+2)/2) > currentShell.size() && ((SHMaxOrder+1)*(SHMaxOrder+2)/2) >= 4 )
-    {
-      SHMaxOrder -= 2 ;
-    }
+          SHMaxOrder -= 2 ;
+
     //- get TragetSHBasis using allDirectionsContainer
     vnl_matrix<double> sphericalCoordinates;
     sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(m_allDirectionsIndicies, m_OriginalGradientDirections);
     vnl_matrix<double> TargetSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
-    //MITK_INFO << "TargetSHBasis " << TargetSHBasis.rows() << " x " << TargetSHBasis.cols();
     //- get ShellSHBasis using currentShellDirections
     sphericalCoordinates = mitk::gradients::ComputeSphericalFromCartesian(currentShell, m_OriginalGradientDirections);
     vnl_matrix<double> ShellSHBasis = mitk::gradients::ComputeSphericalHarmonicsBasis(sphericalCoordinates, SHMaxOrder);
-    //MITK_INFO << "ShellSHBasis " << ShellSHBasis.rows() << " x " << ShellSHBasis.cols();
     //- calculate interpolationSHBasis [TargetSHBasis * ShellSHBasis^-1]
     vnl_matrix_inverse<double> invShellSHBasis(ShellSHBasis);
     vnl_matrix<double> shellInterpolationMatrix = TargetSHBasis * invShellSHBasis.pinverse();
-    //MITK_INFO << "shellInterpolationMatrix " << shellInterpolationMatrix.rows() << " x " << shellInterpolationMatrix.cols();
     //- save interpolationSHBasis
     m_ShellInterpolationMatrixVector.push_back(shellInterpolationMatrix);
 
@@ -173,7 +166,6 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     ++shellIndex;
 
   }
-
 
   m_WeightsVector.reserve(m_B_ValueMap.size()-1);
   BValueMap::const_iterator itt = m_B_ValueMap.begin();
@@ -190,7 +182,6 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
     m_WeightsVector.push_back(itt->second.size() / (double)maxShellSize);
     MITK_INFO << m_WeightsVector.back();
   }
-
 
   // initialize output image
   typename OutputImageType::Pointer outImage = static_cast<OutputImageType * >(ProcessObject::GetOutput(0));
@@ -232,7 +223,6 @@ void
 MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType /*threadId*/)
 {
-
   // Get input gradient image pointer
   typename InputImageType::Pointer inputImage = static_cast< InputImageType * >(ProcessObject::GetInput(0));
   // ImageRegionIterator for the input image
@@ -324,7 +314,6 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   }
 }
 
-
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
 ::calculateCoeffs(vnl_matrix<double> &lsfCoeffs, const vnl_matrix<double> & SignalMatrix, const double & S0)
@@ -333,30 +322,28 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   // initialize Least Squres Function
   // SignalMatrix.cols() defines the number of shells/measurement points
   lestSquaresFunction model(SignalMatrix.cols());
-
+  // set BValue Vector e.g.: [1000, 2000, 3000] <- shell b Values
+  model.set_bvalues(m_bValueVector);
 
   // initialize Levenberg Marquardt
   vnl_levenberg_marquardt minimizer(model);
-  minimizer.set_max_function_evals(50000); // Iterations
+
+  minimizer.set_max_function_evals(10000); // Iterations
   minimizer.set_f_tolerance(1e-10);        // Function tolerance
 
   // for each Direction calculate LSF Coeffs ADC & AKC
   for(unsigned int i = 0 ; i < SignalMatrix.rows(); i++)
   {
-    // set Signal Vector
+    // set voxel signal vector
     model.set_measurements(SignalMatrix.get_row(i));
-    // set BValue Vector e.g.: [1000, 2000, 3000] <- shell b Values
-    model.set_bvalues(m_bValueVector);
+    // set voxel reference signal
     model.set_reference_measurement(S0);
-
-    // Start Vector [ADC, AKC, S0]
-    initalGuess.put(0, 0.f);
-    initalGuess.put(1, 0.f);
-    //initalGuess.put(2, S0); // user B=0 Signal of processing Voxel
+    // Start Vector [ADC, AKC]
+    initalGuess.put(0, 0.f); // ADC
+    initalGuess.put(1, 0.8f); // AKC
 
     // start Levenberg-Marquardt
-    bool status =
-    minimizer.minimize_without_gradient(initalGuess);
+    bool status = minimizer.minimize_without_gradient(initalGuess);
 
     if(!status)
     {
@@ -366,7 +353,7 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
       MITK_INFO<< "Minimizer Evaluations: " << minimizer.get_num_evaluations();
       MITK_INFO<< "Minimizer Iterations: " << minimizer.get_num_iterations();
       MITK_INFO<< "______________________________";
-    }else{
+    }/*else{ //OUTPUT FOR EVALUATION
 
       std::cout << std::scientific << std::setprecision(5)
                 << initalGuess[0] << ";"                  // fitted ADC
@@ -377,13 +364,11 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
        std::cout << std::scientific << std::setprecision(5)
                  << SignalMatrix.get_row(i)[j] << ";";    // S_n Values corresponding to shell 1 to shell n
       std::cout << std::endl;
-    }
+    }*/
     // Set Coeffs for each gradient direction
     lsfCoeffs.set_row(i, initalGuess);
   }
 }
-
-
 
 template <class TInputScalarType, class TOutputScalarType>
 void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
@@ -393,13 +378,8 @@ void MultiShellRadialAdcKurtosisImageFilter<TInputScalarType, TOutputScalarType>
   for(unsigned int i = 0 ; i < lsfCoeffs.rows();i++){
     const double & D = lsfCoeffs(i,0);
     const double & K = lsfCoeffs(i,1);
-    //const double & S0 = lsfCoeffs(i,2);
-
     vec[i] = S0 * exp( -b * D + 1./6.* b * b * D * D * K);
-
-    //    std::cout << "OUTVAL = " << i << std::endl;
   }
 }
-
 
 } // end of namespace

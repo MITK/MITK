@@ -55,12 +55,46 @@ private:
   ClustersQuadrics& operator=(const ClustersQuadrics&);
 };
 
-mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
+static bool ValidateSurface(mitk::Surface::Pointer surface, unsigned int t)
 {
+  if (surface.IsNull())
+  {
+    MITK_ERROR << "Input surface is NULL!";
+    return false;
+  }
+
+  if (t >= surface->GetSizeOfPolyDataSeries())
+  {
+    MITK_ERROR << "Input surface doesn't have data at time step " << t << "!";
+    return false;
+  }
+
+  vtkPolyData* polyData = surface->GetVtkPolyData(t);
+
+  if (polyData == NULL)
+  {
+    MITK_ERROR << "PolyData of input surface at time step " << t << " is NULL!";
+    return false;
+  }
+
+  if (polyData->GetNumberOfPolys() == 0)
+  {
+    MITK_ERROR << "Input surface has no polygons at time step " << t << "!";
+    return false;
+  }
+
+  return true;
+}
+
+mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
+{
+  if (!ValidateSurface(surface, t))
+    return NULL;
+
   MITK_INFO << "Start remeshing...";
 
   vtkSmartPointer<vtkPolyData> surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
-  surfacePolyData->DeepCopy(surface->GetVtkPolyData());
+  surfacePolyData->DeepCopy(surface->GetVtkPolyData(t));
 
   vtkSmartPointer<vtkSurface> mesh = vtkSmartPointer<vtkSurface>::New();
 
@@ -86,6 +120,7 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, int nu
 
   remesher->Remesh();
 
+  // Optimization: Minimize distance between input surface and remeshed surface
   if (optimizationLevel != 0)
   {
     ClustersQuadrics clustersQuadrics(numVertices);

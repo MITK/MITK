@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageToImageFilter.h>
 #include <itkVectorImage.h>
 #include <itkPointShell.h>
+#include "vnl/vnl_least_squares_function.h"
+#include "vnl/algo/vnl_levenberg_marquardt.h"
 
 namespace itk
 {
@@ -31,6 +33,53 @@ namespace itk
   class MultiShellRadialAdcKurtosisImageFilter
     : public ImageToImageFilter<itk::VectorImage<TInputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >
   {
+
+  private:
+    struct lestSquaresFunction: public vnl_least_squares_function
+    {
+
+      void set_measurements(const vnl_vector<double>& x)
+      {
+        measurements.set_size(x.size());
+        measurements.copy_in(x.data_block());
+      }
+
+      void set_bvalues(const vnl_vector<double>& x)
+      {
+        bValueVector.set_size(x.size());
+        bValueVector.copy_in(x.data_block());
+      }
+
+      void set_reference_measurement(const double & x)
+      {
+        S0 = x;
+      }
+
+      vnl_vector<double> measurements;
+      vnl_vector<double> bValueVector;
+      double S0;
+      int N;
+
+      lestSquaresFunction(unsigned int number_of_measurements) :
+        vnl_least_squares_function(2 /*number of unknowns [ADC AKC]*/, number_of_measurements, no_gradient)
+      {
+        N = get_number_of_residuals();
+      }
+
+      void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+
+        const double & D = x[0];
+        const double & K = x[1];
+        const vnl_vector<double> & b = bValueVector;
+
+        for(int s=0; s<N; s++)
+        {
+          double approx = std::log(S0) - b[s] * D + 1./6. *b[s] * b[s] *D * D * K;
+          fx[s] = vnl_math_abs( std::log(measurements[s]) - approx );
+        }
+
+      }
+    };
 
   public:
 

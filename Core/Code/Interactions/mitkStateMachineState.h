@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 #define SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include <MitkExports.h>
 #include <string>
 #include <itkLightObject.h>
 #include "mitkStateMachineTransition.h"
@@ -30,7 +29,7 @@ namespace mitk {
    * m_StateMode .
    */
 
-  class MITK_CORE_EXPORT StateMachineState : public itk::LightObject
+  class StateMachineState : public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineState, itk::LightObject);
@@ -42,6 +41,13 @@ namespace mitk {
     typedef std::vector<StateMachineTransition::Pointer> TransitionVector;
 
     bool AddTransition( StateMachineTransition::Pointer transition );
+
+    /**
+    * @brief Return Transition which matches given event description.
+    *
+    * \deprecatedSince{2013_09} Use method GetTransitionList() instead.
+    */
+    DEPRECATED(StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant));
 
     /**
     * @brief Return Transitions that match given event description.

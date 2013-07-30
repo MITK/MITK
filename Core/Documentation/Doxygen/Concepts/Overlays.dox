@@ -5,7 +5,7 @@
 
 \section OverlaysPage_Introduction Overlays and Annotations
 
-The overlays in mitk are a simple way to display additional information on the render windows. A class, deriving from mitk::Overlay represents an arbitrary
+The overlays in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Overlay represents an arbitrary
 2D or 3D object that can be rendered as an overlay. This can for example be used for the annotation of 3D points or to overlay despriptions in the window corners.
 The mitk::OverlayManager is used to add the overlays to the renderwindows, updating them and manage the respective layout managers.
 The following features are implemented in this framework.
@@ -13,7 +13,7 @@ The following features are implemented in this framework.
   <li>Definition of graphical elements that can be displayed in the render windows.
   <li>It is possible to manage multiple elements in each window.
   <li>A single Overlay can be rendered on any number of available render windows.
-  <li>2D and 3D textelements are already defined in the Overlay module and are using vtk to create custom annotations.
+  <li>2D and 3D textelements are already defined in the Overlay module and are using VTK to create custom annotations.
   <li>The mitk::BaseLayouter interface enables the implementation of layout managers, to handle the placement of the overlays.
 </ol>
 
@@ -41,6 +41,53 @@ The mitk::Overlay can be implemented using a custom rendering framework like VTK
 The OverlayManager is a microservice that can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
 It also manages the respective Layouters which are used to manage the placement of a group of Overlays.
 
+\subsection OverlaysPage_OverlayManagerSubsection OverlayManager
+
+The mitk::OverlayManager is the manager for a set of Overlays and the respective Layouters. It is implemented as a microservice that can be instanciated multiple times.
+Before the manager can be used, all mitk::BaseRenderer have to be registered to the mitk::OverlayManager instance like this:
+
+\code
+m_OverlayManager = mitk::OverlayManager::New();
+mitk::BaseRenderer* axialRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow());
+axialRenderer->SetOverlayManager(m_OverlayManager);
+\endcode
+
+The mitk::OverlayManager can then be used anywhere in the program by fetching it as follows:
+
+\code
+//The id that is passed identifies the correct mitk::OverlayManager and is '0' by default.
+mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance(0);
+\endcode
+
+All mitk::Overlay instances can now be added to the OverlayManager by calling mitk::OverlayManager::AddOverlay.
+
+\subsection OverlaysPage_LayouterSubsection Layouter
+
+In order to use Layouters for the positioning
+of the Overlays, each Layouter object that has been created has to be added to an internal list in the OverlayManager:
+
+\code
+//fetch the renderer for that the Layouter will be used.
+mitk::BaseRenderer* axialRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow());
+
+//This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
+mitk::Overlay2DLayouter::Pointer layouter2D mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT, axialRenderer)
+
+//Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
+overlayManager->AddLayouter(layouter2D.GetPointer());
+
+//Several other Layouters can be added to the overlayManager
+mitk::Overlay2DLayouter::Pointer layouter2D mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM, axialRenderer)
+overlayManager->AddLayouter(layouter2D.GetPointer());
+\endcode
+
+The mitk::OverlayManager::SetLayouter method can then be used to configure an Overlay to be positioned by a certain Layouter:
+
+\code
+//Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
+overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,axialRenderer);
+\endcode
+
 \section OverlaysPage_UsageSection Usage of Predefined Overlays
 
 \subsection OverlaysPage_TextWidget2DUsageSubsection mitkTextOverlay2D
@@ -51,7 +98,7 @@ specific corner.
 mitk::BaseRenderer* axialRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetRenderWindow());
 
 //This fetches an instance of the OverlayManager microservice
-mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance();
+mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance(0);
 
 //Create a textOverlay2D
 mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
@@ -61,7 +108,7 @@ textOverlay->SetFontSize(40);
 textOverlay->SetColor(1,0,0); //Set text color to red
 textOverlay->SetOpacity(1);
 
-//Position is committed as a Point2D Property
+//The position of the Overlay can be set to a fixed coordinate on the display.
 mitk::Point2D pos;
 pos[0] = 10,pos[1] = 20;
 textOverlay->SetPosition2D(pos);
@@ -69,10 +116,11 @@ textOverlay->SetPosition2D(pos);
 //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
 overlayManager->AddOverlay(textOverlay.GetPointer());
 
+//Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
 //The Standard TopLeft Layouter has to be registered to the OverlayManager first
-overlayManager->AddLayouter(renderer, mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT, renderer));
+overlayManager->AddLayouter(mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT, renderer).GetPointer());
 
-//Set a Layouter to the overlay. If the Layouter is custom it has to be added to the OverlayManager first.
+//Set a Layouter to the overlay by using this method and pass the identifier of the previously registered Layouter.
 overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,axialRenderer);
 
 \endcode
@@ -80,8 +128,8 @@ overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::ST
 \subsection OverlaysPage_TextWidget3DUsageSubsection mitkTextOverlay3D
 This overlay displays labels in 3D coordinates. The labels always face the camera.
 \code
-//This fetches an instance of the OverlayManager microservice
-mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance();
+//This fetches an instance of the OverlayManager microservice.
+mitk::OverlayManager::Pointer overlayManager = mitk::OverlayManager::GetServiceInstance(0);
 
 mitk::PointSet::Pointer pointset = mitk::PointSet::New();
 
@@ -126,7 +174,7 @@ To do so, the update methods of the overlays have to be called manually before t
 
 A new custom Overlay should derive from mitkOverlay or one of the later mentioned subclasses VtkOverlay2D oder VtkOverlay3D. There should always be an implementation for the methods
 AddOverlay, RemoveOverlay and Update Overlay.
-UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by vtk, this method only applies the properties to the representation.
+UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by VTK, this method only applies the properties to the representation.
 If the custom Overlay requires additional properties, they should be made accessible by getters and setters for a better usability:
 \code
 void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)

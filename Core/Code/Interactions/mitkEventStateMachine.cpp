@@ -175,7 +175,7 @@ void mitk::EventStateMachine::ConnectActionsAndFunctions()
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
-bool mitk::EventStateMachine::CheckCondition(StateMachineCondition* condition, InteractionEvent* event)
+bool mitk::EventStateMachine::CheckCondition( const StateMachineCondition* condition, const InteractionEvent* event)
 {
   if (condition == NULL)
   {

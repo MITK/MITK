@@ -85,7 +85,7 @@ namespace mitk
     EventStateMachine::AddActionFunction(a, MessageDelegate2<Self, StateMachineAction*, InteractionEvent*, bool>(this, &Self::f));
 
 #define CONNECT_CONDITION(a, f) \
-    EventStateMachine::AddConditionFunction(a, MessageDelegate1<Self, InteractionEvent*, bool>(this, &Self::f));
+    EventStateMachine::AddConditionFunction(a, MessageDelegate1<Self,const InteractionEvent*, bool>(this, &Self::f));
 
 
   /**
@@ -136,7 +136,7 @@ namespace mitk
     virtual ~EventStateMachine();
 
     typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, bool> ActionFunctionDelegate;
-    typedef MessageAbstractDelegate1<InteractionEvent*, bool> ConditionFunctionDelegate;
+    typedef MessageAbstractDelegate1<const InteractionEvent*, bool> ConditionFunctionDelegate;
 
     /**
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
@@ -157,7 +157,7 @@ namespace mitk
 
     virtual void ConnectActionsAndFunctions();
 
-    virtual bool CheckCondition( StateMachineCondition* condition, InteractionEvent* interactionEvent );
+    virtual bool CheckCondition( const StateMachineCondition* condition, const InteractionEvent* interactionEvent );
 
     /**
      * Looks up function that is associated with action and executes it.

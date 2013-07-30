@@ -29,7 +29,7 @@ namespace mitk
   class StateMachineState;
 
   typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
-  typedef std::vector<mitk::StateMachineCondition::Pointer> ConditionVectorType;
+  typedef std::vector<const mitk::StateMachineCondition*> ConditionVectorType;
   typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
   /**
@@ -45,14 +45,12 @@ namespace mitk
 
   class StateMachineTransition: public itk::LightObject
   {
+    friend class StateMachineFactory;
+    friend class StateMachineContainer;
+
   public:
     mitkClassMacro(StateMachineTransition, itk::LightObject);
     mitkNewMacro3Param(Self, const std::string&, const std::string&, const std::string&);
-
-
-    void AddAction(const StateMachineAction::Pointer& action);
-
-    void AddCondition(const StateMachineCondition::Pointer& condition);
 
     SpStateMachineState GetNextState() const;
     std::string GetNextStateName() const;
@@ -86,9 +84,14 @@ namespace mitk
 
   private:
 
-    SpStateMachineState m_NextState;
-    std::string m_NextStateName;
+    void AddAction(const StateMachineAction::Pointer& action);
 
+    void AddCondition(const StateMachineCondition* condition);
+
+
+    SpStateMachineState m_NextState;
+
+    std::string m_NextStateName;
 
     InteractionEvent::Pointer m_TransitionEvent;
 
@@ -97,7 +100,7 @@ namespace mitk
      **/
     std::vector<StateMachineAction::Pointer> m_Actions;
 
-    std::vector<StateMachineCondition::Pointer> m_Conditions;
+    std::vector<const StateMachineCondition*> m_Conditions;
   };
 
 } // namespace mitk

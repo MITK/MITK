@@ -170,11 +170,11 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
 
     std::string conditionName = ReadXMLStringAttribut(NAME, atts);
     std::string inverted = ReadXMLStringAttribut(INVERTED, atts);
-    mitk::StateMachineCondition::Pointer condition = NULL;
+    mitk::StateMachineCondition* condition = NULL;
     if ( inverted ==  "" || inverted == "false" )
-      condition = mitk::StateMachineCondition::New( conditionName );
+      condition = new mitk::StateMachineCondition( conditionName );
     else
-      condition = mitk::StateMachineCondition::New( conditionName, true );
+      condition = new mitk::StateMachineCondition( conditionName, true );
 
     m_CurrTransition->AddCondition(condition);
   }

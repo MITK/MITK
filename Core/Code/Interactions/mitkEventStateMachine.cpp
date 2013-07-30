@@ -137,9 +137,18 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
       for (ConditionVectorType::iterator it = conditions.begin(); it != conditions.end(); ++it)
       {
         // sequentially check all conditions
-        if ( CheckCondition( *it, event ) == (*it)->IsInverted() )
+        try
         {
-          // if a condition is not fulfilled we can stop here
+          if ( CheckCondition( *it, event ) == (*it)->IsInverted() )
+          {
+            // if a condition is not fulfilled we can stop here
+            conditionMet = false;
+            break;
+          }
+        }
+        catch( std::exception e )
+        {
+          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
           conditionMet = false;
           break;
         }
@@ -156,7 +165,15 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
       ActionVectorType actions = (*transitionIter)->GetActions();
       for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
       {
-       ExecuteAction(*it, event);
+        try
+        {
+          ExecuteAction(*it, event);
+        }
+        catch( std::exception e )
+        {
+          MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
+          return false;
+        }
       }
 
       return true;

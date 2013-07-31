@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
 #include <mitkDiffusionImage.h>
-
+#include <mitkConnectomicsNetwork.h>
 #include "mitkGlobalInteraction.h"
 
 #include "mitkGeometry2D.h"
@@ -904,6 +904,8 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
       m_Controls->m_TSMenu->setVisible(false);  // deactivate mip etc. for tensor and q-ball images
       break;
     }
+    else if( node.IsNotNull() && dynamic_cast<mitk::ConnectomicsNetwork*>(nodeData) )
+      m_Controls->m_TSMenu->setVisible(false);
     else
       m_Controls->m_TSMenu->setVisible(true);
   }

@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
 
 int mitkIOUtilTest(int  argc , char* argv[])
 {
     // always start with this!
-    MITK_TEST_BEGIN("mitkIOUtilTest")
-            MITK_TEST_CONDITION_REQUIRED( argc >= 4, "Testing if input parameters are set.");
+    MITK_TEST_BEGIN("mitkIOUtilTest");
+    MITK_TEST_CONDITION_REQUIRED( argc >= 4, "Testing if input parameters are set.");
 
     std::string pathToImage = argv[1];
     std::string pathToPointSet = argv[2];
@@ -64,6 +65,18 @@ int mitkIOUtilTest(int  argc , char* argv[])
     //remove the pointset with default extension and not the one without
     remove(pointSetPathWithDefaultExtension.c_str());
 
-    MITK_TEST_END();
+    mitk::Image::Pointer relativImage = mitk::ImageGenerator::GenerateGradientImage<float>(4,4,4,1);
+    mitk::IOUtil::SaveImage(relativImage, "tempfile.nrrd");
+    try
+    {
+      mitk::IOUtil::LoadImageA("tempfile.nrrd");
+      MITK_TEST_CONDITION(true, "Temporary image is in right place");
+      remove("tempfile.nrrd");
+    }
+    catch (mitk::Exception &e)
+    {
+      MITK_TEST_CONDITION(false, "Temporary image is in right place");
+    }
 
+    MITK_TEST_END();
 }

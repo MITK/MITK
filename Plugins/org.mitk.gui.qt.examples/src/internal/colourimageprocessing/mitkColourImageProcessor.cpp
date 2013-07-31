@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkImage.h>
 #include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
 
 
 
@@ -873,7 +874,7 @@ static  inline int clamp(int x)
   }
 
 
-mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* input  ,unsigned char* input2, int sizeX,int sizeY,int sizeZ )
+mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( const unsigned char* input  , const unsigned char* input2, int sizeX,int sizeY,int sizeZ )
 {
   int voxel= sizeX*sizeY*sizeZ;
 
@@ -962,15 +963,23 @@ mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* 
 
 mitk::Image::Pointer mitkColourImageProcessor::combineRGBAImage( mitk::Image::Pointer input1 , mitk::Image::Pointer input2)
 {
+  // Order access to a whole Image object
+  try
+  {
+    mitk::ImageReadAccessor img1(input1);
+    const unsigned char* data1 = (const unsigned char*) img1.GetData();
+    mitk::ImageReadAccessor img2(input2);
+    const unsigned char* data2 = (const unsigned char*) img2.GetData();
 
-  RGBAImage::Pointer itk1,itk2;
+    unsigned int *dim = input1->GetDimensions();
 
-  unsigned char *data1=(unsigned char *)input1->GetData();
-  unsigned char *data2=(unsigned char *)input2->GetData();
-
-  unsigned int *dim = input1->GetDimensions();
-
-  return CombineRGBAImage(data1,data2,dim[0],dim[1],dim[2]);
+    return CombineRGBAImage(data1,data2,dim[0],dim[1],dim[2]);
+  }
+  catch(mitk::Exception& e)
+  {
+    MITK_ERROR << "mitkColourImageProcessor::combineRGBAImage - No access to image data possible." << e.what();
+    return NULL;
+  }
 }
 
 

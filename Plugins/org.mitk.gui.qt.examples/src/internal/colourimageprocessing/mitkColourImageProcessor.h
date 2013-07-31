@@ -59,7 +59,7 @@ class mitkColourImageProcessor
     template<class TType,class BType>
     mitk::Image::Pointer ScalarAndBinaryAndColorToRGBA(itk::Image<TType, 3>* input  ,itk::Image<BType, 3>* input2  , mitk::TransferFunction::Pointer tf, int * color);
 
-    mitk::Image::Pointer CombineRGBAImage( unsigned char* input  ,unsigned char* input2, int sizeX,int sizeY,int sizeZ );
+    mitk::Image::Pointer CombineRGBAImage(const unsigned char *input  , const unsigned char *input2, int sizeX, int sizeY, int sizeZ );
 
 };
 }//end namespace mitk

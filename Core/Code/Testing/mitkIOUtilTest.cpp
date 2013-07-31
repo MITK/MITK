@@ -69,7 +69,7 @@ int mitkIOUtilTest(int  argc , char* argv[])
     mitk::IOUtil::SaveImage(relativImage, "tempfile.nrrd");
     try
     {
-      mitk::IOUtil::LoadImageA("tempfile.nrrd");
+      mitk::IOUtil::LoadImage("tempfile.nrrd");
       MITK_TEST_CONDITION(true, "Temporary image is in right place");
       remove("tempfile.nrrd");
     }

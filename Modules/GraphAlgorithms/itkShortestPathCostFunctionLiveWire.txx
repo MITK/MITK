@@ -64,16 +64,16 @@ namespace itk
   void ShortestPathCostFunctionLiveWire<TInputImageType>
      ::SetImage(const TInputImageType* _arg)
   {
-      if (m_Image != _arg)
+      if (this->m_Image != _arg)
       {
-        m_Image = _arg;
+        this->m_Image = _arg;
 
         // initialize mask image
         m_MaskImage = UnsignedCharImageType::New();
-        m_MaskImage->SetRegions(m_Image->GetLargestPossibleRegion());
-        m_MaskImage->SetOrigin( m_Image->GetOrigin() );
-        m_MaskImage->SetSpacing( m_Image->GetSpacing() );
-        m_MaskImage->SetDirection( m_Image->GetDirection() );
+        m_MaskImage->SetRegions(this->m_Image->GetLargestPossibleRegion());
+        m_MaskImage->SetOrigin( this->m_Image->GetOrigin() );
+        m_MaskImage->SetSpacing( this->m_Image->GetSpacing() );
+        m_MaskImage->SetDirection( this->m_Image->GetDirection() );
         m_MaskImage->Allocate ();
         m_MaskImage->FillBuffer(0);
 

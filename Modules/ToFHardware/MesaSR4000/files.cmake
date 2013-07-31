@@ -7,5 +7,8 @@ SET(CPP_FILES
   mitkToFCameraMESADevice.cpp
   mitkToFCameraMESAController.cpp
 )
+set(RESOURCE_FILES
+  CalibrationFiles/Mesa-SR4000_Camera.xml
+)
 
 ENDIF(MITK_USE_TOF_MESASR4000)

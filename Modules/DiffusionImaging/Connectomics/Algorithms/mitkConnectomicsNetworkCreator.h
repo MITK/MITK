@@ -59,6 +59,10 @@ namespace mitk
     mitkClassMacro(ConnectomicsNetworkCreator, itk::Object);
     itkNewMacro(Self);
 
+
+    /** Type for Images **/
+    typedef itk::Image<int, 3 > ITKImageType;
+
     /** Types for the standardized Tract **/
     typedef itk::Point<float,3>                                          PointType;
     typedef itk::VectorContainer<unsigned int, PointType>                TractType;
@@ -187,6 +191,7 @@ namespace mitk
     /////////////////////// Variables ////////////////////////
     mitk::FiberBundleX::Pointer m_FiberBundle;
     mitk::Image::Pointer m_Segmentation;
+    ITKImageType::Pointer m_SegmentationItk;
 
     // the graph itself
     mitk::ConnectomicsNetwork::Pointer m_ConNetwork;

@@ -18,7 +18,7 @@ include_directories(${CTK_INCLUDE_DIRS})
 #find_program(DCMTK_STORESCP storescp)
 
 if(NOT EXISTS ${DCMTK_STORESCP})
-  message(SEND_ERROR "Couldn't find program storescp without the program query retrieve of the dicom plugin won't work!")
+  message(WARNING "Couldn't find program storescp without the program query retrieve of the dicom plugin won't work!")
 
 else(NOT EXISTS ${DCMTK_STORESCP})
 

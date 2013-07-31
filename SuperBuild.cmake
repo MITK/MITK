@@ -41,11 +41,11 @@ set(external_projects
   ACVD
   GDCM
   CableSwig
+  OpenCV
   ITK
   Boost
   DCMTK
   CTK
-  OpenCV
   SOFA
   MITKData
   )

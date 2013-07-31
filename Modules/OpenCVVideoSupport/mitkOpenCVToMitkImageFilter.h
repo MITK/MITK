@@ -72,5 +72,3 @@ protected:
 } // namespace
 
 #endif // mitkOpenCVToMitkImageFilter_h
-
-

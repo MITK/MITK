@@ -21,6 +21,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <sstream>
 
+#define _MITK_TEST_FOR_EXCEPTION(STATEMENT, EXCEPTION, MESSAGE) \
+  MITK_TEST_OUTPUT_NO_ENDL(<< MESSAGE) \
+  try \
+  { \
+    STATEMENT; \
+    MITK_TEST_OUTPUT(<< " [FAILED]") \
+    mitk::TestManager::GetInstance()->TestFailed(); \
+  } \
+  catch (const EXCEPTION& e) \
+  { \
+    MITK_TEST_OUTPUT(<< "\n  " << e.GetDescription() << " [PASSED]") \
+    mitk::TestManager::GetInstance()->TestPassed(); \
+  }
+
 template <typename T>
 static T lexical_cast(const std::string& string)
 {
@@ -38,34 +52,30 @@ static T lexical_cast(const std::string& string)
   return value;
 }
 
-static void Remesh_SurfaceIsNull_ReturnsNull()
+static void Remesh_SurfaceIsNull_ThrowsException()
 {
   mitk::Surface::ConstPointer surface;
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, 100, 0.0);
-  MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceIsNull_ReturnsNull")
+  _MITK_TEST_FOR_EXCEPTION(mitk::ACVD::Remesh(surface, 0, 100, 0.0), mitk::Exception, "Remesh_SurfaceIsNull_ThrowsException")
 }
 
-static void Remesh_PolyDataIsNull_ReturnsNull()
+static void Remesh_PolyDataIsNull_ThrowsException()
 {
   mitk::Surface::ConstPointer surface = mitk::Surface::New();
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, 100, 0.0);
-  MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_PolyDataIsNull_ReturnsNull")
+  _MITK_TEST_FOR_EXCEPTION(mitk::ACVD::Remesh(surface, 0, 100, 0.0), mitk::Exception, "Remesh_PolyDataIsNull_ThrowsException")
 }
 
-static void Remesh_SurfaceDoesNotHaveDataAtTimeStep_ReturnsNull()
+static void Remesh_SurfaceDoesNotHaveDataAtTimeStep_ThrowsException()
 {
   mitk::Surface::ConstPointer surface = mitk::Surface::New();
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 1, 100, 0.0);
-  MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceDoesNotHaveDataAtTimeStep_ReturnsNull")
+  _MITK_TEST_FOR_EXCEPTION(mitk::ACVD::Remesh(surface, 1, 100, 0.0), mitk::Exception, "Remesh_SurfaceDoesNotHaveDataAtTimeStep_ThrowsException")
 }
 
-static void Remesh_SurfaceHasNoPolygons_ReturnsNull()
+static void Remesh_SurfaceHasNoPolygons_ThrowsException()
 {
   mitk::Surface::Pointer surface = mitk::Surface::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   surface->SetVtkPolyData(polyData);
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface.GetPointer(), 0, 100, 0.0);
-  MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceHasNoPolygons_ReturnsNull")
+  _MITK_TEST_FOR_EXCEPTION(mitk::ACVD::Remesh(surface.GetPointer(), 0, 100, 0.0), mitk::Exception, "Remesh_SurfaceHasNoPolygons_ThrowsException")
 }
 
 static void Remesh_SurfaceIsValid_ReturnsRemeshedSurface(const std::string& filename, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
@@ -100,10 +110,10 @@ int mitkACVDTest(int argc, char* argv[])
 
   MITK_TEST_BEGIN("mitkACVDTest")
 
-    Remesh_SurfaceIsNull_ReturnsNull();
-    Remesh_PolyDataIsNull_ReturnsNull();
-    Remesh_SurfaceDoesNotHaveDataAtTimeStep_ReturnsNull();
-    Remesh_SurfaceHasNoPolygons_ReturnsNull();
+    Remesh_SurfaceIsNull_ThrowsException();
+    Remesh_PolyDataIsNull_ThrowsException();
+    Remesh_SurfaceDoesNotHaveDataAtTimeStep_ThrowsException();
+    Remesh_SurfaceHasNoPolygons_ThrowsException();
 
     Remesh_SurfaceIsValid_ReturnsRemeshedSurface(filename, t, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
 

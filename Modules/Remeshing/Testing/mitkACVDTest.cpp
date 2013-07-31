@@ -40,21 +40,21 @@ static T lexical_cast(const std::string& string)
 
 static void Remesh_SurfaceIsNull_ReturnsNull()
 {
-  mitk::Surface::Pointer surface;
+  mitk::Surface::ConstPointer surface;
   mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, 100, 0.0);
   MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceIsNull_ReturnsNull")
 }
 
 static void Remesh_PolyDataIsNull_ReturnsNull()
 {
-  mitk::Surface::Pointer surface = mitk::Surface::New();
+  mitk::Surface::ConstPointer surface = mitk::Surface::New();
   mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, 100, 0.0);
   MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_PolyDataIsNull_ReturnsNull")
 }
 
 static void Remesh_SurfaceDoesNotHaveDataAtTimeStep_ReturnsNull()
 {
-  mitk::Surface::Pointer surface = mitk::Surface::New();
+  mitk::Surface::ConstPointer surface = mitk::Surface::New();
   mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 1, 100, 0.0);
   MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceDoesNotHaveDataAtTimeStep_ReturnsNull")
 }
@@ -64,13 +64,13 @@ static void Remesh_SurfaceHasNoPolygons_ReturnsNull()
   mitk::Surface::Pointer surface = mitk::Surface::New();
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   surface->SetVtkPolyData(polyData);
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, 100, 0.0);
+  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface.GetPointer(), 0, 100, 0.0);
   MITK_TEST_CONDITION(remeshedSurface.IsNull(), "Remesh_SurfaceHasNoPolygons_ReturnsNull")
 }
 
 static void Remesh_SurfaceIsValid_ReturnsRemeshedSurface(const std::string& filename, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
 {
-  mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(filename);
+  mitk::Surface::ConstPointer surface = mitk::IOUtil::LoadSurface(filename);
   mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, t, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
   MITK_TEST_CONDITION(remeshedSurface.IsNotNull() && remeshedSurface->GetVtkPolyData() != NULL && remeshedSurface->GetVtkPolyData()->GetNumberOfPolys() != 0, "Remesh_SurfaceIsValid_ReturnsRemeshedSurface")
 }

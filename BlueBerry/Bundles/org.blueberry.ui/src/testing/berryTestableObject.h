@@ -48,7 +48,7 @@ private:
 
 public:
 
-  berryObjectMacro(TestableObject)
+  berryObjectMacro(TestableObject);
 
     /**
      * Returns the test harness, or <code>null</code> if it has not yet been set.

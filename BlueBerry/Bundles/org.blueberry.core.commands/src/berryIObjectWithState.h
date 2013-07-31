@@ -38,7 +38,7 @@ namespace berry {
  */
 struct BERRY_COMMANDS IObjectWithState : public virtual Object {
 
-  berryInterfaceMacro(IObjectWithState, berry)
+  berryInterfaceMacro(IObjectWithState, berry);
 
   /**
    * Adds state to this object.

@@ -41,7 +41,7 @@ class CommandManagerEvent;
 struct BERRY_COMMANDS ICommandManagerListener: public virtual Object
 {
 
-berryInterfaceMacro(ICommandManagerListener, berry)
+berryInterfaceMacro(ICommandManagerListener, berry);
 
 struct Events {
 

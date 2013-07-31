@@ -41,7 +41,7 @@ class BERRY_JOBS Worker: public Object, public Poco::Thread
 
 public:
 
-  berryObjectMacro(Worker)
+  berryObjectMacro(Worker);
 
   Worker(WeakPointer<WorkerPool> myPool);
 

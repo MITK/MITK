@@ -34,7 +34,7 @@ class QmitkPropertyListView : public QmitkAbstractView
   Q_OBJECT
 
 public:
-  berryObjectMacro(QmitkPropertyListView)
+  berryObjectMacro(QmitkPropertyListView);
 
   ///
   /// The unique ID of this view

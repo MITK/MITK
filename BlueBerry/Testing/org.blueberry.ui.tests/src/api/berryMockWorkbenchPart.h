@@ -41,7 +41,7 @@ class MockWorkbenchPart: public virtual IWorkbenchPart, public IExecutableExtens
 
 public:
 
-  berryObjectMacro(MockWorkbenchPart)
+  berryObjectMacro(MockWorkbenchPart);
 
   MockWorkbenchPart();
 

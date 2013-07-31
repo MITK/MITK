@@ -66,7 +66,7 @@ namespace berry {
  */
 struct BERRY_UI ISaveablesSource : public virtual Object {
 
-  berryInterfaceMacro(ISaveablesSource, berry)
+  berryInterfaceMacro(ISaveablesSource, berry);
 
   ~ISaveablesSource();
 

@@ -62,7 +62,7 @@ namespace berry {
  */
 struct BERRY_UI IPerspectiveDescriptor : public Object {
 
-  berryInterfaceMacro(IPerspectiveDescriptor, berry)
+  berryInterfaceMacro(IPerspectiveDescriptor, berry);
 
   virtual ~IPerspectiveDescriptor();
 

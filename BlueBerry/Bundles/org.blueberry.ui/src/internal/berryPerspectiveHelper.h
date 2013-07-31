@@ -125,7 +125,7 @@ private:
   struct ActualDropTarget: public AbstractDropTarget
   {
 
-    berryObjectMacro(ActualDropTarget)
+    berryObjectMacro(ActualDropTarget);
 
     /**
      * @param part

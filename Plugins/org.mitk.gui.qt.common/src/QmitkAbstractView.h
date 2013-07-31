@@ -127,7 +127,7 @@ public:
   /**
    * Creates smartpointer typedefs
    */
-  berryObjectMacro(QmitkAbstractView)
+  berryObjectMacro(QmitkAbstractView);
 
   /**
    * Nothing to do in the standard ctor. <b>Initiliaze your GUI in CreateQtPartControl(QWidget*)</b>

@@ -73,7 +73,7 @@ namespace berry {
  */
 struct BERRY_UI IViewPart : public virtual IWorkbenchPart {
 
-  berryInterfaceMacro(IViewPart, berry)
+  berryInterfaceMacro(IViewPart, berry);
 
   virtual ~IViewPart();
 

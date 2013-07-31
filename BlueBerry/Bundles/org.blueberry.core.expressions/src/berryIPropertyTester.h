@@ -43,7 +43,7 @@ namespace berry {
  */
 struct BERRY_EXPRESSIONS IPropertyTester : public Object {
 
-  berryInterfaceMacro(IPropertyTester, berry)
+  berryInterfaceMacro(IPropertyTester, berry);
 
   virtual ~IPropertyTester() {}
 

@@ -47,7 +47,7 @@ namespace berry
 struct BERRY_JOBS IJobChangeListener: public Object
 {
 
-berryInterfaceMacro(IJobChangeListener, berry)
+berryInterfaceMacro(IJobChangeListener, berry);
 
   struct BERRY_JOBS Events
   {

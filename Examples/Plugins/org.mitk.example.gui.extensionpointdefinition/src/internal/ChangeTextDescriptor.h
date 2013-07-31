@@ -27,7 +27,7 @@ class ChangeTextDescriptor : public berry::Object
 
 public:
 
-  berryObjectMacro(ChangeTextDescriptor)
+  berryObjectMacro(ChangeTextDescriptor);
 
   /**
    * Initialize the "ChangeText" Descriptor with the given extension point.

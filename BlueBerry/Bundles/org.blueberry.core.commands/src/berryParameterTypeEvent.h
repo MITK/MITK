@@ -37,7 +37,7 @@ class BERRY_COMMANDS ParameterTypeEvent : public AbstractHandleObjectEvent {
 
 public:
 
-  berryObjectMacro(ParameterTypeEvent)
+  berryObjectMacro(ParameterTypeEvent);
 
   /**
    * Returns the instance of the parameter type that changed.

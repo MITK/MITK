@@ -37,7 +37,7 @@ namespace berry {
  */
 struct BERRY_EXPRESSIONS IIterable : public Object {
 
-  berryObjectMacro(IIterable)
+  berryObjectMacro(IIterable);
 
   typedef std::vector<Object::Pointer>::iterator iterator;
 

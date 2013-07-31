@@ -32,7 +32,7 @@ class ServiceLocatorCreator : public IServiceLocatorCreator
 
 public:
 
-  berryObjectMacro(ServiceLocatorCreator)
+  berryObjectMacro(ServiceLocatorCreator);
 
   SmartPointer<IServiceLocator> CreateServiceLocator(
       const WeakPointer<IServiceLocator> parent,

@@ -39,7 +39,7 @@ class State;
  */
 struct BERRY_COMMANDS IStateListener : public virtual Object {
 
-  berryInterfaceMacro(IStateListener, berry)
+  berryInterfaceMacro(IStateListener, berry);
 
   struct Events {
 

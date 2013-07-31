@@ -45,7 +45,7 @@ namespace berry {
  */
 struct BERRY_UI IServiceLocator : public virtual Object {
 
-  berryInterfaceMacro(IServiceLocator, berry)
+  berryInterfaceMacro(IServiceLocator, berry);
 
   ~IServiceLocator();
 

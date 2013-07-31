@@ -40,7 +40,7 @@ class PageLayout;
  */
 class FolderLayout : public IFolderLayout {
 
-public: berryObjectMacro(FolderLayout)
+public: berryObjectMacro(FolderLayout);
 
 private:
 

@@ -45,7 +45,7 @@ class BERRY_EXPRESSIONS Expression : public Object {
 
 
 public:
-  berryObjectMacro(Expression)
+  berryObjectMacro(Expression);
 
   /**
    * The constant integer hash code value meaning the hash code has not yet

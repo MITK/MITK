@@ -60,8 +60,8 @@ class BERRY_UI WorkbenchPage: public IWorkbenchPage
 {
 
 public:
-  berryObjectMacro(WorkbenchPage)
-;
+  berryObjectMacro(WorkbenchPage);
+
 protected:
 
   //TODO Weakpointer

@@ -41,7 +41,7 @@ class ExecutionEvent;
  */
 struct BERRY_COMMANDS IExecutionListener : public virtual Object {
 
-  berryInterfaceMacro(IExecutionListener, berry)
+  berryInterfaceMacro(IExecutionListener, berry);
 
   struct Events {
 

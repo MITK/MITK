@@ -36,7 +36,7 @@ namespace berry {
  */
 struct BERRY_UI IFolderLayout : public IPlaceholderFolderLayout {
 
-  berryInterfaceMacro(IFolderLayout, berry)
+  berryInterfaceMacro(IFolderLayout, berry);
 
   ~IFolderLayout();
 

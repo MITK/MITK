@@ -115,8 +115,7 @@ public:
   struct IExceptionHandler: public Object
   {
 
-    berryObjectMacro(IExceptionHandler)
-    ;
+    berryObjectMacro(IExceptionHandler);
 
     /**
      * Handle the exception.

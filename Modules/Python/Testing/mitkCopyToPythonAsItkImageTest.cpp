@@ -54,6 +54,7 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   index[2] = 24;
 
   try{
+    // pic3D of type char
     mitk::ImagePixelReadAccessor<char,3> pythonImageAccesor(pythonImage);
 
     //TODO Use the assert comparison methods once we have them implemented and remove GetPixelValueByIndex
@@ -61,8 +62,7 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
     MITK_TEST_CONDITION( pythonImageAccesor.GetDimension(1) == 256, "Is the 2nd dimension of Pic3D still 256?");
     MITK_TEST_CONDITION( pythonImageAccesor.GetDimension(2) == 49, "Is the 3rd dimension of Pic3D still 49?");
 
-
-    MITK_TEST_CONDITION( pythonImageAccesor.GetPixelByIndex(indx) == 96, "Is the value of Pic3D at (128,128,24) still 96?");
+    MITK_TEST_CONDITION( pythonImageAccesor.GetPixelByIndex(index) == 96, "Is the value of Pic3D at (128,128,24) still 96?");
   }catch(...)
   {
     MITK_TEST_CONDITION( false, "Image is not readable! ");

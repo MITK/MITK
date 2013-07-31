@@ -54,6 +54,7 @@ class DataStorage;
  *
  * Properties that influence rendering are:
  *
+ *   - \b "draw edges": (Bool) Toggle display of the tubed frame
  *   - \b "color": (ColorProperty) Color of the tubed frame.
  *   - \b "xresolution": (FloatProperty) Resolution (=number of tiles) in x direction. Only relevant for ThinPlateSplineCurvedGeometry
  *   - \b "yresolution": (FloatProperty) Resolution (=number of tiles) in y direction. Only relevant for ThinPlateSplineCurvedGeometry

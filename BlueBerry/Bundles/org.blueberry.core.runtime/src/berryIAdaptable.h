@@ -54,7 +54,7 @@ struct BERRY_RUNTIME IAdaptable {
 
 public:
 
-  berryNameMacro(berry::IAdaptable)
+  berryNameMacro(berry::IAdaptable);
 
   /**
    * Returns an object which is an instance of the given class

@@ -4,7 +4,7 @@
 
 This Introduction will acquaint you with the most important work flows to get you started with your MITK Development.
 First, \ref Architecture will explain the difference between the application and the toolkit. 
-\ref SettingUpMITK will get you started with a working MITK Development environment. \GettingToKnowMITK will walk you trough the folder structure and the module and plugin system. This chapter also contains an extensive tutorial on how to work with MITK.
+\ref SettingUpMITK will get you started with a working MITK Development environment. \ref GettingToKnowMITK will walk you trough the folder structure and the module and plugin system. This chapter also contains an extensive tutorial on how to work with MITK.
 The \ref FirstSteps section will then show you how to extend MITK for your own project.
 
 
@@ -17,7 +17,7 @@ The \ref FirstSteps section will then show you how to extend MITK for your own p
     <li> \ref SupportedPlatformsPage </li>
     <li> \ref BuildInstructionsPage </li>
     <li> \ref thirdpartylibs </li>
-	<li> \ref HowToNewProject </li>
+  <li> \ref HowToNewProject </li>
   </ul>
   <li> \subpage GettingToKnowMITK </li>
   <ul>
@@ -33,7 +33,7 @@ The \ref FirstSteps section will then show you how to extend MITK for your own p
   <ul>
     <li> \ref NewPluginPage </li>
     <li> \ref NewModulePage</li>
-	<li> \ref CMAKE_FAQ </li>
+  <li> \ref CMAKE_FAQ </li>
     <li> \ref StatemachineEditor </li>
   </ul>
   <li> \subpage AboutTestingPage </li>

@@ -36,7 +36,7 @@ namespace mitk {
 class MITK_CORE_EXPORT AnnotationProperty : public BaseProperty
 {
 public:
-  mitkClassMacro(AnnotationProperty, BaseProperty)
+  mitkClassMacro(AnnotationProperty, BaseProperty);
 
   typedef std::string ValueType;
 

@@ -84,17 +84,17 @@ cd MITK-superbuild
 ccmake ../MITK
 \endcode
 
-If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
+If you use <b>Windows</b>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
 choose a suitable generator and configure the project.
 
 If you use <b>Mac OS X</b> you will have to tweak the CMake configuration:
  - First of all you have to check the selected compilers, i.e.:
-  - <tt><b>CMAKE_CXX_COMPILER</tt></b>
-  - <tt><b>CMAKE_C_COMPILER</tt></b>
+  - <tt><b>CMAKE_CXX_COMPILER</b></tt>
+  - <tt><b>CMAKE_C_COMPILER</b></tt>
   - both should be either apple's clang or apple's gcc compiler
- - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</tt></b> points to the correct SDK location:
+ - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</b></tt> points to the correct SDK location:
   - This is either /Developer/SDKs/Developer/SDKs/MacOSX10.7.sdk or if you have installed Xcode 4.3+ it is located in /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/
- - Finally you should set the cmake variable <tt><b>MITK_USE_VTK_5_8_IN_SUPERBUILD</tt></b> to ON
+ - Finally you should set the cmake variable <tt><b>MITK_USE_VTK_5_8_IN_SUPERBUILD</b></tt> to ON
 
 CMake will present you a couple of options, these are the most important ones:
 

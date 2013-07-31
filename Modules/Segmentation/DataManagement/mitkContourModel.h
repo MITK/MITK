@@ -124,8 +124,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep.
     The vertex is added at the end of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -145,9 +145,9 @@ namespace mitk
 
     /** \brief Add a vertex to the contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
     will be rendered).
 
 
@@ -159,8 +159,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -170,8 +170,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -180,9 +180,9 @@ namespace mitk
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
     will be rendered).
 
 
@@ -233,7 +233,7 @@ namespace mitk
 
     /** \brief Returns the number of vertices at a given timestep.
 
-    \pararm timestep - default = 0
+    \param timestep - default = 0
     */
     int GetNumberOfVertices( int timestep=0);
 
@@ -251,9 +251,9 @@ namespace mitk
 
     /** \brief Mark a vertex at a given position in 3D space.
 
-    \pararm point - query point in 3D space
-    \pararm eps - radius for nearest neighbour search (error bound).
-    \pararm timestep - search at this timestep
+    \param point - query point in 3D space
+    \param eps - radius for nearest neighbour search (error bound).
+    \param timestep - search at this timestep
 
     @return true = vertex found;  false = no vertex found
     */
@@ -283,14 +283,14 @@ namespace mitk
 
     /** \brief Shift the currently selected vertex by a translation vector.
 
-    \pararm translate - the translation vector.
+    \param translate - the translation vector.
     */
     void ShiftSelectedVertex(mitk::Vector3D &translate);
 
     /** \brief Shift the whole contour by a translation vector at given timestep.
 
-    \pararm translate - the translation vector.
-    \pararm timestep - at this timestep the contour will be shifted.
+    \param translate - the translation vector.
+    \param timestep - at this timestep the contour will be shifted.
     */
     void ShiftContour(mitk::Vector3D &translate, int timestep=0);
 

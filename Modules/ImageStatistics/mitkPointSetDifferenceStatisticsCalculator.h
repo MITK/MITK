@@ -38,7 +38,7 @@ public:
   mitkClassMacro( PointSetDifferenceStatisticsCalculator, itk::Object );
   itkNewMacro( PointSetDifferenceStatisticsCalculator );
 
-  mitkNewMacro2Param(PointSetDifferenceStatisticsCalculator,mitk::PointSet::Pointer,mitk::PointSet::Pointer)
+  mitkNewMacro2Param(PointSetDifferenceStatisticsCalculator,mitk::PointSet::Pointer,mitk::PointSet::Pointer);
 
   /*!
   \brief set point sets to be compared

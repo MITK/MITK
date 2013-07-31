@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkACVD.h"
+#include <mitkExceptionMacro.h>
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
 #include <vtkIsotropicDiscreteRemeshing.h>
@@ -55,46 +56,31 @@ private:
   ClustersQuadrics& operator=(const ClustersQuadrics&);
 };
 
-static bool ValidateSurface(mitk::Surface::Pointer surface, unsigned int t)
+static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
 {
   if (surface.IsNull())
-  {
-    MITK_ERROR << "Input surface is NULL!";
-    return false;
-  }
+    mitkThrow() << "Input surface is NULL!";
 
   if (t >= surface->GetSizeOfPolyDataSeries())
-  {
-    MITK_ERROR << "Input surface doesn't have data at time step " << t << "!";
-    return false;
-  }
+    mitkThrow() << "Input surface doesn't have data at time step " << t << "!";
 
-  vtkPolyData* polyData = surface->GetVtkPolyData(t);
+  vtkPolyData* polyData = const_cast<mitk::Surface*>(surface.GetPointer())->GetVtkPolyData(t);
 
   if (polyData == NULL)
-  {
-    MITK_ERROR << "PolyData of input surface at time step " << t << " is NULL!";
-    return false;
-  }
+    mitkThrow() << "PolyData of input surface at time step " << t << " is NULL!";
 
   if (polyData->GetNumberOfPolys() == 0)
-  {
-    MITK_ERROR << "Input surface has no polygons at time step " << t << "!";
-    return false;
-  }
-
-  return true;
+    mitkThrow() << "Input surface has no polygons at time step " << t << "!";
 }
 
-mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
+mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
 {
-  if (!ValidateSurface(surface, t))
-    return NULL;
+  ValidateSurface(surface, t);
 
   MITK_INFO << "Start remeshing...";
 
   vtkSmartPointer<vtkPolyData> surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
-  surfacePolyData->DeepCopy(surface->GetVtkPolyData(t));
+  surfacePolyData->DeepCopy(const_cast<Surface*>(surface.GetPointer())->GetVtkPolyData(t));
 
   vtkSmartPointer<vtkSurface> mesh = vtkSmartPointer<vtkSurface>::New();
 
@@ -103,6 +89,9 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, unsign
   mesh->GetPointData()->Initialize();
 
   mesh->DisplayMeshProperties();
+
+  if (numVertices == 0)
+    numVertices = surfacePolyData->GetNumberOfPoints();
 
   if (edgeSplitting != 0.0)
     mesh->SplitLongEdges(edgeSplitting);
@@ -193,4 +182,28 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::Pointer surface, unsign
   MITK_INFO << "Finished remeshing";
 
   return remeshedSurface;
+}
+
+mitk::ACVD::RemeshFilter::RemeshFilter()
+: m_TimeStep(0),
+  m_NumVertices(0),
+  m_Gradation(1.0),
+  m_Subsampling(10),
+  m_EdgeSplitting(0.0),
+  m_OptimizationLevel(1),
+  m_ForceManifold(false),
+  m_BoundaryFixing(false)
+{
+  Surface::Pointer output = Surface::New();
+  this->SetNthOutput(0, output);
+}
+
+mitk::ACVD::RemeshFilter::~RemeshFilter()
+{
+}
+
+void mitk::ACVD::RemeshFilter::GenerateData()
+{
+  Surface::Pointer output = Remesh(this->GetInput(), m_TimeStep, m_NumVertices, m_Gradation, m_Subsampling, m_EdgeSplitting, m_OptimizationLevel, m_ForceManifold, m_BoundaryFixing);
+  this->SetNthOutput(0, output);
 }

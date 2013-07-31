@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageStatisticsHolder.h"
 #include "mitkImageCast.h"
-#include "mitkImagePixelReadAccessor.h"
 
 #include "itkImageRegionIteratorWithIndex.h"
 

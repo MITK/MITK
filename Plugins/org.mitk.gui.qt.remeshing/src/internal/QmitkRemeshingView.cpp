@@ -163,7 +163,7 @@ void QmitkRemeshingView::OnOptimizationLevelChanged(int optimizationLevel)
 void QmitkRemeshingView::OnRemeshButtonClicked()
 {
   mitk::DataNode::Pointer selectedNode = m_Controls.surfaceComboBox->GetSelectedNode();
-  mitk::Surface::Pointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
+  mitk::Surface::ConstPointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
   int numVertices = m_Controls.numVerticesSpinBox->value();
   double gradation = m_Controls.gradationSpinBox->value();
   int subsampling = m_Controls.subsamplingSpinBox->value();
@@ -172,7 +172,30 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
   bool forceManifold = m_Controls.forceManifoldCheckBox->isChecked();
   bool boundaryFixing = m_Controls.boundaryFixingCheckBox->isChecked();
 
-  mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
+  // mitk::Surface::Pointer remeshedSurface = mitk::ACVD::Remesh(surface, 0, numVertices, gradation, subsampling, edgeSplitting, optimizationLevel, forceManifold, boundaryFixing);
+
+  mitk::ACVD::RemeshFilter::Pointer remesher = mitk::ACVD::RemeshFilter::New();
+  remesher->SetInput(surface);
+  remesher->SetTimeStep(0);
+  remesher->SetNumVertices(numVertices);
+  remesher->SetGradation(gradation);
+  remesher->SetSubsampling(subsampling);
+  remesher->SetEdgeSplitting(edgeSplitting);
+  remesher->SetOptimizationLevel(optimizationLevel);
+  remesher->SetForceManifold(forceManifold);
+  remesher->SetBoundaryFixing(boundaryFixing);
+
+  try
+  {
+    remesher->Update();
+  }
+  catch(const mitk::Exception& exception)
+  {
+    MITK_ERROR << exception.GetDescription();
+    return;
+  }
+
+  mitk::Surface::Pointer remeshedSurface = remesher->GetOutput();
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2, %3)").arg(selectedNode->GetName().c_str()).arg(remeshedSurface->GetVtkPolyData()->GetNumberOfPoints()).arg(gradation).toStdString());

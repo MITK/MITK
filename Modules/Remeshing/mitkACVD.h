@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkACVD_h
 
 #include <mitkSurface.h>
+#include <mitkSurfaceToSurfaceFilter.h>
 #include <RemeshingExports.h>
 
 namespace mitk
@@ -40,7 +41,7 @@ namespace mitk
      *
      * \param[in] surface Input surface.
      * \param[in] t Time step of a four-dimensional input surface, zero otherwise.
-     * \param[in] numVertices Desired number of vertices in the remeshed surface.
+     * \param[in] numVertices Desired number of vertices in the remeshed surface, set to zero to keep original vertex count.
      * \param[in] gradation Influence of surface curvature on polygon size.
      * \param[in] subsampling Subsample input surface until number of vertices exceeds initial count times this parameter.
      * \param[in] edgeSplitting Recursively split edges that are longer than the average edge length times this parameter.
@@ -48,7 +49,41 @@ namespace mitk
      * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
      * \return Returns the remeshed surface or NULL if input surface is invalid.
      */
-    Remeshing_EXPORT Surface::Pointer Remesh(Surface::Pointer surface, unsigned int t, int numVertices, double gradation, int subsampling = 10, double edgeSplitting = 0.0, int optimizationLevel = 1, bool forceManifold = false, bool boundaryFixing = false);
+    Remeshing_EXPORT Surface::Pointer Remesh(Surface::ConstPointer surface, unsigned int t, int numVertices, double gradation, int subsampling = 10, double edgeSplitting = 0.0, int optimizationLevel = 1, bool forceManifold = false, bool boundaryFixing = false);
+
+    /** \brief Encapsulates mitk::ACVD::Remesh function as filter.
+     */
+    class Remeshing_EXPORT RemeshFilter : public mitk::SurfaceToSurfaceFilter
+    {
+    public:
+      mitkClassMacro(RemeshFilter, SurfaceToSurfaceFilter);
+      itkNewMacro(Self);
+
+      itkSetMacro(TimeStep, unsigned int);
+      itkSetMacro(NumVertices, int);
+      itkSetMacro(Gradation, double);
+      itkSetMacro(Subsampling, int);
+      itkSetMacro(EdgeSplitting, double);
+      itkSetMacro(OptimizationLevel, int);
+      itkSetMacro(ForceManifold, bool);
+      itkSetMacro(BoundaryFixing, bool);
+
+    protected:
+      void GenerateData();
+
+    private:
+      RemeshFilter();
+      ~RemeshFilter();
+
+      unsigned int m_TimeStep;
+      int m_NumVertices;
+      double m_Gradation;
+      int m_Subsampling;
+      double m_EdgeSplitting;
+      int m_OptimizationLevel;
+      bool m_ForceManifold;
+      bool m_BoundaryFixing;
+    };
   }
 }
 

@@ -31,9 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorContainer.h"
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
+#include <itkDwiGradientLengthCorrectionFilter.h>
+
+// Multishell includes
 #include <itkMultiShellAdcAverageReconstructionImageFilter.h>
 #include <itkMultiShellRadialAdcKurtosisImageFilter.h>
-#include <itkDwiGradientLengthCorrectionFilter.h>
+#include <itkRadialMultishellToSingleshellImageFilter.h>
+
+// Multishell Functors
+#include <itkADCAverageFunctor.h>
+#include <itkKurtosisFitFunctor.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -168,26 +175,37 @@ void QmitkPreprocessingView::DoBiExpFit(){}
 void QmitkPreprocessingView::DoAKCFit()
 {
   typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef itk::MultiShellRadialAdcKurtosisImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
   typedef DiffusionImageType::BValueMap BValueMap;
+  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
 
   for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
       DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
       BValueMap originalShellMap = inImage->GetB_ValueMap();
-
       GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+
+      BValueMap::iterator it = originalShellMap.begin();
+      ++it;/* skip b=0*/ int s = 0; /*shell index */
+      vnl_vector<double> bValueList(originalShellMap.size()-1);
+      while(it != originalShellMap.end())
+        bValueList.put(s++,(it++)->first);
+
+      const double targetBValue = 1000;
+      itk::KurtosisFitFunctor::Pointer kurtosisFitFunctor = itk::KurtosisFitFunctor::New();
+      kurtosisFitFunctor->setListOfBValues(bValueList);
+      kurtosisFitFunctor->setTargetBValue(targetBValue);
 
       FilterType::Pointer filter = FilterType::New();
       filter->SetInput(inImage->GetVectorImage());
       filter->SetOriginalGradientDirections(gradientContainer);
       filter->SetOriginalBValueMap(originalShellMap);
-      filter->SetB_Value(inImage->GetB_Value());
+      filter->SetOriginalBValue(inImage->GetB_Value());
+      filter->SetFunctor(kurtosisFitFunctor);
       filter->Update();
 
       DiffusionImageType::Pointer outImage = DiffusionImageType::New();
       outImage->SetVectorImage( filter->GetOutput() );
-      outImage->SetB_Value( filter->GetTargetB_Value() );
+      outImage->SetB_Value( targetBValue );
       outImage->SetDirections( filter->GetTargetGradientDirections() );
       outImage->InitializeFromVectorImage();
 
@@ -203,30 +221,40 @@ void QmitkPreprocessingView::DoAKCFit()
 
 void QmitkPreprocessingView::DoADCFit()
 {
+
     typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-    typedef itk::MultiShellAdcAverageReconstructionImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
     typedef DiffusionImageType::BValueMap BValueMap;
+    typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
 
     for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
     {
         DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
         BValueMap originalShellMap = inImage->GetB_ValueMap();
-
         GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+
+        BValueMap::iterator it = originalShellMap.begin();
+        ++it;/* skip b=0*/ int s = 0; /*shell index */
+        vnl_vector<double> bValueList(originalShellMap.size()-1);
+        while(it != originalShellMap.end())
+          bValueList.put(s++,(it++)->first);
+
+        const double targetBValue = 1000;
+        itk::ADCAverageFunctor::Pointer ADCAverageFunctor = itk::ADCAverageFunctor::New();
+        ADCAverageFunctor->setListOfBValues(bValueList);
+        ADCAverageFunctor->setTargetBValue(targetBValue);
 
         FilterType::Pointer filter = FilterType::New();
         filter->SetInput(inImage->GetVectorImage());
         filter->SetOriginalGradientDirections(gradientContainer);
         filter->SetOriginalBValueMap(originalShellMap);
-        filter->SetB_Value(inImage->GetB_Value());
+        filter->SetOriginalBValue(inImage->GetB_Value());
+        filter->SetFunctor(ADCAverageFunctor);
         filter->Update();
 
         DiffusionImageType::Pointer outImage = DiffusionImageType::New();
         outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( filter->GetTargetB_Value() );
-        //image->SetOriginalDirections( filter->GetTargetGradientDirections() );
+        outImage->SetB_Value( targetBValue );
         outImage->SetDirections( filter->GetTargetGradientDirections() );
-        //image->SetMeasurementFrame( m_DiffusionImage->GetMeasurementFrame() );
         outImage->InitializeFromVectorImage();
 
         mitk::DataNode::Pointer imageNode = mitk::DataNode::New();

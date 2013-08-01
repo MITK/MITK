@@ -39,6 +39,8 @@ set(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
+  #IODataStructures/mitkRegistrationObject.cpp
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -53,6 +55,7 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
+  Algorithms/mitkPyramidImageRegistrationMethod.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp

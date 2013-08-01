@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Multishell Functors
 #include <itkADCAverageFunctor.h>
 #include <itkKurtosisFitFunctor.h>
+#include <itkBiExpFitFunctor.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -128,6 +129,7 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
         connect( (QObject*)(m_Controls->m_AdcSignalFit), SIGNAL(clicked()), this, SLOT(DoADCFit()) );
         connect( (QObject*)(m_Controls->m_AkcSignalFit), SIGNAL(clicked()), this, SLOT(DoAKCFit()) );
+        connect( (QObject*)(m_Controls->m_BiExpSignalFit), SIGNAL(clicked()), this, SLOT(DoBiExpFit()) );
         connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
         connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
         connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
@@ -170,7 +172,51 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
     UpdateBValueTableWidget(i);
 }
 
-void QmitkPreprocessingView::DoBiExpFit(){}
+void QmitkPreprocessingView::DoBiExpFit()
+{
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef DiffusionImageType::BValueMap BValueMap;
+  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+
+  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  {
+      DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
+      BValueMap originalShellMap = inImage->GetB_ValueMap();
+      GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+
+      BValueMap::iterator it = originalShellMap.begin();
+      ++it;/* skip b=0*/ int s = 0; /*shell index */
+      vnl_vector<double> bValueList(originalShellMap.size()-1);
+      while(it != originalShellMap.end())
+        bValueList.put(s++,(it++)->first);
+
+      const double targetBValue = 1000;
+      itk::BiExpFitFunctor::Pointer biExpFitFunctor = itk::BiExpFitFunctor::New();
+      biExpFitFunctor->setListOfBValues(bValueList);
+      biExpFitFunctor->setTargetBValue(targetBValue);
+
+      FilterType::Pointer filter = FilterType::New();
+      filter->SetInput(inImage->GetVectorImage());
+      filter->SetOriginalGradientDirections(gradientContainer);
+      filter->SetOriginalBValueMap(originalShellMap);
+      filter->SetOriginalBValue(inImage->GetB_Value());
+      filter->SetFunctor(biExpFitFunctor);
+      filter->Update();
+
+      DiffusionImageType::Pointer outImage = DiffusionImageType::New();
+      outImage->SetVectorImage( filter->GetOutput() );
+      outImage->SetB_Value( targetBValue );
+      outImage->SetDirections( filter->GetTargetGradientDirections() );
+      outImage->InitializeFromVectorImage();
+
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( outImage );
+      QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+
+      imageNode->SetName((name+"_averaged").toStdString().c_str());
+      GetDefaultDataStorage()->Add(imageNode);
+  }
+}
 
 void QmitkPreprocessingView::DoAKCFit()
 {
@@ -407,6 +453,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
     m_Controls->m_AdcSignalFit->setEnabled(foundDwiVolume);
     m_Controls->m_AkcSignalFit->setEnabled(foundDwiVolume);
+    m_Controls->m_BiExpSignalFit->setEnabled(foundDwiVolume);
     m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
     m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
 

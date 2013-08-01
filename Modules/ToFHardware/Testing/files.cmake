@@ -1,5 +1,4 @@
 set(MODULE_TESTS
-#  mitkAbstractToFDeviceFactoryTest.cpp
   #mitkThreadedToFRawDataReconstructionTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp
@@ -11,6 +10,7 @@ set(MODULE_TESTS
 )
 
 set(MODULE_CUSTOM_TESTS
+  mitkAbstractToFDeviceFactoryTest.cpp
   mitkPlayerLoadAndRenderDepthDataTest.cpp
   mitkPlayerLoadAndRenderRGBDataTest.cpp
 )

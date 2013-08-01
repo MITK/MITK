@@ -44,7 +44,7 @@ class BERRY_COMMANDS ExecutionEvent : public Object {
 
 public:
 
-  berryObjectMacro(ExecutionEvent)
+  berryObjectMacro(ExecutionEvent);
 
   typedef std::map<std::string, std::string> ParameterMap;
 

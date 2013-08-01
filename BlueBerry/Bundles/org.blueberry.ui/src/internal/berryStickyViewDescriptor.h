@@ -35,7 +35,7 @@ private:
 
 public:
 
-  berryObjectMacro(StickyViewDescriptor)
+  berryObjectMacro(StickyViewDescriptor);
 
   /**
    * Folder constant for right sticky views.

@@ -91,7 +91,7 @@ namespace mitk {
 
   RuleType m_Rule;
 
-  berryObjectMacro(DataStorageAccessRule)
+  berryObjectMacro(DataStorageAccessRule);
 
   DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataNode::Pointer myDataNode,
                          DataStorageAccessRule::RuleType myRule) ;

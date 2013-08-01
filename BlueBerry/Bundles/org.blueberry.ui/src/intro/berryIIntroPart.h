@@ -56,7 +56,7 @@ namespace berry {
  */
 struct BERRY_UI IIntroPart : public virtual Object { // IAdaptable {
 
-  berryInterfaceMacro(IIntroPart, berry)
+  berryInterfaceMacro(IIntroPart, berry);
 
   ~IIntroPart();
 

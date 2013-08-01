@@ -41,7 +41,7 @@ class HandlerEvent;
  */
 struct BERRY_COMMANDS IHandlerListener : public virtual Object {
 
-  berryInterfaceMacro(IHandlerListener, berry)
+  berryInterfaceMacro(IHandlerListener, berry);
 
   struct Events {
 

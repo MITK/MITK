@@ -37,7 +37,7 @@ class ORG_MITK_GUI_QT_STDMULTIWIDGETEDITOR QmitkStdMultiWidgetEditor
 
 public:
 
-  berryObjectMacro(QmitkStdMultiWidgetEditor)
+  berryObjectMacro(QmitkStdMultiWidgetEditor);
 
   static const std::string EDITOR_ID;
 

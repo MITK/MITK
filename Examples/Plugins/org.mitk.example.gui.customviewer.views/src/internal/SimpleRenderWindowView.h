@@ -53,7 +53,7 @@ public:
    */
   static const std::string VIEW_ID;
 
-  berryObjectMacro(SimpleRenderWindowView)
+  berryObjectMacro(SimpleRenderWindowView);
 
   // -------------------  mitk::IRenderWindowPart  ----------------------
 

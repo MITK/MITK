@@ -55,7 +55,7 @@ namespace berry {
  */
 struct BERRY_COMMANDS IParameterValueConverter : public virtual Object {
 
-  berryInterfaceMacro(IParameterValueConverter, berry)
+  berryInterfaceMacro(IParameterValueConverter, berry);
 
   /**
    * Returns whether the provided value is compatible with this parameter

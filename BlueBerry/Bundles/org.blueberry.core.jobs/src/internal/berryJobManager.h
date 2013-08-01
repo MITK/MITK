@@ -66,7 +66,7 @@ public:
   friend struct NullRule;
 
 
-  berryObjectMacro(JobManager)
+  berryObjectMacro(JobManager);
   /**
    * The unique identifier constant of this plug-in.
    */

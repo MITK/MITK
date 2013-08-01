@@ -31,7 +31,7 @@ namespace berry
 class PropertyTesterDescriptor : public IPropertyTester {
 
 public:
-  berryObjectMacro(PropertyTesterDescriptor)
+  berryObjectMacro(PropertyTesterDescriptor);
 
 private:
 

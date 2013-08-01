@@ -29,7 +29,7 @@ Jdom: 1.0
 GEF runtime: 3.3.2 
 Java Runtime Environment: jre6
 
-Now you have to unzip the file StateMachines.zip into your eclipse folder. The file is located in your SVN checkout mitk\Modules\MitkExt\Interactions.
+Now you have to unzip the file StateMachines.zip into your eclipse folder. The file is located in your SVN checkout mitk/Modules/MitkExt/Interactions.
 
 Start Eclipse and select "File" -> "Import...".
 

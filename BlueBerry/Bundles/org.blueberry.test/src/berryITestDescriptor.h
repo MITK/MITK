@@ -27,7 +27,7 @@ namespace berry {
 
 struct ITestDescriptor : public Object
 {
-  berryInterfaceMacro(ITestDescriptor, berry)
+  berryInterfaceMacro(ITestDescriptor, berry);
 
   virtual CppUnit::Test* CreateTest() = 0;
   virtual std::string GetId() const = 0;

@@ -110,7 +110,7 @@ struct IWorkbenchPartSite;
  */
 struct BERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
 
-  berryInterfaceMacro(IWorkbenchPart, berry)
+  berryInterfaceMacro(IWorkbenchPart, berry);
 
   virtual ~IWorkbenchPart();
 

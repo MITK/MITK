@@ -37,7 +37,7 @@ class SaveableMockViewPart: public MockViewPart, public ISaveablePart
 
 public:
 
-  berryObjectMacro(SaveableMockViewPart)
+  berryObjectMacro(SaveableMockViewPart);
 
   static const std::string ID; // = "org.blueberry.ui.tests.api.SaveableMockViewPart";
 

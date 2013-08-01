@@ -33,7 +33,7 @@ class BERRY_UI_QT QModelIndexObject : public Object
 
 public:
 
-  berryObjectMacro(berry::QModelIndexObject)
+  berryObjectMacro(berry::QModelIndexObject);
 
   QModelIndexObject(const QModelIndex& index);
 

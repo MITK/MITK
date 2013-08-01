@@ -67,7 +67,7 @@ class BERRY_COMMANDS Command: public NamedHandleObjectWithState
 
 public:
 
-  berryObjectMacro(Command)
+  berryObjectMacro(Command);
 
   /**
    * This flag can be set to <code>true</code> if commands should print

@@ -116,9 +116,9 @@ namespace mitk {
     * Method to support addition of externaly loaded patterns.
     * Instances of states, transitions and actions are maintained within this class and freed on destruction.
     * The states already have to be connected by transitions and actions and checked for errors.
-    * @params type name of the pattern to add. Will be used during initialization of a new interactor.
-    * @params startState the start state of this pattern.
-    * @params allStatesOfStateMachine a map of state ids and its states to hold their reference and delete them in destructor
+    * \param type name of the pattern to add. Will be used during initialization of a new interactor.
+    * \param startState the start state of this pattern.
+    * \param allStatesOfStateMachine a map of state ids and its states to hold their reference and delete them in destructor
     **/
     bool AddStateMachinePattern(const char * type, mitk::State* startState, StateMachineMapType* allStatesOfStateMachine);
 

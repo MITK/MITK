@@ -155,7 +155,7 @@ protected:
 
   public:
 
-    berryObjectMacro(TestWindowListener)
+    berryObjectMacro(TestWindowListener);
 
     TestWindowListener(std::list<IWorkbenchWindow::Pointer>& testWindows);
 

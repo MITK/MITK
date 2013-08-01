@@ -44,7 +44,7 @@ struct IHandlerService;
  */
 struct BERRY_UI IHandlerActivation : public IEvaluationResultCache {
 
-  berryInterfaceMacro(IHandlerActivation, berry)
+  berryInterfaceMacro(IHandlerActivation, berry);
 
   ~IHandlerActivation();
 

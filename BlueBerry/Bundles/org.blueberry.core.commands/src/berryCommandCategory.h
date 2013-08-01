@@ -37,7 +37,7 @@ class CommandCategory: public NamedHandleObject
 
 public:
 
-  berryObjectMacro(CommandCategory)
+  berryObjectMacro(CommandCategory);
 
   /**
    * Adds a listener to this category that will be notified when this

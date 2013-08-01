@@ -73,7 +73,7 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     /// \brief Add a control point and finish current segment
     virtual bool OnAddPoint   (Action*, const StateEvent*);
 
-    /// \breif Actual LiveWire computation
+    /// \brief Actual LiveWire computation
     virtual bool OnMouseMoved(Action*, const StateEvent*);
 
     /// \brief Check double click on first control point to finish the LiveWire tool

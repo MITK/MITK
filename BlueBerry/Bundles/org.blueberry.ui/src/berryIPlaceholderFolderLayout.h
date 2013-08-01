@@ -40,7 +40,7 @@ namespace berry {
  */
 struct BERRY_UI IPlaceholderFolderLayout : public Object {
 
-  berryInterfaceMacro(IPlaceholderFolderLayout, berry)
+  berryInterfaceMacro(IPlaceholderFolderLayout, berry);
 
   virtual ~IPlaceholderFolderLayout();
 

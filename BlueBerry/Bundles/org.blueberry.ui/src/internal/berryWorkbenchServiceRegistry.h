@@ -55,7 +55,7 @@ private:
 
   struct ServiceFactoryHandle : public Object
   {
-    berryObjectMacro(ServiceFactoryHandle)
+    berryObjectMacro(ServiceFactoryHandle);
 
     SmartPointer<const IServiceFactory> factory;
     // TODO used in removeExtension to react to bundles being unloaded

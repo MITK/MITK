@@ -36,7 +36,7 @@ namespace berry
     Q_INTERFACES(berry::IPreferencesService)
 
   public:
-    berryObjectMacro(PreferencesService)
+    berryObjectMacro(PreferencesService);
 
     //# From berry::Service
     virtual bool IsA(const std::type_info& type) const;

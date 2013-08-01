@@ -53,7 +53,7 @@ class BERRY_COMMANDS HandleObject : public virtual Object { // extends EventMana
 
 public:
 
-  berryObjectMacro(HandleObject)
+  berryObjectMacro(HandleObject);
 
 private:
 

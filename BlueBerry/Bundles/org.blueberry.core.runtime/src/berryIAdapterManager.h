@@ -85,7 +85,7 @@ namespace berry
 struct BERRY_RUNTIME IAdapterManager: public Object
 {
 
-  berryInterfaceMacro(IAdapterManager, berry)
+  berryInterfaceMacro(IAdapterManager, berry);
 
   /**
    * This value can be returned to indicate that no applicable adapter factory

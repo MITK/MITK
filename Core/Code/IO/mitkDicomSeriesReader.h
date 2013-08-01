@@ -251,13 +251,13 @@ Stacked slices:
  behaviors of these classes, the following is a list of features that we find in the code and need to work with:
 
   - itk::ImageSeriesReader::GenerateOutputInformation() does the z-spacing handling
-    - spacing is directly determined by comparing (euclidean distance) the origins of the first two slices of a series
-      - this is GOOD because there is no reliable z-spacing information in DICOM images
-      - this is bad because it does not work with gantry tilt, in which case the slice distance is SMALLER than the distance between two origins (see section on tilt)
+    + spacing is directly determined by comparing (euclidean distance) the origins of the first two slices of a series
+      * this is GOOD because there is no reliable z-spacing information in DICOM images
+      * this is bad because it does not work with gantry tilt, in which case the slice distance is SMALLER than the distance between two origins (see section on tilt)
   - origin and spacing are calculated by GDCMImageIO and re-used in itk::ImageSeriesReader
-      - the origins are read from appropriate tags, nothing special about that
-      - the spacing is read by gdcm::ImageReader, gdcm::ImageHelper::GetSpacingValue() from a tag determined by gdcm::ImageHelper::GetSpacingTagFromMediaStorage(), which basically determines ONE appropriate pixel spacing tag for each media storage type (ct image, mr image, secondary capture image, etc.)
-        - this is fine for modalities such as CT/MR where the "Pixel Spacing" tag is mandatory, but for other modalities such as CR or Secondary Capture, the tag "Imager Pixel Spacing" is taken, which is no only optional but also has a more complicated relation with the "Pixel Spacing" tag. For this reason we check/modify the pixel spacing reported by itk::ImageSeriesReader after loading the image (see \ref DicomSeriesReader_pixelspacing)
+    + the origins are read from appropriate tags, nothing special about that
+    + the spacing is read by gdcm::ImageReader, gdcm::ImageHelper::GetSpacingValue() from a tag determined by gdcm::ImageHelper::GetSpacingTagFromMediaStorage(), which basically determines ONE appropriate pixel spacing tag for each media storage type (ct image, mr image, secondary capture image, etc.)
+      * this is fine for modalities such as CT/MR where the "Pixel Spacing" tag is mandatory, but for other modalities such as CR or Secondary Capture, the tag "Imager Pixel Spacing" is taken, which is no only optional but also has a more complicated relation with the "Pixel Spacing" tag. For this reason we check/modify the pixel spacing reported by itk::ImageSeriesReader after loading the image (see \ref DicomSeriesReader_pixelspacing)
 
  AFTER loading, DicomSeriesReader marks some of its findings as mitk::Properties to the loaded Image and DataNode:
   - <b>dicomseriesreader.SOPClass</b> : DICOM SOP Class as readable string (instead of a UID)

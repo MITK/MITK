@@ -38,7 +38,7 @@ class ExecutionEvent;
  */
 struct BERRY_COMMANDS IHandler : public Object {
 
-  berryInterfaceMacro(IHandler, berry)
+  berryInterfaceMacro(IHandler, berry);
 
   /**
    * Registers an instance of <code>IHandlerListener</code> to listen for

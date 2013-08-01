@@ -44,7 +44,7 @@ class BERRY_EXPRESSIONS ElementHandler : public Object {
 
 public:
 
-  berryObjectMacro(ElementHandler)
+  berryObjectMacro(ElementHandler);
 
   virtual ~ElementHandler() {}
 

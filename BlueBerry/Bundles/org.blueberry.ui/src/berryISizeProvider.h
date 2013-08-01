@@ -125,13 +125,12 @@ struct BERRY_UI ISizeProvider {
      *         }
      *    </code>
      *     In this case, getSizeFlags(boolean width) must return (width ? SWT.FILL | SWT.MIN: 0)
-     * </ul>
      * <li>To maintain a minimum area of 100000 pixels:
      *     <code>
      *     {return availablePerpendicular < 100 ? 1000 : 100000 / availablePerpendicular;}
      *     </code>
      *     getSizeFlags(boolean width) must return SWT.WRAP | SWT.MIN;
-     * </li>
+     * </ul>
      * </p>
      *
      * @param width indicates whether a width (=true) or a height (=false) is being computed

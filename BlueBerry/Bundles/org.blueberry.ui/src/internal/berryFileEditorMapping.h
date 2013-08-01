@@ -37,7 +37,7 @@ class FileEditorMapping : public IFileEditorMapping
 {
 
 public:
-  berryObjectMacro(FileEditorMapping)
+  berryObjectMacro(FileEditorMapping);
 
 private:
   static const std::string STAR; // = "*"; //$NON-NLS-1$

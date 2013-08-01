@@ -37,7 +37,7 @@ namespace berry
     ///
     /// For use with berry::SmartPtr
     ///
-    berryObjectMacro(berry::XMLPreferencesStorage)
+    berryObjectMacro(berry::XMLPreferencesStorage);
     ///
     /// Construct a new XML-based PreferencesStorage
     ///

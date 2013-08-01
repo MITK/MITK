@@ -56,7 +56,7 @@ struct IHandlerActivation;
  */
 struct BERRY_UI IHandlerService : public IServiceWithSources {
 
-  berryInterfaceMacro(IHandlerService, berry)
+  berryInterfaceMacro(IHandlerService, berry);
 
   ~IHandlerService();
 

@@ -88,7 +88,7 @@ private:
 
 public:
 
-  berryObjectMacro(ServiceLocator)
+  berryObjectMacro(ServiceLocator);
 
   /**
    * Constructs a service locator with no parent.

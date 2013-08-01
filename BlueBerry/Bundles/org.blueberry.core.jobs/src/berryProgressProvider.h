@@ -40,7 +40,7 @@ struct ProgressProvider: public Object
 
 public:
 
-  berryObjectMacro(ProgressProvider)
+  berryObjectMacro(ProgressProvider);
 
   /**
    * Provides a new progress monitor instance to be used by the given job.

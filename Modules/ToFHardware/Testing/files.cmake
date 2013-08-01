@@ -1,5 +1,5 @@
 set(MODULE_TESTS
-  mitkAbstractToFDeviceFactoryTest.cpp
+#  mitkAbstractToFDeviceFactoryTest.cpp
   #mitkThreadedToFRawDataReconstructionTest.cpp
   mitkToFImageCsvWriterTest.cpp
   mitkToFImageGrabberTest.cpp

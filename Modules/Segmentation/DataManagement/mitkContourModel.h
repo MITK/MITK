@@ -210,7 +210,17 @@ namespace mitk
     /** \brief Returns a const VertexIterator at the start element of the contour.
     @throw mitk::Exception if the timestep is invalid.
     */
+    VertexIterator Begin( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the start element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
     VertexIterator IteratorBegin( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator End( int timestep=0);
 
     /** \brief Returns a const VertexIterator at the end element of the contour.
     @throw mitk::Exception if the timestep is invalid.
@@ -235,13 +245,11 @@ namespace mitk
     virtual void SetIsClosed(bool isClosed, int timestep=0);
 
     /** \brief Returns the number of vertices at a given timestep.
-
     \param timestep - default = 0
     */
     int GetNumberOfVertices( int timestep=0);
 
     /** \brief Returns whether the contour model is empty at a given timestep.
-
     \pararm timestep - default = 0
     */
     bool IsEmpty( int timestep=0);
@@ -325,6 +333,15 @@ namespace mitk
     timestep.
     */
     virtual void Clear(int timestep);
+
+    /** \brief Initialize all data objects
+    */
+    virtual void Initialize();
+
+    /** \brief Initialize object with specs of other contour.
+    Note: No data will be copied.
+    */
+    void Initialize(mitk::ContourModel &other);
 
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/

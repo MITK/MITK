@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "SegmentationExports.h"
 #include "mitkContour.h"
+#include "mitkContourModel.h"
 #include "mitkLegacyAdaptors.h"
 
 #include <itkImage.h>
@@ -44,21 +45,45 @@ class Segmentation_EXPORT ContourUtils : public itk::Object
 
       \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    Contour::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
+    ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
+
+    /**
+      \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
+
+      \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
+    */
+    ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool correctionForIpSegmentation, bool constrainToInside);
+
+    /**
+      \brief Projects a slice index coordinates of a contour back into world coordinates.
+
+            \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
+    */
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    Contour::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
+    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
     void FillContourInSlice( Contour* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
 
-  protected:
+    /**
+    \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
+    */
+    void FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
+
+    /**
+    \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
+    */
+    void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
+
+protected:
 
     ContourUtils();
     virtual ~ContourUtils();

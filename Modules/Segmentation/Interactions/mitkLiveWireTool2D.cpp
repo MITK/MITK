@@ -30,6 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGradientMagnitudeImageFilter.h>
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -93,34 +97,44 @@ float mitk::LiveWireTool2D::CanHandleEvent( StateEvent const *stateEvent) const
 
 }
 
-
-
-
 const char** mitk::LiveWireTool2D::GetXPM() const
 {
   return mitkLiveWireTool2D_xpm;
 }
 
+mitk::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("LiveWire_48x48.png");
+  return resource;
+}
 
-
+mitk::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
+  return resource;
+}
 
 const char* mitk::LiveWireTool2D::GetName() const
 {
-  return "LiveWire";
+  return "Live Wire";
 }
-
-
-
 
 void mitk::LiveWireTool2D::Activated()
 {
   Superclass::Activated();
 }
 
-
-
-
 void mitk::LiveWireTool2D::Deactivated()
+{
+  this->FinishTool();
+
+  Superclass::Deactivated();
+}
+
+
+void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   assert ( workingNode );
@@ -150,16 +164,7 @@ void mitk::LiveWireTool2D::Deactivated()
           //get the segmentation image slice at current timestep
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
-          // transfer to plain old contour to use contour util functionality
-          mitk::Contour::Pointer plainOldContour = mitk::Contour::New();
-          mitk::ContourModel::VertexIterator iter = contourModel->IteratorBegin(currentTimestep);
-          while(iter != contourModel->IteratorEnd(currentTimestep) )
-          {
-            plainOldContour->AddVertex( (*iter)->Coordinates );
-            iter++;
-          }
-
-          mitk::Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, plainOldContour, true, false);
+          mitk::ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
           contourUtils->FillContourInSlice(projectedContour, workingSlice, 1.0);
 
           //write back to image volume

@@ -66,7 +66,6 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
 
   Interactions/mitkEventMapperAddOn.h
-
   Interfaces/mitkIDataNodeReader.h
 
   Rendering/mitkLocalStorageHandler.h

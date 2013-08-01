@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkConfirmSegmentationDialog</class>
+ <widget class="QDialog" name="QmitkConfirmSegmentationDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>238</width>
+    <height>80</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="m_lblDialogText">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="m_btnOverwriteSegmentation">
+       <property name="text">
+        <string>Ok</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_btnNewSegmentation">
+       <property name="text">
+        <string>New...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_btnCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -43,7 +43,7 @@ int mitkAbstractToFDeviceFactoryTest(int  argc , char* argv[])
   MITK_TEST_BEGIN("ToFImageWriter");
 
   MITK_TEST_CONDITION_REQUIRED(argc > 0, "Testing if enough arguments are set.");
-    std::string calibrationFilePath(argv[1]);
+    std::string calibrationFilePath(argv[2]);
 
   //testing initialization of object
   DummyFactory factory;

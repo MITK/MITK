@@ -54,3 +54,10 @@ ENDIF(MITK_USE_TOF_PMDCAMBOARD)
    mitkToFCameraPMDO3Controller.cpp
  )
  ENDIF(MITK_USE_TOF_PMDO3)
+
+set(RESOURCE_FILES
+  CalibrationFiles/PMDCamCube3_camera.xml
+  CalibrationFiles/PMDCamBoard_camera.xml
+  CalibrationFiles/PMDCamCube2_camera.xml
+)
+

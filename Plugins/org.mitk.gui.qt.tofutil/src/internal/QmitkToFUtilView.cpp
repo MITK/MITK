@@ -339,6 +339,11 @@ void QmitkToFUtilView::OnToFCameraStarted()
       this->m_ToFDistanceImageToSurfaceFilter->SetReconstructionMode(mitk::ToFDistanceImageToSurfaceFilter::Kinect);
     }
 
+    if (m_CameraIntrinsics.IsNotNull())
+    {
+      m_ToFDistanceImageToSurfaceFilter->SetCameraIntrinsics(m_CameraIntrinsics);
+    }
+
     if(hasRGBImage || (rgbFileName!=""))
     {
       if(m_ToFImageGrabber->GetBoolProperty("IR"))

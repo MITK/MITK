@@ -23,6 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsicsProperty.h>
 #include <mitkToFConfig.h>
 
+// Microservices
+#include <usServiceRegistration.h>
+#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <mitkModule.h>
+#include <mitkModuleResource.h>
+#include <mitkModuleResourceStream.h>
+
 namespace mitk
 {
 
@@ -66,17 +74,9 @@ private:
      /*!
    \brief Create an instance of a ToFPMDRawDataDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDRawDataCamCubeDevice::Pointer device = ToFCameraPMDRawDataCamCubeDevice::New();
-
-      //Set default camera intrinsics for the RawDataCamCube-Camera.
-      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamCube3_camera.xml");
-      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
       device->SetBoolProperty("HasRGBImage", false);
       device->SetBoolProperty("HasAmplitudeImage", true);
@@ -84,6 +84,13 @@ private:
 
      return device.GetPointer();
    }
+
+   ModuleResource GetIntrinsicsResource()
+   {
+     Module* module = GetModuleContext()->GetModule();
+     return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
+   }
+
    int m_DeviceNumber;
 };
 }

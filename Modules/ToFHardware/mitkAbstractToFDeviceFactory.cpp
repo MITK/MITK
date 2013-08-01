@@ -14,13 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "mitkAbstractToFDeviceFactory.h"
-#include <usGetModuleContext.h>
+#include <mitkCameraIntrinsics.h>
+#include <mitkCameraIntrinsicsProperty.h>
+//Microservices
 #include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <mitkModule.h>
+#include <mitkModuleResource.h>
+#include <mitkModuleResourceStream.h>
+
+//TinyXML
+#include <tinyxml.h>
 
 mitk::ToFCameraDevice::Pointer mitk::AbstractToFDeviceFactory::ConnectToFDevice()
 {
-   ToFCameraDevice::Pointer device = createToFCameraDevice();
-   m_Devices.push_back(device);
+ ToFCameraDevice::Pointer device = CreateToFCameraDevice();
+ mitk::CameraIntrinsics::Pointer cameraIntrinsics = GetCameraIntrinsics();
+ device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+ m_Devices.push_back(device);
 
   ModuleContext* context = mitk::GetModuleContext();
   ServiceProperties deviceProps;
@@ -39,4 +50,34 @@ void mitk::AbstractToFDeviceFactory::DisconnectToFDevice(const ToFCameraDevice::
    m_DeviceRegistrations.erase(i);
 
    m_Devices.erase(std::remove(m_Devices.begin(), m_Devices.end(), device), m_Devices.end());
+}
+
+mitk::CameraIntrinsics::Pointer mitk::AbstractToFDeviceFactory::GetCameraIntrinsics()
+{
+  mitk::ModuleResource resource = GetIntrinsicsResource();
+  if (! resource.IsValid())
+  {
+    MITK_WARN << "Could not load resource '" << resource.GetName() << "'. CameraIntrinsics are invalid!";
+  }
+
+  // Create ResourceStream from Resource
+  mitk::ModuleResourceStream resStream(resource);
+
+  // Parse XML
+  TiXmlDocument xmlDocument;
+  resStream >> xmlDocument;
+
+  //Retrieve Child Element and convert to CamerIntrinsics
+  TiXmlElement* element = xmlDocument.FirstChildElement();
+  mitk::CameraIntrinsics::Pointer intrinsics = mitk::CameraIntrinsics::New();
+  intrinsics->FromXML(element);
+
+  return intrinsics;
+}
+
+mitk::ModuleResource mitk::AbstractToFDeviceFactory::GetIntrinsicsResource()
+{
+  mitk::Module* module = mitk::GetModuleContext()->GetModule();
+  return module->GetResource("CalibrationFiles/Default_Parameters.xml");
+  MITK_WARN << "Loaded Default CameraIntrinsics. Overwrite AbstractToFDeviceFactory::GetIntrinsicsResource() if you want to define your own.";
 }

@@ -17,3 +17,5 @@ SET_PROPERTY(TEST mitkPlayerLoadAndRenderDepthDataTest_KinectDepthImage mitkPlay
 
 endif(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING)
 endif(BUILD_TESTING AND MODULE_IS_ENABLED)
+
+mitkAddCustomModuleTest(mitkAbstractToFDeviceFactoryTest_DefaultCalibrationFile -V ${MITK_DATA_DIR}/ToF-Data/CalibrationFiles/Default_Parameters.xml)

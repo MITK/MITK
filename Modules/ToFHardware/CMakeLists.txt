@@ -10,6 +10,13 @@ MITK_CREATE_MODULE(mitkToFHardware
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )
 
+# set(tofHardware_srcs )
+# usFunctionEmbedResources(tofHardware_srcs
+                         # LIBRARY_NAME mitkToFHardware
+                         # ROOT_DIR ${MITK_DATA_DIR}/ToF-Data/CalibrationFiles
+                         # FILES  Default_Parameters.xml Kinect_IR_camera.xml Kinect_RGB_camera.xml Mesa-SR4000_Camera.xml PMDCamBoard_camera.xml PMDCamCube2_camera.xml PMDCamCube3_camera.xml
+                        # )
+
 add_subdirectory(Testing)
 add_subdirectory(Kinect)
 add_subdirectory(PMD)

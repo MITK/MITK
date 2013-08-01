@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
+#include <mitkModuleResource.h>
 
 namespace mitk
 {
@@ -37,7 +38,26 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
 
    void DisconnectToFDevice(const ToFCameraDevice::Pointer& device);
 
-private:
+
+  protected:
+
+   /**
+   \brief Returns the CameraIntrinsics for the cameras created by this factory.
+   *
+   * This Method calls the virtual method GetIntrinsicsResource() to retrieve the necessary data.
+   * Override getIntrinsicsResource in your subclasses, also see the documentation of GetIntrinsicsResource
+   */
+   CameraIntrinsics::Pointer GetCameraIntrinsics();
+
+   /**
+   \brief Returns the ModuleResource that contains a xml definition of the CameraIntrinsics.
+   *
+   * The default implementation returns a default calibration.
+   * In subclasses, you can override this method to return a different xml resource.
+   * See this implementation for an example.
+   */
+   virtual mitk::ModuleResource GetIntrinsicsResource();
+
 
    std::vector<ToFCameraDevice::Pointer> m_Devices;
    std::map<ToFCameraDevice*,ServiceRegistration> m_DeviceRegistrations;

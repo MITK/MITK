@@ -181,8 +181,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
   {
     emit AddNewTransformationToUndoList();
 
-    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
-    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData())->Clone();
+    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData())->Clone();
     mitk::Image::Pointer mmimage = NULL;
     mitk::Image::Pointer fmimage = NULL;
     if (m_MovingMaskNode.IsNotNull())

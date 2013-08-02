@@ -81,7 +81,7 @@ protected:
     int N;
 
     lestSquaresFunction(unsigned int number_of_measurements) :
-      vnl_least_squares_function(2 /*number of unknowns [ ADC_slow ADC_fast]*/, number_of_measurements, no_gradient)
+      vnl_least_squares_function(3 /*number of unknowns [ ADC_slow ADC_fast lambda]*/, number_of_measurements, no_gradient)
     {
       N = get_number_of_residuals();
     }
@@ -90,14 +90,14 @@ protected:
 
       const double & ADC_slow = x[0];
       const double & ADC_fast = x[1];
-      //const double & beta = x[2];
+      const double & lambda = x[2];
 
       const vnl_vector<double> & b = bValueVector;
 
       for(int s=0; s<N; s++)
       {
-        double approx = S0 * std::exp(-b[s] * ADC_slow) + (1-S0) * std::exp(-b[s] * ADC_fast);
-        fx[s] = vnl_math_abs( measurements[s] - approx );
+        double approx = lambda * std::exp(-b[s] * ADC_slow) + (1-lambda) * std::exp(-b[s] * ADC_fast);
+        fx[s] = vnl_math_abs( (measurements[s]/S0) - approx );
       }
 
     }

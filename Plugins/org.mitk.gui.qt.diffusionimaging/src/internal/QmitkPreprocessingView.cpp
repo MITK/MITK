@@ -60,6 +60,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOdfScaleByProperty.h"
 #include <mitkPointSet.h>
 #include <itkAdcImageFilter.h>
+#include "mitkImage.h"
 
 #include <QTableWidgetItem>
 #include <QTableWidget>
@@ -209,11 +210,21 @@ void QmitkPreprocessingView::DoBiExpFit()
       outImage->SetDirections( filter->GetTargetGradientDirections() );
       outImage->InitializeFromVectorImage();
 
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( outImage );
       QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
 
-      imageNode->SetName((name+"_averaged").toStdString().c_str());
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( outImage );
+      imageNode->SetName((name+"_BiExp").toStdString().c_str());
+      GetDefaultDataStorage()->Add(imageNode);
+
+      FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+      mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+      mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+      mitkErrImage->SetVolume(errImage->GetBufferPointer());
+
+      imageNode = mitk::DataNode::New();
+      imageNode->SetData( mitkErrImage );
+      imageNode->SetName((name+"_BiExp_Error").toStdString().c_str());
       GetDefaultDataStorage()->Add(imageNode);
   }
 }
@@ -255,11 +266,21 @@ void QmitkPreprocessingView::DoAKCFit()
       outImage->SetDirections( filter->GetTargetGradientDirections() );
       outImage->InitializeFromVectorImage();
 
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( outImage );
       QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
 
-      imageNode->SetName((name+"_averaged").toStdString().c_str());
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( outImage );
+      imageNode->SetName((name+"_Kurtosis").toStdString().c_str());
+      GetDefaultDataStorage()->Add(imageNode);
+
+      FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+      mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+      mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+      mitkErrImage->SetVolume(errImage->GetBufferPointer());
+
+      imageNode = mitk::DataNode::New();
+      imageNode->SetData( mitkErrImage );
+      imageNode->SetName((name+"_Kurtosis_Error").toStdString().c_str());
       GetDefaultDataStorage()->Add(imageNode);
   }
 }
@@ -303,11 +324,21 @@ void QmitkPreprocessingView::DoADCFit()
         outImage->SetDirections( filter->GetTargetGradientDirections() );
         outImage->InitializeFromVectorImage();
 
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( outImage );
         QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
 
-        imageNode->SetName((name+"_averaged").toStdString().c_str());
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( outImage );
+        imageNode->SetName((name+"_ADC-Average").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode);
+
+        FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+        mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+        mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+        mitkErrImage->SetVolume(errImage->GetBufferPointer());
+
+        imageNode = mitk::DataNode::New();
+        imageNode->SetData( mitkErrImage );
+        imageNode->SetName((name+"_ADC-Average_Error").toStdString().c_str());
         GetDefaultDataStorage()->Add(imageNode);
     }
 }

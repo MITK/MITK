@@ -46,13 +46,13 @@ vnl_matrix<double> itk::ADCAverageFunctor::operator()(const vnl_matrix<double> &
 
     newSignal.put(i, 1, error ); // RMS Error
 
-    std::cout << std::scientific << std::setprecision(5)
+    /*std::cout << std::scientific << std::setprecision(5)
               << averageADC   << ","                    // AverageADC
               << S0           << ","                    // S0 value
               << error        << ",";                   // End error
     for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
       std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j] << ",";    // S_n Values corresponding to shell 1 to shell n
-    std::cout << std::endl;
+    std::cout << std::endl;*/
   }
 
   // return new Signal and Signal Fit Error (RMS)

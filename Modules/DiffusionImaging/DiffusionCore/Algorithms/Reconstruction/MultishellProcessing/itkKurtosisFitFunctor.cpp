@@ -54,14 +54,14 @@ vnl_matrix<double> itk::KurtosisFitFunctor::operator()(const vnl_matrix<double> 
 
     //OUTPUT FOR EVALUATION
 
-    std::cout << std::scientific << std::setprecision(5)
+    /*std::cout << std::scientific << std::setprecision(5)
               << initalGuess[0] << ";"                  // fitted ADC
               << initalGuess[1] << ";"                  // fitted AKC
               << S0 << ";"                              // S0 value
               << minimizer.get_end_error() << ";";      // End error
     for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
       std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j] << ";";    // S_n Values corresponding to shell 1 to shell n
-    std::cout << std::endl;
+    std::cout << std::endl;*/
   }
 
   // return new Signal Vector [S_1 S_2 ... S_N]

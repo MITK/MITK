@@ -55,7 +55,7 @@ vnl_matrix<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & S
     newSignal.put(i, 0, S0 * std::exp(-m_TargetBvalue * ADC_slow) + (1-S0)* std::exp(-m_TargetBvalue * ADC_fast));
     newSignal.put(i, 1, minimizer.get_end_error()); // RMS Error
 
-    //OUTPUT FOR EVALUATION
+    /*//OUTPUT FOR EVALUATION
     std::cout << std::scientific << std::setprecision(5)
               << ADC_slow   << ";"                        // lambda
               << ADC_fast   << ";"                        // alpha
@@ -64,7 +64,7 @@ vnl_matrix<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & S
               << minimizer.get_end_error() << ";";      // End error
     for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
       std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j] << ";";    // S_n Values corresponding to shell 1 to shell n
-    std::cout << std::endl;
+    std::cout << std::endl;*/
   }
 
   // return new Signal Vector [S_1 S_2 ... S_N]

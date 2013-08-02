@@ -94,8 +94,8 @@ protected:
 
       for(int s=0; s<N; s++)
       {
-        double approx = std::log(S0) - b[s] * D + 1./6. *b[s] * b[s] *D * D * K;
-        fx[s] = vnl_math_abs( std::log(measurements[s]) - approx );
+        double approx = S0 * std::exp(- b[s] * D + 1./6. *b[s] * b[s] *D * D * K);
+        fx[s] = vnl_math_abs( measurements[s] - approx );
       }
 
     }

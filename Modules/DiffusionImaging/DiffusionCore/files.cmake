@@ -56,6 +56,7 @@ set(CPP_FILES
 
   # MultishellProcessing
   Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.cpp
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.cpp
   Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.cpp
 
@@ -87,6 +88,7 @@ set(H_FILES
   Algorithms/Reconstruction/MultishellProcessing/itkADCAverageFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkKurtosisFitFunctor.h
   Algorithms/Reconstruction/MultishellProcessing/itkBiExpFitFunctor.h
+  Algorithms/Reconstruction/MultishellProcessing/itkADCFitFunctor.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h

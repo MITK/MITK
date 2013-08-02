@@ -26,7 +26,7 @@ namespace itk
 {
 
 /**
- * @brief The DWIVoxelFunctor class
+ * \brief The DWIVoxelFunctor class
  * Abstract basisclass for voxelprocessing of Diffusion Weighted Images
  */
 class DWIVoxelFunctor: public Object
@@ -47,12 +47,13 @@ public:
   //itkNewMacro(Self)
 
   /**
-   * @brief operator ()
-   * @param SignalMatrix is a NxM matrix (N = Number of gradients; M = Number of Shells)
-   * @param S0 is the reference signal (b=0)
-   * @return 1xP Signal vector containing the new signal (e.g. [S_1 S_2 S_3 ... S_N] -> only diffusion weighted signal)
+   * \brief operator ()
+   * \param SignalMatrix is a NxM matrix (N = Number of gradients; M = Number of Shells)
+   * \param S0 is the reference signal (b=0)
+   * \return NxP Signal vector containing the new signal (e.g. [S_1 S_2 S_3 ... S_N] -> only diffusion weighted signal).
+   *The first column of the matrix is reserved for the new calculated signal (other columns can hold e.g. the RMS-error)
    */
-  virtual vnl_vector<double> operator()(const vnl_matrix<double> & /*SignalMatrix*/, const double & /*S0*/)=0;
+  virtual vnl_matrix<double> operator()(const vnl_matrix<double> & /*SignalMatrix*/, const double & /*S0*/)=0;
 
 };
 

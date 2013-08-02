@@ -90,7 +90,7 @@ namespace itk
     IndicesVector m_TargetDirectionsIndicies;
     unsigned int m_NumberTargetDirections;
 
-    itk::DWIVoxelFunctor::Pointer m_Functor;
+    itk::DWIVoxelFunctor * m_Functor;
 
    };
 

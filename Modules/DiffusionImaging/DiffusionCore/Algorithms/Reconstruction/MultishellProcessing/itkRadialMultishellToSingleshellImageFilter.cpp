@@ -179,7 +179,7 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
   OutputPixelType out;
   InputPixelType b;
   BValueMap::const_iterator shellIterator;
-  vnl_matrix<double> lsfCoeffs;
+  vnl_matrix<double> NewSignalMatrix (m_NumberTargetDirections, 2);
   vnl_vector<double> InterpVector;
   unsigned int shellIndex = 0;
   // ** walking over each Voxel
@@ -218,7 +218,8 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
       shellIndex++;
     }
     // apply voxel wise signal manipulation functor
-    SignalVector = m_Functor->operator ()(SignalMatrix, AverageS0).get_column(0);
+    (*m_Functor)(NewSignalMatrix, /*const &*/SignalMatrix,/*const &*/ AverageS0);
+    SignalVector = NewSignalMatrix.get_column(0);
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));

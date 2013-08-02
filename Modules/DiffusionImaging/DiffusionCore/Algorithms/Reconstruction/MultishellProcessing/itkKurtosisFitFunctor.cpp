@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <iomanip>
 
-vnl_vector<double> itk::KurtosisFitFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
+vnl_matrix<double> itk::KurtosisFitFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
 {
 
-  vnl_vector<double> newSignal(SignalMatrix.rows());
+  vnl_matrix<double> newSignal(SignalMatrix.rows(),1);
 
   vnl_vector<double> initalGuess(2);
   // initialize Least Squres Function
@@ -49,8 +49,8 @@ vnl_vector<double> itk::KurtosisFitFunctor::operator()(const vnl_matrix<double> 
     const double & ADC = initalGuess.get(0);
     const double & AKC = initalGuess.get(1);
 
-    newSignal.put(i, S0 * std::exp(-m_TargetBvalue * ADC + 1./6. * m_TargetBvalue* m_TargetBvalue * ADC * ADC * AKC));
-
+    newSignal.put(i, 0, S0 * std::exp(-m_TargetBvalue * ADC + 1./6. * m_TargetBvalue* m_TargetBvalue * ADC * ADC * AKC));
+    newSignal.put(i, 1, minimizer.get_end_error()); // RMS Error
 
     //OUTPUT FOR EVALUATION
 

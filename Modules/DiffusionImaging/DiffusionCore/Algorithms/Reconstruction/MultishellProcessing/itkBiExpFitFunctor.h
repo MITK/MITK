@@ -43,7 +43,7 @@ public:
   /** Runtime information support. */
   itkTypeMacro(BiExpFitFunctor, DWIVoxelFunctor)
 
-  vnl_vector<double> operator()(const vnl_matrix<double> & SignalMatrix, const double & S0);
+  vnl_matrix<double> operator()(const vnl_matrix<double> & SignalMatrix, const double & S0);
 
   void setTargetBValue(const double & targetBValue){m_TargetBvalue = targetBValue;}
   void setListOfBValues(const vnl_vector<double> & BValueList){m_BValueList = BValueList;}

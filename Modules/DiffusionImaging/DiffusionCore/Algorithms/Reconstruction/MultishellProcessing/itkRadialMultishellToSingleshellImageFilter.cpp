@@ -218,7 +218,7 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
       shellIndex++;
     }
     // apply voxel wise signal manipulation functor
-    SignalVector = m_Functor->operator()(SignalMatrix, AverageS0);
+    SignalVector = m_Functor->operator ()(SignalMatrix, AverageS0).get_column(0);
 
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));

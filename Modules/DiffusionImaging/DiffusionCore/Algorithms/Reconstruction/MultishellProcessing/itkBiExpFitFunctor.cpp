@@ -15,14 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "itkBiExpFitFunctor.h"
+#include <math.h>
 #include <iostream>
 #include <iomanip>
-#include <math.h>
 
-vnl_vector<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
+vnl_matrix<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
 {
 
-  vnl_vector<double> newSignal(SignalMatrix.rows());
+  vnl_matrix<double> newSignal(SignalMatrix.rows(),2); //[Signal RMS]
 
   vnl_vector<double> initalGuess(2);
   // initialize Least Squres Function
@@ -52,8 +52,8 @@ vnl_vector<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & S
     const double & ADC_fast = initalGuess.get(1);
    // const double & beta = initalGuess.get(1);
 
-    newSignal.put(i, S0 * std::exp(-m_TargetBvalue * ADC_slow) + (1-S0)* std::exp(-m_TargetBvalue * ADC_fast));
-
+    newSignal.put(i, 0, S0 * std::exp(-m_TargetBvalue * ADC_slow) + (1-S0)* std::exp(-m_TargetBvalue * ADC_fast));
+    newSignal.put(i, 1, minimizer.get_end_error()); // RMS Error
 
     //OUTPUT FOR EVALUATION
     std::cout << std::scientific << std::setprecision(5)

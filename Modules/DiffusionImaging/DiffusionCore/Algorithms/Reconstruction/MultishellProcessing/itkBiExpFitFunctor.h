@@ -53,7 +53,7 @@ protected:
   vnl_vector<double> m_BValueList;
 
   /**
-   * \brief The lestSquaresFunction struct for Non-Linear-Least-Squres fit of Kurtosis
+   * \brief The lestSquaresFunction struct for Non-Linear-Least-Squres fit of Biexponential model
    */
   struct lestSquaresFunction: public vnl_least_squares_function
   {

@@ -41,7 +41,7 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
 
     initalGuess.put(0, 0.f); // ADC_slow
     initalGuess.put(1, 0.f); // ADC_fast
-    initalGuess.put(2, 0.f); // lambda
+    initalGuess.put(2, 0.5f); // lambda
 
     // start Levenberg-Marquardt
     minimizer.minimize_without_gradient(initalGuess);
@@ -53,16 +53,18 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
     newSignal.put(i, 0, S0 * (lambda * std::exp(-m_TargetBvalue * ADC_slow) + (1-lambda)* std::exp(-m_TargetBvalue * ADC_fast)));
     newSignal.put(i, 1, minimizer.get_end_error()); // RMS Error
 
-    /*//OUTPUT FOR EVALUATION
+    //OUTPUT FOR EVALUATION
     std::cout << std::scientific << std::setprecision(5)
-              << ADC_slow   << ";"                        // lambda
-              << ADC_fast   << ";"                        // alpha
-              //<< beta     << ";"                        // beta
-              << S0       << ";"                        // S0 value
-              << minimizer.get_end_error() << ";";      // End error
-    for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ )
-      std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j] << ";";    // S_n Values corresponding to shell 1 to shell n
-    std::cout << std::endl;*/
+              << ADC_slow   << ","                        // lambda
+              << ADC_fast   << ","                        // alpha
+              << lambda     << ","                        // lambda
+              << S0         << ","                        // S0 value
+              << minimizer.get_end_error() << ",";      // End error
+    for(unsigned int j = 0; j < SignalMatrix.get_row(i).size(); j++ ){
+      std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j];    // S_n Values corresponding to shell 1 to shell n
+      if(j != SignalMatrix.get_row(i).size()-1) std::cout << ",";
+    }
+    std::cout << std::endl;
   }
 
 }

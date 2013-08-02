@@ -53,7 +53,7 @@ public:
    * \return NxP Signal vector containing the new signal (e.g. [S_1 S_2 S_3 ... S_N] -> only diffusion weighted signal).
    *The first column of the matrix is reserved for the new calculated signal (other columns can hold e.g. the RMS-error)
    */
-  virtual vnl_matrix<double> operator()(const vnl_matrix<double> & /*SignalMatrix*/, const double & /*S0*/)=0;
+  virtual void operator()(vnl_matrix<double> & /*newSignal*/,const vnl_matrix<double> & /*SignalMatrix*/, const double & /*S0*/)=0;
 
 };
 

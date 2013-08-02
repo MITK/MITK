@@ -19,10 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <iomanip>
 
-vnl_matrix<double> itk::ADCAverageFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
+void itk::ADCAverageFunctor::operator()(vnl_matrix<double> & newSignal, const vnl_matrix<double> & SignalMatrix, const double & S0)
 {
 
-  vnl_matrix<double> newSignal(SignalMatrix.rows(),2);/*[Signal Error]*/
   vnl_matrix<double> ADCMatrix(SignalMatrix.rows(),SignalMatrix.cols());
 
   // Calculate ADC for each measurement
@@ -54,7 +53,4 @@ vnl_matrix<double> itk::ADCAverageFunctor::operator()(const vnl_matrix<double> &
       std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j] << ",";    // S_n Values corresponding to shell 1 to shell n
     std::cout << std::endl;*/
   }
-
-  // return new Signal and Signal Fit Error (RMS)
-  return newSignal;
 }

@@ -19,10 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <iomanip>
 
-vnl_matrix<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & SignalMatrix, const double & S0)
+void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_matrix<double> & SignalMatrix, const double & S0)
 {
-
-  vnl_matrix<double> newSignal(SignalMatrix.rows(),2); //[Signal RMS]
 
   vnl_vector<double> initalGuess(2);
   // initialize Least Squres Function
@@ -67,6 +65,4 @@ vnl_matrix<double> itk::BiExpFitFunctor::operator()(const vnl_matrix<double> & S
     std::cout << std::endl;*/
   }
 
-  // return new Signal Vector [S_1 S_2 ... S_N]
-  return newSignal;
 }

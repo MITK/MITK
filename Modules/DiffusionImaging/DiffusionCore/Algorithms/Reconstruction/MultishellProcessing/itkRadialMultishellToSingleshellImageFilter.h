@@ -59,6 +59,10 @@ namespace itk
     typedef BaselineScalarType                        BaselinePixelType;
     typedef typename itk::Image<BaselinePixelType,3>  BaselineImageType;
 
+    typedef float                                     ErrorScalarType;
+    typedef ErrorScalarType                           ErrorPixelType;
+    typedef typename itk::Image<ErrorPixelType,3>     ErrorImageType;
+
     typedef vnl_vector_fixed< double, 3 >                               GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, GradientDirectionType > GradientDirectionContainerType;
 
@@ -70,6 +74,8 @@ namespace itk
     void SetOriginalBValueMap(const BValueMap & inp){m_BValueMap = inp;}
     void SetFunctor(DWIVoxelFunctor * functor){m_Functor = functor;}
     GradientDirectionContainerType::Pointer GetTargetGradientDirections(){return m_TargetGradientDirections;}
+    ErrorImageType::Pointer GetErrorImage(){return m_ErrorImage;}
+
 
   protected:
     RadialMultishellToSingleshellImageFilter();
@@ -91,6 +97,8 @@ namespace itk
     unsigned int m_NumberTargetDirections;
 
     itk::DWIVoxelFunctor * m_Functor;
+
+    ErrorImageType::Pointer m_ErrorImage;
 
    };
 

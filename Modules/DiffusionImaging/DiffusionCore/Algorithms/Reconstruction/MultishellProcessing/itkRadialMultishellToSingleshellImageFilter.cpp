@@ -50,6 +50,7 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
 ::RadialMultishellToSingleshellImageFilter()
 {
   this->SetNumberOfRequiredInputs( 1 );
+  //this->SetNumberOfThreads(1);
 }
 
 template <class TInputScalarType, class TOutputScalarType>
@@ -124,6 +125,16 @@ void RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarTyp
   outImage->SetVectorLength( 1+m_NumberTargetDirections ); // size of 1(bzeroValue) + AllDirectionsContainer
   outImage->Allocate();
 
+  m_ErrorImage = ErrorImageType::New();
+  m_ErrorImage->SetSpacing( this->GetInput()->GetSpacing() );
+  m_ErrorImage->SetOrigin( this->GetInput()->GetOrigin() );
+  m_ErrorImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction using bZeroDirection+AllDirectionsContainer
+  m_ErrorImage->SetLargestPossibleRegion( this->GetInput()->GetLargestPossibleRegion());
+  m_ErrorImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  m_ErrorImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
+  m_ErrorImage->Allocate();
+
+
   BValueMap::iterator ittt = m_BValueMap.begin();
   ittt++; // skip bZeroImages corresponding to 0-bValue
   m_TargetBValue = 0;
@@ -164,6 +175,10 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
   // ImageRegionIterator for the output image
   ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
   oit.GoToBegin();
+
+  // ImageRegionIterator for the output image
+  ImageRegionIterator< ErrorImageType > eit(m_ErrorImage, outputRegionForThread);
+  eit.GoToBegin();
 
   // calculate target bZero-Value [b0_t]
   const IndicesVector IndicesS0 = m_BValueMap[0.0];
@@ -224,7 +239,10 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
     for(unsigned int i = 1 ; i < out.Size(); i ++)
       out.SetElement(i,SignalVector.get(i-1));
 
+    eit.Set(NewSignalMatrix.get_column(1).mean());
+
     oit.Set(out);
+    ++eit;
     ++oit;
     ++iit;
   }

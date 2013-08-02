@@ -80,8 +80,6 @@ set(H_FILES
   Algorithms/Reconstruction/itkPointShell.h
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
-  Algorithms/Reconstruction/itkMultiShellRadialAdcKurtosisImageFilter.h
 
   # MultishellProcessing
   Algorithms/Reconstruction/MultishellProcessing/itkRadialMultishellToSingleshellImageFilter.h

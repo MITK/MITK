@@ -30,7 +30,7 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
 
   // initialize Levenberg Marquardt
   vnl_levenberg_marquardt minimizer(model);
-  minimizer.set_max_function_evals(10000); // Iterations
+  minimizer.set_max_function_evals(1000);   // Iterations
   minimizer.set_f_tolerance(1e-10);        // Function tolerance
 
   // for each Direction calculate LSF Coeffs ADC & AKC

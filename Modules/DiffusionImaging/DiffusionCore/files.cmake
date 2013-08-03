@@ -117,6 +117,8 @@ set(H_FILES
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
   Algorithms/itkAdcImageFilter.h
 
+  Algorithms/itkSplitDWImageFilter.h
+
 
 
 )

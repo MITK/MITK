@@ -53,12 +53,34 @@ public:
   typedef Image< TOutputImagePixelType, 4 >       OutputImageType;
   typedef typename OutputImageType::RegionType    OutputImageRegionType;
 
+  typedef std::vector< unsigned int > IndexListType;
+
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** Runtime information support. */
   itkTypeMacro(SplitDWImageFilter, ImageToImageFilter);
+
+  /**
+   * @brief Set the indices of the images to be extracted.
+   *
+   *
+   */
+  void SetExtractIndices( IndexListType list)
+  {
+    m_IndexList = list;
+  }
+
+  /**
+   * @brief Extract all images
+   *
+   * The same as setting SetExtractIndices( ) with [0,1,2,...,N]
+   */
+  void SetExtractAll()
+  {
+    m_ExtractAllImages = true;
+  }
 
 protected:
 
@@ -78,6 +100,9 @@ protected:
     dimensionality of the input and the output
   */
   virtual void GenerateOutputInformation();
+
+  IndexListType m_IndexList;
+  bool m_ExtractAllImages;
 };
 
 } //end namespace itk

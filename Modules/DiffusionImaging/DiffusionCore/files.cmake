@@ -20,6 +20,7 @@ set(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
+  IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
@@ -58,6 +59,7 @@ set(CPP_FILES
 
   # Registration Algorithms & Co.
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
+  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp

@@ -21,6 +21,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+/**
+ * @class ImageToDiffusionImageSource
+ * @brief The class requires a 3d+t image, list of gradient directions and a corresponding b-value
+ * and reinterprets the input image as a diffusion-weighted image.
+ *
+ * The filter throws an mitk::Exception if
+ *  - no gradient list was set
+ *  - no input image was set
+ *  - the size of the gradient list and the count of timesteps do not match
+ */
 template< typename TPixelType >
 class ImageToDiffusionImageSource
     : public DiffusionImageSource< TPixelType >
@@ -60,6 +70,10 @@ public:
     m_GradientDirections = container;
   }
 
+  /**
+   * @brief Set the b-value
+   * @param bvalue the b-value associated with the gradient list
+   */
   void SetBValue( float bvalue )
   {
     this->m_BValue = bvalue;

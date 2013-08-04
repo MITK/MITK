@@ -27,6 +27,10 @@ namespace itk
  *
  * \brief Splits a DW-Image passed in as input into a 3D-t image where each volume coresponds to a
  * gradient image ( or the unweighted b0 )
+ *
+ * Several applications require to get the gradient images as a separate volume, f.e. the registration for
+ * head-motion correction. Also a reduction of the DW Image is possible when combined with its counterpart filter,
+ * the \sa mitkImageToDiffusionImageSource, which can reinterpret a 3d+t (scalar) image into a diffusion weighted image.
  */
 
 template< class TInputImagePixelType,

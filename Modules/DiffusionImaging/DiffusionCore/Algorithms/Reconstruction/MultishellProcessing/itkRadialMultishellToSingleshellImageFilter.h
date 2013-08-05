@@ -25,9 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-/**
-* \brief Select subset of the input vectors equally distributed over the sphere using an iterative electrostatic repulsion strategy.   */
-
   template <class TInputScalarType, class TOutputScalarType>
   class RadialMultishellToSingleshellImageFilter
     : public ImageToImageFilter<itk::VectorImage<TInputScalarType,3>, itk::VectorImage<TOutputScalarType,3> >

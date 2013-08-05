@@ -36,8 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define _USE_MATH_DEFINES
 
 #include "itkRadialMultishellToSingleshellImageFilter.h"
-#include <itkImageRegionIterator.h>
-#include <itkImageRegion.h>
 #include "mitkDiffusionFunctionCollection.h"
 
 
@@ -133,8 +131,6 @@ void RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarTyp
   m_ErrorImage->SetBufferedRegion( this->GetInput()->GetLargestPossibleRegion() );
   m_ErrorImage->SetRequestedRegion( this->GetInput()->GetLargestPossibleRegion() );
   m_ErrorImage->Allocate();
-
-
 
   MITK_INFO << "Input:" << std::endl << std::endl
             << "    GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl

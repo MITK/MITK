@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
-  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0)
+  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0),
+  m_GenerateTriangularMesh(true)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -101,6 +102,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   isPointValid.resize(size);
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetDataTypeToDouble();
+  vtkSmartPointer<vtkCellArray> verts = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
@@ -199,43 +201,51 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
         //in the vertexIdList.
         m_VertexIdList->SetId(pixelID, points->InsertNextPoint(cartesianCoordinates.GetDataPointer()));
 
-        if((i >= 1) && (j >= 1))
+        if (m_GenerateTriangularMesh)
         {
-          //This little piece of art explains the ID's:
-          //
-          // P(x_1y_1)---P(xy_1)
-          // |           |
-          // |           |
-          // |           |
-          // P(x_1y)-----P(xy)
-          //
-          //We can only start triangulation if we are at vertex (1,1),
-          //because we need the other 3 vertices near this one.
-          //To go one pixel line back in the image array, we have to
-          //subtract 1x xDimension.
-          vtkIdType xy = pixelID;
-          vtkIdType x_1y = pixelID-1;
-          vtkIdType xy_1 = pixelID-xDimension;
-          vtkIdType x_1y_1 = xy_1-1;
-
-          //Find the corresponding vertex ID's in the saved vertexIdList:
-          vtkIdType xyV = m_VertexIdList->GetId(xy);
-          vtkIdType x_1yV = m_VertexIdList->GetId(x_1y);
-          vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
-          vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
-
-          if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
+          if((i >= 1) && (j >= 1))
           {
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1yV);
-            polys->InsertCellPoint(xyV);
-            polys->InsertCellPoint(x_1y_1V);
+            //This little piece of art explains the ID's:
+            //
+            // P(x_1y_1)---P(xy_1)
+            // |           |
+            // |           |
+            // |           |
+            // P(x_1y)-----P(xy)
+            //
+            //We can only start triangulation if we are at vertex (1,1),
+            //because we need the other 3 vertices near this one.
+            //To go one pixel line back in the image array, we have to
+            //subtract 1x xDimension.
+            vtkIdType xy = pixelID;
+            vtkIdType x_1y = pixelID-1;
+            vtkIdType xy_1 = pixelID-xDimension;
+            vtkIdType x_1y_1 = xy_1-1;
 
-            polys->InsertNextCell(3);
-            polys->InsertCellPoint(x_1y_1V);
-            polys->InsertCellPoint(xyV);
-            polys->InsertCellPoint(xy_1V);
+            //Find the corresponding vertex ID's in the saved vertexIdList:
+            vtkIdType xyV = m_VertexIdList->GetId(xy);
+            vtkIdType x_1yV = m_VertexIdList->GetId(x_1y);
+            vtkIdType xy_1V = m_VertexIdList->GetId(xy_1);
+            vtkIdType x_1y_1V = m_VertexIdList->GetId(x_1y_1);
+
+            if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
+            {
+              polys->InsertNextCell(3);
+              polys->InsertCellPoint(x_1yV);
+              polys->InsertCellPoint(xyV);
+              polys->InsertCellPoint(x_1y_1V);
+
+              polys->InsertNextCell(3);
+              polys->InsertCellPoint(x_1y_1V);
+              polys->InsertCellPoint(xyV);
+              polys->InsertCellPoint(xy_1V);
+            }
           }
+        }
+        else
+        {
+          verts->InsertNextCell(1);
+          verts->InsertCellPoint(m_VertexIdList->GetId(pixelID));
         }
         //Scalar values are necessary for mapping colors/texture onto the surface
         if (scalarFloatData)
@@ -252,7 +262,14 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
   vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
   mesh->SetPoints(points);
-  mesh->SetPolys(polys);
+  if (m_GenerateTriangularMesh)
+  {
+    mesh->SetPolys(polys);
+  }
+  else
+  {
+    mesh->SetVerts(verts);
+  }
   //Pass the scalars to the polydata (if they were set).
   if (scalarArray->GetNumberOfTuples()>0)
   {

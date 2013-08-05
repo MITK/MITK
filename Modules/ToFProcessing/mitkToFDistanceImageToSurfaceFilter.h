@@ -63,6 +63,9 @@ namespace mitk
     itkSetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
     itkGetMacro(VertexIdList, vtkSmartPointer<vtkIdList>);
 
+    itkSetMacro(GenerateTriangularMesh,bool);
+    itkGetMacro(GenerateTriangularMesh,bool);
+
 
     /**
      * @brief The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
@@ -162,6 +165,7 @@ namespace mitk
     ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
 
     int m_TextureIndex; ///< Index of the input used as texture image when no scalar image was set via SetIplScalarImage(). 0 = Distance, 1 = Amplitude, 2 = Intensity
+    bool m_GenerateTriangularMesh;
 
     ReconstructionModeType m_ReconstructionMode; ///< The ReconstructionModeType enum: Defines the reconstruction mode, if using no interpixeldistances and focal lenghts in pixel units  or interpixeldistances and focal length in mm. The Kinect option defines a special reconstruction mode for the kinect.
 

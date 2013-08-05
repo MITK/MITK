@@ -189,7 +189,7 @@ void QmitkPreprocessingView::DoBiExpFit()
       while(it != originalShellMap.end())
         bValueList.put(s++,(it++)->first);
 
-      const double targetBValue = 1000;
+      const double targetBValue = bValueList.mean();
       itk::BiExpFitFunctor::Pointer biExpFitFunctor = itk::BiExpFitFunctor::New();
       biExpFitFunctor->setListOfBValues(bValueList);
       biExpFitFunctor->setTargetBValue(targetBValue);
@@ -245,7 +245,7 @@ void QmitkPreprocessingView::DoAKCFit()
       while(it != originalShellMap.end())
         bValueList.put(s++,(it++)->first);
 
-      const double targetBValue = 1000;
+      const double targetBValue = bValueList.mean();
       itk::KurtosisFitFunctor::Pointer kurtosisFitFunctor = itk::KurtosisFitFunctor::New();
       kurtosisFitFunctor->setListOfBValues(bValueList);
       kurtosisFitFunctor->setTargetBValue(targetBValue);
@@ -303,7 +303,7 @@ void QmitkPreprocessingView::DoADCFit()
         while(it != originalShellMap.end())
           bValueList.put(s++,(it++)->first);
 
-        const double targetBValue = 1000;
+        const double targetBValue = bValueList.mean();
         itk::ADCAverageFunctor::Pointer ADCAverageFunctor = itk::ADCAverageFunctor::New();
         ADCAverageFunctor->setListOfBValues(bValueList);
         ADCAverageFunctor->setTargetBValue(targetBValue);

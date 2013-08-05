@@ -224,7 +224,7 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
 }
 
 
-int mitk::SerialCommunication::Send(const std::string& input)
+int mitk::SerialCommunication::Send(const std::string& input, bool block)
 {
   //long retval = E2ERR_OPENFAILED;
   if (input.empty())
@@ -255,6 +255,12 @@ int mitk::SerialCommunication::Send(const std::string& input)
     if (bytesWritten <= 0)
       return ERROR_VALUE; //return ERROR_VALUE
     bytesLeft -= bytesWritten;
+  }
+  if (block)
+  {
+    // wait for output to be physically sent
+    if (tcdrain(m_FileDescriptor) == -1)
+      return ERROR_VALUE;
   }
   return OK;
 #endif

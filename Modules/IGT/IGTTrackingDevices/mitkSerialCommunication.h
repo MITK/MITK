@@ -140,10 +140,13 @@ namespace mitk
     /**
     * \brief Send the string input
     *
-    * This method will send the string input to the serial interface.
-    * It does not send the string termination character \\0.
+    * \param[in] input  The string to send to the serial interface. The string
+    *                   termination character \\0 is not sent.
+    * \param[in] block  If false, the this method will return immediately. If
+    *                   true, this method will block until all bytes have been
+    *                   physically transmitted over the serial interface.
     */
-    int Send(const std::string& input);
+    int Send(const std::string& input, bool block = false);
 
     /**
     * \brief Send the break signal for ms milliseconds

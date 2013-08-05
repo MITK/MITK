@@ -146,7 +146,7 @@ void mitk::SerialCommunication::CloseConnection()
 }
 
 
-int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberOfBytes)
+int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberOfBytes, const char *eol)
 {
   if (numberOfBytes == 0)
     return OK;
@@ -208,12 +208,16 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
 
     bytesLeft -= num;  // n is number of chars left to read
     bytesRead += num;  // i is the number of chars read
+
+    if (eol && *eol == buffer[bytesRead-1]) // end of line char reached
+      break;
   }
   if (bytesRead > 0)
     answer.assign(buffer, bytesRead); // copy buffer to answer
   delete buffer;
-  if (bytesRead == numberOfBytes)
-    return OK;           // everything was received
+  if ( bytesRead == numberOfBytes ||                            // everything was received
+       (eol && answer.size() > 0 && *eol == answer.at(answer.size()-1)) )  // end of line char reached
+    return OK;
   else
     return ERROR_VALUE;  // some data was received, but not as much as expected
 #endif

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkSimulation.h>
 #include <mitkSimulationModel.h>
-#include <sofa/simulation/common/UpdateContextVisitor.h>
 
 QmitkSimulationView::QmitkSimulationView()
   : m_SelectionWasRemovedFromDataStorage(false),
@@ -140,7 +139,7 @@ void QmitkSimulationView::OnResetButtonClicked()
   sofaSimulation->reset(rootNode.get());
 
   rootNode->setTime(0.0);
-  rootNode->execute<sofa::simulation::UpdateContextVisitor>(sofa::core::ExecParams::defaultInstance());
+  sofaSimulation->updateContext(rootNode.get());
 
   simulation->GetDrawTool()->Reset();
 

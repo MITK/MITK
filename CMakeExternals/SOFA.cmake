@@ -30,7 +30,9 @@ if(MITK_USE_SOFA)
     -DSOFA-TUTORIAL_ONE_TETRAHEDRON:BOOL=OFF
   )
 
-  set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev9672.cmake)
+  set(rev "9832")
+
+  set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev${rev}.cmake)
   set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${CMAKE_BINARY_DIR}/${proj}-src)
   set(SOFA_CONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${additional_cmake_args} ${CMAKE_BINARY_DIR}/${proj}-src)
 
@@ -39,8 +41,8 @@ if(MITK_USE_SOFA)
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
       BINARY_DIR ${proj}-build
       PREFIX ${proj}-cmake
-      URL http://mitk.org/download/thirdparty/SOFA-rev9672.tar.gz
-      URL_MD5 1b7b89aec94c54d5ecb12477916f788d
+      URL http://mitk.org/download/thirdparty/SOFA-rev${rev}.tar.gz
+      URL_MD5 ff65b2813dcc27755844f95cb0392bcf
       PATCH_COMMAND ${SOFA_PATCH_COMMAND}
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

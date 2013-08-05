@@ -31,7 +31,7 @@ namespace mitk
   class StateMachineState;
 
   typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
-  typedef std::vector<const mitk::StateMachineCondition*> ConditionVectorType;
+  typedef std::vector<const mitk::StateMachineCondition> ConditionVectorType;
   typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
   /**
@@ -69,7 +69,7 @@ namespace mitk
      **/
     ActionVectorType GetActions() const;
 
-    ConditionVectorType GetConditions() const;
+    const ConditionVectorType& GetConditions() const;
 
     /**
      * @brief Set the next state of this object.
@@ -88,7 +88,7 @@ namespace mitk
 
     void AddAction(const StateMachineAction::Pointer& action);
 
-    void AddCondition(const StateMachineCondition* condition);
+    void AddCondition(const StateMachineCondition& condition);
 
 
     SpStateMachineState m_NextState;
@@ -102,7 +102,7 @@ namespace mitk
      **/
     std::vector<StateMachineAction::Pointer> m_Actions;
 
-    std::vector<const StateMachineCondition*> m_Conditions;
+    ConditionVectorType m_Conditions;
   };
 
 } // namespace mitk

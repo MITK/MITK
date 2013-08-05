@@ -157,7 +157,7 @@ namespace mitk
 
     virtual void ConnectActionsAndFunctions();
 
-    virtual bool CheckCondition( const StateMachineCondition* condition, const InteractionEvent* interactionEvent );
+    virtual bool CheckCondition( const StateMachineCondition& condition, const InteractionEvent* interactionEvent );
 
     /**
      * Looks up function that is associated with action and executes it.

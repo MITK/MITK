@@ -166,17 +166,19 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
   else if (name == CONDITION)
   {
     if (!m_CurrTransition)
-      MITK_WARN<< "Malformed state machine Pattern. Action without transition. \n Will be ignored.";
+      MITK_WARN<< "Malformed state machine Pattern. Condition without transition. \n Will be ignored.";
 
     std::string conditionName = ReadXMLStringAttribut(NAME, atts);
     std::string inverted = ReadXMLStringAttribut(INVERTED, atts);
-    mitk::StateMachineCondition* condition = NULL;
     if ( inverted ==  "" || inverted == "false" )
-      condition = new mitk::StateMachineCondition( conditionName );
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName ) );
+    }
     else
-      condition = new mitk::StateMachineCondition( conditionName, true );
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName, true ) );
+    }
 
-    m_CurrTransition->AddCondition(condition);
   }
 
 

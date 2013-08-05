@@ -139,14 +139,14 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
         // sequentially check all conditions
         try
         {
-          if ( CheckCondition( *it, event ) == (*it)->IsInverted() )
+          if ( CheckCondition( (*it), event ) == (*it).IsInverted() )
           {
             // if a condition is not fulfilled we can stop here
             conditionMet = false;
             break;
           }
         }
-        catch( std::exception e )
+        catch( const std::exception& e )
         {
           MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
           conditionMet = false;
@@ -169,7 +169,7 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
         {
           ExecuteAction(*it, event);
         }
-        catch( std::exception e )
+        catch( const std::exception& e )
         {
           MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
           return false;
@@ -192,22 +192,17 @@ void mitk::EventStateMachine::ConnectActionsAndFunctions()
   MITK_WARN<< "ConnectActionsAndFunctions in DataInteractor not implemented.\n DataInteractor will not be able to process any events.";
 }
 
-bool mitk::EventStateMachine::CheckCondition( const StateMachineCondition* condition, const InteractionEvent* event)
+bool mitk::EventStateMachine::CheckCondition( const StateMachineCondition& condition, const InteractionEvent* event)
 {
-  if (condition == NULL)
-  {
-    return false;
-  }
-
   bool retVal = false;
-  ConditionDelegatesMapType::iterator delegateIter = m_ConditionDelegatesMap.find(condition->GetConditionName());
+  ConditionDelegatesMapType::iterator delegateIter = m_ConditionDelegatesMap.find(condition.GetConditionName());
   if (delegateIter != m_ConditionDelegatesMap.end())
   {
     retVal = delegateIter->second->Execute(event);
   }
   else
   {
-    MITK_WARN << "No implementation of condition '" << condition->GetConditionName() << "' has been found.";
+    MITK_WARN << "No implementation of condition '" << condition.GetConditionName() << "' has been found.";
   }
 
   return retVal;

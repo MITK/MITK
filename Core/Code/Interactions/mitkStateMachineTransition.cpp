@@ -72,12 +72,6 @@ mitk::StateMachineTransition::~StateMachineTransition()
   m_NextState = NULL;
 
   m_Actions.clear();
-
-  for( int i=0; i<m_Conditions.size(); i++ )
-  {
-    delete m_Conditions.at(i);
-  }
-
   m_Conditions.clear();
 }
 
@@ -86,9 +80,9 @@ void mitk::StateMachineTransition::AddAction(const StateMachineAction::Pointer& 
   m_Actions.push_back(action);
 }
 
-void mitk::StateMachineTransition::AddCondition(const StateMachineCondition* condition)
+void mitk::StateMachineTransition::AddCondition(const StateMachineCondition& condition)
 {
-  m_Conditions.push_back(condition);
+  m_Conditions.push_back( condition );
 }
 
 
@@ -107,7 +101,7 @@ std::vector<mitk::StateMachineAction::Pointer> mitk::StateMachineTransition::Get
   return m_Actions;
 }
 
-std::vector<const mitk::StateMachineCondition*> mitk::StateMachineTransition::GetConditions() const
+const mitk::ConditionVectorType& mitk::StateMachineTransition::GetConditions() const
 {
   return m_Conditions;
 }

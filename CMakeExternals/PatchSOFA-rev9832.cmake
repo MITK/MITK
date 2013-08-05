@@ -1,3 +1,11 @@
+file(STRINGS "sofa-dependencies.cmake" sofaDependencies_cmake NEWLINE_CONSUME)
+string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" sofaDependencies_cmake "${sofaDependencies_cmake}")
+file(WRITE "sofa-dependencies.cmake" "${sofaDependencies_cmake}")
+
+file(STRINGS "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "../collision/AddFramePerformer." "#../collision/AddFramePerformer." CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" "${CMakeLists_txt}")
+
 file(STRINGS "cmake/preBuildConfig.cmake" preBuildConfig_cmake NEWLINE_CONSUME)
 string(REPLACE "DEBUG \"\${SOFA_BIN_DIR}" "DEBUG \"\${SOFA_BIN_DIR}/Debug" preBuildConfig_cmake "${preBuildConfig_cmake}")
 string(REPLACE "RELEASE \"\${SOFA_BIN_DIR}" "RELEASE \"\${SOFA_BIN_DIR}/Release" preBuildConfig_cmake "${preBuildConfig_cmake}")

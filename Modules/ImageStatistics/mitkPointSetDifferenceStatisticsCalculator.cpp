@@ -167,10 +167,9 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
     int numberOfPoints = m_PointSet1->GetSize();
 
     //Iterate over both pointsets in order to compare all points pair-wise
-    mitk::PointSet::PointsIterator pointSetIterator = m_PointSet1->Begin();
-    mitk::PointSet::PointsIterator pointSetIterator2 = m_PointSet2->Begin();
     mitk::PointSet::PointsIterator end = m_PointSet1->End();
-    while(pointSetIterator != end)
+    for( mitk::PointSet::PointsIterator pointSetIterator = m_PointSet1->Begin(), pointSetIterator2 = m_PointSet2->Begin();
+         pointSetIterator != end; ++pointSetIterator, ++pointSetIterator2) //iterate simultaneously over both sets
     {
       point1 = pointSetIterator.Value();
       point2 = pointSetIterator2.Value();
@@ -180,10 +179,8 @@ void mitk::PointSetDifferenceStatisticsCalculator::ComputeStatistics()
       rms+=squaredDistance;
       this->m_SquaredDifferencesVector.push_back(squaredDistance);
       differencesVector.push_back(sqrt(squaredDistance));
-
-      ++pointSetIterator;
-      ++pointSetIterator2;
     }
+
     m_DifferencesVector = differencesVector;
     mean = mean/numberOfPoints;
     rms = sqrt(rms/numberOfPoints);

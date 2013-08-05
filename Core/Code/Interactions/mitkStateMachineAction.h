@@ -21,6 +21,7 @@
 #include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
+#include "MitkExports.h"
 
 namespace mitk
 {
@@ -29,7 +30,7 @@ namespace mitk
   //## TODO: implement: Is used to connect the Action-Id in an XML Statemachine description with a functor in the StateMachine
   //## implementation
   //## @ingroup Interaction
-  class StateMachineAction: public itk::LightObject
+  class MITK_CORE_EXPORT StateMachineAction: public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineAction, itk::Object)

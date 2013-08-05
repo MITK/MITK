@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <itkLightObject.h>
 #include "mitkStateMachineTransition.h"
+#include "MitkExports.h"
 
 namespace mitk {
   /**
@@ -29,7 +30,7 @@ namespace mitk {
    * m_StateMode .
    */
 
-  class StateMachineState : public itk::LightObject
+  class MITK_CORE_EXPORT StateMachineState : public itk::LightObject
   {
   public:
     mitkClassMacro(StateMachineState, itk::LightObject);

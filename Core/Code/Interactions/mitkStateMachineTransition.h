@@ -24,6 +24,8 @@
 #include "mitkStateMachineCondition.h"
 #include "mitkInteractionEvent.h"
 
+#include "MitkExports.h"
+
 namespace mitk
 {
   class StateMachineState;
@@ -43,7 +45,7 @@ namespace mitk
   * \ingroup Interaction
   **/
 
-  class StateMachineTransition: public itk::LightObject
+  class MITK_CORE_EXPORT StateMachineTransition : public itk::LightObject
   {
     friend class StateMachineFactory;
     friend class StateMachineContainer;

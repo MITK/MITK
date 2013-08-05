@@ -374,3 +374,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     emit ToFCameraDisconnected();
   }
 }
+
+void QmitkToFConnectionWidget::ConnectCamera()
+{
+  this->m_Controls->m_ConnectCameraButton->animateClick();
+}

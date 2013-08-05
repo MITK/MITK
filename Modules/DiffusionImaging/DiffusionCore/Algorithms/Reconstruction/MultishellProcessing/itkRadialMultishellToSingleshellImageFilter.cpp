@@ -135,16 +135,6 @@ void RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarTyp
   m_ErrorImage->Allocate();
 
 
-  BValueMap::iterator ittt = m_BValueMap.begin();
-  ittt++; // skip bZeroImages corresponding to 0-bValue
-  m_TargetBValue = 0;
-  while(ittt!=m_BValueMap.end())
-  {
-    m_TargetBValue += ittt->first;
-    ittt++;
-  }
-  m_TargetBValue /= (double)(m_BValueMap.size()-1);
-
 
   MITK_INFO << "Input:" << std::endl << std::endl
             << "    GradientDirections: " << m_OriginalGradientDirections->Size() << std::endl
@@ -154,7 +144,6 @@ void RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarTyp
   MITK_INFO << "Output:" << std::endl << std::endl
             << "    OutImageVectorLength: " << outImage->GetVectorLength() << std::endl
             << "    TargetDirections: " << m_NumberTargetDirections << std::endl
-            << "    TargetBValue: " << m_TargetBValue << std::endl
             << std::endl;
 
 }
@@ -232,6 +221,7 @@ RadialMultishellToSingleshellImageFilter<TInputScalarType, TOutputScalarType>
       shellIterator++;
       shellIndex++;
     }
+
     // apply voxel wise signal manipulation functor
     (*m_Functor)(NewSignalMatrix, /*const &*/SignalMatrix,/*const &*/ AverageS0);
     SignalVector = NewSignalMatrix.get_column(0);

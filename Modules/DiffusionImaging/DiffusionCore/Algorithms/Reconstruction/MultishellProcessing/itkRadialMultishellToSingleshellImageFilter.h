@@ -89,7 +89,6 @@ namespace itk
 
     BValueMap m_BValueMap;
     double m_OriginalBValue;
-    double m_TargetBValue;
 
     std::vector<vnl_matrix< double > > m_ShellInterpolationMatrixVector;
 

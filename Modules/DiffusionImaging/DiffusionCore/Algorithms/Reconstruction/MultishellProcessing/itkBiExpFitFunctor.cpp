@@ -40,8 +40,8 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
     model.set_reference_measurement(S0);
 
     initalGuess.put(0, 0.f); // ADC_slow
-    initalGuess.put(1, 0.f); // ADC_fast
-    initalGuess.put(2, 0.5f); // lambda
+    initalGuess.put(1, 0.009f); // ADC_fast
+    initalGuess.put(2, 0.7f); // lambda
 
     // start Levenberg-Marquardt
     minimizer.minimize_without_gradient(initalGuess);
@@ -54,7 +54,7 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
     newSignal.put(i, 1, minimizer.get_end_error()); // RMS Error
 
     //OUTPUT FOR EVALUATION
-    std::cout << std::scientific << std::setprecision(5)
+    /*std::cout << std::scientific << std::setprecision(5)
               << ADC_slow   << ","                        // lambda
               << ADC_fast   << ","                        // alpha
               << lambda     << ","                        // lambda
@@ -64,7 +64,7 @@ void itk::BiExpFitFunctor::operator()(vnl_matrix<double> & newSignal,const vnl_m
       std::cout << std::scientific << std::setprecision(5) << SignalMatrix.get_row(i)[j];    // S_n Values corresponding to shell 1 to shell n
       if(j != SignalMatrix.get_row(i).size()-1) std::cout << ",";
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
   }
 
 }

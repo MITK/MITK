@@ -97,7 +97,7 @@ protected:
       for(int s=0; s<N; s++)
       {
         double approx = lambda * std::exp(-b[s] * ADC_slow) + (1-lambda) * std::exp(-b[s] * ADC_fast);
-        fx[s] = vnl_math_abs( (measurements[s]/S0) - approx );
+        fx[s] = vnl_math_abs( measurements[s] - approx*S0 );
       }
 
     }

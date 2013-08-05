@@ -92,7 +92,7 @@ namespace itk
     IndicesVector m_TargetDirectionsIndicies;
     unsigned int m_NumberTargetDirections;
 
-    itk::DWIVoxelFunctor * m_Functor;
+    DWIVoxelFunctor * m_Functor;
 
     ErrorImageType::Pointer m_ErrorImage;
 

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "SegmentationUIExports.h"
 #include "mitkLiveWireTool2D.h"
+#include "ui_QmitkLiveWireTool2DGUIControls.h"
 
 class QSlider;
 class QLabel;
@@ -29,6 +30,8 @@ class QPushButton;
 
 
 #include "QmitkStepperAdapter.h"
+
+class QmitkLiveWireTool2DGUIControls;
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -49,12 +52,14 @@ public:
 
     void OnConfirmSegmentation();
 
+    void OnShowInformation( bool on );
+
 protected:
 
   QmitkLiveWireTool2DGUI();
   virtual ~QmitkLiveWireTool2DGUI();
 
-  QPushButton* m_ConfirmButton;
+  Ui::QmitkLiveWireTool2DGUIControls m_Controls;
 
   mitk::LiveWireTool2D::Pointer m_LiveWireTool;
 };

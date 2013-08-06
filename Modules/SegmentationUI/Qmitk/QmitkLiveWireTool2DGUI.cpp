@@ -32,16 +32,14 @@ MITK_TOOL_GUI_MACRO(SegmentationUI_EXPORT, QmitkLiveWireTool2DGUI, "")
 QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI()
 :QmitkToolGUI()
 {
-  this->setContentsMargins( 0, 0, 0, 0 );
+  m_Controls.setupUi(this);
+  m_Controls.m_Information->hide();
 
-  // create the visible widgets
-  QGridLayout *layout = new QGridLayout(this);
-
-  m_ConfirmButton = new QPushButton("Confirm Segmentation");
-  layout->addWidget(m_ConfirmButton, 0,0);
-  connect( m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
+  connect( m_Controls.m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()) );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+
+  connect( m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
 }
 
 QmitkLiveWireTool2DGUI::~QmitkLiveWireTool2DGUI()
@@ -60,4 +58,12 @@ void QmitkLiveWireTool2DGUI::OnConfirmSegmentation()
   {
     m_LiveWireTool->ConfirmSegmentation();
   }
+}
+
+void QmitkLiveWireTool2DGUI::OnShowInformation( bool on )
+{
+  if (on)
+    m_Controls.m_Information->show();
+  else
+    m_Controls.m_Information->hide();
 }

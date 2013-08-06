@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkCallbackFromGUIThread.h"
 #include "QmitkNodeDescriptorManager.h"
 
-#include "QmitkDrawPaintbrushToolGUI.h"
+//#include "QmitkDrawPaintbrushToolGUI.h"
 
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"

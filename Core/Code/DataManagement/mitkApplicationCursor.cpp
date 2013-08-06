@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
+//us
+#include "mitkModuleResource.h"
+
 mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = NULL;
 
 namespace mitk {
@@ -41,6 +44,19 @@ ApplicationCursor* ApplicationCursor::GetInstance()
 void ApplicationCursor::RegisterImplementation(ApplicationCursorImplementation* implementation)
 {
   m_Implementation = implementation;
+}
+
+void ApplicationCursor::PushCursor(const ModuleResource resource, int hotspotX, int hotspotY)
+{
+  if (m_Implementation)
+  {
+    m_Implementation->PushCursor(resource, hotspotX, hotspotY);
+  }
+  else
+  {
+    MITK_ERROR << "in mitk::ApplicationCursor::PushCursor(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
+  }
 }
 
 void ApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)

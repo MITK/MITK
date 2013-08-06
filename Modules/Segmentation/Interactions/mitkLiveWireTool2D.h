@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModelLiveWireInteractor.h>
 #include <mitkImageLiveWireContourModelFilter.h>
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -51,7 +53,13 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     itkNewMacro(LiveWireTool2D);
 
     virtual const char** GetXPM() const;
+    virtual ModuleResource GetCursorIconResource() const;
+    ModuleResource GetIconResource() const;
+
     virtual const char* GetName() const;
+
+    /// \brief Convert all current contour objects to binary segmentation image.
+    void ConfirmSegmentation();
 
   protected:
 
@@ -66,6 +74,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     virtual void Activated();
     virtual void Deactivated();
+
+    /// \brief Memory release from all used contours
+    virtual void ClearContours();
 
     /// \brief Initialize tool
     virtual bool OnInitLiveWire (Action*, const StateEvent*);

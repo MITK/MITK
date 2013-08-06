@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSetRegionTool.h"
 #include "SegmentationExports.h"
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -46,6 +48,9 @@ class Segmentation_EXPORT EraseRegionTool : public SetRegionTool
     itkNewMacro(EraseRegionTool);
 
     virtual const char** GetXPM() const;
+    virtual ModuleResource GetCursorIconResource() const;
+    ModuleResource GetIconResource() const;
+
     virtual const char* GetName() const;
 
   protected:

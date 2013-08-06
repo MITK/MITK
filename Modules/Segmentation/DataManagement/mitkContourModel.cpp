@@ -216,6 +216,15 @@ void mitk::ContourModel::Concatenate(mitk::ContourModel* other, int timestep, bo
   }
 }
 
+
+
+mitk::ContourModel::VertexIterator mitk::ContourModel::Begin( int timestep)
+{
+  return this->IteratorBegin(timestep);
+}
+
+
+
 mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timestep)
 {
   if(!this->IsEmptyTimeStep(timestep))
@@ -227,6 +236,15 @@ mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorBegin( int timest
     mitkThrow() << "No iterator at invalid timestep " << timestep << ". There are only " << this->GetTimeSteps() << " timesteps available.";
   }
 }
+
+
+
+mitk::ContourModel::VertexIterator mitk::ContourModel::End( int timestep)
+{
+  return this->IteratorEnd(timestep);
+}
+
+
 
 mitk::ContourModel::VertexIterator mitk::ContourModel::IteratorEnd( int timestep)
 {
@@ -263,7 +281,7 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int tim
 
 bool mitk::ContourModel::SelectVertexAt(int index, int timestep)
 {
-  if(!this->IsEmptyTimeStep(timestep))
+  if(!this->IsEmptyTimeStep(timestep) && index > 0)
   {
     return (this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(index));
   }
@@ -286,7 +304,7 @@ bool mitk::ContourModel::SetControlVertexAt(mitk::Point3D &point, float eps, int
 
 bool mitk::ContourModel::SetControlVertexAt(int index, int timestep)
 {
-  if(!this->IsEmptyTimeStep(timestep))
+  if(!this->IsEmptyTimeStep(timestep) && index > 0)
   {
       VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(index);
       if (vertex != NULL)
@@ -491,6 +509,33 @@ void mitk::ContourModel::ClearData()
   //clear out the time resolved contours
   this->m_ContourSeries.clear();
 }
+
+
+
+void mitk::ContourModel::Initialize()
+{
+  this->InitializeEmpty();
+  this->Modified();
+}
+
+
+
+void mitk::ContourModel::Initialize(mitk::ContourModel &other)
+{
+  unsigned int numberOfTimesteps = other.GetTimeSlicedGeometry()->GetTimeSteps();
+  this->InitializeTimeSlicedGeometry(numberOfTimesteps);
+
+  for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
+  {
+    this->m_ContourSeries.push_back(mitk::ContourElement::New());
+    this->SetIsClosed(other.IsClosed(currentTimestep),currentTimestep);
+  }
+
+  m_SelectedVertex = NULL;
+  this->m_lineInterpolation = other.m_lineInterpolation;
+  this->Modified();
+}
+
 
 
 void mitk::ContourModel::InitializeEmpty()

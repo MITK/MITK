@@ -75,6 +75,9 @@ class Segmentation_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Activated();
     virtual void Deactivated();
 
+    /// \brief Memory release from all used contours
+    virtual void ClearContours();
+
     /// \brief Initialize tool
     virtual bool OnInitLiveWire (Action*, const StateEvent*);
 

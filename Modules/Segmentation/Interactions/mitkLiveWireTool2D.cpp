@@ -128,11 +128,46 @@ void mitk::LiveWireTool2D::Activated()
 
 void mitk::LiveWireTool2D::Deactivated()
 {
-  this->FinishTool();
+  this->ClearContours();
 
   Superclass::Deactivated();
 }
 
+void mitk::LiveWireTool2D::ClearContours()
+{
+  // for all contours in list (currently created by tool)
+  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator iter = this->m_WorkingContours.begin();
+  while(iter != this->m_WorkingContours.end() )
+  {
+    //remove contour node from datastorage
+    m_ToolManager->GetDataStorage()->Remove( iter->first );
+
+    ++iter;
+  }
+
+  this->m_WorkingContours.clear();
+
+  // for all contours in list (currently created by tool)
+  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itEditingContours = this->m_EditingContours.begin();
+  while(itEditingContours != this->m_EditingContours.end() )
+  {
+      //remove contour node from datastorage
+      m_ToolManager->GetDataStorage()->Remove( itEditingContours->first );
+      ++itEditingContours;
+  }
+
+  this->m_EditingContours.clear();
+
+  std::vector< mitk::ContourModelLiveWireInteractor::Pointer >::iterator itLiveWireInteractors = this->m_LiveWireInteractors.begin();
+  while(itLiveWireInteractors != this->m_LiveWireInteractors.end() )
+  {
+      // remove interactors from globalInteraction instance
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( *itLiveWireInteractors );
+      ++itLiveWireInteractors;
+  }
+
+  this->m_LiveWireInteractors.clear();
+}
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
@@ -172,13 +207,13 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
         }
 
         //remove contour node from datastorage
-        m_ToolManager->GetDataStorage()->Remove( itWorkingContours->first );
+    //    m_ToolManager->GetDataStorage()->Remove( itWorkingContours->first );
       }
     }
 
     ++itWorkingContours;
   }
-
+/*
   this->m_WorkingContours.clear();
 
   // for all contours in list (currently created by tool)
@@ -201,8 +236,8 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   }
 
   this->m_LiveWireInteractors.clear();
-
-  Superclass::Deactivated();
+*/
+  this->ClearContours();
 }
 
 bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* stateEvent)

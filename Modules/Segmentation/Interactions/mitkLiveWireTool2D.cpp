@@ -296,6 +296,7 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+  //add repulsive points to avoid to get the same path again
   typedef mitk::ImageLiveWireContourModelFilter::InternalImageType::IndexType IndexType;
   mitk::ContourModel::ConstVertexIterator iter = m_LiveWireContour->IteratorBegin(timestep);
   for (;iter != m_LiveWireContour->IteratorEnd(timestep); iter++)
@@ -305,8 +306,6 @@ bool mitk::LiveWireTool2D::OnAddPoint (Action* action, const StateEvent* stateEv
 
       this->m_LiveWireFilter->AddRepulsivePoint( idx );
   }
-
-  this->m_LiveWireFilter->Update();
 
   //remove duplicate first vertex, it's already contained in m_Contour
   m_LiveWireContour->RemoveVertexAt(0, timestep);

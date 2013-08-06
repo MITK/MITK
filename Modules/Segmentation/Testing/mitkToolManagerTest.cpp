@@ -57,36 +57,22 @@ static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
 
 };
 
-int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
+int mitkToolManagerTest(int, char* [])
 {
-  // always start with this!
   MITK_TEST_BEGIN("ToolManager")
 
-  // Global interaction must(!) be initialized if used
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
-  // instantiation
-  /*TEMPmitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
+  MITK_TEST_CONDITION_REQUIRED(dataStorage.IsNotNull(), "StandaloneDataManager instantiation")
+
+  MITK_INFO << "Instantiate ToolManager...";
   mitk::ToolManager::Pointer toolManager = mitk::ToolManager::New(dataStorage.GetPointer());
+  MITK_TEST_CONDITION_REQUIRED(toolManager.IsNotNull(), "ToolManager instantiation")
 
-  // first test: did this work?
-  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
-  // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(toolManager.IsNotNull(),"Testing instantiation")
-
-  // write your own tests here and use the macros from mitkTestingMacros.h !!!
-  // do not write to std::cout and do not return from this function yourself!
-  //mitkToolManagerTestClass::TestToolManagerWithOutTools(toolManager);
-
-  //now we add one tool
-  toolManager = mitk::ToolManager::New(dataStorage.GetPointer());
-
-  //start test with tool
+  MITK_INFO << "Start ToolManager tests...";
   mitkToolManagerTestClass::TestToolManagerWithTools(toolManager);
+  mitkToolManagerTestClass::TestSetterMethods(toolManager);
 
-  //now the setter methods
-  mitkToolManagerTestClass::TestSetterMethods(toolManager);TEMP*/
-
-  // always end with this!
   MITK_TEST_END()
 }

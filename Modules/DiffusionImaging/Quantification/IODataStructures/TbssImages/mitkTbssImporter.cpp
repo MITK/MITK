@@ -105,12 +105,15 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
           ix[0] = id[0] = i;
           ix[1] = id[1] = j;
           ix[2] = id[2] = k;
+
+          pixel = m_Data->GetPixel(id);
+
           for(int z=0; z<vecSize; z++)
           {
             ix[3] = z;
             float value = readTbss.GetPixelByIndex(ix);
 
-            pixel = m_Data->GetPixel(id);
+
             pixel.SetElement(z, value);
           }
           m_Data->SetPixel(id, pixel);

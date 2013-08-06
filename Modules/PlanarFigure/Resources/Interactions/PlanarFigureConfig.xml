@@ -1,0 +1,33 @@
+<config>
+  <!-- Undeclared tags are filled with standard values -->
+  <!-- Mouse Events -->
+  <!-- MousePressEvents -->
+  <event_variant class="MousePressEvent" name="PrimaryButtonPressed">
+    <attribute name="EventButton" value="LeftMouseButton" />
+  </event_variant>
+  <event_variant class="MousePressEvent" name="SecondaryButtonPressed">
+    <attribute name="EventButton" value="RightMouseButton" />
+  </event_variant>
+
+  <event_variant class="MouseDoubleClickEvent" name="PrimaryButtonDoubleClick">
+    <attribute name="EventButton" value="LeftMouseButton" />
+  </event_variant>
+
+
+  <!-- MouseMoveEvents -->
+  <event_variant class="MouseMoveEvent" name="MouseMove" />
+  <event_variant class="MouseMoveEvent" name="PrimaryButtonPressedAndMouseMove">
+    <attribute name="ButtonState" value="LeftMouseButton" />
+  </event_variant>
+
+  <!-- MouseReleaseEvents -->
+  <event_variant class="MouseReleaseEvent" name="PrimaryButtonReleased">
+    <attribute name="EventButton" value="LeftMouseButton" />
+  </event_variant>
+
+  <event_variant class="InternalEvent" name="Dummy-Event" >
+    <attribute name="SignalName" value="Dummy-Event" />
+  </event_variant>
+
+
+</config>

@@ -293,7 +293,7 @@ void QmitkTensorReconstructionView::ResidualCalculation()
     filter->SetBValue(diffImage->GetB_Value());
     filter->SetGradientList(gradientList);
     filter->SetMin(stats->GetScalarValueMin());
-    filter->SetMax(500);
+    filter->SetMax(stats->GetScalarValueMax());
     filter->Update();
 
 

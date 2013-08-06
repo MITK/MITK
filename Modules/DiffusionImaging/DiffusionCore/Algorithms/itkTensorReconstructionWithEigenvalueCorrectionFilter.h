@@ -198,7 +198,7 @@ namespace itk
 
   private:
 
-    double CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3> ::Pointer mask);
+    double CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3> ::Pointer mask,itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp);
 
     void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
 

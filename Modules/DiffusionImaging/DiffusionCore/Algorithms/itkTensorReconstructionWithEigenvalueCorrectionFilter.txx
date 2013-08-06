@@ -61,27 +61,6 @@ namespace itk
     m_GradientImagePointer = static_cast< GradientImagesType * >(
       this->ProcessObject::GetInput(0) );
 
-
-
-    itk::Index<3> testIx;
-    testIx[0] = 48;
-    testIx[0] = 41;
-    testIx[0] = 31;
-
-    GradientVectorType data_vec = m_GradientImagePointer->GetPixel(testIx);
-
-    short data_vec1 = data_vec[0];
-    short data_vec2 = data_vec[1];
-    short data_vec3 = data_vec[2];
-    short data_vec4 = data_vec[3];
-    short data_vec5 = data_vec[4];
-    short data_vec6 = data_vec[5];
-    short data_vec7 = data_vec[6];
-
-
-
-
-
     typename GradientImagesType::SizeType size = m_GradientImagePointer->GetLargestPossibleRegion().GetSize();
     int nof = m_GradientDirectionContainer->Size();
     int numberb0=0;
@@ -138,35 +117,6 @@ namespace itk
 
     vnl_matrix<double> directions(nof-numberb0,3);
     m_B0Mask.set_size(nof);
-
-
-    std::cout<<"logarithm test start"<<std::endl;
-
-    double R=3.;
-    double prev_x=0.5;
-
-    double x;
-
-    double delta=0;
-
-    double one=0.0;
-
-    cout.precision(32);
-
-
-            for (double i=1;i< 100;++i)
-            {
-
-                delta= one + i*0.01;
-
-                x= log((double)delta);
-
-                std::cout<<x<<std::endl;
-
-             }
-
-
-         std::cout<<"logarithm test end"<<std::endl;
 
 
 
@@ -260,14 +210,6 @@ namespace itk
 
 
     ImageType::Pointer corrected_diffusion_temp = ImageType::New();
-    /*corrected_diffusion_temp->SetRegions(size);
-    corrected_diffusion_temp->SetSpacing(m_GradientImagePointer->GetSpacing());
-    corrected_diffusion_temp->SetOrigin(m_GradientImagePointer->GetOrigin());
-    corrected_diffusion_temp->SetVectorLength(nof);
-    corrected_diffusion_temp->Allocate();*/
-
-    DeepCopyDiffusionImage(corrected_diffusion,corrected_diffusion_temp,nof);
-
 
     typedef itk::VariableLengthVector<short> VariableVectorType;
     VariableVectorType variableLengthVector;
@@ -288,8 +230,6 @@ namespace itk
 
 
     double mean_b=0.0;
-    double pixel=0.0;
-    vnl_vector<double> tensor (6);
 
 
     int mask_cnt=0;
@@ -327,15 +267,6 @@ namespace itk
       }
     }
 
-
-   //Sometimes the gradient voxels may contain negative values ( even if B0 voxel is > = 50 ). This must be corrected
-
-
-    double mask_val=0.0;
-    vnl_vector<double> org_vec(nof-numberb0);
-
-    int counter_corrected =0;
-
     for ( int x=0;x<size[0];x++)
     {
       for ( int y=0;y<size[1];y++)
@@ -344,46 +275,69 @@ namespace itk
         {
           ix[0] = x; ix[1] = y; ix[2] = z;
 
-          mask_val = mask->GetPixel(ix);
           GradientVectorType pixel2 = m_GradientImagePointer->GetPixel(ix);
 
-          for (int i=0;i<nof;i++)
-          {
-            org_vec[i]=pixel2[i];
-          }
+          corrected_diffusion->SetPixel(ix,pixel2);
 
-          if(mask_val >0)// we are dooing this only if the voxels are in the mask
-          {
-
-          for( int f=0;f<nof;f++)
-          {
-            if(org_vec[f] <= 0) // if in one of the gradients it is 0 or les than 0
-            {
-              org_vec[f] = CheckNeighbours(x,y,z,f,size,mask);
-              counter_corrected++;
-
-              // If method returned 0 it means that there is no valid ( correct) neighborhood. It is done outside the function because
-              //later the same method is called in different concept when this is not important
-            }
-          }
-
-          for (int i=0;i<nof;i++)
-          {
-            pixel2[i]=org_vec[i];
-          }
-
-          corrected_diffusion->SetPixel(ix, pixel2);
-          //counter_corrected++;
-
-          }
         }
       }
     }
 
 
 
-    std::cout << "Number of voxels in mask: " << mask_cnt << std::endl;
-    std::cout << "Number of voxels corrected: " << counter_corrected << std::endl;
+   //Sometimes the gradient voxels may contain negative values ( even if B0 voxel is > = 50 ). This must be corrected
+
+
+    double mask_val=0.0;
+        vnl_vector<double> org_vec(nof-numberb0);
+
+        int counter_corrected =0;
+
+        for ( int x=0;x<size[0];x++)
+        {
+          for ( int y=0;y<size[1];y++)
+          {
+            for ( int z=0;z<size[2];z++)
+            {
+              ix[0] = x; ix[1] = y; ix[2] = z;
+
+              mask_val = mask->GetPixel(ix);
+              GradientVectorType pixel2 = corrected_diffusion->GetPixel(ix);
+
+              for (int i=0;i<nof;i++)
+              {
+                org_vec[i]=pixel2[i];
+              }
+
+              if(mask_val >0)// we are dooing this only if the voxels are in the mask
+              {
+
+              for( int f=0;f<nof;f++)
+              {
+                if(org_vec[f] <= 0) // if in one of the gradients it is 0 or les than 0
+                {
+                  org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
+                  counter_corrected++;
+
+                  // If method returned 0 it means that there is no valid ( correct) neighborhood. It is done outside the function because
+                  //later the same method is called in different concept when this is not important
+                }
+              }
+
+              for (int i=0;i<nof;i++)
+              {
+                pixel2[i]=org_vec[i];
+              }
+
+              corrected_diffusion->SetPixel(ix, pixel2);
+
+
+              }
+            }
+          }
+        }
+
+
 
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > TensorImageType;
     TensorImageType::Pointer tensorImg = TensorImageType::New();
@@ -393,14 +347,8 @@ namespace itk
     tensorImg->Allocate();
 
 
-
-
-
     TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
-    /*temp_tensorImg->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
-    temp_tensorImg->SetSpacing(m_GradientImagePointer->GetSpacing());
-    temp_tensorImg->SetOrigin(m_GradientImagePointer->GetOrigin());
-    temp_tensorImg->Allocate();*/
+
 
     DeepCopyTensorImage(tensorImg,temp_tensorImg);
 
@@ -419,9 +367,6 @@ namespace itk
 
 
 
-   // info for Thomas ( to be removed) :start of "lots of new code
-
-
     double what_mask=0;
     double set_mask=2.0;
     double previous_mask=0;
@@ -429,57 +374,44 @@ namespace itk
     double old_number_negative_eigs=0;
     double new_number_negative_eigs=0;
 
-    std::cout << "I am here "<< std::endl;
 
     bool  stil_correcting = true;
 
     TurnMask(size,mask,previous_mask,set_mask);// simply defining all possible tensors as with negative eigenvalues
 
-
-
-    //corrected_diffusion= m_GradientImagePointer;
-
-    std::cout << "Stil good"<< std::endl;
-
     what_mask=1.0;// we want to calculate all the tensors
 
-    int tensors_generated=0;
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,tensorImg);// generating of the tensors
+    DeepCopyDiffusionImage(corrected_diffusion,corrected_diffusion_temp,nof);
 
-    std::cout << "good_tensors_generated"<<tensors_generated<< std::endl;
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);// generating of the tensors
 
-    //this->SetNthOutput(0, tensorImg);
 
     old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);// checking how many tensors has problems, this is working only for mask =2
 
-    std::cout << "good now how many bads there are"<< std::endl;
+    std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
+
+    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+
+
+
 
     while (stil_correcting == true)
     {
 
     std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
 
-    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion,mask,pixel_max,pixel_min);
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,temp_tensorImg);
-
-    new_number_negative_eigs = CheckNegatives (size,mask, temp_tensorImg);
-
-    /*typedef  itk::ImageFileWriter< MaskImageType  > WriterType;
-    WriterType::Pointer writer = WriterType::New();
-    writer->SetFileName("/Users/macbook_fb/Desktop/franksecondfound.nrrd");
-    writer->SetInput(mask);
-    writer->Update();*/
+    new_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
 
     if(new_number_negative_eigs<old_number_negative_eigs)
     {
         stil_correcting=true;
         old_number_negative_eigs=new_number_negative_eigs;
+        DeepCopyDiffusionImage(corrected_diffusion_temp,corrected_diffusion,nof);
 
-        tensorImg=temp_tensorImg;
 
-        corrected_diffusion=corrected_diffusion_temp;
     }
     else
     {
@@ -487,26 +419,21 @@ namespace itk
     }
 
 
+    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+
 
     }//end of while
 
 
-    TurnMask(size, mask,1,0);
+    TurnMask(size, mask,1,1);
 
-    tensorImg=temp_tensorImg;
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,tensorImg);
 
-    //what_mask=0;
-
-    //GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,tensorImg,pseudoInverse,tensors_generated );
-
-
-   // info for Thomas ( to be removed) :end  of "lots of new code
+    m_MaskImage = mask;
 
     this->SetNthOutput(0, tensorImg);
 
     m_VectorImage = corrected_diffusion;
-    m_MaskImage = mask;
-
 
     m_Voxdim = vox_dim;
 
@@ -555,7 +482,7 @@ namespace itk
   template <class TDiffusionPixelType, class TTensorPixelType>
   double
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3>::Pointer mask)
+  ::CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp)
   {
     double back_x=std::max(0,x-1);
     double back_y=std::max(0,y-1);
@@ -574,6 +501,7 @@ namespace itk
     double temp_mask=0;// declaration of variables
     double one =1.0;
 
+
     for(int i=back_x; i<forth_x+1; i++)
     {
       for (int j=back_y; j<forth_y+1; j++)
@@ -585,37 +513,55 @@ namespace itk
 
           temp_mask=mask->GetPixel(ix);
 
-          if(temp_mask > 0 && temp_mask < 2 )
-          {
-              GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
+          //if(temp_mask > 0 && temp_mask < 2 )
+          //{
+              //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
+              GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
 
               double test= p[f];
 
               if (test > 0.0 )// hmm this must be here becaus the method is used in multiple ocasions. Sometiems we may deal with negative values
               {
+                if(i==x && j==y && c== z)
+                {
 
-                tempsum=tempsum+p[f];// sum for calculation of mean
-                temp_number++;// number for calculation of mean
 
 
-            }//end of pf>0
-          }//end of mask condition
+                }
+                else
+                {
+                    tempsum=tempsum+p[f];// sum for calculation of mean
+                    temp_number++;// number for calculation of mean
+                }
+
+
+
+            }
+
+          //}//end of mask condition
+
+
 
         }
       }
     }// end of size
 
 
+
     ix[0] = x;ix[1] = y;ix[2] = z;
 
     if (temp_number <= 0.0)
     {
+      //ix[0] = x;ix[1] = y;ix[2] = z;
+      //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
+      //tempsum=p[f];
       tempsum=0;
       mask->SetPixel(ix,0);
     }
     else
     {
       tempsum=tempsum/temp_number;
+
     }
 
 
@@ -665,7 +611,10 @@ namespace itk
     for (int i=0;i<nof-numberb0;i++)
     {
 
-      if(atten[i]==0.0)
+      if(atten[i]<=0.0)
+      {
+          atten[i]==0.1;
+      }
      std::cout << "problem";
       atten[i]=log((double)atten[i]);
     }
@@ -711,7 +660,7 @@ namespace itk
 
               pixel = mask->GetPixel(ix);
 
-              if(pixel == 2.0)
+              if(pixel > 1)
               {// but only if previously marked as bad or potentially bad one
 
               ten = tensorImg->GetPixel(ix);
@@ -767,25 +716,22 @@ namespace itk
       //-ry while we can't use corrected voxel to correct other voxel in the same iteration.
 
 
-
-
       itk::Index<3> ix;
       vnl_vector<double> org_data(nof-numberb0);
       vnl_vector<double> atten(nof-numberb0);
       double cnt_atten=0;// declaration of important variables
 
-      for (int x=0;x<size[0];x++)
+      for (int z=0;z<size[2];z++)
       {
 
-        for (int y=0;y<size[1];y++)
+        for (int x=0;x<size[0];x++)
         {
 
-          for (int z=0;z<size[2];z++)
+          for (int y=0;y<size[1];y++)
           {
               // for every pixel
 
               ix[0] = x; ix[1] = y; ix[2] = z;
-
 
 
               if(mask->GetPixel(ix) > 1.0)
@@ -821,7 +767,6 @@ namespace itk
                     }
                   }
 
-
                   cnt_atten=0;
 
                   for (int f=0;f<nof;f++)
@@ -829,17 +774,29 @@ namespace itk
                     if(m_B0Mask[f]==0)
                     {
 
-                    //if(atten[cnt_atten]<0.0067 || atten[cnt_atten]> 0.99)
-                    //{
-                       org_data[f] = CheckNeighbours(x,y,z,f,size,mask);
-                    //}
+                        if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
+                    {
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion_temp);
+
+                    }
 
 
                     cnt_atten++;
 
                    }
+                    if(m_B0Mask[f]==1)
+                    {
+
+
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion_temp);
+
+
+                    }
+
 
                   }//end for
+
+
 
                   for (int i=0;i<nof;i++)
                   {
@@ -902,9 +859,6 @@ namespace itk
                     org_data[i]=pt[i];
                   }
 
-                  //CalculateAttenuation(org_data,atten,nof,numberb0);
-                  //CalculateTensor(atten,tensor,nof,numberb0);
-
                   double mean_b=0.0;
 
                   for (int i=0;i<nof;i++)
@@ -920,9 +874,13 @@ namespace itk
                   int cnt=0;
                   for (int i=0;i<nof;i++)
                   {
+                    if (org_data[i]<= 0)
+
+                    {
+                        org_data[i]=0.1;
+                    }
                     if(m_B0Mask[i]==0)
                     {
-                      //if(org_data[i]<0.001){org_data[i]=0.01;}
                       atten[cnt]=org_data[i]/mean_b;
                       cnt++;
                     }
@@ -1022,8 +980,8 @@ namespace itk
     itk::ImageRegionConstIterator<ImageType> inputIterator(corrected_diffusion, corrected_diffusion->GetLargestPossibleRegion());
     itk::ImageRegionIterator<ImageType> outputIterator(corrected_diffusion_temp, corrected_diffusion_temp->GetLargestPossibleRegion());
 
-    //inputIterator.begin();
-    //outputIterator.begin();
+    inputIterator.GoToBegin();
+    outputIterator.GoToBegin();
 
     while(!inputIterator.IsAtEnd())
       {
@@ -1047,8 +1005,8 @@ namespace itk
     itk::ImageRegionConstIterator<TensorImageType> inputIterator(tensorImg, tensorImg->GetLargestPossibleRegion());
     itk::ImageRegionIterator<TensorImageType> outputIterator(temp_tensorImg, temp_tensorImg->GetLargestPossibleRegion());
 
-    //inputIterator.begin();
-    //outputIterator.begin();
+    inputIterator.GoToBegin();
+    outputIterator.GoToBegin();
 
     while(!inputIterator.IsAtEnd())
       {
@@ -1059,10 +1017,6 @@ namespace itk
   }
 
 
-
-
-
-// info for Thomas ( to be removed) : end of "lots of new code"
 
 } // end of namespace
 

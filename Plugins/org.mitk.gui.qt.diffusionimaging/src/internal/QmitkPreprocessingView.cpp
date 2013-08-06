@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkADCAverageFunctor.h>
 #include <itkKurtosisFitFunctor.h>
 #include <itkBiExpFitFunctor.h>
+#include <itkADCFitFunctor.h>
 
 // mitk includes
 #include "QmitkDataStorageComboBox.h"
@@ -126,6 +127,7 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
+        connect( (QObject*)(m_Controls->m_AdcSignalAverage), SIGNAL(clicked()), this, SLOT(DoADCAverage()) );
         connect( (QObject*)(m_Controls->m_AdcSignalFit), SIGNAL(clicked()), this, SLOT(DoADCFit()) );
         connect( (QObject*)(m_Controls->m_AkcSignalFit), SIGNAL(clicked()), this, SLOT(DoAKCFit()) );
         connect( (QObject*)(m_Controls->m_BiExpSignalFit), SIGNAL(clicked()), this, SLOT(DoBiExpFit()) );
@@ -283,8 +285,65 @@ void QmitkPreprocessingView::DoAKCFit()
   }
 }
 
-
 void QmitkPreprocessingView::DoADCFit()
+{
+
+    typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+    typedef DiffusionImageType::BValueMap BValueMap;
+    typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+
+    for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+    {
+        DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
+        BValueMap originalShellMap = inImage->GetB_ValueMap();
+        GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+
+        BValueMap::iterator it = originalShellMap.begin();
+        ++it;/* skip b=0*/ int s = 0; /*shell index */
+        vnl_vector<double> bValueList(originalShellMap.size()-1);
+        while(it != originalShellMap.end())
+          bValueList.put(s++,(it++)->first);
+
+        const double targetBValue = bValueList.mean();
+        itk::ADCFitFunctor::Pointer ADCAverageFunctor = itk::ADCFitFunctor::New();
+        ADCAverageFunctor->setListOfBValues(bValueList);
+        ADCAverageFunctor->setTargetBValue(targetBValue);
+
+        FilterType::Pointer filter = FilterType::New();
+        filter->SetInput(inImage->GetVectorImage());
+        filter->SetOriginalGradientDirections(gradientContainer);
+        filter->SetOriginalBValueMap(originalShellMap);
+        filter->SetOriginalBValue(inImage->GetB_Value());
+        filter->SetFunctor(ADCAverageFunctor);
+        filter->Update();
+
+        DiffusionImageType::Pointer outImage = DiffusionImageType::New();
+        outImage->SetVectorImage( filter->GetOutput() );
+        outImage->SetB_Value( targetBValue );
+        outImage->SetDirections( filter->GetTargetGradientDirections() );
+        outImage->InitializeFromVectorImage();
+
+        QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+
+        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+        imageNode->SetData( outImage );
+        imageNode->SetName((name+"_ADC-Average").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode);
+
+        FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+        mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+        mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+        mitkErrImage->SetVolume(errImage->GetBufferPointer());
+
+        imageNode = mitk::DataNode::New();
+        imageNode->SetData( mitkErrImage );
+        imageNode->SetName((name+"_ADC-Average_Error").toStdString().c_str());
+        GetDefaultDataStorage()->Add(imageNode);
+    }
+}
+
+
+void QmitkPreprocessingView::DoADCAverage()
 {
 
     typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
@@ -481,6 +540,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
     m_Controls->m_AdcSignalFit->setEnabled(foundDwiVolume);
+    m_Controls->m_AdcSignalAverage->setEnabled(foundDwiVolume);
     m_Controls->m_AkcSignalFit->setEnabled(foundDwiVolume);
     m_Controls->m_BiExpSignalFit->setEnabled(foundDwiVolume);
     m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);

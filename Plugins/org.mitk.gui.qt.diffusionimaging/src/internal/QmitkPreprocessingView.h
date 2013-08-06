@@ -81,6 +81,7 @@ protected slots:
   void DoReduceGradientDirections();
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
+  void DoADCAverage();
   void DoADCFit();
   void DoAKCFit();
   void DoBiExpFit();

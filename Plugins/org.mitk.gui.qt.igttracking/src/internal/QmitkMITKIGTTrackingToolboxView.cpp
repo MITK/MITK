@@ -199,6 +199,9 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   //build the IGT pipeline
   mitk::TrackingDevice::Pointer trackingDevice = this->m_Controls->m_configurationWidget->GetTrackingDevice();
 
+  //set the tracking device to transposed rotation
+  trackingDevice->SetRotationMode(mitk::TrackingDevice::RotationTransposed);
+
   //Get Tracking Volume Data
   mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
 

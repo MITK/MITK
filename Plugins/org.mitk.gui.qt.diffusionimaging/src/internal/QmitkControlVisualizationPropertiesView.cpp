@@ -228,7 +228,7 @@ struct CvpSelListener : ISelectionListener
       {
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
-        i != m_View->m_CurrentSelection->End(); ++i)
+          i != m_View->m_CurrentSelection->End(); ++i)
         {
 
           // extract datatree node
@@ -261,6 +261,7 @@ struct CvpSelListener : ISelectionListener
                 int val;
                 node->GetIntProperty("DisplayChannel", val);
                 m_View->m_Controls->m_DisplayIndex->setValue(val);
+                m_View->m_Controls->m_DisplayIndexSpinBox->setValue(val);
 
                 QString label = "Channel %1";
                 label = label.arg(val);
@@ -268,6 +269,7 @@ struct CvpSelListener : ISelectionListener
 
                 int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(nodeData))->GetVectorImage()->GetVectorLength();
                 m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
+                m_View->m_Controls->m_DisplayIndexSpinBox->setMaximum(maxVal-1);
               }
 
               if(QString("TbssImage").compare(nodeData->GetNameOfClass())==0)
@@ -290,6 +292,7 @@ struct CvpSelListener : ISelectionListener
                 int val;
                 node->GetIntProperty("DisplayChannel", val);
                 m_View->m_Controls->m_DisplayIndex->setValue(val);
+                m_View->m_Controls->m_DisplayIndexSpinBox->setValue(val);
 
                 QString label = "Channel %1";
                 label = label.arg(val);
@@ -297,6 +300,7 @@ struct CvpSelListener : ISelectionListener
 
                 int maxVal = (dynamic_cast<mitk::TbssImage* >(nodeData))->GetImage()->GetVectorLength();
                 m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
+                m_View->m_Controls->m_DisplayIndexSpinBox->setMaximum(maxVal-1);
               }
 
 
@@ -319,8 +323,8 @@ struct CvpSelListener : ISelectionListener
                 foundImage = true;
                 mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(nodeData);
                 if(img.IsNotNull()
-                   && img->GetPixelType().GetPixelType() == itk::ImageIOBase::RGBA
-                   && img->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR )
+                  && img->GetPixelType().GetPixelType() == itk::ImageIOBase::RGBA
+                  && img->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR )
                 {
                   foundRGBAImage = true;
                 }
@@ -347,7 +351,7 @@ struct CvpSelListener : ISelectionListener
       }
 
       m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
-                                      && !foundMultipleOdfImages;
+        && !foundMultipleOdfImages;
       m_View->m_Controls->m_NumberGlyphsFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
       m_View->m_Controls->m_NormalizationDropdown->setVisible(m_View->m_FoundSingleOdfImage);
@@ -367,7 +371,7 @@ struct CvpSelListener : ISelectionListener
       m_View->m_Controls->m_VisibleOdfsON_C->setVisible(m_View->m_FoundSingleOdfImage);
 
       bool foundAnyImage = foundDiffusionImage ||
-                           foundQBIVolume || foundTensorVolume || foundImage || foundTbssImage;
+        foundQBIVolume || foundTensorVolume || foundImage || foundTbssImage;
 
       m_View->m_Controls->m_Reinit->setVisible(foundAnyImage);
       m_View->m_Controls->m_TextureIntON->setVisible(foundAnyImage);
@@ -423,7 +427,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)
 {
   Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
+    throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
@@ -468,7 +472,7 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
   n = this->m_MultiWidget->GetWidgetPlane3(); if(n) n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
 
   mitk::BaseRenderer::Pointer renderer =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
   if(renderer.IsNotNull())
   {
     renderer->SendUpdateSlice();
@@ -510,7 +514,7 @@ void QmitkControlVisualizationPropertiesView::OnTSNumChanged(int num)
   m_TSLabel->setText(QString::number(num*2+1));
 
   mitk::BaseRenderer::Pointer renderer =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
   if(renderer.IsNotNull())
   {
     renderer->SendUpdateSlice();
@@ -564,7 +568,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
     QIcon iconCrosshair(":/QmitkDiffusionImaging/crosshair.png");
     m_Controls->m_Crosshair->setIcon(iconCrosshair);
-// was is los
+    // was is los
     QIcon iconPaint(":/QmitkDiffusionImaging/paint2.png");
     m_Controls->m_TDI->setIcon(iconPaint);
 
@@ -600,7 +604,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
   m_SelListener = berry::ISelectionListener::Pointer(new CvpSelListener(this));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
   berry::ISelection::ConstPointer sel(
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
   m_IsInitialized = true;
@@ -616,7 +620,7 @@ void QmitkControlVisualizationPropertiesView::OnMenuAboutToShow ()
   thickSlicesActionGroup->setExclusive(true);
 
   mitk::BaseRenderer::Pointer renderer =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
 
   int currentTSMode = 0;
   {
@@ -744,6 +748,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_DisplayIndex), SIGNAL(valueChanged(int)), this, SLOT(DisplayIndexChanged(int)) );
+    connect( (QObject*)(m_Controls->m_DisplayIndexSpinBox), SIGNAL(valueChanged(int)), this, SLOT(DisplayIndexChanged(int)) );
+
     connect( (QObject*)(m_Controls->m_TextureIntON), SIGNAL(clicked()), this, SLOT(TextIntON()) );
     connect( (QObject*)(m_Controls->m_Reinit), SIGNAL(clicked()), this, SLOT(Reinit()) );
 
@@ -786,7 +792,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 void QmitkControlVisualizationPropertiesView::Activated()
 {
   berry::ISelection::ConstPointer sel(
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
   QmitkFunctionality::Activated();
@@ -840,11 +846,12 @@ void QmitkControlVisualizationPropertiesView::NodeAdded(const mitk::DataNode *no
 }
 
 /* OnSelectionChanged is registered to SelectionService, therefore no need to
- implement SelectionService Listener explicitly */
+implement SelectionService Listener explicitly */
 void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   // deactivate channel slider if no diffusion weighted image or tbss image is selected
   m_Controls->m_DisplayIndex->setVisible(false);
+  m_Controls->m_DisplayIndexSpinBox->setVisible(false);
   m_Controls->label_channel->setVisible(false);
 
   for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
@@ -858,9 +865,10 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
       continue;
 
     if (node.IsNotNull() && (dynamic_cast<mitk::TbssImage*>(nodeData) ||
-                             dynamic_cast<mitk::DiffusionImage<short>*>(nodeData)))
+      dynamic_cast<mitk::DiffusionImage<short>*>(nodeData)))
     {
       m_Controls->m_DisplayIndex->setVisible(true);
+      m_Controls->m_DisplayIndexSpinBox->setVisible(true);
       m_Controls->label_channel->setVisible(true);
     }
     else if (node.IsNotNull() && dynamic_cast<mitk::FiberBundleX*>(node->GetData()))
@@ -912,17 +920,17 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 }
 
 mitk::DataStorage::SetOfObjects::Pointer
-    QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
+  QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
 {
   if (m_CurrentSelection)
   {
     mitk::DataStorage::SetOfObjects::Pointer set =
-        mitk::DataStorage::SetOfObjects::New();
+      mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
     for (IStructuredSelection::iterator i = m_CurrentSelection->Begin();
-    i != m_CurrentSelection->End();
-    ++i)
+      i != m_CurrentSelection->End();
+      ++i)
     {
 
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
@@ -949,8 +957,8 @@ mitk::DataStorage::SetOfObjects::Pointer
 }
 
 void QmitkControlVisualizationPropertiesView::SetBoolProp(
-    mitk::DataStorage::SetOfObjects::Pointer set,
-    std::string name, bool value)
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, bool value)
 {
   if(set.IsNotNull())
   {
@@ -966,8 +974,8 @@ void QmitkControlVisualizationPropertiesView::SetBoolProp(
 }
 
 void QmitkControlVisualizationPropertiesView::SetIntProp(
-    mitk::DataStorage::SetOfObjects::Pointer set,
-    std::string name, int value)
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, int value)
 {
   if(set.IsNotNull())
   {
@@ -983,8 +991,8 @@ void QmitkControlVisualizationPropertiesView::SetIntProp(
 }
 
 void QmitkControlVisualizationPropertiesView::SetFloatProp(
-    mitk::DataStorage::SetOfObjects::Pointer set,
-    std::string name, float value)
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, float value)
 {
   if(set.IsNotNull())
   {
@@ -1000,8 +1008,8 @@ void QmitkControlVisualizationPropertiesView::SetFloatProp(
 }
 
 void QmitkControlVisualizationPropertiesView::SetLevelWindowProp(
-    mitk::DataStorage::SetOfObjects::Pointer set,
-    std::string name, mitk::LevelWindow value)
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, mitk::LevelWindow value)
 {
   if(set.IsNotNull())
   {
@@ -1019,8 +1027,8 @@ void QmitkControlVisualizationPropertiesView::SetLevelWindowProp(
 }
 
 void QmitkControlVisualizationPropertiesView::SetEnumProp(
-    mitk::DataStorage::SetOfObjects::Pointer set,
-    std::string name, mitk::EnumerationProperty::Pointer value)
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, mitk::EnumerationProperty::Pointer value)
 {
   if(set.IsNotNull())
   {
@@ -1038,6 +1046,9 @@ void QmitkControlVisualizationPropertiesView::SetEnumProp(
 
 void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
 {
+
+  m_Controls->m_DisplayIndex->setValue(dispIndex);
+  m_Controls->m_DisplayIndexSpinBox->setValue(dispIndex);
 
   QString label = "Channel %1";
   label = label.arg(dispIndex);
@@ -1080,13 +1091,13 @@ void QmitkControlVisualizationPropertiesView::Reinit()
   if (m_CurrentSelection)
   {
     mitk::DataNodeObject::Pointer nodeObj =
-        m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
+      m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
     mitk::DataNode::Pointer node = nodeObj->GetDataNode();
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())
     {
       mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -1104,7 +1115,7 @@ void QmitkControlVisualizationPropertiesView::TextIntON()
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("DiffusionImage");
+    ActiveSet("DiffusionImage");
   SetBoolProp(set,"texture interpolation", !m_TexIsOn);
 
   set = ActiveSet("TensorImage");
@@ -1197,7 +1208,7 @@ void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetIntProp(set,"ShowMaxNumber", maxNr);
 
   set = ActiveSet("TensorImage");
@@ -1232,14 +1243,14 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetEnumProp(set,"Normalization", normMeth.GetPointer());
 
   set = ActiveSet("TensorImage");
   SetEnumProp(set,"Normalization", normMeth.GetPointer());
 
-//  if(m_MultiWidget)
-//    m_MultiWidget->RequestUpdate();
+  //  if(m_MultiWidget)
+  //    m_MultiWidget->RequestUpdate();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -1247,7 +1258,7 @@ void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalin
 {
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetFloatProp(set,"Scaling", scalingFactor);
 
   set = ActiveSet("TensorImage");
@@ -1285,7 +1296,7 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetEnumProp(set,"ScaleBy", scaleBy.GetPointer());
 
   set = ActiveSet("TensorImage");
@@ -1299,7 +1310,7 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
 void QmitkControlVisualizationPropertiesView::IndexParam1Changed(double param1)
 {
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetFloatProp(set,"IndexParam1", param1);
 
   set = ActiveSet("TensorImage");
@@ -1312,7 +1323,7 @@ void QmitkControlVisualizationPropertiesView::IndexParam1Changed(double param1)
 void QmitkControlVisualizationPropertiesView::IndexParam2Changed(double param2)
 {
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetFloatProp(set,"IndexParam2", param2);
 
   set = ActiveSet("TensorImage");
@@ -1328,7 +1339,7 @@ void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
   olw.SetRangeMinMax(l*255, u*255);
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
+    ActiveSet("QBallImage");
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");
@@ -1347,7 +1358,7 @@ void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
 void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
 {
   m_Controls->m_ScalingFrame->setVisible(
-      m_Controls->m_ScalingCheckbox->isChecked());
+    m_Controls->m_ScalingCheckbox->isChecked());
 
   if(!m_Controls->m_ScalingCheckbox->isChecked())
   {
@@ -1483,7 +1494,7 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationResetColoring(
     m_Controls->m_Color->setAutoFillBackground(true);
     QString styleSheet = "background-color:rgb(255,255,255)";
     m_Controls->m_Color->setStyleSheet(styleSheet);
-//    m_SelectedNode->SetProperty("color",NULL);
+    //    m_SelectedNode->SetProperty("color",NULL);
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(1.0, 1.0, 1.0));
 
     mitk::FiberBundleX::Pointer fib = dynamic_cast<mitk::FiberBundleX*>(m_SelectedNode->GetData());
@@ -1508,7 +1519,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       bool PlanarFigureInitializedWindow = false;
 
       QmitkRenderWindow* RenderWindow1 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow1();
+        this->GetActiveStdMultiWidget()->GetRenderWindow1();
 
       if (m_SelectedNode->GetBoolProperty("PlanarFigureInitializedWindow",
         PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
@@ -1517,38 +1528,38 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       }
 
       QmitkRenderWindow* RenderWindow2 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow2();
+        this->GetActiveStdMultiWidget()->GetRenderWindow2();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow2->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow2->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow2;
       }
 
       QmitkRenderWindow* RenderWindow3 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow3();
+        this->GetActiveStdMultiWidget()->GetRenderWindow3();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow3->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow3->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow3;
       }
 
       QmitkRenderWindow* RenderWindow4 =
-          this->GetActiveStdMultiWidget()->GetRenderWindow4();
+        this->GetActiveStdMultiWidget()->GetRenderWindow4();
 
       if (!selectedRenderWindow && m_SelectedNode->GetBoolProperty(
-          "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-          RenderWindow4->GetRenderer()))
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow4->GetRenderer()))
       {
         selectedRenderWindow = RenderWindow4;
       }
 
       const mitk::PlaneGeometry
-          * _PlaneGeometry =
-          dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+        * _PlaneGeometry =
+        dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
 
       mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
 
@@ -1600,13 +1611,13 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       {
         const mitk::Point3D& centerP = _PlaneGeometry->GetOrigin();
         selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-            centerP, _PlaneGeometry->GetNormal());
+          centerP, _PlaneGeometry->GetNormal());
       }
     }
 
     // set interactor for new node (if not already set)
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetInteractor());
+      = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetInteractor());
 
     if(figureInteractor.IsNull())
       figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", m_SelectedNode);
@@ -1629,7 +1640,7 @@ void QmitkControlVisualizationPropertiesView::SetInteractor()
   // finally add all nodes to the model
   for(Container::const_iterator it=_NodeSet.begin(); it!=_NodeSet.end()
     ; it++)
-    {
+  {
     node = const_cast<mitk::DataNode*>(*it);
     bundle = dynamic_cast<mitk::FiberBundleX*>(node->GetData());
 
@@ -1764,5 +1775,5 @@ void QmitkControlVisualizationPropertiesView::TubeRadiusChanged(int r)
 void QmitkControlVisualizationPropertiesView::Welcome()
 {
   berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
-   GetSite()->GetWorkbenchWindow(), false);
+    GetSite()->GetWorkbenchWindow(), false);
 }

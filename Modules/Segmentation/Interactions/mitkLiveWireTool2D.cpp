@@ -226,6 +226,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_LiveWireContourNode = mitk::DataNode::New();
   m_LiveWireContourNode->SetData( m_LiveWireContour );
   m_LiveWireContourNode->SetName("active livewire node");
+  m_LiveWireContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_LiveWireContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_LiveWireContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
 
@@ -234,6 +235,7 @@ bool mitk::LiveWireTool2D::OnInitLiveWire (Action* action, const StateEvent* sta
   m_EditingContourNode = mitk::DataNode::New();
   m_EditingContourNode->SetData( m_EditingContour );
   m_EditingContourNode->SetName("editing node");
+  m_EditingContourNode->SetProperty( "helper object", mitk::BoolProperty::New(true));
   m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_EditingContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );

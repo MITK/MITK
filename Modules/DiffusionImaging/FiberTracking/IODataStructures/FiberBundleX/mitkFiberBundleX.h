@@ -63,6 +63,8 @@ public:
     // colorcoding related methods
     void SetColorCoding(const char*);
     void SetFAMap(mitk::Image::Pointer);
+    template <typename TPixel>
+    void SetFAMap(const mitk::PixelType pixelType, mitk::Image::Pointer);
     void DoColorCodingOrientationBased();
     void DoColorCodingFaBased();
     void DoUseFaFiberOpacity();

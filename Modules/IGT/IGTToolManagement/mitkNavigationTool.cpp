@@ -36,6 +36,19 @@ mitk::NavigationTool::~NavigationTool()
 
   }
 
+bool mitk::NavigationTool::IsToolTipSet()
+  {
+  if( (m_ToolTipPosition[0] == 0) &&
+    (m_ToolTipPosition[1] == 0) &&
+    (m_ToolTipPosition[2] == 0) &&
+    (m_ToolTipOrientation.x() == 0) &&
+    (m_ToolTipOrientation.y() == 0) &&
+    (m_ToolTipOrientation.z() == 0) &&
+    (m_ToolTipOrientation.r() == 1))
+  return false;
+  else return true;
+  }
+
 void mitk::NavigationTool::SetCalibrationFile(const std::string filename)
   {
   //check if file does exist:

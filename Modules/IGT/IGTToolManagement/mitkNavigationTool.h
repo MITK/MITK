@@ -80,6 +80,9 @@ namespace mitk {
     itkGetMacro(ToolTipOrientation,mitk::Quaternion);
     itkSetMacro(ToolTipOrientation,mitk::Quaternion);
 
+    /** @return Returns true if a tooltip is set, false if not. */
+    bool IsToolTipSet();
+
     //Tool Landmarks:
     /** @return Returns the tool registration landmarks which represent markers / special points on a
      *          tool that can be used for registration. The landmarks should be given in tool coordinates.

@@ -199,6 +199,11 @@ bool mitk::InternalTrackingTool::IsEnabled() const
   return m_Enabled;
 }
 
+bool mitk::InternalTrackingTool::IsTooltipSet() const
+{
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
+  return m_ToolTipSet;
+}
 
 bool mitk::InternalTrackingTool::IsDataValid() const
 {

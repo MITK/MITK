@@ -42,7 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkDataStorageTableModel.h>
-#include <QmitkPropertiesTableEditor.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>

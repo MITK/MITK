@@ -223,7 +223,7 @@ mitk::Point3D mitk::SurfaceModifier::GetCenterOfGravity(mitk::Surface::Pointer s
 mitk::Surface::Pointer mitk::SurfaceModifier::DeepCopy(mitk::Surface::Pointer originalSurface)
   {
   mitk::Surface::Pointer clonedSurface = mitk::Surface::New();
-  vtkSmartPointer<vtkPolyData> clonedPolyData = vtkPolyData::New();
+  vtkSmartPointer<vtkPolyData> clonedPolyData = vtkSmartPointer<vtkPolyData>::New();
   clonedPolyData->DeepCopy(originalSurface->GetVtkPolyData());
   clonedSurface->SetVtkPolyData(clonedPolyData);
   return clonedSurface;

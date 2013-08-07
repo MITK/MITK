@@ -1857,7 +1857,7 @@ void QmitkPartialVolumeAnalysisView::Activated()
 
         if(figure)
         {
-          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
           if(figureInteractor.IsNull())
           {
@@ -1894,10 +1894,10 @@ void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartRe
 
         if(figure)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor)
-                mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+              figureInteractor->SetDataNode( NULL );
         }
     }
 }
@@ -2113,7 +2113,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
 
         // set interactor for new node (if not already set)
         mitk::PlanarFigureInteractor::Pointer figureInteractor
-                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
         if(figureInteractor.IsNull())
         {

@@ -227,7 +227,7 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
   {
     MEASUREMENT_DEBUG << "figure added. will add interactor if needed.";
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer() );
 
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
     if(figureInteractor.IsNull())

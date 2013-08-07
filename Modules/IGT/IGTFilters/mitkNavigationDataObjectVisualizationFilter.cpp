@@ -189,7 +189,7 @@ void mitk::NavigationDataObjectVisualizationFilter::SetTransformPosition( unsign
     return;
 
   this->m_TransformPosition[index] = applyTransform;
-  this->Modified(); \
+  this->Modified();
 }
 
 

@@ -112,8 +112,6 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
           {
             ix[3] = z;
             float value = readTbss.GetPixelByIndex(ix);
-
-
             pixel.SetElement(z, value);
           }
           m_Data->SetPixel(id, pixel);
@@ -123,7 +121,7 @@ void TbssImporter::Import(const mitk::PixelType , mitk::TbssImage::Pointer tbssI
   }
   catch ( mitk::Exception& e )
   {
-    MITK_ERROR << "TbssImporter::Import: No read access to tbss image. " << e.what() ;
+    MITK_ERROR << "TbssImporter::Import: No read access to tbss image: " << e.what() ;
   }
 
   tbssImg->SetGroupInfo(m_Groups);

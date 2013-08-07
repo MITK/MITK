@@ -47,25 +47,25 @@ namespace mitk
     mitkClassMacro( TbssImporter, Object )
     itkNewMacro(Self)
 
-    /* \brief Converts the FSL Nifty to NRRD and adds the meta data */
+    /** \brief Converts the FSL Nifty to NRRD and adds the meta data */
     mitk::TbssImage::Pointer Import();
 
     template <typename TPixel>
     void Import(const mitk::PixelType pixelType, mitk::TbssImage::Pointer tbssImg);
 
-    /* \brief Group info is set by providing a vector with pairs of group name and number*/
+    /** \brief Group info is set by providing a vector with pairs of group name and number*/
     void SetGroupInfo(std::vector< std::pair<std::string, int> > groups)
     {
       m_Groups = groups;
     }
 
-    /* \brief Used to indicate the type of measurement */
+    /** \brief Used to indicate the type of measurement */
     void SetMeasurementInfo(std::string s)
     {
       m_MeasurementInfo = s;
     }
 
-    /* \brief Sets the FSL import volume */
+    /** \brief Sets the FSL import volume */
     void SetImportVolume(mitk::Image::Pointer inputVolume)
     {
       m_InputVolume = inputVolume;

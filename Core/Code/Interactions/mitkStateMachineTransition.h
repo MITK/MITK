@@ -31,7 +31,7 @@ namespace mitk
   class StateMachineState;
 
   typedef std::vector<mitk::StateMachineAction::Pointer> ActionVectorType;
-  typedef std::vector<const mitk::StateMachineCondition> ConditionVectorType;
+  typedef std::vector<StateMachineCondition> ConditionVectorType;
   typedef itk::SmartPointer<StateMachineState> SpStateMachineState;
 
   /**

@@ -36,7 +36,6 @@ namespace mitk
 /// \class QmitkNDIToolDelegate
 /// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
 ///
-/// \see QmitkPropertiesTableModel
 class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

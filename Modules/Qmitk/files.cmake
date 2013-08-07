@@ -17,9 +17,6 @@ QmitkNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
 QmitkRenderWindowMenu.cpp
 QmitkProgressBar.cpp
-QmitkPropertiesTableEditor.cpp
-QmitkPropertiesTableModel.cpp
-QmitkPropertyDelegate.cpp
 QmitkRegisterClasses.cpp
 QmitkRenderingManager.cpp
 QmitkRenderingManagerFactory.cpp
@@ -43,8 +40,6 @@ QmitkNodeDescriptor.h
 QmitkNodeDescriptorManager.h
 QmitkRenderWindowMenu.h
 QmitkProgressBar.h
-QmitkPropertiesTableEditor.h
-QmitkPropertyDelegate.h
 QmitkRenderingManager.h
 QmitkRenderWindow.h
 QmitkServiceListWidget.h

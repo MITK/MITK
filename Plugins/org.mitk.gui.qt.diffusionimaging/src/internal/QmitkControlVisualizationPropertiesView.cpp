@@ -1679,7 +1679,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
     // set interactor for new node (if not already set)
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetDataInteractor());
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetDataInteractor().GetPointer());
 
     if(figureInteractor.IsNull())
     {

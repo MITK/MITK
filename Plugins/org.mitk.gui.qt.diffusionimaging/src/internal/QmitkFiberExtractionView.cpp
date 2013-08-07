@@ -851,7 +851,7 @@ void QmitkFiberExtractionView::OnDrawPolygon()
 
         if(figureP)
         {
-          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
           if(figureInteractor.IsNull())
           {
@@ -886,7 +886,7 @@ void QmitkFiberExtractionView::OnDrawCircle()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor.IsNull())
           {

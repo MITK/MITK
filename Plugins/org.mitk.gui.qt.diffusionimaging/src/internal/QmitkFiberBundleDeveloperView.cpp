@@ -1789,7 +1789,7 @@ void QmitkFiberBundleDeveloperView::ActionDrawEllipseTriggered()
 
         if(figureP)
         {
-          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
           if(figureInteractor.IsNull())
           {

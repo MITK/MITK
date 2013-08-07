@@ -140,13 +140,15 @@ void QmitkIGTTrackingLabView::UpdateTimer()
     if(IsTransformDifferenceHigh(ObjectMarkerCurrentTransform, m_ObjectmarkerNavigationDataLastUpdate))
     {
       m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New(m_ObjectmarkerNavigationData);
-      if(m_Controls.m_SurfaceActive->isChecked())
+
+      if(m_Controls.m_SurfaceActive->isChecked()) //m_PermanentRegistrationFilter->Update();
       {
         mitk::Transform::Pointer newTransform = mitk::Transform::New();
         newTransform->Concatenate(m_T_MarkerRel);
         newTransform->Concatenate(ObjectMarkerCurrentTransform);
         this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
       }
+
       if(m_Controls.m_ImageActive->isChecked())
       {
         /*
@@ -753,20 +755,23 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
     //get the marker transform out of the navigation data
     mitk::Transform::Pointer T_Marker = mitk::Transform::New(this->m_ObjectmarkerNavigationData);
 
-
+    //compute transform from object to marker
     mitk::Transform::Pointer T_MarkerRel = mitk::Transform::New();
     T_MarkerRel->Concatenate(T_Object);
     T_Marker->Invert();
     T_MarkerRel->Concatenate(T_Marker);
+    m_T_MarkerRel = T_MarkerRel;
 
     //m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel->GetAffineTransform3D());
-    m_T_MarkerRel = T_MarkerRel;
+
 
     m_PermanentRegistration = true;
     m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New();
 
     //set interpolation mode
-    this->m_Controls.m_ImageComboBox->GetSelectedNode()->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
+    mitk::DataNode::Pointer imageNode = this->m_Controls.m_ImageComboBox->GetSelectedNode();
+    if (imageNode.IsNotNull() && m_Controls.m_ImageActive->isChecked())
+      {imageNode->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );}
     }
   else
     {

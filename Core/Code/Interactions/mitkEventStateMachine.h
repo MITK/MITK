@@ -18,7 +18,6 @@
 #define MITKEVENTSTATEMACHINE_H_
 
 #include "itkObject.h"
-#include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include "mitkMessage.h"
 #include "mitkInteractionEventHandler.h"
@@ -28,8 +27,10 @@
 
 namespace mitk
 {
+  class StateMachineTransition;
   class StateMachineContainer;
   class StateMachineAction;
+  class StateMachineCondition;
   class InteractionEvent;
   class StateMachineState;
   class DataNode;
@@ -78,12 +79,15 @@ namespace mitk
     bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
   };
 
-
   /** Macro that can be used to connect a StateMachineAction with a function.
    *  It assumes that there is a typedef Classname Self in classes that use this macro, as is provided by e.g. mitkClassMacro
    */
 #define CONNECT_FUNCTION(a, f) \
     EventStateMachine::AddActionFunction(a, MessageDelegate2<Self, StateMachineAction*, InteractionEvent*, bool>(this, &Self::f));
+
+#define CONNECT_CONDITION(a, f) \
+    EventStateMachine::AddConditionFunction(a, MessageDelegate1<Self,const InteractionEvent*, bool>(this, &Self::f));
+
 
   /**
    * \class EventStateMachine
@@ -133,6 +137,7 @@ namespace mitk
     virtual ~EventStateMachine();
 
     typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, bool> ActionFunctionDelegate;
+    typedef MessageAbstractDelegate1<const InteractionEvent*, bool> ConditionFunctionDelegate;
 
     /**
      * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
@@ -140,6 +145,8 @@ namespace mitk
     DEPRECATED(void AddActionFunction(const std::string& action, TActionFunctor* functor));
 
     void AddActionFunction(const std::string& action, const ActionFunctionDelegate& delegate);
+
+    void AddConditionFunction(const std::string& condition, const ConditionFunctionDelegate& delegate);
 
     StateMachineState* GetCurrentState() const;
 
@@ -150,6 +157,8 @@ namespace mitk
      */
 
     virtual void ConnectActionsAndFunctions();
+
+    virtual bool CheckCondition( const StateMachineCondition& condition, const InteractionEvent* interactionEvent );
 
     /**
      * Looks up function that is associated with action and executes it.
@@ -176,13 +185,34 @@ namespace mitk
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
 
 
+    /**
+    * \brief Returns the executable transition for the given event.
+    *
+    * This method takes a list of transitions that correspond to the given
+    * event from the current state.
+    *
+    * This method iterates through all transitions and checks all
+    * corresponding conditions. The results of each condition in stored in
+    * map, as other transitions may need the same condition again.
+    *
+    * As soon as a transition is found for which all conditions are
+    * fulfilled, this instance is returned.
+    *
+    * If a transition has no condition, it is automatically returned.
+    * If no executable transition is found, NULL is returned.
+    */
+    StateMachineTransition* GetExecutableTransition( InteractionEvent* event );
+
+
   private:
 
     typedef std::map<std::string, ActionFunctionDelegate*> ActionDelegatesMapType;
+    typedef std::map<std::string, ConditionFunctionDelegate*> ConditionDelegatesMapType;
 
     StateMachineContainer* m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
     std::map<std::string, TActionFunctor*> m_ActionFunctionsMap; // stores association between action string
     ActionDelegatesMapType m_ActionDelegatesMap;
+    ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;
   };
 

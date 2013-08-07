@@ -17,11 +17,11 @@
 #ifndef SMACTION_H_HEADER_INCLUDED_C19AE06B
 #define SMACTION_H_HEADER_INCLUDED_C19AE06B
 
-#include <MitkExports.h>
 #include "mitkCommon.h"
 #include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
+#include "MitkExports.h"
 
 namespace mitk
 {

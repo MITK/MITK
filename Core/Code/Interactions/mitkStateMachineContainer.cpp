@@ -42,6 +42,8 @@ const std::string EVENTVARIANT = "event_variant";
 const std::string STARTSTATE = "startstate";
 const std::string TARGET = "target";
 const std::string ACTION = "action";
+const std::string CONDITION = "condition";
+const std::string INVERTED = "inverted";
 
 namespace mitk
 {
@@ -159,9 +161,28 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
       m_CurrTransition->AddAction(action);
     else
       MITK_WARN<< "Malformed state machine Pattern. Action without transition. \n Will be ignored.";
+  }
+
+  else if (name == CONDITION)
+  {
+    if (!m_CurrTransition)
+      MITK_WARN<< "Malformed state machine Pattern. Condition without transition. \n Will be ignored.";
+
+    std::string conditionName = ReadXMLStringAttribut(NAME, atts);
+    std::string inverted = ReadXMLStringAttribut(INVERTED, atts);
+    if ( inverted ==  "" || inverted == "false" )
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName, false ) );
+    }
+    else
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName, true ) );
     }
 
   }
+
+
+}
 
 void mitk::StateMachineContainer::EndElement(const char* elementName)
 {
@@ -179,6 +200,10 @@ void mitk::StateMachineContainer::EndElement(const char* elementName)
     m_CurrTransition = NULL;
   }
   else if (name == ACTION)
+  {
+    //
+  }
+  else if (name == CONDITION)
   {
     //
   }

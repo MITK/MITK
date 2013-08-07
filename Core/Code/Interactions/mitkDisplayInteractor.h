@@ -71,6 +71,8 @@ namespace mitk
      */
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
 
+    virtual bool CheckPositionEvent( const InteractionEvent* interactionEvent );
+
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
      */

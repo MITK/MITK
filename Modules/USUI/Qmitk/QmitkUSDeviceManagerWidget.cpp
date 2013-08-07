@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkUSDeviceManagerWidget.h>
 #include <mitkModuleContext.h>
 #include <usGetModuleContext.h>
+#include <QMessageBox>
 
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID = "org.mitk.views.QmitkUSDeviceManagerWidget";
@@ -68,6 +69,11 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   if (device.IsNull()) return;
   if (device->GetIsActive()) device->Deactivate();
   else device->Activate();
+
+  if ( ! device->GetIsActive() )
+  {
+    QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
+  }
 
   // Manually reevaluate Button logic
   OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedServiceReference());

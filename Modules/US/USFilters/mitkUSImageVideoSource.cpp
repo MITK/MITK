@@ -90,6 +90,13 @@ if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
 else return 0;
 }
 
+bool mitk::USImageVideoSource::GetIsReady()
+{
+  if (!m_VideoCapture) return false;
+
+  return m_VideoCapture->isOpened();
+}
+
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
   // First, let's do some basic checks to make sure rectangle is inside of actual image

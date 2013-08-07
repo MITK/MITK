@@ -27,6 +27,7 @@
 
 namespace mitk
 {
+  class StateMachineTransition;
   class StateMachineContainer;
   class StateMachineAction;
   class StateMachineCondition;
@@ -182,6 +183,25 @@ namespace mitk
      * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager view..
      */
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
+
+
+    /**
+    * \brief Returns the executable transition for the given event.
+    *
+    * This method takes a list of transitions that correspond to the given
+    * event from the current state.
+    *
+    * This method iterates through all transitions and checks all
+    * corresponding conditions. The results of each condition in stored in
+    * map, as other transitions may need the same condition again.
+    *
+    * As soon as a transition is found for which all conditions are
+    * fulfilled, this instance is returned.
+    *
+    * If a transition has no condition, it is automatically returned.
+    * If no executable transition is found, NULL is returned.
+    */
+    StateMachineTransition* GetExecutableTransition( InteractionEvent* event );
 
 
   private:

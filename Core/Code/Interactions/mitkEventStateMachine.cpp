@@ -124,64 +124,37 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
   {
     return false;
   }
+
+  // Get the transition that can be executed
+  mitk::StateMachineTransition::Pointer transition = GetExecutableTransition( event );
+
   // check if the current state holds a transition that works with the given event.
-  mitk::StateMachineState::TransitionVector transitionList = m_CurrentState->GetTransitionList(event->GetNameOfClass(), MapToEventVariant(event));
-
-  if ( !transitionList.empty() )
+  if ( transition.IsNotNull() )
   {
-    StateMachineState::TransitionVector::iterator transitionIter;
-    for( transitionIter=transitionList.begin(); transitionIter!=transitionList.end(); transitionIter++ )
+    // all conditions are fulfilled so we can continue with the actions
+    m_CurrentState = transition->GetNextState();
+
+    // iterate over all actions in this transition and execute them
+    ActionVectorType actions = transition->GetActions();
+    for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
     {
-      bool conditionMet(true);
-      ConditionVectorType conditions = (*transitionIter)->GetConditions();
-      for (ConditionVectorType::iterator it = conditions.begin(); it != conditions.end(); ++it)
+      try
       {
-        // sequentially check all conditions
-        try
-        {
-          if ( CheckCondition( (*it), event ) == (*it).IsInverted() )
-          {
-            // if a condition is not fulfilled we can stop here
-            conditionMet = false;
-            break;
-          }
-        }
-        catch( const std::exception& e )
-        {
-          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
-          conditionMet = false;
-          break;
-        }
+        ExecuteAction(*it, event);
       }
-
-      // if a condition was not fulfilled we continue with the next transition
-      if ( !conditionMet )
-        continue;
-
-      // all conditions are fulfilled so we can continue with the actions
-      m_CurrentState = (*transitionIter)->GetNextState();
-
-      // iterate over all actions in this transition and execute them
-      ActionVectorType actions = (*transitionIter)->GetActions();
-      for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
+      catch( const std::exception& e )
       {
-        try
-        {
-          ExecuteAction(*it, event);
-        }
-        catch( const std::exception& e )
-        {
-          MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
-          return false;
-        }
+        MITK_ERROR << "Unhandled excaption caught in ExecuteAction(): " << e.what();
+        return false;
       }
-
-      return true;
+      catch( ... )
+      {
+        MITK_ERROR << "Unhandled excaption caught in ExecuteAction()";
+        return false;
+      }
     }
-  }
-  else
-  {
-    return false; // no transition found that matches event
+
+    return true;
   }
 
   return false;
@@ -258,4 +231,85 @@ bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, D
     return false;
   }
   return visible;
+}
+
+mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( mitk::InteractionEvent* event )
+{
+  // Map that will contain all conditions that are possibly used by the
+  // transitions
+  std::map<std::string, bool> conditionsMap;
+
+  // Get a list of all transitions that match the given event
+  mitk::StateMachineState::TransitionVector transitionList =
+    m_CurrentState->GetTransitionList( event->GetNameOfClass(), MapToEventVariant(event) );
+
+  // if there are not transitions, we can return NULL here.
+  if ( transitionList.empty() )
+  {
+    return NULL;
+  }
+
+  StateMachineState::TransitionVector::iterator transitionIter;
+  ConditionVectorType::iterator conditionIter;
+  for( transitionIter=transitionList.begin(); transitionIter!=transitionList.end(); ++transitionIter )
+  {
+    bool allConditionsFulfilled(true);
+
+    // Get all conditions for the current transition
+    ConditionVectorType conditions = (*transitionIter)->GetConditions();
+    for (conditionIter = conditions.begin(); conditionIter != conditions.end(); ++conditionIter)
+    {
+      bool currentConditionFulfilled(false);
+
+      // sequentially check all conditions that we have evaluated above
+      std::string conditionName = (*conditionIter).GetConditionName();
+
+      // Check if the condition has already been evaluated
+      if ( conditionsMap.find(conditionName) == conditionsMap.end() )
+      {
+        // if the condition has not been evaluated yet, do it now and store
+        // the result in the map
+        try
+        {
+          currentConditionFulfilled = CheckCondition( (*conditionIter), event );
+          conditionsMap.insert( std::pair<std::string, bool>(conditionName, currentConditionFulfilled) );
+        }
+        catch (const std::exception& e)
+        {
+          MITK_ERROR << "Unhandled excaption caught in CheckCondition(): " << e.what();
+          currentConditionFulfilled = false;
+          break;
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Unhandled excaption caught in CheckCondition()";
+          currentConditionFulfilled = false;
+          break;
+        }
+      }
+      else
+      {
+        // if the condition has been evaluated before, use that result
+        currentConditionFulfilled = conditionsMap[conditionName];
+      }
+
+      // set 'allConditionsFulfilled' under consideration of a possible
+      // inversion of the condition
+      if ( currentConditionFulfilled == (*conditionIter).IsInverted() )
+      {
+        allConditionsFulfilled = false;
+        break;
+      }
+
+    }
+
+    // If all conditions are fulfilled, we execute this transition
+    if ( allConditionsFulfilled )
+    {
+      return (*transitionIter);
+    }
+  }
+
+  // We have found no transition that can be executed, return NULL
+  return NULL;
 }

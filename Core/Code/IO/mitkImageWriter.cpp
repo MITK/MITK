@@ -432,9 +432,9 @@ const char* mitk::ImageWriter::GetDefaultFilename()
 
 const char* mitk::ImageWriter::GetFileDialogPattern()
 {
-  return "Image (*.pic, *.pic.gz, *.bmp, *.dcm, *.DCM, *.dicom, *.DICOM, *.gipl, *.gipl.gz, *.mha, "
-      "*.nii, *.nii.gz, *.nrrd, *.nhdr, *.png, *.PNG, *.spr, *.mhd, *.vtk, *.vti, *.hdr, *.png, "
-      "*.tif, *.jpg)";
+  return "Image (*.bmp *.dcm *.DCM *.dicom *.DICOM *.gipl *.gipl.gz *.mha "
+      "*.nii *.nii.gz *.nrrd *.nhdr *.png *.PNG *.spr *.mhd *.vtk *.vti *.hdr *.png "
+      "*.tif *.jpg)";
 }
 
 const char *mitk::ImageWriter::GetDefaultExtension()

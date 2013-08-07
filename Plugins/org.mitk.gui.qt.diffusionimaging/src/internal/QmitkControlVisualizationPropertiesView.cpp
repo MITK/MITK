@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOdfScaleByProperty.h"
 #include "mitkResliceMethodProperty.h"
 #include "mitkRenderingManager.h"
+#include "mitkModuleRegistry.h"
 
 #include "mitkTbssImage.h"
 #include "mitkPlanarFigure.h"
@@ -1678,15 +1679,18 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
     // set interactor for new node (if not already set)
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-      = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetInteractor());
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(m_SelectedNode->GetDataInteractor());
 
     if(figureInteractor.IsNull())
-      figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", m_SelectedNode);
-
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+    {
+      figureInteractor = mitk::PlanarFigureInteractor::New();
+      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+      figureInteractor->SetDataNode( m_SelectedNode );
+    }
 
     m_SelectedNode->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
-
   }
 }
 

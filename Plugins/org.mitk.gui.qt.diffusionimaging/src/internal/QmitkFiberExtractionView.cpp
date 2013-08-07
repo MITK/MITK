@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNodeObject.h>
 #include <mitkDiffusionImage.h>
 #include <mitkTensorImage.h>
+#include "mitkModuleRegistry.h"
 
 // ITK
 #include <itkResampleImageFilter.h>
@@ -850,12 +851,16 @@ void QmitkFiberExtractionView::OnDrawPolygon()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
 
-            if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          if(figureInteractor.IsNull())
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 
@@ -881,12 +886,16 @@ void QmitkFiberExtractionView::OnDrawCircle()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor());
 
             if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 }

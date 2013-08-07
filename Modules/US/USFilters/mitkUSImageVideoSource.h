@@ -111,7 +111,7 @@ namespace mitk {
     * Only if true is returned one can retrieve images via mitk::USImageVideoSource::GetNextImage().
     * If false is returned, behaviour is undefined.
     */
-    bool isReady();
+    bool GetIsReady();
 
 
   protected:

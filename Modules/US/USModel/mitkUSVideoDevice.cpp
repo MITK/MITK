@@ -93,6 +93,13 @@ bool mitk::USVideoDevice::OnDisconnection()
 
 bool mitk::USVideoDevice::OnActivation()
 {
+  // make sure that video device is ready before aquiring images
+  if ( ! m_Source->GetIsReady() )
+  {
+    MITK_WARN("mitkUSDevice")("mitkUSVideoDevice") << "Could not activate us video device. Check if video grabber is configured correctly.";
+    return false;
+  }
+
   MITK_INFO << "Activated UsVideoDevice!";
   this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
   return true;

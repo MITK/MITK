@@ -90,7 +90,7 @@ if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
 else return 0;
 }
 
-bool mitk::USImageVideoSource::isReady()
+bool mitk::USImageVideoSource::GetIsReady()
 {
   if (!m_VideoCapture) return false;
 

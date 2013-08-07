@@ -40,6 +40,15 @@ namespace mitk {
     public:
       mitkClassMacro(TrackingDevice, itk::Object);
 
+      /** Defines the rotation modes of this tracking device which results in different representations
+       *  of quaternions.
+       *  - Standard: normal representation, rawdata from the device is not changed
+       *  - Transposed: the rotation is stored transposed, which is standard in VNL
+       *  ndiStandard is default
+       *  use SetRotationMode to change the mode.
+       */
+      enum RotationMode {RotationStandard, RotationTransposed};
+
       enum TrackingDeviceState {Setup, Ready, Tracking};   ///< Type for state variable. The trackingdevice is always in one of these states
       /**
        * \brief Opens a connection to the device
@@ -95,6 +104,17 @@ namespace mitk {
        */
       virtual unsigned int GetToolCount() const = 0;
 
+      /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
+       *  on the different modes. This method has to be implemented in a deriving class to become
+       *  functional / if different rotation modes should be supported.
+       */
+      virtual void SetRotationMode(RotationMode r);
+
+     /** @return Returns the rotation mode of this class. See documentation of enum
+       *         RotationMode for details on the different modes.
+       */
+      itkGetConstMacro(RotationMode,RotationMode);
+
       /**
        * \brief return current error message
        */
@@ -143,6 +163,7 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
       itk::FastMutexLock::Pointer m_StateMutex; ///< mutex to control access to m_State
       std::string m_ErrorMessage; ///< current error message
+      RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
     };
 } // namespace mitk
 

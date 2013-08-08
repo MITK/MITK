@@ -63,9 +63,7 @@ namespace itk
     typedef DiffusionTensor3D< TTensorPixelType >     TensorPixelType;
 
 
-    /** Reference image data,  This image is aquired in the absence
-    * of a diffusion sensitizing field gradient */
-    typedef typename Superclass::InputImageType      ReferenceImageType;
+
     typedef Image< TensorPixelType, 3 >              TensorImageType;
     typedef TensorImageType                          OutputImageType;
     typedef typename Superclass::OutputImageRegionType
@@ -107,33 +105,7 @@ namespace itk
     void SetGradientImage( GradientDirectionContainerType *,
       const GradientImagesType *image);
 
-    /** Set method to set the reference image. */
-    void SetReferenceImage( ReferenceImageType *referenceImage )
-    {
-      if( m_GradientImageTypeEnumeration == GradientIsInASingleImage)
-      {
-        itkExceptionMacro( << "Cannot call both methods:"
-          << "AddGradientImage and SetGradientImage. Please call only one of them.");
-      }
 
-      this->ProcessObject::SetNthInput( 0, referenceImage );
-
-      m_GradientImageTypeEnumeration = GradientIsInManyImages;
-    }
-
-    /** Get reference image */
-    virtual ReferenceImageType * GetReferenceImage()
-    { return ( static_cast< ReferenceImageType *>(this->ProcessObject::GetInput(0)) ); }
-
-    /** Return the gradient direction. idx is 0 based */
-    virtual GradientDirectionType GetGradientDirection( unsigned int idx) const
-    {
-      if( idx >= m_NumberOfGradientDirections )
-      {
-        itkExceptionMacro( << "Gradient direction " << idx << "does not exist" );
-      }
-      return m_GradientDirectionContainer->ElementAt( idx+1 );
-    }
 
     itkSetMacro( BValue, TTensorPixelType);
     itkSetMacro( B0Threshold, float);
@@ -160,10 +132,6 @@ namespace itk
       return m_MaskImage;
     }
 
-
-    //itkGetMacro(OutputDiffusionImage, mitk::DiffusionImage<double>)
-
-    //itkGetMacro( GradientDirectionContainer, GradientDirectionContainerType::Pointer);
 
   protected:
 

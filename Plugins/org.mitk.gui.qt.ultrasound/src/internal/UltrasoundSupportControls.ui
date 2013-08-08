@@ -211,7 +211,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>mm</string>
+                <string>px</string>
                </property>
               </widget>
              </item>
@@ -256,7 +256,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>mm</string>
+                <string>px</string>
                </property>
               </widget>
              </item>
@@ -301,7 +301,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>mm</string>
+                <string>px</string>
                </property>
               </widget>
              </item>
@@ -346,7 +346,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QLabel" name="label_8">
                <property name="text">
-                <string>mm</string>
+                <string>px</string>
                </property>
               </widget>
              </item>

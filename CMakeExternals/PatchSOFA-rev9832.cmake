@@ -35,54 +35,60 @@ set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlow
 
 set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")
 
+if(WIN32)
+  set(version "_1_0")
+else()
+  set(version "")
+endif()
+
 set(SOFA_LIBRARIES
-  debug SofaBaseAnimationLoop_1_0d optimized SofaBaseAnimationLoop_1_0
-  debug SofaBaseCollision_1_0d optimized SofaBaseCollision_1_0
-  debug SofaBaseLinearSolver_1_0d optimized SofaBaseLinearSolver_1_0
-  debug SofaBaseMechanics_1_0d optimized SofaBaseMechanics_1_0
-  debug SofaBaseTopology_1_0d optimized SofaBaseTopology_1_0
-  debug SofaBaseVisual_1_0d optimized SofaBaseVisual_1_0
-  debug SofaBoundaryCondition_1_0d optimized SofaBoundaryCondition_1_0
-  debug SofaComponentAdvanced_1_0d optimized SofaComponentAdvanced_1_0
-  debug SofaComponentBase_1_0d optimized SofaComponentBase_1_0
-  debug SofaComponentCommon_1_0d optimized SofaComponentCommon_1_0
-  debug SofaComponentGeneral_1_0d optimized SofaComponentGeneral_1_0
-  debug SofaComponentMain_1_0d optimized SofaComponentMain_1_0
-  debug SofaComponentMisc_1_0d optimized SofaComponentMisc_1_0
-  debug SofaConstraint_1_0d optimized SofaConstraint_1_0
-  debug SofaCore_1_0d optimized SofaCore_1_0
-  debug SofaDefaultType_1_0d optimized SofaDefaultType_1_0
-  debug SofaDeformable_1_0d optimized SofaDeformable_1_0
-  debug SofaDenseSolver_1_0d optimized SofaDenseSolver_1_0
-  debug SofaEngine_1_0d optimized SofaEngine_1_0
-  debug SofaEulerianFluid_1_0d optimized SofaEulerianFluid_1_0
-  debug SofaExplicitOdeSolver_1_0d optimized SofaExplicitOdeSolver_1_0
-  debug SofaExporter_1_0d optimized SofaExporter_1_0
-  debug SofaGraphComponent_1_0d optimized SofaGraphComponent_1_0
-  debug SofaHaptics_1_0d optimized SofaHaptics_1_0
-  debug SofaHelper_1_0d optimized SofaHelper_1_0
-  debug SofaImplicitOdeSolver_1_0d optimized SofaImplicitOdeSolver_1_0
-  debug SofaLoader_1_0d optimized SofaLoader_1_0
-  debug SofaMeshCollision_1_0d optimized SofaMeshCollision_1_0
-  debug SofaMisc_1_0d optimized SofaMisc_1_0
-  debug SofaMiscCollision_1_0d optimized SofaMiscCollision_1_0
-  debug SofaMiscEngine_1_0d optimized SofaMiscEngine_1_0
-  debug SofaMiscFem_1_0d optimized SofaMiscFem_1_0
-  debug SofaMiscForceField_1_0d optimized SofaMiscForceField_1_0
-  debug SofaMiscMapping_1_0d optimized SofaMiscMapping_1_0
-  debug SofaMiscSolver_1_0d optimized SofaMiscSolver_1_0
-  debug SofaMiscTopology_1_0d optimized SofaMiscTopology_1_0
-  debug SofaNonUniformFem_1_0d optimized SofaNonUniformFem_1_0
-  debug SofaObjectInteraction_1_0d optimized SofaObjectInteraction_1_0
-  debug SofaPreconditioner_1_0d optimized SofaPreconditioner_1_0
-  debug SofaRigid_1_0d optimized SofaRigid_1_0
-  debug SofaSimpleFem_1_0d optimized SofaSimpleFem_1_0
-  debug SofaSimulationCommon_1_0d optimized SofaSimulationCommon_1_0
-  debug SofaSimulationTree_1_0d optimized SofaSimulationTree_1_0
-  debug SofaSphFluid_1_0d optimized SofaSphFluid_1_0
-  debug SofaTopologyMapping_1_0d optimized SofaTopologyMapping_1_0
-  debug SofaUserInteraction_1_0d optimized SofaUserInteraction_1_0
-  debug SofaValidation_1_0d optimized SofaValidation_1_0
-  debug SofaVolumetricData_1_0d optimized SofaVolumetricData_1_0
-  debug tinyxml_1_0d optimized tinyxml_1_0
+  debug SofaBaseAnimationLoop${version}d optimized SofaBaseAnimationLoop${version}
+  debug SofaBaseCollision${version}d optimized SofaBaseCollision${version}
+  debug SofaBaseLinearSolver${version}d optimized SofaBaseLinearSolver${version}
+  debug SofaBaseMechanics${version}d optimized SofaBaseMechanics${version}
+  debug SofaBaseTopology${version}d optimized SofaBaseTopology${version}
+  debug SofaBaseVisual${version}d optimized SofaBaseVisual${version}
+  debug SofaBoundaryCondition${version}d optimized SofaBoundaryCondition${version}
+  debug SofaComponentAdvanced${version}d optimized SofaComponentAdvanced${version}
+  debug SofaComponentBase${version}d optimized SofaComponentBase${version}
+  debug SofaComponentCommon${version}d optimized SofaComponentCommon${version}
+  debug SofaComponentGeneral${version}d optimized SofaComponentGeneral${version}
+  debug SofaComponentMain${version}d optimized SofaComponentMain${version}
+  debug SofaComponentMisc${version}d optimized SofaComponentMisc${version}
+  debug SofaConstraint${version}d optimized SofaConstraint${version}
+  debug SofaCore${version}d optimized SofaCore${version}
+  debug SofaDefaultType${version}d optimized SofaDefaultType${version}
+  debug SofaDeformable${version}d optimized SofaDeformable${version}
+  debug SofaDenseSolver${version}d optimized SofaDenseSolver${version}
+  debug SofaEngine${version}d optimized SofaEngine${version}
+  debug SofaEulerianFluid${version}d optimized SofaEulerianFluid${version}
+  debug SofaExplicitOdeSolver${version}d optimized SofaExplicitOdeSolver${version}
+  debug SofaExporter${version}d optimized SofaExporter${version}
+  debug SofaGraphComponent${version}d optimized SofaGraphComponent${version}
+  debug SofaHaptics${version}d optimized SofaHaptics${version}
+  debug SofaHelper${version}d optimized SofaHelper${version}
+  debug SofaImplicitOdeSolver${version}d optimized SofaImplicitOdeSolver${version}
+  debug SofaLoader${version}d optimized SofaLoader${version}
+  debug SofaMeshCollision${version}d optimized SofaMeshCollision${version}
+  debug SofaMisc${version}d optimized SofaMisc${version}
+  debug SofaMiscCollision${version}d optimized SofaMiscCollision${version}
+  debug SofaMiscEngine${version}d optimized SofaMiscEngine${version}
+  debug SofaMiscFem${version}d optimized SofaMiscFem${version}
+  debug SofaMiscForceField${version}d optimized SofaMiscForceField${version}
+  debug SofaMiscMapping${version}d optimized SofaMiscMapping${version}
+  debug SofaMiscSolver${version}d optimized SofaMiscSolver${version}
+  debug SofaMiscTopology${version}d optimized SofaMiscTopology${version}
+  debug SofaNonUniformFem${version}d optimized SofaNonUniformFem${version}
+  debug SofaObjectInteraction${version}d optimized SofaObjectInteraction${version}
+  debug SofaPreconditioner${version}d optimized SofaPreconditioner${version}
+  debug SofaRigid${version}d optimized SofaRigid${version}
+  debug SofaSimpleFem${version}d optimized SofaSimpleFem${version}
+  debug SofaSimulationCommon${version}d optimized SofaSimulationCommon${version}
+  debug SofaSimulationTree${version}d optimized SofaSimulationTree${version}
+  debug SofaSphFluid${version}d optimized SofaSphFluid${version}
+  debug SofaTopologyMapping${version}d optimized SofaTopologyMapping${version}
+  debug SofaUserInteraction${version}d optimized SofaUserInteraction${version}
+  debug SofaValidation${version}d optimized SofaValidation${version}
+  debug SofaVolumetricData${version}d optimized SofaVolumetricData${version}
+  debug tinyxml${version}d optimized tinyxml${version}
 )")

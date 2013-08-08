@@ -45,15 +45,18 @@ namespace itk
     typedef TensorReconstructionWithEigenvalueCorrectionFilter                  Self;
     typedef SmartPointer<Self>                          Pointer;
     typedef SmartPointer<const Self>                    ConstPointer;
+
+
+
     typedef ImageToImageFilter< Image< TDiffusionPixelType, 3>,
       Image< DiffusionTensor3D< TTensorPixelType >, 3 > >
       Superclass;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self);
+    itkNewMacro(Self)
 
     /** Runtime information support. */
-    itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter);
+    itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter)
 
     typedef TDiffusionPixelType                       ReferencePixelType;
     typedef TDiffusionPixelType                       GradientPixelType;

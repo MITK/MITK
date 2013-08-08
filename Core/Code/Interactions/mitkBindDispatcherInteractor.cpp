@@ -23,7 +23,7 @@
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
 
-mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
+mitk::BindDispatcherInteractor::BindDispatcherInteractor( const std::string& rendererName ) :
     m_DataStorage(NULL)
 {
   ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
@@ -33,7 +33,7 @@ mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
     return;
   }
 
-  m_Dispatcher = Dispatcher::New();
+  m_Dispatcher = Dispatcher::New(rendererName);
 }
 
 void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer dataStorage)

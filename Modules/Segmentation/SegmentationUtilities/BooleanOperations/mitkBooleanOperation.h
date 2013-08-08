@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBooleanOperation_h
 #define mitkBooleanOperation_h
 
-#include "SegmentationExports.h"
 #include <mitkImage.h>
+#include <SegmentationExports.h>
 
 namespace mitk
 {

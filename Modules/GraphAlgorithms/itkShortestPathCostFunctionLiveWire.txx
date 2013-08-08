@@ -49,7 +49,7 @@ namespace itk
   void ShortestPathCostFunctionLiveWire<TInputImageType>
     ::AddRepulsivePoint( const IndexType&  index )
   {
-    m_MaskImage->SetPixel(index, 255);
+    this->m_MaskImage->SetPixel(index, 255);
     m_UseRepulsivePoints = true;
   }
 
@@ -69,13 +69,13 @@ namespace itk
         this->m_Image = _arg;
 
         // initialize mask image
-        m_MaskImage = UnsignedCharImageType::New();
-        m_MaskImage->SetRegions(this->m_Image->GetLargestPossibleRegion());
-        m_MaskImage->SetOrigin( this->m_Image->GetOrigin() );
-        m_MaskImage->SetSpacing( this->m_Image->GetSpacing() );
-        m_MaskImage->SetDirection( this->m_Image->GetDirection() );
-        m_MaskImage->Allocate ();
-        m_MaskImage->FillBuffer(0);
+        this->m_MaskImage = UnsignedCharImageType::New();
+        this->m_MaskImage->SetRegions( this->m_Image->GetLargestPossibleRegion());
+        this->m_MaskImage->SetOrigin( this->m_Image->GetOrigin() );
+        this->m_MaskImage->SetSpacing( this->m_Image->GetSpacing() );
+        this->m_MaskImage->SetDirection( this->m_Image->GetDirection() );
+        this->m_MaskImage->Allocate ();
+        this->m_MaskImage->FillBuffer(0);
 
         this->Modified();
         this->m_Initialized = false;
@@ -87,7 +87,7 @@ namespace itk
     ::ClearRepulsivePoints()
   {
     m_UseRepulsivePoints = false;
-    m_MaskImage->FillBuffer(0);
+    this->m_MaskImage->FillBuffer(0);
   }
 
 

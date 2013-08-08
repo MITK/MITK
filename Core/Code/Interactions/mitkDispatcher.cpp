@@ -27,7 +27,24 @@
 mitk::Dispatcher::Dispatcher( const std::string& rendererName )
 : m_ProcessingMode(REGULAR)
 {
-  m_EventObserverTracker = new mitk::ServiceTracker<InteractionEventObserver*>(GetModuleContext());
+  // LDAP filter string to find all listeners specific for the renderer
+  // corresponding to this dispatcher
+  std::string specificRenderer = "(rendererName=" + rendererName +")";
+
+  // LDAP filter string to find all listeners that are not specific
+  // to any renderer
+  std::string anyRenderer = "(!(rendererName=*))";
+
+  // LDAP filter string to find only instances of  InteractionEventObserver
+  // The '*' is needed because of some namespace issues
+  std::string classInteractionEventObserver = "(" + ServiceConstants::OBJECTCLASS() + "=*InteractionEventObserver)";
+
+  // Configure the LDAP filter to find all instances of InteractionEventObserver
+  // that are specific to this dispatcher or unspecific to any dispatchers (real global listener)
+  LDAPFilter filter( "(&(|"+ specificRenderer  + anyRenderer + ")"+classInteractionEventObserver+")" );
+
+  // Give the filter to the ObserverTracker
+  m_EventObserverTracker = new mitk::ServiceTracker<InteractionEventObserver*>(GetModuleContext(), filter);
   m_EventObserverTracker->Open();
 }
 

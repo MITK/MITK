@@ -27,11 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-typedef itk::VectorImage<short, 3>  ImageType;
-
-
-
-
 namespace itk
 {
 
@@ -41,6 +36,11 @@ namespace itk
   {
 
   public:
+
+
+    typedef itk::VectorImage<short, 3>  ImageType;
+
+
 
     typedef TensorReconstructionWithEigenvalueCorrectionFilter                  Self;
     typedef SmartPointer<Self>                          Pointer;

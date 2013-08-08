@@ -335,7 +335,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
                 m_Controls->m_ReductionFrame->layout()->addWidget(checkBox);
 
                 spinBox = new QSpinBox();
-                spinBox->setValue(std::ceil((float)it->second.size()/2));
+                spinBox->setValue(it->second.size());
                 spinBox->setMaximum(it->second.size());
                 spinBox->setMinimum(0);
                 m_ReduceGradientSpinboxes.push_back(spinBox);

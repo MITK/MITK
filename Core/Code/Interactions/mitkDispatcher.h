@@ -49,7 +49,7 @@ namespace mitk
 
   public:
     mitkClassMacro(Dispatcher, itk::LightObject);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, const std::string&);
 
     typedef std::list<DataInteractor::Pointer> ListInteractorType;
     typedef std::list<itk::SmartPointer<InteractionEvent> > ListEventsType;
@@ -87,7 +87,7 @@ namespace mitk
     size_t GetNumberOfInteractors(); // DEBUG TESTING
 
   protected:
-    Dispatcher();
+    Dispatcher(const std::string& rendererName);
     virtual ~Dispatcher();
 
   private:

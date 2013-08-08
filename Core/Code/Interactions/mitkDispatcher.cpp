@@ -20,14 +20,12 @@
 
 // MicroServices
 #include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
 
 #include "mitkInteractionEventObserver.h"
 
 
-mitk::Dispatcher::Dispatcher() :
-    m_ProcessingMode(REGULAR)
+mitk::Dispatcher::Dispatcher( const std::string& rendererName )
+: m_ProcessingMode(REGULAR)
 {
   m_EventObserverTracker = new mitk::ServiceTracker<InteractionEventObserver*>(GetModuleContext());
   m_EventObserverTracker->Open();

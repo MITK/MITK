@@ -75,7 +75,7 @@ namespace mitk
     elem->SetAttribute( "ShowImagesInDebug",
                         (d->m_EndoDebug->GetShowImagesInDebug()? 1:0) );
     elem->SetAttribute( "ShowImagesTimeOut",
-                        (static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut()) );
+                        (static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut())) );
     elem->SetAttribute( "DebugImagesOutputDirectory",
                         d->m_EndoDebug->GetDebugImagesOutputDirectory() );
 

@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK HEADER
 #include "mitkUSImageVideoSource.h"
 #include "mitkImage.h"
+#include "Commands/mitkCropOpenCVImageFilter.h"
+#include "Commands/mitkConvertGrayscaleOpenCVImageFilter.h"
 
 //OpenCV HEADER
 #include <cv.h>
@@ -34,7 +36,10 @@ m_IsGreyscale(false),
 m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
 m_ResolutionOverrideWidth(0),
 m_ResolutionOverrideHeight(0),
-m_ResolutionOverride(false)
+m_ResolutionOverride(false),
+m_ImageFilter(0),
+m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
+m_CropFilter(mitk::CropOpenCVImageFilter::New())
 {
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
@@ -104,12 +109,13 @@ void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, i
   if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
   if (topLeftY > bottomRightY) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
 
-  m_CropRegion = cv::Rect(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY);
+  m_CropFilter->SetCropRegion(cv::Rect(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY));
+  m_IsCropped = true;
+
 }
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest(){
-  m_CropRegion.width = 0;
-  m_CropRegion.height = 0;
+  m_IsCropped = false;
 }
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
@@ -125,19 +131,14 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   // Retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
 
-  // if Region of interest is set, crop image
-  if (m_CropRegion.width > 0){
-    buffer = image(m_CropRegion);
-    image.release();
-    image = buffer;
-  }
+  // If region of interest was set, crop image
+  if ( m_IsCropped ) { m_CropFilter->filterImage(image); }
+
   // If this source is set to deliver greyscale images, convert it
-  if (m_IsGreyscale)
-  {
-    cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
-    image.release();
-    image = buffer;
-  }
+  if (m_IsGreyscale) { m_GrayscaleFilter->filterImage(image); }
+
+  // Execute filter, if an additional filter is specified
+  if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->filterImage(image); }
 
   // Convert to MITK-Image
   IplImage ipl_img = image;

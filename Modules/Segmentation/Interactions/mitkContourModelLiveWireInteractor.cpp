@@ -211,6 +211,9 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
   assert ( contour );
 
+  mitk::ContourModel::Pointer editingContour = mitk::ContourModel::New();
+  editingContour->Expand(contour->GetTimeSteps());
+
   // recompute left live wire, i.e. the contour between previous active vertex and selected vertex
   this->m_LiveWireFilter->SetStartPoint( this->m_NextActiveVertexDown );
   this->m_LiveWireFilter->SetEndPoint( currentPosition );
@@ -234,6 +237,11 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
   if ( !leftLiveWire->IsEmpty(timestep) )
     leftLiveWire->RemoveVertexAt(0, timestep);
+
+  editingContour->Concatenate( leftLiveWire, timestep );
+
+  //the new index of the selected vertex
+  unsigned int selectedVertexIndex = this->m_ContourLeft->GetNumberOfVertices(timestep) + leftLiveWire->GetNumberOfVertices(timestep) -1;
 
   // at this point the container has to be empty
   m_ContourBeingModified.clear();
@@ -272,6 +280,8 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   if ( !rightLiveWire->IsEmpty(timestep) )
     rightLiveWire->RemoveVertexAt(0, timestep);
 
+  editingContour->Concatenate( rightLiveWire, timestep );
+
 // not really needed
 /*
   // add points from right live wire contour
@@ -286,11 +296,6 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
   }
 */
 
-  mitk::ContourModel::Pointer editingContour = mitk::ContourModel::New();
-  editingContour->Expand(contour->GetTimeSteps());
-
-  editingContour->Concatenate( leftLiveWire, timestep );
-  editingContour->Concatenate( rightLiveWire, timestep );
 
   m_EditingContourNode->SetData(editingContour);
 
@@ -299,22 +304,15 @@ bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const St
 
   // concatenate left original contour
   newContour->Concatenate( this->m_ContourLeft, timestep );
-  newContour->Deselect();
 
-  // concatenate left live wire but only if we have more than one vertex
-  if (!leftLiveWire->IsEmpty())
-  {
-      newContour->Concatenate( leftLiveWire, timestep, true);
-  }
+  newContour->Concatenate( editingContour, timestep, true);
 
   // set last inserted vertex as selected
-  newContour->SelectVertexAt(newContour->GetNumberOfVertices()-1, timestep);
+  newContour->SelectVertexAt(selectedVertexIndex, timestep);
 
-  // concatenate right live wire but only if we have more than one vertex
-  if (!rightLiveWire->IsEmpty())
-  {
-      newContour->Concatenate( rightLiveWire, timestep, true );
-  }
+  //set as control point
+  newContour->SetSelectedVertexAsControlPoint(true);
+
 
   // concatenate right original contour
   newContour->Concatenate( this->m_ContourRight, timestep );

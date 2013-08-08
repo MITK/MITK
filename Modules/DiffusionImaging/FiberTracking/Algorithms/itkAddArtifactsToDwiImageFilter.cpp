@@ -220,8 +220,8 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 newSlice = dft->GetOutput();
 
                 // put slice back into channel g
-                for (int y=0; y<inputRegion.GetSize(1); y++)
-                    for (int x=0; x<inputRegion.GetSize(0); x++)
+                for (y=0; y<inputRegion.GetSize(1); y++)
+                    for (x=0; x<inputRegion.GetSize(0); x++)
                     {
                         typename DiffusionImageType::IndexType index3D;
                         index3D[0]=x; index3D[1]=y; index3D[2]=z;

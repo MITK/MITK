@@ -445,7 +445,7 @@ int TestUnitilizedImage()
     is->ComputeStatistics();
     MITK_TEST_FOR_EXCEPTION_END(mitk::Exception)
   }
-  catch (mitk::Exception& e)
+  catch (const mitk::Exception&)
   {
     std::cout << "Success: Loading uninitialized image has thrown an exception." << std::endl;
   }

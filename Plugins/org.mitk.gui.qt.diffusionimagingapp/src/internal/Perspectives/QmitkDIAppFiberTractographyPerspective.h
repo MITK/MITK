@@ -28,11 +28,6 @@ class QmitkDIAppFiberTractographyPerspective : public QObject, public berry::IPe
 public:
 
   QmitkDIAppFiberTractographyPerspective() {}
-  QmitkDIAppFiberTractographyPerspective(const QmitkDIAppFiberTractographyPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppFiberTractographyPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

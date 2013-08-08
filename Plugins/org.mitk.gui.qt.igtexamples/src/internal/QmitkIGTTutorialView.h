@@ -51,11 +51,6 @@ class QmitkIGTTutorialView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkIGTTutorialView();
-  QmitkIGTTutorialView(const QmitkIGTTutorialView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   virtual ~QmitkIGTTutorialView();
 
   virtual void CreateQtPartControl(QWidget *parent);

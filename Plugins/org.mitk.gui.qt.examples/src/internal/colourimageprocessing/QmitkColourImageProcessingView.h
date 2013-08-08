@@ -42,12 +42,6 @@ public:
 
   QmitkColourImageProcessingView();
 
-   QmitkColourImageProcessingView(const QmitkColourImageProcessingView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
-
   virtual ~QmitkColourImageProcessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);

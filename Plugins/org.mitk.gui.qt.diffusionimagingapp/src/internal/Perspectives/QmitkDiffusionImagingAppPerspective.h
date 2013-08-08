@@ -28,11 +28,6 @@ class QmitkDiffusionImagingAppPerspective : public QObject, public berry::IPersp
 public:
 
   QmitkDiffusionImagingAppPerspective() {}
-  QmitkDiffusionImagingAppPerspective(const QmitkDiffusionImagingAppPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDiffusionImagingAppPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

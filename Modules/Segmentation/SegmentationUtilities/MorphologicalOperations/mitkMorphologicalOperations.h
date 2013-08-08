@@ -17,63 +17,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkMorphologicalOperations_h
 #define mitkMorphologicalOperations_h
 
-#include "SegmentationExports.h"
 #include <mitkImage.h>
-#include <itkBinaryBallStructuringElement.h>
-#include <itkBinaryCrossStructuringElement.h>
-#include <itkBinaryErodeImageFilter.h>
-#include <itkBinaryDilateImageFilter.h>
-#include <itkBinaryMorphologicalOpeningImageFilter.h>
-#include <itkBinaryMorphologicalClosingImageFilter.h>
-#include <itkBinaryFillholeImageFilter.h>
-#include <mitkImageTimeSelector.h>
+#include <SegmentationExports.h>
 
 namespace mitk
 {
+  /** \brief Encapsulates several morphological operations that can be performed on segmentations.
+    */
   class Segmentation_EXPORT MorphologicalOperations
   {
   public:
-    MorphologicalOperations();
-    ~MorphologicalOperations();
-
     enum StructuralElementType
     {
-       BALL,
-       CUBE
+       Ball,
+       Cross
     };
 
     ///@{
-    /**
-    * \brief Static functions to perform morphological operations on 2D,3D or 4D segmentation images with pixel type unsigned char.
-    */
-    static void Closing(mitk::Image::Pointer &image, int factor, StructuralElementType structuralElement);
-    static void Erode(mitk::Image::Pointer &image, int factor, StructuralElementType structuralElement);
-    static void Dilate(mitk::Image::Pointer &image, int factor, StructuralElementType structuralElement);
-    static void Opening(mitk::Image::Pointer &image, int factor, StructuralElementType structuralElement);
-    static void Fillhole(mitk::Image::Pointer &image);
-   ///@}
+    /** \brief Perform morphological operation on 2D, 3D or 3D+t segmentation.
+     */
+    static void Closing(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
+    static void Erode(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
+    static void Dilate(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
+    static void Opening(mitk::Image::Pointer& image, int factor, StructuralElementType structuralElement);
+    static void FillHoles(mitk::Image::Pointer& image);
+    ///@}
 
-  protected:
+  private:
+    MorphologicalOperations();
+
     ///@{
-    /**
-    * \brief Performs morphological operations using itk filters
-    */
+    /** \brief Perform morphological operation by using corresponding ITK filter.
+     */
     template<typename TPixel, unsigned int VDimension>
-    void static itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, StructuralElementType structuralElement);
+    void static itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, StructuralElementType structuralElement);
 
     template<typename TPixel, unsigned int VDimension>
-    void static itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, StructuralElementType structuralElement);
+    void static itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, StructuralElementType structuralElement);
 
     template<typename TPixel, unsigned int VDimension>
-    void static itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, StructuralElementType structuralElement);
+    void static itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, StructuralElementType structuralElement);
 
     template<typename TPixel, unsigned int VDimension>
-    void static itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage, int factor, StructuralElementType structuralElement);
+    void static itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, StructuralElementType structuralElement);
 
     template<typename TPixel, unsigned int VDimension>
-    void static itkFillhole(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer & resultImage);
-   ///@}
+    void static itkFillHoles(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
+    ///@}
   };
 }
 
-#endif // mitkMorphologicalOperations_h
+#endif

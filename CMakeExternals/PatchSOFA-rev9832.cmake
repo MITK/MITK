@@ -1,3 +1,12 @@
+file(STRINGS "framework/sofa/helper/vector_device.h" vector_device_h NEWLINE_CONSUME)
+string(REPLACE "#ifndef SOFA_NO_OPENGL\n    GLu" "    unsigned " vector_device_h ${vector_device_h})
+string(REPLACE "#endif\n    mutable i" "    mutable i" vector_device_h ${vector_device_h})
+string(REPLACE "        if (MemoryManager::SUPPORT_GL_BUFFER && bufferObject)\n" "#ifndef SOFA_NO_OPENGL\n        if (MemoryManager::SUPPORT_GL_BUFFER && bufferObject)\n" vector_device_h ${vector_device_h})
+string(REPLACE "//         else {" "#endif\n//         else {" vector_device_h ${vector_device_h})
+string(REPLACE "P ( GLu" "P ( unsigned " vector_device_h ${vector_device_h})
+set(CONTENTS ${vector_device_h})
+configure_file(${TEMPLATE_FILE} "framework/sofa/helper/vector_device.h" @ONLY)
+
 file(STRINGS "sofa-dependencies.cmake" sofaDependencies_cmake NEWLINE_CONSUME)
 string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" sofaDependencies_cmake "${sofaDependencies_cmake}")
 file(WRITE "sofa-dependencies.cmake" "${sofaDependencies_cmake}")

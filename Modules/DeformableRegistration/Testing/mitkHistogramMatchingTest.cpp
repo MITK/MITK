@@ -41,7 +41,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
       *p=i;
     std::cout<<"[PASSED]"<<std::endl;
   }
-  catch(mitk::Exception& e)
+  catch(const mitk::Exception&)
   {
     // we don't have image access, set test to failed
     std::cout<<"[FAILED] creation of the image" <<std::endl;
@@ -71,7 +71,7 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
       *p2=i2;
     std::cout<<"[PASSED]"<<std::endl;
   }
-  catch(mitk::Exception& e)
+  catch(const mitk::Exception&)
   {
     // we don't have image access, set test to failed
     std::cout<<"[FAILED] creation of the image" <<std::endl;

@@ -33,11 +33,11 @@ file(WRITE "SOFAConfig.cmake.in"
 
 set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 
-set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")
-
 if(WIN32)
+  set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")
   set(version "_1_0")
 else()
+  set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@/@CMAKE_BUILD_TYPE@\")
   set(version "")
 endif()
 

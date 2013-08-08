@@ -26,7 +26,7 @@ namespace mitk
 {
   class DataStorage;
 }
-class QmitkCmdLineModuleGuiPrivate;
+struct QmitkCmdLineModuleGuiPrivate;
 class QWidget;
 
 /**

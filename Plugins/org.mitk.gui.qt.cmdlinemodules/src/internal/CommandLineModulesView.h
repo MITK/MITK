@@ -33,7 +33,7 @@ class QVBoxLayout;
 
 namespace berry
 {
-  class IBerryPreferences;
+  struct IBerryPreferences;
 }
 
 /*!

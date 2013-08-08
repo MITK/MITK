@@ -28,11 +28,6 @@ class QmitkDIAppSyntheticDataGenerationPerspective : public QObject, public berr
 public:
 
   QmitkDIAppSyntheticDataGenerationPerspective() {}
-  QmitkDIAppSyntheticDataGenerationPerspective(const QmitkDIAppSyntheticDataGenerationPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppSyntheticDataGenerationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

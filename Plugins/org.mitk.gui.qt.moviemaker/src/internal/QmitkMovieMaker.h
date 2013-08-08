@@ -141,12 +141,6 @@ class QmitkMovieMaker: public QmitkFunctionality
 public:
   /** \brief Constructor. */
   QmitkMovieMaker(QObject *parent=0, const char *name=0);
-  QmitkMovieMaker(const QmitkMovieMaker& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
-
 
   /** \brief Destructor. */
   virtual ~QmitkMovieMaker();

@@ -56,11 +56,6 @@ public:
   static const std::string VIEW_ID;
 
   QmitkODFDetailsView();
-  QmitkODFDetailsView(const QmitkODFDetailsView& other)
-    {
-      Q_UNUSED(other)
-      throw std::runtime_error("Copy constructor not implemented");
-    }
   virtual ~QmitkODFDetailsView();
 
   typedef float TOdfPixelType;

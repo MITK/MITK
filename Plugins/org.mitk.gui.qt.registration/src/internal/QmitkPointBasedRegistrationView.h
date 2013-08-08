@@ -66,13 +66,6 @@ public:
   */
   QmitkPointBasedRegistrationView(QObject *parent=0, const char *name=0);
 
-  QmitkPointBasedRegistrationView(const QmitkPointBasedRegistrationView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
-
-
   /*!
   \brief Default destructor
   */

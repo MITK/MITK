@@ -28,11 +28,6 @@ class QmitkDTIAtlasAppPerspective : public QObject, public berry::IPerspectiveFa
 public:
 
   QmitkDTIAtlasAppPerspective() {}
-  QmitkDTIAtlasAppPerspective(const QmitkDTIAtlasAppPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDTIAtlasAppPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

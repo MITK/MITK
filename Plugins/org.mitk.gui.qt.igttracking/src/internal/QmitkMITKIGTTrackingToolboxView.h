@@ -51,12 +51,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkMITKIGTTrackingToolboxView();
-
-    QmitkMITKIGTTrackingToolboxView(const QmitkMITKIGTTrackingToolboxView& other)
-    {
-      Q_UNUSED(other)
-      throw std::runtime_error("Copy constructor not implemented");
-    }
     virtual ~QmitkMITKIGTTrackingToolboxView();
 
     virtual void CreateQtPartControl(QWidget *parent);

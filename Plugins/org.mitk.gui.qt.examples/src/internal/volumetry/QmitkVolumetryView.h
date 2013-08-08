@@ -45,12 +45,6 @@ class QmitkVolumetryView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkVolumetryView();
-  QmitkVolumetryView(const QmitkVolumetryView& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
-
 
   virtual ~QmitkVolumetryView();
 

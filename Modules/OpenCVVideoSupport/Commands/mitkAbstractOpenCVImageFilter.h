@@ -32,6 +32,7 @@ namespace mitk {
 
 /**
   * \brief Interface for image filters on OpenCV images.
+  *
   * Every concrete filter has to implement the pure virual
   * mitk::AbstractOpenCVImageFilter::filterImage() method.
   *
@@ -48,7 +49,7 @@ public:
     * \param image OpenCV image which is supposed to be manipulated.
     * \return true if filtering was successfull, false otherwise
     */
-  virtual bool filterImage( cv::Mat image ) = 0;
+  virtual bool FilterImage( cv::Mat& image ) = 0;
 };
 
 } // namespace mitk

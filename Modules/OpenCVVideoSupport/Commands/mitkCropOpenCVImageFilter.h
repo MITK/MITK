@@ -37,15 +37,16 @@ public:
     * \brief Crops image to rectangle given by mitk::CropOpenCVImageFilter::SetCropRegion.
     * \return false if no crop region was set or the crop region width is zero, true otherwise.
     */
-  bool filterImage( cv::Mat image );
+  bool FilterImage( cv::Mat& image );
 
   void SetCropRegion( cv::Rect cropRegion );
+  void SetCropRegion( int topLeftX, int topLeftY, int bottomRightX, int bottomRightY );
   cv::Rect GetCropRegion( );
 
 protected:
   /**
-  * \brief Defines the region which will be cropped from the image.
-  */
+    * \brief Defines the region which will be cropped from the image.
+    */
   cv::Rect m_CropRegion;
 };
 

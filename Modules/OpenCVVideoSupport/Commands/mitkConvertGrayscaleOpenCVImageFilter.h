@@ -35,7 +35,7 @@ public:
     * \brief Converts given image to grayscale.
     * \return always true
     */
-  bool filterImage( cv::Mat image );
+  bool FilterImage( cv::Mat& image );
 };
 
 } // namespace mitk

@@ -97,21 +97,8 @@ else return 0;
 
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
-  // First, let's do some basic checks to make sure rectangle is inside of actual image
-  if (topLeftX < 0) topLeftX = 0;
-  if (topLeftY < 0) topLeftY = 0;
-
-  // We can try and correct too large boundaries
-  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH)) bottomRightX = m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-  if (bottomRightY >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
-
-  // Nothing to save, throw an exception
-  if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
-  if (topLeftY > bottomRightY) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
-
-  m_CropFilter->SetCropRegion(cv::Rect(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY));
+  m_CropFilter->SetCropRegion(topLeftX, topLeftY, bottomRightX, bottomRightY);
   m_IsCropped = true;
-
 }
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest(){

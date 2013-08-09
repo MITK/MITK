@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-bool ConvertGrayscaleOpenCVImageFilter::filterImage( cv::Mat image )
+bool ConvertGrayscaleOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
   cv::Mat buffer;
 

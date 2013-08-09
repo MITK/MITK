@@ -127,14 +127,9 @@ namespace mitk {
     */
     bool m_IsGreyscale;
     /**
-      * \brief If true, image will be cropped according to settings of crop filter.
-      */
-    bool m_IsCropped;
-    /**
-    * \brief If values inside are nonzero, this rectangle will be cropped from the stream and used as an output.
-    * Used to mark Region of Interest.
+    * \brief If true, image will be cropped according to settings of crop filter.
     */
-    cv::Rect m_CropRegion;
+    bool m_IsCropped;
     /**
     * \brief Used to convert from OpenCV Images to MITK Images.
     */

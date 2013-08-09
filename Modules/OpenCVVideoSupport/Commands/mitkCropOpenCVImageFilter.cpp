@@ -20,16 +20,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-bool CropOpenCVImageFilter::filterImage( cv::Mat image )
+bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
-  if (m_CropRegion.width <= 0)
+  if (m_CropRegion.width == 0)
   {
     MITK_ERROR("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
         << "Cropping cannot be done without setting a non-empty crop region first.";
     return false;
   }
 
-  cv::Mat buffer = image(m_CropRegion);
+  cv::Rect cropRegion = m_CropRegion;
+
+  // We can try and correct too large boundaries
+  if ( cropRegion.x + cropRegion.width >= image.size().width)
+  {
+    cropRegion.width = image.size().width - cropRegion.x;
+  }
+  if ( cropRegion.y + cropRegion.height >= image.size().height)
+  {
+    cropRegion.height = image.size().height - cropRegion.y;
+  }
+
+  cv::Mat buffer = image(cropRegion);
   image.release();
   image = buffer;
 
@@ -38,7 +50,22 @@ bool CropOpenCVImageFilter::filterImage( cv::Mat image )
 
 void CropOpenCVImageFilter::SetCropRegion( cv::Rect cropRegion )
 {
+  // First, let's do some basic checks to make sure rectangle is inside of actual image
+  if (cropRegion.x < 0) { cropRegion.x = 0; }
+  if (cropRegion.y < 0) { cropRegion.y = 0; }
+
+  // Nothing to save, throw an exception
+  if ( cropRegion.height < 0 || cropRegion.width < 0 )
+  {
+    mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
+  }
+
   m_CropRegion = cropRegion;
+}
+
+void CropOpenCVImageFilter::SetCropRegion( int topLeftX, int topLeftY, int bottomRightX, int bottomRightY )
+{
+  this->SetCropRegion( cv::Rect(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY) );
 }
 
 cv::Rect CropOpenCVImageFilter::GetCropRegion( )

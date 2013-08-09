@@ -46,12 +46,12 @@ void QmitkNodeDescriptorManager::Initialize()
   // Adding "Images"
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("Image"), QString(":/Qmitk/Images_48.png"), isImage, this));
-
+/*
   // Adding "Image Masks"
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateAnd::Pointer isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
   this->AddDescriptor(new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
-
+*/
   // Adding "PointSet"
   mitk::NodePredicateDataType::Pointer isPointSet = mitk::NodePredicateDataType::New("PointSet");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
@@ -59,12 +59,12 @@ void QmitkNodeDescriptorManager::Initialize()
   // Adding "Surface"
   mitk::NodePredicateDataType::Pointer isSurface = mitk::NodePredicateDataType::New("Surface");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
-
+/*
   // Adding "NoneBinaryImages"
   mitk::NodePredicateNot::Pointer isNotBinary = mitk::NodePredicateNot::New(isBinary);
   mitk::NodePredicateAnd::Pointer isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
   this->AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
-
+*/
 }
 
 void QmitkNodeDescriptorManager::AddDescriptor( QmitkNodeDescriptor* _Descriptor )

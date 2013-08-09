@@ -36,6 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModelGLMapper2D.h"
 #include "mitkContourModelMapper3D.h"
 
+#include "mitkLabelSetImage.h"
+#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkNrrdLabelSetImageWriterFactory.h"
+#include "mitkNrrdLabelSetImageIOFactory.h"
+
 
 mitk::SegmentationObjectFactory::SegmentationObjectFactory()
 :CoreObjectFactoryBase()
@@ -147,8 +152,10 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SegmentationObjectFactory::GetSa
 void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.cnt", "Contour File"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.lset", "Segmentation Files"));
 }
 
 const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
@@ -166,6 +173,12 @@ void mitk::SegmentationObjectFactory::RegisterIOFactories()
   mitk::ContourModelWriterFactory::RegisterOneFactory();
 
   this->m_FileWriters.push_back(mitk::ContourModelWriter::New().GetPointer());
+
+  mitk::NrrdLabelSetImageIOFactory::RegisterOneFactory();
+
+  mitk::NrrdLabelSetImageWriterFactory::RegisterOneFactory();
+
+  this->m_FileWriters.push_back(mitk::NrrdLabelSetImageWriter<unsigned char>::New().GetPointer());
 
   CreateFileExtensionsMap();
 }

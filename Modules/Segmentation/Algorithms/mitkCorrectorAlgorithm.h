@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageToImageFilter.h"
 #include "SegmentationExports.h"
-#include "mitkContourModel.h"
+#include "mitkContour.h"
 #include "ipSegmentation.h"
 
 #include <itkImage.h>
@@ -56,7 +56,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     /**
      * \brief User drawn contour
      */
-    void SetContour( ContourModel* contour){this->m_Contour = contour;}
+    itkSetMacro(Contour, Contour*);
 
     /**
      * \brief Calculated difference image.
@@ -88,7 +88,7 @@ class Segmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     void ItkCalculateDifferenceImage( itk::Image<TPixel, VImageDimension>* originalImage, Image* modifiedMITKImage );
 
     Image::Pointer m_WorkingImage;
-    ContourModel::Pointer m_Contour;
+    Contour::ConstPointer m_Contour;
     Image::Pointer m_DifferenceImage;
 };
 

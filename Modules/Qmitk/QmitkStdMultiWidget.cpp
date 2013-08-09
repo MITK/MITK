@@ -1654,6 +1654,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   node = this->GetTopLayerNode(nodes);
   if(node.IsNotNull())
   {
+      /*
     node->GetBoolProperty("binary",isBinary);
     if(isBinary)
     {
@@ -1673,8 +1674,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     }
     else
     {
+    */
       image = dynamic_cast<mitk::Image*>(node->GetData());
-    }
+    //}
   }
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();
@@ -1682,7 +1684,7 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   std::stringstream stream;
   mitk::Index3D p;
   mitk::BaseRenderer* baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
-  unsigned int timestep = baseRenderer->GetTimeStep();
+  int timestep = baseRenderer->GetTimeStep();
 
   if(image.IsNotNull() && (image->GetTimeSteps() > timestep ))
   {

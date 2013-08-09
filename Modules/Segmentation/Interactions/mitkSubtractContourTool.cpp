@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSubtractContourTool.h"
-
+#include "mitkToolManager.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLookupTableProperty.h"
 #include "mitkSubtractContourTool.xpm"
 
 // us
@@ -28,13 +30,21 @@ namespace mitk {
 }
 
 mitk::SubtractContourTool::SubtractContourTool()
-:ContourTool(0)
+:ContourTool()
 {
-  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+    CONNECT_ACTION( 49014, OnInvertLogic );
 }
 
 mitk::SubtractContourTool::~SubtractContourTool()
 {
+}
+
+bool mitk::SubtractContourTool::OnMousePressed (Action* action, const StateEvent* stateEvent)
+{
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+
+    return Superclass::OnMousePressed(action, stateEvent);
 }
 
 const char** mitk::SubtractContourTool::GetXPM() const
@@ -61,3 +71,30 @@ const char* mitk::SubtractContourTool::GetName() const
   return "Subtract";
 }
 
+/**
+  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to the active label
+  and viceversa.
+*/
+bool mitk::SubtractContourTool::OnInvertLogic(Action* action, const StateEvent* stateEvent)
+{
+    if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
+    m_LogicInverted = !m_LogicInverted;
+
+    if (m_LogicInverted)
+    {
+        DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+        if (!workingNode) return false;
+        LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+        m_PaintingPixelValue = image->GetActiveLabelIndex();
+        const mitk::Color& color = image->GetActiveLabelColor();
+        FeedbackContourTool::SetFeedbackContourColor( color.GetRed(), color.GetGreen(), color.GetBlue() );
+    }
+    else
+    {
+        m_PaintingPixelValue = 0;
+        FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+    }
+
+  return true;
+}

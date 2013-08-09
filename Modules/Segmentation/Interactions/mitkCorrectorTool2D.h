@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkFeedbackContourTool.h"
 
-class ModuleResource;
-
 namespace mitk
 {
 
@@ -56,9 +54,6 @@ class Segmentation_EXPORT CorrectorTool2D : public FeedbackContourTool
     itkNewMacro(CorrectorTool2D);
 
     virtual const char** GetXPM() const;
-    virtual ModuleResource GetCursorIconResource() const;
-    ModuleResource GetIconResource() const;
-
     virtual const char* GetName() const;
 
   protected:

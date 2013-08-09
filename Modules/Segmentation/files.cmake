@@ -70,6 +70,11 @@ set(CPP_FILES
   IO/mitkContourModelReader.cpp
   IO/mitkContourModelWriter.cpp
   IO/mitkContourModelWriterFactory.cpp
+  IO/mitkNrrdLabelSetImageIOFactory.cpp
+  IO/mitkNrrdLabelSetImageWriterFactory.cpp
+  IO/mitkNrrdLabelSetImageReader.cpp
+  IO/mitkNrrdLabelSetImageWriter.cpp
+  IO/mitkLabelSetImageSource.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourModelGLMapper2D.cpp
   Rendering/mitkContourModelMapper2D.cpp

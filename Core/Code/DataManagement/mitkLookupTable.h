@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include "vtkLookupTable.h"
+#include "vtkSmartPointer.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
 
@@ -29,7 +30,6 @@ class vtkPiecewiseFunction;
 
 namespace mitk
 {
-
 //##
 //##Documentation
 //## @brief LookupTable containing a vtkLookupTable
@@ -60,6 +60,17 @@ public:
 
     virtual void ChangeOpacity(int index, float opacity );
 
+    virtual void GetColor(int, double rgb[3]);
+
+    virtual void GetTableValue(int, double rgba[4]);
+
+    virtual void SetTableValue(int, double rgba[4]);
+
+    virtual void SetActiveColormap(int index);
+
+    itkSetMacro(Window, float);
+    itkSetMacro(Level, float);
+    itkSetMacro(Opacity, float);
 
     /*!
     * \brief equality operator implementation
@@ -123,7 +134,37 @@ protected:
 
     LookupTable(const LookupTable& other);
 
-    vtkLookupTable* m_LookupTable;
+    virtual void BuildGrayScaleLookupTable();
+    virtual void BuildInverseGrayScaleLookupTable();
+    virtual void BuildRedBlackAlphaLookupTable();
+    virtual void BuildGreenBlackAlphaLookupTable();
+    virtual void BuildBlueBlackAlphaLookupTable();
+    virtual void BuildVRMusclesBonesLookupTable();
+    virtual void BuildVRRedVesselsLookupTable();
+    virtual void BuildSternLookupTable();
+    virtual void BuildHotGreenLookupTable();
+    virtual void BuildVRBonesLookupTable();
+    virtual void BuildCardiacLookupTable();
+    virtual void BuildGrayRainbowLookupTable();
+    virtual void BuildRainbowLookupTable();
+    virtual void BuildHotMetalLookupTable();
+    virtual void BuildHotIronLookupTable();
+    virtual void BuildSpectrumLookupTable();
+    virtual void BuildGEColorLookupTable();
+    virtual void BuildFlowLookupTable();
+    virtual void BuildLONILookupTable();
+    virtual void BuildLONI2LookupTable();
+    virtual void BuildAsymmetryLookupTable();
+    virtual void BuildPValueLookupTable();
+    virtual void BuildMultiLabelLookupTable();
+
+    vtkSmartPointer<vtkLookupTable> m_LookupTable;
+
+    float m_Window;
+
+    float m_Level;
+
+    float m_Opacity;
 
 private:
 

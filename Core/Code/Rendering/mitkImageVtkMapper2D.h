@@ -167,8 +167,6 @@ public:
     vtkSmartPointer<vtkTexture> m_Texture;
     /** \brief The lookuptables for colors and level window */
     vtkSmartPointer<vtkLookupTable> m_DefaultLookupTable;
-    vtkSmartPointer<vtkLookupTable> m_BinaryLookupTable;
-    vtkSmartPointer<vtkLookupTable> m_ColorLookupTable;
     /** \brief The actual reslicer (one per renderer) */
     mitk::ExtractSliceFilter::Pointer m_Reslicer;
     /** \brief Filter for thick slices */
@@ -183,6 +181,8 @@ public:
 
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
+
+    int m_Colormap;
 
     /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;

@@ -139,6 +139,7 @@ set(CPP_FILES
   DataManagement/mitkGeometryData.cpp
   DataManagement/mitkGroupTagProperty.cpp
   DataManagement/mitkImage.cpp
+  DataManagement/mitkLabelSetImage.cpp
   DataManagement/mitkImageAccessorBase.cpp
   DataManagement/mitkImageCaster.cpp
   DataManagement/mitkImageCastPart1.cpp
@@ -206,6 +207,10 @@ set(CPP_FILES
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
   DataManagement/mitkPointSetShapeProperty.cpp
+  DataManagement/mitkColormapProperty.cpp
+  DataManagement/mitkLabelSetProperty.cpp
+  DataManagement/mitkLabelSet.cpp
+  DataManagement/mitkLabel.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkBindDispatcherInteractor.cpp

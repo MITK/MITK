@@ -692,6 +692,7 @@ SliceNavigationController
                 node = this->GetTopLayerNode(nodes,worldposition);
                 if(node.IsNotNull())
                 {
+                    /*
                   node->GetBoolProperty("binary", isBinary);
                   if(isBinary)
                   {
@@ -711,8 +712,9 @@ SliceNavigationController
                   }
                   else
                   {
+                  */
                     image3D = dynamic_cast<mitk::Image*>(node->GetData());
-                  }
+                  //}
                 }
                 std::stringstream stream;
                 stream.imbue(std::locale::classic());

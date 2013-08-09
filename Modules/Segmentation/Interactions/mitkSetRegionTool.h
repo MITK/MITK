@@ -66,8 +66,8 @@ class Segmentation_EXPORT SetRegionTool : public FeedbackContourTool
     bool m_FillContour;
     bool m_StatusFillWholeSlice;
 
-    ContourModel::Pointer m_SegmentationContourInWorldCoordinates;
-    ContourModel::Pointer m_WholeImageContourInWorldCoordinates;
+    Contour::Pointer m_SegmentationContourInWorldCoordinates;
+    Contour::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

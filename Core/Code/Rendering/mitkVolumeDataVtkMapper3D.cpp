@@ -575,7 +575,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
 {
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering configuration", mitk::VtkVolumeRenderingProperty::New( 1 ), renderer, overwrite );
-  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+ // node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())

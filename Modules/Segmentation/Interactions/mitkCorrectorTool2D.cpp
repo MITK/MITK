@@ -18,15 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorAlgorithm.h"
 
 #include "mitkToolManager.h"
+#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
-// us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
@@ -41,7 +39,7 @@ mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
 
-  GetFeedbackContour()->SetIsClosed( false ); // don't close the contour to a polygon
+  GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
@@ -51,20 +49,6 @@ mitk::CorrectorTool2D::~CorrectorTool2D()
 const char** mitk::CorrectorTool2D::GetXPM() const
 {
   return mitkCorrectorTool2D_xpm;
-}
-
-mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
-{
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_48x48.png");
-  return resource;
-}
-
-mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
-{
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
-  return resource;
 }
 
 const char* mitk::CorrectorTool2D::GetName() const
@@ -92,12 +76,9 @@ bool mitk::CorrectorTool2D::OnMousePressed (Action* action, const StateEvent* st
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->Clear();
-  contour->Expand(timestep + 1);
-  contour->SetIsClosed(false, timestep);
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  contour->Initialize();
+  contour->AddVertex( positionEvent->GetWorldPosition() );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 
@@ -111,9 +92,8 @@ bool mitk::CorrectorTool2D::OnMouseMoved   (Action* action, const StateEvent* st
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
+  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -150,21 +130,9 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
       return false;
   }
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  mitk::ContourModel::Pointer singleTimestepContour = mitk::ContourModel::New();
-
-  mitk::ContourModel::VertexIterator it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
-  mitk::ContourModel::VertexIterator end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
-
-  while(it!=end)
-  {
-    singleTimestepContour->AddVertex((*it)->Coordinates);
-    it++;
-  }
-
   CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();
   algorithm->SetInput( m_WorkingSlice );
-  algorithm->SetContour( singleTimestepContour );
+  algorithm->SetContour( FeedbackContourTool::GetFeedbackContour() );
   try
   {
       algorithm->UpdateLargestPossibleRegion();

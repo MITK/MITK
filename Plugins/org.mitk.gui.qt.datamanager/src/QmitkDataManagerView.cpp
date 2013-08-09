@@ -33,15 +33,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkProperties.h"
+#include "mitkLookupTableProperty.h"
 #include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIRenderingManager.h>
 #include <mitkImageCast.h>
+#include <mitkLabelSetImage.h>
+
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkDataStorageTableModel.h>
+#include <QmitkPropertiesTableEditor.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
@@ -183,6 +188,14 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
+  mitk::TNodePredicateDataType<mitk::LabelSetImage>::Pointer isLabelSetImage =
+      mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+
+  QmitkNodeDescriptor* labelSetImageDataNodeDescriptor = new
+      QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this);
+
+  QmitkNodeDescriptorManager::GetInstance()->AddDescriptor(labelSetImageDataNodeDescriptor);
+
   QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
   QObject::connect( globalReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( GlobalReinit(bool) ) );
@@ -304,7 +317,22 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_TextureInterpolation, SIGNAL( toggled(bool) )
     , this, SLOT( TextureInterpolationToggled(bool) ) );
   imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
+  labelSetImageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,m_TextureInterpolation));
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(labelSetImageDataNodeDescriptor,m_TextureInterpolation));
+
+  m_ColormapAction = new QAction("Colormap", this);
+  m_ColormapAction->setMenu(new QMenu);
+//  m_ColormapAction->setCheckable(true);
+//  m_ColormapAction->setChecked(false);
+//  QObject::connect( m_ColormapAction, SIGNAL( toggled (bool) )
+//    , this, SLOT( ColormapActionEnabled(bool) ) );
+  QObject::connect( m_ColormapAction->menu(), SIGNAL( aboutToShow() )
+    , this, SLOT( ColormapMenuAboutToShow() ) );
+  imageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  labelSetImageDataNodeDescriptor->AddAction(m_ColormapAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor, m_ColormapAction));
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(labelSetImageDataNodeDescriptor, m_ColormapAction));
 
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
@@ -541,6 +569,85 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
   {
     node->SetBoolProperty("texture interpolation", checked);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+
+}
+
+void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+  mitk::EnumerationProperty* cmProp =
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+  if(!cmProp)
+    return;
+
+  mitk::LookupTableProperty::Pointer lutProp =
+      dynamic_cast<mitk::LookupTableProperty*> (node->GetProperty("LookupTable"));
+  if(!lutProp)
+    return;
+
+  QAction* senderAction = qobject_cast<QAction*> ( QObject::sender() );
+
+  if(!senderAction)
+    return;
+
+  std::string activatedItem = senderAction->text().toStdString();
+
+  if ( activatedItem != cmProp->GetValueAsString() )
+  {
+    if ( cmProp->IsValidEnumerationValue( activatedItem ) )
+    {
+        cmProp->SetValue( activatedItem );
+
+        mitk::RenderingModeProperty::Pointer renderingModeProp = dynamic_cast<mitk::RenderingModeProperty*> (node->GetProperty("Image Rendering.Mode"));
+        if (renderingModeProp.IsNotNull())
+        {
+            if (cmProp->GetValueAsId() == 0)
+              renderingModeProp->SetValue( mitk::RenderingModeProperty::LEVELWINDOW_COLOR );
+            else
+            {
+              renderingModeProp->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+              lutProp->GetLookupTable()->SetActiveColormap( cmProp->GetValueAsId() );
+            }
+        }
+
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
+void QmitkDataManagerView::ColormapMenuAboutToShow()
+{
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(!node)
+    return;
+
+  mitk::EnumerationProperty* cmProp =
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("colormap"));
+  if(!cmProp)
+    return;
+
+  // clear menu
+  m_ColormapAction->menu()->clear();
+  QAction* tmp;
+
+  // create menu entries
+  for(mitk::EnumerationProperty::EnumConstIterator it=cmProp->Begin(); it!=cmProp->End()
+    ; it++)
+  {
+    tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(it->second));
+    tmp->setCheckable(true);
+
+    if(it->second == cmProp->GetValueAsString())
+    {
+      tmp->setChecked(true);
+    }
+
+    QObject::connect( tmp, SIGNAL( triggered(bool) )
+      , this, SLOT( ColormapActionToggled(bool) ) );
   }
 
 }

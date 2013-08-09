@@ -215,11 +215,13 @@ namespace mitk
     NodePredicateOr::Pointer m_PredicateDimension;
     NodePredicateAnd::Pointer m_PredicateImage3D;
 
-    NodePredicateProperty::Pointer m_PredicateBinary;
-    NodePredicateNot::Pointer m_PredicateNotBinary;
+    NodePredicateDataType::Pointer m_PredicateLabelSet;
+    NodePredicateNot::Pointer m_PredicateNotLabelset;
+   // NodePredicateProperty::Pointer m_PredicateBinary;
+   // NodePredicateNot::Pointer m_PredicateNotBinary;
 
-    NodePredicateProperty::Pointer m_PredicateSegmentation;
-    NodePredicateNot::Pointer m_PredicateNotSegmentation;
+   // NodePredicateProperty::Pointer m_PredicateSegmentation;
+   // NodePredicateNot::Pointer m_PredicateNotSegmentation;
 
     NodePredicateProperty::Pointer m_PredicateHelper;
     NodePredicateNot::Pointer m_PredicateNotHelper;
@@ -238,4 +240,3 @@ namespace mitk
 } // namespace
 
 #endif
-

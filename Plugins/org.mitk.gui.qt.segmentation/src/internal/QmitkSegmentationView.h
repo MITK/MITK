@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 class QmitkRenderWindow;
+class QCompleter;
+
 
 /**
  * \ingroup ToolManagerEtAl
@@ -50,7 +52,6 @@ public:
   virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
   // reaction to new segmentations being created by segmentation tools
-  void NewNodesGenerated();
   void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
   // QmitkFunctionality's activate/deactivate
@@ -79,8 +80,38 @@ protected slots:
   void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
 
-  // reaction to the button "New segmentation"
-  void CreateNewSegmentation();
+  // reaction to the signal "newLabel" from QmitkLabelSetTableWidget
+  void OnNewLabel();
+
+  // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
+  void OnLabelListModified(const QStringList& list);
+
+  // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
+  void OnRenameLabel(int);
+
+  // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
+  void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );
+
+  // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
+  void OnCreateSurface(int);
+
+  // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
+  void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
+
+
+  void CreateLabelFromSurface();
+
+  // reaction to label search
+  void OnSearchLabel();
+
+  // reaction to the button "New Segmentation"
+  void OnNewLabelSet();
+
+  // reaction to the button "Load Segmentation"
+  void OnLoadLabelSet();
+
+  // reaction to the button "Save Segmentation"
+  void OnSaveLabelSet();
 
   void OnManualTool2DSelected(int id);
   // reaction to the button "New segmentation"
@@ -92,9 +123,6 @@ protected slots:
 //  void OnSurfaceSelectionChanged();
 
   void OnWorkingNodeVisibilityChanged();
-
-  // called if a node's binary property has changed
-  void OnBinaryPropertyChanged();
 
   void OnShowMarkerNodes(bool);
 
@@ -117,7 +145,7 @@ protected:
   mitk::DataNode::Pointer FindFirstSegmentation( std::vector<mitk::DataNode*> nodes );
 
   // propagate BlueBerry selection to ToolManager for manual segmentation
-  void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
+  void SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
 
   // checks if given render window aligns with the slices of given image
   bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
@@ -157,6 +185,8 @@ protected:
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 
+  QCompleter* m_Completer;
+
   // our GUI
   Ui::QmitkSegmentationControls * m_Controls;
 
@@ -174,10 +204,13 @@ protected:
   bool m_AutoSelectionEnabled;
 
   mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
-  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
-  mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
-  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
-  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
+//  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
+
+//  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
+//  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
+  mitk::NodePredicateDataType::Pointer m_IsOfTypeLabelSetImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_IsNotLabelSetImagePredicate;
+
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

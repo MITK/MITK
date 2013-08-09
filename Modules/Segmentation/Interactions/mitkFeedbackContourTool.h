@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkSegTool2D.h"
-#include "mitkContourModel.h"
+#include "mitkContour.h"
 #include "mitkContourUtils.h"
 #include "mitkImage.h"
-
-#include "mitkDataNode.h"
+#include "mitkLabelSet.h"
+//#include "mitkDataNode.h"
 
 #include "mitkImageCast.h"
 
@@ -35,7 +35,7 @@ namespace mitk
   \brief Base class for tools that use a contour for feedback
 
   \sa Tool
-  \sa ContourModel
+  \sa Contour
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl
@@ -62,8 +62,8 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     FeedbackContourTool(const char*); // purposely hidden
     virtual ~FeedbackContourTool();
 
-    ContourModel* GetFeedbackContour();
-    void SetFeedbackContour(ContourModel&);
+    Contour* GetFeedbackContour();
+    void SetFeedbackContour(Contour&);
 
     void Disable3dRendering();
     void SetFeedbackContourVisible(bool);
@@ -77,28 +77,23 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
 
       \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool correctionForIpSegmentation = false, bool constrainToInside = true);
+    Contour::Pointer ProjectContourTo2DSlice(Image* slice, Contour* contourIn3D, bool correctionForIpSegmentation = false, bool constrainToInside = true);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation and MITK contours)
     */
-    ContourModel::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, ContourModel* contourIn2D, bool correctionForIpSegmentation = false);
+    Contour::Pointer BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
-    void FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue = 1 );
-
-    /**
-      \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
-    */
-    void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
+    void FillContourInSlice( Contour* projectedContour, Image* slice, LabelSet* labelSet, int paintingPixelValue = 1 );
 
   private:
 
-    ContourModel::Pointer      m_FeedbackContour;
+    Contour::Pointer      m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 

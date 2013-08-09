@@ -21,27 +21,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 
 #include <QMessageBox>
+#include <QCompleter>
+#include <QStringListModel>
+#include <QInputDialog>
+#include <QFileDialog>
+#include <QDateTime>
 
 #include <berryIWorkbenchPage.h>
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationOrganNamesHandling.cpp"
 
+
 #include <mitkSurfaceToImageFilter.h>
 
 #include "mitkVtkResliceInterpolationProperty.h"
-
+#include "mitkRenderingModeProperty.h"
 #include "mitkGetModuleContext.h"
 #include "mitkModule.h"
 #include "mitkModuleRegistry.h"
+
+#include "mitkLabelSetImage.h"
+#include "mitkColormapProperty.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkNrrdLabelSetImageReader.h"
+
 #include "mitkModuleResource.h"
 #include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
 
 #include "mitkSegmentationObjectFactory.h"
 
-const std::string QmitkSegmentationView::VIEW_ID =
-    "org.mitk.views.segmentation";
+const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 // public methods
 
@@ -56,25 +68,23 @@ QmitkSegmentationView::QmitkSegmentationView()
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-  mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-  isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+
+  mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New();
+  isDiffusionImage->AddPredicate(isDwi);
+  isDiffusionImage->AddPredicate(isDti);
+  isDiffusionImage->AddPredicate(isQbi);
+
   m_IsOfTypeImagePredicate = mitk::NodePredicateOr::New(isDiffusionImage, mitk::TNodePredicateDataType<mitk::Image>::New());
 
-  m_IsBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  m_IsNotBinaryPredicate = mitk::NodePredicateNot::New( m_IsBinaryPredicate );
-
-  m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsNotBinaryPredicate );
-  m_IsABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsBinaryPredicate);
+  m_IsOfTypeLabelSetImagePredicate = mitk::NodePredicateDataType::New("LabelSetImage");
+  m_IsNotLabelSetImagePredicate = mitk::NodePredicateAnd::New();
+  m_IsNotLabelSetImagePredicate->AddPredicate( m_IsOfTypeImagePredicate );
+  m_IsNotLabelSetImagePredicate->AddPredicate( mitk::NodePredicateNot::New( m_IsOfTypeLabelSetImagePredicate));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
   delete m_Controls;
-}
-
-void QmitkSegmentationView::NewNodesGenerated()
-{
-  MITK_WARN<<"Use of deprecated function: NewNodesGenerated!! This function is empty and will be removed in the next time!";
 }
 
 void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)
@@ -114,27 +124,13 @@ void QmitkSegmentationView::Activated()
 
 //    m_Controls->m_SlicesInterpolator->Enable3DInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 
+    mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( m_IsOfTypeLabelSetImagePredicate );
 
-    mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( m_IsABinaryImagePredicate );
-
-    mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset( m_IsNotABinaryImagePredicate );
+    mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset( m_IsNotLabelSetImagePredicate );
     if (!image->empty()) {
       OnSelectionChanged(*image->begin());
     }
 
-    for ( mitk::DataStorage::SetOfObjects::const_iterator iter = segmentations->begin();
-        iter != segmentations->end();
-        ++iter)
-    {
-      mitk::DataNode* node = *iter;
-      itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-      m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( node, node->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-
-      itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-      command2->SetCallbackFunction(this, &QmitkSegmentationView::OnBinaryPropertyChanged);
-      m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( node, node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
-    }
   }
   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 }
@@ -147,22 +143,7 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
     m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
-//    m_Controls->m_OrganToolSelectionBox->setEnabled( false );
-//    m_Controls->m_LesionToolSelectionBox->setEnabled( false );
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
-
-    //Removing all observers
-    for ( NodeTagMapType::iterator dataIter = m_WorkingDataObserverTags.begin(); dataIter != m_WorkingDataObserverTags.end(); ++dataIter )
-    {
-      (*dataIter).first->GetProperty("visible")->RemoveObserver( (*dataIter).second );
-    }
-    m_WorkingDataObserverTags.clear();
-
-    for ( NodeTagMapType::iterator dataIter = m_BinaryPropertyObserverTags.begin(); dataIter != m_BinaryPropertyObserverTags.end(); ++dataIter )
-    {
-      (*dataIter).first->GetProperty("binary")->RemoveObserver( (*dataIter).second );
-    }
-    m_BinaryPropertyObserverTags.clear();
 
     // gets the context of the "Mitk" (Core) module (always has id 1)
     // TODO Workaround until CTK plugincontext is available
@@ -217,54 +198,51 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
 }
 
-void QmitkSegmentationView::CreateNewSegmentation()
+void QmitkSegmentationView::OnLabelListModified(const QStringList& list)
 {
+   QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
+   completeModel->setStringList(list);
+}
 
-  mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
-  if (node.IsNotNull())
-  {
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-    if (image.IsNotNull())
+void QmitkSegmentationView::OnNewLabel()
+{
+    // ask about the name and organ type of the new segmentation
+    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
+
+    QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+    QStringList organColors;
+    if (storedList.isEmpty())
     {
-      if (image->GetDimension()>1)
-      {
-        // ask about the name and organ type of the new segmentation
-        QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+        organColors = GetDefaultOrganColorString();
+    }
+    else
+    {
+        /*
+        a couple of examples of how organ names are stored:
 
-        QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
-        QStringList organColors;
-        if (storedList.isEmpty())
+        a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+
+        items are stored separated by ';'
+        this makes it necessary to escape occurrences of ';' in name.
+        otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
+        but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
+
+        so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
+        and must be unescaped after loading
+
+        the following lines could be one split with Perl's negative lookbehind
+        */
+
+        // recover string list from BlueBerry view's preferences
+        QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+        MITK_DEBUG << "storedString: " << storedString.toStdString();
+        // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+        QRegExp onePart("(?:[^;]|\\\\;)*");
+        MITK_DEBUG << "matching " << onePart.pattern().toStdString();
+        int count = 0;
+        int pos = 0;
+        while( (pos = onePart.indexIn( storedString, pos )) != -1 )
         {
-          organColors = GetDefaultOrganColorString();
-        }
-        else
-        {
-          /*
-          a couple of examples of how organ names are stored:
-
-          a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
-
-          items are stored separated by ';'
-          this makes it necessary to escape occurrences of ';' in name.
-          otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
-          but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
-
-          so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
-          and must be unescaped after loading
-
-          the following lines could be one split with Perl's negative lookbehind
-          */
-
-          // recover string list from BlueBerry view's preferences
-          QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
-          MITK_DEBUG << "storedString: " << storedString.toStdString();
-          // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-          QRegExp onePart("(?:[^;]|\\\\;)*");
-          MITK_DEBUG << "matching " << onePart.pattern().toStdString();
-          int count = 0;
-          int pos = 0;
-          while( (pos = onePart.indexIn( storedString, pos )) != -1 )
-          {
             ++count;
             int length = onePart.matchedLength();
             if (length == 0) break;
@@ -277,9 +255,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             // add matched string part to output list
             organColors << matchedString;
-          }
-            MITK_DEBUG << "Captured " << count << " organ name/colors";
-          }
+        }
+        MITK_DEBUG << "Captured " << count << " organ name/colors";
+    }
 
     dialog->SetSuggestionList( organColors );
 
@@ -287,173 +265,127 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
     if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-    // ask the user about an organ type and name, add this information to the image's (!) propertylist
-    // create a new image of the same dimensions and smallest possible pixel type
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
-    mitk::Tool* firstTool = toolManager->GetToolById(0);
-    if (firstTool)
+    mitk::Color color = dialog->GetColor();
+
+    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    if (!workingNode) return;
+
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    if ( !lsImage ) return;
+
+    lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
+}
+
+void QmitkSegmentationView::OnCreateSurface(int index)
+{
+}
+
+void QmitkSegmentationView::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )
+{
+
+}
+
+void QmitkSegmentationView::OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges )
+{
+
+}
+
+void QmitkSegmentationView::OnRenameLabel(int index)
+{
+    // ask about the name and organ type of the new segmentation
+    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+
+    QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+    QStringList organColors;
+    if (storedList.isEmpty())
     {
-      try
-      {
-        std::string newNodeName = dialog->GetSegmentationName().toStdString();
-        if(newNodeName.empty())
-          newNodeName = "no_name";
-
-      mitk::DataNode::Pointer emptySegmentation =
-        firstTool->CreateEmptySegmentationNode( image, newNodeName, dialog->GetColor() );
-
-      // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
-      emptySegmentation->SetProperty( "showVolume", mitk::BoolProperty::New( false ) );
-
-      if (!emptySegmentation) return; // could be aborted by user
-
-      UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
-
-      /*
-      escape ';' here (replace by '\;'), see longer comment above
-      */
-            std::string stringForStorage = organColors.replaceInStrings(";","\\;").join(";").toStdString();
-            MITK_DEBUG << "Will store: " << stringForStorage;
-            this->GetPreferences()->PutByteArray("Organ-Color-List", stringForStorage );
-            this->GetPreferences()->Flush();
-
-            if(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0))
-            {
-              m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0)->SetSelected(false);
-            }
-            emptySegmentation->SetSelected(true);
-            this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
-
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-            m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
-
-            itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-            command2->SetCallbackFunction(this, &QmitkSegmentationView::OnBinaryPropertyChanged);
-            m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( emptySegmentation, emptySegmentation->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
-
-            this->ApplyDisplayOptions( emptySegmentation );
-            this->FireNodeSelected( emptySegmentation );
-            this->OnSelectionChanged( emptySegmentation );
-
-            m_Controls->segImageSelector->SetSelectedNode(emptySegmentation);
-          }
-          catch (std::bad_alloc)
-          {
-            QMessageBox::warning(NULL,"Create new segmentation","Could not allocate memory for new segmentation");
-          }
-        }
-      }
-      else
-      {
-        QMessageBox::information(NULL,"Segmentation","Segmentation is currently not supported for 2D images");
-      }
+        organColors = GetDefaultOrganColorString();
     }
-  }
-  else
-  {
-    MITK_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
-  }
+    else
+    {
+        /*
+        a couple of examples of how organ names are stored:
+
+        a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+
+        items are stored separated by ';'
+        this makes it necessary to escape occurrences of ';' in name.
+        otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
+        but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
+
+        so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
+        and must be unescaped after loading
+
+        the following lines could be one split with Perl's negative lookbehind
+        */
+
+        // recover string list from BlueBerry view's preferences
+        QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+        MITK_DEBUG << "storedString: " << storedString.toStdString();
+        // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+        QRegExp onePart("(?:[^;]|\\\\;)*");
+        MITK_DEBUG << "matching " << onePart.pattern().toStdString();
+        int count = 0;
+        int pos = 0;
+        while( (pos = onePart.indexIn( storedString, pos )) != -1 )
+        {
+            ++count;
+            int length = onePart.matchedLength();
+            if (length == 0) break;
+            QString matchedString = storedString.mid(pos, length);
+            MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+            pos += length + 1; // skip separating ';'
+
+            // unescape possible occurrences of '\;' in the string
+            matchedString.replace("\\;", ";");
+
+            // add matched string part to output list
+            organColors << matchedString;
+        }
+        MITK_DEBUG << "Captured " << count << " organ name/colors";
+    }
+
+    dialog->SetSuggestionList( organColors );
+
+    int dialogReturnValue = dialog->exec();
+
+    if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
+
+    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    if (!workingNode) return;
+
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    if ( !lsImage ) return;
+
+    lsImage->RenameLabel(index, dialog->GetSegmentationName().toStdString(), dialog->GetColor());
 }
 
 void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
 {
-  mitk::DataNode* selectedNode = m_Controls->segImageSelector->GetSelectedNode();
-  bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
-                                                         mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-
-  if (m_Controls->tab2DTools->isVisible() && !selectedNodeIsVisible)
+  m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
+  if (!m_Controls->m_ManualToolSelectionBox2D->isEnabled())
   {
-    m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
     this->UpdateWarningLabel("The selected segmentation is currently not visible!");
-    m_Controls->m_SlicesInterpolator->Show3DInterpolationResult(false);
-    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
   }
   else
   {
-      m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
     this->UpdateWarningLabel("");
-    //Trigger 3d interpolation is selected segmentation is visible again
-    mitk::SurfaceInterpolationController::GetInstance()->Modified();
-  }
-}
-
-void QmitkSegmentationView::OnBinaryPropertyChanged()
-{
-  mitk::DataStorage::SetOfObjects::ConstPointer patImages = m_Controls->patImageSelector->GetNodes();
-
-  bool isBinary(false);
-
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = patImages->Begin(); it != patImages->End(); ++it)
-  {
-    const mitk::DataNode* node = it->Value();
-    node->GetBoolProperty("binary", isBinary);
-
-    if(isBinary)
-    {
-      m_Controls->patImageSelector->RemoveNode(node);
-      m_Controls->segImageSelector->AddNode(node);
-      this->SetToolManagerSelection(NULL,NULL);
-      return;
-    }
-  }
-
-  mitk::DataStorage::SetOfObjects::ConstPointer segImages = m_Controls->segImageSelector->GetNodes();
-
-  isBinary = true;
-
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = segImages->Begin(); it != segImages->End(); ++it)
-  {
-    const mitk::DataNode* node = it->Value();
-    node->GetBoolProperty("binary", isBinary);
-
-    if(!isBinary)
-    {
-      m_Controls->segImageSelector->RemoveNode(node);
-      m_Controls->patImageSelector->AddNode(node);
-      if (m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0) == node)
-        m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->SetWorkingData(NULL);
-      return;
-    }
   }
 }
 
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
 {
-  bool isBinary (false);
-  bool isHelperObject (false);
-  node->GetBoolProperty("binary", isBinary);
-  node->GetBoolProperty("helper object", isHelperObject);
-  if (m_AutoSelectionEnabled)
-  {
-    if (!isBinary && dynamic_cast<mitk::Image*>(node->GetData()))
-    {
-      FireNodeSelected(const_cast<mitk::DataNode*>(node));
-    }
-  }
-  if (isBinary && !isHelperObject)
-  {
-    itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-    command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
-    m_WorkingDataObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command ) ) );
 
-    itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-    command2->SetCallbackFunction(this, &QmitkSegmentationView::OnBinaryPropertyChanged);
-    m_BinaryPropertyObserverTags.insert( std::pair<mitk::DataNode*, unsigned long>( const_cast<mitk::DataNode*>(node), node->GetProperty("binary")->AddObserver( itk::ModifiedEvent(), command2 ) ) );
-
-    this->ApplyDisplayOptions(  const_cast<mitk::DataNode*>(node) );
-  }
 }
 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 {
-  bool isSeg(false);
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
-  node->GetBoolProperty("binary", isSeg);
 
-  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-  if(isSeg && !isHelperObject && image)
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+
+  if(lsImage && !isHelperObject)
   {
     //First of all remove all possible contour markers of the segmentation
     mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
@@ -481,19 +413,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     if ((m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
     {
       this->SetToolManagerSelection(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0), NULL);
-      this->UpdateWarningLabel("Select or create a segmentation!");
+      this->UpdateWarningLabel("Create a segmentation!");
     }
-
-    mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(image);
-  }
-  mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-  //Since the binary property could be changed during runtime by the user
-  if (image && !isHelperObject)
-  {
-      node->GetProperty("visible")->RemoveObserver( m_WorkingDataObserverTags[tempNode] );
-      m_WorkingDataObserverTags.erase(tempNode);
-      node->GetProperty("binary")->RemoveObserver( m_BinaryPropertyObserverTags[tempNode] );
-      m_BinaryPropertyObserverTags.erase(tempNode);
+    mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(lsImage);
   }
 
   if((m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0) == node))
@@ -504,81 +426,219 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   }
 }
 
-//void QmitkSegmentationView::CreateSegmentationFromSurface()
-//{
-//  mitk::DataNode::Pointer surfaceNode =
-//      m_Controls->MaskSurfaces->GetSelectedNode();
-//  mitk::Surface::Pointer surface(0);
-//  if(surfaceNode.IsNotNull())
-//    surface = dynamic_cast<mitk::Surface*> ( surfaceNode->GetData() );
-//  if(surface.IsNull())
-//  {
-//    this->HandleException( "No surface selected.", m_Parent, true);
-//    return;
-//  }
+void QmitkSegmentationView::OnSearchLabel()
+{
+    m_Controls->m_LabelSetTableWidget->SetActiveLabel(m_Controls->m_LabelSearchBox->text().toStdString());
+}
 
-//  mitk::DataNode::Pointer imageNode
-//      = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
-//  mitk::Image::Pointer image(0);
-//  if (imageNode.IsNotNull())
-//    image = dynamic_cast<mitk::Image*>( imageNode->GetData() );
-//  if(image.IsNull())
-//  {
-//    this->HandleException( "No image selected.", m_Parent, true);
-//    return;
-//  }
+void QmitkSegmentationView::OnLoadLabelSet()
+{
+    mitk::DataNode* refNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+    if (!refNode) return;
 
-//  mitk::SurfaceToImageFilter::Pointer s2iFilter
-//      = mitk::SurfaceToImageFilter::New();
+    mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
+    if (!refImage) return;
 
-//  s2iFilter->MakeOutputBinaryOn();
-//  s2iFilter->SetInput(surface);
-//  s2iFilter->SetImage(image);
-//  s2iFilter->Update();
+    std::string fileExtensions("Segmentation files (*.lset);;");
+    QString qfileName = QFileDialog::getOpenFileName(m_Parent, "Open segmentation", "", fileExtensions.c_str() );
+    if (qfileName.isEmpty() ) return;
 
-//  mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-//  std::string nameOfResultImage = imageNode->GetName();
-//  nameOfResultImage.append(surfaceNode->GetName());
-//  resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-//  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
-//  resultNode->SetData( s2iFilter->GetOutput() );
+    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+    reader->SetFileName(qfileName.toLatin1());
 
-//  this->GetDataStorage()->Add(resultNode, imageNode);
+    this->WaitCursorOn();
 
-//}
+    try
+    {
+        reader->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QMessageBox::information(m_Parent, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
+        this->WaitCursorOff();
+    }
 
-//void QmitkSegmentationView::ToolboxStackPageChanged(int id)
-//{
-//  // interpolation only with manual tools visible
-//  m_Controls->m_SlicesInterpolator->EnableInterpolation( id == 0 );
+    this->WaitCursorOff();
 
-//  if( id == 0 )
-//  {
-//    mitk::DataNode::Pointer workingData =   m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
-//    if( workingData.IsNotNull() )
-//    {
-//      m_Controls->segImageSelector->setCurrentIndex( m_Controls->segImageSelector->Find(workingData) );
-//    }
-//  }
+    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
 
-//  // this is just a workaround, should be removed when all tools support 3D+t
-//  if (id==2) // lesions
-//  {
-//    mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
-//    if (node.IsNotNull())
-//    {
-//      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-//      if (image.IsNotNull())
-//      {
-//        if (image->GetDimension()>3)
-//        {
-//          m_Controls->widgetStack->setCurrentIndex(0);
-//          QMessageBox::information(NULL,"Segmentation","Lesion segmentation is currently not supported for 4D images");
-//        }
-//      }
-//    }
-//  }
-//}
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    newNode->SetData(lsImage);
+    newNode->SetName( lsImage->GetLabelSetName() );
+
+    this->GetDataStorage()->Add(newNode, refNode);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSegmentationView::OnSaveLabelSet()
+{
+  mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+  if (!workingNode) return;
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if ( !lsImage ) return;
+
+  // update the name in case has changed
+  lsImage->SetLabelSetName( workingNode->GetName() );
+
+  //set last modification date and time
+  QDateTime cTime = QDateTime::currentDateTime ();
+  lsImage->SetLabelSetLastModified( cTime.toString().toStdString() );
+
+  QString proposedFileName = QString::fromStdString(workingNode->GetName());
+  QString selected_suffix("segmentation files (*.lset)");
+  QString qfileName = QFileDialog::getSaveFileName(m_Parent, QString("Save segmentation..."), proposedFileName, selected_suffix);
+  if (qfileName.isEmpty() ) return;
+
+  mitk::NrrdLabelSetImageWriter<unsigned char>::Pointer writer = mitk::NrrdLabelSetImageWriter<unsigned char>::New();
+  writer->SetFileName(qfileName.toStdString());
+  std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
+  lsImage->SetLabelSetName(newName);
+  workingNode->SetName(newName);
+  writer->SetInput(lsImage);
+
+  this->WaitCursorOn();
+
+  try
+  {
+      writer->Update();
+  }
+  catch ( itk::ExceptionObject & excep )
+  {
+    MITK_ERROR << "Exception caught: " << excep.GetDescription();
+    QMessageBox::information(m_Parent, "Save segmenation", "Could not save active segmentation. See error log for details.\n\n");
+    this->WaitCursorOff();
+  }
+
+  this->WaitCursorOff();
+}
+
+void QmitkSegmentationView::OnNewLabelSet()
+{
+  mitk::DataNode::Pointer refNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+  if (refNode.IsNotNull())
+  {
+    mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
+    if (refImage.IsNotNull())
+    {
+        bool ok = false;
+        QString refNodeName = QString::fromStdString(refNode->GetName());
+        refNodeName.append("-");
+        QString newName = QInputDialog::getText(m_Parent, "New segmentation", "Set name:", QLineEdit::Normal, refNodeName, &ok);
+        if (!ok) return;
+
+        mitk::PixelType pixelType(mitk::MakeScalarPixelType<unsigned char>() );
+        mitk::LabelSetImage::Pointer labelSetImage = mitk::LabelSetImage::New();
+
+        if (refImage->GetDimension() == 2)
+        {
+            const unsigned int dimensions[] = { refImage->GetDimension(0), refImage->GetDimension(1), 1 };
+            labelSetImage->Initialize(pixelType, 3, dimensions);
+        }
+        else
+        {
+            labelSetImage->Initialize(pixelType, refImage->GetDimension(), refImage->GetDimensions());
+        }
+
+        unsigned int byteSize = sizeof(unsigned char);
+        for (unsigned int dim = 0; dim < labelSetImage->GetDimension(); ++dim)
+        {
+            byteSize *= labelSetImage->GetDimension(dim);
+        }
+
+        mitk::ImageWriteAccessor accessor(static_cast<mitk::Image*>(labelSetImage));
+        memset( accessor.GetData(), 0, byteSize );
+
+        mitk::TimeSlicedGeometry::Pointer originalGeometry = refImage->GetTimeSlicedGeometry()->Clone();
+        labelSetImage->SetGeometry( originalGeometry );
+
+        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+        newNode->SetData(labelSetImage);
+        newNode->SetName(newName.toStdString());
+        labelSetImage->SetLabelSetName(newName.toStdString());
+
+        this->GetDataStorage()->Add(newNode, refNode);
+
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+}
+
+void QmitkSegmentationView::CreateLabelFromSurface()
+{
+    /*
+  mitk::DataNode* imageNode
+      = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+
+  if (!imageNode) return;
+
+  mitk::DataNode* surfaceNode = m_Controls->MaskSurfaces->GetSelectedNode();
+  if (!surfaceNode) return;
+
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( surfaceNode->GetData() );
+  if (surface.IsNull()) return;
+
+//adapt this one or write a new one for label set images
+  mitk::SurfaceToImageFilter::Pointer s2iFilter
+      = mitk::SurfaceToImageFilter::New();
+
+  s2iFilter->MakeOutputBinaryOn();
+  s2iFilter->SetInput(surface);
+  s2iFilter->SetImage(image);
+  s2iFilter->Update();
+*/
+// ask about the name and organ type of the new segmentation
+    QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
+
+    QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+    QStringList organColors;
+    if (storedList.isEmpty())
+    {
+        organColors = GetDefaultOrganColorString();
+    }
+    else
+    {
+        // recover string list from BlueBerry view's preferences
+        QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
+        // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+        QRegExp onePart("(?:[^;]|\\\\;)*");
+        int count = 0;
+        int pos = 0;
+        while( (pos = onePart.indexIn( storedString, pos )) != -1 )
+        {
+            ++count;
+            int length = onePart.matchedLength();
+            if (length == 0) break;
+            QString matchedString = storedString.mid(pos, length);
+            MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+            pos += length + 1; // skip separating ';'
+
+            // unescape possible occurrences of '\;' in the string
+            matchedString.replace("\\;", ";");
+
+            // add matched string part to output list
+            organColors << matchedString;
+        }
+    }
+
+    dialog->SetSuggestionList( organColors );
+
+    int dialogReturnValue = dialog->exec();
+
+    if ( dialogReturnValue == QDialog::Rejected ) return;
+
+    mitk::Color color = dialog->GetColor();
+
+    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    if (!workingNode) return;
+
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    if ( !lsImage ) return;
+
+    lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
+}
 
 // protected
 
@@ -587,11 +647,12 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
   //mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
   if( node != NULL )
   {
+    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
     this->UpdateWarningLabel("");
     mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
     if (segNode)
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( segNode, m_IsNotABinaryImagePredicate );
+      mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( segNode, m_IsNotLabelSetImagePredicate );
       bool isSourceNode(false);
 
       for (mitk::DataStorage::SetOfObjects::ConstIterator it = possibleParents->Begin(); it != possibleParents->End(); it++)
@@ -602,12 +663,12 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
       if ( !isSourceNode && (!this->CheckForSameGeometry(segNode, node) || possibleParents->Size() > 0 ))
       {
-        this->SetToolManagerSelection(node, NULL);
-        this->UpdateWarningLabel("The selected patient image does not\nmatch with the selected segmentation!");
+        this->SetToolManagerSelection(const_cast<mitk::DataNode*>(node), NULL);
+        this->UpdateWarningLabel("The selected patient image does not\n match with the selected segmentation!");
       }
       else if ((!isSourceNode && this->CheckForSameGeometry(segNode, node)) || isSourceNode )
       {
-        this->SetToolManagerSelection(node, segNode);
+        this->SetToolManagerSelection(const_cast<mitk::DataNode*>(node), segNode);
         //Doing this we can assure that the segmenation is always visible if the segmentation and the patient image are
         //loaded separately
         int layer(10);
@@ -619,8 +680,8 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
     }
     else
     {
-      this->SetToolManagerSelection(node, NULL);
-      this->UpdateWarningLabel("Select or create a segmentation");
+      this->SetToolManagerSelection(const_cast<mitk::DataNode*>(node), NULL);
+      this->UpdateWarningLabel("Create a segmentation");
     }
   }
   else
@@ -631,18 +692,21 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
 void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::DataNode *node)
 {
-  if ( node == 0)
+  if ( !node)
     return;
 
   mitk::DataNode* refNode = m_Controls->patImageSelector->GetSelectedNode();
+  mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
+
+  m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
 
   if (m_AutoSelectionEnabled)
   {
-    this->OnSelectionChanged(const_cast<mitk::DataNode*>(node));
+    this->OnSelectionChanged(segNode);
   }
   else
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( node, m_IsNotABinaryImagePredicate );
+    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( segNode, m_IsNotLabelSetImagePredicate );
 
     if ( possibleParents->Size() == 1 )
     {
@@ -650,24 +714,34 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
 
       if (parentNode != refNode)
       {
-        this->UpdateWarningLabel("The selected segmentation does not\nmatch with the selected patient image!");
-        this->SetToolManagerSelection(NULL, node);
+        this->UpdateWarningLabel("The selected segmentation does not\n match with the selected patient image!");
+        this->SetToolManagerSelection(NULL, segNode);
       }
       else
       {
         this->UpdateWarningLabel("");
-        this->SetToolManagerSelection(refNode, node);
+        segNode->SetVisibility(true);
+        this->SetToolManagerSelection(refNode, segNode);
+        mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsOfTypeLabelSetImagePredicate);
+        for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
+        {
+          mitk::DataNode* _otherSegNode = *iter;
+          if (dynamic_cast<mitk::Image*>(_otherSegNode->GetData()) != segNode->GetData())
+            _otherSegNode->SetVisibility(false);
+        }
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
-
     }
-    else if (refNode && this->CheckForSameGeometry(node, refNode))
+    /* // todo: ask for a use case
+    else if (refNode && this->CheckForSameGeometry(segNode, refNode))
     {
       this->UpdateWarningLabel("");
-      this->SetToolManagerSelection(refNode, node);
+      this->SetToolManagerSelection(refNode, segNode);
     }
+    */
     else if (!refNode || !this->CheckForSameGeometry(node, refNode))
     {
-      this->UpdateWarningLabel("Please select or load the according patient image!");
+      this->UpdateWarningLabel("Please select or load the right patient image!");
     }
   }
   if (!node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
@@ -706,144 +780,9 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
   this->OnSelectionChanged( nodes );
 }
 
-//void QmitkSegmentationView::OnSurfaceSelectionChanged()
-//{
-//  // if Image and Surface are selected, enable button
-//  if ( (m_Controls->patImageSelector->GetSelectedNode().IsNull()) ||
-//  (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
-//  else
-//    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
-//}
-
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if (nodes.size() != 0)
-  {
-    std::string markerName = "Position";
-    unsigned int numberOfNodes = nodes.size();
-    std::string nodeName = nodes.at( 0 )->GetName();
-    if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
-    {
-      this->OnContourMarkerSelected( nodes.at( 0 ) );
-      return;
-    }
 
-  }
-  if (m_AutoSelectionEnabled && this->IsActivated())
-  {
-    if (nodes.size() == 0 && m_Controls->patImageSelector->GetSelectedNode().IsNull())
-    {
-      SetToolManagerSelection(NULL,NULL);
-    }
-    else if (nodes.size() == 1)
-    {
-      mitk::DataNode::Pointer selectedNode = nodes.at(0);
-      if(selectedNode.IsNull())
-      {
-        return;
-      }
-
-      mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
-      if (selectedImage.IsNull())
-      {
-        SetToolManagerSelection(NULL,NULL);
-        return;
-      }
-      else
-      {
-        bool isASegmentation(false);
-        selectedNode->GetBoolProperty("binary", isASegmentation);
-
-        if (isASegmentation)
-        {
-
-          //If a segmentation is selected find a possible reference image:
-          mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(selectedNode, m_IsNotABinaryImagePredicate);
-          mitk::DataNode::Pointer refNode;
-          if (sources->Size() != 0)
-          {
-            refNode = sources->ElementAt(0);
-
-            refNode->SetVisibility(true);
-            selectedNode->SetVisibility(true);
-            SetToolManagerSelection(refNode,selectedNode);
-
-            mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
-            for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
-            {
-              mitk::DataNode* node = *iter;
-              if (dynamic_cast<mitk::Image*>(node->GetData()) != selectedImage.GetPointer())
-                node->SetVisibility(false);
-            }
-
-            mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
-            for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
-            {
-              mitk::DataNode* node = *iter;
-              if (dynamic_cast<mitk::Image*>(node->GetData()) != dynamic_cast<mitk::Image*>(refNode->GetData()))
-                node->SetVisibility(false);
-            }
-          }
-          else
-          {
-            mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
-
-            for (mitk::DataStorage::SetOfObjects::ConstIterator it = possiblePatientImages->Begin(); it != possiblePatientImages->End(); it++)
-            {
-              refNode = it->Value();
-
-              if (this->CheckForSameGeometry(selectedNode, it->Value()))
-              {
-                refNode->SetVisibility(true);
-                selectedNode->SetVisibility(true);
-
-                mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
-                for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
-                {
-                  mitk::DataNode* node = *iter;
-                  if (dynamic_cast<mitk::Image*>(node->GetData()) != selectedImage.GetPointer())
-                    node->SetVisibility(false);
-                }
-
-                mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
-                for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
-                {
-                  mitk::DataNode* node = *iter;
-                  if (dynamic_cast<mitk::Image*>(node->GetData()) != dynamic_cast<mitk::Image*>(refNode->GetData()))
-                    node->SetVisibility(false);
-                }
-                this->SetToolManagerSelection(refNode, selectedNode);
-
-                //Doing this we can assure that the segmenation is always visible if the segmentation and the patient image are at the
-                //same level in the datamanager
-                int layer(10);
-                refNode->GetIntProperty("layer", layer);
-                layer++;
-                selectedNode->SetProperty("layer", mitk::IntProperty::New(layer));
-                return;
-              }
-            }
-            this->SetToolManagerSelection(NULL, selectedNode);
-
-          }
-        }
-        else
-        {
-          if (m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0) != selectedNode)
-          {
-            SetToolManagerSelection(selectedNode, NULL);
-            //May be a bug in the selection services. A node which is deselected will be passed as selected node to the OnSelectionChanged function
-            if (!selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
-                selectedNode->SetVisibility(true);
-            this->UpdateWarningLabel("The selected patient image does not\nmatchwith the selected segmentation!");
-          }
-        }
-      }
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-  }
 }
 
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
@@ -929,18 +868,26 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
 }
 
 
-void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData)
+void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData)
 {
   // called as a result of new BlueBerry selections
   //   tells the ToolManager for manual segmentation about new selections
   //   updates GUI information about what the user should select
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
-  toolManager->SetReferenceData(const_cast<mitk::DataNode*>(referenceData));
-  toolManager->SetWorkingData(  const_cast<mitk::DataNode*>(workingData));
+  toolManager->SetReferenceData(referenceData);
+  toolManager->SetWorkingData(workingData);
 
+  if (workingData)
+  {
+      mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( workingData->GetData());
+      m_Controls->m_LabelSetTableWidget->SetActiveLabelSetImage(lsImage);
+  }
+  else
+      m_Controls->m_LabelSetTableWidget->SetActiveLabelSetImage(NULL);
 
   // check original image
-  m_Controls->btnNewSegmentation->setEnabled(referenceData != NULL);
+  m_Controls->m_btNewLabelSet->setEnabled(referenceData != NULL);
+  m_Controls->m_btLoadLabelSet->setEnabled(referenceData != NULL);
   if (referenceData)
   {
     this->UpdateWarningLabel("");
@@ -973,13 +920,16 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
              this, SLOT( OnSegmentationComboBoxSelectionChanged(const mitk::DataNode*)) );
 //      }
     }
+    m_Controls->m_btNewLabel->setEnabled(workingData != NULL);
+    m_Controls->m_btSaveLabelSet->setEnabled(workingData != NULL);
+    m_Controls->m_LabelSetTableWidget->setEnabled(workingData != NULL);
   }
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
 {
   if (!node) return;
-
+/*
   bool isBinary(false);
   node->GetPropertyValue("binary", isBinary);
 
@@ -990,6 +940,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     node->SetProperty( "opacity", mitk::FloatProperty::New( this->GetPreferences()->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
     node->SetProperty( "volumerendering", mitk::BoolProperty::New( this->GetPreferences()->GetBool("volume rendering", false) ) );
   }
+*/
 }
 
 bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const
@@ -1029,6 +980,7 @@ void QmitkSegmentationView::UpdateWarningLabel(QString text)
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
+  MITK_INFO << "CreateQtPartControl 1";
   // setup the basic GUI of this view
   m_Parent = parent;
 
@@ -1036,21 +988,49 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->setupUi(parent);
 
   m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->patImageSelector->SetPredicate(m_IsNotABinaryImagePredicate);
+  m_Controls->patImageSelector->SetPredicate(m_IsNotLabelSetImagePredicate);
 
   this->UpdateWarningLabel("Please load an image");
 
   if( m_Controls->patImageSelector->GetSelectedNode().IsNotNull() )
-    this->UpdateWarningLabel("Select or create a new segmentation");
+    this->UpdateWarningLabel("Create a segmentation");
 
   m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->segImageSelector->SetPredicate(m_IsABinaryImagePredicate);
+  m_Controls->segImageSelector->SetPredicate(m_IsOfTypeLabelSetImagePredicate);
+  m_Controls->segImageSelector->SetAutoSelectNewItems(true);
   if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
 
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
   toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
   assert ( toolManager );
+
+  m_Controls->m_LabelSetTableWidget->Init();
+
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(renameLabel(int)), this, SLOT(OnRenameLabel(int)) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
+      this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
+
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(createMask(int)), this, SLOT(OnCreateMask(int)) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>& )),
+      this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
+
+  m_Controls->m_LabelSearchBox->setAlwaysShowClearIcon(true);
+  m_Controls->m_LabelSearchBox->setShowSearchIcon(true);
+
+  QStringList completionList;
+  completionList << "";
+  m_Completer = new QCompleter(completionList,m_Parent);
+  m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+  m_Controls->m_LabelSearchBox->setCompleter(m_Completer);
+
+  connect( m_Controls->m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(labelListModified(const QStringList&)), this, SLOT( OnLabelListModified(const QStringList&)) );
+
+  QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
+  completeModel->setStringList(m_Controls->m_LabelSetTableWidget->GetLabelList());
 
   //use the same ToolManager instance for our 3D Tools
   m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
@@ -1075,8 +1055,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox3D->hide();
   m_Controls->m_ManualToolSelectionBox2D->show();
 
-  toolManager->NewNodesGenerated +=
-      mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::NewNodesGenerated );      // update the list of segmentations
   toolManager->NewNodeObjectsGenerated +=
       mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::NewNodeObjectsGenerated );      // update the list of segmentations
 
@@ -1085,9 +1063,15 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
        this, SLOT( OnPatientComboBoxSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->segImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
        this, SLOT( OnSegmentationComboBoxSelectionChanged( const mitk::DataNode* ) ) );
-  connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
-//  connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
+
+  connect( m_Controls->m_btNewLabelSet, SIGNAL(clicked()), this, SLOT(OnNewLabelSet()) );
+  connect( m_Controls->m_btSaveLabelSet, SIGNAL(clicked()), this, SLOT(OnSaveLabelSet()) );
+  connect( m_Controls->m_btLoadLabelSet, SIGNAL(clicked()), this, SLOT(OnLoadLabelSet()) );
+  connect( m_Controls->m_btNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
+
+//  connect( m_Controls->m_pbCreateLabelFromSurface, SIGNAL(clicked()), this, SLOT(CreateLabelFromSurface()) );
 //  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
+
 
   connect( m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
@@ -1099,6 +1083,15 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
 //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+
+  m_Controls->m_btNewLabelSet->setEnabled(false);
+  m_Controls->m_btSaveLabelSet->setEnabled(false);
+  m_Controls->m_btLoadLabelSet->setEnabled(false);
+  m_Controls->m_btNewLabel->setEnabled(false);
+
+  m_Controls->m_LabelSetTableWidget->setEnabled(false);
+
+  MITK_INFO << "CreateQtPartControl N";
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)

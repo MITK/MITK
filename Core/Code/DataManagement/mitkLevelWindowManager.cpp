@@ -351,7 +351,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
     return mitk::DataStorage::SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return empty set
 
   mitk::BoolProperty::Pointer trueProp = mitk::BoolProperty::New(true);
-  mitk::NodePredicateProperty::Pointer notBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
+//  mitk::NodePredicateProperty::Pointer notBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
   mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", NULL);
 
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
@@ -365,7 +365,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   predicateTypes->AddPredicate(isQImage);
 
   mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New();
-  predicate->AddPredicate(notBinary);
+  //predicate->AddPredicate(notBinary);
   predicate->AddPredicate(hasLevelWindow);
   predicate->AddPredicate(predicateTypes);
 

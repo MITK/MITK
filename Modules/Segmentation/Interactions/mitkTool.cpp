@@ -40,23 +40,26 @@ mitk::Tool::Tool(const char* type)
   m_PredicateDimension( mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4) ),
   m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
 
-  m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
-  m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) ),
+  m_PredicateLabelSet(NodePredicateDataType::New("LabelSetImage")),
+  m_PredicateNotLabelset( NodePredicateNot::New(m_PredicateLabelSet) ),
+//  m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
+//  m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) ),
 
-  m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
-  m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
+//  m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
+//  m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
 
   m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
   m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) ),
 
-  m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
+//  m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
 
-  m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
+  m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateNotLabelset, m_PredicateNotHelper) ),
 
   m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
 
   // for working image
-  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+  //m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+  m_IsSegmentationPredicate(NodePredicateAnd::New(m_PredicateLabelSet, m_PredicateNotHelper))
 {
 }
 
@@ -193,7 +196,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
   segmentationNode->SetProperty( "name", StringProperty::New( organName ) );
 
   // visualization properties
-  segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
+  //segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
   segmentationNode->SetProperty( "color", ColorProperty::New(color) );
   segmentationNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   segmentationNode->SetProperty( "layer", IntProperty::New(10) );

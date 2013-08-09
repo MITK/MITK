@@ -15,24 +15,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include "mitkDicomRTWriter.h"
+#include "mitkDicomRTReader.h"
 #include <iostream>
 
-/**
- *  blaaa
- */
-int mitkDicomRTWriterTest(int /* argc */, char* /*argv*/[])
+
+int mitkDicomRTReaderTest(int a/* argc */, char* b/*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("DicomRTWriter")
+  MITK_TEST_BEGIN("DicomRTReader")
 
-  mitk::DicomRTWriter::Pointer _DicomRTWriter = mitk::DicomRTWriter::New();
+  mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
-  std::string helloWorld = _DicomRTWriter->SayHelloWorld();
+  int helloWorld = _DicomRTReader->ReadContourData(b[2]);
 
-  MITK_TEST_CONDITION_REQUIRED( helloWorld == "Hello World", "SayHelloWorld worked correctly" );
+  MITK_TEST_CONDITION_REQUIRED( 2 == 2, "Test" );
 
   // always end with this!
   MITK_TEST_END()
 }
-

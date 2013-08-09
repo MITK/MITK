@@ -128,12 +128,13 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
     connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
     connect( (QObject*)(m_Controls->m_AdcSignalAverage), SIGNAL(clicked()), this, SLOT(DoADCAverage()) );
-        connect( (QObject*)(m_Controls->m_AdcSignalFit), SIGNAL(clicked()), this, SLOT(DoADCFit()) );
+    //connect( (QObject*)(m_Controls->m_AdcSignalFit), SIGNAL(clicked()), this, SLOT(DoADCFit()) );
     connect( (QObject*)(m_Controls->m_AkcSignalFit), SIGNAL(clicked()), this, SLOT(DoAKCFit()) );
     connect( (QObject*)(m_Controls->m_BiExpSignalFit), SIGNAL(clicked()), this, SLOT(DoBiExpFit()) );
     connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
     connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
     connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
+  }
 }
 
 void QmitkPreprocessingView::DoLengthCorrection()
@@ -172,231 +173,136 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
   UpdateBValueTableWidget(i);
 }
 
+void QmitkPreprocessingView::CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName)
+{
+  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+
+  // filter input parameter
+  const mitk::DiffusionImage<DiffusionPixelType>::BValueMap
+      &originalShellMap  = ImPtr->GetB_ValueMap();
+
+  const mitk::DiffusionImage<DiffusionPixelType>::ImageType
+      *vectorImage       = ImPtr->GetVectorImage();
+
+  const mitk::DiffusionImage<DiffusionPixelType>::GradientDirectionContainerType::Pointer
+      gradientContainer = ImPtr->GetDirections();
+
+  const unsigned int
+      &bValue            = ImPtr->GetB_Value();
+
+  mitk::DataNode::Pointer imageNode = 0;
+
+  // filter call
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(vectorImage);
+  filter->SetOriginalGradientDirections(gradientContainer);
+  filter->SetOriginalBValueMap(originalShellMap);
+  filter->SetOriginalBValue(bValue);
+  filter->SetFunctor(functor);
+  filter->Update();
+
+  // create new DWI image
+  mitk::DiffusionImage<DiffusionPixelType>::Pointer outImage = mitk::DiffusionImage<DiffusionPixelType>::New();
+  outImage->SetVectorImage( filter->GetOutput() );
+  outImage->SetB_Value( m_Controls->m_targetBValueSpinBox->value() );
+  outImage->SetDirections( filter->GetTargetGradientDirections() );
+  outImage->InitializeFromVectorImage();
+
+  imageNode = mitk::DataNode::New();
+  imageNode->SetData( outImage );
+  imageNode->SetName(imageName.toStdString().c_str());
+  GetDefaultDataStorage()->Add(imageNode);
+
+  // create new Error image
+  FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
+  mitk::Image::Pointer mitkErrImage = mitk::Image::New();
+  mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
+  mitkErrImage->SetVolume(errImage->GetBufferPointer());
+
+  imageNode = mitk::DataNode::New();
+  imageNode->SetData( mitkErrImage );
+  imageNode->SetName((imageName+"_Error").toStdString().c_str());
+  GetDefaultDataStorage()->Add(imageNode);
+}
+
 void QmitkPreprocessingView::DoBiExpFit()
 {
-  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef DiffusionImageType::BValueMap BValueMap;
-  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  itk::BiExpFitFunctor::Pointer functor = itk::BiExpFitFunctor::New();
 
   for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
-      DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
-      BValueMap originalShellMap = inImage->GetB_ValueMap();
-      GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
+        dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-      BValueMap::iterator it = originalShellMap.begin();
-      ++it;/* skip b=0*/ int s = 0; /*shell index */
-      vnl_vector<double> bValueList(originalShellMap.size()-1);
-      while(it != originalShellMap.end())
-        bValueList.put(s++,(it++)->first);
+    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-      const double targetBValue = bValueList.mean();
-      itk::BiExpFitFunctor::Pointer biExpFitFunctor = itk::BiExpFitFunctor::New();
-      biExpFitFunctor->setListOfBValues(bValueList);
-      biExpFitFunctor->setTargetBValue(targetBValue);
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
+    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+    vnl_vector<double> bValueList(originalShellMap.size()-1);
+    while(it != originalShellMap.end())
+      bValueList.put(s++,(it++)->first);
 
-      FilterType::Pointer filter = FilterType::New();
-      filter->SetInput(inImage->GetVectorImage());
-      filter->SetOriginalGradientDirections(gradientContainer);
-      filter->SetOriginalBValueMap(originalShellMap);
-      filter->SetOriginalBValue(inImage->GetB_Value());
-      filter->SetFunctor(biExpFitFunctor);
-      filter->Update();
-
-      DiffusionImageType::Pointer outImage = DiffusionImageType::New();
-      outImage->SetVectorImage( filter->GetOutput() );
-      outImage->SetB_Value( targetBValue );
-      outImage->SetDirections( filter->GetTargetGradientDirections() );
-      outImage->InitializeFromVectorImage();
-
-      QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
-
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( outImage );
-      imageNode->SetName((name+"_BiExp").toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
-
-      FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-      mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-      mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-      mitkErrImage->SetVolume(errImage->GetBufferPointer());
-
-      imageNode = mitk::DataNode::New();
-      imageNode->SetData( mitkErrImage );
-      imageNode->SetName((name+"_BiExp_Error").toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
+    const double targetBValue = bValueList.mean();
+    functor->setListOfBValues(bValueList);
+    functor->setTargetBValue(targetBValue);
+    CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC");
   }
 }
 
 void QmitkPreprocessingView::DoAKCFit()
 {
-  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef DiffusionImageType::BValueMap BValueMap;
-  typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  itk::KurtosisFitFunctor::Pointer functor = itk::KurtosisFitFunctor::New();
 
   for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
   {
-      DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
-      BValueMap originalShellMap = inImage->GetB_ValueMap();
-      GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
+        dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-      BValueMap::iterator it = originalShellMap.begin();
-      ++it;/* skip b=0*/ int s = 0; /*shell index */
-      vnl_vector<double> bValueList(originalShellMap.size()-1);
-      while(it != originalShellMap.end())
-        bValueList.put(s++,(it++)->first);
+    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-      const double targetBValue = bValueList.mean();
-      itk::KurtosisFitFunctor::Pointer kurtosisFitFunctor = itk::KurtosisFitFunctor::New();
-      kurtosisFitFunctor->setListOfBValues(bValueList);
-      kurtosisFitFunctor->setTargetBValue(targetBValue);
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
+    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+    vnl_vector<double> bValueList(originalShellMap.size()-1);
+    while(it != originalShellMap.end())
+      bValueList.put(s++,(it++)->first);
 
-      FilterType::Pointer filter = FilterType::New();
-      filter->SetInput(inImage->GetVectorImage());
-      filter->SetOriginalGradientDirections(gradientContainer);
-      filter->SetOriginalBValueMap(originalShellMap);
-      filter->SetOriginalBValue(inImage->GetB_Value());
-      filter->SetFunctor(kurtosisFitFunctor);
-      filter->Update();
-
-      DiffusionImageType::Pointer outImage = DiffusionImageType::New();
-      outImage->SetVectorImage( filter->GetOutput() );
-      outImage->SetB_Value( targetBValue );
-      outImage->SetDirections( filter->GetTargetGradientDirections() );
-      outImage->InitializeFromVectorImage();
-
-      QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
-
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData( outImage );
-      imageNode->SetName((name+"_Kurtosis").toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
-
-      FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-      mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-      mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-      mitkErrImage->SetVolume(errImage->GetBufferPointer());
-
-      imageNode = mitk::DataNode::New();
-      imageNode->SetData( mitkErrImage );
-      imageNode->SetName((name+"_Kurtosis_Error").toStdString().c_str());
-      GetDefaultDataStorage()->Add(imageNode);
+    const double targetBValue = bValueList.mean();
+    functor->setListOfBValues(bValueList);
+    functor->setTargetBValue(targetBValue);
+    CallMultishellToSingleShellFilter(functor,inImage,name + "_AKC");
   }
 }
 
 void QmitkPreprocessingView::DoADCFit()
 {
-
-    typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-    typedef DiffusionImageType::BValueMap BValueMap;
-    typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
-
-    for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-    {
-        DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
-        BValueMap originalShellMap = inImage->GetB_ValueMap();
-        GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
-
-        BValueMap::iterator it = originalShellMap.begin();
-        ++it;/* skip b=0*/ int s = 0; /*shell index */
-        vnl_vector<double> bValueList(originalShellMap.size()-1);
-        while(it != originalShellMap.end())
-          bValueList.put(s++,(it++)->first);
-
-        const double targetBValue = bValueList.mean();
-        itk::ADCFitFunctor::Pointer ADCAverageFunctor = itk::ADCFitFunctor::New();
-        ADCAverageFunctor->setListOfBValues(bValueList);
-        ADCAverageFunctor->setTargetBValue(targetBValue);
-
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput(inImage->GetVectorImage());
-        filter->SetOriginalGradientDirections(gradientContainer);
-        filter->SetOriginalBValueMap(originalShellMap);
-        filter->SetOriginalBValue(inImage->GetB_Value());
-        filter->SetFunctor(ADCAverageFunctor);
-        filter->Update();
-
-        DiffusionImageType::Pointer outImage = DiffusionImageType::New();
-        outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
-        outImage->SetDirections( filter->GetTargetGradientDirections() );
-        outImage->InitializeFromVectorImage();
-
-        QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
-
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( outImage );
-        imageNode->SetName((name+"_ADC-Average").toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
-
-        FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-        mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-        mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-        mitkErrImage->SetVolume(errImage->GetBufferPointer());
-
-        imageNode = mitk::DataNode::New();
-        imageNode->SetData( mitkErrImage );
-        imageNode->SetName((name+"_ADC-Average_Error").toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
-    }
+// later
 }
-
 
 void QmitkPreprocessingView::DoADCAverage()
 {
+  itk::ADCAverageFunctor::Pointer functor = itk::ADCAverageFunctor::New();
 
-    typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-    typedef DiffusionImageType::BValueMap BValueMap;
-    typedef itk::RadialMultishellToSingleshellImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  {
+    mitk::DiffusionImage<DiffusionPixelType>::Pointer inImage =
+        dynamic_cast< mitk::DiffusionImage<DiffusionPixelType>* >(m_SelectedDiffusionNodes.at(i)->GetData());
 
-    for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
-    {
-        DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
-        BValueMap originalShellMap = inImage->GetB_ValueMap();
-        GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+    QString name(m_SelectedDiffusionNodes.at(i)->GetName().c_str());
 
-        BValueMap::iterator it = originalShellMap.begin();
-        ++it;/* skip b=0*/ int s = 0; /*shell index */
-        vnl_vector<double> bValueList(originalShellMap.size()-1);
-        while(it != originalShellMap.end())
-          bValueList.put(s++,(it++)->first);
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & originalShellMap = inImage->GetB_ValueMap();
+    mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = originalShellMap.begin();
+    ++it;/* skip b=0*/ unsigned int s = 0; /*shell index */
+    vnl_vector<double> bValueList(originalShellMap.size()-1);
+    while(it != originalShellMap.end())
+      bValueList.put(s++,(it++)->first);
 
-        const double targetBValue = bValueList.mean();
-        itk::ADCAverageFunctor::Pointer ADCAverageFunctor = itk::ADCAverageFunctor::New();
-        ADCAverageFunctor->setListOfBValues(bValueList);
-        ADCAverageFunctor->setTargetBValue(targetBValue);
-
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput(inImage->GetVectorImage());
-        filter->SetOriginalGradientDirections(gradientContainer);
-        filter->SetOriginalBValueMap(originalShellMap);
-        filter->SetOriginalBValue(inImage->GetB_Value());
-        filter->SetFunctor(ADCAverageFunctor);
-        filter->Update();
-
-        DiffusionImageType::Pointer outImage = DiffusionImageType::New();
-        outImage->SetVectorImage( filter->GetOutput() );
-        outImage->SetB_Value( targetBValue );
-        outImage->SetDirections( filter->GetTargetGradientDirections() );
-        outImage->InitializeFromVectorImage();
-
-        QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
-
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData( outImage );
-        imageNode->SetName((name+"_ADC-Average").toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
-
-        FilterType::ErrorImageType::Pointer errImage = filter->GetErrorImage();
-        mitk::Image::Pointer mitkErrImage = mitk::Image::New();
-        mitkErrImage->InitializeByItk<FilterType::ErrorImageType>(errImage);
-        mitkErrImage->SetVolume(errImage->GetBufferPointer());
-
-        imageNode = mitk::DataNode::New();
-        imageNode->SetData( mitkErrImage );
-        imageNode->SetName((name+"_ADC-Average_Error").toStdString().c_str());
-        GetDefaultDataStorage()->Add(imageNode);
-    }
+    const double targetBValue = bValueList.mean();
+    functor->setListOfBValues(bValueList);
+    functor->setTargetBValue(targetBValue);
+    CallMultishellToSingleShellFilter(functor,inImage,name + "_ADC");
+  }
 }
 
 void QmitkPreprocessingView::DoAdcCalculation()
@@ -562,6 +468,14 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
         item->setText(QString::number(mf.get(r,c)));
         m_Controls->m_MeasurementFrameTable->setItem(r,c,item);
       }
+    //calculate target bValue for MultishellToSingleShellfilter
+    const mitk::DiffusionImage<DiffusionPixelType>::BValueMap & bValMap = m_DiffusionImage->GetB_ValueMap();
+    mitk::DiffusionImage<DiffusionPixelType>::BValueMap::const_iterator it = bValMap.begin();
+    unsigned int targetBVal = 0;
+    while(it != bValMap.end())
+      targetBVal += (it++)->first;
+    targetBVal /= (float)bValMap.size();
+    m_Controls->m_targetBValueSpinBox->setValue(targetBVal);
 
   }
   else

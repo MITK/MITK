@@ -474,7 +474,7 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     unsigned int targetBVal = 0;
     while(it != bValMap.end())
       targetBVal += (it++)->first;
-    targetBVal /= (float)bValMap.size();
+    targetBVal /= (float)bValMap.size()-1;
     m_Controls->m_targetBValueSpinBox->setValue(targetBVal);
 
   }

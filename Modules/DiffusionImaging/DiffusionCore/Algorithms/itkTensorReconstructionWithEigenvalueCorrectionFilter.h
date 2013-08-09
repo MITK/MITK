@@ -108,10 +108,6 @@ namespace itk
     itkGetMacro(B0Mask, vnl_vector<short>)
     itkGetMacro(Voxdim, vnl_vector<double>)
 
-    mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
-    {
-      return m_OutputDiffusionImage;
-    }
 
     ImageType::Pointer GetVectorImage()
     {
@@ -179,8 +175,6 @@ namespace itk
     /** Number of baseline images */
     unsigned int                                      m_NumberOfBaselineImages;
 
-    mitk::DiffusionImage<short>::Pointer              m_OutputDiffusionImage;
-
     ImageType::Pointer                                m_VectorImage;
 
     float                                             m_B0Threshold;
@@ -193,7 +187,6 @@ namespace itk
     vnl_vector<double> m_BVec;
     vnl_vector<short> m_B0Mask;
     vnl_vector<double> m_Voxdim;
-   // int  m_Flagstatus;
 
     typename GradientImagesType::Pointer m_GradientImagePointer;
 

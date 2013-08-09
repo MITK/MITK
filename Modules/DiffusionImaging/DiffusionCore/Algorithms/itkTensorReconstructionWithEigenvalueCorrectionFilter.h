@@ -69,8 +69,6 @@ namespace itk
     typedef typename Superclass::OutputImageRegionType
       OutputImageRegionType;
 
-    /** Typedef defining one (of the many) gradient images.  */
-    typedef Image< GradientPixelType, 3 >            GradientImageType;
 
     /** An alternative typedef defining one (of the many) gradient images.
     * It will be assumed that the vectorImage has the same dimension as the
@@ -80,12 +78,6 @@ namespace itk
     typedef typename GradientImagesType::PixelType         GradientVectorType;
 
 
-    /*
-    /** Holds the tensor basis coefficients G_k
-    typedef vnl_matrix_fixed< double, 6, 6 >         TensorBasisMatrixType;
-
-    typedef vnl_matrix< double >                     CoefficientMatrixType;
-    */
 
     /** Holds each magnetic field gradient used to acquire one DWImage */
     typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
@@ -107,15 +99,14 @@ namespace itk
 
 
 
-    itkSetMacro( BValue, TTensorPixelType);
-    itkSetMacro( B0Threshold, float);
-    itkSetMacro (Flagstatus, int);
+    itkSetMacro( BValue, TTensorPixelType)
+    itkSetMacro( B0Threshold, float)
 
-    itkGetMacro(PseudoInverse, vnl_matrix<double>);
-    itkGetMacro(H, vnl_matrix<double>);
-    itkGetMacro(BVec, vnl_vector<double>);
-    itkGetMacro(B0Mask, vnl_vector<short>);
-    itkGetMacro(Voxdim, vnl_vector<double>);
+    itkGetMacro(PseudoInverse, vnl_matrix<double>)
+    itkGetMacro(H, vnl_matrix<double>)
+    itkGetMacro(BVec, vnl_vector<double>)
+    itkGetMacro(B0Mask, vnl_vector<short>)
+    itkGetMacro(Voxdim, vnl_vector<double>)
 
     mitk::DiffusionImage<short>::Pointer GetOutputDiffusionImage()
     {
@@ -136,7 +127,7 @@ namespace itk
   protected:
 
     TensorReconstructionWithEigenvalueCorrectionFilter();
-    ~TensorReconstructionWithEigenvalueCorrectionFilter() {};
+    ~TensorReconstructionWithEigenvalueCorrectionFilter() {}
 
 
     void GenerateData();
@@ -156,7 +147,6 @@ namespace itk
     double CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3> ::Pointer mask,itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp);
 
     void CalculateAttenuation(vnl_vector<double> org_data, vnl_vector<double> &atten,int nof,int numberb0);
-
 
     void CalculateTensor(vnl_vector<double> atten, vnl_vector<double> &tensor,int nof,int numberb0);
 
@@ -203,7 +193,7 @@ namespace itk
     vnl_vector<double> m_BVec;
     vnl_vector<short> m_B0Mask;
     vnl_vector<double> m_Voxdim;
-    int  m_Flagstatus;
+   // int  m_Flagstatus;
 
     typename GradientImagesType::Pointer m_GradientImagePointer;
 

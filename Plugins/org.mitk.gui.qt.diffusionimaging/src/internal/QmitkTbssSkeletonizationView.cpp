@@ -407,7 +407,7 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(mitk::Image
 
     try{
       // REPLACE THIS METHODE()ConvertToItk) WITH mitk::CastToItk
-      mitk::ImagePixelReadAccessor<float,4> imageAccessor(image);
+      mitk::ImagePixelReadAccessor<float,4> imageAccessor(image, image->GetSliceData());
 
       // iterate through the subjects and copy data to output
       for(int t=0; t<timesteps; t++)

@@ -42,19 +42,22 @@ namespace itk
   ::GenerateData ()
   {
 
+    // GradientImagesType input
     m_GradientImagePointer = static_cast< GradientImagesType * >(
       this->ProcessObject::GetInput(0) );
 
     typename GradientImagesType::SizeType size = m_GradientImagePointer->GetLargestPossibleRegion().GetSize();
+
+    // number of volumes
     int nof = m_GradientDirectionContainer->Size();
+
+    // determine the number of b-zero values
     int numberb0=0;
-
-    int cnt=0;
-
     for(int i=0; i<nof; i++)
     {
       vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
 
+      // due to roundings, the values are not always exactly zero
       if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.0001&& vec[1]>-0.0001 && vec[2]>-0.0001)
       {
         numberb0++;
@@ -62,9 +65,11 @@ namespace itk
     }
 
 
-    itk::Vector<double,3u> spacing_term = m_GradientImagePointer->GetSpacing();
-    itk::Matrix<double,3u,3u> direction_term = m_GradientImagePointer->GetDirection();
+    typename GradientImagesType::SpacingType spacing_term = m_GradientImagePointer->GetSpacing();
+    typename GradientImagesType::DirectionType direction_term = m_GradientImagePointer->GetDirection();
 
+
+    /*
     vnl_vector <double> spacing_vnl(3);
     vnl_matrix <double> dir_vnl (3,3);
 
@@ -76,7 +81,7 @@ namespace itk
       {
         dir_vnl[i][j]=direction_term[i][j];
       }
-    }
+    }*/
 
     vnl_matrix <double> vox_dim_step (3,3);
 
@@ -84,7 +89,7 @@ namespace itk
     {
       for(int j=0;j<3;j++)
       {
-        vox_dim_step[i][j]=spacing_vnl[i]*dir_vnl[i][j];
+        vox_dim_step[i][j]=spacing_term[i]*direction_term[i][j];
       }
     }
 
@@ -104,7 +109,7 @@ namespace itk
 
 
 
-
+    int cnt=0;
     for(int i=0; i<nof; i++)
     {
       vnl_vector_fixed <double, 3 > vec = m_GradientDirectionContainer->ElementAt(i);
@@ -468,62 +473,55 @@ namespace itk
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp)
   {
+
+    // Definition of neighbourhood avoiding crossing the image boundaries
+    int x_max=size[0];
+    int y_max=size[1];
+    int z_max=size[2];
+
     double back_x=std::max(0,x-1);
     double back_y=std::max(0,y-1);
     double back_z=std::max(0,z-1);
 
-    int x_max=size[0];int y_max=size[1];int z_max=size[2];// converting short to int
-
     double forth_x=std::min((x+1),x_max);
     double forth_y=std::min((y+1),y_max);
-    double forth_z=std::min((z+1),z_max);// setting constraints for neigborhood
+    double forth_z=std::min((z+1),z_max);
 
 
     double tempsum=0;
     itk::Index<3> ix;
     double temp_number=0;
-    double temp_mask=0;// declaration of variables
-    double one =1.0;
+    double temp_mask=0;
 
-
-    for(int i=back_x; i<forth_x+1; i++)
+    for(int i=back_x; i<=forth_x; i++)
     {
-      for (int j=back_y; j<forth_y+1; j++)
+      for (int j=back_y; j<=forth_y; j++)
       {
-        for (int c=back_z; c<forth_z+1;c++)
+        for (int k=back_z; k<=forth_z; k++)
         {
 
-          ix[0] = i;ix[1] = j;ix[2] = c;
+          ix[0] = i;
+          ix[1] = j;
+          ix[2] = k;
 
           temp_mask=mask->GetPixel(ix);
 
           //if(temp_mask > 0 && temp_mask < 2 )
           //{
               //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
-              GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
+          GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
 
-              double test= p[f];
+          double test= p[f];
 
-              if (test > 0.0 )// hmm this must be here becaus the method is used in multiple ocasions. Sometiems we may deal with negative values
-              {
-                if(i==x && j==y && c== z)
-                {
-
-
-
-                }
-                else
-                {
-                    tempsum=tempsum+p[f];// sum for calculation of mean
-                    temp_number++;// number for calculation of mean
-                }
-
-
-
+          if (test > 0.0 )// hmm this must be here becaus the method is used in multiple ocasions. Sometiems we may deal with negative values
+          {
+            if(!(i==x && j==y && k== z))
+            {
+                tempsum=tempsum+p[f];// sum for calculation of mean
+                temp_number++;// number for calculation of mean
             }
 
-          //}//end of mask condition
-
+          }
 
 
         }
@@ -549,11 +547,7 @@ namespace itk
     }
 
 
-
-    double ret = tempsum;
-
-
-    return ret;
+    return tempsum;
   }
 
 

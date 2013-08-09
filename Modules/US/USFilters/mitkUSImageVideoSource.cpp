@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK HEADER
 #include "mitkUSImageVideoSource.h"
 #include "mitkImage.h"
-#include "Commands/mitkCropOpenCVImageFilter.h"
-#include "Commands/mitkConvertGrayscaleOpenCVImageFilter.h"
+#include "mitkCropOpenCVImageFilter.h"
+#include "mitkConvertGrayscaleOpenCVImageFilter.h"
 
 //OpenCV HEADER
 #include <cv.h>
@@ -113,7 +113,6 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // Setup pointers
   cv::Mat image;
-  cv::Mat buffer;
 
   // Retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
@@ -122,7 +121,7 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   if ( m_IsCropped ) { m_CropFilter->filterImage(image); }
 
   // If this source is set to deliver greyscale images, convert it
-  if (m_IsGreyscale) { m_GrayscaleFilter->filterImage(image); }
+  if ( m_IsGreyscale ) { m_GrayscaleFilter->filterImage(image); }
 
   // Execute filter, if an additional filter is specified
   if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->filterImage(image); }
@@ -137,7 +136,6 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
   // Clean up
-  buffer.release();
   image.release();
 
   return result;

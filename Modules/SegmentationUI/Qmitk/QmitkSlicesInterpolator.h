@@ -49,6 +49,7 @@ namespace mitk
 {
   class PlaneGeometry;
   class SliceNavigationController;
+  class LabelSetImage;
 }
 
 class QPushButton;
@@ -253,7 +254,7 @@ private:
     mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
     mitk::DataNode::Pointer m_3DContourNode;
 
-    mitk::Image* m_Segmentation;
+    mitk::LabelSetImage* m_Segmentation;
 
     mitk::SliceNavigationController* m_LastSNC;
     unsigned int m_LastSliceIndex;

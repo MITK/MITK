@@ -100,6 +100,8 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
     */
     void SetSegmentationVolume( const Image* segmentation );
 
+    itkSetMacro(ActiveLabel, int);
+
     /**
       \brief Set a reference image (original patient image) - optional.
 
@@ -197,6 +199,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     Image::ConstPointer m_Segmentation;
     Image::ConstPointer m_ReferenceImage;
+    int m_ActiveLabel;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;
 };

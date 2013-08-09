@@ -45,7 +45,7 @@ mitk::SegmentationInterpolationController* mitk::SegmentationInterpolationContro
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController()
-:m_BlockModified(false)
+:m_BlockModified(false), m_ActiveLabel(0)
 {
 }
 
@@ -515,6 +515,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  sliceIndex,
                                  sliceDimension,
                                  resultImage,
+                                 m_ActiveLabel,
                                  timeStep,
                                  m_ReferenceImage );
 }

@@ -39,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSliceNavigationController.h"
 #include <mitkVtkImageOverwrite.h>
 #include <mitkExtractSliceFilter.h>
+#include <mitkLabelSetImage.h>
+#include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 
 #include <itkCommand.h>
@@ -125,13 +127,9 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_FeedbackNode );
-
-  m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-  m_FeedbackNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
   m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
   m_FeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
   m_FeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
-  m_FeedbackNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
   m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
@@ -268,11 +266,14 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
     // remove old observers
     Uninitialize();
   }
+  if ( m_DataStorage.IsNotNull() )
+  {
+    if(m_DataStorage->Exists(m_3DContourNode))
+        m_DataStorage->Remove(m_3DContourNode);
 
-  if(m_DataStorage->Exists(m_3DContourNode))
-    m_DataStorage->Remove(m_3DContourNode);
-  if(m_DataStorage->Exists(m_InterpolatedSurfaceNode))
-    m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+    if(m_DataStorage->Exists(m_InterpolatedSurfaceNode))
+        m_DataStorage->Remove(m_InterpolatedSurfaceNode);
+  }
 
   // remove observer
   m_Interpolator->RemoveObserver( InterpolationInfoChangedObserverTag );
@@ -375,7 +376,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
   if (m_ToolManager->GetWorkingData(0) != 0)
   {
-    m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+    m_Segmentation = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   }
   //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
@@ -467,7 +468,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
     mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
     if (node)
     {
-      m_Segmentation = dynamic_cast<mitk::Image*>(node->GetData());
+      m_Segmentation = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
       if (m_Segmentation)
       {
         int clickedSliceDimension(-1);
@@ -476,7 +477,13 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
 
-        mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
+        mitk::Image* auxImage = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
+
+        mitk::LabelSetImage::Pointer interpolation = mitk::LabelSetImage::New();
+        interpolation->Initialize(auxImage);
+        mitk::ImageReadAccessor accessor(auxImage);
+        interpolation->SetVolume(accessor.GetData());
+
         m_FeedbackNode->SetData( interpolation );
 
         m_LastSNC = slicer;
@@ -776,10 +783,11 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
     if (workingNode)
     {
-      mitk::Image* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
+      mitk::LabelSetImage* segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
       if (segmentation)
       {
         m_Interpolator->SetSegmentationVolume( segmentation );
+        m_Interpolator->SetActiveLabel( segmentation->GetActiveLabelIndex() );
 
         if (referenceNode)
         {

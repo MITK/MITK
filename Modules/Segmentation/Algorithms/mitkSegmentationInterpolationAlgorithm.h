@@ -59,6 +59,7 @@ class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Objec
                                        unsigned int requestedIndex,
                                        unsigned int sliceDimension,
                                        Image::Pointer resultImage,
+                                       int activeLabel = 1,
                                        unsigned int timeStep = 0,
                                        Image::ConstPointer referenceImage = NULL) = 0;
 };

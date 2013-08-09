@@ -51,9 +51,6 @@ public:
   virtual void OnSelectionChanged(mitk::DataNode* node);
   virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
-  // reaction to new segmentations being created by segmentation tools
-  void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
-
   // QmitkFunctionality's activate/deactivate
   virtual void Activated();
   virtual void Deactivated();
@@ -122,8 +119,6 @@ protected slots:
 
 //  void OnSurfaceSelectionChanged();
 
-  void OnWorkingNodeVisibilityChanged();
-
   void OnShowMarkerNodes(bool);
 
   void OnTabWidgetChanged(int);
@@ -152,9 +147,6 @@ protected:
 
   // make sure all images/segmentations look as selected by the users in this view's preferences
   void ForceDisplayPreferencesUponAllImages();
-
-  // decorates a DataNode according to the user preference settings
-  void ApplyDisplayOptions(mitk::DataNode* node);
 
   // GUI setup
   void CreateQtPartControl(QWidget* parent);
@@ -203,13 +195,14 @@ protected:
 
   bool m_AutoSelectionEnabled;
 
-  mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_IsOfTypeReferenceImagePredicate;
+  mitk::NodePredicateDataType::Pointer m_IsOfTypeWorkingImagePredicate;
 //  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
 
 //  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
 //  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
-  mitk::NodePredicateDataType::Pointer m_IsOfTypeLabelSetImagePredicate;
-  mitk::NodePredicateAnd::Pointer m_IsNotLabelSetImagePredicate;
+//  mitk::NodePredicateDataType::Pointer m_IsOfTypeLabelSetImagePredicate;
+  //mitk::NodePredicateAnd::Pointer m_IsNotLabelSetImagePredicate;
 
 };
 

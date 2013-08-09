@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageDataItem.h"
 
+#include <itkBinaryThresholdImageFilter.h>
 #include "ipSegmentation.h"
 
 mitk::Image::Pointer
@@ -27,9 +28,12 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                unsigned int requestedIndex,
                                unsigned int /*sliceDimension*/, // commented variables are not used
                                Image::Pointer resultImage,
+                               int activeLabel,
                                unsigned int /*timeStep*/,
                                Image::ConstPointer /*referenceImage*/)
 {
+  typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
+
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
   CastToItkImage( lowerSlice, correctPixelTypeLowerITKSlice );
@@ -45,14 +49,35 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   correctPixelTypeLowerITKSlice->SetDirection(imageDirection);
   correctPixelTypeUpperITKSlice->SetDirection(imageDirection);
 
+  // binarize the slice according to current label
+  typedef itk::BinaryThresholdImageFilter< InputSliceType, InputSliceType > InputThresholdType;
+
+  InputThresholdType::Pointer thresholder1 = InputThresholdType::New();
+  thresholder1->SetInput(correctPixelTypeLowerITKSlice);
+  thresholder1->SetUpperThreshold( activeLabel );
+  thresholder1->SetLowerThreshold( activeLabel );
+  thresholder1->SetInsideValue( 1 );
+  thresholder1->SetOutsideValue( 0 );
+  thresholder1->ReleaseDataFlagOn();
+  thresholder1->Update();
+
   // back-convert to MITK images to access a mitkIpPicDescriptor
   Image::Pointer correctPixelTypeLowerMITKSlice = Image::New();
-  CastToMitkImage( correctPixelTypeLowerITKSlice, correctPixelTypeLowerMITKSlice );
+  CastToMitkImage( thresholder1->GetOutput(), correctPixelTypeLowerMITKSlice );
   mitkIpPicDescriptor* lowerPICSlice = mitkIpPicNew();
   CastToIpPicDescriptor( correctPixelTypeLowerMITKSlice, lowerPICSlice);
 
+  InputThresholdType::Pointer thresholder2 = InputThresholdType::New();
+  thresholder2->SetInput(correctPixelTypeUpperITKSlice);
+  thresholder2->SetUpperThreshold( activeLabel );
+  thresholder2->SetLowerThreshold( activeLabel );
+  thresholder2->SetInsideValue( 1 );
+  thresholder2->SetOutsideValue( 0 );
+  thresholder2->ReleaseDataFlagOn();
+  thresholder2->Update();
+
   Image::Pointer correctPixelTypeUpperMITKSlice = Image::New();
-  CastToMitkImage( correctPixelTypeUpperITKSlice, correctPixelTypeUpperMITKSlice );
+  CastToMitkImage( thresholder2->GetOutput(), correctPixelTypeUpperMITKSlice );
   mitkIpPicDescriptor* upperPICSlice = mitkIpPicNew();
   CastToIpPicDescriptor( correctPixelTypeUpperMITKSlice, upperPICSlice);
 
@@ -62,13 +87,52 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   mitkIpPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
   if (!ipPicResult) return NULL;
 
+  mitk::Image::Pointer auxImage = mitk::Image::New();
   Geometry3D::Pointer originalGeometry = resultImage->GetGeometry();
-  resultImage->Initialize( CastToImageDescriptor( ipPicResult ) );
-  // FIXME resultImage->SetPicSlice( ipPicResult );
-  resultImage->SetSlice( ipPicResult->data );
-  resultImage->SetGeometry( originalGeometry );
+  auxImage->Initialize( CastToImageDescriptor( ipPicResult ) );
+  //resultImage->SetPicSlice( ipPicResult );
+  auxImage->SetSlice( ipPicResult->data );
+  auxImage->SetGeometry( originalGeometry );
 
   mitkIpPicFree( ipPicResult );
+
+  // add the rest of data in the slice
+  InputSliceType::Pointer itkAuxImage;
+  CastToItkImage( auxImage, itkAuxImage );
+  assert ( itkAuxImage.IsNotNull() );
+
+  InputSliceType::Pointer itkResultImage;
+  CastToItkImage( resultImage, itkResultImage );
+  assert ( itkResultImage.IsNotNull() );
+
+  typedef itk::ImageRegionConstIterator< InputSliceType > SourceIteratorType;
+  typedef itk::ImageRegionIterator< InputSliceType >      TargetIteratorType;
+
+  SourceIteratorType sourceIterator( itkAuxImage, itkAuxImage->GetLargestPossibleRegion() );
+  TargetIteratorType targetIterator( itkResultImage, itkResultImage->GetLargestPossibleRegion() );
+
+  sourceIterator.GoToBegin();
+  targetIterator.GoToBegin();
+
+  const bool overwrite = true;
+
+    while (!sourceIterator.IsAtEnd())
+    {
+
+      if (overwrite)
+      {
+         if ( sourceIterator.Get() )
+            targetIterator.Set( activeLabel );
+      }
+      else
+      {
+         if ( sourceIterator.Get() && !targetIterator.Get() )
+           targetIterator.Set( activeLabel );
+      }
+
+      ++sourceIterator;
+      ++targetIterator;
+    }
 
   return resultImage;
 }

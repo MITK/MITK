@@ -33,8 +33,7 @@ if(MITK_USE_SOFA)
   set(rev "9832")
 
   set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev${rev}.cmake)
-  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${CMAKE_BINARY_DIR}/${proj}-src)
-  set(SOFA_CONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${additional_cmake_args} ${CMAKE_BINARY_DIR}/${proj}-src)
+  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${CMAKE_BINARY_DIR}/${proj}-src)
 
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}

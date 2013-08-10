@@ -199,7 +199,7 @@ endif()
 
 if(MITK_USE_SOFA)
   set(SOFA_CMAKE_VERSION 2.8.8)
-  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION} OR APPLE)
+  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
   endif()

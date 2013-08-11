@@ -203,6 +203,10 @@ if(MITK_USE_SOFA)
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
   endif()
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
+  endif()
 endif()
 
 # Customize the default pixel types for multiplex macros

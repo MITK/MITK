@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriter.h"
 #include "mitkSurfaceVtkWriter.h"
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
@@ -47,14 +47,14 @@ const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = mitk::GetModuleContext();
-    const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
+    us::ModuleContext* context = us::GetModuleContext();
+    const std::vector<us::ServiceReference<IDataNodeReader> > refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
-        IDataNodeReader* s = context->GetService<IDataNodeReader>(*i);
+        IDataNodeReader* s = context->GetService(*i);
         if (s != 0)
         {
             services.push_back(s);
@@ -86,7 +86,7 @@ int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds
         mitk::ProgressBar::GetInstance()->Progress(2);
     }
 
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
         context->UngetService(*i);

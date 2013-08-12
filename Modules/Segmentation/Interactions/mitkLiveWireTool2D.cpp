@@ -31,9 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkGradientMagnitudeImageFilter.h>
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
@@ -102,17 +103,17 @@ const char** mitk::LiveWireTool2D::GetXPM() const
   return mitkLiveWireTool2D_xpm;
 }
 
-mitk::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
+us::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("LiveWire_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("LiveWire_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
+us::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("LiveWire_Cursor_32x32.png");
   return resource;
 }
 

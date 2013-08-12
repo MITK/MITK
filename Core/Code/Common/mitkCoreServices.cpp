@@ -18,21 +18,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIShaderRepository.h"
 
-#include "mitkGetModuleContext.h"
-#include "mitkModuleContext.h"
-#include "mitkServiceReference.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usServiceReference.h"
 
 namespace mitk {
 
-IShaderRepository* CoreServices::GetShaderRepository()
+template<class S>
+S* GetCoreService(us::ModuleContext* context, std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& csm)
 {
-  IShaderRepository* shaderRepo = NULL;
-  ServiceReference serviceRef = GetModuleContext()->GetServiceReference<IShaderRepository>();
+  S* coreService = NULL;
+  us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
   if (serviceRef)
   {
-    shaderRepo = GetModuleContext()->GetService<IShaderRepository>(serviceRef);
+    coreService = context->GetService(serviceRef);
   }
-  return shaderRepo;
+
+  assert(coreService && "Asserting non-NULL MITK core service");
+  csm[context].insert(std::make_pair(coreService,serviceRef));
+
+  return coreService;
+}
+
+std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > CoreServices::m_ContextToServicesMap;
+
+IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
+{
+  return GetCoreService<IShaderRepository>(context, m_ContextToServicesMap);
+}
+
+bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)
+{
+  bool success = false;
+
+  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = m_ContextToServicesMap.find(context);
+  if (iter != m_ContextToServicesMap.end())
+  {
+    std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
+    if (iter2 != iter->second.end())
+    {
+      us::ServiceReferenceU serviceRef = iter2->second;
+      if (serviceRef)
+      {
+        success = context->UngetService(serviceRef);
+        if (success)
+        {
+          iter->second.erase(iter2);
+        }
+      }
+    }
+  }
+
+  return success;
 }
 
 }

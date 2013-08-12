@@ -24,8 +24,8 @@
 #include "mitkMouseReleaseEvent.h"
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMousePressEvent.h"
-#include "mitkModule.h"
-#include "mitkGetModuleContext.h"
+#include "usModule.h"
+#include "usGetModuleContext.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -50,7 +50,7 @@ int mitkEventConfigTest(int argc, char* argv[])
    */
 
   // Construction using compiled-in resrouces:
-   mitk::Module *module = mitk::GetModuleContext()->GetModule();
+   us::Module *module = us::GetModuleContext()->GetModule();
    mitk::EventConfig newConfig("StatemachineConfigTest.xml",module);
 
   MITK_TEST_CONDITION_REQUIRED(

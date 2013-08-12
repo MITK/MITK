@@ -19,7 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SegmentationExports.h"
 #include "mitkAutoSegmentationTool.h"
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk{
   class Segmentation_EXPORT OtsuTool3D : public AutoSegmentationTool
@@ -31,7 +33,7 @@ namespace mitk{
 
       virtual const char* GetName() const;
       virtual const char** GetXPM() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
       virtual void Activated();
       virtual void Deactivated();

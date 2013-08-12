@@ -16,11 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSphereInterpolator.h"
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
-#include <mitkModule.h>
-#include <mitkModuleResource.h>
-#include <mitkModuleResourceStream.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
 
 #include <mitkQBallImage.h>
 
@@ -101,23 +101,23 @@ bool SphereInterpolator::LoadLookuptables()
 {
   MITK_INFO << "SphereInterpolator: loading lookuptables";
 
-  mitk::Module* module = mitk::GetModuleContext()->GetModule();
-  mitk::ModuleResource BaryCoordsRes = module->GetResource(BaryCoordsFileName);
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource BaryCoordsRes = module->GetResource(BaryCoordsFileName);
   if (!BaryCoordsRes.IsValid())
   {
     MITK_INFO << "Could not retrieve resource " << BaryCoordsFileName;
     return false;
   }
 
-  mitk::ModuleResource IndicesRes = module->GetResource(IndicesFileName);
+  us::ModuleResource IndicesRes = module->GetResource(IndicesFileName);
   if (!IndicesRes)
   {
     MITK_INFO << "Could not retrieve resource " << IndicesFileName;
     return false;
   }
 
-  mitk::ModuleResourceStream BaryCoordsStream(BaryCoordsRes, std::ios_base::binary);
-  mitk::ModuleResourceStream IndicesStream(IndicesRes, std::ios_base::binary);
+  us::ModuleResourceStream BaryCoordsStream(BaryCoordsRes, std::ios_base::binary);
+  us::ModuleResourceStream IndicesStream(IndicesRes, std::ios_base::binary);
   return LoadLookuptables(BaryCoordsStream, IndicesStream);
 }
 

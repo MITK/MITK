@@ -25,6 +25,8 @@ bool ConvertGrayscaleOpenCVImageFilter::FilterImage( cv::Mat& image )
   cv::Mat buffer;
 
   cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
+
+  // content of buffer should now be the conten of image
   image.release();
   image = buffer;
 

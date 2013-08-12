@@ -39,8 +39,19 @@ public:
     */
   bool FilterImage( cv::Mat& image );
 
+  /**
+    * \brief Set region of interest for cropping.
+    */
   void SetCropRegion( cv::Rect cropRegion );
+
+  /**
+    * \brief Set region of interest for cropping.
+    */
   void SetCropRegion( int topLeftX, int topLeftY, int bottomRightX, int bottomRightY );
+
+  /**
+    * \brief Returns region, which was set by mitk::CropOpenCVImageFilter::SetCropRegion().
+    */
   cv::Rect GetCropRegion( );
 
 protected:

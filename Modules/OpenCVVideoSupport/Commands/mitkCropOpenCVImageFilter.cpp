@@ -35,10 +35,14 @@ bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
   if ( cropRegion.x + cropRegion.width >= image.size().width)
   {
     cropRegion.width = image.size().width - cropRegion.x;
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+        << "Changed to large roi in x direction to fit the image size.";
   }
   if ( cropRegion.y + cropRegion.height >= image.size().height)
   {
     cropRegion.height = image.size().height - cropRegion.y;
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+        << "Changed to large roi in y direction to fit the image size.";
   }
 
   cv::Mat buffer = image(cropRegion);
@@ -51,8 +55,18 @@ bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
 void CropOpenCVImageFilter::SetCropRegion( cv::Rect cropRegion )
 {
   // First, let's do some basic checks to make sure rectangle is inside of actual image
-  if (cropRegion.x < 0) { cropRegion.x = 0; }
-  if (cropRegion.y < 0) { cropRegion.y = 0; }
+  if (cropRegion.x < 0)
+  {
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+        << "Changed negative x value in roi to 0.";
+    cropRegion.x = 0;
+  }
+  if (cropRegion.y < 0)
+  {
+    cropRegion.y = 0;
+    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+        << "Changed negative y value in roi to 0.";
+  }
 
   // Nothing to save, throw an exception
   if ( cropRegion.height < 0 || cropRegion.width < 0 )

@@ -1,0 +1,41 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+#include "mitkTestingMacros.h"
+#include "mitkToolManagerProvider.h"
+#include "itkLightObject.h"
+
+#include <usGetModuleContext.h>
+#include "mitkModuleContext.h"
+#include "mitkServiceReference.h"
+
+class mitkToolManagerProviderTestClass {
+public:
+
+
+};
+
+int mitkToolManagerProviderTest(int, char* [])
+{
+  MITK_TEST_BEGIN("ToolManagerProvider")
+
+
+  mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference< mitk::ToolManagerProvider >();
+  mitk::ToolManagerProvider* service = mitk::GetModuleContext()->GetService< mitk::ToolManagerProvider >(serviceRef);
+
+  MITK_TEST_CONDITION(service!=NULL,"Service was succesfully  called");
+  MITK_TEST_CONDITION(service->Dummy(), "Dummy call");
+  MITK_TEST_END()
+}

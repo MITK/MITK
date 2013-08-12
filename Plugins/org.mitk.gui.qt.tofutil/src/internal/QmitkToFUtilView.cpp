@@ -456,6 +456,8 @@ void QmitkToFUtilView::OnSurfaceCheckboxChecked(bool checked)
     this->m_SurfaceNode->SetData(this->m_Surface);
     this->m_SurfaceNode->SetMapper(mitk::BaseRenderer::Standard3D, m_ToFSurfaceVtkMapper3D);
 
+    this->m_ToFDistanceImageToSurfaceFilter->SetTriangulationThreshold( this->m_Controls->m_TriangulationThreshold->value() );
+
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
     this->GetRenderWindowPart()->GetRenderingManager()->InitializeViews(
           this->m_Surface->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);

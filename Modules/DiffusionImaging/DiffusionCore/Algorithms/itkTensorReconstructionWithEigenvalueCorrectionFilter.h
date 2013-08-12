@@ -185,6 +185,8 @@ namespace itk
     vnl_matrix<double> m_PseudoInverse;
     vnl_matrix<double> m_H;
     vnl_vector<double> m_BVec;
+
+    /** m_B0Mask indicates whether a volume identified by an index is B0-weighted or not */
     vnl_vector<short> m_B0Mask;
     vnl_vector<double> m_Voxdim;
 

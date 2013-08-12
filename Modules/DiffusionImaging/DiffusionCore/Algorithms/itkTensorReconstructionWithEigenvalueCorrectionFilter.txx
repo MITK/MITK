@@ -65,32 +65,6 @@ namespace itk
     }
 
 
-    typename GradientImagesType::SpacingType spacing_term = m_GradientImagePointer->GetSpacing();
-    typename GradientImagesType::DirectionType direction_term = m_GradientImagePointer->GetDirection();
-
-
-    // Explain function of vox_dim_step
-    vnl_matrix <double> vox_dim_step (3,3);
-
-    for (int i=0;i<3;i++)
-    {
-      for(int j=0;j<3;j++)
-      {
-        vox_dim_step[i][j]=spacing_term[i]*direction_term[i][j];
-      }
-    }
-
-    vnl_symmetric_eigensystem <double> eigen_spacing(vox_dim_step);
-
-    vnl_vector <double> vox_dim (3);
-
-    vox_dim[0]=eigen_spacing.get_eigenvalue(0);
-    vox_dim[1]=eigen_spacing.get_eigenvalue(1);
-    vox_dim[2]=eigen_spacing.get_eigenvalue(2);
-
-    vox_dim=vox_dim/(vox_dim.min_value());
-
-
     // Matrix to store al diffusion encoding gradients
     vnl_matrix<double> directions(nof-numberb0,3);
 
@@ -415,7 +389,7 @@ namespace itk
 
     this->SetNthOutput(0, tensorImg);
 
-    m_Voxdim = vox_dim;
+    //m_Voxdim = vox_dim;
 
 
   }

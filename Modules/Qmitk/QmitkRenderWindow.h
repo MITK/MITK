@@ -29,6 +29,7 @@
 class QmitkStdMultiWidget;
 class QDragEnterEvent;
 class QDropEvent;
+class QInputEvent;
 
 /**
  * \ingroup QmitkModule
@@ -162,10 +163,8 @@ private:
   mitk::Point2D GetMousePosition(QWheelEvent* we) const;
   mitk::InteractionEvent::MouseButtons GetEventButton(QMouseEvent* me) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent* me) const;
-  mitk::InteractionEvent::ModifierKeys GetModifiers(QMouseEvent* me) const;
+  mitk::InteractionEvent::ModifierKeys GetModifiers(QInputEvent* me) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent* we) const;
-  mitk::InteractionEvent::ModifierKeys GetModifiers(QWheelEvent* we) const;
-  mitk::InteractionEvent::ModifierKeys GetModifiers(QKeyEvent* ke) const;
   std::string GetKeyLetter(QKeyEvent* ke) const;
   int GetDelta(QWheelEvent* we) const;
   bool m_ResendQtEvents;

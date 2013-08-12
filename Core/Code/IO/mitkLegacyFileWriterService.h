@@ -48,7 +48,7 @@ namespace mitk {
 
     mitkNewMacro4Param( Self, mitk::FileWriter::Pointer, std::string, std::string, std::string);
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0);
+    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path);
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream );
 

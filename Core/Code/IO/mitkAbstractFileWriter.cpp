@@ -23,16 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::AbstractFileWriter::AbstractFileWriter() :
-m_Priority (0),
-m_Extension ("")
+m_Priority (0)
 {
 }
 
 mitk::AbstractFileWriter::AbstractFileWriter(std::string basedataType, std::string extension, std::string description) :
-m_Priority (0),
 m_Extension (extension),
+m_BasedataType(basedataType),
 m_Description (description),
-m_BasedataType(basedataType)
+m_Priority (0)
 {
 }
 
@@ -84,7 +83,7 @@ void mitk::AbstractFileWriter::Write(const itk::SmartPointer<BaseData> data, con
   this->Write(data, stream);
 }
 
-//////////// µS Registration & Properties //////////////
+//////////// ÂµS Registration & Properties //////////////
 
 void mitk::AbstractFileWriter::RegisterMicroservice(mitk::ModuleContext* context)
 {
@@ -155,7 +154,7 @@ float mitk::AbstractFileWriter::GetProgress() const
   return 1;
 }
 
-////////////////// µS related Getters //////////////////
+////////////////// ÂµS related Getters //////////////////
 
 int mitk::AbstractFileWriter::GetPriority() const
 {

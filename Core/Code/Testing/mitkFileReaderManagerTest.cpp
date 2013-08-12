@@ -49,6 +49,8 @@ public:
   mitkClassMacro(DummyReader, itk::LightObject);
   itkNewMacro(Self);
 
+  using mitk::AbstractFileReader::Read;
+
   virtual std::list< itk::SmartPointer<mitk::BaseData> >  Read(const std::istream& stream, mitk::DataStorage *ds = 0)
   {
     std::list<mitk::BaseData::Pointer> result;

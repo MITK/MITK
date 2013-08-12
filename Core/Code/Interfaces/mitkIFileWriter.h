@@ -97,7 +97,7 @@ namespace mitk {
     //*/
     //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0) = 0;
+    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path ) = 0;
 
     virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream ) = 0;
 

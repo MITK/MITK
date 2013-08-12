@@ -112,7 +112,7 @@ namespace mitk {
     * \brief Reads the specified file and returns its contents.
     *
     */
-    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path = 0, mitk::DataStorage* ds = 0) = 0;
+    virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* ds = 0) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.

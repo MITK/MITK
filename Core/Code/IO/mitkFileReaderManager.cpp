@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::Read(const std::string& path)
 {
-  mitk::ModuleContext * context = mitk::GetModuleContext();
   // Find extension
   std::string extension = path;
   extension.erase(0, path.find_last_of('.'));
@@ -51,7 +50,8 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std:
   {
     try
     {
-      result.merge(Read( *iterator ));
+      std::list<mitk::BaseData::Pointer> baseDataList = Read( *iterator );
+      result.merge(baseDataList);
     }
     catch (...)
     {

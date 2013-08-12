@@ -49,7 +49,9 @@ namespace mitk {
 
     mitkNewMacro3Param( Self, std::string, std::string, std::string);
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0);
+    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path);
+
+    using LegacyFileWriterService::Write;
 
 protected:
     LegacyImageWriterService(std::string basedataType, std::string extension, std::string description);

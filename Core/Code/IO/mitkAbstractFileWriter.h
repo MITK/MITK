@@ -72,7 +72,7 @@ namespace mitk {
     /**
     * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
     */
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path = 0);
+    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path);
 
     /**
     * \brief Write the data in <code>data</code> to the the stream specified in <code>stream</code>

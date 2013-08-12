@@ -23,15 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::AbstractFileReader::AbstractFileReader() :
-m_Priority (0),
-m_Extension ("")
+m_Priority (0)
 {
 }
 
 mitk::AbstractFileReader::AbstractFileReader(std::string extension, std::string description) :
-m_Priority (0),
 m_Extension (extension),
-m_Description (description)
+m_Description (description),
+m_Priority (0)
 {
 }
 
@@ -87,7 +86,7 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
   return this->Read(stream);
 }
 
-//////////// µS Registration & Properties //////////////
+//////////// ÂµS Registration & Properties //////////////
 
 void mitk::AbstractFileReader::RegisterMicroservice(mitk::ModuleContext* context)
 {
@@ -153,7 +152,7 @@ float mitk::AbstractFileReader::GetProgress() const
   return 1;
 }
 
-////////////////// µS related Getters //////////////////
+////////////////// ÂµS related Getters //////////////////
 
 int mitk::AbstractFileReader::GetPriority() const
 {

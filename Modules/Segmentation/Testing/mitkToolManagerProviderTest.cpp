@@ -44,6 +44,6 @@ int mitkToolManagerProviderTest(int, char* [])
 
 
   MITK_TEST_CONDITION(service!=NULL,"Service was succesfully  called");
-  MITK_TEST_CONDITION((service->GetToolManager()) == (service->GetToolManager()), "Service singleton");
+  MITK_TEST_CONDITION((service->GetToolManager()) == (mitk::ToolManagerProvider::GetInstance()->GetToolManager()), "Service singleton");
   MITK_TEST_END()
 }

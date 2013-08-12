@@ -36,7 +36,7 @@ mitk::ToolManagerProvider::~ToolManagerProvider()
 
 mitk::ToolManager* mitk::ToolManagerProvider::GetToolManager()
 {
-  return this->m_ToolManager;
+  return this->m_ToolManager.GetPointer();
 }
 
 

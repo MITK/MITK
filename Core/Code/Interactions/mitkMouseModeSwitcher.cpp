@@ -16,9 +16,9 @@
 
 #include "mitkMouseModeSwitcher.h"
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+
 #include "mitkInteractionEventObserver.h"
 
 mitk::MouseModeSwitcher::MouseModeSwitcher() :
@@ -41,9 +41,9 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
     m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
-    ServiceProperties props;
+    us::ServiceProperties props;
     props["name"] = std::string("DisplayInteractor");
-    m_ServiceRegistration = GetModuleContext()->RegisterService<InteractionEventObserver>(
+    m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
         m_CurrentObserver.GetPointer(),props);
 
   }

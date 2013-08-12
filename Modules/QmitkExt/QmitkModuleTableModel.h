@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkExtExports.h>
 
-namespace mitk {
+namespace us {
 class ModuleContext;
 class Module;
 }
@@ -34,7 +34,7 @@ class QmitkExt_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {
 public:
 
-  QmitkModuleTableModel(QObject* parent = 0, mitk::ModuleContext* mc = 0);
+  QmitkModuleTableModel(QObject* parent = 0, us::ModuleContext* mc = 0);
   ~QmitkModuleTableModel();
 
 protected:
@@ -51,7 +51,7 @@ private:
 
   friend class QmitkModuleTableModelPrivate;
 
-  void insertModule(mitk::Module* module);
+  void insertModule(us::Module* module);
 
   QmitkModuleTableModelPrivate* const d;
 };

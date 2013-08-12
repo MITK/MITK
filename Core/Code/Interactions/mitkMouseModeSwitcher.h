@@ -120,7 +120,7 @@ namespace mitk {
      * Reference to the service registration of the observer,
      * it is needed to unregister the observer on unload.
      */
-    ServiceRegistration m_ServiceRegistration;
+    us::ServiceRegistration<InteractionEventObserver> m_ServiceRegistration;
   };
 } // namespace mitk
 

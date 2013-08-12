@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usServiceProperties.h>
-#include "mitkModuleContext.h"
+#include <usModuleContext.h>
 
 const std::string mitk::USDevice::US_INTERFACE_NAME = "org.mitk.services.UltrasoundDevice";
 const std::string mitk::USDevice::US_PROPKEY_LABEL = US_INTERFACE_NAME + ".label";
@@ -82,9 +82,9 @@ mitk::USDevice::~USDevice()
 
 }
 
-mitk::ServiceProperties mitk::USDevice::ConstructServiceProperties()
+us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 {
-  ServiceProperties props;
+  us::ServiceProperties props;
   std::string yes = "true";
   std::string no = "false";
 
@@ -129,10 +129,10 @@ bool mitk::USDevice::Connect()
   m_IsConnected = true;
 
   // Get Context and Module
-  mitk::ModuleContext* context = GetModuleContext();
-  ServiceProperties props = ConstructServiceProperties();
+  us::ModuleContext* context = us::GetModuleContext();
+  us::ServiceProperties props = ConstructServiceProperties();
 
-  m_ServiceRegistration = context->RegisterService<mitk::USDevice>(this, props);
+  m_ServiceRegistration = context->RegisterService(this, props);
 
   // This makes sure that the SmartPointer to this device does not invalidate while the device is connected
   this->Register();
@@ -168,7 +168,7 @@ bool mitk::USDevice::Activate()
   m_IsActive = true; // <- Necessary to safely allow Subclasses to start threading based on activity state
   m_IsActive = OnActivation();
 
-  ServiceProperties props = ConstructServiceProperties();
+  us::ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   return m_IsActive;
 }
@@ -178,7 +178,7 @@ void mitk::USDevice::Deactivate()
 {
   m_IsActive= false;
 
-  ServiceProperties props = ConstructServiceProperties();
+  us::ServiceProperties props = ConstructServiceProperties();
   this->m_ServiceRegistration.SetProperties(props);
   OnDeactivation();
 }
@@ -276,7 +276,7 @@ void mitk::USDevice::setCalibration (mitk::AffineTransform3D::Pointer calibratio
   m_Metadata->SetDeviceIsCalibrated(true);
   if (m_ServiceRegistration != 0)
   {
-    ServiceProperties props = ConstructServiceProperties();
+    us::ServiceProperties props = ConstructServiceProperties();
     this->m_ServiceRegistration.SetProperties(props);
   }
 }

@@ -30,10 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsHolder.h"
 #include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
-#include <mitkModule.h>
-#include <mitkModuleContext.h>
-#include <mitkModuleResource.h>
-#include <mitkGetModuleContext.h>
+
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 #include <vtkLookupTable.h>
 
@@ -66,17 +67,17 @@ void mitk::WatershedTool::Deactivated()
   Superclass::Deactivated();
 }
 
-mitk::ModuleResource mitk::WatershedTool::GetIconResource() const
+us::ModuleResource mitk::WatershedTool::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Watershed_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Watershed_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
+us::ModuleResource mitk::WatershedTool::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Watershed_Cursor_32x32.png");
   return resource;
 }
 

@@ -13,7 +13,9 @@ MITK_USE_MODULE(Mitk)
 include_directories(${ALL_INCLUDE_DIRECTORIES})
 link_directories(${ALL_LIBRARY_DIRS})
 
-add_executable(${PROJECT_NAME} QtFreeRender.cpp)
+usFunctionGenerateExecutableInit(init_src_file IDENTIFIER ${PROJECT_NAME})
+
+add_executable(${PROJECT_NAME} QtFreeRender.cpp ${init_src_file})
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBRARIES} )
 
 # subproject support

@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
-#include "mitkGetModuleContext.h"
+#include "usGetModuleContext.h"
 
 //Includes for 3DSurfaceInterpolation
 #include "mitkImageToContourFilter.h"
@@ -237,8 +237,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const PositionEvent* position
     if (m_3DInterpolationEnabled && contour->GetVtkPolyData()->GetNumberOfPoints() > 0 )
     {
       unsigned int pos = this->AddContourmarker(positionEvent);
-      mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-      PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+      us::ServiceReference<PlanePositionManagerService> serviceRef =
+          us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+      PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
       mitk::SurfaceInterpolationController::GetInstance()->AddNewContour( contour, service->GetPlanePosition(pos));
       contour->DisconnectPipeline();
     }
@@ -315,8 +316,9 @@ unsigned int mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEv
   const mitk::Geometry2D* plane = dynamic_cast<const Geometry2D*> (dynamic_cast< const mitk::SlicedGeometry3D*>(
     positionEvent->GetSender()->GetSliceNavigationController()->GetCurrentGeometry3D())->GetGeometry2D(0));
 
-  mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
-  PlanePositionManagerService* service = dynamic_cast<PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+  us::ServiceReference<PlanePositionManagerService> serviceRef =
+      us::GetModuleContext()->GetServiceReference<PlanePositionManagerService>();
+  PlanePositionManagerService* service = us::GetModuleContext()->GetService(serviceRef);
   unsigned int size = service->GetNumberOfPlanePositions();
   unsigned int id = service->AddNewPlanePosition(plane, positionEvent->GetSender()->GetSliceNavigationController()->GetSlice()->GetPos());
 

@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowPreset.h"
 #include <vtkObjectFactory.h>
 
-#include "mitkGetModuleContext.h"
-#include "mitkModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 namespace mitk {
 
@@ -39,10 +39,10 @@ LevelWindowPreset::~LevelWindowPreset()
 
 bool LevelWindowPreset::LoadPreset()
 {
-  ModuleResource presetResource = GetModuleContext()->GetModule()->GetResource("mitkLevelWindowPresets.xml");
+  us::ModuleResource presetResource = us::GetModuleContext()->GetModule()->GetResource("mitkLevelWindowPresets.xml");
   if (!presetResource) return false;
 
-  ModuleResourceStream presetStream(presetResource);
+  us::ModuleResourceStream presetStream(presetResource);
   vtkXMLParser::SetStream(&presetStream);
   if ( !vtkXMLParser::Parse() )
   {

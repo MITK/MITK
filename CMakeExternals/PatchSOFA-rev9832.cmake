@@ -8,8 +8,21 @@ set(CONTENTS ${vector_device_h})
 configure_file(${TEMPLATE_FILE} "framework/sofa/helper/vector_device.h" @ONLY)
 
 file(STRINGS "sofa-dependencies.cmake" sofaDependencies_cmake NEWLINE_CONSUME)
+string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" sofaDependencies_cmake "${sofaDependencies_cmake}")
 string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" sofaDependencies_cmake "${sofaDependencies_cmake}")
 file(WRITE "sofa-dependencies.cmake" "${sofaDependencies_cmake}")
+
+file(STRINGS "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/component/SofaBaseVisual/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "modules/sofa/component/SofaLoader/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/component/SofaLoader/CMakeLists.txt" "${CMakeLists_txt}")
+
+file(STRINGS "modules/sofa/simulation/common/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
+string(REPLACE "tinyxml" "SofaTinyXml" CMakeLists_txt "${CMakeLists_txt}")
+file(WRITE "modules/sofa/simulation/common/CMakeLists.txt" "${CMakeLists_txt}")
 
 file(STRINGS "modules/sofa/component/SofaUserInteraction/CMakeLists.txt" CMakeLists_txt NEWLINE_CONSUME)
 string(REPLACE "../collision/AddFramePerformer." "#../collision/AddFramePerformer." CMakeLists_txt "${CMakeLists_txt}")
@@ -90,5 +103,5 @@ set(SOFA_LIBRARIES
   debug SofaUserInteraction\${version}d optimized SofaUserInteraction\${version}
   debug SofaValidation\${version}d optimized SofaValidation\${version}
   debug SofaVolumetricData\${version}d optimized SofaVolumetricData\${version}
-  debug tinyxml\${version}d optimized tinyxml\${version}
+  debug SofaTinyXml\${version}d optimized SofaTinyXml\${version}
 )")

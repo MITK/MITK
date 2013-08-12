@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  struct IToFDeviceFactory;
+
   /**
   * @brief ToFDeviceListener
   *
@@ -52,7 +54,7 @@ namespace mitk
     ~ToFDeviceFactoryManager();
 
     std::vector<std::string> m_RegisteredFactoryNames;
-    std::list<ServiceReference> m_RegisteredFactoryRefs;
+    std::vector<us::ServiceReference<IToFDeviceFactory> > m_RegisteredFactoryRefs;
 
 
   private:

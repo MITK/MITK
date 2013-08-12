@@ -249,17 +249,12 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
     // Applying shading properties
-    {
-        Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
-        // VTK Properties
-        ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
-        // Shaders
-        IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-        if (shaderRepo != NULL)
-        {
-            shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
-        }
-    }
+    Superclass::ApplyColorAndOpacityProperties( renderer, ls->m_Actor ) ;
+    // VTK Properties
+    ApplyMitkPropertiesToVtkProperty( this->GetDataNode(), ls->m_Actor->GetProperty(), renderer );
+    // Shaders
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->ApplyProperties(this->GetDataNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
     mitk::LookupTableProperty::Pointer lookupTableProp;
     this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
@@ -467,11 +462,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     }
 
     // Shaders
-    IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-    if (shaderRepo)
-    {
-        shaderRepo->AddDefaultProperties(node,renderer,overwrite);
-    }
+    CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+    shaderRepo->AddDefaultProperties(node,renderer,overwrite);
 }
 
 

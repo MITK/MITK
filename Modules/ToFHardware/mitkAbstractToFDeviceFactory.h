@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Microservices
 #include <usServiceRegistration.h>
-#include <mitkModuleResource.h>
+#include <usModuleResource.h>
 
 namespace mitk
 {
@@ -56,11 +56,11 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
    * In subclasses, you can override this method to return a different xml resource.
    * See this implementation for an example.
    */
-   virtual mitk::ModuleResource GetIntrinsicsResource();
+   virtual us::ModuleResource GetIntrinsicsResource();
 
 
    std::vector<ToFCameraDevice::Pointer> m_Devices;
-   std::map<ToFCameraDevice*,ServiceRegistration> m_DeviceRegistrations;
+   std::map<ToFCameraDevice*,us::ServiceRegistration<ToFCameraDevice> > m_DeviceRegistrations;
 };
 }
 #endif

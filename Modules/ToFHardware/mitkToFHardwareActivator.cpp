@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceRegistration.h>
 #include <usModuleActivator.h>
-#include "mitkModuleContext.h"
+#include <usModuleContext.h>
 
-#include <mitkModuleActivator.h>
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
@@ -34,14 +33,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class ToFHardwareActivator : public mitk::ModuleActivator {
+class ToFHardwareActivator : public us::ModuleActivator {
 public:
 
-    void Load(mitk::ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
         //Registering MITKPlayerDevice as MicroService
         ToFCameraMITKPlayerDeviceFactory* toFCameraMITKPlayerDeviceFactory = new ToFCameraMITKPlayerDeviceFactory();
-        ServiceProperties mitkPlayerFactoryProps;
+        us::ServiceProperties mitkPlayerFactoryProps;
         mitkPlayerFactoryProps["ToFFactoryName"] = toFCameraMITKPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMITKPlayerDeviceFactory, mitkPlayerFactoryProps);
         //Create an instance of the player
@@ -50,7 +49,7 @@ public:
         m_Factories.push_back( toFCameraMITKPlayerDeviceFactory );
     }
 
-    void Unload(mitk::ModuleContext* )
+    void Unload(us::ModuleContext* )
     {
     }
 

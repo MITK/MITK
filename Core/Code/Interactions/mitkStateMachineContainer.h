@@ -29,9 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineAction.h"
 
-namespace mitk {
+namespace us {
+class Module;
+}
 
-  class Module;
+namespace mitk {
 
   /**
    *@brief
@@ -64,7 +66,7 @@ namespace mitk {
     * Loads a XML resource file in the given module context.
     * The files have to be placed in the Resources/Interaction folder of their respective module.
     **/
-    bool LoadBehavior(const std::string& fileName , const Module* module);
+    bool LoadBehavior(const std::string& fileName , const us::Module* module);
 
 
     /**

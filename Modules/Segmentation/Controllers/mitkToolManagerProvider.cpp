@@ -14,16 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkToolManagerProviderImpl.h"
+#include "mitkToolManagerProvider.h"
 
-mitk::ToolManagerProviderImpl::ToolManagerProviderImpl()
+
+
+mitk::ToolManagerProvider::ToolManagerProvider()
 {
-}
-mitk::ToolManagerProviderImpl::~ToolManagerProviderImpl()
-{
+  this->m_ToolManager = mitk::ToolManager::New(NULL);
 }
 
-bool mitk::ToolManagerProviderImpl::Dummy()
+mitk::ToolManagerProvider::~ToolManagerProvider()
 {
-  return true;
+  this->m_ToolManager = NULL;
+}
+
+mitk::ToolManager* mitk::ToolManagerProvider::GetToolManager()
+{
+  return this->m_ToolManager;
+}
+
+mitk::ToolManagerProvider* mitk::ToolManagerProvider::GetInstance()
+{
+  return NULL;
 }

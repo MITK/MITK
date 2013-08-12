@@ -27,7 +27,7 @@ set(CPP_FILES
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkSegmentationModuleActivator.cpp
-  Controllers/mitkToolManagerProviderImpl.cpp
+  Controllers/mitkToolManagerProvider.cpp
   DataManagement/mitkContour.cpp
   DataManagement/mitkContourElement.cpp
   DataManagement/mitkContourModel.cpp

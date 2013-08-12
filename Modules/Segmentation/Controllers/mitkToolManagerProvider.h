@@ -17,26 +17,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_TOOLMANAGERPROVIDER_H
 #define MITK_TOOLMANAGERPROVIDER_H
 
+#include <usModuleContext.h>
 #include <usServiceInterface.h>
 
-namespace mitk {
+#include "mitkToolManager.h"
+#include <itkObjectFactory.h>
+#include <mitkCommon.h>
 
+//class SegmentationModuleActivator;
 
-  /**
-  * \ingroup MicroServices_Interfaces
-  *
-  */
-  struct ToolManagerProvider
+namespace mitk
+{
+
+  class ToolManagerProvider : public itk::LightObject
   {
-    virtual ~ToolManagerProvider() {}
+  public:
+    mitkClassMacro(ToolManagerProvider, itk::LightObject);
+    itkNewMacro(ToolManagerProvider);
 
-    virtual bool Dummy() = 0;
+    virtual mitk::ToolManager* GetToolManager();
 
+    static mitk::ToolManagerProvider* GetInstance();
+
+    //friend class SegmentationModuleActivator;
+
+  protected:
+    //mitkClassMacro(ToolManagerProvider, itk::LightObject);
+    //itkNewMacro(Self);
+
+    ToolManagerProvider();
+    virtual ~ToolManagerProvider();
+
+    mitk::ToolManager::Pointer m_ToolManager;
   };
-
 }
 
-
-  US_DECLARE_SERVICE_INTERFACE(mitk::ToolManagerProvider, "org.mitk.services.ToolManagerProvider")
+US_DECLARE_SERVICE_INTERFACE(mitk::ToolManagerProvider, "org.mitk.services.ToolManagerProvider")
 
 #endif

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <usModule.h>
 
-#include "mitkContourManagerImpl.h"
+#include "mitkToolManagerProvider.h"
 
 namespace mitk
 {
@@ -29,6 +29,9 @@ namespace mitk
 
     void Load(mitk::ModuleContext* context)
     {
+      /*register ToolManager provider service*/
+      m_ToolManagerProvider = mitk::ToolManagerProvider::New();
+      context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
     }
 
     void Unload(ModuleContext*)
@@ -36,7 +39,7 @@ namespace mitk
     }
 
   private:
-    mitk::ContourManagerImpl::Pointer m_ContourManagerImpl;
+    mitk::ToolManagerProvider::Pointer m_ToolManagerProvider;
   };
 }
 

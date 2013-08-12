@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
+#include "mitkStatusBar.h"
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
@@ -31,14 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkResliceInterpolationProperty.h"
 
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
-#include "mitkModuleResource.h"
-#include "mitkStatusBar.h"
 #include "mitkApplicationCursor.h"
-
 #include "mitkSegmentationObjectFactory.h"
+#include "mitkPluginActivator.h"
+
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 const std::string QmitkSegmentationView::VIEW_ID =
     "org.mitk.views.segmentation";
@@ -164,13 +163,11 @@ void QmitkSegmentationView::Deactivated()
     }
     m_BinaryPropertyObserverTags.clear();
 
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTK plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+    ctkPluginContext* context = mitk::PluginActivator::getContext();
+    ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
     service->RemoveAllPlanePositions();
+    context->ungetService(ppmRef);
   }
 }
 
@@ -459,13 +456,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
     mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
                                                                             , mitk::BoolProperty::New(true)));
 
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTK plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
+    ctkPluginContext* context = mitk::PluginActivator::getContext();
+    ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
 
     for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
     {
@@ -477,6 +470,9 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
       this->GetDataStorage()->Remove(it->Value());
     }
+
+    context->ungetService(ppmRef);
+    service = NULL;
 
     if ((m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
     {
@@ -891,14 +887,14 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     unsigned int t = nodeName.find_last_of(" ");
     unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
 
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTL plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
+    {
+      ctkPluginContext* context = mitk::PluginActivator::getContext();
+      ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+      mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
+      selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
+      context->ungetService(ppmRef);
+    }
 
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
-    selectedRenderWindow->GetSliceNavigationController()->ExecuteOperation(service->GetPlanePosition(id));
     selectedRenderWindow->GetRenderer()->GetDisplayGeometry()->Fit();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -1111,7 +1107,7 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
         text += "\"";
         mitk::StatusBar::GetInstance()->DisplayText(text.c_str());
 
-        mitk::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
+        us::ModuleResource resource = toolManager->GetToolById(id)->GetCursorIconResource();
         this->SetMouseCursor(resource, 0, 0);
     }
     else
@@ -1130,15 +1126,18 @@ void QmitkSegmentationView::ResetMouseCursor()
   }
 }
 
-void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource, int hotspotX, int hotspotY )
+void QmitkSegmentationView::SetMouseCursor( const us::ModuleResource& resource, int hotspotX, int hotspotY )
 {
+  if (!resource) return;
+
   // Remove previously set mouse cursor
   if ( m_MouseCursorSet )
   {
     mitk::ApplicationCursor::GetInstance()->PopCursor();
   }
 
-  mitk::ApplicationCursor::GetInstance()->PushCursor( resource, hotspotX, hotspotY );
+  us::ModuleResourceStream cursor(resource, std::ios::binary);
+  mitk::ApplicationCursor::GetInstance()->PushCursor( cursor, hotspotX, hotspotY );
   m_MouseCursorSet = true;
 }
 

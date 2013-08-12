@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
-#include "mitkModuleRegistry.h"
+#include "usModuleRegistry.h"
 
 
 struct QmitkPlanarFigureData
@@ -233,7 +233,7 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( nonConstNode );

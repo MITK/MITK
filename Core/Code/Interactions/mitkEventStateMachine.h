@@ -25,6 +25,10 @@
 #include <MitkExports.h>
 #include <string>
 
+namespace us {
+class Module;
+}
+
 namespace mitk
 {
   class StateMachineTransition;
@@ -34,7 +38,6 @@ namespace mitk
   class InteractionEvent;
   class StateMachineState;
   class DataNode;
-  class Module;
 
   /**
    * \class TActionFunctor
@@ -118,7 +121,7 @@ namespace mitk
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string& filename, const Module* module = NULL);
+    bool LoadStateMachine(const std::string& filename, const us::Module* module = NULL);
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for

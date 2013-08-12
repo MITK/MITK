@@ -20,10 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkExports.h>
 #include "mitkApplicationCursor.h"
 
-namespace mitk {
-class ModuleResource;
-}
-
 /*!
   \ingroup QmitkModule
   \brief Qt specific implementation of ApplicationCursorImplementation
@@ -39,7 +35,7 @@ class QMITK_EXPORT QmitkApplicationCursor : public mitk::ApplicationCursorImplem
     QmitkApplicationCursor();
 
     virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY);
-    virtual void PushCursor(const mitk::ModuleResource, int hotspotX, int hotspotY);
+    virtual void PushCursor(std::istream&, int hotspotX, int hotspotY);
     virtual void PopCursor();
     virtual const mitk::Point2I GetCursorPosition();
     virtual void SetCursorPosition(const mitk::Point2I&);

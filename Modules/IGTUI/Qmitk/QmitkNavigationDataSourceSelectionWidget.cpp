@@ -18,9 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk headers
 #include <mitkNavigationDataSource.h>
-#include <mitkGetModuleContext.h>
-#include <qlistwidget.h>
-
+#include <usGetModuleContext.h>
 
 
 
@@ -62,7 +60,7 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
   }
 }
 
-void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk::ServiceReference s)
+void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::ServiceReference<mitk::NavigationDataSource> s)
   {
     if (!s) //no device selected
       {
@@ -73,21 +71,21 @@ void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(mitk
       }
 
     // Get Source
-    m_CurrentSource = this->m_Controls->m_NaviagationDataSourceWidget->TranslateReference<mitk::NavigationDataSource>(s);
+    us::ModuleContext* context = us::GetModuleContext();
+    m_CurrentSource = context->GetService(s);
     std::string id = s.GetProperty(mitk::NavigationDataSource::US_PROPKEY_ID).ToString();
-    mitk::ModuleContext* context = mitk::GetModuleContext();
 
     //Fill tool list
-    for(int i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
+    for(std::size_t i = 0; i < m_CurrentSource->GetNumberOfOutputs(); i++) {new QListWidgetItem(tr(m_CurrentSource->GetOutput(i)->GetName()), m_Controls->m_ToolView);}
 
 
     // Create Filter for ToolStorage
-    std::string filter = "(&(" + mitk::ServiceConstants::OBJECTCLASS() + "=" + mitk::NavigationToolStorage::US_INTERFACE_NAME + ")("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + "))";
+    std::string filter = "("+ mitk::NavigationToolStorage::US_PROPKEY_SOURCE_ID + "=" + id + ")";
 
     // Get Storage
-    std::list<mitk::ServiceReference> refs = context->GetServiceReferences(mitk::NavigationToolStorage::US_INTERFACE_NAME, filter);
-    if (refs.size() == 0) return; //no storage was found
-    m_CurrentStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+    std::vector<us::ServiceReference<mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>(filter);
+    if (refs.empty()) return; //no storage was found
+    m_CurrentStorage = context->GetService(refs.front());
     if (m_CurrentStorage.IsNull())
       {
       MITK_WARN << "Found an invalid storage object!";

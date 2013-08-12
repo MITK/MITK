@@ -668,7 +668,6 @@ endforeach()
 link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
-include(${CMAKE_CURRENT_BINARY_DIR}/Core/Code/CppMicroServices/CppMicroServicesConfig.cmake)
 
 add_subdirectory(Modules)
 

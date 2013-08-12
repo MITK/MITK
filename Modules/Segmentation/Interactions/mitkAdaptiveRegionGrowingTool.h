@@ -24,7 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetInteractor.h"
 #include "mitkPointSet.h"
 
+namespace us {
 class ModuleResource;
+}
 
 namespace mitk
 {
@@ -47,7 +49,7 @@ namespace mitk
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
 
     virtual void Activated();

@@ -56,7 +56,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarPolygon.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
 #include "mitkDiffusionImage.h"
-#include "mitkModuleRegistry.h"
+#include "usModuleRegistry.h"
 
 #include <itkVectorImage.h>
 #include "itkTensorDerivedMeasurementsFilter.h"
@@ -1862,7 +1862,7 @@ void QmitkPartialVolumeAnalysisView::Activated()
           if(figureInteractor.IsNull())
           {
             figureInteractor = mitk::PlanarFigureInteractor::New();
-            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+            us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
             figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
             figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
             figureInteractor->SetDataNode( node );
@@ -2118,7 +2118,7 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
         if(figureInteractor.IsNull())
         {
           figureInteractor = mitk::PlanarFigureInteractor::New();
-          mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
           figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
           figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
           figureInteractor->SetDataNode( nonConstNode );

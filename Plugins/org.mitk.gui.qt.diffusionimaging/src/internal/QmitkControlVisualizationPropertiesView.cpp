@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOdfScaleByProperty.h"
 #include "mitkResliceMethodProperty.h"
 #include "mitkRenderingManager.h"
-#include "mitkModuleRegistry.h"
 
 #include "mitkTbssImage.h"
 #include "mitkPlanarFigure.h"
@@ -36,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionImage.h>
 #include <mitkConnectomicsNetwork.h>
 #include "mitkGlobalInteraction.h"
+#include "usModuleRegistry.h"
 
 #include "mitkGeometry2D.h"
 
@@ -1684,7 +1684,7 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( m_SelectedNode );

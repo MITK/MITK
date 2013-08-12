@@ -28,9 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, FastMarchingTool3D, "FastMarching3D tool");
@@ -59,10 +60,10 @@ const char** mitk::FastMarchingTool3D::GetXPM() const
   return NULL;//mitkFastMarchingTool3D_xpm;
 }
 
-mitk::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
+us::ModuleResource mitk::FastMarchingTool3D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("FastMarching_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("FastMarching_48x48.png");
   return resource;
 }
 

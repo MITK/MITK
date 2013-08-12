@@ -1,3 +1,0 @@
-
-usFunctionCreateTestModule(TestModuleS usTestModuleS.cpp)
-

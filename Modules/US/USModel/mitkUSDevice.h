@@ -229,7 +229,7 @@ namespace mitk {
       *  register the object with the Microservices
       *  Return service properties
       */
-      mitk::ServiceProperties ConstructServiceProperties();
+      us::ServiceProperties ConstructServiceProperties();
 
 
       /**
@@ -300,7 +300,7 @@ namespace mitk {
       /**
       *  \brief The device's ServiceRegistration object that allows to modify it's Microservice registraton details.
       */
-       mitk::ServiceRegistration m_ServiceRegistration;
+       us::ServiceRegistration<Self> m_ServiceRegistration;
 
 
 

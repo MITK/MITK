@@ -66,13 +66,22 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
 void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 {
   mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
-  if (device.IsNull()) return;
-  if (device->GetIsActive()) device->Deactivate();
-  else device->Activate();
-
-  if ( ! device->GetIsActive() )
+  if (device.IsNull())
   {
-    QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
+    return;
+  }
+  if (device->GetIsActive())
+  {
+    device->Deactivate();
+  }
+  else
+  {
+    device->Activate();
+
+    if ( ! device->GetIsActive() )
+    {
+      QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
+    }
   }
 
   // Manually reevaluate Button logic
@@ -81,7 +90,7 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
 
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
-  if (device.IsNull()) return;
+  if (device.IsNull()) { return; }
   device->Disconnect();
 }
 

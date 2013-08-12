@@ -69,20 +69,7 @@ namespace itk
     typename GradientImagesType::DirectionType direction_term = m_GradientImagePointer->GetDirection();
 
 
-    /*
-    vnl_vector <double> spacing_vnl(3);
-    vnl_matrix <double> dir_vnl (3,3);
-
-    for (int i=0;i<3;i++)
-    {
-      spacing_vnl[i]=spacing_term[i];
-
-      for(int j=0;j<3;j++)
-      {
-        dir_vnl[i][j]=direction_term[i][j];
-      }
-    }*/
-
+    // Explain function of vox_dim_step
     vnl_matrix <double> vox_dim_step (3,3);
 
     for (int i=0;i<3;i++)
@@ -104,9 +91,10 @@ namespace itk
     vox_dim=vox_dim/(vox_dim.min_value());
 
 
+    // Matrix to store al diffusion encoding gradients
     vnl_matrix<double> directions(nof-numberb0,3);
-    m_B0Mask.set_size(nof);
 
+    m_B0Mask.set_size(nof);
 
 
     int cnt=0;
@@ -116,14 +104,19 @@ namespace itk
 
       if(vec[0]<0.0001 && vec[1]<0.0001 && vec[2]<0.0001 && vec[0]>-0.001&& vec[1]>-0.001 && vec[2]>-0.001)
       {
+        // the diffusion encoding gradient is approximately zero, wo we are dealing with a non-diffusion weighted volume
         m_B0Mask[i]=1;
       }
       else
       {
+        // dealing with a diffusion weighted volume
         m_B0Mask[i]=0;
+
+        // set the diffusion encoding gradient to the directions matrix
         directions[cnt][0] = vec[0];
         directions[cnt][1] = vec[1];
         directions[cnt][2] = vec[2];
+
         cnt++;
       }
     }
@@ -188,14 +181,9 @@ namespace itk
     vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
 
 
-    itk::Index<3> ix;
 
-    ImageType::Pointer corrected_diffusion = ImageType::New();
-    corrected_diffusion->SetRegions(size);
-    corrected_diffusion->SetSpacing(m_GradientImagePointer->GetSpacing());
-    corrected_diffusion->SetOrigin(m_GradientImagePointer->GetOrigin());
-    corrected_diffusion->SetVectorLength(nof);
-    corrected_diffusion->Allocate();
+
+
 
 
     ImageType::Pointer corrected_diffusion_temp = ImageType::New();
@@ -218,9 +206,6 @@ namespace itk
     mask->Allocate();
 
 
-    double mean_b=0.0;
-
-
     int mask_cnt=0;
     for(int x=0;x<size[0];x++)
     {
@@ -228,10 +213,10 @@ namespace itk
       {
         for(int z=0;z<size[2];z++)
         {
-          mean_b=0.0;
-          ix[0] = x;
-          ix[1] = y;
-          ix[2] = z;
+          double mean_b=0.0;
+
+          itk::Index<3> ix = {{x,y,z}};
+
 
           GradientVectorType pixel = m_GradientImagePointer->GetPixel(ix);
           for (int i=0;i<nof;i++)
@@ -256,17 +241,27 @@ namespace itk
       }
     }
 
+
+    //create a copy of the original image
+    m_CorrectedDiffusionVolumes = ImageType::New();
+    m_CorrectedDiffusionVolumes->SetRegions(size);
+    m_CorrectedDiffusionVolumes->SetSpacing(m_GradientImagePointer->GetSpacing());
+    m_CorrectedDiffusionVolumes->SetOrigin(m_GradientImagePointer->GetOrigin());
+    m_CorrectedDiffusionVolumes->SetVectorLength(nof);
+    m_CorrectedDiffusionVolumes->Allocate();
+
+
     for ( int x=0;x<size[0];x++)
     {
       for ( int y=0;y<size[1];y++)
       {
         for ( int z=0;z<size[2];z++)
         {
-          ix[0] = x; ix[1] = y; ix[2] = z;
+          itk::Index<3> ix = {{x,y,z}};
 
-          GradientVectorType pixel2 = m_GradientImagePointer->GetPixel(ix);
+          GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
 
-          corrected_diffusion->SetPixel(ix,pixel2);
+          m_CorrectedDiffusionVolumes->SetPixel(ix,p);
 
         }
       }
@@ -278,53 +273,53 @@ namespace itk
 
 
     double mask_val=0.0;
-        vnl_vector<double> org_vec(nof-numberb0);
+    vnl_vector<double> org_vec(nof-numberb0);
 
-        int counter_corrected =0;
+    int counter_corrected =0;
 
-        for ( int x=0;x<size[0];x++)
+    for ( int x=0;x<size[0];x++)
+    {
+      for ( int y=0;y<size[1];y++)
+      {
+        for ( int z=0;z<size[2];z++)
         {
-          for ( int y=0;y<size[1];y++)
+          itk::Index<3> ix = {{x,y,z}};
+
+          mask_val = mask->GetPixel(ix);
+          GradientVectorType pixel2 = m_CorrectedDiffusionVolumes->GetPixel(ix);
+
+          for (int i=0;i<nof;i++)
           {
-            for ( int z=0;z<size[2];z++)
+            org_vec[i]=pixel2[i];
+          }
+
+          if(mask_val >0)// we are dooing this only if the voxels are in the mask
+          {
+
+          for( int f=0;f<nof;f++)
+          {
+            if(org_vec[f] <= 0) // if in one of the gradients it is 0 or les than 0
             {
-              ix[0] = x; ix[1] = y; ix[2] = z;
+              org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,m_CorrectedDiffusionVolumes);
+              counter_corrected++;
 
-              mask_val = mask->GetPixel(ix);
-              GradientVectorType pixel2 = corrected_diffusion->GetPixel(ix);
-
-              for (int i=0;i<nof;i++)
-              {
-                org_vec[i]=pixel2[i];
-              }
-
-              if(mask_val >0)// we are dooing this only if the voxels are in the mask
-              {
-
-              for( int f=0;f<nof;f++)
-              {
-                if(org_vec[f] <= 0) // if in one of the gradients it is 0 or les than 0
-                {
-                  org_vec[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
-                  counter_corrected++;
-
-                  // If method returned 0 it means that there is no valid ( correct) neighborhood. It is done outside the function because
-                  //later the same method is called in different concept when this is not important
-                }
-              }
-
-              for (int i=0;i<nof;i++)
-              {
-                pixel2[i]=org_vec[i];
-              }
-
-              corrected_diffusion->SetPixel(ix, pixel2);
-
-
-              }
+              // If method returned 0 it means that there is no valid ( correct) neighborhood. It is done outside the function because
+              //later the same method is called in different concept when this is not important
             }
           }
+
+          for (int i=0;i<nof;i++)
+          {
+            pixel2[i]=org_vec[i];
+          }
+
+          m_CorrectedDiffusionVolumes->SetPixel(ix, pixel2);
+
+
+          }
         }
+      }
+    }
 
 
 
@@ -371,7 +366,7 @@ namespace itk
     what_mask=1.0;// we want to calculate all the tensors
 
 
-    DeepCopyDiffusionImage(corrected_diffusion,corrected_diffusion_temp,nof);
+    DeepCopyDiffusionImage(m_CorrectedDiffusionVolumes,corrected_diffusion_temp,nof);
 
     GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);// generating of the tensors
 
@@ -388,41 +383,37 @@ namespace itk
     while (stil_correcting == true)
     {
 
-    std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
+      std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
+      GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
 
-    new_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
+      new_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
 
-    if(new_number_negative_eigs<old_number_negative_eigs)
-    {
+      if(new_number_negative_eigs<old_number_negative_eigs)
+      {
         stil_correcting=true;
         old_number_negative_eigs=new_number_negative_eigs;
-        DeepCopyDiffusionImage(corrected_diffusion_temp,corrected_diffusion,nof);
+        DeepCopyDiffusionImage(corrected_diffusion_temp,m_CorrectedDiffusionVolumes,nof);
+      }
 
-
-    }
-    else
-    {
+      else
+      {
         stil_correcting=false;
+      }
+
+
+      CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+
+
     }
-
-
-    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
-
-
-    }//end of while
-
 
     TurnMask(size, mask,1,1);
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion,mask,what_mask,tensorImg);
+    GenerateTensorImage(nof,numberb0,size,m_CorrectedDiffusionVolumes,mask,what_mask,tensorImg);
 
     m_MaskImage = mask;
 
     this->SetNthOutput(0, tensorImg);
-
-    m_VectorImage = corrected_diffusion;
 
     m_Voxdim = vox_dim;
 

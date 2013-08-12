@@ -109,9 +109,9 @@ namespace itk
     itkGetMacro(Voxdim, vnl_vector<double>)
 
 
-    ImageType::Pointer GetVectorImage()
+    ImageType::Pointer GetCorrectedDiffusionVolumes()
     {
-      return m_VectorImage;
+      return m_CorrectedDiffusionVolumes;
     }
 
     itk::Image<short, 3>::Pointer GetMask()
@@ -175,7 +175,7 @@ namespace itk
     /** Number of baseline images */
     unsigned int                                      m_NumberOfBaselineImages;
 
-    ImageType::Pointer                                m_VectorImage;
+    ImageType::Pointer                                m_CorrectedDiffusionVolumes;
 
     float                                             m_B0Threshold;
 

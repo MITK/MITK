@@ -28,9 +28,9 @@ set(MODULE_TESTIMAGES
 
 # Create an artificial module initializing class for
 # usServices
-set(testdriver_resources )
+set(testdriver_init_file )
 usFunctionGenerateModuleInit(testdriver_init_file
-                             NAME ${MODULE_NAME}TestDriver
+                             NAME SegmentationTestDriver
                              DEPENDS "Segmentation"
                              VERSION "0.1.0"
                              EXECUTABLE

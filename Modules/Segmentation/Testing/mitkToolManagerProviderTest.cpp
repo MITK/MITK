@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleContext.h"
 #include "mitkServiceReference.h"
 
+#include "mitkGlobalInteraction.h"
 
 class mitkToolManagerProviderTestClass {
 public:
@@ -34,13 +35,15 @@ int mitkToolManagerProviderTest(int, char* [])
 {
   MITK_TEST_BEGIN("ToolManagerProvider")
 
+    mitk::GlobalInteraction::GetInstance()->Initialize("global");
+
     mitkToolManagerProviderTestClass::RegisterService();
-  mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference< mitk::ToolManagerProvider >();
-  mitk::ToolManagerProvider* service = mitk::GetModuleContext()->GetService< mitk::ToolManagerProvider >(serviceRef);
+
+    mitk::ToolManagerProvider* service = mitk::ToolManagerProvider::GetInstance();
 
 
 
   MITK_TEST_CONDITION(service!=NULL,"Service was succesfully  called");
-  MITK_TEST_CONDITION((service->GetToolManager()) == NULL, "Dummy call");
+  MITK_TEST_CONDITION((service->GetToolManager()) == (service->GetToolManager()), "Service singleton");
   MITK_TEST_END()
 }

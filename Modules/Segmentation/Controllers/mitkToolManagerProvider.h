@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_TOOLMANAGERPROVIDER_H
 #define MITK_TOOLMANAGERPROVIDER_H
 
+#include "SegmentationExports.h"
+
 #include <usModuleContext.h>
 #include <usServiceInterface.h>
 
@@ -29,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class ToolManagerProvider : public itk::LightObject
+  class Segmentation_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
     mitkClassMacro(ToolManagerProvider, itk::LightObject);
@@ -47,6 +49,8 @@ namespace mitk
 
     ToolManagerProvider();
     virtual ~ToolManagerProvider();
+    ToolManagerProvider(const ToolManagerProvider&);
+    ToolManagerProvider& operator=(const ToolManagerProvider&);
 
     mitk::ToolManager::Pointer m_ToolManager;
   };

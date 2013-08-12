@@ -26,6 +26,7 @@ set(CPP_FILES
   Algorithms/mitkVtkImageOverwrite.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
+  Controllers/mitkSegmentationModuleActivator.cpp
   DataManagement/mitkContour.cpp
   DataManagement/mitkContourElement.cpp
   DataManagement/mitkContourModel.cpp

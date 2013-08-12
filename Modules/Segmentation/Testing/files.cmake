@@ -24,3 +24,15 @@ set(MODULE_TESTIMAGES
   BallBinary30x30x30.nrrd
   Png2D-bw.png
 )
+
+# Create an artificial module initializing class for
+# usServices
+set(testdriver_resources )
+usFunctionGenerateModuleInit(testdriver_init_file
+                             NAME ${MODULE_NAME}TestDriver
+                             DEPENDS "Segmentation"
+                             VERSION "0.1.0"
+                             EXECUTABLE
+                            )
+
+set(TEST_CPP_FILES ${testdriver_init_file})

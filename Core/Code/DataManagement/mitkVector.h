@@ -44,12 +44,33 @@ typedef itk::Transform<ScalarType, 3, 3> Transform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
-typedef itk::Point<ScalarType,2> Point2D;
-typedef itk::Point<ScalarType,3> Point3D;
-typedef itk::Point<ScalarType,4> Point4D;
-typedef itk::Point<int,2> Point2I;
-typedef itk::Point<int,3> Point3I;
-typedef itk::Point<int,4> Point4I;
+
+
+
+template<class TCoordRep, unsigned int NPointDimension = 3>
+class Point : public itk::Point<TCoordRep, NPointDimension>
+{
+public:
+     /** Default constructor has nothing to do. */
+  mitk::Point<TCoordRep, NPointDimension>() {}
+
+  /** Pass-through constructors for the Array base class. */
+  mitk::Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
+  mitk::Point<TCoordRep, NPointDimension>(const ValueType r[3]):itk::Point<TCoordRep, NPointDimension>(r) {}
+  mitk::Point<TCoordRep, NPointDimension>(const ValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
+  mitk::Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
+
+  operator itk::Point<TCoordRep, NPointDimension> () const { return itk::Point<TCoordRep, NPointDimension> point; }
+};
+
+typedef mitk::Point<ScalarType,3> Point3D;
+typedef mitk::Point<ScalarType,2> Point2D;
+
+
+typedef mitk::Point<ScalarType,4> Point4D;
+typedef mitk::Point<int,2> Point2I;
+typedef mitk::Point<int,3> Point3I;
+typedef mitk::Point<int,4> Point4I;
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;
 typedef itk::Index<3> Index3D;
@@ -125,15 +146,26 @@ template<> class VectorTraits< unsigned int *> {
     typedef unsigned int ValueType;
 };
 
-template<> class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< double[4] > {
   public:
-    typedef ScalarType ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<float,3> > {
   public:
     typedef float ValueType;
 };
+
+template<> class VectorTraits< mitk::Point<float,3> > {
+  public:
+    typedef float ValueType;
+};
+
+template<> class VectorTraits< mitk::Point<float,4> > {
+  public:
+    typedef float ValueType;
+};
+
 
 template<> class VectorTraits< itk::Point<float,3> > {
   public:
@@ -150,6 +182,16 @@ template<> class VectorTraits< itk::Vector<double,3> > {
     typedef double ValueType;
 };
 
+template<> class VectorTraits< mitk::Point<double,3> > {
+  public:
+    typedef double ValueType;
+};
+
+template<> class VectorTraits< mitk::Point<double,4> > {
+public:
+    typedef double ValueType;
+};
+
 template<> class VectorTraits< itk::Point<double,3> > {
   public:
     typedef double ValueType;
@@ -160,12 +202,13 @@ public:
     typedef double ValueType;
 };
 
+
 template<> class VectorTraits< itk::Vector<int,3> > {
   public:
     typedef int ValueType;
 };
 
-template<> class VectorTraits< itk::Point<int,3> > {
+template<> class VectorTraits< mitk::Point<int,3> > {
   public:
     typedef int ValueType;
 };

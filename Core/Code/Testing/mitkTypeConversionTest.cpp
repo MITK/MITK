@@ -49,19 +49,29 @@ static void Test_Mitk2Itk_PointCompatibility()
   MITK_TEST_CONDITION(itkPoint3D == copiedValues, "correct values were assigned")
 }
 
+void testFunction(Point3D& point)
+{
+  point.SetElement(0, 1);
+}
+
 static void Test_Itk2Mitk_PointCompatibility()
 {
   Setup();
 
+  const float testValues[] = {4.0, 5.0, 6.0};
+
   mitk::Point3D point3D                = originalValues;
   itk::Point<ScalarType, 3> itkPoint3D = copiedValues;
 
+  itkPoint3D = point3D;
+
   point3D    = itkPoint3D;
+
+  testFunction(static_cast<mitk::Point3D& >(itkPoint3D));
 
   MITK_TEST_CONDITION(point3D == itkPoint3D, "itk point assigned to mitk point")
   MITK_TEST_CONDITION(point3D == copiedValues, "correct values were assigned")
 }
-
 
 
 static void Test_Vtk2Mitk_PointCompatibility()
@@ -82,18 +92,14 @@ static void Test_Vtk2Mitk_PointCompatibility()
 
 
 template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(vnl_vector_fixed<T, NVectorDimension> vnlVectorFixed)
+itk::Vector<T, NVectorDimension>  toItk(const vnl_vector_fixed<T, NVectorDimension>& vnlVectorFixed)
 {
-  itk::Vector<T, NVectorDimension> vector;
-  vnl_vector<T> vec = vnlVectorFixed.as_vector();
-
-  vector.SetVnlVector(vec);
-  return vector;
+  return toItk<T, NVectorDimension>(vnlVectorFixed.as_vector());
 }
 
 
 template< class T, unsigned int NVectorDimension>
-itk::Vector<T, NVectorDimension>  toItk(vnl_vector<T> vnlVector)
+itk::Vector<T, NVectorDimension>  toItk(const vnl_vector<T>& vnlVector)
 {
   itk::Vector<T, NVectorDimension> vector;
   vector.SetVnlVector(vnlVector);

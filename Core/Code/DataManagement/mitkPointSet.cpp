@@ -189,7 +189,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
   out.Fill( 0 );
   PointType indexPoint;
 
-  this->GetGeometry( t )->WorldToIndex(point, indexPoint);
+  this->GetGeometry( t )->WorldToIndex(point, Point3D(indexPoint));
 
   // Searching the first point in the Set, that is +- distance far away fro
   // the given point
@@ -241,7 +241,9 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
 mitk::PointSet::PointType
 mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
 {
-  PointType out;
+  PointType outP;
+  mitk::Point3D out(outP);
+
   out.Fill(0);
 
   if ( (unsigned int) t >= m_PointSetSeries.size() )
@@ -519,8 +521,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     {
       int position = pointOp->GetIndex();
 
-      PointType pt;
-      pt.CastFrom(pointOp->GetPoint());
+      Point3D pt = pointOp->GetPoint();
 
       //transfer from world to index coordinates
       mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
@@ -555,8 +556,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
   case OpMOVE://moves the point given by index
     {
-      PointType pt;
-      pt.CastFrom(pointOp->GetPoint());
+      Point3D pt = pointOp->GetPoint();
 
       //transfer from world to index coordinates
       this->GetGeometry( timeStep )->WorldToIndex(pt, pt);

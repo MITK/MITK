@@ -130,7 +130,7 @@ public:
   typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;
 
   typedef MeshType DataType;
-  typedef DataType::PointType PointType;
+  typedef Point3D PointType;
   typedef DataType::PointIdentifier PointIdentifier;
   typedef DataType::PointsContainer PointsContainer;
   typedef DataType::PointsContainerIterator PointsIterator;

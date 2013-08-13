@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <QBoxLayout>
 #include <QLabel>
+#include "mitkToolManagerProvider.h"
 
 QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
@@ -39,7 +40,7 @@ m_lastSelectedName(tr("none"))
   connect(m_boundingObjectWidget, SIGNAL(BoundingObjectsChanged()), this, SLOT(OnRoiDataSelectionChanged()));
 
   //create ToolManager
-  m_ToolManager = mitk::ToolManager::New(storage);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   //setup message delegates
   m_ToolManager->RoiDataChanged += mitk::MessageDelegate<QmitkToolRoiDataSelectionBox> (this, &QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified);

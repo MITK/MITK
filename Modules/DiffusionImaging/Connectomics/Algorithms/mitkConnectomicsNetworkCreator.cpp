@@ -569,6 +569,8 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
 
     bool keepOn( true );
 
+    itk::ImageRegion<3> itkRegion = m_SegmentationItk->GetLargestPossibleRegion();
+
     for( int parameter( 0 ) ; keepOn ; parameter++ )
     {
       if( parameter > 1000 )
@@ -582,7 +584,14 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
         tempIndex.SetElement( index, endPoint.GetElement( index ) + parameter * differenceVector[ index ] );
       }
 
-      tempLabel = m_SegmentationItk->GetPixel( tempIndex );
+      if( itkRegion.IsInside( tempIndex ) )
+      {
+        tempLabel = m_SegmentationItk->GetPixel( tempIndex );
+      }
+      else
+      {
+        tempLabel = -1;
+      }
 
       if( IsNonWhiteMatterLabel( tempLabel ) )
       {

@@ -203,10 +203,6 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
     {
       return EndElementPositionLabel( singleTract );
     }
-  case PrecomputeAndDistance:
-    {
-      return PrecomputeVertexLocationsBySegmentation( singleTract );
-    }
   case JustEndPointVerticesNoLabel:
     {
       return JustEndPointVerticesNoLabelTest( singleTract );
@@ -214,6 +210,10 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
   case EndElementPositionAvoidingWhiteMatter:
     {
       return EndElementPositionLabelAvoidingWhiteMatter( singleTract );
+    }
+  case PrecomputeAndDistance:
+    {
+      return PrecomputeVertexLocationsBySegmentation( singleTract );
     }
   }
 

@@ -97,31 +97,10 @@ void mitk::ImageToDiffusionImageSource<TPixelType>
   typedef itk::ComposeImageFilter< SingleVolumeType > ComposeFilterType;
   typename ComposeFilterType::Pointer vec_composer = ComposeFilterType::New();
 
-  typename InputItkType::Pointer itkImage;
-  //mitk::CastToItkImage(m_SourceImage, itkImage);
-/*
-  typename InputItkType::RegionType lpr;// = itkImage->GetLargestPossibleRegion();
-  typename InputItkType::SizeType extract_size = lpr.GetSize();
-  extract_size[3] = 0;
-
-  unsigned int* dimensions = m_SourceImage->GetDimensions();
-  extract_size[0] = dimensions[0];
-  extract_size[1] = dimensions[1];
-  extract_size[2] = dimensions[2];
-
-  typename InputItkType::IndexType extract_index = lpr.GetIndex();
-  extract_index.Fill()
-
-
-  typename InputItkType::RegionType exr;
-  exr.SetSize( extract_size );
-  exr.SetIndex( extract_index );
-*/
   mitk::ImageTimeSelector::Pointer t_selector =
       mitk::ImageTimeSelector::New();
 
   t_selector->SetInput( m_SourceImage );
-
 
   for( unsigned int i=0; i< m_SourceImage->GetTimeSteps(); i++)
   {

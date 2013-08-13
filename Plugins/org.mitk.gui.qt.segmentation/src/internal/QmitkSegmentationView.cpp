@@ -1053,9 +1053,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     this->UpdateWarningLabel("");
 
   mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
   assert ( toolManager );
 
+  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
+  toolManager->InitializeTools();
 
   // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);

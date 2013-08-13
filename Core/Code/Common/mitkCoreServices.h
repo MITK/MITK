@@ -76,8 +76,6 @@ private:
 
   static bool Unget(us::ModuleContext* context, const std::string& interfaceId, void* service);
 
-  static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > m_ContextToServicesMap;
-
   // purposely not implemented
   CoreServices();
   CoreServices(const CoreServices&);

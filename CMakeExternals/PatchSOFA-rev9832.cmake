@@ -42,9 +42,9 @@ file(WRITE "cmake/preBuildConfig.cmake" "${preBuildConfig_cmake}")
 file(APPEND "CMakeLists.txt" "\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)")
 
 file(WRITE "SOFAConfig.cmake.in"
-"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR)
+"add_definitions(-DSOFA_NO_OPENGL;-DSOFA_XML_PARSER_TINYXML;-DTIXML_USE_STL;-DMINI_FLOWVR;-DSOFA_HAVE_BOOST)
 
-set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniBoost;@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
+set(SOFA_INCLUDE_DIRS \"@SOFA_EXTLIBS_DIR@/miniFlowVR/include;@SOFA_EXTLIBS_DIR@/newmat;@SOFA_EXTLIBS_DIR@/tinyxml;@SOFA_SRC_DIR@/framework;@SOFA_SRC_DIR@/modules\")
 
 if(WIN32)
   set(SOFA_LIBRARY_DIRS \"@SOFA_LIB_DIR@\")

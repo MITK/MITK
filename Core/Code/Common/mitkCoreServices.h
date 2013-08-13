@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceInterface.h>
 #include <usServiceReference.h>
 
+#include <cassert>
+
 namespace mitk {
 
 struct IShaderRepository;

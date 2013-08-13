@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRotationOperation.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkVtkRepresentationProperty.h"
+#include "mitkToolManagerProvider.h"
 
 #include "vtkFloatArray.h"
 #include "vtkPointData.h"
@@ -74,7 +75,7 @@ void QmitkDeformableClippingPlaneView::StdMultiWidgetNotAvailable()
 
 void QmitkDeformableClippingPlaneView::CreateConnections()
 {
-  m_ToolManager = m_Controls.interactionToolSelectionBox->GetToolManager();
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   m_ToolManager->SetDataStorage(*(this->GetDefaultDataStorage()));
   assert(m_ToolManager);
 

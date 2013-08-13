@@ -362,6 +362,12 @@ bool mitk::LabelSetImage::GetLabelSelected(int index) const
     return this->m_LabelSet->GetLabelSelected(index);
 }
 
+void mitk::LabelSetImage::SetLabelSet(const mitk::LabelSet& labelset)
+{
+    *m_LabelSet = labelset;
+    this->ResetLabels();
+}
+
 bool mitk::LabelSetImage::IsLabelSelected(mitk::Label::Pointer label)
 {
     return label->GetSelected();

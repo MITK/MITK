@@ -162,11 +162,10 @@ public:
 
   virtual void RemoveAllLabels();
 
-  mitk::LabelSet* GetLabelSet()
+  const mitk::LabelSet* GetLabelSet() const
     {return m_LabelSet.GetPointer(); };
 
-  void SetLabelSet(mitk::LabelSet* labelset)
-    { m_LabelSet = labelset; };
+  void SetLabelSet(const mitk::LabelSet& labelset);
 
   bool IsLabelSelected(mitk::Label::Pointer label);
 

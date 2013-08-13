@@ -89,12 +89,12 @@ class Segmentation_EXPORT FeedbackContourTool : public SegTool2D
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
-    void FillContourInSlice( Contour* projectedContour, Image* slice, LabelSet* labelSet, int paintingPixelValue = 1 );
+    void FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue = 1 );
 
   private:
 
     Contour::Pointer      m_FeedbackContour;
-    DataNode::Pointer m_FeedbackContourNode;
+    DataNode::Pointer     m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
     ContourUtils::Pointer m_ContourUtils;

@@ -108,7 +108,8 @@ ElectrostaticRepulsionDiffusionGradientReductionFilter<TInputScalarType, TOutput
         m_InputBValueMap.erase(0);
     }
 
-    BValueMap manipulatedMap = m_OriginalBValueMap;
+    BValueMap manipulatedMap = m_InputBValueMap;
+    manipulatedMap[0] = m_OriginalBValueMap[0];
 
     int shellCounter = 0;
     for(BValueMap::iterator it = m_InputBValueMap.begin(); it != m_InputBValueMap.end(); it++ )

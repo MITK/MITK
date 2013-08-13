@@ -40,23 +40,6 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
 
-  // get a list of all known mitk::Tools
-  std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
-
-  // remember these tools
-  for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
-    iter != thingsThatClaimToBeATool.end();
-    ++iter )
-  {
-    if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
-    {
-      tool->SetToolManager(this); // important to call right after instantiation
-      tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
-      tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
-      m_Tools.push_back( tool );
-    }
-  }
-
   //ActivateTool(0); // first one is default
 }
 
@@ -85,6 +68,31 @@ mitk::ToolManager::~ToolManager()
     observerTagMapIter->first->RemoveObserver( observerTagMapIter->second );
   }
 }
+
+
+void mitk::ToolManager::InitializeTools()
+{
+  if(mitk::GlobalInteraction::GetInstance()->IsInitialized())
+  {
+    // get a list of all known mitk::Tools
+    std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
+
+    // remember these tools
+    for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
+      iter != thingsThatClaimToBeATool.end();
+      ++iter )
+    {
+      if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
+      {
+        tool->SetToolManager(this); // important to call right after instantiation
+        tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
+        tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
+        m_Tools.push_back( tool );
+      }
+    }
+  }
+}
+
 
 void mitk::ToolManager::OnToolErrorMessage(std::string s)
 {

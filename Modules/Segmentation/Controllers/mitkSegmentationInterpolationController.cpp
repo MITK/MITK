@@ -110,6 +110,8 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Lab
 
   m_Segmentation = segmentation;
 
+  m_ActiveLabel = m_Segmentation->GetActiveLabelIndex();
+
   m_SegmentationCountInSlice.resize( m_Segmentation->GetTimeSteps() );
   for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)
   {
@@ -136,8 +138,6 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Lab
     AccessFixedDimensionByItk_2( segmentation3D, ScanWholeVolume, 3, m_Segmentation, timeStep );
   }
 
-  //PrintStatus();
-
   this->SetReferenceVolume( m_ReferenceImage );
 
   Modified();
@@ -148,7 +148,6 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
   m_ReferenceImage = referenceImage;
 
   if ( m_ReferenceImage.IsNull() ) return; // no image set - ignore it then
-  assert ( m_Segmentation.IsNotNull() ); // should never happen
 
   // ensure the reference image has the same dimensionality and extents as the segmentation image
   if (    m_ReferenceImage.IsNull()
@@ -252,9 +251,12 @@ void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DAT
       assert ( (signed) m_SegmentationCountInSlice[timeStep][dim0][u] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
       assert ( (signed) m_SegmentationCountInSlice[timeStep][dim1][v] + (signed)value >= 0 );
 
-      m_SegmentationCountInSlice[timeStep][dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim0][u] + value );
-      m_SegmentationCountInSlice[timeStep][dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim1][v] + value );
-      numberOfPixels += static_cast<int>( value );
+      if (value == m_ActiveLabel)
+      {
+          m_SegmentationCountInSlice[timeStep][dim0][u] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim0][u] + value );
+          m_SegmentationCountInSlice[timeStep][dim1][v] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][dim1][v] + value );
+          numberOfPixels += static_cast<int>( value );
+      }
     }
   }
 
@@ -300,10 +302,16 @@ void mitk::SegmentationInterpolationController::ScanChangedVolume( itk::Image<TP
         assert ( (signed) m_SegmentationCountInSlice[timeStep][0][x] + (signed)value >= 0 ); // just for debugging. This must always be true, otherwise some counting is going wrong
         assert ( (signed) m_SegmentationCountInSlice[timeStep][1][y] + (signed)value >= 0 );
 
-        m_SegmentationCountInSlice[timeStep][0][x] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][0][x] + value );
-        m_SegmentationCountInSlice[timeStep][1][y] = static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][1][y] + value );
+        if (value == m_ActiveLabel)
+        {
+           m_SegmentationCountInSlice[timeStep][0][x] =
+               static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][0][x] + value );
 
-        numberOfPixels += static_cast<int>( value );
+            m_SegmentationCountInSlice[timeStep][1][y] =
+                static_cast<unsigned int>( m_SegmentationCountInSlice[timeStep][1][y] + value );
+
+            numberOfPixels += static_cast<int>( value );
+        }
 
         ++iter;
       }
@@ -443,7 +451,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
 
   mitk::Image::Pointer lowerMITKSlice;
   mitk::Image::Pointer upperMITKSlice;
-  mitk::Image::Pointer resultImage;
+  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
 
   try
   {
@@ -458,11 +466,12 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     extractor->SetWorldGeometry(currentPlane);
     extractor->Modified();
     extractor->Update();
-    resultImage = extractor->GetOutput();
-    resultImage->DisconnectPipeline();
 
-    MITK_INFO << "resultImage->GetDimension(0)" << resultImage->GetDimension(0);
-    MITK_INFO << "resultImage->GetDimension(1)" << resultImage->GetDimension(1);
+    resultImage->Initialize(extractor->GetOutput());
+    mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(extractor->GetOutput()));
+    resultImage->SetVolume( accessor.GetData() );
+    resultImage->SetLabelSet( *m_Segmentation->GetLabelSet() );
+    extractor->GetOutput()->DisconnectPipeline();
 
     //Creating PlaneGeometry for lower slice
     mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
@@ -502,8 +511,6 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     return NULL;
   }
 
-  m_ActiveLabel = m_Segmentation->GetActiveLabelIndex();
-
   // interpolation algorithm gets some inputs
   //   two segmentations (guaranteed to be of the same data type, but no special data type guaranteed)
   //   orientation (sliceDimension) of the segmentations
@@ -519,12 +526,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  sliceIndex,
                                  sliceDimension,
                                  resultImage,
-                                 m_ActiveLabel,
                                  timeStep,
                                  m_ReferenceImage );
-
-  MITK_INFO << "2) resultImage->GetDimension(0)" << resultImage->GetDimension(0);
-  MITK_INFO << "2) resultImage->GetDimension(1)" << resultImage->GetDimension(1);
 
   return resultImage;
 }

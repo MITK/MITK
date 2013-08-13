@@ -43,6 +43,8 @@ public:
 
     itkNewMacro( Self );
 
+    mitkCloneMacro(LabelSet);
+
     typedef std::vector <mitk::Label::Pointer>            LabelContainerType;
     typedef LabelContainerType::const_iterator            LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator                  LabelContainerIteratorType;
@@ -153,9 +155,6 @@ protected:
 
     std::string m_Name;
 
-private:
-
-    virtual itk::LightObject::Pointer InternalClone() const;
 };
 
 } // namespace mitk

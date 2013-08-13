@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkModuleResource.h"
 #include "mitkModuleResourceStream.h"
 
+#include "mitkToolManagerProvider.h"
+
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
  m_SelfCall(false),
@@ -51,7 +53,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   currentFont.setBold(true);
   QWidget::setFont( currentFont );
 
-  m_ToolManager = mitk::ToolManager::New( storage );
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   // muellerm
   // QButtonGroup
@@ -94,11 +96,6 @@ void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
 {
   m_EnabledMode = mode;
   SetGUIEnabledAccordingToToolManagerState();
-}
-
-mitk::ToolManager* QmitkToolSelectionBox::GetToolManager()
-{
-  return m_ToolManager;
 }
 
 void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required

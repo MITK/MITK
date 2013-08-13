@@ -127,22 +127,21 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
-  m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
-  m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.6) );
-  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+  m_FeedbackNode->SetName( "Interpolation feedback" );
+  m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(false) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
+  m_InterpolatedSurfaceNode->SetName( "Surface Interpolation feedback" );
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(255.0,255.0,0.0) );
-  m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);
 
   m_3DContourNode = mitk::DataNode::New();
+  m_3DContourNode->SetName( "Drawn Contours" );
   m_3DContourNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 0.0, 0.0) );
   m_3DContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_3DContourNode->SetProperty( "name", mitk::StringProperty::New("Drawn Contours") );
   m_3DContourNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   m_3DContourNode->SetProperty("material.wireframeLineWidth", mitk::FloatProperty::New(2.0f));
   m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
@@ -478,24 +477,14 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
         if (auxImage.IsNotNull())
         {
-            MITK_INFO << "auxImage->GetDimension: " << auxImage->GetDimension();
-            MITK_INFO << "auxImage->GetDimension(0): " << auxImage->GetDimension(0);
-            MITK_INFO << "auxImage->GetDimension(1): " << auxImage->GetDimension(1);
-
             mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
             newImage->Initialize( auxImage );
-
-            MITK_INFO << "after initialize";
-
-//            newImage->SetGeometry(
-//                static_cast< mitk::Geometry3D * >( m_Segmentation->GetGeometry()->Clone().GetPointer() ) );
-
-            MITK_INFO << "after set geometry";
+            newImage->SetLabelSet( *m_Segmentation->GetLabelSet() );
 
             mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(auxImage));
             newImage->SetVolume( accessor.GetData() );
+            newImage->SetLabelOpacity( m_ActiveLabel, 1.0 );
 
-            MITK_INFO << "after set volume";
             m_FeedbackNode->SetData( newImage );
         }
 

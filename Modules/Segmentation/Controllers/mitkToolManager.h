@@ -236,6 +236,9 @@ class Segmentation_EXPORT ToolManager : public itk::Object
      */
     void UnregisterClient();
 
+    /** \brief Initialize all classes derived from mitk::Tool by itkObjectFactoy */
+    void InitializeTools();
+
     void OnOneOfTheReferenceDataDeletedConst(const itk::Object* caller, const itk::EventObject& e);
     void OnOneOfTheReferenceDataDeleted           (itk::Object* caller, const itk::EventObject& e);
 

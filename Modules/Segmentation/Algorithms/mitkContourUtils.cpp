@@ -92,7 +92,7 @@ mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const G
   return worldContour;
 }
 
-void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* slice, LabelSet* labelSet, int paintingPixelValue )
+void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
 {
   // 1. Use ipSegmentation to draw a filled(!) contour into a new 8 bit 2D image, which will later be copied back to the slice.
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
@@ -130,7 +130,7 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   LabelSetImage::Pointer ipsegmentationModifiedSlice = LabelSetImage::New();
   ipsegmentationModifiedSlice->Initialize( CastToImageDescriptor( picSlice ) );
   ipsegmentationModifiedSlice->SetSlice( picSlice->data );
-  ipsegmentationModifiedSlice->SetLabelSet( labelSet );
+  ipsegmentationModifiedSlice->SetLabelSet( *labelSet );
 
   //AccessFixedDimensionByItk_2( slice, ItkCopyFilledContourToSlice, 2, ipsegmentationModifiedSlice, paintingPixelValue );
   AccessFixedDimensionByItk_2( slice, ItkCopyFilledContourToSlice2, 2, ipsegmentationModifiedSlice, paintingPixelValue );

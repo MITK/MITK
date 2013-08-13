@@ -109,7 +109,7 @@ mitk::Contour::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(
   return m_ContourUtils->BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D, correctionForIpSegmentation);
 }
 
-void mitk::FeedbackContourTool::FillContourInSlice( Contour* projectedContour, Image* slice, LabelSet* labelSet, int paintingPixelValue )
+void mitk::FeedbackContourTool::FillContourInSlice( Contour* projectedContour, Image* slice, const LabelSet* labelSet, int paintingPixelValue )
 {
   m_ContourUtils->FillContourInSlice(projectedContour, slice, labelSet, paintingPixelValue);
 }

@@ -28,7 +28,36 @@ mitk::LabelSet::LabelSet(): m_Owner(""), m_LastModified("00.00.00")
 
 mitk::LabelSet::LabelSet(const LabelSet& other) : itk::Object()
 {
-//  m_LabelSet->DeepCopy(other.m_LabelSet);
+    m_LabelContainer = other.m_LabelContainer;
+}
+
+
+bool mitk::LabelSet::operator==( const mitk::LabelSet& other ) const
+{
+  return true;
+}
+
+bool mitk::LabelSet::operator!=( const mitk::LabelSet& other ) const
+{
+  return !(*this == other);
+}
+
+mitk::LabelSet& mitk::LabelSet::operator=( const mitk::LabelSet& other )
+{
+  if ( this == &other )
+  {
+    return * this;
+  }
+  else
+  {
+    this->m_LabelContainer = other.m_LabelContainer;
+    this->m_ActiveLabel = this->m_LabelContainer[other.GetActiveLabelIndex()];
+    this->m_Owner = other.m_Owner;
+    this->m_LastModified  = other.m_LastModified;
+    this->m_Name = other.m_Name;
+
+    return *this;
+  }
 }
 
 mitk::LabelSet::~LabelSet()
@@ -244,39 +273,10 @@ void mitk::LabelSet::RenameLabel(int index, const std::string& name, const mitk:
     }
 }
 
-bool mitk::LabelSet::operator==( const mitk::LabelSet& other ) const
-{
-  return true;
-}
-
-bool mitk::LabelSet::operator!=( const mitk::LabelSet& other ) const
-{
-  return !(*this == other);
-}
-
-mitk::LabelSet& mitk::LabelSet::operator=( const mitk::LabelSet& other )
-{
-  if ( this == &other )
-  {
-    return * this;
-  }
-  else
-  {
-    this->m_LabelContainer = other.m_LabelContainer;
-    return *this;
-  }
-}
-
 void mitk::LabelSet::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
  // os << indent;
  // todo: complete
-}
-
-itk::LightObject::Pointer mitk::LabelSet::InternalClone() const
-{
-  itk::LightObject::Pointer result(new Self(*this));
-  return result;
 }
 
 void mitk::LabelSet::ResetLabels()

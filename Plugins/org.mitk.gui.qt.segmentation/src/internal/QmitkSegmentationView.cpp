@@ -54,6 +54,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
+//micro service to get the ToolManager instance
+#include "mitkToolManagerProvider.h"
+
 
 // public methods
 
@@ -125,7 +128,8 @@ void QmitkSegmentationView::Deactivated()
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
-    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
 
     // gets the context of the "Mitk" (Core) module (always has id 1)
@@ -166,7 +170,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   // tell the interpolation about toolmanager and multiwidget (and data storage)
   if (m_Controls && m_MultiWidget)
   {
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
     m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
@@ -250,7 +254,7 @@ void QmitkSegmentationView::OnNewLabel()
 
     mitk::Color color = dialog->GetColor();
 
-    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
     if (!workingNode) return;
 
     mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -332,7 +336,7 @@ void QmitkSegmentationView::OnRenameLabel(int index)
 
     if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
     if (!workingNode) return;
 
     mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -378,7 +382,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
       this->GetDataStorage()->Remove(it->Value());
     }
 
-    mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(lsImage);
+ //   mitk::SurfaceInterpolationController::GetInstance()->RemoveSegmentationFromContourList(lsImage);
   }
 }
 
@@ -389,7 +393,7 @@ void QmitkSegmentationView::OnSearchLabel()
 
 void QmitkSegmentationView::OnLoadLabelSet()
 {
-    mitk::DataNode* refNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+    mitk::DataNode* refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
     if (!refNode) return;
 
     mitk::Image* refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
@@ -430,7 +434,7 @@ void QmitkSegmentationView::OnLoadLabelSet()
 
 void QmitkSegmentationView::OnSaveLabelSet()
 {
-  mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+  mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
   if (!workingNode) return;
 
   mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -473,7 +477,7 @@ void QmitkSegmentationView::OnSaveLabelSet()
 
 void QmitkSegmentationView::OnNewLabelSet()
 {
-  mitk::DataNode::Pointer refNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+  mitk::DataNode::Pointer refNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
   if (refNode.IsNotNull())
   {
     mitk::Image::Pointer refImage = dynamic_cast<mitk::Image*>( refNode->GetData() );
@@ -526,7 +530,7 @@ void QmitkSegmentationView::CreateLabelFromSurface()
 {
     /*
   mitk::DataNode* imageNode
-      = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetReferenceData(0);
+      = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
 
   if (!imageNode) return;
 
@@ -587,7 +591,7 @@ void QmitkSegmentationView::CreateLabelFromSurface()
 
     mitk::Color color = dialog->GetColor();
 
-    mitk::DataNode* workingNode = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetWorkingData(0);
+    mitk::DataNode* workingNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
     if (!workingNode) return;
 
     mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
@@ -596,12 +600,11 @@ void QmitkSegmentationView::CreateLabelFromSurface()
     lsImage->AddLabel(dialog->GetSegmentationName().toStdString(), color);
 }
 
-
 void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataNode* node )
 {
   if( node != NULL )
   {
-    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
     this->UpdateWarningLabel("");
     mitk::DataNode* refNode = const_cast<mitk::DataNode*>(node);
 
@@ -639,7 +642,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
 {
   if( node != NULL )
   {
-      m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
+      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
       mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
 
@@ -678,11 +681,11 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
 {
   mitk::SegTool2D::Pointer manualSegmentationTool;
 
-  unsigned int numberOfExistingTools = m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetTools().size();
+  unsigned int numberOfExistingTools = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetTools().size();
 
   for(unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->GetToolById(i));
+    manualSegmentationTool = dynamic_cast<mitk::SegTool2D*>(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetToolById(i));
 
     if (manualSegmentationTool)
     {
@@ -767,6 +770,9 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 
 void QmitkSegmentationView::OnTabWidgetChanged(int id)
 {
+  //always disable tools on tab changed
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
   //2D Tab ID = 0
   //3D Tab ID = 1
   if (id == 0)
@@ -775,7 +781,6 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
     m_Controls->m_ManualToolSelectionBox3D->hide();
     m_Controls->m_ManualToolSelectionBox2D->show();
     //Deactivate possible active tool
-    m_Controls->m_ManualToolSelectionBox3D->GetToolManager()->ActivateTool(-1);
 
     //TODO Remove possible visible interpolations -> Maybe changes in SlicesInterpolator
   }
@@ -785,7 +790,6 @@ void QmitkSegmentationView::OnTabWidgetChanged(int id)
     m_Controls->m_ManualToolSelectionBox2D->hide();
     m_Controls->m_ManualToolSelectionBox3D->show();
     //Deactivate possible active tool
-    m_Controls->m_ManualToolSelectionBox2D->GetToolManager()->ActivateTool(-1);
   }
 }
 
@@ -795,12 +799,9 @@ void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceDat
   // called as a result of new BlueBerry selections
   //   tells the ToolManager for manual segmentation about new selections
   //   updates GUI information about what the user should select
-  MITK_INFO << "SetToolManagerSelection 1";
-  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   toolManager->SetReferenceData(referenceData);
   toolManager->SetWorkingData(workingData);
-
-  MITK_INFO << "SetToolManagerSelection 2";
 
   if (workingData)
   {
@@ -869,7 +870,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   this->UpdateWarningLabel("Please load an image");
 
   if( m_Controls->patImageSelector->GetSelectedNode().IsNotNull() )
-    this->UpdateWarningLabel("Create a segmentation");
+      this->UpdateWarningLabel("Create a segmentation");
 
   m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->segImageSelector->SetPredicate(m_IsOfTypeWorkingImagePredicate);
@@ -877,9 +878,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");
 
-  mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
-  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert ( toolManager );
+  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
+  toolManager->InitializeTools();
 
   m_Controls->m_LabelSetTableWidget->Init();
 
@@ -910,6 +912,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   //use the same ToolManager instance for our 3D Tools
   m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*toolManager);
+
 
   // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
@@ -964,7 +967,7 @@ void QmitkSegmentationView::OnManualTool2DSelected(int id)
     if (id >= 0)
     {
         std::string text = "Active Tool: \"";
-        mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox2D->GetToolManager();
+        mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
         text += toolManager->GetToolById(id)->GetName();
         text += "\"";
         mitk::StatusBar::GetInstance()->DisplayText(text.c_str());

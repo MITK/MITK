@@ -65,7 +65,6 @@ class SegmentationUI_EXPORT QmitkToolSelectionBox : public QWidget
     QmitkToolSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
     virtual ~QmitkToolSelectionBox();
 
-    mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
     void setTitle( const QString& title );

@@ -26,12 +26,13 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
                                unsigned int /*sliceDimension*/, // commented variables are not used
-                               Image* resultImage,
-                               int activeLabel,
+                               LabelSetImage* resultImage,
                                unsigned int /*timeStep*/,
                                Image::ConstPointer /*referenceImage*/)
 {
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > InputSliceType;
+
+  const int activeLabel = resultImage->GetActiveLabelIndex();
 
   // convert these slices to the ipSegmentation data type (into an ITK image)
   itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeLowerITKSlice;
@@ -118,15 +119,11 @@ void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
     while (!sourceIterator.IsAtEnd())
     {
 
-      if (overwrite)
+      const int targetValue = targetIterator.Get();
+      if ( sourceIterator.Get() != 0 )
       {
-         if ( sourceIterator.Get() )
-            targetIterator.Set( activeLabel );
-      }
-      else
-      {
-         if ( sourceIterator.Get() && !targetIterator.Get() )
-           targetIterator.Set( activeLabel );
+        if (!resultImage->GetLabelLocked(targetValue))
+          targetIterator.Set( activeLabel );
       }
 
       ++sourceIterator;

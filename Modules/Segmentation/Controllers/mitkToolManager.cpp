@@ -39,7 +39,7 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
  m_DataStorage(storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
-
+  this->InitializeTools();
   //ActivateTool(0); // first one is default
 }
 
@@ -74,6 +74,7 @@ void mitk::ToolManager::InitializeTools()
 {
   if(mitk::GlobalInteraction::GetInstance()->IsInitialized())
   {
+    m_Tools.resize(0);
     // get a list of all known mitk::Tools
     std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 

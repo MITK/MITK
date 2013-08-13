@@ -43,6 +43,8 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
 }
 
@@ -57,6 +59,8 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_LabelsToCoordinatesMap()
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
+, m_ZeroLabelInvalid( true )
+, m_AbortConnection( false )
 {
   mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
@@ -120,6 +124,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
         ReturnLabelForFiberTract( singleTract, m_MappingStrategy )
         )
         );
+      m_AbortConnection = false;
     }
   }
 
@@ -136,6 +141,12 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 
 void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType newConnection)
 {
+  if( m_AbortConnection )
+  {
+    MITK_DEBUG << "Connection aborted";
+    return;
+  }
+
   VertexType vertexA = newConnection.first;
   VertexType vertexB = newConnection.second;
 
@@ -157,6 +168,12 @@ void mitk::ConnectomicsNetworkCreator::AddConnectionToNetwork(ConnectionType new
 
 mitk::ConnectomicsNetworkCreator::VertexType mitk::ConnectomicsNetworkCreator::ReturnAssociatedVertexForLabel( ImageLabelType label )
 {
+  if( m_ZeroLabelInvalid && ( label == 0 ) )
+  {
+    m_AbortConnection = true;
+    return NULL;
+  }
+
   // if label is not known, create entry
   if( ! ( m_LabelToVertexMap.count( label ) > 0 ) )
   {

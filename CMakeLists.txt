@@ -209,6 +209,11 @@ if(MITK_USE_SOFA)
     set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
     message(WARNING "Switched off MITK_USE_SOFA\n  Clang is not supported, use GCC instead.")
   endif()
+  # SOFA doesn't support MSVC 11
+  if(MSVC AND NOT (MSVC_VERSION LESS 1700))
+    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
+    message(WARNING "Switched off MITK_USE_SOFA\n  Maximum supported MSVC version is 10.")
+  endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
     message("Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")

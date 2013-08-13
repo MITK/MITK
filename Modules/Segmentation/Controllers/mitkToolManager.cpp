@@ -26,10 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionEventObserver.h"
 #include "mitkDisplayInteractor.h"
 #include "mitkSegTool2D.h"
-// MicroServices
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
 
 
 mitk::ToolManager::ToolManager(DataStorage* storage)

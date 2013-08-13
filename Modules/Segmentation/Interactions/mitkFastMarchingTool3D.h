@@ -34,8 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkSigmoidImageFilter.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
+namespace us {
 class ModuleResource;
-
+}
 
 namespace mitk
 {
@@ -75,7 +76,7 @@ class Segmentation_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     /* icon stuff */
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
-    ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const;
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);

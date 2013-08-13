@@ -53,7 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/foreach.hpp>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "mitkModuleRegistry.h"
+#include "usModuleRegistry.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -1219,7 +1219,7 @@ void QmitkFiberfoxView::OnDrawROI()
     if(figureInteractor.IsNull())
     {
       figureInteractor = mitk::PlanarFigureInteractor::New();
-      mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
       figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
       figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
       figureInteractor->SetDataNode( node );
@@ -1928,7 +1928,7 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
         if(figureInteractor.IsNull())
         {
           figureInteractor = mitk::PlanarFigureInteractor::New();
-          mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
           figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
           figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
           figureInteractor->SetDataNode( nonConstNode );

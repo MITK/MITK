@@ -52,10 +52,10 @@ public:
 
 namespace mitk
 {
-  class PropertiesActivator : public ModuleActivator
+  class PropertiesActivator : public us::ModuleActivator
   {
   public:
-    void Load(ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
       m_PropertyAliases = PropertyAliasesImpl::New();
       context->RegisterService<PropertyAliases>(m_PropertyAliases);
@@ -70,7 +70,7 @@ namespace mitk
       context->RegisterService<PropertyFilters>(m_PropertyFilters);
     }
 
-    void Unload(ModuleContext*)
+    void Unload(us::ModuleContext*)
     {
     }
 

@@ -241,7 +241,7 @@ macro(MITK_CREATE_MODULE MODULE_NAME_IN)
           set(_STATIC )
         endif(MODULE_FORCE_STATIC)
 
-        if(NOT MODULE_NO_INIT)
+        if(NOT MODULE_NO_INIT AND NOT MODULE_HEADERS_ONLY)
           set(MODULE_LIBNAME ${MODULE_PROVIDES})
 
           usFunctionGenerateModuleInit(CPP_FILES

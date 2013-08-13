@@ -24,7 +24,7 @@
 #include "mitkDataInteractor.h"
 #include <MitkExports.h>
 #include <list>
-#include "mitkServiceTracker.h"
+#include "usServiceTracker.h"
 
 
 namespace mitk
@@ -123,7 +123,7 @@ namespace mitk
     /**
      * Hold microservice reference to object that takes care of informing the InteractionEventObservers about InteractionEvents
      */
-    mitk::ServiceTracker<InteractionEventObserver*>* m_EventObserverTracker;
+    us::ServiceTracker<InteractionEventObserver>* m_EventObserverTracker;
 
   };
 

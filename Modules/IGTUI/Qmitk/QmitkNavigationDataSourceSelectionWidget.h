@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include <mitkNavigationToolStorage.h>
 #include <mitkNavigationDataSource.h>
-#include <mitkServiceReference.h>
+#include <usServiceReference.h>
 //ui header
 #include "ui_QmitkNavigationDataSourceSelectionWidgetControls.h"
 
@@ -67,7 +67,7 @@ class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
 
   protected slots:
 
-    void NavigationDataSourceSelected(mitk::ServiceReference s);
+    void NavigationDataSourceSelected(us::ServiceReference<mitk::NavigationDataSource> s);
 
 
   protected:

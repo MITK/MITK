@@ -22,12 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class SceneDataNodeReader : public itk::LightObject, public mitk::IDataNodeReader
+class SceneDataNodeReader : public mitk::IDataNodeReader
 {
 
 public:
-
-  itkNewMacro(SceneDataNodeReader)
 
   int Read(const std::string& fileName, mitk::DataStorage& storage);
 };

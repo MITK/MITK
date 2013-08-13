@@ -37,10 +37,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <itkObject.h>
 
+namespace us {
+class ModuleResource;
+}
+
 namespace mitk
 {
 
-  class ModuleResource;
   class ToolManager;
 
   /**
@@ -123,14 +126,14 @@ namespace mitk
      * \brief Returns the path of a cursor icon.
      *
      */
-    virtual ModuleResource GetCursorIconResource() const;
+    virtual us::ModuleResource GetCursorIconResource() const;
 
     /**
      * @brief Returns the tool button icon of the tool wrapped by a usModuleResource
      * @return a valid ModuleResource or an invalid if this function
      *         is not reimplemented
      */
-    virtual ModuleResource GetIconResource() const;
+    virtual us::ModuleResource GetIconResource() const;
 
     /**
     \brief Returns the name of this tool. Make it short!

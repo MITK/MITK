@@ -16,11 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanePositionManager.h"
 #include "mitkInteractionConst.h"
 
-#include <mitkModule.h>
-#include <mitkGetModuleContext.h>
-#include <mitkModuleRegistry.h>
-
-
 mitk::PlanePositionManagerService::PlanePositionManagerService()
 {
 }

@@ -27,10 +27,10 @@
 #include <vtkXMLDataElement.h>
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 namespace mitk {
 
@@ -62,7 +62,7 @@ private:
 
 };
 
-struct EventConfigPrivate : public SharedData
+struct EventConfigPrivate : public us::SharedData
 {
 
   EventConfigPrivate();
@@ -123,7 +123,7 @@ mitk::EventConfigPrivate::EventConfigPrivate()
 }
 
 mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate& other)
-  : SharedData(other)
+  : us::SharedData(other)
   , m_PropertyList(other.m_PropertyList->Clone())
   , m_EventPropertyList(other.m_EventPropertyList->Clone())
   , m_CurrEventMapping(other.m_CurrEventMapping)
@@ -253,14 +253,14 @@ mitk::EventConfig::EventConfig(const EventConfig &other)
 {
 }
 
-mitk::EventConfig::EventConfig(const std::string& filename, const Module* module)
+mitk::EventConfig::EventConfig(const std::string& filename, const us::Module* module)
   : d(new EventConfigPrivate)
 {
   if (module == NULL)
   {
-    module = GetModuleContext()->GetModule();
+    module = us::GetModuleContext()->GetModule();
   }
-  mitk::ModuleResource resource = module->GetResource("Interactions/" + filename);
+  us::ModuleResource resource = module->GetResource("Interactions/" + filename);
   if (!resource.IsValid())
   {
     MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
@@ -269,7 +269,7 @@ mitk::EventConfig::EventConfig(const std::string& filename, const Module* module
   }
 
   EventConfig newConfig;
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   newConfig.d->m_XmlParser.SetStream(&stream);
   bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
   if (success)
@@ -344,13 +344,13 @@ bool mitk::EventConfig::IsValid() const
   return !( d->m_EventList.empty() && d->m_PropertyList->IsEmpty() );
 }
 
-bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* module)
+bool mitk::EventConfig::AddConfig(const std::string& fileName, const us::Module* module)
 {
   if (module == NULL)
   {
-    module = GetModuleContext()->GetModule();
+    module = us::GetModuleContext()->GetModule();
   }
-  mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
+  us::ModuleResource resource = module->GetResource("Interactions/" + fileName);
   if (!resource.IsValid())
   {
     MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
@@ -359,7 +359,7 @@ bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* mod
   }
 
   EventConfig newConfig(*this);
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   newConfig.d->m_XmlParser.SetStream(&stream);
   bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
   if (success)

@@ -26,7 +26,7 @@ mitk::InteractionEventHandler::~InteractionEventHandler()
 {
 }
 
-bool mitk::InteractionEventHandler::SetEventConfig(const std::string& filename, const Module* module)
+bool mitk::InteractionEventHandler::SetEventConfig(const std::string& filename, const us::Module* module)
 {
   EventConfig newConfig(filename, module);
   if (newConfig.IsValid())
@@ -56,7 +56,7 @@ mitk::EventConfig mitk::InteractionEventHandler::GetEventConfig() const
   return m_EventConfig;
 }
 
-bool mitk::InteractionEventHandler::AddEventConfig(const std::string& filename, const Module* module)
+bool mitk::InteractionEventHandler::AddEventConfig(const std::string& filename, const us::Module* module)
 {
   if (!m_EventConfig.IsValid())
   {

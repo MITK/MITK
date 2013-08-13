@@ -24,9 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorTool2D.xpm"
 
 // us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include <mitkGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, CorrectorTool2D, "Correction tool");
@@ -53,17 +54,17 @@ const char** mitk::CorrectorTool2D::GetXPM() const
   return mitkCorrectorTool2D_xpm;
 }
 
-mitk::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
+us::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_48x48.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Correction_48x48.png");
   return resource;
 }
 
-mitk::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
+us::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
 {
-  Module* module = GetModuleContext()->GetModule();
-  ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
   return resource;
 }
 

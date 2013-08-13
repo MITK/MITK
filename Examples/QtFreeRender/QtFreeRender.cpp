@@ -50,9 +50,9 @@
 #include "vtkProperty.h"
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+
 #include "mitkInteractionEventObserver.h"
 
 //##Documentation
@@ -318,7 +318,7 @@ int main(int argc, char* argv[])
     m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
 
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
+    us::ModuleContext* context = us::GetModuleContext();
     context->RegisterService<mitk::InteractionEventObserver>(
         m_DisplayInteractor.GetPointer());
   }

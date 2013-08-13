@@ -31,16 +31,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+  /**
+   \brief Micro Service Singleton to get an instance of mitk::ToolManager
+
+   \sa ToolManager
+
+   Implemented as a singleton to have implicitely only one instance of ToolManager.
+   Use this service to make sure your Tools are managed by the object.
+
+   \note Can only be instantiated by SegmentationModuleActivator.
+  */
   class Segmentation_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
     mitkClassMacro(ToolManagerProvider, itk::LightObject);
     itkNewMacro(ToolManagerProvider);
 
+    /** \brief Returns ToolManager object
+    \note As this service is implemented as a singleton there is always the same ToolManager instance returned.
+    */
     virtual mitk::ToolManager* GetToolManager();
 
+    /** \brief Returns an instance of ToolManagerProvider service */
     static mitk::ToolManagerProvider* GetInstance();
 
+    //ONLY SegmentationModuleActivator is able to create instances of the service
     //friend class SegmentationModuleActivator;
 
   protected:

@@ -35,7 +35,6 @@ int mitkToolManagerProviderTest(int, char* [])
 {
   MITK_TEST_BEGIN("ToolManagerProvider")
 
-    mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
     mitkToolManagerProviderTestClass::RegisterService();
 

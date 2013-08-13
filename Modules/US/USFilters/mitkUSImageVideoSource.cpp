@@ -118,13 +118,13 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   *m_VideoCapture >> image; // get a new frame from camera
 
   // If region of interest was set, crop image
-  if ( m_IsCropped ) { m_CropFilter->filterImage(image); }
+  if ( m_IsCropped ) { m_CropFilter->FilterImage(image); }
 
   // If this source is set to deliver greyscale images, convert it
-  if ( m_IsGreyscale ) { m_GrayscaleFilter->filterImage(image); }
+  if ( m_IsGreyscale ) { m_GrayscaleFilter->FilterImage(image); }
 
   // Execute filter, if an additional filter is specified
-  if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->filterImage(image); }
+  if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
 
   // Convert to MITK-Image
   IplImage ipl_img = image;

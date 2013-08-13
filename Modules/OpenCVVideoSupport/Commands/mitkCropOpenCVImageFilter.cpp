@@ -32,17 +32,17 @@ bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
   cv::Rect cropRegion = m_CropRegion;
 
   // We can try and correct too large boundaries
-  if ( cropRegion.x + cropRegion.width >= image.size().width)
+  if ( cropRegion.x + cropRegion.width > image.size().width)
   {
     cropRegion.width = image.size().width - cropRegion.x;
     MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
-        << "Changed to large roi in x direction to fit the image size.";
+        << "Changed too large roi in x direction to fit the image size.";
   }
-  if ( cropRegion.y + cropRegion.height >= image.size().height)
+  if ( cropRegion.y + cropRegion.height > image.size().height)
   {
     cropRegion.height = image.size().height - cropRegion.y;
     MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
-        << "Changed to large roi in y direction to fit the image size.";
+        << "Changed too large roi in y direction to fit the image size.";
   }
 
   cv::Mat buffer = image(cropRegion);

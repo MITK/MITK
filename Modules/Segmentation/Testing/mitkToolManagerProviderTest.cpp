@@ -23,24 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGlobalInteraction.h"
 
-class mitkToolManagerProviderTestClass {
-public:
-  static void RegisterService(){
-    mitk::GetModuleContext()->RegisterService<mitk::ToolManagerProvider>(mitk::ToolManagerProvider::New().GetPointer());
-  }
-
-};
 
 int mitkToolManagerProviderTest(int, char* [])
 {
   MITK_TEST_BEGIN("ToolManagerProvider")
 
 
-    mitkToolManagerProviderTestClass::RegisterService();
+    //at this point the service is already registered by loading the Segmentation module.
 
     mitk::ToolManagerProvider* service = mitk::ToolManagerProvider::GetInstance();
-
-
 
   MITK_TEST_CONDITION(service!=NULL,"Service was succesfully  called");
   MITK_TEST_CONDITION((service->GetToolManager()) == (mitk::ToolManagerProvider::GetInstance()->GetToolManager()), "Service singleton");

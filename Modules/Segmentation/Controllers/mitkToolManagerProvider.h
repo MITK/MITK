@@ -26,11 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
-//class SegmentationModuleActivator;
+
 
 namespace mitk
 {
 
+  class SegmentationModuleActivator;
   /**
    \brief Micro Service Singleton to get an instance of mitk::ToolManager
 
@@ -46,7 +47,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(ToolManagerProvider, itk::LightObject);
-    itkNewMacro(ToolManagerProvider);
+    //itkNewMacro(ToolManagerProvider);
 
     /** \brief Returns ToolManager object
     \note As this service is implemented as a singleton there is always the same ToolManager instance returned.
@@ -57,11 +58,11 @@ namespace mitk
     static mitk::ToolManagerProvider* GetInstance();
 
     //ONLY SegmentationModuleActivator is able to create instances of the service
-    //friend class SegmentationModuleActivator;
+    friend class mitk::SegmentationModuleActivator;
 
   protected:
     //mitkClassMacro(ToolManagerProvider, itk::LightObject);
-    //itkNewMacro(Self);
+    itkNewMacro(ToolManagerProvider);
 
     ToolManagerProvider();
     virtual ~ToolManagerProvider();

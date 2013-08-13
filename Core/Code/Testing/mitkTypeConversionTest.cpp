@@ -29,7 +29,7 @@ using namespace mitk;
 static vtkSmartPointer<vtkPoints>   a_vtkPoints = vtkSmartPointer<vtkPoints>::New();
 
 static const ScalarType originalValues[] =  {1.0, 2.0, 3.0};
-static const ScalarType copiedValues[]   =  {4.0, 5.0, 6.0};
+static const ScalarType valuesToCopy[]   =  {4.0, 5.0, 6.0};
 
 static void Setup(void)
 {
@@ -41,36 +41,26 @@ static void Test_Mitk2Itk_PointCompatibility()
   Setup();
 
   itk::Point<ScalarType, 3> itkPoint3D = originalValues;
-  mitk::Point3D             point3D    = copiedValues;
+  mitk::Point3D             point3D    = valuesToCopy;
 
   itkPoint3D = point3D;
 
   MITK_TEST_CONDITION(itkPoint3D == point3D, "mitk point assigned to itk point")
-  MITK_TEST_CONDITION(itkPoint3D == copiedValues, "correct values were assigned")
+  MITK_TEST_CONDITION(itkPoint3D == valuesToCopy, "correct values were assigned")
 }
 
-void testFunction(Point3D& point)
-{
-  point.SetElement(0, 1);
-}
 
 static void Test_Itk2Mitk_PointCompatibility()
 {
   Setup();
 
-  const float testValues[] = {4.0, 5.0, 6.0};
-
   mitk::Point3D point3D                = originalValues;
-  itk::Point<ScalarType, 3> itkPoint3D = copiedValues;
+  itk::Point<ScalarType, 3> itkPoint3D = valuesToCopy;
 
-  itkPoint3D = point3D;
-
-  point3D    = itkPoint3D;
-
-  testFunction(static_cast<mitk::Point3D& >(itkPoint3D));
+  point3D = itkPoint3D;
 
   MITK_TEST_CONDITION(point3D == itkPoint3D, "itk point assigned to mitk point")
-  MITK_TEST_CONDITION(point3D == copiedValues, "correct values were assigned")
+  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
 }
 
 
@@ -79,15 +69,55 @@ static void Test_Vtk2Mitk_PointCompatibility()
   Setup();
 
   mitk::Point3D point3D = originalValues;
-  a_vtkPoints->InsertNextPoint(copiedValues);
-
+  a_vtkPoints->InsertNextPoint(valuesToCopy);
   double vtkPoint[3];
   a_vtkPoints->GetPoint(0, vtkPoint);
 
   point3D = vtkPoint;
 
   MITK_TEST_CONDITION(point3D == vtkPoint, "vtkPoint assigned to mitk point")
-  MITK_TEST_CONDITION(point3D == copiedValues, "correct values were assigned")
+  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
+}
+
+static void Test_Mitk2Vtk_PointCompatibility()
+{
+  Setup();
+  double vtkPoint[3];
+  mitk::Point3D point3D = valuesToCopy;
+
+  //a_vtkPoints->InsertNextPoint(point3D.GetAsArray());
+ // a_vtkPoints->GetPoint(0, vtkPoint);
+
+  MITK_TEST_CONDITION(point3D == vtkPoint, "MITK point assigned to VTK point")
+  MITK_TEST_CONDITION(Equal(vtkPoint[0], valuesToCopy[0])
+    && Equal(vtkPoint[1], valuesToCopy[1])
+    && Equal(vtkPoint[2], valuesToCopy[2]), "correct values were assigned")
+}
+
+
+static void Test_Mitk2Pod_PointCompatibility()
+{
+  ScalarType podPoint[] = {1.0, 2.0, 3.0};
+  mitk::Point3D point3D = valuesToCopy;
+
+  point3D.CopyToArray(podPoint);
+
+  MITK_TEST_CONDITION(point3D  == podPoint, "MITK point assigned to POD point")
+  MITK_TEST_CONDITION(Equal(podPoint[0], valuesToCopy[0])
+    && Equal(podPoint[1], valuesToCopy[1])
+    && Equal(podPoint[2], valuesToCopy[2]), "correct values were assigned")
+
+}
+
+static void Test_Pod2Mitk_PointCompatibility()
+{
+  mitk::Point3D point3D = originalValues;
+  ScalarType podPoint[] = {4.0, 5.0, 6.0};
+
+  point3D = podPoint;
+
+  MITK_TEST_CONDITION(point3D == podPoint, "POD point assigned to MITK point")
+  MITK_TEST_CONDITION(point3D == valuesToCopy, "correct values were assigned")
 }
 
 
@@ -112,12 +142,12 @@ static void Test_Vnl2Mitk_VectorFixedCompatibility()
   Setup();
 
   mitk::Vector3D vector3D = originalValues;
-  vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(copiedValues);
+  vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(valuesToCopy);
 
   vector3D = toItk(vnlVectorFixed);
 
   MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVectorFixed, "vnl_vector_fixed assigned to mitk vector")
-  MITK_TEST_CONDITION( vector3D == copiedValues, "correct values were assigned" )
+  MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
 }
 
 static void Test_Vnl2Mitk_VectorCompatibility()
@@ -126,12 +156,12 @@ static void Test_Vnl2Mitk_VectorCompatibility()
 
   mitk::Vector3D vector3D = originalValues;
   vnl_vector<ScalarType> vnlVector(3);
-  vnlVector.set(copiedValues);
+  vnlVector.set(valuesToCopy);
 
   vector3D = toItk<ScalarType, 3>(vnlVector);
 
   MITK_TEST_CONDITION( vector3D.GetVnlVector() == vnlVector, "vnl_vector assigned to mitk vector")
-  MITK_TEST_CONDITION( vector3D == copiedValues, "correct values were assigned" )
+  MITK_TEST_CONDITION( vector3D == valuesToCopy, "correct values were assigned" )
 }
 
 
@@ -162,11 +192,15 @@ int mitkTypeConversionTest(int /*argc*/ , char* /*argv*/[])
   Test_Itk2Mitk_PointCompatibility();
 
   Test_Vtk2Mitk_PointCompatibility();
+  Test_Mitk2Vtk_PointCompatibility();
 
   Test_Vnl2Mitk_VectorFixedCompatibility();
   Test_Vnl2Mitk_VectorCompatibility();
 
   Test_Mitk2Vnl_PointCompatibility();
+
+  Test_Mitk2Pod_PointCompatibility();
+  Test_Pod2Mitk_PointCompatibility();
 
   MITK_TEST_END()
 

@@ -56,11 +56,20 @@ public:
 
   /** Pass-through constructors for the Array base class. */
   mitk::Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
-  mitk::Point<TCoordRep, NPointDimension>(const ValueType r[3]):itk::Point<TCoordRep, NPointDimension>(r) {}
+  mitk::Point<TCoordRep, NPointDimension>(const ValueType r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
   mitk::Point<TCoordRep, NPointDimension>(const ValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
   mitk::Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
 
-  operator itk::Point<TCoordRep, NPointDimension> () const { return itk::Point<TCoordRep, NPointDimension> point; }
+  /**
+  * Warning: Array must have same dimension as Point
+  */
+  void CopyToArray(ScalarType* const array_p) const
+  {
+    for (int i = 0; i < this->GetPointDimension(); i++)
+    {
+      array_p[i] = this->GetElement(i);
+    }
+  }
 };
 
 typedef mitk::Point<ScalarType,3> Point3D;

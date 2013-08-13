@@ -78,6 +78,30 @@ public:
       this->SetCrossModalityOff();
   }
 
+  /** Controll the verbosity of the registration output
+   *
+   * for true, each iteration step of the optimizer is watched and passed to the std::cout
+   */
+  void SetVerbose(bool flag)
+  {
+    if( flag )
+      this->SetCrossModalityOn();
+    else
+      this->SetCrossModalityOff();
+  }
+
+  /** Turn verbosity on, \sa SetVerbose */
+  void SetVerboseOn()
+  {
+    m_Verbose = true;
+  }
+
+  /** Turn verbosity off, \sa SetVerbose */
+  void SetVerboseOff()
+  {
+    m_Verbose = false;
+  }
+
   /** A rigid ( 6dof : translation + rotation ) transform is optimized */
   void SetTransformToRigid()
   {
@@ -152,6 +176,9 @@ protected:
   bool m_UseAffineTransform;
 
   double* m_EstimatedParameters;
+
+  /** Control the verbosity of the regsitistration output */
+  bool m_Verbose;
 
   template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
   void RegisterTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2)
@@ -266,7 +293,12 @@ protected:
     OptimizerIterationCommand< OptimizerType >::Pointer iterationObserver =
         OptimizerIterationCommand<OptimizerType>::New();
 
-    unsigned long vopt_tag = optimizer->AddObserver( itk::IterationEvent(), iterationObserver );
+    // add observer tag if verbose */
+    unsigned long vopt_tag = 0;
+    if(m_Verbose)
+    {
+      vopt_tag = optimizer->AddObserver( itk::IterationEvent(), iterationObserver );
+    }
 
 
     // INPUT IMAGES
@@ -307,6 +339,12 @@ protected:
     for( unsigned int i=0; i<paramDim; i++)
     {
       m_EstimatedParameters[i] = finalParameters[i];
+    }
+
+    // remove optimizer tag if used
+    if( vopt_tag )
+    {
+      optimizer->RemoveObserver( vopt_tag );
     }
 
 

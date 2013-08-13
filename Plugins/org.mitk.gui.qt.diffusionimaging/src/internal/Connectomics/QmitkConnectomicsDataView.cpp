@@ -334,6 +334,10 @@ void QmitkConnectomicsDataView::OnSyntheticNetworkCreationPushButtonClicked()
     MITK_WARN << "Problem occured during synthetic network generation.";
   }
 
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    networkNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   return;
 }
 

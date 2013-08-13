@@ -29,7 +29,10 @@ mitk::LegacyFileWriterService::LegacyFileWriterService()
 
 }
 
-mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, std::string basedataType, std::string extension, std::string description)
+mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
+                                                       const std::string& basedataType,
+                                                       const std::string& extension,
+                                                       const std::string& description)
 {
   if (extension == "") mitkThrow() << "LegacyFileWriterWrapper cannot be initialized without FileExtension." ;
   m_Extension = extension;
@@ -47,25 +50,25 @@ mitk::LegacyFileWriterService::~LegacyFileWriterService()
 
 ////////////////////// Writing /////////////////////////
 
-void mitk::LegacyFileWriterService::Write(const itk::SmartPointer<BaseData> data, const std::string& path)
+void mitk::LegacyFileWriterService::Write(const BaseData* data, const std::string& path)
 {
   if (m_LegacyWriter.IsNull())
     mitkThrow() << "LegacyFileWriterService was incorrectly initialized: Has no LegacyFileWriter.";
 
   m_LegacyWriter->SetFileName(path.c_str());
   mitk::DataNode::Pointer node = mitk::DataNode::New();
-  node->SetData(data);
+  node->SetData(const_cast<BaseData*>(data));
   m_LegacyWriter->SetInput(node);
   m_LegacyWriter->Write();
 }
 
-void mitk::LegacyFileWriterService::Write(const itk::SmartPointer<BaseData> data, const std::istream& stream )
+void mitk::LegacyFileWriterService::Write(const BaseData* /*data*/, std::ostream& /*stream*/ )
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
   //return 0;
 }
 
-bool mitk::LegacyFileWriterService::CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const
+bool mitk::LegacyFileWriterService::CanWrite(const BaseData* data, const std::string& path) const
 {
   // Default implementation only checks if extension and basedatatype are correct
   std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );

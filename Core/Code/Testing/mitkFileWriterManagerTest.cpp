@@ -42,23 +42,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-class DummyWriter : public mitk::AbstractFileWriter, public itk::LightObject {
+class DummyWriter : public mitk::AbstractFileWriter {
 
 public:
 
-  mitkClassMacro(DummyWriter, itk::LightObject);
-  itkNewMacro(Self);
+  using AbstractFileWriter::Write;
 
-  virtual void Write(const mitk::BaseData::Pointer data, const std::string& path)
-  {  }
-
-  virtual void Write(const mitk::BaseData::Pointer data, const std::istream& stream )
+  virtual void Write(const mitk::BaseData* /*data*/, std::ostream& /*stream*/ )
   {  }
 
   virtual void SetOptions(std::list< std::string > options )
   { m_Options = options; m_Registration.SetProperties(ConstructServiceProperties());}
 
-  virtual void Init(std::string basedataType, std::string extension, int priority)
+  virtual void Init(const std::string& basedataType, const std::string& extension, int priority)
   {
    m_BasedataType = basedataType;
    m_Extension = extension;

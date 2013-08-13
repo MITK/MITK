@@ -46,7 +46,7 @@ std::string mitk::AbstractFileReader::GetFileName() const
   return m_FileName;
 }
 
-void mitk::AbstractFileReader::SetFileName(const std::string aFileName)
+void mitk::AbstractFileReader::SetFileName(const std::string& aFileName)
 {
  m_FileName = aFileName;
 }

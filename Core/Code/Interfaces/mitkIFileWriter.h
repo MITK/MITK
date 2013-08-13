@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 
-
 namespace mitk {
 
   class BaseData;
@@ -46,8 +45,7 @@ namespace mitk {
 * as the abstract class already implements most of the methods and also makes sure that your writer
 * will be managed by the FileWriterManager.
 */
-
-  struct MITK_CORE_EXPORT IFileWriter
+struct MITK_CORE_EXPORT IFileWriter
 {
 
     virtual ~IFileWriter();
@@ -60,7 +58,7 @@ namespace mitk {
     /**
     * \brief Set the complete file name and path to the file that will be written.
     */
-    virtual void SetFileName(const std::string aFileName) = 0;
+    virtual void SetFileName(const std::string& aFileName) = 0;
 
     // File Pattern Functions are currently not used for all writers
     ///**
@@ -97,9 +95,11 @@ namespace mitk {
     //*/
     //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path ) = 0;
+    virtual void Write(const BaseData* data) = 0;
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream ) = 0;
+    virtual void Write(const BaseData* data, const std::string& path ) = 0;
+
+    virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
 
     /**
     * \brief Returns the priority which defines how 'good' the FileWriter can handle it's file format.
@@ -143,7 +143,7 @@ namespace mitk {
     /**
     * \brief Returns true if this reader can confirm that it can read this file and false otherwise.
     */
-    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const = 0;
+    virtual bool CanWrite(const BaseData* data, const std::string& path) const = 0;
 
     /**
     * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
@@ -164,6 +164,6 @@ protected:
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.services.FileWriter")
+US_DECLARE_SERVICE_INTERFACE(mitk::IFileWriter, "org.mitk.IFileWriter")
 
 #endif /* IFileWriter_H_HEADER_INCLUDED_C1E7E521 */

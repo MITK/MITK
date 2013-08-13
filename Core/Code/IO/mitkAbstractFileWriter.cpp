@@ -27,7 +27,7 @@ m_Priority (0)
 {
 }
 
-mitk::AbstractFileWriter::AbstractFileWriter(std::string basedataType, std::string extension, std::string description) :
+mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description) :
 m_Extension (extension),
 m_BasedataType(basedataType),
 m_Description (description),
@@ -47,7 +47,7 @@ std::string mitk::AbstractFileWriter::GetFileName() const
   return m_FileName;
 }
 
-void mitk::AbstractFileWriter::SetFileName(const std::string aFileName)
+void mitk::AbstractFileWriter::SetFileName(const std::string& aFileName)
 {
  m_FileName = aFileName;
 }
@@ -74,11 +74,16 @@ void mitk::AbstractFileWriter::SetFileName(const std::string aFileName)
 
 ////////////////////// Writing /////////////////////////
 
-void mitk::AbstractFileWriter::Write(const itk::SmartPointer<BaseData> data, const std::string& path)
+void mitk::AbstractFileWriter::Write(const BaseData *data)
+{
+  this->Write(data, GetFileName());
+}
+
+void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& path)
 {
   if (! itksys::SystemTools::FileExists(path.c_str()))
     mitkThrow() << "File '" + path + "' not found.";
-  std::ifstream stream;
+  std::ofstream stream;
   stream.open(path.c_str());
   this->Write(data, stream);
 }
@@ -132,7 +137,7 @@ std::list< std::string > mitk::AbstractFileWriter::GetSupportedOptions() const
 
 ////////////////// MISC //////////////////
 
-bool mitk::AbstractFileWriter::CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const
+bool mitk::AbstractFileWriter::CanWrite(const BaseData* data, const std::string& path) const
 {
   // Default implementation only checks if extension and basedatatype are correct
   std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );

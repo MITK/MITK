@@ -25,17 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceInterface.h>
 
-//MITK
-#include <mitkDataStorage.h>
-
 // STL
 #include <list>
 
 
-
 namespace mitk {
-
   class BaseData;
+  class DataStorage;
 }
 
 namespace itk {
@@ -54,8 +50,7 @@ namespace mitk {
 * as the abstract class already implements most of the functions and also makes sure
 * that your reader will be managed by the FileReaderManager.
 */
-
-  struct MITK_CORE_EXPORT IFileReader
+struct MITK_CORE_EXPORT IFileReader
 {
 
     virtual ~IFileReader();
@@ -68,7 +63,7 @@ namespace mitk {
     /**
     * \brief Set the complete file name and path to the file that will be read.
     */
-    virtual void SetFileName(const std::string aFileName) = 0;
+    virtual void SetFileName(const std::string& aFileName) = 0;
 
     /**
     * \brief Get the File Prefix of the file that will be read.
@@ -184,6 +179,6 @@ protected:
 
 
 // This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.services.FileReader")
+US_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
 
 #endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */

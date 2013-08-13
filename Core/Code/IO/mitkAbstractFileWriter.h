@@ -67,17 +67,22 @@ namespace mitk {
     /**
     * \brief Set the complete file name and path to the file that will be writen.
     */
-    virtual void SetFileName(const std::string aFileName);
+    virtual void SetFileName(const std::string& aFileName);
+
+    /**
+    * \brief Write the data in <code>data</code> to the the location returned by GetFileName().
+    */
+    virtual void Write(const BaseData *data);
 
     /**
     * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
     */
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path);
+    virtual void Write(const BaseData* data, const std::string& path);
 
     /**
     * \brief Write the data in <code>data</code> to the the stream specified in <code>stream</code>
     */
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream ) = 0;
+    virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
 
     /**
     * \brief Returns the priority which defined how 'good' the FileWriter can handle it's file format.
@@ -134,7 +139,7 @@ namespace mitk {
     * The default implementation of AbstractFileWriter checks if the supplied filename is of the same extension as m_extension.
     * Overwrite this method if you require more specific behaviour
     */
-    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const;
+    virtual bool CanWrite(const BaseData* data, const std::string& path) const;
 
     /**
     * \brief Returns a value between 0 and 1 depending on the progress of the writing process.
@@ -145,7 +150,7 @@ namespace mitk {
 
 protected:
     AbstractFileWriter();
-    AbstractFileWriter(std::string basedataType, std::string extension, std::string description);
+    AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
     virtual ~AbstractFileWriter();
 
     // Filenames etc..
@@ -171,8 +176,5 @@ protected:
 
 };
 } // namespace mitk
-
-// This is the microservice declaration. Do not meddle!
-US_DECLARE_SERVICE_INTERFACE(mitk::AbstractFileWriter, "org.mitk.services.FileWriter")
 
 #endif /* AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521 */

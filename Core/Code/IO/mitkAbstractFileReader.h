@@ -53,7 +53,7 @@ namespace mitk {
     //## @brief Specify the file to load.
     //##
     //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual void SetFileName(const std::string aFileName);
+    virtual void SetFileName(const std::string& aFileName);
 
     //##Documentation
     //## @brief Get the specified file prefix for the file(s) to load.

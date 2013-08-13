@@ -44,20 +44,23 @@ namespace mitk {
 {
   public:
 
-    mitkClassMacro( LegacyFileWriterService, AbstractFileWriter);
+    mitkClassMacro( LegacyFileWriterService, AbstractFileWriter)
 
-    mitkNewMacro4Param( Self, mitk::FileWriter::Pointer, std::string, std::string, std::string);
+    mitkNewMacro4Param( Self, mitk::FileWriter::Pointer, const std::string&, const std::string&, const std::string&)
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::string& path);
+    using AbstractFileWriter::Write;
 
-    virtual void Write(const itk::SmartPointer<BaseData> data, const std::istream& stream );
+    virtual void Write(const BaseData* data, const std::string& path);
 
-    virtual bool CanWrite(const itk::SmartPointer<BaseData> data, const std::string& path) const;
+    virtual void Write(const BaseData* data, std::ostream& stream );
+
+    virtual bool CanWrite(const BaseData* data, const std::string& path) const;
 
 
 protected:
     LegacyFileWriterService();
-    LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, std::string basedataType, std::string extension, std::string description);
+    LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter, const std::string& basedataType,
+                            const std::string& extension, const std::string& description);
     virtual ~LegacyFileWriterService();
 
     mitk::FileWriter::Pointer m_LegacyWriter;

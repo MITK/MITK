@@ -59,7 +59,7 @@ set(CPP_FILES
 
   # Registration Algorithms & Co.
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
-  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
+#  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp

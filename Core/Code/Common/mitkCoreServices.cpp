@@ -22,11 +22,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 #include "usServiceReference.h"
 
+#include <itkSimpleFastMutexLock.h>
+#include <itkMutexLockHolder.h>
+
 namespace mitk {
 
+static itk::SimpleFastMutexLock s_ContextToServicesMapMutex;
+static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > s_ContextToServicesMap;
+
 template<class S>
-S* GetCoreService(us::ModuleContext* context, std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& csm)
+static S* GetCoreService(us::ModuleContext* context)
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
   S* coreService = NULL;
   us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
   if (serviceRef)
@@ -35,24 +42,23 @@ S* GetCoreService(us::ModuleContext* context, std::map<us::ModuleContext*, std::
   }
 
   assert(coreService && "Asserting non-NULL MITK core service");
-  csm[context].insert(std::make_pair(coreService,serviceRef));
+  s_ContextToServicesMap[context].insert(std::make_pair(coreService,serviceRef));
 
   return coreService;
 }
 
-std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > CoreServices::m_ContextToServicesMap;
-
 IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
 {
-  return GetCoreService<IShaderRepository>(context, m_ContextToServicesMap);
+  return GetCoreService<IShaderRepository>(context);
 }
 
 bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)
 {
   bool success = false;
 
-  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = m_ContextToServicesMap.find(context);
-  if (iter != m_ContextToServicesMap.end())
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex);
+  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap.find(context);
+  if (iter != s_ContextToServicesMap.end())
   {
     std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
     if (iter2 != iter->second.end())

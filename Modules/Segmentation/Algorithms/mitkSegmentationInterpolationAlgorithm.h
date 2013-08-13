@@ -54,11 +54,11 @@ class Segmentation_EXPORT SegmentationInterpolationAlgorithm : public itk::Objec
 
     mitkClassMacro(SegmentationInterpolationAlgorithm, itk::Object);
 
-    virtual Image::Pointer Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
+    virtual void Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                        Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                        unsigned int requestedIndex,
                                        unsigned int sliceDimension,
-                                       Image::Pointer resultImage,
+                                       Image* resultImage,
                                        int activeLabel = 1,
                                        unsigned int timeStep = 0,
                                        Image::ConstPointer referenceImage = NULL) = 0;

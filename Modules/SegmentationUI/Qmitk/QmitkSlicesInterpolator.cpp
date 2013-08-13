@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkImageTimeSelector.h>
 
+
 #include <itkCommand.h>
 
 #include <QCheckBox>
@@ -126,12 +127,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
-  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_FeedbackNode );
-  m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(255.0, 255.0, 0.0) );
-  m_FeedbackNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
-  m_FeedbackNode->SetProperty( "layer", mitk::IntProperty::New( 20 ) );
   m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
-  m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
+  m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.6) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 
   m_InterpolatedSurfaceNode = mitk::DataNode::New();
@@ -379,7 +376,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_Segmentation = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
   }
   //Updating the current selected segmentation for the 3D interpolation
-  SetCurrentContourListID();
+  //this->SetCurrentContourListID();
 
   if (m_2DInterpolationEnabled)
   {
@@ -477,14 +474,30 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
 
-        mitk::Image* auxImage = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
+        mitk::Image::Pointer auxImage = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
 
-        mitk::LabelSetImage::Pointer interpolation = mitk::LabelSetImage::New();
-        interpolation->Initialize(auxImage);
-        mitk::ImageReadAccessor accessor(auxImage);
-        interpolation->SetVolume(accessor.GetData());
+        if (auxImage.IsNotNull())
+        {
+            MITK_INFO << "auxImage->GetDimension: " << auxImage->GetDimension();
+            MITK_INFO << "auxImage->GetDimension(0): " << auxImage->GetDimension(0);
+            MITK_INFO << "auxImage->GetDimension(1): " << auxImage->GetDimension(1);
 
-        m_FeedbackNode->SetData( interpolation );
+            mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
+            newImage->Initialize( auxImage );
+
+            MITK_INFO << "after initialize";
+
+//            newImage->SetGeometry(
+//                static_cast< mitk::Geometry3D * >( m_Segmentation->GetGeometry()->Clone().GetPointer() ) );
+
+            MITK_INFO << "after set geometry";
+
+            mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(auxImage));
+            newImage->SetVolume( accessor.GetData() );
+
+            MITK_INFO << "after set volume";
+            m_FeedbackNode->SetData( newImage );
+        }
 
         m_LastSNC = slicer;
         m_LastSliceIndex = clickedSliceIndex;
@@ -770,7 +783,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   {
     mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
     mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-    QWidget::setEnabled( workingNode != NULL );
+    this->setEnabled( workingNode != NULL );
 
     m_BtnApply2D->setEnabled( on );
     m_FeedbackNode->SetVisibility( on );
@@ -787,7 +800,6 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       if (segmentation)
       {
         m_Interpolator->SetSegmentationVolume( segmentation );
-        m_Interpolator->SetActiveLabel( segmentation->GetActiveLabelIndex() );
 
         if (referenceNode)
         {
@@ -909,7 +921,7 @@ void QmitkSlicesInterpolator::EnableInterpolation(bool on)
 {
   // only to be called from the outside world
   // just a redirection to OnInterpolationActivated
-  OnInterpolationActivated(on);
+  this->OnInterpolationActivated(on);
 }
 
 void QmitkSlicesInterpolator::Enable3DInterpolation(bool on)

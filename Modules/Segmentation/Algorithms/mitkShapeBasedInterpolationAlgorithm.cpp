@@ -21,13 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 #include "ipSegmentation.h"
 
-mitk::Image::Pointer
-mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
+void mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
                                Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
                                unsigned int requestedIndex,
                                unsigned int /*sliceDimension*/, // commented variables are not used
-                               Image::Pointer resultImage,
+                               Image* resultImage,
                                int activeLabel,
                                unsigned int /*timeStep*/,
                                Image::ConstPointer /*referenceImage*/)
@@ -85,7 +84,7 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
 
   mitkIpPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
-  if (!ipPicResult) return NULL;
+  if (!ipPicResult) return;
 
   mitk::Image::Pointer auxImage = mitk::Image::New();
   Geometry3D::Pointer originalGeometry = resultImage->GetGeometry();
@@ -134,6 +133,6 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
       ++targetIterator;
     }
 
-  return resultImage;
+    resultImage->Modified();
 }
 

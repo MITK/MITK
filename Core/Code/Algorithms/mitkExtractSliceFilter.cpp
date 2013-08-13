@@ -54,14 +54,17 @@ mitk::ExtractSliceFilter::~ExtractSliceFilter(){
 
 void mitk::ExtractSliceFilter::GenerateOutputInformation(){
   Superclass::GenerateOutputInformation();
+/*
   //TODO try figure out how to set the specs of the slice before it is actually extracted
-  /*Image::Pointer output = this->GetOutput();
+  Image::Pointer output = this->GetOutput();
   Image::ConstPointer input = this->GetInput();
   if (input.IsNull()) return;
+
   unsigned int dimensions[2];
   dimensions[0] = m_WorldGeometry->GetExtent(0);
   dimensions[1] = m_WorldGeometry->GetExtent(1);
-  output->Initialize(input->GetPixelType(), 2, dimensions, 1);*/
+  output->Initialize(input->GetPixelType(), 2, dimensions, 1);
+*/
 }
 
 void mitk::ExtractSliceFilter::GenerateInputRequestedRegion(){

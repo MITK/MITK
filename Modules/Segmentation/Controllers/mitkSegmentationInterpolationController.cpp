@@ -82,7 +82,7 @@ void mitk::SegmentationInterpolationController::BlockModified(bool block)
   m_BlockModified = block;
 }
 
-void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Image* segmentation )
+void mitk::SegmentationInterpolationController::SetSegmentationVolume( const LabelSetImage* segmentation )
 {
   // clear old information (remove all time steps
   m_SegmentationCountInSlice.clear();
@@ -138,7 +138,7 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Ima
 
   //PrintStatus();
 
-  SetReferenceVolume( m_ReferenceImage );
+  this->SetReferenceVolume( m_ReferenceImage );
 
   Modified();
 }
@@ -396,7 +396,6 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
 {
   if (m_Segmentation.IsNull()) return NULL;
 
-
   if(!currentPlane)
   {
     return NULL;
@@ -462,6 +461,9 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     resultImage = extractor->GetOutput();
     resultImage->DisconnectPipeline();
 
+    MITK_INFO << "resultImage->GetDimension(0)" << resultImage->GetDimension(0);
+    MITK_INFO << "resultImage->GetDimension(1)" << resultImage->GetDimension(1);
+
     //Creating PlaneGeometry for lower slice
     mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
 
@@ -500,6 +502,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     return NULL;
   }
 
+  m_ActiveLabel = m_Segmentation->GetActiveLabelIndex();
+
   // interpolation algorithm gets some inputs
   //   two segmentations (guaranteed to be of the same data type, but no special data type guaranteed)
   //   orientation (sliceDimension) of the segmentations
@@ -509,8 +513,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
   // interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
   //   inspect the original patient image at appropriate positions
 
-  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New().GetPointer();
-  return algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
+  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+  algorithm->Interpolate( lowerMITKSlice.GetPointer(), lowerBound,
                                  upperMITKSlice.GetPointer(), upperBound,
                                  sliceIndex,
                                  sliceDimension,
@@ -518,5 +522,10 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  m_ActiveLabel,
                                  timeStep,
                                  m_ReferenceImage );
+
+  MITK_INFO << "2) resultImage->GetDimension(0)" << resultImage->GetDimension(0);
+  MITK_INFO << "2) resultImage->GetDimension(1)" << resultImage->GetDimension(1);
+
+  return resultImage;
 }
 

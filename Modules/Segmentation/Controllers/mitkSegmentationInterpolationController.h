@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
-#include "mitkImage.h"
+#include "mitkLabelSetImage.h"
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
@@ -68,7 +68,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
   public:
 
     mitkClassMacro(SegmentationInterpolationController, itk::Object);
-    itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
+    itkNewMacro(SegmentationInterpolationController);
 
     /**
       \brief Find interpolator for a given image.
@@ -98,9 +98,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
       When you change a single slice, call SetChangedSlice() instead.
     */
-    void SetSegmentationVolume( const Image* segmentation );
-
-    itkSetMacro(ActiveLabel, int);
+    void SetSegmentationVolume( const LabelSetImage* segmentation );
 
     /**
       \brief Set a reference image (original patient image) - optional.
@@ -197,7 +195,7 @@ class Segmentation_EXPORT SegmentationInterpolationController : public itk::Obje
 
     static InterpolatorMapType s_InterpolatorForImage;
 
-    Image::ConstPointer m_Segmentation;
+    LabelSetImage::ConstPointer m_Segmentation;
     Image::ConstPointer m_ReferenceImage;
     int m_ActiveLabel;
     bool m_BlockModified;

@@ -14,4 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkVector.h"
+#include "mitkDataTypeBasics.h"
+#include "vnl/vnl_math.h"
+#include <limits>
+
+const mitk::ScalarType mitk::eps     = vnl_math::eps*100;
+const mitk::ScalarType mitk::sqrteps = vnl_math::sqrteps;
+const mitk::ScalarType mitk::large   = std::numeric_limits<mitk::ScalarType>::max();

@@ -31,11 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 #include <MitkExports.h>
+#include "mitkPoint.h" // TODO SW: should not be included here, maybe generate one "general datatype include" like mitkPrimitives.h
+#include "mitkDataTypeBasics.h"
 
 #ifndef DOXYGEN_SKIP
 
 namespace mitk {
-typedef double ScalarType;
+
 
 typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
@@ -47,39 +49,7 @@ typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
 
 
-template<class TCoordRep, unsigned int NPointDimension = 3>
-class Point : public itk::Point<TCoordRep, NPointDimension>
-{
-public:
-     /** Default constructor has nothing to do. */
-  mitk::Point<TCoordRep, NPointDimension>() {}
 
-  /** Pass-through constructors for the Array base class. */
-  mitk::Point<TCoordRep, NPointDimension>(const mitk::Point<TCoordRep, NPointDimension>& r) : itk::Point<TCoordRep, NPointDimension>(r) {}
-  mitk::Point<TCoordRep, NPointDimension>(const ValueType r[NPointDimension]):itk::Point<TCoordRep, NPointDimension>(r) {}
-  mitk::Point<TCoordRep, NPointDimension>(const ValueType & v):itk::Point<TCoordRep, NPointDimension>(v) {}
-  mitk::Point<TCoordRep, NPointDimension>(const itk::Point<TCoordRep, NPointDimension> r) : itk::Point<TCoordRep, NPointDimension>(r) {}
-
-  /**
-  * Warning: Array must have same dimension as Point
-  */
-  void CopyToArray(ScalarType* const array_p) const
-  {
-    for (int i = 0; i < this->GetPointDimension(); i++)
-    {
-      array_p[i] = this->GetElement(i);
-    }
-  }
-};
-
-typedef mitk::Point<ScalarType,3> Point3D;
-typedef mitk::Point<ScalarType,2> Point2D;
-
-
-typedef mitk::Point<ScalarType,4> Point4D;
-typedef mitk::Point<int,2> Point2I;
-typedef mitk::Point<int,3> Point3I;
-typedef mitk::Point<int,4> Point4I;
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;
 typedef itk::Index<3> Index3D;

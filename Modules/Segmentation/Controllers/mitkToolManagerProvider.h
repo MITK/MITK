@@ -39,7 +39,8 @@ namespace mitk
    Implemented as a singleton to have implicitely only one instance of ToolManager.
    Use this service to make sure your Tools are managed by the object.
 
-   \note Can only be instantiated by SegmentationModuleActivator.
+   \note Can only be instantiated by SegmentationModuleActivator. The common way to get the ToolManager is by
+   <code> mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); </code>
   */
   class Segmentation_EXPORT ToolManagerProvider : public itk::LightObject
   {

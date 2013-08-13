@@ -48,9 +48,9 @@ namespace mitk
     enum MappingStrategy
     {
       EndElementPosition,
-      PrecomputeAndDistance,
+      EndElementPositionAvoidingWhiteMatter,
       JustEndPointVerticesNoLabel,
-      EndElementPositionAvoidingWhiteMatter
+      PrecomputeAndDistance
     };
 
     /** Standard class typedefs. */

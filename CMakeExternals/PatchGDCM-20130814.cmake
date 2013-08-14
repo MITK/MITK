@@ -5,7 +5,7 @@
 file(STRINGS Source/MediaStorageAndFileFormat/gdcmSorter.cxx sourceCode NEWLINE_CONSUME)
 
 # Changing the way gdcmSorter.cxx behaves when encountering an unreadable file
-string(REGEX REPLACE "f = NULL;" "std::cerr << "Err: File could not be read: " << it->c_str() << std::endl;\n return false;" sourceCode ${sourceCode})
+string(REPLACE "f = NULL;" "std::cerr << \"Err: File could not be read: \" << it->c_str() << std::endl; \n      return false;" sourceCode ${sourceCode})
 
 # set variable CONTENTS, which is substituted in TEMPLATE_FILE
 set(CONTENTS ${sourceCode})

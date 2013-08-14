@@ -16,11 +16,12 @@
 #!        be added to the current source directory. The resulting directories
 #!        will be available in the set of include directories of depending plug-ins.
 #! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
+#! \param MOC_OPTIONS (optional) Additional options to pass to the Qt MOC compiler
 #! \param TEST_PLUGIN (option) Mark this plug-in as a testing plug-in.
 #! \param NO_INSTALL (option) Don't install this plug-in.
 macro(MACRO_CREATE_CTK_PLUGIN)
 
-  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_PLUGIN "EXPORT_DIRECTIVE;EXPORTED_INCLUDE_SUFFIXES;DOXYGEN_TAGFILES;MOC_OPTIONS" "TEST_PLUGIN;NO_INSTALL;NO_QHP_TRANSFORM" ${ARGN})
 
   message(STATUS "Creating CTK plugin ${PROJECT_NAME}")
 
@@ -114,6 +115,7 @@ macro(MACRO_CREATE_CTK_PLUGIN)
     EXPORT_DIRECTIVE ${_PLUGIN_EXPORT_DIRECTIVE}
     SRCS ${_PLUGIN_CPP_FILES}
     MOC_SRCS ${_PLUGIN_MOC_H_FILES}
+    MOC_OPTIONS ${_PLUGIN_MOC_OPTIONS}
     UI_FORMS ${_PLUGIN_UI_FILES}
     EXPORTED_INCLUDE_SUFFIXES ${_PLUGIN_EXPORTED_INCLUDE_SUFFIXES}
     RESOURCES ${_PLUGIN_QRC_FILES}

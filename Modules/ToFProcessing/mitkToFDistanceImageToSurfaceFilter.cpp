@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
-  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0), m_TriangulationThreshold(-1.0)
+  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0), m_TriangulationThreshold(0.0)
 {
   m_InterPixelDistance.Fill(0.045);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
@@ -236,7 +236,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
             points->GetPoint(xy_1V, pointXY_1);
             points->GetPoint(x_1y_1V, pointX_1Y_1);
 
-            if( (m_TriangulationThreshold == -1.0) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= m_TriangulationThreshold)
+            if( (mitk::Equal(m_TriangulationThreshold, 0.0)) || ((vtkMath::Distance2BetweenPoints(pointXY, pointX_1Y) <= m_TriangulationThreshold)
                 && (vtkMath::Distance2BetweenPoints(pointXY, pointXY_1) <= m_TriangulationThreshold)
                 && (vtkMath::Distance2BetweenPoints(pointX_1Y, pointX_1Y_1) <= m_TriangulationThreshold)
                 && (vtkMath::Distance2BetweenPoints(pointXY_1, pointX_1Y_1) <= m_TriangulationThreshold)))

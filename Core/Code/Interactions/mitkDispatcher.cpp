@@ -169,8 +169,8 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   }
 
   /* Notify InteractionEventObserver  */
-  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver;
-  m_EventObserverTracker->GetServiceReferences(listEventObserver);
+  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver =
+      m_EventObserverTracker->GetServiceReferences();
   for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin();
        it != listEventObserver.end(); ++it)
   {

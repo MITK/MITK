@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageDuplicator.h>
-#include <boost/progress.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/progress.hpp>
+#endif
 
 #define _USE_MATH_DEFINES
 #include <math.h>

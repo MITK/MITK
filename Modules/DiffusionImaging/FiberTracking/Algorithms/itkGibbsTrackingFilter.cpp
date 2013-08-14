@@ -35,9 +35,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // #include <QFile>
 #include <tinyxml.h>
 #include <math.h>
-#include <boost/progress.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/progress.hpp>
+#  include <boost/lexical_cast.hpp>
+#  include <boost/algorithm/string.hpp>
+#endif
 
 namespace itk{
 

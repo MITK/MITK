@@ -30,8 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
 
-#include <boost/math/special_functions.hpp>
-#include <boost/progress.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/math/special_functions.hpp>
+#  include <boost/progress.hpp>
+#endif
 
 
 using namespace boost::math;

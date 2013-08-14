@@ -30,7 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include <boost/math/special_functions.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/math/special_functions.hpp>
+#endif
 
 #include "itkPointShell.h"
 

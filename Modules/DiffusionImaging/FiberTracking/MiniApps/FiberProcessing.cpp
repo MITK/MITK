@@ -38,7 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberTrackingObjectFactory.h>
 #include <mitkFiberBundleX.h>
 #include "ctkCommandLineParser.h"
-#include <boost/lexical_cast.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/lexical_cast.hpp>
+#endif
 
 /**
  * Short program to average redundant gradients in dwi-files

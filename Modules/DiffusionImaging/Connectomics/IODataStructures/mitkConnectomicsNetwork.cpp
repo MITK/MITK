@@ -16,8 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkConnectomicsNetwork.h"
-#include <boost/graph/clustering_coefficient.hpp>
-#include <boost/graph/betweenness_centrality.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/graph/clustering_coefficient.hpp>
+#  include <boost/graph/betweenness_centrality.hpp>
+#endif
 
 /* Constructor and Destructor */
 mitk::ConnectomicsNetwork::ConnectomicsNetwork()

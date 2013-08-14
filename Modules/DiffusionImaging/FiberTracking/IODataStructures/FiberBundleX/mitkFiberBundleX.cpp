@@ -40,9 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolygon.h>
 #include <vtkCleanPolyData.h>
 #include <cmath>
-#ifndef Q_MOC_RUN
-#  include <boost/progress.hpp>
-#endif
+#include <boost/progress.hpp>
 
 const char* mitk::FiberBundleX::COLORCODING_ORIENTATION_BASED = "Color_Orient";
 //const char* mitk::FiberBundleX::COLORCODING_FA_AS_OPACITY = "Color_Orient_FA_Opacity";

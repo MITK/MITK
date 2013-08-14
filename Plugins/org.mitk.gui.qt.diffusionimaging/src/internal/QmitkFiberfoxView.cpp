@@ -48,11 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
 #include <itkAddArtifactsToDwiImageFilter.h>
-#ifndef Q_MOC_RUN
-#  include <boost/property_tree/ptree.hpp>
-#  include <boost/property_tree/xml_parser.hpp>
-#  include <boost/foreach.hpp>
-#endif
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/foreach.hpp>
 #include <QFileDialog>
 #include <QMessageBox>
 #include "usModuleRegistry.h"

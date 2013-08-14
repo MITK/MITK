@@ -17,9 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<mitkConnectomicsShortestPathHistogram.h>
 
-#ifndef Q_MOC_RUN
-#  include <boost/graph/dijkstra_shortest_paths.hpp>
-#endif
+#include <boost/graph/dijkstra_shortest_paths.hpp>
 
 #include "mitkConnectomicsConstantsManager.h"
 

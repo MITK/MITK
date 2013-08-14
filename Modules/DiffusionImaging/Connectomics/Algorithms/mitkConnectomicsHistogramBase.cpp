@@ -19,9 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsHistogramBase.h>
 #include <mitkConnectomicsConstantsManager.h>
 
-#ifndef Q_MOC_RUN
-#  include <boost/numeric/conversion/converter.hpp>
-#endif
+#include <boost/numeric/conversion/converter.hpp>
 
 mitk::ConnectomicsHistogramBase::ConnectomicsHistogramBase()
 : m_Valid( false )

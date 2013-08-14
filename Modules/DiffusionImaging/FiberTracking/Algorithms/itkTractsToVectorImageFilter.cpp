@@ -12,9 +12,7 @@
 // misc
 #define _USE_MATH_DEFINES
 #include <math.h>
-#ifndef Q_MOC_RUN
-#  include <boost/progress.hpp>
-#endif
+#include <boost/progress.hpp>
 
 
 namespace itk{

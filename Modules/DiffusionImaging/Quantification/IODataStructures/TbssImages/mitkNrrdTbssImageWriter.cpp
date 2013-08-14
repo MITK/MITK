@@ -24,9 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
-#ifndef Q_MOC_RUN
-#  include "boost/lexical_cast.hpp"
-#endif
+#include "boost/lexical_cast.hpp"
 
 #include <iostream>
 #include <fstream>

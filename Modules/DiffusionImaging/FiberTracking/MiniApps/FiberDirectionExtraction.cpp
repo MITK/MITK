@@ -26,9 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
-#ifndef Q_MOC_RUN
-#  include <boost/lexical_cast.hpp>
-#endif 
+#include <boost/lexical_cast.hpp>
 #include <itkEvaluateDirectionImagesFilter.h>
 #include <itkTractsToVectorImageFilter.h>
 

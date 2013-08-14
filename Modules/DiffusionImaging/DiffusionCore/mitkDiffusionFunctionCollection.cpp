@@ -24,11 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 // Namespace ::SH
-#ifndef Q_MOC_RUN
-#  include <boost/math/special_functions/legendre.hpp>
-#  include <boost/math/special_functions/spherical_harmonic.hpp>
-#  include <boost/version.hpp>
-#endif
+#include <boost/math/special_functions/legendre.hpp>
+#include <boost/math/special_functions/spherical_harmonic.hpp>
+#include <boost/version.hpp>
 
 
 // Namespace ::Gradients

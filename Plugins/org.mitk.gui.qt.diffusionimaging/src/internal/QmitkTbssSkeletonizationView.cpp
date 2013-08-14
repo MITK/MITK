@@ -37,9 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMatrix4x4.h>
 
 // Boost
-#ifndef Q_MOC_RUN
-#  include <boost/lexical_cast.hpp>
-#endif
+#include <boost/lexical_cast.hpp>
 
 const std::string QmitkTbssSkeletonizationView::VIEW_ID = "org.mitk.views.tbssskeletonization";
 

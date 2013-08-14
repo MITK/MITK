@@ -35,10 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShCoefficientImageImporter.h>
 #include <mitkNrrdQBallImageWriter.h>
 #include <itkFlipImageFilter.h>
-#ifndef Q_MOC_RUN
-#  include <boost/lexical_cast.hpp>
-#  include <boost/algorithm/string.hpp>
-#endif
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 
 mitk::Image::Pointer LoadData(std::string filename)

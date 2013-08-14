@@ -451,15 +451,14 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
   const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
   mitk::Point2D pointProjectedOntoLine;
-  int previousControlPoint = mitk::PlanarFigureInteractor::IsPositionOverFigure(
-    positionEvent,
-    planarFigure,
-    planarFigureGeometry,
-    projectionPlane,
-    renderer->GetDisplayGeometry(),
-    pointProjectedOntoLine
-    );
-  bool isHovering = ( previousControlPoint != -1 );
+  int previousControlPoint = this->IsPositionOverFigure(positionEvent, planarFigure, planarFigureGeometry, projectionPlane, renderer->GetDisplayGeometry(), pointProjectedOntoLine );
+
+  if ( previousControlPoint == -1 )
+  {
+      previousControlPoint = this->IsPositionInsideMarker( positionEvent, planarFigure, planarFigureGeometry, projectionPlane, renderer->GetDisplayGeometry());
+  }
+
+  bool isHovering = (previousControlPoint != -1);
 
   if ( isHovering )
   {
@@ -806,7 +805,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
       return 0; // Return index of first control point
     }
   }
-
   return -1;
 }
 

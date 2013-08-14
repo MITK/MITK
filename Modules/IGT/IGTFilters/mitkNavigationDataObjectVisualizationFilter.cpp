@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataObjectVisualizationFilter::NavigationDataObjectVisualizationFilter()
 : NavigationDataToNavigationDataFilter(),
-m_RepresentationList(), m_TransformPosition(), m_TransformOrientation()
+m_RepresentationList(), m_TransformPosition(), m_TransformOrientation(), m_RotationMode(RotationStandard)
 {
 }
 
@@ -79,6 +79,12 @@ m_OffsetList[index] = offset;
 }
 
 
+void mitk::NavigationDataObjectVisualizationFilter::SetRotationMode(RotationMode r)
+{
+  m_RotationMode = r;
+}
+
+
 void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 {
   /*get each input, lookup the associated BaseData and transfer the data*/
@@ -129,23 +135,31 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 
     if (this->GetTransformOrientation(index) == true)
     {
-      //calculate the transform from the quaternions
-      static itk::QuaternionRigidTransform<double>::Pointer quatTransform = itk::QuaternionRigidTransform<double>::New();
-
       mitk::NavigationData::OrientationType orientation = nd->GetOrientation();
-      // convert mitk::ScalarType quaternion to double quaternion because of itk bug
-      vnl_quaternion<double> doubleQuaternion(orientation.x(), orientation.y(), orientation.z(), orientation.r());
-      quatTransform->SetIdentity();
-      quatTransform->SetRotation(doubleQuaternion);
-      quatTransform->Modified();
 
       /* because of an itk bug, the transform can not be calculated with float data type.
       To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
       static AffineTransform3D::MatrixType m;
-      //mitk::TransferMatrix(quatTransform->GetMatrix(), m);
-      vnl_matrix_fixed<float,3,3> rot = orientation.rotation_matrix_transpose();
-      for(int i=0; i<3; i++) for (int j=0; j<3; j++) m[i][j] = rot[i][j];
+
+      //convert quaternion to rotation matrix depending on the rotation mode
+      if(m_RotationMode == RotationStandard)
+        {
+        //calculate the transform from the quaternions
+        static itk::QuaternionRigidTransform<double>::Pointer quatTransform = itk::QuaternionRigidTransform<double>::New();
+        // convert mitk::ScalarType quaternion to double quaternion because of itk bug
+        vnl_quaternion<double> doubleQuaternion(orientation.x(), orientation.y(), orientation.z(), orientation.r());
+        quatTransform->SetIdentity();
+        quatTransform->SetRotation(doubleQuaternion);
+        quatTransform->Modified();
+        mitk::TransferMatrix(quatTransform->GetMatrix(), m);
+        }
+      else if(m_RotationMode == RotationTransposed)
+        {
+        vnl_matrix_fixed<float,3,3> rot = orientation.rotation_matrix_transpose();
+        for(int i=0; i<3; i++) for (int j=0; j<3; j++) m[i][j] = rot[i][j];
+        }
       affineTransform->SetMatrix(m);
+
     }
     if (this->GetTransformPosition(index) == true)
     {

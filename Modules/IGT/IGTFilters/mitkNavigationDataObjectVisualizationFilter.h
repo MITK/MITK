@@ -38,6 +38,15 @@ namespace mitk {
 
     itkNewMacro(Self);
 
+    /** Defines the rotation modes of the input data of this filter
+       *  which results in different interpretations of quaternions.
+       *  - Standard: normal representation, rawdata from the device is not changed
+       *  - Transposed: the rotation is stored transposed, which is standard in VNL
+       *  ndiStandard is default
+       *  use SetRotationMode to change the mode.
+       */
+      enum RotationMode {RotationStandard, RotationTransposed};
+
     /**
     * \brief Smart Pointer type to a BaseData.
     */
@@ -85,6 +94,11 @@ namespace mitk {
      */
     void SetOffset(int index, mitk::AffineTransform3D::Pointer offset);
 
+    /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
+     *  on the different modes.
+     */
+    virtual void SetRotationMode(RotationMode r);
+
     /** @return Returns the offset of a represenation object. Returns NULL if there is no offset. */
     mitk::AffineTransform3D::Pointer GetOffset(int index);
 
@@ -124,6 +138,9 @@ namespace mitk {
     BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     OffsetPointerMap m_OffsetList;
+
+  private:
+    RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */

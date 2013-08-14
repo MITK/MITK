@@ -15,7 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "itkTractsToDWIImageFilter.h"
-#include <boost/progress.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/progress.hpp>
+#endif
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>

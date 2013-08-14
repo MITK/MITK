@@ -53,7 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
-#include <boost/version.hpp>
+#ifndef Q_MOC_RUN
+#  include <boost/version.hpp>
+#endif
 
 const std::string QmitkQBallReconstructionView::VIEW_ID = "org.mitk.views.qballreconstruction";
 

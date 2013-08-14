@@ -230,7 +230,7 @@ private:
   /**
     \brief This method performs GlobalReinit() for the rendering widgets.
     */
-  void GlobalReinit();
+  //void GlobalReinit();
 
 };
 

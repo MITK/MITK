@@ -140,36 +140,24 @@ void QmitkIGTTrackingLabView::UpdateTimer()
     if(IsTransformDifferenceHigh(ObjectMarkerCurrentTransform, m_ObjectmarkerNavigationDataLastUpdate))
     {
       m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New(m_ObjectmarkerNavigationData);
+      m_PermanentRegistrationFilter->Update();
+      //if(m_Controls.m_SurfaceActive->isChecked())
+      //{
+      //  mitk::Transform::Pointer newTransform = mitk::Transform::New();
+      //  newTransform->Concatenate(m_T_MarkerRel);
+      //  newTransform->Concatenate(ObjectMarkerCurrentTransform);
+      //  this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
+      //}
 
-      if(m_Controls.m_SurfaceActive->isChecked()) m_PermanentRegistrationFilter->Update();
-      /*{
-        mitk::Transform::Pointer newTransform = mitk::Transform::New();
-        newTransform->Concatenate(m_T_MarkerRel);
-        newTransform->Concatenate(ObjectMarkerCurrentTransform);
-        this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform->GetAffineTransform3D());
-      }*/
-
-      if(m_Controls.m_ImageActive->isChecked())
-      {
-        /*
-        mitk::AffineTransform3D::Pointer imageTransform = m_T_ImageGeo;
-        imageTransform->Compose(newTransform->GetAffineTransform3D());
-        mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-        itk::Matrix<float,3,3> rotationFloatNew = imageTransform->GetMatrix();
-        itk::Vector<float,3> translationFloatNew = imageTransform->GetOffset();
-        newImageTransform->SetMatrix(rotationFloatNew);
-        newImageTransform->SetOffset(translationFloatNew);
-        m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
-        */
-
-        mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
-        newTransform->SetIdentity();
-        newTransform->Compose(m_T_ImageGeo);
-        newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
-        newTransform->Compose(ObjectMarkerCurrentTransform->GetAffineTransform3D());
-        this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
-
-      }
+      //if(m_Controls.m_ImageActive->isChecked())
+      //{
+      //  mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
+      //  newTransform->SetIdentity();
+      //  newTransform->Compose(m_T_ImageGeo);
+      //  newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
+      //  newTransform->Compose(ObjectMarkerCurrentTransform->GetAffineTransform3D());
+      //  this->m_Controls.m_ImageComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(newTransform);
+      //}
     }
   }
 
@@ -565,7 +553,7 @@ void QmitkIGTTrackingLabView::OnPointSetRecording(bool record)
   }
 }
 
-void QmitkIGTTrackingLabView::GlobalReinit()
+/*void QmitkIGTTrackingLabView::GlobalReinit()
 {
   // request global reiinit
   mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
@@ -578,7 +566,7 @@ void QmitkIGTTrackingLabView::GlobalReinit()
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 
   //global reinit end
-}
+}*/
 
 void QmitkIGTTrackingLabView::OnVirtualCamera(bool on)
 {
@@ -724,7 +712,6 @@ bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::Transform::Pointer
 
 void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 {
-  MITK_INFO << "Permanent registration: " << on;
   if(on)
     {
 
@@ -745,9 +732,13 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     //create the permanent registration filter
     m_PermanentRegistrationFilter = mitk::NavigationDataObjectVisualizationFilter::New();
+    //set to rotation mode transposed because we are working with VNL style quaternions
+    m_PermanentRegistrationFilter->SetRotationMode(mitk::NavigationDataObjectVisualizationFilter::RotationTransposed);
+
+    //first: surface (always activated)
 
     //connect filter to source
-    m_PermanentRegistrationFilter->SetInput(this->m_ObjectmarkerNavigationData);
+    m_PermanentRegistrationFilter->SetInput(0,this->m_ObjectmarkerNavigationData);
 
     //set representation object
     m_PermanentRegistrationFilter->SetRepresentationObject(0,this->m_Controls.m_ObjectComboBox->GetSelectedNode()->GetData());
@@ -764,14 +755,27 @@ void QmitkIGTTrackingLabView::OnPermanentRegistration(bool on)
 
     m_PermanentRegistrationFilter->SetOffset(0,T_MarkerRel->GetAffineTransform3D());
 
+    //first: image (if activated)
+    //set interpolation mode
+    if (m_Controls.m_ImageActive->isChecked() && (m_Controls.m_ImageComboBox->GetSelectedNode().IsNotNull()))
+      {
+      mitk::DataNode::Pointer imageNode = this->m_Controls.m_ImageComboBox->GetSelectedNode();
+      imageNode->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );
+      m_PermanentRegistrationFilter->SetInput(1,this->m_ObjectmarkerNavigationData);
+      m_PermanentRegistrationFilter->SetRepresentationObject(1,imageNode->GetData());
 
+      mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
+      newTransform->SetIdentity();
+      newTransform->Compose(m_T_ImageGeo);
+      newTransform->Compose(m_T_MarkerRel->GetAffineTransform3D());
+      m_PermanentRegistrationFilter->SetOffset(1,newTransform);
+      }
+
+    //some general stuff
     m_PermanentRegistration = true;
     m_ObjectmarkerNavigationDataLastUpdate = mitk::Transform::New();
 
-    //set interpolation mode
-    mitk::DataNode::Pointer imageNode = this->m_Controls.m_ImageComboBox->GetSelectedNode();
-    if (imageNode.IsNotNull() && m_Controls.m_ImageActive->isChecked())
-      {imageNode->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_LINEAR) );}
+
     }
   else
     {

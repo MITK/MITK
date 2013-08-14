@@ -120,6 +120,8 @@ protected:
 
   bool HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );
 
+  bool HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent );
+
   bool RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
   bool RequestContextMenu(StateMachineAction*, InteractionEvent* interactionEvent);

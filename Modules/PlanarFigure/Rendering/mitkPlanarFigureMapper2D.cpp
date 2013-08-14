@@ -547,7 +547,7 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
 
   //node->SetProperty("planarfigure.iseditable",mitk::BoolProperty::New(true));
-  //node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
+  node->AddProperty("planarfigure.isextendable",mitk::BoolProperty::New(false));
   //node->AddProperty( "planarfigure.ishovering", mitk::BoolProperty::New(true) );
   node->AddProperty( "planarfigure.drawoutline", mitk::BoolProperty::New(false) );
   //node->AddProperty( "planarfigure.drawquantities", mitk::BoolProperty::New(true) );

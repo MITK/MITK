@@ -59,6 +59,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
   CONNECT_FUNCTION( "hide_preview_point", HidePreviewPoint )
+  CONNECT_FUNCTION( "hide_control_points", HideControlPoints )
   CONNECT_FUNCTION( "set_preview_point_position", SetPreviewPointPosition )
   CONNECT_FUNCTION( "switch_to_hovering", SwitchToHovering )
   CONNECT_FUNCTION( "move_current_point", MoveCurrentPoint);
@@ -413,7 +414,7 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
   bool isEditable(true);
   GetDataNode()->GetBoolProperty("selected", selected);
   GetDataNode()->GetBoolProperty("planarfigure.isextendable", isExtendable);
-  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
+  GetDataNode()->GetBoolProperty("planarfigure.iseditable", isEditable );
 
   if ( selected &&  isExtendable && isEditable )
   {
@@ -423,9 +424,14 @@ bool mitk::PlanarFigureInteractor::SetPreviewPointPosition( StateMachineAction*,
 
   renderer->GetRenderingManager()->RequestUpdateAll();
 
-  return false;
+  return true;
 }
 
+bool mitk::PlanarFigureInteractor::HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent )
+{
+  GetDataNode()->SetBoolProperty( "planarfigure.drawcontrolpoints", false );
+  return true;
+}
 
 bool mitk::PlanarFigureInteractor::HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent )
 {
@@ -435,7 +441,7 @@ bool mitk::PlanarFigureInteractor::HidePreviewPoint( StateMachineAction*, Intera
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   renderer->GetRenderingManager()->RequestUpdateAll();
 
-  return false;
+  return true;
 }
 
 
@@ -805,6 +811,25 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
     {
       return 0; // Return index of first control point
     }
+  }
+
+  // finally, check control points (some of which might be located outside polyline, e.g. PlanarCircle)
+  for ( unsigned short idx=0; idx<planarFigure->GetNumberOfControlPoints(); ++idx )
+  {
+ 	  if ( !this->TransformObjectToDisplay( planarFigure->GetControlPoint(idx),
+ 												polyLinePoint,
+ 												planarFigureGeometry,
+												rendererGeometry,
+												displayGeometry )
+											   )
+		  {
+			break; // invalid, skip it
+		  }
+
+	  if ( displayPosition.SquaredEuclideanDistanceTo(polyLinePoint) < 20.0)
+		{
+        return idx; // Return index of control point under cursor
+		}
   }
 
   return -1;

@@ -121,30 +121,40 @@ int mitkEventConfigTest(int argc, char* argv[])
   // always end with this!
 
   // Construction providing a property list
+  std::vector<mitk::PropertyList::Pointer> configDescription;
+
   mitk::PropertyList::Pointer propertyList1 = mitk::PropertyList::New();
   propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MousePressEvent");
   propertyList1->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MousePressEventVariant");
   propertyList1->SetStringProperty("Modifiers","CTRL,ALT");
+  configDescription.push_back(propertyList1);
 
   mitk::PropertyList::Pointer propertyList2 = mitk::PropertyList::New();
   propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MOUSERELEASEEVENT");
   propertyList2->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MouseReleaseEventVariant");
   propertyList2->SetStringProperty("Modifiers","SHIFT");
+  configDescription.push_back(propertyList2);
 
-  std::vector<mitk::PropertyList::Pointer>* configDescription = new std::vector<mitk::PropertyList::Pointer>();
-  configDescription->push_back(propertyList1);
-  configDescription->push_back(propertyList2);
+  mitk::PropertyList::Pointer propertyList3 = mitk::PropertyList::New();
+  propertyList3->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventClass().c_str(), "MOUSERELEASEEVENT");
+  propertyList3->SetStringProperty(mitk::InteractionEventConst::xmlParameterEventVariant().c_str(), "MouseReleaseEventVariant");
+  propertyList3->SetStringProperty("Modifiers","ALT");
+  configDescription.push_back(propertyList3);
 
-  mitk::EventConfig newConfig3(*configDescription);
+  mitk::EventConfig newConfig3( configDescription );
 
   mitk::MousePressEvent::Pointer mousePress1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey | mitk::InteractionEvent::ControlKey ,mitk::InteractionEvent::NoButton );
-  mitk::MouseReleaseEvent::Pointer mousePress2 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );
+  mitk::MouseReleaseEvent::Pointer mouseRelease1 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );
 
+  // create a second event with the same name but different modifiers...
+  mitk::MouseReleaseEvent::Pointer mouseRelease2 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey ,mitk::InteractionEvent::NoButton );
 
   MITK_TEST_CONDITION_REQUIRED(
-        newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant" &&
-         newConfig3.GetMappedEvent(mousePress2.GetPointer()) == "MouseReleaseEventVariant"
-        , "04 Check Mouseevents from PropertyLists"  );
+    newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant" &&
+    newConfig3.GetMappedEvent(mouseRelease1.GetPointer()) == "MouseReleaseEventVariant" &&
+    newConfig3.GetMappedEvent(mouseRelease2.GetPointer()) == "MouseReleaseEventVariant",
+    "04 Check Mouseevents from PropertyLists"  );
+
 
   MITK_TEST_END()
 

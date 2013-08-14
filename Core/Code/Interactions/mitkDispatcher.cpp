@@ -36,8 +36,7 @@ mitk::Dispatcher::Dispatcher( const std::string& rendererName )
   std::string anyRenderer = "(!(rendererName=*))";
 
   // LDAP filter string to find only instances of  InteractionEventObserver
-  // The '*' is needed because of some namespace issues
-  std::string classInteractionEventObserver = "(" + us::ServiceConstants::OBJECTCLASS() + "=*InteractionEventObserver)";
+  std::string classInteractionEventObserver = "(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<InteractionEventObserver>() + ")";
 
   // Configure the LDAP filter to find all instances of InteractionEventObserver
   // that are specific to this dispatcher or unspecific to any dispatchers (real global listener)
@@ -169,8 +168,8 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   }
 
   /* Notify InteractionEventObserver  */
-  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver;
-  m_EventObserverTracker->GetServiceReferences(listEventObserver);
+  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver =
+      m_EventObserverTracker->GetServiceReferences();
   for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin();
        it != listEventObserver.end(); ++it)
   {

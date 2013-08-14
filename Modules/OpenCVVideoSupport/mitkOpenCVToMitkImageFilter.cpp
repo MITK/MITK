@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImportImageFilter.h>
 #include <itkRGBPixel.h>
 #include <mitkITKImageImport.txx>
+#include <itkOpenCVImageBridge.h>
 
 mitk::OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
 : m_OpenCVImage(0), m_CopyBuffer(true)
@@ -37,47 +38,51 @@ void mitk::OpenCVToMitkImageFilter::SetOpenCVImage(const IplImage* image)
 
 void mitk::OpenCVToMitkImageFilter::GenerateData()
 {
+  IplImage cvMatIplImage;
+  const IplImage* targetImage = 0;
   if(m_OpenCVImage == 0)
   {
-    MITK_WARN << "Cannot not start filter. OpenCV Image not set.";
-    return;
+      if( m_OpenCVMat.cols == 0 || m_OpenCVMat.rows == 0 )
+      {
+        MITK_WARN << "Cannot not start filter. OpenCV Image not set.";
+        return;
+      }
+      else
+      {
+          cvMatIplImage = m_OpenCVMat;
+          targetImage = &cvMatIplImage;
+      }
   }
-
-  /*
-  // convert to rgb image color space
-  IplImage* rgbOpenCVImage = cvCreateImage( cvSize( m_OpenCVImage->width, m_OpenCVImage->height )
-    , m_OpenCVImage->depth, m_OpenCVImage->nChannels );
-
-  if( m_OpenCVImage->nChannels == 3)
-    cvCvtColor( m_OpenCVImage, rgbOpenCVImage,  CV_BGR2RGB );*/
+  else
+      targetImage = m_OpenCVImage;
 
   // now convert rgb image
-  if( (m_OpenCVImage->depth>=0) && ((unsigned int)m_OpenCVImage->depth == IPL_DEPTH_8S) && (m_OpenCVImage->nChannels == 1) )
-    m_Image = ConvertIplToMitkImage< char, 2>( m_OpenCVImage, m_CopyBuffer );
+  if( (targetImage->depth>=0) && ((unsigned int)targetImage->depth == IPL_DEPTH_8S) && (targetImage->nChannels == 1) )
+    m_Image = ConvertIplToMitkImage< char, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_8U && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned char, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 1 )
+    m_Image = ConvertIplToMitkImage< unsigned char, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_8U && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 3 )
+    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_16U && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned short, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 1 )
+    m_Image = ConvertIplToMitkImage< unsigned short, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_16U && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 3 )
+    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_32F && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< float, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 1 )
+    m_Image = ConvertIplToMitkImage< float, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_32F && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 3 )
+    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< double, 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 1 )
+    m_Image = ConvertIplToMitkImage< double, 2>( targetImage, m_CopyBuffer );
 
-  else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( m_OpenCVImage, m_CopyBuffer );
+  else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 3 )
+    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( targetImage, m_CopyBuffer );
 
   else
   {

@@ -20,67 +20,75 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <mitkImage.h>
 #include <mitkWeakPointer.h>
-#include <itkMacro.h>
-#include <itkImage.h>
-#include <itkRGBPixel.h>
-#include <mitkPixelType.h>
-#include <itkImageRegionIterator.h>
-#include <cv.h>
-#include <string>
-#include <sstream>
-#include "itkOpenCVImageBridge.h"
-
-#include "mitkOpenCVVideoSupportExports.h"
+#include <itkOpenCVImageBridge.h>
+#include <mitkOpenCVVideoSupportExports.h>
 
 namespace mitk
 {
 
-/**
-  \brief A pseudo-Filter for creating OpenCV images from MITK images with the option of copying data or referencing it
-
-  Last contributor: $Author: mueller $
-*/
-  class MITK_OPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Object
+///
+/// \brief A pseudo-Filter for creating OpenCV images from MITK images with the option of copying data or referencing it
+///
+class MITK_OPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Object
 {
-  public:
-    typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
-    typedef itk::RGBPixel< unsigned short > USRGBPixelType;
-    typedef itk::RGBPixel< float > FloatRGBPixelType;
-    typedef itk::RGBPixel< double > DoubleRGBPixelType;
+    public:
+        typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
+        typedef itk::RGBPixel< unsigned short > USRGBPixelType;
+        typedef itk::RGBPixel< float > FloatRGBPixelType;
+        typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
-    template <typename TPixel, unsigned int VImageDimension>
-    static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer = true );
+        mitkClassMacro(ImageToOpenCVImageFilter, itk::Object);
+        itkNewMacro(ImageToOpenCVImageFilter);
 
-    mitkClassMacro(ImageToOpenCVImageFilter, itk::Object);
-    itkNewMacro(ImageToOpenCVImageFilter);
+        ///
+        /// \brief set the input MITK image
+        ///
+        void SetImage( mitk::Image* _Image );
+        ///
+        /// \brief get the input MITK image
+        ///
+        itkGetMacro(Image, mitk::Image*);
 
-    void SetImage( mitk::Image* _Image );
-    itkGetMacro(Image, mitk::Image*);
+        ///
+        /// \brief get the input MITK image
+        ///
+        bool CheckImage(mitk::Image* image);
 
-    bool CheckImage(mitk::Image* image);
-    ///
-    /// Get the produced OpenCVImage.
-    /// ATTENTION: Do not forget to release this image again with cvReleaseImage().
-    ///
-    IplImage* GetOpenCVImage();
+        ///
+        /// RUNS the conversion and returns the produced OpenCVImage.
+        /// !!!ATTENTION!!! Do not forget to release this image again with cvReleaseImage().
+        /// \return the produced OpenCVImage or 0 if an error occured!
+        ///
+        IplImage* GetOpenCVImage();
 
-  protected:
-    ///
-    /// Saves if the filter should copy the data or just reference it
-    ///
-    mitk::WeakPointer<mitk::Image> m_Image;
-    IplImage* m_OpenCVImage;
+        ///
+        /// RUNS the conversion and returns the produced image as cv::Mat.
+        /// \return the produced OpenCVImage or an empty image if an error occured
+        ///
+        cv::Mat GetOpenCVMat();
+
+    protected:
+        ///
+        /// the actual templated conversion method
+        ///
+        template<typename TPixel, unsigned int VImageDimension>
+        void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image );
+
+        ImageToOpenCVImageFilter();
+        ~ImageToOpenCVImageFilter();
+
+        ///
+        /// Saves if the filter should copy the data or just reference it
+        ///
+        mitk::WeakPointer<mitk::Image> m_Image;
+        IplImage* m_OpenCVImage;
 };
 
-  template<typename TPixel, unsigned int VImageDimension>
-  void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
-  {
-    PixelType pType = m_Image->GetPixelType(0);
-    typedef itk::Image<TPixel, VImageDimension> ImageType;
-
-    // create new opencv image
+template<typename TPixel, unsigned int VImageDimension>
+void mitk::ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
+{
     m_OpenCVImage = itk::OpenCVImageBridge::ITKImageToIplImage (image);
-  }
+}
 
 } // namespace
 

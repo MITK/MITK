@@ -19,22 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkITKImageImport.h>
 #include <iostream>
-#include <mitkItkImageFileReader.h>
-
-// #include <itkImageFileWriter.h>
 #include <highgui.h>
 
-mitk::Image::Pointer LoadImage( std::string filename )
-{
-  mitk::ItkImageFileReader::Pointer reader = mitk::ItkImageFileReader::New();
-  reader->SetFileName ( filename.c_str() );
-  reader->Update();
-  if ( reader->GetOutput() == NULL )
-    itkGenericExceptionMacro("File "<<filename <<" could not be read!");
-  mitk::Image::Pointer image = reader->GetOutput();
-  return image;
-}
-
+/*
 static void testGeneratedImage()
 {
     // create itk rgb image
@@ -160,15 +147,29 @@ static void testLoadedImage(std::string mitkImagePath)
 //     cvWaitKey();
 }
 
+void testGeneratedImage()
 /**Documentation
  *  test for the class "ImageToOpenCVImageFilter".
  */
+
+cv::Mat generateImage()
+{
+    cv::Mat testImage = cv::Mat::zeros( 240, 320, CV_8UC3 );
+    testImage.at<uchar>(0, 0) = 10;
+    testImage.at<uchar>(160, 120) = 128;
+    testImage.at<uchar>(319, 239) = 255;
+    return testImage;
+}
+
 int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 
-  testGeneratedImage();
-  testLoadedImage(argv[1]);
+  cv::Mat testImage = generateImage();
+  cv::imshow("testImage", testImage);
+  cv::waitKey(10000);
+  //testGeneratedImage();
+  //testLoadedImage(argv[1]);
   // always end with this!
   MITK_TEST_END();
 

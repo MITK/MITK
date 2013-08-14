@@ -47,6 +47,7 @@ bool mitk::ImageToOpenCVImageFilter::CheckImage( mitk::Image* image )
 
 IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
 {
+  m_OpenCVImage = 0;
   if(!this->CheckImage( m_Image ))
     return 0;
 
@@ -65,6 +66,16 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
     }
 
   return m_OpenCVImage;
+}
+
+cv::Mat mitk::ImageToOpenCVImageFilter::GetOpenCVMat()
+{
+    IplImage* img = this->GetOpenCVImage();
+    cv::Mat mat;
+    if( img )
+        mat = cv::Mat ( img, true );
+
+    return mat;
 }
 
 void mitk::ImageToOpenCVImageFilter::SetImage( mitk::Image* _Image )

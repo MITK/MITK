@@ -27,14 +27,22 @@ using namespace mitk;
 
 static Vector3D offset;
 static Matrix3D rotation;
-static Point3D  pointToTransform;
+static Point3D  originalPoint;
+static double   originalPointDouble[4];
+
+static vtkMatrix4x4* homogenMatrix;
+
 
 static vtkMatrix4x4* expectedHomogenousMatrix;
 static const double  expectedPointAfterTransformation[] = {2, 4, 4, 1};
 
 static void Setup()
 {
-  pointToTransform[0] = 1.0; pointToTransform[1] = 0.0; pointToTransform[2] = 0.0;
+  originalPoint[0] = 1.0; originalPoint[1] = 0.0; originalPoint[2] = 0.0;
+
+  for (int i = 0; i < 3; i++)
+    originalPointDouble[i] = originalPoint[i]; // same point as the Point3D version
+  originalPointDouble[3] = 1; // homogenous extension
 
   offset[0] = 2.0; offset[1] = 3.0; offset[2] = 4.0;
 
@@ -42,6 +50,17 @@ static void Setup()
   rotation.Fill(0);
   rotation[0][1] = -1;
   rotation[1][0] =  1;
+
+  // prepare a Matrix which shall be set later to a specific
+  // homogen matrix by TransferItkTransformToVtkMatrix
+  // this makes sure, that the initialization to the identity does not
+  // overshadow any bugs in TransferItkTransformToVtkMatrix
+  // (it actually did that by "helping out" TransferItkTransformToVtkMatrix
+  // by setting the (3,3) element to 1).
+  homogenMatrix = vtkMatrix4x4::New();
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 4; j++)
+      homogenMatrix->SetElement(i,j, i+j*j); // just some not trivial value
 
   // set the expected homogenous matrix result
   expectedHomogenousMatrix = vtkMatrix4x4::New();
@@ -62,36 +81,27 @@ static void testIfPointIsTransformedAsExpected(void)
 {
   Setup();
 
-  /**
-  * create both a AffineTransform3D
-  * and let this AffineTransform describe also a homogenous 4x4 Matrix vtkMatrix
-  * by using our transfer method
-  */
+  /** construct the transformation */
   AffineTransform3D::Pointer transform = AffineTransform3D::New();
 
   transform->SetOffset(offset);
   transform->SetMatrix(rotation);
 
-  vtkMatrix4x4* homogenMatrix = vtkMatrix4x4::New();
   TransferItkTransformToVtkMatrix(transform.GetPointer(), homogenMatrix);
 
-  // Let a point be transformed by the AffineTransform3D
-  Point3D pointTransformedByAffineTransform3D = transform->TransformPoint(pointToTransform);
+  /** Let a point be transformed by the AffineTransform3D */
+  Point3D pointTransformedByAffineTransform3D = transform->TransformPoint(originalPoint);
 
+  /** assert that the transformation was successful */
   bool pointCorrect = true;
   for (int i = 0; i < 3; i++) // only first three since no homogenous coordinates
     pointCorrect &= Equal(pointTransformedByAffineTransform3D[i], expectedPointAfterTransformation[i]);
 
   MITK_TEST_CONDITION(pointCorrect, "Point has been correctly transformed by AffineTranform3D")
-  /*
-  // Same Transformation with homogenous matrix
-  homogenMatrix->MultiplyDoublePoint
-  */
-
 }
 
 /**
-* Second test ensures that the function TransferItkTransformToVtkMatrix translates the AffineTransform3D
+* This test ensures that the function TransferItkTransformToVtkMatrix translates the AffineTransform3D
 * correctly to a VtkMatrix4x4
 */
 static void testTransferItkTransformToVtkMatrix(void)
@@ -103,7 +113,7 @@ static void testTransferItkTransformToVtkMatrix(void)
   transform->SetOffset(offset);
   transform->SetMatrix(rotation);
 
-  vtkMatrix4x4* homogenMatrix = vtkMatrix4x4::New();
+
   TransferItkTransformToVtkMatrix(transform.GetPointer(), homogenMatrix);
 
   bool allElementsEqual = true;
@@ -111,7 +121,50 @@ static void testTransferItkTransformToVtkMatrix(void)
     for (int j = 0; j < 4; j++)
       allElementsEqual &= Equal(homogenMatrix->GetElement(i,j), expectedHomogenousMatrix->GetElement(i,j));
 
-  MITK_TEST_CONDITION(allElementsEqual, "Homogenous Matrix is set as Expected")
+  MITK_TEST_CONDITION(allElementsEqual, "Homogenous Matrix is set as expected")
+}
+
+/**
+ * This test basically is just a sanity check and should be PASSED exactly when both
+ * testTransferItkTransformToVtkMatrix and testIfPointIsTransformedAsExpected are PASSED.
+ * Tests if we get the same
+ * result by using the AffineTransform3D to transform a point or the vtkMatrix4x4 which we got by applying
+ * the TransferItkTransformToVtkMatrix function. This test e.g. ensures we made no mistake in our
+ * reference results.
+ *
+ */
+static void testIfBothTransformationsProduceSameResults(void)
+{
+  Setup();
+
+    /**
+  * create both a AffineTransform3D
+  * and let this AffineTransform describe also a homogenous 4x4 Matrix vtkMatrix
+  * by using our transfer method
+  */
+  AffineTransform3D::Pointer transform = AffineTransform3D::New();
+
+  transform->SetOffset(offset);
+  transform->SetMatrix(rotation);
+
+  TransferItkTransformToVtkMatrix(transform.GetPointer(), homogenMatrix);
+
+  /** Let a point be transformed by the AffineTransform3D and by homogenMatrix */
+  Point3D pointTransformedByAffineTransform3D = transform->TransformPoint(originalPoint);
+
+  double* pointTransformedByHomogenous= homogenMatrix->MultiplyDoublePoint(originalPointDouble);
+
+  /* check if results match */
+
+  bool pointsMatch = true;
+  for (int i = 0; i < 3; i++) // only first three since no homogenous coordinates
+    pointsMatch &= Equal(pointTransformedByAffineTransform3D[i], pointTransformedByHomogenous[i]);
+
+  bool homogenousComponentCorrect = Equal(1, pointTransformedByHomogenous[3]);
+
+  MITK_TEST_CONDITION(pointsMatch
+    && homogenousComponentCorrect, "Point transformed by AffineTransform and homogenous coordinates match")
+
 }
 
 /**
@@ -126,6 +179,7 @@ int mitkAffineTransformBaseTest(int /*argc*/, char* /*argv*/[])
 
   testTransferItkTransformToVtkMatrix();
 
+  testIfBothTransformationsProduceSameResults();
 
   MITK_TEST_END();
 }

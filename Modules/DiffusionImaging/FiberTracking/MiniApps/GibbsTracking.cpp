@@ -29,9 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <mitkIOUtil.h>
 #include "ctkCommandLineParser.h"
-#ifndef Q_MOC_RUN
-#  include <boost/algorithm/string.hpp>
-#endif
+#include <boost/algorithm/string.hpp>
 
 template<int shOrder>
 typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Pointer TemplatedConvertShCoeffs(mitk::Image* mitkImg, int toolkit)

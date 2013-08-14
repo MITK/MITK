@@ -21,9 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include<mitkConnectomicsHistogramBase.h>
 
-#ifndef Q_MOC_RUN
-#  include <boost/graph/betweenness_centrality.hpp>
-#endif
+#include <boost/graph/betweenness_centrality.hpp>
 
 namespace mitk {
 

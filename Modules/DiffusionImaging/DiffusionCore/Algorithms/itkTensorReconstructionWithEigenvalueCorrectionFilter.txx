@@ -267,7 +267,7 @@ namespace itk
             org_vec[i]=pixel2[i];
           }
 
-          if(mask_val >0)// we are dooing this only if the voxels are in the mask
+          if(mask_val >0) // we are dooing this only if the voxels are in the mask
           {
 
           for( int f=0;f<nof;f++)
@@ -388,9 +388,6 @@ namespace itk
     m_MaskImage = mask;
 
     this->SetNthOutput(0, tensorImg);
-
-    //m_Voxdim = vox_dim;
-
 
   }
 
@@ -546,6 +543,8 @@ namespace itk
   }
 
 
+
+  /*
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
@@ -564,10 +563,9 @@ namespace itk
     tensor = m_PseudoInverse*atten;
 
 
-  }// end of void calculate tensor
+  }
 
-
-  // info for Thomas ( to be removed) : start of "lots of new code"
+*/
 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
@@ -881,31 +879,27 @@ namespace itk
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::TurnMask( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, double previous_mask, double set_mask)
   {
-      // in this method voxels in the mask that poses a certain value are substituded by other value. It is connected to the
-      //idea in the algorithm. It is called more tna once so separate method spares some lines of code.
+    // in this method voxels in the mask that poses a certain value are substituded by other value.// in this method voxels in the mask that poses a certain value are substituded by other value.
+    itk::Index<3> ix;
+    double temp_mask_value=0;
 
-
-  itk::Index<3> ix;
-  double temp_mask_value=0;
-
-  for(int x=0;x<size[0];x++)
-  {
-    for(int y=0;y<size[1];y++)
+    for(int x=0;x<size[0];x++)
     {
-      for(int z=0;z<size[2];z++)
+      for(int y=0;y<size[1];y++)
       {
+        for(int z=0;z<size[2];z++)
+        {
           ix[0] = x; ix[1] = y; ix[2] = z;
-
           temp_mask_value=mask->GetPixel(ix);
 
           if(temp_mask_value>previous_mask)
           {
-             mask->SetPixel(ix,set_mask);
+            mask->SetPixel(ix,set_mask);
           }
+        }
       }
     }
-   }
-}//end of turn mas
+  }
 
 
 

@@ -30,14 +30,6 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   MITK_TEST_BEGIN("TbssSkeletonizationTest");
 
 
-  MITK_INFO << "argv[0]: " << argv[0];
-  MITK_INFO << "argv[1]: " << argv[1];
-  MITK_INFO << "argv[2]: " << argv[2];
-  MITK_INFO << "argv[3]: " << argv[3];
-  MITK_INFO << "argv[4]: " << argv[4];
-  MITK_INFO << "argv[5]: " << argv[5];
-
-
   // Load images
   typedef itk::Image<float, 3> FloatImageType;
   typedef itk::ImageFileReader<FloatImageType> ImageReaderType;
@@ -53,6 +45,7 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   skeletonizer->Update();
 
 
+  // Create a new image so the skeletonizaton won't be performed every time the skeleton is needed.
   FloatImageType::Pointer skeleton = skeletonizer->GetOutput();
 
   // Check whether the skeleton is correct
@@ -98,26 +91,23 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   // Retrieve direction image needed later by the projection filter
   DirectionImageType::Pointer directionImg = skeletonizer->GetVectorImage();
 
-
-
-
   // Define a distance map filter that creates a distance map to limit the projection search
   typedef itk::DistanceMapFilter<FloatImageType, FloatImageType> DistanceMapFilterType;
 
-
-
   DistanceMapFilterType::Pointer distanceMapFilter = DistanceMapFilterType::New();
-  distanceMapFilter->SetInput(skeleton);
+  distanceMapFilter->SetInput(controlSkeleton); //use controlSkeleton to prevent updating the skeletonfilter, which is time consuming
   distanceMapFilter->Update();
+
   FloatImageType::Pointer distanceMap = distanceMapFilter->GetOutput();
 
 
-  // Threshold the skeleton on FA=0.2 to create a binary skeleton mask
 
+
+  // Threshold the skeleton on FA=0.2 to create a binary skeleton mask
   typedef itk::Image<char, 3> CharImageType;
   typedef itk::BinaryThresholdImageFilter<FloatImageType, CharImageType> ThresholdFilterType;
   ThresholdFilterType::Pointer thresholder = ThresholdFilterType::New();
-  thresholder->SetInput(skeleton);
+  thresholder->SetInput(controlSkeleton); //use controlSkeleton to prevent updating the skeletonfilter, which is time consuming
   thresholder->SetLowerThreshold(0.2);
   thresholder->SetUpperThreshold(std::numeric_limits<float>::max());
   thresholder->SetOutsideValue(0);
@@ -144,6 +134,8 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   typedef itk::Image<float, 4> Float4DImageType;
   typedef itk::ImageFileReader<Float4DImageType> ImageReader4DType;
 
+
+
   ImageReader4DType::Pointer reader4d = ImageReader4DType::New();
   reader4d->SetFileName(argv[4]);
   reader4d->Update();
@@ -162,6 +154,8 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
 
   Float4DImageType::Pointer projected = projectionFilter->GetProjections();
 
+
+
   // Open control projection image
   reader4d->SetFileName(argv[5]);
   reader4d->Update();
@@ -176,6 +170,30 @@ int mitkTbssSkeletonizationTest(int argc , char* argv[])
   MITK_TEST_CONDITION(pSize == pControlSize, "Size of projection image and control projection image are the same");
 
 
+  // Check all pixel values of the projection
+  same = true;
+
+  for(int x=0; x<pSize[0]; x++)
+  {
+    for(int y=0; y<pSize[1]; y++)
+    {
+      for(int z=0; z<pSize[2]; z++)
+      {
+
+        for(int t=0; t<pSize[3]; t++)
+        {
+          itk::Index<4> ix = {x,y,z,t};
+          if(projected->GetPixel(ix) != controlProjection->GetPixel(ix))
+          {
+            same = false;
+          }
+        }
+      }
+    }
+  }
+
+
+  MITK_TEST_CONDITION(same, "Check correctness of the projections");
 
 
   MITK_TEST_END();

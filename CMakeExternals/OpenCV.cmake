@@ -51,7 +51,7 @@ if(MITK_USE_OpenCV)
     endif()
 
     set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-2.4.6.1.tar.gz)
-    set(opencv_url_md5 d756bfa460891697571d5c90050e1cfe)
+    set(opencv_url_md5 d41d8cd98f00b204e9800998ecf8427e)
 
     ExternalProject_Add(${proj}
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src

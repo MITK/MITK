@@ -24,6 +24,7 @@ if(MITK_USE_Boost)
       set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
 
       # We need binary boost libraries
+      string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
         set(_boost_libs ${_boost_libs} --with-${_boost_lib})
       endforeach()

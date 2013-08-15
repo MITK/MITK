@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkLightObject.h>
 #include <usServiceInterface.h>
+#include <vector>
 #include <MitkExports.h>
 
 namespace mitk

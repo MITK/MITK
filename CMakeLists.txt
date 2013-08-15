@@ -168,7 +168,7 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 
 if(MITK_USE_Boost)
   option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
-  set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
+  set(MITK_USE_Boost_LIBRARIES "system;thread" CACHE STRING "A semi-colon separated list of required Boost libraries")
 endif()
 
 if(MITK_USE_BLUEBERRY)

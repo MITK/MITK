@@ -81,7 +81,7 @@ void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 
 }
 
-int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
+int mitkOpenCVMitkConversionTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 

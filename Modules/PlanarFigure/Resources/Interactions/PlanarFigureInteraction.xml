@@ -66,6 +66,14 @@
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
       <condition name="figure_is_on_current_slice" />
       <condition name="hovering_above_figure" />
+      <condition name="hovering_above_point" inverted="true"/>
+      <action name="switch_to_hovering" />
+    </transition>
+    
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverPoint" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="hovering_above_figure" inverted="true"/>
+      <condition name="hovering_above_point" />
       <action name="switch_to_hovering" />
     </transition>
   </state>

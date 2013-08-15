@@ -41,9 +41,10 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
 
     ///
     /// the static function for the conversion
+    /// WARNING: copyBuffer is deprecated, data will always be copied
     ///
     template <typename TPixel, unsigned int VImageDimension>
-    static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer = true );
+    static mitk::Image::Pointer ConvertIplToMitkImage( const IplImage * input, bool copyBuffer=true );
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkNewMacro(OpenCVToMitkImageFilter);
@@ -57,11 +58,11 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
     ///
     /// sets an opencv mat as input (will be used if OpenCVImage Ipl image is 0)
     ///
-    void SetGetOpenCVMat(const cv::Mat& image);
+    void SetOpenCVMat(const cv::Mat& image);
     itkGetMacro(OpenCVMat, cv::Mat);
 
-    itkSetMacro(CopyBuffer, bool);
-    itkGetMacro(CopyBuffer, bool);
+    DEPRECATED( void SetCopyBuffer( bool ); );
+    DEPRECATED( bool GetCopyBuffer(); );
 
     OutputImageType* GetOutput(void);
 
@@ -76,7 +77,6 @@ protected:
     mitk::Image::Pointer m_Image;
     const IplImage* m_OpenCVImage;
     cv::Mat m_OpenCVMat;
-    bool m_CopyBuffer;
 };
 
 } // namespace

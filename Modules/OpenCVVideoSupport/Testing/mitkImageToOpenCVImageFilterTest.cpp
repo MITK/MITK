@@ -20,157 +20,124 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <iostream>
 #include <highgui.h>
+#include <itkRGBPixel.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkIOUtil.h>
 
-/*
-static void testGeneratedImage()
+// define test pixel indexes and intensities and other values
+typedef itk::RGBPixel< unsigned char > TestUCRGBPixelType;
+
+cv::Size testImageSize;
+
+cv::Point pos1;
+cv::Point pos2;
+cv::Point pos3;
+
+cv::Vec3b color1;
+cv::Vec3b color2;
+cv::Vec3b color3;
+
+uchar greyValue1;
+uchar greyValue2;
+uchar greyValue3;
+
+template<typename TPixel, unsigned int VImageDimension>
+void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 {
-    // create itk rgb image
-    typedef unsigned char PixelType;
-    typedef itk::Image< itk::RGBPixel<PixelType>, 2 > ImageType;
-    ImageType::Pointer itkImage = ImageType::New();
-
-    ImageType::IndexType start;
-    start[0] = 0; // first index on X
-    start[1] = 0; // first index on Y
-    ImageType::SizeType size;
-    size[0] = 50; // size along X
-    size[1] = 40; // size along Y
-    ImageType::RegionType region;
-    region.SetSize( size );
-    region.SetIndex( start );
-    itkImage->SetRegions( region );
-    itkImage->Allocate();
-
-    typedef itk::ImageRegionIterator<ImageType> IteratorType;
-    IteratorType it(itkImage, region);
-    float twoThirdsTheWidth = size[0] / 4;
-    unsigned int x=0, y=0;
-    // create rgb pic
-    for ( it.GoToBegin(); !it.IsAtEnd(); ++it )
-    {
-      ImageType::PixelType newPixel;
-      newPixel.SetRed(0);
-      newPixel.SetGreen(0);
-      // create asymmetric pic
-      if( x > twoThirdsTheWidth )
-        newPixel.SetBlue(0);
-      else
-        newPixel.SetBlue(255);
-      it.Set(newPixel);
-
-      ++x;
-      // next line found
-      if( x == size[0] )
-        x = 0;
-    }
-
-    // debugging
-  //   itk::ImageFileWriter< ImageType >::Pointer writer = itk::ImageFileWriter< ImageType >::New();
-  //   writer->SetFileName( "c:\\image.png" );
-  //   writer->SetInput ( itkImage );
-  //   writer->Update();
-
-    // import rgb image as MITK image
-    mitk::Image::Pointer mitkImage = mitk::ImportItkImage(itkImage)->Clone();
-
-    mitk::ImageToOpenCVImageFilter::Pointer _ImageToOpenCVImageFilter =
-      mitk::ImageToOpenCVImageFilter::New();
-
-    _ImageToOpenCVImageFilter->SetImage( mitkImage );
-
-    IplImage* openCVImage = _ImageToOpenCVImageFilter->GetOpenCVImage();
-
-    MITK_TEST_CONDITION_REQUIRED( openCVImage != NULL, "Image returned by filter is not null.");
-
-    // check byte size
-    const unsigned int expectedSize = size[0] * size[1] * 3 * sizeof( unsigned char);// sizeof( PixelType );
-    const unsigned int realSize = openCVImage->width * openCVImage->height * openCVImage->nChannels * sizeof( unsigned char);//* sizeof  ( PixelType );
-    MITK_TEST_CONDITION_REQUIRED( expectedSize == realSize, "Test expectedSize == realSize");
-
-    // check pixel values
-    PixelType expectedBlueValue;
-    CvScalar s;
-    for (y = 0; (int)y < openCVImage->height; ++y)
-    {
-      for (x = 0; (int)x < openCVImage->width; ++x)
-      {
-        expectedBlueValue = 255;
-        if(x > twoThirdsTheWidth)
-          expectedBlueValue = 0;
-
-        s = cvGet2D(openCVImage,y,x);
-        if( s.val[0] != expectedBlueValue || s.val[1] != 0 || s.val[2] != 0 )
-        {
-          std::cout << "Wrong RGB values in created OpenCV image" << std::endl;
-          throw mitk::TestFailedException();
-        }
-      }
-    }
-
-//     cvNamedWindow( "test" );
-//     cvShowImage( "test" , openCVImage );
-//     cvWaitKey();
-
-}
-
-static void testLoadedImage(std::string mitkImagePath)
-{
-      mitk::Image::Pointer testImage = LoadImage(mitkImagePath);
-    mitk::ImageToOpenCVImageFilter::Pointer _ImageToOpenCVImageFilter =
-      mitk::ImageToOpenCVImageFilter::New();
-
-    _ImageToOpenCVImageFilter->SetImage( testImage );
-
-    IplImage* openCVImage = _ImageToOpenCVImageFilter->GetOpenCVImage();
-    IplImage* openCVImage_Ref = cvLoadImage(mitkImagePath.c_str());
-
-    MITK_TEST_CONDITION_REQUIRED( openCVImage != NULL, "Image returned by filter is not null.");
-
-    for(int i = 0 ; i<openCVImage->height ; i++)
-    {
-        for(int j = 0 ; j<openCVImage->width ; j++)
-        {
-            CvScalar s;
-            s=cvGet2D(openCVImage,i,j); // get the (i,j) pixel value
-            CvScalar sRef;
-            sRef=cvGet2D(openCVImage_Ref,i,j); // get the (i,j) pixel value
-            for(int c = 0 ; c < openCVImage->nChannels ; c++)
-            {
-            MITK_TEST_CONDITION_REQUIRED( s.val[c] == sRef.val[c] , "All pixel values have to be equal");
-            }
-        }
-    }
 
 
-//     cvNamedWindow( "test" );
-//     cvShowImage( "test" , openCVImage );
-//     cvWaitKey();
-}
+   typedef itk::RGBPixel<TPixel> PixelType;
+   typedef itk::Image<PixelType, VImageDimension> ImageType;
 
-void testGeneratedImage()
-/**Documentation
- *  test for the class "ImageToOpenCVImageFilter".
- */
+   typename ImageType::IndexType pixelIndex;
+   pixelIndex[0] = pos1.x;
+   pixelIndex[1] = pos1.y;
+   PixelType onePixel = image->GetPixel( pixelIndex );
 
-cv::Mat generateImage()
-{
-    cv::Mat testImage = cv::Mat::zeros( 240, 320, CV_8UC3 );
-    testImage.at<uchar>(0, 0) = 10;
-    testImage.at<uchar>(160, 120) = 128;
-    testImage.at<uchar>(319, 239) = 255;
-    return testImage;
+   MITK_TEST_CONDITION( color1[0] == onePixel.GetBlue(), "Testing if blue value (= " << static_cast<int>(color1[0]) << ") at postion "
+                                                                                                 << pos1.x << ", " << pos1.y << " in OpenCV image is "
+                                                                                                    << "equals the blue value (= " <<  static_cast<int>(onePixel.GetBlue()) << ")"
+                                                                                                        << " in the generated mitk image");
+
+
+   pixelIndex[0] = pos2.x;
+   pixelIndex[1] = pos2.y;
+   onePixel = image->GetPixel( pixelIndex );
+
+   MITK_TEST_CONDITION( color2[1] == onePixel.GetGreen(), "Testing if green value (= " << static_cast<int>(color2[1]) << ") at postion "
+                                                                                                 << pos2.x << ", " << pos2.y << " in OpenCV image is "
+                                                                                                    << "equals the green value (= " <<  static_cast<int>(onePixel.GetGreen()) << ")"
+                                                                                                        << " in the generated mitk image");
+
+
+   pixelIndex[0] = pos3.x;
+   pixelIndex[1] = pos3.y;
+   onePixel = image->GetPixel( pixelIndex );
+
+   MITK_TEST_CONDITION( color3[2] == onePixel.GetRed(), "Testing if red value (= " << static_cast<int>(color3[2]) << ") at postion "
+                                                                                                 << pos3.x << ", " << pos3.y << " in OpenCV image is "
+                                                                                                    << "equals the red value (= " <<  static_cast<int>(onePixel.GetRed()) << ")"
+                                                                                                        << " in the generated mitk image");
+
 }
 
 int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 
-  cv::Mat testImage = generateImage();
-  cv::imshow("testImage", testImage);
-  cv::waitKey(10000);
-  //testGeneratedImage();
-  //testLoadedImage(argv[1]);
-  // always end with this!
+  MITK_INFO << "setting test values";
+  testImageSize = cv::Size(11,11);
+
+  pos1 = cv::Point(0,0);
+  pos2 = cv::Point(5,5);
+  pos3 = cv::Point(10,10);
+
+  color1 = cv::Vec3b(50,0,0);
+  color2 = cv::Vec3b(0,128,0);
+  color3 = cv::Vec3b(0,0,255);
+
+  greyValue1 = 0;
+  greyValue2 = 128;
+  greyValue3 = 255;
+
+  MITK_INFO << "generating test OpenCV image (RGB)";
+  cv::Mat testRGBImage = cv::Mat::zeros( testImageSize, CV_8UC3 );
+  // generate some test intensity values
+  testRGBImage.at<cv::Vec3b>(pos1)= color1;
+  testRGBImage.at<cv::Vec3b>(pos2)= color2;
+  testRGBImage.at<cv::Vec3b>(pos3)= color3;
+
+  //cv::namedWindow("debug", CV_WINDOW_FREERATIO );
+  //cv::imshow("debug", testRGBImage.clone());
+  //cv::waitKey(0);
+
+  MITK_INFO << "converting OpenCV test image to mitk image and comparing scalar rgb values";
+  mitk::OpenCVToMitkImageFilter::Pointer openCvToMitkFilter =
+    mitk::OpenCVToMitkImageFilter::New();
+  openCvToMitkFilter->SetOpenCVMat( testRGBImage );
+  openCvToMitkFilter->Update();
+
+  mitk::Image::Pointer mitkImage = openCvToMitkFilter->GetOutput();
+  AccessFixedTypeByItk(mitkImage.GetPointer(), ComparePixels,
+                       (itk::RGBPixel<unsigned char>), // rgb image
+                       (2) );
+
+
+  MITK_INFO << "converting mitk image to OpenCV image and comparing scalar rgb values";
+  mitk::ImageToOpenCVImageFilter::Pointer mitkToOpenCv = mitk::ImageToOpenCVImageFilter::New();
+  mitkToOpenCv->SetImage( mitkImage );
+  cv::Mat openCvImage = mitkToOpenCv->GetOpenCVMat();
+
+  cv::Vec3b convertedColor1 = openCvImage.at<cv::Vec3b>(pos1);
+  cv::Vec3b convertedColor2 = openCvImage.at<cv::Vec3b>(pos2);
+  cv::Vec3b convertedColor3 = openCvImage.at<cv::Vec3b>(pos3);
+
+  MITK_TEST_CONDITION( color1 == convertedColor1, "Testing if initially created color values " << static_cast<int>( color1[0] ) << ", " << static_cast<int>( color1[1] ) << ", " << static_cast<int>( color1[2] ) << " matches the color values " << static_cast<int>( convertedColor1[0] ) << ", " << static_cast<int>( convertedColor1[1] ) << ", " << static_cast<int>( convertedColor1[2] ) << " at the same position " << pos1.x << ", " << pos1.y << " in the back converted OpenCV image" )
+
+  MITK_TEST_CONDITION( color2 == convertedColor2, "Testing if initially created color values " << static_cast<int>( color2[0] ) << ", " << static_cast<int>( color2[1] ) << ", " << static_cast<int>( color2[2] ) << " matches the color values " << static_cast<int>( convertedColor2[0] ) << ", " << static_cast<int>( convertedColor2[1] ) << ", " << static_cast<int>( convertedColor2[2] ) << " at the same position " << pos2.x << ", " << pos2.y << " in the back converted OpenCV image" )
+
+  MITK_TEST_CONDITION( color3 == convertedColor3, "Testing if initially created color values " << static_cast<int>( color3[0] ) << ", " << static_cast<int>( color3[1] ) << ", " << static_cast<int>( color3[2] ) << " matches the color values " << static_cast<int>( convertedColor3[0] ) << ", " << static_cast<int>( convertedColor3[1] ) << ", " << static_cast<int>( convertedColor3[2] ) << " at the same position " << pos3.x << ", " << pos3.y << " in the back converted OpenCV image" )
+
   MITK_TEST_END();
 
 }

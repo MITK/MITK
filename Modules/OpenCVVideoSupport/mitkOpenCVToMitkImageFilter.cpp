@@ -20,9 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRGBPixel.h>
 #include <mitkITKImageImport.txx>
 #include <itkOpenCVImageBridge.h>
+#include <itkImageFileWriter.h>
 
 mitk::OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
-: m_OpenCVImage(0), m_CopyBuffer(true)
+: m_OpenCVImage(0)
 {
 }
 
@@ -58,31 +59,31 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
 
   // now convert rgb image
   if( (targetImage->depth>=0) && ((unsigned int)targetImage->depth == IPL_DEPTH_8S) && (targetImage->nChannels == 1) )
-    m_Image = ConvertIplToMitkImage< char, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< char, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned char, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< unsigned char, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< unsigned short, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< unsigned short, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< float, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< float, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 1 )
-    m_Image = ConvertIplToMitkImage< double, 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< double, 2>( targetImage );
 
   else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 3 )
-    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( targetImage, m_CopyBuffer );
+    m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( targetImage );
 
   else
   {
@@ -102,15 +103,31 @@ mitk::ImageSource::OutputImageType* mitk::OpenCVToMitkImageFilter::GetOutput()
 * Converting from OpenCV image to ITK Image
 *********************************************/
 template <typename TPixel, unsigned int VImageDimension>
-mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const IplImage * input, bool copyBuffer )
+mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const IplImage * input,  bool )
 {
   mitk::Image::Pointer mitkImage(0);
 
-  typedef itk::Image< TPixel, VImageDimension > ItkImage;
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
 
-  typename ItkImage::Pointer output = itk::OpenCVImageBridge::IplImageToITKImage<ItkImage>(input);
+  typename ImageType::Pointer output = itk::OpenCVImageBridge::IplImageToITKImage<ImageType>(input);
 
-  mitkImage = mitk::ImportItkImage(output);
+  mitkImage = mitk::GrabItkImageMemory(output);
 
   return mitkImage;
+}
+
+
+void mitk::OpenCVToMitkImageFilter::SetOpenCVMat(const cv::Mat &image)
+{
+    m_OpenCVMat = image;
+}
+
+
+void mitk::OpenCVToMitkImageFilter::SetCopyBuffer(bool)
+{
+}
+
+bool mitk::OpenCVToMitkImageFilter::GetCopyBuffer()
+{
+    return true;
 }

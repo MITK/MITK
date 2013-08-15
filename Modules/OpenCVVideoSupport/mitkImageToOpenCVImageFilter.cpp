@@ -71,9 +71,16 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
 cv::Mat mitk::ImageToOpenCVImageFilter::GetOpenCVMat()
 {
     IplImage* img = this->GetOpenCVImage();
+    //cvNamedWindow("debug2", CV_WINDOW_FREERATIO);
+    //cvShowImage("debug2", img);
+    //cv::waitKey(0);
     cv::Mat mat;
     if( img )
-        mat = cv::Mat ( img, true );
+    {
+        // do not copy data, then release just the header
+        mat = cv::Mat ( img, false );
+        cvReleaseImageHeader( &img );
+    }
 
     return mat;
 }

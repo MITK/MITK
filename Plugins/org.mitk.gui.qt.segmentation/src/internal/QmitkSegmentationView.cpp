@@ -69,7 +69,9 @@ QmitkSegmentationView::QmitkSegmentationView()
 {
   RegisterSegmentationObjectFactory();
 
-  m_IsOfTypeWorkingImagePredicate = mitk::NodePredicateDataType::New("LabelSetImage");
+  m_IsOfTypeWorkingImagePredicate = mitk::NodePredicateAnd::New();
+  m_IsOfTypeWorkingImagePredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
+  m_IsOfTypeWorkingImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -81,9 +83,11 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isQbi);
 
+
   m_IsOfTypeReferenceImagePredicate = mitk::NodePredicateAnd::New();
   m_IsOfTypeReferenceImagePredicate->AddPredicate(validImages);
   m_IsOfTypeReferenceImagePredicate->AddPredicate(mitk::NodePredicateNot::New( m_IsOfTypeWorkingImagePredicate));
+  m_IsOfTypeReferenceImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -917,7 +921,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  //m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' 'FastMarching2D'");
+  m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups("Add Subtract 'Region Growing'");
   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -952,7 +957,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->tabWidgetSegmentationTools, SIGNAL(currentChanged(int)), this, SLOT(OnTabWidgetChanged(int)));
 
   connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
-  connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
+  //connect(m_Controls->m_SlicesInterpolator, SIGNAL(Signal3DInterpolationEnabled(bool)), this, SLOT(On3DInterpolationEnabled(bool)));
 
   m_Controls->m_btNewLabelSet->setEnabled(false);
   m_Controls->m_btSaveLabelSet->setEnabled(false);

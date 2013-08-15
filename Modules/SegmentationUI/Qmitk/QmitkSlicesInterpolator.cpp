@@ -81,13 +81,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_3DInterpolationEnabled(false)
 {
   m_GroupBoxEnableExclusiveInterpolationMode = new QGroupBox("Interpolation", this);
-
-
+  m_GroupBoxEnableExclusiveInterpolationMode->setCheckable(true);
+  m_GroupBoxEnableExclusiveInterpolationMode->setChecked(false);
 
   QVBoxLayout* vboxLayout = new QVBoxLayout(m_GroupBoxEnableExclusiveInterpolationMode);
 
   m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
-  m_CmbInterpolation->addItem("Disabled");
+//  m_CmbInterpolation->addItem("Disabled");
   m_CmbInterpolation->addItem("2-Dimensional");
   m_CmbInterpolation->addItem("3-Dimensional");
   vboxLayout->addWidget(m_CmbInterpolation);
@@ -106,6 +106,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   this->HideAllInterpolationControls();
 
+
+  connect(m_GroupBoxEnableExclusiveInterpolationMode, SIGNAL(toggled(bool)), this, SLOT(ActivateInterpolation(bool)));
   connect(m_CmbInterpolation, SIGNAL(currentIndexChanged(int)), this, SLOT(OnInterpolationMethodChanged(int)));
   connect(m_BtnApply2D, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()));
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
@@ -278,29 +280,6 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   delete m_Timer;
 }
 
-void QmitkSlicesInterpolator::On2DInterpolationEnabled(bool status)
-{
-  OnInterpolationActivated(status);
-  m_Interpolator->Activate2DInterpolation(status);
-}
-
-void QmitkSlicesInterpolator::On3DInterpolationEnabled(bool status)
-{
-  On3DInterpolationActivated(status);
-}
-
-void QmitkSlicesInterpolator::OnInterpolationDisabled(bool status)
-{
-  if (status)
-  {
-    OnInterpolationActivated(!status);
-    On3DInterpolationActivated(!status);
-    this->Show3DInterpolationResult(false);
-  }
-}
-
-
-
 void QmitkSlicesInterpolator::HideAllInterpolationControls()
 {
   this->Show2DInterpolationControls(false);
@@ -319,35 +298,63 @@ void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
   m_ChkShowPositionNodes->setVisible(show);
 }
 
+void QmitkSlicesInterpolator::EnableInterpolation(bool enabled)
+{
+    m_GroupBoxEnableExclusiveInterpolationMode->setChecked(enabled);
+}
 
+void QmitkSlicesInterpolator::ActivateInterpolation(bool enabled)
+{
+    if (enabled)
+    {
+        if (m_3DInterpolationEnabled)
+        {
+            this->Show3DInterpolationControls(true);
+            this->Show3DInterpolationResult(false);
+        }
+        else
+        {
+            this->Show2DInterpolationControls(true);
+            this->Activate2DInterpolation(true); // re-initialize if needed
+        }
+    }
+    else
+    {
+      this->HideAllInterpolationControls();
+      this->Activate2DInterpolation(false);
+      this->Activate3DInterpolation(false);
+      this->Show3DInterpolationResult(false);
+    }
+}
 
 void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
 {
   switch(index)
   {
+/*
     case 0: // Disabled
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation");
       this->HideAllInterpolationControls();
       this->OnInterpolationActivated(false);
-      this->On3DInterpolationActivated(false);
+      this->Activate3DInterpolation(false);
       this->Show3DInterpolationResult(false);
       break;
-
-    case 1: // 2D
+*/
+    case 0: // 2D
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
       this->HideAllInterpolationControls();
       this->Show2DInterpolationControls(true);
-      this->OnInterpolationActivated(true);
-      this->On3DInterpolationActivated(false);
+      this->Activate2DInterpolation(true);
+      this->Activate3DInterpolation(false);
       m_Interpolator->Activate2DInterpolation(true);
       break;
 
-    case 2: // 3D
+    case 1: // 3D
       m_GroupBoxEnableExclusiveInterpolationMode->setTitle("Interpolation (Enabled)");
       this->HideAllInterpolationControls();
       this->Show3DInterpolationControls(true);
-      this->OnInterpolationActivated(false);
-      this->On3DInterpolationActivated(true);
+      this->Activate2DInterpolation(false);
+      this->Activate3DInterpolation(true);
       break;
 
     default:
@@ -379,7 +386,7 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 
   if (m_2DInterpolationEnabled)
   {
-    OnInterpolationActivated( true ); // re-initialize if needed
+    this->Activate2DInterpolation( true ); // re-initialize if needed
   }
 }
 
@@ -387,7 +394,7 @@ void QmitkSlicesInterpolator::OnToolManagerReferenceDataModified()
 {
   if (m_2DInterpolationEnabled)
   {
-    OnInterpolationActivated( true ); // re-initialize if needed
+    this->Activate2DInterpolation( true ); // re-initialize if needed
   }
   if (m_3DInterpolationEnabled)
   {
@@ -483,7 +490,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 
             mitk::ImageReadAccessor accessor(static_cast<mitk::Image*>(auxImage));
             newImage->SetVolume( accessor.GetData() );
-            newImage->SetLabelOpacity( m_ActiveLabel, 1.0 );
+            newImage->SetLabelOpacity( m_Segmentation->GetActiveLabelIndex(), 1.0 );
 
             m_FeedbackNode->SetData( newImage );
         }
@@ -749,7 +756,7 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
   }
 }
 
-void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
+void QmitkSlicesInterpolator::Activate2DInterpolation(bool on)
 {
   m_2DInterpolationEnabled = on;
 
@@ -760,6 +767,10 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       if (on && !m_DataStorage->Exists(m_FeedbackNode))
       {
         m_DataStorage->Add( m_FeedbackNode );
+      }
+      else if (!on && m_DataStorage->Exists(m_FeedbackNode))
+      {
+        m_DataStorage->Remove( m_FeedbackNode );
       }
     }
   }
@@ -775,7 +786,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     this->setEnabled( workingNode != NULL );
 
     m_BtnApply2D->setEnabled( on );
-    m_FeedbackNode->SetVisibility( on );
+//    m_FeedbackNode->SetVisibility( on );
 
     if (!on)
     {
@@ -838,7 +849,7 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
   mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
 }
 
-void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
+void QmitkSlicesInterpolator::Activate3DInterpolation(bool on)
 {
   m_3DInterpolationEnabled = on;
 
@@ -906,19 +917,6 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSlicesInterpolator::EnableInterpolation(bool on)
-{
-  // only to be called from the outside world
-  // just a redirection to OnInterpolationActivated
-  this->OnInterpolationActivated(on);
-}
-
-void QmitkSlicesInterpolator::Enable3DInterpolation(bool on)
-{
-  // only to be called from the outside world
-  // just a redirection to OnInterpolationActivated
-  On3DInterpolationActivated(on);
-}
 
 void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
 {

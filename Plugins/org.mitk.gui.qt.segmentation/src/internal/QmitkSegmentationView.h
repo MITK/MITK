@@ -196,7 +196,7 @@ protected:
   bool m_AutoSelectionEnabled;
 
   mitk::NodePredicateAnd::Pointer m_IsOfTypeReferenceImagePredicate;
-  mitk::NodePredicateDataType::Pointer m_IsOfTypeWorkingImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_IsOfTypeWorkingImagePredicate;
 //  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
 
 //  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;

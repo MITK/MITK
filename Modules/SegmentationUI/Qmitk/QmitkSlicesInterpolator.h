@@ -127,19 +127,14 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
      */
     void Show3DInterpolationResult(bool);
 
+    void EnableInterpolation(bool);
+
   signals:
 
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
 
   public slots:
-
-    /**
-      Call this from the outside to enable/disable interpolation
-    */
-   void EnableInterpolation(bool);
-
-   void Enable3DInterpolation(bool);
 
     /**
       Call this from the outside to accept all interpolations
@@ -168,19 +163,10 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
      */
     void OnAcceptAllPopupActivated(QAction* action);
 
-    /**
-      Called on activation/deactivation
-    */
-    void OnInterpolationActivated(bool);
-
-    void On3DInterpolationActivated(bool);
+    void ActivateInterpolation(bool);
 
     void OnInterpolationMethodChanged(int index);
 
-    //Enhancement for 3D interpolation
-    void On2DInterpolationEnabled(bool);
-    void On3DInterpolationEnabled(bool);
-    void OnInterpolationDisabled(bool);
     void OnShowMarkers(bool);
 
     void Run3DInterpolation();
@@ -223,6 +209,10 @@ class SegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void UpdateVisibleSuggestion();
 
     void SetCurrentContourListID();
+
+    void Activate2DInterpolation(bool);
+
+    void Activate3DInterpolation(bool);
 
 private:
 

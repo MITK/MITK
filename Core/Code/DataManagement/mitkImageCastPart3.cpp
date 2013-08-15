@@ -51,10 +51,12 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF2*,  itk::Smar
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
+typedef itk::Image<itk::RGBPixel<float>, 3>  itkImageRGBF3;
 typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
 typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC3*,  itk::SmartPointer<itkImageRGBUC3>&);
+template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBF3*,  itk::SmartPointer<itkImageRGBF3>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
 

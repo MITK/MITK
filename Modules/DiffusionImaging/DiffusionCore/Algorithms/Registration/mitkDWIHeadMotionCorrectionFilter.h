@@ -35,7 +35,7 @@ public:
   mitkClassMacro( DWIHeadMotionCorrectionFilter,
                   DiffusionImageToDiffusionImageFilter<DiffusionPixelType> )
 
-  itkSimpleNewMacro(Self)
+  itkNewMacro(Self)
 
   // public typedefs
   typedef typename Superclass::DiffusionImageType         DiffusionImageType;
@@ -44,6 +44,7 @@ public:
 
 protected:
   DWIHeadMotionCorrectionFilter();
+
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
   virtual void GenerateData();

@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
-#define MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
+#ifndef MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP
+#define MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP
 
 #include "mitkDWIHeadMotionCorrectionFilter.h"
 
@@ -34,4 +34,4 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
 }
 
-#endif // MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
+#endif // MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP

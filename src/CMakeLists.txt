@@ -5,6 +5,7 @@
 set(_srcs
   util/usAny.cpp
   util/jsoncpp.cpp
+  util/usLDAPProp.cpp
   util/usSharedLibrary.cpp
   util/usThreads.cpp
   util/usUncompressResourceData.c
@@ -75,6 +76,7 @@ set(_private_headers
 
 set(_public_headers
   util/usAny.h
+  util/usLDAPProp.h
   util/usSharedData.h
   util/usSharedLibrary.h
   util/usUncompressResourceData.h
@@ -182,9 +184,9 @@ endif()
 if(NOT US_IS_EMBEDDED)
   install(TARGETS ${PROJECT_NAME}
           EXPORT ${PROJECT_NAME}Targets
-          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} COMPONENT sdk
-          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} COMPONENT sdk
-          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} COMPONENT sdk
-          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk
-          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} COMPONENT sdk)
+          RUNTIME DESTINATION ${RUNTIME_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          LIBRARY DESTINATION ${LIBRARY_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          ARCHIVE DESTINATION ${ARCHIVE_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PUBLIC_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT}
+          PRIVATE_HEADER DESTINATION ${HEADER_INSTALL_DIR} ${US_SDK_INSTALL_COMPONENT})
 endif()

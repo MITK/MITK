@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGetSimulationPreferences.h>
 #include <mitkLoadPropertiesModule.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkPropertyFilters.h>
+#include <mitkIPropertyFilters.h>
 #include <mitkSimulationObjectFactory.h>
 #include <QmitkNodeDescriptorManager.h>
 #include <QtPlugin>
@@ -71,7 +71,7 @@ static void InitSOFAPlugins()
 
 static void SetPropertyFilters(ctkPluginContext* context)
 {
-  mitk::PropertyFilters* propertyFilters = GetPropertyService<mitk::PropertyFilters>(context);
+  mitk::IPropertyFilters* propertyFilters = GetPropertyService<mitk::IPropertyFilters>(context);
 
   if (propertyFilters == NULL)
     return;
@@ -84,8 +84,8 @@ static void SetPropertyFilters(ctkPluginContext* context)
   simulationFilter.AddEntry("selected", mitk::PropertyFilter::Blacklist);
   simulationFilter.AddEntry("visible", mitk::PropertyFilter::Blacklist);
 
-  propertyFilters->AddFilter("Simulation", simulationFilter);
-  propertyFilters->AddFilter("SimulationTemplate", simulationFilter);
+  propertyFilters->AddFilter(simulationFilter, "Simulation");
+  propertyFilters->AddFilter(simulationFilter, "SimulationTemplate");
 }
 
 void mitk::org_mitk_simulation_Activator::start(ctkPluginContext* context)

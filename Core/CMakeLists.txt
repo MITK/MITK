@@ -5,7 +5,12 @@
 set(US_ENABLE_AUTOLOADING_SUPPORT ON)
 set(US_ENABLE_THREADING_SUPPORT ON)
 set(US_IS_EMBEDDED OFF)
+
+# Don't create a "doc" target and don't install the documentation files
 set(US_NO_DOCUMENTATION ON)
+
+# Don't use an install component for SDK artifacts
+set(US_SDK_INSTALL_COMPONENT )
 
 if(BUILD_TESTING)
   set(US_BUILD_TESTING ON)

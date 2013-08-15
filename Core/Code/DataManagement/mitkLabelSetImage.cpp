@@ -16,13 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLabelSetImage.h"
 
-#include "mitkOperation.h"
-#include "mitkOperationActor.h"
-//#include "mitkDrawOperation.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkInteractionConst.h"
 #include "mitkRenderingManager.h"
 #include "mitkColormapProperty.h"
+#include "mitkImageCast.h"
 
 #include "mitkLookupTableProperty.h"
 
@@ -107,6 +105,19 @@ void mitk::LabelSetImage::EraseLabel(int index, bool reorder)
   this->Modified();
 }
 
+void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
+{
+    AccessByItk_1(this, ConcatenateProcessing, other);
+
+    const mitk::LabelSet* ls = other->GetLabelSet();
+    for( int i=1; i<ls->GetNumberOfLabels(); i++) // skip exterior
+    {
+        this->AddLabel( *ls->GetLabel(i) );
+    }
+
+    this->Modified();
+}
+
 void mitk::LabelSetImage::ClearBuffer()
 {
   AccessByItk(this, ClearBufferProcessing);
@@ -117,6 +128,37 @@ template < typename LabelSetImageType >
 void mitk::LabelSetImage::ClearBufferProcessing(LabelSetImageType* itkImage)
 {
   itkImage->FillBuffer(0);
+}
+
+//AccessTwoImagesFixedDimensionByItk
+template < typename LabelSetImageType >
+void mitk::LabelSetImage::ConcatenateProcessing(LabelSetImageType* itkTarget, mitk::LabelSetImage* other)
+{
+//    typedef itk::Image< unsigned char, 3 > ImageType;
+    typename LabelSetImageType::Pointer itkSource = LabelSetImageType::New();
+    mitk::CastToItkImage( other, itkSource );
+
+    typedef itk::ImageRegionConstIterator< LabelSetImageType > ConstIteratorType;
+    typedef itk::ImageRegionIterator< LabelSetImageType >      IteratorType;
+
+    ConstIteratorType sourceIter( itkSource, itkSource->GetLargestPossibleRegion() );
+    IteratorType      targetIter( itkTarget, itkTarget->GetLargestPossibleRegion() );
+
+    int numberOfTargetLabels = this->GetNumberOfLabels() - 1; // skip exterior
+    sourceIter.GoToBegin();
+    targetIter.GoToBegin();
+
+    while (!sourceIter.IsAtEnd())
+    {
+        int sourceValue = static_cast<int>(sourceIter.Get());
+        int targetValue =  static_cast<int>(targetIter.Get());
+        if ( (sourceValue != 0) && !this->GetLabelLocked(targetValue) ) // skip exterior and locked labels
+        {
+            targetIter.Set( sourceValue + numberOfTargetLabels );
+        }
+        ++sourceIter;
+        ++targetIter;
+    }
 }
 
 template < typename LabelSetImageType >

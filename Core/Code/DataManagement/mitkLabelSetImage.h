@@ -88,6 +88,8 @@ public:
   /// handles operations
   virtual void ExecuteOperation(Operation* operation);
 
+  void Concatenate(mitk::LabelSetImage* image);
+
   void ClearBuffer();
 
   void AddLabel(const std::string& name, const mitk::Color& color);
@@ -183,6 +185,9 @@ protected:
 
   template < typename LabelSetImageType >
   void MergeLabelsProcessing(LabelSetImageType * itkImage, int index);
+
+  template < typename LabelSetImageType >
+  void ConcatenateProcessing(LabelSetImageType * itkImage1, mitk::LabelSetImage* other);
 
   mitk::LabelSet::Pointer m_LabelSet;
 };

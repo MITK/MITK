@@ -113,16 +113,9 @@ void QmitkSegmentationView::Activated()
     m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( true );
 
-/*
-    mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( m_IsOfTypeWorkingImagePredicate );
-
-    mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset( m_IsNotLabelSetImagePredicate );
-    if (!image->empty()) {
-      OnSelectionChanged(*image->begin());
-    }
-*/
+    this->OnPatientComboBoxSelectionChanged(m_Controls->patImageSelector->GetSelectedNode());
+    this->OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
   }
- // this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 }
 
 void QmitkSegmentationView::Deactivated()
@@ -135,6 +128,7 @@ void QmitkSegmentationView::Deactivated()
     mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
+    m_Controls->m_SlicesInterpolator->setEnabled( false );
 
     // gets the context of the "Mitk" (Core) module (always has id 1)
     // TODO Workaround until CTK plugincontext is available
@@ -358,14 +352,13 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 {
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
+  if (isHelperObject) return;
 
-  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-
-  if (lsImage && !isHelperObject)
+  if (dynamic_cast<mitk::LabelSetImage*>(node->GetData()))
   {
     //First of all remove all possible contour markers of the segmentation
-    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
-                                                                            , mitk::BoolProperty::New(true)));
+    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers =
+        this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
 
     // gets the context of the "Mitk" (Core) module (always has id 1)
     // TODO Workaround until CTK plugincontext is available
@@ -393,6 +386,43 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 void QmitkSegmentationView::OnSearchLabel()
 {
     m_Controls->m_LabelSetTableWidget->SetActiveLabel(m_Controls->m_LabelSearchBox->text().toStdString());
+}
+
+void QmitkSegmentationView::OnImportLabelSet()
+{
+    mitk::DataNode* segNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+    if (!segNode) return;
+
+    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+    if (!segImage) return;
+
+    std::string fileExtensions("Segmentation files (*.lset);;");
+    QString qfileName = QFileDialog::getOpenFileName(m_Parent, "Open segmentation", "", fileExtensions.c_str() );
+    if (qfileName.isEmpty() ) return;
+
+    mitk::NrrdLabelSetImageReader<unsigned char>::Pointer reader = mitk::NrrdLabelSetImageReader<unsigned char>::New();
+    reader->SetFileName(qfileName.toLatin1());
+
+    this->WaitCursorOn();
+
+    try
+    {
+        reader->Update();
+    }
+    catch ( itk::ExceptionObject & excep )
+    {
+        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QMessageBox::information(m_Parent, "Load segmentation", "Could not load active segmentation. See error log for details.\n");
+        this->WaitCursorOff();
+    }
+
+    this->WaitCursorOff();
+
+    mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
+
+    segImage->Concatenate(lsImage);
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSegmentationView::OnLoadLabelSet()
@@ -627,7 +657,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
     if (segNode)
     {
       this->SetToolManagerSelection(refNode, segNode);
-      m_Controls->m_SlicesInterpolator->EnableInterpolation( true );
+      m_Controls->m_SlicesInterpolator->setEnabled( true );
     }
     else
     {
@@ -644,12 +674,11 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
 void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::DataNode *node)
 {
+  mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
+
   if( node != NULL )
   {
-      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->ActivateTool(-1);
-
       mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
-
       segNode->SetVisibility(true);
 
       mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsOfTypeWorkingImagePredicate);
@@ -671,12 +700,13 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
         this->UpdateWarningLabel("");
         segNode->SetVisibility(true);
         this->SetToolManagerSelection(refNode, segNode);
-        m_Controls->m_SlicesInterpolator->EnableInterpolation( true );
+        m_Controls->m_SlicesInterpolator->setEnabled( true );
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
   }
   else
   {
+    this->SetToolManagerSelection(NULL, NULL);
     this->UpdateWarningLabel("Create a segmentation");
   }
 }
@@ -948,6 +978,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->m_btNewLabelSet, SIGNAL(clicked()), this, SLOT(OnNewLabelSet()) );
   connect( m_Controls->m_btSaveLabelSet, SIGNAL(clicked()), this, SLOT(OnSaveLabelSet()) );
   connect( m_Controls->m_btLoadLabelSet, SIGNAL(clicked()), this, SLOT(OnLoadLabelSet()) );
+  connect( m_Controls->m_btImportLabelSet, SIGNAL(clicked()), this, SLOT(OnImportLabelSet()) );
   connect( m_Controls->m_btNewLabel, SIGNAL(clicked()), this, SLOT(OnNewLabel()) );
 
 //  connect( m_Controls->m_pbCreateLabelFromSurface, SIGNAL(clicked()), this, SLOT(CreateLabelFromSurface()) );

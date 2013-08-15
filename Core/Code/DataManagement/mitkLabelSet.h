@@ -82,7 +82,7 @@ public:
     itkGetStringMacro(Name);
     itkSetStringMacro(Name);
 
-    bool HasLabel(int);
+    bool HasLabel(int) const;
 
     void SetActiveLabel(int);
 
@@ -100,7 +100,7 @@ public:
 
     void RenameLabel(int, const std::string&, const mitk::Color&);
 
-    virtual int GetNumberOfLabels();
+    virtual int GetNumberOfLabels() const;
 
     virtual void SetAllLabelsVisible(bool);
 
@@ -130,6 +130,8 @@ public:
     virtual const mitk::Color& GetLabelColor(int index);
 
     virtual const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
+
+    virtual const mitk::Label* GetLabel(int index) const;
 
     virtual int GetActiveLabelIndex() const;
 

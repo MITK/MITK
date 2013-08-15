@@ -75,7 +75,7 @@ mitk::LabelSet::LabelContainerConstIteratorType mitk::LabelSet::IteratorBegin()
     return this->m_LabelContainer.begin();
 }
 
-bool mitk::LabelSet::HasLabel(int index)
+bool mitk::LabelSet::HasLabel(int index) const
 {
     return ( (index >=0) && (index<this->m_LabelContainer.size()) );
 }
@@ -199,7 +199,7 @@ void mitk::LabelSet::SetAllLabelsVisible(bool value)
     }
 }
 
-int mitk::LabelSet::GetNumberOfLabels()
+int mitk::LabelSet::GetNumberOfLabels() const
 {
     return this->m_LabelContainer.size();
 }
@@ -302,4 +302,12 @@ int mitk::LabelSet::GetActiveLabelIndex() const
             break;
     }
     return index;
+}
+
+const mitk::Label* mitk::LabelSet::GetLabel(int index) const
+{
+    if (this->HasLabel(index))
+        return this->m_LabelContainer[index];
+    else
+        return NULL;
 }

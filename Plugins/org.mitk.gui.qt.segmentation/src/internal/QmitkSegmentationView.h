@@ -101,11 +101,14 @@ protected slots:
   // reaction to label search
   void OnSearchLabel();
 
-  // reaction to the button "New Segmentation"
+  // reaction to the button "New segmentation session"
   void OnNewLabelSet();
 
-  // reaction to the button "Load Segmentation"
+  // reaction to the button "Load segmentation session"
   void OnLoadLabelSet();
+
+  // reaction to the button "Import segmentation session"
+  void OnImportLabelSet();
 
   // reaction to the button "Save Segmentation"
   void OnSaveLabelSet();

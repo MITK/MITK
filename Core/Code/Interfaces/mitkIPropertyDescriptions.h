@@ -14,19 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkPropertyDescriptions_h
-#define mitkPropertyDescriptions_h
+#ifndef mitkIPropertyDescriptions_h
+#define mitkIPropertyDescriptions_h
 
 #include <itkLightObject.h>
-#include <PropertiesExports.h>
 #include <usServiceInterface.h>
+#include <MitkExports.h>
 
 namespace mitk
 {
-  class Properties_EXPORT PropertyDescriptions
+  /** \brief Interface of property descriptions service.
+    *
+    * This service allows you to set a description for a certain property name.
+    * The property view displays descriptions of selected properties (in rich text format) at its bottom.
+    */
+  class MITK_CORE_EXPORT IPropertyDescriptions
   {
   public:
-    virtual ~PropertyDescriptions();
+    virtual ~IPropertyDescriptions();
 
     virtual bool AddDescription(const std::string& propertyName, const std::string& description, bool overwrite = false) = 0;
     virtual std::string GetDescription(const std::string& propertyName) const = 0;
@@ -36,6 +41,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::PropertyDescriptions, "org.mitk.services.PropertyDescriptions")
+US_DECLARE_SERVICE_INTERFACE(mitk::IPropertyDescriptions, "org.mitk.IPropertyDescriptions")
 
 #endif

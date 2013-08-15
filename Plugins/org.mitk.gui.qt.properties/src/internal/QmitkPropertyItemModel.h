@@ -30,8 +30,8 @@ namespace berry
 
 namespace mitk
 {
-  class PropertyAliases;
-  class PropertyFilters;
+  class IPropertyAliases;
+  class IPropertyFilters;
 
   enum
   {
@@ -67,8 +67,8 @@ private:
   void OnPropertyModified(const itk::Object* property, const itk::EventObject& event);
   void SetNewPropertyList(mitk::PropertyList* propertyList);
 
-  mitk::PropertyAliases* m_PropertyAliases;
-  mitk::PropertyFilters* m_PropertyFilters;
+  mitk::IPropertyAliases* m_PropertyAliases;
+  mitk::IPropertyFilters* m_PropertyFilters;
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
   QString m_ClassName;
   std::auto_ptr<QmitkPropertyItem> m_RootItem;

@@ -1,11 +1,4 @@
 set(CPP_FILES
-  mitkFloatPropertyExtension.cpp
   mitkLoadPropertiesModule.cpp
   mitkPropertiesActivator.cpp
-  mitkPropertyAliases.cpp
-  mitkPropertyDescriptions.cpp
-  mitkPropertyExtension.cpp
-  mitkPropertyExtensions.cpp
-  mitkPropertyFilter.cpp
-  mitkPropertyFilters.cpp
 )

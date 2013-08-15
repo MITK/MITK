@@ -14,20 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkPropertyExtensions_h
-#define mitkPropertyExtensions_h
+#ifndef mitkIPropertyExtensions_h
+#define mitkIPropertyExtensions_h
 
-#include <PropertiesExports.h>
+#include <MitkExports.h>
 #include <usServiceInterface.h>
 
 namespace mitk
 {
   class PropertyExtension;
 
-  class Properties_EXPORT PropertyExtensions
+  /** \brief Interface of property extensions service.
+    *
+    * This service allows you to set an extension for a certain property name.
+    * An extension is a class that derives from mitk::PropertyExtension.
+    * Use extensions to attach useful metadata to your properties, e.g. the allowed range of values.
+    * Note that you have to extend the property view if you want it to respect your custom metadata.
+    */
+  class MITK_CORE_EXPORT IPropertyExtensions
   {
   public:
-    virtual ~PropertyExtensions();
+    virtual ~IPropertyExtensions();
 
     virtual bool AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite = false) = 0;
     virtual PropertyExtension* GetExtension(const std::string& propertyName) const = 0;
@@ -37,6 +44,6 @@ namespace mitk
   };
 }
 
-US_DECLARE_SERVICE_INTERFACE(mitk::PropertyExtensions, "org.mitk.services.PropertyExtensions")
+US_DECLARE_SERVICE_INTERFACE(mitk::IPropertyExtensions, "org.mitk.IPropertyExtensions")
 
 #endif

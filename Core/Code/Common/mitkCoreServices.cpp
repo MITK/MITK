@@ -16,11 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreServices.h"
 
-#include "mitkIShaderRepository.h"
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyExtensions.h>
+#include <mitkIPropertyFilters.h>
+#include <mitkIShaderRepository.h>
 
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-#include "usServiceReference.h"
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
 
 #include <itkSimpleFastMutexLock.h>
 #include <itkMutexLockHolder.h>
@@ -50,6 +54,26 @@ static S* GetCoreService(us::ModuleContext* context)
 IShaderRepository* CoreServices::GetShaderRepository(us::ModuleContext* context)
 {
   return GetCoreService<IShaderRepository>(context);
+}
+
+IPropertyAliases* CoreServices::GetPropertyAliases(us::ModuleContext* context)
+{
+  return GetCoreService<IPropertyAliases>(context);
+}
+
+IPropertyDescriptions* CoreServices::GetPropertyDescriptions(us::ModuleContext* context)
+{
+  return GetCoreService<IPropertyDescriptions>(context);
+}
+
+IPropertyExtensions* CoreServices::GetPropertyExtensions(us::ModuleContext* context)
+{
+  return GetCoreService<IPropertyExtensions>(context);
+}
+
+IPropertyFilters* CoreServices::GetPropertyFilters(us::ModuleContext* context)
+{
+  return GetCoreService<IPropertyFilters>(context);
 }
 
 bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)

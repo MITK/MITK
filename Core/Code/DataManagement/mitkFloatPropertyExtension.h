@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFloatPropertyExtension_h
 #define mitkFloatPropertyExtension_h
 
-#include "mitkPropertyExtension.h"
-#include <PropertiesExports.h>
+#include <mitkPropertyExtension.h>
+#include <MitkExports.h>
 
 namespace mitk
 {
-  class Properties_EXPORT FloatPropertyExtension : public PropertyExtension
+  class MITK_CORE_EXPORT FloatPropertyExtension : public PropertyExtension
   {
   public:
     FloatPropertyExtension();

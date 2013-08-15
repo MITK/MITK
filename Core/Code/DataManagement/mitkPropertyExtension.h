@@ -14,8 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPropertyExtensions.h"
+#ifndef mitkPropertyExtension_h
+#define mitkPropertyExtension_h
 
-mitk::PropertyExtensions::~PropertyExtensions()
+#include <MitkExports.h>
+
+namespace mitk
 {
+  class MITK_CORE_EXPORT PropertyExtension
+  {
+  public:
+    virtual ~PropertyExtension();
+
+  protected:
+    PropertyExtension();
+
+  private:
+    PropertyExtension(const PropertyExtension& other);
+    PropertyExtension& operator=(PropertyExtension other);
+  };
 }
+
+#endif

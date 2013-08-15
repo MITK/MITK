@@ -18,11 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPropertyFilter_h
 
 #include <mitkBaseProperty.h>
-#include <PropertiesExports.h>
+#include <MitkExports.h>
 
 namespace mitk
 {
-  class Properties_EXPORT PropertyFilter
+  /** \brief Consists of blacklist and whitelist entries.
+    *
+    * Blacklist filtering is less restrictive than whitelist filtering since you can filter out individual property names.
+    * If whitelist entries were added, all other property names are filtered out.
+    * In addition, whitelist entries are reduced by blacklist entries.
+    */
+  class MITK_CORE_EXPORT PropertyFilter
   {
   public:
     enum List

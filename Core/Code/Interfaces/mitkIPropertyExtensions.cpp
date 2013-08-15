@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPropertyFilters.h"
+#include "mitkIPropertyExtensions.h"
 
-mitk::PropertyFilters::~PropertyFilters()
+mitk::IPropertyExtensions::~IPropertyExtensions()
 {
 }

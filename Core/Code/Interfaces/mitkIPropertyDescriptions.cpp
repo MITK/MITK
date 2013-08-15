@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPropertyDescriptions.h"
+#include "mitkIPropertyDescriptions.h"
 
-mitk::PropertyDescriptions::~PropertyDescriptions()
+mitk::IPropertyDescriptions::~IPropertyDescriptions()
 {
 }

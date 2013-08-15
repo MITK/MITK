@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPropertyAliases.h"
-#include "mitkPropertyDescriptions.h"
-#include "mitkPropertyExtension.h"
-#include "mitkPropertyExtensions.h"
-#include "mitkPropertyFilters.h"
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkPropertyExtension.h>
+#include <mitkIPropertyExtensions.h>
+#include <mitkIPropertyFilters.h>
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 #include <usModuleActivator.h>
@@ -32,9 +32,10 @@ public:
   {
   }
 
-  bool operator()(const std::pair<std::string, std::string>& element)
+  bool operator()(const std::pair<std::string, std::vector<std::string> >& element)
   {
-    return element.second == m_Alias;
+    std::vector<std::string>::const_iterator iter = std::find(element.second.begin(), element.second.end(), m_Alias);
+    return iter != element.second.end();
   }
 
 private:
@@ -58,16 +59,16 @@ namespace mitk
     void Load(us::ModuleContext* context)
     {
       m_PropertyAliases = PropertyAliasesImpl::New();
-      context->RegisterService<PropertyAliases>(m_PropertyAliases);
+      context->RegisterService<IPropertyAliases>(m_PropertyAliases);
 
       m_PropertyDescriptions = PropertyDescriptionsImpl::New();
-      context->RegisterService<PropertyDescriptions>(m_PropertyDescriptions);
+      context->RegisterService<IPropertyDescriptions>(m_PropertyDescriptions);
 
       m_PropertyExtensions = PropertyExtensionsImpl::New();
-      context->RegisterService<PropertyExtensions>(m_PropertyExtensions);
+      context->RegisterService<IPropertyExtensions>(m_PropertyExtensions);
 
       m_PropertyFilters = PropertyFiltersImpl::New();
-      context->RegisterService<PropertyFilters>(m_PropertyFilters);
+      context->RegisterService<IPropertyFilters>(m_PropertyFilters);
     }
 
     void Unload(us::ModuleContext*)
@@ -75,24 +76,25 @@ namespace mitk
     }
 
   private:
-    class PropertyAliasesImpl : public itk::LightObject, public PropertyAliases
+    class PropertyAliasesImpl : public itk::LightObject, public IPropertyAliases
     {
     public:
       mitkClassMacro(PropertyAliasesImpl, itk::LightObject);
       itkNewMacro(Self);
 
-      bool AddAlias(const std::string& propertyName, const std::string& alias, bool overwrite);
-      std::string GetAlias(const std::string& propertyName) const;
-      std::string GetPropertyName(const std::string& alias) const;
-      bool HasAlias(const std::string& propertyName) const;
-      void RemoveAllAliases();
-      void RemoveAlias(const std::string& propertyName);
+      bool AddAlias(const std::string& propertyName, const std::string& alias, const std::string& className);
+      std::vector<std::string> GetAliases(const std::string& propertyName, const std::string& className);
+      std::string GetPropertyName(const std::string& alias, const std::string& className);
+      bool HasAliases(const std::string& propertyName, const std::string& className);
+      void RemoveAlias(const std::string& propertyName, const std::string& alias, const std::string& className);
+      void RemoveAliases(const std::string& propertyName, const std::string& className);
+      void RemoveAllAliases(const std::string& className);
 
     private:
-      std::map<std::string, std::string> m_Aliases;
+      std::map<std::string, std::map<std::string, std::vector<std::string> > > m_Aliases;
     };
 
-    class PropertyDescriptionsImpl : public itk::LightObject, public PropertyDescriptions
+    class PropertyDescriptionsImpl : public itk::LightObject, public IPropertyDescriptions
     {
     public:
       mitkClassMacro(PropertyDescriptionsImpl, itk::LightObject);
@@ -108,7 +110,7 @@ namespace mitk
       std::map<std::string, std::string> m_Descriptions;
     };
 
-    class PropertyExtensionsImpl : public itk::LightObject, public PropertyExtensions
+    class PropertyExtensionsImpl : public itk::LightObject, public IPropertyExtensions
     {
     public:
       mitkClassMacro(PropertyExtensionsImpl, itk::LightObject);
@@ -124,16 +126,14 @@ namespace mitk
       std::map<std::string, PropertyExtension*> m_Extensions;
     };
 
-    class PropertyFiltersImpl : public itk::LightObject, public PropertyFilters
+    class PropertyFiltersImpl : public itk::LightObject, public IPropertyFilters
     {
     public:
       mitkClassMacro(PropertyFiltersImpl, itk::LightObject);
       itkNewMacro(Self);
 
-      bool AddFilter(const PropertyFilter& filter, bool overwrite);
-      bool AddFilter(const std::string& className, const PropertyFilter& filter, bool overwrite);
-      std::map<std::string, BaseProperty::Pointer> ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap) const;
-      std::map<std::string, BaseProperty::Pointer> ApplyFilter(const std::string& className, const std::map<std::string, BaseProperty::Pointer>& propertyMap) const;
+      bool AddFilter(const PropertyFilter& filter, const std::string& className, bool overwrite);
+      std::map<std::string, BaseProperty::Pointer> ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap, const std::string& className) const;
       PropertyFilter GetFilter(const std::string& className) const;
       bool HasFilter(const std::string& className) const;
       void RemoveAllFilters();
@@ -149,64 +149,99 @@ namespace mitk
     PropertyFiltersImpl::Pointer m_PropertyFilters;
   };
 
-  bool PropertiesActivator::PropertyAliasesImpl::AddAlias(const std::string& propertyName, const std::string& alias, bool overwrite)
+  bool PropertiesActivator::PropertyAliasesImpl::AddAlias(const std::string& propertyName, const std::string& alias, const std::string& className)
   {
     if (alias.empty())
       return false;
 
-    std::pair<std::map<std::string, std::string>::iterator, bool> ret = m_Aliases.insert(std::make_pair(propertyName, alias));
+    std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+    std::map<std::string, std::vector<std::string> >::iterator iter = aliases.find(propertyName);
 
-    if (!ret.second && overwrite)
+    if (iter != aliases.end())
     {
-      ret.first->second = alias;
-      ret.second = true;
+      if (std::find(iter->second.begin(), iter->second.end(), alias) == iter->second.end())
+        iter->second.push_back(alias);
+    }
+    else
+    {
+      aliases.insert(std::make_pair(propertyName, std::vector<std::string>(1, alias)));
     }
 
-    return ret.second;
+    return true;
   }
 
-  std::string PropertiesActivator::PropertyAliasesImpl::GetAlias(const std::string& propertyName) const
+  std::vector<std::string> PropertiesActivator::PropertyAliasesImpl::GetAliases(const std::string& propertyName, const std::string& className)
   {
     if (!propertyName.empty())
     {
-      std::map<std::string, std::string>::const_iterator iter = m_Aliases.find(propertyName);
+      std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+      std::map<std::string, std::vector<std::string> >::const_iterator iter = aliases.find(propertyName);
 
-      if (iter != m_Aliases.end())
+      if (iter != aliases.end())
         return iter->second;
     }
 
-    return "";
+    return std::vector<std::string>();
   }
 
-  std::string PropertiesActivator::PropertyAliasesImpl::GetPropertyName(const std::string& alias) const
+  std::string PropertiesActivator::PropertyAliasesImpl::GetPropertyName(const std::string& alias, const std::string& className)
   {
     if (!alias.empty())
     {
-      std::map<std::string, std::string>::const_iterator iter = std::find_if(m_Aliases.begin(), m_Aliases.end(), AliasEquals(alias));
+      std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+      std::map<std::string, std::vector<std::string> >::const_iterator iter = std::find_if(aliases.begin(), aliases.end(), AliasEquals(alias));
 
-      if (iter != m_Aliases.end())
+      if (iter != aliases.end())
         return iter->first;
     }
 
     return "";
   }
 
-  bool PropertiesActivator::PropertyAliasesImpl::HasAlias(const std::string& propertyName) const
+  bool PropertiesActivator::PropertyAliasesImpl::HasAliases(const std::string& propertyName, const std::string& className)
   {
+    const std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+
     return !propertyName.empty()
-      ? m_Aliases.find(propertyName) != m_Aliases.end()
+      ? aliases.find(propertyName) != aliases.end()
       : false;
   }
 
-  void PropertiesActivator::PropertyAliasesImpl::RemoveAlias(const std::string& propertyName)
+  void PropertiesActivator::PropertyAliasesImpl::RemoveAlias(const std::string& propertyName, const std::string& alias, const std::string& className)
   {
-    if (!propertyName.empty())
-      m_Aliases.erase(propertyName);
+    if (!propertyName.empty() && !alias.empty())
+    {
+      std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+      std::map<std::string, std::vector<std::string> >::iterator iter = aliases.find(propertyName);
+
+      if (iter != aliases.end())
+      {
+        std::vector<std::string>::const_iterator aliasIter = std::find(iter->second.begin(), iter->second.end(), alias);
+
+        if (aliasIter != iter->second.end())
+        {
+          iter->second.erase(aliasIter);
+
+          if (iter->second.empty())
+            aliases.erase(propertyName);
+        }
+      }
+    }
   }
 
-  void PropertiesActivator::PropertyAliasesImpl::RemoveAllAliases()
+  void PropertiesActivator::PropertyAliasesImpl::RemoveAliases(const std::string& propertyName, const std::string& className)
   {
-    m_Aliases.clear();
+    if (!propertyName.empty())
+    {
+      std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+      aliases.erase(propertyName);
+    }
+  }
+
+  void PropertiesActivator::PropertyAliasesImpl::RemoveAllAliases(const std::string& className)
+  {
+    std::map<std::string, std::vector<std::string> >& aliases = m_Aliases[className];
+    aliases.clear();
   }
 
   bool PropertiesActivator::PropertyDescriptionsImpl::AddDescription(const std::string& propertyName, const std::string& description, bool overwrite)
@@ -311,12 +346,7 @@ namespace mitk
     }
   }
 
-  bool PropertiesActivator::PropertyFiltersImpl::AddFilter(const PropertyFilter& filter, bool overwrite)
-  {
-    return this->AddFilter("", filter, overwrite);
-  }
-
-  bool PropertiesActivator::PropertyFiltersImpl::AddFilter(const std::string& className, const PropertyFilter& filter, bool overwrite)
+  bool PropertiesActivator::PropertyFiltersImpl::AddFilter(const PropertyFilter& filter, const std::string& className, bool overwrite)
   {
     if (!filter.IsEmpty())
     {
@@ -334,12 +364,7 @@ namespace mitk
     return false;
   }
 
-  std::map<std::string, BaseProperty::Pointer> PropertiesActivator::PropertyFiltersImpl::ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap) const
-  {
-    return this->ApplyFilter("", propertyMap);
-  }
-
-  std::map<std::string, BaseProperty::Pointer> PropertiesActivator::PropertyFiltersImpl::ApplyFilter(const std::string& className, const std::map<std::string, BaseProperty::Pointer>& propertyMap) const
+  std::map<std::string, BaseProperty::Pointer> PropertiesActivator::PropertyFiltersImpl::ApplyFilter(const std::map<std::string, BaseProperty::Pointer>& propertyMap, const std::string& className) const
   {
     std::map<std::string, BaseProperty::Pointer> ret = propertyMap;
     PropertyFilter filter = this->GetFilter("");

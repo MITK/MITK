@@ -26,8 +26,8 @@ class QmitkPropertyItemSortFilterProxyModel;
 
 namespace mitk
 {
-  class PropertyAliases;
-  class PropertyDescriptions;
+  class IPropertyAliases;
+  class IPropertyDescriptions;
 }
 
 class QmitkPropertyTreeView : public QmitkAbstractView
@@ -60,9 +60,10 @@ private slots:
 
 private:
   unsigned long m_PropertyNameChangedTag;
-  mitk::PropertyAliases* m_PropertyAliases;
-  mitk::PropertyDescriptions* m_PropertyDescriptions;
-  bool m_ShowGenuineNames;
+  std::string m_SelectionClassName;
+  mitk::IPropertyAliases* m_PropertyAliases;
+  mitk::IPropertyDescriptions* m_PropertyDescriptions;
+  bool m_ShowAliasesInDescription;
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;

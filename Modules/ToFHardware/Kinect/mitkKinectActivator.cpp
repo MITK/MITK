@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceRegistration.h>
 #include <usModuleActivator.h>
-#include "mitkModuleContext.h"
+#include <usModuleContext.h>
 
-#include <mitkModuleActivator.h>
 #include "mitkIToFDeviceFactory.h"
 
 #include "mitkToFConfig.h"
@@ -36,14 +35,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class KinectActivator : public ModuleActivator {
+class KinectActivator : public us::ModuleActivator {
 public:
 
-    void Load(mitk::ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
         //Implementing KinectDeviceFactory
         KinectDeviceFactory* kinectFactory = new KinectDeviceFactory();
-        ServiceProperties kinectFactoryProps;
+        us::ServiceProperties kinectFactoryProps;
         kinectFactoryProps["ToFFactoryName"] =kinectFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(kinectFactory, kinectFactoryProps);
         kinectFactory->ConnectToFDevice();
@@ -51,7 +50,7 @@ public:
         m_Factories.push_back( kinectFactory );
     }
 
-    void Unload(mitk::ModuleContext* )
+    void Unload(us::ModuleContext* )
     {
     }
 

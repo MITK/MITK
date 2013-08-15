@@ -24,6 +24,7 @@ set(CPP_FILES
   Rendering/mitkConnectomicsRenderingNodeRadiusParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingNodeThresholdParameterProperty.cpp
   Rendering/mitkConnectomicsRenderingEdgeThresholdParameterProperty.cpp
+  Rendering/mitkConnectomicsEnumerationSubclassesSerializer.cpp
 
   # Algorithms Connectomics
   Algorithms/mitkConnectomicsNetworkCreator.cpp

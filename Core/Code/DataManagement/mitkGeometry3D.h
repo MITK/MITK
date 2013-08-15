@@ -626,7 +626,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
    * @param eps Optional (default: mitk::eps) tolarence.
    * @return True, if comparison is true. False in any other case.
    */
-  static bool AreOriginsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps =mitk::eps);
+  static bool AreOriginsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);
   static bool AreSpacingsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps );
   static bool AreExtendsAndAxisEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);
   static bool AreIndexToWorldTransformsEqual(const mitk::Geometry3D *rightHandSide, const mitk::Geometry3D *leftHandSide, ScalarType eps = mitk::eps);

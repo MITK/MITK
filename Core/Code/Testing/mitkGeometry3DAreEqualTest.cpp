@@ -23,20 +23,20 @@ mitk::Geometry3D::Pointer m_AnotherGeometry3D;
 /**
  * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the two used members for a new test case.
  */
-void Setup()
+static void Setup()
 {
   m_Geometry3D = mitk::Geometry3D::New();
   m_Geometry3D->Initialize();
   m_AnotherGeometry3D = m_Geometry3D->Clone();
 }
 
-void AreEqual_CloneAndOriginal_ReturnsTrue()
+static void AreEqual_CloneAndOriginal_ReturnsTrue()
 {
   Setup();
   MITK_TEST_CONDITION_REQUIRED( mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "A clone should be equal to its original.");
 }
 
-void AreEqual_DifferentOrigin_ReturnsFalse()
+static void AreEqual_DifferentOrigin_ReturnsFalse()
 {
   Setup();
 
@@ -49,7 +49,7 @@ void AreEqual_DifferentOrigin_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "Origin was modified. Result should be false.");
 }
 
-void AreEqual_DifferentIndexToWorldTransform_ReturnsFalse()
+static void AreEqual_DifferentIndexToWorldTransform_ReturnsFalse()
 {
   Setup();
 
@@ -66,7 +66,7 @@ void AreEqual_DifferentIndexToWorldTransform_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "IndexToWorldTransform was modified. Result should be false.");
 }
 
-void AreEqual_DifferentSpacing_ReturnsFalse()
+static void AreEqual_DifferentSpacing_ReturnsFalse()
 {
   Setup();
 
@@ -80,7 +80,7 @@ void AreEqual_DifferentSpacing_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "Spacing was modified. Result should be false.");
 }
 
-void AreEqual_InputIsNull_ReturnsFalse()
+static void AreEqual_InputIsNull_ReturnsFalse()
 {
   Setup();
 
@@ -90,7 +90,7 @@ void AreEqual_InputIsNull_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "Input is NULL. Result should be false.");
 }
 
-void AreEqual_DifferentImageGeometry_ReturnsFalse()
+static void AreEqual_DifferentImageGeometry_ReturnsFalse()
 {
   Setup();
 
@@ -99,7 +99,7 @@ void AreEqual_DifferentImageGeometry_ReturnsFalse()
   MITK_TEST_CONDITION_REQUIRED( !mitk::Geometry3D::AreEqual( m_Geometry3D, m_AnotherGeometry3D), "One Geometry is image, the other is not. Result should be false.");
 }
 
-void AreEqual_DifferentBoundingBox_ReturnsFalse()
+static void AreEqual_DifferentBoundingBox_ReturnsFalse()
 {
     Setup();
 
@@ -115,7 +115,7 @@ void AreEqual_DifferentBoundingBox_ReturnsFalse()
 }
 
 /**
- * @brief mitkCompareGeometry3DTest A test class for AreEqual methods in mitk::Geometry3D.
+ * @brief mitkGeometry3DAreEqualTest A test class for AreEqual methods in mitk::Geometry3D.
  */
 int mitkGeometry3DAreEqualTest(int /*argc*/, char* /*argv*/[])
 {

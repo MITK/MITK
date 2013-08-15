@@ -571,7 +571,13 @@ public:
     Identical means same dimensionality, same dimensions and same orientation for the geometry and identical voxel values in case of integral pixel types
     and a difference in the voxel values of less then mitk::eps for floating point pixel types.
     */
-  static bool MITK_CORE_EXPORT AreEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide);
+  static bool AreEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps);
+  static bool AreGeometriesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps );
+  static bool AreDimensionsEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool AreDimensionalitiesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool ArePixelTypesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide );
+  static bool ArePixelValuesEqual( const mitk::Image* rightHandSide, const mitk::Image* leftHandSide, ScalarType eps = mitk::eps );
+  static bool AreNotNull(const mitk::Image *rightHandSide, const mitk::Image *leftHandSide);
 
 protected:
 

@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCompareImageFilter.h"
 #include "mitkImageAccessByItk.h"
 
+#include <itkTestingComparisonImageFilter.h>
+
 mitk::CompareImageFilter::CompareImageFilter()
 {
 }
@@ -101,4 +103,14 @@ float mitk::CompareImageFilter::GetMaxValue()
 {
   if( Dim == 3)
   //return m_OutputImage->GetMaxValue()
+}
+
+void mitk::CompareImageFilter::SetInputImage1(mitk::Image::Pointer image)
+{
+  this->m_InputImage1 = image;
+}
+
+void mitk::CompareImageFilter::SetInputImage2(mitk::Image::Pointer image)
+{
+  this->m_InputImage2 = image;
 }

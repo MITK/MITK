@@ -17,10 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCOMPAREIMAGEFILTER_H
 #define MITKCOMPAREIMAGEFILTER_H
 
-#include "itkAbsoluteValueDifferenceImageFilter.h"
+//MITK
 #include "mitkImageToImageFilter.h"
 #include "mitkImage.h"
-#include "itkImage.h"
+
+//ITK
+#include <itkImage.h>
+#include <itkAbsoluteValueDifferenceImageFilter.h>
 
 namespace mitk{
 
@@ -29,6 +32,9 @@ class MITK_CORE_EXPORT CompareImageFilter : public ImageToImageFilter
 public:
 
   CompareImageFilter();
+
+//  itkSetMacro( InputImage1, mitk::Image::Pointer );
+//  itkSetMacro( InputImage2, mitk::Image::Pointer );
 
   void SetInputImage1( mitk::Image::Pointer image);
   void SetInputImage2( mitk::Image::Pointer image);
@@ -59,4 +65,4 @@ private:
 
 } // end namespace mitk
 
-#endif // ITKCOMPAREIMAGEFILTER_H
+#endif // MITKCOMPAREIMAGEFILTER_H

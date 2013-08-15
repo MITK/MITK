@@ -516,8 +516,6 @@ bool mitk::PlanarFigureInteractor::CheckControlPointHovering( const InteractionE
   {
     return false;
   }
-
-  return false;
 }
 
 bool mitk::PlanarFigureInteractor::CheckSelection( const InteractionEvent* interactionEvent )

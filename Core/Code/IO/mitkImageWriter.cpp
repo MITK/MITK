@@ -123,7 +123,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   MITK_INFO << "Writing image: " << fileName << std::endl;
   // Pictures and picture series like .png are written via a different mechanism then volume images.
   // So, they are still multiplexed and thus not support vector images.
-  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
+  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos || fileName.find(".bmp") != std::string::npos)
   {
     try
     {

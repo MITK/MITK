@@ -40,7 +40,7 @@ std::string AppendExtension(const std::string &filename, const char *extension)
   return new_filename;
 }
 
-bool CompareImageMetaData( mitk::Image::Pointer image, mitk::Image::Pointer reference)
+bool CompareImageMetaData( mitk::Image::Pointer image, mitk::Image::Pointer reference, bool checkPixelType = true )
 {
   // switch to AreIdentical() methods as soon as Bug 11925 (Basic comparison operators) is fixed
 
@@ -51,16 +51,104 @@ bool CompareImageMetaData( mitk::Image::Pointer image, mitk::Image::Pointer refe
   }
 
   // pixel type
-  if( image->GetPixelType() != reference->GetPixelType()
-      && image->GetPixelType().GetBitsPerComponent() != reference->GetPixelType().GetBitsPerComponent() )
+  if( checkPixelType &&
+      ( image->GetPixelType() != reference->GetPixelType()
+      && image->GetPixelType().GetBitsPerComponent() != reference->GetPixelType().GetBitsPerComponent() ) )
   {
-    MITK_ERROR << "Pixeltype differs ";
+    MITK_ERROR << "Pixeltype differs ( image=" << image->GetPixelType().GetPixelTypeAsString() << "[" << image->GetPixelType().GetBitsPerComponent() << "]" << " reference=" << reference->GetPixelType().GetPixelTypeAsString() << "[" << reference->GetPixelType().GetBitsPerComponent() << "]" << " )";
     return false;
   }
 
   return true;
 }
 
+
+/*
+Test writing picture formats like *.bmp, *.png, *.tiff or *.jpg
+NOTE: Saving as picture format must ignore PixelType comparison - not all bits per components are supported (see specification of the format)
+*/
+void TestPictureWriting(mitk::Image* image, const std::string& filename, const std::string& extension)
+{
+   mitk::ImageWriter::Pointer myImageWriter = mitk::ImageWriter::New();
+   myImageWriter->SetFileName(AppendExtension(filename, extension.c_str()) );
+   myImageWriter->SetFilePrefix("pref");
+   myImageWriter->SetFilePattern("pattern");
+   myImageWriter->SetInput(image);
+
+
+   mitk::Image::Pointer singleSliceImage = NULL;
+  if( image->GetDimension() == 3 )
+  {
+    mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
+    extractFilter->SetInput( image );
+    extractFilter->SetWorldGeometry( image->GetSlicedGeometry()->GetGeometry2D(0) );
+
+    extractFilter->Update();
+    singleSliceImage = extractFilter->GetOutput();
+
+    // test 3D writing in format supporting only 2D
+    myImageWriter->Update();
+
+    // test images
+    unsigned int foundImagesCount = 0;
+
+    //if the image only contains one sinlge slice the itkImageSeriesWriter won't add a number like filename.XX.extension
+    if(image->GetDimension(2) == 1)
+    {
+      std::stringstream series_filenames;
+        series_filenames << filename << extension;
+        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( series_filenames.str() );
+        if( compareImage.IsNotNull() )
+        {
+          foundImagesCount++;
+          MITK_TEST_CONDITION(CompareImageMetaData( singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. "); //ignore bits per component
+        }
+        remove( series_filenames.str().c_str() );
+    }
+    else //test the whole slice stack
+    {
+      for( unsigned int i=0; i< image->GetDimension(2); i++)
+      {
+        std::stringstream series_filenames;
+        series_filenames << filename << "." << i+1 << extension;
+        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( series_filenames.str() );
+        if( compareImage.IsNotNull() )
+        {
+          foundImagesCount++;
+          MITK_TEST_CONDITION(CompareImageMetaData( singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. "); //ignore bits per component
+        }
+        remove( series_filenames.str().c_str() );
+      }
+    }
+    MITK_TEST_CONDITION( foundImagesCount == image->GetDimension(2), "All 2D-Slices of a 3D image were stored correctly.");
+  }
+  else if( image->GetDimension() == 2 )
+  {
+    singleSliceImage = image;
+  }
+
+  // test 2D writing
+  if( singleSliceImage.IsNotNull() )
+  {
+    try
+    {
+      myImageWriter->SetInput( singleSliceImage );
+      myImageWriter->Update();
+
+      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( AppendExtension(filename, extension.c_str()).c_str());
+      MITK_TEST_CONDITION_REQUIRED( compareImage.IsNotNull(), "Image stored was succesfully loaded again");
+
+      MITK_TEST_CONDITION_REQUIRED( CompareImageMetaData(singleSliceImage, compareImage, false ), "Image meta data unchanged after writing and loading again. ");//ignore bits per component
+      remove(AppendExtension(filename, extension.c_str()).c_str());
+    }
+    catch(itk::ExceptionObject &e)
+    {
+      MITK_TEST_FAILED_MSG(<< "Exception during file writing for ." << extension << ": " << e.what() );
+    }
+
+  }
+
+}
 
 /**
 *  test for "ImageWriter".
@@ -175,64 +263,10 @@ int mitkImageWriterTest(int  argc , char* argv[])
     MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
   }
 
-
-  mitk::Image::Pointer singleSliceImage = NULL;
-  if( image->GetDimension() == 3 )
-  {
-    mitk::ExtractSliceFilter::Pointer extractFilter = mitk::ExtractSliceFilter::New();
-    extractFilter->SetInput( image );
-    extractFilter->SetWorldGeometry( image->GetSlicedGeometry()->GetGeometry2D(0) );
-
-    extractFilter->Update();
-    singleSliceImage = extractFilter->GetOutput();
-
-    // test 3D writing in format supporting only 2D
-    myImageWriter->SetExtension(".png");
-    myImageWriter->Update();
-
-    // test images
-    unsigned int foundImagesCount = 0;
-    for( unsigned int i=0; i< image->GetDimension(2); i++)
-    {
-      std::stringstream series_filenames;
-      series_filenames << filename << "." << i+1 << ".png";
-      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( series_filenames.str() );
-      if( compareImage.IsNotNull() )
-      {
-        foundImagesCount++;
-        MITK_TEST_CONDITION(CompareImageMetaData( singleSliceImage, compareImage ), "Image meta data unchanged after writing and loading again. ");
-      }
-      remove( series_filenames.str().c_str() );
-    }
-    MITK_TEST_CONDITION( foundImagesCount == image->GetDimension(2), "All 2D-Slices of a 3D image were stored correctly as PNGs.");
-  }
-  else if( image->GetDimension() == 2 )
-  {
-    singleSliceImage = image;
-  }
-
-  // test 2D writing
-  if( singleSliceImage.IsNotNull() )
-  {
-    try
-    {
-      myImageWriter->SetInput( singleSliceImage );
-      myImageWriter->SetExtension(".png");
-      myImageWriter->Update();
-
-      mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage( AppendExtension(filename, ".png").c_str());
-      MITK_TEST_CONDITION_REQUIRED( compareImage.IsNotNull(), "Image stored in PNG format was succesfully loaded again");
-
-      MITK_TEST_CONDITION_REQUIRED( CompareImageMetaData(singleSliceImage, compareImage ), "Image meta data unchanged after writing and loading again. ");
-      remove(AppendExtension(filename, ".png").c_str());
-    }
-    catch(itk::ExceptionObject &e)
-    {
-      MITK_TEST_FAILED_MSG(<< "Exception during .png file writing: " << e.what() );
-    }
-
-  }
-
+  TestPictureWriting(image, filename, ".png");
+  TestPictureWriting(image, filename, ".jpg");
+  TestPictureWriting(image, filename, ".tiff");
+  TestPictureWriting(image, filename, ".bmp");
 
   // test for exception handling
   try

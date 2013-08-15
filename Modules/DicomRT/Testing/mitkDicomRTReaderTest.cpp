@@ -19,16 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 
 
-int mitkDicomRTReaderTest(int a/* argc */, char* b/*argv*/[])
+int mitkDicomRTReaderTest(int  argc , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("DicomRTReader")
 
   mitk::DicomRTReader::Pointer _DicomRTReader = mitk::DicomRTReader::New();
 
-  int helloWorld = _DicomRTReader->ReadContourData(b[2]);
+  int helloWorld = _DicomRTReader->ReadContourDataSequence0_1(argv[1]);
 
-  MITK_TEST_CONDITION_REQUIRED( 2 == 2, "Test" );
+  MITK_TEST_CONDITION_REQUIRED( helloWorld == 1, "Test" );
 
   // always end with this!
   MITK_TEST_END()

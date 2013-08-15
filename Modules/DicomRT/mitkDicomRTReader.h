@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <gdcmTag.h>
 #include <gdcmScanner.h>
+#include "gdcmReader.h"
+#include "gdcmAttribute.h"
+#include "gdcmSequenceOfItems.h"
+#include "gdcmFileExplicitFilter.h"
 
 
 namespace mitk
@@ -37,7 +41,11 @@ public:
 
   itkNewMacro( Self );
 
-  int ReadContourData(char* filename);
+  int ReadContourDataSequence0(char* filename);
+  int ReadContourDataSequence0_1(char* filename);
+  int ReadContourDataSequence1(char* filename);
+  int ReadContourDataSequence2(char* filename);
+  int ReadContourDataSequence3(char* filename);
 
   /**
   * Virtual destructor.

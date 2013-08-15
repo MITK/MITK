@@ -65,7 +65,7 @@ namespace itk
     }
 
 
-    // Matrix to store al diffusion encoding gradients
+    // Matrix to store all diffusion encoding gradients
     vnl_matrix<double> directions(nof-numberb0,3);
 
     m_B0Mask.set_size(nof);
@@ -95,11 +95,15 @@ namespace itk
       }
     }
 
+    // looking for maximal norm among gradients.
+    // The norm is calculated with use of spectral radius theorem- based on determination of eigenvalue.
+
     vnl_matrix<double> dirsTimesDirsTrans = directions*directions.transpose();
 
     vnl_vector< double> diagonal(nof-numberb0);
     vnl_vector< double> b_vec(nof-numberb0);
     vnl_vector< double> temporary(3);
+
 
     for (int i=0;i<nof-numberb0;i++)
     {
@@ -109,8 +113,11 @@ namespace itk
     double max_diagonal = diagonal.max_value();
 
 
+    // normalization: free-water method assumes that directions matrix norm 1 is equal to b=1000
+
     directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
 
+    //calculation of norms and stoaring them in vector
 
     dirsTimesDirsTrans = directions*directions.transpose();
 
@@ -119,11 +126,16 @@ namespace itk
       b_vec[i]= dirsTimesDirsTrans[i][i];
     }
 
+    // Calculation of so called design matrix that is used to obtain expected signal.
+
     vnl_matrix<double> H(nof-numberb0, 6);
     vnl_matrix<double> H_org(nof-numberb0, 6);
     vnl_vector<double> pre_tensor(9);
 
-    int etbt[6] = { 0, 4, 8, 1, 5, 2 };
+    //H is matrix that containes covariances for directions. It is stored twice because its original value is needed later
+    // while H is changed
+
+    int etbt[6] = { 0, 4, 8, 1, 5, 2 };// tensor order
 
     for (int i = 0; i < nof-numberb0; i++)
     {
@@ -150,13 +162,11 @@ namespace itk
 
     H_org=H;
 
+    // calculation of inverse matrix by means of pseudoinverse
+
     vnl_matrix<double> inputtopseudoinverse=H.transpose()*H;
     vnl_symmetric_eigensystem<double> eig( inputtopseudoinverse);
     vnl_matrix<double> pseudoInverse = eig.pinverse()*H.transpose();
-
-
-
-
 
 
 
@@ -179,6 +189,8 @@ namespace itk
     mask->SetOrigin(m_GradientImagePointer->GetOrigin());
     mask->Allocate();
 
+    // Image thresholding: For every voxel mean B0 image is calculated and then voxels of mean B0 less than assumed
+    //treshold are excluded from the dataset with use of defined mask image. 1 in mask voxel has mean B0 > assumed treshold.
 
     int mask_cnt=0;
     for(int x=0;x<size[0];x++)
@@ -216,7 +228,8 @@ namespace itk
     }
 
 
-    //create a copy of the original image
+    //create a copy of the original image- it is then used in pre-processing methods
+
     m_CorrectedDiffusionVolumes = ImageType::New();
     m_CorrectedDiffusionVolumes->SetRegions(size);
     m_CorrectedDiffusionVolumes->SetSpacing(m_GradientImagePointer->GetSpacing());
@@ -243,7 +256,8 @@ namespace itk
 
 
 
-   //Sometimes the gradient voxels may contain negative values ( even if B0 voxel is > = 50 ). This must be corrected
+   //Sometimes the gradient voxels may contain negative values ( even if B0 voxel is > = 50 ). This must be corrected by smoothing DWI
+   //Smoothing is done by aproximation of negative voxel value by its correct ( positive) 27-th neighborhood.
 
 
     double mask_val=0.0;
@@ -295,7 +309,7 @@ namespace itk
       }
     }
 
-
+    //Declaration of tensor image that is used for estimation of free water map
 
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > TensorImageType;
     TensorImageType::Pointer tensorImg = TensorImageType::New();
@@ -307,15 +321,21 @@ namespace itk
 
     TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
 
+    //Deep copy into memmory tensor image. It is done because temporary tensor image is needed for the pre-processing methods.
 
     DeepCopyTensorImage(tensorImg,temp_tensorImg);
 
-    vnl_vector< double> pixel_max(nof-numberb0);
-    vnl_vector< double> pixel_min(nof-numberb0);
+    //Declaration of vectors that contains values of toohigh and toolow atenuation for each gradient. Attenuation is only calculated for
+    //non B0 images so nof-numberb0.
+
+    vnl_vector< double> pixel_max(nof-numberb0);// to high attenuation
+    vnl_vector< double> pixel_min(nof-numberb0);//to low attenuation
+
+    // to high and to low attenuation is calculated with use of highest allowed =5 and lowest allowed =0.01 diffusion coefficient
 
     for (int i=0;i<nof-numberb0;i++)
     {
-      pixel_max[i]=exp(-b_vec[i]*0.01);// here some values for low and high diffusivity were pre define as 0.01 for low and 5 for high
+      pixel_max[i]=exp(-b_vec[i]*0.01);
       pixel_min[i]= exp(-b_vec[i]*5);
     }
 
@@ -323,41 +343,59 @@ namespace itk
     m_H = H_org;
     m_BVec=b_vec;
 
-
+    // in pre-processing we are dealing with 3 types of voxels: voxels excluded = 0 in mask, voxels correct =1 and voxels under correction
+    //= 2. During pre processing most of voxels should be switched from 2 to 1.
+    //To smoothly edal with the mask the Turn mask method is defined that takes previous value of mask and new value of mask.
 
     double what_mask=0;
+
+    // what amsk is a variable declared to simplify tensor calculaton. Tensors are obtained only for voxels that have a mask value bigger
+    //than what mask. Sometimes it is 1 sometimes 2.
+
+    // initialization of required variables
     double set_mask=2.0;
     double previous_mask=0;
 
     double old_number_negative_eigs=0;
     double new_number_negative_eigs=0;
 
-
     bool  stil_correcting = true;
 
-    TurnMask(size,mask,previous_mask,set_mask);// simply defining all possible tensors as with negative eigenvalues
+    TurnMask(size,mask,previous_mask,set_mask);
+    // simply defining all possible tensors as with negative eigenvalues
 
     what_mask=1.0;// we want to calculate all the tensors
 
 
+    //Pre-processing is done in iterations as long as next iteration does not introduce higher number of bad voxels.
+    //In such a case smoothed DWI should be last one that has smaller or equal number of bad voxels in comparison to the
+    //previous iteration. To obtain this temporary DWI image must be stored in memory.
+
     DeepCopyDiffusionImage(m_CorrectedDiffusionVolumes,corrected_diffusion_temp,nof);
 
-    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);// generating of the tensors
+    // generating of initial tensor image
+    GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
 
 
-    old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);// checking how many tensors has problems, this is working only for mask =2
-
-    std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
-
-    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+    // checking how many tensors has problems, this is working only for mask =2
+    old_number_negative_eigs = CheckNegatives (size,mask,tensorImg);
 
 
+    //info for the user printed in the consol-debug information to be removed in the future
+    std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;
 
+
+    //Smoothing DWI - method is described when it is defined
+    CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+
+
+    //pre-processing loop-most important part of the algorithm. The iterative  is repeated as long as correction still helds. The process
+    //might be described in 3 steps: correct diffusion, generate tensor, check how may negative eigenvalues are there.
 
     while (stil_correcting == true)
     {
-
-      std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;// info for Thomas: Debug stuff - to be removed
+      //info for the user printed in the consol-debug information to be removed in the future
+      std::cout << "Number of negative eigenvalues: " << old_number_negative_eigs << std::endl;
 
       GenerateTensorImage(nof,numberb0,size,corrected_diffusion_temp,mask,what_mask,tensorImg);
 
@@ -365,6 +403,8 @@ namespace itk
 
       if(new_number_negative_eigs<old_number_negative_eigs)
       {
+        // if the correction does not introduce new negative eigenvalues and corrects some of negative detected n previous iteration
+        // smoothed DWI is used to substitute DWI from previous iteration
         stil_correcting=true;
         old_number_negative_eigs=new_number_negative_eigs;
         DeepCopyDiffusionImage(corrected_diffusion_temp,m_CorrectedDiffusionVolumes,nof);
@@ -376,13 +416,16 @@ namespace itk
       }
 
 
-      CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,corrected_diffusion_temp,mask,pixel_max,pixel_min);
+      CorrectDiffusionImage(nof,numberb0,size,corrected_diffusion_temp,mask,pixel_max,pixel_min);
 
 
     }
 
+    //Changing the mask value for voxels that are still not corrcted. Original idea is to take them into analysis even though
+    // eigenvalues are still negative
     TurnMask(size, mask,1,1);
 
+    //Generation of final pre-processed tensor image that might be used as an input for FWE method
     GenerateTensorImage(nof,numberb0,size,m_CorrectedDiffusionVolumes,mask,what_mask,tensorImg);
 
     m_MaskImage = mask;
@@ -399,8 +442,7 @@ namespace itk
     ::SetGradientImage( GradientDirectionContainerType *gradientDirection,
     const GradientImagesType *gradientImage )
   {
-    // Make sure crazy users did not call both AddGradientImage and
-    // SetGradientImage
+
     if( m_GradientImageTypeEnumeration == GradientIsInManyImages )
     {
       itkExceptionMacro( << "Cannot call both methods:"
@@ -435,6 +477,9 @@ namespace itk
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::CheckNeighbours(int x, int y, int z,int f, itk::Size<3> size, itk::Image<short, 3>::Pointer mask, itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp)
   {
+    // method is used for finding a new value for the voxel with use of its 27 neighborhood. To perform such a smoothing correct voxels are
+    // counted an arithmetical mean is calculated and stored as a new value for the voxel. If there is no proper neigborhood voxel is turned
+    // to the value of 0.
 
     // Definition of neighbourhood avoiding crossing the image boundaries
     int x_max=size[0];
@@ -468,19 +513,17 @@ namespace itk
 
           temp_mask=mask->GetPixel(ix);
 
-          //if(temp_mask > 0 && temp_mask < 2 )
-          //{
-              //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
+
           GradientVectorType p = corrected_diffusion_temp->GetPixel(ix);
 
           double test= p[f];
 
-          if (test > 0.0 )// hmm this must be here becaus the method is used in multiple ocasions. Sometiems we may deal with negative values
+          if (test > 0.0 )// taking only positive values and counting them
           {
             if(!(i==x && j==y && k== z))
             {
-                tempsum=tempsum+p[f];// sum for calculation of mean
-                temp_number++;// number for calculation of mean
+                tempsum=tempsum+p[f];
+                temp_number++;
             }
 
           }
@@ -488,17 +531,14 @@ namespace itk
 
         }
       }
-    }// end of size
+    }// end of jumping through 27th neighbours
 
-
+    //getting back to the original position of the voxel
 
     ix[0] = x;ix[1] = y;ix[2] = z;
 
     if (temp_number <= 0.0)
     {
-      //ix[0] = x;ix[1] = y;ix[2] = z;
-      //GradientVectorType p = m_GradientImagePointer->GetPixel(ix);
-      //tempsum=p[f];
       tempsum=0;
       mask->SetPixel(ix,0);
     }
@@ -509,7 +549,7 @@ namespace itk
     }
 
 
-    return tempsum;
+    return tempsum;// smoothed value of voxel
   }
 
 
@@ -542,32 +582,6 @@ namespace itk
     }
   }
 
-
-
-  /*
-  template <class TDiffusionPixelType, class TTensorPixelType>
-  void
-  TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::CalculateTensor(vnl_vector<double> atten,vnl_vector<double> &tensor, int nof,int numberb0)
-  {
-    for (int i=0;i<nof-numberb0;i++)
-    {
-
-      if(atten[i]<=0.0)
-      {
-          atten[i]==0.1;
-      }
-     std::cout << "problem";
-      atten[i]=log((double)atten[i]);
-    }
-    tensor = m_PseudoInverse*atten;
-
-
-  }
-
-*/
-
-
   template <class TDiffusionPixelType, class TTensorPixelType>
   double
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
@@ -578,15 +592,16 @@ namespace itk
       // of voxels (tensors) with negative eigenvalues. Then if the voxel was previously bad ( mask=2 ) but it is not bad anymore mask is
       //changed to 1.
 
+      // declaration of important structures and variables
       double badvoxels=0;
       double pixel=0;
       itk::Index<3> ix;
       itk::DiffusionTensor3D<float> ten;
       vnl_matrix<double> temp_tensor(3,3);
-      vnl_vector<double> eigen_vals(3);// declaration of important structures and variables
+      vnl_vector<double> eigen_vals(3);
       vnl_vector<double> tensor (6);
 
-
+      // for every pixel from the image
       for (int x=0;x<size[0];x++)
       {
 
@@ -595,16 +610,20 @@ namespace itk
 
           for (int z=0;z<size[2];z++)
           {
-              // for every pixel
+
 
               ix[0] = x; ix[1] = y; ix[2] = z;
 
               pixel = mask->GetPixel(ix);
 
+              // but only if previously marked as bad one-negative eigen value
+
               if(pixel > 1)
-              {// but only if previously marked as bad or potentially bad one
+              {
 
               ten = tensorImg->GetPixel(ix);
+
+              // changing order from tensor structure in MITK into vnl structure 3x3 symmetric tensor matrix
 
               tensor[0] = ten(0,0);
               tensor[3] = ten(0,1);
@@ -617,13 +636,16 @@ namespace itk
               temp_tensor[0][1]= tensor[3]; temp_tensor[1][1]= tensor[1]; temp_tensor[2][1]= tensor[4];
               temp_tensor[0][2]= tensor[5]; temp_tensor[1][2]= tensor[4]; temp_tensor[2][2]= tensor[2];
 
+              //checking negativity of tensor eigenvalues
 
-              vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);//creating an eigensystem out of 3x3 symmetric tensor matrix
+              vnl_symmetric_eigensystem<double> eigen_tensor(temp_tensor);
 
 
               eigen_vals[0]=eigen_tensor.get_eigenvalue(0);
               eigen_vals[1]=eigen_tensor.get_eigenvalue(1);
-              eigen_vals[2]=eigen_tensor.get_eigenvalue(2);// calculating eigenvalues for current tensor
+              eigen_vals[2]=eigen_tensor.get_eigenvalue(2);
+
+              //comparison to 0.01 instead of 0 was proposed by O.Pasternak
 
               if( eigen_vals[0]>0.01 && eigen_vals[1]>0.01 && eigen_vals[2]>0.01)
               {
@@ -632,7 +654,7 @@ namespace itk
               }
               else
               {
-                badvoxels++;// increasing a number of detected bad
+                badvoxels++;
               }
 
               }
@@ -641,26 +663,28 @@ namespace itk
          }
        }
 
-      double ret = badvoxels;//returning just the number of bad voxels
+      double ret = badvoxels;
 
       return ret;
 
-  }// end of void check negativity
+  }
 
 
   template <class TDiffusionPixelType, class TTensorPixelType>
   void
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
-  ::CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion_temp,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min)
+  ::CorrectDiffusionImage(int nof,int numberb0,itk::Size<3> size,itk::VectorImage<short, 3>::Pointer corrected_diffusion,itk::Image<short, 3>::Pointer mask,vnl_vector< double> pixel_max,vnl_vector< double> pixel_min)
   {
-      // in this method the diffusion image temporray is corrected with use of information from updated mask. The diffusion image is tempora
-      //-ry while we can't use corrected voxel to correct other voxel in the same iteration.
+      // in this method the voxels that has tensor negative eigenvalues are smoothed. Smoothing is done on DWI image.For the voxel
+      //detected as bad one, B0 image is smoothed obligatory. All other gradient images are smoothed only when value of attenuation
+      //is out of declared bounds for too high or too low attenuation.
 
+     // declaration of important variables
 
       itk::Index<3> ix;
       vnl_vector<double> org_data(nof-numberb0);
       vnl_vector<double> atten(nof-numberb0);
-      double cnt_atten=0;// declaration of important variables
+      double cnt_atten=0;
 
       for (int z=0;z<size[2];z++)
       {
@@ -670,7 +694,7 @@ namespace itk
 
           for (int y=0;y<size[1];y++)
           {
-              // for every pixel
+
 
               ix[0] = x; ix[1] = y; ix[2] = z;
 
@@ -684,7 +708,6 @@ namespace itk
                     org_data[i]=pt[i];
                   }
 
-                  //CalculateAttenuation(org_data,atten,nof,numberb0);
 
                   double mean_b=0.0;
 
@@ -702,13 +725,15 @@ namespace itk
                   {
                     if(m_B0Mask[i]==0)
                     {
-                      //if(org_data[i]<0.001){org_data[i]=0.01;}
+
                       atten[cnt]=org_data[i]/mean_b;
                       cnt++;
                     }
                   }
 
                   cnt_atten=0;
+
+                  //smoothing certain gradient images taht are out of declared constraints
 
                   for (int f=0;f<nof;f++)
                   {
@@ -717,7 +742,7 @@ namespace itk
 
                         if(atten[cnt_atten]<pixel_min[cnt_atten] || atten[cnt_atten]> pixel_max[cnt_atten])
                     {
-                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion_temp);
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
 
                     }
 
@@ -725,19 +750,16 @@ namespace itk
                     cnt_atten++;
 
                    }
+                    //smoothing B0
                     if(m_B0Mask[f]==1)
                     {
 
-
-                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion_temp);
-
+                        org_data[f] = CheckNeighbours(x,y,z,f,size,mask,corrected_diffusion);
 
                     }
 
 
-                  }//end for
-
-
+                  }
 
                   for (int i=0;i<nof;i++)
                   {
@@ -750,14 +772,14 @@ namespace itk
               else
               {
                   GradientVectorType  pt = corrected_diffusion->GetPixel(ix);
-                  corrected_diffusion_temp->SetPixel(ix, pt);
+                  corrected_diffusion->SetPixel(ix, pt);
 
               }
            }
         }
        }
 
-      std::cout << "break point";
+
 
   }
 
@@ -785,14 +807,18 @@ namespace itk
 
          for (int z=0;z<size[2];z++)
           {
-              // for every pixel
+
 
               ix[0] = x; ix[1] = y; ix[2] = z;
 
               mask_val= mask->GetPixel(ix);
 
+              //Tensors are calculated only for voxels above theshold for B0 image.
+
               if( mask_val > 0.0 )
               {
+
+                 // calculation of attenuation with use of gradient image and  and mean B0 image
                  GradientVectorType pt = corrected_diffusion->GetPixel(ix);
 
                   for (int i=0;i<nof;i++)
@@ -833,10 +859,10 @@ namespace itk
                   for (int i=0;i<nof-numberb0;i++)
                   {
 
-                    if(atten[i]==0.0)
-                   std::cout << "problem";
                     atten[i]=log((double)atten[i]);
                   }
+
+                  // Calculation of tensor with use of previously calculated inverse of design matrix and attenuation
                   tensor = m_PseudoInverse*atten;
 
                   ten(0,0) = tensor[0];
@@ -851,6 +877,7 @@ namespace itk
 
 
               }
+              // for voxels with mask value 0 - tensor is simply 0 ( outside brain value)
               else if (mask_val < 1.0)
               {
                   ten(0,0) = 0;
@@ -861,9 +888,6 @@ namespace itk
                   ten(2,2) = 0;
                   tensorImg->SetPixel(ix, ten);
               }
-
-
-
 
            }
         }
@@ -879,7 +903,8 @@ namespace itk
   TensorReconstructionWithEigenvalueCorrectionFilter<TDiffusionPixelType, TTensorPixelType>
   ::TurnMask( itk::Size<3> size, itk::Image<short, 3>::Pointer mask, double previous_mask, double set_mask)
   {
-    // in this method voxels in the mask that poses a certain value are substituded by other value.// in this method voxels in the mask that poses a certain value are substituded by other value.
+    // The method changes voxels in the mask that poses a certain value with other value.
+
     itk::Index<3> ix;
     double temp_mask_value=0;
 

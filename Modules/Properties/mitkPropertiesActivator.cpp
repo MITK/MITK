@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
+#include <algorithm>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 class AliasEquals
 {
@@ -216,7 +221,7 @@ namespace mitk
 
       if (iter != aliases.end())
       {
-        std::vector<std::string>::const_iterator aliasIter = std::find(iter->second.begin(), iter->second.end(), alias);
+        std::vector<std::string>::iterator aliasIter = std::find(iter->second.begin(), iter->second.end(), alias);
 
         if (aliasIter != iter->second.end())
         {

@@ -85,12 +85,12 @@ public:
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
 
-    MITK_DEBUG << optimizer->GetStopConditionDescription()  << "\n"
+    MITK_INFO << optimizer->GetStopConditionDescription()  << "\n"
                << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
 
-    optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.5f );
+    optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
     optimizer->SetMinimumStepLength( optimizer->GetMinimumStepLength() * 0.1f );
-    optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
+   // optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
   }
 
   void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
@@ -108,7 +108,7 @@ public:
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
 
     unsigned int currentIter = optimizer->GetCurrentIteration();
-    MITK_DEBUG << "[" << currentIter << "] : " << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
+    MITK_INFO << "[" << currentIter << "] : " << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
 
   }
 

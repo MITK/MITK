@@ -85,9 +85,9 @@ public:
   void SetVerbose(bool flag)
   {
     if( flag )
-      this->SetCrossModalityOn();
+      this->SetVerboseOn();
     else
-      this->SetCrossModalityOff();
+      this->SetVerboseOff();
   }
 
   /** Turn verbosity on, \sa SetVerbose */
@@ -246,18 +246,14 @@ protected:
     unsigned int min_value = std::min( image_size[0], std::min( image_size[1], image_size[2]));
 
     // condition for the top level pyramid image
-    float optmaxstep = 12;
-    float optminstep = 0.1f;
-    unsigned int iterations = 40;
-    if( min_value / max_schedule_val < 16 )
+    float optmaxstep = 6;
+    float optminstep = 0.05f;
+    unsigned int iterations = 100;
+    if( min_value / max_schedule_val < 12 )
     {
-      //max_pyramid_lvl--;
       max_schedule_val /= 2;
-      optmaxstep *= 0.5f;
-      optminstep *= 0.2f;
-      iterations *= 1.5;
-
-      //std::cout << "Changed default pyramid: lvl " << max_pyramid_lvl << std::endl;
+      optmaxstep *= 0.25f;
+      optminstep *= 0.1f;
     }
 
     typename RegistrationType::ScheduleType fixedSchedule(max_pyramid_lvl,3);
@@ -276,7 +272,7 @@ protected:
 
     typename OptimizerType::Pointer optimizer = OptimizerType::New();
     typename OptimizerType::ScalesType optScales( paramDim );
-    optScales.Fill(5.0);
+    optScales.Fill(10.0);
 
     optScales[paramDim-3] = 1.0/1000;
     optScales[paramDim-2] = 1.0/1000;
@@ -290,13 +286,16 @@ protected:
     optimizer->SetMaximumStepLength( optmaxstep );
     optimizer->SetMinimumStepLength( optminstep );
 
-    OptimizerIterationCommand< OptimizerType >::Pointer iterationObserver =
-        OptimizerIterationCommand<OptimizerType>::New();
-
     // add observer tag if verbose */
     unsigned long vopt_tag = 0;
     if(m_Verbose)
     {
+      MITK_INFO << "  :: Starting at " << initialParams;
+      MITK_INFO << "  :: Scales  =  " << optScales;
+
+      OptimizerIterationCommand< OptimizerType >::Pointer iterationObserver =
+          OptimizerIterationCommand<OptimizerType>::New();
+
       vopt_tag = optimizer->AddObserver( itk::IterationEvent(), iterationObserver );
     }
 

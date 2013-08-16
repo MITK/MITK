@@ -58,7 +58,7 @@ public:
   typedef typename OutputImageType::RegionType    OutputImageRegionType;
 
   typedef std::vector< unsigned int > IndexListType;
-
+  typedef std::map< unsigned int, IndexListType> BValueMapType;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -84,6 +84,33 @@ public:
   void SetExtractAll()
   {
     m_ExtractAllImages = true;
+  }
+
+  /**
+   * @brief Selects only the weighted images with b-value above the given b_threshold to be extracted
+   *
+   * Setting b_threshold to 0 will do the same as \sa SetExtractAll. Please note that some images have no true
+   * unweighted images as the minimal b-value is something like 5 so for extracting all.
+   *
+   * @note It will reorder the images!
+   *
+   * @param b_threshold the minimal b-value to be extracted
+   * @param map the map with b-values to the corresponding image
+   *
+   * @sa GetIndexList
+   */
+  void SetExtractAllAboveThreshold( double b_threshold, BValueMapType map);
+
+  /**
+   * @brief Returns the index list used for extraction
+   *
+   * The list is necessary for further processing, especially when a b-value threshold is used ( like in \sa SetExtractAllAboveThreshold )
+   *
+   * @return The index list used during the extraction
+   */
+  const IndexListType GetIndexList() const
+  {
+    return m_IndexList;
   }
 
 protected:

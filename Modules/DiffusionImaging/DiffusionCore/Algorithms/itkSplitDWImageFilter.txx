@@ -49,6 +49,36 @@ TInputImagePixelType, TOutputImagePixelType >::GenerateOutputInformation()
 
 template< class TInputImagePixelType,
           class TOutputImagePixelType>
+void itk::SplitDWImageFilter< TInputImagePixelType, TOutputImagePixelType >
+::SetExtractAllAboveThreshold(double b_threshold, BValueMapType map)
+{
+  m_ExtractAllImages = false;
+  m_IndexList.clear();
+
+  // create the index list following the given threshold
+  // iterate over the b-value map
+  BValueMapType::const_iterator bvalueIt = map.begin();
+  while( bvalueIt != map.end() )
+  {
+    // check threshold
+    if (bvalueIt->first > b_threshold)
+    {
+       // the map contains an index container, this needs to be inserted into the
+       // index list
+       IndexListType::const_iterator listIt = bvalueIt->second.begin();
+       while( listIt != bvalueIt->second.end() )
+       {
+         m_IndexList.push_back( *listIt );
+         ++listIt;
+       }
+    }
+
+    ++bvalueIt;
+  }
+}
+
+template< class TInputImagePixelType,
+          class TOutputImagePixelType>
 void itk::SplitDWImageFilter<
 TInputImagePixelType, TOutputImagePixelType >::GenerateData()
 {

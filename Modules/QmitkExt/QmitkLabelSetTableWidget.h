@@ -73,16 +73,13 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     /// \brief All labels were modified in the LabelSet.
     virtual void AllLabelsModified();
 
+    /// \brief Init-function this class with the given dataStorage and _Predicate. This function is called by all ctors.
+    void Init();
+
     /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
     virtual void SetAutoSelectNewItems(bool _AutoSelectNewItems);
 
-    /// \brief Reset function to populate available labels again
-    void Reset();
-
     const QStringList& GetLabelList();
-
-    /// \brief Init-function this class with the given dataStorage and _Predicate. This function is called by all ctors.
-    void Init();
 
   signals:
 
@@ -148,6 +145,19 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
 
     /// \brief Inserts a new label at the end of the table.
     virtual void InsertItem();
+
+    void WaitCursorOn();
+
+    void BusyCursorOn();
+
+    void WaitCursorOff();
+
+    void BusyCursorOff();
+
+    void RestoreOverrideCursor();
+
+    /// \brief Reset function to populate available labels again
+    void Reset();
 
   protected:
 

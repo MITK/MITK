@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTableWidgetSelectionRange>
 #include <QVBoxLayout>
 #include <QStringList>
+#include <QApplication>
 
 #include <itkCommand.h>
 
@@ -626,7 +627,9 @@ void QmitkLabelSetTableWidget::OnRemoveLabel(bool value)
 
   if (answerButton == QMessageBox::Yes)
   {
+    this->BusyCursorOn();
     this->m_LabelSetImage->RemoveLabel( this->currentRow() );
+    this->BusyCursorOff();
   }
 }
 
@@ -650,7 +653,6 @@ void QmitkLabelSetTableWidget::OnMergeLabels(bool value)
           int begin = ranges.at(range).topRow();
           int count = ranges.at(range).rowCount();
 
-          MITK_INFO << "merging from: " << begin-1 << " count " << count;
           this->m_LabelSetImage->MergeLabels( begin-1, count, this->currentRow() );
       }
 
@@ -683,7 +685,11 @@ void QmitkLabelSetTableWidget::OnRemoveLabels(bool value)
           }
       }
 
+      this->BusyCursorOn();
+
       this->m_LabelSetImage->RemoveLabels(indexes);
+
+      this->BusyCursorOff();
    }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -713,10 +719,14 @@ void QmitkLabelSetTableWidget::OnEraseLabels(bool value)
           }
       }
 
-      this->m_LabelSetImage->EraseLabels(indexes);
-   }
+      this->BusyCursorOn();
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      this->m_LabelSetImage->EraseLabels(indexes);
+
+      this->BusyCursorOff();
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+   }
 }
 
 void QmitkLabelSetTableWidget::OnEraseLabel(bool value)
@@ -730,7 +740,9 @@ void QmitkLabelSetTableWidget::OnEraseLabel(bool value)
 
   if (answerButton == QMessageBox::Yes)
   {
+    this->BusyCursorOn();
     this->m_LabelSetImage->EraseLabel( this->currentRow(), false );
+    this->BusyCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -833,4 +845,29 @@ void QmitkLabelSetTableWidget::Reset()
           ++counter;
       }
   }
+}
+
+void QmitkLabelSetTableWidget::WaitCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+}
+
+void QmitkLabelSetTableWidget::BusyCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+}
+
+void QmitkLabelSetTableWidget::WaitCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkLabelSetTableWidget::BusyCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkLabelSetTableWidget::RestoreOverrideCursor()
+{
+  QApplication::restoreOverrideCursor();
 }

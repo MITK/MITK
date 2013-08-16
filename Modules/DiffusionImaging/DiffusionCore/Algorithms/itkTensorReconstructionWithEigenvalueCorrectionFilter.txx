@@ -310,15 +310,15 @@ namespace itk
 
     //Declaration of tensor image that is used for estimation of free water map
 
-    typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > TensorImageType;
-    TensorImageType::Pointer tensorImg = TensorImageType::New();
+
+    typename TensorImageType::Pointer tensorImg = TensorImageType::New();
     tensorImg->SetRegions(m_GradientImagePointer->GetLargestPossibleRegion().GetSize());
     tensorImg->SetSpacing(m_GradientImagePointer->GetSpacing());
     tensorImg->SetOrigin(m_GradientImagePointer->GetOrigin());
     tensorImg->Allocate();
 
 
-    TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
+    typename TensorImageType::Pointer temp_tensorImg = TensorImageType::New();
 
     //Deep copy into memmory tensor image. It is done because temporary tensor image is needed for the pre-processing methods.
 

@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 #include <math.h>
-//#include <mitkDiffusionImage.h>
-
 
 
 
@@ -58,14 +56,12 @@ namespace itk
     /** Runtime information support. */
     itkTypeMacro(TensorReconstructionWithEigenvalueCorrectionFilter, ImageToImageFilter)
 
-    typedef TDiffusionPixelType                       ReferencePixelType;
+
     typedef TDiffusionPixelType                       GradientPixelType;
     typedef DiffusionTensor3D< TTensorPixelType >     TensorPixelType;
 
-
-
     typedef Image< TensorPixelType, 3 >              TensorImageType;
-    typedef TensorImageType                          OutputImageType;
+
     typedef typename Superclass::OutputImageRegionType
       OutputImageRegionType;
 

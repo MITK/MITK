@@ -14,7 +14,6 @@ set(CPP_FILES
   Algorithms/mitkInterpolateLinesFilter.cpp
   Algorithms/mitkLabeledImageToSurfaceFilter.cpp
   Algorithms/mitkLabeledImageVolumeCalculator.cpp
-  Algorithms/mitkLookupTableSource.cpp
   Algorithms/mitkMaskImageFilter.cpp
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
@@ -53,14 +52,12 @@ set(CPP_FILES
   DataManagement/mitkCylinder.cpp
   DataManagement/mitkDataStorageSelection.cpp
   DataManagement/mitkDelegateManager.cpp
-  DataManagement/mitkDrawOperation.cpp
   DataManagement/mitkEllipsoid.cpp
   DataManagement/mitkExternAbstractTransformGeometry.cpp
   DataManagement/mitkFrameOfReferenceUIDManager.cpp
   DataManagement/mitkGridRepresentationProperty.cpp
   DataManagement/mitkGridVolumeMapperProperty.cpp
   DataManagement/mitkItkBaseDataAdapter.cpp
-  DataManagement/mitkLabeledImageLookupTable.cpp
   DataManagement/mitkLineOperation.cpp
   DataManagement/mitkMesh.cpp
   DataManagement/mitkObjectSet.cpp
@@ -69,8 +66,6 @@ set(CPP_FILES
   DataManagement/mitkPlane.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkPropertyObserver.cpp
-  DataManagement/mitkSeedsImage.cpp
-  DataManagement/mitkSeedsImageLookupTableSource.cpp
   DataManagement/mitkSphereLandmarkProjector.cpp
 # DataManagement/mitkUSLookupTableSource.cpp
   DataManagement/mitkUnstructuredGrid.cpp
@@ -104,7 +99,6 @@ set(CPP_FILES
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
-  Interactions/mitkSeedsInteractor.cpp
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp

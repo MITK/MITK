@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSEEDSIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
 #include "mitkImage.h"
-#include "MitkExtExports.h"
+#include "SeedsImageExports.h"
 
 #include <itkImage.h>
 #include <itkNeighborhood.h>
@@ -35,7 +35,7 @@ namespace mitk
 //##
 //## Handles operations for drawing seeds.
 //## @ingroup Data
-class MitkExt_EXPORT SeedsImage : public Image
+class SeedsImage_EXPORT SeedsImage : public Image
 {
 
 public:

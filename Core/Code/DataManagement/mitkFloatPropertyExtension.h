@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief Property extension for mitk::FloatProperty.
+    *
+    * The property view uses this extension to configure the corresponding property editor.
+    */
   class MITK_CORE_EXPORT FloatPropertyExtension : public PropertyExtension
   {
   public:

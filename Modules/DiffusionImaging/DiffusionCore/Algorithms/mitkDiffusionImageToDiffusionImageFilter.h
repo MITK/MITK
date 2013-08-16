@@ -17,8 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
 #define MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
 
-#include "mitkImageToImageFilter.h"
+#include <DiffusionCoreExports.h>
+
+#include "mitkDiffusionImageSource.h"
 #include "mitkDiffusionImage.h"
+
 
 namespace mitk {
 /**
@@ -28,23 +31,37 @@ namespace mitk {
  * The class inherits the mitk::ImageToImageFilter to gain access to the filtering pipline.
  */
 template <typename DiffusionPixelType>
-class DiffusionImageToDiffusionImageFilter
-    : public ImageToImageFilter
+class DiffusionCore_EXPORT DiffusionImageToDiffusionImageFilter
+    : public DiffusionImageSource< DiffusionPixelType >
 {
 public:
   /** typedefs for compatibility */
-  typedef mitk::DiffusionImage< DiffusionPixelType >  DiffusionImageType;
-  typedef typename DiffusionImageType::Pointer        DiffusionImagePointerType;
+  typedef mitk::DiffusionImage< DiffusionPixelType >     InputImageType;
+  typedef typename InputImageType::Pointer               InputImagePointerType;
 
-  mitkClassMacro( DiffusionImageToDiffusionImageFilter<DiffusionPixelType>,
-                  ImageToImageFilter )
+  mitkClassMacro( DiffusionImageToDiffusionImageFilter,
+                  DiffusionImageSource<DiffusionPixelType> )
 
   itkNewMacro(Self)
+
+  using itk::ProcessObject::SetInput;
+  virtual void SetInput( const InputImageType* image);
+  virtual void SetInput( unsigned int, const InputImageType* image);
+
+  const InputImageType* GetInput(void);
+  const InputImageType* GetInput(unsigned int);
+
 
 protected:
   DiffusionImageToDiffusionImageFilter();
   virtual ~DiffusionImageToDiffusionImageFilter() {}
 
+  virtual void PrintSelf(std::ostream &os, itk::Indent indent) const {}
+  virtual void GenerateInputRequestedRegion() {}
+
+private:
+  // purposely not implemented
+  void operator=(const Self&);
 };
 
 } // end namespace mitk

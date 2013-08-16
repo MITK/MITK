@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief Base class for all property extensions.
+    */
   class MITK_CORE_EXPORT PropertyExtension
   {
   public:

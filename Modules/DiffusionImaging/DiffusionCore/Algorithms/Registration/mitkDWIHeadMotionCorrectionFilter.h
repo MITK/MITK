@@ -38,8 +38,8 @@ public:
   itkNewMacro(Self)
 
   // public typedefs
-  typedef typename Superclass::DiffusionImageType         DiffusionImageType;
-  typedef typename Superclass::DiffusionImagePointerType  DiffusionImagePointerType;
+  typedef typename Superclass::InputImageType         DiffusionImageType;
+  typedef typename Superclass::InputImagePointerType  DiffusionImagePointerType;
 
 
 protected:
@@ -48,6 +48,8 @@ protected:
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
   virtual void GenerateData();
+
+  virtual void GenerateOutputInformation();
 
 };
 

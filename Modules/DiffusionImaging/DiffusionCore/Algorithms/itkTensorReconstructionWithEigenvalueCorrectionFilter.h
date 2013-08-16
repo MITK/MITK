@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vnl/algo/vnl_symmetric_eigensystem.h>
 
 #include <math.h>
-#include <mitkDiffusionImage.h>
+//#include <mitkDiffusionImage.h>
 
 
 

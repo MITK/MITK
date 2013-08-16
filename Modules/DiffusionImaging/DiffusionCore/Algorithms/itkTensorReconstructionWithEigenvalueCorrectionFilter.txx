@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 #include "itkImageRegionConstIterator.h"
 #include <math.h>
-#include <mitkImageWriter.h>
 #include "itkImageFileWriter.h"
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"

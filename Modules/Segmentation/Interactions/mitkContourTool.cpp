@@ -65,9 +65,10 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
+  assert (workingNode);
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  Contour* contour = this->GetFeedbackContour();
+  assert (contour);
   contour->Initialize();
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
@@ -88,7 +89,8 @@ bool mitk::ContourTool::OnMouseMoved (Action* action, const StateEvent* stateEve
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  Contour* contour = this->GetFeedbackContour();
+  assert( contour );
   contour->AddVertex( positionEvent->GetWorldPosition() );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -114,7 +116,7 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
     if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    if (!workingNode) return false;
+    assert(workingNode);
 
     LabelSetImage* image = dynamic_cast<LabelSetImage*>(workingNode->GetData());
     const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
@@ -129,12 +131,13 @@ bool mitk::ContourTool::OnMouseReleased (Action* action, const StateEvent* state
       return false;
     }
 
-    Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-    Contour::Pointer projectedContour = mitk::FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, true );
+    Contour* feedbackContour = this->GetFeedbackContour();
+    assert( feedbackContour);
+    Contour::Pointer projectedContour = this->ProjectContourTo2DSlice( slice, feedbackContour, false, true );
 
     if (projectedContour.IsNull()) return false;
 
-    mitk::FeedbackContourTool::FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue );
+    this->FillContourInSlice( projectedContour, slice, image->GetLabelSet(), m_PaintingPixelValue );
 
     this->WriteBackSegmentationResult(positionEvent, slice);
 

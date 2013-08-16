@@ -200,13 +200,6 @@ protected:
 
   mitk::NodePredicateAnd::Pointer m_IsOfTypeReferenceImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsOfTypeWorkingImagePredicate;
-//  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
-
-//  mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
-//  mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;
-//  mitk::NodePredicateDataType::Pointer m_IsOfTypeLabelSetImagePredicate;
-  //mitk::NodePredicateAnd::Pointer m_IsNotLabelSetImagePredicate;
-
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

@@ -97,17 +97,9 @@ QmitkSegmentationView::~QmitkSegmentationView()
 
 void QmitkSegmentationView::Visible()
 {
-  if (m_DataSelectionChanged)
-  {
-    this->OnSelectionChanged(this->GetDataManagerSelection());
-  }
-}
-
-void QmitkSegmentationView::Activated()
-{
-  // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
+    MITK_INFO << "Activated() entered";
     m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
     m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
@@ -118,10 +110,16 @@ void QmitkSegmentationView::Activated()
   }
 }
 
+void QmitkSegmentationView::Activated()
+{
+
+}
+
 void QmitkSegmentationView::Deactivated()
 {
   if( m_Controls )
   {
+    MITK_INFO << "Deactivated() entered";
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools
@@ -129,14 +127,6 @@ void QmitkSegmentationView::Deactivated()
 
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
     m_Controls->m_SlicesInterpolator->setEnabled( false );
-
-    // gets the context of the "Mitk" (Core) module (always has id 1)
-    // TODO Workaround until CTK plugincontext is available
-    mitk::ModuleContext* context = mitk::ModuleRegistry::GetModule(1)->GetModuleContext();
-    // Workaround end
-    mitk::ServiceReference serviceRef = context->GetServiceReference<mitk::PlanePositionManagerService>();
-    mitk::PlanePositionManagerService* service = dynamic_cast<mitk::PlanePositionManagerService*>(context->GetService(serviceRef));
-    service->RemoveAllPlanePositions();
   }
 }
 
@@ -420,7 +410,11 @@ void QmitkSegmentationView::OnImportLabelSet()
 
     mitk::LabelSetImage::Pointer lsImage = reader->GetOutput();
 
-    segImage->Concatenate(lsImage);
+    if (!segImage->Concatenate(lsImage)) {
+        QMessageBox::information(m_Parent,
+        "Import segmentation...",
+        "Could not import the selected segmentation session with the current software version (dimensions must match).\n");
+    }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -661,7 +655,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
     }
     else
     {
-      this->SetToolManagerSelection(const_cast<mitk::DataNode*>(node), NULL);
+      this->SetToolManagerSelection(refNode, NULL);
       this->UpdateWarningLabel("Create a segmentation");
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -851,6 +845,8 @@ void QmitkSegmentationView::SetToolManagerSelection(mitk::DataNode* referenceDat
 
   m_Controls->m_btNewLabel->setEnabled(workingData != NULL);
   m_Controls->m_btSaveLabelSet->setEnabled(workingData != NULL);
+  m_Controls->m_btImportLabelSet->setEnabled(workingData != NULL);
+
   m_Controls->m_LabelSetTableWidget->setEnabled(workingData != NULL);
 }
 
@@ -993,6 +989,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_btNewLabelSet->setEnabled(false);
   m_Controls->m_btSaveLabelSet->setEnabled(false);
   m_Controls->m_btLoadLabelSet->setEnabled(false);
+  m_Controls->m_btImportLabelSet->setEnabled(false);
   m_Controls->m_btNewLabel->setEnabled(false);
 
   m_Controls->m_LabelSetTableWidget->setEnabled(false);

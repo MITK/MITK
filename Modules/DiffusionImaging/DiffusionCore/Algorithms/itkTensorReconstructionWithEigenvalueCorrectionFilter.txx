@@ -766,7 +766,7 @@ namespace itk
                     pt[i]=org_data[i];
                   }
 
-                  corrected_diffusion_temp->SetPixel(ix, pt);
+                  corrected_diffusion->SetPixel(ix, pt);
 
               }
               else

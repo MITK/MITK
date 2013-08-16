@@ -111,12 +111,13 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   }
 
+
   /*
-   * (2) Split the diffusion image into a 3d+t regular image
+   * (2) Split the diffusion image into a 3d+t regular image, extract only the weighted images
    */
   typename SplitFilterType::Pointer split_filter = SplitFilterType::New();
-  split_filter->SetInput(input->GetVectorImage() );
-  split_filter->SetExtractAll();
+  split_filter->SetInput (input->GetVectorImage() );
+  split_filter->SetExtractAllAboveThreshold(20, input->GetB_ValueMap() );
 
   try
   {
@@ -138,8 +139,56 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
    *     to perform the registration of  Image -> unweighted reference
    */
 
+  mitk::PyramidImageRegistrationMethod::Pointer weightedRegistrationMethod
+      = mitk::PyramidImageRegistrationMethod::New();
+
+  weightedRegistrationMethod->SetTransformToAffine();
+  weightedRegistrationMethod->SetCrossModalityOn();
+  /*
+   *   - (3.1) Create a reference image by averaging the aligned b0 images
+   *
+   *   !!!FIXME: For rapid prototyping using the first one
+   */
+
+  weightedRegistrationMethod->SetFixedImage( b0referenceImage );
+
+  /*
+   *   - (3.2) Register all timesteps in the splitted image onto the first reference
+   */
+
+  mitk::ImageTimeSelector::Pointer t_selector_w =
+      mitk::ImageTimeSelector::New();
+
+  mitk::Image::Pointer registeredWeighted = splittedImage->Clone();
+
+  t_selector_w->SetInput( splittedImage );
+  unsigned int maxImageIdx = splittedImage->GetTimeSteps();
+
+  // this time start at 0, we have only gradient images in the 3d+t file
+  // the reference image comes form an other image
+  for( unsigned int i=0; i<maxImageIdx; i++)
+  {
+    t_selector_w->SetTimeNr(i);
+    t_selector_w->Update();
+
+    weightedRegistrationMethod->SetMovingImage( t_selector_w->GetOutput() );
+
+    try
+    {
+      MITK_INFO << " === (" << i <<"/"<< maxImageIdx << ") :: Starting registration";
+      weightedRegistrationMethod->Update();
+    }
+    catch( const itk::ExceptionObject& e)
+    {
+      mitkThrow() << "Failed to register the b0 images, the PyramidRegistration threw an exception: \n" << e.what();
+    }
 
 
+    registeredWeighted->SetImportVolume( weightedRegistrationMethod->GetResampledMovingImage()->GetData(),
+                                         i, 0, mitk::Image::ReferenceMemory);
+
+
+  }
 
 }
 

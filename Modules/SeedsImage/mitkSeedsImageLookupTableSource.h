@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKSEEDSIMAGELOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "SeedsImageExports.h"
 #include "mitkLookupTableSource.h"
 
 
 namespace mitk
 {
 
-class MitkExt_EXPORT SeedsImageLookupTableSource : public LookupTableSource
+class SeedsImage_EXPORT SeedsImageLookupTableSource : public LookupTableSource
 {
 public:
   typedef enum {Seeds, DefaultLUT, Force} LookupTableMode;

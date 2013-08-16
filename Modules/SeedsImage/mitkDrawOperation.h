@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDRAWOPERATION_H
 
 #include <mitkCommon.h>
-#include "MitkExtExports.h"
+#include "SeedsImageExports.h"
 #include <mitkOperation.h>
 #include <mitkVector.h>
 #include <mitkImage.h>
@@ -32,7 +32,7 @@ namespace mitk {
 //##
 //## Stores everything for adding and deleting seeds.
 //## @ingroup Undo
-class MitkExt_EXPORT DrawOperation : public Operation
+class SeedsImage_EXPORT DrawOperation : public Operation
 {
   public:
   //##Documentation

@@ -1,0 +1,40 @@
+<statemachine name="seedsinteractor">
+  <state name="drawSeeds" ID="0" startstate="true" >
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="drawForeground" >
+	  <action name="init_foreground" ID="45" /> <!-- AcINITFOREGROUND -->
+	  <action name="add_point" ID="11" /> <!-- AcADD -->
+	</transition>
+	<transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="drawBackground" >
+	  <action name="init_background" ID="45" /> <!-- AcINITBACKGROUND -->
+	  <action name="add_point" ID="11" /> <!-- AcADD -->
+	</transition>
+	<transition event_class="MousePressEvent" event_variant="MiddleButtonPressed" target="drawNeutral" >
+	  <action name="init_neutral" ID="45" /> <!-- AcINITNEUTRAL -->
+	  <action name="add_point" ID="11" /> <!-- AcADD -->
+	</transition>
+  </state>
+  <state name="drawForeground" ID="1" >
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="drawForeground" >
+      <action name="move_point" ID="92" /> <!--AcMOVE-->
+    </transition>
+	<transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="drawSeeds" >
+      <action name="finish" ID="44" /> <!--AcFINISH-->
+    </transition>
+  </state>
+  <state name="drawBackground" ID="2" >
+    <transition event_class="MouseMoveEvent" event_variant="SecondaryButtonPressedAndMouseMove" target="drawBackground" >
+      <action name="move_point" ID="92" /> <!--AcMOVE-->
+    </transition>
+	<transition event_class="MouseReleaseEvent" event_variant="SecondaryButtonReleased" target="drawSeeds" >
+      <action name="finish" ID="44" /> <!--AcFINISH-->
+    </transition>
+  </state>
+  <state name="drawNeutral" ID="3" >
+    <transition event_class="MouseMoveEvent" event_variant="MiddleButtonPressedAndMouseMove" target="drawNeutral" >
+      <action name="move_point" ID="92" /> <!--AcMOVE-->
+    </transition>
+	<transition event_class="MouseReleaseEvent" event_variant="MiddleButtonReleased" target="drawSeeds" >
+      <action name="finish" ID="44" /> <!--AcFINISH-->
+    </transition>
+  </state>
+</stateMachine>

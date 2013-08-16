@@ -87,14 +87,25 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
         return false;
       }
 
-
       mitk::LevelWindow lv = mitk::LevelWindow();
       node->GetLevelWindow(lv);
       ScalarType level = lv.GetLevel();
       ScalarType window = lv.GetWindow();
 
-      level += ( m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0] )*static_cast<ScalarType>(2);
-      window += ( m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1] )*static_cast<ScalarType>(2);
+      // determine which index shall be used for level and which one for window
+      int levelIndex = m_HorizontalLevelling ? 0 : 1;
+      int windowIndex = m_HorizontalLevelling ? 1 : 0;
+
+      // determine if one these is supposed to be inverted
+      Point2D invertModifier;
+      invertModifier[levelIndex] = m_InvertLevel ? -1 : 1;
+      invertModifier[windowIndex] = m_InvertWindow ? -1 : 1;
+
+      // difference of the two positions 
+      // *2 to make interaction faster
+      // *inverModifier to handle inverted interactionscheme
+      level += ( m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex] )* static_cast<ScalarType>(2) * invertModifier[levelIndex];
+      window += ( m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex] )* static_cast<ScalarType>(2) * invertModifier[windowIndex];
 
       lv.SetLevelWindow( level, window );
       dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow( lv );
@@ -120,7 +131,11 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
 }
 
 mitk::DisplayVectorInteractorLevelWindow::DisplayVectorInteractorLevelWindow(const char * type)
-  : mitk::StateMachine(type), m_Sender(NULL)
+  : mitk::StateMachine(type)
+  , m_Sender(NULL)
+  , m_HorizontalLevelling( false )
+  , m_InvertLevel( false )
+  , m_InvertWindow( false )
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -132,5 +147,20 @@ mitk::DisplayVectorInteractorLevelWindow::DisplayVectorInteractorLevelWindow(con
 
 mitk::DisplayVectorInteractorLevelWindow::~DisplayVectorInteractorLevelWindow()
 {
+}
+
+void mitk::DisplayVectorInteractorLevelWindow::SetHorizontalLevelling( bool enabled )
+{
+  m_HorizontalLevelling = enabled;
+}
+
+void mitk::DisplayVectorInteractorLevelWindow::SetInvertLevel( bool inverted )
+{
+  m_InvertLevel = inverted;
+}
+
+void mitk::DisplayVectorInteractorLevelWindow::SetInvertWindow( bool inverted )
+{
+  m_InvertWindow = inverted;
 }
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
 #include "mitkLookupTable.h"
-#include "MitkExtExports.h"
+#include "SeedsImageExports.h"
 #include "mitkCommon.h"
 
 #include "itkProcessObject.h"
@@ -37,7 +37,7 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-class MitkExt_EXPORT LookupTableSource : public itk::ProcessObject
+class SeedsImage_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 

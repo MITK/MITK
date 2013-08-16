@@ -85,7 +85,7 @@ mitk::Geometry3D::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::GenerateD
   geometry->SetOrigin(origin);
 
   // spacing = {1,1,1}
-  float spacing[3];
+  ScalarType spacing[3];
   spacing[0] = one;
   spacing[1] = one;
   spacing[2] = one;

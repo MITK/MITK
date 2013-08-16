@@ -116,7 +116,7 @@ namespace mitk
           geometry->SetOrigin(origin);
 
           // read spacing
-          float spacing[3];
+          ScalarType spacing[3];
           pElem->Attribute("spacing_x", &temp);
           spacing[0] = temp;
           pElem->Attribute("spacing_y", &temp);
@@ -172,7 +172,7 @@ namespace mitk
 
             for( pElem2; pElem2; pElem2=pElem2->NextSiblingElement())
             {
-              itk::Point<float> point;
+              Point3D point;
               pElem2->Attribute("pos_x", &temp);
               point[0] = temp;
               pElem2->Attribute("pos_y", &temp);

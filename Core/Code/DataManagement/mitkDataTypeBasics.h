@@ -14,4 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkVector.h"
+
+#ifndef MITKDATATYPEBASICS_H
+#define MITKDATATYPEBASICS_H
+
+#include <MitkExports.h>
+
+namespace mitk {
+
+typedef double ScalarType;
+
+MITK_CORE_EXPORT extern const ScalarType eps;
+MITK_CORE_EXPORT extern const ScalarType sqrteps;
+MITK_CORE_EXPORT extern const double large;
+
+}
+
+#endif // MITKDATATYPEBASICS_H

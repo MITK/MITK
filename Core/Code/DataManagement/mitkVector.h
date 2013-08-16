@@ -31,11 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTransform.h>
 #include <vnl/vnl_quaternion.h>
 #include <MitkExports.h>
+#include "mitkPoint.h" // TODO SW: should not be included here, maybe generate one "general datatype include" like mitkPrimitives.h
+#include "mitkDataTypeBasics.h"
 
 #ifndef DOXYGEN_SKIP
 
 namespace mitk {
-typedef float ScalarType;
+
 
 typedef itk::Matrix<ScalarType, 3, 3> Matrix3D;
 typedef itk::Matrix<ScalarType,4,4> Matrix4D;
@@ -44,12 +46,10 @@ typedef itk::Transform<ScalarType, 3, 3> Transform3D;
 typedef vnl_vector<ScalarType> VnlVector;
 typedef vnl_vector_ref<ScalarType> VnlVectorRef;
 
-typedef itk::Point<ScalarType,2> Point2D;
-typedef itk::Point<ScalarType,3> Point3D;
-typedef itk::Point<ScalarType,4> Point4D;
-typedef itk::Point<int,2> Point2I;
-typedef itk::Point<int,3> Point3I;
-typedef itk::Point<int,4> Point4I;
+
+
+
+
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;
 typedef itk::Index<3> Index3D;
@@ -82,10 +82,11 @@ template <> class VectorTraits<VnlVector> {
     typedef ScalarType ValueType;
 };
 
-template<> class VectorTraits<double[4]> {
+template<> class VectorTraits<float[4]> {
   public:
-    typedef double ValueType;
+    typedef float ValueType;
 };
+
 template<> class VectorTraits< itk::Index<5> > {
   public:
     typedef itk::Index<5>::IndexValueType ValueType;
@@ -124,15 +125,26 @@ template<> class VectorTraits< unsigned int *> {
     typedef unsigned int ValueType;
 };
 
-template<> class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< double[4] > {
   public:
-    typedef ScalarType ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<float,3> > {
   public:
     typedef float ValueType;
 };
+
+template<> class VectorTraits< mitk::Point<float,3> > {
+  public:
+    typedef float ValueType;
+};
+
+template<> class VectorTraits< mitk::Point<float,4> > {
+  public:
+    typedef float ValueType;
+};
+
 
 template<> class VectorTraits< itk::Point<float,3> > {
   public:
@@ -149,17 +161,33 @@ template<> class VectorTraits< itk::Vector<double,3> > {
     typedef double ValueType;
 };
 
+template<> class VectorTraits< mitk::Point<double,3> > {
+  public:
+    typedef double ValueType;
+};
+
+template<> class VectorTraits< mitk::Point<double,4> > {
+public:
+    typedef double ValueType;
+};
+
 template<> class VectorTraits< itk::Point<double,3> > {
   public:
     typedef double ValueType;
 };
+
+template<> class VectorTraits< itk::Point<double,4> > {
+public:
+    typedef double ValueType;
+};
+
 
 template<> class VectorTraits< itk::Vector<int,3> > {
   public:
     typedef int ValueType;
 };
 
-template<> class VectorTraits< itk::Point<int,3> > {
+template<> class VectorTraits< mitk::Point<int,3> > {
   public:
     typedef int ValueType;
 };
@@ -388,7 +416,7 @@ inline bool Equal(const mitk::VnlVector& vector1, const mitk::VnlVector& vector2
   return true;
 }
 
-inline bool Equal(double scalar1, double scalar2, ScalarType eps=mitk::eps)
+inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps)
 {
   return fabs(scalar1-scalar2) < eps;
 }

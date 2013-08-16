@@ -68,6 +68,8 @@ set(MODULE_TESTS
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp
+  mitkTypeConversionTest.cpp
+  mitkTypeOperationTest.cpp
 )
 
 # test with image filename as an extra command line parameter

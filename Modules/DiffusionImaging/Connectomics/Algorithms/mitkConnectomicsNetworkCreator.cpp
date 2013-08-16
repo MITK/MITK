@@ -93,7 +93,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
 {
 
   //empty graph
-  m_ConNetwork->clear();
+  m_ConNetwork = mitk::ConnectomicsNetwork::New();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
   idCounter = 0;

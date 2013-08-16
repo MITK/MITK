@@ -116,7 +116,7 @@ namespace itk
 
     directions=directions*sqrt(m_BValue/1000.0)*(1.0/sqrt(max_diagonal));
 
-    //calculation of norms and stoaring them in vector
+    //calculation of norms and storing them in vector
 
     dirsTimesDirsTrans = directions*directions.transpose();
 
@@ -189,7 +189,7 @@ namespace itk
     mask->Allocate();
 
     // Image thresholding: For every voxel mean B0 image is calculated and then voxels of mean B0 less than assumed
-    //treshold are excluded from the dataset with use of defined mask image. 1 in mask voxel has mean B0 > assumed treshold.
+    //treshold are excluded from the dataset with use of defined mask image. 1 in mask voxel means that B0 > assumed treshold.
 
     int mask_cnt=0;
     for(int x=0;x<size[0];x++)
@@ -344,12 +344,12 @@ namespace itk
 
     // in pre-processing we are dealing with 3 types of voxels: voxels excluded = 0 in mask, voxels correct =1 and voxels under correction
     //= 2. During pre processing most of voxels should be switched from 2 to 1.
-    //To smoothly edal with the mask the Turn mask method is defined that takes previous value of mask and new value of mask.
+    //To smoothly deal with the mask the Turn mask method is defined that takes previous value of mask and new value of mask.
 
     double what_mask=0;
 
-    // what amsk is a variable declared to simplify tensor calculaton. Tensors are obtained only for voxels that have a mask value bigger
-    //than what mask. Sometimes it is 1 sometimes 2.
+    // what mask is a variable declared to simplify tensor calculaton. Tensors are obtained only for voxels that have a mask value bigger
+    // than what_mask. Sometimes it is 1 sometimes 2.
 
     // initialization of required variables
     double set_mask=2.0;
@@ -420,11 +420,11 @@ namespace itk
 
     }
 
-    //Changing the mask value for voxels that are still not corrcted. Original idea is to take them into analysis even though
+    // Changing the mask value for voxels that are still not corrcted. Original idea is to take them into analysis even though
     // eigenvalues are still negative
     TurnMask(size, mask,1,1);
 
-    //Generation of final pre-processed tensor image that might be used as an input for FWE method
+    // Generation of final pre-processed tensor image that might be used as an input for FWE method
     GenerateTensorImage(nof,numberb0,size,m_CorrectedDiffusionVolumes,mask,what_mask,tensorImg);
 
     m_MaskImage = mask;
@@ -530,7 +530,7 @@ namespace itk
 
         }
       }
-    }// end of jumping through 27th neighbours
+    }
 
     //getting back to the original position of the voxel
 

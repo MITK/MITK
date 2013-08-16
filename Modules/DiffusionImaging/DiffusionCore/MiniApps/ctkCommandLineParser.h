@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __ctkCommandLineParser_h
 #define __ctkCommandLineParser_h
 
-#include <mitkAny.h>
+#include <usAny.h>
 #include <map>
 
 
@@ -85,13 +85,13 @@ See LICENSE.txt or http://www.mitk.org for details.
  *   parser.enableSettings("disable-settings");
  *
  *   // Add command line argument names
- *   parser.addArgument("disable-settings", "", mitk::Any::Bool, "Do not use QSettings");
- *   parser.addArgument("help", "h", mitk::Any::Bool, "Show this help text");
- *   parser.addArgument("search-paths", "s", mitk::Any::StringList, "A list of paths to search");
+ *   parser.addArgument("disable-settings", "", us::Any::Bool, "Do not use QSettings");
+ *   parser.addArgument("help", "h", us::Any::Bool, "Show this help text");
+ *   parser.addArgument("search-paths", "s", us::Any::StringList, "A list of paths to search");
  *
  *   // Parse the command line arguments
  *   bool ok = false;
- *   map<string, mitk::Any> parsedArgs = parser.parseArguments(QCoreApplication::arguments(), &ok);
+ *   map<string, us::Any> parsedArgs = parser.parseArguments(QCoreApplication::arguments(), &ok);
  *   if (!ok)
  *   {
  *     QTextStream(stderr, QIODevice::WriteOnly) << "Error parsing arguments: "
@@ -155,7 +155,7 @@ public:
    *
    * The keys in the returned map object correspond to the long argument string,
    * if it is not empty. Otherwise, the short argument string is used as key. The
-   * mitk::Any values can safely be converted to the type specified in the
+   * us::Any values can safely be converted to the type specified in the
    * <code>addArgument()</code> method call.
    *
    * @param arguments A StringContainerType containing command line arguments. Usually
@@ -163,16 +163,16 @@ public:
    * @param ok A pointer to a boolean variable. Will be set to <code>true</code>
    *        if all regular expressions matched, <code>false</code> otherwise.
    * @return A map object mapping the long argument (if empty, the short one)
-   *         to a mitk::Any containing the value.
+   *         to a us::Any containing the value.
    */
 
-    map<string, mitk::Any> parseArguments(const StringContainerType &arguments, bool* ok = 0);
+    map<string, us::Any> parseArguments(const StringContainerType &arguments, bool* ok = 0);
 
     /**
     * Convenient method allowing to parse a given list of command line arguments.
     * @see parseArguments(const StringContainerType &, bool*)
     */
-    map<string, mitk::Any> parseArguments(int argc, char** argv, bool* ok = 0);
+    map<string, us::Any> parseArguments(int argc, char** argv, bool* ok = 0);
 
     /**
    * Returns a detailed error description if a call to <code>parseArguments()</code>
@@ -225,10 +225,10 @@ public:
    * <table>
    * <tr><td><b>Type</b></td><td><b># of parameters</b></td><td><b>Default regular expr</b></td>
    *        <td><b>Example</b></td></tr>
-   * <tr><td>mitk::Any::String</td><td>1</td><td>.*</td><td>--test-string StringParameter</td></tr>
-   * <tr><td>mitk::Any::Bool</td><td>0</td><td>does not apply</td><td>--enable-something</td></tr>
-   * <tr><td>mitk::Any::StringList</td><td>-1</td><td>.*</td><td>--test-list string1 string2</td></tr>
-   * <tr><td>mitk::Any::Int</td><td>1</td><td>-?[0-9]+</td><td>--test-int -5</td></tr>
+   * <tr><td>us::Any::String</td><td>1</td><td>.*</td><td>--test-string StringParameter</td></tr>
+   * <tr><td>us::Any::Bool</td><td>0</td><td>does not apply</td><td>--enable-something</td></tr>
+   * <tr><td>us::Any::StringList</td><td>-1</td><td>.*</td><td>--test-list string1 string2</td></tr>
+   * <tr><td>us::Any::Int</td><td>1</td><td>-?[0-9]+</td><td>--test-int -5</td></tr>
    * </table>
    *
    * The regular expressions are used to validate the parameters of command line
@@ -236,7 +236,7 @@ public:
    * <code>setExactMatchRegularExpression()</code> for your argument.
    *
    * Optionally, a help string and a default value can be provided for the argument. If
-   * the mitk::Any type of the default value does not match <code>type</code>, an
+   * the us::Any type of the default value does not match <code>type</code>, an
    * exception is thrown. Arguments with default values are always returned by
    * <code>parseArguments()</code>.
    *
@@ -257,12 +257,12 @@ public:
    *
    * @see setExactMatchRegularExpression()
    * @see addDeprecatedArgument()
-   * @throws std::logic_error If the mitk::Any type of <code>defaultValue</code>
+   * @throws std::logic_error If the us::Any type of <code>defaultValue</code>
    *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
    */
     void addArgument(const string& longarg, const string& shortarg,
                      Type type, const string& argHelp = string(),
-                     const mitk::Any& defaultValue = mitk::Any(), bool optional=true,
+                     const us::Any& defaultValue = us::Any(), bool optional=true,
                      bool ignoreRest = false, bool deprecated = false);
 
     /**
@@ -329,7 +329,7 @@ public:
    * \code
    * ctkCommandLineParser parser;
    * parser.setArgumentPrefix("--", "-");
-   * parser.addArgument("long-argument", "l", mitk::Any::String);
+   * parser.addArgument("long-argument", "l", us::Any::String);
    * StringContainerType args;
    * args << "program name" << "--long-argument Hi";
    * parser.parseArguments(args);
@@ -361,7 +361,7 @@ public:
 
     /**
    * Enables QSettings support in ctkCommandLineParser. If an argument name is found
-   * in the QSettings instance with a valid mitk::Any, the value is considered as
+   * in the QSettings instance with a valid us::Any, the value is considered as
    * a default value and overwrites default values registered with
    * <code>addArgument()</code>. User supplied values on the command line overwrite
    * values in the QSettings instance, except for arguments with multiple parameters

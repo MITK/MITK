@@ -61,19 +61,19 @@ int GibbsTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", mitk::Any(), false);
-    parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", mitk::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("parameters", "p", ctkCommandLineParser::String, "parameter file (.gtp)", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
     parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "sh coefficient convention (FSL, MRtrix)", string("FSL"), true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
-    string paramFileName = mitk::any_cast<string>(parsedArgs["parameters"]);
-    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
+    string inFileName = us::any_cast<string>(parsedArgs["input"]);
+    string paramFileName = us::any_cast<string>(parsedArgs["parameters"]);
+    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
     try
     {
@@ -132,7 +132,7 @@ int GibbsTracking(int argc, char* argv[])
 
             if (parsedArgs.count("shConvention"))
             {
-                string convention = mitk::any_cast<string>(parsedArgs["shConvention"]).c_str();
+                string convention = us::any_cast<string>(parsedArgs["shConvention"]).c_str();
 
                 if ( boost::algorithm::equals(convention, "MRtrix") )
                 {
@@ -173,7 +173,7 @@ int GibbsTracking(int argc, char* argv[])
         if (parsedArgs.count("mask"))
         {
             typedef itk::Image<float,3> MaskImgType;
-            mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(mitk::any_cast<string>(parsedArgs["mask"]));
+            mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
             MaskImgType::Pointer itk_mask = MaskImgType::New();
             mitk::CastToItkImage<MaskImgType>(mitkMaskImage, itk_mask);
             gibbsTracker->SetMaskImage(itk_mask);

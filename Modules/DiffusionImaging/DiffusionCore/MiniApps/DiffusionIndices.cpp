@@ -35,17 +35,17 @@ int DiffusionIndices(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", mitk::Any(), false);
-    parser.addArgument("index", "idx", ctkCommandLineParser::String, "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", mitk::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", mitk::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input image (tensor, Q-ball or FSL/MRTrix SH-coefficient image)", us::Any(), false);
+    parser.addArgument("index", "idx", ctkCommandLineParser::String, "index (fa, gfa, ra, ad, rd, ca, l2, l3, md)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output file", us::Any(), false);
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
-    string index = mitk::any_cast<string>(parsedArgs["index"]);
-    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
+    string inFileName = us::any_cast<string>(parsedArgs["input"]);
+    string index = us::any_cast<string>(parsedArgs["index"]);
+    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
     try
     {

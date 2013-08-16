@@ -31,16 +31,16 @@ int ImageFormatConverter(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", mitk::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", mitk::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", us::Any(), false);
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string imageName = mitk::any_cast<string>(parsedArgs["in"]);
-    string outImage = mitk::any_cast<string>(parsedArgs["out"]);
+    string imageName = us::any_cast<string>(parsedArgs["in"]);
+    string outImage = us::any_cast<string>(parsedArgs["out"]);
 
     try
     {

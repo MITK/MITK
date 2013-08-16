@@ -60,8 +60,8 @@ int PeakExtraction(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", mitk::Any(), false);
-    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", mitk::Any(), false);
+    parser.addArgument("image", "i", ctkCommandLineParser::String, "sh coefficient image", us::Any(), false);
+    parser.addArgument("outroot", "o", ctkCommandLineParser::String, "output root", us::Any(), false);
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "mask image");
     parser.addArgument("normalization", "n", ctkCommandLineParser::Int, "0=no norm, 1=max norm, 2=single vec norm", 1, true);
     parser.addArgument("numpeaks", "p", ctkCommandLineParser::Int, "maximum number of extracted peaks", 2, true);
@@ -70,38 +70,38 @@ int PeakExtraction(int argc, char* argv[])
     parser.addArgument("shConvention", "s", ctkCommandLineParser::String, "use specified SH-basis (MITK, FSL, MRtrix)", string("MITK"), true);
     parser.addArgument("noFlip", "f", ctkCommandLineParser::Bool, "do not flip input image to match MITK coordinate convention");
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string imageName = mitk::any_cast<string>(parsedArgs["image"]);
-    string outRoot = mitk::any_cast<string>(parsedArgs["outroot"]);
+    string imageName = us::any_cast<string>(parsedArgs["image"]);
+    string outRoot = us::any_cast<string>(parsedArgs["outroot"]);
 
     // optional arguments
     string maskImageName("");
     if (parsedArgs.count("mask"))
-        maskImageName = mitk::any_cast<string>(parsedArgs["mask"]);
+        maskImageName = us::any_cast<string>(parsedArgs["mask"]);
 
     int normalization = 1;
     if (parsedArgs.count("normalization"))
-        normalization = mitk::any_cast<int>(parsedArgs["normalization"]);
+        normalization = us::any_cast<int>(parsedArgs["normalization"]);
 
     int numPeaks = 2;
     if (parsedArgs.count("numpeaks"))
-        numPeaks = mitk::any_cast<int>(parsedArgs["numpeaks"]);
+        numPeaks = us::any_cast<int>(parsedArgs["numpeaks"]);
 
     float peakThres = 0.4;
     if (parsedArgs.count("peakthres"))
-        peakThres = mitk::any_cast<float>(parsedArgs["peakthres"]);
+        peakThres = us::any_cast<float>(parsedArgs["peakthres"]);
 
     float absPeakThres = 0.06;
     if (parsedArgs.count("abspeakthres"))
-        absPeakThres = mitk::any_cast<float>(parsedArgs["abspeakthres"]);
+        absPeakThres = us::any_cast<float>(parsedArgs["abspeakthres"]);
 
     bool noFlip = false;
     if (parsedArgs.count("noFlip"))
-        noFlip = mitk::any_cast<bool>(parsedArgs["noFlip"]);
+        noFlip = us::any_cast<bool>(parsedArgs["noFlip"]);
 
     MITK_INFO << "image: " << imageName;
     MITK_INFO << "outroot: " << outRoot;
@@ -130,7 +130,7 @@ int PeakExtraction(int argc, char* argv[])
 
         if (parsedArgs.count("shConvention"))
         {
-            string convention = mitk::any_cast<string>(parsedArgs["shConvention"]).c_str();
+            string convention = us::any_cast<string>(parsedArgs["shConvention"]).c_str();
             if ( boost::algorithm::equals(convention, "FSL") )
             {
                 toolkitConvention = 1;

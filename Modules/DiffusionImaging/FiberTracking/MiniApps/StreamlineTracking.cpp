@@ -30,7 +30,7 @@ int StreamlineTracking(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tensor image (.dti)", mitk::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input tensor image (.dti)", us::Any(), false);
     parser.addArgument("seed", "s", ctkCommandLineParser::String, "binary seed image");
     parser.addArgument("mask", "m", ctkCommandLineParser::String, "binary mask image");
     parser.addArgument("minFA", "t", ctkCommandLineParser::Float, "minimum fractional anisotropy threshold", 0.15, true);
@@ -42,14 +42,14 @@ int StreamlineTracking(int argc, char* argv[])
     parser.addArgument("minLength", "l", ctkCommandLineParser::Float, "minimum fiber length in mm", 20, true);
 
     parser.addArgument("interpolate", "a", ctkCommandLineParser::Bool, "Use linear interpolation", false, true);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
-    string dtiFileName = mitk::any_cast<string>(parsedArgs["input"]);
-    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
+    string dtiFileName = us::any_cast<string>(parsedArgs["input"]);
+    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
     float minFA = 0.15;
     float minCurv = -1;
@@ -61,23 +61,23 @@ int StreamlineTracking(int argc, char* argv[])
     bool interpolate = false;
 
     if (parsedArgs.count("minCurv"))
-        minCurv = mitk::any_cast<float>(parsedArgs["minCurv"]);
+        minCurv = us::any_cast<float>(parsedArgs["minCurv"]);
     if (parsedArgs.count("minFA"))
-        minFA = mitk::any_cast<float>(parsedArgs["minFA"]);
+        minFA = us::any_cast<float>(parsedArgs["minFA"]);
     if (parsedArgs.count("stepSize"))
-        stepSize = mitk::any_cast<float>(parsedArgs["stepSize"]);
+        stepSize = us::any_cast<float>(parsedArgs["stepSize"]);
     if (parsedArgs.count("tendf"))
-        tendf = mitk::any_cast<float>(parsedArgs["tendf"]);
+        tendf = us::any_cast<float>(parsedArgs["tendf"]);
     if (parsedArgs.count("tendg"))
-        tendg = mitk::any_cast<float>(parsedArgs["tendg"]);
+        tendg = us::any_cast<float>(parsedArgs["tendg"]);
     if (parsedArgs.count("minLength"))
-        minLength = mitk::any_cast<float>(parsedArgs["minLength"]);
+        minLength = us::any_cast<float>(parsedArgs["minLength"]);
     if (parsedArgs.count("numSeeds"))
-        numSeeds = mitk::any_cast<int>(parsedArgs["numSeeds"]);
+        numSeeds = us::any_cast<int>(parsedArgs["numSeeds"]);
 
 
     if (parsedArgs.count("interpolate"))
-        interpolate = mitk::any_cast<bool>(parsedArgs["interpolate"]);
+        interpolate = us::any_cast<bool>(parsedArgs["interpolate"]);
 
 
 
@@ -100,12 +100,12 @@ int StreamlineTracking(int argc, char* argv[])
         typedef itk::Image< unsigned char, 3 >    ItkUCharImageType;
         mitk::Image::Pointer mitkSeedImage = NULL;
         if (parsedArgs.count("seed"))
-            mitkSeedImage = mitk::IOUtil::LoadImage(mitk::any_cast<string>(parsedArgs["seed"]));
+            mitkSeedImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["seed"]));
 
         MITK_INFO << "Loading mask image ...";
         mitk::Image::Pointer mitkMaskImage = NULL;
         if (parsedArgs.count("mask"))
-            mitkMaskImage = mitk::IOUtil::LoadImage(mitk::any_cast<string>(parsedArgs["mask"]));
+            mitkMaskImage = mitk::IOUtil::LoadImage(us::any_cast<string>(parsedArgs["mask"]));
 
         // instantiate tracker
         typedef itk::StreamlineTrackingFilter< float > FilterType;

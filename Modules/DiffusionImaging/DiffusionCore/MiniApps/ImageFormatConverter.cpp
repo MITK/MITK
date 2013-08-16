@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 #include <mitkNrrdDiffusionImageWriter.h>
+#include "ctkCommandLineParser.h"
+#include "ctkCommandLineParser.cpp"
 
 using namespace mitk;
 #include "ctkCommandLineParser.h"
@@ -29,16 +31,16 @@ int ImageFormatConverter(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", mitk::Any(), false);
-    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", mitk::Any(), false);
+    parser.addArgument("in", "i", ctkCommandLineParser::String, "input image", us::Any(), false);
+    parser.addArgument("out", "o", ctkCommandLineParser::String, "output image", us::Any(), false);
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     // mandatory arguments
-    string imageName = mitk::any_cast<string>(parsedArgs["in"]);
-    string outImage = mitk::any_cast<string>(parsedArgs["out"]);
+    string imageName = us::any_cast<string>(parsedArgs["in"]);
+    string outImage = us::any_cast<string>(parsedArgs["out"]);
 
     try
     {
@@ -81,4 +83,4 @@ int ImageFormatConverter(int argc, char* argv[])
     MITK_INFO << "DONE";
     return EXIT_SUCCESS;
 }
-RegisterFiberTrackingMiniApp(ImageFormatConverter);
+RegisterDiffusionCoreMiniApp(ImageFormatConverter);

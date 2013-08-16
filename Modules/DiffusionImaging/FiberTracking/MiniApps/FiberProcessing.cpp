@@ -59,8 +59,8 @@ int FiberProcessing(int argc, char* argv[])
 {
     ctkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", ctkCommandLineParser::String, "input fiber bundle (.fib)", mitk::Any(), false);
-    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", mitk::Any(), false);
+    parser.addArgument("input", "i", ctkCommandLineParser::String, "input fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("outFile", "o", ctkCommandLineParser::String, "output fiber bundle (.fib)", us::Any(), false);
 
     parser.addArgument("resample", "r", ctkCommandLineParser::Float, "Resample fiber with the given point distance (in mm)");
     parser.addArgument("smooth", "s", ctkCommandLineParser::Float, "Smooth fiber with the given point distance (in mm)");
@@ -69,36 +69,36 @@ int FiberProcessing(int argc, char* argv[])
     parser.addArgument("minCurv", "a", ctkCommandLineParser::Float, "Minimum curvature radius (in mm)");
     parser.addArgument("mirror", "p", ctkCommandLineParser::Int, "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
-    map<string, mitk::Any> parsedArgs = parser.parseArguments(argc, argv);
+    map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     float pointDist = -1;
     if (parsedArgs.count("resample"))
-        pointDist = mitk::any_cast<float>(parsedArgs["resample"]);
+        pointDist = us::any_cast<float>(parsedArgs["resample"]);
 
     float smoothDist = -1;
     if (parsedArgs.count("smooth"))
-        smoothDist = mitk::any_cast<float>(parsedArgs["smooth"]);
+        smoothDist = us::any_cast<float>(parsedArgs["smooth"]);
 
     float minFiberLength = -1;
     if (parsedArgs.count("minLength"))
-        minFiberLength = mitk::any_cast<float>(parsedArgs["minLength"]);
+        minFiberLength = us::any_cast<float>(parsedArgs["minLength"]);
 
     float maxFiberLength = -1;
     if (parsedArgs.count("maxLength"))
-        maxFiberLength = mitk::any_cast<float>(parsedArgs["maxLength"]);
+        maxFiberLength = us::any_cast<float>(parsedArgs["maxLength"]);
 
     float curvThres = -1;
     if (parsedArgs.count("minCurv"))
-        curvThres = mitk::any_cast<float>(parsedArgs["minCurv"]);
+        curvThres = us::any_cast<float>(parsedArgs["minCurv"]);
 
     int axis = 0;
     if (parsedArgs.count("mirror"))
-        axis = mitk::any_cast<int>(parsedArgs["mirror"]);
+        axis = us::any_cast<int>(parsedArgs["mirror"]);
 
-    string inFileName = mitk::any_cast<string>(parsedArgs["input"]);
-    string outFileName = mitk::any_cast<string>(parsedArgs["outFile"]);
+    string inFileName = us::any_cast<string>(parsedArgs["input"]);
+    string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
 
     try
     {

@@ -9,7 +9,7 @@ endif(ITK_GDCM_DIR)
 
 MITK_CREATE_MODULE( DiffusionCore
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS Algorithms Algorithms/Reconstruction DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS Algorithms Algorithms/Reconstruction Algorithms/Registration DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS MitkExt SceneSerializationBase # QmitkExt
   PACKAGE_DEPENDS Boost
 )

@@ -88,7 +88,7 @@ public:
   /// handles operations
   virtual void ExecuteOperation(Operation* operation);
 
-  void Concatenate(mitk::LabelSetImage* image);
+  bool Concatenate(mitk::LabelSetImage* image);
 
   void ClearBuffer();
 
@@ -164,7 +164,7 @@ public:
 
   virtual void RemoveAllLabels();
 
-  const mitk::LabelSet* GetLabelSet() const
+  mitk::LabelSet::ConstPointer GetLabelSet() const
     {return m_LabelSet.GetPointer(); };
 
   void SetLabelSet(const mitk::LabelSet& labelset);

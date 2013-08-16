@@ -304,10 +304,10 @@ int mitk::LabelSet::GetActiveLabelIndex() const
     return index;
 }
 
-const mitk::Label* mitk::LabelSet::GetLabel(int index) const
+mitk::Label::ConstPointer mitk::LabelSet::GetLabel(int index) const
 {
     if (this->HasLabel(index))
-        return this->m_LabelContainer[index];
+        return this->m_LabelContainer[index].GetPointer();
     else
         return NULL;
 }

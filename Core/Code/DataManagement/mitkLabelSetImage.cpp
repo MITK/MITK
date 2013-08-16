@@ -105,8 +105,13 @@ void mitk::LabelSetImage::EraseLabel(int index, bool reorder)
   this->Modified();
 }
 
-void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
+bool mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
 {
+    const unsigned int* otherDims = other->GetDimensions();
+    const unsigned int* thisDims = this->GetDimensions();
+    if ( (otherDims[0] != thisDims[0]) || (otherDims[1] != thisDims[1]) || (otherDims[2] != thisDims[2]) )
+        return false;
+
     AccessByItk_1(this, ConcatenateProcessing, other);
 
     const mitk::LabelSet* ls = other->GetLabelSet();
@@ -116,6 +121,8 @@ void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage* other)
     }
 
     this->Modified();
+
+    return true;
 }
 
 void mitk::LabelSetImage::ClearBuffer()

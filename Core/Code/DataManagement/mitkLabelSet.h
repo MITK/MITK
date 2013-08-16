@@ -131,7 +131,7 @@ public:
 
     virtual const mitk::Label* GetActiveLabel() const { return m_ActiveLabel; };
 
-    virtual const mitk::Label* GetLabel(int index) const;
+    virtual mitk::Label::ConstPointer GetLabel(int index) const;
 
     virtual int GetActiveLabelIndex() const;
 

@@ -227,18 +227,35 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   caster->SetImage( registeredWeighted );
   caster->SetBValue( input->GetB_Value() );
-  caster->SetGradientDirections( gradients_new );
+  caster->SetGradientDirections( gradients_new.GetPointer() );
 
   try
   {
     caster->Update();
-    this->itk::ProcessObject::SetOutput(0 , caster->GetOutput() );
   }
   catch( const itk::ExceptionObject& e)
   {
     MITK_ERROR << "Casting back to diffusion image failed: ";
     mitkThrow() << "Subprocess failed with exception: " << e.what();
   }
+
+  //
+  // FIXME!!! EXTREME QUICK-HACK
+
+  typedef typename mitk::DiffusionImageSource< DiffusionPixelType>::OutputType OutputType;
+
+  DiffusionImageType* dwimageout =
+      static_cast<DiffusionImageType*>( caster->GetOutput() );
+
+  static_cast<OutputType*>(this->GetOutput())
+      ->SetVectorImage(dwimageout->GetVectorImage());
+  static_cast<OutputType*>(this->GetOutput())
+      ->SetB_Value(dwimageout->GetB_Value());
+  static_cast<OutputType*>(this->GetOutput())
+      ->SetDirections(dwimageout->GetDirections());
+  static_cast<OutputType*>(this->GetOutput())
+      ->SetMeasurementFrame(dwimageout->GetMeasurementFrame());
+  static_cast<OutputType*>(this->GetOutput())->InitializeFromVectorImage();
 
 
 }

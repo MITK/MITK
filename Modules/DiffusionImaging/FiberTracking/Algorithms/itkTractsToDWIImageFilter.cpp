@@ -56,6 +56,8 @@ TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
     , m_FrequencyMap(NULL)
     , m_EddyGradientStrength(0.001)
     , m_SimulateEddyCurrents(false)
+    , m_Spikes(0)
+    , m_SpikeAmplitude(1)
 {
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -115,8 +117,24 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 transform[i][j] *= m_Spacing[j];
         }
 
+    std::vector< int > spikeVolume;
+    for (int i=0; i<m_Spikes; i++)
+        spikeVolume.push_back(rand()%images.at(0)->GetVectorLength());
+    std::sort (spikeVolume.begin(), spikeVolume.end());
+    std::reverse (spikeVolume.begin(), spikeVolume.end());
+
     boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (int g=0; g<images.at(0)->GetVectorLength(); g++)
+    {
+        std::vector< int > spikeSlice;
+        while (!spikeVolume.empty() && spikeVolume.back()==g)
+        {
+            spikeSlice.push_back(rand()%images.at(0)->GetLargestPossibleRegion().GetSize(2));
+            spikeVolume.pop_back();
+        }
+        std::sort (spikeSlice.begin(), spikeSlice.end());
+        std::reverse (spikeSlice.begin(), spikeSlice.end());
+
         for (int z=0; z<images.at(0)->GetLargestPossibleRegion().GetSize(2); z++)
         {
             std::vector< SliceType::Pointer > compartmentSlices;
@@ -173,6 +191,14 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             idft->SetFrequencyMap(fMap);
             idft->SetSignalScale(m_SignalScale);
             idft->SetOutSize(outSize);
+            int numSpikes = 0;
+            while (!spikeSlice.empty() && spikeSlice.back()==z)
+            {
+                numSpikes++;
+                spikeSlice.pop_back();
+            }
+            idft->SetSpikes(numSpikes);
+            idft->SetSpikeAmplitude(m_SpikeAmplitude);
             idft->Update();
 
             ComplexSliceType::Pointer fSlice;
@@ -202,6 +228,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
             ++disp;
         }
+    }
     return newImage;
 }
 
@@ -567,7 +594,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             }
             else
             {
-                m_VolumeFractions.at(0)->SetPixel(index, f);
+                m_VolumeFractions.at(0)->SetPixel(index, f/voxelVolume);
 
                 double nonf = voxelVolume-f;    // non-fiber volume
                 double inter = 0;
@@ -602,7 +629,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     // do k-space stuff
     DoubleDwiType::Pointer doubleOutImage;
-    if (m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_Upsampling>1.00001)
+    if (m_Spikes>0 || m_FrequencyMap.IsNotNull() || !m_KspaceArtifacts.empty() || m_kOffset>0 || m_SimulateRelaxation || m_SimulateEddyCurrents || m_Upsampling>1.00001)
     {
         MITK_INFO << "Adjusting complex signal";
         doubleOutImage = DoKspaceStuff(compartments);

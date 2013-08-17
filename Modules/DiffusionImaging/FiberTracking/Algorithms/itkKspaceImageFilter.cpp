@@ -44,6 +44,8 @@ KspaceImageFilter< TPixelType >
     , m_EddyGradientMagnitude(30)
     , m_IsBaseline(true)
     , m_SignalScale(1)
+    , m_Spikes(0)
+    , m_SpikeAmplitude(1)
 {
     m_DiffusionGradientDirection.Fill(0.0);
 }
@@ -122,6 +124,7 @@ void KspaceImageFilter< TPixelType >
     int xOffset = in_szx-szx;
     int yOffset = in_szy-szy;
 
+    vcl_complex<double> spike(0,0);
     while( !oit.IsAtEnd() )
     {
         itk::Index< 2 > kIdx;
@@ -214,9 +217,21 @@ void KspaceImageFilter< TPixelType >
 
         s /= numPix;
 
+        if (sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(spike.imag()*spike.imag()+spike.real()*spike.real()) )
+            spike = s;
+
         m_TEMPIMAGE->SetPixel(kIdx, sqrt(s.real()*s.real()+s.imag()*s.imag()));
         outputImage->SetPixel(kIdx, s);
         ++oit;
+    }
+
+    spike *= m_SpikeAmplitude;
+    for (int i=0; i<m_Spikes; i++)
+    {
+        itk::Index< 2 > spikeIdx;
+        spikeIdx[0] = rand()%(int)szx;
+        spikeIdx[1] = rand()%(int)szy;
+        outputImage->SetPixel(spikeIdx, spike);
     }
 
 //    typedef itk::ImageFileWriter< InputImageType > WriterType;

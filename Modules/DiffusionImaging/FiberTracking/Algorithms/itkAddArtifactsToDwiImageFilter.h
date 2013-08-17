@@ -64,6 +64,8 @@ namespace itk{
     void SetGradientList(mitk::DiffusionSignalModel<double>::GradientListType list) { m_GradientList=list; }
     itkSetMacro( TE, double )
     itkSetMacro( Upsampling, double )
+    itkSetMacro( Spikes, int )
+    itkSetMacro( SpikeAmplitude, double )
 
   protected:
     AddArtifactsToDwiImageFilter();
@@ -82,6 +84,8 @@ namespace itk{
     mitk::DiffusionSignalModel<double>::GradientListType m_GradientList;
     double                              m_TE;
     double                              m_Upsampling;           ///< causes ringing artifacts
+    int                                 m_Spikes;
+    double                              m_SpikeAmplitude;
 
   private:
 

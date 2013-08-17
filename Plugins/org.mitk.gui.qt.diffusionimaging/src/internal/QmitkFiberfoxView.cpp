@@ -1226,7 +1226,6 @@ void QmitkFiberfoxView::OnDrawROI()
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData( figure );
 
-
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
     for( int i=0; i<nodes.size(); i++)
         nodes.at(i)->SetSelected(false);
@@ -1236,7 +1235,6 @@ void QmitkFiberfoxView::OnDrawROI()
     QString name = QString("Fiducial_%1").arg(children->size());
     node->SetName(name.toStdString());
     node->SetSelected(true);
-    GetDataStorage()->Add(node, m_SelectedBundles.at(0));
 
     this->DisableCrosshairNavigation();
 
@@ -1251,6 +1249,7 @@ void QmitkFiberfoxView::OnDrawROI()
     }
 
     UpdateGui();
+    GetDataStorage()->Add(node, m_SelectedBundles.at(0));
 }
 
 bool CompareLayer(mitk::DataNode::Pointer i,mitk::DataNode::Pointer j)
@@ -1925,6 +1924,14 @@ void QmitkFiberfoxView::NodeRemoved(const mitk::DataNode* node)
 {
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it = m_DataNodeToPlanarFigureData.find(nonConstNode);
+
+    if (dynamic_cast<FiberBundleX*>(node->GetData()))
+    {
+        m_SelectedBundles.clear();
+        m_SelectedBundles2.clear();
+    }
+    else if (dynamic_cast<Image*>(node->GetData()))
+        m_SelectedImages.clear();
 
     if( it != m_DataNodeToPlanarFigureData.end() )
     {

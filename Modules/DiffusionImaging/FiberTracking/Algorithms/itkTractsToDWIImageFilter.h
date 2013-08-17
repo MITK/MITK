@@ -95,6 +95,8 @@ public:
     itkSetMacro( SimulateRelaxation, bool )
     itkSetMacro( EddyGradientStrength, double )
     itkSetMacro( Upsampling, double )
+    itkSetMacro( Spikes, int )
+    itkSetMacro( SpikeAmplitude, double )
 
     // output
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions(){ return m_VolumeFractions; }
@@ -147,6 +149,8 @@ protected:
     bool                                m_SimulateRelaxation;
     bool                                m_SimulateEddyCurrents;
     double                              m_EddyGradientStrength;
+    int                                 m_Spikes;
+    double                              m_SpikeAmplitude;
 };
 }
 

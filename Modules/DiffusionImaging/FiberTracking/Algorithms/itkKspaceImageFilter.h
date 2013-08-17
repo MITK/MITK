@@ -68,6 +68,8 @@ namespace itk{
     itkSetMacro( DirectionMatrix, MatrixType )
     itkSetMacro( SignalScale, double )
     itkSetMacro( OutSize, itk::Size<2> )
+    itkSetMacro( Spikes, int )
+    itkSetMacro( SpikeAmplitude, double )
 
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; }
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }
@@ -103,6 +105,8 @@ namespace itk{
     bool                                    m_IsBaseline;
     double                                  m_SignalScale;
     itk::Size<2>                            m_OutSize;
+    int                                     m_Spikes;
+    double                                  m_SpikeAmplitude;
 
   private:
 

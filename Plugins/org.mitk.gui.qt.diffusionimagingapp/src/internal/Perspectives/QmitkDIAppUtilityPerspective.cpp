@@ -43,7 +43,7 @@ void QmitkDIAppUtilityPerspective::CreateInitialLayout(berry::IPageLayout::Point
   /////////////////////////////////////////////
 
   left->AddView("org.mitk.views.propertylistview");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.propertylistview");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.properties");
   lo->SetCloseable(false);
 
   left->AddView("org.blueberry.views.logview");

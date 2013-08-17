@@ -20,19 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Macro
 #include <MitkExports.h>
-#include <mitkCommon.h>
 
 // MITK
-#include <mitkBaseData.h>
 #include <mitkIFileWriter.h>
-
-// ITK
-#include <itkObjectFactory.h>
 
 // Microservices
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
-#include <usModuleContext.h>
 
 namespace mitk {
 
@@ -150,8 +144,8 @@ namespace mitk {
 
 protected:
     AbstractFileWriter();
+
     AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
-    virtual ~AbstractFileWriter();
 
     // Filenames etc..
     std::string m_FileName;

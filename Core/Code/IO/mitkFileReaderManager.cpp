@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usServiceProperties.h>
+#include <usLDAPProp.h>
 
 // Legacy Support
 #include <mitkCoreObjectFactory.h>
@@ -39,8 +40,7 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::Read(const std::st
   mitk::IFileReader* reader = GetReader(extension);
   // Throw exception if no compatible reader was found
   if (reader == 0) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
-  std::list< itk::SmartPointer<mitk::BaseData> > result = reader->Read(path);
-  return result;
+  return reader->Read(path);
 }
 
 std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles)
@@ -74,12 +74,12 @@ mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extensi
 std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> result;
-  std::vector <us::ServiceReference<IFileReader> > refs = GetReaderList(extension, context);
+  const std::vector <us::ServiceReference<IFileReader> > refs = GetReaderList(extension, context);
   result.reserve(refs.size());
 
   // Translate List of ServiceRefs to List of Pointers
-  for (std::vector <us::ServiceReference<IFileReader> >::const_iterator iter = refs.begin();
-       iter != refs.end(); ++iter)
+  for (std::vector <us::ServiceReference<IFileReader> >::const_iterator iter = refs.begin(), end = refs.end();
+       iter != end; ++iter)
   {
     result.push_back( context->GetService(*iter) );
   }
@@ -96,13 +96,13 @@ mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extensi
 
 std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
 {
-  std::vector <mitk::IFileReader*> allReaders = mitk::FileReaderManager::GetReaders(extension, context);
+  const std::vector <mitk::IFileReader*> allReaders = mitk::FileReaderManager::GetReaders(extension, context);
   std::vector <mitk::IFileReader*> result;
   result.reserve(allReaders.size());
   // the list is already sorted by priority. Now find reader that supports all options
 
-  for (std::vector <mitk::IFileReader*>::const_iterator iter = allReaders.begin();
-       iter != allReaders.end(); ++iter)
+  for (std::vector <mitk::IFileReader*>::const_iterator iter = allReaders.begin(), end = allReaders.end();
+       iter != end; ++iter)
   {
     mitk::IFileReader * currentReader = *iter;
     // Now see if this reader supports all options. If yes, push to results
@@ -119,7 +119,7 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
 std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& extension)
 {
   us::ModuleContext* context = us::GetModuleContext();
-  std::vector<us::ServiceReference<IFileReader> > refs = GetReaderList(extension, context);
+  const std::vector<us::ServiceReference<IFileReader> > refs = GetReaderList(extension, context);
   std::vector<std::string> entries; // Will contain Description + Extension (Human readable)
   entries.reserve(refs.size());
   std::string knownExtensions; // Will contain plain list of all known extensions (for the QFileDialog entry "All Known Extensions")
@@ -147,20 +147,23 @@ std::string mitk::FileReaderManager::GetSupportedExtensions(const std::string& e
 
 //////////////////// INTERNAL CODE ////////////////////
 
-bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options )
+bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options )
 {
-  std::list<std::string> readerOptions = reader->GetSupportedOptions();
-  if (options.size() == 0) return true;         // if no options were requested, return true unconditionally
-  if (readerOptions.size() == 0) return false;  // if options were requested and reader supports no options, return false
+  const std::list<std::string> readerOptions = reader->GetSupportedOptions();
+  if (options.empty()) return true;         // if no options were requested, return true unconditionally
+  if (readerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
   // For each of the strings in requuested options, check if option is available in reader
-  for(std::list<std::string>::iterator options_i = options.begin(); options_i != options.end(); options_i++)
+  for(std::list<std::string>::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {
       bool optionFound = false;
       // Iterate over each available option from reader to check if one of them matches the current option
-      for(std::list<std::string>::iterator options_j = readerOptions.begin(); options_j != readerOptions.end(); options_j++)
+      for(std::list<std::string>::const_iterator options_j = readerOptions.begin(), j_end = readerOptions.end();
+          options_j != j_end; ++options_j)
+      {
         if ( *options_i == *options_j ) optionFound = true;
+      }
       if (optionFound == false) return false; // If one option was not found, leave method and return false
     }
   }
@@ -175,10 +178,10 @@ std::vector< us::ServiceReference<mitk::IFileReader> > mitk::FileReaderManager::
 {
   // filter for class and extension
   std::string filter;
-  if (extension == "")
-    filter = "";
-  else
-    filter = "(" + mitk::IFileReader::PROP_EXTENSION + "=" + extension + ")";
+  if (!extension.empty())
+  {
+    filter = us::LDAPProp(mitk::IFileReader::PROP_EXTENSION) == extension;
+  }
   std::vector<us::ServiceReference<IFileReader> > result = context->GetServiceReferences<IFileReader>(filter);
   std::sort(result.begin(), result.end());
   std::reverse(result.begin(), result.end());

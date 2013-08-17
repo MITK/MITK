@@ -20,19 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Macro
 #include <MitkExports.h>
-#include <mitkCommon.h>
 
 // MITK
-#include <mitkBaseData.h>
 #include <mitkIFileReader.h>
-
-// ITK
-#include <itkObjectFactory.h>
+#include <mitkBaseData.h>
 
 // Microservices
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
-#include <usModuleContext.h>
 
 namespace mitk {
 
@@ -108,8 +103,8 @@ namespace mitk {
 
 protected:
     AbstractFileReader();
-    AbstractFileReader(std::string extension, std::string description);
-    virtual ~AbstractFileReader();
+
+    AbstractFileReader(const std::string& extension, const std::string& description);
 
     // Filenames etc..
     std::string m_FileName;

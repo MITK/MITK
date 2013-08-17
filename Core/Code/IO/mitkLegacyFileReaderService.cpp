@@ -16,17 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkLegacyFileReaderService.h>
-#include <usGetModuleContext.h>
 #include <mitkIOUtil.h>
 
-//#include <mitkBaseData.h>
+#include <usGetModuleContext.h>
 
-mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension, std::string description)
+
+mitk::LegacyFileReaderService::LegacyFileReaderService(const std::string& extension, const std::string& description)
+  : AbstractFileReader(extension, description)
 {
-  if (extension == "") mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension." ;
-  m_Extension = extension;
-  m_Description = description;
-  m_Priority = 0; // Default priority for legacy reader
+  if (extension.empty()) mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension." ;
   RegisterMicroservice(us::GetModuleContext());
 }
 
@@ -37,14 +35,14 @@ mitk::LegacyFileReaderService::~LegacyFileReaderService()
 
 ////////////////////// Reading /////////////////////////
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path, mitk::DataStorage *ds)
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::string& path, mitk::DataStorage* /*ds*/)
 {
   std::list< mitk::BaseData::Pointer > result;
   result.push_front(mitk::IOUtil::LoadDataNode(path)->GetData());
   return result;
 }
 
-std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& stream, mitk::DataStorage *ds)
+std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const std::istream& /*stream*/, mitk::DataStorage* /*ds*/)
 {
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
   std::list< mitk::BaseData::Pointer > result;

@@ -76,9 +76,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
-std::list< mitk::LegacyFileReaderService::Pointer > mitk::CoreObjectFactory::m_LegacyReaders;
-std::list< mitk::LegacyFileWriterService::Pointer > mitk::CoreObjectFactory::m_LegacyWriters;
-std::list< mitk::LegacyImageWriterService::Pointer > mitk::CoreObjectFactory::m_LegacyImageWriters;
+std::list< mitk::LegacyFileReaderService* > mitk::CoreObjectFactory::m_LegacyReaders;
+std::list< mitk::LegacyFileWriterService* > mitk::CoreObjectFactory::m_LegacyWriters;
+std::list< mitk::LegacyImageWriterService* > mitk::CoreObjectFactory::m_LegacyImageWriters;
 
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
   MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
@@ -436,7 +436,7 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase:
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     if(mitk::FileReaderManager::GetReader(it->first) == 0)
    {
-     mitk::LegacyFileReaderService::Pointer lfrs = mitk::LegacyFileReaderService::New(extension, it->second);
+     mitk::LegacyFileReaderService* lfrs = new mitk::LegacyFileReaderService(extension, it->second);
      m_LegacyReaders.push_back(lfrs);
    }
   }
@@ -474,7 +474,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(/*mitk::CoreObjectFactoryBas
     if(mitk::FileWriterManager::GetWriter(extension) == 0)
     {
       MITK_INFO << extension << "/" << description;
-      mitk::LegacyImageWriterService::Pointer liws = mitk::LegacyImageWriterService::New(dummyImage->GetNameOfClass() ,extension, description);
+      mitk::LegacyImageWriterService* liws = new mitk::LegacyImageWriterService(dummyImage->GetNameOfClass(), extension, description);
       m_LegacyImageWriters.push_back(liws);
     }
   }
@@ -495,7 +495,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(/*mitk::CoreObjectFactoryBas
       if(mitk::FileWriterManager::GetWriter(extension) == 0)
       {
         MITK_INFO << extension << "/" << description;
-        mitk::LegacyFileWriterService::Pointer lfws = mitk::LegacyFileWriterService::New(it->GetPointer(), "LegacyDataType" ,extension, description);
+        mitk::LegacyFileWriterService* lfws = new mitk::LegacyFileWriterService(it->GetPointer(), "LegacyDataType", extension, description);
         m_LegacyWriters.push_back(lfws);
       }
     }

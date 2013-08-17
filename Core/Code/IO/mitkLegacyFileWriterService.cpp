@@ -16,36 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkLegacyFileWriterService.h>
-#include <usGetModuleContext.h>
-#include <mitkIOUtil.h>
+
 #include <mitkDataNode.h>
-#include <mitkCoreObjectFactory.h>
-#include <mitkImageWriter.h>
 
-//#include <mitkBaseData.h>
-
-mitk::LegacyFileWriterService::LegacyFileWriterService()
-{
-
-}
+#include <usGetModuleContext.h>
 
 mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer legacyWriter,
                                                        const std::string& basedataType,
                                                        const std::string& extension,
                                                        const std::string& description)
+  : AbstractFileWriter(basedataType, extension, description)
+  , m_LegacyWriter(legacyWriter)
 {
-  if (extension == "") mitkThrow() << "LegacyFileWriterWrapper cannot be initialized without FileExtension." ;
-  m_Extension = extension;
-  m_LegacyWriter = legacyWriter;
-  m_Description = description;
-  m_BasedataType = basedataType;
-  m_Priority = 0; // Default priority for legacy Writer
+  if (extension.empty()) mitkThrow() << "LegacyFileWriterWrapper cannot be initialized without FileExtension." ;
+
   RegisterMicroservice(us::GetModuleContext());
-}
-
-mitk::LegacyFileWriterService::~LegacyFileWriterService()
-{
-
 }
 
 ////////////////////// Writing /////////////////////////

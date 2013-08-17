@@ -16,11 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkAbstractFileWriter.h>
+#include <mitkBaseData.h>
+
 #include <usGetModuleContext.h>
+#include <usModuleContext.h>
+
 #include <itksys/SystemTools.hxx>
+
 #include <fstream>
-
-
 
 mitk::AbstractFileWriter::AbstractFileWriter() :
 m_Priority (0)
@@ -33,11 +36,6 @@ m_BasedataType(basedataType),
 m_Description (description),
 m_Priority (0)
 {
-}
-
-mitk::AbstractFileWriter::~AbstractFileWriter()
-{
-
 }
 
 ////////////////// Filenames etc. //////////////////
@@ -96,7 +94,7 @@ void mitk::AbstractFileWriter::RegisterMicroservice(us::ModuleContext* context)
   m_Registration = context->RegisterService<mitk::IFileWriter>(this, props);
 }
 
-void mitk::AbstractFileWriter::UnregisterMicroservice(us::ModuleContext* context)
+void mitk::AbstractFileWriter::UnregisterMicroservice(us::ModuleContext* /*context*/)
 {
   if (! m_Registration )
   {
@@ -109,11 +107,11 @@ void mitk::AbstractFileWriter::UnregisterMicroservice(us::ModuleContext* context
 
 us::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
 {
-  if ( m_Extension == "" )
+  if ( m_Extension.empty() )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
-  if ( m_BasedataType == "" )
+  if ( m_BasedataType.empty() )
     MITK_WARN << "Registered a Writer with no BasedataType defined (m_BasedataType is empty). Writer will not be found by calls from WriterManager.)";
-  if ( m_Description == "" )
+  if ( m_Description.empty() )
     MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
 
   us::ServiceProperties result;

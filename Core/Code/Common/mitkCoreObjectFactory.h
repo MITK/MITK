@@ -61,9 +61,9 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     MultimapType m_FileExtensionsMap;
     std::string m_SaveFileExtensions;
     MultimapType m_SaveFileExtensionsMap;
-    static std::list< mitk::LegacyFileReaderService::Pointer > m_LegacyReaders;
-    static std::list< mitk::LegacyFileWriterService::Pointer > m_LegacyWriters;
-    static std::list< mitk::LegacyImageWriterService::Pointer > m_LegacyImageWriters;
+    static std::list< mitk::LegacyFileReaderService* > m_LegacyReaders;
+    static std::list< mitk::LegacyFileWriterService* > m_LegacyWriters;
+    static std::list< mitk::LegacyImageWriterService* > m_LegacyImageWriters;
 };
 
 } // namespace mitk

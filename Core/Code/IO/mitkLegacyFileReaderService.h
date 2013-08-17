@@ -20,45 +20,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Macro
 #include <MitkExports.h>
-#include <mitkCommon.h>
 
 // MITK
 #include <mitkBaseData.h>
 #include <mitkAbstractFileReader.h>
-#include <mitkFileReader.h>
 
-// ITK
-#include <itkObjectFactory.h>
-
-// Microservices
-#include <usServiceRegistration.h>
-#include <usServiceProperties.h>
-#include <usModuleContext.h>
 
 namespace mitk {
 
 //##Documentation
 //## @brief
 //## @ingroup Process
-  class MITK_CORE_EXPORT LegacyFileReaderService : public itk::LightObject, public mitk::AbstractFileReader
+class LegacyFileReaderService : public mitk::AbstractFileReader
 {
-  public:
 
-    mitkClassMacro( LegacyFileReaderService, AbstractFileReader);
+public:
 
-    mitkNewMacro2Param( Self, std::string, std::string);
+  LegacyFileReaderService(const std::string& extension, const std::string& description);
+  virtual ~LegacyFileReaderService();
 
-    virtual std::list< mitk::BaseData::Pointer > Read(const std::string& path = 0, mitk::DataStorage *ds = 0);
+  virtual std::list< mitk::BaseData::Pointer > Read(const std::string& path, mitk::DataStorage* ds = 0);
 
-    virtual std::list< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage *ds = 0 );
-
-
-protected:
-  LegacyFileReaderService(std::string extension, std::string description);
-    virtual ~LegacyFileReaderService();
+  virtual std::list< mitk::BaseData::Pointer > Read(const std::istream& stream, mitk::DataStorage* ds = 0 );
 
 };
-} // namespace mitk
 
+} // namespace mitk
 
 #endif /* LegacyFileReaderService_H_HEADER_INCLUDED_C1E7E521 */

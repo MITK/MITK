@@ -19,13 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FileWriterManager_H_HEADER_INCLUDED_C1E7E521
 
 #include <MitkExports.h>
-#include <mitkBaseData.h>
-#include <mitkIFileWriter.h>
 
 // Microservices
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>
 
+namespace mitk {
+  class BaseData;
+  struct IFileWriter;
+}
 
 namespace mitk {
 
@@ -36,7 +38,7 @@ class MITK_CORE_EXPORT FileWriterManager
 {
   public:
 
-    static void Write(const mitk::BaseData::Pointer data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
+    static void Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
     /**
     * Returns a compatible Writer to the given file extension
@@ -62,7 +64,7 @@ protected:
 
     static std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
 
-    static bool WriterSupportsOptions(mitk::IFileWriter* Writer, std::list<std::string> options);
+    static bool WriterSupportsOptions(mitk::IFileWriter* Writer, const std::list<std::string>& options);
 
     //static std::list< mitk::LegacyFileWriterService::Pointer > m_LegacyWriters;
 

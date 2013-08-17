@@ -20,13 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkExports.h>
 #include <mitkBaseData.h>
-#include <mitkIFileReader.h>
-#include <mitkLegacyFileReaderService.h>
 
 // Microservices
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>
 
+namespace mitk {
+  struct IFileReader;
+}
 
 namespace mitk {
 
@@ -80,7 +81,7 @@ protected:
 
     static std::vector< us::ServiceReference<IFileReader> > GetReaderList(const std::string& extension, us::ModuleContext* context);
 
-    static bool ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options);
+    static bool ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options);
 
 };
 } // namespace mitk

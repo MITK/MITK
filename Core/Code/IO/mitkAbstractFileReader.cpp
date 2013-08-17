@@ -16,10 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include <mitkAbstractFileReader.h>
-#include <usGetModuleContext.h>
-#include <itksys/SystemTools.hxx>
-#include <fstream>
 
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+
+#include <itksys/SystemTools.hxx>
+
+#include <fstream>
 
 
 mitk::AbstractFileReader::AbstractFileReader() :
@@ -27,17 +30,13 @@ m_Priority (0)
 {
 }
 
-mitk::AbstractFileReader::AbstractFileReader(std::string extension, std::string description) :
+mitk::AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description) :
 m_Extension (extension),
 m_Description (description),
 m_Priority (0)
 {
 }
 
-mitk::AbstractFileReader::~AbstractFileReader()
-{
-
-}
 
 ////////////////// Filenames etc. //////////////////
 
@@ -77,7 +76,7 @@ void mitk::AbstractFileReader::SetFileName(const std::string& aFileName)
 
 ////////////////////// Reading /////////////////////////
 
-std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path, mitk::DataStorage *ds)
+std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(const std::string& path, mitk::DataStorage* /*ds*/)
 {
   if (! itksys::SystemTools::FileExists(path.c_str()))
     mitkThrow() << "File '" + path + "' not found.";
@@ -94,7 +93,7 @@ void mitk::AbstractFileReader::RegisterMicroservice(us::ModuleContext* context)
   m_Registration = context->RegisterService<mitk::IFileReader>(this, props);
 }
 
-void mitk::AbstractFileReader::UnregisterMicroservice(us::ModuleContext* context)
+void mitk::AbstractFileReader::UnregisterMicroservice(us::ModuleContext* /*context*/)
 {
   if (! m_Registration )
   {
@@ -107,9 +106,9 @@ void mitk::AbstractFileReader::UnregisterMicroservice(us::ModuleContext* context
 
 us::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
 {
-  if ( m_Extension == "" )
+  if ( m_Extension.empty() )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
-  if ( m_Description == "" )
+  if ( m_Description.empty() )
     MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
   std::transform(m_Extension.begin(), m_Extension.end(), m_Extension.begin(), ::tolower);
 

@@ -17,7 +17,6 @@ set(module_dirs
     Qmitk
     QmitkExt
     SegmentationUI
-    Properties
     DiffusionImaging
     GPGPU
     IGT

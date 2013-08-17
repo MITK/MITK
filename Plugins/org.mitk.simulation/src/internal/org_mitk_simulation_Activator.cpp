@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_simulation_Activator.h"
 #include <mitkGetSimulationPreferences.h>
-#include <mitkLoadPropertiesModule.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkSimulationObjectFactory.h>
@@ -29,8 +28,6 @@ T* GetPropertyService(ctkPluginContext* context)
 {
   if (context == NULL)
     return NULL;
-
-  mitk::LoadPropertiesModule();
 
   ctkServiceReference serviceRef = context->getServiceReference<T>();
 

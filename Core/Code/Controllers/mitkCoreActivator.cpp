@@ -16,9 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderingManager.h"
 #include "mitkPlanePositionManager.h"
-#include "mitkCoreDataNodeReader.h"
-#include "mitkShaderRepository.h"
-#include "mitkStandardFileLocations.h"
+#include <mitkCoreDataNodeReader.h>
+#include <mitkStandardFileLocations.h>
+#include <mitkShaderRepository.h>
+#include <mitkPropertyAliases.h>
+#include <mitkPropertyDescriptions.h>
+#include <mitkPropertyExtensions.h>
+#include <mitkPropertyFilters.h>
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
@@ -150,6 +154,18 @@ public:
     m_ShaderRepository.reset(new mitk::ShaderRepository);
     context->RegisterService<mitk::IShaderRepository>(m_ShaderRepository.get());
 
+    m_PropertyAliases.reset(new mitk::PropertyAliases);
+    context->RegisterService<mitk::IPropertyAliases>(m_PropertyAliases.get());
+
+    m_PropertyDescriptions.reset(new mitk::PropertyDescriptions);
+    context->RegisterService<mitk::IPropertyDescriptions>(m_PropertyDescriptions.get());
+
+    m_PropertyExtensions.reset(new mitk::PropertyExtensions);
+    context->RegisterService<mitk::IPropertyExtensions>(m_PropertyExtensions.get());
+
+    m_PropertyFilters.reset(new mitk::PropertyFilters);
+    context->RegisterService<mitk::IPropertyFilters>(m_PropertyFilters.get());
+
     context->AddModuleListener(this, &MitkCoreActivator::HandleModuleEvent);
 
     /*
@@ -180,6 +196,10 @@ private:
   std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
   std::auto_ptr<mitk::CoreDataNodeReader> m_CoreDataNodeReader;
   std::auto_ptr<mitk::ShaderRepository> m_ShaderRepository;
+  std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
+  std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
+  std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
+  std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
 };
 
 void MitkCoreActivator::HandleModuleEvent(const us::ModuleEvent moduleEvent)

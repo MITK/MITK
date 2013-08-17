@@ -212,6 +212,10 @@ set(CPP_FILES
   DataManagement/mitkIntPropertyExtension.cpp
   DataManagement/mitkPropertyExtension.cpp
   DataManagement/mitkPropertyFilter.cpp
+  DataManagement/mitkPropertyAliases.cpp
+  DataManagement/mitkPropertyDescriptions.cpp
+  DataManagement/mitkPropertyExtensions.cpp
+  DataManagement/mitkPropertyFilters.cpp
 
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp

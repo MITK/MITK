@@ -12,6 +12,8 @@ if(MITK_USE_Boost)
     if(NOT MITK_USE_SYSTEM_Boost)
       set(BOOST_INCLUDEDIR ${CMAKE_BINARY_DIR}/../Boost-install/include/boost-1_54)
       set(BOOST_LIBRARYDIR ${CMAKE_BINARY_DIR}/../Boost-install/lib)
+      # Following line is temporary, see bug #15837.
+      set(Boost_DEBUG TRUE)
     endif()
     find_package(Boost 1.54.0 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES})
   else()

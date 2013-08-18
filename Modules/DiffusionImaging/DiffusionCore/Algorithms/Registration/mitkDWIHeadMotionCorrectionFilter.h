@@ -41,6 +41,8 @@ public:
   typedef typename Superclass::InputImageType         DiffusionImageType;
   typedef typename Superclass::InputImagePointerType  DiffusionImagePointerType;
 
+  typedef typename Superclass::OutputImageType        OutputImageType;
+  typedef typename Superclass::OutputImagePointerType OutputImagePointerType;
 
 protected:
   DWIHeadMotionCorrectionFilter();

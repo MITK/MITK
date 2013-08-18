@@ -239,25 +239,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     mitkThrow() << "Subprocess failed with exception: " << e.what();
   }
 
-  //
-  // FIXME!!! EXTREME QUICK-HACK
-
-  typedef typename mitk::DiffusionImageSource< DiffusionPixelType>::OutputType OutputType;
-
-  DiffusionImageType* dwimageout =
-      static_cast<DiffusionImageType*>( caster->GetOutput() );
-
-  static_cast<OutputType*>(this->GetOutput())
-      ->SetVectorImage(dwimageout->GetVectorImage());
-  static_cast<OutputType*>(this->GetOutput())
-      ->SetB_Value(dwimageout->GetB_Value());
-  static_cast<OutputType*>(this->GetOutput())
-      ->SetDirections(dwimageout->GetDirections());
-  static_cast<OutputType*>(this->GetOutput())
-      ->SetMeasurementFrame(dwimageout->GetMeasurementFrame());
-  static_cast<OutputType*>(this->GetOutput())->InitializeFromVectorImage();
-
-
+  OutputImagePointerType output = this->GetOutput();
+  output = caster->GetOutput();
 }
 
 template< typename DiffusionPixelType>

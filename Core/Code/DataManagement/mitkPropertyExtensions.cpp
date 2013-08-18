@@ -15,18 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPropertyExtensions.h"
-#include <mitkPropertyExtension.h>
 #include <algorithm>
 #include <utility>
-
-class DeleteExtension
-{
-public:
-  void operator()(const std::pair<std::string, mitk::PropertyExtension*>& element)
-  {
-    delete element.second;
-  }
-};
 
 mitk::PropertyExtensions::PropertyExtensions()
 {
@@ -36,7 +26,7 @@ mitk::PropertyExtensions::~PropertyExtensions()
 {
 }
 
-bool mitk::PropertyExtensions::AddExtension(const std::string& propertyName, PropertyExtension* extension, const std::string& className, bool overwrite)
+bool mitk::PropertyExtensions::AddExtension(const std::string& propertyName, PropertyExtension::Pointer extension, const std::string& className, bool overwrite)
 {
   if (propertyName.empty())
     return false;
@@ -53,7 +43,7 @@ bool mitk::PropertyExtensions::AddExtension(const std::string& propertyName, Pro
   return ret.second;
 }
 
-mitk::PropertyExtension* mitk::PropertyExtensions::GetExtension(const std::string& propertyName, const std::string& className)
+mitk::PropertyExtension::Pointer mitk::PropertyExtensions::GetExtension(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
   {
@@ -78,19 +68,11 @@ bool mitk::PropertyExtensions::HasExtension(const std::string& propertyName, con
 
 void mitk::PropertyExtensions::RemoveAllExtensions(const std::string& className)
 {
-  ExtensionMap& extensions = m_Extensions[className];
-
-  std::for_each(extensions.begin(), extensions.end(), DeleteExtension());
-  extensions.clear();
+  m_Extensions[className].clear();
 }
 
 void mitk::PropertyExtensions::RemoveExtension(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
-  {
-    ExtensionMap& extensions = m_Extensions[className];
-
-    delete extensions[propertyName];
-    extensions.erase(propertyName);
-  }
+    m_Extensions[className].erase(propertyName);
 }

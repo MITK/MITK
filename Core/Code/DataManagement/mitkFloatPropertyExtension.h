@@ -29,9 +29,12 @@ namespace mitk
   class MITK_CORE_EXPORT FloatPropertyExtension : public PropertyExtension
   {
   public:
-    FloatPropertyExtension();
-    FloatPropertyExtension(float minimum, float maximum, float singleStep = 0.1f, int decimals = 2);
-    ~FloatPropertyExtension();
+    mitkClassMacro(FloatPropertyExtension, PropertyExtension);
+
+    itkNewMacro(Self);
+    mitkNewMacro2Param(Self, float, float);
+    mitkNewMacro3Param(Self, float, float, float);
+    mitkNewMacro4Param(Self, float, float, float, int);
 
     int GetDecimals() const;
     void SetDecimals(int decimals);
@@ -46,6 +49,11 @@ namespace mitk
     void SetSingleStep(float singleStep);
 
   private:
+    FloatPropertyExtension();
+    FloatPropertyExtension(float minimum, float maximum, float singleStep = 0.1f, int decimals = 2);
+
+    ~FloatPropertyExtension();
+
     struct Impl;
     Impl* m_Impl;
   };

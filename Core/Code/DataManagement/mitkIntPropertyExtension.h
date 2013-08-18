@@ -29,9 +29,11 @@ namespace mitk
   class MITK_CORE_EXPORT IntPropertyExtension : public PropertyExtension
   {
   public:
-    IntPropertyExtension();
-    IntPropertyExtension(int minimum, int maximum, int singleStep = 1);
-    ~IntPropertyExtension();
+    mitkClassMacro(IntPropertyExtension, PropertyExtension);
+
+    itkNewMacro(Self);
+    mitkNewMacro2Param(Self, int, int);
+    mitkNewMacro3Param(Self, int, int, int);
 
     int GetMaximum() const;
     void SetMaximum(int maximum);
@@ -43,6 +45,11 @@ namespace mitk
     void SetSingleStep(int singleStep);
 
   private:
+    IntPropertyExtension();
+    IntPropertyExtension(int minimum, int maximum, int singleStep = 1);
+
+    ~IntPropertyExtension();
+
     struct Impl;
     Impl* m_Impl;
   };

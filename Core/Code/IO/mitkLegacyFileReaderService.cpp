@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::LegacyFileReaderService::LegacyFileReaderService(const std::string& extension, const std::string& description)
   : AbstractFileReader(extension, description)
 {
-  if (extension.empty()) mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension." ;
-  RegisterMicroservice(us::GetModuleContext());
+  if (extension.empty()) mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension.";
+  this->RegisterService();
 }
 
 mitk::LegacyFileReaderService::~LegacyFileReaderService()

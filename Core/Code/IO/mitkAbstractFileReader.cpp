@@ -87,13 +87,16 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
 
 //////////// µS Registration & Properties //////////////
 
-void mitk::AbstractFileReader::RegisterMicroservice(us::ModuleContext* context)
+us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterService(us::ModuleContext* context)
 {
+  if (m_Registration) return m_Registration;
+
   us::ServiceProperties props = this->ConstructServiceProperties();
   m_Registration = context->RegisterService<mitk::IFileReader>(this, props);
+  return m_Registration;
 }
 
-void mitk::AbstractFileReader::UnregisterMicroservice(us::ModuleContext* /*context*/)
+void mitk::AbstractFileReader::UnregisterService()
 {
   if (! m_Registration )
   {

@@ -88,13 +88,16 @@ void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& pa
 
 //////////// µS Registration & Properties //////////////
 
-void mitk::AbstractFileWriter::RegisterMicroservice(us::ModuleContext* context)
+us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterService(us::ModuleContext* context)
 {
+  if (m_Registration) return m_Registration;
+
   us::ServiceProperties props = this->ConstructServiceProperties();
   m_Registration = context->RegisterService<mitk::IFileWriter>(this, props);
+  return m_Registration;
 }
 
-void mitk::AbstractFileWriter::UnregisterMicroservice(us::ModuleContext* /*context*/)
+void mitk::AbstractFileWriter::UnregisterService()
 {
   if (! m_Registration )
   {

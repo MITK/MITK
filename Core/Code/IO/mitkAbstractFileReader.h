@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceRegistration.h>
 #include <usServiceProperties.h>
+#include <usGetModuleContext.h>
 
 namespace mitk {
 
@@ -100,6 +101,9 @@ namespace mitk {
 
     virtual float GetProgress() const;
 
+    us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
+
+    void UnregisterService();
 
 protected:
     AbstractFileReader();
@@ -119,10 +123,6 @@ protected:
 
     // Registration
     us::ServiceRegistration<IFileReader> m_Registration;
-
-    virtual void RegisterMicroservice(us::ModuleContext* context);
-
-    virtual void UnregisterMicroservice(us::ModuleContext* context);
 
     virtual us::ServiceProperties ConstructServiceProperties();
 

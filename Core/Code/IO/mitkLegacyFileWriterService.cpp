@@ -30,7 +30,7 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer
 {
   if (extension.empty()) mitkThrow() << "LegacyFileWriterWrapper cannot be initialized without FileExtension." ;
 
-  RegisterMicroservice(us::GetModuleContext());
+  RegisterService();
 }
 
 ////////////////////// Writing /////////////////////////

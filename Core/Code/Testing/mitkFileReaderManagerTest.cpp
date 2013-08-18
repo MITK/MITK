@@ -37,6 +37,7 @@ public:
     : mitk::AbstractFileReader(extension, "This is a dummy description")
   {
     m_Priority = priority;
+    this->RegisterService();
   }
 
   using mitk::AbstractFileReader::Read;

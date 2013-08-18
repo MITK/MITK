@@ -126,9 +126,9 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
       {
-        mitk::IntPropertyExtension* extension = dynamic_cast<mitk::IntPropertyExtension*>(extensions->GetExtension(name));
+        mitk::IntPropertyExtension::Pointer extension = dynamic_cast<mitk::IntPropertyExtension*>(extensions->GetExtension(name).GetPointer());
 
-        if (extension != NULL)
+        if (extension.IsNotNull())
         {
           spinBox->setMinimum(extension->GetMinimum());
           spinBox->setMaximum(extension->GetMaximum());
@@ -150,9 +150,9 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
       {
-        mitk::FloatPropertyExtension* extension = dynamic_cast<mitk::FloatPropertyExtension*>(extensions->GetExtension(name));
+        mitk::FloatPropertyExtension::Pointer extension = dynamic_cast<mitk::FloatPropertyExtension*>(extensions->GetExtension(name).GetPointer());
 
-        if (extension != NULL)
+        if (extension.IsNotNull())
         {
           spinBox->setMinimum(extension->GetMinimum());
           spinBox->setMaximum(extension->GetMaximum());

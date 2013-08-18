@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseProperty.h>
 #include <mitkPropertyFilter.h>
 #include <usServiceInterface.h>
+#include <map>
+#include <string>
 #include <MitkExports.h>
 
 namespace mitk

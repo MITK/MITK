@@ -28,17 +28,21 @@ namespace mitk
     PropertyDescriptions();
     ~PropertyDescriptions();
 
-    bool AddDescription(const std::string& propertyName, const std::string& description, bool overwrite);
-    std::string GetDescription(const std::string& propertyName) const;
-    bool HasDescription(const std::string& propertyName) const;
-    void RemoveAllDescriptions();
-    void RemoveDescription(const std::string& propertyName);
+    bool AddDescription(const std::string& propertyName, const std::string& description, const std::string& className, bool overwrite);
+    std::string GetDescription(const std::string& propertyName, const std::string& className);
+    bool HasDescription(const std::string& propertyName, const std::string& className);
+    void RemoveAllDescriptions(const std::string& className);
+    void RemoveDescription(const std::string& propertyName, const std::string& className);
 
   private:
+    typedef std::map<std::string, std::string> DescriptionMap;
+    typedef DescriptionMap::const_iterator DescriptionMapConstIterator;
+    typedef DescriptionMap::iterator DescriptionMapIterator;
+
     PropertyDescriptions(const PropertyDescriptions&);
     PropertyDescriptions& operator=(const PropertyDescriptions&);
 
-    std::map<std::string, std::string> m_Descriptions;
+    std::map<std::string, DescriptionMap> m_Descriptions;
   };
 }
 

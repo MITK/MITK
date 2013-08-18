@@ -28,17 +28,21 @@ namespace mitk
     PropertyExtensions();
     ~PropertyExtensions();
 
-    bool AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite);
-    PropertyExtension* GetExtension(const std::string& propertyName) const;
-    bool HasExtension(const std::string& propertyName) const;
-    void RemoveAllExtensions();
-    void RemoveExtension(const std::string& propertyName);
+    bool AddExtension(const std::string& propertyName, PropertyExtension::Pointer extension, const std::string& className, bool overwrite);
+    PropertyExtension::Pointer GetExtension(const std::string& propertyName, const std::string& className);
+    bool HasExtension(const std::string& propertyName, const std::string& className);
+    void RemoveAllExtensions(const std::string& className);
+    void RemoveExtension(const std::string& propertyName, const std::string& className);
 
   private:
+    typedef std::map<std::string, PropertyExtension::Pointer> ExtensionMap;
+    typedef ExtensionMap::const_iterator ExtensionMapConstIterator;
+    typedef ExtensionMap::iterator ExtensionMapIterator;
+
     PropertyExtensions(const PropertyExtensions&);
     PropertyExtensions& operator=(const PropertyExtensions&);
 
-    std::map<std::string, PropertyExtension*> m_Extensions;
+    std::map<std::string, ExtensionMap> m_Extensions;
   };
 }
 

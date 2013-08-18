@@ -161,13 +161,13 @@ protected:
     std::list< std::string > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
     // Registration
-    mitk::ServiceRegistration m_Registration;
+    us::ServiceRegistration<IFileWriter> m_Registration;
 
-    virtual void RegisterMicroservice(mitk::ModuleContext* context);
+    virtual void RegisterMicroservice(us::ModuleContext* context);
 
-    virtual void UnregisterMicroservice(mitk::ModuleContext* context);
+    virtual void UnregisterMicroservice(us::ModuleContext* context);
 
-    virtual mitk::ServiceProperties ConstructServiceProperties();
+    virtual us::ServiceProperties ConstructServiceProperties();
 
 };
 } // namespace mitk

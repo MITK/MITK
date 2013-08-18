@@ -88,16 +88,13 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
 
 //////////// µS Registration & Properties //////////////
 
-void mitk::AbstractFileReader::RegisterMicroservice(mitk::ModuleContext* context)
+void mitk::AbstractFileReader::RegisterMicroservice(us::ModuleContext* context)
 {
-  ServiceProperties props = this->ConstructServiceProperties();
-  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
-  if (lightObject == 0)
-     mitkThrow() << "Tried to register reader that is not a lightObject. All readers must inherit from itk::LightObject when used as a Microservice.";
-  m_Registration = context->RegisterService<mitk::IFileReader>(lightObject, props);
+  us::ServiceProperties props = this->ConstructServiceProperties();
+  m_Registration = context->RegisterService<mitk::IFileReader>(this, props);
 }
 
-void mitk::AbstractFileReader::UnregisterMicroservice(mitk::ModuleContext* context)
+void mitk::AbstractFileReader::UnregisterMicroservice(us::ModuleContext* context)
 {
   if (! m_Registration )
   {
@@ -105,13 +102,10 @@ void mitk::AbstractFileReader::UnregisterMicroservice(mitk::ModuleContext* conte
     return;
   }
 
-  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
-  if (lightObject == 0)
-     mitkThrow() << "Tried to unregister reader that is not a lightObject. All readers must inherit from itk::LightObject when used as a Microservice. However, you somehow registered the object. If you read this error message, something is very wrong.";
   m_Registration.Unregister();
 }
 
-mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
+us::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";
@@ -119,10 +113,10 @@ mitk::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
     MITK_WARN << "Registered a Reader with no description defined (m_Description is empty). Reader will have no human readable extension information in FileDialogs.)";
   std::transform(m_Extension.begin(), m_Extension.end(), m_Extension.begin(), ::tolower);
 
-  mitk::ServiceProperties result;
+  us::ServiceProperties result;
   result[mitk::IFileReader::PROP_EXTENSION]    = m_Extension;
   result[mitk::IFileReader::PROP_DESCRIPTION]    = m_Description;
-  result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
+  result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
     result[*it] = std::string("true");

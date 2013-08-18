@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIFileWriter.h>
 
 // Microservices
-#include <mitkServiceReference.h>
-#include <mitkGetModuleContext.h>
+#include <usServiceReference.h>
+#include <usGetModuleContext.h>
 
 
 namespace mitk {
@@ -36,18 +36,18 @@ class MITK_CORE_EXPORT FileWriterManager
 {
   public:
 
-    static void Write(const mitk::BaseData::Pointer data, const std::string& path, mitk::ModuleContext* context = GetModuleContext());
+    static void Write(const mitk::BaseData::Pointer data, const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
     /**
     * Returns a compatible Writer to the given file extension
     **/
-    static mitk::IFileWriter* GetWriter(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileWriter* GetWriter(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static mitk::IFileWriter* GetWriter(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileWriter* GetWriter(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::list <mitk::IFileWriter*> GetWriters(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static std::vector <mitk::IFileWriter*> GetWriters(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::list <mitk::IFileWriter*> GetWriters(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static std::vector <mitk::IFileWriter*> GetWriters(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
     static std::string GetSupportedExtensions(const std::string& extension = 0);
 
@@ -57,10 +57,10 @@ protected:
     //FileWriterManager();
     //virtual ~FileWriterManager();
 
-    static std::list< mitk::ServiceReference > GetWriterList(const std::string& extension, mitk::ModuleContext* context);
-    static std::list< mitk::ServiceReference > GetWriterListByBasedataType(const std::string& basedataType, mitk::ModuleContext* context);
+    static std::vector< us::ServiceReference<IFileWriter> > GetWriterList(const std::string& extension, us::ModuleContext* context);
+    static std::vector< us::ServiceReference<IFileWriter> > GetWriterListByBasedataType(const std::string& basedataType, us::ModuleContext* context);
 
-    static std::string CreateFileDialogString(std::list<mitk::ServiceReference> refs);
+    static std::string CreateFileDialogString(const std::vector<us::ServiceReference<IFileWriter> >& refs);
 
     static bool WriterSupportsOptions(mitk::IFileWriter* Writer, std::list<std::string> options);
 

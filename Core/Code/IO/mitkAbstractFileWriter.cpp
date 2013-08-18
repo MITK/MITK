@@ -85,16 +85,13 @@ void mitk::AbstractFileWriter::Write(const itk::SmartPointer<BaseData> data, con
 
 //////////// µS Registration & Properties //////////////
 
-void mitk::AbstractFileWriter::RegisterMicroservice(mitk::ModuleContext* context)
+void mitk::AbstractFileWriter::RegisterMicroservice(us::ModuleContext* context)
 {
-  ServiceProperties props = this->ConstructServiceProperties();
-  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
-  if (lightObject == 0)
-     mitkThrow() << "Tried to register Writer that is not a lightObject. All Writers must inherit from itk::LightObject when used as a Microservice.";
-  m_Registration = context->RegisterService<mitk::IFileWriter>(lightObject, props);
+  us::ServiceProperties props = this->ConstructServiceProperties();
+  m_Registration = context->RegisterService<mitk::IFileWriter>(this, props);
 }
 
-void mitk::AbstractFileWriter::UnregisterMicroservice(mitk::ModuleContext* context)
+void mitk::AbstractFileWriter::UnregisterMicroservice(us::ModuleContext* context)
 {
   if (! m_Registration )
   {
@@ -102,13 +99,10 @@ void mitk::AbstractFileWriter::UnregisterMicroservice(mitk::ModuleContext* conte
     return;
   }
 
-  itk::LightObject* lightObject = dynamic_cast<itk::LightObject*> (this);
-  if (lightObject == 0)
-     mitkThrow() << "Tried to unregister Writer that is not a lightObject. All Writers must inherit from itk::LightObject when used as a Microservice. However, you somehow registered the object. If you read this error message, something is very wrong.";
   m_Registration.Unregister();
 }
 
-mitk::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
+us::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
 {
   if ( m_Extension == "" )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";
@@ -117,11 +111,11 @@ mitk::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
   if ( m_Description == "" )
     MITK_WARN << "Registered a Writer with no description defined (m_Description is empty). Writer will have no human readable extension information in FileDialogs.)";
 
-  mitk::ServiceProperties result;
+  us::ServiceProperties result;
   result[mitk::IFileWriter::PROP_EXTENSION]    = m_Extension;
   result[mitk::IFileWriter::PROP_DESCRIPTION]    = m_Description;
   result[mitk::IFileWriter::PROP_BASEDATA_TYPE]    = m_BasedataType;
-  result[mitk::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
+  result[us::ServiceConstants::SERVICE_RANKING()]  = m_Priority;
 
   for (std::list<std::string>::const_iterator it = m_Options.begin(); it != m_Options.end(); ++it) {
     result[*it] = std::string("true");

@@ -32,7 +32,7 @@ mitk::LegacyImageWriterService::LegacyImageWriterService(std::string basedataTyp
   m_Extension = extension;
   m_Description = description;
   m_Priority = 0; // Default priority for legacy Writer
-  RegisterMicroservice(mitk::GetModuleContext());
+  RegisterMicroservice(us::GetModuleContext());
 }
 
 mitk::LegacyImageWriterService::~LegacyImageWriterService()

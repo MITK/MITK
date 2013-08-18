@@ -37,7 +37,7 @@ mitk::LegacyFileWriterService::LegacyFileWriterService(mitk::FileWriter::Pointer
   m_Description = description;
   m_BasedataType = basedataType;
   m_Priority = 0; // Default priority for legacy Writer
-  RegisterMicroservice(mitk::GetModuleContext());
+  RegisterMicroservice(us::GetModuleContext());
 }
 
 mitk::LegacyFileWriterService::~LegacyFileWriterService()

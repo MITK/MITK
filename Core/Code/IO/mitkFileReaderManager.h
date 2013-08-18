@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLegacyFileReaderService.h>
 
 // Microservices
-#include <mitkServiceReference.h>
-#include <mitkGetModuleContext.h>
+#include <usServiceReference.h>
+#include <usGetModuleContext.h>
 
 
 namespace mitk {
@@ -64,13 +64,13 @@ class MITK_CORE_EXPORT FileReaderManager
     /**
     * Returns a compatible Reader to the given file extension
     **/
-    static mitk::IFileReader* GetReader(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileReader* GetReader(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::list <mitk::IFileReader*> GetReaders(const std::string& extension, mitk::ModuleContext* context = GetModuleContext() );
+    static std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::list <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, mitk::ModuleContext* context = GetModuleContext() );
+    static std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
     static std::string GetSupportedExtensions(const std::string& extension = "");
 
@@ -78,7 +78,7 @@ protected:
     //FileReaderManager();
     //virtual ~FileReaderManager();
 
-    static std::list< mitk::ServiceReference > GetReaderList(const std::string& extension, mitk::ModuleContext* context);
+    static std::vector< us::ServiceReference<IFileReader> > GetReaderList(const std::string& extension, us::ModuleContext* context);
 
     static bool ReaderSupportsOptions(mitk::IFileReader* reader, std::list<std::string> options);
 

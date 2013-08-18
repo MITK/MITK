@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIFileWriter.h>
 #include <mitkFileWriterManager.h>
 #include <mitkFileReaderManager.h>
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkBaseData.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkLegacyFileWriterService.h>
@@ -64,7 +64,7 @@ public:
    m_Extension = extension;
    m_Priority = priority;
    m_Description = "This is a dummy description.";
-   this->RegisterMicroservice(mitk::GetModuleContext());
+   this->RegisterMicroservice(us::GetModuleContext());
   }
 
 }; // End of internal dummy Writer
@@ -137,7 +137,7 @@ int mitkFileWriterManagerTest(int argc , char* argv[])
 
   // Onward to test the retrieval of multiple Writers
 
-  std::list< mitk::IFileWriter* > returnedList;
+  std::vector< mitk::IFileWriter* > returnedList;
   returnedList = mitk::FileWriterManager::GetWriters("test", options);
   MITK_TEST_CONDITION_REQUIRED(returnedList.size() == 0, "Testing correct return of zero Writers when no matching Writer was found, asking for all compatibles");
 

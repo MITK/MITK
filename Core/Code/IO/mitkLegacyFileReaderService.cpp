@@ -27,7 +27,7 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(std::string extension, st
   m_Extension = extension;
   m_Description = description;
   m_Priority = 0; // Default priority for legacy reader
-  RegisterMicroservice(mitk::GetModuleContext());
+  RegisterMicroservice(us::GetModuleContext());
 }
 
 mitk::LegacyFileReaderService::~LegacyFileReaderService()

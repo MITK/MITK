@@ -10,6 +10,7 @@ set(MODULE_TESTS
 )
 
 set(MODULE_CUSTOM_TESTS
+  mitkAbstractToFDeviceFactoryTest.cpp
   mitkPlayerLoadAndRenderDepthDataTest.cpp
   mitkPlayerLoadAndRenderRGBDataTest.cpp
 )

@@ -1,0 +1,7 @@
+if(MITK_USE_ACVD)
+  MITK_CREATE_MODULE(Remeshing
+    PACKAGE_DEPENDS ACVD
+  )
+
+  add_subdirectory(Testing)
+endif()

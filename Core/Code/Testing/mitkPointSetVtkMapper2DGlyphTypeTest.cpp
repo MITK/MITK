@@ -42,6 +42,10 @@ int mitkPointSetVtkMapper2DGlyphTypeTest(int argc, char* argv[])
   // render triangles instead of crosses
   eP->SetValue(5);
 
+  // disables anti-aliasing which is enabled on several graphics cards and
+  // causes problems when doing a pixel-wise comparison to a reference image
+  renderingHelper.GetVtkRenderWindow()->SetMultiSamples(0);
+
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
 

@@ -31,7 +31,7 @@ class Perspective;
 
 struct BERRY_UI IStickyViewManager : public Object {
 
-  berryInterfaceMacro(IStickyViewManager, berry)
+  berryInterfaceMacro(IStickyViewManager, berry);
 
   ~IStickyViewManager();
 

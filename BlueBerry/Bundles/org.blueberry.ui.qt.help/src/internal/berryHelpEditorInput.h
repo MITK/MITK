@@ -27,7 +27,7 @@ namespace berry
 class HelpEditorInput : public berry::IEditorInput
 {
 public:
-  berryObjectMacro(HelpEditorInput)
+  berryObjectMacro(HelpEditorInput);
 
   HelpEditorInput(const QUrl& url = QUrl());
 

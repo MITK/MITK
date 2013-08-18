@@ -32,7 +32,7 @@ class BERRY_COMMANDS NamedHandleObject : public HandleObject {
 
 public:
 
-  berryObjectMacro(NamedHandleObject)
+  berryObjectMacro(NamedHandleObject);
 
 protected:
 

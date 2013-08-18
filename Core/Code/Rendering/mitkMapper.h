@@ -61,10 +61,10 @@ namespace mitk {
     /** \brief Set the DataNode containing the data to map */
     itkSetObjectMacro(DataNode, DataNode);
 
-
-    /** \brief Get the DataNode containing the data to map */
+    /** \brief Get the DataNode containing the data to map.
+    * Method only returns valid DataNode Pointer if the mapper belongs to a data node.
+    * Otherwise, the returned DataNode Pointer might be invalid. */
     virtual DataNode* GetDataNode() const;
-
 
     /**\brief Get the data to map
     *
@@ -190,8 +190,7 @@ namespace mitk {
     */
     virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { }
 
-    //\brief not thread-safe
-    itk::WeakPointer<DataNode> m_DataNode;
+    mitk::DataNode * m_DataNode;
 
 
   private:
@@ -217,8 +216,7 @@ namespace mitk {
     {
       public:
 
-
-      bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode);
+      bool IsGenerateDataRequired(mitk::BaseRenderer *renderer,mitk::Mapper *mapper,mitk::DataNode *dataNode) const;
 
       inline void UpdateGenerateDataTime()
       {

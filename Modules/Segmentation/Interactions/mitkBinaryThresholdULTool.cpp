@@ -34,6 +34,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 
+// us
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, BinaryThresholdULTool, "ThresholdingUL tool");
 }
@@ -47,7 +53,7 @@ mitk::BinaryThresholdULTool::BinaryThresholdULTool()
   this->SupportRoiOn();
 
   m_ThresholdFeedbackNode = DataNode::New();
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
+  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
   m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
   m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));
@@ -60,12 +66,19 @@ mitk::BinaryThresholdULTool::~BinaryThresholdULTool()
 
 const char** mitk::BinaryThresholdULTool::GetXPM() const
 {
-  return mitkBinaryThresholdULTool_xpm;
+  return NULL;
+}
+
+us::ModuleResource mitk::BinaryThresholdULTool::GetIconResource() const
+{
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("TwoThresholds_48x48.png");
+  return resource;
 }
 
 const char* mitk::BinaryThresholdULTool::GetName() const
 {
-  return "ThresholdingUL";
+  return "Two Thresholds";
 }
 
 void mitk::BinaryThresholdULTool::Activated()
@@ -115,10 +128,10 @@ void mitk::BinaryThresholdULTool::SetThresholdValues(int lower, int upper)
   }
 }
 
-void mitk::BinaryThresholdULTool::AcceptCurrentThresholdValue(const std::string& organName, const Color& color)
+void mitk::BinaryThresholdULTool::AcceptCurrentThresholdValue()
 {
 
-  CreateNewSegmentationFromThreshold(m_NodeForThresholding, organName, color );
+  CreateNewSegmentationFromThreshold(m_NodeForThresholding);
 
   RenderingManager::GetInstance()->RequestUpdateAll();
   m_ToolManager->ActivateTool(-1);
@@ -166,7 +179,7 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
   }
 }
 
-void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organName, const Color& color)
+void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* node)
 {
   if (node)
   {
@@ -174,7 +187,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
     if (image.IsNotNull())
     {
       // create a new image of the same dimensions and smallest possible pixel type
-      DataNode::Pointer emptySegmentation = Tool::CreateEmptySegmentationNode( image, organName, color );
+      DataNode::Pointer emptySegmentation = GetTargetSegmentationNode();
 
       if (emptySegmentation)
       {
@@ -212,12 +225,8 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
           emptySegmentation->SetData(padFilter->GetOutput());
         }
 
-        if (DataStorage* ds = m_ToolManager->GetDataStorage())
-        {
-          ds->Add( emptySegmentation, m_OriginalImageNode );
-        }
-
         m_ToolManager->SetWorkingData( emptySegmentation );
+        m_ToolManager->GetWorkingData(0)->Modified();
       }
     }
   }

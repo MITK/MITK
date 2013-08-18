@@ -1,5 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
 if(BUILD_TESTING AND MODULE_IS_ENABLED)
+mitkAddCustomModuleTest(mitkAbstractToFDeviceFactoryTest_DefaultCalibrationFile mitkAbstractToFDeviceFactoryTest -V ${MITK_DATA_DIR}/ToF-Data/CalibrationFiles/Default_Parameters.xml)
 #Only enabled for Windows and Mac nightlies.
 #If you want to run this on linux, just enable the flag in the superbuild.
 if(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING)
@@ -17,3 +18,4 @@ SET_PROPERTY(TEST mitkPlayerLoadAndRenderDepthDataTest_KinectDepthImage mitkPlay
 
 endif(WIN32 OR APPLE OR MITK_ENABLE_GUI_TESTING)
 endif(BUILD_TESTING AND MODULE_IS_ENABLED)
+

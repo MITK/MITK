@@ -28,11 +28,6 @@ class QmitkWelcomePerspective : public QObject, public berry::IPerspectiveFactor
 public:
 
   QmitkWelcomePerspective() {}
-  QmitkWelcomePerspective(const QmitkWelcomePerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkWelcomePerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);

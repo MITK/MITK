@@ -66,7 +66,6 @@ set(H_FILES
   DataManagement/mitkImageToItk.txx
 
   Interactions/mitkEventMapperAddOn.h
-
   Interfaces/mitkIDataNodeReader.h
   Interfaces/mitkIFileWriter.h
   Interfaces/mitkIFileWriter.cpp
@@ -88,11 +87,13 @@ set(CPP_FILES
   Algorithms/mitkImageSource.cpp
   Algorithms/mitkImageTimeSelector.cpp
   Algorithms/mitkImageToImageFilter.cpp
+  Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkPointSetSource.cpp
   Algorithms/mitkPointSetToPointSetFilter.cpp
   Algorithms/mitkRGBToRGBACastImageFilter.cpp
   Algorithms/mitkSubImageSelector.cpp
   Algorithms/mitkSurfaceSource.cpp
+  Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
@@ -238,6 +239,7 @@ set(CPP_FILES
   Interactions/mitkMouseMoveEvent.cpp
   Interactions/mitkMouseReleaseEvent.cpp
   Interactions/mitkMouseWheelEvent.cpp
+  Interactions/mitkMouseDoubleClickEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveBaseDataInteractor.cpp
@@ -247,6 +249,7 @@ set(CPP_FILES
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp
   Interactions/mitkStateMachineAction.cpp
+  Interactions/mitkStateMachineCondition.cpp
   Interactions/mitkStateMachineState.cpp
   Interactions/mitkStateMachineTransition.cpp
   Interactions/mitkState.cpp

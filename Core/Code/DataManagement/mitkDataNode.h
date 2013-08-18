@@ -72,6 +72,12 @@ public:
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
   typedef std::set<std::string> GroupTagList;
 
+  /**
+  * \brief Definition of an itk::Event that is invoked when
+  * a DataInteractor is set on this DataNode.
+  */
+  itkEventMacro(InteractorChangedEvent, itk::AnyEvent);
+
   mitkClassMacro(DataNode, itk::DataObject);
 
   itkNewMacro(Self);

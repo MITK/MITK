@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPicFileReader.h"
 #include "mitkPicHelper.h"
 #include <itkImageFileReader.h>
+#include "mitkImageWriteAccessor.h"
 
 extern "C"
 {
@@ -220,7 +221,8 @@ void mitk::PicFileReader::GenerateData()
     if( m_FileName != "")
     {
         mitkIpPicDescriptor* outputPic = mitkIpPicNew();
-        outputPic = CastToIpPicDescriptor(output, outputPic);
+        mitk::ImageWriteAccessor imageAccess(output);
+        outputPic = CastToIpPicDescriptor(output, &imageAccess, outputPic);
         mitkIpPicDescriptor* pic=MITKipPicGet(const_cast<char *>(m_FileName.c_str()),
                                               outputPic);
         // comes upside-down (in MITK coordinates) from PIC file

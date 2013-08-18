@@ -428,7 +428,8 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       // Cast to pic descriptor for the timeSelector image
       mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
-      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+      mitk::ImageWriteAccessor imageAccess(timeSelector->GetOutput());
+      CastToIpPicDescriptor( timeSelector->GetOutput(), &imageAccess, timeSelectorPic );
 
       _mitkIpPicFreeTags(pic_transformed->info->tags_head);
       pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);

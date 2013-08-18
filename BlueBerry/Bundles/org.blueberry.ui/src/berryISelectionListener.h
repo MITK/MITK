@@ -42,7 +42,7 @@ namespace berry
 struct BERRY_UI ISelectionListener: public virtual Object
 {
 
-  berryInterfaceMacro(ISelectionListener, berry)
+  berryInterfaceMacro(ISelectionListener, berry);
 
   struct Events
   {

@@ -28,7 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "vnl/vnl_vector.h"
 #include <itkAffineGeometryFrame.h>
-#include "mitkGetModuleContext.h"
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include "usServiceReference.h"
 
 std::vector<mitk::PlaneGeometry::Pointer> m_Geometries;
 std::vector<unsigned int> m_SliceIndices;
@@ -39,8 +41,9 @@ mitk::PlanePositionManagerService* m_Service;
 int SetUpBeforeTest()
 {
     //Getting Service
-    mitk::ServiceReference serviceRef = mitk::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
-    m_Service = dynamic_cast<mitk::PlanePositionManagerService*>(mitk::GetModuleContext()->GetService(serviceRef));
+    us::ServiceReference<mitk::PlanePositionManagerService> serviceRef =
+        us::GetModuleContext()->GetServiceReference<mitk::PlanePositionManagerService>();
+    m_Service = us::GetModuleContext()->GetService(serviceRef);
 
     if (m_Service == 0)
         return EXIT_FAILURE;

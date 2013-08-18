@@ -82,13 +82,14 @@ protected slots:
   // reaction to the button "New segmentation"
   void CreateNewSegmentation();
 
+  void OnManualTool2DSelected(int id);
   // reaction to the button "New segmentation"
-  void CreateSegmentationFromSurface();
+//  void CreateSegmentationFromSurface();
 
   // called when one of "Manual", "Organ", "Lesion" pages of the QToolbox is selected
-  void ToolboxStackPageChanged(int id);
+//  void ToolboxStackPageChanged(int id);
 
-  void OnSurfaceSelectionChanged();
+//  void OnSurfaceSelectionChanged();
 
   void OnWorkingNodeVisibilityChanged();
 
@@ -96,6 +97,8 @@ protected slots:
   void OnBinaryPropertyChanged();
 
   void OnShowMarkerNodes(bool);
+
+  void OnTabWidgetChanged(int);
 
 protected:
 
@@ -127,6 +130,12 @@ protected:
 
   // GUI setup
   void CreateQtPartControl(QWidget* parent);
+
+  void ResetMouseCursor( );
+
+  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY );
+
+  bool m_MouseCursorSet;
 
   // handling of a list of known (organ name, organ color) combination
   // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp

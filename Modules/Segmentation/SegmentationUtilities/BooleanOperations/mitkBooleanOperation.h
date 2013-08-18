@@ -1,0 +1,77 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
+#ifndef mitkBooleanOperation_h
+#define mitkBooleanOperation_h
+
+#include <mitkImage.h>
+#include <SegmentationExports.h>
+
+namespace mitk
+{
+  /** \brief Executes a boolean operation on two different segmentations.
+   *
+   * All parameters of the boolean operations must be specified during construction.
+   * The actual operation is executed when calling GetResult().
+   */
+  class Segmentation_EXPORT BooleanOperation
+  {
+  public:
+    enum Type
+    {
+      None,
+      Difference,
+      Intersection,
+      Union
+    };
+
+    /* \brief Construct a boolean operation.
+     *
+     * Throws an mitk::Exception when segmentations are somehow invalid.
+     *
+     * \param[in] type The type of the boolean operation.
+     * \param[in] segmentation1 The first operand of the boolean operation.
+     * \param[in] segmentation2 The second operand of the boolean operation.
+     * \param[in] The time step at which the operation will be executed.
+     */
+    BooleanOperation(Type type, Image::Pointer segmentation1, Image::Pointer segmentation2, unsigned int time = 0);
+    ~BooleanOperation();
+
+    /* \brief Execute boolean operation and return resulting segmentation.
+     *
+     * \return The resulting segmentation.
+     */
+    Image::Pointer GetResult() const;
+
+  private:
+    BooleanOperation(const BooleanOperation &);
+    BooleanOperation & operator=(const BooleanOperation &);
+
+    Image::Pointer GetDifference() const;
+    Image::Pointer GetIntersection() const;
+    Image::Pointer GetUnion() const;
+
+    void ValidateSegmentation(Image::Pointer segmentation) const;
+    void ValidateSegmentations() const;
+
+    Type m_Type;
+    Image::Pointer m_Segmentation0;
+    Image::Pointer m_Segmentation1;
+    unsigned int m_Time;
+  };
+}
+
+#endif

@@ -1,7 +1,7 @@
 #!
 #! Create a BlueBerry application.
 #!
-#! \brif This function will create a BlueBerry application together with all
+#! \brief This function will create a BlueBerry application together with all
 #! necessary provisioning and configuration data and install support.
 #!
 #! \param NAME (required) The name of the executable.
@@ -167,11 +167,14 @@ endif()
 
 # Create batch files for Windows platforms
 if(WIN32)
-  foreach(BUILD_TYPE debug release)
-    mitkFunctionCreateWindowsBatchScript(start${_APP_NAME}.bat.in
-      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat
-      ${BUILD_TYPE})
-  endforeach()
+  set(template_name "start${_APP_NAME}.bat.in")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${template_name}")
+    foreach(BUILD_TYPE debug release)
+      mitkFunctionCreateWindowsBatchScript(${template_name}
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start${_APP_NAME}_${BUILD_TYPE}.bat
+        ${BUILD_TYPE})
+    endforeach()
+  endif()
 endif(WIN32)
 
 # -----------------------------------------------------------------------

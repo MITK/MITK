@@ -60,8 +60,8 @@ public:
 
     typedef Image< Vector< TOdfPixelType, (NOrderL*NOrderL + NOrderL + 2)/2 + NOrderL >, 3 > CoefficientImageType;
 
-    typedef std::map<double, std::vector<unsigned int> > BValueMap;
-    typedef std::map<double, std::vector<unsigned int> >::iterator BValueMapIteraotr;
+    typedef std::map<unsigned int, std::vector<unsigned int> > BValueMap;
+    typedef std::map<unsigned int, std::vector<unsigned int> >::iterator BValueMapIteraotr;
     typedef std::vector<unsigned int> IndiciesVector;
 
     // --------------------------------------------------------------------------------------------//
@@ -81,7 +81,7 @@ public:
       * GradientDirectionContainerType-Input gradientDirectionContainer (e.g. vols->GetDirections)
       * GradientImagesType-Input gradientImage (e.g. vols->GetVectorImage)
       * float-Input bvalue (e.g. vols->GetB_Value) */
-    void SetGradientImage( GradientDirectionContainerType * gradientDirectionContainer, const GradientImagesType *gradientImage , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
+    void SetGradientImage( const GradientDirectionContainerType * gradientDirectionContainer, const GradientImagesType *gradientImage , float bvalue);//, std::vector<bool> listOfUserSelctedBValues );
 
    /** Set a BValue Map (key = bvalue, value = indicies splittet for each shell)
      * If the input image containes more than three q-shells

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkToFCompositeFilter.h>
 #include <itkMedianImageFilter.h>
+#include <mitkImagePixelReadAccessor.h>
 
 
 /**Documentation
@@ -83,10 +84,11 @@ static bool ApplyTemporalMedianFilter(mitk::Image::Pointer& image, ItkImageType_
       curIdx3D[0] = i; curIdx3D[1] = j;
       curIdx2D[0] = i; curIdx2D[1] = j;
       //gather all distances for one pixel
+      mitk::ImagePixelReadAccessor<ToFScalarType,3> imageAcces(image, image->GetVolumeData());
       for(unsigned int k = 0; k < nbSlices; k++)
       {
         curIdx3D[2] = k;
-        allDistances.push_back(image->GetPixelValueByIndex(curIdx3D));
+        allDistances.push_back(imageAcces.GetPixelByIndex(curIdx3D));
       }
 
       //sort distances and compute median
@@ -118,13 +120,15 @@ static bool CompareImages(mitk::Image::Pointer image1, mitk::Image::Pointer imag
     return false;
 
   //compare all pixel values
+  mitk::ImagePixelReadAccessor<ToFScalarType,2> image1Acces(image1, image1->GetSliceData(0));
+  mitk::ImagePixelReadAccessor<ToFScalarType,2> image2Acces(image2, image2->GetSliceData(0));
   for(unsigned int i = 0; i<dimX; i++)
   {
     for(unsigned int j = 0; j < dimY; j++)
     {
-      mitk::Index3D idx;
-      idx[0] = i; idx[1] = j; idx[2] = 0;
-      if(!(mitk::Equal(image1->GetPixelValueByIndex(idx), image1->GetPixelValueByIndex(idx))))
+      itk::Index<2> idx;
+      idx[0] = i; idx[1] = j;
+      if(!(mitk::Equal(image1Acces.GetPixelByIndex(idx), image2Acces.GetPixelByIndex(idx))))
       {
         return false;
       }

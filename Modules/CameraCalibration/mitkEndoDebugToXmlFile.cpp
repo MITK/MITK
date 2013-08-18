@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkEndoDebugToXmlFile.h"
 #include <tinyxml.h>
@@ -60,7 +75,7 @@ namespace mitk
     elem->SetAttribute( "ShowImagesInDebug",
                         (d->m_EndoDebug->GetShowImagesInDebug()? 1:0) );
     elem->SetAttribute( "ShowImagesTimeOut",
-                        d->m_EndoDebug->GetShowImagesTimeOut() );
+                        (static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut())) );
     elem->SetAttribute( "DebugImagesOutputDirectory",
                         d->m_EndoDebug->GetDebugImagesOutputDirectory() );
 

@@ -37,7 +37,7 @@ struct ISourceProvider;
  */
 struct BERRY_UI IServiceWithSources : public IDisposable {
 
-  berryInterfaceMacro(IServiceWithSources, berry)
+  berryInterfaceMacro(IServiceWithSources, berry);
 
   ~IServiceWithSources();
 

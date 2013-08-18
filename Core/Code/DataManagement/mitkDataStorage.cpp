@@ -188,9 +188,18 @@ void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataNode* node)
   RemoveNodeEvent.Send(node);
 }
 
+void mitk::DataStorage::OnNodeInteractorChanged( itk::Object *caller, const itk::EventObject& )
+{
+  const mitk::DataNode* _Node = dynamic_cast<const mitk::DataNode*>(caller);
+  if(_Node)
+  {
+    InteractorChangedNodeEvent.Send( _Node );
+  }
+}
+
 void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, const itk::EventObject &event )
 {
-  if(m_BlockNodeModifiedEvents)
+  if( m_BlockNodeModifiedEvents )
     return;
 
   const mitk::DataNode* _Node = dynamic_cast<const mitk::DataNode*>(caller);
@@ -220,6 +229,11 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
     m_NodeModifiedObserverTags[NonConstNode]
       = NonConstNode->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
 
+
+    itk::MemberCommand<mitk::DataStorage>::Pointer interactorChangedCommand = itk::MemberCommand<mitk::DataStorage>::New();
+    interactorChangedCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeInteractorChanged);
+    m_NodeInteractorChangedObserverTags[NonConstNode] = NonConstNode->AddObserver( mitk::DataNode::InteractorChangedEvent(), interactorChangedCommand);
+
     // add itk delete listener on datastorage
     itk::MemberCommand<mitk::DataStorage>::Pointer deleteCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
@@ -245,8 +259,13 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
                                  .find(NonConstNode)->second);
     NonConstNode->RemoveObserver(m_NodeDeleteObserverTags
                                  .find(NonConstNode)->second);
+    NonConstNode->RemoveObserver(m_NodeInteractorChangedObserverTags
+      .find(NonConstNode)->second);
+
+
     m_NodeModifiedObserverTags.erase(NonConstNode);
     m_NodeDeleteObserverTags.erase(NonConstNode);
+    m_NodeInteractorChangedObserverTags.erase(NonConstNode);
   }
 }
 
@@ -509,4 +528,9 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
     timeBounds[1] = stmax;
   }
   return timeBounds;
+}
+
+void mitk::DataStorage::BlockNodeModifiedEvents( bool block )
+{
+  m_BlockNodeModifiedEvents = block;
 }

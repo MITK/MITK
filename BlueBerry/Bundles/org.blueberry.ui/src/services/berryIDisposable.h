@@ -51,7 +51,7 @@ namespace berry {
 struct BERRY_UI IDisposable : public virtual Object
 {
 
-  berryInterfaceMacro(IDisposable, berry)
+  berryInterfaceMacro(IDisposable, berry);
 
   ~IDisposable();
 

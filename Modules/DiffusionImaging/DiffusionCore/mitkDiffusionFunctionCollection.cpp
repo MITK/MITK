@@ -95,7 +95,7 @@ double mitk::sh::Yj(int m, int l, double theta, double phi)
 
 //------------------------- gradients-function ------------------------------------
 
-std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap, const GradientDirectionContainerType * refGradientsContainer )
+std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMap & refBValueMap, GradientDirectionContainerType *refGradientsContainer )
 {
 
   IndiciesVector directioncontainer;
@@ -135,7 +135,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const std::map
 }
 
 
-bool mitk::gradients::CheckForDifferingShellDirections(const std::map<double , std::vector<unsigned int> > & refBValueMap,  const GradientDirectionContainerType * refGradientsContainer)
+bool mitk::gradients::CheckForDifferingShellDirections(const BValueMap & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer)
 {
   BValueMap::const_iterator mapIterator = refBValueMap.begin();
 

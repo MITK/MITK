@@ -161,7 +161,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     sliderFixed->setCheckable(true);
     sliderFixed->setChecked(m_LevelWindow.IsFixed());
     contextMenu->addSeparator();
-    contextMenu->addAction(tr("Use Whole Image Greyvalues"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->addAction(tr("Use whole image grey values"), this, SLOT(useAllGreyvaluesFromImage()));
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->addAction(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
@@ -242,7 +242,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     sliderFixed->setCheckable(true);
     sliderFixed->setChecked(m_LevelWindow.IsFixed());
     contextMenu->addSeparator();
-    contextMenu->addAction(tr("Use Whole Image Greyvalues"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->addAction(tr("Use whole image grey values"), this, SLOT(useAllGreyvaluesFromImage()));
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->addAction(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));

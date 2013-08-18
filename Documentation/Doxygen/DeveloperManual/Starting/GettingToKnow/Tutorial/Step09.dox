@@ -10,7 +10,7 @@ user interface for controlling the bundles functions.
 The creation of a MITK plug-in is considerably facilitated by using the MITK PluginGenerator as described in \ref NewPluginPage .
 
 The mentioned tool was used to create a plug-in called org.mitk.example.gui.regiongrowing.
-Let's first look at what files the PluginGenerator created:
+Let's first take a look at which files the PluginGenerator has created:
 
 \verbatim
 documentation\doxygen\
@@ -34,7 +34,7 @@ plugin.xml ........................... BlueBerry integration
 If you are not familiar with Qt development, please look into
 <a href="http://doc.qt.digia.com/4.7/designer-manual.html">this Digia page describing .ui files</a> (no, forget about the please, DO it!)
 
-The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the ability to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
+The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the option to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
 
 To add a mitk::PointSet for the seed points:
 QmitkRegionGrowingView.h

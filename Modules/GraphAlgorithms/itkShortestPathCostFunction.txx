@@ -13,20 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __itkShortestPathCostFunction_cpp
-#define __itkShortestPathCostFunction_cpp
+#ifndef __itkShortestPathCostFunction_txx
+#define __itkShortestPathCostFunction_txx
 
+#include "itkShortestPathCostFunction.h"
 
 namespace itk
 {
-
-  // Constructor
-  template<class TInputImageType>
-  ShortestPathCostFunction<TInputImageType>
-    ::ShortestPathCostFunction()
-  {
-  }
-
 
   template<class TInputImageType>
   void
@@ -39,26 +32,26 @@ namespace itk
 
   template <class TInputImageType>
   void ShortestPathCostFunction<TInputImageType>::
-    SetStartIndex (const typename TInputImageType::IndexType &StartIndex)
+    SetStartIndex (const typename TInputImageType::IndexType &index)
   {
     for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
     {
-      m_StartIndex[i] = StartIndex[i];
+      m_StartIndex[i] = index[i];
     }
   }
 
 
   template <class TInputImageType>
   void ShortestPathCostFunction<TInputImageType>::
-    SetEndIndex (const typename TInputImageType::IndexType &EndIndex)
+    SetEndIndex (const typename TInputImageType::IndexType &index)
   {
     for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
     {
-      m_EndIndex[i] = EndIndex[i];
+      m_EndIndex[i] = index[i];
     }
   }
 
 
 } // end namespace itk
 
-#endif // __itkShortestPathCostFunction_cpp
+#endif // __itkShortestPathCostFunction_txx

@@ -42,7 +42,7 @@ class BERRY_JOBS WorkerPool: public Object, public Poco::SynchronizedObject
 
 public:
 
-  berryObjectMacro(WorkerPool)
+  berryObjectMacro(WorkerPool);
 
   WorkerPool(JobManager* myManager);
 

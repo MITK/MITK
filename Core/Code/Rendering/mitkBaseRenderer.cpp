@@ -151,7 +151,7 @@ mitk::BaseRenderer::BaseRenderer(const char* name, vtkRenderWindow * renWin, mit
   // TODO: INTERACTION_LEGACY
   m_RenderingManager->GetGlobalInteraction()->AddFocusElement(this);
 
-  m_BindDispatcherInteractor = new mitk::BindDispatcherInteractor();
+  m_BindDispatcherInteractor = new mitk::BindDispatcherInteractor( GetName() );
 
   WeakPointerProperty::Pointer rendererProp = WeakPointerProperty::New((itk::Object*) this);
 

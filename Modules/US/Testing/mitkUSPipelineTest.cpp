@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 #include "mitkUSImageToUSImageFilter.h"
 #include "mitkPadImageFilter.h"
+#include <mitkImageWriteAccessor.h>
 
 // START TESTFILER
 // This is an specialization of the USImageToUSImageFIlter
@@ -41,19 +42,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
     void GenerateData()
-      {
+    {
       mitk::USImage::Pointer ni = this->GetInput(0);
       mitk::USImage::Pointer result = mitk::USImage::New();
 
-      result->Initialize(ni);
-      result->SetImportVolume(ni->GetData());
-
-      mitk::USImageMetadata::Pointer meta = ni->GetMetadata();
-      meta->SetDeviceComment("Test");
-      result->SetMetadata(meta);
-      SetNthOutput(0, result);
-      };
+      try
+      {
+        mitk::Image::Pointer image = ni.GetPointer();
+        mitk::ImageWriteAccessor imgA(image, image->GetVolumeData(0));
+        result->Initialize(image);
+        result->SetImportVolume(imgA.GetData());
+        mitk::USImageMetadata::Pointer meta = ni->GetMetadata();
+        meta->SetDeviceComment("Test");
+        result->SetMetadata(meta);
+        SetNthOutput(0, result);
+      }
+      catch(mitk::Exception& e)
+      {
+        std::stringstream msg;
+        msg << "Cannot open image for reading: " << e.GetDescription();
+        MITK_TEST_FAILED_MSG(<<msg.str());
+      }
     };
+  };
 
 
 // END TESTFILTER
@@ -66,7 +77,7 @@ public:
   static void TestPipelineUS(std::string videoFilePath)
   {
    // Set up a pipeline
-    mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New("C:\\Users\\maerz\\Videos\\Debut\\us.avi", "Manufacturer", "Model");
+    mitk::USVideoDevice::Pointer videoDevice = mitk::USVideoDevice::New(videoFilePath, "Manufacturer", "Model");
     TestUSFilter::Pointer filter = TestUSFilter::New();
     videoDevice->Update();
     filter->SetInput(videoDevice->GetOutput());
@@ -91,7 +102,7 @@ int mitkUSPipelineTest(int  argc , char* argv[])
 
   #ifdef WIN32 // Video file compression is currently only supported under windows.
    // US Pipelines need to be reworked :(
-   // mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
+   //mitkUSPipelineTestClass::TestPipelineUS(argv[1]);
   #endif
 
   MITK_TEST_END();

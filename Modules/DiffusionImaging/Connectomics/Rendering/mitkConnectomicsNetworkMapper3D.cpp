@@ -263,7 +263,8 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
     vtkGraphLayout* layout = vtkGraphLayout::New();
     layout->SetInput(graph);
-    layout->SetLayoutStrategy(vtkPassThroughLayoutStrategy::New());
+    vtkPassThroughLayoutStrategy* ptls = vtkPassThroughLayoutStrategy::New();
+    layout->SetLayoutStrategy( ptls );
 
     vtkGraphToPolyData* graphToPoly = vtkGraphToPolyData::New();
     graphToPoly->SetInputConnection(layout->GetOutputPort());

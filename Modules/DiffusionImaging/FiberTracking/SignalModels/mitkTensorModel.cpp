@@ -52,11 +52,11 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        double bVal = g.GetNorm(); bVal *= bVal;
+        ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
         {
-            itk::DiffusionTensor3D<float> S;
+            itk::DiffusionTensor3D< ScalarType > S;
             S[0] = g[0]*g[0];
             S[1] = g[1]*g[0];
             S[2] = g[2]*g[0];
@@ -64,9 +64,9 @@ typename TensorModel< ScalarType >::PixelType TensorModel< ScalarType >::Simulat
             S[4] = g[2]*g[1];
             S[5] = g[2]*g[2];
 
-            double D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
-                       tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
-                       tensor[2]*S[2] + tensor[4]*S[4] + tensor[5]*S[5];
+            ScalarType D = tensor[0]*S[0] + tensor[1]*S[1] + tensor[2]*S[2] +
+                           tensor[1]*S[1] + tensor[3]*S[3] + tensor[4]*S[4] +
+                           tensor[2]*S[2] + tensor[4]*S[4] + tensor[5]*S[5];
 
             // check for corrupted tensor and generate signal
             if (D>=0)

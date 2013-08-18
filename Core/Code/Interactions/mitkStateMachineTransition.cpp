@@ -70,13 +70,21 @@ mitk::StateMachineTransition::~StateMachineTransition()
 {
   //needed for correct reference counting of mitkState//, for real???
   m_NextState = NULL;
+
   m_Actions.clear();
+  m_Conditions.clear();
 }
 
 void mitk::StateMachineTransition::AddAction(const StateMachineAction::Pointer& action)
 {
   m_Actions.push_back(action);
 }
+
+void mitk::StateMachineTransition::AddCondition(const StateMachineCondition& condition)
+{
+  m_Conditions.push_back( condition );
+}
+
 
 mitk::StateMachineState::Pointer mitk::StateMachineTransition::GetNextState() const
 {
@@ -92,6 +100,12 @@ std::vector<mitk::StateMachineAction::Pointer> mitk::StateMachineTransition::Get
 {
   return m_Actions;
 }
+
+const mitk::ConditionVectorType& mitk::StateMachineTransition::GetConditions() const
+{
+  return m_Conditions;
+}
+
 
 void mitk::StateMachineTransition::SetNextState(const SpStateMachineState& nextState)
 {

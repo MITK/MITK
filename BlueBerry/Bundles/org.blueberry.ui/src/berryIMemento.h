@@ -63,7 +63,7 @@ namespace berry
  **/
 struct BERRY_UI IMemento: public Object
 {
-berryInterfaceMacro(IMemento, berry)
+berryInterfaceMacro(IMemento, berry);
 
   /**
    * Special reserved key used to store the memento id

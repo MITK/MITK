@@ -28,7 +28,7 @@ We have made good experiences with epiphan Grabbers and currently recommend the 
 
 To configure an ultrasound device, connect the ultrasound device to the grabber and the grabber to the computer. Start the ultrasound device and open the ultrasound plugin. The devicemanager will open.
 
-\image html devicemanager.png "MITK Screenshot with the devicemanager activated"
+\image html devicemanagement.png "MITK Screenshot with the devicemanager activated"
 
 Any currently configured devices are listed in the box, which accordingly is empty now.
 Click "New Device".
@@ -38,17 +38,22 @@ Click "New Device".
 In the appearing form, enter descriptive data on your device in the corresponding fields.
 Manufacturer and model will be used to display the device in MITK.
 
-You may choose the video source ID if more than one is available (as is the case on laptops with built-in webcams). On Windows, try -1 (defaults to the first available source). On Linux and Mac try 0 and 1. If the wrong camera is address, simply try the next ID.
+You may choose the video source ID if more than one is available (as is the case on laptops with built-in webcams).
+On Windows, try -1 (defaults to the first available source). On Linux and Mac try 0 and 1.
+If the wrong camera is address, simply try the next ID.
 
-Most ultrasound images are grey scale, so using a grey scale conversion doesn't take information away from the image, but makes processing images significantly faster. Only uncheck this box if you require color.
+Most ultrasound images are grey scale, so using a grey scale conversion doesn't take information away from the image, but makes processing images significantly faster.
+Only uncheck this box if you require color.
 
 Click Add Device to save your changes.
 
-\image html devicemanager_2.png "Devicemanager with configured device"
+\image html devicemanagement_2.png "Devicemanager with configured device"
 
 \section org_mitk_gui_qt_ultrasoundActivateConnect Activation and Connection
 
-A ultrasound device in MITK can be connected and activated. The device you just created automatically became connected. A connected device is available to all other plugins in MITK, but does not jet generate image data. Disconnecting the device causes it to be deleted and not be available anymore.
+A ultrasound device in MITK can be connected and activated. The device you just created automatically is now connected.
+A connected device is available to all other plugins in MITK, but does not jet generate image data.
+Disconnecting the device causes it to be deleted and not be available anymore.
 
 Click the device, then click "Activate Device". The device is now activated and generates image data continuously.
 
@@ -60,9 +65,6 @@ Select the device and click "Start Viewing". The US-Image should appear.
 You can adjust the cropping parameters to reduce the acquired image size which will further increase speed and remove unnecessary information.
 
 All changes are saved and restored whenever MITK is started.
-
-
-
 
 */
 

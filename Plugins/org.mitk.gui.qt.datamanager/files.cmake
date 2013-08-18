@@ -7,7 +7,6 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkPropertyListView.cpp
   QmitkNodeTableViewKeyFilter.cpp
   QmitkInfoDialog.cpp
 )
@@ -17,7 +16,6 @@ set(MOC_H_FILES
   src/QmitkDataManagerPreferencePage.h
   src/QmitkDataManagerHotkeysPrefPage.h
   src/internal/QmitkNodeTableViewKeyFilter.h
-  src/internal/QmitkPropertyListView.h
   src/internal/QmitkInfoDialog.h
   src/internal/mitkPluginActivator.h
 )
@@ -27,7 +25,6 @@ set(CPP_FILES )
 set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/DataManager_48.png
-  resources/propertylist.png
 )
 
 set(QRC_FILES

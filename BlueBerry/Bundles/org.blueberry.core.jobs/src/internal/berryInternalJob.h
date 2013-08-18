@@ -54,7 +54,7 @@ struct BERRY_JOBS InternalJob : public Object
   friend struct JobManager;
 
 
-  berryObjectMacro(InternalJob)
+  berryObjectMacro(InternalJob);
 
   bool operator==(const Object* otherJob) const;
 

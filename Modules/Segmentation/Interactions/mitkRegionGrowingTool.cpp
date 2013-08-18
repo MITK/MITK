@@ -30,6 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
+// us
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrowingTool, "Region growing tool");
 }
@@ -65,6 +71,20 @@ mitk::RegionGrowingTool::~RegionGrowingTool()
 const char** mitk::RegionGrowingTool::GetXPM() const
 {
   return mitkRegionGrowingTool_xpm;
+}
+
+us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
+{
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  return resource;
+}
+
+us::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
+{
+  us::Module* module = us::GetModuleContext()->GetModule();
+  us::ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
+  return resource;
 }
 
 const char* mitk::RegionGrowingTool::GetName() const
@@ -216,24 +236,26 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
     mitkIpPicFree( segmentationHistory );
     if (cutContour.cutIt)
     {
+      int timestep = positionEvent->GetSender()->GetTimeStep();
       // 3.1.2 copy point from float* to mitk::Contour
-      Contour::Pointer contourInImageIndexCoordinates = Contour::New();
-      contourInImageIndexCoordinates->Initialize();
+      ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
+      contourInImageIndexCoordinates->Expand(timestep + 1);
+      contourInImageIndexCoordinates->SetIsClosed(true, timestep);
       Point3D newPoint;
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
-        newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ];
-        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
+        newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ] - 0.5;//correction is needed because the output of the algorithm is center based
+        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ] - 0.5;//and we want our contour displayed corner based.
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint - mitk::Point3D::VectorType(0.5) );
+        contourInImageIndexCoordinates->AddVertex( newPoint, timestep );
       }
 
       free(cutContour.traceline);
       free(cutContour.deleteCurve); // perhaps visualize this for fun?
       free(cutContour.onGradient);
 
-      Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
+      ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
 
       FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
       FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -306,7 +328,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
         m_UpperThreshold = m_InitialUpperThreshold;
 
         // 3.2.3. Actually perform region growing
-        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
+        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour(positionEvent->GetSender()->GetTimeStep());
         ipMITKSegmentationFree( result);
 
         // display the contour
@@ -346,7 +368,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved(Action* action, const StateEvent* sta
         m_UpperThreshold = std::max<mitk::ScalarType>(0.0, m_InitialUpperThreshold - m_ScreenYDifference * m_MouseDistanceScaleFactor);
 
         // 2. Perform region growing again and show the result
-        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
+        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour(positionEvent->GetSender()->GetTimeStep());
         ipMITKSegmentationFree( result );
 
         // 3. Update the contour
@@ -375,17 +397,19 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
         m_InitialLowerThreshold = m_LowerThreshold;
         m_InitialUpperThreshold = m_UpperThreshold;
 
+        int timestep = positionEvent->GetSender()->GetTimeStep();
+
         if (m_FillFeedbackContour)
         {
           // 3. use contour to fill a region in our working slice
-          Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+          ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
           if (feedbackContour)
           {
-            Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
+            ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
                                                                                                                                     // false: don't constrain the contour to the image's inside
             if (projectedContour.IsNotNull())
             {
-              FeedbackContourTool::FillContourInSlice( projectedContour, m_WorkingSlice, m_PaintingPixelValue );
+              FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
 
               const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
 
@@ -414,7 +438,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 Uses ipSegmentation algorithms to do the actual region growing. The result (binary image) is first smoothed by a 5x5 circle mask, then
 its contour is extracted and converted to MITK coordinates.
 */
-mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
+mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour(int timestep)
 {
   // 1. m_OriginalPicSlice and m_SeedPointMemoryOffset are set to sensitive values, as well as m_LowerThreshold and m_UpperThreshold
   assert (m_OriginalPicSlice);
@@ -437,7 +461,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
   if (!regionGrowerResult || oneContourOffset == -1)
   {
-    Contour::Pointer dummyContour = Contour::New();
+    ContourModel::Pointer dummyContour = ContourModel::New();
     dummyContour->Initialize();
     FeedbackContourTool::SetFeedbackContour( *dummyContour );
 
@@ -501,21 +525,22 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     }
 
     // copy point from float* to mitk::Contour
-    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
-    contourInImageIndexCoordinates->Initialize();
+    ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
+    contourInImageIndexCoordinates->Expand(timestep + 1);
+    contourInImageIndexCoordinates->SetIsClosed(true, timestep);
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
-      newPoint[0] = contourPoints[ 2 * index + 0 ];
-      newPoint[1] = contourPoints[ 2 * index + 1 ];
+      newPoint[0] = contourPoints[ 2 * index + 0 ] - 0.5;//correction is needed because the output of the algorithm is center based
+      newPoint[1] = contourPoints[ 2 * index + 1 ] - 0.5;//and we want our contour displayed corner based.
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint - mitk::Point3D::VectorType(0.5));
+      contourInImageIndexCoordinates->AddVertex( newPoint, timestep );
     }
 
     free(contourPoints);
 
-    Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
+    ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
 
     FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
   }

@@ -58,6 +58,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Point
 , m_MappingStrategy( EndElementPositionAvoidingWhiteMatter )
 , m_EndPointSearchRadius( 10.0 )
 {
+  mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
 
 mitk::ConnectomicsNetworkCreator::~ConnectomicsNetworkCreator()
@@ -72,6 +73,7 @@ void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundleX::Pointe
 void mitk::ConnectomicsNetworkCreator::SetSegmentation(mitk::Image::Pointer segmentation)
 {
   m_Segmentation = segmentation;
+  mitk::CastToItkImage( segmentation, m_SegmentationItk );
 }
 
 itk::Point<float, 3> mitk::ConnectomicsNetworkCreator::GetItkPoint(double point[3])
@@ -90,6 +92,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   m_ConNetwork->clear();
   m_LabelToVertexMap.clear();
   m_LabelToNodePropertyMap.clear();
+  idCounter = 0;
 
   vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
   vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
@@ -232,8 +235,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastElementSegIndex.SetElement( index, lastElementSegCoord.GetElement( index ) );
     }
 
-    int firstLabel = m_Segmentation->GetPixelValueByIndex( firstElementSegIndex );
-    int lastLabel = m_Segmentation->GetPixelValueByIndex( lastElementSegIndex );
+    int firstLabel = m_SegmentationItk->GetPixel(firstElementSegIndex);
+    int lastLabel = m_SegmentationItk->GetPixel(lastElementSegIndex );
 
     labelpair.first = firstLabel;
     labelpair.second = lastLabel;
@@ -282,8 +285,8 @@ mitk::ConnectomicsNetworkCreator::ImageLabelPairType mitk::ConnectomicsNetworkCr
       lastElementSegIndex.SetElement( index, lastElementSegCoord.GetElement( index ) );
     }
 
-    int firstLabel = m_Segmentation->GetPixelValueByIndex( firstElementSegIndex );
-    int lastLabel = m_Segmentation->GetPixelValueByIndex( lastElementSegIndex );
+    int firstLabel = m_SegmentationItk->GetPixel(firstElementSegIndex);
+    int lastLabel = m_SegmentationItk->GetPixel(lastElementSegIndex );
 
     // Check whether the labels belong to the white matter (which means, that the fibers ended early)
     bool extendFront(false), extendEnd(false), retractFront(false), retractEnd(false);
@@ -579,7 +582,7 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
         tempIndex.SetElement( index, endPoint.GetElement( index ) + parameter * differenceVector[ index ] );
       }
 
-      tempLabel = m_Segmentation->GetPixelValueByIndex( tempIndex );
+      tempLabel = m_SegmentationItk->GetPixel( tempIndex );
 
       if( IsNonWhiteMatterLabel( tempLabel ) )
       {
@@ -598,7 +601,6 @@ void mitk::ConnectomicsNetworkCreator::LinearExtensionUntilGreyMatter(
     }
 
   }
-
 }
 
 void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractFront, TractType::Pointer singleTract,
@@ -668,7 +670,7 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
           currentPoint.GetElement( index ) + ( 1.0 + parameter ) / ( 1.0 + length ) * differenceVector[ index ] );
       }
 
-      tempLabel = m_Segmentation->GetPixelValueByIndex( tempIndex );
+      tempLabel = m_SegmentationItk->GetPixel( tempIndex );
 
       if( !IsBackgroundLabel( tempLabel ) )
       {
@@ -730,12 +732,8 @@ void mitk::ConnectomicsNetworkCreator::RetractionUntilBrainMatter( bool retractF
 
 void mitk::ConnectomicsNetworkCreator::CalculateCenterOfMass()
 {
+
   const int dimensions = 3;
-  typedef itk::Image<int, dimensions > ITKImageType;
-
-  ITKImageType::Pointer itkImage = ITKImageType::New();
-  mitk::CastToItkImage( m_Segmentation, itkImage );
-
   int max = m_Segmentation->GetStatistics()->GetScalarValueMax();
   int min = m_Segmentation->GetStatistics()->GetScalarValueMin();
 
@@ -745,7 +743,7 @@ void mitk::ConnectomicsNetworkCreator::CalculateCenterOfMass()
   std::vector< std::vector< std::vector< double> > > coordinatesPerLabelVector;
   coordinatesPerLabelVector.resize( range );
 
-  itk::ImageRegionIteratorWithIndex<ITKImageType> it_itkImage( itkImage, itkImage->GetLargestPossibleRegion() );
+  itk::ImageRegionIteratorWithIndex<ITKImageType> it_itkImage( m_SegmentationItk, m_SegmentationItk->GetLargestPossibleRegion() );
 
   for( it_itkImage.GoToBegin(); !it_itkImage.IsAtEnd(); ++it_itkImage )
   {

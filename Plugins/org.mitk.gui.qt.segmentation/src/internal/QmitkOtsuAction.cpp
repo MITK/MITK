@@ -178,11 +178,11 @@ void QmitkOtsuAction::PerformOtsuSegmentation()
 
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, numberOfThresholds);
+    levelwindow.SetRangeMinMax(0, numberOfThresholds+1);
     levWinProp->SetLevelWindow( levelwindow );
     resultNode->SetProperty( "levelwindow", levWinProp );
 
-    resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
+    resultNode->SetData( mitk::GrabItkImageMemory( filter->GetOutput() ) );
 
 
     this->m_DataStorage->Add(resultNode, this->m_DataNode);

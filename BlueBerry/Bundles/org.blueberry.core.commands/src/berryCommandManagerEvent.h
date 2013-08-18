@@ -40,7 +40,7 @@ class BERRY_COMMANDS CommandManagerEvent: public Object
 
 public:
 
-  berryObjectMacro(CommandManagerEvent)
+  berryObjectMacro(CommandManagerEvent);
 
   /**
    * Creates a new <code>CommandManagerEvent</code> instance to describe

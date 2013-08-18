@@ -3,33 +3,20 @@
 #  MESSAGE("GL is required for MITK rendering")
 #ENDIF(NOT OPENGL_FOUND )
 
-# Configure the C++ Micro Services Code for MITK
-find_package(ITK REQUIRED)
-include(${ITK_USE_FILE})
-
-set(US_NAMESPACE "mitk")
-set(US_HEADER_PREFIX "mitk")
-set(US_BASECLASS_NAME "itk::LightObject")
-set(US_BASECLASS_HEADER "mitkServiceBaseObject.h")
-set(US_BASECLASS_PACKAGE "ITK")
-set(US_ENABLE_THREADING_SUPPORT 1)
-set(US_ENABLE_AUTOLOADING_SUPPORT 1)
-set(US_EMBEDDING_LIBRARY Mitk)
-set(US_BUILD_TESTING ${BUILD_TESTING})
-if(BUILD_TESTING)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common)
-  set(US_TEST_LABELS MITK-Core)
-endif()
-
-add_subdirectory(CppMicroServices)
-
-include(${CMAKE_CURRENT_BINARY_DIR}/CppMicroServices/CppMicroServicesConfig.cmake)
-
 set(TOOL_CPPS "")
 
 # temporary suppress warnings in the following files until image accessors are fully integrated.
 set_source_files_properties( DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 set_source_files_properties( Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
+
+# In MITK_ITK_Config.cmake, we set ITK_NO_IO_FACTORY_REGISTER_MANAGER to 1 unless
+# the variable is already defined. Setting it to 1 prevents multiple registrations/
+# unregistrations of ITK IO factories during library loading/unloading (of MITK
+# libraries). However, we need "one" place where the IO factories are registered at
+# least once. This could be the application executable, but every executable would
+# need to take care of that itself. Instead, we allow the auto registration in the
+# Mitk Core library.
+set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 0)
 
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS
@@ -38,7 +25,7 @@ MITK_CREATE_MODULE( Mitk
   INTERNAL_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR}
     ${CppMicroServices_INTERNAL_INCLUDE_DIRS}
-  DEPENDS mbilog tinyxml
+  DEPENDS mbilog tinyxml CppMicroServices
   DEPENDS_INTERNAL pic2vtk
   PACKAGE_DEPENDS ITK GDCM VTK OpenGL
   EXPORT_DEFINE MITK_CORE_EXPORT
@@ -46,9 +33,7 @@ MITK_CREATE_MODULE( Mitk
 )
 
 # this is needed for libraries which link to Mitk and need
-# symbols from explicitly instantiated templates like
-# mitk::SurfaceVtkWriter<vtkSTLWriter> which is referenced in
-# QmitkCommonFunctionality in the QmitkExt library.
+# symbols from explicitly instantiated templates
 if(MINGW)
   get_target_property(_mitkCore_MINGW_linkflags Mitk LINK_FLAGS)
   if(NOT _mitkCore_MINGW_linkflags)

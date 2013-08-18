@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkModuleRegistry.h>
 #include <mitkModule.h>
 #include <mitkServiceReference.h>
+#include <mitkImagePixelReadAccessor.h>
 
 int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
 {
@@ -46,16 +47,26 @@ int mitkCopyToPythonAsItkImageTest(int /*argc*/, char* argv[])
   MITK_TEST_CONDITION( pythonService->CopyToPythonAsItkImage( testImage, nameOfImageInPython) == true, "Valid image copied to python import should return true.");
   mitk::Image::Pointer pythonImage = pythonService->CopyItkImageFromPython(nameOfImageInPython);
 
-  //TODO Use the assert comparison methods once we have them implemented and remove GetPixelValueByIndex
-  MITK_TEST_CONDITION( pythonImage->GetDimension(0) == 256, "Is the 1st dimension of Pic3D still 256?");
-  MITK_TEST_CONDITION( pythonImage->GetDimension(1) == 256, "Is the 2nd dimension of Pic3D still 256?");
-  MITK_TEST_CONDITION( pythonImage->GetDimension(2) == 49, "Is the 3rd dimension of Pic3D still 49?");
 
   mitk::Index3D index;
   index[0] = 128;
   index[1] = 128;
   index[2] = 24;
-  MITK_TEST_CONDITION( pythonImage->GetPixelValueByIndex(index) == 96, "Is the value of Pic3D at (128,128,24) still 96?");
+
+  try{
+    // pic3D of type char
+    mitk::ImagePixelReadAccessor<char,3> pythonImageAccesor(pythonImage);
+
+    //TODO Use the assert comparison methods once we have them implemented and remove GetPixelValueByIndex
+    MITK_TEST_CONDITION( pythonImageAccesor.GetDimension(0) == 256, "Is the 1st dimension of Pic3D still 256?");
+    MITK_TEST_CONDITION( pythonImageAccesor.GetDimension(1) == 256, "Is the 2nd dimension of Pic3D still 256?");
+    MITK_TEST_CONDITION( pythonImageAccesor.GetDimension(2) == 49, "Is the 3rd dimension of Pic3D still 49?");
+
+    MITK_TEST_CONDITION( pythonImageAccesor.GetPixelByIndex(index) == 96, "Is the value of Pic3D at (128,128,24) still 96?");
+  }catch(...)
+  {
+    MITK_TEST_CONDITION( false, "Image is not readable! ");
+  }
 
   MITK_TEST_END()
 }

@@ -22,7 +22,7 @@ In the following simple example we have a plugin 'a' and 'b' with two classes 'A
 Plugin 'a' uses the extension point mechanism and creates an extension point that can be extended by other plugins. Now if class 'A' reaches a part that can be extended it asks 'a' if another plugin is registered. If that's the case the functionality of the plugin 'b' that is defined in class 'B' is executed.
 A plugin can therefore be arbitrary extended.
 
-\section Examples Examples
+\section BlueBerryExampleExtensionPoint_Examples Examples
 
 The two following example plugins describe the usage of the BlueBerry Extension Points. One example defines an extension point and the other example extends the created extension point.
 

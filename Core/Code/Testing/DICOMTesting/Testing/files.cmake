@@ -2,6 +2,7 @@
 # tests with no extra command line parameter
 set(MODULE_CUSTOM_TESTS
   mitkDICOMTestingSanityTest.cpp
+  mitkDICOMPreloadedVolumeTest.cpp
 )
 
 # this shouldn't be necessary if this variable

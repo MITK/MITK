@@ -121,7 +121,7 @@ function(func_build_target target build_dir)
               RETURN_VALUE res
               NUMBER_ERRORS num_errors
               NUMBER_WARNINGS num_warnings)
-  ctest_submit(PARTS Build)
+  ctest_submit(PARTS Build RETRY_DELAY 3 RETRY_COUNT 3)
 
   if(num_errors)
     math(EXPR build_errors "${build_errors} + ${num_errors}")
@@ -150,7 +150,7 @@ function(func_test label build_dir)
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
              RETURN_VALUE res
             )
-  ctest_submit(PARTS Test)
+  ctest_submit(PARTS Test RETRY_DELAY 3 RETRY_COUNT 3)
 
   if(res)
     math(EXPR test_errors "${test_errors} + 1")
@@ -167,7 +167,7 @@ function(func_test label build_dir)
   if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
     message("----------- [ Coverage ${label} ] -----------")
     ctest_coverage(BUILD "${build_dir}" LABELS ${label})
-    ctest_submit(PARTS Coverage)
+    ctest_submit(PARTS Coverage RETRY_DELAY 3 RETRY_COUNT 3)
   endif()
 
   if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
@@ -180,7 +180,7 @@ function(func_test label build_dir)
       set(CTEST_MEMORYCHECK_COMMAND_OPTIONS "-q --tool=memcheck --leak-check=yes --show-reachable=no --show-possibly-lost=no --workaround-gcc296-bugs=yes --num-callers=50")
     endif()
     ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL ${label})
-    ctest_submit(PARTS MemCheck)
+    ctest_submit(PARTS MemCheck RETRY_DELAY 3 RETRY_COUNT 3)
   endif()
 
 endfunction()
@@ -275,16 +275,16 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     endif()
 
     # Project.xml is generated during the superbuild configure step
-    ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
+    ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml" RETRY_DELAY 3 RETRY_COUNT 3)
 
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
 
-    ctest_submit(PARTS Configure)
+    ctest_submit(PARTS Configure RETRY_DELAY 3 RETRY_COUNT 3)
 
     # submit the update results *after* the submitting the Configure info,
     # otherwise CDash is somehow confused and cannot add the update info
     # to the superbuild project
-    ctest_submit(PARTS Update)
+    ctest_submit(PARTS Update RETRY_DELAY 3 RETRY_COUNT 3)
 
     # To get CTEST_PROJECT_SUBPROJECTS and CTEST_PROJECT_EXTERNALS definition
     include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")
@@ -363,7 +363,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       RETURN_VALUE res
     )
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
-    ctest_submit(PARTS Configure)
+    ctest_submit(PARTS Configure RETRY_DELAY 3 RETRY_COUNT 3)
 
     if(res)
       math(EXPR build_errors "${build_errors} + 1")
@@ -436,18 +436,18 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     if(WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
       message("----------- [ Global coverage ] -----------")
       ctest_coverage(BUILD "${build_dir}" APPEND)
-      ctest_submit(PARTS Coverage)
+      ctest_submit(PARTS Coverage RETRY_DELAY 3 RETRY_COUNT 3)
     endif()
 
     # Global dynamic analysis ...
     if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
       message("----------- [ Global memcheck ] -----------")
       ctest_memcheck(BUILD "${build_dir}")
-      ctest_submit(PARTS MemCheck)
+      ctest_submit(PARTS MemCheck RETRY_DELAY 3 RETRY_COUNT 3)
     endif()
 
     # Note should be at the end
-    ctest_submit(PARTS Notes)
+    ctest_submit(PARTS Notes RETRY_DELAY 3 RETRY_COUNT 3)
 
     # Send status to the "CDash Web Admin"
     if(CDASH_ADMIN_URL_PREFIX)

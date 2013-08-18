@@ -9,7 +9,7 @@ set(CPP_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.cpp
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.cpp
-  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
+#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.cpp
 
   # DataStructures -> PlanarFigureComposite
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
@@ -20,7 +20,7 @@ set(CPP_FILES
   # Rendering
   Rendering/mitkFiberBundleXMapper2D.cpp
   Rendering/mitkFiberBundleXMapper3D.cpp
-  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
+#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.cpp
   #Rendering/mitkPlanarFigureMapper3D.cpp
 
   # Interactions
@@ -42,7 +42,7 @@ set(H_FILES
   # Rendering
   Rendering/mitkFiberBundleXMapper3D.h
   Rendering/mitkFiberBundleXMapper2D.h
-  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
+#  Rendering/mitkFiberBundleXThreadMonitorMapper3D.h
   #Rendering/mitkPlanarFigureMapper3D.h
 
   # DataStructures -> FiberBundleX
@@ -52,7 +52,7 @@ set(H_FILES
   IODataStructures/FiberBundleX/mitkFiberBundleXIOFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXWriterFactory.h
   IODataStructures/FiberBundleX/mitkFiberBundleXSerializer.h
-  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
+#  IODataStructures/FiberBundleX/mitkFiberBundleXThreadMonitor.h
 
   IODataStructures/mitkFiberTrackingObjectFactory.h
 
@@ -69,6 +69,7 @@ set(H_FILES
   Algorithms/itkAddArtifactsToDwiImageFilter.h
   Algorithms/itkFieldmapGeneratorFilter.h
   Algorithms/itkEvaluateDirectionImagesFilter.h
+  Algorithms/itkEvaluateTractogramDirectionsFilter.h
 
   # (old) Tractography
   Algorithms/itkGibbsTrackingFilter.h

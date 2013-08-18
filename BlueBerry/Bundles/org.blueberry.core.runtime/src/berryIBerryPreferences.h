@@ -33,7 +33,7 @@ namespace berry
   ///
   struct BERRY_RUNTIME IBerryPreferences : virtual public IPreferences
   {
-    berryInterfaceMacro(IBerryPreferences, berry)
+    berryInterfaceMacro(IBerryPreferences, berry);
 
     virtual ~IBerryPreferences();
 

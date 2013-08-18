@@ -33,7 +33,7 @@ class BERRY_COMMANDS AbstractNamedHandleEvent : public AbstractHandleObjectEvent
 
 public:
 
-  berryObjectMacro(AbstractNamedHandleEvent)
+  berryObjectMacro(AbstractNamedHandleEvent);
 
   /**
    * Returns whether or not the description property changed.

@@ -25,7 +25,7 @@ AstroStickModel< ScalarType >::AstroStickModel()
 {
     m_RandGen = ItkRandGenType::New();
 
-    vnl_matrix_fixed<double,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<double, 3, 42> >::DistributePointShell();
+    vnl_matrix_fixed<ScalarType,3,42>* sticks = itk::PointShell<42, vnl_matrix_fixed<ScalarType, 3, 42> >::DistributePointShell();
     for (int i=0; i<m_NumSticks; i++)
     {
         GradientType stick;
@@ -57,7 +57,7 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
 {
     PixelType signal;
     signal.SetSize(this->m_GradientList.size());
-    double b = -m_BValue*m_Diffusivity;
+    ScalarType b = -m_BValue*m_Diffusivity;
 
     if (m_RandomizeSticks)
         m_NumSticks = 30 + m_RandGen->GetIntegerVariate()%31;
@@ -65,13 +65,13 @@ typename AstroStickModel< ScalarType >::PixelType AstroStickModel< ScalarType >:
     for( unsigned int i=0; i<this->m_GradientList.size(); i++)
     {
         GradientType g = this->m_GradientList[i];
-        double bVal = g.GetNorm(); bVal *= bVal;
+        ScalarType bVal = g.GetNorm(); bVal *= bVal;
 
         if (bVal>0.0001)
         {
             for (int j=0; j<m_NumSticks; j++)
             {
-                double dot = 0;
+                ScalarType dot = 0;
                 if(m_RandomizeSticks)
                     dot = GetRandomDirection()*g;
                 else

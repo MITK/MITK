@@ -90,6 +90,7 @@ namespace mitk {
     * If you encounter OpenCV Warnings that buffer sizes do not match while calling getNextFrame,
     * then do the following: Using the drivers control panel to force a certain resolution, then call
     * this method with the same Dimensions after opening the device.
+    * Before retrieving images one should call mitk::USImageVideoSource::isReady().
     */
     void OverrideResolution(int width, int height);
 
@@ -103,6 +104,14 @@ namespace mitk {
     itkGetMacro(ResolutionOverrideHeight,int);
     int GetImageHeight();
     int GetImageWidth();
+
+    /**
+    * \brief Returns true if images can be delivered.
+    *
+    * Only if true is returned one can retrieve images via mitk::USImageVideoSource::GetNextImage().
+    * If false is returned, behaviour is undefined.
+    */
+    bool GetIsReady();
 
 
   protected:

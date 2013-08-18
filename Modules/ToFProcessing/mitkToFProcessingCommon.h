@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKTOFPROCESSINGCOMMON_H
 
 #include "mitkToFProcessingExports.h"
+#include <mitkCameraIntrinsics.h>
 #include "mitkVector.h"
 #include <vnl/vnl_math.h>
 
@@ -330,6 +331,15 @@ namespace mitk
      * @return a ToFPoint3D. The point in world coordinates (mm).
      */
     static ToFProcessingCommon::ToFPoint3D ContinuousKinectIndexToCartesianCoordinates(mitk::Point2D continuousIndex, ToFScalarType distance, ToFScalarType focalLengthX, ToFScalarType focalLengthY, ToFScalarType principalPointX, ToFScalarType principalPointY);
+
+    /**
+    \brief Calculates the horizontal view angle of the camera with the given intrinsics
+    \param intrinsics intrinsic parameters of the camera
+    \param dimX dimension of the image in horizontal direction
+
+    angle = atan(principalPoint[0]/focalLength[0]) + atan((dimX-principalPoint[0]/focalLength[0]))
+    **/
+    static ToFScalarType CalculateViewAngle(mitk::CameraIntrinsics::Pointer intrinsics, unsigned int dimX);
   };
 }
 #endif

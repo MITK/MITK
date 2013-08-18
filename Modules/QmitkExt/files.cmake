@@ -1,6 +1,5 @@
 set(CPP_FILES
 
- QmitkApplicationBase/QmitkCommonFunctionality.cpp
  QmitkApplicationBase/QmitkIOUtil.cpp
 
  #QmitkModels/QmitkDataStorageListModel.cpp
@@ -49,7 +48,6 @@ set(CPP_FILES
 
  QmitkFloatingPointSpanSlider.cpp
  QmitkColorTransferFunctionCanvas.cpp
- QmitkSlicesInterpolator.cpp
  QmitkStandardViews.cpp
  QmitkStepperAdapter.cpp
  # QmitkLineEditLevelWindowWidget.cpp
@@ -70,19 +68,7 @@ set(CPP_FILES
  QmitkTransferFunctionWidget.cpp
  QmitkTransferFunctionGeneratorWidget.cpp
  QmitkSelectableGLWidget.cpp
- QmitkToolReferenceDataSelectionBox.cpp
- QmitkToolWorkingDataSelectionBox.cpp
- QmitkToolGUIArea.cpp
- QmitkToolSelectionBox.cpp
  # QmitkPropertyListPopup.cpp
- QmitkToolGUI.cpp
- QmitkNewSegmentationDialog.cpp
- QmitkPaintbrushToolGUI.cpp
- QmitkDrawPaintbrushToolGUI.cpp
- QmitkErasePaintbrushToolGUI.cpp
- QmitkBinaryThresholdToolGUI.cpp
- QmitkCalculateGrayValueStatisticsToolGUI.cpp
- QmitkCopyToClipBoardDialog.cpp
  # QmitkMaterialEditor.cpp
  # QmitkMaterialShowcase.cpp
  # QmitkPropertiesTableEditor.cpp
@@ -103,18 +89,7 @@ set(CPP_FILES
  QmitkCorrespondingPointSetsWidget.cpp
  QmitkVideoBackground.cpp
  QmitkHotkeyLineEdit.cpp
- QmitkErodeToolGUI.cpp
- QmitkDilateToolGUI.cpp
- QmitkMorphologicToolGUI.cpp
- QmitkOpeningToolGUI.cpp
- QmitkClosingToolGUI.cpp
- QmitkBinaryThresholdULToolGUI.cpp
- QmitkPixelManipulationToolGUI.cpp
- QmitkRegionGrow3DToolGUI.cpp
- QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
-
- QmitkAdaptiveRegionGrowingWidget.cpp
 
  QmitkModuleTableModel.cpp
  QmitkModulesDialog.cpp
@@ -178,7 +153,6 @@ set(MOC_H_FILES
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
  QmitkSliceWidget.h
- QmitkSlicesInterpolator.h
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
@@ -186,20 +160,8 @@ set(MOC_H_FILES
  QmitkCrossWidget.h
  QmitkTransferFunctionWidget.h
  QmitkTransferFunctionGeneratorWidget.h
- QmitkToolGUIArea.h
- QmitkToolGUI.h
- QmitkToolReferenceDataSelectionBox.h
- QmitkToolWorkingDataSelectionBox.h
- QmitkToolSelectionBox.h
  # QmitkPropertyListPopup.h
  #QmitkSelectableGLWidget.h
- QmitkNewSegmentationDialog.h
- QmitkPaintbrushToolGUI.h
- QmitkDrawPaintbrushToolGUI.h
- QmitkErasePaintbrushToolGUI.h
- QmitkBinaryThresholdToolGUI.h
- QmitkCalculateGrayValueStatisticsToolGUI.h
- QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkPlotWidget.h
  QmitkPointListModel.h
@@ -214,18 +176,8 @@ set(MOC_H_FILES
  QmitkFileChooser.h
  QmitkHotkeyLineEdit.h
  QmitkAboutDialog/QmitkAboutDialog.h
- QmitkErodeToolGUI.h
- QmitkDilateToolGUI.h
- QmitkMorphologicToolGUI.h
- QmitkOpeningToolGUI.h
- QmitkClosingToolGUI.h
- QmitkBinaryThresholdULToolGUI.h
- QmitkPixelManipulationToolGUI.h
- QmitkRegionGrow3DToolGUI.h
- QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
  QmitkPlotWidget.h
- QmitkAdaptiveRegionGrowingWidget.h
 
  QmitkHistogramJSWidget.h
 
@@ -263,7 +215,6 @@ set(UI_FILES
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
   QmitkAboutDialog/QmitkAboutDialogGUI.ui
-  QmitkAdaptiveRegionGrowingWidgetControls.ui
 )
 
 set(QRC_FILES

@@ -35,7 +35,7 @@ namespace berry {
  */
 struct BERRY_EXPRESSIONS ICountable : public Object {
 
-  berryObjectMacro(ICountable)
+  berryObjectMacro(ICountable);
 
   /**
    * Returns the number of elements.

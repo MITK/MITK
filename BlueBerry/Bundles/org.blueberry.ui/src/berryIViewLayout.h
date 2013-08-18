@@ -37,7 +37,7 @@ namespace berry {
  */
 struct BERRY_UI IViewLayout : public Object {
 
-  berryInterfaceMacro(IViewLayout, berry)
+  berryInterfaceMacro(IViewLayout, berry);
 
   virtual  ~IViewLayout();
 

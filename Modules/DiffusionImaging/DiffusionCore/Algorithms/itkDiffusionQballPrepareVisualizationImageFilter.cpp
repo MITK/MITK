@@ -99,10 +99,10 @@ namespace itk {
     void DiffusionQballPrepareVisualizationImageFilter< TOdfPixelType,
     NrOdfDirections>
     ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    int )
+    ThreadIdType )
   {
     typename OutputImageType::Pointer outputImage =
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput());
+      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     ImageRegionIterator< OutputImageType > oit(outputImage, outputRegionForThread);
     oit.GoToBegin();
 

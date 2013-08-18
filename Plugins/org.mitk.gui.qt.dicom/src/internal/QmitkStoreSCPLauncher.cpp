@@ -70,7 +70,7 @@ void QmitkStoreSCPLauncher::FindPathToStoreSCP()
         //In developement the storescp isn't copied into bin directory
         if(!QFile::exists(m_PathToStoreSCP))
         {
-            m_PathToStoreSCP = static_cast<QString>(MITK_STORESCP);
+            m_PathToStoreSCP = static_cast<QString>(DCMTK_STORESCP);
         }
     }
 }

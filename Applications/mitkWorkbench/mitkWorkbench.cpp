@@ -134,12 +134,18 @@ int main(int argc, char** argv)
   extConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
   extConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
 
+#ifdef Q_OS_WIN
+#define CTK_LIB_PREFIX
+#else
+#define CTK_LIB_PREFIX "lib"
+#endif
+
   // Preload the org.mitk.gui.qt.ext plug-in (and hence also QmitkExt) to speed
   // up a clean-cache start. This also works around bugs in older gcc and glibc implementations,
   // which have difficulties with multiple dynamic opening and closing of shared libraries with
   // many global static initializers. It also helps if dependent libraries have weird static
   // initialization methods and/or missing de-initialization code.
-  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext,libCTKDICOMCore:0.1");
+  extConfig->setString(berry::Platform::ARG_PRELOAD_LIBRARY, "liborg_mitk_gui_qt_ext," CTK_LIB_PREFIX "CTKDICOMCore:0.1");
 
   // Seed the random number generator, once at startup.
   QTime time = QTime::currentTime();

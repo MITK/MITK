@@ -40,7 +40,7 @@ class ParameterTypeEvent;
  */
 struct BERRY_COMMANDS IParameterTypeListener : public virtual Object {
 
-  berryInterfaceMacro(IParameterTypeListener, berry)
+  berryInterfaceMacro(IParameterTypeListener, berry);
 
   struct Events {
 

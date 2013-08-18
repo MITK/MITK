@@ -68,8 +68,9 @@ class Segmentation_EXPORT ContourModelInteractor : public Interactor
     virtual bool OnCheckContourClick   (Action*, const StateEvent*);
     virtual bool OnDeletePoint(Action*, const StateEvent*);
     virtual bool OnMovePoint(Action*, const StateEvent*);
+    virtual bool OnMove(Action*, const StateEvent*);
     virtual bool OnMoveContour(Action*, const StateEvent*);
-    virtual bool OnFinish(Action*, const StateEvent*);
+    virtual bool OnFinishEditing(Action*, const StateEvent*);
 
     mitk::Point3D m_lastMousePosition;
 

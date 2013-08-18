@@ -115,8 +115,7 @@ public:
   struct IExceptionHandler: public Object
   {
 
-    berryObjectMacro(IExceptionHandler)
-    ;
+    berryObjectMacro(IExceptionHandler);
 
     /**
      * Handle the exception.
@@ -362,16 +361,14 @@ protected:
    */
   virtual void* CreateContents(Shell::Pointer parent);
 
-  /**
-   * Creates and returns this window's shell.
-   * <p>
-   * The default implementation of this framework method creates a new shell
-   * and configures it using <code/>configureShell</code>. Rather than
-   * override this method, subclasses should instead override
-   * <code/>configureShell</code>.
-   * </p>
+  /** \brief Creates and returns this window's shell.
    *
-   * @return the shell
+   * The default implementation of this framework method creates a new shell
+   * and configures it using <code>configureShell</code>. Rather than
+   * override this method, subclasses should instead override
+   * <code>configureShell</code>.
+   *
+   * \return the shell
    */
   virtual Shell::Pointer CreateShell();
 

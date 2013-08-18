@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 
 #include "mitkCommon.h"
-#include "mitkServiceInterface.h"
+#include "usServiceInterface.h"
 
 #include <list>
 

@@ -550,6 +550,10 @@ void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer& interactor
 {
   m_DataInteractor = interactor;
   Modified();
+
+  // the interactor has changed, so we have ti invoke an InteractorChangedEvent
+  const mitk::DataNode::InteractorChangedEvent changedEvent;
+  InvokeEvent( changedEvent );
 }
 
 mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const

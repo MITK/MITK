@@ -85,7 +85,7 @@ namespace berry {
  */
 struct BERRY_UI IPerspectiveFactory : public Object {
 
-  berryInterfaceMacro(IPerspectiveFactory, berry)
+  berryInterfaceMacro(IPerspectiveFactory, berry);
 
   ~IPerspectiveFactory();
 

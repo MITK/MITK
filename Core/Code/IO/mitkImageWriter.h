@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_IMAGE_WRITER__H_
 #define _MITK_IMAGE_WRITER__H_
 
-#include <mitkFileWriter.h>
+#include <mitkFileWriterWithInformation.h>
 
 
 namespace mitk
@@ -31,7 +31,7 @@ class Image;
  * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
  * @ingroup IO
  */
-class MITK_CORE_EXPORT ImageWriter :  public mitk::FileWriter
+class MITK_CORE_EXPORT ImageWriter :  public mitk::FileWriterWithInformation
 {
 public:
 
@@ -45,7 +45,8 @@ public:
      * Sets the filename of the file to write.
      * @param _arg the name of the file to write.
      */
-    itkSetStringMacro( FileName );
+    virtual void SetFileName (const char* fileName);
+    virtual void SetFileName (const std::string& fileName);
 
     /**
      * @returns the name of the file to be written to disk.
@@ -57,7 +58,8 @@ public:
      * @param _arg to be added to the filename, including a "."
      * (e.g., ".mhd").
      */
-    itkSetStringMacro( Extension );
+    virtual void SetExtension (const char* extension);
+    virtual void SetExtension (const std::string& extension);
 
     /**
      * \brief Get the extension to be added to the filename.
@@ -127,6 +129,13 @@ public:
      */
     const mitk::Image* GetInput();
 
+    // FileWriterWithInformation methods
+    virtual const char* GetDefaultFilename();
+    virtual const char *GetFileDialogPattern();
+    virtual const char *GetDefaultExtension();
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
+    virtual void DoWrite(BaseData::Pointer data);
+
 protected:
 
     /**
@@ -144,6 +153,8 @@ protected:
     virtual void WriteByITK(mitk::Image* image, const std::string& fileName);
 
     std::string m_FileName;
+
+    std::string m_FileNameWithoutExtension;
 
     std::string m_FilePrefix;
 

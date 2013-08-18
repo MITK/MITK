@@ -10,20 +10,15 @@
       name="Segmentation" 
       icon="resources/segmentation.png"
       class="QmitkSegmentationView" />
-    <view id="org.mitk.views.segmentationboolean"
-      name="Boolean Operations"
-      class="QmitkBooleanOperationsView"
-      icon="resources/boolean.png" />
      <view id="org.mitk.views.deformableclippingplane"
        name="Clipping Plane"
        class="QmitkDeformableClippingPlaneView"
        icon="resources/deformablePlane.png" />
     <view
-      id="org.mitk.views.regiongrowing"
-      name="RegionGrowing"
-      category="org.mitk.views.general"
-      icon="resources/regiongrowing.xpm"
-      class="QmitkRegionGrowingView" />
+      id="org.mitk.views.segmentationutilities"
+      name="Segmentation Utilities"
+      class="QmitkSegmentationUtilitiesView"
+      icon="resources/SegmentationUtilities_48x48.png" />
   </extension>
   
   <extension point="org.blueberry.ui.preferencePages">
@@ -37,7 +32,6 @@
   </extension>
   
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
-    <contextMenuAction nodeDescriptorName="Image" label="Threshold..." icon="" class="QmitkThresholdAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Otsu Segmentation" icon="" class="QmitkOtsuAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />

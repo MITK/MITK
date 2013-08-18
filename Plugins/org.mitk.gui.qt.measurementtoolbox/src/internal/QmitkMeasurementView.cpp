@@ -39,6 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
+#include "usModuleRegistry.h"
+
+
 struct QmitkPlanarFigureData
 {
   QmitkPlanarFigureData()
@@ -224,21 +227,27 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
   {
     MEASUREMENT_DEBUG << "figure added. will add interactor if needed.";
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer() );
 
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
     if(figureInteractor.IsNull())
     {
-      figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+      figureInteractor = mitk::PlanarFigureInteractor::New();
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+      figureInteractor->SetDataNode( nonConstNode );
+
+      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
     }
     else
     {
       // just to be sure that the interactor is not added twice
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+  //    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
     }
 
     MEASUREMENT_DEBUG << "adding interactor to globalinteraction";
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+  //  mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
 
     MEASUREMENT_DEBUG << "will now add observers for planarfigure";
     QmitkPlanarFigureData data;

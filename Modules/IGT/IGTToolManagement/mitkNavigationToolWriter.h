@@ -46,7 +46,7 @@ namespace mitk
 
     /**
      * @brief           Writes a navigation tool to a file.
-     * @param  FileName The filename (complete, with path, C:\temp\myTool.igtTool for example)
+     * @param  FileName The filename (complete, with path, C:/temp/myTool.igtTool for example)
      * @param  Tool     The tool which should be written to the file.
      * @return          Returns true if the file was written successfully, false if not. In the second
      *                  case you can get the error message by using the method GetErrorMessage().

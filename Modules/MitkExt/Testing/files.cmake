@@ -12,7 +12,6 @@ set(MODULE_TESTS
   mitkPointLocatorTest.cpp
   mitkUnstructuredGridTest.cpp
   mitkSimpleHistogramTest.cpp
-  mitkToolManagerTest.cpp
 )
 set(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp #crappy test, but it can run with surfaces and images

@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkBinaryThresholdImageFilter.h>
 
+namespace us {
+class ModuleResource;
+}
+
 namespace mitk
 {
 
@@ -41,20 +45,21 @@ namespace mitk
   {
   public:
 
-    Message2<int,int> IntervalBordersChanged;
-    Message2<int, int>     ThresholdingValuesChanged;
+    Message2<mitk::ScalarType,mitk::ScalarType> IntervalBordersChanged;
+    Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);
     itkNewMacro(BinaryThresholdULTool);
 
     virtual const char** GetXPM() const;
+    us::ModuleResource GetIconResource() const;
     virtual const char* GetName() const;
 
     virtual void Activated();
     virtual void Deactivated();
 
     virtual void SetThresholdValues(int lower, int upper);
-    virtual void AcceptCurrentThresholdValue(const std::string& organName, const Color& color);
+    virtual void AcceptCurrentThresholdValue();
     virtual void CancelThresholding();
 
 
@@ -65,7 +70,7 @@ namespace mitk
 
     void SetupPreviewNode();
 
-    void CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organType, const Color& color);
+    void CreateNewSegmentationFromThreshold(DataNode* node);
 
     void OnRoiDataChanged();
     void UpdatePreview();
@@ -77,10 +82,10 @@ namespace mitk
     DataNode::Pointer m_OriginalImageNode;
     DataNode::Pointer m_NodeForThresholding;
 
-    int m_SensibleMinimumThresholdValue;
-    int m_SensibleMaximumThresholdValue;
-    int m_CurrentLowerThresholdValue;
-    int m_CurrentUpperThresholdValue;
+    mitk::ScalarType m_SensibleMinimumThresholdValue;
+    mitk::ScalarType m_SensibleMaximumThresholdValue;
+    mitk::ScalarType m_CurrentLowerThresholdValue;
+    mitk::ScalarType m_CurrentUpperThresholdValue;
 
     typedef itk::Image<int, 3> ImageType;
     typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations

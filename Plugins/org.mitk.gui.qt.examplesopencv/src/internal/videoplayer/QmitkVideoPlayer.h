@@ -31,12 +31,6 @@ class QmitkVideoPlayer: public QmitkFunctionality
 
   public:
     QmitkVideoPlayer();
-    QmitkVideoPlayer(const QmitkVideoPlayer& other)
-    {
-      Q_UNUSED(other)
-      throw std::runtime_error("Copy constructor not implemented");
-    }
-
     virtual ~QmitkVideoPlayer();
     virtual bool IsExclusiveFunctionality() const;
     virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);

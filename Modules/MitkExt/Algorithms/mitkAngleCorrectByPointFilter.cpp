@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIpPic.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkProperties.h"
+#include "mitkImageReadAccessor.h"
 
 mitk::AngleCorrectByPointFilter::AngleCorrectByPointFilter() : m_PreferTransducerPositionFromProperty(true)
 {
@@ -164,7 +165,8 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
       InputImagePixelType *in;
       OutputImagePixelType *out;
 
-      in  = (InputImagePixelType *)timeSelector->GetOutput()->GetData();
+      mitk::ImageReadAccessor tsOutAcc(timeSelector->GetOutput());
+      in  = (InputImagePixelType *)tsOutAcc.GetData();
       out = (OutputImagePixelType*)pic_out->data;
 
       for (z=0 ; z<zDim ; ++z)

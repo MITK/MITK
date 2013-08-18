@@ -19,9 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceRegistration.h>
 #include <usModuleActivator.h>
-#include "mitkModuleContext.h"
+#include <usModuleContext.h>
+#include <usModuleActivator.h>
 
-#include <mitkModuleActivator.h>
 #include "mitkIToFDeviceFactory.h"
 #include "mitkToFConfig.h"
 #include "mitkToFPMDConfig.h"
@@ -57,16 +57,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class PMDModuleActivator : public ModuleActivator {
+class PMDModuleActivator : public us::ModuleActivator {
 public:
 
-    void Load(mitk::ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
     //The PMD CamBoard-Factory gets activated as soon as the user toggels one the PMD-parameter in Cmake to on
       #ifdef MITK_USE_TOF_PMDCAMCUBE
        //Implementing Cam Cube
         ToFCameraPMDCamCubeDeviceFactory* toFCameraPMDCamCubeDeviceFactory = new ToFCameraPMDCamCubeDeviceFactory();
-        ServiceProperties camCubeFactoryProps;
+        us::ServiceProperties camCubeFactoryProps;
         camCubeFactoryProps["ToFFactoryName"] = toFCameraPMDCamCubeDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamCubeDeviceFactory,camCubeFactoryProps);
 
@@ -74,7 +74,7 @@ public:
 
        //Implementing PMD Raw Data Cam Cube DeviceFactory
         ToFCameraPMDRawDataCamCubeDeviceFactory* toFCameraPMDRawDataCamCubeDeviceFactory = new ToFCameraPMDRawDataCamCubeDeviceFactory();
-        ServiceProperties rawCamCubeFactoryProps;
+        us::ServiceProperties rawCamCubeFactoryProps;
         rawCamCubeFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamCubeDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamCubeDeviceFactory,rawCamCubeFactoryProps);
 
@@ -88,7 +88,7 @@ public:
       #ifdef MITK_USE_TOF_PMDO3
        //Implementing PMD O3D DeviceFactory
         ToFCameraPMDO3DeviceFactory* toFCameraPMDO3DeviceFactory = new ToFCameraPMDO3DeviceFactory();
-        ServiceProperties o3FactoryProps;
+        us::ServiceProperties o3FactoryProps;
         o3FactoryProps["ToFFactoryName"] = toFCameraPMDO3DeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDO3DeviceFactory,o3FactoryProps);
 
@@ -101,7 +101,7 @@ public:
       #ifdef MITK_USE_TOF_PMDCAMBOARD
        //Implementing CamBoardDeviceFactory
         ToFCameraPMDCamBoardDeviceFactory* toFCameraPMDCamBoardDeviceFactory = new ToFCameraPMDCamBoardDeviceFactory();
-        ServiceProperties camBoardFactoryProps;
+        us::ServiceProperties camBoardFactoryProps;
         camBoardFactoryProps["ToFFactoryName"] = toFCameraPMDCamBoardDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDCamBoardDeviceFactory, camBoardFactoryProps);
 
@@ -110,7 +110,7 @@ public:
 
        //Implementing PMD Raw Data Cam Board DeviceFactory
         ToFCameraPMDRawDataCamBoardDeviceFactory* toFCameraPMDRawDataCamBoardDeviceFactory = new ToFCameraPMDRawDataCamBoardDeviceFactory();
-        ServiceProperties rawCamBoardFactoryProps;
+        us::ServiceProperties rawCamBoardFactoryProps;
         rawCamBoardFactoryProps["ToFFactoryName"] = toFCameraPMDRawDataCamBoardDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDRawDataCamBoardDeviceFactory,rawCamBoardFactoryProps);
 
@@ -123,7 +123,7 @@ public:
       //The PMD Player Device Factory gets activated as soon as the user toggels one of the PMD-parameters in Cmake to on
         //Registrating the PMD Player DeviceFactory
         ToFCameraPMDPlayerDeviceFactory* toFCameraPMDPlayerDeviceFactory = new ToFCameraPMDPlayerDeviceFactory();
-        ServiceProperties pMDPlayerFactoryProps;
+        us::ServiceProperties pMDPlayerFactoryProps;
         pMDPlayerFactoryProps["ToFFactoryName"] = toFCameraPMDPlayerDeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraPMDPlayerDeviceFactory,pMDPlayerFactoryProps);
 
@@ -133,7 +133,7 @@ public:
 
     }
 
-    void Unload(mitk::ModuleContext* )
+    void Unload(us::ModuleContext* )
     {
     }
 

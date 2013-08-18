@@ -63,13 +63,6 @@ public:
   virtual vtkRenderWindow* GetVtkRenderWindow() = 0;
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() = 0;
 
-
-  void SetProcessWheelEvents( bool state );
-
-  bool GetProcessWheelEvents();
-
-  void SetInvertScrollingDirection( bool );
-
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
   DEPRECATED(virtual void mousePressMitkEvent(mitk::MouseEvent *me));
   /** \deprecatedSince{2013_03} Use InteractionEvent instead and pass them to HandleEvent() */
@@ -97,10 +90,6 @@ protected:
   vtkMitkRenderProp*             m_RenderProp;
 
   bool                           m_InResize;
-
-  bool                           m_ProcessWheelEvents;
-
-  bool                           m_InvertScrollingDirection;
 
   private:
 

@@ -56,7 +56,7 @@ class BERRY_UI IntroPart: public QObject, public IIntroPart, public IExecutableE
 {
 
   Q_OBJECT
-  Q_INTERFACES(berry::IIntroPart berry::IExecutableExtension)
+  Q_INTERFACES(berry::IIntroPart berry::IExecutableExtension);
 
 private:
 

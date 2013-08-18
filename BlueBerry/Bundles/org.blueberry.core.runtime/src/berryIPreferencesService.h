@@ -49,7 +49,7 @@ namespace berry
     ///
     static const std::string ID;
 
-    berryInterfaceMacro(IPreferencesService, berry)
+    berryInterfaceMacro(IPreferencesService, berry);
 
     /**
      * Returns the root system node for the calling bundle.

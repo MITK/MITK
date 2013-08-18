@@ -36,11 +36,11 @@ public:
   ///
   /// Creates smartpointer typedefs
   ///
-  berryObjectMacro(QmitkFunctionalitySelectionProvider)
+  berryObjectMacro(QmitkFunctionalitySelectionProvider);
   ///
   /// Create a selection provider for the given _Functionality
   ///
-  berryNewMacro1Param(QmitkFunctionalitySelectionProvider, QmitkFunctionality*)
+  berryNewMacro1Param(QmitkFunctionalitySelectionProvider, QmitkFunctionality*);
 
   //# ISelectionProvider methods
   ///

@@ -77,3 +77,14 @@ void mitk::SurfaceToSurfaceFilter::CreateOutputsForAllInputs(unsigned int  /*idx
   }
   this->Modified();
 }
+
+void mitk::SurfaceToSurfaceFilter::RemoveInputs( mitk::Surface* surface )
+{
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
+  {
+    if ( this->GetInput(idx) == surface )
+    {
+      this->RemoveOutput(idx);
+    }
+  }
+}

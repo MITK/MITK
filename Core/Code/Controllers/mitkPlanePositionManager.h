@@ -18,12 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPlanePositionManager_h_Included
 
 #include "mitkCommon.h"
-//#include "MitkExtExports.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkDataStorage.h"
-#include <mitkServiceReference.h>
-#include <mitkModuleContext.h>
-#include <mitkServiceInterface.h>
+
+#include <usServiceInterface.h>
 
 class MitkCoreActivator;
 
@@ -41,10 +39,13 @@ namespace mitk
 
     \sa QmitkSegmentationView.cpp
   */
- class MITK_CORE_EXPORT PlanePositionManagerService : public itk::LightObject
+ class MITK_CORE_EXPORT PlanePositionManagerService
  {
 
   public:
+
+   PlanePositionManagerService();
+   ~PlanePositionManagerService();
 
     /**
       \brief Adds a new plane position to the list. If this geometry is identical to one of the list nothing will be added
@@ -78,23 +79,12 @@ namespace mitk
     /// \brief Getting the number of all stored planes
     unsigned int GetNumberOfPlanePositions();
 
-    friend class ::MitkCoreActivator;
-
  private:
-
-
-   mitkClassMacro(PlanePositionManagerService, LightObject);
-
-   itkFactorylessNewMacro(PlanePositionManagerService);
-
-   PlanePositionManagerService();
-   ~PlanePositionManagerService();
 
    // Disable copy constructor and assignment operator.
    PlanePositionManagerService(const PlanePositionManagerService&);
    PlanePositionManagerService& operator=(const PlanePositionManagerService&);
 
-   static PlanePositionManagerService* m_Instance;
    std::vector<mitk::RestorePlanePositionOperation*> m_PositionList;
  };
 }

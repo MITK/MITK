@@ -40,7 +40,7 @@ class Job;
 struct BERRY_JOBS IJobChangeEvent : public Object
 {
 
-  berryInterfaceMacro(IJobChangeEvent, berry)
+  berryInterfaceMacro(IJobChangeEvent, berry);
 
   /**
    * The amount of time in milliseconds to wait after scheduling the job before it

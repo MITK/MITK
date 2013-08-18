@@ -39,7 +39,7 @@ void mitk::PlanarFigureToPlanarFigureFilter::SetInput( unsigned int idx, const I
   if ( this->GetInput(idx) != figure )
   {
     this->SetNthInput( idx, const_cast<InputType*>( figure ) );
-    this->CreateOutputsForAllInputs();
+//    this->CreateOutputsForAllInputs();
     this->Modified();
   }
 }

@@ -1,9 +1,16 @@
 /**
 \page DeveloperManualPortal MITK: Developer Manual
 
-Development with MITK can happen under several conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you. In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink. An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
+Development with MITK can happen under several conditions. Depending on whether you are using the Toolkit or the entire application, different sections may apply to you.
+In case you are unsure about what you need, please refer to \link Architecture The Architecture of MITK text\endlink.
+An extensive Introduction to MITK is available under \link StartingDevelopment Starting your MITK Development\endlink.
 
-Depending on whether you are working with the \link DevelopmentToolkit Toolkit\endlink or the \link DevelopmentApplication Application\endlink, you can refer to their respective pages. Generated API-Documentation can be found \link DevelopmentAPI here\endlink.
+Once you have made yourself familiar with MITK, you should have a look at the \link Concepts Development Concepts\endlink, as MITK implements a lot of high-level functionality.
+Knowing about these concepts will prevent you from reimplementing functionality.
+
+Once you start consuming more specific functionality, the \link MITKModuleManualsListPage Module Manual\endlink will be helpful to understand how a specific plugin works and what functionality it provides.
+
+Finally, generated API-Documentation can be found \link DevelopmentAPI here\endlink.
 
 <ul>
   <li> \subpage StartingDevelopment </li>
@@ -14,11 +21,8 @@ Depending on whether you are working with the \link DevelopmentToolkit Toolkit\e
     <li> \ref FirstSteps </li>
     <li> \ref AboutTestingPage </li>
   </ul>
-  <li> \subpage DevelopmentToolkit </li>
-  <ul>
-  <li> \ref Concepts </li>
-  <li> \ref MITKModuleManualsListPage </li>
-  </ul>
+  <li> \subpage Concepts </li>
+  <li> \subpage MITKModuleManualsListPage </li
   <li> \subpage DevelopmentApplication </li>
   <ul>
     <li> \ref mitkExtPointsIndex </li>

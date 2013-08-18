@@ -42,7 +42,7 @@ class Expression;
  */
 struct BERRY_UI IEvaluationResultCache : public Object {
 
-  berryInterfaceMacro(IEvaluationResultCache, berry)
+  berryInterfaceMacro(IEvaluationResultCache, berry);
 
   ~IEvaluationResultCache();
 

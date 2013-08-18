@@ -81,7 +81,9 @@ protected slots:
   void DoReduceGradientDirections();
   void DoShowGradientDirections();
   void DoHalfSphereGradientDirections();
-  void DoAdcAverage();
+  void DoADCFit();
+  void DoAKCFit();
+  void DoBiExpFit();
   void UpdateDwiBValueMapRounder(int i);
   void DoLengthCorrection();
   void DoAdcCalculation();

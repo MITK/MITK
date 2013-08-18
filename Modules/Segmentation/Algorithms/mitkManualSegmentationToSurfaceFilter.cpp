@@ -114,11 +114,12 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->Update();
 
       vtkimage=vtkimagethreshold->GetOutput();
-      mitk::Image::Pointer image = mitk::Image::New();
-      image->Initialize(vtkimagethreshold->GetOutput());
-      mitk::ScalarType max = image->GetScalarValueMax();
-      MITK_INFO<<max;
-      if (max!=0) //too little slices, image smoothing eliminates all segmentation pixels
+
+      double range[2];
+      vtkimage->GetScalarRange(range);
+
+      MITK_DEBUG << "Current scalar max is: " << range[1];
+      if (range[1]!=0) //too little slices, image smoothing eliminates all segmentation pixels
       {
         vtkimage = gaussian->GetOutput(); //->Out
       }
@@ -132,7 +133,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
     ProgressBar::GetInstance()->Progress();
 
-    // Create sureface for t-Slice
+    // Create surface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
     ProgressBar::GetInstance()->Progress();
   }

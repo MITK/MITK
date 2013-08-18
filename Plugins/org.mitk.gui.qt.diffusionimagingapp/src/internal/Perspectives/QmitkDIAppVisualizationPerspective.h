@@ -28,11 +28,6 @@ class QmitkDIAppVisualizationPerspective : public QObject, public berry::IPerspe
 public:
 
   QmitkDIAppVisualizationPerspective() {}
-  QmitkDIAppVisualizationPerspective(const QmitkDIAppVisualizationPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppVisualizationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

@@ -39,7 +39,7 @@ namespace berry {
  */
 struct BERRY_UI IntroContentDetector : public Object {
 
-  berryInterfaceMacro(IntroContentDetector, berry)
+  berryInterfaceMacro(IntroContentDetector, berry);
 
   /**
    * Returns <code>true</code> if new intro content is available.

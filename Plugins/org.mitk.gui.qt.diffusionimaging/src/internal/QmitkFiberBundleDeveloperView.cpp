@@ -38,6 +38,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
+#include "mitkModuleRegistry.h"
+
 
 // VTK
 #include <vtkPointSource.h> //for randomized FiberStructure
@@ -1787,12 +1789,16 @@ void QmitkFiberBundleDeveloperView::ActionDrawEllipseTriggered()
 
         if(figureP)
         {
-            figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+          figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
-            if(figureInteractor.IsNull())
-                figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-
-            mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+          if(figureInteractor.IsNull())
+          {
+            figureInteractor = mitk::PlanarFigureInteractor::New();
+            mitk::Module* planarFigureModule = mitk::ModuleRegistry::GetModule( "PlanarFigure" );
+            figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+            figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+            figureInteractor->SetDataNode( node );
+          }
         }
     }
 

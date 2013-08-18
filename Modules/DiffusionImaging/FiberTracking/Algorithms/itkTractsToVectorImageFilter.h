@@ -22,6 +22,7 @@ namespace itk{
 /**
 * \brief Extracts the voxel-wise main directions of the input fiber bundle.   */
 
+template< class PixelType >
 class TractsToVectorImageFilter : public ImageSource< VectorImage< float, 3 > >
 {
 
@@ -32,7 +33,7 @@ public:
     typedef SmartPointer< const Self > ConstPointer;
 
     typedef itk::Vector<float,3>                    OutputVectorType;
-    typedef itk::Image<OutputVectorType, 3>     OutputImageType;
+    typedef itk::Image<OutputVectorType, 3>         OutputImageType;
     typedef std::vector< OutputImageType::Pointer > OutputImageContainerType;
 
     typedef vnl_vector_fixed< double, 3 >                               DirectionType;
@@ -83,7 +84,7 @@ protected:
     float                               m_Epsilon;                          ///< epsilon for vector equality check
     ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
     bool                                m_NormalizeVectors;                 ///< normalize vectors to length 1
-    mitk::Vector3D                      m_OutImageSpacing;                  ///< spacing of output image
+    itk::Vector<double>                 m_OutImageSpacing;                  ///< spacing of output image
     ContainerType::Pointer              m_DirectionsContainer;              ///< container for fiber directions
     bool                                m_UseWorkingCopy;                   ///< do not modify input fiber bundle but work on copy
     bool                                m_UseTrilinearInterpolation;        ///< trilinearly interpolate between neighbouring voxels

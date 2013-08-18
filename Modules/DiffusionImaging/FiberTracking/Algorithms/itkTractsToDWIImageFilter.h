@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <cmath>
 
-typedef itk::VectorImage< short, 3 > DWIImageType;
 
 namespace itk
 {
@@ -39,15 +38,18 @@ namespace itk
 /**
 * \brief Generates artificial diffusion weighted image volume from the input fiberbundle using a generic multicompartment model.   */
 
-class TractsToDWIImageFilter : public ImageSource< DWIImageType >
+template< class PixelType >
+class TractsToDWIImageFilter : public ImageSource< itk::VectorImage< PixelType, 3 > >
 {
 
 public:
+
     typedef TractsToDWIImageFilter      Self;
-    typedef ImageSource< DWIImageType > Superclass;
+    typedef ImageSource< itk::VectorImage< PixelType, 3 > > Superclass;
     typedef SmartPointer< Self >        Pointer;
     typedef SmartPointer< const Self >  ConstPointer;
 
+    typedef typename Superclass::OutputImageType                     OutputImageType;
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<float, 3>                            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
@@ -59,6 +61,8 @@ public:
     typedef mitk::DiffusionNoiseModel<double>               NoiseModelType;
     typedef itk::Image< double, 2 >                         SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType ComplexSliceType;
+    typedef itk::Vector< double,3>                      VectorType;
+    typedef itk::Point< double,3>                      PointType;
 
     itkNewMacro(Self)
     itkTypeMacro( TractsToDWIImageFilter, ImageToImageFilter )
@@ -69,8 +73,8 @@ public:
     itkSetMacro( InterpolationShrink, double )          ///< large values shrink (towards nearest neighbour interpolation), small values strech interpolation function (towards linear interpolation)
     itkSetMacro( VolumeAccuracy, unsigned int )         ///< determines fiber sampling density and thereby the accuracy of the fiber volume fraction
     itkSetMacro( FiberBundle, FiberBundleType )         ///< input fiber bundle
-    itkSetMacro( Spacing, mitk::Vector3D )              ///< output image spacing
-    itkSetMacro( Origin, mitk::Point3D )                ///< output image origin
+    itkSetMacro( Spacing, VectorType )                  ///< output image spacing
+    itkSetMacro( Origin, PointType )                    ///< output image origin
     itkSetMacro( DirectionMatrix, MatrixType )          ///< output image rotation
     itkSetMacro( EnforcePureFiberVoxels, bool )         ///< treat all voxels containing at least one fiber as fiber-only (actually disable non-fiber compartments for this voxel).
     itkSetMacro( ImageRegion, ImageRegion<3> )          ///< output image size
@@ -109,12 +113,12 @@ protected:
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using FFT and add k-space artifacts. */
     DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
 
-    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
-    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
+//    /** Rearrange FFT output to shift low frequencies to the iamge center (correct itk). */
+//    TractsToDWIImageFilter::ComplexSliceType::Pointer RearrangeSlice(ComplexSliceType::Pointer slice);
 
-    itk::Vector<double>                 m_Spacing;              ///< output image spacing
-    itk::Vector<double>                 m_UpsampledSpacing;
-    mitk::Point3D                       m_Origin;               ///< output image origin
+    itk::Vector<double,3>              m_Spacing;              ///< output image spacing
+    itk::Vector<double,3>               m_UpsampledSpacing;
+    itk::Point<double,3>                m_Origin;               ///< output image origin
     MatrixType                          m_DirectionMatrix;      ///< output image rotation
     ImageRegion<3>                      m_ImageRegion;          ///< output image size
     ImageRegion<3>                      m_UpsampledImageRegion;

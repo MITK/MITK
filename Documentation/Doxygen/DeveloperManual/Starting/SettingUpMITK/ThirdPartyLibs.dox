@@ -3,6 +3,10 @@
 
 The following third-party libraries can be used with MITK by default and can, in part, be automatically downloaded during superbuild.
 
+\par ACVD
+
+http://www.creatis.insa-lyon.fr/site/en/acvd
+
 \par Boost
 
 http://www.boost.org/

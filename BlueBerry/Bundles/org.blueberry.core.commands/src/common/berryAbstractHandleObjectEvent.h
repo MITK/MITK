@@ -34,7 +34,7 @@ class BERRY_COMMANDS AbstractHandleObjectEvent : public AbstractBitSetEvent
 {
 
 public:
-  berryObjectMacro(AbstractHandleObjectEvent)
+  berryObjectMacro(AbstractHandleObjectEvent);
 
   /**
    * Returns whether or not the defined property changed.

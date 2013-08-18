@@ -11,9 +11,12 @@ set(module_dirs
     MitkExt
     SceneSerialization
     GraphAlgorithms
+    SurfaceInterpolation
     Segmentation
+    PlanarFigureSegmentation
     Qmitk
     QmitkExt
+    SegmentationUI
     Properties
     DiffusionImaging
     GPGPU
@@ -36,6 +39,7 @@ set(module_dirs
     USUI
     DicomUI
     Simulation
+    Remeshing
     Python
 )
 

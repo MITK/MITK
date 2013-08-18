@@ -109,7 +109,7 @@ protected:
 
   /** @brief Set the working size for the following OpenCL kernel call */
   void SetWorkingSize(unsigned int locx, unsigned int dimx,
-                      unsigned int locy, unsigned int dimy,
+                      unsigned int locy = 1, unsigned int dimy = 1,
                       unsigned int locz = 1, unsigned int dimz = 1);
 
   /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes

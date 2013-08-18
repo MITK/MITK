@@ -27,10 +27,10 @@
 #include <vtkXMLDataElement.h>
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 namespace mitk {
 
@@ -62,7 +62,7 @@ private:
 
 };
 
-struct EventConfigPrivate : public SharedData
+struct EventConfigPrivate : public us::SharedData
 {
 
   EventConfigPrivate();
@@ -74,11 +74,16 @@ struct EventConfigPrivate : public SharedData
     InteractionEvent::ConstPointer interactionEvent;
   };
 
+  typedef std::list<EventMapping> EventListType;
+
   /**
    * Checks if mapping with the same parameters already exists, if so, it is replaced,
    * else the new mapping added
    */
   void InsertMapping(const EventMapping& mapping);
+
+
+  void CopyMapping( const EventListType );
 
   /**
    * @brief List of all global properties of the config object.
@@ -93,7 +98,6 @@ struct EventConfigPrivate : public SharedData
 
   EventMapping m_CurrEventMapping;
 
-  typedef std::list<EventMapping> EventListType;
 
   /**
    * Stores InteractionEvents and their corresponding VariantName
@@ -110,6 +114,7 @@ struct EventConfigPrivate : public SharedData
 
 mitk::EventConfigPrivate::EventConfigPrivate()
   : m_PropertyList(PropertyList::New())
+  , m_EventPropertyList( PropertyList::New() )
   , m_Errors(false)
   , m_XmlParser(this)
 {
@@ -118,7 +123,7 @@ mitk::EventConfigPrivate::EventConfigPrivate()
 }
 
 mitk::EventConfigPrivate::EventConfigPrivate(const EventConfigPrivate& other)
-  : SharedData(other)
+  : us::SharedData(other)
   , m_PropertyList(other.m_PropertyList->Clone())
   , m_EventPropertyList(other.m_EventPropertyList->Clone())
   , m_CurrEventMapping(other.m_CurrEventMapping)
@@ -143,6 +148,16 @@ void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
   }
   m_EventList.push_back(mapping);
 }
+
+void mitk::EventConfigPrivate::CopyMapping( const EventListType eventList )
+{
+  EventListType::const_iterator iter;
+  for( iter=eventList.begin(); iter!=eventList.end(); iter++ )
+  {
+    InsertMapping( *(iter) );
+  }
+}
+
 
 mitk::EventConfigXMLParser::EventConfigXMLParser(EventConfigPrivate *d)
   : d(d)
@@ -238,14 +253,14 @@ mitk::EventConfig::EventConfig(const EventConfig &other)
 {
 }
 
-mitk::EventConfig::EventConfig(const std::string& filename, const Module* module)
+mitk::EventConfig::EventConfig(const std::string& filename, const us::Module* module)
   : d(new EventConfigPrivate)
 {
   if (module == NULL)
   {
-    module = GetModuleContext()->GetModule();
+    module = us::GetModuleContext()->GetModule();
   }
-  mitk::ModuleResource resource = module->GetResource("Interactions/" + filename);
+  us::ModuleResource resource = module->GetResource("Interactions/" + filename);
   if (!resource.IsValid())
   {
     MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
@@ -254,7 +269,7 @@ mitk::EventConfig::EventConfig(const std::string& filename, const Module* module
   }
 
   EventConfig newConfig;
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   newConfig.d->m_XmlParser.SetStream(&stream);
   bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
   if (success)
@@ -279,21 +294,37 @@ mitk::EventConfig::EventConfig(const std::vector<PropertyList::Pointer> &configD
 : d(new EventConfigPrivate)
 {
   std::vector<PropertyList::Pointer>::const_iterator it_end = configDescription.end();
-  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it) {
-
-    InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
-    if (event.IsNotNull())
+  for (std::vector<PropertyList::Pointer>::const_iterator it = configDescription.begin(); it != it_end; ++it)
+  {
+    std::string typeVariant;
+    (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), typeVariant);
+    if ( typeVariant != "" )
     {
+      InteractionEvent::Pointer event = EventFactory::CreateEvent(*it);
+      if (event.IsNotNull())
+      {
 
-      d->m_CurrEventMapping.interactionEvent = event;
-      std::string eventVariant;
-      (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), eventVariant);
-      d->m_CurrEventMapping.variantName = eventVariant;
-      d->InsertMapping(d->m_CurrEventMapping);
+        d->m_CurrEventMapping.interactionEvent = event;
+        std::string eventVariant;
+        (*it)->GetStringProperty(InteractionEventConst::xmlTagEventVariant().c_str(), eventVariant);
+        d->m_CurrEventMapping.variantName = eventVariant;
+        d->InsertMapping(d->m_CurrEventMapping);
+      }
+      else
+      {
+        MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+      }
     }
     else
     {
-      MITK_WARN<< "EventConfig: Unknown Event-Type in config. When constructing from PropertyList.";
+      (*it)->GetStringProperty(InteractionEventConst::xmlTagParam().c_str(), typeVariant);
+      if ( typeVariant != "" )
+      {
+        std::string name, value;
+        (*it)->GetStringProperty(InteractionEventConst::xmlParameterName().c_str(), name);
+        (*it)->GetStringProperty(InteractionEventConst::xmlParameterValue().c_str(), value);
+        d->m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
+      }
     }
   }
 }
@@ -310,16 +341,16 @@ mitk::EventConfig::~EventConfig()
 
 bool mitk::EventConfig::IsValid() const
 {
-  return !d->m_EventList.empty();
+  return !( d->m_EventList.empty() && d->m_PropertyList->IsEmpty() );
 }
 
-bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* module)
+bool mitk::EventConfig::AddConfig(const std::string& fileName, const us::Module* module)
 {
   if (module == NULL)
   {
-    module = GetModuleContext()->GetModule();
+    module = us::GetModuleContext()->GetModule();
   }
-  mitk::ModuleResource resource = module->GetResource("Interactions/" + fileName);
+  us::ModuleResource resource = module->GetResource("Interactions/" + fileName);
   if (!resource.IsValid())
   {
     MITK_ERROR << "Resource not valid. State machine pattern in module " << module->GetName()
@@ -328,7 +359,7 @@ bool mitk::EventConfig::AddConfig(const std::string& fileName, const Module* mod
   }
 
   EventConfig newConfig(*this);
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   newConfig.d->m_XmlParser.SetStream(&stream);
   bool success = newConfig.d->m_XmlParser.Parse() && !newConfig.d->m_Errors;
   if (success)
@@ -345,7 +376,8 @@ bool mitk::EventConfig::AddConfig(const EventConfig& config)
   d->m_PropertyList->ConcatenatePropertyList(config.d->m_PropertyList->Clone(), true);
   d->m_EventPropertyList = config.d->m_EventPropertyList->Clone();
   d->m_CurrEventMapping = config.d->m_CurrEventMapping;
-  d->InsertMapping(config.d->m_CurrEventMapping);
+  d->CopyMapping( config.d->m_EventList );
+
   return true;
 }
 

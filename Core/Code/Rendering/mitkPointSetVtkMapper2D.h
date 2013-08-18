@@ -18,29 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626
 #define MITKPointSetVtkMAPPER2D_H_HEADER_INCLUDED_C1902626
 
+
 #include <MitkExports.h>
 #include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
 #include "mitkLocalStorageHandler.h"
 #include "mitkPointSetShapeProperty.h"
 #include <vtkSmartPointer.h>
-#include <vtkAppendPolyData.h>
-#include <vtkGlyph3D.h>
-#include <vtkGlyphSource2D.h>
-#include <vtkFloatArray.h>
-#include <vtkCellArray.h>
-#include <vtkTextActor.h>
 
 class vtkActor;
 class vtkPropAssembly;
-class vtkAppendPolyData;
 class vtkPolyData;
-class vtkTubeFilter;
 class vtkPolyDataMapper;
 class vtkGlyphSource2D;
-class vtkSphereSource;
 class vtkGlyph3D;
 class vtkFloatArray;
+class vtkCellArray;
 
 
 namespace mitk {
@@ -69,22 +62,26 @@ namespace mitk {
 
   * Properties that can be set for point sets and influence the PointSetVTKMapper2D are:
   *
-  *   - \b "line width": (IntProperty 2)               // line width of the line from one point to another
-  *   - \b "point line width": (IntProperty 1)         // line width of the cross marking a point
-  *   - \b "point 2D size": (IntProperty 6)            // size of the glyph marking a point
-  *   - \b "show contour": (BoolProperty false)        // enable contour rendering between points (lines)
-  *   - \b "close contour": (BoolProperty false)       // if enabled, the open strip is closed (first point connected with last point)
-  *   - \b "show points": (BoolProperty true)          // show or hide points
-  *   - \b "show distances": (BoolProperty false)      // show or hide distance measure
-  *   - \b "distance decimal digits": (IntProperty 2)  // set the number of decimal digits to be shown when rendering the distance information
-  *   - \b "show angles": (BoolProperty false)         // show or hide angle measurement
-  *   - \b "show distant lines": (BoolProperty false)  // show the line between to points from a distant view (equals "always on top" option)
-  *   - \b "layer": (IntProperty 1)                    // default is drawing pointset above images (they have a default layer of 0)
+  *   - \b "line width": (IntProperty 2)                      // line width of the line from one point to another
+  *   - \b "point line width": (IntProperty 1)                // line width of the cross marking a point
+  *   - \b "point 2D size": (IntProperty 6)                   // size of the glyph marking a point
+  *   - \b "show contour": (BoolProperty false)               // enable contour rendering between points (lines)
+  *   - \b "close contour": (BoolProperty false)              // if enabled, the open strip is closed (first point connected with last point)
+  *   - \b "show points": (BoolProperty true)                 // show or hide points
+  *   - \b "show distances": (BoolProperty false)             // show or hide distance measure
+  *   - \b "distance decimal digits": (IntProperty 2)         // set the number of decimal digits to be shown when rendering the distance information
+  *   - \b "show angles": (BoolProperty false)                // show or hide angle measurement
+  *   - \b "show distant lines": (BoolProperty false)         // show the line between to points from a distant view (equals "always on top" option)
+  *   - \b "layer": (IntProperty 1)                           // default is drawing pointset above images (they have a default layer of 0)
   *   - \b "PointSet.2D.shape" (EnumerationProperty Cross)    // provides different shapes marking a point
   *       0 = "None", 1 = "Vertex", 2 = "Dash", 3 = "Cross", 4 = "ThickCross", 5 = "Triangle", 6 = "Square", 7 = "Circle",
   *       8 = "Diamond", 9 = "Arrow", 10 = "ThickArrow", 11 = "HookedArrow", 12 = "Cross"
-  *   - \b "PointSet.2D.fill shape": (BoolProperty::New(false))   // fill or do not fill the glyph shape
-  *
+  *   - \b "PointSet.2D.fill shape": (BoolProperty false)     // fill or do not fill the glyph shape
+  *   - \b "Pointset.2D.distance to plane": (FloatProperty 4.0) //In the 2D render window, points are rendered which lie within a certain distance
+  *                                                             to the current plane. They are projected on the current plane and scalled according to their distance.
+  *                                                             Point markers appear smaller as the plane moves away from their true location.
+  *                                                             The distance threshold can be adjusted by this float property, which ables the user to delineate the points
+  *                                                             that lie exactly on the plane. (+/- rounding error)
   *
   * Other Properties used here but not defined in this class:
   *
@@ -103,7 +100,7 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    virtual const mitk::PointSet* GetInput();
+    virtual const mitk::PointSet* GetInput() const;
 
     /** \brief returns the a prop assembly */
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
@@ -185,28 +182,37 @@ namespace mitk {
 
     /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    /* \brief Toggles visiblity of the propassembly */
+    /* \brief Called in mitk::Mapper::Update
+    * If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
+    * displayed e.g. toggle visiblity of the propassembly */
     virtual void ResetMapper( BaseRenderer* renderer );
-    /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
-    * This function iterates over the input point set and uses a specific shape defined in vtk glyph source
-    * to mark each point. The glyphs need to be rotated in the 2D- render windows
-    * in order to be ortogonal to the view vector. Therefore, the rotation of the current PlaneGeometry is
-    * used to determine the appropriate orienation of the glyphs. */
+
+     /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
+    * This function iterates over the input point set and determines the glyphs which lie in a specific
+    * range around the current slice. Those glyphs are rendered using a specific shape defined in vtk glyph source
+    * to mark each point. The shape can be changed in MITK using the property "PointSet.2D.shape".
+    *
+    * There were issues when rendering vtk glyphs in the 2D-render windows. By default, the glyphs are
+    * rendered within the x-y plane in each 2D-render window, so you would only see them from the
+    * side in the saggital and coronal 2D-render window. The solution to this is to rotate the glyphs in order
+    * to be ortogonal to the current view vector. To achieve this, the rotation (vtktransform) of the current
+    * PlaneGeometry is applied to the orienation of the glyphs. */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer* renderer);
 
-    // properties
-    bool m_Polygon;
-    bool m_PolygonClosed;
-    bool m_ShowPoints;
-    bool m_ShowDistances;
-    int m_DistancesDecimalDigits;
-    bool m_ShowAngles;
-    bool m_ShowDistantLines;
-    int  m_LineWidth;
-    int m_PointLineWidth;
-    int m_Point2DSize;
-    int m_IdGlyph;
-    bool m_FillGlyphs;
+    // member variables holding the current value of the properties used in this mapper
+    bool m_ShowContour;             // "show contour" property
+    bool m_CloseContour;            // "close contour" property
+    bool m_ShowPoints;              // "show points" property
+    bool m_ShowDistances;           // "show distances" property
+    int m_DistancesDecimalDigits;   // "distance decimal digits" property
+    bool m_ShowAngles;              // "show angles" property
+    bool m_ShowDistantLines;        // "show distant lines" property
+    int m_LineWidth;                // "line width" property
+    int m_PointLineWidth;           // "point line width" property
+    int m_Point2DSize;              // "point 2D size" property
+    int m_IDShapeProperty;          // ID for mitkPointSetShape Enumeration Property "Pointset.2D.shape"
+    bool m_FillShape;               // "Pointset.2D.fill shape" property
+    float m_DistanceToPlane;        // "Pointset.2D.distance to plane" property
 
   };
 

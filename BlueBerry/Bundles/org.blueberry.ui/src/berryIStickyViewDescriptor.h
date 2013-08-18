@@ -39,7 +39,7 @@ namespace berry {
  */
 struct BERRY_UI IStickyViewDescriptor : public Object {
 
-  berryObjectMacro(IStickyViewDescriptor)
+  berryObjectMacro(IStickyViewDescriptor);
 
   ~IStickyViewDescriptor();
 

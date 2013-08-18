@@ -19,21 +19,21 @@
 #include <string.h>
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleRegistry.h"
 
-mitk::BindDispatcherInteractor::BindDispatcherInteractor() :
+mitk::BindDispatcherInteractor::BindDispatcherInteractor( const std::string& rendererName ) :
     m_DataStorage(NULL)
 {
-  ModuleContext* context = ModuleRegistry::GetModule(1)->GetModuleContext();
+  us::ModuleContext* context = us::ModuleRegistry::GetModule(1)->GetModuleContext();
   if (context == NULL)
   {
     MITK_ERROR<< "BindDispatcherInteractor() - Context could not be obtained.";
     return;
   }
 
-  m_Dispatcher = Dispatcher::New();
+  m_Dispatcher = Dispatcher::New(rendererName);
 }
 
 void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
@@ -71,9 +71,11 @@ void mitk::BindDispatcherInteractor::RegisterDataStorageEvents()
   {
     m_DataStorage->AddNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
+
     m_DataStorage->RemoveNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::UnRegisterInteractor));
-    m_DataStorage->ChangedNodeEvent.AddListener(
+
+    m_DataStorage->InteractorChangedNodeEvent.AddListener(
         MessageDelegate1<BindDispatcherInteractor, const DataNode*>(this, &BindDispatcherInteractor::RegisterInteractor));
   }
 }

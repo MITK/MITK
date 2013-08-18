@@ -17,6 +17,7 @@ if(NOT MITK_DIR)
   option(MITK_BUILD_EXAMPLES "Build the MITK examples" OFF)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   option(MITK_BUILD_TESTING "Build the MITK unit tests" OFF)
+  option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
   option(MITK_USE_QT "Use Nokia's Qt library in MITK" ON)
@@ -50,6 +51,7 @@ if(NOT MITK_DIR)
     MITK_USE_BLUEBERRY
     MITK_BUILD_EXAMPLES
     MITK_BUILD_ALL_PLUGINS
+    MITK_USE_ACVD
     MITK_USE_CTK
     MITK_USE_DCMTK
     MITK_USE_QT
@@ -93,7 +95,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK GDCM VTK ITK OpenCV SOFA CableSwig)
+  foreach(proj CTK DCMTK GDCM VTK ACVD ITK OpenCV SOFA CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

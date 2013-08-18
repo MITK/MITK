@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <itkImage.h>
 #include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
 
 
 
 namespace mitk
 {
-
 mitkColourImageProcessor::mitkColourImageProcessor()
 {
 }
@@ -76,7 +76,6 @@ template <class T> class ScalarToRGBAConverter
 
   inline void write(int x,int y,int z,float grayValue,float gx,float gy,float gz)
   {
-
  /*
     gx /= aspect[0];
     gy /= aspect[1];
@@ -116,7 +115,6 @@ template <class T> class ScalarToRGBAConverter
     gz = sample(x,y,z+1) - sample(x,y,z-1);
 
     write( x, y, z, grayValue, gx, gy, gz );
-
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -225,7 +223,6 @@ template <class T> class ScalarToRGBAConverter
 
 template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGBA( itk::Image<TType, 3>* input  , mitk::TransferFunction::Pointer tf)
 {
-
   const TType *inputData=input->GetBufferPointer();
 
   typename itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
@@ -286,8 +283,7 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
     return NULL;
   }
 
-
-   mitkResult->SetSpacing( mitkInput->GetGeometry()->GetSpacing() );
+  mitkResult->SetClonedGeometry(mitkInput->GetGeometry());
 
   return mitkResult;
 }
@@ -357,7 +353,6 @@ class ScalarBinaryToRGBAConverter
   {
     if(sampleBinary(x,y,z))
     {
-
    /*
       gx /= aspect[0];
       gy /= aspect[1];
@@ -406,7 +401,6 @@ class ScalarBinaryToRGBAConverter
     gz = sample(x,y,z+1) - sample(x,y,z-1);
 
     write( x, y, z, grayValue, gx, gy, gz );
-
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -576,7 +570,9 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
     return 0;
   }
 
-  return ScalarAndBinaryToRGBA<short,unsigned char>(inputCT,inputBinary, tf);
+  mitk::Image::Pointer resultImage = ScalarAndBinaryToRGBA<short,unsigned char>(inputCT,inputBinary, tf);
+  resultImage->SetClonedGeometry(input1->GetGeometry());
+  return resultImage;
 }
 
 //////////////////////////////////////////
@@ -641,7 +637,6 @@ class ScalarBinaryColorToRGBAConverter
   {
     if(sampleBinary(x,y,z))
     {
-
    /*
       gx /= aspect[0];
       gy /= aspect[1];
@@ -694,7 +689,6 @@ class ScalarBinaryColorToRGBAConverter
     gz = sample(x,y,z+1) - sample(x,y,z-1);
 
     write( x, y, z, grayValue, gx, gy, gz );
-
   }
 
   inline void computeClamp(int x,int y,int z)
@@ -835,6 +829,8 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
     mitk::PixelType pixelType( MakePixelType<RGBAImage>() );
     image->Initialize( pixelType, 3, dimensions );
     image->SetImportChannel( RGBABuffer, 0, Image::ManageMemory );
+    //image->GetGeometry()->SetSpacing(input->GetSpacing());
+    //image->GetGeometry()->SetOrigin(input->GetOrigin());
 
     return image;
   }
@@ -863,7 +859,10 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
     return 0;
   }
 
-  return ScalarAndBinaryAndColorToRGBA<short,unsigned char>(inputCT,inputBinary, tf,color);
+  mitk::Image::Pointer resultImage = ScalarAndBinaryAndColorToRGBA<short,unsigned char>(inputCT,inputBinary, tf,color);
+  resultImage->SetClonedGeometry(input1->GetGeometry());
+
+  return resultImage;
 }
 
 static  inline int clamp(int x)
@@ -873,7 +872,7 @@ static  inline int clamp(int x)
   }
 
 
-mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* input  ,unsigned char* input2, int sizeX,int sizeY,int sizeZ )
+mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( const unsigned char* input  , const unsigned char* input2, int sizeX,int sizeY,int sizeZ )
 {
   int voxel= sizeX*sizeY*sizeZ;
 
@@ -940,7 +939,6 @@ mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* 
       RGBABuffer[r*4+2]= result[2];
       RGBABuffer[r*4+3]= result[3];
     }
-
   }
 
   // Create MITK Image out of the raw data
@@ -962,18 +960,22 @@ mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( unsigned char* 
 
 mitk::Image::Pointer mitkColourImageProcessor::combineRGBAImage( mitk::Image::Pointer input1 , mitk::Image::Pointer input2)
 {
+  // Order access to a whole Image object
+  try
+  {
+    mitk::ImageReadAccessor img1(input1);
+    const unsigned char* data1 = (const unsigned char*) img1.GetData();
+    mitk::ImageReadAccessor img2(input2);
+    const unsigned char* data2 = (const unsigned char*) img2.GetData();
 
-  RGBAImage::Pointer itk1,itk2;
+    unsigned int *dim = input1->GetDimensions();
 
-  unsigned char *data1=(unsigned char *)input1->GetData();
-  unsigned char *data2=(unsigned char *)input2->GetData();
-
-  unsigned int *dim = input1->GetDimensions();
-
-  return CombineRGBAImage(data1,data2,dim[0],dim[1],dim[2]);
+    return CombineRGBAImage(data1,data2,dim[0],dim[1],dim[2]);
+  }
+  catch(mitk::Exception& e)
+  {
+    MITK_ERROR << "mitkColourImageProcessor::combineRGBAImage - No access to image data possible." << e.what();
+    return NULL;
+  }
 }
-
-
 }//end namespace mitk
-
-

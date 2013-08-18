@@ -36,55 +36,61 @@ mitk::PropertyExtensions::~PropertyExtensions()
 {
 }
 
-bool mitk::PropertyExtensions::AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite)
+bool mitk::PropertyExtensions::AddExtension(const std::string& propertyName, PropertyExtension* extension, const std::string& className, bool overwrite)
 {
-  if (!propertyName.empty())
+  if (propertyName.empty())
+    return false;
+
+  ExtensionMap& extensions = m_Extensions[className];
+  std::pair<ExtensionMapIterator, bool> ret = extensions.insert(std::make_pair(propertyName, extension));
+
+  if (!ret.second && overwrite)
   {
-    std::pair<std::map<std::string, PropertyExtension*>::iterator, bool> ret = m_Extensions.insert(std::make_pair(propertyName, extension));
-
-    if (!ret.second && overwrite)
-    {
-      ret.first->second = extension;
-      ret.second = true;
-    }
-
-    return ret.second;
+    ret.first->second = extension;
+    ret.second = true;
   }
 
-  return false;
+  return ret.second;
 }
 
-mitk::PropertyExtension* mitk::PropertyExtensions::GetExtension(const std::string& propertyName) const
+mitk::PropertyExtension* mitk::PropertyExtensions::GetExtension(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
   {
-    std::map<std::string, PropertyExtension*>::const_iterator iter = m_Extensions.find(propertyName);
+    ExtensionMap& extensions = m_Extensions[className];
+    ExtensionMapConstIterator iter = extensions.find(propertyName);
 
-    if (iter != m_Extensions.end())
+    if (iter != extensions.end())
       return iter->second;
   }
 
   return NULL;
 }
 
-bool mitk::PropertyExtensions::HasExtension(const std::string& propertyName) const
+bool mitk::PropertyExtensions::HasExtension(const std::string& propertyName, const std::string& className)
 {
+  const ExtensionMap& extensions = m_Extensions[className];
+
   return !propertyName.empty()
-    ? m_Extensions.find(propertyName) != m_Extensions.end()
+    ? extensions.find(propertyName) != extensions.end()
     : false;
 }
 
-void mitk::PropertyExtensions::RemoveAllExtensions()
+void mitk::PropertyExtensions::RemoveAllExtensions(const std::string& className)
 {
-  std::for_each(m_Extensions.begin(), m_Extensions.end(), DeleteExtension());
-  m_Extensions.clear();
+  ExtensionMap& extensions = m_Extensions[className];
+
+  std::for_each(extensions.begin(), extensions.end(), DeleteExtension());
+  extensions.clear();
 }
 
-void mitk::PropertyExtensions::RemoveExtension(const std::string& propertyName)
+void mitk::PropertyExtensions::RemoveExtension(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
   {
-    delete m_Extensions[propertyName];
-    m_Extensions.erase(propertyName);
+    ExtensionMap& extensions = m_Extensions[className];
+
+    delete extensions[propertyName];
+    extensions.erase(propertyName);
   }
 }

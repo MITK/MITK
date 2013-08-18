@@ -41,34 +41,40 @@ namespace mitk
       *
       * \param[in] propertyName Name of the property.
       * \param[in] extension Property extension.
+      * \param[in] className Optional data node class name to which the property extension is restricted.
       * \param[in] overwrite Overwrite already existing property extension.
       * \return True if extension was added successfully.
       */
-    virtual bool AddExtension(const std::string& propertyName, PropertyExtension* extension, bool overwrite = false) = 0;
+    virtual bool AddExtension(const std::string& propertyName, PropertyExtension* extension, const std::string& className = "", bool overwrite = false) = 0;
 
     /** \brief Get the extension of a specific property.
       *
       * \param[in] propertyName Name of the property.
+      * \param[in] className Optional data node class name to which the returned property extension is restricted.
       * \return Property extension or null pointer if no extension was found.
       */
-    virtual PropertyExtension* GetExtension(const std::string& propertyName) const = 0;
+    virtual PropertyExtension* GetExtension(const std::string& propertyName, const std::string& className = "") = 0;
 
     /** \brief Check if a specific property has an extension.
       *
       * \param[in] propertyName Name of the property.
+      * \param[in] className Optional data node class name to which the property extension is restricted.
       * \return True if the property has an extension, false otherwise.
       */
-    virtual bool HasExtension(const std::string& propertyName) const = 0;
+    virtual bool HasExtension(const std::string& propertyName, const std::string& className = "") = 0;
 
     /** \brief Remove all property extensions.
+      *
+      * \param[in] className Optional data node class name to which the property extension is restricted.
       */
-    virtual void RemoveAllExtensions() = 0;
+    virtual void RemoveAllExtensions(const std::string& className = "") = 0;
 
     /** \brief Remove extension of a specific property.
       *
       * \param[in] propertyName Name of the property.
+      * \param[in] className Optional data node class name to which the property extension is restricted.
       */
-    virtual void RemoveExtension(const std::string& propertyName) = 0;
+    virtual void RemoveExtension(const std::string& propertyName, const std::string& className = "") = 0;
   };
 }
 

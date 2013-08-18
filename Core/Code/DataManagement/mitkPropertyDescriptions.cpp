@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPropertyDescriptions.h"
+#include <algorithm>
 #include <utility>
 
 mitk::PropertyDescriptions::PropertyDescriptions()
@@ -25,51 +26,53 @@ mitk::PropertyDescriptions::~PropertyDescriptions()
 {
 }
 
-bool mitk::PropertyDescriptions::AddDescription(const std::string& propertyName, const std::string& description, bool overwrite)
+bool mitk::PropertyDescriptions::AddDescription(const std::string& propertyName, const std::string& description, const std::string& className, bool overwrite)
 {
-  if (!propertyName.empty())
+  if (propertyName.empty())
+    return false;
+
+  DescriptionMap& descriptions = m_Descriptions[className];
+  std::pair<DescriptionMapIterator, bool> ret = descriptions.insert(std::make_pair(propertyName, description));
+
+  if (!ret.second && overwrite)
   {
-    std::pair<std::map<std::string, std::string>::iterator, bool> ret = m_Descriptions.insert(std::make_pair(propertyName, description));
-
-    if (!ret.second && overwrite)
-    {
-      ret.first->second = description;
-      ret.second = true;
-    }
-
-    return ret.second;
+    ret.first->second = description;
+    ret.second = true;
   }
 
-  return false;
+  return ret.second;
 }
 
-std::string mitk::PropertyDescriptions::GetDescription(const std::string& propertyName) const
+std::string mitk::PropertyDescriptions::GetDescription(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
   {
-    std::map<std::string, std::string>::const_iterator iter = m_Descriptions.find(propertyName);
+    DescriptionMap& descriptions = m_Descriptions[className];
+    DescriptionMapConstIterator iter = descriptions.find(propertyName);
 
-    if (iter != m_Descriptions.end())
+    if (iter != descriptions.end())
       return iter->second;
   }
 
   return "";
 }
 
-bool mitk::PropertyDescriptions::HasDescription(const std::string& propertyName) const
+bool mitk::PropertyDescriptions::HasDescription(const std::string& propertyName, const std::string& className)
 {
+  const DescriptionMap& descriptions = m_Descriptions[className];
+
   return !propertyName.empty()
-    ? m_Descriptions.find(propertyName) != m_Descriptions.end()
+    ? descriptions.find(propertyName) != descriptions.end()
     : false;
 }
 
-void mitk::PropertyDescriptions::RemoveAllDescriptions()
+void mitk::PropertyDescriptions::RemoveAllDescriptions(const std::string& className)
 {
-  m_Descriptions.clear();
+  m_Descriptions[className].clear();
 }
 
-void mitk::PropertyDescriptions::RemoveDescription(const std::string& propertyName)
+void mitk::PropertyDescriptions::RemoveDescription(const std::string& propertyName, const std::string& className)
 {
   if (!propertyName.empty())
-    m_Descriptions.erase(propertyName);
+    m_Descriptions[className].erase(propertyName);
 }

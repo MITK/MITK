@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkIPropertyFilters_h
 
 #include <mitkBaseProperty.h>
-#include <mitkPropertyFilter.h>
 #include <usServiceInterface.h>
 #include <map>
 #include <string>
@@ -26,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class PropertyFilter;
+
   /** \brief Interface of property filters service.
     *
     * This service allows you manage property name filters.

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGetSimulationPreferences.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkPropertyFilter.h>
 #include <mitkSimulationObjectFactory.h>
 #include <QmitkNodeDescriptorManager.h>
 #include <QtPlugin>

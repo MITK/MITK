@@ -44,6 +44,9 @@ public:
 
   itkNewMacro(Self)
 
+  typedef typename Superclass::OutputType                OutputImageType;
+  typedef typename OutputImageType::Pointer              OutputImagePointerType;
+
   using itk::ProcessObject::SetInput;
   virtual void SetInput( const InputImageType* image);
   virtual void SetInput( unsigned int, const InputImageType* image);

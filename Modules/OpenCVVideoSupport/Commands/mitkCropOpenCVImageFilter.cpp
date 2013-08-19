@@ -20,6 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+CropOpenCVImageFilter::CropOpenCVImageFilter( )
+  : m_NewCropRegionSet(false)
+{
+
+}
+
 bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
 {
   if (m_CropRegion.width == 0)
@@ -29,23 +35,27 @@ bool CropOpenCVImageFilter::FilterImage( cv::Mat& image )
     return false;
   }
 
-  cv::Rect cropRegion = m_CropRegion;
-
-  // We can try and correct too large boundaries
-  if ( cropRegion.x + cropRegion.width > image.size().width)
+  // We can try and correct too large boundaries (do this only once
+  // after a new crop region was set.
+  if (m_NewCropRegionSet)
   {
-    cropRegion.width = image.size().width - cropRegion.x;
-    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
-        << "Changed too large roi in x direction to fit the image size.";
-  }
-  if ( cropRegion.y + cropRegion.height > image.size().height)
-  {
-    cropRegion.height = image.size().height - cropRegion.y;
-    MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
-        << "Changed too large roi in y direction to fit the image size.";
+    m_NewCropRegionSet = false;
+
+    if ( m_CropRegion.x + m_CropRegion.width > image.size().width)
+    {
+      m_CropRegion.width = image.size().width - m_CropRegion.x;
+      MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+          << "Changed too large roi in x direction to fit the image size.";
+    }
+    if ( m_CropRegion.y + m_CropRegion.height > image.size().height)
+    {
+      m_CropRegion.height = image.size().height - m_CropRegion.y;
+      MITK_WARN("AbstractOpenCVImageFilter")("CropOpenCVImageFilter")
+          << "Changed too large roi in y direction to fit the image size.";
+    }
   }
 
-  cv::Mat buffer = image(cropRegion);
+  cv::Mat buffer = image(m_CropRegion);
   image.release();
   image = buffer;
 

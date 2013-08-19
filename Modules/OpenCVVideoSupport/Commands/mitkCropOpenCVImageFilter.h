@@ -33,6 +33,8 @@ public:
   mitkClassMacro(CropOpenCVImageFilter, AbstractOpenCVImageFilter);
   itkNewMacro(Self);
 
+  CropOpenCVImageFilter( );
+
   /**
     * \brief Crops image to rectangle given by mitk::CropOpenCVImageFilter::SetCropRegion.
     * \return false if no crop region was set or the crop region width is zero, true otherwise.
@@ -59,6 +61,11 @@ protected:
     * \brief Defines the region which will be cropped from the image.
     */
   cv::Rect m_CropRegion;
+
+  /**
+    * \brief True if no image was filtered since last set of a crop region.
+    */
+  bool m_NewCropRegionSet;
 };
 
 } // namespace mitk

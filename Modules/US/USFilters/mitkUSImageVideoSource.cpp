@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK HEADER
 #include "mitkUSImageVideoSource.h"
 #include "mitkImage.h"
+#include "mitkCropOpenCVImageFilter.h"
+#include "mitkConvertGrayscaleOpenCVImageFilter.h"
 
 //OpenCV HEADER
 #include <cv.h>
@@ -34,7 +36,10 @@ m_IsGreyscale(false),
 m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
 m_ResolutionOverrideWidth(0),
 m_ResolutionOverrideHeight(0),
-m_ResolutionOverride(false)
+m_ResolutionOverride(false),
+m_ImageFilter(0),
+m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
+m_CropFilter(mitk::CropOpenCVImageFilter::New())
 {
   m_OpenCVToMitkFilter->SetCopyBuffer(false);
 }
@@ -99,24 +104,12 @@ bool mitk::USImageVideoSource::GetIsReady()
 
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
-  // First, let's do some basic checks to make sure rectangle is inside of actual image
-  if (topLeftX < 0) topLeftX = 0;
-  if (topLeftY < 0) topLeftY = 0;
-
-  // We can try and correct too large boundaries
-  if (bottomRightX >  m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH)) bottomRightX = m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-  if (bottomRightY >  m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT)) bottomRightY = m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
-
-  // Nothing to save, throw an exception
-  if (topLeftX > bottomRightX) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
-  if (topLeftY > bottomRightY) mitkThrow() << "Invalid boundaries supplied to USImageVideoSource::SetRegionOfInterest()";
-
-  m_CropRegion = cv::Rect(topLeftX, topLeftY, bottomRightX - topLeftX, bottomRightY - topLeftY);
+  m_CropFilter->SetCropRegion(topLeftX, topLeftY, bottomRightX, bottomRightY);
+  m_IsCropped = true;
 }
 
 void mitk::USImageVideoSource::RemoveRegionOfInterest(){
-  m_CropRegion.width = 0;
-  m_CropRegion.height = 0;
+  m_IsCropped = false;
 }
 
 mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
@@ -127,24 +120,18 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
 
   // Setup pointers
   cv::Mat image;
-  cv::Mat buffer;
 
   // Retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
 
-  // if Region of interest is set, crop image
-  if (m_CropRegion.width > 0){
-    buffer = image(m_CropRegion);
-    image.release();
-    image = buffer;
-  }
+  // If region of interest was set, crop image
+  if ( m_IsCropped ) { m_CropFilter->FilterImage(image); }
+
   // If this source is set to deliver greyscale images, convert it
-  if (m_IsGreyscale)
-  {
-    cv::cvtColor(image, buffer, CV_RGB2GRAY, 1);
-    image.release();
-    image = buffer;
-  }
+  if ( m_IsGreyscale ) { m_GrayscaleFilter->FilterImage(image); }
+
+  // Execute filter, if an additional filter is specified
+  if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
 
   // Convert to MITK-Image
   IplImage ipl_img = image;
@@ -156,7 +143,6 @@ mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
   mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
   // Clean up
-  buffer.release();
   image.release();
 
   return result;

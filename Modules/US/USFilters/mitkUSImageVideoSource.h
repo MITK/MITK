@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkUSImage.h"
 #include "mitkOpenCVToMitkImageFilter.h"
+#include "Commands/mitkConvertGrayscaleOpenCVImageFilter.h"
+#include "Commands/mitkCropOpenCVImageFilter.h"
 
 // OpenCV
 #include <highgui.h>
@@ -104,6 +106,8 @@ namespace mitk {
     itkGetMacro(ResolutionOverrideHeight,int);
     int GetImageHeight();
     int GetImageWidth();
+    itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
+    itkSetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
 
     /**
     * \brief Returns true if images can be delivered.
@@ -132,10 +136,9 @@ namespace mitk {
     */
     bool m_IsGreyscale;
     /**
-    * \brief If values inside are nonzero, this rectangle will be cropped from the stream and used as an output.
-    * Used to mark Region of Interest.
+    * \brief If true, image will be cropped according to settings of crop filter.
     */
-    cv::Rect m_CropRegion;
+    bool m_IsCropped;
     /**
     * \brief Used to convert from OpenCV Images to MITK Images.
     */
@@ -147,6 +150,14 @@ namespace mitk {
     int  m_ResolutionOverrideWidth;
     int  m_ResolutionOverrideHeight;
     bool m_ResolutionOverride;
+
+    /**
+      * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
+      */
+    AbstractOpenCVImageFilter::Pointer m_ImageFilter;
+
+    ConvertGrayscaleOpenCVImageFilter::Pointer m_GrayscaleFilter;
+    CropOpenCVImageFilter::Pointer m_CropFilter;
 
   };
 } // namespace mitk

@@ -33,9 +33,9 @@ int mitkPropertyFiltersTest(int, char* [])
   typedef PropertyMap::const_iterator PropertyMapConstIterator;
 
   PropertyMap propertyMap;
-  propertyMap.insert(std::make_pair("propertyName1", mitk::BoolProperty::New()));
-  propertyMap.insert(std::make_pair("propertyName2", mitk::BoolProperty::New()));
-  propertyMap.insert(std::make_pair("propertyName3", mitk::BoolProperty::New()));
+  propertyMap.insert(std::make_pair("propertyName1", mitk::BoolProperty::New().GetPointer()));
+  propertyMap.insert(std::make_pair("propertyName2", mitk::BoolProperty::New().GetPointer()));
+  propertyMap.insert(std::make_pair("propertyName3", mitk::BoolProperty::New().GetPointer()));
 
   mitk::PropertyFilter filter;
   filter.AddEntry("propertyName1", mitk::PropertyFilter::Whitelist);

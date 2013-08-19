@@ -67,7 +67,6 @@ set(MODULE_TESTS
   mitkUIDGeneratorTest.cpp
   mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
-
   mitkAffineTransformBaseTest.cpp
 
 )

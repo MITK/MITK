@@ -125,9 +125,9 @@ template<> class VectorTraits< unsigned int *> {
     typedef unsigned int ValueType;
 };
 
-template<> class VectorTraits< ScalarType[4] > {
+template<> class VectorTraits< double[4] > {
   public:
-    typedef ScalarType ValueType;
+    typedef double ValueType;
 };
 
 template<> class VectorTraits< itk::Vector<float,3> > {
@@ -144,6 +144,7 @@ template<> class VectorTraits< itk::Point<float,4> > {
   public:
     typedef float ValueType;
 };
+
 
 template<> class VectorTraits< itk::Vector<double,3> > {
   public:

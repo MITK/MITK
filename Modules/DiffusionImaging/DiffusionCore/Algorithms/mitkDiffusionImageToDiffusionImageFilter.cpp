@@ -45,7 +45,7 @@ void mitk::DiffusionImageToDiffusionImageFilter<DiffusionPixelType>
   }
   // Process object is not const-correct so the const_cast is required here
   this->itk::ProcessObject::SetNthInput(index,
-    const_cast< mitk::DiffusionImageToDiffusionImageFilter<DiffusionPixelType>::InputImageType *>( input ) );
+    const_cast< typename Self::InputImageType *>( input ) );
 }
 
 
@@ -63,7 +63,7 @@ const typename mitk::DiffusionImageToDiffusionImageFilter<DiffusionPixelType>::I
 mitk::DiffusionImageToDiffusionImageFilter<DiffusionPixelType>
 ::GetInput(unsigned int idx)
 {
-  return static_cast< const mitk::DiffusionImageToDiffusionImageFilter<DiffusionPixelType>::InputImageType * >
+  return static_cast< const typename Self::InputImageType * >
     (this->itk::ProcessObject::GetInput(idx));
 }
 

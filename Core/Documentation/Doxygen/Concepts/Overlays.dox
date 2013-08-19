@@ -24,10 +24,10 @@ digraph linker_deps {
   node [shape=record, fontname=Helvetica, fontsize=10];
   BR [ label="BaseRenderer" ];
   BL [ label="{BaseLayouter|+ArrangeOverlays()}" ];
-  O [ label="{Overlay|-PropertyList|+UpdateOverlay(BaseRenderer)}" ];
-  OM [ label="{OverlayManager|+AddOverlay()\n+RemoveOverlay()}" ];
+  O [ label="{Overlay|-PropertyList|+RemoveOverlay(BaseRenderer*)\n+UpdateOverlay(BaseRenderer*)\n+RemoveOverlay(BaseRenderer*)}" ];
+  OM [ label="{OverlayManager|+AddOverlay(Overlay*)\n+RemoveOverlay(Overlay*)}" ];
   TO [ label="TextOverlay" ];
-  VTKO [ label="{vtkOverlay|GetVtkActor()}" ];
+  VTKO [ label="{vtkOverlay|#GetVtkActor()}" ];
   TO -> VTKO;
   VTKO -> O;
   OM -> O [style="dashed",label="manages"];
@@ -40,6 +40,13 @@ digraph linker_deps {
 The mitk::Overlay can be implemented using a custom rendering framework like VTK. In this diagram, the vtkOverlay is shown as the superclass for all Overlays which use the vtk framework for rendering.
 The OverlayManager is a microservice that can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
 It also manages the respective Layouters which are used to manage the placement of a group of Overlays.
+
+\subsection OverlaysPage_OverlaySubsection Overlay
+
+The mitk::Overlay is an abstract class that can manage property lists like the mitk::DataNode and provides the interfaces to thr three methods
+mitk::Overlay::AddOverlay, mitk::Overlay::UpdateOverlay and mitk::Overlay::RemoveOverlay. The subclasses of the mitk::Overlay have to implement these methods
+in order to provide the functionallity of an overlay. There are already a few implementations of mitk::Overlay which are using VTK as a rendering
+framework to display the Overlays. However the mitk::Overlay can also be implemented using OpenGL to draw the Overlay on the renderwindows.
 
 \subsection OverlaysPage_OverlayManagerSubsection OverlayManager
 

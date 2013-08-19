@@ -16,6 +16,7 @@ if(MITK_USE_SOFA)
     -DSOFA-APPLICATION_MODELER:BOOL=OFF
     -DSOFA-APPLICATION_RUNSOFA:BOOL=OFF
     -DSOFA-APPLICATION_SOFABATCH:BOOL=OFF
+    -DSOFA-EXTERNAL_BOOST_PATH:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib
     -DSOFA-EXTERNAL_HAVE_BOOST:BOOL=ON
     -DSOFA-EXTERNAL_HAVE_GLEW:BOOL=OFF
     -DSOFA-EXTERNAL_HAVE_ZLIB:BOOL=OFF
@@ -32,18 +33,18 @@ if(MITK_USE_SOFA)
   )
 
   if(NOT MITK_USE_SYSTEM_Boost)
-    list(APPEND additional_cmake_args
+    list(APPEND boost_cmake_args
+      -DBoost_DEBUG:BOOL=ON
       -DBoost_NO_SYSTEM_PATHS:BOOL=ON
       -DBOOST_INCLUDEDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/include/boost-1_54
       -DBOOST_LIBRARYDIR:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib
-      -DSOFA-EXTERNAL_BOOST_PATH:PATH=${CMAKE_BINARY_DIR}/Boost-install/lib
     )
   endif()
 
   set(rev "9832")
 
   set(SOFA_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchSOFA-rev${rev}.cmake)
-  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${CMAKE_BINARY_DIR}/${proj}-src)
+  set(SOFA_PRECONFIGURE_COMMAND ${CMAKE_COMMAND} -G${gen} ${ep_common_args} ${boost_cmake_args} ${CMAKE_BINARY_DIR}/${proj}-src)
 
   if(NOT DEFINED SOFA_DIR)
     ExternalProject_Add(${proj}
@@ -58,6 +59,7 @@ if(MITK_USE_SOFA)
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}
+        ${boost_cmake_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

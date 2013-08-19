@@ -57,9 +57,11 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
 
+
+
   # Registration Algorithms & Co.
   Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
-#  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
+
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -121,6 +123,8 @@ set(H_FILES
 
   Algorithms/itkSplitDWImageFilter.h
 
+  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.h
+  Algorithms/mitkDiffusionImageToDiffusionImageFilter.h
 
 
 )

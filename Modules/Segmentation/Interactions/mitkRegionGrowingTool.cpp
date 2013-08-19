@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
+// us
+#include "mitkModule.h"
+#include "mitkModuleResource.h"
+#include <mitkGetModuleContext.h>
+
 namespace mitk {
   MITK_TOOL_MACRO(Segmentation_EXPORT, RegionGrowingTool, "Region growing tool");
 }
@@ -57,7 +62,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
   CONNECT_ACTION( 80, OnMousePressed );
   CONNECT_ACTION( 90, OnMouseMoved );
   CONNECT_ACTION( 42, OnMouseReleased );
-
+  CONNECT_ACTION( 91, OnChangeActiveLabel );
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()
@@ -72,6 +77,20 @@ const char** mitk::RegionGrowingTool::GetXPM() const
 const char* mitk::RegionGrowingTool::GetName() const
 {
   return "Region Growing";
+}
+
+mitk::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  return resource;
+}
+
+mitk::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
+{
+  Module* module = GetModuleContext()->GetModule();
+  ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
+  return resource;
 }
 
 void mitk::RegionGrowingTool::Activated()
@@ -426,6 +445,25 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
   m_ReferenceSlice = NULL; // don't leak
   m_WorkingSlice = NULL;
   m_OriginalPicSlice = NULL;
+
+  return true;
+}
+
+bool mitk::RegionGrowingTool::OnChangeActiveLabel (Action* action, const StateEvent* stateEvent)
+{
+  const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent) return false;
+
+  if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
+
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  assert (workingNode);
+
+  mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+
+  int value = lsImage->GetPixelValueByWorldCoordinate( positionEvent->GetWorldPosition() );
+
+  lsImage->SetActiveLabel(value, true);
 
   return true;
 }

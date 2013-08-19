@@ -53,7 +53,7 @@ class Segmentation_EXPORT AddContourTool : public ContourTool
 
     virtual const char** GetXPM() const;
     virtual ModuleResource GetCursorIconResource() const;
-    ModuleResource GetIconResource() const;
+    virtual ModuleResource GetIconResource() const;
 
     virtual const char* GetName() const;
     virtual bool OnMousePressed (Action*, const StateEvent*);

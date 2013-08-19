@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 struct mitkIpPicDescriptor;
 
+class ModuleResource;
+
 namespace mitk
 {
 
@@ -61,6 +63,8 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     virtual const char** GetXPM() const;
     virtual const char* GetName() const;
+    virtual ModuleResource GetCursorIconResource() const;
+    virtual ModuleResource GetIconResource() const;
 
   protected:
 
@@ -75,6 +79,7 @@ class Segmentation_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual bool OnMousePressedOutside (Action*, const StateEvent*);
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
+    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour();
 

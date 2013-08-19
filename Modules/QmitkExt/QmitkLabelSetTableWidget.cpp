@@ -246,7 +246,10 @@ void QmitkLabelSetTableWidget::LabelModified( int index )
          vbutton->setChecked(!m_LabelSetImage->GetLabelVisible(index));
     }
 
+    this->clearSelection();
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->selectRow(m_LabelSetImage->GetActiveLabelIndex());
+    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void QmitkLabelSetTableWidget::SetAutoSelectNewItems( bool value )

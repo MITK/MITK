@@ -64,6 +64,7 @@ class Segmentation_EXPORT ContourTool : public FeedbackContourTool
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
+    virtual bool OnChangeActiveLabel(Action*, const StateEvent*);
 
     int m_PaintingPixelValue;
 

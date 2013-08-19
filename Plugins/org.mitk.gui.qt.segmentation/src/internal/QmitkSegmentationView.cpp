@@ -99,7 +99,6 @@ void QmitkSegmentationView::Visible()
 {
   if( m_Controls )
   {
-    MITK_INFO << "Activated() entered";
     m_Controls->m_ManualToolSelectionBox2D->SetAutoShowNamesWidth(250);
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( true );
     m_Controls->m_ManualToolSelectionBox3D->SetAutoShowNamesWidth(260);
@@ -119,7 +118,6 @@ void QmitkSegmentationView::Deactivated()
 {
   if( m_Controls )
   {
-    MITK_INFO << "Deactivated() entered";
     m_Controls->m_ManualToolSelectionBox2D->setEnabled( false );
     m_Controls->m_ManualToolSelectionBox3D->setEnabled( false );
     //deactivate all tools

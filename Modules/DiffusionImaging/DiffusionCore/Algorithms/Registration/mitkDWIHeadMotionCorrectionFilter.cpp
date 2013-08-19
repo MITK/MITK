@@ -247,20 +247,7 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   this->GetOutput()->SetMeasurementFrame(output->GetMeasurementFrame());
   this->GetOutput()->InitializeFromVectorImage();
 
-
-}
-
-template< typename DiffusionPixelType>
-void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
-::GenerateOutputInformation()
-{
-  if( ! this->GetInput(0) )
-  {
-    mitkThrow() << "No input specified!";
-  }
-
-  OutputImagePointerType output = this->GetOutput();
-  output->CopyInformation( this->GetInput(0) );
+  this->GetOutput()->Modified();
 }
 
 #endif // MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP

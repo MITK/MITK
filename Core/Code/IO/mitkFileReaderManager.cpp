@@ -28,29 +28,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //const std::string mitk::IFileWriter::PROP_EXTENSION = "org.mitk.services.FileWriter.Extension";
 
+mitk::FileReaderManager::FileReaderManager()
+{
+}
+
+mitk::FileReaderManager::~FileReaderManager()
+{
+  for (std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator iter = m_ServiceObjects.begin(),
+       end = m_ServiceObjects.end(); iter != end; ++iter)
+  {
+    iter->second.UngetService(iter->first);
+  }
+}
+
 //////////////////// READING DIRECTLY ////////////////////
 
-std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::Read(const std::string& path)
+std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::Read(const std::string& path, us::ModuleContext* context)
 {
   // Find extension
   std::string extension = path;
   extension.erase(0, path.find_last_of('.'));
 
   // Get best Reader
-  mitk::IFileReader* reader = GetReader(extension);
+  mitk::IFileReader* reader = GetReader(extension, context);
   // Throw exception if no compatible reader was found
-  if (reader == 0) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
+  if (reader == NULL) mitkThrow() << "Tried to directly read a file of type '" + extension + "' via FileReaderManager, but no reader supporting this filetype was found.";
   return reader->Read(path);
 }
 
-std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles)
+std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles,
+                                                                      us::ModuleContext* context)
 {
   std::list< mitk::BaseData::Pointer > result;
   for (std::list<std::string>::const_iterator iterator = paths.begin(), end = paths.end(); iterator != end; ++iterator)
   {
     try
     {
-      std::list<mitk::BaseData::Pointer> baseDataList = Read( *iterator );
+      std::list<mitk::BaseData::Pointer> baseDataList = Read( *iterator, context );
       result.merge(baseDataList);
     }
     catch (...)
@@ -66,9 +80,9 @@ std::list< mitk::BaseData::Pointer > mitk::FileReaderManager::ReadAll(const std:
 
 mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, us::ModuleContext* context )
 {
-  std::vector <us::ServiceReference<IFileReader> > results = GetReaderList(extension, context);
-  if (results.empty()) return 0;
-  return context->GetService(results.front());
+  std::vector<mitk::IFileReader*> results = GetReaders(extension, context);
+  if (results.empty()) return NULL;
+  return results.front();
 }
 
 std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::string& extension, us::ModuleContext* context )
@@ -81,7 +95,10 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
   for (std::vector <us::ServiceReference<IFileReader> >::const_iterator iter = refs.begin(), end = refs.end();
        iter != end; ++iter)
   {
-    result.push_back( context->GetService(*iter) );
+    us::ServiceObjects<mitk::IFileReader> serviceObjects = context->GetServiceObjects(*iter);
+    mitk::IFileReader* reader = serviceObjects.GetService();
+    m_ServiceObjects.insert(std::make_pair(reader, serviceObjects));
+    result.push_back(reader);
   }
 
   return result;
@@ -90,7 +107,7 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
 mitk::IFileReader* mitk::FileReaderManager::GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
 {
   std::vector <mitk::IFileReader*> matching = mitk::FileReaderManager::GetReaders(extension, options, context);
-  if (matching.empty()) return 0;
+  if (matching.empty()) return NULL;
   return matching.front();
 }
 
@@ -112,6 +129,26 @@ std::vector <mitk::IFileReader*> mitk::FileReaderManager::GetReaders(const std::
     }
   }
   return result;
+}
+
+void mitk::FileReaderManager::UngetReader(mitk::IFileReader* reader)
+{
+  std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator readerIter =
+      m_ServiceObjects.find(reader);
+  if (readerIter != m_ServiceObjects.end())
+  {
+    readerIter->second.UngetService(reader);
+    m_ServiceObjects.erase(readerIter);
+  }
+}
+
+void mitk::FileReaderManager::UngetReaders(const std::vector<mitk::IFileReader*>& readers)
+{
+  for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), end = readers.end();
+       iter != end; ++iter)
+  {
+    this->UngetReader(*iter);
+  }
 }
 
 //////////////////// GENERIC INFORMATION ////////////////////
@@ -153,7 +190,7 @@ bool mitk::FileReaderManager::ReaderSupportsOptions(mitk::IFileReader* reader, c
   if (options.empty()) return true;         // if no options were requested, return true unconditionally
   if (readerOptions.empty()) return false;  // if options were requested and reader supports no options, return false
 
-  // For each of the strings in requuested options, check if option is available in reader
+  // For each of the strings in requested options, check if option is available in reader
   for(std::list<std::string>::const_iterator options_i = options.begin(), i_end = options.end(); options_i != i_end; ++options_i)
   {
     {

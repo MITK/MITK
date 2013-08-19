@@ -26,19 +26,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usLDAPProp.h>
 
+mitk::FileWriterManager::FileWriterManager()
+{
+}
+
+mitk::FileWriterManager::~FileWriterManager()
+{
+  for (std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator iter = m_ServiceObjects.begin(),
+       end = m_ServiceObjects.end(); iter != end; ++iter)
+  {
+    iter->second.UngetService(iter->first);
+  }
+}
 
 //////////////////// WRITING DIRECTLY ////////////////////
 
-void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* /*context*/)
+void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::string& path, us::ModuleContext* context)
 {
   // Find extension
   std::string extension = path;
   extension.erase(0, path.find_last_of('.'));
 
   // Get best Writer
-  mitk::IFileWriter* Writer = GetWriter(extension);
+  mitk::IFileWriter* Writer = GetWriter(extension, context);
   // Throw exception if no compatible Writer was found
-  if (Writer == 0) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterManager, but no Writer supporting this filetype was found.";
+  if (Writer == NULL) mitkThrow() << "Tried to directly Write a file of type '" + extension + "' via FileWriterManager, but no Writer supporting this filetype was found.";
   Writer->Write(data, path);
 }
 
@@ -47,30 +59,35 @@ void mitk::FileWriterManager::Write(const mitk::BaseData* data, const std::strin
 
 mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, us::ModuleContext* context )
 {
-  std::vector<us::ServiceReference<IFileWriter> > results = GetWriterList(extension, context);
-  if (results.empty()) return 0;
-  return context->GetService(results.front());
+  std::vector<mitk::IFileWriter*> results = GetWriters(extension, context);
+  if (results.empty()) return NULL;
+  return results.front();
 }
 
 std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::string& extension, us::ModuleContext* context )
 {
   std::vector <mitk::IFileWriter*> result;
   const std::vector <us::ServiceReference<IFileWriter> > refs = GetWriterList(extension, context);
+  result.reserve(refs.size());
 
   // Translate List of ServiceRefs to List of Pointers
   for (std::vector <us::ServiceReference<IFileWriter> >::const_iterator iter = refs.begin(), end = refs.end();
        iter != end; ++iter)
   {
-    result.push_back( context->GetService(*iter));
+    us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(*iter);
+    mitk::IFileWriter* writer = serviceObjects.GetService();
+    m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
+    result.push_back(writer);
   }
 
   return result;
 }
 
-mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context )
+mitk::IFileWriter* mitk::FileWriterManager::GetWriter(const std::string& extension, const std::list<std::string>& options,
+                                                      us::ModuleContext* context )
 {
   const std::vector <mitk::IFileWriter*> matching = mitk::FileWriterManager::GetWriters(extension, options, context);
-  if (matching.empty()) return 0;
+  if (matching.empty()) return NULL;
   return matching.front();
 }
 
@@ -94,16 +111,14 @@ std::vector <mitk::IFileWriter*> mitk::FileWriterManager::GetWriters(const std::
 
 //////////////////// GENERIC INFORMATION ////////////////////
 
-std::string mitk::FileWriterManager::GetSupportedExtensions(const std::string& extension)
+std::string mitk::FileWriterManager::GetSupportedExtensions(const std::string& extension, us::ModuleContext* context)
 {
-  us::ModuleContext* context = us::GetModuleContext();
   const std::vector<us::ServiceReference<IFileWriter> > refs = GetWriterList(extension, context);
   return CreateFileDialogString(refs);
 }
 
-std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& basedataType)
+std::string mitk::FileWriterManager::GetSupportedWriters(const std::string& basedataType, us::ModuleContext* context)
 {
-  us::ModuleContext* context = us::GetModuleContext();
   const std::vector<us::ServiceReference<IFileWriter> > refs = GetWriterListByBasedataType(basedataType, context);
   return CreateFileDialogString(refs);
 }

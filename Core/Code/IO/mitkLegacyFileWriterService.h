@@ -50,6 +50,10 @@ protected:
 
     mitk::FileWriter::Pointer m_LegacyWriter;
 
+private:
+
+    LegacyFileWriterService* Clone() const;
+
 };
 
 } // namespace mitk

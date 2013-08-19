@@ -30,12 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usGetModuleContext.h>
 
+namespace us {
+  struct PrototypeServiceFactory;
+}
+
 namespace mitk {
 
 //##Documentation
 //## @brief Interface class of readers that read from files
 //## @ingroup Process
-  class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
+class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 {
   public:
 
@@ -103,10 +107,11 @@ namespace mitk {
 
     us::ServiceRegistration<IFileReader> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
-    void UnregisterService();
-
 protected:
     AbstractFileReader();
+    ~AbstractFileReader();
+
+    AbstractFileReader(const AbstractFileReader& other);
 
     AbstractFileReader(const std::string& extension, const std::string& description);
 
@@ -121,12 +126,16 @@ protected:
     int m_Priority;
     std::list< std::string > m_Options; // Options supported by this reader. Can be left emtpy if no special options are required
 
-    // Registration
-    us::ServiceRegistration<IFileReader> m_Registration;
-
     virtual us::ServiceProperties ConstructServiceProperties();
 
+private:
+
+    us::PrototypeServiceFactory* m_PrototypeFactory;
+
+    virtual mitk::IFileReader* Clone() const = 0;
+
 };
+
 } // namespace mitk
 
 // This is the microservice declaration. Do not meddle!

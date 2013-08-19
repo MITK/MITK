@@ -35,6 +35,9 @@ public:
 
   LegacyImageWriterService(const std::string& basedataType, const std::string& extension, const std::string& description);
 
+private:
+
+  LegacyImageWriterService* Clone() const;
 };
 
 } // namespace mitk

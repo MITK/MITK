@@ -29,6 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceProperties.h>
 #include <usGetModuleContext.h>
 
+namespace us {
+  struct PrototypeServiceFactory;
+}
+
 namespace mitk {
 
 /**
@@ -36,9 +40,8 @@ namespace mitk {
 *
 * In general, all FileWriters should derive from this class, this way it is made sure that the new implementation is
 * exposed to the Microservice-Framework and that is automatically available troughout MITK.
-* When deriving, inherit from AbstractFileWriter and at least from itkLightObject (Or any other object that derives
-* from itkLightObject and is more suited to your cause). The default implementation only requires both the write
-* methods to be implemented. Be sure to set all important members in the constructor. These are:
+* The default implementation only requires the two write
+* methods and the Clone() method to be implemented. Be sure to set all important members in the constructor. These are:
 * <ul>
 *  <li> m_Extension: To define which file extension can be written.
 *  <li> m_Description: To give a human readable name for this writer to be displayed in FileDialogs.
@@ -50,7 +53,7 @@ namespace mitk {
 *
 * @ingroup Process
 */
-  class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
+class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
 {
   public:
 
@@ -144,10 +147,11 @@ namespace mitk {
 
     us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
 
-    void UnregisterService();
-
 protected:
     AbstractFileWriter();
+    ~AbstractFileWriter();
+
+    AbstractFileWriter(const AbstractFileWriter& other);
 
     AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
 
@@ -163,12 +167,16 @@ protected:
     int m_Priority;
     std::list< std::string > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
-    // Registration
-    us::ServiceRegistration<IFileWriter> m_Registration;
-
     virtual us::ServiceProperties ConstructServiceProperties();
 
+private:
+
+    us::PrototypeServiceFactory* m_PrototypeFactory;
+
+    virtual mitk::IFileWriter* Clone() const = 0;
+
 };
+
 } // namespace mitk
 
 #endif /* AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521 */

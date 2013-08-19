@@ -141,7 +141,7 @@ struct MITK_CORE_EXPORT IFileWriter
     virtual std::list< std::string > GetSupportedOptions() const = 0;
 
     /**
-    * \brief Returns true if this reader can confirm that it can read this file and false otherwise.
+    * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
     */
     virtual bool CanWrite(const BaseData* data, const std::string& path) const = 0;
 

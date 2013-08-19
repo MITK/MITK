@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>
+#include <usServiceObjects.h>
 
 namespace mitk {
   struct IFileReader;
@@ -31,12 +32,22 @@ namespace mitk {
 
 namespace mitk {
 
-//##Documentation
-//## @brief
-//## @ingroup Process
+/**
+ * @ingroup Process
+ *
+ * Provides convenient access to mitk::IFileReader instances and reading
+ * files into mitk::BaseData types.
+ *
+ * \note The life-time of all mitk::IFileReader objects returned by an
+ * instance of this class ends with the destruction of that instance.
+ */
 class MITK_CORE_EXPORT FileReaderManager
 {
-  public:
+
+public:
+
+  FileReaderManager();
+  ~FileReaderManager();
 
     /**
     * Reads the file located at <code>path</code> and returns the
@@ -49,15 +60,15 @@ class MITK_CORE_EXPORT FileReaderManager
     * FileNotFoundException: If no file was found at <code>path</code>
     * FileReadException: If the selected reader failed to read the file
     **/
+    std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext());
 
-    static std::list< itk::SmartPointer<BaseData> > Read(const std::string& path);
-
-    static std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0);
+    std::list< mitk::BaseData::Pointer > ReadAll(const std::list<std::string> paths, std::list<std::string>* unreadableFiles = 0,
+                                                 us::ModuleContext* context = us::GetModuleContext());
 
     template <class T>
-    static itk::SmartPointer<T>  Read(const std::string& path)
+    itk::SmartPointer<T>  Read(const std::string& path, us::ModuleContext* context = us::GetModuleContext())
     {
-      std::list<mitk::BaseData::Pointer> basedatas = Read(path);
+      std::list<mitk::BaseData::Pointer> basedatas = Read(path, context);
       T* result = dynamic_cast<T*> (basedatas.front().GetPointer());
       return result;
     }
@@ -65,23 +76,32 @@ class MITK_CORE_EXPORT FileReaderManager
     /**
     * Returns a compatible Reader to the given file extension
     **/
-    static mitk::IFileReader* GetReader(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+    mitk::IFileReader* GetReader(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    mitk::IFileReader* GetReader(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
+    std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
+    std::vector <mitk::IFileReader*> GetReaders(const std::string& extension, const std::list<std::string>& options, us::ModuleContext* context = us::GetModuleContext() );
 
-    static std::string GetSupportedExtensions(const std::string& extension = "");
+    void UngetReader(mitk::IFileReader* reader);
+    void UngetReaders(const std::vector<mitk::IFileReader*>& readers);
+
+    std::string GetSupportedExtensions(const std::string& extension = "");
 
 protected:
-    //FileReaderManager();
-    //virtual ~FileReaderManager();
 
-    static std::vector< us::ServiceReference<IFileReader> > GetReaderList(const std::string& extension, us::ModuleContext* context);
+    std::vector< us::ServiceReference<IFileReader> > GetReaderList(const std::string& extension, us::ModuleContext* context);
 
-    static bool ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options);
+    bool ReaderSupportsOptions(mitk::IFileReader* reader, const std::list<std::string>& options);
+
+private:
+
+    // purposely not implemented
+    FileReaderManager(const FileReaderManager&);
+    FileReaderManager& operator=(const FileReaderManager&);
+
+    std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> > m_ServiceObjects;
 
 };
 } // namespace mitk

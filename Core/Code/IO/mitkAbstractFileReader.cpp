@@ -19,21 +19,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
+#include <usPrototypeServiceFactory.h>
 
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
 
 
-mitk::AbstractFileReader::AbstractFileReader() :
-m_Priority (0)
+mitk::AbstractFileReader::AbstractFileReader()
+  : m_Priority (0)
+  , m_PrototypeFactory(NULL)
 {
 }
 
-mitk::AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description) :
-m_Extension (extension),
-m_Description (description),
-m_Priority (0)
+mitk::AbstractFileReader::~AbstractFileReader()
+{
+  delete m_PrototypeFactory;
+}
+
+mitk::AbstractFileReader::AbstractFileReader(const mitk::AbstractFileReader& other)
+  : m_FileName(other.m_FileName)
+  , m_FilePrefix(other.m_FilePrefix)
+  , m_FilePattern(other.m_FilePattern)
+  , m_Extension(other.m_Extension)
+  , m_Description(other.m_Description)
+  , m_Priority(other.m_Priority)
+  , m_Options(other.m_Options)
+  , m_PrototypeFactory(NULL)
+{
+}
+
+mitk::AbstractFileReader::AbstractFileReader(const std::string& extension, const std::string& description)
+  : m_Extension (extension)
+  , m_Description (description)
+  , m_Priority (0)
+  , m_PrototypeFactory(NULL)
 {
 }
 
@@ -89,22 +109,31 @@ std::list< itk::SmartPointer<mitk::BaseData> > mitk::AbstractFileReader::Read(co
 
 us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterService(us::ModuleContext* context)
 {
-  if (m_Registration) return m_Registration;
+  if (m_PrototypeFactory) return us::ServiceRegistration<mitk::IFileReader>();
 
-  us::ServiceProperties props = this->ConstructServiceProperties();
-  m_Registration = context->RegisterService<mitk::IFileReader>(this, props);
-  return m_Registration;
-}
-
-void mitk::AbstractFileReader::UnregisterService()
-{
-  if (! m_Registration )
+  struct PrototypeFactory : public us::PrototypeServiceFactory
   {
-    MITK_WARN << "Someone tried to unregister a FileReader, but it was either not registered or the registration has expired.";
-    return;
-  }
+    mitk::AbstractFileReader* const m_Prototype;
 
-  m_Registration.Unregister();
+    PrototypeFactory(mitk::AbstractFileReader* prototype)
+      : m_Prototype(prototype)
+    {}
+
+    us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
+    {
+      return us::MakeInterfaceMap<mitk::IFileReader>(m_Prototype->Clone());
+    }
+
+    void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
+                      const us::InterfaceMap& service)
+    {
+      delete us::ExtractInterface<mitk::IFileReader>(service);
+    }
+  };
+
+  m_PrototypeFactory = new PrototypeFactory(this);
+  us::ServiceProperties props = this->ConstructServiceProperties();
+  return context->RegisterService<mitk::IFileReader>(m_PrototypeFactory, props);
 }
 
 us::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()

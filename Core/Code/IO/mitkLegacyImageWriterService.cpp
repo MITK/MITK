@@ -24,3 +24,8 @@ mitk::LegacyImageWriterService::LegacyImageWriterService(const std::string& base
   : LegacyFileWriterService(mitk::ImageWriter::New().GetPointer(), basedataType, extension, description)
 {
 }
+
+mitk::LegacyImageWriterService* mitk::LegacyImageWriterService::Clone() const
+{
+  return new LegacyImageWriterService(*this);
+}

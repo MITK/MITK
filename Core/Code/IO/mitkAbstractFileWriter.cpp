@@ -20,21 +20,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
+#include <usPrototypeServiceFactory.h>
 
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
 
-mitk::AbstractFileWriter::AbstractFileWriter() :
-m_Priority (0)
+mitk::AbstractFileWriter::AbstractFileWriter()
+  : m_Priority (0)
+  , m_PrototypeFactory(NULL)
 {
 }
 
-mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description) :
-m_Extension (extension),
-m_BasedataType(basedataType),
-m_Description (description),
-m_Priority (0)
+mitk::AbstractFileWriter::~AbstractFileWriter()
+{
+  delete m_PrototypeFactory;
+}
+
+mitk::AbstractFileWriter::AbstractFileWriter(const mitk::AbstractFileWriter& other)
+  : m_FileName(other.m_FileName)
+  ,  m_Extension(other.m_Extension)
+  , m_BasedataType(other.m_BasedataType)
+  , m_Description(other.m_Description)
+  , m_Priority(other.m_Priority)
+  , m_Options(other.m_Options)
+  , m_PrototypeFactory(NULL)
+{
+}
+
+mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, const std::string& extension,
+                                             const std::string& description)
+  : m_Extension (extension)
+  , m_BasedataType(basedataType)
+  , m_Description (description)
+  , m_Priority (0)
+  , m_PrototypeFactory(NULL)
 {
 }
 
@@ -90,22 +110,31 @@ void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& pa
 
 us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterService(us::ModuleContext* context)
 {
-  if (m_Registration) return m_Registration;
+  if (m_PrototypeFactory) return us::ServiceRegistration<mitk::IFileWriter>();
 
-  us::ServiceProperties props = this->ConstructServiceProperties();
-  m_Registration = context->RegisterService<mitk::IFileWriter>(this, props);
-  return m_Registration;
-}
-
-void mitk::AbstractFileWriter::UnregisterService()
-{
-  if (! m_Registration )
+  struct PrototypeFactory : public us::PrototypeServiceFactory
   {
-    MITK_WARN << "Someone tried to unregister a FileWriter, but it was either not registered or the registration has expired.";
-    return;
-  }
+    mitk::AbstractFileWriter* const m_Prototype;
 
-  m_Registration.Unregister();
+    PrototypeFactory(mitk::AbstractFileWriter* prototype)
+      : m_Prototype(prototype)
+    {}
+
+    us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/)
+    {
+      return us::MakeInterfaceMap<mitk::IFileWriter>(m_Prototype->Clone());
+    }
+
+    void UngetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/,
+                      const us::InterfaceMap& service)
+    {
+      delete us::ExtractInterface<mitk::IFileWriter>(service);
+    }
+  };
+
+  m_PrototypeFactory = new PrototypeFactory(this);
+  us::ServiceProperties props = this->ConstructServiceProperties();
+  return context->RegisterService<mitk::IFileWriter>(m_PrototypeFactory, props);
 }
 
 us::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()

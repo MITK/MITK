@@ -62,3 +62,8 @@ bool mitk::LegacyFileWriterService::CanWrite(const BaseData* data, const std::st
   std::string externalDataType = data->GetNameOfClass();
   return (externalDataType == m_BasedataType);
 }
+
+mitk::LegacyFileWriterService* mitk::LegacyFileWriterService::Clone() const
+{
+  return new LegacyFileWriterService(*this);
+}

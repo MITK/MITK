@@ -21,16 +21,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 
 
+mitk::LegacyFileReaderService::LegacyFileReaderService(const mitk::LegacyFileReaderService& other)
+  : mitk::AbstractFileReader(other)
+{
+}
+
 mitk::LegacyFileReaderService::LegacyFileReaderService(const std::string& extension, const std::string& description)
   : AbstractFileReader(extension, description)
 {
   if (extension.empty()) mitkThrow() << "LegacyFileReaderWrapper cannot be initialized without FileExtension.";
-  this->RegisterService();
+  m_ServiceReg = this->RegisterService();
 }
 
 mitk::LegacyFileReaderService::~LegacyFileReaderService()
 {
-
+  if (m_ServiceReg) m_ServiceReg.Unregister();
 }
 
 ////////////////////// Reading /////////////////////////
@@ -47,4 +52,9 @@ std::list< mitk::BaseData::Pointer > mitk::LegacyFileReaderService::Read(const s
   mitkThrow () << "Streaming is not supported in Legacy Wrappers.";
   std::list< mitk::BaseData::Pointer > result;
   return result;
+}
+
+mitk::LegacyFileReaderService* mitk::LegacyFileReaderService::Clone() const
+{
+  return new LegacyFileReaderService(*this);
 }

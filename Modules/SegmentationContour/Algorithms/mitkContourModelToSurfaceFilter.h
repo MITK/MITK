@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkCommon.h"
-#include "SegmentationExports.h"
+#include "SegmentationContourExports.h"
 
 
 #include "mitkContourModel.h"
@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class Segmentation_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
+  class SegmentationContour_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
   {
 
   public:

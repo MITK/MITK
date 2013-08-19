@@ -916,6 +916,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->m_LabelSetTableWidget, SIGNAL(newLabel()), this, SLOT(OnNewLabel()) );
   connect( m_Controls->m_LabelSetTableWidget, SIGNAL(renameLabel(int)), this, SLOT(OnRenameLabel(int)) );
   connect( m_Controls->m_LabelSetTableWidget, SIGNAL(createSurface(int)), this, SLOT(OnCreateSurface(int)) );
+  connect( m_Controls->m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SLOT(OnGoToLabel(const mitk::Point3D&)) );
   connect( m_Controls->m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>& )),
       this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
 
@@ -1032,6 +1033,12 @@ void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource,
 
   mitk::ApplicationCursor::GetInstance()->PushCursor( resource, hotspotX, hotspotY );
   m_MouseCursorSet = true;
+}
+
+void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
+{
+   MITK_INFO << "OngoToLabel entered: " << pos[0];
+   m_MultiWidget->MoveCrossToPosition(pos);
 }
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

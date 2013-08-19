@@ -82,7 +82,12 @@ void QmitkLabelSetTableWidget::Init()
   this->setColumnWidth(COLOR_COL,25);
   this->setColumnWidth(VISIBLE_COL,25);
   this->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
-  this->setStyleSheet("QTableView {selection-background-color: #ebf6e8; selection-color: #c77311;}");
+//  this->setStyleSheet("QTableView {selection-background-color: #5151cd; selection-color: #ffffff;}");
+//  this->setStyleSheet("QTableView {background-color: #ffffff; selection-color: #0a0a0a;}");
+//  this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:20px; border: 4px outset rgb(255,255,255);gridline-color: #669933;"
+//"selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #486909, stop: 1 white);");
+  this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:18px;"
+"selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #486909, stop: 1 white);");
 
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -353,7 +358,8 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (row >= 0 && row < this->rowCount())
   {
       m_LabelSetImage->SetActiveLabel(row,false);
-      emit goToLabel(row);
+      const mitk::Point3D& pos = m_LabelSetImage->GetActiveLabelCenterOfMass();
+      emit goToLabel(pos);
   }
 }
 
@@ -378,18 +384,7 @@ void QmitkLabelSetTableWidget::InsertItem()
   styleSheet.append(",");
   styleSheet.append(QString::number(color[2]*255));
   styleSheet.append(")");
-/*
-  QString id_text;
-  if (index < 10)
-     id_text += "00";
-  else if (index < 100)
-     id_text += "0";
 
-  id_text += QString::number(index);
-
-  QTableWidgetItem *idItem = new QTableWidgetItem( id_text );
-  idItem->setTextAlignment(Qt::AlignCenter | Qt::AlignCenter);
-*/
   QString text = fontMetrics().elidedText(m_LabelSetImage->GetLabelName(index).c_str(), Qt::ElideMiddle, this->columnWidth(NAME_COL)-2);
   QTableWidgetItem *nameItem = new QTableWidgetItem(text);
   nameItem->setToolTip(m_LabelSetImage->GetLabelName(index).c_str());

@@ -132,6 +132,36 @@ void mitk::LabelSetImage::ClearBuffer()
 }
 
 template < typename LabelSetImageType >
+void mitk::LabelSetImage::CenterOfMassProcessing(LabelSetImageType* itkImage, mitk::Point3D& pos)
+{
+   int activeLabel = this->GetActiveLabelIndex();
+
+   typename typedef itk::ImageRegionConstIteratorWithIndex< LabelSetImageType > IteratorType;
+   IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
+   iter.GoToBegin();
+
+   typename std::vector< LabelSetImageType::IndexType > indexVector;
+
+   while ( !iter.IsAtEnd() )
+   {
+    if ( iter.Get() == static_cast<int>(activeLabel) )
+    {
+
+      indexVector.push_back(iter.GetIndex());
+    }
+    ++iter;
+   }
+
+   typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType index;
+
+   index = indexVector.at(indexVector.size()/2);
+   pos[0] = index[0];
+   pos[1] = index[1];
+   pos[2] = index[2];
+   this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+}
+
+template < typename LabelSetImageType >
 void mitk::LabelSetImage::ClearBufferProcessing(LabelSetImageType* itkImage)
 {
   itkImage->FillBuffer(0);
@@ -437,6 +467,14 @@ void mitk::LabelSetImage::SetLabelVisible(int index, bool value)
    rgba[3] = value ? this->m_LabelSet->GetLabelOpacity(index) : 0.0;
    lutProp->GetLookupTable()->SetTableValue(index,rgba);
    ModifyLabelEvent.Send(index);
+}
+
+mitk::Point3D mitk::LabelSetImage::GetActiveLabelCenterOfMass()
+{
+    mitk::Point3D pos;
+    pos.Fill(0.0);
+    AccessByItk_1(this, CenterOfMassProcessing, pos);
+    return pos;
 }
 
 void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent)

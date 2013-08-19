@@ -156,6 +156,8 @@ public:
 
   virtual void SetActiveLabel(int index, bool sendEvent);
 
+  virtual mitk::Point3D GetActiveLabelCenterOfMass();
+
   virtual float GetLabelOpacity(int index);
 
   virtual float GetLabelVolume(int index);
@@ -176,6 +178,9 @@ public:
 protected:
   LabelSetImage();
   virtual ~LabelSetImage();
+
+  template < typename LabelSetImageType >
+  void CenterOfMassProcessing(LabelSetImageType * itkImage, mitk::Point3D& pos);
 
   template < typename LabelSetImageType >
   void ClearBufferProcessing(LabelSetImageType * itkImage);

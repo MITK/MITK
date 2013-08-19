@@ -87,7 +87,7 @@ class QmitkExt_EXPORT QmitkLabelSetTableWidget : public QTableWidget
     void activeLabelChanged(int);
 
     /// \brief Send a signal when it was requested to go to a label.
-    void goToLabel(int);
+    void goToLabel(const mitk::Point3D&);
 
     /// \brief Send a signal when the string list with label names has changed.
     void labelListModified(const QStringList&);

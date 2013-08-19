@@ -18,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 #define _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 
-#include <DiffusionCoreExports.h>
-
 #include "mitkImageSource.h"
 
 namespace mitk {
@@ -42,7 +40,7 @@ namespace mitk {
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class DiffusionCore_EXPORT DiffusionImageSource : public ImageSource
+class DiffusionImageSource : public ImageSource
 {
 public:
   mitkClassMacro(DiffusionImageSource, BaseProcess);

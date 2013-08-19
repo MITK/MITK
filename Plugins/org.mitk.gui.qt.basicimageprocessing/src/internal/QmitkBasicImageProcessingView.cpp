@@ -726,7 +726,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
         ImagePTypeToFloatPTypeCasterType::Pointer floatCaster = ImagePTypeToFloatPTypeCasterType::New();
         floatCaster->SetInput( itkImage );
         floatCaster->Update();
-        FloatImageType::Pointer fImage = caster->GetOutput();
+        FloatImageType::Pointer fImage = floatCaster->GetOutput();
 
         TotalVariationFilterType::Pointer TVFilter
           = TotalVariationFilterType::New();

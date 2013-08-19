@@ -239,10 +239,14 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     mitkThrow() << "Subprocess failed with exception: " << e.what();
   }
 
-  OutputImagePointerType output = this->GetOutput();
-  output = caster->GetOutput();
+  OutputImagePointerType output = caster->GetOutput();
 
-  std::cout << "Last line : Generate Data " << std::endl;
+  this->GetOutput()->SetVectorImage(output->GetVectorImage());
+  this->GetOutput()->SetB_Value(output->GetB_Value());
+  this->GetOutput()->SetDirections(output->GetDirections());
+  this->GetOutput()->SetMeasurementFrame(output->GetMeasurementFrame());
+  this->GetOutput()->InitializeFromVectorImage();
+
 
 }
 

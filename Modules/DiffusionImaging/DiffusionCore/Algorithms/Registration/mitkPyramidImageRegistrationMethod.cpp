@@ -83,6 +83,48 @@ void mitk::PyramidImageRegistrationMethod::Update()
 
 }
 
+mitk::PyramidImageRegistrationMethod::TransformMatrixType mitk::PyramidImageRegistrationMethod
+::GetLastRotationMatrix()
+{
+  TransformMatrixType output;
+  if( m_EstimatedParameters == NULL )
+  {
+    output.set_identity();
+    return output;
+  }
+
+  typedef itk::MatrixOffsetTransformBase< double, 3, 3> BaseTransformType;
+  BaseTransformType::Pointer base_transform = BaseTransformType::New();
+
+  if( this->m_UseAffineTransform )
+  {
+    typedef itk::AffineTransform< double > TransformType;
+    TransformType::Pointer transform = TransformType::New();
+
+    TransformType::ParametersType affine_params( TransformType::ParametersDimension );
+    this->GetParameters( &affine_params[0] );
+
+    transform->SetParameters( affine_params );
+
+    base_transform = transform;
+  }
+  else
+  {
+    typedef itk::Euler3DTransform< double > RigidTransformType;
+    RigidTransformType::Pointer rtransform = RigidTransformType::New();
+
+    RigidTransformType::ParametersType rigid_params( RigidTransformType::ParametersDimension  );
+    this->GetParameters( &rigid_params[0] );
+
+    rtransform->SetParameters( rigid_params );
+
+    base_transform = rtransform;
+  }
+
+  return base_transform->GetMatrix().GetVnlMatrix();
+
+}
+
 mitk::Image::Pointer mitk::PyramidImageRegistrationMethod
 ::GetResampledMovingImage()
 {

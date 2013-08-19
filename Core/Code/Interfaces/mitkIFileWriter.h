@@ -55,25 +55,6 @@ struct MITK_CORE_EXPORT IFileWriter
     virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
 
     /**
-    * \brief Returns the priority which defines how 'good' the FileWriter can handle it's file format.
-    *
-    * Default is zero and should only be chosen differently for a reason.
-    * The priority is intended to be used by the MicroserviceFramework to determine
-    * which reader to use if several equivalent readers have been found.
-    * It may be used to replace a default reader from MITK in your own project.
-    * If you want to use your own reader for *.nrrd files instead of the default,
-    * just implement it and give it a higher priority than zero.
-    */
-    virtual int GetPriority() const = 0 ;
-
-    /**
-    * \brief Returns a human readable description of the file format to be written.
-    *
-    * This will be used in FileDialogs for example.
-    */
-    virtual std::string GetDescription() const = 0 ;
-
-    /**
     * \brief returns the file extension that this FileWriter is able to handle.
     *
     * Please return only the characters after the fullstop, e.g "nrrd" is correct

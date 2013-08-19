@@ -140,11 +140,6 @@ protected:
 
     AbstractFileWriter(const std::string& basedataType, const std::string& extension, const std::string& description);
 
-    // Filenames etc..
-    std::string m_FileName;
-    //std::string m_FilePrefix;
-    //std::string m_FilePattern;
-
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;
     std::string m_BasedataType;

@@ -38,8 +38,7 @@ mitk::AbstractFileWriter::~AbstractFileWriter()
 }
 
 mitk::AbstractFileWriter::AbstractFileWriter(const mitk::AbstractFileWriter& other)
-  : m_FileName(other.m_FileName)
-  ,  m_Extension(other.m_Extension)
+  : m_Extension(other.m_Extension)
   , m_BasedataType(other.m_BasedataType)
   , m_Description(other.m_Description)
   , m_Priority(other.m_Priority)

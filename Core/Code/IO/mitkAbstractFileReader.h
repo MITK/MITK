@@ -43,40 +43,6 @@ class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
 {
   public:
 
-    //##Documentation
-    //## @brief Get the specified file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual std::string GetFilePrefix() const;
-
-    //##Documentation
-    //## @brief Specify file prefix for the file(s) to load.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    // virtual void SetFilePrefix(const std::string& aFilePrefix);
-
-    //##Documentation
-    //## @brief Get the specified file pattern for the file(s) to load. The
-    //## sprintf format used to build filename from FilePrefix and number.
-    //##
-    //## You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //## the data is stored in multiple files.
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual std::string GetFilePattern() const;
-
-    /**
-    @brief Specified file pattern for the file(s) to load. The sprintf
-    format used to build filename from FilePrefix and number.
-
-    You should specify either a FileName or FilePrefix. Use FilePrefix if
-    the data is stored in multiple files. */
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual void SetFilePattern(const std::string& aFilePattern);
-
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage *ds = 0 );
 
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage *ds = 0 ) = 0;
@@ -102,11 +68,6 @@ protected:
     AbstractFileReader(const AbstractFileReader& other);
 
     AbstractFileReader(const std::string& extension, const std::string& description);
-
-    // Filenames etc..
-    std::string m_FileName;
-    std::string m_FilePrefix;
-    std::string m_FilePattern;
 
     // Minimal Service Properties: ALWAYS SET THESE IN CONSTRUCTOR OF DERIVED CLASSES!
     std::string m_Extension;

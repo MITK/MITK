@@ -38,10 +38,7 @@ mitk::AbstractFileReader::~AbstractFileReader()
 }
 
 mitk::AbstractFileReader::AbstractFileReader(const mitk::AbstractFileReader& other)
-  : m_FileName(other.m_FileName)
-  , m_FilePrefix(other.m_FilePrefix)
-  , m_FilePattern(other.m_FilePattern)
-  , m_Extension(other.m_Extension)
+  : m_Extension(other.m_Extension)
   , m_Description(other.m_Description)
   , m_Priority(other.m_Priority)
   , m_Options(other.m_Options)

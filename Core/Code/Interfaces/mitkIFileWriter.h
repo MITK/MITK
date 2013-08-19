@@ -50,53 +50,6 @@ struct MITK_CORE_EXPORT IFileWriter
 
     virtual ~IFileWriter();
 
-    /**
-    * \brief Get the complete file name and path to the file that will be written.
-    */
-    virtual std::string GetFileName() const = 0;
-
-    /**
-    * \brief Set the complete file name and path to the file that will be written.
-    */
-    virtual void SetFileName(const std::string& aFileName) = 0;
-
-    // File Pattern Functions are currently not used for all writers
-    ///**
-    //* \brief Get the File Prefix of the file that will be written.
-    //*
-    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //* the data is stored in multiple files.
-    //*/
-    //virtual std::string GetFilePrefix() const = 0;
-
-    ///**
-    //* \brief Set the File Prefix of the file that will be written.
-    //*
-    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //* the data is stored in multiple files.
-    //*/
-    //virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
-
-    ///**
-    //* \brief Get the specified file pattern for the file(s) to write.
-    //*
-    //* The sprintf format used to build filename from FilePrefix and number.
-    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //* the data is stored in multiple files.
-    //*/
-    //virtual std::string GetFilePattern() const = 0;
-
-    ///**
-    //* \brief Set the specified file pattern for the file(s) to write.
-    //*
-    //* The sprintf format used to build filename from FilePrefix and number.
-    //* You should specify either a FileName or FilePrefix. Use FilePrefix if
-    //* the data is stored in multiple files.
-    //*/
-    //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
-
-    virtual void Write(const BaseData* data) = 0;
-
     virtual void Write(const BaseData* data, const std::string& path ) = 0;
 
     virtual void Write(const BaseData* data, std::ostream& stream ) = 0;
@@ -143,7 +96,7 @@ struct MITK_CORE_EXPORT IFileWriter
     /**
     * \brief Returns true if this reader can confirm that it can write \c data and false otherwise.
     */
-    virtual bool CanWrite(const BaseData* data, const std::string& path) const = 0;
+    virtual bool CanWrite(const BaseData* data) const = 0;
 
     /**
     * \brief Returns a value between 0 and 1 depending on the progress of the writing process.

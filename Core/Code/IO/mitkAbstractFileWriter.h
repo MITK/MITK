@@ -58,21 +58,6 @@ class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
   public:
 
     /**
-    * \brief Get the complete file name and path to the file that will be written.
-    */
-    virtual std::string GetFileName() const;
-
-    /**
-    * \brief Set the complete file name and path to the file that will be writen.
-    */
-    virtual void SetFileName(const std::string& aFileName);
-
-    /**
-    * \brief Write the data in <code>data</code> to the the location returned by GetFileName().
-    */
-    virtual void Write(const BaseData *data);
-
-    /**
     * \brief Write the data in <code>data</code> to the the location specified in <code>path</code>
     */
     virtual void Write(const BaseData* data, const std::string& path);
@@ -137,7 +122,7 @@ class MITK_CORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
     * The default implementation of AbstractFileWriter checks if the supplied filename is of the same extension as m_extension.
     * Overwrite this method if you require more specific behaviour
     */
-    virtual bool CanWrite(const BaseData* data, const std::string& path) const;
+    virtual bool CanWrite(const BaseData* data) const;
 
     /**
     * \brief Returns a value between 0 and 1 depending on the progress of the writing process.

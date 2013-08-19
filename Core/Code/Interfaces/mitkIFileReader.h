@@ -56,62 +56,12 @@ struct MITK_CORE_EXPORT IFileReader
     virtual ~IFileReader();
 
     /**
-    * \brief Get the complete file name and path to the file that will be read.
-    */
-    virtual std::string GetFileName() const = 0;
-
-    /**
-    * \brief Set the complete file name and path to the file that will be read.
-    */
-    virtual void SetFileName(const std::string& aFileName) = 0;
-
-    /**
-    * \brief Get the File Prefix of the file that will be read.
-    *
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual std::string GetFilePrefix() const = 0;
-
-    /**
-    * \brief Set the File Prefix of the file that will be read.
-    *
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual void SetFilePrefix(const std::string& aFilePrefix) = 0;
-
-    /**
-    * \brief Get the specified file pattern for the file(s) to load.
-    *
-    * The sprintf format used to build filename from FilePrefix and number.
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual std::string GetFilePattern() const = 0;
-
-    /**
-    * \brief Set the specified file pattern for the file(s) to load.
-    *
-    * The sprintf format used to build filename from FilePrefix and number.
-    * You should specify either a FileName or FilePrefix. Use FilePrefix if
-    * the data is stored in multiple files.
-    */
-    // File Pattern mechanic is currently deactivated until decision has been reached on how to handle patterns
-    //virtual void SetFilePattern(const std::string& aFilePattern) = 0;
-
-    /**
     * \brief Reads the specified file and returns its contents.
-    *
     */
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::string& path, mitk::DataStorage* ds = 0) = 0;
 
     /**
     * \brief Reads the specified input stream and returns its contents.
-    *
     */
     virtual std::list< itk::SmartPointer<BaseData> > Read(const std::istream& stream, mitk::DataStorage* ds  = 0) = 0;
 

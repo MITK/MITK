@@ -44,18 +44,6 @@ class MITK_CORE_EXPORT AbstractFileReader : public mitk::IFileReader
   public:
 
     //##Documentation
-    //## @brief Get the specified the file to load.
-    //##
-    //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual std::string GetFileName() const;
-
-    //##Documentation
-    //## @brief Specify the file to load.
-    //##
-    //## Either the FileName or FilePrefix plus FilePattern are used to read.
-    virtual void SetFileName(const std::string& aFileName);
-
-    //##Documentation
     //## @brief Get the specified file prefix for the file(s) to load.
     //##
     //## You should specify either a FileName or FilePrefix. Use FilePrefix if

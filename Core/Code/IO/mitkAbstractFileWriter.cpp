@@ -58,44 +58,8 @@ mitk::AbstractFileWriter::AbstractFileWriter(const std::string& basedataType, co
 {
 }
 
-////////////////// Filenames etc. //////////////////
-
-std::string mitk::AbstractFileWriter::GetFileName() const
-{
-  return m_FileName;
-}
-
-void mitk::AbstractFileWriter::SetFileName(const std::string& aFileName)
-{
- m_FileName = aFileName;
-}
-
-//std::string mitk::AbstractFileWriter::GetFilePrefix() const
-//{
-//  return m_FilePrefix;
-//}
-//
-//void mitk::AbstractFileWriter::SetFilePrefix(const std::string& aFilePrefix)
-//{
-//  m_FilePrefix = aFilePrefix;
-//}
-//
-//std::string mitk::AbstractFileWriter::GetFilePattern() const
-//{
-//  return m_FilePattern;
-//}
-//
-//void mitk::AbstractFileWriter::SetFilePattern(const std::string& aFilePattern)
-//{
-//  m_FilePattern = aFilePattern;
-//}
 
 ////////////////////// Writing /////////////////////////
-
-void mitk::AbstractFileWriter::Write(const BaseData *data)
-{
-  this->Write(data, GetFileName());
-}
 
 void mitk::AbstractFileWriter::Write(const BaseData* data, const std::string& path)
 {
@@ -167,12 +131,9 @@ std::list< std::string > mitk::AbstractFileWriter::GetSupportedOptions() const
 
 ////////////////// MISC //////////////////
 
-bool mitk::AbstractFileWriter::CanWrite(const BaseData* data, const std::string& path) const
+bool mitk::AbstractFileWriter::CanWrite(const BaseData* data) const
 {
-  // Default implementation only checks if extension and basedatatype are correct
-  std::string pathEnd = path.substr( path.length() - m_Extension.length(), m_Extension.length() );
-  if ( !(m_Extension == pathEnd)) return false;
-
+  // Default implementation only checks if basedatatype is correct
   std::string externalDataType = data->GetNameOfClass();
   return (externalDataType == m_BasedataType);
 }

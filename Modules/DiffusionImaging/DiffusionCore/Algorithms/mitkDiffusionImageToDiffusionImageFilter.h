@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
 #define MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_H
 
-#include <DiffusionCoreExports.h>
-
 #include "mitkDiffusionImageSource.h"
 #include "mitkDiffusionImage.h"
 
@@ -31,7 +29,7 @@ namespace mitk {
  * The class inherits the mitk::ImageToImageFilter to gain access to the filtering pipline.
  */
 template <typename DiffusionPixelType>
-class DiffusionCore_EXPORT DiffusionImageToDiffusionImageFilter
+class DiffusionImageToDiffusionImageFilter
     : public DiffusionImageSource< DiffusionPixelType >
 {
 public:

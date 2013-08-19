@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <DiffusionCoreExports.h>
 
 #include <itkObject.h>
+#include <vnl/vnl_matrix_fixed.h>
 
 #include "mitkImage.h"
 #include "mitkBaseProcess.h"
@@ -56,6 +57,9 @@ public:
 
   /** Smart pointer support */
   itkNewMacro(Self)
+
+  /** Typedef for the transformation matrix, corresponds to the InternalMatrixType from ITK transforms */
+  typedef vnl_matrix_fixed< double, 3, 3> TransformMatrixType;
 
   /** Registration is between modalities - will take MattesMutualInformation as error metric */
   void SetCrossModalityOn()
@@ -157,7 +161,21 @@ public:
     }
   }
 
+  /**
+   * @brief Returns the moving image transformed according to the estimated transformation and resampled
+   * to the geometry of the fixed image
+   *
+   */
   mitk::Image::Pointer GetResampledMovingImage();
+
+  /**
+   * @brief Get the rotation part of the transformation as a vnl_fixed_matrix<double, 3,3>
+   *
+   * It returns identity if the internal parameters are not-yet allocated ( i.e. the filter did not run yet )
+   *
+   * @return \sa TransformMatrixType
+   */
+  TransformMatrixType GetLastRotationMatrix();
 
 
 protected:

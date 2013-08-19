@@ -14,11 +14,9 @@
 
  ===================================================================*/
 
-#ifndef MITKEVENTINTERACTOR_H_
-#define MITKEVENTINTERACTOR_H_
+#ifndef MITKDATAINTERACTOR_H_
+#define MITKDATAINTERACTOR_H_
 
-#include "itkSmartPointer.h"
-#include "itkObjectFactory.h"
 #include "mitkCommon.h"
 #include <MitkExports.h>
 #include "mitkEventStateMachine.h"
@@ -102,4 +100,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTINTERACTOR_H_ */
+#endif /* MITKDATAINTERACTOR_H_ */

@@ -28,11 +28,6 @@ class QmitkDIAppTrackingEvaluationPerspective : public QObject, public berry::IP
 public:
 
   QmitkDIAppTrackingEvaluationPerspective() {}
-  QmitkDIAppTrackingEvaluationPerspective(const QmitkDIAppTrackingEvaluationPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppTrackingEvaluationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

@@ -6,3 +6,4 @@ MITK_CREATE_MODULE( Qmitk
                QT_MODULE
 )
 
+add_subdirectory(Testing)

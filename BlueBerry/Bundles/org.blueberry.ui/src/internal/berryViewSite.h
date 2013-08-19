@@ -37,7 +37,7 @@ class ViewSite : public PartSite, public IViewSite {
 
 public:
 
-  berryObjectMacro(ViewSite)
+  berryObjectMacro(ViewSite);
 
   ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view,
            WorkbenchPage* page,

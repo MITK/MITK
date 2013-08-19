@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILinkedRenderWindowPart.h>
 #include <QmitkRenderWindow.h>
 
+
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 
 QmitkImageStatisticsView::QmitkImageStatisticsView(QObject* /*parent*/, const char* /*name*/)
@@ -108,9 +109,9 @@ void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
     mitk::IRenderWindowPart* part = this->GetRenderWindowPart();
     if (part)
     {
-        part->GetRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
-        part->GetRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SelectSliceByPoint(world);
+        part->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SelectSliceByPoint(world);
     }
 }
 
@@ -584,28 +585,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     }
   }
   this->m_StatisticsUpdatePending = false;
-}
-
-void QmitkImageStatisticsView::ComputeIntensityProfile( mitk::PlanarLine* line )
-{
-  double sampling = 300;
-  QmitkVtkHistogramWidget::HistogramType::Pointer histogram = QmitkVtkHistogramWidget::HistogramType::New();
-  QmitkVtkHistogramWidget::HistogramType::SizeType size;
-  size.Fill(1);
-  size[0] = sampling;
-  itk::Array<double> lower, higher;
-  lower.Fill(0);
-  mitk::Point3D begin = line->GetWorldControlPoint(0);
-  mitk::Point3D end = line->GetWorldControlPoint(1);
-  itk::Vector<double,3> direction = (end - begin);
-  higher.Fill(direction.GetNorm());
-  histogram->Initialize(size, lower, higher);
-  for(int i = 0; i < sampling; i++)
-  {
-    double d = m_SelectedImage->GetPixelValueByWorldCoordinate(begin + mitk::Point3D::VectorType(double(i)/sampling * direction));
-    histogram->SetFrequency(i,d);
-  }
-  m_Controls->m_JSHistogram->ComputeHistogram( histogram );
 }
 
 void QmitkImageStatisticsView::FillStatisticsTableView(

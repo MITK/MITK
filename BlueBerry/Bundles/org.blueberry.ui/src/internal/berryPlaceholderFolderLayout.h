@@ -40,7 +40,7 @@ class PlaceholderFolderLayout : public IPlaceholderFolderLayout
 {
 
 public:
-  berryObjectMacro(PlaceholderFolderLayout)
+  berryObjectMacro(PlaceholderFolderLayout);
 
 private:
 

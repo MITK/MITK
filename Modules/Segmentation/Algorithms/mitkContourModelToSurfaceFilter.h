@@ -35,7 +35,7 @@ namespace mitk {
 
   public:
     /** Standard class typedefs. */
-    mitkClassMacro( ContourModelToSurfaceFilter,BaseProcess );
+    mitkClassMacro( ContourModelToSurfaceFilter, SurfaceSource );
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self);

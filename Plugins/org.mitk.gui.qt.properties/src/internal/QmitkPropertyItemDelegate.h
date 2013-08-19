@@ -17,7 +17,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyItemDelegate_h
 #define QmitkPropertyItemDelegate_h
 
+#include <QListView>
 #include <QStyledItemDelegate>
+#include <mitkPropertyList.h>
+#include <mitkWeakPointer.h>
+
+class QComboBox;
+class QResizeEvent;
+
+class QmitkComboBoxListView : public QListView
+{
+  Q_OBJECT
+
+public:
+  explicit QmitkComboBoxListView(QComboBox* comboBox = NULL);
+  ~QmitkComboBoxListView();
+
+protected:
+  void paintEvent(QPaintEvent* event);
+  void resizeEvent(QResizeEvent* event);
+  QStyleOptionViewItem viewOptions() const;
+
+private:
+  QComboBox* m_ComboBox;
+};
 
 class QmitkPropertyItemDelegate : public QStyledItemDelegate
 {
@@ -31,11 +54,16 @@ public:
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
   void setEditorData(QWidget* editor, const QModelIndex& index) const;
   void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
-  QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  void SetPropertyList(mitk::PropertyList* propertyList);
 
 private slots:
   void OnComboBoxCurrentIndexChanged(int index);
   void OnSpinBoxEditingFinished();
+
+private:
+  std::string GetPropertyName(const QModelIndex& index) const;
+
+  mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
 };
 
 #endif

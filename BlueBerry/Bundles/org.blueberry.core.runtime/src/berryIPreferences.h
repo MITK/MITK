@@ -124,7 +124,7 @@ namespace berry
    */
   struct BERRY_RUNTIME IPreferences : virtual public Object
   {
-    berryInterfaceMacro(IPreferences, berry)
+    berryInterfaceMacro(IPreferences, berry);
 
     virtual ~IPreferences();
 

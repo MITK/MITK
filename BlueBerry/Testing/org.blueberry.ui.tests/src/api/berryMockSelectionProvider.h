@@ -33,7 +33,7 @@ private:
 
 public:
 
-  berryObjectMacro(MockSelectionProvider)
+  berryObjectMacro(MockSelectionProvider);
 
   MockSelectionProvider();
 

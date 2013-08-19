@@ -128,10 +128,18 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   //Tool Tip
   std::string toolTipPositionString;
   std::string toolTipOrientationString;
-  node->GetStringProperty("ToolTipPosition",toolTipPositionString);
-  node->GetStringProperty("ToolTipOrientation",toolTipOrientationString);
-  returnValue->SetToolTipPosition(ConvertStringToPoint(toolTipPositionString));
-  returnValue->SetToolTipOrientation(ConvertStringToQuaternion(toolTipOrientationString));
+  bool positionSet = node->GetStringProperty("ToolTipPosition",toolTipPositionString);
+  bool orientationSet = node->GetStringProperty("ToolTipOrientation",toolTipOrientationString);
+
+  if(positionSet && orientationSet) //only define tooltip if it is set
+    {
+    returnValue->SetToolTipPosition(ConvertStringToPoint(toolTipPositionString));
+    returnValue->SetToolTipOrientation(ConvertStringToQuaternion(toolTipOrientationString));
+    }
+  else if(positionSet != orientationSet)
+    {
+    MITK_WARN << "Tooltip definition incomplete: position and orientation have to be set! Skipping tooltip definition.";
+    }
 
   return returnValue;
   }

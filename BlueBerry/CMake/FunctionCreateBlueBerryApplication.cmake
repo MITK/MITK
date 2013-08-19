@@ -1,7 +1,7 @@
 #!
 #! Create a BlueBerry application.
 #!
-#! \brif This function will create a BlueBerry application together with all
+#! \brief This function will create a BlueBerry application together with all
 #! necessary provisioning and configuration data and install support.
 #!
 #! \param NAME (required) The name of the executable.

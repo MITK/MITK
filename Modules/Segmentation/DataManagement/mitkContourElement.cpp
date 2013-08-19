@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include <mitkContourElement.h>
+#include <vtkMath.h>
+#include <algorithm>
 
 mitk::ContourElement::ContourElement()
 {
@@ -82,6 +84,10 @@ mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(int index)
   return this->m_Vertices->at(index);
 }
 
+bool mitk::ContourElement::IsEmpty()
+{
+  return this->m_Vertices->empty();
+}
 
 
 mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(const mitk::Point3D &point, float eps)
@@ -232,6 +238,47 @@ bool mitk::ContourElement::IsClosed()
   return this->m_IsClosed;
 }
 
+bool mitk::ContourElement::IsNearContour(const mitk::Point3D &point, float eps)
+{
+    ConstVertexIterator it1 = this->m_Vertices->begin();
+    ConstVertexIterator it2 = this->m_Vertices->begin();
+    it2 ++; // it2 runs one position ahead
+
+    ConstVertexIterator end = this->m_Vertices->end();
+
+    int counter = 0;
+
+    for (; it1 != end; it1++, it2++, counter++)
+    {
+      if (it2 == end)
+          it2 = this->m_Vertices->begin();
+
+      mitk::Point3D v1 = (*it1)->Coordinates;
+      mitk::Point3D v2 = (*it2)->Coordinates;
+
+      const float l2 = v1.SquaredEuclideanDistanceTo(v2);
+
+      mitk::Vector3D p_v1 = point - v1;
+      mitk::Vector3D v2_v1 = v2 - v1;
+
+      double tc = (p_v1 * v2_v1) / l2;
+
+      // take into account we have line segments and not (infinite) lines
+      if (tc < 0.0) tc = 0.0;
+      if (tc > 1.0) tc = 1.0;
+
+      mitk::Point3D crossPoint = v1 + v2_v1 * tc;
+
+      double distance = point.SquaredEuclideanDistanceTo(crossPoint);
+
+      if (distance < eps)
+      {
+          return true;
+      }
+    }
+
+    return false;
+}
 
 
 void mitk::ContourElement::Close()
@@ -253,24 +300,61 @@ void mitk::ContourElement::SetIsClosed( bool isClosed)
   isClosed ? this->Close() : this->Open();
 }
 
+mitk::ContourElement::VertexListType*
+mitk::ContourElement::GetControlVertices()
+{
+    VertexListType* newVertices = new VertexListType();
 
+    VertexIterator it = this->m_Vertices->begin();
+    VertexIterator end = this->m_Vertices->end();
 
-void mitk::ContourElement::Concatenate(mitk::ContourElement* other)
+    while(it != end)
+    {
+        if((*it)->IsControlPoint)
+        {
+           newVertices->push_back((*it));
+        }
+        it++;
+    }
+
+    return newVertices;
+}
+
+void mitk::ContourElement::Concatenate(mitk::ContourElement* other, bool check)
 {
   if( other->GetSize() > 0)
   {
-    ConstVertexIterator it =  other->m_Vertices->begin();
-    ConstVertexIterator end =  other->m_Vertices->end();
-    //add all vertices of other after last vertex
-    while(it != end)
+    ConstVertexIterator otherIt =  other->m_Vertices->begin();
+    ConstVertexIterator otherEnd =  other->m_Vertices->end();
+    while(otherIt != otherEnd)
     {
-      this->m_Vertices->push_back(*it);
-      it++;
+      if (check)
+      {
+          ConstVertexIterator thisIt =  this->m_Vertices->begin();
+          ConstVertexIterator thisEnd =  this->m_Vertices->end();
+
+          bool found = false;
+          while(thisIt != thisEnd)
+          {
+              if ( (*thisIt)->Coordinates == (*otherIt)->Coordinates )
+              {
+                  found = true;
+                  break;
+              }
+
+              thisIt++;
+          }
+          if (!found)
+              this->m_Vertices->push_back(*otherIt);
+      }
+      else
+      {
+        this->m_Vertices->push_back(*otherIt);
+      }
+      otherIt++;
     }
   }
 }
-
-
 
 bool mitk::ContourElement::RemoveVertex(mitk::ContourElement::VertexType* vertex)
 {
@@ -342,4 +426,43 @@ bool mitk::ContourElement::RemoveVertexAt(mitk::Point3D &point, float eps)
 void mitk::ContourElement::Clear()
 {
   this->m_Vertices->clear();
+}
+//----------------------------------------------------------------------
+void mitk::ContourElement::RedistributeControlVertices(const VertexType* selected, int period)
+{
+    int counter = 0;
+    VertexIterator _where = this->m_Vertices->begin();
+
+    if (selected != NULL)
+    {
+        while (_where != this->m_Vertices->end())
+        {
+            if ((*_where) == selected)
+            {
+                break;
+            }
+            _where++;
+        }
+    }
+
+    VertexIterator _iter = _where;
+    while (_iter != this->m_Vertices->end())
+    {
+        div_t divresult;
+        divresult = div (counter,period);
+        (*_iter)->IsControlPoint = (divresult.rem == 0);
+        counter++;
+        _iter++;
+    }
+
+    _iter = _where;
+    counter = 0;
+    while (_iter != this->m_Vertices->begin())
+    {
+        div_t divresult;
+        divresult = div (counter,period);
+        (*_iter)->IsControlPoint = (divresult.rem == 0);
+        counter++;
+        _iter--;
+    }
 }

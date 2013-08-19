@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkHistogramMatching.h"
+#include "mitkImageWriteAccessor.h"
 
 int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
 {
@@ -28,13 +29,26 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
   image = mitk::Image::New();
   //image->DebugOn();
   image->Initialize( mitk::MakeScalarPixelType<int>(), 3, dim);
-  int *p = (int*)image->GetData();
 
-  int size = dim[0]*dim[1]*dim[2];
-  int i;
-  for(i=0; i<size; ++i, ++p)
-    *p=i;
-  std::cout<<"[PASSED]"<<std::endl;
+  try
+  {
+    mitk::ImageWriteAccessor imgB(image);
+    int* p = (int*) imgB.GetData();
+
+    int size = dim[0]*dim[1]*dim[2];
+    int i;
+    for(i=0; i<size; ++i, ++p)
+      *p=i;
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+  catch(const mitk::Exception&)
+  {
+    // we don't have image access, set test to failed
+    std::cout<<"[FAILED] creation of the image" <<std::endl;
+    return EXIT_FAILURE;
+  }
+
+
 
   //Create second Image out of nowhere
   mitk::Image::Pointer image2;
@@ -45,13 +59,24 @@ int mitkHistogramMatchingTest(int /*argc*/, char* /*argv*/[])
   image2 = mitk::Image::New();
   //image->DebugOn();
   image2->Initialize(mitk::MakeScalarPixelType<int>(), 3, dim2);
-  int *p2 = (int*)image2->GetData();
 
-  int size2 = dim2[0]*dim2[1]*dim2[2];
-  int i2;
-  for(i2=0; i2<size2; ++i2, ++p2)
-    *p2=i2;
-  std::cout<<"[PASSED]"<<std::endl;
+  try
+  {
+    mitk::ImageWriteAccessor imgB(image2);
+    int* p2 = (int*) imgB.GetData();
+
+    int size2 = dim2[0]*dim2[1]*dim2[2];
+    int i2;
+    for(i2=0; i2<size2; ++i2, ++p2)
+      *p2=i2;
+    std::cout<<"[PASSED]"<<std::endl;
+  }
+  catch(const mitk::Exception&)
+  {
+    // we don't have image access, set test to failed
+    std::cout<<"[FAILED] creation of the image" <<std::endl;
+    return EXIT_FAILURE;
+  }
 
   std::cout << "Constructor: ";
   mitk::HistogramMatching::Pointer histogramMatching = mitk::HistogramMatching::New();

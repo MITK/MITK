@@ -39,7 +39,7 @@ class CommandEvent;
  */
 struct ICommandListener : public virtual Object {
 
-  berryInterfaceMacro(ICommandListener, berry)
+  berryInterfaceMacro(ICommandListener, berry);
 
   struct Events {
 

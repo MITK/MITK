@@ -30,56 +30,6 @@ mitk::ImageToOpenCVImageFilter::~ImageToOpenCVImageFilter()
   m_OpenCVImage = 0;
 }
 
-int mitk::ImageToOpenCVImageFilter::GetDepth(const std::type_info& typeInfo) const
-{
-  if(typeInfo == typeid(unsigned char))
-  {
-    return IPL_DEPTH_8U;
-  }
-  else if(typeInfo == typeid(char))
-  {
-    return IPL_DEPTH_8S;
-  }
-  else if(typeInfo == typeid(unsigned short))
-  {
-    return IPL_DEPTH_16U;
-  }
-  else if(typeInfo == typeid(short))
-  {
-    return IPL_DEPTH_16S;
-  }
-  else if(typeInfo == typeid(int))
-  {
-    return IPL_DEPTH_32S;
-  }
-  else if(typeInfo == typeid(float))
-  {
-    return IPL_DEPTH_32F;
-  }
-  else if(typeInfo == typeid(double))
-  {
-    return IPL_DEPTH_64F;
-  }
-  // rgb image
-  else if(typeInfo == typeid(UCRGBPixelType))
-  {
-    return IPL_DEPTH_8U;
-  }
-  else if(typeInfo == typeid(USRGBPixelType))
-  {
-    return IPL_DEPTH_16U;
-  }
-  else if(typeInfo == typeid(FloatRGBPixelType))
-  {
-    return IPL_DEPTH_64F;
-  }
-  else if(typeInfo == typeid(DoubleRGBPixelType))
-  {
-    return IPL_DEPTH_64F;
-  }
-  else return -1;
-}
-
 bool mitk::ImageToOpenCVImageFilter::CheckImage( mitk::Image* image )
 {
   if(image == 0)
@@ -97,10 +47,11 @@ bool mitk::ImageToOpenCVImageFilter::CheckImage( mitk::Image* image )
 
 IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
 {
+  m_OpenCVImage = 0;
   if(!this->CheckImage( m_Image ))
     return 0;
-  if(!m_OpenCVImage)
-  {
+
+
     try
     {
       AccessFixedTypeByItk(m_Image.GetPointer(), ItkImageProcessing,
@@ -113,13 +64,29 @@ IplImage* mitk::ImageToOpenCVImageFilter::GetOpenCVImage()
       std::cout << "Caught exception [from AccessFixedTypeByItk]: \n" << e.what() << "\n";
       return 0;
     }
-  }
+
   return m_OpenCVImage;
+}
+
+cv::Mat mitk::ImageToOpenCVImageFilter::GetOpenCVMat()
+{
+    IplImage* img = this->GetOpenCVImage();
+    //cvNamedWindow("debug2", CV_WINDOW_FREERATIO);
+    //cvShowImage("debug2", img);
+    //cv::waitKey(0);
+    cv::Mat mat;
+    if( img )
+    {
+        // do not copy data, then release just the header
+        mat = cv::Mat ( img, false );
+        cvReleaseImageHeader( &img );
+    }
+
+    return mat;
 }
 
 void mitk::ImageToOpenCVImageFilter::SetImage( mitk::Image* _Image )
 {
 //  if(m_Image == _Image) return;
   m_Image = _Image;
-  m_OpenCVImage = 0;
 }

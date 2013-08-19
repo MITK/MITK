@@ -37,7 +37,7 @@ set(src_files
   ctkCommandLineParser.cpp
 )
 
-qt4_wrap_cpp(src_files ctkCommandLineParser.h)
+qt4_wrap_cpp(src_files ctkCommandLineParser.h OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
 qt4_add_resources(src_files plugin_template.qrc project_template.qrc)
 
 set(exec_target ${PROJECT_NAME})

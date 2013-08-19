@@ -1,15 +1,15 @@
 /**
-\page NewPluginPage How to create a new MITK Plug-in
+\page NewPluginPage How to create a new MITK Plugin
 
 The MITK Plugin Generator is a command line tool to simplify the process of creating your own MITK project
-(optional) and plug-ins. It can either be downloaded <a href="http://www.mitk.org/wiki/Download">here</a>
+(optional) and plugins. It can either be downloaded <a href="http://www.mitk.org/wiki/Download">here</a>
 or used from an existing MITK build.
 
 The Plugin Generator takes the following command line arguments:
 
 \verbatim
 ./MITKPluginGenerator -h
-A CTK plug-in generator for MITK (version 1.2.0)
+A CTK plugin generator for MITK (version 1.2.0)
 
   -h, --help                      Show this help text
   -o, --out-dir                   Output directory (default: /tmp)
@@ -20,13 +20,13 @@ A CTK plug-in generator for MITK (version 1.2.0)
   -u, --check-update              Check for updates and exit
   -n, --no-networking             Disable all network requests
 
-Plug-in View options
+Plugin View options
   -vc, --view-class               The View's' class name
   -vn, --view-name              * The View's human readable name
 
-Plug-in options
+Plugin options
   -ps, --plugin-symbolic-name   * The plugin's symbolic name
-  -pn, --plugin-name              The plug-in's human readable name
+  -pn, --plugin-name              The plugin's human readable name
 
 Project options
   --project-copyright             Path to a file containing copyright information (default: :/LICENSE.txt)
@@ -36,21 +36,21 @@ Project options
 [* - options are required]
 \endverbatim
 
-If a project name is provided via the <tt>--project-name</tt> argument, the new plug-in will be generated
+If a project name is provided via the <tt>--project-name</tt> argument, the new plugin will be generated
 as part of a new project.
 
-\section NewPluginOnly Creating a new MITK plug-in
+\section NewPluginOnly Creating a new MITK plugin
 
-Here is an example call to the Plugin Generator, creating one plug-in with the symbolic name
+Here is an example call to the Plugin Generator, creating one plugin with the symbolic name
 <tt>com.mycompany.myplugin</tt> and a View named <tt>My View</tt>:
 
 \verbatim
 ./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View"
 \endverbatim
 
-If you did not already specify the final location of the plug-in via the <tt>--out-dir</tt> argument, move the
+If you did not already specify the final location of the plugin via the <tt>--out-dir</tt> argument, move the
 directory (in our example <tt>/tmp/org.mycompany.myplugin</tt>) to your existing project. Do not forget to add the
-plug-in in your project's build system (usually in the file <tt>&lt;your-project&gt;/Plugins/Plugins.cmake</tt>).
+plugin in your project's build system (usually in the file <tt>&lt;your-project&gt;/Plugins/Plugins.cmake</tt>).
 
 \section NewPluginWithProject Creating a new MITK project 
 
@@ -59,7 +59,7 @@ plug-in in your project's build system (usually in the file <tt>&lt;your-project
 MITK-based projects created with the Plugin Generator need the same prerequisites as MITK itself. See the
 \ref BuildInstructionsPage for MITK for details.
 
-Here is an example call to the Plugin Generator, creating the same plug-in as above but integrated in a new project:
+Here is an example call to the Plugin Generator, creating the same plugin as above but integrated in a new project:
 
 \verbatim
 ./MITKPluginGenerator --plugin-symbolic-name org.mycompany.myplugin --view-name "My View" --project-name "MyProject" --project-app-name "MyApp"
@@ -74,14 +74,14 @@ see \ref HowToNewProject.
 \subsection NewPluginLimitations Limitations
 
 The Plugin Generator supports only a very limited set of possible configuration options. For more customizations of your
-project or plug-in, you must familiarize yourself with CMake and the generated build system.
+project or plugin, you must familiarize yourself with CMake and the generated build system.
 
 Further, the generator is not able to modify existing projects, it can only create new ones.
 
 
-\section NewPluginBuildSystem Build system for plug-ins
+\section NewPluginBuildSystem Build system for plugins
 
-Just put new files in your plug-in's \c src or \c src/internal directory and edit the \c files.cmake file there.
+Just put new files in your plugin's \c src or \c src/internal directory and edit the \c files.cmake file there.
 If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
 
 

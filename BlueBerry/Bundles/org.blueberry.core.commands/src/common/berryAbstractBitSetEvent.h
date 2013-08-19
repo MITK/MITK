@@ -37,7 +37,7 @@ class BERRY_COMMANDS AbstractBitSetEvent : public virtual Object {
 
 public:
 
-  berryObjectMacro(AbstractBitSetEvent)
+  berryObjectMacro(AbstractBitSetEvent);
 
 protected:
 

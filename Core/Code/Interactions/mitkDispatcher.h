@@ -24,7 +24,7 @@
 #include "mitkDataInteractor.h"
 #include <MitkExports.h>
 #include <list>
-#include "mitkServiceTracker.h"
+#include "usServiceTracker.h"
 
 
 namespace mitk
@@ -49,7 +49,7 @@ namespace mitk
 
   public:
     mitkClassMacro(Dispatcher, itk::LightObject);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, const std::string&);
 
     typedef std::list<DataInteractor::Pointer> ListInteractorType;
     typedef std::list<itk::SmartPointer<InteractionEvent> > ListEventsType;
@@ -87,7 +87,7 @@ namespace mitk
     size_t GetNumberOfInteractors(); // DEBUG TESTING
 
   protected:
-    Dispatcher();
+    Dispatcher(const std::string& rendererName);
     virtual ~Dispatcher();
 
   private:
@@ -123,7 +123,7 @@ namespace mitk
     /**
      * Hold microservice reference to object that takes care of informing the InteractionEventObservers about InteractionEvents
      */
-    mitk::ServiceTracker<InteractionEventObserver*>* m_EventObserverTracker;
+    us::ServiceTracker<InteractionEventObserver>* m_EventObserverTracker;
 
   };
 

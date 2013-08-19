@@ -57,21 +57,20 @@ namespace mitk {
     mitkClassMacro(ImageLiveWireContourModelFilter, ContourModelSource);
     itkNewMacro(Self);
 
-
     typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
 
-    typedef itk::Image< float,  2 > FloatImageType;
-    typedef itk::ShortestPathImageFilter< FloatImageType, FloatImageType > ShortestPathImageFilterType;
-    typedef itk::ShortestPathCostFunctionLiveWire< FloatImageType >        CostFunctionType;
+    typedef itk::Image< float,  2 >                                              InternalImageType;
+    typedef itk::ShortestPathImageFilter< InternalImageType, InternalImageType > ShortestPathImageFilterType;
+    typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >           CostFunctionType;
+    typedef std::vector< itk::Index<2> >                                         ShortestPathType;
 
-
-    /** \brief start point in worldcoordinates*/
+    /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
     itkGetMacro(StartPoint, mitk::Point3D);
 
-    /** \brief end point in woorldcoordinates*/
+    /** \brief end point in woorld coordinates*/
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
@@ -82,6 +81,26 @@ namespace mitk {
     itkSetMacro(UseDynamicCostMap, bool);
     itkGetMacro(UseDynamicCostMap, bool);
 
+    /** \brief Actual time step
+    */
+    itkSetMacro(TimeStep, unsigned int);
+    itkGetMacro(TimeStep, unsigned int);
+
+    /** \brief Clear all repulsive points used in the cost function
+    */
+    void ClearRepulsivePoints();
+
+    /** \brief Set a vector with repulsive points to use in the cost function
+    */
+    void SetRepulsivePoints(const ShortestPathType& points);
+
+    /** \brief Add a single repulsive point to the cost function
+    */
+    void AddRepulsivePoint( const itk::Index<2>& idx );
+
+    /** \brief Remove a single repulsive point from the cost function
+    */
+    void RemoveRepulsivePoint( const itk::Index<2>& idx );
 
     virtual void SetInput( const InputType *input);
 
@@ -93,19 +112,10 @@ namespace mitk {
 
     virtual OutputType* GetOutput();
 
+    virtual void DumpMaskImage();
 
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
-
-    void SetTimestep( unsigned int timestep )
-    {
-      m_Timestep = timestep;
-    }
-
-    unsigned int GetTimestep()
-    {
-      return m_Timestep;
-    }
 
   protected:
     ImageLiveWireContourModelFilter();
@@ -115,6 +125,8 @@ namespace mitk {
     void GenerateOutputInformation() {};
 
     void GenerateData();
+
+    void UpdateLiveWire();
 
     /** \brief start point in worldcoordinates*/
     mitk::Point3D m_StartPoint;
@@ -137,15 +149,16 @@ namespace mitk {
     /** \brief Flag to use a dynmic cost map or not*/
     bool m_UseDynamicCostMap;
 
-    bool m_ImageModified;
-
-    unsigned int m_Timestep;
+    unsigned int m_TimeStep;
 
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
+    void ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage);
 
     template<typename TPixel, unsigned int VImageDimension>
     void CreateDynamicCostMapByITK(itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
+
+    InternalImageType::Pointer m_InternalImage;
+
   };
 
 }

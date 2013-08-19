@@ -312,11 +312,34 @@ class mitkNavigationDataLandmarkTransformFilterTestClass
       mitk::Equal(output1->GetPosition(), resultPos1),
       "Testing ND1 position correctly transformed ");
 
-    /* COMMENTED OUT BECAUSE OF BUG 15021
     MITK_TEST_CONDITION(
       mitk::Equal(output1->GetOrientation(), resultQuat),
       "Testing ND1 orientation correctly transformed ");
-    */
+    MITK_TEST_OUTPUT(<<"Orientation1");
+    MITK_TEST_OUTPUT(<<output1->GetOrientation());
+    MITK_TEST_OUTPUT(<<"qX:");
+    MITK_TEST_OUTPUT(<<output1->GetOrientation().x());
+    MITK_TEST_OUTPUT(<<"qY:");
+    MITK_TEST_OUTPUT(<<output1->GetOrientation().y());
+    MITK_TEST_OUTPUT(<<"qZ:");
+    MITK_TEST_OUTPUT(<<output1->GetOrientation().z());
+    MITK_TEST_OUTPUT(<<"qR:");
+    MITK_TEST_OUTPUT(<<output1->GetOrientation().r());
+    MITK_TEST_OUTPUT(<<"angle:");
+    //MITK_TEST_OUTPUT(<<output1->angle());
+    //TODO: something was modified on vnl_quaternion, check what. DONE
+    MITK_TEST_OUTPUT(<<"Orientation2");
+    MITK_TEST_OUTPUT(<<resultQuat);
+    MITK_TEST_OUTPUT(<<"qX:");
+    MITK_TEST_OUTPUT(<<resultQuat.x());
+    MITK_TEST_OUTPUT(<<"qY:");
+    MITK_TEST_OUTPUT(<<resultQuat.y());
+    MITK_TEST_OUTPUT(<<"qZ:");
+    MITK_TEST_OUTPUT(<<resultQuat.z());
+    MITK_TEST_OUTPUT(<<"qR:");
+    MITK_TEST_OUTPUT(<<resultQuat.r());
+
+
 
     //------------------------test FRE calculation------------------------
     mitk::PointSet::Pointer refSet = mitk::PointSet::New();

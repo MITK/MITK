@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 #include <mitkImageSliceSelector.h>
 #include "mitkItkImageFileReader.h"
+#include "mitkImageReadAccessor.h"
 
 /**Documentation
  *  test for the class "ToFImageWriter".
@@ -71,9 +72,12 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
 
   for(unsigned int i = 0; i < numOfFrames ; i++)
   {
-    distanceArray = (float*)distanceImage->GetSliceData(i, 0, 0)->GetData();
-    amplitudeArray = (float*)amplitudeImage->GetSliceData(i, 0, 0)->GetData();
-    intensityArray = (float*)intensityImage->GetSliceData(i, 0, 0)->GetData();
+    mitk::ImageReadAccessor distAcc(distanceImage, distanceImage->GetSliceData(i, 0, 0));
+    mitk::ImageReadAccessor amplAcc(amplitudeImage, amplitudeImage->GetSliceData(i, 0, 0));
+    mitk::ImageReadAccessor intenAcc(intensityImage, intensityImage->GetSliceData(i, 0, 0));
+    distanceArray = (float*)distAcc.GetData();
+    amplitudeArray = (float*)amplAcc.GetData();
+    intensityArray = (float*)intenAcc.GetData();
 
     //write (or add) the three slices to the file
     tofNrrdWriter->Add(distanceArray, amplitudeArray, intensityArray);
@@ -104,14 +108,22 @@ int mitkToFNrrdImageWriterTest(int /* argc */, char* /*argv*/[])
   {
     //get one slice of each image and compare it
     //original data
-    distanceArray = (float*)distanceImage->GetSliceData(j, 0, 0)->GetData();
-    amplitudeArray = (float*)amplitudeImage->GetSliceData(j, 0, 0)->GetData();
-    intensityArray = (float*)intensityImage->GetSliceData(j, 0, 0)->GetData();
+    mitk::ImageReadAccessor distAcc(distanceImage, distanceImage->GetSliceData(j, 0, 0));
+    mitk::ImageReadAccessor amplAcc(amplitudeImage, amplitudeImage->GetSliceData(j, 0, 0));
+    mitk::ImageReadAccessor intenAcc(intensityImage, intensityImage->GetSliceData(j, 0, 0));
+
+    distanceArray = (float*)distAcc.GetData();
+    amplitudeArray = (float*)amplAcc.GetData();
+    intensityArray = (float*)intenAcc.GetData();
 
     //data read from disc
-    distanceArrayRead = (float*)distanceImageRead->GetSliceData(j, 0, 0)->GetData();
-    amplitudeArrayRead = (float*)amplitudeImageRead->GetSliceData(j, 0, 0)->GetData();
-    intensityArrayRead = (float*)intensityImageRead->GetSliceData(j, 0, 0)->GetData();
+    mitk::ImageReadAccessor distReadAcc(distanceImageRead, distanceImageRead->GetSliceData(j, 0, 0));
+    mitk::ImageReadAccessor amplReadAcc(amplitudeImageRead, amplitudeImageRead->GetSliceData(j, 0, 0));
+    mitk::ImageReadAccessor intenReadAcc(intensityImageRead, intensityImageRead->GetSliceData(j, 0, 0));
+
+    distanceArrayRead = (float*)distReadAcc.GetData();
+    amplitudeArrayRead = (float*)amplReadAcc.GetData();
+    intensityArrayRead = (float*)intenReadAcc.GetData();
 
     //for all pixels
     for(unsigned int i=0; i<pixelNumber; i++)

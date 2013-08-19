@@ -19,13 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "itkShapedNeighborhoodIterator.h"
-#include <itkImageRegionConstIterator.h>
 
 
 namespace itk
 {
 
-  // \brief this is a pure virtual superclass for all cost function for the itkShortestPathImageFilter
+  // \brief this is a pure virtual superclass for all cost functions used in itkShortestPathImageFilter
   template <class TInputImageType>
   class ShortestPathCostFunction : public Object
   {
@@ -36,8 +35,7 @@ namespace itk
     typedef Object  Superclass;
     typedef SmartPointer<Self>   Pointer;
     typedef SmartPointer<const Self>  ConstPointer;
-    typedef ShapedNeighborhoodIterator< TInputImageType > itkShapedNeighborhoodIteratorType;
-
+    typedef ShapedNeighborhoodIterator< TInputImageType >   ShapedNeighborhoodIteratorType;
 
     /** Run-time type information (and related methods). */
     itkTypeMacro(ShortestPathCostFunction, Object);
@@ -48,35 +46,30 @@ namespace itk
     // More typdefs for convenience
     typedef typename TInputImageType::Pointer               ImagePointer;
     typedef typename TInputImageType::ConstPointer          ImageConstPointer;
-
-
     typedef typename TInputImageType::PixelType             PixelType;
-
     typedef typename TInputImageType::IndexType             IndexType;
 
-    /** Set the input image. */
+    // \brief Set the input image.
     itkSetConstObjectMacro(Image,TInputImageType);
 
-    // \brief calculates the costs for going from pixel1 to pixel2
+    // \brief Calculate the cost for going from pixel p1 to pixel p2
     virtual double GetCost( IndexType p1, IndexType p2) = 0;
 
-    // \brief returns the minimal costs possible (needed for A*)
+    // \brief Return the minimal possible cost (needed for A*)
     virtual double GetMinCost() = 0;
 
     // \brief Initialize the metric
     virtual void Initialize () = 0;
 
-    // \brief Set Starpoint for Path
-    void SetStartIndex (const IndexType & StartIndex);
+    // \brief Set the starting index of a path
+    void SetStartIndex (const IndexType & index);
 
-    // \brief Set Endpoint for Path
-    void SetEndIndex(const IndexType & EndIndex);
-
-
-    ShortestPathCostFunction();
+    // \brief Set the ending index of a path
+    void SetEndIndex(const IndexType & index);
 
   protected:
 
+    ShortestPathCostFunction() {};
     virtual ~ShortestPathCostFunction() {};
     void PrintSelf(std::ostream& os, Indent indent) const;
     ImageConstPointer    m_Image;

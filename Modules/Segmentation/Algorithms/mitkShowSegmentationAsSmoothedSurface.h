@@ -25,8 +25,8 @@ namespace mitk
   class Segmentation_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
   {
   public:
-    mitkClassMacro(ShowSegmentationAsSmoothedSurface, SegmentationSink)
-    mitkAlgorithmNewMacro(ShowSegmentationAsSmoothedSurface)
+    mitkClassMacro(ShowSegmentationAsSmoothedSurface, SegmentationSink);
+    mitkAlgorithmNewMacro(ShowSegmentationAsSmoothedSurface);
 
   protected:
     void Initialize(const NonBlockingAlgorithm *other = NULL);

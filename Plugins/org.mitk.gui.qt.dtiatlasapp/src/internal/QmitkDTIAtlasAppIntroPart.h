@@ -62,11 +62,6 @@ class QmitkDTIAtlasAppIntroPart : public berry::QtIntroPart
 public:
 
   QmitkDTIAtlasAppIntroPart();
-  QmitkDTIAtlasAppIntroPart(const QmitkDTIAtlasAppIntroPart& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
  ~QmitkDTIAtlasAppIntroPart();
 
 

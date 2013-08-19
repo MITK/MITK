@@ -137,45 +137,19 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
 //}
 
 
-void QmitkSliceWidget::SetData(mitk::DataNode::Pointer /*treeNode*/,
+void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node,
     mitk::SliceNavigationController::ViewDirection view)
 {
-  try
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+
+  if (image.IsNull())
   {
-    if (m_DataStorage.IsNotNull())
-    {
-      levelWindow->SetDataStorage(m_DataStorage);
-      mitk::DataStorage::SetOfObjects::ConstPointer rs =
-          m_DataStorage->GetSubset(mitk::NodePredicateDataType::New(
-              "Image"));
-      mitk::DataStorage::SetOfObjects::ConstIterator it;
-      bool noVisibleImage = true;
-      for (it = rs->Begin(); it != rs->End(); ++it)
-      {
-        mitk::DataNode::Pointer node = it.Value();
-        node->SetName("currentImage");
-        mitk::Image::Pointer image = m_DataStorage->GetNamedObject<
-            mitk::Image> ("currentImage");
-
-        if (image.IsNotNull() && node->IsVisible(GetRenderer()))
-        {
-          m_SlicedGeometry = image->GetSlicedGeometry();
-          mitk::LevelWindow picLevelWindow;
-          node->GetLevelWindow(picLevelWindow, NULL);
-          noVisibleImage = false;
-          break;
-        }
-      }
-
-      if (noVisibleImage)
-        MITK_INFO << " No image visible!";
-
-      GetRenderer()->SetDataStorage(m_DataStorage);
-    }
-    InitWidget(view);
-  } catch (...)
-  {
+    MITK_WARN << "QmitkSliceWidget data is not an image!";
+    return;
   }
+
+  m_SlicedGeometry = image->GetSlicedGeometry();
+  this->InitWidget(view);
 }
 
 void QmitkSliceWidget::InitWidget(

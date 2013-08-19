@@ -86,7 +86,7 @@ private:
    */
 public:
 
-  berryObjectMacro(EditorReference)
+  berryObjectMacro(EditorReference);
 
   EditorReference(EditorManager* manager, IEditorInput::Pointer input,
       SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = IMemento::Pointer(0));

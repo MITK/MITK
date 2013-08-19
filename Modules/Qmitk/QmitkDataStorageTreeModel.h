@@ -189,7 +189,7 @@ protected:
     ///
     int IndexOfChild(const TreeItem* item) const;
     ///
-    /// \child The child at pos index or 0 if it not exists
+    /// \return The child at pos index or 0 if it not exists
     ///
     TreeItem* GetChild(int index) const;
     ///

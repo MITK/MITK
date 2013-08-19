@@ -23,6 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsicsProperty.h>
 #include <mitkToFConfig.h>
 
+// Microservices
+#include <usServiceRegistration.h>
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 namespace mitk
 {
   /**
@@ -40,7 +48,7 @@ public:
     this->m_DeviceNumber=1;
   }
    /*!
-   \brief Defining the Factorie´s Name, here for the ToFPMDCamCube.
+   \brief Defining the FactorieÂ´s Name, here for the ToFPMDCamCube.
    */
    std::string GetFactoryName()
    {
@@ -66,17 +74,9 @@ private:
      /*!
    \brief Create an instance of a ToFPMDCamCubeDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDCamCubeDevice::Pointer device = ToFCameraPMDCamCubeDevice::New();
-
-      //Set default camera intrinsics for the CamCube Amplitude Camera.
-      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamCube3_camera.xml");
-      MITK_INFO <<pathToDefaulCalibrationFile;
-      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
       device->SetBoolProperty("HasRGBImage", false);
       device->SetBoolProperty("HasAmplitudeImage", true);
@@ -84,7 +84,14 @@ private:
 
      return device.GetPointer();
    }
-    int m_DeviceNumber;
+
+   us::ModuleResource GetIntrinsicsResource()
+   {
+     us::Module* module = us::GetModuleContext()->GetModule();
+     return module->GetResource("CalibrationFiles/PMDCamCube3_camera.xml");
+   }
+
+   int m_DeviceNumber;
 };
 }
 #endif

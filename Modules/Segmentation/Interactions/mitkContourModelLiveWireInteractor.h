@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
 #include "mitkContourModelInteractor.h"
-#include <mitkContourModel.h>
-#include <mitkDataNode.h>
 
 #include <mitkImageLiveWireContourModelFilter.h>
 
@@ -48,42 +46,42 @@ namespace mitk
     mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
     mitkNewMacro1Param(Self, DataNode*);
 
+    virtual void SetEditingContourModelNode (mitk::DataNode* _arg);
 
-    virtual void SetWorkingImage (mitk::Image* _arg)
-    {
-      if (this->m_WorkingImage != _arg)
-      {
-        this->m_WorkingImage = _arg;
-        this->m_LiveWireFilter->SetInput(this->m_WorkingImage);
-        this->Modified();
-      }
-    }
+    virtual void SetWorkingImage (mitk::Image* _arg);
 
   protected:
 
     ContourModelLiveWireInteractor(DataNode* dataNode);
     virtual ~ContourModelLiveWireInteractor();
 
-
     virtual bool OnDeletePoint(Action*, const StateEvent*);
     virtual bool OnMovePoint(Action*, const StateEvent*);
     virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
+    virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent);
 
-    int SplitContourFromSelectedVertex(mitk::ContourModel* sourceContour,
-      mitk::ContourModel* destinationContour,
-      bool fromSelectedUpwards,
-      int timestep);
+    int SplitContourFromSelectedVertex(mitk::ContourModel* srcContour,
+                                       mitk::ContourModel* destContour,
+                                       bool fromSelectedUpwards,
+                                       int timestep);
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
-    mitk::Image::Pointer m_WorkingImage;
+    mitk::Image::Pointer m_WorkingSlice;
 
     mitk::Point3D m_NextActiveVertexDown;
     mitk::Point3D m_NextActiveVertexUp;
+
+    mitk::ContourModel::VertexIterator m_NextActiveVertexDownIter;
+    mitk::ContourModel::VertexIterator m_NextActiveVertexUpIter;
+
+    std::vector < itk::Index<2> > m_ContourBeingModified;
+
+    mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
     mitk::ContourModel::Pointer m_ContourRight;
 
   };
 
-} // namespace
+} // namespace mitk
 
-#endif
+#endif // mitkContourModelLiveWireInteractor_h_Included

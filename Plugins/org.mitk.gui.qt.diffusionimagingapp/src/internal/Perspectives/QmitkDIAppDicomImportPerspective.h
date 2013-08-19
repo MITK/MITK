@@ -28,11 +28,6 @@ class QmitkDIAppDicomImportPerspective : public QObject, public berry::IPerspect
 public:
 
   QmitkDIAppDicomImportPerspective() {}
-  QmitkDIAppDicomImportPerspective(const QmitkDIAppDicomImportPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppDicomImportPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

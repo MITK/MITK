@@ -79,7 +79,7 @@ public:
   ///
   /// Creates smartpointer typedefs
   ///
-  berryObjectMacro(QmitkFunctionality)
+  berryObjectMacro(QmitkFunctionality);
   ///
   /// Nothing to do in the standard ctor. <b>Initiliaze your GUI in CreateQtPartControl(QWidget*)</b>
   /// \see berry::QtViewPart::CreateQtPartControl(QWidget*)

@@ -20,6 +20,7 @@ set(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
+  IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
@@ -39,6 +40,8 @@ set(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
   IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
+  #IODataStructures/mitkRegistrationObject.cpp
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -53,6 +56,10 @@ set(CPP_FILES
   Algorithms/mitkPartialVolumeAnalysisHistogramCalculator.cpp
   Algorithms/mitkPartialVolumeAnalysisClusteringCalculator.cpp
   Algorithms/itkDwiGradientLengthCorrectionFilter.cpp
+
+  # Registration Algorithms & Co.
+  Algorithms/Registration/mitkPyramidImageRegistrationMethod.cpp
+#  Algorithms/Registration/mitkDWIHeadMotionCorrectionFilter.cpp
 
   # Function Collection
   mitkDiffusionFunctionCollection.cpp
@@ -76,6 +83,7 @@ set(H_FILES
   Algorithms/Reconstruction/itkOrientationDistributionFunction.h
   Algorithms/Reconstruction/itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h
   Algorithms/Reconstruction/itkMultiShellAdcAverageReconstructionImageFilter.h
+  Algorithms/Reconstruction/itkMultiShellRadialAdcKurtosisImageFilter.h
 
   # IO Datastructures
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
@@ -110,6 +118,8 @@ set(H_FILES
   Algorithms/itkResampleDwiImageFilter.h
   Algorithms/itkDwiGradientLengthCorrectionFilter.h
   Algorithms/itkAdcImageFilter.h
+
+  Algorithms/itkSplitDWImageFilter.h
 
 
 

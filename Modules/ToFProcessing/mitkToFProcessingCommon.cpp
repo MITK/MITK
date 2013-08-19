@@ -160,4 +160,10 @@ namespace mitk
 
     return cartesianCoordinates;
   }
+
+  ToFProcessingCommon::ToFScalarType ToFProcessingCommon::CalculateViewAngle( mitk::CameraIntrinsics::Pointer intrinsics, unsigned int dimX )
+  {
+    ToFScalarType viewAngle = 180*(atan2(intrinsics->GetPrincipalPointX(),intrinsics->GetFocalLengthX()) + atan2((dimX-intrinsics->GetPrincipalPointX()),intrinsics->GetFocalLengthX()))/vnl_math::pi;
+    return viewAngle;
+  }
 }

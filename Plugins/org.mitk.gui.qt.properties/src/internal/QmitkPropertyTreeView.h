@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <ui_QmitkPropertyTreeView.h>
 
+class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
 class QmitkPropertyItemSortFilterProxyModel;
 
@@ -36,7 +37,7 @@ class QmitkPropertyTreeView : public QmitkAbstractView
 public:
   static const std::string VIEW_ID;
 
-  berryObjectMacro(QmitkPropertyTreeView)
+  berryObjectMacro(QmitkPropertyTreeView);
 
   QmitkPropertyTreeView();
   ~QmitkPropertyTreeView();
@@ -65,6 +66,7 @@ private:
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;
+  QmitkPropertyItemDelegate* m_Delegate;
 };
 
 #endif

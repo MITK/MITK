@@ -137,7 +137,7 @@ void KspaceImageFilter< TPixelType >
         else
             kIdx[0] = kIdx[0] - szx/2;
 
-        if( kIdx[1] <  szx/2 )
+        if( kIdx[1] <  szy/2 )
             kIdx[1] = kIdx[1] + szy/2;
         else
             kIdx[1] = kIdx[1] - szy/2;

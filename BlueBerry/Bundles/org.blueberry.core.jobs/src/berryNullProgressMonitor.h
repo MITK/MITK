@@ -38,7 +38,7 @@ class NullProgressMonitor: public IProgressMonitor
 
 public:
 
-  berryObjectMacro(NullProgressMonitor)
+  berryObjectMacro(NullProgressMonitor);
 
   /**
    * Constructs a new progress monitor.

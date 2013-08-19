@@ -37,6 +37,8 @@ void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool is
 
 void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 {
+  CONNECT_CONDITION( "check_position_event", CheckPositionEvent );
+
   CONNECT_FUNCTION("init", Init);
   CONNECT_FUNCTION("move", Move);
   CONNECT_FUNCTION("zoom", Zoom);
@@ -46,8 +48,11 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
 }
 
-mitk::DisplayInteractor::DisplayInteractor() :
-    m_IndexToSliceModifier(4),m_AutoRepeat(false), m_AlwaysReact(false),  m_ZoomFactor(2)
+mitk::DisplayInteractor::DisplayInteractor()
+: m_IndexToSliceModifier(4)
+, m_AutoRepeat(false)
+, m_AlwaysReact(false)
+, m_ZoomFactor(2)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -58,15 +63,21 @@ mitk::DisplayInteractor::~DisplayInteractor()
 {
 }
 
+bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* interactionEvent )
+{
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == NULL)
+  {
+    return false;
+  }
+
+  return true;
+}
+
 bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer* sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetNameOfClass();
-    return false;
-  }
+  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   Vector2D origin = sender->GetDisplayGeometry()->GetOriginInMM();
   double scaleFactorMMPerDisplayUnit = sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
@@ -81,12 +92,8 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
 bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer* sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    MITK_WARN<< "DisplayVectorInteractor: cannot process the event in Move action: " << interactionEvent->GetNameOfClass();
-    return false;
-  }
+  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+
   // perform translation
   sender->GetDisplayGeometry()->MoveBy((positionEvent->GetPointerPositionOnScreen() - m_LastDisplayCoordinate) * (-1.0));
   sender->GetRenderingManager()->RequestUpdate(sender->GetRenderWindow());
@@ -97,15 +104,11 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
 bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    MITK_WARN<< "DisplayVectorInteractor cannot process the event: " << interactionEvent->GetNameOfClass();
-    return false;
-  }
+  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+
   float factor = 1.0;
   float distance = 0;
-  if (m_ZoomDirection == "leftright")
+  if (m_ZoomDirection == "updown")
   {
     distance = m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1];
   }
@@ -131,19 +134,14 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetNameOfClass();
-    return false;
-  }
+  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
   if (sliceNaviController)
   {
     int delta = 0;
     // Scrolling direction
-    if (m_ScrollDirection == "leftright")
+    if (m_ScrollDirection == "updown")
     {
       delta = static_cast<int>(m_LastDisplayCoordinate[1] - positionEvent->GetPointerPositionOnScreen()[1]);
     }
@@ -230,12 +228,8 @@ bool mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent*
 bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    MITK_WARN<< "DisplayVectorInteractor::Scroll cannot process the event: " << interactionEvent->GetNameOfClass();
-    return false;
-  }
+  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   // search for active image

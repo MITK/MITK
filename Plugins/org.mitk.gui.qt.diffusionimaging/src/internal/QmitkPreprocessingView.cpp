@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkElectrostaticRepulsionDiffusionGradientReductionFilter.h>
 #include <itkMergeDiffusionImagesFilter.h>
 #include <itkMultiShellAdcAverageReconstructionImageFilter.h>
+#include <itkMultiShellRadialAdcKurtosisImageFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
 
 // mitk includes
@@ -118,7 +119,8 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ShowGradientsButton), SIGNAL(clicked()), this, SLOT(DoShowGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MirrorGradientToHalfSphereButton), SIGNAL(clicked()), this, SLOT(DoHalfSphereGradientDirections()) );
         connect( (QObject*)(m_Controls->m_MergeDwisButton), SIGNAL(clicked()), this, SLOT(MergeDwis()) );
-        connect( (QObject*)(m_Controls->m_AdcAverage), SIGNAL(clicked()), this, SLOT(DoAdcAverage()) );
+        connect( (QObject*)(m_Controls->m_AdcSignalFit), SIGNAL(clicked()), this, SLOT(DoADCFit()) );
+        connect( (QObject*)(m_Controls->m_AkcSignalFit), SIGNAL(clicked()), this, SLOT(DoAKCFit()) );
         connect( (QObject*)(m_Controls->m_B_ValueMap_Rounder_SpinBox), SIGNAL(valueChanged(int)), this, SLOT(UpdateDwiBValueMapRounder(int)));
         connect( (QObject*)(m_Controls->m_CreateLengthCorrectedDwi), SIGNAL(clicked()), this, SLOT(DoLengthCorrection()) );
         connect( (QObject*)(m_Controls->m_CalcAdcButton), SIGNAL(clicked()), this, SLOT(DoAdcCalculation()) );
@@ -161,7 +163,45 @@ void QmitkPreprocessingView::UpdateDwiBValueMapRounder(int i)
     UpdateBValueTableWidget(i);
 }
 
-void QmitkPreprocessingView::DoAdcAverage()
+void QmitkPreprocessingView::DoBiExpFit(){}
+
+void QmitkPreprocessingView::DoAKCFit()
+{
+  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
+  typedef itk::MultiShellRadialAdcKurtosisImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
+  typedef DiffusionImageType::BValueMap BValueMap;
+
+  for (int i=0; i<m_SelectedDiffusionNodes.size(); i++)
+  {
+      DiffusionImageType::Pointer inImage = dynamic_cast< DiffusionImageType* >(m_SelectedDiffusionNodes.at(i)->GetData());
+      BValueMap originalShellMap = inImage->GetB_ValueMap();
+
+      GradientDirectionContainerType::Pointer gradientContainer = inImage->GetDirections();
+
+      FilterType::Pointer filter = FilterType::New();
+      filter->SetInput(inImage->GetVectorImage());
+      filter->SetOriginalGradientDirections(gradientContainer);
+      filter->SetOriginalBValueMap(originalShellMap);
+      filter->SetB_Value(inImage->GetB_Value());
+      filter->Update();
+
+      DiffusionImageType::Pointer outImage = DiffusionImageType::New();
+      outImage->SetVectorImage( filter->GetOutput() );
+      outImage->SetB_Value( filter->GetTargetB_Value() );
+      outImage->SetDirections( filter->GetTargetGradientDirections() );
+      outImage->InitializeFromVectorImage();
+
+      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+      imageNode->SetData( outImage );
+      QString name = m_SelectedDiffusionNodes.at(i)->GetName().c_str();
+
+      imageNode->SetName((name+"_averaged").toStdString().c_str());
+      GetDefaultDataStorage()->Add(imageNode);
+  }
+}
+
+
+void QmitkPreprocessingView::DoADCFit()
 {
     typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
     typedef itk::MultiShellAdcAverageReconstructionImageFilter<DiffusionPixelType, DiffusionPixelType> FilterType;
@@ -266,7 +306,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
         for( gdcit = m_DiffusionImage->GetDirections()->Begin(); gdcit != m_DiffusionImage->GetDirections()->End(); ++gdcit)
         {
             float currentBvalue = std::floor(m_DiffusionImage->GetB_Value(gdcit.Index()));
-            double rounded = int((currentBvalue + 0.5 * i)/i)*i;
+            unsigned int rounded = int((currentBvalue + 0.5 * i)/i)*i;
             roundedBValueMap[rounded].push_back(gdcit.Index());
         }
 
@@ -295,7 +335,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
                 m_Controls->m_ReductionFrame->layout()->addWidget(checkBox);
 
                 spinBox = new QSpinBox();
-                spinBox->setValue(std::ceil((float)it->second.size()/2));
+                spinBox->setValue(it->second.size());
                 spinBox->setMaximum(it->second.size());
                 spinBox->setMinimum(0);
                 m_ReduceGradientSpinboxes.push_back(spinBox);
@@ -337,7 +377,8 @@ void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_Controls->m_MirrorGradientToHalfSphereButton->setEnabled(foundDwiVolume);
     m_Controls->m_MergeDwisButton->setEnabled(foundDwiVolume);
     m_Controls->m_B_ValueMap_Rounder_SpinBox->setEnabled(foundDwiVolume);
-    m_Controls->m_AdcAverage->setEnabled(foundDwiVolume);
+    m_Controls->m_AdcSignalFit->setEnabled(foundDwiVolume);
+    m_Controls->m_AkcSignalFit->setEnabled(foundDwiVolume);
     m_Controls->m_CreateLengthCorrectedDwi->setEnabled(foundDwiVolume);
     m_Controls->m_CalcAdcButton->setEnabled(foundDwiVolume);
 
@@ -547,10 +588,20 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
     imageNode->SetData( image );
     QString name = m_SelectedDiffusionNodes.front()->GetName().c_str();
 
-    foreach(QSpinBox* box, m_ReduceGradientSpinboxes)
+    QList<QSpinBox*>::iterator itSpinBox = m_ReduceGradientSpinboxes.begin();
+    QList<QCheckBox*>::iterator itCheckBox = m_ReduceGradientCheckboxes.begin();
+
+    while(itSpinBox != m_ReduceGradientSpinboxes.end() && itCheckBox != m_ReduceGradientCheckboxes.end())
     {
-        name += "_";
-        name += QString::number(box->value());
+      name += "_";
+      if((*itCheckBox)->isChecked()){
+        name += QString::number((*itSpinBox)->value());
+      }else
+      {
+        name += QString::number(0);
+      }
+      ++itSpinBox;
+      ++itCheckBox;
     }
 
     imageNode->SetName(name.toStdString().c_str());

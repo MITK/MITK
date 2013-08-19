@@ -44,10 +44,8 @@ void mitk::CorrectorAlgorithm::GenerateData()
     itkExceptionMacro("CorrectorAlgorithm needs a Contour object as input.");
   }
 
-   // copy the input (since m_WorkingImage will be changed later)
-  m_WorkingImage = Image::New();
-  m_WorkingImage->Initialize( inputImage );
-  m_WorkingImage->SetVolume( inputImage.GetPointer()->GetData() );
+  // copy the input (since m_WorkingImage will be changed later)
+  m_WorkingImage = inputImage;
 
   TimeSlicedGeometry::Pointer originalGeometry;
 
@@ -139,9 +137,9 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   std::vector<TSegData> segData;
   segData.reserve( 16 );
 
-  Contour* contour3D = const_cast<Contour*>(m_Contour.GetPointer());
+
   ContourUtils::Pointer contourUtils = ContourUtils::New();
-  Contour::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice( m_WorkingImage, contour3D, true, false );
+  ContourModel::Pointer projectedContour = contourUtils->ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
 
   if (projectedContour.IsNull())
   {
@@ -149,27 +147,29 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     return;
   }
 
-  if (projectedContour->GetNumberOfPoints() < 2)
+  if (projectedContour->GetNumberOfVertices() < 2)
   {
     delete[] _ofsArray;
     return;
   }
 
   // convert the projected contour into a ipSegmentation format
-  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
-  const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
+  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfVertices()];
+  ContourModel::VertexIterator iter = projectedContour->Begin();
+  ContourModel::VertexIterator end = projectedContour->End();
   unsigned int index(0);
-  for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin();
-        iter != pointsIn2D->end();
-        ++iter, ++index )
+
+  while( iter != end)
   {
-    _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 0.5 );
-    _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 0.5 );
+    _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[0] + 0.5 );
+    _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)->Coordinates[1] + 0.5 );
+    ++index;
+    iter++;
   }
 
   // store ofsets of the drawn line in array
   int _ofsNum = 0;
-  unsigned int num = projectedContour->GetNumberOfPoints();
+  unsigned int num = projectedContour->GetNumberOfVertices();
   int lastOfs = -1;
   for (unsigned int i=0; i<num-1; i++)
   {
@@ -296,8 +296,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   if (contourPoints)
   {
 
-    // copy point from float* to mitk::Contour
-    Contour::Pointer contourInImageIndexCoordinates = Contour::New();
+    // copy point from float* to mitk::ContourModel
+    ContourModel::Pointer contourInImageIndexCoordinates = mitk::ContourModel::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
     for (int index = 0; index < numberOfContourPoints; ++index)

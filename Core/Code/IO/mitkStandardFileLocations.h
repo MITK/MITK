@@ -49,7 +49,6 @@ namespace mitk
     /*!
     \brief Remove a directory from the search queue:
     \      Use this function in combination with FindFile().
-    \
     \param dir         directory you want to be searched in
     */
     void RemoveDirectoryForSearch(const char * dir);
@@ -61,13 +60,15 @@ namespace mitk
     \return The absolute path to the file including the filename
 
     This method appends several standard locations to the end of the searchqueue (if they not already exist)
-  and then searches for the file within all directories contained in the search queue:
+    and then searches for the file within all directories contained in the search queue:
 
-    1. Add the directory specified in the environment variable MITKCONF
-  2. Add the .mitk directory in the home folder of the user
-  3. Add the current working directory
-    4. Add the (current working directory)/bin directory
-    5. Add the directory specified in pathInSourceDir, that is relative to the source code directory root (which is determined at compile time)
+    <ol>
+      <li> Add the directory specified in the environment variable MITKCONF
+      <li> Add the .mitk directory in the home folder of the user
+      <li> Add the current working directory
+      <li> Add the (current working directory)/bin directory
+      <li> Add the directory specified in pathInSourceDir, that is relative to the source code directory root (which is determined at compile time)
+    </ol>
 
   Already added directories in the searchqueue by using AddDirectoryForSearch before calling FindFile are still searched first,
     because above mentioned standard locations are always appended at the end of the list.

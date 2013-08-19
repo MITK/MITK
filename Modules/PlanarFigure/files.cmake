@@ -24,3 +24,8 @@ set(CPP_FILES
   Interactions/mitkPlanarFigureInteractor.cpp
   Rendering/mitkPlanarFigureMapper2D.cpp
 )
+
+set(RESOURCE_FILES
+  Interactions/PlanarFigureConfig.xml
+  Interactions/PlanarFigureInteraction.xml
+)

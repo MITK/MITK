@@ -48,7 +48,7 @@ class BERRY_COMMANDS ParameterizedCommand: public Object
 
 public:
 
-  berryObjectMacro(ParameterizedCommand)
+  berryObjectMacro(ParameterizedCommand);
 
   /**
    * The index of the parameter id in the parameter values.

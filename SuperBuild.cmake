@@ -38,13 +38,14 @@ endif()
 
 set(external_projects
   VTK
+  ACVD
   GDCM
   CableSwig
+  OpenCV
   ITK
   Boost
   DCMTK
   CTK
-  OpenCV
   SOFA
   MITKData
   )
@@ -54,7 +55,7 @@ set(MITK_USE_GDCM 1)
 set(MITK_USE_ITK 1)
 set(MITK_USE_VTK 1)
 
-foreach(proj VTK GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
+foreach(proj VTK ACVD GDCM CableSwig ITK DCMTK CTK OpenCV SOFA)
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
     mark_as_advanced(EXTERNAL_${proj}_DIR)
@@ -166,12 +167,12 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_ALL_APPS
   MITK_BUILD_TUTORIAL # Deprecated. Use MITK_BUILD_EXAMPLES instead
   MITK_BUILD_EXAMPLES
+  MITK_USE_ACVD
   MITK_USE_Boost
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
   MITK_USE_DCMTK
-  MITK_DCMTK_BUILD_SHARED_LIBS
   MITK_USE_OpenCV
   MITK_USE_SOFA
   MITK_USE_Python
@@ -206,6 +207,7 @@ ExternalProject_Add(${proj}
     ${VTK_DEPENDS}
     ${ITK_DEPENDS}
     # Optionnal dependencies
+    ${ACVD_DEPENDS}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
@@ -253,7 +255,8 @@ if(MITK_USE_Python)
     list(APPEND mitk_optional_cache_args
          -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY} )
+         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2} )
 endif()
 
 set(proj MITK-Configure)
@@ -310,6 +313,7 @@ ExternalProject_Add(${proj}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
+    -DACVD_DIR:PATH=${ACVD_DIR}
     -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DSOFA_DIR:PATH=${SOFA_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}

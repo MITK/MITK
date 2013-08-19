@@ -61,7 +61,7 @@ private:
 
 public:
 
-  berryObjectMacro(CallHistory)
+  berryObjectMacro(CallHistory);
 
     /**
      * Creates a new call history for an object.

@@ -32,7 +32,7 @@ namespace mitk
   * @ingroup ToFHardware
   */
 
-class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerDeviceFactory : public AbstractToFDeviceFactory {
 
 public:
 
@@ -43,7 +43,7 @@ public:
   }
 
      /*!
-   \brief Defining the Factorie´s Name, here for the ToFPlayer.
+   \brief Defining the Factorie's Name, here for the ToFPlayer.
    */
    std::string GetFactoryName()
    {
@@ -69,7 +69,7 @@ private:
    /*!
    \brief Create an instance of a ToFPlayerDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraMITKPlayerDevice::Pointer device = ToFCameraMITKPlayerDevice::New();
 

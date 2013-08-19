@@ -53,6 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/foreach.hpp>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "usModuleRegistry.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -1214,10 +1215,15 @@ void QmitkFiberfoxView::OnDrawROI()
 
     this->DisableCrosshairNavigation();
 
-    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
     if(figureInteractor.IsNull())
-        figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", node);
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+    {
+      figureInteractor = mitk::PlanarFigureInteractor::New();
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+      figureInteractor->SetDataNode( node );
+    }
 
     UpdateGui();
 }
@@ -1916,21 +1922,17 @@ void QmitkFiberfoxView::NodeAdded( const mitk::DataNode* node )
     {
         MITK_DEBUG << "figure added. will add interactor if needed.";
         mitk::PlanarFigureInteractor::Pointer figureInteractor
-                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+                = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
         mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
         if(figureInteractor.IsNull())
         {
-            figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+          figureInteractor = mitk::PlanarFigureInteractor::New();
+          us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+          figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+          figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+          figureInteractor->SetDataNode( nonConstNode );
         }
-        else
-        {
-            // just to be sure that the interactor is not added twice
-            mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
-        }
-
-        MITK_DEBUG << "adding interactor to globalinteraction";
-        mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
 
         MITK_DEBUG << "will now add observers for planarfigure";
         QmitkPlanarFigureData data;

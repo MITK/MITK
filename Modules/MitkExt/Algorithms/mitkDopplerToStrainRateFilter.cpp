@@ -146,7 +146,8 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
       // Cast to pic descriptor for the timeSelector image
       mitkIpPicDescriptor* timeSelectorPic = mitkIpPicNew();
-      CastToIpPicDescriptor( timeSelector->GetOutput(), timeSelectorPic );
+      ImageWriteAccessor imageAccess(timeSelector->GetOutput());
+      CastToIpPicDescriptor( timeSelector->GetOutput(), &imageAccess, timeSelectorPic );
 
       _mitkIpPicFreeTags(picStrainRate->info->tags_head);
       picStrainRate->info->tags_head = _mitkIpPicCloneTags(timeSelectorPic->info->tags_head);
@@ -327,7 +328,8 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 #ifdef WRITE_STRAIN_PIC
       // Get the StrainRate ipPic descriptor
       picStrainRate = mitkIpPicNew();
-      CastToIpPicDescriptor( output, picStrainRate );
+      ImageWriteAccessor imageAccess(output);
+      CastToIpPicDescriptor( output, &imageAccess, picStrainRate );
 
       std::string filename;
       filename ="strain.pic";

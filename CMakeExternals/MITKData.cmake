@@ -13,7 +13,8 @@ set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
 
-  set(revision_tag cc0840db)
+  set(revision_tag 4a49a318)
+#                  ^^^^^^^^  these are just to check correct length of hash part
 
   ExternalProject_Add(${proj}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz

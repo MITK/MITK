@@ -40,7 +40,7 @@ namespace berry
 struct BERRY_COMMON_RUNTIME ISafeRunnable: public Object
 {
 
-berryInterfaceMacro(ISafeRunnable, berry)
+berryInterfaceMacro(ISafeRunnable, berry);
 
   /**
    * Handles an exception thrown by this runnable's <code>run</code>

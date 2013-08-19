@@ -21,10 +21,10 @@
 #include <algorithm>
 
 // us
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
+#include "usGetModuleContext.h"
+#include "usModule.h"
+#include "usModuleResource.h"
+#include "usModuleResourceStream.h"
 
 
 /**
@@ -42,6 +42,8 @@ const std::string EVENTVARIANT = "event_variant";
 const std::string STARTSTATE = "startstate";
 const std::string TARGET = "target";
 const std::string ACTION = "action";
+const std::string CONDITION = "condition";
+const std::string INVERTED = "inverted";
 
 namespace mitk
 {
@@ -60,17 +62,17 @@ mitk::StateMachineContainer::~StateMachineContainer()
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-bool mitk::StateMachineContainer::LoadBehavior(const std::string& fileName, const Module* module)
+bool mitk::StateMachineContainer::LoadBehavior(const std::string& fileName, const us::Module* module)
 {
   if (module == NULL)
   {
-    module = GetModuleContext()->GetModule();
+    module = us::GetModuleContext()->GetModule();
   }
-  mitk::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
+  us::ModuleResource resource =  module->GetResource("Interactions/" + fileName);
   if (!resource.IsValid() ) {
     mitkThrow() << ("Resource not valid. State machine pattern not found:" + fileName);
   }
-  mitk::ModuleResourceStream stream(resource);
+  us::ModuleResourceStream stream(resource);
   this->SetStream(&stream);
   m_Filename = fileName;
   return this->Parse() && !m_errors;
@@ -159,9 +161,28 @@ void mitk::StateMachineContainer::StartElement(const char* elementName, const ch
       m_CurrTransition->AddAction(action);
     else
       MITK_WARN<< "Malformed state machine Pattern. Action without transition. \n Will be ignored.";
+  }
+
+  else if (name == CONDITION)
+  {
+    if (!m_CurrTransition)
+      MITK_WARN<< "Malformed state machine Pattern. Condition without transition. \n Will be ignored.";
+
+    std::string conditionName = ReadXMLStringAttribut(NAME, atts);
+    std::string inverted = ReadXMLStringAttribut(INVERTED, atts);
+    if ( inverted ==  "" || inverted == "false" )
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName, false ) );
+    }
+    else
+    {
+      m_CurrTransition->AddCondition( mitk::StateMachineCondition( conditionName, true ) );
     }
 
   }
+
+
+}
 
 void mitk::StateMachineContainer::EndElement(const char* elementName)
 {
@@ -179,6 +200,10 @@ void mitk::StateMachineContainer::EndElement(const char* elementName)
     m_CurrTransition = NULL;
   }
   else if (name == ACTION)
+  {
+    //
+  }
+  else if (name == CONDITION)
   {
     //
   }

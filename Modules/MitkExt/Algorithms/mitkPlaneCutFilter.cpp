@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPlaneCutFilter.h"
-
+#include "mitkImageReadAccessor.h"
 #include <mitkImageAccessByItk.h>
 #include <mitkLine.h>
 
@@ -38,8 +38,9 @@ void mitk::PlaneCutFilter::GenerateData()
   //Allocate output.
   OutputImageType *output = this->GetOutput();
 
+  mitk::ImageReadAccessor inputAcc(input);
   output->Initialize(input);
-  output->SetImportVolume(input->GetData());
+  output->SetImportVolume(const_cast<void*>(inputAcc.GetData()));
 
   //Do the intersection.
   AccessByItk_2(output, _computeIntersection, this->m_Plane, input->GetGeometry());

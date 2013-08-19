@@ -64,10 +64,17 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
 
   if ( FeedbackContourTool::CanHandleEvent(stateEvent) < 1.0 ) return false;
 
+  int timestep = positionEvent->GetSender()->GetTimeStep();
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
+  //Clear feedback contour
   contour->Initialize();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  //expand time bounds because our contour was initialized
+  contour->Expand( timestep + 1 );
+  //draw as a closed contour
+  contour->SetIsClosed(true,timestep);
+  //add first mouse position
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   assert( positionEvent->GetSender()->GetRenderWindow() );
@@ -86,8 +93,10 @@ bool mitk::ContourTool::OnMouseMoved   (Action* action, const StateEvent* stateE
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
 
-  Contour* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->AddVertex( positionEvent->GetWorldPosition() );
+  int timestep = positionEvent->GetSender()->GetTimeStep();
+
+  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
+  contour->AddVertex( positionEvent->GetWorldPosition(), timestep );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
@@ -127,12 +136,14 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
       return false;
     }
 
-    Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-    Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
+    ContourModel* feedbackContour = FeedbackContourTool::GetFeedbackContour();
+    ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
 
     if (projectedContour.IsNull()) return false;
 
-    FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+    int timestep = positionEvent->GetSender()->GetTimeStep();
+
+    FeedbackContourTool::FillContourInSlice( projectedContour, timestep, slice, m_PaintingPixelValue );
 
     this->WriteBackSegmentationResult(positionEvent, slice);
 

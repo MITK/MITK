@@ -59,15 +59,6 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     QmitkRigidRegistrationView(QObject *parent=0, const char *name=0);
 
-
-    QmitkRigidRegistrationView(const QmitkRigidRegistrationView& other)
-    {
-      Q_UNUSED(other)
-      throw std::runtime_error("Copy constructor not implemented");
-    }
-
-
-
     /*!
     \brief default destructor
     */

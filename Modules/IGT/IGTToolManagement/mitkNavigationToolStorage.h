@@ -141,7 +141,7 @@ namespace mitk {
     mitk::DataStorage::Pointer m_DataStorage;
 
   private:
-    mitk::ServiceRegistration m_ServiceRegistration;
+    us::ServiceRegistration<Self> m_ServiceRegistration;
 
   };
 } // namespace mitk

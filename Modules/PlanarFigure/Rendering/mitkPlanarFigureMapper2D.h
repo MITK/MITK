@@ -119,6 +119,7 @@ public:
   */
   virtual void Paint(BaseRenderer * renderer);
 
+
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 
@@ -136,6 +137,54 @@ protected:
   PlanarFigureMapper2D();
 
   virtual ~PlanarFigureMapper2D();
+
+  /**
+  * \brief Renders all the lines defined by the PlanarFigure.
+  *
+  * This method renders all the lines that are defined by the PlanarFigure.
+  * That includes the mainlines and helperlines as well as their shadows
+  * and the outlines.
+  *
+  * This method already takes responsibility for the setting of the relevant
+  * openGL attributes to reduce unnecessary setting of these attributes.
+  * (e.g. no need to set color twice if it's the same)
+  */
+  void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
+                    mitk::PlanarFigure * planarFigure,
+                    mitk::Point2D &anchorPoint,
+                    mitk::Geometry2D * planarFigureGeometry2D,
+                    const mitk::Geometry2D * rendererGeometry2D,
+                    mitk::DisplayGeometry * displayGeometry );
+
+  /**
+  * \brief Renders the quantities of the figure below the text annotations.
+  */
+  void RenderQuantities( mitk::PlanarFigure * planarFigure,
+                         mitk::BaseRenderer * renderer,
+                         mitk::Point2D anchorPoint,
+                         double &annotationOffset,
+                         float globalOpacity,
+                         PlanarFigureDisplayMode lineDisplayMode );
+
+  /**
+  * \brief Renders the text annotations.
+  */
+  void RenderAnnotations( mitk::BaseRenderer * renderer,
+                          std::string name,
+                          mitk::Point2D anchorPoint,
+                          float globalOpacity,
+                          PlanarFigureDisplayMode lineDisplayMode,
+                          double &annotationOffset );
+
+  /**
+  * \brief Renders the control-points.
+  */
+  void RenderControlPoints( mitk::PlanarFigure * planarFigure,
+                            PlanarFigureDisplayMode lineDisplayMode,
+                            mitk::Geometry2D * planarFigureGeometry2D,
+                            const mitk::Geometry2D * rendererGeometry2D,
+                            mitk::DisplayGeometry * displayGeometry );
+
 
   void TransformObjectToDisplay(
     const mitk::Point2D &point2D,
@@ -156,34 +205,32 @@ protected:
     const mitk::Geometry2D *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
+  /**
+  * \brief Actually paints the polyline defined by the figure.
+  */
   void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
-    float* color,
-    float opacity,
-    float lineWidth,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry);
 
+  /**
+  * \brief Internally used by RenderLines() to draw the mainlines using
+  * PaintPolyLine().
+  */
   void DrawMainLines( mitk::PlanarFigure* figure,
-    float* color,
-    float opacity,
-    bool drawShadow,
-    float lineWidth,
-    float shadowWidthFactor,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;
 
+  /**
+  * \brief Internally used by RenderLines() to draw the helperlines using
+  * PaintPolyLine().
+  */
   void DrawHelperLines( mitk::PlanarFigure* figure,
-    float* color,
-    float opacity,
-    bool drawShadow,
-    float lineWidth,
-    float shadowWidthFactor,
-    Point2D& firstPoint,
+    Point2D& anchorPoint,
     const Geometry2D* planarFigureGeometry2D,
     const Geometry2D* rendererGeometry2D,
     const DisplayGeometry* displayGeometry) ;
@@ -204,7 +251,14 @@ protected:
     property[mode] = value;
   }
 
-
+  /**
+  * \brief Callback that sets m_NodeModified to true.
+  *
+  * This method set the bool flag m_NodeModified to true. It's a callback
+  * that is executed when a itk::ModifiedEvet is invoked on our
+  * DataNode.
+  */
+  void OnNodeModified();
 
 private:
   bool m_IsSelected;
@@ -214,6 +268,7 @@ private:
   bool m_DrawShadow;
   bool m_DrawControlPoints;
   bool m_DrawName;
+  bool m_DrawDashed;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;
@@ -235,6 +290,11 @@ private:
   float m_MarkerColor[3][3];
   float m_MarkerOpacity[3];
 
+  // Bool flag that represents whether or not the DataNode has been modified.
+  bool m_NodeModified;
+
+  // Observer-tag for listening to itk::ModifiedEvents on the DataNode
+  unsigned long m_NodeModifiedObserverTag;
 };
 
 } // namespace mitk

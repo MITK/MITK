@@ -21,26 +21,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCastImageFilter.h>
 #include <itkGradientMagnitudeImageFilter.h>
 
+#include "mitkIOUtil.h"
 
 mitk::ImageLiveWireContourModelFilter::ImageLiveWireContourModelFilter()
 {
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
   this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfOutputs( 1 );
+  this->SetNumberOfIndexedOutputs( 1 );
   this->SetNthOutput(0, output.GetPointer());
-  m_CostFunction = ImageLiveWireContourModelFilter::CostFunctionType::New();
+  m_CostFunction = CostFunctionType::New();
   m_ShortestPathFilter = ShortestPathImageFilterType::New();
   m_ShortestPathFilter->SetCostFunction(m_CostFunction);
   m_UseDynamicCostMap = false;
-  m_ImageModified = false;
-  m_Timestep = 0;
+  m_TimeStep = 0;
 }
 
 mitk::ImageLiveWireContourModelFilter::~ImageLiveWireContourModelFilter()
 {
-
 }
-
 
 mitk::ImageLiveWireContourModelFilter::OutputType* mitk::ImageLiveWireContourModelFilter::GetOutput()
 {
@@ -62,13 +60,10 @@ void mitk::ImageLiveWireContourModelFilter::SetInput ( unsigned int idx, const m
   {
     this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
     this->Modified();
-    this->m_ImageModified = true;
-    m_ShortestPathFilter = ShortestPathImageFilterType::New();
-    m_ShortestPathFilter->SetCostFunction(m_CostFunction);
+
+    AccessFixedDimensionByItk(input, ItkPreProcessImage, 2);
   }
 }
-
-
 
 const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireContourModelFilter::GetInput( void )
 {
@@ -77,14 +72,12 @@ const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireConto
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
-
 const mitk::ImageLiveWireContourModelFilter::InputType* mitk::ImageLiveWireContourModelFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const mitk::ImageLiveWireContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
-
 
 void mitk::ImageLiveWireContourModelFilter::GenerateData()
 {
@@ -104,30 +97,83 @@ void mitk::ImageLiveWireContourModelFilter::GenerateData()
     return;
   }
 
-
   input->GetGeometry()->WorldToIndex(m_StartPoint, m_StartPointInIndex);
   input->GetGeometry()->WorldToIndex(m_EndPoint, m_EndPointInIndex);
 
   //only start calculating if both indices are inside image geometry
   if( input->GetGeometry()->IsIndexInside(this->m_StartPointInIndex) && input->GetGeometry()->IsIndexInside(this->m_EndPointInIndex) )
   {
-    AccessFixedDimensionByItk(input, ItkProcessImage, 2);
-    m_ImageModified = false;
+      try
+      {
+        this->UpdateLiveWire();
+      }
+      catch( itk::ExceptionObject & e )
+      {
+        MITK_INFO << "Exception caught during live wiring calculation: " << e;
+        return;
+      }
   }
 }
 
 
-
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
+void mitk::ImageLiveWireContourModelFilter::ItkPreProcessImage (itk::Image<TPixel, VImageDimension>* inputImage)
 {
-  typedef itk::Image< TPixel, VImageDimension >   InputImageType;
-  typedef typename InputImageType::IndexType               IndexType;
+  typedef itk::Image< TPixel, VImageDimension >                      InputImageType;
+  typedef itk::CastImageFilter< InputImageType, InternalImageType >  CastFilterType;
 
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
+  castFilter->SetInput(inputImage);
+  castFilter->Update();
+  m_InternalImage = castFilter->GetOutput();
+  m_CostFunction->SetImage( m_InternalImage );
+  m_ShortestPathFilter->SetInput( m_InternalImage );
+}
 
-  /* compute the requested region for itk filters */
+void mitk::ImageLiveWireContourModelFilter::ClearRepulsivePoints()
+{
+    m_CostFunction->ClearRepulsivePoints();
+}
 
-  IndexType startPoint, endPoint;
+void mitk::ImageLiveWireContourModelFilter::AddRepulsivePoint( const itk::Index<2>& idx )
+{
+    m_CostFunction->AddRepulsivePoint(idx);
+}
+
+void mitk::ImageLiveWireContourModelFilter::DumpMaskImage()
+{
+    mitk::Image::Pointer mask = mitk::Image::New();
+    mask->InitializeByItk( this->m_CostFunction->GetMaskImage() );
+    mask->SetVolume( this->m_CostFunction->GetMaskImage()->GetBufferPointer() );
+    mitk::IOUtil::SaveImage(mask, "G:\\Data\\mask.nrrd");
+/*
+    mitk::Image::Pointer slice = mitk::Image::New();
+    slice->InitializeByItk( this->m_CostFunction->m_MaskImage.GetPointer() );
+    slice->SetVolume(this->m_CostFunction->m_MaskImage->GetBufferPointer());
+    */
+
+}
+
+void mitk::ImageLiveWireContourModelFilter::RemoveRepulsivePoint( const itk::Index<2>& idx )
+{
+    m_CostFunction->RemoveRepulsivePoint(idx);
+}
+
+void mitk::ImageLiveWireContourModelFilter::SetRepulsivePoints(const ShortestPathType& points)
+{
+  m_CostFunction->ClearRepulsivePoints();
+
+  ShortestPathType::const_iterator iter = points.begin();
+  for (;iter != points.end(); iter++)
+  {
+      m_CostFunction->AddRepulsivePoint( (*iter) );
+  }
+}
+
+void mitk::ImageLiveWireContourModelFilter::UpdateLiveWire()
+{
+// compute the requested region for itk filters
+  InternalImageType::IndexType startPoint, endPoint;
 
   startPoint[0] = m_StartPointInIndex[0];
   startPoint[1] = m_StartPointInIndex[1];
@@ -135,98 +181,89 @@ void mitk::ImageLiveWireContourModelFilter::ItkProcessImage (itk::Image<TPixel, 
   endPoint[0] = m_EndPointInIndex[0];
   endPoint[1] = m_EndPointInIndex[1];
 
-  //minimum value in each direction for startRegion
-  IndexType startRegion;
+  // minimum value in each direction for startRegion
+  InternalImageType::IndexType startRegion;
   startRegion[0] = startPoint[0] < endPoint[0] ? startPoint[0] : endPoint[0];
   startRegion[1] = startPoint[1] < endPoint[1] ? startPoint[1] : endPoint[1];
 
-  //maximum value in each direction for size
-  typename InputImageType::SizeType size;
-  size[0] = abs( startPoint[0] - endPoint[0] );
-  size[1] = abs( startPoint[1] - endPoint[1] );
+  // maximum value in each direction for size
+  InternalImageType::SizeType size;
+  size[0] = abs( startPoint[0] - endPoint[0] ) + 1;
+  size[1] = abs( startPoint[1] - endPoint[1] ) + 1;
 
-
-  typename CostFunctionType::RegionType region;
+  CostFunctionType::RegionType region;
   region.SetSize( size );
   region.SetIndex( startRegion );
-  /*---------------------------------------------*/
 
   //inputImage->SetRequestedRegion(region);
 
-  typedef itk::CastImageFilter< InputImageType, FloatImageType > CastFilterType;
-  typename CastFilterType::Pointer castFilter = CastFilterType::New();
-  castFilter->SetInput(inputImage);
-  castFilter->Update();
-  /* extracts features from image and calculates costs */
-  if( m_ImageModified )
-    m_CostFunction->SetImage(castFilter->GetOutput());
+  // extracts features from image and calculates costs
+  //m_CostFunction->SetImage(m_InternalImage);
   m_CostFunction->SetStartIndex(startPoint);
   m_CostFunction->SetEndIndex(endPoint);
   m_CostFunction->SetRequestedRegion(region);
   m_CostFunction->SetUseCostMap(m_UseDynamicCostMap);
-  /*---------------------------------------------*/
 
-
-  /* calculate shortest path between start and end point */
+  // calculate shortest path between start and end point
   m_ShortestPathFilter->SetFullNeighborsMode(true);
-  m_ShortestPathFilter->SetInput(castFilter->GetOutput());
+  //m_ShortestPathFilter->SetInput( m_CostFunction->SetImage(m_InternalImage) );
   m_ShortestPathFilter->SetMakeOutputImage(false);
 
   //m_ShortestPathFilter->SetCalcAllDistances(true);
   m_ShortestPathFilter->SetStartIndex(startPoint);
   m_ShortestPathFilter->SetEndIndex(endPoint);
 
-
   m_ShortestPathFilter->Update();
 
-  /*---------------------------------------------*/
-
-
-  /* construct contour from path image */
+  // construct contour from path image
   //get the shortest path as vector
-  typename std::vector< ShortestPathImageFilterType::IndexType> shortestPath = m_ShortestPathFilter->GetVectorPath();
+  ShortestPathType shortestPath = m_ShortestPathFilter->GetVectorPath();
 
-  //fill the output contour with controll points from the path
+  //fill the output contour with control points from the path
   OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
   this->SetNthOutput(0, output.GetPointer());
 
-  output->Expand(m_Timestep+1);
+//  OutputType::Pointer output = dynamic_cast<OutputType*> ( this->GetOutput() );
+  output->Expand(m_TimeStep+1);
+
+//  output->Clear();
 
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
 
-  typename std::vector< ShortestPathImageFilterType::IndexType>::iterator pathIterator = shortestPath.begin();
+  ShortestPathType::const_iterator pathIterator = shortestPath.begin();
 
   while(pathIterator != shortestPath.end())
   {
     mitk::Point3D currentPoint;
-    currentPoint[0] = (*pathIterator)[0];
-    currentPoint[1] = (*pathIterator)[1];
-    currentPoint[2] = 0;
-
+    currentPoint[0] = static_cast<mitk::ScalarType>( (*pathIterator)[0] );
+    currentPoint[1] = static_cast<mitk::ScalarType>( (*pathIterator)[1] );
+    currentPoint[2] = 0.0;
 
     input->GetGeometry()->IndexToWorld(currentPoint, currentPoint);
-    output->AddVertex(currentPoint, false, m_Timestep);
+    output->AddVertex(currentPoint, false, m_TimeStep);
 
     pathIterator++;
   }
-  /*---------------------------------------------*/
 }
+
 
 bool mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMap(mitk::ContourModel* path)
 {
   mitk::Image::ConstPointer input = dynamic_cast<const mitk::Image*>(this->GetInput());
-  if(input)
+  if(!input) return false;
+
+  try
   {
     AccessFixedDimensionByItk_1(input,CreateDynamicCostMapByITK, 2, path);
-    return true;
   }
-  else
+  catch( itk::ExceptionObject & e )
   {
+    MITK_INFO << "Exception caught during dynamic cost map alculation: " << e;
     return false;
   }
+
+  return true;
 }
-
-
 
 template<typename TPixel, unsigned int VImageDimension>
 void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path )
@@ -278,8 +315,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   }
 
-
-  /*+++ filter image gradient magnitude +++*/
+  // filter image gradient magnitude
   typedef  itk::GradientMagnitudeImageFilter< itk::Image<TPixel, VImageDimension>,  itk::Image<TPixel, VImageDimension> > GradientMagnitudeFilterType;
   typename GradientMagnitudeFilterType::Pointer gradientFilter = GradientMagnitudeFilterType::New();
   gradientFilter->SetInput(inputImage);
@@ -287,7 +323,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
   typename itk::Image<TPixel, VImageDimension>::Pointer gradientMagnImage = gradientFilter->GetOutput();
 
   //get the path
-
 
   //iterator of path
   typename std::vector< itk::Index<VImageDimension> >::iterator pathIterator = shortestPath.begin();
@@ -308,7 +343,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   if( !histogram.empty() )
   {
-
     std::map< int, int >::iterator itMAX;
 
     //get max of histogramm
@@ -324,11 +358,9 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
       it++;
     }
 
-
     std::map< int, int >::key_type keyOfMax = itMAX->first;
 
-
-    /*+++++++++++++++++++++++++ compute the to max of gaussian summation ++++++++++++++++++++++++*/
+    // compute the to max of gaussian summation
     std::map< int, int >::iterator end = histogram.end();
     std::map< int, int >::iterator last = --(histogram.end());
 
@@ -338,7 +370,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     std::map< int, int >::iterator right2;
 
     right1 = itMAX;
-
 
     if(right1 == end || right1 == last )
     {
@@ -350,7 +381,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
       right2 = ++right1;//rght1 + 1
       right1 = temp;
     }
-
 
     if( right1 == histogram.begin() )
     {
@@ -375,8 +405,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     double partRight1, partRight2, partLeft1, partLeft2;
     partRight1 = partRight2 = partLeft1 = partLeft2 = 0.0;
 
-
-    /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    /*
     f(x) = v(bin) * e^ ( -1/2 * (|x-k(bin)| / sigma)^2 )
 
     gaussian approximation
@@ -385,6 +414,7 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     v(bin) is the value in the map
     k(bin) is the key
     */
+
     if( left2 != end )
     {
       partLeft2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, left2->first, left2->second);
@@ -404,7 +434,6 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
     {
       partRight2 = ImageLiveWireContourModelFilter::CostFunctionType::Gaussian(keyOfMax, right2->first, right2->second);
     }
-    /*----------------------------------------------------------------------------*/
 
     max = (partRight1 + partRight2 + partLeft1 + partLeft2);
 
@@ -412,5 +441,4 @@ void mitk::ImageLiveWireContourModelFilter::CreateDynamicCostMapByITK( itk::Imag
 
   this->m_CostFunction->SetDynamicCostMap(histogram);
   this->m_CostFunction->SetCostMapMaximum(max);
-
 }

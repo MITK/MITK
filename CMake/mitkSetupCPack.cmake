@@ -33,6 +33,11 @@ if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)
   endif()
 endif()
 
+# By default, do not warn when built on machines using only VS Express
+if(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+endif()
+
 # include required mfc libraries
 include(InstallRequiredSystemLibraries)
 

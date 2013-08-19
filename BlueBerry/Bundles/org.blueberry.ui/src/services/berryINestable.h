@@ -58,7 +58,7 @@ namespace berry {
 struct BERRY_UI INestable : public virtual Object
 {
 
-  berryInterfaceMacro(INestable, berry)
+  berryInterfaceMacro(INestable, berry);
 
   ~INestable();
 

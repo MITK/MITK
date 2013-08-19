@@ -66,6 +66,7 @@ namespace mitk
     typedef mitk::ContourElement::VertexType VertexType;
     typedef mitk::ContourElement::VertexListType VertexListType;
     typedef mitk::ContourElement::VertexIterator VertexIterator;
+    typedef mitk::ContourElement::ConstVertexIterator ConstVertexIterator;
     typedef std::vector< mitk::ContourElement::Pointer > ContourModelSeries;
     /*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
@@ -93,11 +94,11 @@ namespace mitk
       this->m_SelectedVertex = NULL;
     }
 
-    /** \brief Deselect vertex.
+    /** \brief Set selected vertex as control point
     */
     void SetSelectedVertexAsControlPoint(bool isControlPoint=true)
     {
-      if(this->m_SelectedVertex && (this->m_SelectedVertex->IsControlPoint != isControlPoint) )
+      if (this->m_SelectedVertex)
       {
         m_SelectedVertex->IsControlPoint = isControlPoint;
         this->Modified();
@@ -124,8 +125,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep.
     The vertex is added at the end of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -145,9 +146,9 @@ namespace mitk
 
     /** \brief Add a vertex to the contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
     will be rendered).
 
 
@@ -159,8 +160,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -170,8 +171,8 @@ namespace mitk
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
 
     @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
@@ -180,9 +181,9 @@ namespace mitk
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
 
-    \pararm vertex - coordinate representation of a control point
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
+    \param vertex - coordinate representation of a control point
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
     will be rendered).
 
 
@@ -201,13 +202,30 @@ namespace mitk
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
+    \pararm timestep - the timestep at which the vertex will be add ( default 0)
+    \pararm check - check for intersections ( default false)
     */
-    void Concatenate(mitk::ContourModel* other, int timestep=0);
+    void Concatenate(mitk::ContourModel* other, int timestep=0, bool check=false);
+
+    /** \brief Returns a const VertexIterator at the start element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator Begin( int timestep=0);
 
     /** \brief Returns a const VertexIterator at the start element of the contour.
     @throw mitk::Exception if the timestep is invalid.
     */
     VertexIterator IteratorBegin( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator End( int timestep=0);
+
+    /** \brief Returns a const VertexIterator at the end element of the contour.
+    @throw mitk::Exception if the timestep is invalid.
+    */
+    VertexIterator IteratorEnd( int timestep=0);
 
     /** \brief Close the contour.
     The last control point will be linked with the first point.
@@ -226,16 +244,15 @@ namespace mitk
     */
     virtual void SetIsClosed(bool isClosed, int timestep=0);
 
-    /** \brief Returns a const VertexIterator at the end element of the contour.
-    @throw mitk::Exception if the timestep is invalid.
-    */
-    VertexIterator IteratorEnd( int timestep=0);
-
     /** \brief Returns the number of vertices at a given timestep.
-
-    \pararm timestep - default = 0
+    \param timestep - default = 0
     */
     int GetNumberOfVertices( int timestep=0);
+
+    /** \brief Returns whether the contour model is empty at a given timestep.
+    \pararm timestep - default = 0
+    */
+    bool IsEmpty( int timestep=0);
 
     /** \brief Returns the vertex at the index position within the container.
     */
@@ -245,19 +262,35 @@ namespace mitk
     */
     virtual bool IsEmptyTimeStep( int t) const;
 
+    /** \brief Check if mouse cursor is near the contour.
+    */
+    virtual bool IsNearContour(mitk::Point3D &point, float eps, int timestep);
+
     /** \brief Mark a vertex at an index in the container as selected.
     */
     bool SelectVertexAt(int index, int timestep=0);
 
+    /** \brief Mark a vertex at an index in the container as control point.
+    */
+    bool SetControlVertexAt(int index, int timestep=0);
+
     /** \brief Mark a vertex at a given position in 3D space.
 
+    \param point - query point in 3D space
+    \param eps - radius for nearest neighbour search (error bound).
+    \param timestep - search at this timestep
+
+    @return true = vertex found;  false = no vertex found
+    */
+    bool SelectVertexAt(mitk::Point3D &point, float eps, int timestep=0);
+/*
     \pararm point - query point in 3D space
     \pararm eps - radius for nearest neighbour search (error bound).
     \pararm timestep - search at this timestep
 
     @return true = vertex found;  false = no vertex found
     */
-    bool SelectVertexAt(mitk::Point3D &point, float eps, int timestep=0);
+    bool SetControlVertexAt(mitk::Point3D &point, float eps, int timestep=0);
 
     /** \brief Remove a vertex at given index within the container.
 
@@ -283,14 +316,14 @@ namespace mitk
 
     /** \brief Shift the currently selected vertex by a translation vector.
 
-    \pararm translate - the translation vector.
+    \param translate - the translation vector.
     */
     void ShiftSelectedVertex(mitk::Vector3D &translate);
 
     /** \brief Shift the whole contour by a translation vector at given timestep.
 
-    \pararm translate - the translation vector.
-    \pararm timestep - at this timestep the contour will be shifted.
+    \param translate - the translation vector.
+    \param timestep - at this timestep the contour will be shifted.
     */
     void ShiftContour(mitk::Vector3D &translate, int timestep=0);
 
@@ -300,6 +333,15 @@ namespace mitk
     timestep.
     */
     virtual void Clear(int timestep);
+
+    /** \brief Initialize all data objects
+    */
+    virtual void Initialize();
+
+    /** \brief Initialize object with specs of other contour.
+    Note: No data will be copied.
+    */
+    void Initialize(mitk::ContourModel &other);
 
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
@@ -358,6 +400,11 @@ namespace mitk
     */
     void ExecuteOperation(Operation* operation);
 
+    /** \brief Redistributes ontrol vertices with a given period (as number of vertices)
+    \param period - the number of vertices between control points.
+    \param timestep - at this timestep all lines will be rebuilt.
+    */
+    virtual void RedistributeControlVertices(int period, int timestep);
 
   protected:
 
@@ -373,7 +420,6 @@ namespace mitk
 
     //Shift a vertex
     void ShiftVertex(VertexType* vertex, mitk::Vector3D &vector);
-
 
     //Storage with time resolved support.
     ContourModelSeries m_ContourSeries;

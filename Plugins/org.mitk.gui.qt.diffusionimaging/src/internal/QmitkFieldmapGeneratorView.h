@@ -41,11 +41,6 @@ public:
     static const std::string VIEW_ID;
 
     QmitkFieldmapGeneratorView();
-    QmitkFieldmapGeneratorView(const QmitkFieldmapGeneratorView& other)
-    {
-        Q_UNUSED(other)
-        throw std::runtime_error("Copy constructor not implemented");
-    }
     virtual ~QmitkFieldmapGeneratorView();
 
     virtual void CreateQtPartControl(QWidget *parent);

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkItkImageFileReader.h"
 #include "mitkPicFileReader.h"
 #include <mitkIpPic.h>
+#include "mitkImageReadAccessor.h"
 
 namespace mitk
 {
@@ -347,11 +348,13 @@ namespace mitk
     {
       if(!this->m_ToFImageType)
       {
-        memcpy(m_RGBArray, m_RGBImage->GetSliceData(m_CurrentFrame)->GetData(),m_PixelNumber * sizeof(unsigned char)*3 );
+        ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetSliceData(m_CurrentFrame));
+        memcpy(m_RGBArray, rgbAcc.GetData(), m_PixelNumber * sizeof(unsigned char)*3 );
       }
       else if(this->m_ToFImageType)
       {
-        memcpy(m_RGBArray, m_RGBImage->GetVolumeData(m_CurrentFrame)->GetData(), m_PixelNumber * sizeof(unsigned char)*3);
+        ImageReadAccessor rgbAcc(m_RGBImage, m_RGBImage->GetVolumeData(m_CurrentFrame));
+        memcpy(m_RGBArray, rgbAcc.GetData(), m_PixelNumber * sizeof(unsigned char)*3);
       }
     }
     itksys::SystemTools::Delay(50);
@@ -361,11 +364,13 @@ namespace mitk
   {
     if(!this->m_ToFImageType)
     {
-      memcpy(data, image->GetSliceData(frame)->GetData(),this->m_NumberOfBytes );
+      ImageReadAccessor imgAcc(image, image->GetSliceData(frame));
+      memcpy(data, imgAcc.GetData(), this->m_NumberOfBytes );
     }
     else if(this->m_ToFImageType)
     {
-      memcpy(data, image->GetVolumeData(frame)->GetData(), this->m_NumberOfBytes);
+      ImageReadAccessor imgAcc(image, image->GetVolumeData(frame));
+      memcpy(data, imgAcc.GetData(), this->m_NumberOfBytes);
     }
   }
 

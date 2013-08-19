@@ -57,7 +57,7 @@ class DICOM_EXPORT QmitkDicomEditor : public berry::QtEditorPart, virtual public
 
 public:
 
-    berryObjectMacro(QmitkDicomEditor)
+    berryObjectMacro(QmitkDicomEditor);
     static const std::string EDITOR_ID;
     static const QString TEMP_DICOM_FOLDER_SUFFIX;
 

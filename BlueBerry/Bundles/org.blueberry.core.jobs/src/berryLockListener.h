@@ -37,7 +37,7 @@ namespace berry
 class LockListener: public Object
 {
 
-  berryObjectMacro( LockListener)
+  berryObjectMacro( LockListener);
 
   // LockManager::ConstPointer manager = ((JobManager)Job.getJobManager()).getLockManager();
 

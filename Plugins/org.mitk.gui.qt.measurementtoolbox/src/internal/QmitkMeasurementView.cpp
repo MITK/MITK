@@ -39,6 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <QmitkRenderWindow.h>
 
+#include "usModuleRegistry.h"
+
+
 struct QmitkPlanarFigureData
 {
   QmitkPlanarFigureData()
@@ -224,21 +227,26 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
   {
     MEASUREMENT_DEBUG << "figure added. will add interactor if needed.";
     mitk::PlanarFigureInteractor::Pointer figureInteractor
-        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetInteractor());
+        = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer() );
 
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>( node );
     if(figureInteractor.IsNull())
     {
-      figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
+      figureInteractor = mitk::PlanarFigureInteractor::New();
+      us::Module* planarFigureModule = us::ModuleRegistry::GetModule( "PlanarFigure" );
+      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
+      figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
+      figureInteractor->SetDataNode( nonConstNode );
+//      nonConstNode->SetBoolProperty( "planarfigure.isextendable", true );
     }
     else
     {
       // just to be sure that the interactor is not added twice
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
+  //    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(figureInteractor);
     }
 
     MEASUREMENT_DEBUG << "adding interactor to globalinteraction";
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
+  //  mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
 
     MEASUREMENT_DEBUG << "will now add observers for planarfigure";
     QmitkPlanarFigureData data;
@@ -483,6 +491,7 @@ void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)
   mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
   mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
   node->SetProperty("ClosedPlanarPolygon", closedProperty);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPath initialized...";
 }
@@ -539,7 +548,8 @@ void QmitkMeasurementView::ActionDrawPolygonTriggered(bool checked)
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
   QString qString = QString("Polygon%1").arg(++d->m_PolygonCounter);
-  this->AddFigureToDataStorage(figure, qString);
+  mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
+  node->SetProperty("planarfigure.isextendable",mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarPolygon initialized...";
 }

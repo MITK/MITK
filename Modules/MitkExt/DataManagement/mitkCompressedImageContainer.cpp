@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkCompressedImageContainer.h"
+#include "mitkImageReadAccessor.h"
 
 #include "itk_zlib.h"
 
@@ -85,9 +86,10 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
                << "Attempting to compress " << m_OneTimeStepImageSizeInBytes << " image bytes into a buffer of size " << bufferSize << std::endl;
     }
 
+    ImageReadAccessor imgAcc(image, image->GetVolumeData(timestep));
     ::Bytef* dest(byteBuffer);
     ::uLongf destLen(bufferSize);
-    ::Bytef* source( static_cast<unsigned char*>(image->GetVolumeData(timestep)->GetData()) );
+    ::Bytef* source( (unsigned char*) imgAcc.GetData() );
     ::uLongf sourceLen( m_OneTimeStepImageSizeInBytes );
     int zlibRetVal = ::compress(dest, &destLen, source, sourceLen);
     if (itk::Object::GetDebug())
@@ -139,7 +141,8 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
        iter != m_ByteBuffers.end();
        ++iter, ++timeStep)
   {
-    ::Bytef* dest( static_cast<unsigned char*>(image->GetVolumeData(timeStep)->GetData()) );
+    ImageReadAccessor imgAcc(image, image->GetVolumeData(timeStep));
+    ::Bytef* dest( (unsigned char*) imgAcc.GetData() );
     ::uLongf destLen(m_OneTimeStepImageSizeInBytes);
     ::Bytef* source( iter->first );
     ::uLongf sourceLen( iter->second );

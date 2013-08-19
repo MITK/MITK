@@ -38,7 +38,7 @@ class BERRY_UI ShowViewHandler : public AbstractHandler
 {
 
 public:
-  berryObjectMacro(ShowViewHandler)
+  berryObjectMacro(ShowViewHandler);
 
 private:
 

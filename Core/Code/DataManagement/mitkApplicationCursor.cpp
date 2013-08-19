@@ -43,6 +43,19 @@ void ApplicationCursor::RegisterImplementation(ApplicationCursorImplementation* 
   m_Implementation = implementation;
 }
 
+void ApplicationCursor::PushCursor(std::istream& cursor, int hotspotX, int hotspotY)
+{
+  if (m_Implementation)
+  {
+    m_Implementation->PushCursor(cursor, hotspotX, hotspotY);
+  }
+  else
+  {
+    MITK_ERROR << "in mitk::ApplicationCursor::PushCursor(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
+  }
+}
+
 void ApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)
 {
   if (m_Implementation)

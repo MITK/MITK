@@ -75,7 +75,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
 
   /* test translation */
-  transform->TransformVector(translationVector);
+  transform->Translate(translationVector);
 
   myFilter->SetRigid3DTransform(transform);
 

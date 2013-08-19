@@ -60,7 +60,7 @@ protected:
 
    public:
 
-     berryObjectMacro(CONTINUE_)
+     berryObjectMacro(CONTINUE_);
 
      bool Handles(const std::string&  /*namespaze*/, const std::string&  /*method*/) {
        return false;

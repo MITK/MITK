@@ -72,7 +72,7 @@ class MitkUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     /*
     \brief Called, when the selection in the devicelist changes.
     */
-    void OnDeviceSelectionChanged(mitk::ServiceReference reference);
+    void OnDeviceSelectionChanged(us::ServiceReferenceU reference);
 
 
   protected:

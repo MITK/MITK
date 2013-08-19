@@ -38,6 +38,7 @@ namespace mitk {
       /**
       * \brief this constructor creates an US Image identical to the recieved mitkImage. The Metadata are set to default.
       *  The image data is shared, so don't continue to manipulate the original image.
+      * @throw mitk::Exception Throws an exception if there is a problem with access to the data while constructing the image.
       */
       mitkNewMacro1Param(Self, mitk::Image::Pointer);
 

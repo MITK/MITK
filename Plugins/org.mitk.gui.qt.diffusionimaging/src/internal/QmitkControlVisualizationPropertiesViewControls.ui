@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
-    <height>401</height>
+    <width>567</width>
+    <height>619</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -222,6 +222,9 @@
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_DisplayIndexSpinBox"/>
          </item>
          <item>
           <widget class="QFrame" name="m_NumberGlyphsFrame">

@@ -163,8 +163,6 @@ RenderingManager
     // Register vtkRenderWindow instance
     renderWindow->Register( NULL );
 
-    typedef itk::MemberCommand< RenderingManager > MemberCommandType;
-
     // Add callbacks for rendering abort mechanism
     //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
     vtkCallbackCommand *startCallbackCommand = vtkCallbackCommand::New();

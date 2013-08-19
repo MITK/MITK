@@ -142,6 +142,11 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
   if (m_SelectedDataNode.IsNotNull() )
   {
     mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
+    if (image == NULL)
+    {
+      MITK_INFO << "QmitkVolumetryView::OnImageSelected no image selected.";
+      return;
+    }
     image->Update();
     if (image && image->IsInitialized())
     {
@@ -165,94 +170,6 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
     }
   }
 }
-
-//void QmitkVolumetryView::DoSomething()
-//{
-//  mitk::DataNode* node = m_Controls->m_ImageSelector->GetSelectedNode();
-//  if (!node)
-//  {
-//    // Nothing selected. Inform the user and return
-//    QMessageBox::information( NULL, "Template functionality", "Please load and select an image before starting some action.");
-//    return;
-//  }
-//
-//  // here we have a valid mitk::DataNode
-//
-//  // a node itself is not very useful, we need its data item (the image)
-//  mitk::BaseData* data = node->GetData();
-//  if (data)
-//  {
-//    // test if this data item is really an image or not (could also be a surface or something totally different)
-//    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-//    if (image)
-//    {
-//      std::string name("(no name)");
-//      node->GetName(name);
-//
-//      QMessageBox::information( NULL, "Image processing",
-//                                QString( "Doing something to '%1'" ).arg(name.c_str()) );
-//
-//      // at this point anything can be done using the mitk::Image image.
-//    }
-//  }
-//}
-
-
-
-
-
-
-
-
-//void QmitkVolumetryView::SetDataNode(const mitk::DataNode* node)
-//{
-//  if(node == m_OverlayNode.GetPointer())
-//    return;
-//  m_SelectedDataNode = node; // is the non-const m_SelectedDataNode needed anyway?
-//  if (m_OverlayNode)
-//  {
-//    // remove it from the tree
-//    mitk::DataTreeIteratorClone overlayIt = mitk::DataTreeHelper::FindIteratorToNode(m_DataTreeIteratorClone->GetTree(),m_OverlayNode);
-//    if (overlayIt.IsNotNull()) { overlayIt->Remove(); }
-//    m_OverlayNode = NULL;
-//  }
-//  CreateOverlayChild();
-//  std::string name;
-//  if (node->GetName(name))
-//  {
-//    //    m_TreeNodeNameLabel->setText( name.c_str() );
-//  }
-//  m_CalcButton->setEnabled(false);
-//  m_TimeSeriesButton->setEnabled(false);
-//  m_SaveCsvButton->setEnabled(false);
-//  m_TextEdit->clear();
-//
-//  if (m_SelectedDataNode)
-//  {
-//    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
-//    image->Update();
-//    if (image && image->IsInitialized())
-//    {
-//      if (image->GetDimension() == 4)
-//      {
-//        m_TimeSeriesButton->setEnabled(true);
-//      }
-//      else
-//      {
-//        m_CalcButton->setEnabled(true);
-//      }
-//      int minVal = (int)image->GetScalarValue2ndMin();
-//      int maxVal = (int)image->GetScalarValueMaxNoRecompute();
-//      if (minVal == maxVal)
-//        --minVal;
-//      m_ThresholdSlider->setMinValue(minVal);
-//      m_ThresholdSlider->setMaxValue(maxVal);
-//      m_ThresholdSlider->setEnabled(true);
-//      UpdateSlider();
-//      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//    }
-//  }
-//}
 
 void QmitkVolumetryView::OnCalculateVolume()
 {

@@ -66,19 +66,9 @@ private:
      /*!
    \brief Create an instance of a ToFPMDPlayerDevice.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDPlayerDevice::Pointer device = ToFCameraPMDPlayerDevice::New();
-
-//-------------------------If no Intrinsics are specified------------------------------
-      //Set default camera intrinsics for the PMD-Player.
-      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/Default_Parameters.xml");
-      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
-//------------------------------------------------------------------------------------------
 
       device->SetBoolProperty("HasRGBImage", false);
       device->SetBoolProperty("HasAmplitudeImage", true);

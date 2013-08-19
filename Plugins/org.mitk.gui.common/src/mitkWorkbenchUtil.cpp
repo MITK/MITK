@@ -261,7 +261,7 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString&
       }
     }
   }
-  catch (const berry::CoreException& e)
+  catch (const berry::CoreException&)
   {
     // do nothing
   }

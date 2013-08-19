@@ -38,7 +38,7 @@ namespace berry {
 class BERRY_COMMANDS AbstractHandler : public IHandler { // ,public EventManager {
 
 public:
-  berryObjectMacro(AbstractHandler)
+  berryObjectMacro(AbstractHandler);
 
 private:
 

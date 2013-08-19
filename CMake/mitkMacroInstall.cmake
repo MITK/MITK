@@ -43,6 +43,8 @@ macro(_fixup_target)
     endif()
   endif()
 
+  mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
+
   install(CODE "
 
     set(_bundle_dest_dir \"${_bundle_dest_dir}\")
@@ -149,10 +151,7 @@ macro(_fixup_target)
 
     set(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 
-    include(mitkFunctionGetLibrarySearchPaths)
-    mitkFunctionGetLibrarySearchPaths(_search_paths ${intermediate_dir})
-
-    set(DIRS ${DIRS} ${_search_paths})
+    set(DIRS ${_search_paths} ${_install_LIBRARY_DIRS})
     foreach(_plugin \${PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND DIRS \${_pluginpath})

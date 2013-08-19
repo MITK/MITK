@@ -123,7 +123,7 @@ struct QbrShellSelection
     BValueMap inputMap = m_Image->GetB_ValueMap();
     BValueMap outputMap;
 
-    double val = 0;
+    unsigned int val = 0;
 
     if(inputMap.find(0) == inputMap.end()){
       MITK_INFO << "QbrShellSelection: return empty BValueMap from GUI Selection";

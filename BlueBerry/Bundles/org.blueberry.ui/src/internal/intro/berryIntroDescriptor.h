@@ -42,7 +42,7 @@ private:
 
 public:
 
-  berryObjectMacro(IntroDescriptor)
+  berryObjectMacro(IntroDescriptor);
 
   /**
    * Create a new IntroDescriptor for an extension.

@@ -97,7 +97,8 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer* renderer)
   const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
   if ( ( dataTimeGeometry == NULL )
     || ( dataTimeGeometry->GetTimeSteps() == 0 )
-    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) ) )
+    || ( !dataTimeGeometry->IsValidTime( renderer->GetTimeStep() ) )
+    || ( this->GetTimestep() == -1 ) )
   {
     //clear the rendered polydata
     localStorage->m_Mapper->SetInput(vtkSmartPointer<vtkPolyData>::New());

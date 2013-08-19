@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUiLoader.h"
 #include "QmitkDataStorageComboBoxWithSelectNone.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateOr.h"
 
 //-----------------------------------------------------------------------------
 QmitkUiLoader::QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent)
@@ -51,7 +52,7 @@ QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, 
     QmitkDataStorageComboBoxWithSelectNone* comboBox = new QmitkDataStorageComboBoxWithSelectNone(parent);
     comboBox->setObjectName(name);
     comboBox->SetAutoSelectNewItems(false);
-    comboBox->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    comboBox->SetPredicate(mitk::TNodePredicateDataType< mitk::Image >::New());
     comboBox->SetDataStorage(const_cast<mitk::DataStorage*>(m_DataStorage));
     comboBox->setCurrentIndex(0);
     widget = comboBox;

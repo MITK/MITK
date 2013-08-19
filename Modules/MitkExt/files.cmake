@@ -4,7 +4,6 @@ set(CPP_FILES
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
   Algorithms/mitkAngleCorrectByPointFilter.cpp
-  Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
@@ -12,7 +11,6 @@ set(CPP_FILES
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
-  Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
   Algorithms/mitkLabeledImageToSurfaceFilter.cpp
   Algorithms/mitkLabeledImageVolumeCalculator.cpp
@@ -33,14 +31,12 @@ set(CPP_FILES
   Algorithms/mitkProbeFilter.cpp
   Algorithms/mitkSimpleHistogram.cpp
   Algorithms/mitkSimpleUnstructuredGridHistogram.cpp
-  Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
   Controllers/mitkIPythonService.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
-  Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp
   DataManagement/mitkBoundingObject.cpp
@@ -112,14 +108,7 @@ set(CPP_FILES
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
-  Interactions/mitkTool.cpp
 #  Interactions/mitkCreateSurfaceTool.cpp
-  Interactions/mitkMorphologicTool.cpp
-  Interactions/mitkErodeTool.cpp
-  Interactions/mitkDilateTool.cpp
-  Interactions/mitkOpeningTool.cpp
-  Interactions/mitkClosingTool.cpp
-  Interactions/mitkPixelManipulationTool.cpp
   Rendering/mitkEnhancedPointSetVtkMapper3D.cpp
   Rendering/mitkImageBackground2D.cpp
   Rendering/mitkLineMapper2D.cpp

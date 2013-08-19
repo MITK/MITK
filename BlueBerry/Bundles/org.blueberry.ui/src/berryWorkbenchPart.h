@@ -46,7 +46,7 @@ class BERRY_UI WorkbenchPart : public QObject,
     public virtual IWorkbenchPart, public IExecutableExtension
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IExecutableExtension)
+  Q_INTERFACES(berry::IExecutableExtension);
 
 public:
   berryObjectMacro(WorkbenchPart);

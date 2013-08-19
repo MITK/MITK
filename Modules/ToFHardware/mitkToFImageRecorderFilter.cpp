@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageDataItem.h>
 #include "mitkToFNrrdImageWriter.h"
 #include "mitkToFImageCsvWriter.h"
+#include "mitkImageReadAccessor.h"
 
 // itk includes
 #include "itksys/SystemTools.hxx"
@@ -74,9 +75,13 @@ void mitk::ToFImageRecorderFilter::GenerateData()
   mitk::Image::Pointer intensityImageInput = this->GetInput(2);
   assert(intensityImageInput);
   // add current data to file stream
-  float* distanceFloatData = (float*)distanceImageInput->GetSliceData(0, 0, 0)->GetData();
-  float* amplitudeFloatData = (float*)amplitudeImageInput->GetSliceData(0, 0, 0)->GetData();
-  float* intensityFloatData = (float*)intensityImageInput->GetSliceData(0, 0, 0)->GetData();
+  ImageReadAccessor distAcc(distanceImageInput, distanceImageInput->GetSliceData(0,0,0));
+  ImageReadAccessor amplAcc(amplitudeImageInput, amplitudeImageInput->GetSliceData(0,0,0));
+  ImageReadAccessor intenAcc(intensityImageInput, intensityImageInput->GetSliceData(0,0,0));
+
+ float* distanceFloatData = (float*) distAcc.GetData();
+  float* amplitudeFloatData = (float*) amplAcc.GetData();
+  float* intensityFloatData = (float*) intenAcc.GetData();
   if (m_RecordingStarted)
   {
     m_ToFImageWriter->Add(distanceFloatData,amplitudeFloatData,intensityFloatData);

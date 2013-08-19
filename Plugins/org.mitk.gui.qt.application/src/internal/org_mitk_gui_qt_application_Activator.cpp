@@ -23,12 +23,6 @@
 
 #include <QtPlugin>
 
-// us
-#include "mitkModule.h"
-#include "mitkModuleResource.h"
-#include "mitkModuleResourceStream.h"
-#include "mitkModuleRegistry.h"
-
 namespace mitk
 {
 

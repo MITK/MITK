@@ -24,6 +24,7 @@ if(MITK_USE_Boost)
       set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
 
       # We need binary boost libraries
+      string(REPLACE "^^" ";" MITK_USE_Boost_LIBRARIES "${MITK_USE_Boost_LIBRARIES}")
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
         set(_boost_libs ${_boost_libs} --with-${_boost_lib})
       endforeach()
@@ -60,8 +61,8 @@ if(MITK_USE_Boost)
       # Boost needs in-source builds
       BINARY_DIR ${proj}-src
       PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_45_0.tar.bz2
-      URL_MD5 d405c606354789d0426bc07bea617e58
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_54_0.tar.bz2
+      URL_MD5 15cb8c0803064faef0c4ddf5bc5ca279
       INSTALL_DIR ${proj}-install
       CONFIGURE_COMMAND "${_boost_cfg_cmd}"
       BUILD_COMMAND "${_boost_build_cmd}"

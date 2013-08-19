@@ -45,7 +45,8 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char* /*argv*/[])
   //MITK_TEST_OUTPUT(<< "Creating Image as imput for cutting: ");
   //image=mitk::Image::New();
   //image->Initialize(mitk::MakeScalarPixelType<int>(), 3, dim);
-  //int *p = (int*)image->GetData();
+  // mitk::ImageReadAccessor imgAcc(image);
+  //int *p = (int*)imgAcc.GetData();
   //unsigned int i;
   //unsigned int size = dim[0]*dim[1]*dim[2];
   //for(i=0; i<size; ++i, ++p)
@@ -99,8 +100,10 @@ int mitkBoundingObjectCutterTest(int /*argc*/, char* /*argv*/[])
   //}
 
   //MITK_TEST_OUTPUT(<< " Testing whether pixel data of cutted image are identical to pixel data of original image: ");
-  //p = (int*)image->GetData();
-  //int *pCutted = (int*)cuttedImage->GetData();
+  //mitk::ImageReadAccessor imgAcc(image);
+  //p = (int*)imgAcc.GetData();
+  //mitk::ImageReadAccessor cuttedImage(cuttedImage);
+  //int *pCutted = (int*)cuttedImage.GetData();
   //for(i=0; i<size; ++i, ++p, ++pCutted)
   //{
   //  if(*p!=*pCutted)

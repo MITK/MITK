@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef _MITK_ContourElement_H_
-#define _MITK_ContourElement_H_
+#ifndef _mitkContourElement_H_
+#define _mitkContourElement_H_
 
 #include "mitkCommon.h"
 #include "SegmentationExports.h"
@@ -49,8 +49,7 @@ namespace mitk
     mitkCloneMacro(Self);
 
 
-/*+++++++++++++++++++++ Data container representing vertices +++++++++++++++++*/
-
+// Data container representing vertices
 
     /** \brief Represents a single vertex of contour.
     */
@@ -68,79 +67,79 @@ namespace mitk
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
     };
-/*+++++++++++++++++++++ END Data container representing vertices ++++++++++++++*/
+// END Data container representing vertices
 
-
-/*+++++++++++++++ typedefs +++++++++++++++++++++++++++++++*/
     typedef ContourModelVertex VertexType;
     typedef std::deque<VertexType*> VertexListType;
     typedef VertexListType::iterator VertexIterator;
     typedef VertexListType::const_iterator ConstVertexIterator;
-/*+++++++++++++++ END typedefs ++++++++++++++++++++++++++++*/
 
+    //  start of inline methods
 
-
-/*++++++++++++++++  inline methods  +++++++++++++++++++++++*/
-
-    /** \brief Return a const iterator a the front. */
+    /** \brief Return a const iterator a the front.
+    */
     virtual ConstVertexIterator ConstIteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
-    /** \brief Return a const iterator a the end. */
+    /** \brief Return a const iterator a the end.
+    */
     virtual ConstVertexIterator ConstIteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
-    /** \brief Return an iterator a the front. */
+    /** \brief Return an iterator a the front.
+    */
     virtual VertexIterator IteratorBegin()
     {
       return this->m_Vertices->begin();
     }
 
-    /** \brief Return an iterator a the end. */
+    /** \brief Return an iterator a the end.
+    */
     virtual VertexIterator IteratorEnd()
     {
       return this->m_Vertices->end();
     }
 
-    /** \brief Returns the number of contained vertices. */
+    /** \brief Returns the number of contained vertices.
+    */
     virtual int GetSize()
     {
       return this->m_Vertices->size();
     }
-/*++++++++++++++++  END inline methods  +++++++++++++++++++++++*/
-
-
+    //   end of inline methods
 
     /** \brief Add a vertex at the end of the contour
-    \param vertex - coordinates in 3D space.
-    \param isControlPoint - is the vertex a special control point.*/
-    virtual void AddVertex(mitk::Point3D &vertex, bool isControlPoint);
+    \param point - coordinates in 3D space.
+    \param isControlPoint - is the vertex a special control point.
+    */
+    virtual void AddVertex(mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the end of the contour
-    \param vertex - a ContourModelVertex.
+    \param vertex - a contour element vertex.
     */
     virtual void AddVertex(VertexType &vertex);
 
     /** \brief Add a vertex at the front of the contour
-    \param vertex - coordinates in 3D space.
-    \param isControlPoint - is the vertex a special control point.*/
-    virtual void AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint);
+    \param point - coordinates in 3D space.
+    \param isControlPoint - is the vertex a control point.
+    */
+    virtual void AddVertexAtFront(mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the front of the contour
-    \param vertex - a ContourModelVertex.
+    \param vertex - a contour element vertex.
     */
     virtual void AddVertexAtFront(VertexType &vertex);
 
     /** \brief Add a vertex at a given index of the contour
-    \param vertex - coordinates in 3D space.
+    \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a special control point.
     \param index - the index to be inserted at.
     */
-    virtual void InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index);
+    virtual void InsertVertexAtIndex(mitk::Point3D &point, bool isControlPoint, int index);
 
     /** \brief Returns the vertex a given index
     \param index
@@ -157,9 +156,19 @@ namespace mitk
     */
     VertexListType* GetVertexList();
 
+    /** \brief Returns whether the contour element is empty.
+    */
+    bool IsEmpty();
+
     /** \brief Returns if the conour is closed or not.
     */
     virtual bool IsClosed();
+
+    /** \brief Returns whether a given point is near a contour, according to eps.
+    \param point - query position in 3D space.
+    \param eps - the error bound for search algorithm.
+    */
+    virtual bool IsNearContour(const mitk::Point3D &point, float eps);
 
     /** \brief Close the contour.
     Connect first with last element.
@@ -177,9 +186,11 @@ namespace mitk
     virtual void SetIsClosed(bool isClosed);
 
     /** \brief Concatenate the contuor with a another contour.
-    All vertices of the other contour will be add after last vertex.
+    All vertices of the other contour will be added after last vertex.
+    \param other - the other contour
+    \param check - set it true to avoid intersections
     */
-    void Concatenate(mitk::ContourElement* other);
+    void Concatenate(mitk::ContourElement* other, bool check);
 
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
@@ -187,7 +198,7 @@ namespace mitk
     virtual bool RemoveVertex(VertexType* vertex);
 
     /** \brief Remove a vertex at given index within the container if exists.
-    \param index - the index to be removed at.
+    \param index - the index where the vertex should be removed.
     */
     virtual bool RemoveVertexAt(int index);
 
@@ -213,6 +224,13 @@ namespace mitk
     */
     VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
+    VertexListType* GetControlVertices();
+
+    /** \brief Uniformly redistribute control points with a given period (in number of vertices)
+    \param vertex - the vertex around which the redistribution is done.
+    \param period - number of vertices between control points.
+    */
+    void RedistributeControlVertices(const VertexType* vertex, int period);
 
   protected:
 
@@ -224,6 +242,6 @@ namespace mitk
     bool m_IsClosed;
 
   };
-}
+} // namespace mitk
 
-#endif
+#endif // _mitkContourElement_H_

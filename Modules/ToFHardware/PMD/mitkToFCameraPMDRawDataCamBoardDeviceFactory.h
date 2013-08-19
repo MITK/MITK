@@ -23,6 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsicsProperty.h>
 #include <mitkToFConfig.h>
 
+// Microservices
+#include <usServiceRegistration.h>
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 namespace mitk
 {
   /**
@@ -60,20 +68,19 @@ private:
      /*!
    \brief Create an instance of a RawDataCamBoardDeviceFactory.
    */
-   ToFCameraDevice::Pointer createToFCameraDevice()
+   ToFCameraDevice::Pointer CreateToFCameraDevice()
    {
      ToFCameraPMDRawDataCamBoardDevice::Pointer device = ToFCameraPMDRawDataCamBoardDevice::New();
 
-      //Set default camera intrinsics for the RawDataCamBoard-camera
-      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/PMDCamBoard_camera.xml");
-      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
-
      return device.GetPointer();
    }
+
+   us::ModuleResource GetIntrinsicsResource()
+   {
+     us::Module* module = us::GetModuleContext()->GetModule();
+     return module->GetResource("CalibrationFiles/PMDCamBoard_camera.xml");
+   }
+
    int m_DeviceNumber;
 };
 }

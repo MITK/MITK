@@ -36,7 +36,7 @@ class MITK_GUI_COMMON_PLUGIN DataNodeObject : public berry::Object
 
 public:
 
-  berryObjectMacro(mitk::DataNodeObject)
+  berryObjectMacro(mitk::DataNodeObject);
 
   DataNodeObject();
   DataNodeObject(DataNode::Pointer node);

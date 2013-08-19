@@ -21,11 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriter.h"
 #include "mitkSurfaceVtkWriter.h"
 
-#include <mitkGetModuleContext.h>
-#include <mitkModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkIDataNodeReader.h>
 #include <mitkProgressBar.h>
+
+#include <mitkCoreObjectFactory.h>
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -45,14 +47,14 @@ const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
 int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds)
 {
     // Get the set of registered mitk::IDataNodeReader services
-    ModuleContext* context = mitk::GetModuleContext();
-    const std::list<ServiceReference> refs = context->GetServiceReferences<IDataNodeReader>();
+    us::ModuleContext* context = us::GetModuleContext();
+    const std::vector<us::ServiceReference<IDataNodeReader> > refs = context->GetServiceReferences<IDataNodeReader>();
     std::vector<IDataNodeReader*> services;
     services.reserve(refs.size());
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
-        IDataNodeReader* s = context->GetService<IDataNodeReader>(*i);
+        IDataNodeReader* s = context->GetService(*i);
         if (s != 0)
         {
             services.push_back(s);
@@ -84,7 +86,7 @@ int IOUtil::LoadFiles(const std::vector<std::string> &fileNames, DataStorage &ds
         mitk::ProgressBar::GetInstance()->Progress(2);
     }
 
-    for (std::list<ServiceReference>::const_iterator i = refs.begin();
+    for (std::vector<us::ServiceReference<IDataNodeReader> >::const_iterator i = refs.begin();
          i != refs.end(); ++i)
     {
         context->UngetService(*i);
@@ -170,8 +172,10 @@ PointSet::Pointer IOUtil::LoadPointSet(const std::string path)
 bool IOUtil::SaveImage(mitk::Image::Pointer image, const std::string path)
 {
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
-    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
-    std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+    std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
@@ -213,6 +217,8 @@ bool IOUtil::SaveSurface(Surface::Pointer surface, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been set we use the default extension
@@ -283,6 +289,8 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     std::string dir = itksys::SystemTools::GetFilenamePath( path );
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( path );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( path );
+    if (dir == "")
+      dir = ".";
     std::string finalFileName = dir + "/" + baseFilename;
 
     if (extension == "") // if no extension has been entered manually into the filename
@@ -314,4 +322,60 @@ bool IOUtil::SavePointSet(PointSet::Pointer pointset, const std::string path)
     }
     return true;
 }
+
+bool IOUtil::SaveBaseData( mitk::BaseData* data, const std::string& path )
+{
+  if (data == NULL || path.empty()) return false;
+
+  std::string dir = itksys::SystemTools::GetFilenamePath( path );
+  std::string baseFilename = itksys::SystemTools::GetFilenameWithoutExtension( path );
+  std::string extension = itksys::SystemTools::GetFilenameExtension( path );
+  if (dir == "")
+    dir = ".";
+  std::string fileNameWithoutExtension = dir + "/" + baseFilename;
+
+  mitk::CoreObjectFactory::FileWriterList fileWriters = mitk::CoreObjectFactory::GetInstance()->GetFileWriters();
+
+  for (mitk::CoreObjectFactory::FileWriterList::iterator it = fileWriters.begin() ; it != fileWriters.end() ; ++it)
+  {
+    if ( (*it)->CanWriteBaseDataType(data) )
+    {
+      // Ensure a valid filename
+      if(baseFilename=="")
+      {
+        baseFilename = (*it)->GetDefaultFilename();
+      }
+      // Check if an extension exists already and if not, append the default extension
+      if (extension=="" )
+      {
+        extension=(*it)->GetDefaultExtension();
+      }
+      else
+      {
+        if (!(*it)->IsExtensionValid(extension))
+        {
+          MITK_WARN << extension << " extension is unknown";
+          continue;
+        }
+      }
+
+      std::string finalFileName = fileNameWithoutExtension + extension;
+      try
+      {
+        (*it)->SetFileName( finalFileName.c_str() );
+        (*it)->DoWrite( data );
+        return true;
+      }
+      catch( const std::exception& e )
+      {
+        MITK_ERROR << " during attempt to write '" << finalFileName << "' Exception says:";
+        MITK_ERROR << e.what();
+        mitkThrow() << "An exception occured during writing the file " << finalFileName << ". Exception says " << e.what();
+      }
+    }
+  }
+
+  return false;
+}
+
 }

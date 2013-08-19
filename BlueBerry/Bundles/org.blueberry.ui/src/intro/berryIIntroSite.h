@@ -34,7 +34,7 @@ namespace berry {
  */
 struct BERRY_UI IIntroSite : public IWorkbenchSite {
 
-  berryInterfaceMacro(IIntroSite, berry)
+  berryInterfaceMacro(IIntroSite, berry);
 
   ~IIntroSite();
 

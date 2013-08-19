@@ -36,7 +36,7 @@ class BERRY_UI EditorDescriptor : public IEditorDescriptor
 { //, Serializable, IPluginContribution {
 
 public:
-  berryObjectMacro(EditorDescriptor)
+  berryObjectMacro(EditorDescriptor);
 
   // @issue the following constants need not be public; see bug 47600
   /**

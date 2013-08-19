@@ -28,11 +28,6 @@ class QmitkDIAppConnectomicsPerspective : public QObject, public berry::IPerspec
 public:
 
   QmitkDIAppConnectomicsPerspective() {}
-  QmitkDIAppConnectomicsPerspective(const QmitkDIAppConnectomicsPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppConnectomicsPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

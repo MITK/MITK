@@ -35,7 +35,7 @@ public:
   mitkClassMacro( PointSetStatisticsCalculator, itk::Object );
   itkNewMacro( PointSetStatisticsCalculator );
 
-  mitkNewMacro1Param(PointSetStatisticsCalculator,mitk::PointSet::Pointer)
+  mitkNewMacro1Param(PointSetStatisticsCalculator,mitk::PointSet::Pointer);
 
   /** @brief Sets the point set which will be analysed. */
   void SetPointSet(mitk::PointSet::Pointer pSet);

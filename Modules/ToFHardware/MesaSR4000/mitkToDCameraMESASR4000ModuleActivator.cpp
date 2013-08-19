@@ -19,31 +19,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Microservices
 #include <usServiceRegistration.h>
 #include <usModuleActivator.h>
-#include "mitkModuleContext.h"
+#include "usModuleContext.h"
+#include <usModuleActivator.h>
 
-#include <mitkModuleActivator.h>
 #include "mitkIToFDeviceFactory.h"
-
 #include "mitkToFConfig.h"
 #include "mitkToFCameraMESASR4000DeviceFactory.h"
 
-
-
 /*
-  * This is the module activator for the "mitkPMDCamCubeModule" module. It registers services
+  * This is the module activator for the "MESASR4000Module" module. It registers services
   * like the IToFDeviceFactory.
   */
 
 namespace mitk
 {
-class MESASR4000ModuleActivator : public mitk::ModuleActivator {
+class MESASR4000ModuleActivator : public us::ModuleActivator {
 public:
 
-    void Load(mitk::ModuleContext* context)
+    void Load(us::ModuleContext* context)
     {
       //Implementing MESASR4000DeviceFactory
         ToFCameraMESASR4000DeviceFactory* toFCameraMESASR4000DeviceFactory = new ToFCameraMESASR4000DeviceFactory();
-        ServiceProperties mitkMESASR4000FactoryProps;
+        us::ServiceProperties mitkMESASR4000FactoryProps;
         mitkMESASR4000FactoryProps["ToFFactoryName"] = toFCameraMESASR4000DeviceFactory->GetFactoryName();
         context->RegisterService<IToFDeviceFactory>(toFCameraMESASR4000DeviceFactory, mitkMESASR4000FactoryProps);
 
@@ -52,7 +49,7 @@ public:
         m_Factories.push_back(toFCameraMESASR4000DeviceFactory);
     }
 
-    void Unload(mitk::ModuleContext* )
+    void Unload(us::ModuleContext* )
     {
     }
 

@@ -61,12 +61,6 @@ class QmitkMITKSurfaceMaterialEditorView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkMITKSurfaceMaterialEditorView();
-  QmitkMITKSurfaceMaterialEditorView(const QmitkMITKSurfaceMaterialEditorView& other)
-  {
-     Q_UNUSED(other)
-     throw std::runtime_error("Copy constructor not implemented");
-  }
-
   virtual ~QmitkMITKSurfaceMaterialEditorView();
 
   virtual void CreateQtPartControl(QWidget *parent);

@@ -3,10 +3,7 @@
 
 Welcome to the basic MITK user manual. This document tries to give a concise overview of the basic functions of MITK and be an comprehensible guide on using them. 
 
-Available sections:
-  - \ref MITKUserManualPageOverview
-  - \ref MITKUserManualPageUserInterface
-  - \ref MITKUserManualPagePerspectives
+\tableofcontents
 
 \section MITKUserManualPageOverview About MITK
 

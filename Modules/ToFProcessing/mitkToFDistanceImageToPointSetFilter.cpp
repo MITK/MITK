@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageDataItem.h"
 #include "mitkPointSet.h"
+#include <mitkImagePixelReadAccessor.h>
 #include "mitkToFProcessingCommon.h"
 
 mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
@@ -131,10 +132,14 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
   //compute subset of points if input PointSet is defined
   if (m_Subset.size()!=0)
   {
+    mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(input, input->GetSliceData(0));
     for (unsigned int i=0; i<m_Subset.size(); i++)
     {
-      mitk::Index3D currentIndex = m_Subset.at(i);;
-      mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(currentIndex);
+      mitk::Index3D currentIndex = m_Subset.at(i);
+      itk::Index<2> index2D;
+      index2D[0] = currentIndex[0];
+      index2D[1] = currentIndex[1];
+      mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(index2D);
 
       mitk::Point3D currentPoint;
       if (m_ReconstructionMode)
@@ -150,16 +155,16 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     int xDimension = (int)input->GetDimension(0);
     int yDimension = (int)input->GetDimension(1);
     int pointCount = 0;
+    mitk::ImagePixelReadAccessor<mitk::ScalarType,2> imageAcces(input, input->GetSliceData(0));
     for (int j=0; j<yDimension; j++)
     {
       for (int i=0; i<xDimension; i++)
       {
-        mitk::Index3D pixel;
+        itk::Index<2> pixel;
         pixel[0] = i;
         pixel[1] = j;
-        pixel[2] = 0;
 
-        mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(pixel);
+        mitk::ToFProcessingCommon::ToFScalarType distance = (double)imageAcces.GetPixelByIndex(pixel);
 
       mitk::Point3D currentPoint;
       if (m_ReconstructionMode)

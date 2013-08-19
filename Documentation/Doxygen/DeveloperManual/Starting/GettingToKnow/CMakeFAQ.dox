@@ -24,7 +24,7 @@ The correct way to create a new plugin is described in \ref NewPluginOnly. Do no
 <ol>
  <li> Start %CMake
  <li> Configure
- <li> Set the variable MITK_BUILD_<Your-plugin-id-here> to TRUE
+ <li> Set the variable MITK_BUILD_\<Your-plugin-id-here\> to TRUE
  <li> Configure again
  <li> Generate
  <li> Start a build using your development environment

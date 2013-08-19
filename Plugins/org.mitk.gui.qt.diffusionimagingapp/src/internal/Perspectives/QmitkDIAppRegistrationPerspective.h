@@ -28,11 +28,6 @@ class QmitkDIAppRegistrationPerspective : public QObject, public berry::IPerspec
 public:
 
   QmitkDIAppRegistrationPerspective() {}
-  QmitkDIAppRegistrationPerspective(const QmitkDIAppRegistrationPerspective& other)
-  {
-    Q_UNUSED(other)
-    throw std::runtime_error("Copy constructor not implemented");
-  }
   ~QmitkDIAppRegistrationPerspective() {}
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);

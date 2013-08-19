@@ -43,6 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShCoefficientImageImporter.h>
 #include <itkDiffusionTensorPrincipalDirectionImageFilter.h>
 
+// Qt
+#include <QMessageBox>
+
 const std::string QmitkOdfMaximaExtractionView::VIEW_ID = "org.mitk.views.odfmaximaextractionview";
 using namespace mitk;
 
@@ -395,7 +398,9 @@ void QmitkOdfMaximaExtractionView::StartTensor()
     catch(itk::ExceptionObject &e)
     {
         MITK_INFO << "wrong image type: " << e.what();
-        throw e;
+        QMessageBox::warning( NULL, "Wrong pixel type", "Could not perform Tensor Principal Direction Extraction due to Image has wrong pixel type.", QMessageBox::Ok );
+        return;
+        //throw e;
     }
 
     if (!m_BinaryImageNodes.empty())
@@ -494,7 +499,9 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
     catch(itk::ExceptionObject &e)
     {
         MITK_INFO << "wrong image type: " << e.what();
-        throw;
+        QMessageBox::warning( NULL, "Wrong pixel type", "Could not perform Finite Differences Extraction due to Image has wrong pixel type.", QMessageBox::Ok );
+        return;
+        //throw;
     }
 
     filter->SetAngularThreshold(cos((float)m_Controls->m_AngularThreshold->value()*M_PI/180));

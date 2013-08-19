@@ -22,6 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsics.h>
 #include <mitkCameraIntrinsicsProperty.h>
 
+// Microservices
+#include <usServiceRegistration.h>
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
 namespace mitk
 {
   /**
@@ -66,17 +74,9 @@ namespace mitk
     /*!
     \brief Create an instance of a KinectDevice.
     */
-    ToFCameraDevice::Pointer createToFCameraDevice()
+    ToFCameraDevice::Pointer CreateToFCameraDevice()
     {
       KinectDevice::Pointer device = KinectDevice::New();
-
-      //Set default camera intrinsics for the kinect RGB camera.
-      //(OpenNI warps the distance data into the RGB space).
-      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
-      std::string pathToDefaulCalibrationFile(MITK_TOF_DATA_DIR);
-      pathToDefaulCalibrationFile.append("/CalibrationFiles/Kinect_RGB_camera.xml");
-      cameraIntrinsics->FromXMLFile(pathToDefaulCalibrationFile);
-      device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
 
       device->SetBoolProperty("HasRGBImage", true);
       device->SetBoolProperty("HasAmplitudeImage", false);
@@ -85,6 +85,13 @@ namespace mitk
 
       return device.GetPointer();
     }
+
+    us::ModuleResource GetIntrinsicsResource()
+    {
+      us::Module* module = us::GetModuleContext()->GetModule();
+      return module->GetResource("CalibrationFiles/Kinect_RGB_camera.xml");
+    }
+
     //Member variable as variable for our DeviceNumber
     int m_DeviceNumber;
   };

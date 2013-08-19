@@ -37,19 +37,19 @@ See LICENSE.txt or http://www.mitk.org for details.
   typedef berry::SmartPointer<const Self>  ConstPointer; \
   typedef berry::WeakPointer<Self> WeakPtr; \
   typedef berry::WeakPointer<const Self> ConstWeakPtr; \
-  berryNameMacro(className) \
+  berryNameMacro(className); \
 
 
 #define berryInterfaceMacro(className, namespaze) \
   public: \
-  berryObjectMacro(className) \
-  berryManifestMacro(className, namespaze) \
+  berryObjectMacro(className); \
+  berryManifestMacro(className, namespaze); \
 
 #define berrySimpleInterfaceMacro(className, namespaze) \
   protected: className() {} \
   public: \
-  berryNameMacro(className) \
-  berryManifestMacro(className, namespaze) \
+  berryNameMacro(className); \
+  berryManifestMacro(className, namespaze); \
 
 #define berryNewMacro(x) \
 static Pointer New(void) \

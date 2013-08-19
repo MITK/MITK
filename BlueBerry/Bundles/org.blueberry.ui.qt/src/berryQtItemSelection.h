@@ -31,7 +31,7 @@ class BERRY_UI_QT QtItemSelection : public virtual IStructuredSelection
 
 public:
 
-  berryObjectMacro(QtItemSelection)
+  berryObjectMacro(QtItemSelection);
 
   QtItemSelection();
   QtItemSelection(const QItemSelection& sel);

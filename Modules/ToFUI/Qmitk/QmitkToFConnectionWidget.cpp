@@ -35,12 +35,12 @@ const std::string QmitkToFConnectionWidget::VIEW_ID = "org.mitk.views.qmitktofco
 
 //Constructor of QmitkToFConnectionWidget
 QmitkToFConnectionWidget::QmitkToFConnectionWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
+, m_Controls(NULL)
+, m_IntegrationTime(0)
+, m_ModulationFrequency(0)
+, m_SelectedCameraName("")
 {
-  this->m_IntegrationTime = 0;
-  this->m_ModulationFrequency = 0;
   this->m_ToFImageGrabber = mitk::ToFImageGrabber::New();
-  //Setting m_Controls= NULL on Startup-> CreateQtPartControl will generate the Gui Widget if !m_Controls
-  m_Controls = NULL;
   //Calling CreateQtPartControl
   CreateQtPartControl(this);
 }
@@ -115,6 +115,7 @@ void QmitkToFConnectionWidget::OnSelectCamera()
     this->m_Controls->m_KinectParameterWidget->show();
   }
   m_Controls->m_ConnectCameraButton->setEnabled(true); //ConnectCameraButton gets enabled
+  m_SelectedCameraName = selectedCamera;
   emit  (selectedCamera);
 }
 //This Methods hides all Widgets (later each widget is activated on its own)
@@ -372,4 +373,9 @@ void QmitkToFConnectionWidget::OnConnectCamera()
     // send disconnect signal to the caller functionality
     emit ToFCameraDisconnected();
   }
+}
+
+void QmitkToFConnectionWidget::ConnectCamera()
+{
+  this->m_Controls->m_ConnectCameraButton->animateClick();
 }

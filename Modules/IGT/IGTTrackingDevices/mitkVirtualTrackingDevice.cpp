@@ -261,6 +261,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
         quat.y() = 1.0;
         quat.z() = 1.0;
         quat.r() = 1.0;
+        quat.normalize();
         currentTool->SetOrientation(quat);
         // TODO: rotate once per cycle around a fixed rotation vector
 

@@ -27,6 +27,24 @@ QmitkApplicationCursor::QmitkApplicationCursor()
   mitk::ApplicationCursor::RegisterImplementation(this);
 }
 
+void QmitkApplicationCursor::PushCursor(std::istream& cursorStream, int hotspotX, int hotspotY)
+{
+  if (cursorStream)
+  {
+    cursorStream.seekg(0, std::ios::end);
+    std::ios::pos_type length = cursorStream.tellg();
+    cursorStream.seekg(0, std::ios::beg);
+
+    char* data = new char[length];
+    cursorStream.read(data, length);
+    QPixmap pixmap;
+    pixmap.loadFromData(QByteArray::fromRawData(data, length));
+    QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
+    QApplication::setOverrideCursor( cursor );
+    delete[] data;
+  }
+}
+
 void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)
 {
   QPixmap pixmap( XPM );

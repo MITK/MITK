@@ -33,7 +33,7 @@ namespace berry {
 struct BERRY_UI_QT IQtStyleManager : public Service
 {
 
-  berryInterfaceMacro(IQtStyleManager, berry)
+  berryInterfaceMacro(IQtStyleManager, berry);
 
   struct Style {
     QString name;

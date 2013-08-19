@@ -37,11 +37,6 @@ class DICOM_EXPORT QmitkDicomPreferencePage : public QObject, public berry::IQtP
 public:
 
     QmitkDicomPreferencePage();
-    QmitkDicomPreferencePage(const QmitkDicomPreferencePage& other)
-    {
-        Q_UNUSED(other)
-            throw std::runtime_error("Copy constructor not implemented");
-    }
 
     virtual ~QmitkDicomPreferencePage();
 

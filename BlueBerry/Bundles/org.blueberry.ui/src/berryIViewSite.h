@@ -35,7 +35,7 @@ namespace berry {
  */
 struct BERRY_UI IViewSite : public virtual IWorkbenchPartSite {
 
-  berryInterfaceMacro(IViewSite, berry)
+  berryInterfaceMacro(IViewSite, berry);
 
   virtual ~IViewSite();
 

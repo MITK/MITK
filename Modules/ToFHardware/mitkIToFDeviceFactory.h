@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkIToFDeviceFactory_h
 #define __mitkIToFDeviceFactory_h
 
+#include "mitkCameraIntrinsics.h"
 #include "mitkToFCameraDevice.h"
 #include "mitkToFHardwareExports.h"
 //for microservices
@@ -25,17 +26,17 @@ namespace mitk
 {
   struct MITK_TOFHARDWARE_EXPORT IToFDeviceFactory {
 
-    virtual ~IToFDeviceFactory(); // leer in mitkIToFDeviceFactory.cpp implementieren
+    /**
+      \brief  create a specialized device factory in the inherited class
+    */
+    virtual ~IToFDeviceFactory();
 
-    //create a specialized device factory in the inherited class
 
     virtual std::string GetFactoryName() = 0;
 
     virtual std::string GetCurrentDeviceName() = 0;
 
-    virtual ToFCameraDevice::Pointer createToFCameraDevice() = 0;
-    //create a specialized device factory in the inherited class
-
+    virtual ToFCameraDevice::Pointer CreateToFCameraDevice() = 0;
 
   };
 }

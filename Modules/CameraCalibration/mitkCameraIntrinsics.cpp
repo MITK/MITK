@@ -328,23 +328,23 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
   // CAMERA MATRIX
   cv::Mat CameraMatrix = cv::Mat::zeros(3, 3, cv::DataType<double>::type);
   CameraMatrix.at<double>(2,2) = 1.0;
-  float val = 0.0f;
-  if(elem->QueryFloatAttribute("fx", &val) == TIXML_SUCCESS)
+  double val = 0.0;
+  if(elem->QueryDoubleAttribute("fx", &val) == TIXML_SUCCESS)
     CameraMatrix.at<double>(0,0) = val;
   else
     err << "fx, ";
 
-  if(elem->QueryFloatAttribute("fy", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("fy", &val) == TIXML_SUCCESS)
     CameraMatrix.at<double>(1,1) = val;
   else
     err << "fy, ";
 
-  if(elem->QueryFloatAttribute("cx", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("cx", &val) == TIXML_SUCCESS)
     CameraMatrix.at<double>(0,2) = val;
   else
     err << "cx, ";
 
-  if(elem->QueryFloatAttribute("cy", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("cy", &val) == TIXML_SUCCESS)
     CameraMatrix.at<double>(1,2) = val;
   else
     err << "cy, ";
@@ -352,29 +352,29 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
   // DISTORSION COEFFS
   endodebug( "creating DistorsionCoeffs from XML file")
   cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
-  if(elem->QueryFloatAttribute("k1", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("k1", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(0,0) = val;
   else
     err << "k1, ";
 
-  if(elem->QueryFloatAttribute("k2", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("k2", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(0,1) = val;
   else
     err << "k2, ";
 
-  if(elem->QueryFloatAttribute("p1", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("p1", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(0,2) = val;
   else
     err << "p1, ";
 
-  if(elem->QueryFloatAttribute("p2", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("p2", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(0,3) = val;
   else
     err << "p2, ";
 
   DistorsionCoeffs.at<double>(0,4) = 0.0;
 
-  /*if(elem->QueryFloatAttribute("k3", &val) == TIXML_SUCCESS)
+  /*if(elem->QueryDoubleAttribute("k3", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(4,0) = val;
   else
     err << "k3, ";*/

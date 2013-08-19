@@ -104,7 +104,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     //store the current scaling to set it after transformation
     mitk::Vector3D spacing = data->GetGeometry()->GetSpacing();
     //clear spacing of data to be able to set it again afterwards
-    float scale[] = {1.0, 1.0, 1.0};
+    ScalarType scale[] = {1.0, 1.0, 1.0};
     data->GetGeometry()->SetSpacing(scale);
 
     /*now bring quaternion to affineTransform by using vnl_Quaternion*/

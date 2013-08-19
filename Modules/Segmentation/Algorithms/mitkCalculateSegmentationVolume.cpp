@@ -54,11 +54,11 @@ void CalculateSegmentationVolume::ItkImageProcessing( itk::Image< TPixel, VImage
     {
       // update center of mass
       currentIndex = iterBinaryImage.GetIndex();
-      itk::Vector<float, VImageDimension> currentPoint;
+      itk::Vector<ScalarType, VImageDimension> currentPoint;
       for (unsigned int i = 0; i < VImageDimension; ++i) currentPoint[i] = currentIndex[i];
 
-      m_CenterOfMass =    (m_CenterOfMass * ( static_cast<float>(m_Volume) / static_cast<float>(m_Volume+1) ) )  // e.g. 3 points:   old center * 2/3 + currentPoint * 1/3;
-             + currentPoint / static_cast<float>(m_Volume+1);
+      m_CenterOfMass =    (m_CenterOfMass * ( static_cast<ScalarType>(m_Volume) / static_cast<ScalarType>(m_Volume+1) ) )  // e.g. 3 points:   old center * 2/3 + currentPoint * 1/3;
+             + currentPoint / static_cast<ScalarType>(m_Volume+1);
 
       // update number of voxels
       ++m_Volume;

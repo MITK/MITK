@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDWIHEADMOTIONCORRECTIONFILTER_H
 #define MITKDWIHEADMOTIONCORRECTIONFILTER_H
 
+#include <DiffusionCoreExports.h>
+
 #include "mitkDiffusionImageToDiffusionImageFilter.h"
 
 namespace mitk
@@ -35,7 +37,7 @@ namespace mitk
  *
  */
 template< typename DiffusionPixelType>
-class DWIHeadMotionCorrectionFilter
+class DiffusionCore_EXPORT DWIHeadMotionCorrectionFilter
     : public DiffusionImageToDiffusionImageFilter< DiffusionPixelType >
 {
 public:

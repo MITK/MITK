@@ -92,11 +92,11 @@ us::ServiceRegistration<mitk::IFileReader> mitk::AbstractFileReader::RegisterSer
   };
 
   m_PrototypeFactory = new PrototypeFactory(this);
-  us::ServiceProperties props = this->ConstructServiceProperties();
+  us::ServiceProperties props = this->GetServiceProperties();
   return context->RegisterService<mitk::IFileReader>(m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileReader::ConstructServiceProperties()
+us::ServiceProperties mitk::AbstractFileReader::GetServiceProperties()
 {
   if ( m_Extension.empty() )
     MITK_WARN << "Registered a Reader with no extension defined (m_Extension is empty). Reader will not be found by calls from ReaderManager.)";

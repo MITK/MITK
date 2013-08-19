@@ -96,11 +96,11 @@ us::ServiceRegistration<mitk::IFileWriter> mitk::AbstractFileWriter::RegisterSer
   };
 
   m_PrototypeFactory = new PrototypeFactory(this);
-  us::ServiceProperties props = this->ConstructServiceProperties();
+  us::ServiceProperties props = this->GetServiceProperties();
   return context->RegisterService<mitk::IFileWriter>(m_PrototypeFactory, props);
 }
 
-us::ServiceProperties mitk::AbstractFileWriter::ConstructServiceProperties()
+us::ServiceProperties mitk::AbstractFileWriter::GetServiceProperties()
 {
   if ( m_Extension.empty() )
     MITK_WARN << "Registered a Writer with no extension defined (m_Extension is empty). Writer will not be found by calls from WriterManager.)";

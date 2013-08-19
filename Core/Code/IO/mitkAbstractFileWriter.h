@@ -147,7 +147,7 @@ protected:
     int m_Priority;
     std::list< std::string > m_Options; // Options supported by this Writer. Can be left emtpy if no special options are required
 
-    virtual us::ServiceProperties ConstructServiceProperties();
+    virtual us::ServiceProperties GetServiceProperties();
 
 private:
 

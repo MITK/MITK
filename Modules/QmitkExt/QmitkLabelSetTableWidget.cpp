@@ -358,7 +358,9 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (row >= 0 && row < this->rowCount())
   {
       m_LabelSetImage->SetActiveLabel(row,false);
+      this->BusyCursorOn();
       const mitk::Point3D& pos = m_LabelSetImage->GetActiveLabelCenterOfMass();
+      this->BusyCursorOff();
       emit goToLabel(pos);
   }
 }

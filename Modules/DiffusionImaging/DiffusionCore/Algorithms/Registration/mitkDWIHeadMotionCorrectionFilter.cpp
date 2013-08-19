@@ -202,12 +202,12 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   //
   // (4) Cast the resulting image back to an diffusion weighted image
   //
-
   typename DiffusionImageType::GradientDirectionContainerType *gradients = input->GetDirections();
   typename DiffusionImageType::GradientDirectionContainerType::Pointer gradients_new =
       DiffusionImageType::GradientDirectionContainerType::New();
   typename DiffusionImageType::GradientDirectionType bzero_vector;
   bzero_vector.fill(0);
+
   // compose the direction vector
   //  - no direction for the first image
   //  - correct ordering of the directions based on the index list
@@ -241,6 +241,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   OutputImagePointerType output = this->GetOutput();
   output = caster->GetOutput();
+
+  std::cout << "Last line : Generate Data " << std::endl;
+
 }
 
 template< typename DiffusionPixelType>
@@ -251,6 +254,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   {
     mitkThrow() << "No input specified!";
   }
+
+  OutputImagePointerType output = this->GetOutput();
+  output->CopyInformation( this->GetInput(0) );
 }
 
 #endif // MITKDIFFUSIONIMAGETODIFFUSIONIMAGEFILTER_CPP

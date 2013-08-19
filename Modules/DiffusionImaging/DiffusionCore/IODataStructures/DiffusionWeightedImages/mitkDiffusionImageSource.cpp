@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
-#define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
+#ifndef __MITK_DIFFUSIONIMAGE_SOURCE_CPP__
+#define __MITK_DIFFUSIONIMAGE_SOURCE_CPP__
 
 #include "mitkDiffusionImageSource.h"
 #include "mitkDiffusionImage.h"
@@ -93,4 +93,4 @@ mitk::DiffusionImageSource<TPixelType>::GetOutput(DataObjectPointerArraySizeType
   return out;
 }
 
-#endif //__MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
+#endif //__MITK_DIFFUSIONIMAGE_SOURCE_CPP__

@@ -86,6 +86,8 @@ protected slots:
   // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
   void OnRenameLabel(int);
 
+  void OnSurfaceStamp();
+
   void OnGoToLabel( const mitk::Point3D& pos );
 
   // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget

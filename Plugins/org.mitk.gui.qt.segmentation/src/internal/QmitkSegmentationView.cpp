@@ -14,12 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkProperties.h"
-#include "mitkSegTool2D.h"
+#include <berryIWorkbenchPage.h>
 
+
+#include "mitkSurfaceToImageFilter.h"
+#include "mitkLabelSetImageToSurfaceThreadedFilter.h"
+#include "mitkLabelSetImage.h"
+#include "mitkColormapProperty.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkNrrdLabelSetImageWriter.h"
+#include "mitkNrrdLabelSetImageReader.h"
+#include "mitkStatusBar.h"
+#include "mitkApplicationCursor.h"
+#include "mitkToolManagerProvider.h"
+#include "mitkSegmentationObjectFactory.h"
+//#include "mitkProperties.h"
+#include "mitkSegTool2D.h"
+#include "mitkPlanePositionManager.h"
+
+// Qmitk
+#include "QmitkSegmentationView.h"
+#include "QmitkSegmentationOrganNamesHandling.cpp"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
 
+// us
+#include "mitkGetModuleContext.h"
+#include "mitkModule.h"
+#include "mitkModuleRegistry.h"
+#include "mitkModuleResource.h"
+
+//Qt
 #include <QMessageBox>
 #include <QCompleter>
 #include <QStringListModel>
@@ -27,35 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QDateTime>
 
-#include <berryIWorkbenchPage.h>
-
-#include "QmitkSegmentationView.h"
-#include "QmitkSegmentationOrganNamesHandling.cpp"
-
-
-#include <mitkSurfaceToImageFilter.h>
-
-#include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkRenderingModeProperty.h"
-#include "mitkGetModuleContext.h"
-#include "mitkModule.h"
-#include "mitkModuleRegistry.h"
-
-#include "mitkLabelSetImage.h"
-#include "mitkColormapProperty.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkNrrdLabelSetImageWriter.h"
-#include "mitkNrrdLabelSetImageReader.h"
-
-#include "mitkModuleResource.h"
-#include "mitkStatusBar.h"
-#include "mitkApplicationCursor.h"
-
-#include "mitkSegmentationObjectFactory.h"
-
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
-//micro service to get the ToolManager instance
-#include "mitkToolManagerProvider.h"
 
 
 // public methods
@@ -251,6 +248,23 @@ void QmitkSegmentationView::OnNewLabel()
 
 void QmitkSegmentationView::OnCreateSurface(int index)
 {
+    MITK_INFO << "OnCreateSurface 1";
+    mitk::DataNode* segNode = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0);
+    if (!segNode) return;
+
+    mitk::LabelSetImage* segImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+    if (!segImage) return;
+
+    mitk::LabelSetImageToSurfaceThreadedFilter::Pointer filter =
+       mitk::LabelSetImageToSurfaceThreadedFilter::New();
+
+    filter->SetPointerParameter("Input", segImage);
+    filter->SetParameter("RequestedLabel", index);
+    filter->SetDataStorage( *this->GetDataStorage() );
+
+    MITK_INFO << "OnCreateSurface 2";
+
+    filter->StartAlgorithm();
 }
 
 void QmitkSegmentationView::OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges )
@@ -467,7 +481,7 @@ void QmitkSegmentationView::OnSaveLabelSet()
   if ( !lsImage ) return;
 
   // update the name in case has changed
-  lsImage->SetLabelSetName( workingNode->GetName() );
+  lsImage->SetName( workingNode->GetName() );
 
   //set last modification date and time
   QDateTime cTime = QDateTime::currentDateTime ();
@@ -481,7 +495,7 @@ void QmitkSegmentationView::OnSaveLabelSet()
   mitk::NrrdLabelSetImageWriter<unsigned char>::Pointer writer = mitk::NrrdLabelSetImageWriter<unsigned char>::New();
   writer->SetFileName(qfileName.toStdString());
   std::string newName = itksys::SystemTools::GetFilenameWithoutExtension(qfileName.toStdString());
-  lsImage->SetLabelSetName(newName);
+  lsImage->SetName(newName);
   workingNode->SetName(newName);
   writer->SetInput(lsImage);
 
@@ -543,7 +557,7 @@ void QmitkSegmentationView::OnNewLabelSet()
         mitk::DataNode::Pointer newNode = mitk::DataNode::New();
         newNode->SetData(labelSetImage);
         newNode->SetName(newName.toStdString());
-        labelSetImage->SetLabelSetName(newName.toStdString());
+        labelSetImage->SetName(newName.toStdString());
 
         this->GetDataStorage()->Add(newNode,refNode);
 
@@ -1037,8 +1051,95 @@ void QmitkSegmentationView::SetMouseCursor( const mitk::ModuleResource resource,
 
 void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
 {
-   MITK_INFO << "OngoToLabel entered: " << pos[0];
    m_MultiWidget->MoveCrossToPosition(pos);
 }
 
-// ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp
+void QmitkSegmentationView::OnSurfaceStamp()
+{
+    /*
+    mitk::DataNode* surfaceNode = m_Controls->m_SurfaceSelector->GetSelectedNode();
+
+    if (!surfaceNode)
+    {
+        QMessageBox::information( m_Parent, "MITK", "Please load and select a surface before starting some action.");
+        return;
+    }
+
+    m_ToolManager->ActivateTool(-1);
+
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(surfaceNode->GetData() );
+    if ( !surface )
+    {
+        QMessageBox::information( m_Parent, "MITK", "Please load and select a surface before starting some action.");
+        return;
+    }
+
+    mitk::DataNode * segNode = m_Controls->m_LabelSetSelector->GetSelectedNode();
+
+    if (!segNode)
+    {
+       QMessageBox::information( m_Parent, "MITK", "Please load and select a segmentation before starting some action.");
+       return;
+    }
+
+    mitk::LabelSetImage* lsImage = dynamic_cast<mitk::LabelSetImage*>( segNode->GetData() );
+
+    if (!lsImage)
+    {
+        QMessageBox::information( m_Parent, "MITK", "Please load and select a segmentation before starting some action.");
+        return;
+    }
+
+    mitk::SurfaceToImageFilter::Pointer filter = mitk::SurfaceToImageFilter::New();
+    filter->SetInput( surface );
+    filter->SetImage( lsImage );
+    filter->MakeOutputBinaryOff();
+    filter->SetBackgroundValue( 0 );
+//    filter->SetOverwrite( m_Controls->m_chkOverwriteStamp->isChecked() );
+    filter->SetForegroundValue( lsImage->GetActiveLabelIndex() );
+   // filter->SetImage( image );
+
+itk::ReceptorMemberCommand<QmitkImageSegmenterView>::Pointer command =
+itk::ReceptorMemberCommand<QmitkImageSegmenterView>::New();
+//    command->SetCallbackFunction(this, &QmitkDataManagerView::ProcessingCallback);
+
+    mitk::StatusBar::GetInstance()->DisplayText("Surface stamping is running in background...");
+
+    mitk::ProcessObserver::Pointer anyEventObserver = mitk::ProcessObserver::New();
+    anyEventObserver->AddObserver( itk::AnyEvent(), command );
+    filter->SetObserver(anyEventObserver);
+
+    try
+    {
+       filter->Update();
+    }
+    catch (itk::ExceptionObject & excep)
+    {
+     MITK_ERROR << "Exception caught: " << excep.GetDescription();
+     std::string msg = "Could not stamp surface. ";
+     msg += excep.GetDescription();
+     QMessageBox::warning(m_Parent, "MITK", msg.c_str());
+     mitk::ProgressBar::GetInstance()->Reset();
+     mitk::StatusBar::GetInstance()->DisplayText("");
+     return;
+    }
+
+    mitk::Image::Pointer resultImage = filter->GetOutput();
+
+    if (resultImage.IsNull() || resultImage->IsEmpty())
+    {
+       MITK_ERROR << "Could not stamp surface";
+       std::string msg = "Could not stamp surface";
+       QMessageBox::warning(m_Parent, "MITK", msg.c_str());
+       return;
+    }
+
+    //m_LabelSetNode->SetData(resultImage);
+   segNode->Update();
+
+    mitk::ProgressBar::GetInstance()->Reset();
+    mitk::StatusBar::GetInstance()->DisplayText("");
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    */
+}

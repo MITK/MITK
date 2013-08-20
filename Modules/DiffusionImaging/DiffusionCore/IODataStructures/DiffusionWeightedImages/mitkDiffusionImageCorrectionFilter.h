@@ -67,11 +67,23 @@ protected:
   DiffusionImageCorrectionFilter();
   virtual ~DiffusionImageCorrectionFilter() {}
 
+  /**
+   * @brief Get the rotation component following the Finite Strain
+   *
+   * For a given transformation \f$A\f$ its rotation component is defined as \f$ (AA^{T})^{-1/2}\f$.
+   *
+   * The computation first computes \f$ B = AA^T \f$ and then estimates the square root. Square root of
+   * diagonal matrices is defined as
+   *  \f$ S = Q * \sqrt{C} * Q^{-1} \f$ with \f$ C \f$ having the eigenvalues on the diagonal.
+   *
+   */
+  TransformMatrixType GetRotationComponent( const TransformMatrixType& );
+
   DiffusionImageTypePointer m_SourceImage;
 };
 
 }
 
-#include "mitkDiffusionImageCorrectionFilter.h"
+#include "mitkDiffusionImageCorrectionFilter.cpp"
 
 #endif // MITKDIFFUSIONIMAGECORRECTIONFILTER_H

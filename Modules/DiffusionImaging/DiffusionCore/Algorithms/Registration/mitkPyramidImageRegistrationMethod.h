@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseProcess.h"
 
 #include "mitkPyramidRegistrationMethodHelper.h"
+#include <itkWindowedSincInterpolateImageFunction.h>
 
 #include "mitkImageToItk.h"
 #include "mitkITKImageImport.h"
@@ -162,6 +163,18 @@ public:
   }
 
   /**
+   * @brief Control the interpolator used for resampling.
+   *
+   * The class uses the
+   *  - Linear interpolator on default ( flag = false )
+   *  - WindowedSinc interpolator if called with true
+   */
+  void SetUseAdvancedInterpolation( bool flag)
+  {
+    m_UseWindowedSincInterpolator = flag;
+  }
+
+  /**
    * @brief Returns the moving image transformed according to the estimated transformation and resampled
    * to the geometry of the fixed image
    *
@@ -192,6 +205,8 @@ protected:
   bool m_CrossModalityRegistration;
 
   bool m_UseAffineTransform;
+
+  bool m_UseWindowedSincInterpolator;
 
   double* m_EstimatedParameters;
 
@@ -375,7 +390,10 @@ protected:
     typedef typename itk::ResampleImageFilter<  ImageType, ImageType, double> ResampleImageFilterType;
 
     typedef itk::LinearInterpolateImageFunction< ImageType, double > InterpolatorType;
-    typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+    typename InterpolatorType::Pointer linear_interpolator = InterpolatorType::New();
+
+    typedef itk::WindowedSincInterpolateImageFunction< ImageType, 7> WindowedSincInterpolatorType;
+    typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
 
     typename mitk::ImageToItk< ImageType >::Pointer reference_image = mitk::ImageToItk< ImageType >::New();
     reference_image->SetInput( this->m_FixedImage );
@@ -411,6 +429,10 @@ protected:
     }
 
     typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
+    resampler->SetInterpolator( linear_interpolator );
+    if( m_UseWindowedSincInterpolator )
+      resampler->SetInterpolator( sinc_interpolator );
+
     resampler->SetInput( itkImage );
     resampler->SetTransform( base_transform );
     resampler->SetReferenceImage( reference_image->GetOutput() );

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyDescriptions.h>
 #include <mitkPropertyExtensions.h>
 #include <mitkPropertyFilters.h>
+#include <mitkIOUtil.h>
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
@@ -50,45 +51,6 @@ void HandleMicroServicesMessages(us::MsgType type, const char* msg)
     break;
   }
 }
-
-#if defined(_WIN32) || defined(_WIN64)
-std::string GetProgramPath()
-{
-  char path[512];
-  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
-  return std::string(path, index);
-}
-#elif defined(__APPLE__)
-#include <mach-o/dyld.h>
-std::string GetProgramPath()
-{
-  char path[512];
-  uint32_t size = sizeof(path);
-  if (_NSGetExecutablePath(path, &size) == 0)
-  {
-    std::size_t index = std::string(path).find_last_of('/');
-    std::string strPath = std::string(path, index);
-    const char* execPath = strPath.c_str();
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
-    return strPath;
-  }
-  return std::string();
-}
-#else
-#include <sys/types.h>
-#include <unistd.h>
-#include <sstream>
-std::string GetProgramPath()
-{
-  std::stringstream ss;
-  ss << "/proc/" << getpid() << "/exe";
-  char proc[512] = {0};
-  ssize_t ch = readlink(ss.str().c_str(), proc, 512);
-  if (ch == -1) return std::string();
-  std::size_t index = std::string(proc).find_last_of('/');
-  return std::string(proc, index);
-}
-#endif
 
 void AddMitkAutoLoadPaths(const std::string& programPath)
 {
@@ -133,7 +95,7 @@ public:
 
     // Add the current application directory to the auto-load paths.
     // This is useful for third-party executables.
-    std::string programPath = GetProgramPath();
+    std::string programPath = mitk::IOUtil::GetProgramPath();
     if (programPath.empty())
     {
       MITK_WARN << "Could not get the program path.";

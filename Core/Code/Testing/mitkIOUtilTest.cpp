@@ -19,11 +19,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
 
+#include <itksys/SystemTools.hxx>
+
+void TestTempMethods()
+{
+  std::string tmpPath = mitk::IOUtil::GetTempPath();
+  MITK_TEST_CONDITION_REQUIRED(!tmpPath.empty(), "Get temporary path")
+
+  std::ofstream tmpFile;
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpFile);
+  MITK_TEST_CONDITION_REQUIRED(tmpFile && tmpFile.is_open(), "Temp file stream");
+  MITK_TEST_CONDITION_REQUIRED(tmpFilePath.size() > tmpPath.size(), "Temp file path size")
+  MITK_TEST_CONDITION(tmpFilePath.substr(0, tmpPath.size()) == tmpPath, "Temp file is in temp path")
+
+  tmpFile.close();
+  MITK_TEST_CONDITION(std::remove(tmpFilePath.c_str()) == 0, "Remove temp file")
+
+  std::string programPath = mitk::IOUtil::GetProgramPath();
+  MITK_TEST_CONDITION_REQUIRED(!programPath.empty(), "Get program file path")
+  std::ofstream tmpFile2;
+  std::string tmpFilePath2 = mitk::IOUtil::CreateTemporaryFile(tmpFile2, "my-XXXXXX", programPath);
+  MITK_TEST_CONDITION_REQUIRED(tmpFile2 && tmpFile2.is_open(), "Temp file 2 stream")
+  MITK_TEST_CONDITION_REQUIRED(tmpFilePath2.size() > programPath.size(), "Temp file 2 path size")
+  MITK_TEST_CONDITION(tmpFilePath2.substr(0, programPath.size()) == programPath, "Temp file 2 is in program path")
+  tmpFile2.close();
+  MITK_TEST_CONDITION(std::remove(tmpFilePath2.c_str()) == 0, "Remove temp file 2")
+
+  std::string tmpDir = mitk::IOUtil::CreateTemporaryDirectory();
+  MITK_TEST_CONDITION_REQUIRED(tmpDir.size() > tmpPath.size(), "Temp dir size")
+  MITK_TEST_CONDITION(tmpDir.substr(0, tmpPath.size()) == tmpPath, "Temp dir is in temp path")
+  MITK_TEST_CONDITION(itksys::SystemTools::RemoveADirectory(tmpDir.c_str()), "Remove temp dir")
+
+  std::string tmpDir2 = mitk::IOUtil::CreateTemporaryDirectory("my-XXXXXX", programPath);
+  MITK_TEST_CONDITION_REQUIRED(tmpDir2.size() > programPath.size(), "Temp dir 2 size")
+  MITK_TEST_CONDITION(tmpDir2.substr(0, programPath.size()) == programPath, "Temp dir 2 is in temp path")
+  MITK_TEST_CONDITION(itksys::SystemTools::RemoveADirectory(tmpDir2.c_str()), "Remove temp dir 2")
+}
+
 int mitkIOUtilTest(int  argc , char* argv[])
 {
     // always start with this!
     MITK_TEST_BEGIN("mitkIOUtilTest");
     MITK_TEST_CONDITION_REQUIRED( argc >= 4, "Testing if input parameters are set.");
+
+    TestTempMethods();
 
     std::string pathToImage = argv[1];
     std::string pathToPointSet = argv[2];

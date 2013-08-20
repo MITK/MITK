@@ -33,11 +33,6 @@ namespace mitk
 
 /**
  * Calculates surfaces for labeled images.
- * If you have a labeled image containing 5 different labeled regions
- * plus the background, this class creates 5 surface representations
- * from the regions. Each surface is assigned to one output of the
- * filter. You can figure out, which label corresponds to which
- * output using the GetLabelForNthOutput() method.
  * If you want to calculate a surface representation only for one
  * specific label, you may call GenerateAllLabelsOff() and set the
  * desired label by SetLabel(label).
@@ -57,22 +52,19 @@ public:
     typedef std::map<unsigned int, LabelType> IndexToLabelMapType;
 
     /**
-    * Returns a const reference to the input image (e.g. the original input image that ist used to create the surface)
+    * Returns a const pointer to the labelset image set as input
     */
-    const mitk::Image *GetInput(void);
+    const mitk::Image* GetInput(void);
 
     /**
-    * Set the source image to create a surface for this filter class. As input every mitk
-    * 3D or 3D+t image can be used.
+    * Set the labelset image to create a surface from.
     */
     virtual void SetInput(const mitk::Image *image);
 
  //   virtual void SetObserver(mitk::ProcessObserver::Pointer observer);
 
   /**
-   * Set whether you want to extract all (true) or only
-   * a specific label (false)
-   * @param _arg true by default
+   * Set whether you want to extract all labesl (true) or a single one.
    */
   itkSetMacro( GenerateAllLabels, bool );
 
@@ -81,7 +73,6 @@ public:
    * extracted.
    */
   itkGetMacro( GenerateAllLabels, bool );
-
   itkBooleanMacro( GenerateAllLabels );
 
   /**
@@ -89,20 +80,24 @@ public:
    * if GenerateAllLabels() is set to false
    * @param _arg the label to extract, by default 1
    */
-  itkSetMacro( RequestedLabel, LabelType );
+  itkSetMacro( RequestedLabel, int );
 
   /**
    * Returns the label you want to extract. This method only has an effect,
    * if GenerateAllLabels() is set to false
    * @returns _arg the label to extract, by default 1
    */
-  itkGetMacro( RequestedLabel, LabelType );
+  itkGetMacro( RequestedLabel, int );
 
   /**
    * Set the label of the background. No surface will be generated for this label!
    * @param _arg the label of the background, by default 0
    */
-  itkSetMacro( BackgroundLabel, LabelType );
+  itkSetMacro( BackgroundLabel, int );
+
+    /**
+   * Set whether to use image smoothing before surface extraction
+   */
 
   itkSetMacro( UseSmoothing, int );
 
@@ -110,37 +105,10 @@ public:
    * Returns the label of the background. No surface will be generated for this label!
    * @returns the label of the background, by default 0
    */
-  itkGetMacro( BackgroundLabel, LabelType );
-
-  /**
-   * Lets you retrieve the label which was used for generating the Nth output of this filter.
-   * If GenerateAllLabels() is set to false, this filter only knows about the label provided
-   * via SetRequestedLabel(). All other labels in the image are not known.
-   * @param i the index of the Nth output.
-   * @returns the label used for calculating the Nth output of the filter. If i is out of
-   *          range, itk::NumericLimits<LabelType>::max() is returned.
-   */
-  LabelType GetLabelForNthOutput( const unsigned int& i );
-
-  /**
-   * Lets you retrieve the volume in milliliters of the region used to generate the Nth output.
-   * @param i the index of the Nth output.
-   * @returns the volume of the region used to generate the Nth output of the filter. If
-   *          i is out of range, 0.0 is returned.
-   */
-  mitk::ScalarType GetVolumeForNthOutput( const unsigned int& i );
-
-  /**
-   * Lets you retrieve the volume in milliliters of the region with the given label. If
-   * GenerateAllLabels is set to false, you may only call this method for the label provided
-   * using the SetLabel() method.
-   * @param label the label of the region you want to get the volume of
-   * @returns the volume of the region with the given label. If
-   *          label is invalid, 0.0 is returned.
-   */
-  mitk::ScalarType GetVolumeForLabel( const LabelType& label );
+  itkGetMacro( BackgroundLabel, int );
 
   bool GetDataIsAvailable();
+
 protected:
 
   LabelSetImageToSurfaceFilter();
@@ -169,9 +137,9 @@ protected:
 
   bool m_GenerateAllLabels;
 
-  LabelType m_RequestedLabel;
+  int m_RequestedLabel;
 
-  LabelType m_BackgroundLabel;
+  int m_BackgroundLabel;
 
   int m_UseSmoothing;
 
@@ -184,8 +152,6 @@ protected:
   virtual void GenerateData();
 
   virtual void GenerateOutputInformation();
-
-  virtual LabelMapType GetAvailableLabels();
 
   int m_LowerThreshold;
   int m_UpperThreshold;

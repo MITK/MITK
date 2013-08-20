@@ -85,7 +85,7 @@ public:
   int GetNumDirections();
   int GetNumB0();
 
-  float GetB_Value(int i);
+  float GetB_Value(unsigned int i);
   bool IsMultiBval();
   void UpdateBValueMap();
 

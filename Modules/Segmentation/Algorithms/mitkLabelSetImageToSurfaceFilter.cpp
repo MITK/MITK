@@ -83,8 +83,8 @@ void mitk::LabelSetImageToSurfaceFilter::GenerateData()
   mitk::Surface* outputSurface = this->GetOutput( );
   if (!outputSurface) return;
 
-  m_LowerThreshold = static_cast<int>( m_RequestedLabel );
-  m_UpperThreshold = static_cast<int>( m_RequestedLabel );
+  m_LowerThreshold = m_RequestedLabel;
+  m_UpperThreshold = m_RequestedLabel;
 
   AccessFixedDimensionByItk_1( inputImage, ITKProcessing, 3, outputSurface );
 

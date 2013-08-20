@@ -264,7 +264,7 @@ std::string IOUtil::GetProgramPath()
   {
     std::size_t index = std::string(path).find_last_of('/');
     std::string strPath = std::string(path, index);
-    const char* execPath = strPath.c_str();
+    //const char* execPath = strPath.c_str();
     //mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(execPath,false);
     return strPath;
   }

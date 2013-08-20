@@ -43,7 +43,7 @@ public:
   typedef std::vector< TransformMatrixType >  TransformsVectorType;
 
   typedef typename Superclass::OutputType DiffusionImageType;
-  typedef typename OutputType::Pointer    DiffusionImageTypePointer;
+  typedef typename DiffusionImageType::Pointer    DiffusionImageTypePointer;
   typedef itk::VectorImage<TPixelType,3>     ImageType;
 
   /**

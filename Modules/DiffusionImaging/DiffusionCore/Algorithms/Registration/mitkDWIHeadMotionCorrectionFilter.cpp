@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPyramidImageRegistrationMethod.h"
 #include "mitkImageToDiffusionImageSource.h"
 
+#include "mitkDiffusionImageCorrectionFilter.h"
+
+#include <vector>
+
 #include "mitkIOUtil.h"
 
 template< typename DiffusionPixelType>
@@ -176,6 +180,10 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   t_selector_w->SetInput( splittedImage );
 
+  // store the rotation parts of the transformations in a vector
+  typedef mitk::PyramidImageRegistrationMethod::TransformMatrixType MatrixType;
+  std::vector< MatrixType > estimated_transforms;
+
   for( unsigned int i=0; i<maxImageIdx; i++)
   {
     t_selector_w->SetTimeNr(i);
@@ -196,6 +204,8 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     // allow expansion
     registeredWeighted->SetImportVolume( weightedRegistrationMethod->GetResampledMovingImage()->GetData(),
                                          i+1, 0, mitk::Image::CopyMemory);
+
+    estimated_transforms.push_back( weightedRegistrationMethod->GetLastRotationMatrix() );
   }
 
 
@@ -239,8 +249,20 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
     mitkThrow() << "Subprocess failed with exception: " << e.what();
   }
 
-  OutputImagePointerType output = caster->GetOutput();
+  //
+  // (5) Adapt the gradient directions according to the estimated transforms
+  //
+  typedef mitk::DiffusionImageCorrectionFilter< DiffusionPixelType > CorrectionFilterType;
+  typename CorrectionFilterType::Pointer corrector = CorrectionFilterType::New();
 
+  OutputImagePointerType output = caster->GetOutput();
+  corrector->SetImage( output );
+  corrector->CorrectDirections( estimated_transforms );
+
+
+  //
+  // (6) Pass the corrected image to the filters output port
+  //
   this->GetOutput()->SetVectorImage(output->GetVectorImage());
   this->GetOutput()->SetB_Value(output->GetB_Value());
   this->GetOutput()->SetDirections(output->GetDirections());

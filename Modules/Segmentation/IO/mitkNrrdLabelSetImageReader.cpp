@@ -120,7 +120,7 @@ namespace mitk
                 }
               }
 
-              output->SetLabelSetName(name);
+              output->SetName(name);
               output->SetLabelSetLastModified(lastmodified);
 
               // skip first label (exterior) since it is created by mitkLabelSetImage constructor
@@ -285,7 +285,6 @@ namespace mitk
             {
               if (metaString.find("LSET") != std::string::npos)
               {
-                MITK_INFO << "Can read segmentation file!";
                 return true;
               }
             }

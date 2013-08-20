@@ -65,3 +65,23 @@ void mitk::Label::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
  // todo
 }
+
+void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D& center)
+{
+  this->m_CenterOfMassIndex = center;
+}
+
+const mitk::Point3D& mitk::Label::GetCenterOfMassIndex()
+{
+  return this->m_CenterOfMassIndex;
+}
+
+void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D& center)
+{
+  this->m_CenterOfMassCoordinates = center;
+}
+
+const mitk::Point3D& mitk::Label::GetCenterOfMassCoordinates()
+{
+  return this->m_CenterOfMassCoordinates;
+}

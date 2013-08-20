@@ -102,7 +102,7 @@ public:
 
   void CalculateLabelVolume(int index);
 
-  void SetLabelSetName(const std::string& name);
+  void SetName(const std::string& name);
 
   std::string GetLabelSetName();
 
@@ -110,61 +110,63 @@ public:
 
   std::string GetLabelSetLastModified();
 
-  virtual void SetLabelColor(int index, const mitk::Color &color);
+  void SetLabelColor(int index, const mitk::Color &color);
 
-  virtual const mitk::Color& GetLabelColor(int index);
+  const mitk::Color& GetLabelColor(int index);
 
-  virtual void SetLabelOpacity(int index, float value);
+  void SetLabelOpacity(int index, float value);
 
-  virtual void SetLabelVolume(int index, float value);
+  void SetLabelVolume(int index, float value);
 
-  virtual void RenameLabel(int index, const std::string& name, const mitk::Color& color);
+  void RenameLabel(int index, const std::string& name, const mitk::Color& color);
 
-  virtual void SetLabelName(int index, const std::string& name);
+  void SetLabelName(int index, const std::string& name);
 
-  virtual std::string GetLabelName(int index);
+  std::string GetLabelName(int index);
 
-  virtual void SetAllLabelsLocked(bool);
+  void SetAllLabelsLocked(bool);
 
-  virtual void SetAllLabelsVisible(bool);
+  void SetAllLabelsVisible(bool);
 
-  virtual void SetLabelLocked(int index, bool value);
+  void SetLabelLocked(int index, bool value);
 
-  virtual void SetLabelSelected(int index, bool value);
+  void SetLabelSelected(int index, bool value);
 
-  virtual void SetLabelVisible(int index, bool value);
+  void SetLabelVisible(int index, bool value);
 
-  virtual void RemoveLabel(int index);
+  void RemoveLabel(int index);
 
-  virtual void RemoveLabels(std::vector<int>& indexes);
+  void RemoveLabels(std::vector<int>& indexes);
 
-  virtual void EraseLabels(std::vector<int>& indexes);
+  void EraseLabels(std::vector<int>& indexes);
 
-//  virtual void RemoveActiveLabel();
+//  void RemoveActiveLabel();
 
-  virtual bool GetLabelSelected(int index) const;
+  bool GetLabelSelected(int index) const;
 
-  virtual bool GetLabelLocked(int index) const;
+  bool GetLabelLocked(int index) const;
 
-  virtual bool GetLabelVisible(int index);
+  bool GetLabelVisible(int index);
 
-  virtual int GetActiveLabelIndex() const;
+  int GetActiveLabelIndex() const;
 
-  virtual const mitk::Color& GetActiveLabelColor() const;
+  const mitk::Color& GetActiveLabelColor() const;
 
-  //virtual const mitk::Label* GetActiveLabel() const;
+  //const mitk::Label* GetActiveLabel() const;
 
-  virtual void SetActiveLabel(int index, bool sendEvent);
+  void SetActiveLabel(int index, bool sendEvent);
 
-  virtual mitk::Point3D GetActiveLabelCenterOfMass();
+  const mitk::Point3D& GetLabelCenterOfMassIndex(int index, bool update);
 
-  virtual float GetLabelOpacity(int index);
+  const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index, bool update);
 
-  virtual float GetLabelVolume(int index);
+  float GetLabelOpacity(int index);
 
-  virtual int GetNumberOfLabels();
+  float GetLabelVolume(int index);
 
-  virtual void RemoveAllLabels();
+  int GetNumberOfLabels();
+
+  void RemoveAllLabels();
 
   mitk::LabelSet::ConstPointer GetLabelSet() const
     {return m_LabelSet.GetPointer(); };
@@ -173,14 +175,14 @@ public:
 
   bool IsLabelSelected(mitk::Label::Pointer label);
 
-  virtual void ResetLabels();
+  void ResetLabels();
 
 protected:
   LabelSetImage();
   virtual ~LabelSetImage();
 
   template < typename LabelSetImageType >
-  void CenterOfMassProcessing(LabelSetImageType * itkImage, mitk::Point3D& pos);
+  void CalculateCenterOfMassProcessing(LabelSetImageType * itkImage,int index);
 
   template < typename LabelSetImageType >
   void ClearBufferProcessing(LabelSetImageType * itkImage);

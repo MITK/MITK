@@ -293,21 +293,33 @@ void mitk::LabelSet::ResetLabels()
 
 int mitk::LabelSet::GetActiveLabelIndex() const
 {
-    LabelContainerType::const_iterator _end = this->m_LabelContainer.end();
-    LabelContainerType::const_iterator _it = this->m_LabelContainer.begin();
-    int index = 0;
-    for (; _it!=_end; ++_it, ++index)
-    {
-        if ((*_it) == this->m_ActiveLabel)
-            break;
-    }
-    return index;
+    return this->GetActiveLabel()->GetIndex();
 }
 
 mitk::Label::ConstPointer mitk::LabelSet::GetLabel(int index) const
 {
-    if (this->HasLabel(index))
-        return this->m_LabelContainer[index].GetPointer();
-    else
-        return NULL;
+  if (this->HasLabel(index))
+    return this->m_LabelContainer[index].GetPointer();
+  else
+    return NULL;
+}
+
+void mitk::LabelSet::SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center)
+{
+  this->m_LabelContainer[index]->SetCenterOfMassIndex(center);
+}
+
+const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassIndex(int index)
+{
+  return this->m_LabelContainer[index]->GetCenterOfMassIndex();
+}
+
+void mitk::LabelSet::SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center)
+{
+  this->m_LabelContainer[index]->SetCenterOfMassCoordinates(center);
+}
+
+const mitk::Point3D& mitk::LabelSet::GetLabelCenterOfMassCoordinates(int index)
+{
+  return this->m_LabelContainer[index]->GetCenterOfMassCoordinates();
 }

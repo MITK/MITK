@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkExports.h>
 #include <mitkCommon.h>
 #include <mitkColorProperty.h>
+#include <mitkVector.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -80,6 +81,12 @@ public:
     itkSetMacro(LastModified, std::string);
     itkGetConstMacro(LastModified, std::string);
 
+    void SetCenterOfMassIndex(const mitk::Point3D& center);
+    const mitk::Point3D& GetCenterOfMassIndex();
+
+    void SetCenterOfMassCoordinates(const mitk::Point3D& center);
+    const mitk::Point3D& GetCenterOfMassCoordinates();
+
     void SetColor(const mitk::Color&);
     const mitk::Color& GetColor() const
     { return m_Color; };
@@ -109,6 +116,8 @@ protected:
     std::string m_LastModified;
     int m_Index;
     mitk::Color m_Color;
+    mitk::Point3D m_CenterOfMassIndex;
+    mitk::Point3D m_CenterOfMassCoordinates;
 };
 
 } // namespace mitk

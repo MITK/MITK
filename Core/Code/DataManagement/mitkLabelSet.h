@@ -135,6 +135,12 @@ public:
 
     virtual int GetActiveLabelIndex() const;
 
+    virtual void SetLabelCenterOfMassIndex(int index, const mitk::Point3D& center);
+    virtual const mitk::Point3D& GetLabelCenterOfMassIndex(int index);
+
+    virtual void SetLabelCenterOfMassCoordinates(int index, const mitk::Point3D& center);
+    virtual const mitk::Point3D& GetLabelCenterOfMassCoordinates(int index);
+
     virtual void ResetLabels();
 
 

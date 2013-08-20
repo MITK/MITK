@@ -59,7 +59,7 @@ void mitk::LabelSetImage::ExecuteOperation(mitk::Operation* operation)
 // todo
 }
 
-void mitk::LabelSetImage::SetLabelSetName(const std::string& name)
+void mitk::LabelSetImage::SetName(const std::string& name)
 {
     this->m_LabelSet->SetName(name);
 }
@@ -132,10 +132,9 @@ void mitk::LabelSetImage::ClearBuffer()
 }
 
 template < typename LabelSetImageType >
-void mitk::LabelSetImage::CenterOfMassProcessing(LabelSetImageType* itkImage, mitk::Point3D& pos)
+void mitk::LabelSetImage::CalculateCenterOfMassProcessing(LabelSetImageType* itkImage, int index)
 {
-   int activeLabel = this->GetActiveLabelIndex();
-
+   // for now, we just retrieve the voxel in the middle
    typename typedef itk::ImageRegionConstIteratorWithIndex< LabelSetImageType > IteratorType;
    IteratorType iter( itkImage, itkImage->GetLargestPossibleRegion() );
    iter.GoToBegin();
@@ -144,21 +143,28 @@ void mitk::LabelSetImage::CenterOfMassProcessing(LabelSetImageType* itkImage, mi
 
    while ( !iter.IsAtEnd() )
    {
-    if ( iter.Get() == static_cast<int>(activeLabel) )
+    if ( iter.Get() == static_cast<int>(index) )
     {
-
       indexVector.push_back(iter.GetIndex());
     }
     ++iter;
    }
 
-   typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType index;
+   mitk::Point3D pos;
+   pos.Fill(0.0);
 
-   index = indexVector.at(indexVector.size()/2);
-   pos[0] = index[0];
-   pos[1] = index[1];
-   pos[2] = index[2];
+   if (!indexVector.empty())
+   {
+       typename itk::ImageRegionConstIteratorWithIndex< LabelSetImageType >::IndexType centerIndex;
+       centerIndex = indexVector.at(indexVector.size()/2);
+       pos[0] = centerIndex[0];
+       pos[1] = centerIndex[1];
+       pos[2] = centerIndex[2];
+   }
+
+   this->m_LabelSet->SetLabelCenterOfMassIndex(index, pos);
    this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+   this->m_LabelSet->SetLabelCenterOfMassCoordinates(index, pos);
 }
 
 template < typename LabelSetImageType >
@@ -469,12 +475,18 @@ void mitk::LabelSetImage::SetLabelVisible(int index, bool value)
    ModifyLabelEvent.Send(index);
 }
 
-mitk::Point3D mitk::LabelSetImage::GetActiveLabelCenterOfMass()
+const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassIndex(int index, bool update)
 {
-    mitk::Point3D pos;
-    pos.Fill(0.0);
-    AccessByItk_1(this, CenterOfMassProcessing, pos);
-    return pos;
+  if (update)
+    AccessByItk_1( this, CalculateCenterOfMassProcessing, index );
+  return this->m_LabelSet->GetLabelCenterOfMassIndex(index);
+}
+
+const mitk::Point3D& mitk::LabelSetImage::GetLabelCenterOfMassCoordinates(int index, bool update)
+{
+  if (update)
+    AccessByItk_1( this, CalculateCenterOfMassProcessing, index );
+  return this->m_LabelSet->GetLabelCenterOfMassCoordinates(index);
 }
 
 void mitk::LabelSetImage::SetActiveLabel(int index, bool sendEvent)

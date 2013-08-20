@@ -82,12 +82,10 @@ void QmitkLabelSetTableWidget::Init()
   this->setColumnWidth(COLOR_COL,25);
   this->setColumnWidth(VISIBLE_COL,25);
   this->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
+  this->setStyleSheet("QTableView {selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #3257bf, stop: 1 white);}");
 //  this->setStyleSheet("QTableView {selection-background-color: #5151cd; selection-color: #ffffff;}");
-//  this->setStyleSheet("QTableView {background-color: #ffffff; selection-color: #0a0a0a;}");
-//  this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:20px; border: 4px outset rgb(255,255,255);gridline-color: #669933;"
-//"selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #486909, stop: 1 white);");
-  this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:18px;"
-"selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #486909, stop: 1 white);");
+ // this->setStyleSheet("background: rgb(255,255,255);color:rgb(0,0,0); font-family:Arial Narrow;font-size:18px;"
+//"selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #3257bf, stop: 1 white);");
 
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -359,7 +357,7 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   {
       m_LabelSetImage->SetActiveLabel(row,false);
       this->BusyCursorOn();
-      const mitk::Point3D& pos = m_LabelSetImage->GetActiveLabelCenterOfMass();
+      const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
       this->BusyCursorOff();
       emit goToLabel(pos);
   }

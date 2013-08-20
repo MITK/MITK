@@ -10,6 +10,10 @@ USModel/mitkUSProbe.cpp
 USService/mitkUSDeviceService.cpp
 
 ## Filters and sources
+USFilters/mitkUSImageSource.cpp
 USFilters/mitkUSImageVideoSource.cpp
 USFilters/mitkUSImageToUSImageFilter.cpp
+
+## Control Interfaces
+USControlInterfaces/mitkBModeControlInterface.cpp
 )

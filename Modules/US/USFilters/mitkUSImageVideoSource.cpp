@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK HEADER
 #include "mitkUSImageVideoSource.h"
 #include "mitkImage.h"
-#include "mitkCropOpenCVImageFilter.h"
-#include "mitkConvertGrayscaleOpenCVImageFilter.h"
 
 //OpenCV HEADER
 #include <cv.h>
@@ -29,19 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::USImageVideoSource::USImageVideoSource()
-: itk::Object(),
-m_VideoCapture(new cv::VideoCapture()),
-m_IsVideoReady(false),
-m_IsGreyscale(false),
-m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
-m_ResolutionOverrideWidth(0),
-m_ResolutionOverrideHeight(0),
-m_ResolutionOverride(false),
-m_ImageFilter(0),
-m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
-m_CropFilter(mitk::CropOpenCVImageFilter::New())
+  : m_VideoCapture(new cv::VideoCapture()),
+    m_IsVideoReady(false),
+    m_IsGreyscale(false),
+    m_ResolutionOverrideWidth(0),
+    m_ResolutionOverrideHeight(0),
+    m_ResolutionOverride(false),
+    m_GrayscaleFilter(mitk::ConvertGrayscaleOpenCVImageFilter::New()),
+    m_CropFilter(mitk::CropOpenCVImageFilter::New()),
+    m_CombinationFilter(mitk::BasicCombinationOpenCVImageFilter::New())
 {
-  m_OpenCVToMitkFilter->SetCopyBuffer(false);
+  SetImageFilter(m_CombinationFilter.GetPointer());
 }
 
 mitk::USImageVideoSource::~USImageVideoSource()
@@ -73,31 +69,41 @@ void mitk::USImageVideoSource::SetCameraInput(int deviceID)
     m_IsVideoReady = true;
 
   // If Override is enabled, use it
-  if (m_ResolutionOverride) {
+  if (m_ResolutionOverride)
+  {
     m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, this->m_ResolutionOverrideWidth);
     m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, this->m_ResolutionOverrideHeight);
   }
 }
 
 void mitk::USImageVideoSource::SetColorOutput(bool isColor){
+  if ( ! isColor && ! m_IsGreyscale )
+  {
+    m_CombinationFilter->PushFilter(m_GrayscaleFilter.GetPointer());
+  }
+  else if ( isColor && m_IsGreyscale )
+  {
+    m_CombinationFilter->RemoveFilter(m_GrayscaleFilter.GetPointer());
+  }
+
   m_IsGreyscale = !isColor;
 }
 
 int mitk::USImageVideoSource::GetImageHeight()
 {
-if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
-else return 0;
+  if (m_VideoCapture) { return m_VideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT); }
+  else { return 0; }
 }
 
 int mitk::USImageVideoSource::GetImageWidth()
 {
-if (m_VideoCapture) return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-else return 0;
+  if (m_VideoCapture) { return m_VideoCapture->get(CV_CAP_PROP_FRAME_WIDTH); }
+  else { return 0; }
 }
 
 bool mitk::USImageVideoSource::GetIsReady()
 {
-  if (!m_VideoCapture) return false;
+  if (!m_VideoCapture) { return false; }
 
   return m_VideoCapture->isOpened();
 }
@@ -105,50 +111,52 @@ bool mitk::USImageVideoSource::GetIsReady()
 void mitk::USImageVideoSource::SetRegionOfInterest(int topLeftX, int topLeftY, int bottomRightX, int bottomRightY)
 {
   m_CropFilter->SetCropRegion(topLeftX, topLeftY, bottomRightX, bottomRightY);
+
+  if (! m_IsCropped ) { m_CombinationFilter->PushFilter(m_CropFilter.GetPointer()); }
+
   m_IsCropped = true;
 }
 
-void mitk::USImageVideoSource::RemoveRegionOfInterest(){
+void mitk::USImageVideoSource::RemoveRegionOfInterest()
+{
+  //itk::BaseData<>
+  m_CombinationFilter->RemoveFilter(m_CropFilter.GetPointer());
   m_IsCropped = false;
 }
 
-mitk::USImage::Pointer mitk::USImageVideoSource::GetNextImage()
+void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
 {
   // Loop video if necessary
   if (m_VideoCapture->get(CV_CAP_PROP_POS_AVI_RATIO) >= 0.99 )
+  {
     m_VideoCapture->set(CV_CAP_PROP_POS_AVI_RATIO, 0);
-
-  // Setup pointers
-  cv::Mat image;
+  }
 
   // Retrieve image
   *m_VideoCapture >> image; // get a new frame from camera
+}
 
-  // If region of interest was set, crop image
-  if ( m_IsCropped ) { m_CropFilter->FilterImage(image); }
+void mitk::USImageVideoSource::GetNextRawImage( mitk::Image::Pointer image )
+{
+  cv::Mat cv_img;
 
-  // If this source is set to deliver greyscale images, convert it
-  if ( m_IsGreyscale ) { m_GrayscaleFilter->FilterImage(image); }
-
-  // Execute filter, if an additional filter is specified
-  if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image); }
+  this->GetNextRawImage(cv_img);
 
   // Convert to MITK-Image
-  IplImage ipl_img = image;
+  IplImage ipl_img = cv_img;
 
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
   this->m_OpenCVToMitkFilter->Update();
 
   // OpenCVToMitkImageFilter returns a standard mitk::image. We then transform it into an USImage
-  mitk::USImage::Pointer result = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
+  image = mitk::USImage::New(this->m_OpenCVToMitkFilter->GetOutput());
 
   // Clean up
-  image.release();
-
-  return result;
+  cv_img.release();
 }
 
-void mitk::USImageVideoSource::OverrideResolution(int width, int height){
+void mitk::USImageVideoSource::OverrideResolution(int width, int height)
+{
   this->m_ResolutionOverrideHeight = height;
   this->m_ResolutionOverrideWidth = width;
 
@@ -158,4 +166,3 @@ void mitk::USImageVideoSource::OverrideResolution(int width, int height){
     m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, height);
   }
 }
-

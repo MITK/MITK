@@ -22,10 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 
 // MITK
-#include "mitkUSImage.h"
-#include "mitkOpenCVToMitkImageFilter.h"
-#include "Commands/mitkConvertGrayscaleOpenCVImageFilter.h"
-#include "Commands/mitkCropOpenCVImageFilter.h"
+#include "mitkUSImageSource.h"
+#include "mitkConvertGrayscaleOpenCVImageFilter.h"
+#include "mitkCropOpenCVImageFilter.h"
+#include "mitkBasicCombinationOpenCVImageFilter.h"
 
 // OpenCV
 #include <highgui.h>
@@ -42,7 +42,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USImageVideoSource : public itk::Object
+  class MitkUS_EXPORT USImageVideoSource : public mitk::USImageSource
   {
   public:
     mitkClassMacro(USImageVideoSource, itk::ProcessObject);
@@ -81,12 +81,6 @@ namespace mitk {
     void RemoveRegionOfInterest();
 
     /**
-    * \brief Retrieves the next frame. This will typically be the next frame in a file
-    * or the last cached file in a device.
-    */
-    mitk::USImage::Pointer GetNextImage();
-
-    /**
     * \brief This is a workaround for a problem that happens with some video device drivers.
     *
     * If you encounter OpenCV Warnings that buffer sizes do not match while calling getNextFrame,
@@ -106,8 +100,6 @@ namespace mitk {
     itkGetMacro(ResolutionOverrideHeight,int);
     int GetImageHeight();
     int GetImageWidth();
-    itkGetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
-    itkSetMacro(ImageFilter, mitk::AbstractOpenCVImageFilter::Pointer);
 
     /**
     * \brief Returns true if images can be delivered.
@@ -121,6 +113,13 @@ namespace mitk {
   protected:
     USImageVideoSource();
     virtual ~USImageVideoSource();
+
+    /**
+      * \brief Next image is gathered from the image source.
+      * Returns an OpenCV-Matrix containing this image.
+      */
+    virtual void GetNextRawImage( cv::Mat& );
+    virtual void GetNextRawImage( mitk::Image::Pointer );
 
     /**
     * \brief The source of the video, managed internally
@@ -139,10 +138,6 @@ namespace mitk {
     * \brief If true, image will be cropped according to settings of crop filter.
     */
     bool m_IsCropped;
-    /**
-    * \brief Used to convert from OpenCV Images to MITK Images.
-    */
-    mitk::OpenCVToMitkImageFilter::Pointer m_OpenCVToMitkFilter;
 
     /**
     * These Variables determined whether Resolution Override is on, what dimensions to use.
@@ -151,13 +146,9 @@ namespace mitk {
     int  m_ResolutionOverrideHeight;
     bool m_ResolutionOverride;
 
-    /**
-      * \brief Filter is executed during mitk::USImageVideoSource::GetNextImage().
-      */
-    AbstractOpenCVImageFilter::Pointer m_ImageFilter;
-
     ConvertGrayscaleOpenCVImageFilter::Pointer m_GrayscaleFilter;
     CropOpenCVImageFilter::Pointer m_CropFilter;
+    BasicCombinationOpenCVImageFilter::Pointer m_CombinationFilter;
 
   };
 } // namespace mitk

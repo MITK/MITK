@@ -30,9 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionImageCorrectionFilter.h"
 
+
+
 #include <vector>
 
 #include "mitkIOUtil.h"
+#include <itkImage.h>
 
 template< typename DiffusionPixelType>
 mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
@@ -82,6 +85,9 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   // the unweighted images are of same modality
   registrationMethod->SetCrossModalityOff();
+
+  // use the advanced (windowed sinc) interpolation
+  registrationMethod->SetUseAdvancedInterpolation(true);
 
   // Initialize the temporary output image
   mitk::Image::Pointer registeredB0Image = b0Image->Clone();
@@ -149,13 +155,17 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
 
   weightedRegistrationMethod->SetTransformToAffine();
   weightedRegistrationMethod->SetCrossModalityOn();
+
   //
   //   - (3.1) Create a reference image by averaging the aligned b0 images
   //
-  //   !!!FIXME: For rapid prototyping using the first one
-  //
+
+  // use the accumulateImageFilter as provided by the ItkAccumulateFilter method in the header file
+  AccessFixedDimensionByItk_1(registeredB0Image, ItkAccumulateFilter, (4), b0referenceImage );
 
   weightedRegistrationMethod->SetFixedImage( b0referenceImage );
+  // use the advanced (windowed sinc) interpolation
+  weightedRegistrationMethod->SetUseAdvancedInterpolation(true);
 
   //
   //   - (3.2) Register all timesteps in the splitted image onto the first reference
@@ -258,7 +268,6 @@ void mitk::DWIHeadMotionCorrectionFilter<DiffusionPixelType>
   OutputImagePointerType output = caster->GetOutput();
   corrector->SetImage( output );
   corrector->CorrectDirections( estimated_transforms );
-
 
   //
   // (6) Pass the corrected image to the filters output port

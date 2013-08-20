@@ -24,6 +24,7 @@ mitk::PyramidImageRegistrationMethod::PyramidImageRegistrationMethod()
     m_MovingImage(NULL),
     m_CrossModalityRegistration(true),
     m_UseAffineTransform(true),
+    m_UseWindowedSincInterpolator(false),
     m_EstimatedParameters(NULL),
     m_Verbose(false)
 {

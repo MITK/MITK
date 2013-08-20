@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionImageToDiffusionImageFilter.h"
 
+#include <itkAccumulateImageFilter.h>
+#include "mitkITKImageImport.h"
+
 namespace mitk
 {
 
@@ -58,6 +61,39 @@ protected:
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
   virtual void GenerateData();
+
+  /**
+   * @brief Averages an 3d+t image along the time axis.
+   *
+   * The method uses the AccumulateImageFilter as provided by ITK and collapses the given 3d+t image
+   * to an 3d image while computing the average over the time axis for each of the spatial voxels.
+   */
+  template< typename TPixel, unsigned int VDimensions>
+  static void ItkAccumulateFilter(
+      const itk::Image< TPixel, VDimensions>* image,
+      mitk::Image::Pointer& output)
+  {
+    // input 3d+t --> output 3d
+    typedef itk::Image< TPixel, 4> InputItkType;
+    typedef itk::Image< TPixel, 3> OutputItkType;
+    typedef typename itk::AccumulateImageFilter< InputItkType, OutputItkType > FilterType;
+
+    typename FilterType::Pointer filter = FilterType::New();
+    filter->SetInput( image );
+    filter->SetAccumulateDimension( 3 );
+    filter->SetAverage( true );
+
+    try
+    {
+      filter->Update();
+    }
+    catch( const itk::ExceptionObject& e)
+    {
+      mitkThrow() << " Exception while averaging: " << e.what();
+    }
+
+    output = mitk::GrabItkImageMemory( filter->GetOutput() );
+  }
 
 };
 

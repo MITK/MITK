@@ -72,10 +72,10 @@ void mitk::DiffusionImage<TPixelType>
   InitializeByItk( img.GetPointer(), 1, vecLength );
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-  itw = itw.Begin();
+  itw.GoToBegin();
 
   itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
-  itr = itr.Begin();
+  itr.GoToBegin();
 
   while(!itr.IsAtEnd())
   {
@@ -370,7 +370,7 @@ void mitk::DiffusionImage<TPixelType>::UpdateBValueMap()
 }
 
 template<typename TPixelType>
-float mitk::DiffusionImage<TPixelType>::GetB_Value(int i)
+float mitk::DiffusionImage<TPixelType>::GetB_Value(unsigned int i)
 {
   if(i > m_Directions->Size()-1)
     return -1;

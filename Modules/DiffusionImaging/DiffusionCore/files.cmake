@@ -21,6 +21,7 @@ set(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
   IODataStructures/DiffusionWeightedImages/mitkImageToDiffusionImageSource.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp

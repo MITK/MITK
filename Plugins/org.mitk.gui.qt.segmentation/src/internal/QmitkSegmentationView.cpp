@@ -66,9 +66,9 @@ QmitkSegmentationView::QmitkSegmentationView()
 {
   RegisterSegmentationObjectFactory();
 
-  m_IsOfTypeWorkingImagePredicate = mitk::NodePredicateAnd::New();
-  m_IsOfTypeWorkingImagePredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
-  m_IsOfTypeWorkingImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_SegmentationPredicate = mitk::NodePredicateAnd::New();
+  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateDataType::New("LabelSetImage"));
+  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
   mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -81,10 +81,10 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isQbi);
 
 
-  m_IsOfTypeReferenceImagePredicate = mitk::NodePredicateAnd::New();
-  m_IsOfTypeReferenceImagePredicate->AddPredicate(validImages);
-  m_IsOfTypeReferenceImagePredicate->AddPredicate(mitk::NodePredicateNot::New( m_IsOfTypeWorkingImagePredicate));
-  m_IsOfTypeReferenceImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_ImagePredicate = mitk::NodePredicateAnd::New();
+  m_ImagePredicate->AddPredicate(validImages);
+  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New( m_SegmentationPredicate));
+  m_ImagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -650,7 +650,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
     refNode->SetVisibility(true);
 
-    mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsOfTypeReferenceImagePredicate);
+    mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_ImagePredicate);
     for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
     {
         mitk::DataNode* _otherSegNode = *iter;
@@ -687,7 +687,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
       mitk::DataNode* segNode = const_cast<mitk::DataNode*>(node);
       segNode->SetVisibility(true);
 
-      mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsOfTypeWorkingImagePredicate);
+      mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
       for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
       {
           mitk::DataNode* _otherSegNode = *iter;
@@ -907,7 +907,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->setupUi(parent);
 
   m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->patImageSelector->SetPredicate(m_IsOfTypeReferenceImagePredicate);
+  m_Controls->patImageSelector->SetPredicate(m_ImagePredicate);
 
   this->UpdateWarningLabel("Please load an image");
 
@@ -915,7 +915,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
       this->UpdateWarningLabel("Create a segmentation");
 
   m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls->segImageSelector->SetPredicate(m_IsOfTypeWorkingImagePredicate);
+  m_Controls->segImageSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls->segImageSelector->SetAutoSelectNewItems(true);
   if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
     this->UpdateWarningLabel("");

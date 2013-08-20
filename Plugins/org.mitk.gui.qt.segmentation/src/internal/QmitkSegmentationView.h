@@ -202,8 +202,8 @@ protected:
 
   bool m_AutoSelectionEnabled;
 
-  mitk::NodePredicateAnd::Pointer m_IsOfTypeReferenceImagePredicate;
-  mitk::NodePredicateAnd::Pointer m_IsOfTypeWorkingImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_ImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

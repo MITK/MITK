@@ -54,12 +54,12 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
     projectedPointIn2D.Fill(0.0);
     sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
     // MITK_INFO << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
-
+/*
     if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) && constrainToInside )
     {
       MITK_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
     }
-
+*/
     projectedContour->AddVertex( projectedPointIn2D );
   }
 

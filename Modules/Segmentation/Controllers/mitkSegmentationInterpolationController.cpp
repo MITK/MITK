@@ -400,7 +400,7 @@ void mitk::SegmentationInterpolationController::PrintStatus()
   }
 }
 
-mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep )
+mitk::Image* mitk::SegmentationInterpolationController::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep )
 {
   if (m_Segmentation.IsNull()) return NULL;
 
@@ -529,6 +529,6 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
                                  timeStep,
                                  m_ReferenceImage );
 
-  return resultImage;
+  return resultImage.GetPointer();
 }
 

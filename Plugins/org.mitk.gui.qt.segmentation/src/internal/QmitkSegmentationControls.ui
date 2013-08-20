@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>274</width>
-    <height>475</height>
+    <height>481</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -256,7 +256,7 @@
       <item>
        <widget class="QToolButton" name="m_btLoadLabelSet">
         <property name="toolTip">
-         <string>Load a segmentation session...</string>
+         <string>Load a segmentation session</string>
         </property>
         <property name="text">
          <string>...</string>
@@ -276,7 +276,7 @@
       <item>
        <widget class="QToolButton" name="m_btSaveLabelSet">
         <property name="toolTip">
-         <string>Save current segmentation session...</string>
+         <string>Save current segmentation session</string>
         </property>
         <property name="text">
          <string>...</string>

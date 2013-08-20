@@ -13,6 +13,7 @@ set(INTERNAL_CPP_FILES
   QmitkDeformableClippingPlaneView.cpp
   QmitkOtsuAction.cpp
   Common/QmitkDataSelectionWidget.cpp
+  Common/QmitkLabelSetWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
@@ -26,6 +27,7 @@ set(UI_FILES
   src/internal/QmitkSegmentationControls.ui
   src/internal/QmitkDeformableClippingPlaneViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
+  src/internal/Common/QmitkLabelSetWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
@@ -45,6 +47,7 @@ set(MOC_H_FILES
   src/internal/QmitkDeformableClippingPlaneView.h
   src/internal/QmitkOtsuAction.h
   src/internal/Common/QmitkDataSelectionWidget.h
+  src/internal/Common/QmitkLabelSetWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h

@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QStringList>
 
-QStringList QmitkSegmentationView::GetDefaultOrganColorString()
+QStringList QmitkLabelSetWidget::GetDefaultOrganColorString()
 {
   QStringList organColors;
 
@@ -75,7 +75,7 @@ QStringList QmitkSegmentationView::GetDefaultOrganColorString()
   return organColors;
 }
 
-void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
+void QmitkLabelSetWidget::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
 {
   QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
 
@@ -94,7 +94,7 @@ void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QStr
   }
 }
 
-void QmitkSegmentationView::AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b)
+void QmitkLabelSetWidget::AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b)
 {
   organColors.append( organname + QColor(r, g, b).name() );
 }

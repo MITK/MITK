@@ -77,15 +77,6 @@ protected slots:
   void OnPatientComboBoxSelectionChanged(const mitk::DataNode* node);
   void OnSegmentationComboBoxSelectionChanged(const mitk::DataNode* node);
 
-  // reaction to the signal "newLabel" from QmitkLabelSetTableWidget
-  void OnNewLabel();
-
-  // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
-  void OnLabelListModified(const QStringList& list);
-
-  // reaction to the signal "renameLabel" from QmitkLabelSetTableWidget
-  void OnRenameLabel(int);
-
   void OnSurfaceStamp();
 
   void OnGoToLabel( const mitk::Point3D& pos );
@@ -93,17 +84,8 @@ protected slots:
   // reaction to the signal "combineAndCreateMask" from QmitkLabelSetTableWidget
   void OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>& ranges );
 
-  // reaction to the signal "createSurface" from QmitkLabelSetTableWidget
-  void OnCreateSurface(int);
-
   // reaction to the signal "combineAndCreateSurface" from QmitkLabelSetTableWidget
   void OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>& ranges );
-
-
-  void CreateLabelFromSurface();
-
-  // reaction to label search
-  void OnSearchLabel();
 
   // reaction to the button "New segmentation session"
   void OnNewLabelSet();
@@ -164,12 +146,6 @@ protected:
 
   bool m_MouseCursorSet;
 
-  // handling of a list of known (organ name, organ color) combination
-  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-  QStringList GetDefaultOrganColorString();
-  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
-
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected (const mitk::DataNode* node);
 
@@ -183,8 +159,6 @@ protected:
 
   // the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
-
-  QCompleter* m_Completer;
 
   // our GUI
   Ui::QmitkSegmentationControls * m_Controls;

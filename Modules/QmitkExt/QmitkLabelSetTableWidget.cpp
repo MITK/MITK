@@ -359,7 +359,8 @@ void QmitkLabelSetTableWidget::OnItemDoubleClicked(QTableWidgetItem *item)
       this->BusyCursorOn();
       const mitk::Point3D& pos = m_LabelSetImage->GetLabelCenterOfMassCoordinates(m_LabelSetImage->GetActiveLabelIndex(), true);
       this->BusyCursorOff();
-      emit goToLabel(pos);
+      if (pos.Get_vnl_vector().max_value() > 0.0)
+          emit goToLabel(pos);
   }
 }
 

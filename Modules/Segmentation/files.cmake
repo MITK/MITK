@@ -24,6 +24,8 @@ set(CPP_FILES
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkVtkImageOverwrite.cpp
+  Algorithms/mitkLabelSetImageToSurfaceFilter.cpp
+  Algorithms/mitkLabelSetImageToSurfaceThreadedFilter.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   Controllers/mitkSegmentationModuleActivator.cpp
